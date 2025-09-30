@@ -163,7 +163,7 @@ describe("Electron Preload Script", () => {
                 "complexity"
             );
             await annotate(
-                "Methods: addSite, getSites, removeSite, updateSite, checkSiteNow",
+                "Methods: addSite, getSites, removeSite, updateSite",
                 "methods"
             );
             await annotate(
@@ -180,7 +180,6 @@ describe("Electron Preload Script", () => {
             expect(siteAPI).toHaveProperty("getSites");
             expect(siteAPI).toHaveProperty("removeSite");
             expect(siteAPI).toHaveProperty("updateSite");
-            expect(siteAPI).toHaveProperty("checkSiteNow");
         });
 
         it("should properly invoke IPC for addSite", async ({ annotate }) => {
@@ -328,975 +327,1072 @@ describe("Electron Preload Script", () => {
             );
         });
 
-        it("should properly invoke IPC for checkSiteNow", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Site API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Manual Site Check IPC Communication",
-                "operation"
-            );
-            await annotate("Priority: High - On-Demand Monitoring", "priority");
-            await annotate(
-                "Complexity: Medium - Manual Check Flow",
-                "complexity"
-            );
-            await annotate("IPC Channel: check-site-now", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure manual site checks communicate properly",
-                "purpose"
-            );
+        describe("Monitoring API", () => {
+            it("should expose all monitoring control methods", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - Method Exposure",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Monitoring Control Method Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Method Existence Check",
+                    "complexity"
+                );
+                await annotate(
+                    "Methods: start/stop monitoring globally and per-site",
+                    "methods"
+                );
+                await annotate(
+                    "Purpose: Validate all monitoring control methods are available",
+                    "purpose"
+                );
 
-            await import("../preload");
+                await import("../preload");
 
-            const exposedAPI = getExposedAPI();
-            const identifier = "test-site-123";
-            const monitorType = "http";
+                const exposedAPI = getExposedAPI();
+                const monitoringAPI = exposedAPI.monitoring;
 
-            await exposedAPI.sites.checkSiteNow(identifier, monitorType);
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "check-site-now",
-                identifier,
-                monitorType
-            );
-        });
-    });
-
-    describe("Monitoring API", () => {
-        it("should expose all monitoring control methods", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Monitoring API", "component");
-            await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate(
-                "Operation: Monitoring Control Method Validation",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Monitoring Control",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Low - Method Existence Check",
-                "complexity"
-            );
-            await annotate(
-                "Methods: start/stop monitoring globally and per-site",
-                "methods"
-            );
-            await annotate(
-                "Purpose: Validate all monitoring control methods are available",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const monitoringAPI = exposedAPI.monitoring;
-
-            expect(monitoringAPI).toHaveProperty("startMonitoring");
-            expect(monitoringAPI).toHaveProperty("stopMonitoring");
-            expect(monitoringAPI).toHaveProperty("startMonitoringForSite");
-            expect(monitoringAPI).toHaveProperty("stopMonitoringForSite");
-        });
-
-        it("should properly invoke IPC for startMonitoring", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Monitoring API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate("Operation: Global Monitoring Start", "operation");
-            await annotate(
-                "Priority: Critical - Global Monitoring Control",
-                "priority"
-            );
-            await annotate("Complexity: Low - Simple IPC Call", "complexity");
-            await annotate("IPC Channel: start-monitoring", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure global monitoring start communicates properly",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            await exposedAPI.monitoring.startMonitoring();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "start-monitoring"
-            );
-        });
-
-        it("should properly invoke IPC for stopMonitoring", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Monitoring API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate("Operation: Global Monitoring Stop", "operation");
-            await annotate(
-                "Priority: Critical - Global Monitoring Control",
-                "priority"
-            );
-            await annotate("Complexity: Low - Simple IPC Call", "complexity");
-            await annotate("IPC Channel: stop-monitoring", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure global monitoring stop communicates properly",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            await exposedAPI.monitoring.stopMonitoring();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "stop-monitoring"
-            );
-        });
-
-        it("should properly invoke IPC for startMonitoringForSite", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Monitoring API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Site-Specific Monitoring Start",
-                "operation"
-            );
-            await annotate(
-                "Priority: High - Selective Monitoring Control",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Site-Specific Control",
-                "complexity"
-            );
-            await annotate(
-                "IPC Channel: start-monitoring-for-site",
-                "ipc-channel"
-            );
-            await annotate(
-                "Purpose: Ensure site-specific monitoring start works",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const identifier = "test-site";
-            const monitorType = "http";
-
-            await exposedAPI.monitoring.startMonitoringForSite(
-                identifier,
-                monitorType
-            );
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "start-monitoring-for-site",
-                identifier,
-                monitorType
-            );
-        });
-
-        it("should properly invoke IPC for stopMonitoringForSite", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Monitoring API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Site-Specific Monitoring Stop",
-                "operation"
-            );
-            await annotate(
-                "Priority: High - Selective Monitoring Control",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Site-Specific Control",
-                "complexity"
-            );
-            await annotate(
-                "IPC Channel: stop-monitoring-for-site",
-                "ipc-channel"
-            );
-            await annotate(
-                "Purpose: Ensure site-specific monitoring stop works",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const identifier = "test-site";
-            const monitorType = "port";
-
-            await exposedAPI.monitoring.stopMonitoringForSite(
-                identifier,
-                monitorType
-            );
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "stop-monitoring-for-site",
-                identifier,
-                monitorType
-            );
-        });
-    });
-
-    describe("Data API", () => {
-        it("should expose all data management methods", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Data API", "component");
-            await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate(
-                "Operation: Data Management Method Validation",
-                "operation"
-            );
-            await annotate("Priority: Critical - Data Operations", "priority");
-            await annotate(
-                "Complexity: Low - Method Existence Check",
-                "complexity"
-            );
-            await annotate(
-                "Methods: exportData, importData, downloadSqliteBackup",
-                "methods"
-            );
-            await annotate(
-                "Purpose: Validate all data management methods are available",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const dataAPI = exposedAPI.data;
-
-            expect(dataAPI).toHaveProperty("exportData");
-            expect(dataAPI).toHaveProperty("importData");
-            expect(dataAPI).toHaveProperty("downloadSqliteBackup");
-        });
-
-        it("should properly invoke IPC for exportData", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Data API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Data Export IPC Communication",
-                "operation"
-            );
-            await annotate("Priority: Critical - Data Backup", "priority");
-            await annotate(
-                "Complexity: Medium - Data Serialization",
-                "complexity"
-            );
-            await annotate("IPC Channel: export-data", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure data export communicates properly with main process",
-                "purpose"
-            );
-
-            // Mock IPC response for exportData
-            const mockExportedData = JSON.stringify({ sites: [], events: [] });
-            const mockExportResponse = {
-                success: true,
-                data: mockExportedData,
-            };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockExportResponse);
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            const result = await exposedAPI.data.exportData();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("export-data");
-            expect(result).toBe(mockExportedData);
-        });
-
-        it("should properly invoke IPC for importData", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Data API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Data Import IPC Communication",
-                "operation"
-            );
-            await annotate("Priority: Critical - Data Restoration", "priority");
-            await annotate(
-                "Complexity: High - Data Validation & Import",
-                "complexity"
-            );
-            await annotate("IPC Channel: import-data", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure data import communicates properly with main process",
-                "purpose"
-            );
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const data = '{"sites": []}';
-
-            await exposedAPI.data.importData(data);
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "import-data",
-                data
-            );
-        });
-
-        it("should properly invoke IPC for downloadSqliteBackup", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Data API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate("Operation: SQLite Backup Download", "operation");
-            await annotate("Priority: Critical - Database Backup", "priority");
-            await annotate(
-                "Complexity: Medium - Binary Data Handling",
-                "complexity"
-            );
-            await annotate(
-                "IPC Channel: download-sqlite-backup",
-                "ipc-channel"
-            );
-            await annotate(
-                "Purpose: Ensure SQLite backup download works properly",
-                "purpose"
-            );
-
-            // Mock the IPC response with valid backup response format
-            const mockBackupData = {
-                buffer: new ArrayBuffer(1024),
-                fileName: "backup_test.db",
-            };
-            const mockBackupResponse = {
-                success: true,
-                data: mockBackupData,
-            };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(mockBackupResponse);
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            const result = await exposedAPI.data.downloadSqliteBackup();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "download-sqlite-backup"
-            );
-            expect(result).toEqual(mockBackupData);
-        });
-    });
-
-    describe("Settings API", () => {
-        it("should expose all settings methods", async ({ annotate }) => {
-            await annotate("Component: Settings API", "component");
-            await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate(
-                "Operation: Settings Management Method Validation",
-                "operation"
-            );
-            await annotate(
-                "Priority: High - Configuration Management",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Low - Method Existence Check",
-                "complexity"
-            );
-            await annotate(
-                "Methods: getHistoryLimit, updateHistoryLimit",
-                "methods"
-            );
-            await annotate(
-                "Purpose: Validate all settings management methods are available",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const settingsAPI = exposedAPI.settings;
-
-            expect(settingsAPI).toHaveProperty("getHistoryLimit");
-            expect(settingsAPI).toHaveProperty("updateHistoryLimit");
-        });
-
-        it("should properly invoke IPC for getHistoryLimit", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Settings API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate("Operation: History Limit Retrieval", "operation");
-            await annotate(
-                "Priority: Medium - Configuration Query",
-                "priority"
-            );
-            await annotate("Complexity: Low - Simple IPC Call", "complexity");
-            await annotate("IPC Channel: get-history-limit", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure history limit retrieval works properly",
-                "purpose"
-            );
-
-            // Mock IPC response for getHistoryLimit
-            const mockHistoryLimit = 100;
-            const mockHistoryLimitResponse = {
-                success: true,
-                data: mockHistoryLimit,
-            };
-            mockIpcRenderer.invoke.mockResolvedValueOnce(
-                mockHistoryLimitResponse
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            const result = await exposedAPI.settings.getHistoryLimit();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "get-history-limit"
-            );
-            expect(result).toBe(mockHistoryLimit);
-        });
-
-        it("should properly invoke IPC for updateHistoryLimit", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Settings API", "component");
-            await annotate(
-                "Test Type: Unit - IPC Bridge Validation",
-                "test-type"
-            );
-            await annotate("Operation: History Limit Update", "operation");
-            await annotate(
-                "Priority: High - Configuration Management",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Configuration Persistence",
-                "complexity"
-            );
-            await annotate("IPC Channel: update-history-limit", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure history limit updates work properly",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const limit = 1000;
-
-            mockIpcRenderer.invoke.mockResolvedValue({
-                success: true,
-                data: limit,
+                expect(monitoringAPI).toHaveProperty("checkSiteNow");
+                expect(monitoringAPI).toHaveProperty("startMonitoring");
+                expect(monitoringAPI).toHaveProperty("stopMonitoring");
+                expect(monitoringAPI).toHaveProperty("startMonitoringForSite");
+                expect(monitoringAPI).toHaveProperty("stopMonitoringForSite");
             });
 
-            const result = await exposedAPI.settings.updateHistoryLimit(limit);
+            it("should properly invoke IPC for startMonitoring", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Global Monitoring Start",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Global Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Simple IPC Call",
+                    "complexity"
+                );
+                await annotate("IPC Channel: start-monitoring", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure global monitoring start communicates properly",
+                    "purpose"
+                );
 
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "update-history-limit",
-                limit
-            );
-            expect(result).toBe(limit);
-        });
-    });
+                await import("../preload");
 
-    describe("Events API", () => {
-        it("should expose all event handling methods", async ({ annotate }) => {
-            await annotate("Component: Events API", "component");
-            await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate(
-                "Operation: Event Handling Method Validation",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Real-time Communication",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Event System Validation",
-                "complexity"
-            );
-            await annotate(
-                "Methods: Status change events, listener management",
-                "methods"
-            );
-            await annotate(
-                "Purpose: Validate all event handling methods are available",
-                "purpose"
-            );
+                const exposedAPI = getExposedAPI();
 
-            await import("../preload");
+                await exposedAPI.monitoring.startMonitoring();
 
-            const exposedAPI = getExposedAPI();
-            const eventsAPI = exposedAPI.events;
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "start-monitoring"
+                );
+            });
 
-            expect(eventsAPI).toHaveProperty("onMonitorStatusChanged");
-            expect(eventsAPI).toHaveProperty("onMonitorUp");
-            expect(eventsAPI).toHaveProperty("onMonitorDown");
-            expect(eventsAPI).toHaveProperty("onUpdateStatus");
-            expect(eventsAPI).toHaveProperty("removeAllListeners");
-        });
+            it("should properly invoke IPC for stopMonitoring", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Global Monitoring Stop",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Global Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Simple IPC Call",
+                    "complexity"
+                );
+                await annotate("IPC Channel: stop-monitoring", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure global monitoring stop communicates properly",
+                    "purpose"
+                );
 
-        it("should properly setup IPC listener for onMonitorStatusChanged", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Events API", "component");
-            await annotate(
-                "Test Type: Unit - Event Listener Setup",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Monitor Status Change Event Setup",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Status Change Notifications",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Event Registration",
-                "complexity"
-            );
-            await annotate(
-                "Event Type: Monitor status change events",
-                "event-type"
-            );
-            await annotate(
-                "Purpose: Ensure monitor status change events are properly registered",
-                "purpose"
-            );
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
 
-            const exposedAPI = getExposedAPI();
-            const callback = vi.fn();
+                await exposedAPI.monitoring.stopMonitoring();
 
-            exposedAPI.events.onMonitorStatusChanged(callback);
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "stop-monitoring"
+                );
+            });
 
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "monitor:status-changed",
-                expect.any(Function)
-            );
-        });
+            it("should properly invoke IPC for startMonitoringForSite", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Site-Specific Monitoring Start",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Selective Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Site-Specific Control",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: start-monitoring-for-site",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure site-specific monitoring start works",
+                    "purpose"
+                );
 
-        it("should properly setup IPC listener for onUpdateStatus", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Events API", "component");
-            await annotate(
-                "Test Type: Unit - Event Listener Setup",
-                "test-type"
-            );
-            await annotate("Operation: Update Status Event Setup", "operation");
-            await annotate("Priority: High - Application Updates", "priority");
-            await annotate(
-                "Complexity: Medium - Event Registration",
-                "complexity"
-            );
-            await annotate(
-                "Event Type: Application update status events",
-                "event-type"
-            );
-            await annotate(
-                "Purpose: Ensure update status events are properly registered",
-                "purpose"
-            );
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
+                const identifier = "test-site";
+                const monitorType = "http";
 
-            const exposedAPI = getExposedAPI();
-            const callback = vi.fn();
+                await exposedAPI.monitoring.startMonitoringForSite(
+                    identifier,
+                    monitorType
+                );
 
-            exposedAPI.events.onUpdateStatus(callback);
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "start-monitoring-for-site",
+                    identifier,
+                    monitorType
+                );
+            });
 
-            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
-                "update-status",
-                expect.any(Function)
-            );
-        });
+            it("should properly invoke IPC for stopMonitoringForSite", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Site-Specific Monitoring Stop",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Selective Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Site-Specific Control",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: stop-monitoring-for-site",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure site-specific monitoring stop works",
+                    "purpose"
+                );
 
-        it("should properly remove listeners", async ({ annotate }) => {
-            await annotate("Component: Events API", "component");
-            await annotate("Test Type: Unit - Event Cleanup", "test-type");
-            await annotate("Operation: Event Listener Removal", "operation");
-            await annotate("Priority: Medium - Memory Management", "priority");
-            await annotate("Complexity: Low - Cleanup Operation", "complexity");
-            await annotate(
-                "Cleanup: Prevents memory leaks from event listeners",
-                "cleanup"
-            );
-            await annotate(
-                "Purpose: Ensure event listeners can be properly removed",
-                "purpose"
-            );
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
+                const identifier = "test-site";
+                const monitorType = "port";
 
-            const exposedAPI = getExposedAPI();
-            const channel = "monitor:status-changed";
+                await exposedAPI.monitoring.stopMonitoringForSite(
+                    identifier,
+                    monitorType
+                );
 
-            exposedAPI.events.removeAllListeners(channel);
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "stop-monitoring-for-site",
+                    identifier,
+                    monitorType
+                );
+            });
 
-            expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(
-                channel
-            );
-        });
+            it("should properly invoke IPC for checkSiteNow", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Manual Monitor Check IPC Communication",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - On-Demand Monitoring",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Manual Check Flow",
+                    "complexity"
+                );
+                await annotate("IPC Channel: check-site-now", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure manual monitor checks communicate properly",
+                    "purpose"
+                );
 
-        it("should call callback with data when IPC event is received", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Events API", "component");
-            await annotate("Test Type: Unit - Event Data Flow", "test-type");
-            await annotate(
-                "Operation: IPC Event Data Transmission",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Event Data Integrity",
-                "priority"
-            );
-            await annotate(
-                "Complexity: High - Event Flow Simulation",
-                "complexity"
-            );
-            await annotate(
-                "Data Flow: IPC event -> callback with proper data",
-                "data-flow"
-            );
-            await annotate(
-                "Purpose: Ensure event data is properly passed to callbacks",
-                "purpose"
-            );
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
+                const identifier = "test-site-123";
+                const monitorId = "http-monitor";
 
-            const exposedAPI = getExposedAPI();
-            const callback = vi.fn();
+                await exposedAPI.monitoring.checkSiteNow(identifier, monitorId);
 
-            exposedAPI.events.onMonitorStatusChanged(callback);
-
-            // Get the listener function that was registered
-            const listenerCall = mockIpcRenderer.on.mock.calls.find(
-                (call) => call[0] === "monitor:status-changed"
-            );
-            expect(listenerCall).toBeDefined();
-
-            const listener = listenerCall![1];
-
-            // Simulate IPC event
-            const testData = {
-                siteId: "test-site",
-                monitor: { id: "test-monitor", type: "http" },
-                monitorId: "test-monitor",
-                newStatus: "up",
-                previousStatus: "down",
-                timestamp: Date.now(),
-            };
-            listener(null, testData);
-
-            expect(callback).toHaveBeenCalledWith(testData);
-        });
-    });
-
-    describe("System API", () => {
-        it("should expose system methods", async ({ annotate }) => {
-            await annotate("Component: System API", "component");
-            await annotate("Test Type: Unit - Method Exposure", "test-type");
-            await annotate("Operation: System Method Validation", "operation");
-            await annotate("Priority: Medium - System Integration", "priority");
-            await annotate(
-                "Complexity: Low - Method Existence Check",
-                "complexity"
-            );
-            await annotate(
-                "System Operations: Platform-specific functionality",
-                "system-operations"
-            );
-            await annotate(
-                "Purpose: Validate system integration methods are available",
-                "purpose"
-            );
-
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-            const systemAPI = exposedAPI.system;
-
-            expect(systemAPI).toHaveProperty("quitAndInstall");
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "check-site-now",
+                    identifier,
+                    monitorId
+                );
+            });
         });
 
-        it("should properly send IPC for quitAndInstall", async ({
-            annotate,
-        }) => {
-            await annotate("Component: System API", "component");
-            await annotate("Test Type: Unit - IPC Communication", "test-type");
-            await annotate("Operation: Quit and Install IPC", "operation");
-            await annotate("Priority: High - Application Updates", "priority");
-            await annotate(
-                "Complexity: Medium - System-level Operation",
-                "complexity"
-            );
-            await annotate("IPC Channel: quit-and-install", "ipc-channel");
-            await annotate(
-                "Purpose: Ensure quit and install operation works properly",
-                "purpose"
-            );
+        describe("Data API", () => {
+            it("should expose all data management methods", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - Method Exposure",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Data Management Method Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Data Operations",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Method Existence Check",
+                    "complexity"
+                );
+                await annotate(
+                    "Methods: exportData, importData, downloadSqliteBackup",
+                    "methods"
+                );
+                await annotate(
+                    "Purpose: Validate all data management methods are available",
+                    "purpose"
+                );
 
-            // Mock ipcRenderer.send for system API
-            const mockSend = vi.fn();
-            mockIpcRenderer.send = mockSend;
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
+                const dataAPI = exposedAPI.data;
 
-            const exposedAPI = getExposedAPI();
+                expect(dataAPI).toHaveProperty("exportData");
+                expect(dataAPI).toHaveProperty("importData");
+                expect(dataAPI).toHaveProperty("downloadSqliteBackup");
+            });
 
-            exposedAPI.system.quitAndInstall();
+            it("should properly invoke IPC for exportData", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Data Export IPC Communication",
+                    "operation"
+                );
+                await annotate("Priority: Critical - Data Backup", "priority");
+                await annotate(
+                    "Complexity: Medium - Data Serialization",
+                    "complexity"
+                );
+                await annotate("IPC Channel: export-data", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure data export communicates properly with main process",
+                    "purpose"
+                );
 
-            expect(mockSend).toHaveBeenCalledWith("quit-and-install");
-        });
-    });
+                // Mock IPC response for exportData
+                const mockExportedData = JSON.stringify({
+                    sites: [],
+                    events: [],
+                });
+                const mockExportResponse = {
+                    success: true,
+                    data: mockExportedData,
+                };
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    mockExportResponse
+                );
 
-    describe("Security Validation", () => {
-        it("should only expose safe IPC communication methods", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Security", "component");
-            await annotate(
-                "Test Type: Security - API Surface Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Dangerous Method Exclusion Check",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Security Boundary",
-                "priority"
-            );
-            await annotate(
-                "Complexity: High - Security Validation",
-                "complexity"
-            );
-            await annotate(
-                "Security Check: Ensures no dangerous methods are exposed",
-                "security-check"
-            );
-            await annotate(
-                "Purpose: Prevent exposure of dangerous Node.js APIs to renderer",
-                "purpose"
-            );
+                await import("../preload");
 
-            await import("../preload");
+                const exposedAPI = getExposedAPI();
 
-            const exposedAPI = getExposedAPI();
+                const result = await exposedAPI.data.exportData();
 
-            // Should not expose dangerous methods
-            expect(exposedAPI).not.toHaveProperty("require");
-            expect(exposedAPI).not.toHaveProperty("eval");
-            expect(exposedAPI).not.toHaveProperty("process");
-            expect(exposedAPI).not.toHaveProperty("global");
-        });
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "export-data"
+                );
+                expect(result).toBe(mockExportedData);
+            });
 
-        it("should use contextBridge instead of direct global assignment", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Security", "component");
-            await annotate(
-                "Test Type: Security - Context Isolation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Context Bridge Usage Validation",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Renderer Isolation",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Security Architecture",
-                "complexity"
-            );
-            await annotate(
-                "Security Pattern: Uses contextBridge for safe API exposure",
-                "security-pattern"
-            );
-            await annotate(
-                "Purpose: Ensure proper context isolation is maintained",
-                "purpose"
-            );
-            await import("../preload");
+            it("should properly invoke IPC for importData", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Data Import IPC Communication",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Data Restoration",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: High - Data Validation & Import",
+                    "complexity"
+                );
+                await annotate("IPC Channel: import-data", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure data import communicates properly with main process",
+                    "purpose"
+                );
+                await import("../preload");
 
-            // Should use contextBridge.exposeInMainWorld
-            expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalled();
-        });
+                const exposedAPI = getExposedAPI();
+                const data = '{"sites": []}';
 
-        it("should validate that all API methods return promises or are synchronous", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Security", "component");
-            await annotate(
-                "Test Type: Security - API Contract Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Promise Return Type Validation",
-                "operation"
-            );
-            await annotate("Priority: Medium - API Consistency", "priority");
-            await annotate(
-                "Complexity: Medium - Return Type Validation",
-                "complexity"
-            );
-            await annotate(
-                "Contract: IPC methods must return promises",
-                "contract"
-            );
-            await annotate(
-                "Purpose: Ensure consistent async API interface",
-                "purpose"
-            );
+                await exposedAPI.data.importData(data);
 
-            await import("../preload");
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "import-data",
+                    data
+                );
+            });
 
-            const exposedAPI = getExposedAPI();
+            it("should properly invoke IPC for downloadSqliteBackup", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Data API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: SQLite Backup Download",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Database Backup",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Binary Data Handling",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: download-sqlite-backup",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure SQLite backup download works properly",
+                    "purpose"
+                );
 
-            // Check that IPC invoke methods are async
-            const result1 = exposedAPI.sites.getSites();
-            expect(result1).toBeInstanceOf(Promise);
+                // Mock the IPC response with valid backup response format
+                const mockBackupData = {
+                    buffer: new ArrayBuffer(1024),
+                    fileName: "backup_test.db",
+                };
+                const mockBackupResponse = {
+                    success: true,
+                    data: mockBackupData,
+                };
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    mockBackupResponse
+                );
 
-            const result2 = exposedAPI.monitoring.startMonitoring();
-            expect(result2).toBeInstanceOf(Promise);
+                await import("../preload");
 
-            const result3 = exposedAPI.data.exportData();
-            expect(result3).toBeInstanceOf(Promise);
-        });
-    });
+                const exposedAPI = getExposedAPI();
 
-    describe("Type Safety", () => {
-        it("should properly type the Site parameter in addSite", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Type Safety", "component");
-            await annotate(
-                "Test Type: Unit - Type Contract Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Site Parameter Type Validation",
-                "operation"
-            );
-            await annotate("Priority: High - Data Type Safety", "priority");
-            await annotate(
-                "Complexity: Medium - Type Interface Validation",
-                "complexity"
-            );
-            await annotate(
-                "Type Contract: Site object with required fields",
-                "type-contract"
-            );
-            await annotate(
-                "Purpose: Ensure addSite accepts properly typed Site objects",
-                "purpose"
-            );
+                const result = await exposedAPI.data.downloadSqliteBackup();
 
-            await import("../preload");
-
-            const exposedAPI = getExposedAPI();
-
-            // This should not throw type errors when called with proper Site object
-            const site = {
-                identifier: "test-site",
-                name: "Test Site",
-                monitors: [],
-            };
-
-            await exposedAPI.sites.addSite(site);
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "add-site",
-                site
-            );
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "download-sqlite-backup"
+                );
+                expect(result).toEqual(mockBackupData);
+            });
         });
 
-        it("should properly handle partial Site updates in updateSite", async ({
-            annotate,
-        }) => {
-            await annotate("Component: Type Safety", "component");
-            await annotate(
-                "Test Type: Unit - Partial Type Validation",
-                "test-type"
-            );
-            await annotate(
-                "Operation: Partial Site Update Validation",
-                "operation"
-            );
-            await annotate(
-                "Priority: High - Flexible Update Interface",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Medium - Partial Type Handling",
-                "complexity"
-            );
-            await annotate(
-                "Type Contract: Partial Site object for updates",
-                "type-contract"
-            );
-            await annotate(
-                "Purpose: Ensure updateSite accepts partial Site objects",
-                "purpose"
-            );
+        describe("Settings API", () => {
+            it("should expose all settings methods", async ({ annotate }) => {
+                await annotate("Component: Settings API", "component");
+                await annotate(
+                    "Test Type: Unit - Method Exposure",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Settings Management Method Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Configuration Management",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Method Existence Check",
+                    "complexity"
+                );
+                await annotate(
+                    "Methods: getHistoryLimit, updateHistoryLimit",
+                    "methods"
+                );
+                await annotate(
+                    "Purpose: Validate all settings management methods are available",
+                    "purpose"
+                );
 
-            await import("../preload");
+                await import("../preload");
 
-            const exposedAPI = getExposedAPI();
+                const exposedAPI = getExposedAPI();
+                const settingsAPI = exposedAPI.settings;
 
-            const partialUpdate = { name: "New Name" };
+                expect(settingsAPI).toHaveProperty("getHistoryLimit");
+                expect(settingsAPI).toHaveProperty("updateHistoryLimit");
+            });
 
-            await exposedAPI.sites.updateSite("test-id", partialUpdate);
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "update-site",
-                "test-id",
-                partialUpdate
-            );
+            it("should properly invoke IPC for getHistoryLimit", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Settings API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: History Limit Retrieval",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Medium - Configuration Query",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Simple IPC Call",
+                    "complexity"
+                );
+                await annotate("IPC Channel: get-history-limit", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure history limit retrieval works properly",
+                    "purpose"
+                );
+
+                // Mock IPC response for getHistoryLimit
+                const mockHistoryLimit = 100;
+                const mockHistoryLimitResponse = {
+                    success: true,
+                    data: mockHistoryLimit,
+                };
+                mockIpcRenderer.invoke.mockResolvedValueOnce(
+                    mockHistoryLimitResponse
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                const result = await exposedAPI.settings.getHistoryLimit();
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "get-history-limit"
+                );
+                expect(result).toBe(mockHistoryLimit);
+            });
+
+            it("should properly invoke IPC for updateHistoryLimit", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Settings API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate("Operation: History Limit Update", "operation");
+                await annotate(
+                    "Priority: High - Configuration Management",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Configuration Persistence",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: update-history-limit",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure history limit updates work properly",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const limit = 1000;
+
+                mockIpcRenderer.invoke.mockResolvedValue({
+                    success: true,
+                    data: limit,
+                });
+
+                const result =
+                    await exposedAPI.settings.updateHistoryLimit(limit);
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "update-history-limit",
+                    limit
+                );
+                expect(result).toBe(limit);
+            });
+        });
+
+        describe("Events API", () => {
+            it("should expose all event handling methods", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Events API", "component");
+                await annotate(
+                    "Test Type: Unit - Method Exposure",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Event Handling Method Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Real-time Communication",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Event System Validation",
+                    "complexity"
+                );
+                await annotate(
+                    "Methods: Status change events, listener management",
+                    "methods"
+                );
+                await annotate(
+                    "Purpose: Validate all event handling methods are available",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const eventsAPI = exposedAPI.events;
+
+                expect(eventsAPI).toHaveProperty("onMonitorStatusChanged");
+                expect(eventsAPI).toHaveProperty("onMonitorUp");
+                expect(eventsAPI).toHaveProperty("onMonitorDown");
+                expect(eventsAPI).toHaveProperty("onUpdateStatus");
+                expect(eventsAPI).toHaveProperty("removeAllListeners");
+            });
+
+            it("should properly setup IPC listener for onMonitorStatusChanged", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Events API", "component");
+                await annotate(
+                    "Test Type: Unit - Event Listener Setup",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Monitor Status Change Event Setup",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Status Change Notifications",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Event Registration",
+                    "complexity"
+                );
+                await annotate(
+                    "Event Type: Monitor status change events",
+                    "event-type"
+                );
+                await annotate(
+                    "Purpose: Ensure monitor status change events are properly registered",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const callback = vi.fn();
+
+                exposedAPI.events.onMonitorStatusChanged(callback);
+
+                expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                    "monitor:status-changed",
+                    expect.any(Function)
+                );
+            });
+
+            it("should properly setup IPC listener for onUpdateStatus", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Events API", "component");
+                await annotate(
+                    "Test Type: Unit - Event Listener Setup",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Update Status Event Setup",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Application Updates",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Event Registration",
+                    "complexity"
+                );
+                await annotate(
+                    "Event Type: Application update status events",
+                    "event-type"
+                );
+                await annotate(
+                    "Purpose: Ensure update status events are properly registered",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const callback = vi.fn();
+
+                exposedAPI.events.onUpdateStatus(callback);
+
+                expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                    "update-status",
+                    expect.any(Function)
+                );
+            });
+
+            it("should properly remove listeners", async ({ annotate }) => {
+                await annotate("Component: Events API", "component");
+                await annotate("Test Type: Unit - Event Cleanup", "test-type");
+                await annotate(
+                    "Operation: Event Listener Removal",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Medium - Memory Management",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Cleanup Operation",
+                    "complexity"
+                );
+                await annotate(
+                    "Cleanup: Prevents memory leaks from event listeners",
+                    "cleanup"
+                );
+                await annotate(
+                    "Purpose: Ensure event listeners can be properly removed",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const channel = "monitor:status-changed";
+
+                exposedAPI.events.removeAllListeners(channel);
+
+                expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledWith(
+                    channel
+                );
+            });
+
+            it("should call callback with data when IPC event is received", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Events API", "component");
+                await annotate(
+                    "Test Type: Unit - Event Data Flow",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: IPC Event Data Transmission",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Event Data Integrity",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: High - Event Flow Simulation",
+                    "complexity"
+                );
+                await annotate(
+                    "Data Flow: IPC event -> callback with proper data",
+                    "data-flow"
+                );
+                await annotate(
+                    "Purpose: Ensure event data is properly passed to callbacks",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const callback = vi.fn();
+
+                exposedAPI.events.onMonitorStatusChanged(callback);
+
+                // Get the listener function that was registered
+                const listenerCall = mockIpcRenderer.on.mock.calls.find(
+                    (call) => call[0] === "monitor:status-changed"
+                );
+                expect(listenerCall).toBeDefined();
+
+                const listener = listenerCall![1];
+
+                // Simulate IPC event
+                const testData = {
+                    siteId: "test-site",
+                    monitor: { id: "test-monitor", type: "http" },
+                    monitorId: "test-monitor",
+                    newStatus: "up",
+                    previousStatus: "down",
+                    timestamp: Date.now(),
+                };
+                listener(null, testData);
+
+                expect(callback).toHaveBeenCalledWith(testData);
+            });
+        });
+
+        describe("System API", () => {
+            it("should expose system methods", async ({ annotate }) => {
+                await annotate("Component: System API", "component");
+                await annotate(
+                    "Test Type: Unit - Method Exposure",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: System Method Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Medium - System Integration",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Low - Method Existence Check",
+                    "complexity"
+                );
+                await annotate(
+                    "System Operations: Platform-specific functionality",
+                    "system-operations"
+                );
+                await annotate(
+                    "Purpose: Validate system integration methods are available",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const systemAPI = exposedAPI.system;
+
+                expect(systemAPI).toHaveProperty("quitAndInstall");
+            });
+
+            it("should properly send IPC for quitAndInstall", async ({
+                annotate,
+            }) => {
+                await annotate("Component: System API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Communication",
+                    "test-type"
+                );
+                await annotate("Operation: Quit and Install IPC", "operation");
+                await annotate(
+                    "Priority: High - Application Updates",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - System-level Operation",
+                    "complexity"
+                );
+                await annotate("IPC Channel: quit-and-install", "ipc-channel");
+                await annotate(
+                    "Purpose: Ensure quit and install operation works properly",
+                    "purpose"
+                );
+
+                // Mock ipcRenderer.send for system API
+                const mockSend = vi.fn();
+                mockIpcRenderer.send = mockSend;
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                exposedAPI.system.quitAndInstall();
+
+                expect(mockSend).toHaveBeenCalledWith("quit-and-install");
+            });
+        });
+
+        describe("Security Validation", () => {
+            it("should only expose safe IPC communication methods", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Security", "component");
+                await annotate(
+                    "Test Type: Security - API Surface Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Dangerous Method Exclusion Check",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Security Boundary",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: High - Security Validation",
+                    "complexity"
+                );
+                await annotate(
+                    "Security Check: Ensures no dangerous methods are exposed",
+                    "security-check"
+                );
+                await annotate(
+                    "Purpose: Prevent exposure of dangerous Node.js APIs to renderer",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                // Should not expose dangerous methods
+                expect(exposedAPI).not.toHaveProperty("require");
+                expect(exposedAPI).not.toHaveProperty("eval");
+                expect(exposedAPI).not.toHaveProperty("process");
+                expect(exposedAPI).not.toHaveProperty("global");
+            });
+
+            it("should use contextBridge instead of direct global assignment", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Security", "component");
+                await annotate(
+                    "Test Type: Security - Context Isolation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Context Bridge Usage Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Critical - Renderer Isolation",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Security Architecture",
+                    "complexity"
+                );
+                await annotate(
+                    "Security Pattern: Uses contextBridge for safe API exposure",
+                    "security-pattern"
+                );
+                await annotate(
+                    "Purpose: Ensure proper context isolation is maintained",
+                    "purpose"
+                );
+                await import("../preload");
+
+                // Should use contextBridge.exposeInMainWorld
+                expect(mockContextBridge.exposeInMainWorld).toHaveBeenCalled();
+            });
+
+            it("should validate that all API methods return promises or are synchronous", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Security", "component");
+                await annotate(
+                    "Test Type: Security - API Contract Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Promise Return Type Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: Medium - API Consistency",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Return Type Validation",
+                    "complexity"
+                );
+                await annotate(
+                    "Contract: IPC methods must return promises",
+                    "contract"
+                );
+                await annotate(
+                    "Purpose: Ensure consistent async API interface",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                // Check that IPC invoke methods are async
+                const result1 = exposedAPI.sites.getSites();
+                expect(result1).toBeInstanceOf(Promise);
+
+                const result2 = exposedAPI.monitoring.startMonitoring();
+                expect(result2).toBeInstanceOf(Promise);
+
+                const result3 = exposedAPI.data.exportData();
+                expect(result3).toBeInstanceOf(Promise);
+            });
+        });
+
+        describe("Type Safety", () => {
+            it("should properly type the Site parameter in addSite", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Type Safety", "component");
+                await annotate(
+                    "Test Type: Unit - Type Contract Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Site Parameter Type Validation",
+                    "operation"
+                );
+                await annotate("Priority: High - Data Type Safety", "priority");
+                await annotate(
+                    "Complexity: Medium - Type Interface Validation",
+                    "complexity"
+                );
+                await annotate(
+                    "Type Contract: Site object with required fields",
+                    "type-contract"
+                );
+                await annotate(
+                    "Purpose: Ensure addSite accepts properly typed Site objects",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                // This should not throw type errors when called with proper Site object
+                const site = {
+                    identifier: "test-site",
+                    name: "Test Site",
+                    monitors: [],
+                };
+
+                await exposedAPI.sites.addSite(site);
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "add-site",
+                    site
+                );
+            });
+
+            it("should properly handle partial Site updates in updateSite", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Type Safety", "component");
+                await annotate(
+                    "Test Type: Unit - Partial Type Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Partial Site Update Validation",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Flexible Update Interface",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Partial Type Handling",
+                    "complexity"
+                );
+                await annotate(
+                    "Type Contract: Partial Site object for updates",
+                    "type-contract"
+                );
+                await annotate(
+                    "Purpose: Ensure updateSite accepts partial Site objects",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+
+                const partialUpdate = { name: "New Name" };
+
+                await exposedAPI.sites.updateSite("test-id", partialUpdate);
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "update-site",
+                    "test-id",
+                    partialUpdate
+                );
+            });
         });
     });
 });

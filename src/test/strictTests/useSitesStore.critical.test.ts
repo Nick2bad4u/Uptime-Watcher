@@ -26,7 +26,6 @@ vi.mock("../../stores/sites/services/SiteService", () => ({
         getSites: vi.fn(),
         updateSite: vi.fn(),
         removeSite: vi.fn(),
-        checkSiteNow: vi.fn(),
         initialize: vi.fn(),
     },
 }));
@@ -38,6 +37,7 @@ vi.mock("../../stores/sites/services/MonitoringService", () => ({
         stopSiteMonitoring: vi.fn(),
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+        checkSiteNow: vi.fn(),
         initialize: vi.fn(),
     },
 }));
@@ -69,10 +69,10 @@ describe("useSitesStore Function Coverage Tests", () => {
         vi.mocked(SiteService.getSites).mockResolvedValue([]);
         vi.mocked(SiteService.updateSite).mockResolvedValue(undefined);
         vi.mocked(SiteService.removeSite).mockResolvedValue(true);
-        vi.mocked(SiteService.checkSiteNow).mockResolvedValue({} as Site);
         vi.mocked(SiteService.initialize).mockResolvedValue(undefined);
 
         // Set up MonitoringService mocks
+        vi.mocked(MonitoringService.checkSiteNow).mockResolvedValue(undefined);
         vi.mocked(MonitoringService.startSiteMonitoring).mockResolvedValue(
             undefined
         );
@@ -267,6 +267,12 @@ describe("useSitesStore Function Coverage Tests", () => {
             await store.stopSiteMonitoring("site-id");
             expect(MonitoringService.stopSiteMonitoring).toHaveBeenCalledWith(
                 "site-id"
+            );
+
+            await store.checkSiteNow("site-id", "monitor-id");
+            expect(MonitoringService.checkSiteNow).toHaveBeenCalledWith(
+                "site-id",
+                "monitor-id"
             );
         });
 

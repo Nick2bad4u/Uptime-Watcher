@@ -13,12 +13,26 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { StatusUpdate } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
+
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the monitoring domain API operations
  */
 export interface MonitoringApiInterface {
+    /**
+     * Performs an immediate check for a specific monitor
+     *
+     * @param siteId - ID of the site containing the monitor
+     * @param monitorId - ID of the monitor to check
+     *
+     * @returns Promise resolving to the latest {@link StatusUpdate} or undefined
+     *   when no update is available
+     */
+    checkSiteNow: (...args: unknown[]) => Promise<StatusUpdate | undefined>;
+
     /**
      * Formats monitor detail information for display
      *
@@ -89,13 +103,20 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: (...args: unknown[]) => Promise<unknown>;
+    validateMonitorData: (...args: unknown[]) => Promise<ValidationResult>;
 }
 
 /**
  * Monitoring domain API providing all monitoring control operations
  */
 export const monitoringApi: MonitoringApiInterface = {
+    /**
+     * Performs an immediate check for a specific monitor
+     */
+    checkSiteNow: createTypedInvoker<StatusUpdate | undefined>(
+        "check-site-now"
+    ) satisfies (...args: unknown[]) => Promise<StatusUpdate | undefined>,
+
     /**
      * Formats monitor detail information for display
      *
@@ -180,9 +201,9 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: createTypedInvoker<unknown>(
+    validateMonitorData: createTypedInvoker<ValidationResult>(
         "validate-monitor-data"
-    ) satisfies (...args: unknown[]) => Promise<unknown>,
+    ) satisfies (...args: unknown[]) => Promise<ValidationResult>,
 } as const;
 
 export type MonitoringApi = MonitoringApiInterface;

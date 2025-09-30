@@ -29,6 +29,8 @@
  * @public
  */
 
+import type { StatusUpdate } from "@shared/types";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "../../../services/logger";
@@ -45,6 +47,22 @@ import { waitForElectronAPI } from "../../utils";
  * @public
  */
 export const MonitoringService = {
+    /**
+     * Perform an immediate manual check for a specific monitor.
+     *
+     * @param siteId - The identifier of the site containing the monitor.
+     * @param monitorId - The identifier of the monitor to check.
+     *
+     * @returns The latest {@link StatusUpdate} when available, otherwise
+     *   undefined.
+     */
+    async checkSiteNow(
+        siteId: string,
+        monitorId: string
+    ): Promise<StatusUpdate | undefined> {
+        await this.initialize();
+        return window.electronAPI.monitoring.checkSiteNow(siteId, monitorId);
+    },
     /**
      * Initialize the service by ensuring electron API is available
      *

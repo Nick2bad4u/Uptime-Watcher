@@ -1,12 +1,13 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
-import type { Site } from "@shared/types";
+import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import type { ValidationResult } from "@shared/types/validation";
 
 import type { ElectronAPI } from "../types/electron-api";
 
@@ -154,6 +155,56 @@ export const electronAPIMock: ElectronAPI = {
         removeAllListeners: noop,
     },
     monitoring: {
+        checkSiteNow: async (
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<StatusUpdate | undefined> => {
+            const site = ensureSite(siteIdentifier);
+            const monitor = site.monitors.find(
+                (candidate) => candidate.id === monitorId
+            );
+
+            if (!monitor) {
+                return undefined;
+            }
+
+            const previousStatus = monitor.status;
+            const timestamp = new Date().toISOString();
+
+            const updatedSite = applySiteMutation(
+                siteIdentifier,
+                (current) => ({
+                    ...current,
+                    monitors: current.monitors.map((candidate) =>
+                        candidate.id === monitorId
+                            ? {
+                                  ...candidate,
+                                  lastChecked: new Date(),
+                                  responseTime: Math.max(
+                                      10,
+                                      Math.round(Math.random() * 250)
+                                  ),
+                                  status: "up",
+                              }
+                            : candidate
+                    ),
+                })
+            );
+
+            const resultingMonitor = updatedSite.monitors.find(
+                (candidate) => candidate.id === monitorId
+            );
+
+            return {
+                details: `Manual check completed for monitor '${monitorId}'.`,
+                monitorId,
+                previousStatus,
+                site: clone(updatedSite),
+                siteIdentifier,
+                status: resultingMonitor?.status ?? previousStatus,
+                timestamp,
+            };
+        },
         formatMonitorDetail: async (
             monitorType: string,
             details: string
@@ -233,18 +284,12 @@ export const electronAPIMock: ElectronAPI = {
             return true;
         },
         validateMonitorData: async (
-            _monitorType: string,
+            monitorType: string,
             monitorData: unknown
-        ): Promise<{
-            data: unknown;
-            errors: readonly string[];
-            metadata: Record<string, never>;
-            success: true;
-            warnings: readonly string[];
-        }> => ({
+        ): Promise<ValidationResult> => ({
             data: monitorData ?? {},
             errors: [],
-            metadata: {},
+            metadata: { monitorType },
             success: true,
             warnings: [],
         }),
@@ -265,26 +310,6 @@ export const electronAPIMock: ElectronAPI = {
             mockState.sites = [...mockState.sites, clone(site)];
             return clone(site);
         },
-        checkSiteNow: async (
-            siteIdentifier: string,
-            monitorId: string
-        ): Promise<Site> =>
-            applySiteMutation(siteIdentifier, (site) => ({
-                ...site,
-                monitors: site.monitors.map((monitor) =>
-                    monitor.id === monitorId
-                        ? {
-                              ...monitor,
-                              lastChecked: new Date(),
-                              responseTime: Math.max(
-                                  10,
-                                  Math.round(Math.random() * 250)
-                              ),
-                              status: "up",
-                          }
-                        : monitor
-                ),
-            })),
         deleteAllSites: async (): Promise<number> =>
             mockState.sites.splice(0).length,
         getSites: async (): Promise<Site[]> => clone(mockState.sites),
@@ -305,24 +330,6 @@ export const electronAPIMock: ElectronAPI = {
 
             return true;
         },
-        startMonitoringForSite: async (siteIdentifier: string): Promise<Site> =>
-            applySiteMutation(siteIdentifier, (site) => ({
-                ...site,
-                monitoring: true,
-                monitors: site.monitors.map((monitor) => ({
-                    ...monitor,
-                    monitoring: true,
-                })),
-            })),
-        stopMonitoringForSite: async (siteIdentifier: string): Promise<Site> =>
-            applySiteMutation(siteIdentifier, (site) => ({
-                ...site,
-                monitoring: false,
-                monitors: site.monitors.map((monitor) => ({
-                    ...monitor,
-                    monitoring: false,
-                })),
-            })),
         updateSite: async (
             identifier: string,
             updates: Partial<Site>

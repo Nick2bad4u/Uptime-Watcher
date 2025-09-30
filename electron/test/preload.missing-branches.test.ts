@@ -398,7 +398,6 @@ describe("preload.ts - Missing Branch Coverage", () => {
             expect(typeof exposedAPI.sites.addSite).toBe("function");
             expect(typeof exposedAPI.sites.updateSite).toBe("function");
             expect(typeof exposedAPI.sites.removeSite).toBe("function");
-            expect(typeof exposedAPI.sites.checkSiteNow).toBe("function");
         });
         it("should expose all monitoring API methods", async ({
             task,
@@ -423,6 +422,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 "function"
             );
             expect(typeof exposedAPI.monitoring.removeMonitor).toBe("function");
+            expect(typeof exposedAPI.monitoring.checkSiteNow).toBe("function");
         });
     });
 });

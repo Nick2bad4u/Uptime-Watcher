@@ -195,20 +195,16 @@ describe(useMonitorTypesStore, () => {
         await annotate("Category: Store", "category");
         await annotate("Type: Validation", "type");
 
-        // Mock returns just the data that backend would return, not the wrapped ValidationResult
-        const mockValidationData = { url: "https://example.com" };
-
-        // This is what the store will create when wrapping the backend data
-        const expectedValidationResult: ValidationResult = {
+        const mockValidationResult: ValidationResult = {
             success: true,
-            data: mockValidationData,
+            data: { url: "https://example.com" },
             errors: [],
             warnings: [],
             metadata: {},
         };
 
         mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-            mockValidationData
+            mockValidationResult
         );
 
         const { result } = renderHook(() => useMonitorTypesStore());
@@ -221,7 +217,7 @@ describe(useMonitorTypesStore, () => {
             );
         });
 
-        expect(validationResult!).toEqual(expectedValidationResult);
+        expect(validationResult!).toEqual(mockValidationResult);
     });
 
     it("should format monitor detail", async ({ task, annotate }) => {
@@ -335,11 +331,16 @@ describe(useMonitorTypesStore, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: IPC Response Handling", "type");
 
-            // Mock the raw data that backend would return (preload bridge extracts it)
-            const mockValidationData = { url: "https://example.com" };
+            const mockValidationResult: ValidationResult = {
+                success: true,
+                data: { url: "https://example.com" },
+                errors: [],
+                warnings: [],
+                metadata: {},
+            };
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-                mockValidationData
+                mockValidationResult
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -375,7 +376,7 @@ describe(useMonitorTypesStore, () => {
                 errors: ["URL is required"],
                 warnings: [],
                 metadata: {},
-            };
+            } satisfies ValidationResult;
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 mockValidationFailureData

@@ -538,6 +538,21 @@ describe("Types Module", () => {
                     removeAllListeners: () => {},
                 },
                 monitoring: {
+                    checkSiteNow: () =>
+                        Promise.resolve({
+                            details: "Manual check completed",
+                            monitorId: "monitor-1",
+                            previousStatus: "up",
+                            site: {
+                                identifier: "checked-id",
+                                monitors: [],
+                                monitoring: true,
+                                name: "Checked",
+                            },
+                            siteIdentifier: "checked-id",
+                            status: "up",
+                            timestamp: new Date().toISOString(),
+                        }),
                     formatMonitorDetail: () => Promise.resolve("detail"),
                     formatMonitorTitleSuffix: () => Promise.resolve("suffix"),
                     removeMonitor: () => Promise.resolve(true),
@@ -545,7 +560,14 @@ describe("Types Module", () => {
                     startMonitoringForSite: () => Promise.resolve(true),
                     stopMonitoring: () => Promise.resolve(true),
                     stopMonitoringForSite: () => Promise.resolve(true),
-                    validateMonitorData: () => Promise.resolve({}),
+                    validateMonitorData: () =>
+                        Promise.resolve({
+                            data: {},
+                            errors: [],
+                            metadata: {},
+                            success: true,
+                            warnings: [],
+                        }),
                 },
                 settings: {
                     getHistoryLimit: () => Promise.resolve(100),
@@ -565,13 +587,6 @@ describe("Types Module", () => {
                             monitors: [],
                             monitoring: false,
                             name: "Updated",
-                        } as Site),
-                    checkSiteNow: () =>
-                        Promise.resolve({
-                            identifier: "checked-id",
-                            monitors: [],
-                            monitoring: true,
-                            name: "Checked",
                         } as Site),
                 },
                 system: {
@@ -609,6 +624,7 @@ describe("Types Module", () => {
             expect(typeof mockAPI.monitoring.validateMonitorData).toBe(
                 "function"
             );
+            expect(typeof mockAPI.monitoring.checkSiteNow).toBe("function");
 
             expect(typeof mockAPI.settings.getHistoryLimit).toBe("function");
             expect(typeof mockAPI.settings.updateHistoryLimit).toBe("function");
@@ -617,7 +633,6 @@ describe("Types Module", () => {
             expect(typeof mockAPI.sites.addSite).toBe("function");
             expect(typeof mockAPI.sites.removeSite).toBe("function");
             expect(typeof mockAPI.sites.updateSite).toBe("function");
-            expect(typeof mockAPI.sites.checkSiteNow).toBe("function");
 
             expect(typeof mockAPI.system.quitAndInstall).toBe("function");
         });

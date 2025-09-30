@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Monitor } from "../../../shared/types";
+import type { ValidationResult } from "../../../shared/types/validation";
 import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
 import { CacheKeys } from "../../../shared/utils/cacheKeys";
 
@@ -222,9 +223,12 @@ beforeEach(() => {
     mockedService.formatMonitorTitleSuffix.mockResolvedValue(" (suffix)");
     mockedService.getMonitorTypes.mockResolvedValue([]);
     mockedService.validateMonitorData.mockResolvedValue({
-        success: true,
+        data: undefined,
         errors: [],
-    });
+        metadata: {},
+        success: true,
+        warnings: [],
+    } satisfies ValidationResult);
 });
 
 afterEach(() => {

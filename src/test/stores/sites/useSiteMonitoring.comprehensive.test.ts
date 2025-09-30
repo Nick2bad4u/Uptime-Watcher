@@ -9,13 +9,12 @@ import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonito
 
 // Mock electron API
 const mockElectronAPI = {
-    sites: {
-        checkSiteNow: vi.fn().mockResolvedValue(true),
-    },
     monitoring: {
+        checkSiteNow: vi.fn().mockResolvedValue(undefined),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
+    sites: {},
 };
 
 Object.defineProperty(globalThis, "electronAPI", {
@@ -64,10 +63,9 @@ describe("useSiteMonitoring", () => {
 
             await actions.checkSiteNow(siteId, monitorId);
 
-            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(
-                siteId,
-                monitorId
-            );
+            expect(
+                mockElectronAPI.monitoring.checkSiteNow
+            ).toHaveBeenCalledWith(siteId, monitorId);
         });
     });
 

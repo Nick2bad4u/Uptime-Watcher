@@ -11,7 +11,6 @@ import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { MonitoringService } from "./services/MonitoringService";
-import { SiteService } from "./services/SiteService";
 
 /**
  * Site monitoring actions interface for managing monitoring operations.
@@ -58,7 +57,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await SiteService.checkSiteNow(siteId, monitorId);
+                await MonitoringService.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'monitor:status-changed', which will
                 // trigger incremental update
             },

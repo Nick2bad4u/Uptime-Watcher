@@ -12,6 +12,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -184,7 +185,10 @@ export const MonitorTypesService = {
      * @throws If the electron API is unavailable or the validation operation
      *   fails.
      */
-    async validateMonitorData(type: string, data: unknown): Promise<unknown> {
+    async validateMonitorData(
+        type: string,
+        data: unknown
+    ): Promise<ValidationResult> {
         await this.initialize();
         try {
             return await window.electronAPI.monitoring.validateMonitorData(

@@ -353,13 +353,9 @@ describe(useMonitorTypesStore, () => {
     });
 
     describe("validateMonitorData", () => {
-        // Mock returns just the data that backend would return, not the wrapped ValidationResult
-        const mockValidationData = { url: "https://example.com" };
-
-        // This is what the store will create when wrapping the backend data
-        const expectedValidationResult: ValidationResult = {
+        const mockValidationResult: ValidationResult = {
             success: true,
-            data: mockValidationData,
+            data: { url: "https://example.com" },
             errors: [],
             warnings: [],
             metadata: {},
@@ -375,7 +371,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Validation", "type");
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-                mockValidationData
+                mockValidationResult
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -388,7 +384,7 @@ describe(useMonitorTypesStore, () => {
                 );
             });
 
-            expect(validationResult!).toEqual(expectedValidationResult);
+            expect(validationResult!).toEqual(mockValidationResult);
             expect(
                 mockElectronAPI.monitoring.validateMonitorData
             ).toHaveBeenCalledWith("http", { url: "https://example.com" });
@@ -443,7 +439,7 @@ describe(useMonitorTypesStore, () => {
                 data: { url: "https://example.com" },
                 errors: [],
                 // Missing warnings and metadata
-            };
+            } satisfies ValidationResult;
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 partialResult
@@ -829,13 +825,19 @@ describe(useMonitorTypesStore, () => {
                 },
             ];
 
-            const mockValidationData = { url: "https://example.com" };
+            const mockValidationResult: ValidationResult = {
+                success: true,
+                data: { url: "https://example.com" },
+                errors: [],
+                warnings: [],
+                metadata: {},
+            };
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
                 mockMonitorTypes
             );
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-                mockValidationData
+                mockValidationResult
             );
             mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
                 "Formatted: 150ms"

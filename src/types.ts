@@ -23,6 +23,7 @@ import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import type { ValidationResult } from "@shared/types/validation";
 // Additional global types
 
 // Re-export core types for convenience
@@ -248,6 +249,20 @@ declare global {
             monitoring: {
                 /**
                  * @remarks
+                 * Perform immediate manual check for a monitor.
+                 *
+                 * @param siteId - The site identifier.
+                 * @param monitorId - The monitor identifier.
+                 *
+                 * @returns A promise resolving to the latest status update or
+                 *   undefined when no update is available.
+                 */
+                checkSiteNow: (
+                    siteId: string,
+                    monitorId: string
+                ) => Promise<StatusUpdate | undefined>;
+                /**
+                 * @remarks
                  * Format monitor detail using backend registry.
                  *
                  * @param monitorType - The monitor type identifier.
@@ -338,7 +353,7 @@ declare global {
                 validateMonitorData: (
                     monitorType: string,
                     monitorData: unknown
-                ) => Promise<unknown>;
+                ) => Promise<ValidationResult>;
             };
 
             /**
@@ -396,20 +411,6 @@ declare global {
                 addSite: (site: Site) => Promise<Site>;
                 /**
                  * @remarks
-                 * Perform immediate manual check for a site.
-                 *
-                 * @param siteId - The site identifier.
-                 * @param monitorId - The monitor identifier.
-                 *
-                 * @returns A promise resolving to the updated site with latest
-                 *   status.
-                 */
-                checkSiteNow: (
-                    siteId: string,
-                    monitorId: string
-                ) => Promise<Site>;
-                /**
-                 * @remarks
                  * Delete all sites (dangerous operation).
                  *
                  * @returns A promise resolving to the count of deleted sites.
@@ -432,24 +433,6 @@ declare global {
                  *   removed.
                  */
                 removeSite: (id: string) => Promise<boolean>;
-                /**
-                 * @remarks
-                 * Start monitoring for a specific site.
-                 *
-                 * @param siteId - The site identifier.
-                 *
-                 * @returns A promise resolving to the updated site.
-                 */
-                startMonitoringForSite: (siteId: string) => Promise<Site>;
-                /**
-                 * @remarks
-                 * Stop monitoring for a specific site.
-                 *
-                 * @param siteId - The site identifier.
-                 *
-                 * @returns A promise resolving to the updated site.
-                 */
-                stopMonitoringForSite: (siteId: string) => Promise<Site>;
                 /**
                  * @remarks
                  * Update site configuration.

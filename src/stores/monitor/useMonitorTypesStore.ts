@@ -478,61 +478,29 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
                     });
 
                     // Get the validation result directly from the service
-                    const rawValidationResult =
+                    const validationResult =
                         await MonitorTypesService.validateMonitorData(
                             type,
                             data
                         );
 
-                    // Try to parse as ValidationResult, with fallback
-                    // eslint-disable-next-line @typescript-eslint/init-declarations -- Variable is always assigned in conditional branches
-                    let normalizedResult: ValidationResult;
-
-                    if (
-                        rawValidationResult &&
-                        typeof rawValidationResult === "object" &&
-                        "success" in rawValidationResult
-                    ) {
-                        // It's a ValidationResult - ensure all required properties exist
-                        const result = rawValidationResult as Record<
-                            string,
-                            unknown
-                        >;
-                        const success = Boolean(result["success"]);
-                        const resultData = result["data"];
-                        const errors = Array.isArray(result["errors"])
-                            ? (result["errors"] as string[]) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Array type check ensures string array
-                            : [];
-                        const metadata =
-                            typeof result["metadata"] === "object" &&
-                            result["metadata"] !== null
-                                ? // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Object type check ensures record structure
-                                  (result["metadata"] as Record<
-                                      string,
-                                      unknown
-                                  >)
-                                : {};
-                        const warnings = Array.isArray(result["warnings"])
-                            ? (result["warnings"] as string[]) // eslint-disable-line @typescript-eslint/no-unsafe-type-assertion -- Array type check ensures string array
-                            : [];
-
-                        normalizedResult = {
-                            data: resultData,
-                            errors,
-                            metadata,
-                            success,
-                            warnings,
-                        };
-                    } else {
-                        // Not a ValidationResult - create normalized structure
-                        normalizedResult = {
-                            data: rawValidationResult,
-                            errors: [],
-                            metadata: {},
-                            success: true,
-                            warnings: [],
-                        };
+                    if (!Array.isArray(validationResult.errors)) {
+                        throw new TypeError(
+                            "Invalid validation result received: errors payload missing"
+                        );
                     }
+
+                    const normalizedResult: ValidationResult = {
+                        data: validationResult.data,
+                        errors: Array.from(validationResult.errors),
+                        metadata: validationResult.metadata
+                            ? { ...validationResult.metadata }
+                            : {},
+                        success: validationResult.success,
+                        warnings: validationResult.warnings
+                            ? Array.from(validationResult.warnings)
+                            : [],
+                    };
 
                     logStoreAction("MonitorTypesStore", "validateMonitorData", {
                         errorCount: normalizedResult.errors.length,

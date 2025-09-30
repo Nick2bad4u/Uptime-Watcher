@@ -72,12 +72,12 @@ const mockElectronAPI = {
         updateMonitorRetryAttempts: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
         downloadSqliteBackup: vi.fn(),
-        checkSiteNow: vi.fn(),
     },
     data: {
         getHistoryLimit: vi.fn().mockReturnValue(1000),
     },
     monitoring: {
+        checkSiteNow: vi.fn().mockResolvedValue(undefined),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
         startMonitoringForSiteMonitor: vi.fn().mockResolvedValue(true),
@@ -252,7 +252,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
-            mockElectronAPI.sites.checkSiteNow.mockResolvedValueOnce({
+            mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce({
                 identifier: "default-site",
                 monitoring: true,
                 monitors: [],
@@ -270,10 +270,9 @@ describe("useSitesStore Function Coverage Tests", () => {
             ).toHaveBeenCalledWith("test-site");
 
             await store.checkSiteNow("test-site", "monitor-id");
-            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(
-                "test-site",
-                "monitor-id"
-            );
+            expect(
+                mockElectronAPI.monitoring.checkSiteNow
+            ).toHaveBeenCalledWith("test-site", "monitor-id");
         });
 
         it("should properly integrate sync functions", async () => {

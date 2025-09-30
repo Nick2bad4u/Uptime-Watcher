@@ -828,9 +828,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue({
-                data: mockValidationResult
-            });
+            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+                mockValidationResult
+            );
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();

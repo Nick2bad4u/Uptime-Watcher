@@ -88,7 +88,7 @@ function createMockStore(
             success: true,
             warnings: [],
             metadata: {},
-        }),
+        } satisfies ValidationResult),
 
         // Apply any overrides
         ...overrides,
@@ -602,10 +602,12 @@ describe("Monitor Validation Utilities", () => {
         beforeEach(() => {
             // Mock validateMonitorData for use in validateMonitorField
             mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue({
+                data: undefined,
                 errors: [],
+                metadata: {},
                 success: true,
                 warnings: [],
-            });
+            } satisfies ValidationResult);
         });
 
         it("should return empty array for valid field", async ({

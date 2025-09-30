@@ -3,7 +3,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import type { Site } from "../../../../shared/types";
 
 import { SiteService } from "../../../stores/sites/services/SiteService";
 
@@ -20,7 +20,6 @@ const mockElectronAPI = {
     },
     sites: {
         addSite: vi.fn(),
-        checkSiteNow: vi.fn(),
         getSites: vi.fn(),
         removeSite: vi.fn(),
         updateSite: vi.fn(),
@@ -429,64 +428,6 @@ describe("SiteService", () => {
         });
     });
 
-    describe("checkSiteNow", () => {
-        it("should check a site now successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const siteId = "site1";
-            const monitorId = "monitor1";
-            mockElectronAPI.sites.checkSiteNow.mockResolvedValueOnce(undefined);
-
-            await SiteService.checkSiteNow(siteId, monitorId);
-
-            expect(mockElectronAPI.sites.checkSiteNow).toHaveBeenCalledWith(
-                siteId,
-                monitorId
-            );
-        });
-
-        it("should handle check errors", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const siteId = "site1";
-            const monitorId = "monitor1";
-            const error = new Error("Failed to check site");
-            mockElectronAPI.sites.checkSiteNow.mockRejectedValueOnce(error);
-
-            await expect(
-                SiteService.checkSiteNow(siteId, monitorId)
-            ).rejects.toThrow("Failed to check site");
-        });
-
-        it("should handle invalid site/monitor IDs", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const siteId = "invalid-site";
-            const monitorId = "invalid-monitor";
-            const error = new Error("Invalid site or monitor ID");
-            mockElectronAPI.sites.checkSiteNow.mockRejectedValueOnce(error);
-
-            await expect(
-                SiteService.checkSiteNow(siteId, monitorId)
-            ).rejects.toThrow("Invalid site or monitor ID");
-        });
-    });
-
     describe("downloadSqliteBackup", () => {
         it("should successfully download SQLite backup", async () => {
             // Mock the API response
@@ -539,7 +480,6 @@ describe("SiteService", () => {
             expect(SiteService.addSite).toBeDefined();
             expect(SiteService.updateSite).toBeDefined();
             expect(SiteService.removeSite).toBeDefined();
-            expect(SiteService.checkSiteNow).toBeDefined();
             expect(SiteService.downloadSqliteBackup).toBeDefined();
         });
 
@@ -575,9 +515,6 @@ describe("SiteService", () => {
             await expect(SiteService.removeSite("test")).rejects.toThrow(
                 "ElectronAPI not available"
             );
-            await expect(
-                SiteService.checkSiteNow("test", "test")
-            ).rejects.toThrow("ElectronAPI not available");
             await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "ElectronAPI not available"
             );

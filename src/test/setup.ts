@@ -6,6 +6,8 @@
 import { vi, type Mock } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
+import type { StatusUpdate } from "../../shared/types";
+import type { ValidationResult } from "../../shared/types/validation";
 
 import EventEmitter from "node:events";
 
@@ -122,6 +124,7 @@ const mockElectronAPI: {
         removeAllListeners: Mock<(...args: any[]) => any>;
     };
     monitoring: {
+        checkSiteNow: Mock<(...args: any[]) => any>;
         removeMonitor: Mock<(...args: any[]) => any>;
         startMonitor: Mock<(...args: any[]) => any>;
         startMonitoring: Mock<(...args: any[]) => any>;
@@ -144,7 +147,6 @@ const mockElectronAPI: {
     };
     sites: {
         addSite: Mock<(...args: any[]) => any>;
-        checkSiteNow: Mock<(...args: any[]) => any>;
         getSites: Mock<(...args: any[]) => any>;
         removeMonitor: Mock<(...args: any[]) => any>;
         removeSite: Mock<(...args: any[]) => any>;
@@ -209,6 +211,20 @@ const mockElectronAPI: {
         removeAllListeners: vi.fn(),
     },
     monitoring: {
+        checkSiteNow: vi.fn().mockResolvedValue({
+            details: "Manual check completed",
+            monitorId: "monitor-1",
+            previousStatus: "up",
+            site: {
+                identifier: "site-1",
+                monitoring: true,
+                monitors: [],
+                name: "Test Site",
+            },
+            siteIdentifier: "site-1",
+            status: "up",
+            timestamp: new Date().toISOString(),
+        } satisfies StatusUpdate),
         removeMonitor: vi.fn().mockResolvedValue(true),
         startMonitor: vi.fn().mockResolvedValue(true),
         startMonitoring: vi.fn().mockResolvedValue(true),
@@ -266,9 +282,12 @@ const mockElectronAPI: {
             },
         ]),
         validateMonitorData: vi.fn().mockResolvedValue({
+            data: {},
             errors: [],
-            isValid: true,
-        }),
+            metadata: {},
+            success: true,
+            warnings: [],
+        } satisfies ValidationResult),
     },
     settings: {
         getHistoryLimit: vi.fn().mockResolvedValue(1000),
@@ -278,12 +297,6 @@ const mockElectronAPI: {
     },
     sites: {
         addSite: vi.fn().mockResolvedValue({
-            identifier: "test-site",
-            monitoring: true,
-            monitors: [],
-            name: "Test Site",
-        }),
-        checkSiteNow: vi.fn().mockResolvedValue({
             identifier: "test-site",
             monitoring: true,
             monitors: [],

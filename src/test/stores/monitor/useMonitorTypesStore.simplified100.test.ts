@@ -213,20 +213,16 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
     describe("Validation Operations", () => {
         it("should handle successful validation", async () => {
-            // Mock returns just the data that backend would return, not the wrapped ValidationResult
-            const mockValidationData = { url: "https://example.com" };
-
-            // This is what the store will create when wrapping the backend data
-            const expectedValidationResult: ValidationResult = {
+            const mockValidationResult: ValidationResult = {
                 success: true,
-                data: mockValidationData,
+                data: { url: "https://example.com" },
                 errors: [],
                 warnings: [],
                 metadata: {},
             };
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-                mockValidationData
+                mockValidationResult
             );
 
             const { result } = renderHook(() => useMonitorTypesStore());
@@ -241,7 +237,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 );
             });
 
-            expect(validationResult!).toEqual(expectedValidationResult);
+            expect(validationResult!).toEqual(mockValidationResult);
         });
 
         it("should handle validation with missing optional fields", async () => {
@@ -250,7 +246,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 data: null,
                 errors: ["URL required"],
                 // Missing warnings and metadata
-            };
+            } satisfies ValidationResult;
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
                 mockResult
@@ -540,17 +536,16 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
             mockSafeExtractIpcData.mockClear();
 
             // Test validation logging
-            const mockValidationData = {};
             const expectedValidationResult: ValidationResult = {
                 success: true,
-                data: mockValidationData,
+                data: {},
                 errors: [],
                 warnings: [],
                 metadata: {},
             };
 
             mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
-                mockValidationData
+                expectedValidationResult
             );
 
             // Mock safeExtractIpcData to return the validation result directly

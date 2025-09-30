@@ -30,18 +30,9 @@ export interface SitesApiInterface {
     addSite: (...args: unknown[]) => Promise<Site>;
 
     /**
-     * Performs an immediate connectivity check for a site
-     *
-     * @param siteId - ID of the site to check
-     *
-     * @returns Promise resolving to the updated site with latest status
-     */
-    checkSiteNow: (...args: unknown[]) => Promise<Site>;
-
-    /**
      * Deletes all sites (dangerous operation)
      *
-     * @returns Promise resolving to the count of deleted sites
+     * @returns Promise resolving to the number of removed sites
      */
     deleteAllSites: (...args: unknown[]) => Promise<number>;
 
@@ -60,24 +51,6 @@ export interface SitesApiInterface {
      * @returns Promise resolving to a boolean indicating removal success
      */
     removeSite: (...args: unknown[]) => Promise<boolean>;
-
-    /**
-     * Starts monitoring for a specific site
-     *
-     * @param siteId - ID of the site to start monitoring
-     *
-     * @returns Promise resolving to the updated site
-     */
-    startMonitoringForSite: (...args: unknown[]) => Promise<Site>;
-
-    /**
-     * Stops monitoring for a specific site
-     *
-     * @param siteId - ID of the site to stop monitoring
-     *
-     * @returns Promise resolving to the updated site
-     */
-    stopMonitoringForSite: (...args: unknown[]) => Promise<Site>;
 
     /**
      * Updates an existing site's configuration
@@ -106,20 +79,9 @@ export const sitesApi: SitesApiInterface = {
     ) => Promise<Site>,
 
     /**
-     * Performs an immediate connectivity check for a site
-     *
-     * @param siteId - ID of the site to check
-     *
-     * @returns Promise resolving to the updated site with latest status
-     */
-    checkSiteNow: createTypedInvoker<Site>("check-site-now") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site>,
-
-    /**
      * Deletes all sites (dangerous operation)
      *
-     * @returns Promise resolving to the count of deleted sites
+     * @returns Promise resolving to the number of removed sites
      */
     deleteAllSites: createTypedInvoker<number>("delete-all-sites") satisfies (
         ...args: unknown[]
@@ -145,36 +107,6 @@ export const sitesApi: SitesApiInterface = {
         ...args: unknown[]
     ) => Promise<boolean>,
 
-    /**
-     * Starts monitoring for a specific site
-     *
-     * @param siteId - ID of the site to start monitoring
-     *
-     * @returns Promise resolving to the updated site
-     */
-    startMonitoringForSite: createTypedInvoker<Site>(
-        "start-monitoring-for-site"
-    ) satisfies (...args: unknown[]) => Promise<Site>,
-
-    /**
-     * Stops monitoring for a specific site
-     *
-     * @param siteId - ID of the site to stop monitoring
-     *
-     * @returns Promise resolving to the updated site
-     */
-    stopMonitoringForSite: createTypedInvoker<Site>(
-        "stop-monitoring-for-site"
-    ) satisfies (...args: unknown[]) => Promise<Site>,
-
-    /**
-     * Updates an existing site's configuration
-     *
-     * @param siteId - ID of the site to update
-     * @param siteData - Partial site data to update
-     *
-     * @returns Promise resolving to the updated site
-     */
     updateSite: createTypedInvoker<Site>("update-site") satisfies (
         ...args: unknown[]
     ) => Promise<Site>,

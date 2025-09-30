@@ -52,31 +52,6 @@ export const SiteService = {
     },
 
     /**
-     * Triggers an immediate check for a site's monitor.
-     *
-     * @example
-     *
-     * ```typescript
-     * const updatedSite = await SiteService.checkSiteNow(
-     *     "site123",
-     *     "monitor456"
-     * );
-     * ```
-     *
-     * @param siteId - The identifier of the site to check.
-     * @param monitorId - The identifier of the monitor to check.
-     *
-     * @returns A promise that resolves to the updated site.
-     *
-     * @throws If the electron API is unavailable or the backend operation
-     *   fails.
-     */
-    async checkSiteNow(siteId: string, monitorId: string): Promise<Site> {
-        await this.initialize();
-        return window.electronAPI.sites.checkSiteNow(siteId, monitorId);
-    },
-
-    /**
      * Downloads a backup of the SQLite database.
      *
      * @example

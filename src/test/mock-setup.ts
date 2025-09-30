@@ -16,11 +16,12 @@ process.setMaxListeners(MAX_LISTENERS);
 
 import { vi } from "vitest";
 import fc from "fast-check";
-import type { Monitor, Site } from "../../shared/types";
+import type { Monitor, Site, StatusUpdate } from "../../shared/types";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
 } from "../../shared/types/stateSync";
+import type { ValidationResult } from "../../shared/types/validation";
 import type { ElectronAPI } from "../types";
 
 // Configure fast-check for property-based testing
@@ -179,6 +180,56 @@ const mockElectronAPI: ElectronAPI = {
     },
 
     monitoring: {
+        checkSiteNow: vi.fn<ElectronAPI["monitoring"]["checkSiteNow"]>(
+            async (siteId, monitorId) => {
+                const base = cloneSite(defaultSite);
+                base.identifier = siteId;
+
+                const monitor = base.monitors.find(
+                    (candidate) => candidate.id === monitorId
+                );
+
+                if (!monitor) {
+                    return undefined;
+                }
+
+                const timestamp = new Date().toISOString();
+                const previousStatus = monitor.status;
+
+                const updatedSite = cloneSite({
+                    ...base,
+                    monitors: base.monitors.map((candidate) =>
+                        candidate.id === monitorId
+                            ? {
+                                  ...candidate,
+                                  lastChecked: new Date(),
+                                  responseTime: Math.max(
+                                      10,
+                                      Math.round(Math.random() * 200)
+                                  ),
+                                  status: "up",
+                              }
+                            : candidate
+                    ),
+                });
+
+                const updatedMonitor = updatedSite.monitors.find(
+                    (candidate) => candidate.id === monitorId
+                );
+
+                const statusUpdate: StatusUpdate = {
+                    details: `Manual check run for monitor '${monitorId}'.`,
+                    monitorId,
+                    previousStatus,
+                    site: updatedSite,
+                    siteIdentifier: siteId,
+                    status: updatedMonitor?.status ?? previousStatus,
+                    timestamp,
+                };
+
+                return statusUpdate;
+            }
+        ),
         formatMonitorDetail: vi.fn<
             ElectronAPI["monitoring"]["formatMonitorDetail"]
         >(async (_monitorType, details) => details),
@@ -202,13 +253,16 @@ const mockElectronAPI: ElectronAPI = {
         >(async () => true),
         validateMonitorData: vi.fn<
             ElectronAPI["monitoring"]["validateMonitorData"]
-        >(async (_monitorType, monitorData) => ({
-            data: monitorData ?? {},
-            errors: [],
-            metadata: {},
-            success: true,
-            warnings: [],
-        })),
+        >(
+            async (monitorType, monitorData) =>
+                ({
+                    data: monitorData ?? {},
+                    errors: [],
+                    metadata: { monitorType },
+                    success: true,
+                    warnings: [],
+                }) satisfies ValidationResult
+        ),
     },
 
     monitorTypes: {
@@ -230,18 +284,6 @@ const mockElectronAPI: ElectronAPI = {
         addSite: vi.fn<ElectronAPI["sites"]["addSite"]>(async (site) =>
             cloneSite(site)
         ),
-        checkSiteNow: vi.fn<ElectronAPI["sites"]["checkSiteNow"]>(
-            async (siteId, monitorId) => {
-                const site = cloneSite(defaultSite);
-                site.identifier = siteId;
-                site.monitors = site.monitors.map((monitor) =>
-                    monitor.id === monitorId
-                        ? { ...monitor, lastChecked: new Date() }
-                        : monitor
-                );
-                return site;
-            }
-        ),
         deleteAllSites: vi.fn<ElectronAPI["sites"]["deleteAllSites"]>(
             async () => 0
         ),
@@ -249,30 +291,6 @@ const mockElectronAPI: ElectronAPI = {
             cloneSite(defaultSite),
         ]),
         removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
-        startMonitoringForSite: vi.fn<
-            ElectronAPI["sites"]["startMonitoringForSite"]
-        >(async (siteId) => {
-            const site = cloneSite(defaultSite);
-            site.identifier = siteId;
-            site.monitoring = true;
-            site.monitors = site.monitors.map((monitor) => ({
-                ...monitor,
-                monitoring: true,
-            }));
-            return site;
-        }),
-        stopMonitoringForSite: vi.fn<
-            ElectronAPI["sites"]["stopMonitoringForSite"]
-        >(async (siteId) => {
-            const site = cloneSite(defaultSite);
-            site.identifier = siteId;
-            site.monitoring = false;
-            site.monitors = site.monitors.map((monitor) => ({
-                ...monitor,
-                monitoring: false,
-            }));
-            return site;
-        }),
         updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(
             async (siteId, updates) => {
                 const base = cloneSite(defaultSite);
