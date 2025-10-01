@@ -835,3 +835,4 @@ dist-playwright/
 
 *storybook.log
 storybook-static
+.github/chatmodes/BeastMode.chatmode.md
