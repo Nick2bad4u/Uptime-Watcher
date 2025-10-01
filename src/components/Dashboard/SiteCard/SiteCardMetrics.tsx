@@ -61,7 +61,10 @@ export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
             () => [
                 {
                     label: "Status",
-                    value: status ? status.toUpperCase() : "UNKNOWN",
+                    value: status
+                        ? status.charAt(0).toUpperCase() +
+                          status.slice(1).toLowerCase()
+                        : "Unknown",
                 },
                 {
                     label: "Uptime",
@@ -86,7 +89,7 @@ export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
         );
 
         return (
-            <div className="mb-4 grid grid-cols-4 gap-4">
+            <div className="site-card__metrics-grid">
                 {metrics.map((metric) => (
                     <MetricCard
                         key={metric.label}

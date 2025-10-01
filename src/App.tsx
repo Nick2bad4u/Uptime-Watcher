@@ -24,12 +24,17 @@ import {
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
+import { DashboardOverview } from "./components/Dashboard/Overview/DashboardOverview";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
+import { AppSidebar } from "./components/Layout/AppSidebar/AppSidebar";
+import { SidebarLayoutProvider } from "./components/Layout/SidebarLayoutProvider";
+import { SidebarRevealButton } from "./components/Layout/SidebarRevealButton/SidebarRevealButton";
 import { Settings } from "./components/Settings/Settings";
 import { SiteDetails } from "./components/SiteDetails/SiteDetails";
 import { UI_DELAYS } from "./constants";
 import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
+import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import { logger } from "./services/logger";
@@ -100,8 +105,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const { clearError, isLoading, lastError } = useErrorStore();
 
     // Sites store
-    const { sites } = useSitesStore();
-
     // Settings store - store is initialized via the initialization effect below
     // Store subscription happens automatically when store is accessed
 
@@ -136,8 +139,20 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Track if initial app initialization is complete to prevent loading overlay flash
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
+    // Sidebar responsive state management
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
+        const { matchMedia } = globalThis as typeof globalThis & {
+            matchMedia?: (query: string) => MediaQueryList;
+        };
+        if (typeof matchMedia !== "function") {
+            return true;
+        }
+        return !matchMedia("(max-width: 1024px)").matches;
+    });
+
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
+    const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
 
     // Create stable callbacks to avoid direct setState in useEffect
     const clearLoadingOverlay = useCallback(() => {
@@ -257,6 +272,48 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
     useBackendFocusSync(false); // Set to true to enable focus-based backend sync
+
+    const handleSidebarBreakpointChange = useCallback(
+        (event: MediaQueryListEvent): void => {
+            setIsSidebarOpen(!event.matches);
+        },
+        []
+    );
+
+    const cleanupSidebarListener = useCallback(() => {
+        const mediaQuery = sidebarMediaQueryRef.current;
+        if (!mediaQuery) {
+            return;
+        }
+
+        mediaQuery.removeEventListener("change", handleSidebarBreakpointChange);
+        sidebarMediaQueryRef.current = null;
+    }, [handleSidebarBreakpointChange]);
+
+    useMount(
+        useCallback(() => {
+            const { matchMedia } = globalThis as typeof globalThis & {
+                matchMedia?: (query: string) => MediaQueryList;
+            };
+            if (typeof matchMedia !== "function") {
+                return;
+            }
+
+            const mediaQuery = matchMedia("(max-width: 1024px)");
+            sidebarMediaQueryRef.current = mediaQuery;
+            mediaQuery.addEventListener(
+                "change",
+                handleSidebarBreakpointChange
+            );
+        }, [handleSidebarBreakpointChange]),
+        cleanupSidebarListener
+    );
+
+    const toggleSidebar = useCallback(() => {
+        setIsSidebarOpen((previous) => !previous);
+    }, []);
+
+    const globalMetrics = useGlobalMonitoringMetrics();
 
     const selectedSite = useSelectedSite();
 
@@ -440,89 +497,84 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     return (
         <ErrorBoundary>
             <ThemeProvider>
-                <div
-                    className={`app-container ${isDark ? "dark" : ""}`}
-                    data-testid="app-container"
+                <SidebarLayoutProvider
+                    isSidebarOpen={isSidebarOpen}
+                    toggleSidebar={toggleSidebar}
                 >
-                    <ConfirmDialog />
-                    {/* Global Loading Overlay */}
-                    {showLoadingOverlay ? (
-                        <output
-                            aria-label="Loading application"
-                            aria-live="polite"
-                            className="loading-overlay"
-                        >
-                            <ThemedBox
-                                padding="lg"
-                                rounded="lg"
-                                shadow="xl"
-                                surface="elevated"
-                            >
-                                <div className="loading-content">
-                                    <div className="loading-spinner" />
-                                    <ThemedText size="base" weight="medium">
-                                        {UI_MESSAGES.LOADING}
-                                    </ThemedText>
+                    <div
+                        className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
+                        data-testid="app-container"
+                    >
+                        <AppSidebar />
+                        <SidebarRevealButton />
+
+                        <div className="app-shell__main">
+                            <ConfirmDialog />
+
+                            {showLoadingOverlay ? (
+                                <output
+                                    aria-label="Loading application"
+                                    aria-live="polite"
+                                    className="loading-overlay"
+                                >
+                                    <ThemedBox
+                                        padding="lg"
+                                        rounded="lg"
+                                        shadow="xl"
+                                        surface="elevated"
+                                    >
+                                        <div className="loading-content">
+                                            <div className="loading-spinner" />
+                                            <ThemedText
+                                                size="base"
+                                                weight="medium"
+                                            >
+                                                {UI_MESSAGES.LOADING}
+                                            </ThemedText>
+                                        </div>
+                                    </ThemedBox>
+                                </output>
+                            ) : null}
+
+                            {lastError ? (
+                                <div className="fixed top-0 right-0 left-0 z-50 p-4">
+                                    <ErrorAlert
+                                        message={lastError}
+                                        onDismiss={clearError}
+                                        variant="error"
+                                    />
                                 </div>
-                            </ThemedBox>
-                        </output>
-                    ) : null}
+                            ) : null}
 
-                    {/* Global Error Notification */}
-                    {lastError ? (
-                        <div className="fixed top-0 right-0 left-0 z-50 p-4">
-                            <ErrorAlert
-                                message={lastError}
-                                onDismiss={clearError}
-                                variant="error"
-                            />
-                        </div>
-                    ) : null}
+                            {renderUpdateNotification()}
 
-                    {/* Update Notification */}
-                    {renderUpdateNotification()}
+                            <Header />
 
-                    <Header />
+                            <div className="app-shell__content">
+                                <DashboardOverview
+                                    metrics={globalMetrics}
+                                    siteCountLabel={
+                                        UI_MESSAGES.SITE_COUNT_LABEL
+                                    }
+                                />
 
-                    <main className="main-container">
-                        {/* Full-width site list */}
-                        <ThemedBox
-                            data-testid="dashboard-container"
-                            padding="md"
-                            rounded="lg"
-                            shadow="sm"
-                            surface="elevated"
-                        >
-                            <ThemedBox
-                                border
-                                className="border-b"
-                                padding="md"
-                                surface="base"
-                            >
-                                <ThemedText size="lg" weight="medium">
-                                    {UI_MESSAGES.SITE_COUNT_LABEL} (
-                                    {sites.length})
-                                </ThemedText>
-                            </ThemedBox>
-                            <div className="p-0">
-                                <SiteList />
+                                <div className="app-shell__panel">
+                                    <SiteList />
+                                </div>
                             </div>
-                        </ThemedBox>
-                    </main>
+                        </div>
+                    </div>
 
-                    {/* Add Site Modal */}
                     {showAddSiteModal ? (
                         <AddSiteModal onClose={handleCloseAddSiteModal} />
                     ) : null}
 
-                    {/* Settings Modal */}
                     {showSettings ? (
                         <Settings onClose={handleCloseSettings} />
                     ) : null}
 
-                    {/* Site Details Modal */}
                     {siteDetailsJSX}
-                </div>
+                </SidebarLayoutProvider>
             </ThemeProvider>
         </ErrorBoundary>
     );

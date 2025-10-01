@@ -26,8 +26,6 @@
  * @public
  */
 
-import type { CoreComponentProperties } from "@shared/types/componentProps";
-
 import {
     memo,
     type MouseEvent,
@@ -35,6 +33,9 @@ import {
     useCallback,
 } from "react";
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
+import type { ButtonSize } from "../../../theme/components/types";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 
 /**
@@ -59,6 +60,8 @@ export interface SiteMonitoringButtonProperties
     readonly onStartSiteMonitoring: () => void;
     /** Handler for stopping site-level monitoring */
     readonly onStopSiteMonitoring: () => void;
+    /** Size variant for the underlying themed buttons. */
+    readonly size?: ButtonSize;
 }
 
 /**
@@ -114,6 +117,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
         isLoading,
         onStartSiteMonitoring,
         onStopSiteMonitoring,
+        size = "sm",
     }: SiteMonitoringButtonProperties) {
         // UseCallback handlers for jsx-no-bind compliance
         const handleStopClick = useCallback(
@@ -139,7 +143,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                     className={`flex items-center gap-1 ${className}`}
                     disabled={isLoading}
                     onClick={handleStopClick}
-                    size="sm"
+                    size={size}
                     variant="error"
                 >
                     <span>⏹️</span>
@@ -158,7 +162,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                 className={`flex items-center gap-1 ${className}`}
                 disabled={isLoading}
                 onClick={handleStartClick}
-                size="sm"
+                size={size}
                 variant="success"
             >
                 <span>▶️</span>

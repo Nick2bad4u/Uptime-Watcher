@@ -13,6 +13,11 @@ import type { Site } from "@shared/types";
 import type { ChartTimeRange } from "../types";
 
 /**
+ * Layout modes available for the dashboard site list.
+ */
+export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
+
+/**
  * Interface for the UI store.
  *
  * @remarks
@@ -44,6 +49,13 @@ export interface UIStore {
      * @param site - The site to select, or `undefined` to clear selection.
      */
     selectSite: (site: Site | undefined) => void;
+
+    /**
+     * Updates the active presentation layout for the dashboard site list.
+     *
+     * @param layout - The target layout mode to activate.
+     */
+    setSiteListLayout: (layout: SiteListLayoutMode) => void;
 
     /**
      * Sets the active tab in the site details modal.
@@ -115,6 +127,11 @@ export interface UIStore {
      * The selected time range for charts in the site details modal.
      */
     siteDetailsChartTimeRange: ChartTimeRange;
+
+    /**
+     * The currently active presentation layout for the dashboard site list.
+     */
+    siteListLayout: SiteListLayoutMode;
 
     // NOTE: getSelectedSite removed - use useSelectedSite hook instead
     // (src/hooks/useSelectedSite.ts)

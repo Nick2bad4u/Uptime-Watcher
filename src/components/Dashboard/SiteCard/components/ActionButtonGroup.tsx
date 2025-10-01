@@ -13,6 +13,8 @@ import {
     useCallback,
 } from "react";
 
+import type { ButtonSize } from "../../../../theme/components/types";
+
 import { ThemedButton } from "../../../../theme/components/ThemedButton";
 import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
 
@@ -26,6 +28,8 @@ import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteM
 export interface ActionButtonGroupProperties {
     /** Whether all monitors are currently running */
     readonly allMonitorsRunning: boolean;
+    /** Size variant for rendered buttons (defaults to `sm`). */
+    readonly buttonSize?: ButtonSize;
     /** Whether all buttons should be disabled */
     readonly disabled: boolean;
     /** Whether any operation is currently loading */
@@ -78,6 +82,7 @@ export interface ActionButtonGroupProperties {
 export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties> =
     memo(function ActionButtonGroup({
         allMonitorsRunning,
+        buttonSize = "sm",
         disabled,
         isLoading,
         isMonitoring,
@@ -113,14 +118,16 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
             [onStopMonitoring]
         );
 
+        const clusterGapClass = buttonSize === "xs" ? "gap-1.5" : "gap-2";
+
         return (
-            <div className="flex items-center gap-2">
+            <div className={`flex flex-wrap items-center ${clusterGapClass}`}>
                 <ThemedButton
                     aria-label="Check Now"
                     className="min-w-8"
                     disabled={isLoading || disabled}
                     onClick={handleCheckNowClick}
-                    size="sm"
+                    size={buttonSize}
                     variant="ghost"
                 >
                     {/* Using emoji icon consistent with project's status icon system */}
@@ -134,6 +141,7 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                     isLoading={isLoading || disabled}
                     onStartSiteMonitoring={onStartSiteMonitoring}
                     onStopSiteMonitoring={onStopSiteMonitoring}
+                    size={buttonSize}
                 />
 
                 {isMonitoring ? (
@@ -142,7 +150,7 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                         className="min-w-8"
                         disabled={isLoading || disabled}
                         onClick={handleStopMonitoringClick}
-                        size="sm"
+                        size={buttonSize}
                         variant="error"
                     >
                         {/* Using emoji icon consistent with project's status icon system */}
@@ -154,7 +162,7 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                         className="min-w-8"
                         disabled={isLoading || disabled}
                         onClick={handleStartMonitoringClick}
-                        size="sm"
+                        size={buttonSize}
                         variant="success"
                     >
                         {/* Using emoji icon consistent with project's status icon system */}

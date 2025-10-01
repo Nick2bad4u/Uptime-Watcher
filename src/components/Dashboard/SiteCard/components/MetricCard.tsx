@@ -5,6 +5,7 @@
 
 import { memo, type NamedExoticComponent } from "react";
 
+import { ThemedBox } from "../../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../../theme/components/ThemedText";
 
 /**
@@ -57,20 +58,28 @@ export const MetricCard: NamedExoticComponent<MetricCardProperties> = memo(
         value,
     }: MetricCardProperties) {
         return (
-            <div
-                className={`flex flex-col items-center text-center ${className}`}
+            <ThemedBox
+                className={`metric-card ${className}`}
+                padding="md"
+                rounded="md"
+                surface="overlay"
+                variant="tertiary"
             >
                 <ThemedText
-                    className="mb-1 block"
+                    className="metric-card__label"
                     size="xs"
                     variant="secondary"
                 >
                     {label}
                 </ThemedText>
-                <ThemedText size="sm" weight="medium">
+                <ThemedText
+                    className="metric-card__value"
+                    size="sm"
+                    weight="semibold"
+                >
                     {value}
                 </ThemedText>
-            </div>
+            </ThemedBox>
         );
     }
 );

@@ -1,0 +1,207 @@
+/* Dashboard site list layout enhancements */
+
+.site-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.site-list__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.site-list__toolbar-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.site-list__layout-selector {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 999px;
+    background: rgb(15 23 42 / 16%);
+    border: 1px solid rgb(255 255 255 / 12%);
+}
+
+.site-list__layout-button {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    justify-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: rgb(255 255 255 / 6%);
+    color: inherit;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        border-color var(--transition-fast),
+        background var(--transition-fast);
+    min-inline-size: 6rem;
+}
+
+.site-list__layout-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgb(37 99 235 / 18%);
+    border-color: rgb(96 165 250 / 35%);
+}
+
+.site-list__layout-button--active {
+    background: linear-gradient(
+        135deg,
+        rgb(59 130 246 / 35%),
+        rgb(129 140 248 / 28%)
+    );
+    border-color: rgb(129 140 248 / 60%);
+    box-shadow: 0 16px 40px rgb(99 102 241 / 25%);
+}
+
+.site-list__layout-icon {
+    font-size: 1.1rem;
+}
+
+.site-table {
+    overflow-inline: auto;
+}
+
+.site-table__table {
+    inline-size: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.site-table__table thead {
+    position: sticky;
+    inset-block-start: 0;
+    background: rgb(15 23 42 / 35%);
+    backdrop-filter: blur(8px);
+    z-index: 1;
+}
+
+.site-table__table th,
+.site-table__table td {
+    padding: 0.75rem 1rem;
+    border-block-end: 1px solid rgb(255 255 255 / 8%);
+    text-align: start;
+}
+
+.site-table__row:hover {
+    background: rgb(59 130 246 / 8%);
+}
+
+.site-table__site-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: start;
+}
+
+.site-table__monitor-selector {
+    inline-size: 16rem;
+    max-inline-size: 100%;
+}
+
+.site-table__actions {
+    text-align: end;
+}
+
+.site-table__actions-heading {
+    text-align: end;
+}
+
+.site-card__compact-header,
+.site-card__compact-metrics,
+.site-card__compact-controls,
+.site-card__compact-footer {
+    display: flex;
+    inline-size: 100%;
+}
+
+.site-card__compact-header {
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.site-card__compact-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.site-card__compact-subtitle {
+    opacity: 0.75;
+}
+
+.site-card__compact-metrics {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+}
+
+.site-card__compact-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-inline-size: 6rem;
+}
+
+.site-card__compact-metric-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.7;
+}
+
+.site-card__compact-metric-value {
+    font-weight: var(--font-weight-semibold);
+}
+
+.site-card__compact-controls {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.site-card__compact-selector {
+    inline-size: 14rem;
+    max-inline-size: 100%;
+}
+
+.site-card__compact-footer {
+    justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+    .site-list__layout-selector {
+        inline-size: 100%;
+        justify-content: center;
+    }
+
+    .site-table__monitor-selector {
+        inline-size: 100%;
+    }
+
+    .site-card__compact-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

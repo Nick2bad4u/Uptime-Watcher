@@ -5,7 +5,7 @@
 
 import type { MonitorStatus } from "@shared/types";
 
-import { memo, type NamedExoticComponent } from "react";
+import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
 
 import { StatusBadge } from "../../common/StatusBadge";
 
@@ -20,6 +20,9 @@ export interface SiteCardStatusProperties {
     /** Current status of the monitor */
     readonly status: MonitorStatus;
 }
+
+const toTitleCase = (value: string): string =>
+    `${value.charAt(0).toUpperCase()}${value.slice(1).toLowerCase()}`;
 
 /**
  * Status section component for site card displaying current monitor status.
@@ -50,10 +53,28 @@ export const SiteCardStatus: NamedExoticComponent<SiteCardStatusProperties> =
     }: SiteCardStatusProperties) {
         // Ensure selectedMonitorId is a string to prevent runtime errors
         const safeMonitorId = selectedMonitorId || "unknown";
+        const statusLabel = useMemo(() => {
+            const normalizedSegments = safeMonitorId
+                .trim()
+                .replaceAll(/[\p{Dash_Punctuation}_]+/gv, " ")
+                .split(/\s+/v)
+                .filter(Boolean)
+                .map((segment) => toTitleCase(segment));
+
+            const joined = normalizedSegments.join(" ").trim();
+            return joined.length > 0 ? joined : "Monitor";
+        }, [safeMonitorId]);
+
+        const formatStatus = useCallback(
+            (label: string, monitorStatus: MonitorStatus) =>
+                `${label}: ${monitorStatus.charAt(0).toUpperCase()}${monitorStatus.slice(1)}`,
+            []
+        );
 
         return (
             <StatusBadge
-                label={`${safeMonitorId.toUpperCase()} Status`}
+                formatter={formatStatus}
+                label={`${statusLabel} Status`}
                 size="sm"
                 status={status}
             />

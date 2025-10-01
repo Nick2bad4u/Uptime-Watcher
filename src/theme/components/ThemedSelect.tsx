@@ -69,6 +69,8 @@ import { useTheme, useThemeClasses } from "../useTheme";
 export interface ThemedSelectProperties
     extends AccessibilityProperties,
         CoreComponentProperties {
+    /** Whether the select should expand to fill its container width */
+    readonly fluid?: boolean;
     /** Unique identifier for the select element */
     readonly id?: string;
     /** Change handler for selection updates */
@@ -121,6 +123,7 @@ const ThemedSelectComponent = ({
     children,
     className = "",
     disabled = false,
+    fluid = true,
     id,
     onChange,
     onClick,
@@ -148,13 +151,15 @@ const ThemedSelectComponent = ({
             fontSize: currentTheme.typography.fontSize.sm,
             padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
             transition: TRANSITION_ALL,
-            width: "100%",
+            ...(fluid ? { width: "100%" } : {}),
         }),
         [
             currentTheme.borderRadius.md,
             currentTheme.spacing.md,
             currentTheme.spacing.sm,
             currentTheme.typography.fontSize.sm,
+
+            fluid,
 
             getBackgroundClass,
 

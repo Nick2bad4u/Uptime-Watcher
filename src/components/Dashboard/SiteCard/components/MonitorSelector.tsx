@@ -139,9 +139,14 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 : monitorTypeLabel;
         }, []);
 
+        const composedClassName = ["monitor-selector", className]
+            .filter(Boolean)
+            .join(" ");
+
         return (
             <ThemedSelect
-                className={className}
+                className={composedClassName}
+                fluid={false}
                 onChange={onChange}
                 onClick={handleClick}
                 onMouseDown={handleMouseDown}

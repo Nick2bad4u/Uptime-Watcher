@@ -1,56 +1,147 @@
-/* Use theme variables for status colors and accent */
-
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
 
-:root {
-    --status-up: var(--color-status-up, #10b981);
-    --status-down: var(--color-status-down, #ef4444);
-    --status-pending: var(--color-status-pending, #fbbf24);
-    --header-accent: var(--color-primary, #2563eb);
+.app-topbar {
+    position: relative;
+    padding: clamp(1rem, 2vi, 1.5rem) clamp(1rem, 3vi, 2.5rem) 0;
 }
 
-.themed-header {
+.app-topbar__container {
     position: relative;
-    z-index: 10;
+    border: 1px solid rgb(255 255 255 / 14%);
+    background: linear-gradient(
+        135deg,
+        rgb(15 23 42 / 92%),
+        rgb(30 41 59 / 62%)
+    );
+    backdrop-filter: blur(18px);
+    box-shadow: 0 22px 60px rgb(15 23 42 / 35%);
+    overflow: hidden;
+}
+
+.app-topbar__container::after {
+    position: absolute;
+    content: "";
+    inset-inline-end: -25%;
+    inset-block-start: -35%;
+    inline-size: 50%;
+    block-size: 50%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(59 130 246 / 38%), transparent 70%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.app-topbar__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.app-topbar__identity {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    min-inline-size: 0;
+}
+
+.app-topbar__identity-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-inline-size: 0;
+}
+
+.app-topbar__sidebar-toggle {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: var(--border-radius-full);
+    border: 1px solid rgb(96 165 250 / 45%);
+    background: linear-gradient(
+        135deg,
+        rgb(59 130 246 / 60%),
+        rgb(96 165 250 / 45%)
+    );
+    color: rgb(241 245 249);
+    transition:
+        transform var(--transition-fast),
+        background var(--transition-fast);
+}
+
+.app-topbar__sidebar-toggle:hover {
+    transform: scale(1.05);
+    background: linear-gradient(
+        135deg,
+        rgb(59 130 246 / 70%),
+        rgb(129 140 248 / 55%)
+    );
+}
+
+.app-topbar__title {
+    letter-spacing: 0.03em;
+}
+
+.app-topbar__subtitle {
+    opacity: 0.75;
+    letter-spacing: 0.08em;
+}
+
+.app-topbar__badges {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-inline-size: 0;
+}
+
+.app-topbar__badge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgb(255 255 255 / 16%);
+    background: rgb(255 255 255 / 10%);
+    padding: 0.5rem 0.9rem;
+}
+
+.app-topbar__badge--primary {
+    border-color: rgb(59 130 246 / 35%);
+    background: linear-gradient(
+        135deg,
+        rgb(59 130 246 / 45%),
+        rgb(96 165 250 / 25%)
+    );
+    box-shadow: 0 12px 28px rgb(59 130 246 / 28%);
+}
+
+.app-topbar__badge-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.app-topbar__badge-value {
+    font-size: 1.1rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.app-topbar__controls {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.app-topbar__summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-xl) var(--spacing-md)
-        var(--spacing-xl);
-    background: var(--color-surface-elevated);
-    border-block-end: 1px solid var(--color-border-primary);
-    box-shadow: 0 2px 12px 0 var(--shadow-md);
+    gap: 1rem;
+    margin-block-start: 1.5rem;
 }
 
-.header-title {
-    position: relative;
-    color: var(--color-primary-500);
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: 0.01em;
-    margin-inline-end: var(--spacing-lg);
-    padding-block-end: 0.25em;
-
-    &::after {
-        display: block;
-        border-radius: 2px;
-        background: linear-gradient(
-            90deg,
-            var(--color-primary-500),
-            transparent 80%
-        );
-        block-size: 3px;
-        content: "";
-        inline-size: 2.5em;
-        margin-block-start: 0.2em;
-    }
-}
-
-.header-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
+.app-topbar__site-count {
+    opacity: 0.75;
+    letter-spacing: 0.04em;
 }
 
 .header-status-summary {
@@ -58,7 +149,7 @@
     align-items: center;
     padding: 0.5em 1.25em;
     border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    background: rgb(15 23 42 / 55%);
     box-shadow: 0 1px 6px 0 var(--color-shadow);
     gap: var(--spacing-md);
 }
@@ -236,8 +327,6 @@
 
 /* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
-    .themed-header,
-    .header-title,
     .header-status-summary,
     .health-badge,
     .status-up-badge,
@@ -245,13 +334,37 @@
     .status-down-badge,
     .status-pending-badge,
     .status-paused-badge,
-    .header-title-box,
-    .header-status-summary-box,
-    .total-sites-badge,
-    .header-interval-box,
-    .header-controls-box {
+    .total-sites-badge {
         animation: none;
         transform: none;
         transition: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .app-topbar__row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+
+    .app-topbar__controls {
+        inline-size: 100%;
+        justify-content: flex-start;
+    }
+
+    .app-topbar__summary {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .app-topbar__badges {
+        inline-size: 100%;
+        justify-content: space-between;
+    }
+
+    .app-topbar__sidebar-toggle {
+        display: grid;
     }
 }

@@ -144,7 +144,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         return (
             <ThemedBox
                 aria-label={`View details for ${latestSite.name}`}
-                className="group site-card flex w-full cursor-pointer flex-col gap-2 text-left"
+                className="group site-card site-card--modern flex w-full cursor-pointer flex-col gap-4 text-left"
                 data-testid="site-card"
                 onClick={handleCardClick}
                 padding="md"
@@ -152,19 +152,25 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                 shadow="sm"
                 variant="secondary"
             >
-                <SiteCardHeader {...siteCardHeaderProps} />
+                <div className="site-card__header">
+                    <SiteCardHeader {...siteCardHeaderProps} />
+                </div>
 
-                <SiteCardStatus
-                    selectedMonitorId={selectedMonitorId}
-                    status={status}
-                />
+                <div className="site-card__status">
+                    <SiteCardStatus
+                        selectedMonitorId={selectedMonitorId}
+                        status={status}
+                    />
+                </div>
 
-                <SiteCardMetrics
-                    status={status}
-                    uptime={uptime}
-                    {...(responseTime !== undefined && { responseTime })}
-                    checkCount={checkCount}
-                />
+                <div className="site-card__metrics">
+                    <SiteCardMetrics
+                        status={status}
+                        uptime={uptime}
+                        {...(responseTime !== undefined && { responseTime })}
+                        checkCount={checkCount}
+                    />
+                </div>
 
                 <SiteCardHistory
                     filteredHistory={filteredHistory}

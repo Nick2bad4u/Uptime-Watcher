@@ -120,13 +120,20 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
         } = interactions;
 
         return (
-            <div className="flex items-center justify-between">
-                <ThemedText size="lg" variant="primary" weight="semibold">
-                    {site.site.name}
-                </ThemedText>
+            <div className="site-card__header-row">
+                <div className="site-card__title-container">
+                    <span aria-hidden="true" className="site-card__title-dot" />
+                    <ThemedText
+                        className="site-card__title"
+                        size="lg"
+                        variant="primary"
+                        weight="semibold"
+                    >
+                        {site.site.name}
+                    </ThemedText>
+                </div>
 
-                {/* Monitor selector with proper Tailwind width class */}
-                <div className="header-title-box flex min-w-45 items-center gap-2 px-4 py-1">
+                <div className="site-card__control-cluster">
                     <MonitorSelector
                         monitors={site.site.monitors}
                         onChange={handleChange}
@@ -135,6 +142,7 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
 
                     <ActionButtonGroup
                         allMonitorsRunning={monitoring.allMonitorsRunning}
+                        buttonSize="xs"
                         disabled={!monitoring.hasMonitor}
                         isLoading={display.isLoading}
                         isMonitoring={monitoring.isMonitoring}

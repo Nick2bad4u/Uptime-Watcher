@@ -7,6 +7,7 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "../../../../shared/types";
+import type { SiteListLayoutMode } from "../../../stores/ui/types";
 
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
@@ -59,6 +60,7 @@ describe(useUIStore, () => {
             store.setShowSettings(false);
             store.setShowSiteDetails(false);
             store.setSiteDetailsChartTimeRange("24h");
+            store.setSiteListLayout("card-large");
         });
         vi.clearAllMocks();
         localStorageMock.clear();
@@ -83,6 +85,7 @@ describe(useUIStore, () => {
             expect(result.current.showSettings).toBeFalsy();
             expect(result.current.showSiteDetails).toBeFalsy();
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
+            expect(result.current.siteListLayout).toBe("card-large");
         });
 
         it("should have all required action methods", async ({
@@ -108,6 +111,7 @@ describe(useUIStore, () => {
             expect(typeof result.current.setSiteDetailsChartTimeRange).toBe(
                 "function"
             );
+            expect(typeof result.current.setSiteListLayout).toBe("function");
         });
     });
 
@@ -359,6 +363,51 @@ describe(useUIStore, () => {
                     result.current.setShowAdvancedMetrics(false);
                 });
                 expect(result.current.showAdvancedMetrics).toBeFalsy();
+            }
+        });
+    });
+
+    describe("Site List Layout", () => {
+        it("should update layout preference", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            expect(result.current.siteListLayout).toBe("card-large");
+
+            act(() => {
+                result.current.setSiteListLayout("list");
+            });
+
+            expect(result.current.siteListLayout).toBe("list");
+        });
+
+        it("should handle multiple layout switches", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            const layouts: SiteListLayoutMode[] = [
+                "card-large",
+                "card-compact",
+                "list",
+                "card-large",
+            ];
+
+            for (const mode of layouts) {
+                act(() => {
+                    result.current.setSiteListLayout(mode);
+                });
+                expect(result.current.siteListLayout).toBe(mode);
             }
         });
     });

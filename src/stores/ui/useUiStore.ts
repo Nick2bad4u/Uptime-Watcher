@@ -36,7 +36,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { ChartTimeRange } from "../types";
-import type { UIStore } from "./types";
+import type { SiteListLayoutMode, UIStore } from "./types";
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
@@ -56,6 +56,7 @@ type UIStoreWithPersist = UseBoundStore<
                         activeSiteDetailsTab: string;
                         showAdvancedMetrics: boolean;
                         siteDetailsChartTimeRange: ChartTimeRange;
+                        siteListLayout: SiteListLayoutMode;
                     }
                 >
             >;
@@ -71,6 +72,7 @@ type UIStoreWithPersist = UseBoundStore<
                             activeSiteDetailsTab: string;
                             showAdvancedMetrics: boolean;
                             siteDetailsChartTimeRange: ChartTimeRange;
+                            siteListLayout: SiteListLayoutMode;
                         }
                     >
                 >
@@ -148,11 +150,16 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 });
                 set({ siteDetailsChartTimeRange: range });
             },
+            setSiteListLayout: (layout: SiteListLayoutMode): void => {
+                logStoreAction("UIStore", "setSiteListLayout", { layout });
+                set({ siteListLayout: layout });
+            },
             showAddSiteModal: false,
             showAdvancedMetrics: false,
             showSettings: false,
             showSiteDetails: false,
             siteDetailsChartTimeRange: "24h",
+            siteListLayout: "card-large",
         }),
         {
             name: "uptime-watcher-ui",
@@ -183,6 +190,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 activeSiteDetailsTab: state.activeSiteDetailsTab,
                 showAdvancedMetrics: state.showAdvancedMetrics,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                siteListLayout: state.siteListLayout,
                 // Don't persist modal states or selected site
             }),
         }
