@@ -27,21 +27,21 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to the created site
      */
-    addSite: (...args: unknown[]) => Promise<Site>;
+    addSite: (siteData: Site) => Promise<Site>;
 
     /**
      * Deletes all sites (dangerous operation)
      *
      * @returns Promise resolving to the number of removed sites
      */
-    deleteAllSites: (...args: unknown[]) => Promise<number>;
+    deleteAllSites: () => Promise<number>;
 
     /**
      * Retrieves all sites from the database
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: (...args: unknown[]) => Promise<Site[]>;
+    getSites: () => Promise<Site[]>;
 
     /**
      * Removes a site from monitoring
@@ -50,7 +50,7 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: (...args: unknown[]) => Promise<boolean>;
+    removeSite: (siteId: string) => Promise<boolean>;
 
     /**
      * Updates an existing site's configuration
@@ -60,7 +60,7 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to the updated site
      */
-    updateSite: (...args: unknown[]) => Promise<Site>;
+    updateSite: (siteId: string, siteData: Partial<Site>) => Promise<Site>;
 }
 
 /**
@@ -74,27 +74,21 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the created site
      */
-    addSite: createTypedInvoker<Site>("add-site") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site>,
+    addSite: createTypedInvoker("add-site"),
 
     /**
      * Deletes all sites (dangerous operation)
      *
      * @returns Promise resolving to the number of removed sites
      */
-    deleteAllSites: createTypedInvoker<number>("delete-all-sites") satisfies (
-        ...args: unknown[]
-    ) => Promise<number>,
+    deleteAllSites: createTypedInvoker("delete-all-sites"),
 
     /**
      * Retrieves all sites from the database
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: createTypedInvoker<Site[]>("get-sites") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site[]>,
+    getSites: createTypedInvoker("get-sites"),
 
     /**
      * Removes a site from monitoring
@@ -103,13 +97,9 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: createTypedInvoker<boolean>("remove-site") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    removeSite: createTypedInvoker("remove-site"),
 
-    updateSite: createTypedInvoker<Site>("update-site") satisfies (
-        ...args: unknown[]
-    ) => Promise<Site>,
+    updateSite: createTypedInvoker("update-site"),
 } as const;
 
 export type SitesApi = SitesApiInterface;

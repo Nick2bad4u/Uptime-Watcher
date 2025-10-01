@@ -10,6 +10,7 @@
 
 // Import types for global declarations
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -94,10 +95,7 @@ declare global {
                  * @returns A promise resolving to an object containing the
                  *   backup buffer and file name.
                  */
-                downloadSqliteBackup: () => Promise<{
-                    buffer: ArrayBuffer;
-                    fileName: string;
-                }>;
+                downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
                 /**
                  * @remarks
                  * Export all application data as a JSON string.

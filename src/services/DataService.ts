@@ -10,10 +10,19 @@
  * @packageDocumentation
  */
 
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { waitForElectronAPI } from "../stores/utils";
 import { logger } from "./logger";
+
+interface DataServiceContract {
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    exportData: () => Promise<string>;
+    importData: (data: string) => Promise<boolean>;
+    initialize: () => Promise<void>;
+}
 
 /**
  * Service for managing data operations through Electron IPC.
@@ -25,7 +34,7 @@ import { logger } from "./logger";
  *
  * @public
  */
-export const DataService = {
+export const DataService: DataServiceContract = {
     /**
      * Downloads a complete SQLite database backup.
      *
@@ -43,12 +52,7 @@ export const DataService = {
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSqliteBackup(): Promise<{
-        /** SQLite database backup as binary data */
-        buffer: ArrayBuffer;
-        /** Generated filename for the backup file */
-        fileName: string;
-    }> {
+    async downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult> {
         await this.initialize();
         return window.electronAPI.data.downloadSqliteBackup();
     },

@@ -22,7 +22,7 @@ export interface SettingsApiInterface {
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: (...args: unknown[]) => Promise<number>;
+    getHistoryLimit: () => Promise<number>;
 
     /**
      * Updates the history retention limit
@@ -31,7 +31,7 @@ export interface SettingsApiInterface {
      *
      * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: (...args: unknown[]) => Promise<number>;
+    updateHistoryLimit: (limitDays: number) => Promise<number>;
 }
 
 /**
@@ -43,9 +43,7 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: createTypedInvoker<number>("get-history-limit") satisfies (
-        ...args: unknown[]
-    ) => Promise<number>,
+    getHistoryLimit: createTypedInvoker("get-history-limit"),
 
     /**
      * Updates the history retention limit
@@ -54,9 +52,7 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: createTypedInvoker<number>(
-        "update-history-limit"
-    ) satisfies (...args: unknown[]) => Promise<number>,
+    updateHistoryLimit: createTypedInvoker("update-history-limit"),
 } as const;
 
 export type SettingsApi = SettingsApiInterface;

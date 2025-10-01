@@ -19,7 +19,15 @@ const mockElectronAPI = {
         getSites: vi.fn(),
     },
     data: {
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(1024),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 1024,
+            },
+        }),
         getHistoryLimit: vi.fn().mockReturnValue(1000),
     },
     stateSync: {
@@ -56,7 +64,15 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 vi.mock("../../../services/DataService", () => ({
     DataService: {
         isConnected: vi.fn().mockReturnValue(true),
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(1024),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 1024,
+            },
+        }),
     },
 }));
 
@@ -72,10 +88,6 @@ describe("IPC Response Handling Regression Tests", () => {
         // Set up default mock responses to prevent hanging
         mockElectronAPI.sites.getSites.mockResolvedValue([]);
         mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
-        mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
-            buffer: new ArrayBuffer(0),
-            fileName: "backup-data.db",
-        });
         mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,

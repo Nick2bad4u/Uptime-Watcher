@@ -15,7 +15,15 @@ vi.mock("../../../stores/utils", () => ({
 // Mock the electron window API
 const mockElectronAPI = {
     data: {
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
+        }),
         exportData: vi.fn(),
     },
     sites: {
@@ -435,6 +443,11 @@ describe("SiteService", () => {
             const mockResponse = {
                 buffer: mockBackupData,
                 fileName: "backup_20240101_120000.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/backup.sqlite",
+                    sizeBytes: 1024,
+                },
             };
 
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValueOnce(

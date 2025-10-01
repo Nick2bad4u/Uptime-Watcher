@@ -168,6 +168,11 @@ const mockElectronAPI: {
         downloadSqliteBackup: vi.fn().mockResolvedValue({
             buffer: new ArrayBuffer(8),
             fileName: "test-backup.sqlite",
+            metadata: {
+                createdAt: Date.now(),
+                originalPath: "/tmp/test-backup.sqlite",
+                sizeBytes: 8,
+            },
         }),
         exportData: vi.fn().mockResolvedValue("mock-data"),
         importData: vi.fn().mockResolvedValue(true),

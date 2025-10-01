@@ -13,7 +13,7 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { StatusUpdate } from "@shared/types";
+import type { Monitor, StatusUpdate } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
@@ -31,7 +31,10 @@ export interface MonitoringApiInterface {
      * @returns Promise resolving to the latest {@link StatusUpdate} or undefined
      *   when no update is available
      */
-    checkSiteNow: (...args: unknown[]) => Promise<StatusUpdate | undefined>;
+    checkSiteNow: (
+        siteId: string,
+        monitorId: string
+    ) => Promise<StatusUpdate | undefined>;
 
     /**
      * Formats monitor detail information for display
@@ -40,7 +43,10 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to formatted detail string
      */
-    formatMonitorDetail: (...args: unknown[]) => Promise<string>;
+    formatMonitorDetail: (
+        monitorType: string,
+        details: string
+    ) => Promise<string>;
 
     /**
      * Formats monitor title suffix for display
@@ -49,7 +55,10 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (...args: unknown[]) => Promise<string>;
+    formatMonitorTitleSuffix: (
+        monitorType: string,
+        monitorData: Monitor
+    ) => Promise<string>;
 
     /**
      * Removes a monitor from a site
@@ -59,14 +68,14 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true when the monitor is removed
      */
-    removeMonitor: (...args: unknown[]) => Promise<boolean>;
+    removeMonitor: (siteId: string, monitorId: string) => Promise<boolean>;
 
     /**
      * Starts the global monitoring system
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoring: (...args: unknown[]) => Promise<boolean>;
+    startMonitoring: () => Promise<boolean>;
 
     /**
      * Starts monitoring for a specific site or monitor
@@ -76,14 +85,17 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForSite: (...args: unknown[]) => Promise<boolean>;
+    startMonitoringForSite: (
+        siteId: string,
+        monitorId?: string
+    ) => Promise<boolean>;
 
     /**
      * Stops the global monitoring system
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoring: (...args: unknown[]) => Promise<boolean>;
+    stopMonitoring: () => Promise<boolean>;
 
     /**
      * Stops monitoring for a specific site or monitor
@@ -93,7 +105,10 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForSite: (...args: unknown[]) => Promise<boolean>;
+    stopMonitoringForSite: (
+        siteId: string,
+        monitorId?: string
+    ) => Promise<boolean>;
 
     /**
      * Validates monitor configuration data
@@ -103,7 +118,10 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: (...args: unknown[]) => Promise<ValidationResult>;
+    validateMonitorData: (
+        monitorType: string,
+        monitorData: unknown
+    ) => Promise<ValidationResult>;
 }
 
 /**
@@ -113,9 +131,7 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Performs an immediate check for a specific monitor
      */
-    checkSiteNow: createTypedInvoker<StatusUpdate | undefined>(
-        "check-site-now"
-    ) satisfies (...args: unknown[]) => Promise<StatusUpdate | undefined>,
+    checkSiteNow: createTypedInvoker("check-site-now"),
 
     /**
      * Formats monitor detail information for display
@@ -124,9 +140,7 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to formatted detail string
      */
-    formatMonitorDetail: createTypedInvoker<string>(
-        "format-monitor-detail"
-    ) satisfies (...args: unknown[]) => Promise<string>,
+    formatMonitorDetail: createTypedInvoker("format-monitor-detail"),
 
     /**
      * Formats monitor title suffix for display
@@ -135,9 +149,7 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: createTypedInvoker<string>(
-        "format-monitor-title-suffix"
-    ) satisfies (...args: unknown[]) => Promise<string>,
+    formatMonitorTitleSuffix: createTypedInvoker("format-monitor-title-suffix"),
 
     /**
      * Removes a monitor from a site
@@ -147,18 +159,14 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true when the monitor is removed
      */
-    removeMonitor: createTypedInvoker<boolean>("remove-monitor") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    removeMonitor: createTypedInvoker("remove-monitor"),
 
     /**
      * Starts the global monitoring system
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoring: createTypedInvoker<boolean>("start-monitoring") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    startMonitoring: createTypedInvoker("start-monitoring"),
 
     /**
      * Starts monitoring for a specific site or monitor
@@ -168,18 +176,14 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForSite: createTypedInvoker<boolean>(
-        "start-monitoring-for-site"
-    ) satisfies (...args: unknown[]) => Promise<boolean>,
+    startMonitoringForSite: createTypedInvoker("start-monitoring-for-site"),
 
     /**
      * Stops the global monitoring system
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoring: createTypedInvoker<boolean>("stop-monitoring") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    stopMonitoring: createTypedInvoker("stop-monitoring"),
 
     /**
      * Stops monitoring for a specific site or monitor
@@ -189,9 +193,7 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForSite: createTypedInvoker<boolean>(
-        "stop-monitoring-for-site"
-    ) satisfies (...args: unknown[]) => Promise<boolean>,
+    stopMonitoringForSite: createTypedInvoker("stop-monitoring-for-site"),
 
     /**
      * Validates monitor configuration data
@@ -201,9 +203,7 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: createTypedInvoker<ValidationResult>(
-        "validate-monitor-data"
-    ) satisfies (...args: unknown[]) => Promise<ValidationResult>,
+    validateMonitorData: createTypedInvoker("validate-monitor-data"),
 } as const;
 
 export type MonitoringApi = MonitoringApiInterface;

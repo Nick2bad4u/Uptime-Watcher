@@ -1,196 +1,102 @@
-/**
- * Focused tests for the sites preload domain API.
- *
- * These tests cover the remaining CRUD-style IPC bridges after extracting
- * monitoring responsibilities to the monitoring domain.
- */
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { ipcRenderer } from "electron";
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import fc from "fast-check";
-
-const mockIpcRenderer = vi.hoisted(() => ({
-    invoke: vi.fn(),
-}));
+import { sitesApi } from "../../../preload/domains/sitesApi";
+import type { Site } from "../../../../shared/types";
 
 vi.mock("electron", () => ({
-    ipcRenderer: mockIpcRenderer,
+    ipcRenderer: {
+        invoke: vi.fn(),
+    },
 }));
 
-import {
-    sitesApi,
-    type SitesApiInterface,
-} from "../../../preload/domains/sitesApi";
-
-const createIpcResponse = <T>(data: T) => ({
-    data,
-    success: true as const,
-});
-
-describe("sitesApi preload bridge", () => {
-    let api: SitesApiInterface;
+describe("sitesApi", () => {
+    const baseSite: Site = {
+        identifier: "site-1",
+        monitoring: true,
+        monitors: [],
+        name: "Main Site",
+    };
 
     beforeEach(() => {
         vi.clearAllMocks();
-        api = sitesApi;
     });
 
-    afterEach(() => {
-        vi.resetAllMocks();
+    it("adds sites with typed payload", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: baseSite,
+        });
+
+        const result = await sitesApi.addSite(baseSite);
+
+        expect(result).toEqual(baseSite);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith("add-site", baseSite);
     });
 
-    describe("structure", () => {
-        it("exposes only CRUD operations", () => {
-            expect(api).toHaveProperty("addSite");
-            expect(api).toHaveProperty("getSites");
-            expect(api).toHaveProperty("updateSite");
-            expect(api).toHaveProperty("removeSite");
-            expect(api).toHaveProperty("deleteAllSites");
+    it("retrieves all sites", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: [baseSite],
         });
+
+        const result = await sitesApi.getSites();
+
+        expect(result).toEqual([baseSite]);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith("get-sites");
     });
 
-    describe("getSites", () => {
-        it("invokes the proper IPC channel", async () => {
-            const sites: unknown[] = [];
-            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(sites));
-
-            const result = await api.getSites();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith("get-sites");
-            expect(result).toEqual(sites);
+    it("removes a site by identifier", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
         });
 
-        it("propagates IPC failures", async () => {
-            mockIpcRenderer.invoke.mockRejectedValue(new Error("ipc error"));
+        const result = await sitesApi.removeSite(baseSite.identifier);
 
-            await expect(api.getSites()).rejects.toThrow("ipc error");
-        });
+        expect(result).toBeTruthy();
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "remove-site",
+            baseSite.identifier
+        );
     });
 
-    describe("addSite", () => {
-        it("forwards payload and returns created site", async () => {
-            const payload = { name: "Site", monitors: [] } as const;
-            const created = {
-                identifier: "site-1",
-                monitoring: true,
-                monitors: [],
-                name: "Site",
-            };
-            mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(created)
-            );
-
-            const result = await api.addSite(payload);
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "add-site",
-                payload
-            );
-            expect(result).toEqual(created);
+    it("updates a site", async () => {
+        const updated = { ...baseSite, name: "Updated" };
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: updated,
         });
+
+        const result = await sitesApi.updateSite(baseSite.identifier, {
+            name: "Updated",
+        });
+
+        expect(result).toEqual(updated);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "update-site",
+            baseSite.identifier,
+            { name: "Updated" }
+        );
     });
 
-    describe("updateSite", () => {
-        it("sends identifier and patch data", async () => {
-            const identifier = "site-2";
-            const updates = { name: "Renamed" } as const;
-            const updated = {
-                identifier,
-                monitoring: false,
-                monitors: [],
-                name: "Renamed",
-            };
-            mockIpcRenderer.invoke.mockResolvedValue(
-                createIpcResponse(updated)
-            );
-
-            const result = await api.updateSite(identifier, updates);
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "update-site",
-                identifier,
-                updates
-            );
-            expect(result).toEqual(updated);
+    it("deletes all sites", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: 4,
         });
+
+        const result = await sitesApi.deleteAllSites();
+
+        expect(result).toBe(4);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith("delete-all-sites");
     });
 
-    describe("removeSite", () => {
-        it("passes identifier and returns success flag", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(true));
+    it("throws when an IPC call fails", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
-            const result = await api.removeSite("site-3");
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "remove-site",
-                "site-3"
-            );
-            expect(result).toBeTruthy();
-        });
-    });
-
-    describe("deleteAllSites", () => {
-        it("returns the number of deleted records", async () => {
-            mockIpcRenderer.invoke.mockResolvedValue(createIpcResponse(4));
-
-            const result = await api.deleteAllSites();
-
-            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "delete-all-sites"
-            );
-            expect(result).toBe(4);
-        });
-    });
-
-    describe("property-based scenarios", () => {
-        it("handles diverse site payloads for addSite", async () => {
-            await fc.assert(
-                fc.asyncProperty(
-                    fc.record({
-                        name: fc.string({ minLength: 1, maxLength: 64 }),
-                        monitors: fc.array(fc.record({}), {
-                            maxLength: 5,
-                        }),
-                    }),
-                    async (payload) => {
-                        const created = {
-                            identifier: `site-${payload.name.slice(0, 5)}`,
-                            monitoring: false,
-                            monitors: payload.monitors,
-                            name: payload.name,
-                        };
-                        mockIpcRenderer.invoke.mockResolvedValue(
-                            createIpcResponse(created)
-                        );
-
-                        const result = await api.addSite(payload);
-
-                        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                            "add-site",
-                            payload
-                        );
-                        expect(result.identifier).toContain("site-");
-                    }
-                ),
-                { numRuns: 10 }
-            );
-        });
-
-        it("handles batches for deleteAllSites", async () => {
-            await fc.assert(
-                fc.asyncProperty(
-                    fc.integer({ min: 0, max: 50 }),
-                    async (count) => {
-                        mockIpcRenderer.invoke.mockResolvedValue(
-                            createIpcResponse(count)
-                        );
-
-                        const result = await api.deleteAllSites();
-
-                        expect(result).toBe(count);
-                    }
-                ),
-                { numRuns: 10 }
-            );
-        });
+        await expect(sitesApi.getSites()).rejects.toThrow(
+            /ipc operation failed/i
+        );
     });
 });

@@ -3,7 +3,15 @@
  * property-based testing for robust coverage
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import {
+    describe,
+    expect,
+    it,
+    vi,
+    beforeEach,
+    afterEach,
+    expectTypeOf,
+} from "vitest";
 import fc from "fast-check";
 
 // Mock electron using vi.hoisted() to ensure proper initialization order
@@ -19,6 +27,7 @@ import {
     monitorTypesApi,
     type MonitorTypesApiInterface,
 } from "../../../preload/domains/monitorTypesApi";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 // Helper functions for IPC response format
 const createIpcResponse = <T>(data: T) => ({ success: true, data });
@@ -597,17 +606,22 @@ describe("Monitor Types Domain API", () => {
 
     describe("Type safety and contract validation", () => {
         it("should maintain proper typing for return values", async () => {
-            const typedData = {
-                http: {
-                    name: "HTTP Monitor",
-                    fields: ["url", "method"],
-                    config: {
-                        timeout: 5000,
-                        retries: 3,
-                        followRedirects: true,
-                    },
+            const typedData: MonitorTypeConfig[] = [
+                {
+                    type: "http",
+                    displayName: "HTTP Monitor",
+                    description: "Monitors HTTP endpoints",
+                    fields: [
+                        {
+                            label: "URL",
+                            name: "url",
+                            required: true,
+                            type: "url",
+                        },
+                    ],
+                    version: "1.0.0",
                 },
-            };
+            ];
 
             mockIpcRenderer.invoke.mockResolvedValue(
                 createIpcResponse(typedData)
@@ -615,13 +629,9 @@ describe("Monitor Types Domain API", () => {
 
             const result = await api.getMonitorTypes();
 
-            // The result should be assignable to unknown
-            expect(result).toBeDefined();
-            expect(typeof result).toBeDefined();
-
-            // Should be able to access properties if casting
-            const typed = result as typeof typedData;
-            expect(typed.http.name).toBe("HTTP Monitor");
+            expectTypeOf(result).toEqualTypeOf<MonitorTypeConfig[]>();
+            expect(result).toHaveLength(1);
+            expect(result[0]?.displayName).toBe("HTTP Monitor");
         });
 
         it("should handle function context properly", async () => {

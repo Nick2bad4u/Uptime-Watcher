@@ -3,7 +3,15 @@
  * testing for robust coverage
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import {
+    describe,
+    expect,
+    it,
+    vi,
+    beforeEach,
+    afterEach,
+    expectTypeOf,
+} from "vitest";
 import fc from "fast-check";
 
 // Mock electron using vi.hoisted() for proper hoisting
@@ -20,6 +28,24 @@ import {
     type DataApiInterface,
 } from "../../../preload/domains/dataApi";
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
+const createSerializedBackup = (
+    buffer: ArrayBuffer,
+    overrides: Partial<SerializedDatabaseBackupResult> = {}
+): SerializedDatabaseBackupResult => ({
+    buffer,
+    fileName:
+        overrides.fileName ?? "uptime-watcher-backup-2025-10-01T00-00-00Z.db",
+    metadata: {
+        createdAt:
+            overrides.metadata?.createdAt ?? Date.UTC(2025, 9, 1, 0, 0, 0),
+        originalPath:
+            overrides.metadata?.originalPath ??
+            "C:/backups/uptime-watcher/uptime-watcher.db",
+        sizeBytes: overrides.metadata?.sizeBytes ?? buffer.byteLength,
+    },
+});
 
 describe("Data Domain API", () => {
     beforeEach(() => {
@@ -70,11 +96,12 @@ describe("Data Domain API", () => {
     });
 
     describe("downloadSqliteBackup", () => {
-        it("should call correct IPC channel and return ArrayBuffer", async () => {
+        it("should call correct IPC channel and return serialized backup", async () => {
             const mockBuffer = new ArrayBuffer(1024);
-            const mockResponse: IpcResponse<ArrayBuffer> = {
+            const serializedBackup = createSerializedBackup(mockBuffer);
+            const mockResponse: IpcResponse<SerializedDatabaseBackupResult> = {
                 success: true,
-                data: mockBuffer,
+                data: serializedBackup,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
@@ -83,36 +110,41 @@ describe("Data Domain API", () => {
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "download-sqlite-backup"
             );
-            expect(result).toBe(mockBuffer);
-            expect(result).toBeInstanceOf(ArrayBuffer);
+            expect(result).toBe(serializedBackup);
+            expect(result.buffer).toBe(mockBuffer);
+            expect(result.metadata.sizeBytes).toBe(mockBuffer.byteLength);
         });
 
         it("should handle empty backup", async () => {
             const emptyBuffer = new ArrayBuffer(0);
-            const mockResponse: IpcResponse<ArrayBuffer> = {
+            const serializedBackup = createSerializedBackup(emptyBuffer);
+            const mockResponse: IpcResponse<SerializedDatabaseBackupResult> = {
                 success: true,
-                data: emptyBuffer,
+                data: serializedBackup,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
             const result = await dataApi.downloadSqliteBackup();
 
-            expect(result).toBe(emptyBuffer);
-            expect(result.byteLength).toBe(0);
+            expect(result.buffer).toBe(emptyBuffer);
+            expect(result.buffer.byteLength).toBe(0);
+            expect(result.metadata.sizeBytes).toBe(0);
         });
 
         it("should handle large backup files", async () => {
             const largeBuffer = new ArrayBuffer(10 * 1024 * 1024); // 10MB
-            const mockResponse: IpcResponse<ArrayBuffer> = {
+            const serializedBackup = createSerializedBackup(largeBuffer);
+            const mockResponse: IpcResponse<SerializedDatabaseBackupResult> = {
                 success: true,
-                data: largeBuffer,
+                data: serializedBackup,
             };
             mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
 
             const result = await dataApi.downloadSqliteBackup();
 
-            expect(result).toBe(largeBuffer);
-            expect(result.byteLength).toBe(10 * 1024 * 1024);
+            expect(result.buffer).toBe(largeBuffer);
+            expect(result.buffer.byteLength).toBe(10 * 1024 * 1024);
+            expect(result.metadata.sizeBytes).toBe(10 * 1024 * 1024);
         });
 
         it("should propagate IPC errors", async () => {
@@ -501,29 +533,11 @@ describe("Data Domain API", () => {
             );
         });
 
-        it("should handle various argument combinations", async () => {
-            await fc.assert(
-                fc.asyncProperty(
-                    fc.array(fc.anything(), { maxLength: 5 }),
-                    async (args) => {
-                        const mockResponse: IpcResponse<string> = {
-                            success: true,
-                            data: "test-result",
-                        };
-                        mockIpcRenderer.invoke.mockResolvedValue(mockResponse);
-
-                        // Test with exportData which takes no arguments
-                        const result = await dataApi.exportData(...args);
-
-                        expect(result).toBe("test-result");
-                        expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                            "export-data",
-                            ...args
-                        );
-                    }
-                ),
-                { numRuns: 15 }
-            );
+        it("rejects unexpected argument combinations at compile time", () => {
+            expectTypeOf(dataApi.exportData).parameters.toEqualTypeOf<[]>();
+            // @ts-expect-error exportData does not accept positional arguments
+            void dataApi.exportData("unexpected-argument");
+            expect(typeof dataApi.exportData).toBe("function");
         });
 
         it("should handle various error scenarios", async () => {

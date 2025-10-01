@@ -108,7 +108,7 @@ export interface StateSyncApiInterface {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: (...args: unknown[]) => Promise<StateSyncFullSyncResult>;
+    requestFullSync: () => Promise<StateSyncFullSyncResult>;
 }
 
 /**
@@ -120,9 +120,7 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to current sync status information
      */
-    getSyncStatus: createTypedInvoker<StateSyncStatusSummary>(
-        "get-sync-status"
-    ) satisfies (...args: unknown[]) => Promise<StateSyncStatusSummary>,
+    getSyncStatus: createTypedInvoker("get-sync-status"),
 
     /**
      * Subscribe to state synchronization events
@@ -146,9 +144,7 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: createTypedInvoker<StateSyncFullSyncResult>(
-        "request-full-sync"
-    ) satisfies (...args: unknown[]) => Promise<StateSyncFullSyncResult>,
+    requestFullSync: createTypedInvoker("request-full-sync"),
 } as const;
 
 export type StateSyncApi = StateSyncApiInterface;

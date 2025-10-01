@@ -77,7 +77,15 @@ describe("Settings - Branch Coverage Tests", () => {
     };
 
     const mockSitesStore = {
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
+        }),
         fullResyncSites: vi.fn(),
     };
 

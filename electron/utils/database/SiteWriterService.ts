@@ -11,7 +11,6 @@
  */
 
 import type { Monitor, Site } from "@shared/types";
-import type { MonitorRow } from "@shared/types/database";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { Database } from "node-sqlite3-wasm";
 
@@ -21,7 +20,6 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 
-import { rowsToMonitors } from "../../services/database/utils/monitorMapper";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteNotFoundError } from "./interfaces";
 
@@ -29,19 +27,6 @@ import { SiteNotFoundError } from "./interfaces";
  * Service for handling site writing operations. Separates data operations from
  * side effects for better testability.
  */
-
-/**
- * Common SQL queries for site writer operations.
- *
- * @remarks
- * Centralizes query strings for maintainability and consistency. This constant
- * is internal to the service and not exported.
- *
- * @internal
- */
-const SITE_WRITER_QUERIES = {
-    SELECT_MONITORS_BY_SITE: "SELECT * FROM monitors WHERE site_identifier = ?",
-} as const;
 
 export class SiteWriterService {
     private readonly databaseService: DatabaseService;
@@ -690,13 +675,11 @@ export class SiteWriterService {
     ): void {
         // Fetch existing monitors using the transaction database instance
         // This ensures consistent reads within the transaction boundary
-        const monitorRows = db.all(
-            SITE_WRITER_QUERIES.SELECT_MONITORS_BY_SITE,
-            [siteIdentifier]
-        ) as MonitorRow[];
-
-        // Convert rows to monitor objects using the imported mapper
-        const existingMonitors = rowsToMonitors(monitorRows);
+        const existingMonitors =
+            this.repositories.monitor.findBySiteIdentifierInternal(
+                db,
+                siteIdentifier
+            );
 
         // Process each monitor: update existing or create new
         this.processMonitorUpdates(

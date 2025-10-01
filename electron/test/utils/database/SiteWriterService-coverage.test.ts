@@ -41,14 +41,6 @@ const createCompleteMonitor = (
     ...overrides,
 });
 
-// Mock the rowsToMonitors function
-vi.mock("../../../services/database/utils/monitorMapper", () => ({
-    rowsToMonitors: vi.fn(),
-}));
-
-// Import the mocked function
-import { rowsToMonitors } from "../../../services/database/utils/monitorMapper";
-
 describe("SiteWriterService Coverage Tests", () => {
     let siteWriterService: SiteWriterService;
     let mockDatabaseService: DatabaseService;
@@ -99,6 +91,21 @@ describe("SiteWriterService Coverage Tests", () => {
             updateInternal: vi.fn(),
             deleteInternal: vi.fn(),
             deleteBySiteIdentifierInternal: vi.fn(),
+            findBySiteIdentifierInternal: vi.fn().mockReturnValue([
+                {
+                    id: "monitor-1",
+                    type: "http",
+                    url: "https://example.com",
+                    checkInterval: 30_000,
+                    timeout: 5000,
+                    retryAttempts: 3,
+                    monitoring: false,
+                    status: "pending",
+                    responseTime: 0,
+                    lastChecked: undefined,
+                    history: [],
+                },
+            ]),
         } as any;
 
         mockSiteRepository = {
@@ -122,23 +129,6 @@ describe("SiteWriterService Coverage Tests", () => {
             has: vi.fn(),
             clear: vi.fn(),
         } as any;
-
-        // Mock rowsToMonitors function
-        (rowsToMonitors as MockedFunction<any>).mockReturnValue([
-            {
-                id: "monitor-1",
-                type: "http",
-                url: "https://example.com",
-                checkInterval: 30_000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: false,
-                status: "pending",
-                responseTime: 0,
-                lastChecked: undefined,
-                history: [],
-            },
-        ]);
 
         // Create service instance
         siteWriterService = new SiteWriterService({
@@ -423,8 +413,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 } as MonitorRow,
             ]);
 
-            // Set up default rowsToMonitors mock
-            (rowsToMonitors as MockedFunction<any>).mockReturnValue([
+            // Set up default monitor repository response
+            (
+                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+            ).mockReturnValue([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -951,8 +943,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 mockDatabaseService.executeTransaction as MockedFunction<any>
             ).mockImplementation(async (callback: any) => callback(mockDb));
 
-            // Set up default rowsToMonitors mock for this describe block
-            (rowsToMonitors as MockedFunction<any>).mockReturnValue([
+            // Set up default monitor repository response for this describe block
+            (
+                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+            ).mockReturnValue([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -1022,8 +1016,10 @@ describe("SiteWriterService Coverage Tests", () => {
             // where a monitor somehow loses its ID during processing
             const monitorWithoutId = createCompleteMonitor({ id: "" });
 
-            // Set up rowsToMonitors to return an existing monitor
-            (rowsToMonitors as MockedFunction<any>).mockReturnValueOnce([
+            // Configure monitor repository to return an existing monitor
+            (
+                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+            ).mockReturnValueOnce([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -1205,8 +1201,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 mockDatabaseService.executeTransaction as MockedFunction<any>
             ).mockImplementation(async (callback: any) => callback(mockDb));
 
-            // Set up rowsToMonitors to return two existing monitors
-            (rowsToMonitors as MockedFunction<any>).mockReturnValueOnce([
+            // Configure monitor repository to return two existing monitors
+            (
+                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+            ).mockReturnValueOnce([
                 {
                     id: "monitor-1",
                     type: "http",

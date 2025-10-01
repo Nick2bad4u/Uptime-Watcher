@@ -40,7 +40,15 @@ const mockFullResyncSites = vi.fn(async () => {
 // Mock electronAPI for various scenarios
 const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     data: {
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
+        }),
         exportData: vi.fn(),
         importData: vi.fn(),
     },

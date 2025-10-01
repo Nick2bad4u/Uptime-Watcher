@@ -8,6 +8,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -64,12 +65,7 @@ export const SiteService = {
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSqliteBackup(): Promise<{
-        /** SQLite database backup as binary data */
-        buffer: ArrayBuffer;
-        /** Generated filename for the backup file */
-        fileName: string;
-    }> {
+    async downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult> {
         await this.initialize();
         // Preload now returns extracted data directly
         return DataService.downloadSqliteBackup();

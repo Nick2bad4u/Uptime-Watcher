@@ -1,6 +1,7 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
 import type { Site, StatusUpdate } from "@shared/types";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
@@ -94,13 +95,16 @@ const applySiteMutation = (
 
 export const electronAPIMock: ElectronAPI = {
     data: {
-        downloadSqliteBackup: async (): Promise<{
-            buffer: ArrayBuffer;
-            fileName: string;
-        }> => ({
-            buffer: new ArrayBuffer(0),
-            fileName: "uptime-watcher-backup.sqlite",
-        }),
+        downloadSqliteBackup:
+            async (): Promise<SerializedDatabaseBackupResult> => ({
+                buffer: new ArrayBuffer(0),
+                fileName: "uptime-watcher-backup.sqlite",
+                metadata: {
+                    createdAt: Date.now(),
+                    originalPath: "C:/mock/uptime-watcher.sqlite",
+                    sizeBytes: 0,
+                },
+            }),
         exportData: async (): Promise<string> =>
             JSON.stringify({
                 historyLimit: mockState.historyLimit,

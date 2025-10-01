@@ -12,6 +12,8 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
@@ -23,7 +25,7 @@ export interface MonitorTypesApiInterface {
      *
      * @returns Promise resolving to monitor types registry
      */
-    getMonitorTypes: (...args: unknown[]) => Promise<unknown>;
+    getMonitorTypes: () => Promise<MonitorTypeConfig[]>;
 }
 
 /**
@@ -35,9 +37,7 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
      *
      * @returns Promise resolving to monitor types registry
      */
-    getMonitorTypes: createTypedInvoker<unknown>(
-        "get-monitor-types"
-    ) satisfies (...args: unknown[]) => Promise<unknown>,
+    getMonitorTypes: createTypedInvoker("get-monitor-types"),
 } as const;
 
 export type MonitorTypesApi = MonitorTypesApiInterface;

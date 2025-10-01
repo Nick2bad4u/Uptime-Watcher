@@ -135,6 +135,11 @@ const mockElectronAPI: ElectronAPI = {
         >(async () => ({
             buffer: new ArrayBuffer(8),
             fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
         })),
         exportData: vi.fn<ElectronAPI["data"]["exportData"]>(async () => "{}"),
         getHistoryLimit: vi.fn<ElectronAPI["data"]["getHistoryLimit"]>(

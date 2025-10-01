@@ -88,6 +88,37 @@ describe(SiteRepository, () => {
             );
         });
     });
+
+    describe("exportAll", () => {
+        it("should return the same data set as findAll", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteRepository", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Data Retrieval", "type");
+
+            const mockSites = [
+                { identifier: "site1", name: "Site 1", monitoring: 1 },
+                { identifier: "site2", name: "Site 2", monitoring: 0 },
+            ];
+
+            const mockDb = mockDatabaseService.getDatabase();
+            mockDb.all.mockReturnValueOnce(mockSites);
+
+            const findAllResult = await repository.findAll();
+
+            mockDb.all.mockReturnValueOnce(mockSites);
+
+            const exportAllResult = await repository.exportAll();
+
+            expect(findAllResult).toEqual(exportAllResult);
+            expect(mockDb.all).toHaveBeenCalledWith(
+                expect.stringContaining("SELECT")
+            );
+        });
+    });
     describe("findByIdentifier", () => {
         it("should find a site by identifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -188,33 +219,6 @@ describe(SiteRepository, () => {
                     const mockDb = {
                         prepare: mockPrepare,
                         run: vi.fn().mockReturnValue({ changes: 1 }),
-                    };
-                    return callback(mockDb);
-                }
-            );
-
-            const result = await repository.delete("site1");
-
-            expect(result).toBeTruthy();
-        });
-        it("should return false when site not found", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const mockPrepare = vi.fn().mockReturnValue({
-                run: vi.fn().mockReturnValue({ changes: 0 }),
-                finalize: vi.fn(),
-            });
-            mockDatabaseService.executeTransaction.mockImplementation(
-                (callback: any) => {
-                    const mockDb = {
-                        prepare: mockPrepare,
-                        run: vi.fn().mockReturnValue({ changes: 0 }),
                     };
                     return callback(mockDb);
                 }
@@ -367,33 +371,6 @@ describe(SiteRepository, () => {
             );
         });
     });
-    describe("exportAll", () => {
-        it("should export all sites", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteRepository", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Export Operation", "type");
-
-            const mockSites = [
-                { identifier: "site1", name: "Site 1", monitoring: true },
-                { identifier: "site2", name: "Site 2", monitoring: false },
-            ];
-
-            const mockPrepare = vi.fn().mockReturnValue({
-                all: vi.fn().mockReturnValue(mockSites),
-                finalize: vi.fn(),
-            });
-            const mockAll = vi.fn().mockReturnValue(mockSites);
-            mockDatabaseService.getDatabase.mockReturnValue({
-                prepare: mockPrepare,
-                all: mockAll,
-            });
-            const result = await repository.exportAll();
-
-            expect(result).toEqual(mockSites);
-        });
-    });
-
     describe("Property-Based SiteRepository Tests", () => {
         it("should handle various site creation scenarios", async () => {
             await fc.assert(

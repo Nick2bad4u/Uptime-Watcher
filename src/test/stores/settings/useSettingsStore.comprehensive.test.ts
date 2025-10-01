@@ -56,7 +56,15 @@ const mockElectronAPI = {
         resetSettings: vi.fn(),
         updateHistoryLimit: vi.fn(),
         getHistoryLimit: vi.fn(),
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(100),
+            fileName: "settings-backup.sqlite",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/settings-backup.sqlite",
+                sizeBytes: 100,
+            },
+        }),
     },
     monitoring: {
         removeMonitor: vi.fn(),
@@ -88,9 +96,15 @@ describe(useSettingsStore, () => {
         mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(500);
         mockElectronAPI.data.resetSettings.mockResolvedValue(undefined);
         mockElectronAPI.data.getHistoryLimit.mockResolvedValue(500); // This is what SettingsService actually calls
-        mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
-            new ArrayBuffer(100)
-        );
+        mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
+            buffer: new ArrayBuffer(100),
+            fileName: "settings-backup.sqlite",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/settings-backup.sqlite",
+                sizeBytes: 100,
+            },
+        });
         mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(undefined);
         mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(() => {});
 

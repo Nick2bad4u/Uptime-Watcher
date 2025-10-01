@@ -14,6 +14,8 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
 import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
 /**
@@ -23,23 +25,23 @@ export interface DataApiInterface {
     /**
      * Downloads a SQLite database backup
      *
-     * @returns Promise resolving to backup buffer data
+     * @returns Promise resolving to the serialized backup payload and metadata
      */
-    downloadSqliteBackup: (...args: unknown[]) => Promise<ArrayBuffer>;
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
 
     /**
      * Exports all application data to a JSON string
      *
      * @returns Promise resolving to exported data as JSON string
      */
-    exportData: (...args: unknown[]) => Promise<string>;
+    exportData: () => Promise<string>;
 
     /**
      * Gets the current history retention limit
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: (...args: unknown[]) => Promise<number>;
+    getHistoryLimit: () => Promise<number>;
 
     /**
      * Imports application data from a JSON string
@@ -48,14 +50,14 @@ export interface DataApiInterface {
      *
      * @returns Promise resolving to a boolean success flag
      */
-    importData: (...args: unknown[]) => Promise<boolean>;
+    importData: (serializedData: string) => Promise<boolean>;
 
     /**
      * Resets all application settings to defaults
      *
      * @returns Promise that resolves when settings are reset
      */
-    resetSettings: (...args: unknown[]) => Promise<void>;
+    resetSettings: () => Promise<void>;
 
     /**
      * Updates the history retention limit
@@ -64,7 +66,7 @@ export interface DataApiInterface {
      *
      * @returns Promise resolving to the updated limit value
      */
-    updateHistoryLimit: (...args: unknown[]) => Promise<number>;
+    updateHistoryLimit: (limitDays: number) => Promise<number>;
 }
 
 /**
@@ -76,27 +78,21 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to backup buffer data
      */
-    downloadSqliteBackup: createTypedInvoker<ArrayBuffer>(
-        "download-sqlite-backup"
-    ) satisfies (...args: unknown[]) => Promise<ArrayBuffer>,
+    downloadSqliteBackup: createTypedInvoker("download-sqlite-backup"),
 
     /**
      * Exports all application data to a JSON string
      *
      * @returns Promise resolving to exported data as JSON string
      */
-    exportData: createTypedInvoker<string>("export-data") satisfies (
-        ...args: unknown[]
-    ) => Promise<string>,
+    exportData: createTypedInvoker("export-data"),
 
     /**
      * Gets the current history retention limit
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: createTypedInvoker<number>("get-history-limit") satisfies (
-        ...args: unknown[]
-    ) => Promise<number>,
+    getHistoryLimit: createTypedInvoker("get-history-limit"),
 
     /**
      * Imports application data from a JSON string
@@ -105,18 +101,14 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to a boolean success flag
      */
-    importData: createTypedInvoker<boolean>("import-data") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    importData: createTypedInvoker("import-data"),
 
     /**
      * Resets all application settings to defaults
      *
      * @returns Promise that resolves when settings are reset
      */
-    resetSettings: createVoidInvoker("reset-settings") satisfies (
-        ...args: unknown[]
-    ) => Promise<void>,
+    resetSettings: createVoidInvoker("reset-settings"),
 
     /**
      * Updates the history retention limit
@@ -125,9 +117,7 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise that resolves to the updated limit value
      */
-    updateHistoryLimit: createTypedInvoker<number>(
-        "update-history-limit"
-    ) satisfies (...args: unknown[]) => Promise<number>,
+    updateHistoryLimit: createTypedInvoker("update-history-limit"),
 } as const;
 
 export type DataApi = DataApiInterface;

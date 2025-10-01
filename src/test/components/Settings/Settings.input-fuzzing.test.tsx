@@ -70,6 +70,8 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
+ * ```
+ *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -80,6 +82,7 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -152,9 +155,15 @@ const mockfullResyncSites = vi.fn(async () => {
     // Simulate sync operation
 });
 
-const mockDownloadSQLiteBackup = vi.fn(async () => {
-    // Simulate backup download
-});
+const mockDownloadSQLiteBackup = vi.fn(async () => ({
+    buffer: new ArrayBuffer(32),
+    fileName: "uptime-watcher-backup.db",
+    metadata: {
+        createdAt: Date.now(),
+        originalPath: "C:/tmp/uptime-watcher.db",
+        sizeBytes: 32,
+    },
+}));
 
 const mockOnClose = vi.fn();
 const confirmMock = vi.fn();

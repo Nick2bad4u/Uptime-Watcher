@@ -235,9 +235,10 @@ export class SiteRepository {
      */
     public async exists(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
-            async () => {
-                const site = await this.findByIdentifier(identifier);
-                return site !== undefined;
+            () => {
+                const db = this.getDb();
+                const site = this.findByIdentifierInternal(db, identifier);
+                return Promise.resolve(site !== undefined);
             },
             "site-exists",
             undefined,
@@ -262,13 +263,7 @@ export class SiteRepository {
      * @throws If the database operation fails.
      */
     public async exportAll(): Promise<SiteRow[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const siteRows = db.all(
-                SITE_QUERIES.SELECT_ALL
-            ) as DatabaseSiteRow[];
-            return Promise.resolve(rowsToSites(siteRows));
-        }, "site-export-all");
+        return this.runAllSitesOperation("site-export-all");
     }
 
     /**
@@ -289,13 +284,7 @@ export class SiteRepository {
      * @throws If the database operation fails.
      */
     public async findAll(): Promise<SiteRow[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const siteRows = db.all(
-                SITE_QUERIES.SELECT_ALL
-            ) as DatabaseSiteRow[];
-            return Promise.resolve(rowsToSites(siteRows));
-        }, "find-all-sites");
+        return this.runAllSitesOperation("find-all-sites");
     }
 
     /**
@@ -320,26 +309,8 @@ export class SiteRepository {
         return withDatabaseOperation(
             () => {
                 const db = this.getDb();
-
-                try {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
-                    const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [
-                        identifier,
-                    ]) as DatabaseSiteRow | undefined;
-
-                    const result: SiteRow | undefined = siteRow
-                        ? rowToSite(siteRow)
-                        : undefined;
-                    return Promise.resolve(result);
-                } catch (error) {
-                    logger.error(
-                        `[SiteRepository] Failed to find site: ${identifier}`,
-                        error
-                    );
-                    throw error instanceof Error
-                        ? error
-                        : new Error(String(error));
-                }
+                const site = this.findByIdentifierInternal(db, identifier);
+                return Promise.resolve(site);
             },
             "site-lookup",
             undefined,
@@ -540,5 +511,62 @@ export class SiteRepository {
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
+    }
+
+    /**
+     * Executes the shared "select all sites" operation within a database
+     * context.
+     *
+     * @param operationName - Identifier used for logging and metrics.
+     *
+     * @returns Promise resolving to all sites currently persisted.
+     */
+    private runAllSitesOperation(operationName: string): Promise<SiteRow[]> {
+        return withDatabaseOperation(() => {
+            const db = this.getDb();
+            const sites = this.fetchAllSitesInternal(db);
+            return Promise.resolve(sites);
+        }, operationName);
+    }
+
+    /**
+     * Internal helper to retrieve all sites using an existing database
+     * connection.
+     *
+     * @param db - Active database connection.
+     *
+     * @returns Array of all site records.
+     */
+    private fetchAllSitesInternal(db: Database): SiteRow[] {
+        const siteRows = db.all(SITE_QUERIES.SELECT_ALL) as DatabaseSiteRow[];
+        return rowsToSites(siteRows);
+    }
+
+    /**
+     * Internal helper to find a site by identifier within a transaction scope.
+     *
+     * @param db - Active database connection tied to the caller's transaction.
+     * @param identifier - Site identifier to look up.
+     *
+     * @returns Site data if found; otherwise undefined.
+     */
+    private findByIdentifierInternal(
+        db: Database,
+        identifier: string
+    ): SiteRow | undefined {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
+            const siteRow = db.get(SITE_QUERIES.SELECT_BY_ID, [identifier]) as
+                | DatabaseSiteRow
+                | undefined;
+
+            return siteRow ? rowToSite(siteRow) : undefined;
+        } catch (error) {
+            logger.error(
+                `[SiteRepository] Failed to find site: ${identifier}`,
+                error
+            );
+            throw error instanceof Error ? error : new Error(String(error));
+        }
     }
 }

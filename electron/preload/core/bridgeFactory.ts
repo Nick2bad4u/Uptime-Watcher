@@ -11,6 +11,12 @@
  * @packageDocumentation
  */
 
+import type {
+    IpcInvokeChannel,
+    IpcInvokeChannelParams,
+    IpcInvokeChannelResult,
+    VoidIpcInvokeChannel,
+} from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
 
 import { ipcRenderer } from "electron";
@@ -32,22 +38,6 @@ export type EventCallback = (...args: unknown[]) => void;
 export type RemoveListener = () => void;
 
 /**
- * Configuration for an IPC channel
- */
-export interface ChannelConfig<TInput = unknown[], TOutput = unknown> {
-    /** The IPC channel name */
-    channel: string;
-    /** Whether this channel requires parameters */
-    hasParameters?: boolean;
-    /** Input parameter types (for TypeScript inference) */
-    inputTypes?: TInput;
-    /** Method name to expose in the API */
-    methodName: string;
-    /** Output type (for TypeScript inference) */
-    outputType?: TOutput;
-}
-
-/**
  * Error class for IPC-related errors with enhanced context
  */
 export class IpcError extends Error {
@@ -55,15 +45,23 @@ export class IpcError extends Error {
 
     public readonly channel: string;
 
+    /**
+     * Optional structured metadata that provides additional IPC failure
+     * context.
+     */
+    public readonly details: Readonly<Record<string, unknown>> | undefined;
+
     public constructor(
         message: string,
         channel: string,
-        originalError?: Error
+        originalError?: Error,
+        details?: Record<string, unknown>
     ) {
         super(message, { cause: originalError });
         this.name = "IpcError";
         this.channel = channel;
         this.originalError = originalError;
+        this.details = details ? Object.freeze({ ...details }) : undefined;
     }
 }
 
@@ -81,22 +79,6 @@ function isIpcResponse(value: unknown): value is IpcResponse {
         "success" in value &&
         typeof (value as { success: unknown }).success === "boolean"
     );
-}
-
-/**
- * Converts kebab-case channel names to camelCase method names
- *
- * @param channel - Channel name in kebab-case
- *
- * @returns Method name in camelCase
- */
-function convertChannelToCamelCase(channel: string): string {
-    return channel
-        .split("-")
-        .map((part, index) =>
-            index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)
-        )
-        .join("");
 }
 
 /**
@@ -159,17 +141,26 @@ function validateVoidIpcResponse(response: unknown): void {
  *
  * @returns A function that safely invokes the IPC channel with validation
  */
-// eslint-disable-next-line etc/no-misused-generics -- TOutput type parameter is provided by caller for return type
-export function createTypedInvoker<TOutput>(
-    channel: string
-): (...args: unknown[]) => Promise<TOutput> {
-    return async (...args: unknown[]): Promise<TOutput> => {
+export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
+    channel: TChannel
+): (
+    ...args: IpcInvokeChannelParams<TChannel>
+) => Promise<IpcInvokeChannelResult<TChannel>> {
+    return async function invokeTypedChannel(
+        ...args: IpcInvokeChannelParams<TChannel>
+    ): Promise<IpcInvokeChannelResult<TChannel>> {
         try {
+            const invokeArgs: unknown[] = [];
+            for (const value of args) {
+                invokeArgs.push(value);
+            }
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...args
+                ...invokeArgs
             );
-            return validateIpcResponse<TOutput>(response);
+            return validateIpcResponse<IpcInvokeChannelResult<TChannel>>(
+                response
+            );
         } catch (error) {
             const errorMessage =
                 error instanceof Error ? error.message : String(error);
@@ -191,14 +182,20 @@ export function createTypedInvoker<TOutput>(
  * @returns A function that safely invokes the IPC channel and validates void
  *   response
  */
-export function createVoidInvoker(
-    channel: string
-): (...args: unknown[]) => Promise<void> {
-    return async (...args: unknown[]): Promise<void> => {
+export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
+    channel: TChannel
+): (...args: IpcInvokeChannelParams<TChannel>) => Promise<void> {
+    return async function invokeVoidChannel(
+        ...args: IpcInvokeChannelParams<TChannel>
+    ): Promise<void> {
         try {
+            const invokeArgs: unknown[] = [];
+            for (const value of args) {
+                invokeArgs.push(value);
+            }
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...args
+                ...invokeArgs
             );
             validateVoidIpcResponse(response);
         } catch (error) {
@@ -271,59 +268,4 @@ export function createEventManager(channel: string): {
             ipcRenderer.removeAllListeners(channel);
         },
     };
-}
-
-/**
- * Utility function to create channel configuration objects
- *
- * @param channel - IPC channel name
- * @param methodName - Method name for the API (defaults to camelCase of
- *   channel)
- * @param outputType - Expected output type (for TypeScript inference)
- *
- * @returns Channel configuration object
- */
-export function defineChannel<TOutput = unknown>(
-    channel: string,
-    methodName?: string,
-    outputType?: TOutput
-): ChannelConfig<unknown[], TOutput> {
-    return {
-        channel,
-        methodName: methodName ?? convertChannelToCamelCase(channel),
-        ...(outputType !== undefined && { outputType }),
-        hasParameters: false, // This would be detected automatically in full implementation
-    };
-}
-
-/**
- * Creates a domain-specific API bridge from channel configurations
- *
- * @param channels - Array of channel configurations for the domain
- *
- * @returns Object with typed methods for each channel
- */
-export function createDomainBridge<
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter provides type safety for channel configurations
-    TChannels extends Record<string, ChannelConfig>,
->(
-    channels: TChannels
-): Record<string, (...args: unknown[]) => Promise<unknown>> {
-    const api: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
-
-    for (const [methodName, config] of Object.entries(channels)) {
-        if (config.outputType === undefined) {
-            // Void return type
-            api[methodName] = createVoidInvoker(config.channel) as (
-                ...args: unknown[]
-            ) => Promise<unknown>;
-        } else {
-            // Typed return type
-            api[methodName] = createTypedInvoker(config.channel) as (
-                ...args: unknown[]
-            ) => Promise<unknown>;
-        }
-    }
-
-    return api;
 }

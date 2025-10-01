@@ -141,7 +141,15 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const sitesStore = {
-                downloadSQLiteBackup: vi.fn(),
+                downloadSQLiteBackup: vi.fn().mockResolvedValue({
+                    buffer: new ArrayBuffer(8),
+                    fileName: "backup.db",
+                    metadata: {
+                        createdAt: 0,
+                        originalPath: "/tmp/backup.db",
+                        sizeBytes: 8,
+                    },
+                }),
                 fullResyncSites: vi.fn(),
             };
 
@@ -499,7 +507,15 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Category: Component", "category");
             await annotate("Type: Backup Operation", "type");
 
-            const downloadSQLiteBackup = vi.fn().mockResolvedValue(undefined);
+            const downloadSQLiteBackup = vi.fn().mockResolvedValue({
+                buffer: new ArrayBuffer(8),
+                fileName: "uptime-watcher-backup.db",
+                metadata: {
+                    createdAt: 42,
+                    originalPath: "C:/tmp/uptime-watcher.db",
+                    sizeBytes: 8,
+                },
+            });
 
             const handleBackup = async () => {
                 await downloadSQLiteBackup();

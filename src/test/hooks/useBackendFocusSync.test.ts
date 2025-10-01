@@ -27,7 +27,15 @@ const createMockStore = (): Partial<SitesStore> => ({
     checkSiteNow: vi.fn(),
     createSite: vi.fn(),
     deleteSite: vi.fn(),
-    downloadSqliteBackup: vi.fn(),
+    downloadSqliteBackup: vi.fn().mockResolvedValue({
+        buffer: new ArrayBuffer(8),
+        fileName: "backup.db",
+        metadata: {
+            createdAt: 0,
+            originalPath: "/tmp/backup.db",
+            sizeBytes: 8,
+        },
+    }),
     getSelectedMonitorId: vi.fn(),
     getSelectedSite: vi.fn(),
     getSyncStatus: vi.fn(),

@@ -90,7 +90,15 @@ describe("Settings Component", () => {
     };
 
     const mockSitesStore = {
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
+        }),
         fullResyncSites: vi.fn().mockResolvedValue(undefined),
     };
 

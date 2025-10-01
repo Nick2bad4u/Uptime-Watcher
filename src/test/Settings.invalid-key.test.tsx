@@ -51,7 +51,15 @@ vi.mock("../services/logger", () => ({
 const mockUpdateSettings = vi.fn();
 const mockUseStore = {
     clearError: vi.fn(),
-    downloadSQLiteBackup: vi.fn().mockResolvedValue(undefined),
+    downloadSQLiteBackup: vi.fn().mockResolvedValue({
+        buffer: new ArrayBuffer(8),
+        fileName: "backup.db",
+        metadata: {
+            createdAt: 0,
+            originalPath: "/tmp/backup.db",
+            sizeBytes: 8,
+        },
+    }),
     fullResyncSites: vi.fn().mockResolvedValue(undefined),
     isLoading: false,
     lastError: null as string | null,

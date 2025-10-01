@@ -138,6 +138,11 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 downloadSqliteBackup: vi.fn().mockResolvedValue({
                     buffer: new ArrayBuffer(1024),
                     fileName: "backup.db",
+                    metadata: {
+                        createdAt: 0,
+                        originalPath: "/tmp/backup.db",
+                        sizeBytes: 1024,
+                    },
                 }),
             },
         };

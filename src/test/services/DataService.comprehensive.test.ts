@@ -35,11 +35,20 @@ vi.mock("../../../shared/utils/errorHandling", () => ({
 }));
 
 // Helper functions for creating mock data
-function createMockBackupResult(): { buffer: ArrayBuffer; fileName: string } {
+function createMockBackupResult(): {
+    buffer: ArrayBuffer;
+    fileName: string;
+    metadata: { createdAt: number; originalPath: string; sizeBytes: number };
+} {
     const buffer = new ArrayBuffer(1024);
     return {
         buffer,
         fileName: "backup_2024-01-01_12-00-00.sqlite",
+        metadata: {
+            createdAt: 0,
+            originalPath: "/tmp/backup.sqlite",
+            sizeBytes: 1024,
+        },
     };
 }
 
@@ -193,6 +202,11 @@ describe("DataService", () => {
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
                 buffer: emptyBuffer,
                 fileName: "empty.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/empty.sqlite",
+                    sizeBytes: 0,
+                },
             });
 
             const result = await DataService.downloadSqliteBackup();
@@ -482,6 +496,11 @@ describe("DataService", () => {
             const largeBackup = {
                 buffer: largeBuffer,
                 fileName: "large_backup.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/large_backup.sqlite",
+                    sizeBytes: 50 * 1024 * 1024,
+                },
             };
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
                 largeBackup
@@ -516,6 +535,11 @@ describe("DataService", () => {
             const specialBackup = {
                 buffer: new ArrayBuffer(1024),
                 fileName: "backup (copy) #1 [2024-01-01] @12-00-00.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/backup-special.sqlite",
+                    sizeBytes: 1024,
+                },
             };
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue(
                 specialBackup

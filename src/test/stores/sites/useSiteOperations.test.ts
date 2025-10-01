@@ -485,8 +485,13 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Backup Operation", "type");
 
             mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
-                success: true,
-                data: { buffer: new ArrayBuffer(8), fileName: "backup.sqlite" },
+                buffer: new ArrayBuffer(8),
+                fileName: "backup.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "/tmp/backup.sqlite",
+                    sizeBytes: 8,
+                },
             });
 
             await actions.downloadSqliteBackup();

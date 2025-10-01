@@ -3,7 +3,9 @@
  *
  * This test file targets the useSitesStore.ts file which has 0% function
  * coverage despite having 100% other metrics. We need to test the actual store
- * creation and function composition.
+ * downloadSqliteBackup: vi.fn().mockResolvedValue({ buffer: new ArrayBuffer(8),
+ * fileName: "backup.db", metadata: { createdAt: 0, originalPath:
+ * "/tmp/backup.db", sizeBytes: 8, }, }),
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -71,7 +73,15 @@ const mockElectronAPI = {
         updateMonitorTimeout: vi.fn(),
         updateMonitorRetryAttempts: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
-        downloadSqliteBackup: vi.fn(),
+        downloadSqliteBackup: vi.fn().mockResolvedValue({
+            buffer: new ArrayBuffer(8),
+            fileName: "backup.db",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/backup.db",
+                sizeBytes: 8,
+            },
+        }),
     },
     data: {
         getHistoryLimit: vi.fn().mockReturnValue(1000),

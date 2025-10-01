@@ -27,7 +27,7 @@ export interface SystemApiInterface {
      *
      * @returns Promise resolving to true if URL was opened successfully
      */
-    openExternal: (...args: unknown[]) => Promise<boolean>;
+    openExternal: (url: string) => Promise<boolean>;
 
     /**
      * Quits the application and installs a pending update
@@ -51,9 +51,7 @@ export const systemApi: SystemApiInterface = {
      *
      * @returns Promise resolving to true if URL was opened successfully
      */
-    openExternal: createTypedInvoker<boolean>("open-external") satisfies (
-        ...args: unknown[]
-    ) => Promise<boolean>,
+    openExternal: createTypedInvoker("open-external"),
 
     /**
      * Quits the application and installs a pending update
