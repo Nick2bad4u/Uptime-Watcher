@@ -7,14 +7,431 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7b9bfbb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc)...
-[f1fdd24](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f1fdd245fdabc2e1a4e2e0591e400de78ee432e3)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc...f1fdd245fdabc2e1a4e2e0591e400de78ee432e3))
+[[3a6fde5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)...
+[3a6fde5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3a6fde5f3faee473677c0f0d2c59b13148c327b1...3a6fde5f3faee473677c0f0d2c59b13148c327b1))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 16.1.0 [`(3a6fde5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)
+
+
+
+
+
+
+## [16.1.0] - 2025-10-01
+
+
+[[7b9bfbb](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc)...
+[29d1c8d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29d1c8df649442215788b160a10c224540ebf16d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc...29d1c8df649442215788b160a10c224540ebf16d))
+
+
+### ✨ Features
+
+- ✨ [feat] Add SQLite database backup download
+
+Adds functionality to download a SQLite database backup.
+
+- ✨ [feat] Introduces `downloadSqliteBackup` API to generate and transfer a SQLite database backup to the renderer process.
+ - Returns a transferable payload containing the binary buffer, file metadata, and a suggested download file name, ensuring compatibility with browser APIs.
+- 🛠️ [fix] Moves `findBySiteIdentifierInternal` and `runAllSitesOperation` methods to maintain code organization and readability.
+ - The methods are relocated within their respective classes without changing their functionality.
+- 🧪 [test] Enhances test coverage and reliability.
+ - 🧪 [test] Updates `SiteRepository.test.ts` to correctly assert the number of changes during database operations.
+ - 🧪 [test] Modifies `generateUuid.test.ts` to ensure fallback mechanism is correctly triggered and tested when `crypto.randomUUID` is unavailable.
+ - 🧪 [test] Refactors `fileDownload.fast-check-comprehensive.test.ts` and `fileDownload.fixed.test.ts` to improve the validation and handling of SQLite backup downloads, ensuring comprehensive test coverage and proper error handling.
+ - 🧹 [chore] Cleans up test descriptions in `bridgeFactory.comprehensive.test.ts` for better readability.
+- 🛠️ [fix] Implements a fallback mechanism for UUID generation when `crypto.randomUUID` is unavailable.
+ - 🛠️ [fix] Modifies `generateUuid` to use a timestamp-based ID when `crypto.randomUUID` is not available, ensuring functionality in environments lacking the crypto API.
+- 🧹 [chore] Refactors `handleSQLiteBackupDownload` to improve data handling and validation.
+ - 🧹 [chore] Implements validation for backup data to ensure it matches the expected structure.
+ - 🧹 [chore] Uses a fresh typed array view when creating the blob from backup data.
+ - 🧹 [chore] Falls back to a generated filename when the provided filename is blank.
+- 📝 [docs] Adds API documentation for `downloadSqliteBackup` to explain its usage and the structure of the returned data.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0061e49)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0061e49085e1a7a2d1cd9250faa4e9f12a8f2a6b)
+
+
+- ✨ [feat] Introduce global confirmation dialog and refactor cache TTL
+
+This commit introduces several key enhancements, focusing on UI consistency and code clarity. The primary changes include implementing a centralized confirmation dialog to replace native browser confirms and refactoring the cache configuration to use a more intuitive `ttl` property.
+
+✨ **[feat] Add Global Confirmation Dialog**
+ - Implements a new, non-blocking `ConfirmDialog` component and a corresponding `useConfirmDialog` hook.
+ - Provides a global `requestConfirmation` function managed by a Zustand store (`useConfirmDialogStore`) to display modal confirmations.
+ - This replaces all instances of `window.confirm` and `globalThis.confirm` for destructive actions (like deleting sites/monitors or resetting settings), offering a consistent and modern UX.
+ - The dialog is integrated into the main `App` component and is controlled via a centralized store, ensuring only one can be active at a time.
+
+🚜 **[refactor] Standardize Cache TTL Configuration**
+ - Renames the `defaultTTL` property to `ttl` across the entire `StandardizedCache` and `TypedCache` implementation.
+ - This change clarifies that the property sets a cache-level time-to-live, not just a default that can be overridden.
+ - All related configurations, documentation (including ADRs), and tests have been updated to reflect this new, more intuitive naming convention.
+ - The cache now emits `undefined` for the TTL in events when expiration is disabled (TTL <= 0), improving event data clarity.
+
+🚜 **[refactor] Improve Unique ID Generation**
+ - Simplifies unique ID generation by exclusively using `globalThis.crypto.randomUUID()`.
+ - Removes the previous fallback logic that used `Date.now()` and `Math.random()`.
+ - This change enforces a dependency on a modern, secure, and more reliable method for creating unique identifiers, throwing an error if `crypto.randomUUID` is unavailable.
+
+🧪 **[test] Enhance Test Suites**
+ - Updates all relevant tests to use the new `useConfirmDialog` mock instead of spying on `window.confirm`.
+ - Refactors cache tests to align with the `defaultTTL` -> `ttl` rename.
+ - Improves test mocks for `matchMedia` and `crypto` to be more robust and accurate.
+
+🧹 **[chore] Update BeastMode Chatmode**
+ - Adds `think` and `problems` tools to the agent's capabilities.
+ - Updates instructions to reflect new tool usage and enforce TSDoc commenting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(79b6211)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79b6211fde8d4875ba63e16cc37aa9b5944bd12f)
+
+
+- ✨ [feat] Enhance Docusaurus configuration and add glossary pipeline
+
+This commit introduces significant improvements to the Docusaurus documentation site, focusing on configuration flexibility, build performance, and content structure.
+
+✨ **Features & Enhancements**
+*   **Dynamic Configuration**: The `docusaurus.config.ts` now uses environment variables for `baseUrl` and `siteUrl`, allowing for more flexible deployments across different environments.
+*   **Experimental Build Flag**: Adds a `build:fast` npm script using `cross-env` to enable experimental Docusaurus performance features like the Rspack bundler via a `DOCUSAURUS_ENABLE_EXPERIMENTAL` flag.
+*   **SEO & Social Sharing**: Enriches pages with Open Graph (og:) meta tags for improved social media card previews.
+*   **Glossary Pipeline**:
+    *   Introduces a placeholder `glossary.md` page.
+    *   Adds a `docs/terms/` directory for defining terminology.
+    *   The `@grnet/docusaurus-terminology` plugin, which is incompatible with Docusaurus v3, has been disabled. A new build process will handle glossary generation.
+
+🔧 **Build & Tooling**
+*   **Cleanup Script**: Adds a new Node.js script `scripts/clean-generated-docs.mjs` to programmatically remove generated documentation artifacts (TypeDoc output, Docusaurus build cache) and recreate placeholder files. This simplifies the pre-build cleanup process.
+*   **Dependency**: Adds `cross-env` to enable setting environment variables in npm scripts for cross-platform compatibility.
+
+🎨 **Style & Refactoring**
+*   **Plugin Configuration**:
+    *   Moves theme-related plugins (`@docusaurus/theme-live-codeblock`, `@docusaurus/theme-mermaid`, `@easyops-cn/docusaurus-search-local`) to the correct `themes` array in the configuration.
+    *   Activates and refines the styling for `docusaurus-plugin-copy-page-button` using CSS variables for better theme integration and a modern look.
+*   **Code Cleanup**: Removes redundant ESLint comments from various MDX documentation pages.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5ff9a16)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ff9a165b12d21514ccd2d77e6fd192bd020eb04)
+
+
+- ✨ [feat] Overhaul Storybook configuration and improve monitor display
+
+This update introduces a comprehensive overhaul of the Storybook setup, refactors core application logic for improved clarity and robustness, and enhances the user interface.
+
+✨ **Features & Enhancements**
+*   **Storybook Overhaul**:
+    *   Replaces the manual theme provider with `storybook-dark-mode` and `@storybook/addon-themes` for a more integrated and robust theming experience in Storybook.
+    *   Introduces a compatibility shim for `@storybook/preview-api` to ensure addon compatibility.
+    *   Removes the explicit `title` property from story metadata, allowing Storybook to infer it from the file path for better organization.
+*   **Improved Monitor Display**:
+    *   The monitor selector now intelligently displays the `host:port` combination for monitors where the port is non-standard (not 80 or 443), providing more context at a glance.
+*   **Enhanced AI Capabilities**:
+    *   Expands Beast Mode's toolset with Tavily's `crawl` and `search` capabilities for more advanced web interactions.
+
+🚜 **Refactoring**
+*   **Sequential Task Execution**:
+    *   Introduces a `runSequentially` helper in `MonitorManager` to abstract and centralize the pattern of executing asynchronous monitor operations in order. This simplifies methods like `startAll` and `stopAll` by removing repetitive `for...of` loops with `await` and associated ESLint disable comments.
+*   **Form Submission Logic**:
+    *   Decomposes the monitor creation and validation logic in the "Add Site" form into smaller, single-responsibility functions. This makes the form submission process more modular, readable, and easier to extend with new monitor types.
+*   **Error Handling**:
+    *   Improves error handling in monitor services by re-throwing normalized errors with enriched messages. This preserves the original stack trace and error type, simplifying debugging.
+
+🧹 **Chore & Docs**
+*   **Dependency Updates**:
+    *   Updates numerous development dependencies, including `@typescript-eslint`, `@types/node`, and various Storybook packages.
+*   **ESLint Configuration**:
+    *   Cleans up the ESLint configuration by removing commented-out code and adding `MARK:` comments to delineate sections, significantly improving readability and navigation.
+*   **Documentation**:
+    *   Updates the guide for implementing new monitor types with clearer instructions on schema access and validation builder usage.
+    *   Refines ESLint disable comments in Docusaurus MDX files for better style and precision.
+
+🧪 **Testing**
+*   **Test Modernization**:
+    *   Updates tests to use `Reflect.deleteProperty` instead of assigning `undefined` for more accurate object manipulation.
+    *   Improves the WebSocket mock in tests for better clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4993111)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4993111150068fcd901d77f06209fb37b78db82c)
+
+
+- ✨ [feat] Add new monitor types and enhance monitoring capabilities
+
+This commit introduces several new monitor types and enhances existing monitoring and development features.
+
+### ✨ Source Code Features & Refinements
+
+-   **New Monitor Types Added**: Introduces four new advanced monitor types to expand the application's monitoring capabilities:
+    -   `cdn-edge-consistency`: Verifies that content served from multiple CDN edge locations is consistent with a baseline origin URL.
+    -   `replication`: Checks database or system replication lag by comparing timestamps between a primary and a replica.
+    -   `server-heartbeat`: Monitors a service's health by checking a heartbeat endpoint for a specific status and timestamp drift.
+    -   `websocket-keepalive`: Ensures WebSocket connections are stable by performing a ping/pong keepalive check.
+-   **Enhanced Monitor Display**: Improves how monitor information is displayed in the UI:
+    -   The monitor selector dropdown and site details view now show more descriptive labels and relevant identifiers (e.g., "Website URL: example.com", "Replication Lag: primary.example.com/status") for better clarity.
+    -   Refactors the logic for generating these display names to be more robust and cover all monitor types.
+-   **Improved Form Logic**: Refactors the "Add Site/Monitor" form logic for better state management and validation.
+    -   The `useAddSiteForm` hook is streamlined, improving how monitor-specific fields are managed and reset when the type changes.
+    -   Validation logic in `monitorValidation.ts` is expanded to cover the new monitor types.
+-   **Robust Error Handling**: Strengthens the `CdnEdgeConsistencyMonitor` by adding a check to prevent runtime errors when a baseline request fails without an error message.
+-   **Type Safety**: Improves type safety in utility functions (`isNonNegativeNumber`, `isPositiveNumber`) by ensuring they only validate finite numbers.
+
+### 🧪 Testing & Development Experience
+
+-   **Comprehensive Unit Tests**: Adds extensive unit tests for the new monitor services (`CdnEdgeConsistencyMonitor`, `ReplicationMonitor`, `ServerHeartbeatMonitor`, `WebsocketKeepaliveMonitor`), ensuring their reliability.
+-   **Property-Based Testing**: Updates property-based and fuzz tests to include all new monitor types, making schema and validation testing more comprehensive.
+-   **New Build Task**: Adds a new `"Install Dependencies (Force)"` task to `tasks.json` to simplify forcefully reinstalling dependencies during development.
+-   **AI Agent Tooling**: Refactors and updates the tools available to the "Beast Mode" AI agent, including namespacing and adding a new `executePrompt` tool.
+
+### 🧹 Dependency Updates
+
+-   Updates various development and production dependencies, including ESLint plugins and Vite, to their latest versions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(201ede3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/201ede3f4c3821b7c5c80fa40086e7308c4b52f4)
+
+
+- ✨ [feat] Add four advanced monitor types and supporting documentation
+
+This commit introduces four new advanced monitor types to enhance system observability and provides comprehensive documentation for the project's architecture and tooling.
+
+### ✨ Source Code Features
+- **Adds Four New Monitor Types**:
+  - `CDN Edge Consistency`: Compares responses from multiple edge locations against a baseline origin URL to detect content or status drift.
+  - `Replication Lag`: Tracks database replication by comparing timestamps between primary and replica status endpoints.
+  - `Server Heartbeat`: Polls a heartbeat endpoint, validates its status, and checks for timestamp drift to ensure services are responsive.
+  - `WebSocket Keepalive`: Verifies WebSocket connections by sending ping frames and expecting a pong response within a specified delay.
+- **Introduces New Shared Utilities**:
+  - Adds helper functions for parsing URL lists, extracting nested fields from JSON objects using dot-notation, and normalizing various timestamp formats into milliseconds. These utilities support the complex data handling required by the new monitors.
+- **Enhances the "Add Monitor" Form**:
+  - The UI form for adding/editing monitors is updated with new dynamic fields corresponding to each new monitor type.
+  - State management (`useAddSiteForm` hook) is extended to handle the new fields, including their values, setters, and validation logic.
+  - The form submission process now correctly constructs monitor objects for the new types.
+
+### 📝 Documentation
+- **Adds Engineering Tooling Diagrams**:
+  - Introduces a new `engineering-tooling.mdx` page with Mermaid diagrams visualizing the linting, type-checking, documentation, and site build pipelines.
+- **Adds Testing Architecture Diagrams**:
+  - Creates a new `testing-architecture.mdx` page that maps out the entire testing stack, including Vitest, Playwright E2E, and property-based testing workflows.
+- **Expands System Architecture Diagrams**:
+  - Updates the existing `system-architecture.mdx` page with new diagrams for "UI Component Composition" and "UI-State Integration," clarifying how UI components and state stores interact.
+
+### 🧪 Testing
+- Extends the test suite to provide comprehensive coverage for the new monitor types. This includes:
+  - Unit and integration tests for the new monitor services.
+  - Property-based tests (`fast-check`) for Zod schemas and type guards.
+  - Validation tests for form data and monitor configurations.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8dddf86)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8dddf86d57923188cb32a58b49843c940a369120)
+
+
+- ✨ [feat] Add advanced monitor types and system documentation
+
+✨ [feat] Implements four new advanced monitor types to expand system health checking capabilities.
+ - **CDN Edge Consistency Monitor**: Compares responses from multiple CDN edge locations against a baseline origin. It uses content hashing (SHA256) to detect mismatches in status codes or response bodies, reporting `degraded` for inconsistencies and `down` for widespread failures.
+ - **Replication Monitor**: Checks the time lag between primary and replica database or service endpoints. It extracts timestamps from JSON responses and reports a `degraded` status if the lag exceeds a configurable threshold.
+ - **Server Heartbeat Monitor**: Validates a service's health by checking a heartbeat endpoint. It ensures the service reports an expected status value and that its reported timestamp is within an acceptable drift from the current time.
+ - **WebSocket Keepalive Monitor**: Establishes a WebSocket connection, sends a `ping`, and waits for a `pong` or any message. It reports `degraded` if no response is received within a specified window and `down` if the connection fails.
+
+📝 [docs] Adds new architecture and workflow diagrams to enhance system understanding.
+ - A sequence diagram for the "Scheduled Monitor Check Lifecycle" is added, detailing the flow from scheduling to UI updates.
+ - A flowchart for the "Site Provisioning Control Plane" is included, illustrating the process of adding a new site from the UI to the backend persistence layer.
+
+🔧 [build] Updates project dependencies to support new features.
+ - Adds `ws` and `@types/ws` to dependencies for the WebSocket monitor implementation.
+
+🧹 [chore] Updates the BeastMode chatmode tool configuration.
+ - Refines the available tools, removing several legacy or unused commands and adding new capabilities like `fileSearch`, `runInTerminal`, and `websearch`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(89b3123)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89b3123f1a193bdac1785bc1877983d198e25ccd)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 4 updates (#79) [`(770e617)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/770e617441e9d8d1d2c311fbc4f43e5a6ff9acab)
+
+
 - [dependency] Update version 16.0.0 [`(7b9bfbb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b9bfbbc7019da3603ee4de7ca547b73b9e751bc)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Refactor preload script structure
+
+This commit refactors the Electron preload script to improve code organization and maintainability.
+
+- ♻️ Introduces domain-specific modules for the preload script, enhancing structure and separation of concerns.
+   - Moves functionality into dedicated files under `electron/preload/domains/`.
+   - Improves code modularity and readability.
+- 📝 Updates the main `preload.ts` to import and aggregate the domain APIs.
+   - Simplifies the main preload file.
+   - Removes the old `preload.old.ts` file.
+- ⚡ Leverages shared types for IPC channel definitions and bridge construction, promoting type safety and consistency between the main process and renderer.
+   - Introduces `shared/types/preload.ts` to define IPC channel maps.
+   - Uses `DomainBridge` and `IpcBridgeMethod` to enforce type contracts.
+- ⬆️ Updates `docs/docusaurus/package.json` to upgrade the TypeScript version.
+- 🔨 Implements `MonitorConfigurationError` to improve error handling for monitor configuration updates.
+- 🧪 Adds a targeted test to `electron/test/services/monitoring/MonitorFactory.fixed.test.ts` to check for configuration update failures.
+- 🧹 Removes comprehensive tests for the Data domain API which includes fast-check property-based testing for robust coverage
+- 🧪 Adds a focused test for the data preload domain
+- 🎨 Applies a dedicated stacking class in `src/theme/components.css` so the `ConfirmDialog` stays above other modals
+- 🧪 Adds a regression test for the `ConfirmDialog` component
+- 🚜 Moves history limit operations to `SettingsService`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(29d1c8d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29d1c8df649442215788b160a10c224540ebf16d)
+
+
+- 🚜 [refactor] Enhance IPC bridge for type safety
+
+This commit refactors the IPC bridge factory to enhance type safety and improve code maintainability.
+
+- 🚀 **Refactors `createTypedInvoker` and `createVoidInvoker`**:
+  - ♻️  Updates the invoker functions to leverage the `IpcInvokeChannelMap` for stronger type enforcement.
+  - ✅ Enforces parameter tuples and result payloads at compile time, reducing runtime errors.
+  - ⚙️  Removes the need for explicit `TOutput` type parameters, inferring types directly from channel definitions.
+  - 🗑️  Removes now-unnecessary `satisfies` type assertions.
+ - 📝 **Updates IPC type definitions**:
+  - ➕ Introduces `IpcInvokeChannelMap` to map channel names to parameter and result types.
+  - ➕ Adds `IpcInvokeChannel`, `IpcInvokeChannelParams`, and `IpcInvokeChannelResult` utility types for type extraction.
+  - ✅ Enforces strict type checking for IPC channel parameters and results.
+  - ➕ Adds `VoidIpcInvokeChannel` to identify channels with no return payload
+ - 💥 **Updates domain APIs to use typed invokers**:
+  - ✅ Modifies domain APIs (e.g., `dataApi`, `monitoringApi`, `sitesApi`) to use the new typed invokers.
+  - ⬆️  Updates function signatures to align with the `IpcInvokeChannelMap` definitions.
+  - ⚠️ This represents a breaking change if consumers were relying on the looser typing of the previous invokers.
+ - 🗑️ **Removes deprecated channel configuration**:
+  - 🗑️  Removes the `ChannelConfig` interface and related utility functions (`defineChannel`, `createDomainBridge`, `convertChannelToCamelCase`) as they are no longer needed with the new type system.
+ - 🐞 **Fixes**:
+   - 🐛 Fixes an issue where error details were not being correctly passed in `IpcError` constructor.
+   - ✅ Ensures `details` are frozen in `IpcError` to prevent mutation.
+ - 🧪 **Updates tests**:
+   - ✅ Updates comprehensive tests to reflect the new API and type constraints.
+   - ✅ Adds tests to ensure the typed invokers enforce correct parameter types.
+   - 🗑️ Removes property-based testing as it is less relevant with the stronger type system.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b1b5831)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b1b58313dad7b6e3d63e0ea47d097b3c6444c99b)
+
+
+- 🚜 [refactor] Relocate monitoring IPC methods from sites to monitoring domain
+
+✨ [feat] Moves `checkSiteNow` from the `sites` API to the `monitoring` API domain.
+- The `checkSiteNow` function now belongs to the `monitoringApi`, providing a more logical grouping of monitoring-related functionalities.
+- The return type is updated from `Site` to `StatusUpdate | undefined` for more specific feedback.
+
+🛠️ [fix] Improves type safety for `validateMonitorData` IPC calls.
+- The `validateMonitorData` function in `monitoringApi` and its corresponding service now correctly return a strongly-typed `ValidationResult` instead of `unknown`.
+- The `useMonitorTypesStore` is updated to handle the new `ValidationResult` type directly, removing the need for manual type guards and normalization logic.
+
+🧹 [chore] Removes deprecated monitoring methods from the `sitesApi`.
+- The `startMonitoringForSite` and `stopMonitoringForSite` methods are removed from the `sitesApi`, as their responsibilities are now handled by the dedicated `monitoringApi`.
+
+📝 [docs] Restructures and enhances AI agent instruction files.
+- The `BeastMode.chatmode.md` and `copilot-instructions.md` files are updated with XML-like tags (`<rules>`, `<plan>`, etc.) to provide better structure and clarity for the AI agent prompts.
+
+🧪 [test] Updates tests to align with API refactoring.
+- All relevant unit, integration, and comprehensive tests are updated to reflect the relocation of `checkSiteNow` from the `sites` to the `monitoring` domain.
+- Mocks and test assertions are adjusted to match the new `ValidationResult` return type.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(53f425f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/53f425f41d0daa2c4dc0ed4ae4af58c3e353a99e)
+
+
+- 🚜 [refactor] Update tool definitions across all chat modes and prompts
+
+🧹 [chore] This commit refactors the tool definitions used by AI agents across all chat modes and prompts.
+
+- ♻️ Replaces generic tool names with new, namespaced versions for better organization and clarity (e.g., `search` becomes `search/fileSearch`, `runCommands` becomes `runCommands/runInTerminal`).
+- ✨ Adds new tools such as `executePrompt` and `deepwiki/ask_question` to enhance agent capabilities.
+- 🗑️ Removes a large number of deprecated or unused tools, including `think`, `vscodeAPI`, `githubRepo`, and various database-related commands, to streamline the toolset.
+- 🌐 Updates the web search tool to a more specific identifier: `ms-vscode.vscode-websearchforcopilot/websearch`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9eacfd9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9eacfd9870cb786d6516da3512a620728324a630)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Expand documentation for 14 new monitor types
+
+This commit introduces a comprehensive update to the project's documentation to reflect the addition of 10 new monitor types, bringing the total to 14. It also includes related refactoring, test improvements, and dependency updates.
+
+### ✨ Features & Documentation
+*   **README Overhaul**: The `README.md` is significantly updated to showcase the 14 distinct monitor types, replacing the previous list of four.
+    *   The "Key Features" and "Monitor Types" tables are expanded with detailed descriptions, objectives, and highlights for each monitor, including: HTTP family (6), Transport (2), Network (2), and Advanced (4).
+    *   The architecture diagram is updated to reflect the new protocol workers.
+*   **API & Developer Guides**:
+    *   `API_DOCUMENTATION.md` is rewritten to detail the new `MonitorConfig` union type and provides a comprehensive table mapping all 14 monitor types to their configuration interfaces and key fields.
+    *   The Docusaurus site documentation is updated across multiple pages (`system-architecture`, `data-models`, `monitoring-workflows`) with new Mermaid diagrams illustrating the expanded monitor ecosystem, updated data models, and a new decision tree for choosing the right monitor.
+*   **License Change**: The project license mentioned in the documentation is updated from MIT to UnLicense.
+
+### 🚜 Refactoring
+*   **Form Submission Logic**: The `AddSiteForm/Submit.tsx` component is refactored to use a more robust, data-driven approach for creating and validating monitor configurations.
+    *   Introduces `monitorValidationBuilders` to centralize the logic for constructing validation payloads for each of the 14 monitor types, reducing duplication and improving clarity.
+*   **WebSocket Monitor**: The `WebsocketKeepaliveMonitor` is refactored for improved readability and robustness.
+    *   Introduces distinct handler functions (`handleOpen`, `handlePong`, `handleError`, etc.) to break down the logic.
+    *   Improves timer management and cleanup logic.
+
+### 🧪 Testing
+*   **HTTP Monitor Tests**: The `httpbin.org` integration tests are improved by adding a pre-flight check to ensure `httpbin.org` is available, skipping the tests gracefully if it's not.
+*   **Linting**: ESLint configuration is updated with new rules and Storybook plugin integration. `eslint-disable` comments are added where necessary to handle await-in-loop for sequential operations and other specific cases.
+
+### 🧹 Chore
+*   **Dependencies**: Updates `package.json` and `package-lock.json` to add new Storybook addons (`@storybook/addon-essentials`, `@storybook/addon-themes`) and related dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(bfec946)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bfec9466366854e962c9678f2b3f800aadd6ccc8)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Apply consistent formatting across the codebase
+
+🧹 [chore] Improves code consistency and readability by applying automated formatting rules across multiple files. This addresses minor stylistic discrepancies, ensuring a unified code style.
+
+- Updates formatting for `Array.from` calls, ternary operators, and function arguments across various benchmark and test files.
+- Adjusts JSDoc comments and `console.log` statements in build scripts for better alignment with style guidelines.
+- Standardizes quote usage within the ESLint configuration file.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2c8ab4b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2c8ab4b53e32ef74221a3490c191803bd30b1414)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Add E2E tests for advanced and infrastructure monitors
+
+✨ [feat] Introduces comprehensive end-to-end (E2E) test coverage using Playwright for various monitor types, ensuring the "Add Site" modal and monitor creation flow function correctly for complex configurations.
+
+🛠️ [fix] Improves the reliability of existing E2E tests by adding explicit waits for the Electron application to be ready before proceeding with test actions.
+ - This prevents race conditions and flaky tests where the test would start interacting with the UI before the application was fully initialized.
+
+🧪 [test] Adds two new test suites for monitor creation:
+ - **Advanced HTTP Monitors:** Validates the creation flow for monitors that perform specific HTTP checks, including:
+    - `http-keyword`: Checks for a keyword in the response body.
+    - `http-status`: Verifies the HTTP status code.
+    - `http-header`: Compares a response header value.
+    - `http-json`: Asserts a value from a JSON response using a JSON path.
+    - `http-latency`: Ensures response time is within a threshold.
+ - **Infrastructure Monitors:** Covers specialized monitors for infrastructure health:
+    - `dns`: Checks DNS records.
+    - `ssl`: Verifies SSL certificate validity and expiry.
+    - `websocket-keepalive`: Tests WebSocket connections.
+    - `server-heartbeat`: Monitors API heartbeat endpoints.
+    - `replication`: Checks database replication lag.
+    - `cdn-edge-consistency`: Compares content across CDN edges.
+
+🚜 [refactor] Introduces a new test utility file to share common E2E testing logic.
+ - This centralizes functions for launching the app, managing the "Add Site" modal, and verifying monitor creation, reducing code duplication and improving test maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(86d3b35)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/86d3b35a3cf5a6746ccd483bbf30f26fb5dc81b7)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove Beast Mode chatmode documentation file from the repository
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(06127b2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06127b207d7bfbc663d834703acf460262dfb007)
+
+
+- Update changelogs for v16.0.0 [skip ci] [`(0f30fb2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0f30fb20b5ee086f98ee72bcce19d570fbc41ea1)
 
 
 
