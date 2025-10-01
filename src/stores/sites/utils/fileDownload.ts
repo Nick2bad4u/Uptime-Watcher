@@ -3,6 +3,8 @@
  * for browser-based file downloads.
  */
 
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
 import { logger } from "../../../services/logger";
 
 /**
@@ -230,6 +232,47 @@ export function generateBackupFileName(
     return `${prefix}-${timestamp}.${extension}`;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
+
+/**
+ * Type guard ensuring a value matches {@link SerializedDatabaseBackupResult}.
+ */
+function isSerializedDatabaseBackupResult(
+    value: unknown
+): value is SerializedDatabaseBackupResult {
+    if (!isRecord(value)) {
+        return false;
+    }
+
+    const bufferCandidate = value["buffer"];
+    if (!(bufferCandidate instanceof ArrayBuffer)) {
+        return false;
+    }
+
+    const fileNameCandidate = value["fileName"];
+    if (typeof fileNameCandidate !== "string") {
+        return false;
+    }
+
+    const metadataCandidate = value["metadata"];
+    if (!isRecord(metadataCandidate)) {
+        return false;
+    }
+
+    const createdAtCandidate = metadataCandidate["createdAt"];
+    const originalPathCandidate = metadataCandidate["originalPath"];
+    const sizeBytesCandidate = metadataCandidate["sizeBytes"];
+
+    return (
+        typeof createdAtCandidate === "number" &&
+        Number.isFinite(createdAtCandidate) &&
+        typeof originalPathCandidate === "string" &&
+        typeof sizeBytesCandidate === "number" &&
+        Number.isFinite(sizeBytesCandidate)
+    );
+}
+
 /**
  * Handles downloading SQLite backup data as a file.
  *
@@ -244,26 +287,29 @@ export function generateBackupFileName(
  * await handleSQLiteBackupDownload(() => fetchBackupData());
  * ```
  *
- * @param downloadFunction - An async function that returns the backup data as a
- *   Uint8Array
+ * @param downloadFunction - Async function resolving to a serialized backup
+ *   payload from the Electron main process.
  *
- * @throws TypeError if the backup data is not a Uint8Array
+ * @throws TypeError if the backup data fails validation
  * @throws Error if the download fails due to browser API or DOM errors
  */
 export async function handleSQLiteBackupDownload(
-    downloadFunction: () => Promise<Uint8Array>
+    downloadFunction: () => Promise<SerializedDatabaseBackupResult>
 ): Promise<void> {
-    // Get the backup data
-    const backupData = await downloadFunction();
+    const backupResult = await downloadFunction();
 
-    // Validate the backup data
-    if (!(backupData instanceof Uint8Array)) {
+    if (!isSerializedDatabaseBackupResult(backupResult)) {
         throw new TypeError("Invalid backup data received");
     }
 
-    // Create blob from the backup data
-    // Create a new Uint8Array to ensure proper typing for Blob constructor
-    const blobData = new Uint8Array(backupData);
+    const trimmedFileName = backupResult.fileName.trim();
+    const normalizedFileName =
+        trimmedFileName.length > 0
+            ? trimmedFileName
+            : generateBackupFileName("uptime-watcher", "db");
+
+    // Create blob from the backup data using a fresh typed array view
+    const blobData = new Uint8Array(backupResult.buffer);
     const blob = new Blob([blobData], {
         type: "application/x-sqlite3",
     });
@@ -276,7 +322,7 @@ export async function handleSQLiteBackupDownload(
         // Create anchor element for download
         const anchor = document.createElement("a");
         anchor.href = objectURL;
-        anchor.download = generateBackupFileName("uptime-watcher", "db");
+        anchor.download = normalizedFileName;
 
         // Trigger download
         try {

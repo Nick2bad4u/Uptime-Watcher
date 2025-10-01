@@ -179,21 +179,18 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "downloadSqliteBackup",
             async () => {
-                /* eslint-disable-next-line ex/no-unhandled -- Exception is handled by the try-catch block */
-                await handleSQLiteBackupDownload(async () => {
-                    try {
-                        const response =
-                            await DataService.downloadSqliteBackup();
-                        // Response from preload is already unwrapped: { buffer: ArrayBuffer, fileName: string }
-                        return new Uint8Array(response.buffer);
-                    } catch (error) {
-                        logger.error(
-                            "Failed to download SQLite backup:",
-                            ensureError(error)
-                        );
-                        throw error;
-                    }
-                });
+                try {
+                    await handleSQLiteBackupDownload(() =>
+                        DataService.downloadSqliteBackup()
+                    );
+                } catch (error) {
+                    const resolvedError = ensureError(error);
+                    logger.error(
+                        "Failed to download SQLite backup:",
+                        resolvedError
+                    );
+                    throw resolvedError;
+                }
             },
             { message: "SQLite backup download completed", success: true },
             deps,

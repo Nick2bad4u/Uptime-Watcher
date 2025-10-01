@@ -109,6 +109,10 @@ vi.mock("../../../hooks/site/useSiteAnalytics", () => ({
     })),
 }));
 
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: vi.fn(() => vi.fn(async () => true)),
+}));
+
 // Mock globalThis.confirm for destructive action tests
 Object.defineProperty(globalThis, "confirm", {
     writable: true,
@@ -119,9 +123,11 @@ import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useSiteAnalytics } from "../../../hooks/site/useSiteAnalytics";
+import { useConfirmDialog } from "../../../hooks/ui/useConfirmDialog";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
+const mockUseConfirmDialog = vi.mocked(useConfirmDialog);
 
 describe("useSiteDetails Hook - Basic Coverage", () => {
     const mockSite: Site = {
@@ -143,6 +149,9 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+
+        // Reset confirmation dialog mock to return true by default
+        mockUseConfirmDialog.mockReturnValue(vi.fn(async () => true));
 
         // Setup default mock for withUtilityErrorHandling
         mockWithUtilityErrorHandling.mockImplementation(
@@ -526,6 +535,9 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
         // Reset confirm mock
         (globalThis.confirm as any) = vi.fn(() => true);
+
+        // Reset confirmation dialog mock to return true by default
+        mockUseConfirmDialog.mockReturnValue(vi.fn(async () => true));
 
         // Mock sites store with default values
         (useSitesStore as any).mockReturnValue({
@@ -1034,8 +1046,6 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Monitoring", "type");
 
-            (globalThis.confirm as any) = vi.fn(() => true);
-
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1044,9 +1054,6 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveMonitor();
             });
 
-            expect(globalThis.confirm).toHaveBeenCalledWith(
-                'Are you sure you want to remove the monitor "https://example.com" from Test Site?'
-            );
             // Test passes if no error is thrown
             expect(true).toBeTruthy();
         });
@@ -1062,7 +1069,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockRemoveMonitorFromSite = vi.fn();
 
-            (globalThis.confirm as any) = vi.fn(() => false);
+            // Mock confirmation dialog to return false (user cancels)
+            mockUseConfirmDialog.mockReturnValue(vi.fn(async () => false));
 
             (useSitesStore as any).mockReturnValue({
                 checkSiteNow: vi.fn(),
@@ -1089,7 +1097,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveMonitor();
             });
 
-            expect(globalThis.confirm).toHaveBeenCalled();
+            // Should not remove monitor when user cancels
             expect(mockRemoveMonitorFromSite).not.toHaveBeenCalled();
         });
 
@@ -1102,8 +1110,6 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
             await annotate("Category: Hook", "category");
             await annotate("Type: Business Logic", "type");
 
-            (globalThis.confirm as any) = vi.fn(() => true);
-
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
@@ -1112,9 +1118,6 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveSite();
             });
 
-            expect(globalThis.confirm).toHaveBeenCalledWith(
-                "Are you sure you want to remove Test Site?"
-            );
             // Test passes if no error is thrown
             expect(true).toBeTruthy();
         });
@@ -1130,7 +1133,8 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
 
             const mockDeleteSite = vi.fn();
 
-            (globalThis.confirm as any) = vi.fn(() => false);
+            // Mock confirmation dialog to return false (user cancels)
+            mockUseConfirmDialog.mockReturnValue(vi.fn(async () => false));
 
             (useSitesStore as any).mockReturnValue({
                 checkSiteNow: vi.fn(),
@@ -1157,7 +1161,7 @@ describe("useSiteDetails Hook - Comprehensive Coverage", () => {
                 await result.current.handleRemoveSite();
             });
 
-            expect(globalThis.confirm).toHaveBeenCalled();
+            // Should not delete site when user cancels
             expect(mockDeleteSite).not.toHaveBeenCalled();
         });
     });

@@ -6,6 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import {
     downloadFile,
     generateBackupFileName,
@@ -505,6 +506,37 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
     });
 
     describe("handleSQLiteBackupDownload Function", () => {
+        const buildBackupResult = (
+            data: Uint8Array,
+            overrides: Partial<SerializedDatabaseBackupResult> = {}
+        ): SerializedDatabaseBackupResult => {
+            const cloned = new Uint8Array(data);
+
+            return {
+                buffer: cloned.buffer,
+                fileName: overrides.fileName ?? "uptime-watcher-backup.sqlite",
+                metadata: {
+                    createdAt: overrides.metadata?.createdAt ?? 0,
+                    originalPath:
+                        overrides.metadata?.originalPath ??
+                        "/tmp/uptime-watcher.sqlite",
+                    sizeBytes: overrides.metadata?.sizeBytes ?? data.length,
+                },
+            };
+        };
+
+        const expectLatestBlobCall = (expectedLength: number): void => {
+            const lastCall = vi.mocked(globalThis.Blob).mock.calls.at(-1);
+            expect(lastCall).toBeDefined();
+            const [parts, options] = lastCall!;
+            expect(Array.isArray(parts)).toBeTruthy();
+            expect(parts).toHaveLength(1);
+            const [firstPart] = parts as unknown[];
+            expect(firstPart).toBeInstanceOf(Uint8Array);
+            expect(firstPart as Uint8Array).toHaveLength(expectedLength);
+            expect(options).toEqual({ type: "application/x-sqlite3" });
+        };
+
         it("should handle successful backup download", async ({
             task,
             annotate,
@@ -514,23 +546,20 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Backup Operation", "type");
 
-            const mockData = new Uint8Array([
+            const payload = new Uint8Array([
                 1,
                 2,
                 3,
                 4,
             ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const backup = buildBackupResult(payload);
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
             expect(mockDownloadFunction).toHaveBeenCalled();
-            expect(globalThis.Blob).toHaveBeenCalledWith([mockData], {
-                type: "application/x-sqlite3",
-            });
-            expect(mockAnchor.download).toMatch(
-                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
-            );
+            expectLatestBlobCall(payload.length);
+            expect(mockAnchor.download).toBe(backup.fileName);
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
@@ -571,7 +600,7 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should throw TypeError for undefined backup data", async ({
+        it("should throw TypeError when required fields are missing", async ({
             task,
             annotate,
         }) => {
@@ -580,49 +609,58 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockDownloadFunction = vi.fn().mockResolvedValue(undefined);
+            const invalidResult = {
+                fileName: "invalid.sqlite",
+                metadata: {
+                    createdAt: 0,
+                    originalPath: "",
+                    sizeBytes: 0,
+                },
+            } as SerializedDatabaseBackupResult;
+
+            const mockDownloadFunction = vi
+                .fn()
+                .mockResolvedValue(invalidResult);
 
             await expect(
                 handleSQLiteBackupDownload(mockDownloadFunction)
             ).rejects.toThrow(TypeError);
         });
 
-        it("should throw TypeError for array instead of Uint8Array", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: fileDownload", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const mockDownloadFunction = vi.fn().mockResolvedValue([
-                1,
-                2,
-                3,
-                4,
-            ]);
-
-            await expect(
-                handleSQLiteBackupDownload(mockDownloadFunction)
-            ).rejects.toThrow(TypeError);
-        });
-
-        it("should handle empty Uint8Array", async ({ task, annotate }) => {
+        it("should handle empty backup buffers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: fileDownload", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockData = new Uint8Array(0);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const payload = new Uint8Array(0);
+            const backup = buildBackupResult(payload);
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
-            expect(globalThis.Blob).toHaveBeenCalledWith([mockData], {
-                type: "application/x-sqlite3",
-            });
+            expectLatestBlobCall(payload.length);
             expect(mockAnchor.click).toHaveBeenCalled();
+        });
+
+        it("should fall back to generated filename when provided name is blank", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: fileDownload", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const payload = new Uint8Array([1, 2]);
+            const backup = buildBackupResult(payload, { fileName: "  " });
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
+
+            await handleSQLiteBackupDownload(mockDownloadFunction);
+
+            expect(mockAnchor.download).toMatch(
+                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
+            );
         });
 
         it("should handle click errors with proper error message", async ({
@@ -634,13 +672,8 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockData = new Uint8Array([
-                1,
-                2,
-                3,
-                4,
-            ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const backup = buildBackupResult(new Uint8Array([1]));
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
                 throw new Error("Click failed");
@@ -660,13 +693,8 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockData = new Uint8Array([
-                1,
-                2,
-                3,
-                4,
-            ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const backup = buildBackupResult(new Uint8Array([1]));
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
                 throw "String error";
@@ -686,47 +714,19 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockData = new Uint8Array([
-                1,
-                2,
-                3,
-                4,
-            ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const backup = buildBackupResult(new Uint8Array([1]));
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             mockAnchor.click = vi.fn().mockImplementation(() => {
                 throw new Error("Click failed");
             });
 
-            try {
-                await handleSQLiteBackupDownload(mockDownloadFunction);
-            } catch {
-                // Expected to fail
-            }
+            await expect(
+                handleSQLiteBackupDownload(mockDownloadFunction)
+            ).rejects.toThrow();
 
             expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
                 "mock-object-url"
-            );
-        });
-
-        it("should use correct filename format", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: fileDownload", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const mockData = new Uint8Array([
-                1,
-                2,
-                3,
-                4,
-            ]);
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
-
-            await handleSQLiteBackupDownload(mockDownloadFunction);
-
-            expect(mockAnchor.download).toMatch(
-                /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
             );
         });
 
@@ -754,14 +754,13 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Backup Operation", "type");
 
-            const mockData = new Uint8Array(1_000_000); // 1MB
-            const mockDownloadFunction = vi.fn().mockResolvedValue(mockData);
+            const payload = new Uint8Array(1_000_000); // 1MB
+            const backup = buildBackupResult(payload);
+            const mockDownloadFunction = vi.fn().mockResolvedValue(backup);
 
             await handleSQLiteBackupDownload(mockDownloadFunction);
 
-            expect(globalThis.Blob).toHaveBeenCalledWith([mockData], {
-                type: "application/x-sqlite3",
-            });
+            expectLatestBlobCall(payload.length);
             expect(mockAnchor.click).toHaveBeenCalled();
         });
 
@@ -769,22 +768,16 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             test.prop([fc.uint8Array({ minLength: 1, maxLength: 10_000 })])(
                 "should handle various backup data sizes",
                 async (mockDataArray) => {
+                    const backup = buildBackupResult(mockDataArray);
                     const mockDownloadFunction = vi
                         .fn()
-                        .mockResolvedValue(mockDataArray);
+                        .mockResolvedValue(backup);
 
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
                     expect(mockDownloadFunction).toHaveBeenCalledTimes(1);
-                    expect(globalThis.Blob).toHaveBeenCalledWith(
-                        [mockDataArray],
-                        {
-                            type: "application/x-sqlite3",
-                        }
-                    );
-                    expect(mockAnchor.download).toMatch(
-                        /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
-                    );
+                    expectLatestBlobCall(mockDataArray.length);
+                    expect(mockAnchor.download).toBe(backup.fileName);
                     expect(mockAnchor.click).toHaveBeenCalled();
                 }
             );
@@ -805,25 +798,16 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             );
 
             test.prop([fc.uint8Array({ minLength: 0, maxLength: 1000 })])(
-                "should always use SQLite MIME type and generate proper filename",
+                "should always use SQLite MIME type and cleanup resources",
                 async (backupData) => {
+                    const backup = buildBackupResult(backupData);
                     const mockDownloadFunction = vi
                         .fn()
-                        .mockResolvedValue(backupData);
+                        .mockResolvedValue(backup);
 
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
-                    expect(globalThis.Blob).toHaveBeenCalledWith([backupData], {
-                        type: "application/x-sqlite3",
-                    });
-
-                    // Verify filename format
-                    const filename = mockAnchor.download;
-                    expect(filename).toMatch(
-                        /^uptime-watcher-\d{4}-\d{2}-\d{2}\.db$/
-                    );
-
-                    // Verify proper cleanup
+                    expectLatestBlobCall(backupData.length);
                     expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith(
                         "mock-object-url"
                     );
@@ -836,19 +820,19 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
                     maxLength: 500,
                 }),
             ])(
-                "should handle integer array conversion to Uint8Array",
+                "should reflect metadata byte size in the backup result",
                 async (intArray) => {
                     const uint8Data = new Uint8Array(intArray);
+                    const backup = buildBackupResult(uint8Data);
                     const mockDownloadFunction = vi
                         .fn()
-                        .mockResolvedValue(uint8Data);
+                        .mockResolvedValue(backup);
 
                     await handleSQLiteBackupDownload(mockDownloadFunction);
 
-                    expect(globalThis.Blob).toHaveBeenCalledWith([uint8Data], {
-                        type: "application/x-sqlite3",
-                    });
+                    expectLatestBlobCall(uint8Data.length);
                     expect(mockAnchor.href).toBe("mock-object-url");
+                    expect(backup.metadata.sizeBytes).toBe(uint8Data.length);
                 }
             );
         });

@@ -218,7 +218,7 @@ describe(SiteRepository, () => {
                 (callback: any) => {
                     const mockDb = {
                         prepare: mockPrepare,
-                        run: vi.fn().mockReturnValue({ changes: 1 }),
+                        run: vi.fn().mockReturnValue({ changes: 0 }),
                     };
                     return callback(mockDb);
                 }

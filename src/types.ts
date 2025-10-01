@@ -10,7 +10,6 @@
 
 // Import types for global declarations
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -20,6 +19,7 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,

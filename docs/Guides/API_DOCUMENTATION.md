@@ -203,6 +203,27 @@ const importResult = await window.electronAPI.data.importData(importData, {
 });
 ```
 
+#### `downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult>`
+
+Generates a SQLite database backup and returns a transferable payload
+containing the binary buffer, file metadata, and the suggested download file
+name.
+
+```typescript
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+
+const backup: SerializedDatabaseBackupResult =
+ await window.electronAPI.data.downloadSqliteBackup();
+
+await handleSQLiteBackupDownload(async () => backup);
+// Downloads `backup.fileName` using the ArrayBuffer payload.
+```
+
+> The renderer receives an `ArrayBuffer`, ensuring compatibility with browser
+> APIs without leaking Node.js `Buffer` instances. Additional metadata (size,
+> creation timestamp, and original on-disk location) can be used for analytics
+> or audit logging.
+
 ### Monitor Types API (`window.electronAPI.monitorTypes`)
 
 #### `getAll(): Promise<MonitorTypeConfig[]>`

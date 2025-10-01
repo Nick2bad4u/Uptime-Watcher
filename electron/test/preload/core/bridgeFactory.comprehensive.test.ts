@@ -40,7 +40,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         vi.clearAllMocks();
     });
 
-    describe("createTypedInvoker", function describeCreateTypedInvoker() {
+    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
+    describe("createTypedInvoker", () => {
         it("invokes IPC with typed parameters and propagates data", async () => {
             const response: IpcResponse<string> = {
                 success: true,
@@ -102,7 +103,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
     });
 
-    describe("createVoidInvoker", function describeCreateVoidInvoker() {
+    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
+    describe("createVoidInvoker", () => {
         it("resolves when the response is successful", async () => {
             const response: IpcResponse = { success: true };
             vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(response);
@@ -126,7 +128,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
     });
 
-    describe("createEventManager", function describeCreateEventManager() {
+    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
+    describe("createEventManager", () => {
         it("registers and unregisters listeners", () => {
             const handler = vi.fn();
             vi.mocked(ipcRenderer.on).mockImplementationOnce((_channel, cb) => {
@@ -146,7 +149,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
     });
 
-    describe("typed channel utility", function describeTypedChannelUtility() {
+    describe("typed channel utility", () => {
         it("enforces parameter tuples at compile time", () => {
             const invoke = createTypedInvoker("remove-monitor");
 
@@ -172,7 +175,8 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         });
     });
 
-    describe("IpcError", function describeIpcErrorBehaviour() {
+    // eslint-disable-next-line vitest/prefer-describe-function-title -- Vitest requires string titles; using literal keeps clarity
+    describe("IpcError", () => {
         it("captures channel, original error, and details", () => {
             const inner = new Error("failure");
             const details = { context: "test" } as const;
@@ -188,7 +192,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             expect(error.originalError).toBe(inner);
             expect(error.details).toEqual(details);
             expect(error.details).not.toBe(details);
-            expect(Object.isFrozen(error.details)).toBe(true);
+            expect(Object.isFrozen(error.details)).toBeTruthy();
         });
     });
 });

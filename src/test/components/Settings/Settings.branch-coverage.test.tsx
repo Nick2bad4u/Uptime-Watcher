@@ -517,7 +517,10 @@ describe("Settings - Branch Coverage Tests", () => {
     });
 
     describe("User Confirmation Branches", () => {
-        it("should reset settings when user confirms", ({ task, annotate }) => {
+        it("should reset settings when user confirms", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: Settings.branch-coverage", "component");
             annotate("Category: Component", "category");
@@ -535,14 +538,20 @@ describe("Settings - Branch Coverage Tests", () => {
             const resetButton = screen.getByText("Reset to Defaults");
             fireEvent.click(resetButton);
 
-            expect(confirmMock).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    message:
-                        "Are you sure you want to reset all settings to defaults?",
-                    title: "Reset Settings",
-                })
-            );
-            expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
+            await waitFor(() => {
+                expect(confirmMock).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message:
+                            "Are you sure you want to reset all settings to defaults?",
+                        title: "Reset Settings",
+                    })
+                );
+            });
+
+            await waitFor(() => {
+                expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
+            });
+
             expect(mockErrorStore.clearError).toHaveBeenCalled();
         });
 

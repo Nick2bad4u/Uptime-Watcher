@@ -1,8 +1,8 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
 import type { Site, StatusUpdate } from "@shared/types";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { StateSyncEventData } from "@shared/types/events";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
     StateSyncFullSyncResult,

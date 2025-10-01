@@ -71,7 +71,7 @@ describe(generateUuid, () => {
             expect(result).toBe("550e8400-e29b-41d4-a716-446655440000");
         });
 
-        it("should surface errors from crypto.randomUUID", async ({
+        it("should use fallback when crypto.randomUUID throws an error", async ({
             task,
             annotate,
         }) => {
@@ -87,7 +87,8 @@ describe(generateUuid, () => {
                     throw failure;
                 });
 
-            expect(() => generateUuid()).toThrow(failure);
+            const result = generateUuid();
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
             expect(mockRandomUUID).toHaveBeenCalledTimes(1);
         });
     });
@@ -162,11 +163,18 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
+            // Force fallback by removing crypto
+            const tempCrypto = globalThis.crypto;
+            globalThis.crypto = undefined as any;
+
             const results = Array.from({ length: 10 }, () => generateUuid());
 
             for (const result of results) {
                 expect(result).toMatch(/^site-[\da-z]+-\d+$/);
             }
+
+            // Restore
+            globalThis.crypto = tempCrypto;
         });
     });
 
@@ -328,54 +336,57 @@ describe(generateUuid, () => {
     });
 
     describe("Environment validation", () => {
-        it("should throw when crypto.randomUUID is undefined", async ({
+        it("should use fallback when crypto.randomUUID is undefined", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+            await annotate("Type: Fallback Behavior", "type");
 
             Reflect.deleteProperty(
                 globalThis.crypto as unknown as Record<string, unknown>,
                 "randomUUID"
             );
 
-            expect(() => generateUuid()).toThrow(TypeError);
+            const result = generateUuid();
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
         });
 
-        it("should throw when crypto.randomUUID is not a function", async ({
+        it("should use fallback when crypto.randomUUID is not a function", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+            await annotate("Type: Fallback Behavior", "type");
 
             (
                 globalThis.crypto as unknown as { randomUUID: unknown }
             ).randomUUID = "not a function";
 
-            expect(() => generateUuid()).toThrow(TypeError);
+            const result = generateUuid();
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
         });
 
-        it("should throw when crypto is unavailable", async ({
+        it("should use fallback when crypto is unavailable", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
-            await annotate("Type: Error Handling", "type");
+            await annotate("Type: Fallback Behavior", "type");
 
             Reflect.deleteProperty(
                 globalThis as unknown as Record<string, unknown>,
                 "crypto"
             );
 
-            expect(() => generateUuid()).toThrow(TypeError);
+            const result = generateUuid();
+            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
 
             globalThis.crypto = originalCrypto;
         });

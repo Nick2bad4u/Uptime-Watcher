@@ -445,35 +445,6 @@ export class MonitorRepository {
     }
 
     /**
-     * Internal helper to fetch monitors for a site within an existing
-     * transaction.
-     *
-     * @remarks
-     * Must be invoked with a database connection that belongs to the active
-     * transaction. Consumers should prefer the public
-     * {@link findBySiteIdentifier} unless they already participate in a larger
-     * transactional flow.
-     *
-     * @param db - Active transaction database connection.
-     * @param siteIdentifier - Identifier of the site whose monitors should be
-     *   retrieved.
-     *
-     * @returns Array of monitors associated with the specified site.
-     */
-    public findBySiteIdentifierInternal(
-        db: Database,
-        siteIdentifier: string
-    ): Site["monitors"] {
-        const monitorRows = queryForRecords(
-            db,
-            MONITOR_QUERIES.SELECT_BY_SITE,
-            [siteIdentifier]
-        );
-
-        return rowsToMonitors(monitorRows);
-    }
-
-    /**
      * Gets all monitor IDs in the database.
      *
      * @remarks
@@ -530,6 +501,35 @@ export class MonitorRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Internal helper to fetch monitors for a site within an existing
+     * transaction.
+     *
+     * @remarks
+     * Must be invoked with a database connection that belongs to the active
+     * transaction. Consumers should prefer the public
+     * {@link findBySiteIdentifier} unless they already participate in a larger
+     * transactional flow.
+     *
+     * @param db - Active transaction database connection.
+     * @param siteIdentifier - Identifier of the site whose monitors should be
+     *   retrieved.
+     *
+     * @returns Array of monitors associated with the specified site.
+     */
+    public findBySiteIdentifierInternal(
+        db: Database,
+        siteIdentifier: string
+    ): Site["monitors"] {
+        const monitorRows = queryForRecords(
+            db,
+            MONITOR_QUERIES.SELECT_BY_SITE,
+            [siteIdentifier]
+        );
+
+        return rowsToMonitors(monitorRows);
     }
 
     /**

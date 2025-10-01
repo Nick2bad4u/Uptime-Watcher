@@ -357,6 +357,24 @@ export class SiteRepository {
     }
 
     /**
+     * Executes the shared "select all sites" operation within a database
+     * context.
+     *
+     * @param operationName - Identifier used for logging and metrics.
+     *
+     * @returns Promise resolving to all sites currently persisted.
+     */
+    private async runAllSitesOperation(
+        operationName: string
+    ): Promise<SiteRow[]> {
+        return withDatabaseOperation(() => {
+            const db = this.getDb();
+            const sites = this.fetchAllSitesInternal(db);
+            return Promise.resolve(sites);
+        }, operationName);
+    }
+
+    /**
      * Constructs a new {@link SiteRepository} instance.
      *
      * @example
@@ -511,22 +529,6 @@ export class SiteRepository {
      */
     private getDb(): Database {
         return this.databaseService.getDatabase();
-    }
-
-    /**
-     * Executes the shared "select all sites" operation within a database
-     * context.
-     *
-     * @param operationName - Identifier used for logging and metrics.
-     *
-     * @returns Promise resolving to all sites currently persisted.
-     */
-    private runAllSitesOperation(operationName: string): Promise<SiteRow[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const sites = this.fetchAllSitesInternal(db);
-            return Promise.resolve(sites);
-        }, operationName);
     }
 
     /**

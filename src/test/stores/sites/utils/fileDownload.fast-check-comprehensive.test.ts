@@ -5,6 +5,7 @@
 
 import { fc } from "@fast-check/vitest";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 // Import the functions to test
 import {
@@ -371,24 +372,46 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
     });
 
     describe("handleSQLiteBackupDownload function coverage", () => {
+        const buildBackupResult = (
+            bytes: Uint8Array
+        ): SerializedDatabaseBackupResult => ({
+            buffer: new Uint8Array(bytes).buffer,
+            fileName: "uptime-watcher-backup.sqlite",
+            metadata: {
+                createdAt: 0,
+                originalPath: "/tmp/uptime-watcher.sqlite",
+                sizeBytes: bytes.length,
+            },
+        });
+
+        const expectBlobCalledWithLength = (expected: number): void => {
+            const lastCall = mockBlob.mock.calls.at(-1);
+            expect(lastCall).toBeDefined();
+            const [parts, options] = lastCall!;
+            expect(Array.isArray(parts)).toBeTruthy();
+            expect(parts).toHaveLength(1);
+            const [first] = parts as unknown[];
+            expect(first).toBeInstanceOf(Uint8Array);
+            expect(first as Uint8Array).toHaveLength(expected);
+            expect(options).toEqual({ type: "application/x-sqlite3" });
+        };
+
         it("should handle successful SQLite backup download", async () => {
             await fc.assert(
                 fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 1000 }),
                     async (backupData) => {
+                        const backup = buildBackupResult(backupData);
                         const downloadFunction = vi
                             .fn()
-                            .mockResolvedValue(backupData);
+                            .mockResolvedValue(backup);
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
                         ).resolves.not.toThrow();
 
                         expect(downloadFunction).toHaveBeenCalled();
-                        expect(mockBlob).toHaveBeenCalledWith(
-                            [expect.any(Uint8Array)],
-                            { type: "application/x-sqlite3" }
-                        );
+                        expectBlobCalledWithLength(backupData.length);
                         expect(mockURL.createObjectURL).toHaveBeenCalled();
                         expect(mockAnchor.click).toHaveBeenCalled();
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
@@ -405,7 +428,10 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         fc.integer(),
                         fc.array(fc.integer()),
                         fc.constant(null),
-                        fc.constant(undefined)
+                        fc.constant(undefined),
+                        fc.record({
+                            buffer: fc.uint8Array().map((array) => array),
+                        })
                     ),
                     async (invalidData) => {
                         const downloadFunction = vi
@@ -425,9 +451,10 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
                     async (backupData) => {
+                        const backup = buildBackupResult(backupData);
                         const downloadFunction = vi
                             .fn()
-                            .mockResolvedValue(backupData);
+                            .mockResolvedValue(backup);
                         mockAnchor.click.mockImplementation(() => {
                             throw new Error("Click failed");
                         });
@@ -436,7 +463,6 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        // Should still clean up object URL
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
@@ -448,18 +474,18 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
                     async (backupData) => {
+                        const backup = buildBackupResult(backupData);
                         const downloadFunction = vi
                             .fn()
-                            .mockResolvedValue(backupData);
+                            .mockResolvedValue(backup);
                         mockAnchor.click.mockImplementation(() => {
-                            throw "string error"; // Non-Error object
+                            throw "string error";
                         });
 
                         await expect(
                             handleSQLiteBackupDownload(downloadFunction)
                         ).rejects.toThrow("Download trigger failed");
 
-                        // Should still clean up object URL
                         expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                     }
                 )
@@ -471,16 +497,16 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                 fc.asyncProperty(
                     fc.uint8Array({ minLength: 1, maxLength: 100 }),
                     async (backupData) => {
+                        const backup = buildBackupResult(backupData);
                         const downloadFunction = vi
                             .fn()
-                            .mockResolvedValue(backupData);
+                            .mockResolvedValue(backup);
 
-                        // Test both success and failure scenarios
                         const scenarios = [
-                            () => {}, // Success
+                            () => {},
                             () => {
                                 throw new Error("Click failed");
-                            }, // Click failure
+                            },
                         ];
 
                         for (const scenario of scenarios) {
@@ -495,7 +521,6 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                                 // Expected for error scenarios
                             }
 
-                            // Should always clean up object URL
                             expect(mockURL.revokeObjectURL).toHaveBeenCalled();
                         }
                     }
@@ -517,7 +542,6 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
                         ).rejects.toThrow(errorMessage);
 
                         expect(downloadFunction).toHaveBeenCalled();
-                        // Should not create blob or object URL if download function fails
                         expect(mockBlob).not.toHaveBeenCalled();
                         expect(mockURL.createObjectURL).not.toHaveBeenCalled();
                     }
