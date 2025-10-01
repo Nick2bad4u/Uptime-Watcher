@@ -12,6 +12,8 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { SystemDomainBridge } from "@shared/types/preload";
+
 import { ipcRenderer } from "electron";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
@@ -19,7 +21,7 @@ import { createTypedInvoker } from "../core/bridgeFactory";
 /**
  * Interface defining the system domain API operations
  */
-export interface SystemApiInterface {
+export interface SystemApiInterface extends SystemDomainBridge {
     /**
      * Opens an external URL in the default browser
      *
@@ -27,7 +29,7 @@ export interface SystemApiInterface {
      *
      * @returns Promise resolving to true if URL was opened successfully
      */
-    openExternal: (url: string) => Promise<boolean>;
+    openExternal: SystemDomainBridge["openExternal"];
 
     /**
      * Quits the application and installs a pending update
@@ -66,6 +68,8 @@ export const systemApi: SystemApiInterface = {
     },
 } as const;
 
-export type SystemApi = SystemApiInterface;
+export interface SystemApi extends SystemDomainBridge {
+    readonly quitAndInstall: () => void;
+}
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

@@ -83,8 +83,8 @@ const mockElectronAPI = {
             },
         }),
     },
-    data: {
-        getHistoryLimit: vi.fn().mockReturnValue(1000),
+    settings: {
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
     },
     monitoring: {
         checkSiteNow: vi.fn().mockResolvedValue(undefined),

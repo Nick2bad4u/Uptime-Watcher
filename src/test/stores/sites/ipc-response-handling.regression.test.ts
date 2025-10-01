@@ -28,7 +28,9 @@ const mockElectronAPI = {
                 sizeBytes: 1024,
             },
         }),
-        getHistoryLimit: vi.fn().mockReturnValue(1000),
+    },
+    settings: {
+        getHistoryLimit: vi.fn().mockResolvedValue(1000),
     },
     stateSync: {
         getSyncStatus: vi.fn(),

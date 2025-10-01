@@ -221,7 +221,8 @@ export async function waitForElectronAPI(
         try {
             if (
                 typeof window.electronAPI.sites.getSites === "function" &&
-                typeof window.electronAPI.data.getHistoryLimit === "function"
+                typeof window.electronAPI.settings.getHistoryLimit ===
+                    "function"
             ) {
                 return; // API is ready
             }

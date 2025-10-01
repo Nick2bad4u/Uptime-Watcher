@@ -234,14 +234,9 @@ export class SiteRepository {
      * @throws If the database operation fails.
      */
     public async exists(identifier: string): Promise<boolean> {
-        return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-                const site = this.findByIdentifierInternal(db, identifier);
-                return Promise.resolve(site !== undefined);
-            },
+        return this.runSiteReadOperation(
             "site-exists",
-            undefined,
+            (db) => this.findByIdentifierInternal(db, identifier) !== undefined,
             { identifier }
         );
     }
@@ -306,14 +301,9 @@ export class SiteRepository {
     public async findByIdentifier(
         identifier: string
     ): Promise<SiteRow | undefined> {
-        return withDatabaseOperation(
-            () => {
-                const db = this.getDb();
-                const site = this.findByIdentifierInternal(db, identifier);
-                return Promise.resolve(site);
-            },
+        return this.runSiteReadOperation(
             "site-lookup",
-            undefined,
+            (db) => this.findByIdentifierInternal(db, identifier),
             { identifier }
         );
     }
@@ -367,11 +357,34 @@ export class SiteRepository {
     private async runAllSitesOperation(
         operationName: string
     ): Promise<SiteRow[]> {
-        return withDatabaseOperation(() => {
-            const db = this.getDb();
-            const sites = this.fetchAllSitesInternal(db);
-            return Promise.resolve(sites);
-        }, operationName);
+        return this.runSiteReadOperation(operationName, (db) =>
+            this.fetchAllSitesInternal(db)
+        );
+    }
+
+    /**
+     * Executes a readonly site repository operation inside the shared
+     * operational hook with consistent logging metadata.
+     *
+     * @param operationName - Identifier used for logging/metrics.
+     * @param handler - Function executed with an active database connection.
+     * @param metadata - Optional metadata to include in operational logging.
+     */
+    private async runSiteReadOperation<TResult>(
+        operationName: string,
+        handler: (db: Database) => TResult,
+        metadata?: Record<string, unknown>
+    ): Promise<TResult> {
+        return withDatabaseOperation(
+            () => {
+                const db = this.getDb();
+                const result = handler(db);
+                return Promise.resolve(result);
+            },
+            operationName,
+            undefined,
+            metadata
+        );
     }
 
     /**

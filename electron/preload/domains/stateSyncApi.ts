@@ -13,9 +13,9 @@
 
 import type { StateSyncEventData } from "@shared/types/events";
 import type {
-    StateSyncFullSyncResult,
-    StateSyncStatusSummary,
-} from "@shared/types/stateSync";
+    StateSyncApiSurface,
+    StateSyncDomainBridge,
+} from "@shared/types/preload";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
 
@@ -84,13 +84,13 @@ const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
 /**
  * Interface defining the state sync domain API operations
  */
-export interface StateSyncApiInterface {
+export interface StateSyncApiInterface extends StateSyncDomainBridge {
     /**
      * Gets the current synchronization status
      *
      * @returns Promise resolving to current sync status information
      */
-    getSyncStatus: () => Promise<StateSyncStatusSummary>;
+    getSyncStatus: StateSyncDomainBridge["getSyncStatus"];
 
     /**
      * Subscribe to state synchronization events
@@ -108,7 +108,7 @@ export interface StateSyncApiInterface {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: () => Promise<StateSyncFullSyncResult>;
+    requestFullSync: StateSyncDomainBridge["requestFullSync"];
 }
 
 /**
@@ -147,4 +147,4 @@ export const stateSyncApi: StateSyncApiInterface = {
     requestFullSync: createTypedInvoker("request-full-sync"),
 } as const;
 
-export type StateSyncApi = StateSyncApiInterface;
+export type StateSyncApi = StateSyncApiSurface;

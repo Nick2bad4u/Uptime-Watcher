@@ -2,9 +2,24 @@
  * Type alias that mirrors the Electron API exposed via the preload script.
  *
  * @remarks
- * The application declares the `electronAPI` surface in `src/types.ts` through
- * a global augmentation. Storybook consumes the same type to keep mocks and
- * stories aligned with the production bridge contract without duplicating
- * domain definitions.
+ * Storybook consumes the shared preload bridge contracts directly to ensure
+ * mocks and stories stay aligned with the production surface without relying on
+ * global augmentations.
  */
-export type ElectronAPI = Window["electronAPI"];
+import type { EventsDomainBridge } from "@shared/types/eventsBridge";
+import type {
+    ElectronBridgeApi,
+    StateSyncApiSurface,
+    SystemDomainBridge,
+} from "@shared/types/preload";
+
+type StorybookSystemApi = SystemDomainBridge & {
+    readonly quitAndInstall: () => void;
+};
+
+export type ElectronAPI = ElectronBridgeApi<
+    EventsDomainBridge,
+    StorybookSystemApi
+> & {
+    readonly stateSync: StateSyncApiSurface;
+};

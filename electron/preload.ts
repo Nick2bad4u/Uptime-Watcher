@@ -10,7 +10,12 @@
  * @packageDocumentation
  */
 
+import type { ElectronBridgeApi } from "@shared/types/preload";
+
 import { contextBridge } from "electron";
+
+import type { EventsApi } from "./preload/domains/eventsApi";
+import type { SystemApi } from "./preload/domains/systemApi";
 
 import { dataApi } from "./preload/domains/dataApi";
 import { createEventsApi } from "./preload/domains/eventsApi";
@@ -24,24 +29,7 @@ import { systemApi } from "./preload/domains/systemApi";
 /**
  * Complete electron API interface with all domain APIs
  */
-interface ElectronAPI {
-    /** Data management operations (import/export, settings, backup) */
-    data: typeof dataApi;
-    /** Event listener registration for various system events */
-    events: ReturnType<typeof createEventsApi>;
-    /** Monitoring control operations (start/stop, validation, formatting) */
-    monitoring: typeof monitoringApi;
-    /** Monitor type registry operations */
-    monitorTypes: typeof monitorTypesApi;
-    /** Settings management operations */
-    settings: typeof settingsApi;
-    /** Site management operations (CRUD, monitoring control) */
-    sites: typeof sitesApi;
-    /** State synchronization operations */
-    stateSync: typeof stateSyncApi;
-    /** System-level operations (external links, etc.) */
-    system: typeof systemApi;
-}
+type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
 
 /**
  * The complete domain-based electron API exposed to the renderer process

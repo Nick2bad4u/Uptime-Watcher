@@ -4,6 +4,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { StateSyncDomainBridge } from "@shared/types/preload";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
@@ -93,7 +94,26 @@ const applySiteMutation = (
     return clone(next);
 };
 
-export const electronAPIMock: ElectronAPI = {
+const stateSyncBase: StateSyncDomainBridge = {
+    getSyncStatus: async (): Promise<StateSyncStatusSummary> => ({
+        lastSyncAt: Date.now(),
+        siteCount: mockState.sites.length,
+        source: "frontend",
+        synchronized: true,
+    }),
+    requestFullSync: async (): Promise<StateSyncFullSyncResult> => {
+        const sites = clone(mockState.sites);
+        return {
+            completedAt: Date.now(),
+            siteCount: sites.length,
+            sites,
+            source: "frontend",
+            synchronized: true,
+        };
+    },
+};
+
+const electronAPIMockDefinition = {
     data: {
         downloadSqliteBackup:
             async (): Promise<SerializedDatabaseBackupResult> => ({
@@ -111,7 +131,6 @@ export const electronAPIMock: ElectronAPI = {
                 monitorTypes: mockState.monitorTypes,
                 sites: mockState.sites,
             }),
-        getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         importData: async (payload: string): Promise<boolean> => {
             try {
                 const parsed = JSON.parse(payload) as Partial<{
@@ -141,10 +160,6 @@ export const electronAPIMock: ElectronAPI = {
         },
         resetSettings: async (): Promise<void> => {
             mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
-        },
-        updateHistoryLimit: async (limit: number): Promise<number> => {
-            mockState.historyLimit = normalizeLimit(limit);
-            return mockState.historyLimit;
         },
     },
     events: {
@@ -346,31 +361,22 @@ export const electronAPIMock: ElectronAPI = {
                     : site.monitors,
             })),
     },
-    stateSync: {
-        getSyncStatus: async (): Promise<StateSyncStatusSummary> => ({
-            lastSyncAt: Date.now(),
-            siteCount: mockState.sites.length,
-            source: "frontend",
-            synchronized: true,
-        }),
-        onStateSyncEvent: registerListener<StateSyncEventData>,
-        requestFullSync: async (): Promise<StateSyncFullSyncResult> => {
-            const sites = clone(mockState.sites);
-            return {
-                completedAt: Date.now(),
-                siteCount: sites.length,
-                sites,
-                source: "frontend",
-                synchronized: true,
-            };
-        },
-    },
+    stateSync: stateSyncBase as ElectronAPI["stateSync"],
     system: {
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
         quitAndInstall: noop,
     },
-};
+} as ElectronAPI;
+
+const electronAPIMock: ElectronAPI = electronAPIMockDefinition;
+Reflect.set(
+    electronAPIMock.stateSync as Record<string, unknown>,
+    "onStateSyncEvent",
+    registerListener<StateSyncEventData>
+);
+
+export { electronAPIMock };
 
 export const electronMockState: ElectronMockState = mockState;
 

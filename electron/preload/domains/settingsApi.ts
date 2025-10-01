@@ -11,18 +11,20 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
+import type { SettingsDomainBridge } from "@shared/types/preload";
+
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the settings domain API operations
  */
-export interface SettingsApiInterface {
+export interface SettingsApiInterface extends SettingsDomainBridge {
     /**
      * Gets the current history retention limit
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: () => Promise<number>;
+    getHistoryLimit: SettingsDomainBridge["getHistoryLimit"];
 
     /**
      * Updates the history retention limit
@@ -31,7 +33,7 @@ export interface SettingsApiInterface {
      *
      * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: (limitDays: number) => Promise<number>;
+    updateHistoryLimit: SettingsDomainBridge["updateHistoryLimit"];
 }
 
 /**
@@ -55,6 +57,6 @@ export const settingsApi: SettingsApiInterface = {
     updateHistoryLimit: createTypedInvoker("update-history-limit"),
 } as const;
 
-export type SettingsApi = SettingsApiInterface;
+export type SettingsApi = SettingsDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

@@ -53,17 +53,22 @@ const WithFormatFailure = ({
 
     useMount(
         () => {
-            originalRef.current =
-                window.electronAPI.monitoring.formatMonitorDetail;
-            window.electronAPI.monitoring.formatMonitorDetail =
-                async (): Promise<never> => {
-                    throw new Error("Simulated formatting failure");
-                };
+            const monitoring = window.electronAPI.monitoring as unknown as {
+                formatMonitorDetail: FormatMonitorDetail;
+            };
+
+            originalRef.current = monitoring.formatMonitorDetail;
+            monitoring.formatMonitorDetail = async (): Promise<never> => {
+                throw new Error("Simulated formatting failure");
+            };
         },
         () => {
             if (originalRef.current) {
-                window.electronAPI.monitoring.formatMonitorDetail =
-                    originalRef.current;
+                const monitoring = window.electronAPI.monitoring as unknown as {
+                    formatMonitorDetail: FormatMonitorDetail;
+                };
+
+                monitoring.formatMonitorDetail = originalRef.current;
             }
         }
     );

@@ -44,7 +44,7 @@ export const SettingsService = {
      */
     async getHistoryLimit(): Promise<number> {
         await SettingsService.initialize();
-        return window.electronAPI.data.getHistoryLimit();
+        return window.electronAPI.settings.getHistoryLimit();
     },
 
     /**
@@ -112,7 +112,7 @@ export const SettingsService = {
     async updateHistoryLimit(limit: number): Promise<number> {
         await SettingsService.initialize();
         const updatedLimit =
-            await window.electronAPI.data.updateHistoryLimit(limit);
+            await window.electronAPI.settings.updateHistoryLimit(limit);
         const sanitizedLimit = safeNumberConversion(updatedLimit, limit);
 
         if (sanitizedLimit !== updatedLimit) {

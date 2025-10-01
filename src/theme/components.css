@@ -699,6 +699,11 @@
     inset: 0;
 }
 
+/* Elevated overlay stacking for confirmation dialogs to ensure visibility above feature modals */
+.modal-overlay--confirm {
+    z-index: 80;
+}
+
 /* Ensure dialog elements within modal overlays are positioned correctly */
 .modal-overlay dialog {
     position: relative;

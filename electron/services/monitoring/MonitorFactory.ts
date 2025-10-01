@@ -51,6 +51,30 @@ export interface MonitorServiceResult {
 }
 
 /**
+ * Error thrown when a monitor service fails to apply configuration updates.
+ */
+export class MonitorConfigurationError extends Error {
+    /** The monitor type whose configuration failed to apply. */
+    public readonly type: MonitorType;
+
+    /**
+     * @param type - Monitor type whose configuration update failed.
+     * @param message - Normalized error message from the underlying failure.
+     * @param cause - Optional underlying error for rich diagnostics.
+     */
+    public constructor(type: MonitorType, message: string, cause?: Error) {
+        super(
+            `Failed to apply configuration for monitor '${type}': ${message}`,
+            {
+                cause,
+            }
+        );
+        this.name = "MonitorConfigurationError";
+        this.type = type;
+    }
+}
+
+/**
  * Factory for creating, caching, and managing monitor service instances for all
  * registered monitor types.
  *
@@ -202,17 +226,22 @@ export function getMonitorWithResult(
             instance.updateConfig(config);
             // ConfigurationApplied remains true
         } catch (error) {
-            configurationApplied = false;
-            configurationError =
-                error instanceof Error ? error.message : String(error);
+            const normalizedError =
+                error instanceof Error ? error : new Error(String(error));
 
-            // Log but don't throw for backward compatibility
-            logger.warn(
+            logger.error(
                 interpolateLogTemplate(
                     LOG_TEMPLATES.warnings.MONITOR_CONFIG_UPDATE_FAILED_TYPE,
                     { type }
                 ),
-                { error }
+                { error: normalizedError }
+            );
+
+            // eslint-disable-next-line ex/use-error-cause -- MonitorConfigurationError forwards the cause to Error via its constructor
+            throw new MonitorConfigurationError(
+                type,
+                normalizedError.message,
+                normalizedError
             );
         }
     } else if (config) {
@@ -257,6 +286,7 @@ export function getMonitorWithResult(
  *
  * @throws {@link Error} If the monitor type is not supported or no service
  *   factory is registered for the type.
+ * @throws {@link MonitorConfigurationError} If configuration application fails.
  *
  * @public
  *

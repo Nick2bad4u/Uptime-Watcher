@@ -26,6 +26,7 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import type { EventsDomainBridge } from "@shared/types/eventsBridge";
 
 import { ipcRenderer } from "electron";
 
@@ -36,29 +37,9 @@ import { createEventManager } from "../core/bridgeFactory";
  *
  * @returns Events API object with event listener functions
  */
-export function createEventsApi(): {
-    onCacheInvalidated: (
-        callback: (data: CacheInvalidatedEventData) => void
-    ) => () => void;
-    onMonitorDown: (
-        callback: (data: MonitorDownEventData) => void
-    ) => () => void;
-    onMonitoringStarted: (
-        callback: (data: MonitoringControlEventData) => void
-    ) => () => void;
-    onMonitoringStopped: (
-        callback: (data: MonitoringControlEventData) => void
-    ) => () => void;
-    onMonitorStatusChanged: (
-        callback: (data: StatusUpdate) => void
-    ) => () => void;
-    onMonitorUp: (callback: (data: MonitorUpEventData) => void) => () => void;
-    onTestEvent: (callback: (data: TestEventData) => void) => () => void;
-    onUpdateStatus: (
-        callback: (data: UpdateStatusEventData) => void
-    ) => () => void;
-    removeAllListeners: () => void;
-} {
+export type EventsApi = EventsDomainBridge;
+
+export function createEventsApi(): EventsApi {
     return {
         /**
          * Register a listener for cache invalidation events

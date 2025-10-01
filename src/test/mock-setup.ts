@@ -142,15 +142,9 @@ const mockElectronAPI: ElectronAPI = {
             },
         })),
         exportData: vi.fn<ElectronAPI["data"]["exportData"]>(async () => "{}"),
-        getHistoryLimit: vi.fn<ElectronAPI["data"]["getHistoryLimit"]>(
-            async () => 1000
-        ),
         importData: vi.fn<ElectronAPI["data"]["importData"]>(async () => true),
         resetSettings: vi.fn<ElectronAPI["data"]["resetSettings"]>(
             async () => undefined
-        ),
-        updateHistoryLimit: vi.fn<ElectronAPI["data"]["updateHistoryLimit"]>(
-            async (limit: number) => limit
         ),
     },
 

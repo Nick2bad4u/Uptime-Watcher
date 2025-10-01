@@ -150,13 +150,9 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
         try {
-            const invokeArgs: unknown[] = [];
-            for (const value of args) {
-                invokeArgs.push(value);
-            }
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...invokeArgs
+                ...args
             );
             return validateIpcResponse<IpcInvokeChannelResult<TChannel>>(
                 response
@@ -189,13 +185,9 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
         try {
-            const invokeArgs: unknown[] = [];
-            for (const value of args) {
-                invokeArgs.push(value);
-            }
             const response: unknown = await ipcRenderer.invoke(
                 channel,
-                ...invokeArgs
+                ...args
             );
             validateVoidIpcResponse(response);
         } catch (error) {

@@ -65,7 +65,8 @@ const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
 // Mock window.electronAPI
 const mockElectronAPI = {
-    data: {
+    data: {},
+    settings: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
@@ -126,7 +127,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 .mockImplementation(() => {});
 
             // Mock getHistoryLimit to throw an error
-            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
                 new Error("Backend connection failed")
             );
 
@@ -137,7 +138,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await act(async () => {
                 try {
                     const response =
-                        await mockElectronAPI.data.getHistoryLimit();
+                        await mockElectronAPI.settings.getHistoryLimit();
                     const historyLimit = mockSafeExtractIpcData(
                         response,
                         100
@@ -176,7 +177,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 .mockImplementation(() => {});
 
             // Mock successful API call but safeExtractIpcData throws
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(200);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(200);
 
             mockSafeExtractIpcData.mockImplementation(() => {
                 throw new Error("Data extraction failed");
@@ -185,7 +186,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await act(async () => {
                 try {
                     const response =
-                        await mockElectronAPI.data.getHistoryLimit();
+                        await mockElectronAPI.settings.getHistoryLimit();
                     const historyLimit = mockSafeExtractIpcData(
                         response,
                         100
@@ -220,7 +221,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(250);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(250);
 
             // Mock withErrorHandling to execute normally
             mockWithErrorHandling.mockImplementation(
@@ -241,7 +242,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             expect(state.settings.historyLimit).toBe(250);
 
             // Verify API calls
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
         });
 
         it("should handle backend errors in syncFromBackend", async ({
@@ -254,7 +255,9 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await annotate("Type: Error Handling", "type");
 
             const mockError = new Error("Backend sync failed");
-            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(mockError);
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
+                mockError
+            );
 
             // Mock withErrorHandling to throw the error
             mockWithErrorHandling.mockImplementation(
@@ -304,7 +307,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
 
             useSettingsStore.setState({ settings: customSettings });
 
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(300);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(300);
             mockSafeExtractIpcData.mockReturnValue(300);
 
             mockWithErrorHandling.mockImplementation(
@@ -334,7 +337,9 @@ describe("useSettingsStore - Targeted Coverage", () => {
 
             // Mock electronAPI to fail
             const apiError = new Error("API call failed");
-            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(apiError);
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
+                apiError
+            );
 
             mockWithErrorHandling.mockImplementation(
                 async (asyncFn, errorHandler) => {
@@ -370,7 +375,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test successful sync scenario
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(350);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(350);
 
             mockWithErrorHandling.mockImplementation(
                 async (asyncFn) => await asyncFn()
@@ -392,7 +397,7 @@ describe("useSettingsStore - Targeted Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(400);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(400);
 
             mockWithErrorHandling.mockImplementation(
                 async (asyncFn) => await asyncFn()

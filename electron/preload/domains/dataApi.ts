@@ -14,34 +14,27 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
+import type { DataDomainBridge } from "@shared/types/preload";
 
 import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the data domain API operations
  */
-export interface DataApiInterface {
+export interface DataApiInterface extends DataDomainBridge {
     /**
      * Downloads a SQLite database backup
      *
      * @returns Promise resolving to the serialized backup payload and metadata
      */
-    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    downloadSqliteBackup: DataDomainBridge["downloadSqliteBackup"];
 
     /**
      * Exports all application data to a JSON string
      *
      * @returns Promise resolving to exported data as JSON string
      */
-    exportData: () => Promise<string>;
-
-    /**
-     * Gets the current history retention limit
-     *
-     * @returns Promise resolving to the current history limit in days
-     */
-    getHistoryLimit: () => Promise<number>;
+    exportData: DataDomainBridge["exportData"];
 
     /**
      * Imports application data from a JSON string
@@ -50,23 +43,14 @@ export interface DataApiInterface {
      *
      * @returns Promise resolving to a boolean success flag
      */
-    importData: (serializedData: string) => Promise<boolean>;
+    importData: DataDomainBridge["importData"];
 
     /**
      * Resets all application settings to defaults
      *
      * @returns Promise that resolves when settings are reset
      */
-    resetSettings: () => Promise<void>;
-
-    /**
-     * Updates the history retention limit
-     *
-     * @param limitDays - New history limit in days
-     *
-     * @returns Promise resolving to the updated limit value
-     */
-    updateHistoryLimit: (limitDays: number) => Promise<number>;
+    resetSettings: DataDomainBridge["resetSettings"];
 }
 
 /**
@@ -88,13 +72,6 @@ export const dataApi: DataApiInterface = {
     exportData: createTypedInvoker("export-data"),
 
     /**
-     * Gets the current history retention limit
-     *
-     * @returns Promise resolving to the current history limit in days
-     */
-    getHistoryLimit: createTypedInvoker("get-history-limit"),
-
-    /**
      * Imports application data from a JSON string
      *
      * @param jsonData - JSON string containing application data to import
@@ -109,17 +86,8 @@ export const dataApi: DataApiInterface = {
      * @returns Promise that resolves when settings are reset
      */
     resetSettings: createVoidInvoker("reset-settings"),
-
-    /**
-     * Updates the history retention limit
-     *
-     * @param limitDays - New history limit in days
-     *
-     * @returns Promise that resolves to the updated limit value
-     */
-    updateHistoryLimit: createTypedInvoker("update-history-limit"),
 } as const;
 
-export type DataApi = DataApiInterface;
+export type DataApi = DataDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

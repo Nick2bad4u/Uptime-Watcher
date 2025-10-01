@@ -13,15 +13,14 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { Monitor, StatusUpdate } from "@shared/types";
-import type { ValidationResult } from "@shared/types/validation";
+import type { MonitoringDomainBridge } from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the monitoring domain API operations
  */
-export interface MonitoringApiInterface {
+export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Performs an immediate check for a specific monitor
      *
@@ -31,10 +30,7 @@ export interface MonitoringApiInterface {
      * @returns Promise resolving to the latest {@link StatusUpdate} or undefined
      *   when no update is available
      */
-    checkSiteNow: (
-        siteId: string,
-        monitorId: string
-    ) => Promise<StatusUpdate | undefined>;
+    checkSiteNow: MonitoringDomainBridge["checkSiteNow"];
 
     /**
      * Formats monitor detail information for display
@@ -43,10 +39,7 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to formatted detail string
      */
-    formatMonitorDetail: (
-        monitorType: string,
-        details: string
-    ) => Promise<string>;
+    formatMonitorDetail: MonitoringDomainBridge["formatMonitorDetail"];
 
     /**
      * Formats monitor title suffix for display
@@ -55,10 +48,7 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to formatted title suffix
      */
-    formatMonitorTitleSuffix: (
-        monitorType: string,
-        monitorData: Monitor
-    ) => Promise<string>;
+    formatMonitorTitleSuffix: MonitoringDomainBridge["formatMonitorTitleSuffix"];
 
     /**
      * Removes a monitor from a site
@@ -68,14 +58,14 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true when the monitor is removed
      */
-    removeMonitor: (siteId: string, monitorId: string) => Promise<boolean>;
+    removeMonitor: MonitoringDomainBridge["removeMonitor"];
 
     /**
      * Starts the global monitoring system
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoring: () => Promise<boolean>;
+    startMonitoring: MonitoringDomainBridge["startMonitoring"];
 
     /**
      * Starts monitoring for a specific site or monitor
@@ -85,17 +75,14 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForSite: (
-        siteId: string,
-        monitorId?: string
-    ) => Promise<boolean>;
+    startMonitoringForSite: MonitoringDomainBridge["startMonitoringForSite"];
 
     /**
      * Stops the global monitoring system
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoring: () => Promise<boolean>;
+    stopMonitoring: MonitoringDomainBridge["stopMonitoring"];
 
     /**
      * Stops monitoring for a specific site or monitor
@@ -105,10 +92,7 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForSite: (
-        siteId: string,
-        monitorId?: string
-    ) => Promise<boolean>;
+    stopMonitoringForSite: MonitoringDomainBridge["stopMonitoringForSite"];
 
     /**
      * Validates monitor configuration data
@@ -118,10 +102,7 @@ export interface MonitoringApiInterface {
      *
      * @returns Promise resolving to validation result
      */
-    validateMonitorData: (
-        monitorType: string,
-        monitorData: unknown
-    ) => Promise<ValidationResult>;
+    validateMonitorData: MonitoringDomainBridge["validateMonitorData"];
 }
 
 /**

@@ -12,14 +12,14 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { Site } from "@shared/types";
+import type { SitesDomainBridge } from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the sites domain API operations
  */
-export interface SitesApiInterface {
+export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Adds a new site to be monitored
      *
@@ -27,21 +27,21 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to the created site
      */
-    addSite: (siteData: Site) => Promise<Site>;
+    addSite: SitesDomainBridge["addSite"];
 
     /**
      * Deletes all sites (dangerous operation)
      *
      * @returns Promise resolving to the number of removed sites
      */
-    deleteAllSites: () => Promise<number>;
+    deleteAllSites: SitesDomainBridge["deleteAllSites"];
 
     /**
      * Retrieves all sites from the database
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: () => Promise<Site[]>;
+    getSites: SitesDomainBridge["getSites"];
 
     /**
      * Removes a site from monitoring
@@ -50,7 +50,7 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: (siteId: string) => Promise<boolean>;
+    removeSite: SitesDomainBridge["removeSite"];
 
     /**
      * Updates an existing site's configuration
@@ -60,7 +60,7 @@ export interface SitesApiInterface {
      *
      * @returns Promise resolving to the updated site
      */
-    updateSite: (siteId: string, siteData: Partial<Site>) => Promise<Site>;
+    updateSite: SitesDomainBridge["updateSite"];
 }
 
 /**
@@ -102,6 +102,6 @@ export const sitesApi: SitesApiInterface = {
     updateSite: createTypedInvoker("update-site"),
 } as const;
 
-export type SitesApi = SitesApiInterface;
+export type SitesApi = SitesDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

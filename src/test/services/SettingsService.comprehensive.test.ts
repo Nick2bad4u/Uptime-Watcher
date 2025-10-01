@@ -27,8 +27,10 @@ const mockLogger = vi.hoisted(() => ({
 
 const mockElectronAPI = vi.hoisted(() => ({
     data: {
-        getHistoryLimit: vi.fn(),
         resetSettings: vi.fn(),
+    },
+    settings: {
+        getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 }));
@@ -60,8 +62,10 @@ describe("SettingsService", () => {
 
         // Recreate fresh mocks for each test
         mockElectronAPI.data = {
-            getHistoryLimit: vi.fn().mockResolvedValue(500),
             resetSettings: vi.fn().mockResolvedValue(undefined),
+        };
+        mockElectronAPI.settings = {
+            getHistoryLimit: vi.fn().mockResolvedValue(500),
             updateHistoryLimit: vi.fn().mockResolvedValue(1000),
         };
 
@@ -127,7 +131,7 @@ describe("SettingsService", () => {
     describe("getHistoryLimit", () => {
         it("should get history limit successfully after initialization", async () => {
             const expectedLimit = 750;
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(
                 expectedLimit
             );
 
@@ -135,9 +139,9 @@ describe("SettingsService", () => {
 
             expect(result).toBe(expectedLimit);
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                1
-            );
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should fail if initialization fails", async () => {
@@ -147,20 +151,22 @@ describe("SettingsService", () => {
             await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
                 "Initialization failed"
             );
-            expect(mockElectronAPI.data.getHistoryLimit).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle getHistoryLimit API errors", async () => {
             const error = new Error("Failed to get history limit");
-            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(error);
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(error);
 
             await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
                 "Failed to get history limit"
             );
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                1
-            );
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should handle different history limit values", async () => {
@@ -175,16 +181,16 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of limits) {
-                mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
                 const result = await SettingsService.getHistoryLimit();
                 expect(result).toBe(limit);
             }
 
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                limits.length
-            );
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(limits.length);
         });
 
         it("should handle negative and unusual numeric values", async () => {
@@ -197,7 +203,7 @@ describe("SettingsService", () => {
             ];
 
             for (const value of unusualValues) {
-                mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     value
                 );
                 const result = await SettingsService.getHistoryLimit();
@@ -254,14 +260,16 @@ describe("SettingsService", () => {
     describe("updateHistoryLimit", () => {
         it("should update history limit successfully after initialization", async () => {
             const newLimit = 2000;
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(newLimit);
+            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(
+                newLimit
+            );
 
             await expect(
                 SettingsService.updateHistoryLimit(newLimit)
             ).resolves.toBe(newLimit);
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(newLimit);
         });
 
@@ -273,20 +281,22 @@ describe("SettingsService", () => {
                 SettingsService.updateHistoryLimit(1000)
             ).rejects.toThrow("Initialization failed");
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.updateHistoryLimit
             ).not.toHaveBeenCalled();
         });
 
         it("should handle updateHistoryLimit API errors", async () => {
             const error = new Error("Failed to update history limit");
-            mockElectronAPI.data.updateHistoryLimit.mockRejectedValue(error);
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
+                error
+            );
 
             await expect(
                 SettingsService.updateHistoryLimit(1000)
             ).rejects.toThrow("Failed to update history limit");
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(1000);
         });
 
@@ -303,18 +313,18 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of limits) {
-                mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
-                    mockElectronAPI.data.updateHistoryLimit
+                    mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
                 expect(result).toBe(limit);
             }
 
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledTimes(limits.length);
         });
 
@@ -328,12 +338,12 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of edgeCases) {
-                mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
-                    mockElectronAPI.data.updateHistoryLimit
+                    mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
                 expect(result).toBe(limit);
             }
@@ -348,12 +358,12 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of floatValues) {
-                mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     Math.floor(limit)
                 );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
-                    mockElectronAPI.data.updateHistoryLimit
+                    mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
                 expect(result).toBe(Math.floor(limit));
             }
@@ -363,19 +373,19 @@ describe("SettingsService", () => {
     describe("Integration Testing", () => {
         it("should handle multiple operations in sequence", async () => {
             // Get initial limit
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(500);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(500);
             const initialLimit = await SettingsService.getHistoryLimit();
             expect(initialLimit).toBe(500);
 
             // Update limit
             const newLimit = 1000;
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                 newLimit
             );
             await SettingsService.updateHistoryLimit(newLimit);
 
             // Get updated limit
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                 newLimit
             );
             const updatedLimit = await SettingsService.getHistoryLimit();
@@ -385,7 +395,7 @@ describe("SettingsService", () => {
             await SettingsService.resetSettings();
 
             // Get limit after reset
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(500);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(500);
             const resetLimit = await SettingsService.getHistoryLimit();
             expect(resetLimit).toBe(500);
 
@@ -402,11 +412,11 @@ describe("SettingsService", () => {
             await Promise.all(promises);
 
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                2
-            );
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(2);
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledTimes(1);
         });
 
@@ -425,18 +435,18 @@ describe("SettingsService", () => {
             await SettingsService.updateHistoryLimit(2000);
 
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(4); // 2 explicit + 2 from operations
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                1
-            );
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledTimes(1);
         });
     });
 
     describe("Error Edge Cases", () => {
         it("should handle electron API method throwing synchronously", async () => {
-            mockElectronAPI.data.getHistoryLimit.mockImplementation(() => {
+            mockElectronAPI.settings.getHistoryLimit.mockImplementation(() => {
                 throw new Error("Synchronous error");
             });
 
@@ -446,7 +456,7 @@ describe("SettingsService", () => {
         });
 
         it("should handle missing electron API methods gracefully", async () => {
-            mockElectronAPI.data.getHistoryLimit.mockImplementation(() => {
+            mockElectronAPI.settings.getHistoryLimit.mockImplementation(() => {
                 throw new TypeError("Cannot read properties of undefined");
             });
 
@@ -454,15 +464,17 @@ describe("SettingsService", () => {
         });
 
         it("should handle partial electron API gracefully", async () => {
-            mockElectronAPI.data.getHistoryLimit.mockImplementation(() => {
+            mockElectronAPI.settings.getHistoryLimit.mockImplementation(() => {
                 throw new TypeError("Cannot read properties of undefined");
             });
             mockElectronAPI.data.resetSettings.mockImplementation(() => {
                 throw new TypeError("Cannot read properties of undefined");
             });
-            mockElectronAPI.data.updateHistoryLimit.mockImplementation(() => {
-                throw new TypeError("Cannot read properties of undefined");
-            });
+            mockElectronAPI.settings.updateHistoryLimit.mockImplementation(
+                () => {
+                    throw new TypeError("Cannot read properties of undefined");
+                }
+            );
 
             await expect(SettingsService.getHistoryLimit()).rejects.toThrow();
             await expect(SettingsService.resetSettings()).rejects.toThrow();
@@ -480,7 +492,7 @@ describe("SettingsService", () => {
             ];
 
             for (const error of databaseErrors) {
-                mockElectronAPI.data.getHistoryLimit.mockRejectedValueOnce(
+                mockElectronAPI.settings.getHistoryLimit.mockRejectedValueOnce(
                     error
                 );
                 await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
@@ -519,7 +531,7 @@ describe("SettingsService", () => {
             ];
 
             for (const value of unexpectedValues) {
-                mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     value
                 );
                 const result = await SettingsService.getHistoryLimit();
@@ -536,12 +548,12 @@ describe("SettingsService", () => {
             ];
 
             for (const limit of largeLimits) {
-                mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
                 await SettingsService.updateHistoryLimit(limit);
                 expect(
-                    mockElectronAPI.data.updateHistoryLimit
+                    mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
             }
         });
@@ -557,20 +569,20 @@ describe("SettingsService", () => {
 
             for (const value of specialValues) {
                 if (Number.isNaN(value)) {
-                    mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                    mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                         Number.NaN
                     );
                     await SettingsService.updateHistoryLimit(value);
                     expect(
-                        mockElectronAPI.data.updateHistoryLimit
+                        mockElectronAPI.settings.updateHistoryLimit
                     ).toHaveBeenCalledWith(value);
                 } else {
-                    mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                    mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                         value
                     );
                     await SettingsService.updateHistoryLimit(value);
                     expect(
-                        mockElectronAPI.data.updateHistoryLimit
+                        mockElectronAPI.settings.updateHistoryLimit
                     ).toHaveBeenCalledWith(value);
                 }
             }
@@ -589,7 +601,7 @@ describe("SettingsService", () => {
 
             for (const returnValue of returnValues) {
                 mockLogger.warn.mockClear();
-                mockElectronAPI.data.updateHistoryLimit.mockResolvedValueOnce(
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     returnValue
                 );
                 const expectedResult =
@@ -622,16 +634,18 @@ describe("SettingsService", () => {
             const calls = Array.from({ length: 100 }, (_, i) => i);
 
             const promises = calls.map((i) => {
-                mockElectronAPI.data.getHistoryLimit.mockResolvedValueOnce(i);
+                mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
+                    i
+                );
                 return SettingsService.getHistoryLimit();
             });
 
             const results = await Promise.all(promises);
 
             expect(results).toHaveLength(100);
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalledTimes(
-                100
-            );
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).toHaveBeenCalledTimes(100);
         });
 
         it("should handle mixed rapid operations", async () => {

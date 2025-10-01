@@ -12,14 +12,10 @@ import { useSettingsStore } from "../stores/settings/useSettingsStore";
 // Mock electron API - Updated to match new domain-based structure
 const mockElectronAPI = {
     data: {
-        getHistoryLimit: vi.fn(),
         resetSettings: vi.fn(),
-        updateHistoryLimit: vi.fn(),
     },
     settings: {
         getHistoryLimit: vi.fn(),
-        resetSettings: vi.fn(),
-        setHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 };
@@ -130,7 +126,7 @@ describe(useSettingsStore, () => {
                 success: true,
                 message: "Settings reset successfully",
             });
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(100);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(100);
 
             // First modify settings
             useSettingsStore.getState().updateSettings({
@@ -164,11 +160,11 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.data.getHistoryLimit.mockResolvedValue(250);
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(250);
 
             await useSettingsStore.getState().initializeSettings();
 
-            expect(mockElectronAPI.data.getHistoryLimit).toHaveBeenCalled();
+            expect(mockElectronAPI.settings.getHistoryLimit).toHaveBeenCalled();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(250);
@@ -183,7 +179,7 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.data.getHistoryLimit.mockRejectedValue(
+            mockElectronAPI.settings.getHistoryLimit.mockRejectedValue(
                 new Error("Backend error")
             );
 
@@ -306,14 +302,16 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            mockElectronAPI.data.updateHistoryLimit.mockResolvedValue(300);
+            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(300);
 
             await useSettingsStore.getState().persistHistoryLimit(300);
 
             expect(
-                mockElectronAPI.data.updateHistoryLimit
+                mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(300);
-            expect(mockElectronAPI.data.getHistoryLimit).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.settings.getHistoryLimit
+            ).not.toHaveBeenCalled();
 
             const state = useSettingsStore.getState();
             expect(state.settings.historyLimit).toBe(300);
@@ -328,7 +326,7 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockElectronAPI.data.updateHistoryLimit.mockRejectedValue(
+            mockElectronAPI.settings.updateHistoryLimit.mockRejectedValue(
                 new Error("Backend error")
             );
 

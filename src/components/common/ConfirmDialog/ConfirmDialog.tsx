@@ -53,7 +53,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
         return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler; keyboard dismissal handled globally via escape key handler
             <div
-                className={`modal-overlay fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm ${
+                className={`modal-overlay modal-overlay--confirm fixed inset-0 flex items-center justify-center backdrop-blur-sm ${
                     isDark ? "dark" : ""
                 }`}
                 onClick={handleBackdropClick}

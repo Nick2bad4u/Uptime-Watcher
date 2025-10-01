@@ -175,9 +175,6 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                 ],
                 provider: "playwright",
             },
-            cache: {
-                dir: "./.cache/vitest/storybook/browser",
-            },
             coverage: {
                 enabled: false,
                 exclude: [

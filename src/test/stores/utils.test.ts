@@ -452,7 +452,7 @@ describe("Store Utils", () => {
             (global as any).window = {
                 electronAPI: {
                     sites: { getSites: vi.fn() },
-                    data: { getHistoryLimit: vi.fn() },
+                    settings: { getHistoryLimit: vi.fn() },
                 },
             };
 
@@ -472,7 +472,7 @@ describe("Store Utils", () => {
             (global as any).window = {
                 electronAPI: {
                     sites: { getSites: vi.fn() },
-                    data: { getHistoryLimit: vi.fn() },
+                    settings: { getHistoryLimit: vi.fn() },
                 },
             };
 
