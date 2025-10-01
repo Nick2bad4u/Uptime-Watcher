@@ -95,35 +95,35 @@ graph TB
 export const CACHE_CONFIG = Object.freeze({
  SITES: Object.freeze({
   name: "sites",
-  defaultTTL: 600_000, // 10 minutes
+  ttl: 600_000, // 10 minutes
   maxSize: 500,
   enableStats: true,
  }),
 
  MONITORS: Object.freeze({
   name: "monitors",
-  defaultTTL: 300_000, // 5 minutes - shorter for real-time monitoring
+  ttl: 300_000, // 5 minutes - shorter for real-time monitoring
   maxSize: 1000,
   enableStats: true,
  }),
 
  SETTINGS: Object.freeze({
   name: "settings",
-  defaultTTL: 1_800_000, // 30 minutes - longer for infrequent changes
+  ttl: 1_800_000, // 30 minutes - longer for infrequent changes
   maxSize: 100,
   enableStats: true,
  }),
 
  VALIDATION: Object.freeze({
   name: "validation-results",
-  defaultTTL: 300_000, // 5 minutes
+  ttl: 300_000, // 5 minutes
   maxSize: 200,
   enableStats: true,
  }),
 
  TEMPORARY: Object.freeze({
   name: "temporary",
-  defaultTTL: 300_000, // 5 minutes
+  ttl: 300_000, // 5 minutes
   maxSize: 1000,
   enableStats: false, // Disabled for performance
  }),
@@ -152,7 +152,7 @@ export const CACHE_NAMES = Object.freeze({
 ```typescript
 // Before (inconsistent)
 const sitesCache = new StandardizedCache<Site>({
- defaultTTL: 600_000, // 10 minutes
+ ttl: 600_000, // 10 minutes
  enableStats: true,
  eventEmitter: this.eventEmitter,
  maxSize: 500,

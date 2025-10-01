@@ -4,7 +4,7 @@
  */
 
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../../../theme/types";
@@ -42,6 +42,10 @@ vi.mock("../../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
     ),
+}));
+const confirmMock = vi.fn();
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
 }));
 
 // Import after mocks
@@ -156,6 +160,7 @@ describe("Settings Component", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        confirmMock.mockReset();
 
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseSettingsStore.mockReturnValue(mockSettingsStore);
@@ -271,7 +276,7 @@ describe("Settings Component", () => {
         expect(mockSettingsStore.persistHistoryLimit).toHaveBeenCalledWith(500);
     });
 
-    it("should handle reset settings", ({ task, annotate }) => {
+    it("should handle reset settings", async ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");
         annotate("Category: Component", "category");
@@ -282,22 +287,29 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        // Mock window.confirm to return true
-        const confirmSpy = vi
-            .spyOn(globalThis, "confirm")
-            .mockReturnValue(true);
+        confirmMock.mockResolvedValue(true);
 
         render(<Settings onClose={mockOnClose} />);
 
         const resetButton = screen.getByText("Reset to Defaults");
         fireEvent.click(resetButton);
 
-        expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
-
-        confirmSpy.mockRestore();
+        await waitFor(() =>
+            expect(mockSettingsStore.resetSettings).toHaveBeenCalled()
+        );
+        expect(confirmMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                message:
+                    "Are you sure you want to reset all settings to defaults?",
+                title: "Reset Settings",
+            })
+        );
     });
 
-    it("should not reset settings when cancelled", ({ task, annotate }) => {
+    it("should not reset settings when cancelled", async ({
+        task,
+        annotate,
+    }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: Settings", "component");
         annotate("Category: Component", "category");
@@ -308,19 +320,16 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        // Mock window.confirm to return false
-        const confirmSpy = vi
-            .spyOn(globalThis, "confirm")
-            .mockReturnValue(false);
+        confirmMock.mockResolvedValue(false);
 
         render(<Settings onClose={mockOnClose} />);
 
         const resetButton = screen.getByText("Reset to Defaults");
         fireEvent.click(resetButton);
 
-        expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled();
-
-        confirmSpy.mockRestore();
+        await waitFor(() =>
+            expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled()
+        );
     });
 
     it("should handle sync settings", async ({ task, annotate }) => {

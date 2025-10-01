@@ -27,7 +27,7 @@ class MockMonitorOperationRegistry {
     }
 
     private generateOperationId(): string {
-        return `op-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        return `op-${globalThis.crypto.randomUUID()}`;
     }
 
     validateOperation(operationId: string): boolean {

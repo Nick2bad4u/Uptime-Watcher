@@ -119,31 +119,6 @@ export interface MonitorFieldValues {
 }
 
 /**
- * Monitor validation result with specific error types
- *
- * @deprecated Use ValidationResult from unified validation system instead
- *
- * @see {@link ValidationResult} in shared/types/validation.ts
- */
-export interface MonitorValidationResult {
-    /** Array of error messages */
-    errors: readonly string[];
-    /** Additional validation metadata */
-    metadata: {
-        /** Monitor type being validated */
-        monitorType: MonitorType;
-        /** Validation timestamp */
-        timestamp: number;
-        /** Fields that were validated */
-        validatedFields: readonly string[];
-    };
-    /** Whether validation passed */
-    success: boolean;
-    /** Array of warning messages */
-    warnings: readonly string[];
-}
-
-/**
  * Ping monitor specific fields
  */
 export interface PingMonitorFields extends BaseMonitorFields {

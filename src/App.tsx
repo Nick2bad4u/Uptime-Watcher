@@ -22,6 +22,7 @@ import {
 } from "react";
 
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
+import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
 import { SiteList } from "./components/Dashboard/SiteList/SiteList";
 import { Header } from "./components/Header/Header";
@@ -36,6 +37,7 @@ import { ErrorBoundary } from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
 import { useSitesStore } from "./stores/sites/useSitesStore";
+import { useConfirmDialogVisibility } from "./stores/ui/useConfirmDialogStore";
 import { useUIStore } from "./stores/ui/useUiStore";
 import { useUpdatesStore } from "./stores/updates/useUpdatesStore";
 import { ThemedBox } from "./theme/components/ThemedBox";
@@ -112,6 +114,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         showSettings,
         showSiteDetails,
     } = useUIStore();
+
+    const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
+        useConfirmDialogVisibility();
 
     // Updates store
     const {
@@ -303,6 +308,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const modalConfigs = useMemo(
         () => [
             {
+                isOpen: isConfirmDialogOpen,
+                onClose: closeConfirmDialog,
+                priority: 4,
+            },
+            {
                 isOpen: showSiteDetails,
                 onClose: handleCloseSiteDetails,
                 priority: 3, // Highest priority
@@ -319,9 +329,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             },
         ],
         [
+            closeConfirmDialog,
             handleCloseAddSiteModal,
             handleCloseSettings,
             handleCloseSiteDetails,
+            isConfirmDialogOpen,
             showAddSiteModal,
             showSettings,
             showSiteDetails,
@@ -432,6 +444,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     className={`app-container ${isDark ? "dark" : ""}`}
                     data-testid="app-container"
                 >
+                    <ConfirmDialog />
                     {/* Global Loading Overlay */}
                     {showLoadingOverlay ? (
                         <output

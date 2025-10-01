@@ -9,16 +9,15 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 
 // Mock window.matchMedia
-const createMockMediaQuery = (matches: boolean) => ({
-    matches,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(), // Legacy support
-    removeListener: vi.fn(), // Legacy support
-    dispatchEvent: vi.fn(),
-    media: "(prefers-color-scheme: dark)",
-    onchange: null,
-});
+const createMockMediaQuery = (matches: boolean): MediaQueryList =>
+    ({
+        addEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+        matches,
+        media: "(prefers-color-scheme: dark)",
+        onchange: null,
+        removeEventListener: vi.fn(),
+    }) as unknown as MediaQueryList;
 
 // Setup window.matchMedia mock before any tests run
 Object.defineProperty(globalThis, "matchMedia", {
@@ -265,8 +264,16 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.headerStyle.color).toBe("#111827");
 
             // Simulate theme change to dark mode
-            mockMediaQuery.matches = true;
-            const listener = mockMediaQuery.addEventListener.mock.calls[0]?.[1];
+            Reflect.set(
+                mockMediaQuery as unknown as Record<string, unknown>,
+                "matches",
+                true
+            );
+            const listener = (
+                mockMediaQuery.addEventListener as unknown as ReturnType<
+                    typeof vi.fn
+                >
+            ).mock.calls[0]?.[1];
 
             act(() => {
                 if (listener) {
@@ -297,8 +304,16 @@ describe("useThemeStyles Hook", () => {
             expect(result.current.headerStyle.color).toBe("#f3f4f6");
 
             // Simulate theme change to light mode
-            mockMediaQuery.matches = false;
-            const listener = mockMediaQuery.addEventListener.mock.calls[0]?.[1];
+            Reflect.set(
+                mockMediaQuery as unknown as Record<string, unknown>,
+                "matches",
+                false
+            );
+            const listener = (
+                mockMediaQuery.addEventListener as unknown as ReturnType<
+                    typeof vi.fn
+                >
+            ).mock.calls[0]?.[1];
 
             act(() => {
                 if (listener) {

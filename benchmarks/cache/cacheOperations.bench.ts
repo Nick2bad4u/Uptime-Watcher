@@ -84,7 +84,7 @@ describe("Cache Operations Performance Benchmarks", () => {
         smallCache = new StandardizedCache<TestCacheData>({
             name: "small-benchmark-cache",
             maxSize: 100,
-            defaultTTL: 60_000, // 1 minute
+            ttl: 60_000, // 1 minute
             enableStats: true,
             eventEmitter: eventBus,
         });
@@ -92,7 +92,7 @@ describe("Cache Operations Performance Benchmarks", () => {
         mediumCache = new StandardizedCache<TestCacheData>({
             name: "medium-benchmark-cache",
             maxSize: 1000,
-            defaultTTL: 300_000, // 5 minutes
+            ttl: 300_000, // 5 minutes
             enableStats: true,
             eventEmitter: eventBus,
         });
@@ -100,7 +100,7 @@ describe("Cache Operations Performance Benchmarks", () => {
         largeCache = new StandardizedCache<TestCacheData>({
             name: "large-benchmark-cache",
             maxSize: 10_000,
-            defaultTTL: 600_000, // 10 minutes
+            ttl: 600_000, // 10 minutes
             enableStats: true,
             eventEmitter: eventBus,
         });
@@ -127,7 +127,7 @@ describe("Cache Operations Performance Benchmarks", () => {
             const cache = new StandardizedCache<TestCacheData>({
                 name: "set-small-cache",
                 maxSize: 200,
-                defaultTTL: 60_000,
+                ttl: 60_000,
             });
             smallKeys.forEach((key, i) => {
                 cache.set(key, smallValues[i]);
@@ -142,7 +142,7 @@ describe("Cache Operations Performance Benchmarks", () => {
             const cache = new StandardizedCache<TestCacheData>({
                 name: "set-medium-cache",
                 maxSize: 2000,
-                defaultTTL: 300_000,
+                ttl: 300_000,
             });
             mediumKeys.forEach((key, i) => {
                 cache.set(key, mediumValues[i]);
@@ -157,7 +157,7 @@ describe("Cache Operations Performance Benchmarks", () => {
             const cache = new StandardizedCache<TestCacheData>({
                 name: "set-large-cache",
                 maxSize: 20_000,
-                defaultTTL: 600_000,
+                ttl: 600_000,
             });
             largeKeys.forEach((key, i) => {
                 cache.set(key, largeValues[i]);
@@ -221,7 +221,7 @@ describe("Cache Operations Performance Benchmarks", () => {
             const cache = new StandardizedCache<TestCacheData>({
                 name: "eviction-cache",
                 maxSize: 50, // Small cache for forced evictions
-                defaultTTL: 300_000,
+                ttl: 300_000,
             });
 
             for (let i = 0; i < 200; i++) {
@@ -243,7 +243,7 @@ describe("Cache Operations Performance Benchmarks", () => {
             const cache = new StandardizedCache<TestCacheData>({
                 name: "ttl-cache",
                 maxSize: 2000,
-                defaultTTL: 300_000,
+                ttl: 300_000,
             });
 
             mediumKeys.forEach((key, i) => {

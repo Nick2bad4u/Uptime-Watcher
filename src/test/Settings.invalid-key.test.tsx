@@ -271,12 +271,16 @@ vi.mock("../theme/useTheme", () => ({
     }),
 }));
 
-// Mock window.confirm
-globalThis.confirm = vi.fn(() => true);
+const confirmMock = vi.fn();
+vi.mock("../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
+}));
 
 describe("Settings Component - Invalid Key Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        confirmMock.mockReset();
+        confirmMock.mockResolvedValue(true);
     });
 
     it("should warn and return early when attempting to update invalid settings key", async ({

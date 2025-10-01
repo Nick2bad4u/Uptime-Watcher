@@ -16,16 +16,17 @@ const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
 // Mock window.matchMedia before other imports
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(), // Deprecated
-        removeListener: vi.fn(), // Deprecated
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
+    value: vi.fn().mockImplementation(
+        (query) =>
+            ({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                matches: false,
+                media: query,
+                onchange: null,
+                removeEventListener: vi.fn(),
+            }) as unknown as MediaQueryList
+    ),
 });
 
 // Also mock the theme manager to avoid deep dependencies

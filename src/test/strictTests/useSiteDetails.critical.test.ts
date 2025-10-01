@@ -25,6 +25,10 @@ vi.mock("../../stores/error/useErrorStore", () => ({
     })),
 }));
 vi.mock("../../stores/ui/useUiStore");
+const confirmMock = vi.fn();
+vi.mock("../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
+}));
 vi.mock("@shared/utils/errorHandling", () => ({
     withUtilityErrorHandling: vi.fn(
         async (fn, _context, _defaultValue, _throwOnError) => await fn()
@@ -79,6 +83,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        confirmMock.mockReset();
 
         // Mock logger with the correct structure
         (logger as any).site = {
@@ -160,8 +165,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         (useSitesStore as any).mockReturnValue(mockStore);
 
-        // Mock window.confirm to return false (cancel)
-        global.confirm = vi.fn().mockReturnValue(false);
+        confirmMock.mockResolvedValue(false);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithMonitor })
@@ -173,8 +177,12 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         // Should not remove monitor when confirmation is cancelled
         expect(mockStore.removeMonitorFromSite).not.toHaveBeenCalled();
-        expect(global.confirm).toHaveBeenCalledWith(
-            'Are you sure you want to remove the monitor "https://example.com" from Test Site?'
+        expect(confirmMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                message:
+                    'Remove the monitor "https://example.com" from Test Site?',
+                title: "Remove Monitor",
+            })
         );
     });
 
@@ -191,8 +199,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         (useSitesStore as any).mockReturnValue(mockStore);
 
-        // Mock window.confirm to return true (confirm)
-        global.confirm = vi.fn().mockReturnValue(true);
+        confirmMock.mockResolvedValue(true);
 
         const { result } = renderHook(() =>
             useSiteDetails({ site: siteWithMonitor })
@@ -239,8 +246,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         (useSitesStore as any).mockReturnValue(mockStore);
 
-        // Mock window.confirm to return false (cancel)
-        global.confirm = vi.fn().mockReturnValue(false);
+        confirmMock.mockResolvedValue(false);
 
         const { result } = renderHook(() => useSiteDetails({ site: mockSite }));
 
@@ -250,8 +256,11 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         // Should not remove site when confirmation is cancelled
         expect(mockStore.deleteSite).not.toHaveBeenCalled();
-        expect(global.confirm).toHaveBeenCalledWith(
-            "Are you sure you want to remove Test Site?"
+        expect(confirmMock).toHaveBeenCalledWith(
+            expect.objectContaining({
+                message: "Are you sure you want to remove Test Site?",
+                title: "Remove Site",
+            })
         );
     });
 

@@ -5,13 +5,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { generateUuid } from "../../../utils/data/generateUuid";
 
+const originalCrypto = globalThis.crypto;
+
 describe(generateUuid, () => {
     beforeEach(() => {
         vi.restoreAllMocks();
+        globalThis.crypto = originalCrypto;
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
+        globalThis.crypto = originalCrypto;
     });
 
     describe("Basic Functionality", () => {
@@ -58,13 +62,8 @@ describe(generateUuid, () => {
             await annotate("Type: Business Logic", "type");
 
             const mockRandomUUID = vi
-                .fn()
+                .spyOn(globalThis.crypto, "randomUUID")
                 .mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
-
-            // Mock crypto object
-            globalThis.crypto = {
-                randomUUID: mockRandomUUID,
-            } as any;
 
             const result = generateUuid();
 
@@ -72,7 +71,7 @@ describe(generateUuid, () => {
             expect(result).toBe("550e8400-e29b-41d4-a716-446655440000");
         });
 
-        it("should handle crypto.randomUUID throwing an error", async ({
+        it("should surface errors from crypto.randomUUID", async ({
             task,
             annotate,
         }) => {
@@ -81,18 +80,15 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const mockRandomUUID = vi.fn().mockImplementation(() => {
-                throw new Error("randomUUID not available");
-            });
+            const failure = new Error("randomUUID not available");
+            const mockRandomUUID = vi
+                .spyOn(globalThis.crypto, "randomUUID")
+                .mockImplementation(() => {
+                    throw failure;
+                });
 
-            globalThis.crypto = {
-                randomUUID: mockRandomUUID,
-            } as any;
-
-            const result = generateUuid();
-
+            expect(() => generateUuid()).toThrow(failure);
             expect(mockRandomUUID).toHaveBeenCalledTimes(1);
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
         });
     });
 
@@ -144,89 +140,6 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            globalThis.crypto = {
-                randomUUID: "not a function",
-            } as any;
-
-            const result = generateUuid();
-
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(result.startsWith("site-")).toBeTruthy();
-        });
-
-        it("should generate unique fallback UUIDs on multiple calls", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const originalCrypto = globalThis.crypto;
-            globalThis.crypto = undefined as any;
-
-            const results = new Set();
-            const numCalls = 20;
-
-            for (let i = 0; i < numCalls; i++) {
-                results.add(generateUuid());
-            }
-
-            // All should be unique
-            expect(results.size).toBe(numCalls);
-
-            // Restore original
-            globalThis.crypto = originalCrypto;
-        });
-    });
-
-    describe("Fallback Format Validation", () => {
-        beforeEach(() => {
-            // Force fallback behavior
-            globalThis.crypto = undefined as any;
-        });
-
-        afterEach(() => {
-            vi.restoreAllMocks();
-        });
-
-        it('should always start with "site-"', async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const result = generateUuid();
-            expect(result.startsWith("site-")).toBeTruthy();
-        });
-
-        it("should contain timestamp", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: generateUuid", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const beforeTimestamp = Date.now();
-            const result = generateUuid();
-            const afterTimestamp = Date.now();
-
-            const parts = result.split("-");
-            expect(parts).toHaveLength(3);
-            expect(parts[0]).toBe("site");
-
-            // Extract timestamp by removing last 3 digits (microseconds) from parts[2]
-            const fullTimestampString = parts[2]!;
-            const timestampString = fullTimestampString.slice(0, -3);
-            const extractedTimestamp = Number.parseInt(timestampString, 10);
-            expect(extractedTimestamp).toBeGreaterThanOrEqual(beforeTimestamp);
-            expect(extractedTimestamp).toBeLessThanOrEqual(afterTimestamp);
-        });
-
-        it("should have random part between prefix and timestamp", async ({
-            task,
-            annotate,
-        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: generateUuid", "component");
             await annotate("Category: Utility", "category");
@@ -411,6 +324,60 @@ describe(generateUuid, () => {
 
             const ids = items.map((item) => item.id);
             expect(new Set(ids).size).toBe(10); // All unique
+        });
+    });
+
+    describe("Environment validation", () => {
+        it("should throw when crypto.randomUUID is undefined", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            Reflect.deleteProperty(
+                globalThis.crypto as unknown as Record<string, unknown>,
+                "randomUUID"
+            );
+
+            expect(() => generateUuid()).toThrow(TypeError);
+        });
+
+        it("should throw when crypto.randomUUID is not a function", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            (
+                globalThis.crypto as unknown as { randomUUID: unknown }
+            ).randomUUID = "not a function";
+
+            expect(() => generateUuid()).toThrow(TypeError);
+        });
+
+        it("should throw when crypto is unavailable", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: generateUuid", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Error Handling", "type");
+
+            Reflect.deleteProperty(
+                globalThis as unknown as Record<string, unknown>,
+                "crypto"
+            );
+
+            expect(() => generateUuid()).toThrow(TypeError);
+
+            globalThis.crypto = originalCrypto;
         });
     });
 });

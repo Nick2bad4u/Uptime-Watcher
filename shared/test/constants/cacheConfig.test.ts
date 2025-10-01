@@ -65,12 +65,12 @@ describe("Cache Configuration Constants", () => {
             for (const cacheType of cacheTypes) {
                 const config = CACHE_CONFIG[cacheType];
                 expect(config).toHaveProperty("name");
-                expect(config).toHaveProperty("defaultTTL");
+                expect(config).toHaveProperty("ttl");
                 expect(config).toHaveProperty("maxSize");
                 expect(config).toHaveProperty("enableStats");
 
                 expect(typeof config.name).toBe("string");
-                expect(typeof config.defaultTTL).toBe("number");
+                expect(typeof config.ttl).toBe("number");
                 expect(typeof config.maxSize).toBe("number");
                 expect(typeof config.enableStats).toBe("boolean");
             }
@@ -88,7 +88,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(CACHE_CONFIG.SITES.name).toBe("sites");
-            expect(CACHE_CONFIG.SITES.defaultTTL).toBe(600_000); // 10 minutes
+            expect(CACHE_CONFIG.SITES.ttl).toBe(600_000); // 10 minutes
             expect(CACHE_CONFIG.SITES.maxSize).toBe(500);
             expect(CACHE_CONFIG.SITES.enableStats).toBeTruthy();
         });
@@ -102,10 +102,8 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(CACHE_CONFIG.SITES.defaultTTL).toBeGreaterThan(0);
-            expect(CACHE_CONFIG.SITES.defaultTTL).toBeLessThanOrEqual(
-                30 * 60 * 1000
-            ); // <= 30 minutes
+            expect(CACHE_CONFIG.SITES.ttl).toBeGreaterThan(0);
+            expect(CACHE_CONFIG.SITES.ttl).toBeLessThanOrEqual(30 * 60 * 1000); // <= 30 minutes
         });
     });
 
@@ -120,7 +118,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Monitoring", "type");
 
             expect(CACHE_CONFIG.MONITORS.name).toBe("monitors");
-            expect(CACHE_CONFIG.MONITORS.defaultTTL).toBe(300_000); // 5 minutes
+            expect(CACHE_CONFIG.MONITORS.ttl).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.MONITORS.maxSize).toBe(1000);
             expect(CACHE_CONFIG.MONITORS.enableStats).toBeTruthy();
         });
@@ -134,8 +132,8 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Monitoring", "type");
 
-            expect(CACHE_CONFIG.MONITORS.defaultTTL).toBeLessThan(
-                CACHE_CONFIG.SITES.defaultTTL
+            expect(CACHE_CONFIG.MONITORS.ttl).toBeLessThan(
+                CACHE_CONFIG.SITES.ttl
             );
         });
     });
@@ -151,7 +149,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(CACHE_CONFIG.SETTINGS.name).toBe("settings");
-            expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBe(1_800_000); // 30 minutes
+            expect(CACHE_CONFIG.SETTINGS.ttl).toBe(1_800_000); // 30 minutes
             expect(CACHE_CONFIG.SETTINGS.maxSize).toBe(100);
             expect(CACHE_CONFIG.SETTINGS.enableStats).toBeTruthy();
         });
@@ -165,11 +163,11 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Business Logic", "type");
 
-            expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBeGreaterThan(
-                CACHE_CONFIG.SITES.defaultTTL
+            expect(CACHE_CONFIG.SETTINGS.ttl).toBeGreaterThan(
+                CACHE_CONFIG.SITES.ttl
             );
-            expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBeGreaterThan(
-                CACHE_CONFIG.MONITORS.defaultTTL
+            expect(CACHE_CONFIG.SETTINGS.ttl).toBeGreaterThan(
+                CACHE_CONFIG.MONITORS.ttl
             );
         });
     });
@@ -185,7 +183,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Validation", "type");
 
             expect(CACHE_CONFIG.VALIDATION.name).toBe("validation-results");
-            expect(CACHE_CONFIG.VALIDATION.defaultTTL).toBe(300_000); // 5 minutes
+            expect(CACHE_CONFIG.VALIDATION.ttl).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.VALIDATION.maxSize).toBe(200);
             expect(CACHE_CONFIG.VALIDATION.enableStats).toBeTruthy();
         });
@@ -199,9 +197,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Validation", "type");
 
-            expect(CACHE_CONFIG.VALIDATION.defaultTTL).toBe(
-                CACHE_CONFIG.MONITORS.defaultTTL
-            );
+            expect(CACHE_CONFIG.VALIDATION.ttl).toBe(CACHE_CONFIG.MONITORS.ttl);
         });
     });
 
@@ -216,7 +212,7 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             expect(CACHE_CONFIG.TEMPORARY.name).toBe("temporary");
-            expect(CACHE_CONFIG.TEMPORARY.defaultTTL).toBe(300_000); // 5 minutes
+            expect(CACHE_CONFIG.TEMPORARY.ttl).toBe(300_000); // 5 minutes
             expect(CACHE_CONFIG.TEMPORARY.maxSize).toBe(1000);
             expect(CACHE_CONFIG.TEMPORARY.enableStats).toBeFalsy(); // Disabled for performance
         });
@@ -242,24 +238,20 @@ describe("Cache Configuration Constants", () => {
             await annotate("Type: Business Logic", "type");
 
             // Settings should have longest TTL (infrequent changes)
-            expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBeGreaterThan(
-                CACHE_CONFIG.SITES.defaultTTL
+            expect(CACHE_CONFIG.SETTINGS.ttl).toBeGreaterThan(
+                CACHE_CONFIG.SITES.ttl
             );
 
             // Sites should have longer TTL than monitors (less real-time)
-            expect(CACHE_CONFIG.SITES.defaultTTL).toBeGreaterThan(
-                CACHE_CONFIG.MONITORS.defaultTTL
+            expect(CACHE_CONFIG.SITES.ttl).toBeGreaterThan(
+                CACHE_CONFIG.MONITORS.ttl
             );
 
             // Monitors and validation should have same TTL (both need accuracy)
-            expect(CACHE_CONFIG.MONITORS.defaultTTL).toBe(
-                CACHE_CONFIG.VALIDATION.defaultTTL
-            );
+            expect(CACHE_CONFIG.MONITORS.ttl).toBe(CACHE_CONFIG.VALIDATION.ttl);
 
             // Temporary should have short TTL
-            expect(CACHE_CONFIG.TEMPORARY.defaultTTL).toBe(
-                CACHE_CONFIG.MONITORS.defaultTTL
-            );
+            expect(CACHE_CONFIG.TEMPORARY.ttl).toBe(CACHE_CONFIG.MONITORS.ttl);
         });
 
         it("should have all positive TTL values", async ({
@@ -274,7 +266,7 @@ describe("Cache Configuration Constants", () => {
             const cacheTypes = Object.keys(CACHE_CONFIG) as CacheConfigKey[];
 
             for (const cacheType of cacheTypes) {
-                expect(CACHE_CONFIG[cacheType].defaultTTL).toBeGreaterThan(0);
+                expect(CACHE_CONFIG[cacheType].ttl).toBeGreaterThan(0);
             }
         });
     });
@@ -312,6 +304,7 @@ describe("Cache Configuration Constants", () => {
             const cacheTypes = Object.keys(CACHE_CONFIG) as CacheConfigKey[];
 
             for (const cacheType of cacheTypes) {
+                expect(CACHE_CONFIG[cacheType].ttl).toBeGreaterThan(0);
                 expect(CACHE_CONFIG[cacheType].maxSize).toBeGreaterThan(0);
             }
         });
@@ -496,7 +489,7 @@ describe("Type Definitions", () => {
         const config: CacheConfig = CACHE_CONFIG.SITES;
 
         expect(typeof config.name).toBe("string");
-        expect(typeof config.defaultTTL).toBe("number");
+        expect(typeof config.ttl).toBe("number");
         expect(typeof config.maxSize).toBe("number");
         expect(typeof config.enableStats).toBe("boolean");
     });

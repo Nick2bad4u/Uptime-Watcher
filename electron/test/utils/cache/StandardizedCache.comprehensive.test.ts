@@ -56,7 +56,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(stats.size).toBe(0);
         });
 
-        it("should respect custom defaultTTL", async ({ task, annotate }) => {
+        it("should respect custom cache TTL", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
             await annotate("Category: Utility", "category");
@@ -64,7 +64,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 1000,
+                ttl: 1000,
             });
 
             cache.set("key1", "value1");
@@ -77,7 +77,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("key1")).toBeUndefined();
         });
 
-        it("should handle defaultTTL of 0 (no expiration)", async ({
+        it("should handle cache TTL of 0 (no expiration)", async ({
             task,
             annotate,
         }) => {
@@ -88,7 +88,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 0,
+                ttl: 0,
             });
 
             cache.set("key1", "value1");
@@ -98,7 +98,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.get("key1")).toBe("value1");
         });
 
-        it("should handle negative defaultTTL (no expiration)", async ({
+        it("should handle negative cache TTL (no expiration)", async ({
             task,
             annotate,
         }) => {
@@ -109,7 +109,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: -1000,
+                ttl: -1000,
             });
 
             cache.set("key1", "value1");
@@ -188,6 +188,34 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             });
         });
 
+        it("should emit undefined TTL when cache TTL is disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const eventSpy = vi.fn();
+            eventBus.on("internal:cache:item-cached", eventSpy);
+
+            cache = new StandardizedCache({
+                name: "test-cache",
+                eventEmitter: eventBus,
+                ttl: 0,
+            });
+
+            cache.set("key1", "value1");
+
+            expect(eventSpy).toHaveBeenCalledWith({
+                cacheName: "test-cache",
+                key: "key1",
+                timestamp: expect.any(Number),
+                ttl: undefined,
+            });
+        });
+
         it("should work without event emitter", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: StandardizedCache", "component");
@@ -212,7 +240,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
         beforeEach(() => {
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 1000,
+                ttl: 1000,
             });
         });
 
@@ -278,7 +306,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache = new StandardizedCache({
                 name: "test-cache",
-                defaultTTL: 1000,
+                ttl: 1000,
                 eventEmitter: eventBus,
             });
 
@@ -1327,7 +1355,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache = new StandardizedCache({
                 name: "integration-test",
                 maxSize: 3,
-                defaultTTL: 1000,
+                ttl: 1000,
                 enableStats: true,
                 eventEmitter: eventBus,
             });

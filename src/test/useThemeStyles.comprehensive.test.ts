@@ -95,16 +95,17 @@ describe(useThemeStyles, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
-            addEventListener: vi.fn(),
-            addListener: vi.fn(),
-            dispatchEvent: vi.fn(),
-            matches: false, // Light mode
-            media: query,
-            onchange: null,
-            removeEventListener: vi.fn(),
-            removeListener: vi.fn(),
-        }));
+        vi.mocked(globalThis.matchMedia).mockImplementation(
+            (query) =>
+                ({
+                    addEventListener: vi.fn(),
+                    dispatchEvent: vi.fn(),
+                    matches: false, // Light mode
+                    media: query,
+                    onchange: null,
+                    removeEventListener: vi.fn(),
+                }) as unknown as MediaQueryList
+        );
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -120,16 +121,17 @@ describe(useThemeStyles, () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Business Logic", "type");
 
-        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
-            addEventListener: vi.fn(),
-            addListener: vi.fn(),
-            dispatchEvent: vi.fn(),
-            matches: query === "(prefers-color-scheme: dark)",
-            media: query,
-            onchange: null,
-            removeEventListener: vi.fn(),
-            removeListener: vi.fn(),
-        }));
+        vi.mocked(globalThis.matchMedia).mockImplementation(
+            (query) =>
+                ({
+                    addEventListener: vi.fn(),
+                    dispatchEvent: vi.fn(),
+                    matches: query === "(prefers-color-scheme: dark)",
+                    media: query,
+                    onchange: null,
+                    removeEventListener: vi.fn(),
+                }) as unknown as MediaQueryList
+        );
 
         const { result } = renderHook(() => useThemeStyles());
 
@@ -300,30 +302,32 @@ describe(useThemeStyles, () => {
         await annotate("Type: Business Logic", "type");
 
         // Test light mode
-        vi.mocked(globalThis.matchMedia).mockImplementation(() => ({
-            addEventListener: vi.fn(),
-            addListener: vi.fn(),
-            dispatchEvent: vi.fn(),
-            matches: false,
-            media: "",
-            onchange: null,
-            removeEventListener: vi.fn(),
-            removeListener: vi.fn(),
-        }));
+        vi.mocked(globalThis.matchMedia).mockImplementation(
+            () =>
+                ({
+                    addEventListener: vi.fn(),
+                    dispatchEvent: vi.fn(),
+                    matches: false,
+                    media: "",
+                    onchange: null,
+                    removeEventListener: vi.fn(),
+                }) as unknown as MediaQueryList
+        );
 
         const { result: lightResult } = renderHook(() => useThemeStyles());
 
         // Test dark mode
-        vi.mocked(globalThis.matchMedia).mockImplementation((query) => ({
-            addEventListener: vi.fn(),
-            addListener: vi.fn(),
-            dispatchEvent: vi.fn(),
-            matches: query === "(prefers-color-scheme: dark)",
-            media: query,
-            onchange: null,
-            removeEventListener: vi.fn(),
-            removeListener: vi.fn(),
-        }));
+        vi.mocked(globalThis.matchMedia).mockImplementation(
+            (query) =>
+                ({
+                    addEventListener: vi.fn(),
+                    dispatchEvent: vi.fn(),
+                    matches: query === "(prefers-color-scheme: dark)",
+                    media: query,
+                    onchange: null,
+                    removeEventListener: vi.fn(),
+                }) as unknown as MediaQueryList
+        );
 
         const { result: darkResult } = renderHook(() => useThemeStyles());
 

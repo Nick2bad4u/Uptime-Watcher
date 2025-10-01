@@ -18,11 +18,11 @@
  * @example
  *
  * ```tsx
- * import { createInputChangeHandler, validationPatterns } from './formUtils';
+ * import { createStringInputHandler, validationPatterns } from './formUtils';
  *
  * function MyForm() {
  *   const [url, setUrl] = useState('');
- *   const handleUrlChange = createInputChangeHandler(setUrl);
+ *   const handleUrlChange = createStringInputHandler(setUrl);
  *
  *   return (
  *     <input
@@ -197,35 +197,3 @@ export const validationPatterns = {
         (value: string): boolean =>
             allowedValues.includes(value),
 } as const;
-
-// ============================================================================
-// Backward Compatibility Functions
-// ============================================================================
-
-/**
- * Legacy function for backward compatibility with existing tests and
- * components. Creates a standardized input change handler for strings.
- *
- * @deprecated Use createStringInputHandler or createTypedInputHandler instead
- *
- * @param setValue - State setter function
- * @param validator - Optional validation function
- *
- * @returns Input change handler
- */
-export function createInputChangeHandler<T = string>(
-    setValue: (value: T) => void,
-    validator?: (value: T) => boolean
-): (event: React.ChangeEvent<HTMLInputElement>) => void {
-    return (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-
-        // For string types (default), pass the value directly
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- generic type assertion for input value
-        const finalValue = value as T;
-
-        if (!validator || validator(finalValue)) {
-            setValue(finalValue);
-        }
-    };
-}

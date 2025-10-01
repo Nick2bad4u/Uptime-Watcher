@@ -1000,10 +1000,10 @@ describe("Cache Utilities", () => {
             });
 
             test.prop([fc.integer({ min: 100, max: 2000 })])(
-                "should handle default TTL correctly",
-                (defaultTtl) => {
+                "should handle configured TTL correctly",
+                (configuredTtl) => {
                     const cache = new TypedCache<string, string>({
-                        ttl: defaultTtl,
+                        ttl: configuredTtl,
                     });
                     const key = "test-key";
                     const value = "test-value";
@@ -1015,7 +1015,7 @@ describe("Cache Utilities", () => {
                     expect(cache.get(key)).toBe(value);
 
                     // Property: Value should expire after default TTL
-                    mockNow.mockReturnValue(1000 + defaultTtl + 1);
+                    mockNow.mockReturnValue(1000 + configuredTtl + 1);
                     expect(cache.get(key)).toBeUndefined();
                 }
             );

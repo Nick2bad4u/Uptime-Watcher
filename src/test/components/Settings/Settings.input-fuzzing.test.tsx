@@ -70,8 +70,6 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
- * ```
- *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,7 +80,6 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -160,7 +157,11 @@ const mockDownloadSQLiteBackup = vi.fn(async () => {
 });
 
 const mockOnClose = vi.fn();
-let windowConfirmMock: ReturnType<typeof vi.fn>;
+const confirmMock = vi.fn();
+
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
+}));
 
 // Mock stores
 vi.mock("../../../stores/settings/useSettingsStore", () => ({
@@ -399,6 +400,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
     beforeEach(() => {
         // Reset mocks
         vi.clearAllMocks();
+        confirmMock.mockReset();
+        confirmMock.mockResolvedValue(true);
 
         // Reset mock state
         mockSettingsState = {
@@ -419,13 +422,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             sites: [],
             isLoading: false,
         };
-
-        // Mock window.confirm for reset tests
-        windowConfirmMock = vi.fn(() => true);
-        Object.defineProperty(window, "confirm", {
-            writable: true,
-            value: windowConfirmMock,
-        });
     });
 
     afterEach(() => {
@@ -740,8 +736,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 // Manual DOM cleanup for property-based testing iterations
                 document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
-
-                windowConfirmMock.mockReturnValue(confirmReset);
+                confirmMock.mockReset();
+                confirmMock.mockResolvedValue(confirmReset);
 
                 render(<Settings onClose={mockOnClose} />);
 
@@ -750,8 +746,12 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 fireEvent.click(resetButton);
 
-                expect(window.confirm).toHaveBeenCalledWith(
-                    "Are you sure you want to reset all settings to defaults?"
+                expect(confirmMock).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        message:
+                            "Are you sure you want to reset all settings to defaults?",
+                        title: "Reset Settings",
+                    })
                 );
 
                 if (confirmReset) {

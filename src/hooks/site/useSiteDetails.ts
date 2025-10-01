@@ -36,6 +36,7 @@ import {
     getTimeoutSeconds,
     timeoutSecondsToMs,
 } from "../../utils/timeoutUtils";
+import { useConfirmDialog } from "../ui/useConfirmDialog";
 import { type SiteAnalytics, useSiteAnalytics } from "./useSiteAnalytics";
 
 /**
@@ -212,6 +213,8 @@ export function useSiteDetails({
         siteDetailsChartTimeRange,
     } = useUIStore();
 
+    const requestConfirmation = useConfirmDialog();
+
     // Always call hooks first, use fallback for currentSite
     const currentSite = sites.find((s) => s.identifier === site.identifier) ?? {
         identifier: site.identifier,
@@ -357,12 +360,17 @@ export function useSiteDetails({
 
     // Handler for site removal
     const handleRemoveSite = useCallback(async () => {
-        if (
-            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action
-            !globalThis.confirm(
-                `Are you sure you want to remove ${currentSite.name}?`
-            )
-        ) {
+        const confirmed = await requestConfirmation({
+            cancelLabel: "Keep Site",
+            confirmLabel: "Remove Site",
+            details:
+                "This action permanently removes the site and its monitors.",
+            message: `Are you sure you want to remove ${currentSite.name}?`,
+            title: "Remove Site",
+            tone: "danger",
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -382,6 +390,7 @@ export function useSiteDetails({
         currentSite.identifier,
         currentSite.name,
         deleteSite,
+        requestConfirmation,
     ]);
 
     // Handler for monitor removal
@@ -396,12 +405,17 @@ export function useSiteDetails({
 
         const monitorName =
             selectedMonitor.url ?? selectedMonitor.host ?? selectedMonitor.type;
-        if (
-            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action
-            !globalThis.confirm(
-                `Are you sure you want to remove the monitor "${monitorName}" from ${currentSite.name}?`
-            )
-        ) {
+
+        const confirmed = await requestConfirmation({
+            cancelLabel: "Keep Monitor",
+            confirmLabel: "Remove Monitor",
+            details: `${currentSite.name} will no longer be monitored by "${monitorName}".`,
+            message: `Remove the monitor "${monitorName}" from ${currentSite.name}?`,
+            title: "Remove Monitor",
+            tone: "danger",
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -428,6 +442,7 @@ export function useSiteDetails({
         currentSite.identifier,
         currentSite.name,
         removeMonitorFromSite,
+        requestConfirmation,
         selectedMonitor,
     ]);
 

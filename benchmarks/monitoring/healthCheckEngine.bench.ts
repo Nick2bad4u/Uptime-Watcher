@@ -101,7 +101,7 @@ describe("Enhanced Monitor Checker Performance", () => {
         sitesCache = new StandardizedCache<Site>({
             name: "benchmarks-sites",
             maxSize: 1000,
-            defaultTTL: 300_000, // 5 minutes
+            ttl: 300_000, // 5 minutes
         });
 
         operationRegistry = new MonitorOperationRegistry();
@@ -141,7 +141,7 @@ describe("Enhanced Monitor Checker Performance", () => {
             const freshCache = new StandardizedCache<Site>({
                 name: "benchmarks-sites-fresh",
                 maxSize: 1000,
-                defaultTTL: 300_000,
+                ttl: 300_000,
             });
 
             const freshRegistry = new MonitorOperationRegistry();

@@ -8,16 +8,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Mock window.matchMedia
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(), // Deprecated
-        removeListener: vi.fn(), // Deprecated
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
+    value: vi.fn().mockImplementation(
+        (query) =>
+            ({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                matches: false,
+                media: query,
+                onchange: null,
+                removeEventListener: vi.fn(),
+            }) as unknown as MediaQueryList
+    ),
 });
 
 // Mock document with body
@@ -160,15 +161,13 @@ describe(ThemeManager, () => {
             await annotate("Type: Business Logic", "type");
 
             vi.mocked(globalThis.matchMedia).mockReturnValue({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
                 matches: true,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
-                addListener: vi.fn(),
-                removeListener: vi.fn(),
-                addEventListener: vi.fn(),
                 removeEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-            } as any);
+            } as unknown as MediaQueryList);
 
             const preference = themeManager.getSystemThemePreference();
             expect(preference).toBe("dark");
@@ -184,15 +183,13 @@ describe(ThemeManager, () => {
             await annotate("Type: Business Logic", "type");
 
             vi.mocked(globalThis.matchMedia).mockReturnValue({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
                 matches: false,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
-                addListener: vi.fn(),
-                removeListener: vi.fn(),
-                addEventListener: vi.fn(),
                 removeEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-            } as any);
+            } as unknown as MediaQueryList);
 
             const preference = themeManager.getSystemThemePreference();
             expect(preference).toBe("light");

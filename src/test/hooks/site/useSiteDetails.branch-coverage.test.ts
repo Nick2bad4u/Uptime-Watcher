@@ -14,6 +14,10 @@ vi.mock("../../../stores/sites/useSitesStore");
 vi.mock("../../../stores/monitor/useMonitorTypesStore");
 vi.mock("../../../utils/monitorValidation");
 vi.mock("../../../services/logger");
+const confirmMock = vi.fn();
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
+}));
 
 const mockUseSelectedSite = vi.mocked(useSelectedSite);
 const mockUseSitesStore = vi.mocked(useSitesStore);
@@ -69,6 +73,7 @@ describe("useSiteDetails - Branch Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        confirmMock.mockReset();
 
         mockUseSelectedSite.mockReturnValue(mockSite);
 

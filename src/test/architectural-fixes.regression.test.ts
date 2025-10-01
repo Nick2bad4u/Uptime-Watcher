@@ -63,22 +63,22 @@ describe("Architectural Fixes Regression Tests", () => {
     });
 
     describe("Cache TTL Configuration Mapping", () => {
-        it("should correctly map CACHE_CONFIG.defaultTTL to TypedCache ttl parameter", () => {
+        it("should correctly map CACHE_CONFIG ttl to TypedCache configuration", () => {
             // Test the adapter pattern by checking configuration structure
             const monitorConfig = CACHE_CONFIG.MONITORS;
 
             // Verify the config has the expected structure
-            expect(monitorConfig.defaultTTL).toBeDefined();
+            expect(monitorConfig.ttl).toBeDefined();
             expect(monitorConfig.maxSize).toBeDefined();
-            expect(typeof monitorConfig.defaultTTL).toBe("number");
+            expect(typeof monitorConfig.ttl).toBe("number");
             expect(typeof monitorConfig.maxSize).toBe("number");
-            expect(monitorConfig.defaultTTL).toBeGreaterThan(0);
+            expect(monitorConfig.ttl).toBeGreaterThan(0);
             expect(monitorConfig.maxSize).toBeGreaterThan(0);
 
             // Create adapted config as done in the fix
             const adaptedConfig = {
                 maxSize: monitorConfig.maxSize,
-                ttl: monitorConfig.defaultTTL,
+                ttl: monitorConfig.ttl,
             };
 
             // Verify the adapter works by creating a cache
@@ -100,10 +100,9 @@ describe("Architectural Fixes Regression Tests", () => {
             ];
 
             for (const { name, config } of configs) {
-                expect(
-                    config.defaultTTL,
-                    `${name} should have defaultTTL`
-                ).toBeGreaterThan(0);
+                expect(config.ttl, `${name} should have ttl`).toBeGreaterThan(
+                    0
+                );
                 expect(
                     config.maxSize,
                     `${name} should have maxSize`
@@ -112,7 +111,7 @@ describe("Architectural Fixes Regression Tests", () => {
                 // Verify adapter pattern works for each config
                 const adaptedConfig = {
                     maxSize: config.maxSize,
-                    ttl: config.defaultTTL,
+                    ttl: config.ttl,
                 };
 
                 expect(() => {
@@ -125,10 +124,10 @@ describe("Architectural Fixes Regression Tests", () => {
 
         it("should verify TTL values are reasonable", () => {
             // Verify TTL values make sense for their use cases
-            expect(CACHE_CONFIG.MONITORS.defaultTTL).toBe(300_000); // 5 minutes
-            expect(CACHE_CONFIG.SITES.defaultTTL).toBe(600_000); // 10 minutes
-            expect(CACHE_CONFIG.SETTINGS.defaultTTL).toBe(1_800_000); // 30 minutes
-            expect(CACHE_CONFIG.TEMPORARY.defaultTTL).toBe(300_000); // 5 minutes
+            expect(CACHE_CONFIG.MONITORS.ttl).toBe(300_000); // 5 minutes
+            expect(CACHE_CONFIG.SITES.ttl).toBe(600_000); // 10 minutes
+            expect(CACHE_CONFIG.SETTINGS.ttl).toBe(1_800_000); // 30 minutes
+            expect(CACHE_CONFIG.TEMPORARY.ttl).toBe(300_000); // 5 minutes
         });
     });
 

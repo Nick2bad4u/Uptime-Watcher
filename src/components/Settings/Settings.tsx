@@ -45,6 +45,7 @@ import type { AppSettings } from "../../stores/types";
 import type { ThemeName } from "../../theme/types";
 
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
+import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
 import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
@@ -117,6 +118,7 @@ export const Settings = ({
     const { persistHistoryLimit, resetSettings, settings, updateSettings } =
         useSettingsStore();
     const { downloadSqliteBackup, fullResyncSites } = useSitesStore();
+    const requestConfirmation = useConfirmDialog();
 
     const { availableThemes, setTheme } = useTheme();
 
@@ -166,20 +168,28 @@ export const Settings = ({
         [persistHistoryLimit, settings.historyLimit]
     );
 
-    const handleReset = useCallback(() => {
-        // Use window.confirm instead of globalThis for better React
-        // compatibility
-        if (
-            // eslint-disable-next-line no-alert -- Legacy confirmation dialog for destructive action, requires UI refactoring to replace
-            window.confirm(
-                "Are you sure you want to reset all settings to defaults?"
-            )
-        ) {
-            void resetSettings(); // Explicitly mark promise as ignored for fire-and-forget operation
-            clearError(); // Clear any errors when resetting
-            logger.user.action("Reset settings to defaults");
+    const handleReset = useCallback(async () => {
+        const confirmed = await requestConfirmation({
+            cancelLabel: "Keep Settings",
+            confirmLabel: "Reset",
+            details: "All application settings will revert to their defaults.",
+            message: "Are you sure you want to reset all settings to defaults?",
+            title: "Reset Settings",
+            tone: "danger",
+        });
+
+        if (!confirmed) {
+            return;
         }
-    }, [clearError, resetSettings]);
+
+        await resetSettings();
+        clearError();
+        logger.user.action("Reset settings to defaults");
+    }, [
+        clearError,
+        requestConfirmation,
+        resetSettings,
+    ]);
 
     const handleThemeChange = useCallback(
         (themeName: string) => {
@@ -290,6 +300,10 @@ export const Settings = ({
     const handleDownloadSQLiteClick = useCallback(() => {
         void handleDownloadSQLite();
     }, [handleDownloadSQLite]);
+
+    const handleResetClick = useCallback(() => {
+        void handleReset();
+    }, [handleReset]);
 
     return (
         <div className="modal-overlay">
@@ -591,7 +605,7 @@ export const Settings = ({
                         <ThemedButton
                             disabled={isLoading}
                             loading={showButtonLoading}
-                            onClick={handleReset}
+                            onClick={handleResetClick}
                             size="sm"
                             variant="error"
                         >

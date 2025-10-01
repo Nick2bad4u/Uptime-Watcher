@@ -21,10 +21,6 @@ import { logger } from "../logger";
  * Cache configuration.
  */
 export interface CacheConfig {
-    /**
-     * Default TTL in milliseconds. Set to 0 or negative to disable expiration.
-     */
-    defaultTTL?: number;
     /** Enable statistics tracking */
     enableStats?: boolean;
     /** Event emitter for cache events */
@@ -33,6 +29,15 @@ export interface CacheConfig {
     maxSize?: number;
     /** Cache identifier for logging */
     name: string;
+    /**
+     * Cache-level TTL applied when no per-entry TTL is supplied.
+     *
+     * @remarks
+     * Provide `0` or a negative value to disable automatic expiration.
+     *
+     * @defaultValue 300_000 (5 minutes)
+     */
+    ttl?: number;
 }
 
 /**
@@ -83,11 +88,11 @@ export class StandardizedCache<T> {
     private readonly cache = new Map<string, CacheEntry<T>>();
 
     private readonly config: {
-        defaultTTL: number;
         enableStats: boolean;
         eventEmitter?: TypedEventBus<UptimeEvents>;
         maxSize: number;
         name: string;
+        ttl: number;
     };
 
     private readonly invalidationCallbacks = new Set<(key?: string) => void>();
@@ -108,15 +113,15 @@ export class StandardizedCache<T> {
 
     public constructor(config: CacheConfig) {
         this.config = {
-            defaultTTL: config.defaultTTL ?? 300_000, // 5 minutes
             enableStats: config.enableStats ?? true,
             maxSize: config.maxSize ?? 1000,
             name: config.name,
+            ttl: config.ttl ?? 300_000, // 5 minutes
             ...(config.eventEmitter && { eventEmitter: config.eventEmitter }),
         };
 
         logger.debug(
-            `[Cache:${this.config.name}] Initialized with maxSize=${this.config.maxSize}, defaultTTL=${this.config.defaultTTL}ms`
+            `[Cache:${this.config.name}] Initialized with maxSize=${this.config.maxSize}, ttl=${this.config.ttl}ms`
         );
     }
 
@@ -363,24 +368,26 @@ export class StandardizedCache<T> {
         }
 
         const now = Date.now();
-        const effectiveTTL = ttl ?? this.config.defaultTTL;
+        const requestedTTL = ttl ?? this.config.ttl;
 
         const entry: CacheEntry<T> = {
             data,
             hits: 0,
             timestamp: now,
-            ...(effectiveTTL > 0 && { expiresAt: now + effectiveTTL }),
+            ...(requestedTTL > 0 && { expiresAt: now + requestedTTL }),
         };
 
         this.cache.set(key, entry);
         this.updateSize();
 
         logger.debug(
-            `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${effectiveTTL}ms)`
+            `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${
+                requestedTTL > 0 ? `${requestedTTL}ms` : "disabled"
+            })`
         );
         this.emitEvent("internal:cache:item-cached", {
             key,
-            ttl: effectiveTTL,
+            ttl: requestedTTL > 0 ? requestedTTL : undefined,
         });
     }
 

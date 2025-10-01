@@ -29,13 +29,11 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         const config = CACHE_CONFIG[key];
 
                         // TTL should be positive and reasonable (1 second to 1 day)
-                        expect(config.defaultTTL).toBeGreaterThan(0);
-                        expect(config.defaultTTL).toBeLessThanOrEqual(
-                            86_400_000
-                        ); // 1 day in ms
+                        expect(config.ttl).toBeGreaterThan(0);
+                        expect(config.ttl).toBeLessThanOrEqual(86_400_000); // 1 day in ms
 
                         // TTL should be a multiple of 1000 (full seconds)
-                        expect(config.defaultTTL % 1000).toBe(0);
+                        expect(config.ttl % 1000).toBe(0);
                     }
                 )
             );
@@ -96,10 +94,10 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
         it("should have consistent configuration structure", () => {
             const expectedKeys = [
-                "defaultTTL",
                 "enableStats",
                 "maxSize",
                 "name",
+                "ttl",
             ];
 
             fc.assert(
@@ -388,7 +386,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                     const config = CACHE_CONFIG[key];
 
                     // Validate TypeScript types at runtime
-                    expect(typeof config.defaultTTL).toBe("number");
+                    expect(typeof config.ttl).toBe("number");
                     expect(typeof config.enableStats).toBe("boolean");
                     expect(typeof config.maxSize).toBe("number");
                     expect(typeof config.name).toBe("string");
@@ -405,7 +403,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
                     // Attempt to modify should fail (frozen objects)
                     expect(() => {
-                        (config as any).defaultTTL = 999;
+                        (config as any).ttl = 999;
                     }).toThrow();
 
                     expect(() => {
@@ -425,7 +423,7 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
                         const config: CacheConfig = CACHE_CONFIG[key];
 
                         // Should satisfy CacheConfig interface
-                        expect(config).toHaveProperty("defaultTTL");
+                        expect(config).toHaveProperty("ttl");
                         expect(config).toHaveProperty("enableStats");
                         expect(config).toHaveProperty("maxSize");
                         expect(config).toHaveProperty("name");
@@ -490,8 +488,8 @@ describe("cacheConfig - Property-Based Fuzzing Tests", () => {
 
             for (const config of configs) {
                 // TTL should be reasonable (5 minutes to 30 minutes based on actual values)
-                expect(config.defaultTTL).toBeGreaterThanOrEqual(300_000); // 5 minutes
-                expect(config.defaultTTL).toBeLessThanOrEqual(1_800_000); // 30 minutes
+                expect(config.ttl).toBeGreaterThanOrEqual(300_000); // 5 minutes
+                expect(config.ttl).toBeLessThanOrEqual(1_800_000); // 30 minutes
 
                 // MaxSize should be reasonable
                 expect(config.maxSize).toBeGreaterThanOrEqual(100);

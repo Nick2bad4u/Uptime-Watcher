@@ -14,10 +14,10 @@
  * Cache configuration interface for type safety.
  */
 interface CacheConfigItem {
-    readonly defaultTTL: number;
     readonly enableStats: boolean;
     readonly maxSize: number;
     readonly name: string;
+    readonly ttl: number;
 }
 
 /**
@@ -54,14 +54,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * shorter expiration for real-time monitoring needs.
      */
     MONITORS: Object.freeze({
-        /** TTL: 5 minutes - shorter for real-time monitoring */
-        defaultTTL: 300_000,
         /** Enable statistics tracking */
         enableStats: true,
         /** Maximum entries: 1000 monitors */
         maxSize: 1000,
         /** Cache name identifier */
         name: "monitors",
+        /** TTL: 5 minutes - shorter for real-time monitoring */
+        ttl: 300_000,
     }),
 
     /**
@@ -72,14 +72,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * expiration since settings change infrequently.
      */
     SETTINGS: Object.freeze({
-        /** TTL: 30 minutes - longer for infrequently changing data */
-        defaultTTL: 1_800_000,
         /** Enable statistics tracking */
         enableStats: true,
         /** Maximum entries: 100 settings */
         maxSize: 100,
         /** Cache name identifier */
         name: "settings",
+        /** TTL: 30 minutes - longer for infrequently changing data */
+        ttl: 1_800_000,
     }),
 
     /**
@@ -90,14 +90,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * time suitable for site management operations.
      */
     SITES: Object.freeze({
-        /** TTL: 10 minutes - balances freshness with performance */
-        defaultTTL: 600_000,
         /** Enable statistics tracking */
         enableStats: true,
         /** Maximum entries: 500 sites */
         maxSize: 500,
         /** Cache name identifier */
         name: "sites",
+        /** TTL: 10 minutes - balances freshness with performance */
+        ttl: 600_000,
     }),
 
     /**
@@ -108,14 +108,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * and disabled stats for performance.
      */
     TEMPORARY: Object.freeze({
-        /** TTL: 5 minutes - short for temporary data */
-        defaultTTL: 300_000,
         /** Disable statistics for performance */
         enableStats: false,
         /** Maximum entries: 1000 temporary items */
         maxSize: 1000,
         /** Cache name identifier prefix (append operation type) */
         name: "temporary",
+        /** TTL: 5 minutes - short for temporary data */
+        ttl: 300_000,
     }),
 
     /**
@@ -126,14 +126,14 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
      * expiration to balance accuracy with performance.
      */
     VALIDATION: Object.freeze({
-        /** TTL: 5 minutes - moderate for validation accuracy */
-        defaultTTL: 300_000,
         /** Enable statistics tracking */
         enableStats: true,
         /** Maximum entries: 200 validation results */
         maxSize: 200,
         /** Cache name identifier */
         name: "validation-results",
+        /** TTL: 5 minutes - moderate for validation accuracy */
+        ttl: 300_000,
     }),
 } as const);
 

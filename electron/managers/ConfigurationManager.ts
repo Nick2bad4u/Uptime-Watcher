@@ -270,17 +270,17 @@ export class ConfigurationManager {
 
         // Initialize standardized caches
         this.validationCache = new StandardizedCache<ValidationResult>({
-            defaultTTL: CACHE_CONFIG.VALIDATION.defaultTTL,
             enableStats: true,
             maxSize: CACHE_CONFIG.VALIDATION.maxSize,
             name: "validation-results",
+            ttl: CACHE_CONFIG.VALIDATION.ttl,
         });
 
         this.configCache = new StandardizedCache<ConfigValue>({
-            defaultTTL: CACHE_CONFIG.SETTINGS.defaultTTL,
             enableStats: true,
             maxSize: CACHE_CONFIG.SETTINGS.maxSize,
             name: "configuration-values",
+            ttl: CACHE_CONFIG.SETTINGS.ttl,
         });
     }
 

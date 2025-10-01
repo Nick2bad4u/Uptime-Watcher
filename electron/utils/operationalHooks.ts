@@ -170,22 +170,16 @@ function calculateDelay(
 }
 
 /**
- * Generate a unique operation ID for tracking. Uses crypto.randomUUID() when
- * available, falls back to timestamp-based ID.
+ * Generate a unique operation ID for tracking using crypto.randomUUID().
  */
 function generateOperationId(): string {
-    try {
-        // Prefer crypto.randomUUID() for better uniqueness
-        return `op_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
-    } catch (error) {
-        // Fallback for environments where crypto.randomUUID() is not available
-        logger.debug(
-            "[OperationalHooks] crypto.randomUUID() not available, using fallback",
-            error
+    if (typeof globalThis.crypto.randomUUID !== "function") {
+        throw new TypeError(
+            "crypto.randomUUID is unavailable for operation ID generation"
         );
-        // eslint-disable-next-line sonarjs/pseudo-random -- fallback when crypto.randomUUID unavailable
-        return `op_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     }
+
+    return `op_${Date.now()}_${globalThis.crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

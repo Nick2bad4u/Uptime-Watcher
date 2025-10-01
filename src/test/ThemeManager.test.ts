@@ -6,16 +6,17 @@ import type { Theme } from "../theme/types";
 // Mock DOM environment
 Object.defineProperty(globalThis, "matchMedia", {
     writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-        matches: false,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(), // Deprecated
-        removeListener: vi.fn(), // Deprecated
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
+    value: vi.fn().mockImplementation(
+        (query) =>
+            ({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+                matches: false,
+                media: query,
+                onchange: null,
+                removeEventListener: vi.fn(),
+            }) as unknown as MediaQueryList
+    ),
 });
 
 describe(ThemeManager, () => {
@@ -155,15 +156,13 @@ describe(ThemeManager, () => {
             await annotate("Type: Data Retrieval", "type");
 
             vi.mocked(globalThis.matchMedia).mockReturnValue({
+                addEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
                 matches: true,
                 media: "(prefers-color-scheme: dark)",
                 onchange: null,
-                addListener: vi.fn(),
-                removeListener: vi.fn(),
-                addEventListener: vi.fn(),
                 removeEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-            } as any);
+            } as unknown as MediaQueryList);
 
             const theme = themeManager.getTheme("system");
 

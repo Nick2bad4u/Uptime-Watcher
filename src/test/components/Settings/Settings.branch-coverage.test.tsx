@@ -31,13 +31,10 @@ vi.mock("../../../stores/sites/useSitesStore");
 vi.mock("../../../theme/useTheme");
 vi.mock("../../../services/logger");
 vi.mock("../../../hooks/useDelayedButtonLoading");
-
-// Mock global window.confirm
-const mockConfirm = vi.fn();
-Object.defineProperty(globalThis, "confirm", {
-    value: mockConfirm,
-    writable: true,
-});
+const confirmMock = vi.fn();
+vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
+    useConfirmDialog: () => confirmMock,
+}));
 
 // Mock logger
 vi.mock("../../../services/logger", () => ({
@@ -176,8 +173,9 @@ describe("Settings - Branch Coverage Tests", () => {
                 .mockReturnValue({ backgroundColor: "#f5f5f5" }),
         } as any);
 
-        // Reset window.confirm
-        mockConfirm.mockReturnValue(false);
+        // Reset confirmation dialog mock
+        confirmMock.mockReset();
+        confirmMock.mockResolvedValue(true);
     });
 
     describe("Error Display Branches", () => {
@@ -522,15 +520,19 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            mockConfirm.mockReturnValue(true);
+            confirmMock.mockResolvedValue(true);
 
             render(<Settings onClose={mockOnClose} />);
 
             const resetButton = screen.getByText("Reset to Defaults");
             fireEvent.click(resetButton);
 
-            expect(mockConfirm).toHaveBeenCalledWith(
-                "Are you sure you want to reset all settings to defaults?"
+            expect(confirmMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message:
+                        "Are you sure you want to reset all settings to defaults?",
+                    title: "Reset Settings",
+                })
             );
             expect(mockSettingsStore.resetSettings).toHaveBeenCalled();
             expect(mockErrorStore.clearError).toHaveBeenCalled();
@@ -550,15 +552,19 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            mockConfirm.mockReturnValue(false);
+            confirmMock.mockResolvedValue(false);
 
             render(<Settings onClose={mockOnClose} />);
 
             const resetButton = screen.getByText("Reset to Defaults");
             fireEvent.click(resetButton);
 
-            expect(mockConfirm).toHaveBeenCalledWith(
-                "Are you sure you want to reset all settings to defaults?"
+            expect(confirmMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    message:
+                        "Are you sure you want to reset all settings to defaults?",
+                    title: "Reset Settings",
+                })
             );
             expect(mockSettingsStore.resetSettings).not.toHaveBeenCalled();
             expect(mockErrorStore.clearError).not.toHaveBeenCalled();

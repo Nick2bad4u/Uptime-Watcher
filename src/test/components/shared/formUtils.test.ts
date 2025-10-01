@@ -9,7 +9,6 @@ import { describe, expect, it, vi } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import type React from "react";
 import {
-    createInputChangeHandler,
     createStringInputHandler,
     createTypedInputHandler,
     createSelectChangeHandler,
@@ -24,7 +23,7 @@ describe("Form Utilities", () => {
                 "should handle any string input without validation",
                 (inputValue) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler(setValue);
+                    const handler = createStringInputHandler(setValue);
 
                     const mockEvent = {
                         target: { value: inputValue },
@@ -48,7 +47,7 @@ describe("Form Utilities", () => {
                     const mockValidator = vi
                         .fn()
                         .mockReturnValue(inputValue.trim().length > 0);
-                    const handler = createInputChangeHandler(
+                    const handler = createStringInputHandler(
                         setValue,
                         mockValidator
                     );
@@ -72,7 +71,7 @@ describe("Form Utilities", () => {
                 "should handle various character sets and encodings",
                 (complexInput) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler(setValue);
+                    const handler = createStringInputHandler(setValue);
 
                     const mockEvent = {
                         target: { value: complexInput },
@@ -88,7 +87,7 @@ describe("Form Utilities", () => {
                 "should handle numeric strings consistently",
                 (numValue) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler<string>(setValue);
+                    const handler = createStringInputHandler(setValue);
                     const stringValue = numValue.toString();
 
                     const mockEvent = {
@@ -401,7 +400,7 @@ describe("Form Utilities", () => {
                 "should handle whitespace and empty inputs consistently",
                 (whitespaceInput) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler(setValue);
+                    const handler = createStringInputHandler(setValue);
 
                     const mockEvent = {
                         target: { value: whitespaceInput },
@@ -419,7 +418,7 @@ describe("Form Utilities", () => {
                 "should handle very long input strings",
                 (longInput) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler(setValue);
+                    const handler = createStringInputHandler(setValue);
 
                     const mockEvent = {
                         target: { value: longInput },
@@ -446,7 +445,7 @@ describe("Form Utilities", () => {
                 "should handle HTML-like characters in inputs",
                 (htmlLikeInput) => {
                     const setValue = vi.fn();
-                    const handler = createInputChangeHandler(setValue);
+                    const handler = createStringInputHandler(setValue);
 
                     const mockEvent = {
                         target: { value: htmlLikeInput },
@@ -469,7 +468,7 @@ describe("Form Utilities", () => {
         });
     });
 
-    describe(createInputChangeHandler, () => {
+    describe(createStringInputHandler, () => {
         it("should create handler that sets value without validation", async ({
             task,
             annotate,
@@ -480,7 +479,7 @@ describe("Form Utilities", () => {
             await annotate("Type: Constructor", "type");
 
             const setValue = vi.fn();
-            const handler = createInputChangeHandler(setValue);
+            const handler = createStringInputHandler(setValue);
 
             const mockEvent = {
                 target: { value: "test value" },
@@ -502,7 +501,7 @@ describe("Form Utilities", () => {
 
             const setValue = vi.fn();
             const validator = vi.fn().mockReturnValue(true);
-            const handler = createInputChangeHandler(setValue, validator);
+            const handler = createStringInputHandler(setValue, validator);
 
             const mockEvent = {
                 target: { value: "valid value" },
@@ -525,7 +524,7 @@ describe("Form Utilities", () => {
 
             const setValue = vi.fn();
             const validator = vi.fn().mockReturnValue(false);
-            const handler = createInputChangeHandler(setValue, validator);
+            const handler = createStringInputHandler(setValue, validator);
 
             const mockEvent = {
                 target: { value: "invalid value" },
@@ -544,7 +543,7 @@ describe("Form Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const setValue = vi.fn();
-            const handler = createInputChangeHandler<number>(setValue);
+            const handler = createStringInputHandler(setValue);
 
             const mockEvent = {
                 target: { value: "123" },
@@ -562,7 +561,7 @@ describe("Form Utilities", () => {
             await annotate("Type: Business Logic", "type");
 
             const setValue = vi.fn();
-            const handler = createInputChangeHandler(setValue);
+            const handler = createStringInputHandler(setValue);
 
             const mockEvent = {
                 target: { value: "" },
@@ -584,7 +583,7 @@ describe("Form Utilities", () => {
 
             const setValue = vi.fn();
             const minLengthValidator = (value: string) => value.length >= 3;
-            const handler = createInputChangeHandler(
+            const handler = createStringInputHandler(
                 setValue,
                 minLengthValidator
             );
@@ -1177,7 +1176,7 @@ describe("Form Utilities", () => {
             const setAge = vi.fn();
             const setActive = vi.fn();
 
-            const nameHandler = createInputChangeHandler(
+            const nameHandler = createStringInputHandler(
                 setName,
                 validationPatterns.nonEmptyString
             );
@@ -1240,7 +1239,7 @@ describe("Form Utilities", () => {
                 );
             };
 
-            const handler = createInputChangeHandler(
+            const handler = createStringInputHandler(
                 setValue,
                 combinedValidator
             );

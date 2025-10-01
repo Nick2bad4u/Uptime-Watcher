@@ -5,7 +5,7 @@
 
 import "@testing-library/jest-dom";
 import fc from "fast-check";
-
+import { afterAll, beforeAll, vi } from "vitest";
 import EventEmitter from "node:events";
 
 // Set max listeners to prevent memory leak warnings in tests
@@ -72,8 +72,6 @@ beforeAll(() => {
             matches: false,
             media: query,
             onchange: null,
-            addListener: vi.fn(), // Deprecated
-            removeListener: vi.fn(), // Deprecated
             addEventListener: vi.fn(),
             removeEventListener: vi.fn(),
             dispatchEvent: vi.fn(),

@@ -202,10 +202,10 @@ describe("Cache Utils Property-Based Tests", () => {
                 maxLength: 10,
             }),
         ])(
-            "should use default TTL when no per-entry TTL is provided",
-            (defaultTtl, entries) => {
+            "should use configured TTL when no per-entry TTL is provided",
+            (configuredTtl, entries) => {
                 const cache = new TypedCache<string, string>({
-                    ttl: defaultTtl,
+                    ttl: configuredTtl,
                 });
 
                 // Set entries without per-entry TTL
@@ -214,8 +214,8 @@ describe("Cache Utils Property-Based Tests", () => {
                     expect(cache.get(key)).toBe(value);
                 }
 
-                // Advance time beyond default TTL
-                advanceTime(defaultTtl + 1);
+                // Advance time beyond configured TTL
+                advanceTime(configuredTtl + 1);
 
                 // All entries should be expired
                 for (const [key] of entries) {
@@ -232,8 +232,8 @@ describe("Cache Utils Property-Based Tests", () => {
                 maxLength: 10,
             }),
         ])(
-            "should honor per-entry TTL over default TTL",
-            (defaultTtl, perEntryTtl, entries) => {
+            "should honor per-entry TTL over configured TTL",
+            (configuredTtl, perEntryTtl, entries) => {
                 // Filter to unique keys only to avoid duplicate key issues
                 const uniqueEntries = entries.filter(
                     (entry, index, arr) =>
@@ -241,7 +241,7 @@ describe("Cache Utils Property-Based Tests", () => {
                 );
 
                 const cache = new TypedCache<string, string>({
-                    ttl: defaultTtl,
+                    ttl: configuredTtl,
                 });
 
                 // Set entries with per-entry TTL
@@ -249,8 +249,8 @@ describe("Cache Utils Property-Based Tests", () => {
                     cache.set(key, value, perEntryTtl);
                 }
 
-                // Advance time beyond default TTL but before per-entry TTL
-                advanceTime(defaultTtl + 100);
+                // Advance time beyond configured TTL but before per-entry TTL
+                advanceTime(configuredTtl + 100);
 
                 // Entries should still be valid (using per-entry TTL)
                 for (const [key, value] of uniqueEntries) {
