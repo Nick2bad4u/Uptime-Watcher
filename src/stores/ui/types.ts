@@ -18,6 +18,11 @@ import type { ChartTimeRange } from "../types";
 export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 
 /**
+ * Presentation modes available for large site cards.
+ */
+export type SiteCardPresentation = "grid" | "stacked";
+
+/**
  * Interface for the UI store.
  *
  * @remarks
@@ -49,13 +54,6 @@ export interface UIStore {
      * @param site - The site to select, or `undefined` to clear selection.
      */
     selectSite: (site: Site | undefined) => void;
-
-    /**
-     * Updates the active presentation layout for the dashboard site list.
-     *
-     * @param layout - The target layout mode to activate.
-     */
-    setSiteListLayout: (layout: SiteListLayoutMode) => void;
 
     /**
      * Sets the active tab in the site details modal.
@@ -95,11 +93,25 @@ export interface UIStore {
     setShowSiteDetails: (show: boolean) => void;
 
     /**
+     * Updates the presentation style for large site cards.
+     *
+     * @param presentation - The presentation mode to activate.
+     */
+    setSiteCardPresentation: (presentation: SiteCardPresentation) => void;
+
+    /**
      * Sets the selected time range for site details charts.
      *
      * @param range - The chart time range to select.
      */
     setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
+
+    /**
+     * Updates the active presentation layout for the dashboard site list.
+     *
+     * @param layout - The target layout mode to activate.
+     */
+    setSiteListLayout: (layout: SiteListLayoutMode) => void;
 
     /**
      * Whether the add site modal is currently open.
@@ -122,6 +134,11 @@ export interface UIStore {
      * Whether the site details modal is currently open.
      */
     showSiteDetails: boolean;
+
+    /**
+     * Presentation style for large site cards (grid or stacked).
+     */
+    siteCardPresentation: SiteCardPresentation;
 
     /**
      * The selected time range for charts in the site details modal.

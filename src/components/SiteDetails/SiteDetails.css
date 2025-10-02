@@ -373,6 +373,34 @@
     }
 }
 
+/* History tab refinements */
+.history-filter__content {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--spacing-xs);
+}
+
+.history-filter__icon {
+    color: var(--color-primary-400);
+}
+
+.history-filter__label {
+    font-size: var(--font-size-2xs);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.history-status-label {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--spacing-3xs);
+}
+
+.history-status-label__icon {
+    color: var(--color-primary-300);
+}
+
 /* Keyframe animations */
 @keyframes pulse {
     0%,

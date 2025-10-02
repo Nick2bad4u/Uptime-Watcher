@@ -9,7 +9,6 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
 import { FaListOl } from "react-icons/fa";
-import { FiTrash2 } from "react-icons/fi";
 import {
     MdAccessTime,
     MdBolt,
@@ -27,9 +26,13 @@ import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons } from "../../../utils/icons";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
+
+const RefreshIcon = AppIcons.actions.refresh;
+const RemoveIcon = AppIcons.actions.remove;
 
 /**
  * Props for the OverviewTab component.
@@ -212,7 +215,7 @@ export const OverviewTab = ({
         () => <MdBolt color={iconColors.quickAction} />,
         [iconColors.quickAction]
     );
-    const trashIcon = useMemo(() => <FiTrash2 />, []);
+    const trashIcon = useMemo(() => <RemoveIcon />, []);
     return (
         <div className="space-y-6" data-testid="overview-tab">
             {/* Key Metrics Grid */}
@@ -394,7 +397,7 @@ export const OverviewTab = ({
                         size="sm"
                         variant="secondary"
                     >
-                        <span>🔄</span>
+                        <RefreshIcon size={16} />
                         <span className="text-xs">Check Now</span>
                     </ThemedButton>
 

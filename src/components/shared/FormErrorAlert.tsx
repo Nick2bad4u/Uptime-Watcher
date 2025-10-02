@@ -8,6 +8,7 @@ import type { FC } from "react";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { AppIcons } from "../../utils/icons";
 
 /**
  * Props for the FormErrorAlert component
@@ -48,6 +49,8 @@ export const FormErrorAlert: FC<FormErrorAlertProperties> = ({
         return null;
     }
 
+    const CloseIcon = AppIcons.ui.close;
+
     return (
         <ThemedBox
             className={`error-alert ${isDark ? "dark" : ""} ${className}`.trim()}
@@ -63,7 +66,7 @@ export const FormErrorAlert: FC<FormErrorAlertProperties> = ({
                     size="xs"
                     variant="secondary"
                 >
-                    ✕
+                    <CloseIcon size={14} />
                 </ThemedButton>
             </div>
         </ThemedBox>

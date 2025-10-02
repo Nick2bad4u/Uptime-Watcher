@@ -51,6 +51,7 @@ import { ThemedText } from "./theme/components/ThemedText";
 import { ThemeProvider } from "./theme/components/ThemeProvider";
 import { useTheme } from "./theme/useTheme";
 import { setupCacheSync } from "./utils/cacheSync";
+import { AppIcons } from "./utils/icons";
 
 // UI Message constants for consistency and future localization
 const UI_MESSAGES = {
@@ -405,6 +406,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             <SiteDetails onClose={handleCloseSiteDetails} site={selectedSite} />
         ) : null;
 
+    const UpdateWarningIcon = AppIcons.status.warning;
+    const UpdateAvailableIcon = AppIcons.actions.refresh;
+    const UpdateDownloadingIcon = AppIcons.actions.refreshAlt;
+    const UpdateReadyIcon = AppIcons.status.upFilled;
+
     // Helper function to render update notification to reduce complexity
     const renderUpdateNotification = (): JSX.Element | null => {
         if (
@@ -432,7 +438,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                                <div className="update-alert__icon">⚠️</div>
+                                <div className="update-alert__icon">
+                                    <UpdateWarningIcon
+                                        className="update-alert__icon-symbol"
+                                        size={20}
+                                    />
+                                </div>
                                 <ThemedText size="sm" variant="error">
                                     {updateError ??
                                         UI_MESSAGES.UPDATE_ERROR_FALLBACK}
@@ -465,9 +476,24 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                             <div className="update-alert__icon">
-                                {updateStatus === "available" && "⬇️"}
-                                {updateStatus === "downloading" && "⏬"}
-                                {updateStatus === "downloaded" && "✅"}
+                                {updateStatus === "available" ? (
+                                    <UpdateAvailableIcon
+                                        className="update-alert__icon-symbol"
+                                        size={20}
+                                    />
+                                ) : null}
+                                {updateStatus === "downloading" ? (
+                                    <UpdateDownloadingIcon
+                                        className="update-alert__icon-symbol"
+                                        size={20}
+                                    />
+                                ) : null}
+                                {updateStatus === "downloaded" ? (
+                                    <UpdateReadyIcon
+                                        className="update-alert__icon-symbol"
+                                        size={20}
+                                    />
+                                ) : null}
                             </div>
                             <ThemedText size="sm" variant="primary">
                                 {updateStatus === "available" &&

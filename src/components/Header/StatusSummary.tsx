@@ -11,6 +11,7 @@ import type { JSX } from "react";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { Tooltip } from "../common/Tooltip/Tooltip";
 import { HealthIndicator } from "./HealthIndicator";
 import { StatusCounter } from "./StatusCounter";
 
@@ -54,105 +55,181 @@ export const StatusSummary = ({
     uptimePercentage,
 }: StatusSummaryProperties): JSX.Element => (
     <ThemedBox
-        className="header-status-summary-box inline-flex w-fit min-w-0 flex-wrap items-center gap-2 transition-all duration-300 sm:gap-3"
-        padding="sm"
+        className="header-status-summary"
+        padding="md"
         rounded="lg"
-        shadow="sm"
+        shadow="md"
         variant="secondary"
     >
-        {/* Overall Health Badge */}
-        {totalMonitors > 0 && (
-            <div className="shrink-0">
-                <HealthIndicator
-                    getAvailabilityColor={getAvailabilityColor}
-                    uptimePercentage={uptimePercentage}
-                />
-            </div>
-        )}
-
-        {/* Up Status */}
-        <div className="shrink-0">
-            <StatusCounter
-                className="status-up-badge"
-                count={upMonitors}
-                label="Up"
-                status="up"
-            />
-        </div>
-
-        {/* Degraded Status - Only show if there are degraded monitors */}
-        {degradedMonitors > 0 && (
-            <div className="shrink-0">
-                <StatusCounter
-                    className="status-degraded-badge"
-                    count={degradedMonitors}
-                    label="Degraded"
-                    status="degraded"
-                />
-            </div>
-        )}
-
-        {/* Down Status */}
-        <div className="shrink-0">
-            <StatusCounter
-                className="status-down-badge"
-                count={downMonitors}
-                label="Down"
-                status="down"
-            />
-        </div>
-
-        {/* Pending Status */}
-        <div className="group status-pending-badge flex shrink-0 items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-            <StatusIndicator size="sm" status="pending" />
-            <div className="flex flex-col">
-                <ThemedText size="sm" variant="primary" weight="semibold">
-                    {pendingMonitors}
-                </ThemedText>
-                <ThemedText
-                    className="leading-none"
-                    size="xs"
-                    variant="secondary"
+        <div className="header-status-summary__group">
+            {totalMonitors > 0 ? (
+                <Tooltip
+                    content={`${uptimePercentage}% uptime across ${totalMonitors} monitor${totalMonitors === 1 ? "" : "s"}`}
+                    position="bottom"
                 >
-                    Pending
-                </ThemedText>
-            </div>
-        </div>
+                    {(triggerProps) => (
+                        <div
+                            className="header-status-summary__health"
+                            {...triggerProps}
+                        >
+                            <HealthIndicator
+                                getAvailabilityColor={getAvailabilityColor}
+                                uptimePercentage={uptimePercentage}
+                            />
+                            <div className="header-status-summary__health-meta">
+                                <ThemedText
+                                    size="xs"
+                                    variant="secondary"
+                                    weight="medium"
+                                >
+                                    Global Health
+                                </ThemedText>
+                                <ThemedText size="lg" weight="semibold">
+                                    {uptimePercentage}%
+                                </ThemedText>
+                            </div>
+                        </div>
+                    )}
+                </Tooltip>
+            ) : null}
 
-        {/* Paused Status */}
-        <div className="group status-paused-badge flex shrink-0 items-center space-x-2 rounded-md px-2 py-1 transition-all duration-200">
-            <StatusIndicator size="sm" status="paused" />
-            <div className="flex flex-col">
-                <ThemedText size="sm" variant="primary" weight="semibold">
-                    {pausedMonitors}
-                </ThemedText>
-                <ThemedText
-                    className="leading-none"
-                    size="xs"
-                    variant="secondary"
+            <Tooltip content="Monitors operating normally" position="bottom">
+                {(triggerProps) => (
+                    <div {...triggerProps}>
+                        <StatusCounter
+                            className="status-up-badge"
+                            count={upMonitors}
+                            label="Up"
+                            status="up"
+                        />
+                    </div>
+                )}
+            </Tooltip>
+
+            {degradedMonitors > 0 ? (
+                <Tooltip
+                    content="Monitors experiencing degraded performance"
+                    position="bottom"
                 >
-                    Paused
-                </ThemedText>
-            </div>
+                    {(triggerProps) => (
+                        <div {...triggerProps}>
+                            <StatusCounter
+                                className="status-degraded-badge"
+                                count={degradedMonitors}
+                                label="Degraded"
+                                status="degraded"
+                            />
+                        </div>
+                    )}
+                </Tooltip>
+            ) : null}
+
+            <Tooltip content="Monitors currently down" position="bottom">
+                {(triggerProps) => (
+                    <div {...triggerProps}>
+                        <StatusCounter
+                            className="status-down-badge"
+                            count={downMonitors}
+                            label="Down"
+                            status="down"
+                        />
+                    </div>
+                )}
+            </Tooltip>
         </div>
 
-        {/* Total Sites Badge */}
-        {totalMonitors > 0 && (
-            <div className="total-sites-badge bg-overlay-default/10 flex shrink-0 items-center space-x-2 rounded-md px-2 py-1">
-                <div className="h-2 w-2 rounded-full bg-current opacity-50" />
-                <div className="flex flex-col">
-                    <ThemedText size="sm" variant="primary" weight="semibold">
-                        {totalMonitors}
-                    </ThemedText>
-                    <ThemedText
-                        className="leading-none"
-                        size="xs"
-                        variant="secondary"
+        <div className="header-status-summary__group header-status-summary__group--secondary">
+            <Tooltip
+                content="Monitoring jobs awaiting verification"
+                position="bottom"
+            >
+                {(triggerProps) => (
+                    <div
+                        className="header-status-summary__pill status-pending-badge"
+                        {...triggerProps}
                     >
-                        Total
-                    </ThemedText>
-                </div>
-            </div>
-        )}
+                        <StatusIndicator size="sm" status="pending" />
+                        <div className="header-status-summary__pill-text">
+                            <ThemedText
+                                size="sm"
+                                variant="primary"
+                                weight="semibold"
+                            >
+                                {pendingMonitors}
+                            </ThemedText>
+                            <ThemedText
+                                className="leading-none"
+                                size="xs"
+                                variant="secondary"
+                            >
+                                Pending
+                            </ThemedText>
+                        </div>
+                    </div>
+                )}
+            </Tooltip>
+
+            <Tooltip
+                content="Monitoring paused manually or awaiting schedule"
+                position="bottom"
+            >
+                {(triggerProps) => (
+                    <div
+                        className="header-status-summary__pill status-paused-badge"
+                        {...triggerProps}
+                    >
+                        <StatusIndicator size="sm" status="paused" />
+                        <div className="header-status-summary__pill-text">
+                            <ThemedText
+                                size="sm"
+                                variant="primary"
+                                weight="semibold"
+                            >
+                                {pausedMonitors}
+                            </ThemedText>
+                            <ThemedText
+                                className="leading-none"
+                                size="xs"
+                                variant="secondary"
+                            >
+                                Paused
+                            </ThemedText>
+                        </div>
+                    </div>
+                )}
+            </Tooltip>
+
+            {totalMonitors > 0 ? (
+                <Tooltip
+                    content="Total configured monitors across all sites"
+                    position="bottom"
+                >
+                    {(triggerProps) => (
+                        <div
+                            className="header-status-summary__pill total-sites-badge"
+                            {...triggerProps}
+                        >
+                            <div className="header-status-summary__dot" />
+                            <div className="header-status-summary__pill-text">
+                                <ThemedText
+                                    size="sm"
+                                    variant="primary"
+                                    weight="semibold"
+                                >
+                                    {totalMonitors}
+                                </ThemedText>
+                                <ThemedText
+                                    className="leading-none"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    Total Monitors
+                                </ThemedText>
+                            </div>
+                        </div>
+                    )}
+                </Tooltip>
+            ) : null}
+        </div>
     </ThemedBox>
 );

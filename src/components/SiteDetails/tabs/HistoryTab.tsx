@@ -24,7 +24,7 @@
  * @public
  */
 
-import type { Monitor, StatusHistory } from "@shared/types";
+import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
 import type { ChangeEvent, ReactElement } from "react";
 import type { JSX } from "react/jsx-runtime";
 
@@ -40,6 +40,8 @@ import { ThemedCard } from "../../../theme/components/ThemedCard";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
+import { getStatusIcon, type StatusWithIcon } from "../../../utils/status";
 import { DetailLabel } from "../../common/MonitorUiComponents";
 
 /**
@@ -57,8 +59,8 @@ export interface HistoryTabProperties {
     readonly formatFullTimestamp: (timestamp: number) => string;
     /** Function to format response times for display */
     readonly formatResponseTime: (time: number) => string;
-    /** Function to format status with appropriate icons */
-    readonly formatStatusWithIcon: (status: string) => string;
+    /** Function to format status with appropriate icon metadata */
+    readonly formatStatusWithIcon: (status: string) => StatusWithIcon;
     /** Currently selected monitor to display history for */
     readonly selectedMonitor: Monitor;
 }
@@ -74,24 +76,20 @@ export interface HistoryTabProperties {
  */
 type HistoryFilter = "all" | "down" | "up";
 
-/**
- * Get the formatted label for filter buttons.
- *
- * @param filter - The filter type to get the label for
- *
- * @returns The human-readable label for the filter button
- *
- * @internal
- */
-function getFilterButtonLabel(filter: HistoryFilter): string {
-    if (filter === "all") {
-        return "All";
-    }
-    if (filter === "up") {
-        return "✅ Up";
-    }
-    return "❌ Down";
-}
+const FILTER_LABELS: Record<HistoryFilter, string> = {
+    all: "All",
+    down: "Down",
+    up: "Up",
+};
+
+const FILTER_OPTIONS: ReadonlyArray<{
+    readonly status?: SiteStatus;
+    readonly value: HistoryFilter;
+}> = [
+    { value: "all" },
+    { status: "up", value: "up" },
+    { status: "down", value: "down" },
+];
 
 /**
  * History tab component displaying paginated monitor check history.
@@ -117,9 +115,7 @@ export const HistoryTab = ({
 }: HistoryTabProperties): JSX.Element => {
     const { settings } = useSettingsStore();
     const { currentTheme } = useTheme();
-    const [historyFilter, setHistoryFilter] = useState<"all" | "down" | "up">(
-        "all"
-    );
+    const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("all");
     const historyLength = selectedMonitor.history.length;
 
     const backendLimit = settings.historyLimit || 25;
@@ -143,6 +139,8 @@ export const HistoryTab = ({
     });
 
     const iconColors = getIconColors();
+
+    const FilterAllIcon = AppIcons.ui.analytics;
 
     // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
     // available history)
@@ -252,7 +250,7 @@ export const HistoryTab = ({
 
     // Memoized event handlers
     const createFilterHandler = useCallback(
-        (filter: "all" | "down" | "up") => (): void => {
+        (filter: HistoryFilter) => (): void => {
             setHistoryFilter(filter);
             logger.user.action("History filter changed", {
                 filter: filter,
@@ -307,27 +305,33 @@ export const HistoryTab = ({
                             Filter by status:
                         </ThemedText>
                         <div className="flex space-x-1">
-                            {(
-                                [
-                                    "all",
-                                    "up",
-                                    "down",
-                                ] as const
-                            ).map((filter) => (
-                                <ThemedButton
-                                    className="capitalize"
-                                    key={filter}
-                                    onClick={createFilterHandler(filter)}
-                                    size="xs"
-                                    variant={
-                                        historyFilter === filter
-                                            ? "primary"
-                                            : "ghost"
-                                    }
-                                >
-                                    {getFilterButtonLabel(filter)}
-                                </ThemedButton>
-                            ))}
+                            {FILTER_OPTIONS.map(({ status, value }) => {
+                                const isActive = historyFilter === value;
+                                const FilterIconComponent = status
+                                    ? getStatusIcon(status)
+                                    : FilterAllIcon;
+
+                                return (
+                                    <ThemedButton
+                                        className="capitalize"
+                                        key={value}
+                                        onClick={createFilterHandler(value)}
+                                        size="xs"
+                                        variant={isActive ? "primary" : "ghost"}
+                                    >
+                                        <span className="history-filter__content">
+                                            <FilterIconComponent
+                                                aria-hidden="true"
+                                                className="history-filter__icon"
+                                                size={14}
+                                            />
+                                            <span className="history-filter__label">
+                                                {FILTER_LABELS[value]}
+                                            </span>
+                                        </span>
+                                    </ThemedButton>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -360,50 +364,65 @@ export const HistoryTab = ({
             {/* History List */}
             <ThemedCard icon={historyIcon} title="Check History">
                 <div className="max-h-96 space-y-2 overflow-y-auto">
-                    {filteredHistoryRecords.map((record) => (
-                        <div
-                            className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
-                            key={record.timestamp}
-                        >
-                            <div className="flex items-center space-x-3">
-                                <StatusIndicator
-                                    size="sm"
-                                    status={record.status}
-                                />
-                                <div>
+                    {filteredHistoryRecords.map((record) => {
+                        const StatusLabelIcon = getStatusIcon(record.status);
+                        const { label: statusLabel } = formatStatusWithIcon(
+                            record.status
+                        ) satisfies StatusWithIcon;
+
+                        return (
+                            <div
+                                className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
+                                key={record.timestamp}
+                            >
+                                <div className="flex items-center space-x-3">
+                                    <StatusIndicator
+                                        size="sm"
+                                        status={record.status}
+                                    />
+                                    <div>
+                                        <ThemedText size="sm" weight="medium">
+                                            {formatFullTimestamp(
+                                                record.timestamp
+                                            )}
+                                        </ThemedText>
+                                        <ThemedText
+                                            className="ml-4"
+                                            size="xs"
+                                            variant="secondary"
+                                        >
+                                            Record #
+                                            {historyLength -
+                                                selectedMonitor.history.findIndex(
+                                                    (r) =>
+                                                        r.timestamp ===
+                                                        record.timestamp
+                                                )}
+                                        </ThemedText>
+                                        {renderDetails(record)}
+                                    </div>
+                                </div>
+                                <div className="text-right">
                                     <ThemedText size="sm" weight="medium">
-                                        {formatFullTimestamp(record.timestamp)}
+                                        {formatResponseTime(
+                                            record.responseTime
+                                        )}
                                     </ThemedText>
                                     <ThemedText
-                                        className="ml-4"
+                                        className="history-status-label"
                                         size="xs"
                                         variant="secondary"
                                     >
-                                        Record #
-                                        {historyLength -
-                                            selectedMonitor.history.findIndex(
-                                                (r) =>
-                                                    r.timestamp ===
-                                                    record.timestamp
-                                            )}
+                                        <StatusLabelIcon
+                                            className="history-status-label__icon"
+                                            size={14}
+                                        />
+                                        <span>{statusLabel}</span>
                                     </ThemedText>
-                                    {renderDetails(record)}
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <ThemedText size="sm" weight="medium">
-                                    {formatResponseTime(record.responseTime)}
-                                </ThemedText>
-                                <ThemedText
-                                    className="ml-4"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    {formatStatusWithIcon(record.status)}
-                                </ThemedText>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
 
                     {filteredHistoryRecords.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-12 text-center">

@@ -73,6 +73,8 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
         };
 
         const sizeStyles = getSizeStyles();
+        const StatusIconComponent = getStatusIcon(status);
+        const iconPixelSize = Number.parseInt(sizeStyles.iconSize, 10) || 16;
 
         const indicatorStyle: CSSProperties = useMemo(
             () => ({
@@ -138,7 +140,9 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                 style={containerStyle}
             >
                 {showText ? (
-                    <div style={iconStyle}>{getStatusIcon(status)}</div>
+                    <div style={iconStyle}>
+                        <StatusIconComponent size={iconPixelSize} />
+                    </div>
                 ) : (
                     <div
                         className="themed-status-indicator__dot"

@@ -1,14 +1,5 @@
-/**
- * Application sidebar containing global navigation and site quick-switching.
- *
- * @remarks
- * Presents a Slack/Discord-inspired navigation column with search, quick
- * actions, and per-site status indicators. The component relies on the global
- * stores for data and integrates with {@link SidebarLayoutProvider} so it can
- * collapse on compact layouts.
- */
-
 import type { Site, SiteStatus } from "@shared/types";
+import type { IconType } from "react-icons";
 
 import {
     getSiteDisplayStatus,
@@ -30,20 +21,42 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
 import "./AppSidebar.css";
+
+/**
+ * Application sidebar containing global navigation and site quick-switching.
+ *
+ * @remarks
+ * Presents a Slack/Discord-inspired navigation column with search, quick
+ * actions, and per-site status indicators. The component relies on the global
+ * stores for data and integrates with {@link SidebarLayoutProvider} so it can
+ * collapse on compact layouts.
+ */
+
+const STATUS_ICON_MAP: Record<SiteStatus, IconType> = {
+    degraded: AppIcons.status.warning,
+    down: AppIcons.status.downFilled,
+    mixed: AppIcons.status.warning,
+    paused: AppIcons.status.pausedFilled,
+    pending: AppIcons.status.pendingFilled,
+    unknown: AppIcons.status.pendingFilled,
+    up: AppIcons.status.upFilled,
+};
 
 /**
  * Maps a {@link SiteStatus} to a CSS modifier class.
  */
 const STATUS_CLASS_MAP: Record<SiteStatus, string> = {
-    degraded: "app-sidebar__item-status-dot--degraded",
-    down: "app-sidebar__item-status-dot--down",
-    mixed: "app-sidebar__item-status-dot--mixed",
-    paused: "app-sidebar__item-status-dot--paused",
-    pending: "app-sidebar__item-status-dot--pending",
-    unknown: "app-sidebar__item-status-dot--unknown",
-    up: "app-sidebar__item-status-dot--up",
+    degraded: "app-sidebar__item-status--degraded",
+    down: "app-sidebar__item-status--down",
+    mixed: "app-sidebar__item-status--mixed",
+    paused: "app-sidebar__item-status--paused",
+    pending: "app-sidebar__item-status--pending",
+    unknown: "app-sidebar__item-status--unknown",
+    up: "app-sidebar__item-status--up",
 };
 
 /**
@@ -67,6 +80,9 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     );
     const setShowSiteDetails = useUIStore(
         useCallback((state) => state.setShowSiteDetails, [])
+    );
+    const setSelectedMonitorId = useSitesStore(
+        useCallback((state) => state.setSelectedMonitorId, [])
     );
 
     const [query, setQuery] = useState<string>("");
@@ -128,14 +144,46 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
             }
 
             selectSite(siteToSelect);
-            setShowSiteDetails(false);
+
+            const [primaryMonitor] = siteToSelect.monitors;
+            if (primaryMonitor) {
+                setSelectedMonitorId(
+                    siteToSelect.identifier,
+                    primaryMonitor.id
+                );
+            }
+
+            setShowSiteDetails(true);
+
+            // Scroll to the site card in the main content area
+            requestAnimationFrame(() => {
+                const cardElement = document.querySelector(
+                    `[data-site-id="${siteId}"]`
+                );
+                if (cardElement) {
+                    cardElement.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                }
+            });
         },
         [
             selectSite,
+            setSelectedMonitorId,
             setShowSiteDetails,
             sites,
         ]
     );
+
+    const MenuIcon = AppIcons.layout.viewColumns;
+    const AddIcon = AppIcons.actions.add;
+    const SettingsIcon = AppIcons.settings.gear;
+    const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
+    const themeButtonLabel = isDark
+        ? "Switch to light mode"
+        : "Switch to dark mode";
+    const themeButtonText = isDark ? "Light Mode" : "Dark Mode";
 
     return (
         <aside
@@ -152,7 +200,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                         onClick={toggleSidebar}
                         type="button"
                     >
-                        ☰
+                        <MenuIcon size={18} />
                     </button>
                     <div>
                         <ThemedText
@@ -209,65 +257,105 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                 (monitor) => monitor.monitoring
                             ).length;
                             const statusClass = STATUS_CLASS_MAP[status];
+                            const StatusIcon = STATUS_ICON_MAP[status];
 
                             return (
-                                <button
-                                    className={`app-sidebar__item ${
-                                        site.identifier === selectedSiteId
-                                            ? "app-sidebar__item--active"
-                                            : ""
-                                    }`}
-                                    data-site-id={site.identifier}
+                                <Tooltip
+                                    content={statusDescription}
                                     key={site.identifier}
-                                    onClick={handleSelectSite}
-                                    title={statusDescription}
-                                    type="button"
+                                    position="right"
                                 >
-                                    <span
-                                        aria-hidden="true"
-                                        className={`app-sidebar__item-status-dot ${statusClass}`}
-                                    />
-                                    <span className="app-sidebar__item-content">
-                                        <span className="app-sidebar__item-name">
-                                            {site.name}
-                                        </span>
-                                        <span className="app-sidebar__item-meta">
-                                            {runningMonitors}/
-                                            {site.monitors.length} monitoring
-                                        </span>
-                                    </span>
-                                </button>
+                                    {(triggerProps) => (
+                                        <button
+                                            {...triggerProps}
+                                            className={`app-sidebar__item ${
+                                                site.identifier ===
+                                                selectedSiteId
+                                                    ? "app-sidebar__item--active"
+                                                    : ""
+                                            }`}
+                                            data-site-id={site.identifier}
+                                            onClick={handleSelectSite}
+                                            type="button"
+                                        >
+                                            <span
+                                                aria-hidden="true"
+                                                className={`app-sidebar__item-status ${statusClass}`}
+                                            >
+                                                <StatusIcon className="app-sidebar__item-status-icon" />
+                                            </span>
+                                            <span className="app-sidebar__item-content">
+                                                <span className="app-sidebar__item-name">
+                                                    {site.name}
+                                                </span>
+                                                <span className="app-sidebar__item-meta">
+                                                    {runningMonitors}/
+                                                    {site.monitors.length}
+                                                    {" · "}
+                                                    monitoring
+                                                </span>
+                                            </span>
+                                        </button>
+                                    )}
+                                </Tooltip>
                             );
                         })
                     )}
                 </nav>
 
                 <div className="app-sidebar__footer">
-                    <ThemedButton
-                        className="app-sidebar__footer-action"
-                        onClick={handleAddSite}
-                        size="sm"
-                        variant="primary"
-                    >
-                        ➕ Add Site
-                    </ThemedButton>
+                    <Tooltip content="Add a new site" position="right">
+                        {(triggerProps) => (
+                            <ThemedButton
+                                {...triggerProps}
+                                className="app-sidebar__footer-action"
+                                onClick={handleAddSite}
+                                size="sm"
+                                variant="primary"
+                            >
+                                <AddIcon className="app-sidebar__action-icon" />
+                                <span className="app-sidebar__action-label">
+                                    Add Site
+                                </span>
+                            </ThemedButton>
+                        )}
+                    </Tooltip>
                     <div className="app-sidebar__footer-controls">
-                        <ThemedButton
-                            className="app-sidebar__footer-control"
-                            onClick={handleOpenSettings}
-                            size="sm"
-                            variant="secondary"
+                        <Tooltip
+                            content="Open application settings"
+                            position="right"
                         >
-                            ⚙️ Settings
-                        </ThemedButton>
-                        <ThemedButton
-                            className="app-sidebar__footer-control"
-                            onClick={toggleTheme}
-                            size="sm"
-                            variant="secondary"
-                        >
-                            {isDark ? "☀️ Light" : "🌙 Dark"}
-                        </ThemedButton>
+                            {(triggerProps) => (
+                                <ThemedButton
+                                    {...triggerProps}
+                                    className="app-sidebar__footer-control"
+                                    onClick={handleOpenSettings}
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    <SettingsIcon className="app-sidebar__action-icon" />
+                                    <span className="app-sidebar__action-label">
+                                        Settings
+                                    </span>
+                                </ThemedButton>
+                            )}
+                        </Tooltip>
+                        <Tooltip content={themeButtonLabel} position="right">
+                            {(triggerProps) => (
+                                <ThemedButton
+                                    {...triggerProps}
+                                    className="app-sidebar__footer-control"
+                                    onClick={toggleTheme}
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    <ThemeIcon className="app-sidebar__action-icon" />
+                                    <span className="app-sidebar__action-label">
+                                        {themeButtonText}
+                                    </span>
+                                </ThemedButton>
+                            )}
+                        </Tooltip>
                     </div>
                 </div>
             </div>

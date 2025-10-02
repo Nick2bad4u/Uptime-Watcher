@@ -26,6 +26,8 @@
  * @public
  */
 
+import type { CoreComponentProperties } from "@shared/types/componentProps";
+
 import {
     memo,
     type MouseEvent,
@@ -33,10 +35,10 @@ import {
     useCallback,
 } from "react";
 
-import type { CoreComponentProperties } from "@shared/types/componentProps";
-
 import type { ButtonSize } from "../../../theme/components/types";
+
 import { ThemedButton } from "../../../theme/components/ThemedButton";
+import { AppIcons } from "../../../utils/icons";
 
 /**
  * Props for the SiteMonitoringButton component.
@@ -136,6 +138,10 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
             [onStartSiteMonitoring]
         );
 
+        const iconSize = size === "xs" ? 14 : 16;
+        const StopIcon = AppIcons.actions.pauseFilled;
+        const StartIcon = AppIcons.actions.playAll;
+
         if (allMonitorsRunning) {
             return (
                 <ThemedButton
@@ -146,7 +152,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                     size={size}
                     variant="error"
                 >
-                    <span>⏹️</span>
+                    <StopIcon size={iconSize} />
                     {!compact && (
                         <span className="hidden text-xs sm:inline">
                             Stop All
@@ -165,7 +171,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
                 size={size}
                 variant="success"
             >
-                <span>▶️</span>
+                <StartIcon size={iconSize} />
                 {!compact && (
                     <span className="hidden text-xs sm:inline">Start All</span>
                 )}

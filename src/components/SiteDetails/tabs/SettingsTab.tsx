@@ -24,6 +24,7 @@ import {
 } from "../../../constants";
 import { logger } from "../../../services/logger";
 import { ThemedBadge } from "../../../theme/components/ThemedBadge";
+import { AppIcons } from "../../../utils/icons";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedCard } from "../../../theme/components/ThemedCard";
@@ -39,6 +40,8 @@ import {
 } from "../../../utils/fallbacks";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
+
+const WarningIcon = AppIcons.status.warning;
 
 /**
  * Props for the SettingsTab component.
@@ -386,7 +389,8 @@ export const SettingsTab = ({
                         </div>
                         {hasUnsavedChanges ? (
                             <ThemedBadge size="sm" variant="warning">
-                                ⚠️ Unsaved changes
+                                <WarningIcon size={14} />
+                                <span className="ml-1">Unsaved changes</span>
                             </ThemedBadge>
                         ) : null}
                     </div>

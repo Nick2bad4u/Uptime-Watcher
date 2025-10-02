@@ -11,6 +11,7 @@
 /* eslint-disable react/prop-types -- Component uses TypeScript for props validation. */
 
 import type { NamedExoticComponent } from "react";
+import type { IconType } from "react-icons";
 
 import { memo, useMemo } from "react";
 
@@ -18,6 +19,7 @@ import type { GlobalMonitoringMetrics } from "../../../utils/monitoring/globalMe
 
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons } from "../../../utils/icons";
 import "./DashboardOverview.css";
 
 /**
@@ -32,7 +34,7 @@ export interface DashboardOverviewProperties {
 
 interface OverviewCardDescriptor {
     readonly description: string;
-    readonly icon: string;
+    readonly Icon: IconType;
     readonly id: string;
     readonly label: string;
     readonly trend?: string;
@@ -55,28 +57,28 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
             return [
                 {
                     description: "Sites currently under monitoring",
-                    icon: "🛰️",
+                    Icon: AppIcons.metrics.monitor,
                     id: "sites",
                     label: siteCountLabel,
                     value: metrics.totalSites.toString(),
                 },
                 {
                     description: "Monitors with active polling",
-                    icon: "📡",
+                    Icon: AppIcons.metrics.activity,
                     id: "active-monitors",
                     label: "Active Monitors",
                     value: `${metrics.activeMonitors}/${metrics.totalMonitors}`,
                 },
                 {
                     description: "Global uptime across all monitors",
-                    icon: "⚡",
+                    Icon: AppIcons.metrics.uptime,
                     id: "uptime",
                     label: "Global Uptime",
                     value: uptime,
                 },
                 {
                     description: "Monitors requiring attention",
-                    icon: "🚨",
+                    Icon: AppIcons.metrics.incidents,
                     id: "incidents",
                     label: "Active Incidents",
                     trend: `${downMonitors} down · ${degradedMonitors} degraded`,
@@ -84,7 +86,7 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
                 },
                 {
                     description: "Average response time from active monitors",
-                    icon: "⏱️",
+                    Icon: AppIcons.metrics.response,
                     id: "response",
                     label: "Avg Response",
                     value: averageResponse,
@@ -108,54 +110,58 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
                 className="dashboard-overview"
             >
                 <div className="dashboard-overview__grid">
-                    {cards.map((card) => (
-                        <ThemedBox
-                            className="dashboard-overview__card"
-                            key={card.id}
-                            padding="lg"
-                            rounded="lg"
-                            shadow="md"
-                            surface="elevated"
-                        >
-                            <div className="dashboard-overview__card-header">
-                                <span
-                                    aria-hidden="true"
-                                    className="dashboard-overview__card-icon"
-                                >
-                                    {card.icon}
-                                </span>
-                                <ThemedText size="sm" variant="secondary">
-                                    {card.label}
-                                </ThemedText>
-                            </div>
-
-                            <ThemedText
-                                className="dashboard-overview__card-value"
-                                size="2xl"
-                                weight="semibold"
+                    {cards.map((card) => {
+                        const { description, Icon, id, label, trend, value } =
+                            card;
+                        return (
+                            <ThemedBox
+                                className="dashboard-overview__card"
+                                key={id}
+                                padding="lg"
+                                rounded="lg"
+                                shadow="md"
+                                surface="elevated"
                             >
-                                {card.value}
-                            </ThemedText>
+                                <div className="dashboard-overview__card-header">
+                                    <span
+                                        aria-hidden="true"
+                                        className="dashboard-overview__card-icon"
+                                    >
+                                        <Icon />
+                                    </span>
+                                    <ThemedText size="sm" variant="secondary">
+                                        {label}
+                                    </ThemedText>
+                                </div>
 
-                            <ThemedText
-                                className="dashboard-overview__card-description"
-                                size="xs"
-                                variant="tertiary"
-                            >
-                                {card.description}
-                            </ThemedText>
-
-                            {card.trend ? (
                                 <ThemedText
-                                    className="dashboard-overview__card-trend"
-                                    size="xs"
-                                    variant="info"
+                                    className="dashboard-overview__card-value"
+                                    size="2xl"
+                                    weight="semibold"
                                 >
-                                    {card.trend}
+                                    {value}
                                 </ThemedText>
-                            ) : null}
-                        </ThemedBox>
-                    ))}
+
+                                <ThemedText
+                                    className="dashboard-overview__card-description"
+                                    size="xs"
+                                    variant="tertiary"
+                                >
+                                    {description}
+                                </ThemedText>
+
+                                {trend ? (
+                                    <ThemedText
+                                        className="dashboard-overview__card-trend"
+                                        size="xs"
+                                        variant="info"
+                                    >
+                                        {trend}
+                                    </ThemedText>
+                                ) : null}
+                            </ThemedBox>
+                        );
+                    })}
                 </div>
             </section>
         );

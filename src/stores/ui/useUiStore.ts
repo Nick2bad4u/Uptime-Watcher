@@ -36,7 +36,11 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { ChartTimeRange } from "../types";
-import type { SiteListLayoutMode, UIStore } from "./types";
+import type {
+    SiteCardPresentation,
+    SiteListLayoutMode,
+    UIStore,
+} from "./types";
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
@@ -55,6 +59,7 @@ type UIStoreWithPersist = UseBoundStore<
                     {
                         activeSiteDetailsTab: string;
                         showAdvancedMetrics: boolean;
+                        siteCardPresentation: SiteCardPresentation;
                         siteDetailsChartTimeRange: ChartTimeRange;
                         siteListLayout: SiteListLayoutMode;
                     }
@@ -71,6 +76,7 @@ type UIStoreWithPersist = UseBoundStore<
                         {
                             activeSiteDetailsTab: string;
                             showAdvancedMetrics: boolean;
+                            siteCardPresentation: SiteCardPresentation;
                             siteDetailsChartTimeRange: ChartTimeRange;
                             siteListLayout: SiteListLayoutMode;
                         }
@@ -144,6 +150,14 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "setShowSiteDetails", { show });
                 set({ showSiteDetails: show });
             },
+            setSiteCardPresentation: (
+                presentation: SiteCardPresentation
+            ): void => {
+                logStoreAction("UIStore", "setSiteCardPresentation", {
+                    presentation,
+                });
+                set({ siteCardPresentation: presentation });
+            },
             setSiteDetailsChartTimeRange: (range: ChartTimeRange): void => {
                 logStoreAction("UIStore", "setSiteDetailsChartTimeRange", {
                     range,
@@ -158,6 +172,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showAdvancedMetrics: false,
             showSettings: false,
             showSiteDetails: false,
+            siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
             siteListLayout: "card-large",
         }),
@@ -189,6 +204,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             partialize: (state) => ({
                 activeSiteDetailsTab: state.activeSiteDetailsTab,
                 showAdvancedMetrics: state.showAdvancedMetrics,
+                siteCardPresentation: state.siteCardPresentation,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
                 siteListLayout: state.siteListLayout,
                 // Don't persist modal states or selected site

@@ -10,6 +10,11 @@ import type { JSX } from "react";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
+import { AppIcons } from "../../utils/icons";
+import {
+    Tooltip,
+    type TooltipTriggerProperties,
+} from "../common/Tooltip/Tooltip";
 
 /**
  * Properties for the HeaderControls component.
@@ -37,60 +42,90 @@ export const HeaderControls = ({
     onShowAddSiteModal,
     onShowSettings,
     onToggleTheme,
-}: HeaderControlsProperties): JSX.Element => (
-    <div className="flex shrink-0 items-center space-x-2">
-        {/* Add Site Button */}
-        <ThemedBox
-            className="header-controls-box flex items-center"
-            padding="xs"
-            rounded="md"
-            variant="tertiary"
-        >
-            <ThemedButton
-                aria-label="Add new site"
-                className="themed-button--icon p-2"
-                onClick={onShowAddSiteModal}
-                size="sm"
-                variant="secondary"
-            >
-                ➕
-            </ThemedButton>
-        </ThemedBox>
+}: HeaderControlsProperties): JSX.Element => {
+    const AddIcon = AppIcons.actions.add;
+    const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
+    const SettingsIcon = AppIcons.settings.gear;
 
-        {/* Theme Toggle */}
-        <ThemedBox
-            className="header-controls-box flex items-center"
-            padding="xs"
-            rounded="md"
-            variant="tertiary"
-        >
-            <ThemedButton
-                aria-label="Toggle theme"
-                className="themed-button--icon p-2"
-                onClick={onToggleTheme}
-                size="sm"
-                variant="secondary"
-            >
-                {isDark ? "☀️" : "🌙"}
-            </ThemedButton>
-        </ThemedBox>
+    return (
+        <div className="flex shrink-0 items-center space-x-2">
+            {/* Add Site Button */}
+            <Tooltip content="Add new site to monitor" position="bottom">
+                {(triggerProps: TooltipTriggerProperties) => (
+                    <ThemedBox
+                        className="header-controls-box flex items-center"
+                        padding="xs"
+                        rounded="md"
+                        variant="tertiary"
+                    >
+                        <ThemedButton
+                            aria-label="Add new site"
+                            className="themed-button--icon p-2"
+                            onClick={onShowAddSiteModal}
+                            size="sm"
+                            variant="secondary"
+                            {...triggerProps}
+                        >
+                            <AddIcon size={18} />
+                        </ThemedButton>
+                    </ThemedBox>
+                )}
+            </Tooltip>
 
-        {/* Settings Button */}
-        <ThemedBox
-            className="header-controls-box flex items-center"
-            padding="xs"
-            rounded="md"
-            variant="tertiary"
-        >
-            <ThemedButton
-                aria-label="Settings"
-                className="themed-button--icon p-2"
-                onClick={onShowSettings}
-                size="sm"
-                variant="secondary"
+            {/* Theme Toggle */}
+            <Tooltip
+                content={
+                    isDark ? "Switch to light theme" : "Switch to dark theme"
+                }
+                position="bottom"
             >
-                ⚙️
-            </ThemedButton>
-        </ThemedBox>
-    </div>
-);
+                {(triggerProps: TooltipTriggerProperties) => (
+                    <ThemedBox
+                        className="header-controls-box flex items-center"
+                        padding="xs"
+                        rounded="md"
+                        variant="tertiary"
+                    >
+                        <ThemedButton
+                            aria-label={
+                                isDark
+                                    ? "Switch to light theme"
+                                    : "Switch to dark theme"
+                            }
+                            className="themed-button--icon p-2"
+                            onClick={onToggleTheme}
+                            size="sm"
+                            variant="secondary"
+                            {...triggerProps}
+                        >
+                            <ThemeIcon size={18} />
+                        </ThemedButton>
+                    </ThemedBox>
+                )}
+            </Tooltip>
+
+            {/* Settings Button */}
+            <Tooltip content="Open application settings" position="bottom">
+                {(triggerProps: TooltipTriggerProperties) => (
+                    <ThemedBox
+                        className="header-controls-box flex items-center"
+                        padding="xs"
+                        rounded="md"
+                        variant="tertiary"
+                    >
+                        <ThemedButton
+                            aria-label="Open settings"
+                            className="themed-button--icon p-2"
+                            onClick={onShowSettings}
+                            size="sm"
+                            variant="secondary"
+                            {...triggerProps}
+                        >
+                            <SettingsIcon size={18} />
+                        </ThemedButton>
+                    </ThemedBox>
+                )}
+            </Tooltip>
+        </div>
+    );
+};

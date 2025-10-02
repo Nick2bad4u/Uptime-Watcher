@@ -8,10 +8,23 @@
  * values are expected to be lowercase single-word strings.
  */
 
+import type { IconType } from "react-icons";
 import type { CamelCase } from "type-fest";
+
+import { AppIcons } from "./icons";
+
 /**
- * Get the emoji icon for a given status. Provides visual indicators for
- * different monitoring states.
+ * Normalized representation of a status decorated with an icon component.
+ */
+export interface StatusWithIcon {
+    /** Icon component conveying the status visually. */
+    readonly icon: IconType;
+    /** Human-friendly status label. */
+    readonly label: string;
+}
+/**
+ * Get the icon component for a given status. Provides visual indicators for
+ * different monitoring states using the shared {@link AppIcons} catalog.
  *
  * @remarks
  * Status comparison is case-insensitive. Supports standard monitoring states:
@@ -20,55 +33,44 @@ import type { CamelCase } from "type-fest";
  *
  * @param status - The status string to get an icon for
  *
- * @returns Emoji string representing the status (defaults to "⚪" for unknown
- *   statuses)
+ * @returns Icon component representing the status (defaults to neutral info
+ *   icon for unknown statuses)
  */
-export function getStatusIcon(status: string): string {
-    switch (status.toLowerCase()) {
-        case "degraded": {
-            return "⚠️";
-        }
-        case "down": {
-            return "❌";
-        }
-        case "mixed": {
-            return "🔄";
-        }
-        case "paused": {
-            return "⏸️";
-        }
-        case "pending": {
-            return "⏳";
-        }
-        case "unknown": {
-            return "❓";
-        }
-        case "up": {
-            return "✅";
-        }
-        default: {
-            return "⚪";
-        }
-    }
+export function getStatusIcon(status: string): IconType {
+    const normalizedStatus = status.toLowerCase();
+
+    const statusIconMap: Record<string, IconType> = {
+        degraded: AppIcons.status.warning,
+        down: AppIcons.status.downFilled,
+        mixed: AppIcons.actions.refresh,
+        paused: AppIcons.status.pausedFilled,
+        pending: AppIcons.status.pendingFilled,
+        unknown: AppIcons.ui.info,
+        up: AppIcons.status.upFilled,
+    };
+
+    return statusIconMap[normalizedStatus] ?? AppIcons.ui.info;
 }
 
 /**
- * Format status with emoji icon and properly capitalized text. Combines status
- * icon with formatted text for display.
+ * Format status with icon metadata and properly capitalized text.
  *
  * @remarks
- * Uses simple capitalization logic suitable for single-word status values. For
- * multi-word statuses, consider using a more sophisticated formatting
- * function.
+ * Returns an object containing the icon component associated with the status
+ * and the capitalized label for display. For multi-word statuses, consider
+ * using a more sophisticated formatting function for label generation.
  *
  * @param status - The status string to format (expected to be lowercase)
  *
- * @returns Formatted string with emoji and capitalized text (e.g., "✅ Up")
+ * @returns Object containing icon component and formatted label
  */
-export function formatStatusWithIcon(status: string): string {
+export function formatStatusWithIcon(status: string): StatusWithIcon {
     const icon = getStatusIcon(status);
     const text = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-    return `${icon} ${text}`;
+    return {
+        icon,
+        label: text,
+    };
 }
 
 /**

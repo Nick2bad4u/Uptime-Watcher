@@ -26,9 +26,11 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
+import { AppIcons } from "../../utils/icons";
+import { Tooltip } from "../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../Layout/SidebarLayoutContext";
-import { HeaderControls } from "./HeaderControls";
 import "./Header.css";
+import { HeaderControls } from "./HeaderControls";
 import { StatusSummary } from "./StatusSummary";
 
 /**
@@ -77,6 +79,9 @@ export const Header = (): JSX.Element => {
         setShowSettings(true);
     }, [setShowSettings]);
 
+    const SiteCountIcon = AppIcons.metrics.monitor;
+    const SidebarToggleIcon = AppIcons.layout.viewColumns;
+
     return (
         <header className="app-topbar" role="banner">
             <ThemedBox
@@ -94,7 +99,7 @@ export const Header = (): JSX.Element => {
                             onClick={toggleSidebar}
                             type="button"
                         >
-                            ☰
+                            <SidebarToggleIcon size={20} />
                         </button>
                         <div className="app-topbar__identity-text">
                             <ThemedText
@@ -154,13 +159,40 @@ export const Header = (): JSX.Element => {
                         upMonitors={upMonitors}
                         uptimePercentage={uptimePercentage}
                     />
-                    <ThemedText
-                        className="app-topbar__site-count"
-                        size="sm"
-                        variant="secondary"
+                    <Tooltip
+                        content={`Monitoring ${totalSites} site${totalSites === 1 ? "" : "s"} with ${totalMonitors} total monitor${totalMonitors === 1 ? "" : "s"}`}
+                        position="bottom"
                     >
-                        Tracking {totalSites} site{totalSites === 1 ? "" : "s"}
-                    </ThemedText>
+                        {(triggerProps) => (
+                            <div
+                                className="app-topbar__site-chip"
+                                {...triggerProps}
+                            >
+                                <SiteCountIcon
+                                    className="app-topbar__site-chip-icon"
+                                    size={18}
+                                />
+                                <div className="app-topbar__site-chip-text">
+                                    <ThemedText
+                                        className="app-topbar__site-chip-label"
+                                        size="xs"
+                                        variant="secondary"
+                                        weight="medium"
+                                    >
+                                        Tracking
+                                    </ThemedText>
+                                    <ThemedText
+                                        className="app-topbar__site-chip-count"
+                                        size="lg"
+                                        weight="semibold"
+                                    >
+                                        {totalSites} site
+                                        {totalSites === 1 ? "" : "s"}
+                                    </ThemedText>
+                                </div>
+                            </div>
+                        )}
+                    </Tooltip>
                 </div>
             </ThemedBox>
         </header>

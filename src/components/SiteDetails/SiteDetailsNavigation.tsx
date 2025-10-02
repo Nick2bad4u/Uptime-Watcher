@@ -16,6 +16,7 @@ import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
+import { AppIcons } from "../../utils/icons";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary
@@ -165,6 +166,14 @@ export const SiteDetailsNavigation = ({
         void handleStartMonitoring();
     }, [handleStartMonitoring]);
 
+    const SiteOverviewIcon = AppIcons.ui.home;
+    const MonitorOverviewIcon = AppIcons.metrics.activity;
+    const AnalyticsIcon = AppIcons.ui.analytics;
+    const HistoryIcon = AppIcons.ui.history;
+    const SettingsIcon = AppIcons.settings.gear;
+    const PauseIcon = AppIcons.actions.pauseFilled;
+    const PlayIcon = AppIcons.actions.playFilled;
+
     return (
         <ThemedBox
             className="space-y-4 border-b"
@@ -176,6 +185,7 @@ export const SiteDetailsNavigation = ({
                 {/* Tab navigation buttons (left) */}
                 <div className="flex flex-wrap items-center gap-2">
                     <ThemedButton
+                        className="flex items-center gap-2"
                         onClick={handleSiteOverviewClick}
                         size="sm"
                         variant={
@@ -184,9 +194,11 @@ export const SiteDetailsNavigation = ({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        🏠 Site Overview
+                        <SiteOverviewIcon size={16} />
+                        <span>Site Overview</span>
                     </ThemedButton>
                     <ThemedButton
+                        className="flex items-center gap-2"
                         onClick={handleMonitorOverviewClick}
                         size="sm"
                         variant={
@@ -195,10 +207,12 @@ export const SiteDetailsNavigation = ({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        📊 Monitor Overview
+                        <MonitorOverviewIcon size={16} />
+                        <span>Monitor Overview</span>
                     </ThemedButton>
                     {/* Render analytics tab for selected monitor type only */}
                     <ThemedButton
+                        className="flex items-center gap-2"
                         onClick={handleMonitorAnalyticsClick}
                         size="sm"
                         variant={
@@ -208,9 +222,11 @@ export const SiteDetailsNavigation = ({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        {`📈 ${monitorTypeLabel} Analytics`}
+                        <AnalyticsIcon size={16} />
+                        <span>{`${monitorTypeLabel} Analytics`}</span>
                     </ThemedButton>
                     <ThemedButton
+                        className="flex items-center gap-2"
                         onClick={handleHistoryClick}
                         size="sm"
                         variant={
@@ -219,9 +235,11 @@ export const SiteDetailsNavigation = ({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        📜 History
+                        <HistoryIcon size={16} />
+                        <span>History</span>
                     </ThemedButton>
                     <ThemedButton
+                        className="flex items-center gap-2"
                         onClick={handleSettingsClick}
                         size="sm"
                         variant={
@@ -230,7 +248,8 @@ export const SiteDetailsNavigation = ({
                                 : BUTTON_VARIANT_SECONDARY
                         }
                     >
-                        ⚙️ Settings
+                        <SettingsIcon size={16} />
+                        <span>Settings</span>
                     </ThemedButton>
                 </div>
 
@@ -253,12 +272,12 @@ export const SiteDetailsNavigation = ({
                         {isMonitoring ? (
                             <ThemedButton
                                 aria-label="Stop Monitoring"
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-2"
                                 onClick={handleStopMonitoringClick}
                                 size="sm"
                                 variant="warning"
                             >
-                                <span>⏸️</span>
+                                <PauseIcon size={16} />
                                 <span className="hidden text-xs sm:inline">
                                     Stop
                                 </span>
@@ -266,12 +285,12 @@ export const SiteDetailsNavigation = ({
                         ) : (
                             <ThemedButton
                                 aria-label="Start Monitoring"
-                                className="flex items-center gap-1"
+                                className="flex items-center gap-2"
                                 onClick={handleStartMonitoringClick}
                                 size="sm"
                                 variant="success"
                             >
-                                <span>▶️</span>
+                                <PlayIcon size={16} />
                                 <span className="hidden text-xs sm:inline">
                                     Start
                                 </span>

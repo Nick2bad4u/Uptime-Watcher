@@ -9,7 +9,10 @@ import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
 
-import type { SiteListLayoutMode } from "../../../stores/ui/types";
+import type {
+    SiteCardPresentation,
+    SiteListLayoutMode,
+} from "../../../stores/ui/types";
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
@@ -30,6 +33,14 @@ const selectSiteListLayout = (state: UiStoreState): SiteListLayoutMode =>
 const selectSetSiteListLayout = (
     state: UiStoreState
 ): UiStoreState["setSiteListLayout"] => state.setSiteListLayout;
+
+const selectSiteCardPresentation = (
+    state: UiStoreState
+): SiteCardPresentation => state.siteCardPresentation;
+
+const selectSetSiteCardPresentation = (
+    state: UiStoreState
+): UiStoreState["setSiteCardPresentation"] => state.setSiteCardPresentation;
 
 /**
  * Main site list component that displays all monitored sites.
@@ -57,6 +68,8 @@ export const SiteList = (): JSX.Element => {
     const { sites } = useSitesStore();
     const layout = useUIStore(selectSiteListLayout);
     const setLayout = useUIStore(selectSetSiteListLayout);
+    const cardPresentation = useUIStore(selectSiteCardPresentation);
+    const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
     const { isDark } = useTheme();
 
     if (sites.length === 0) {
@@ -70,16 +83,30 @@ export const SiteList = (): JSX.Element => {
         [setLayout]
     );
 
+    const handlePresentationChange = useCallback(
+        (presentation: SiteCardPresentation) => {
+            setCardPresentation(presentation);
+        },
+        [setCardPresentation]
+    );
+
     const gridClassName = useMemo(() => {
         const classes = ["site-grid"];
         if (layout === "card-compact") {
             classes.push("site-grid--compact");
         }
+        if (layout === "card-large" && cardPresentation === "stacked") {
+            classes.push("site-grid--stacked");
+        }
         if (isDark) {
             classes.push("site-grid--dark");
         }
         return classes.join(" ");
-    }, [isDark, layout]);
+    }, [
+        cardPresentation,
+        isDark,
+        layout,
+    ]);
 
     return (
         <div className="site-list">
@@ -94,8 +121,10 @@ export const SiteList = (): JSX.Element => {
                     </ThemedText>
                 </div>
                 <SiteListLayoutSelector
+                    cardPresentation={cardPresentation}
                     layout={layout}
                     onLayoutChange={handleLayoutChange}
+                    onPresentationChange={handlePresentationChange}
                 />
             </div>
 
@@ -110,7 +139,11 @@ export const SiteList = (): JSX.Element => {
                                 site={site}
                             />
                         ) : (
-                            <SiteCard key={site.identifier} site={site} />
+                            <SiteCard
+                                key={site.identifier}
+                                presentation={cardPresentation}
+                                site={site}
+                            />
                         )
                     )}
                 </div>

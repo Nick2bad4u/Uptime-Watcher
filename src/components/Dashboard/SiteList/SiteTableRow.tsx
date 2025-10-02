@@ -50,11 +50,13 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             uptime,
         } = useSite(site);
 
-        const runningMonitors = useMemo(() => {
-            return latestSite.monitors.filter(
-                (siteMonitor) => siteMonitor.monitoring
-            ).length;
-        }, [latestSite.monitors]);
+        const runningMonitors = useMemo(
+            () =>
+                latestSite.monitors.filter(
+                    (siteMonitor) => siteMonitor.monitoring
+                ).length,
+            [latestSite.monitors]
+        );
 
         const allMonitorsRunning = useMemo(() => {
             if (latestSite.monitors.length === 0) {

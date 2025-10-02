@@ -16,7 +16,9 @@ import {
 import type { ButtonSize } from "../../../../theme/components/types";
 
 import { ThemedButton } from "../../../../theme/components/ThemedButton";
+import { AppIcons } from "../../../../utils/icons";
 import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
+import { Tooltip } from "../../../common/Tooltip/Tooltip";
 
 /**
  * Props for the ActionButtonGroup component.
@@ -119,20 +121,32 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
         );
 
         const clusterGapClass = buttonSize === "xs" ? "gap-1.5" : "gap-2";
+        const iconSize = buttonSize === "xs" ? 14 : 16;
+
+        const RefreshIcon = AppIcons.actions.refresh;
+        const PauseIcon = AppIcons.actions.pause;
+        const PlayIcon = AppIcons.actions.play;
 
         return (
             <div className={`flex flex-wrap items-center ${clusterGapClass}`}>
-                <ThemedButton
-                    aria-label="Check Now"
-                    className="min-w-8"
-                    disabled={isLoading || disabled}
-                    onClick={handleCheckNowClick}
-                    size={buttonSize}
-                    variant="ghost"
+                <Tooltip
+                    content="Trigger an immediate availability check"
+                    position="top"
                 >
-                    {/* Using emoji icon consistent with project's status icon system */}
-                    <span>🔄</span>
-                </ThemedButton>
+                    {(triggerProps) => (
+                        <ThemedButton
+                            {...triggerProps}
+                            aria-label="Check Now"
+                            className="min-w-8"
+                            disabled={isLoading || disabled}
+                            onClick={handleCheckNowClick}
+                            size={buttonSize}
+                            variant="ghost"
+                        >
+                            <RefreshIcon size={iconSize} />
+                        </ThemedButton>
+                    )}
+                </Tooltip>
 
                 <SiteMonitoringButton
                     allMonitorsRunning={allMonitorsRunning}
@@ -145,29 +159,43 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                 />
 
                 {isMonitoring ? (
-                    <ThemedButton
-                        aria-label="Stop Monitoring"
-                        className="min-w-8"
-                        disabled={isLoading || disabled}
-                        onClick={handleStopMonitoringClick}
-                        size={buttonSize}
-                        variant="error"
+                    <Tooltip
+                        content="Pause monitoring for this site"
+                        position="top"
                     >
-                        {/* Using emoji icon consistent with project's status icon system */}
-                        ⏸️
-                    </ThemedButton>
+                        {(triggerProps) => (
+                            <ThemedButton
+                                {...triggerProps}
+                                aria-label="Stop Monitoring"
+                                className="min-w-8"
+                                disabled={isLoading || disabled}
+                                onClick={handleStopMonitoringClick}
+                                size={buttonSize}
+                                variant="error"
+                            >
+                                <PauseIcon size={iconSize} />
+                            </ThemedButton>
+                        )}
+                    </Tooltip>
                 ) : (
-                    <ThemedButton
-                        aria-label="Start Monitoring"
-                        className="min-w-8"
-                        disabled={isLoading || disabled}
-                        onClick={handleStartMonitoringClick}
-                        size={buttonSize}
-                        variant="success"
+                    <Tooltip
+                        content="Resume monitoring for this site"
+                        position="top"
                     >
-                        {/* Using emoji icon consistent with project's status icon system */}
-                        ▶️
-                    </ThemedButton>
+                        {(triggerProps) => (
+                            <ThemedButton
+                                {...triggerProps}
+                                aria-label="Start Monitoring"
+                                className="min-w-8"
+                                disabled={isLoading || disabled}
+                                onClick={handleStartMonitoringClick}
+                                size={buttonSize}
+                                variant="success"
+                            >
+                                <PlayIcon size={iconSize} />
+                            </ThemedButton>
+                        )}
+                    </Tooltip>
                 )}
             </div>
         );

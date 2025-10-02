@@ -34,8 +34,9 @@
  * @public
  */
 
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 import type { JSX } from "react/jsx-runtime";
+import type { IconType } from "react-icons";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
@@ -58,8 +59,11 @@ import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
+import { AppIcons } from "../../utils/icons";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
+import { Tooltip } from "../common/Tooltip/Tooltip";
 import { SettingItem } from "../shared/SettingItem";
+import "./Settings.css";
 
 /**
  * Allowed settings keys that can be updated
@@ -81,6 +85,61 @@ const ALLOWED_SETTINGS_KEYS = new Set<keyof AppSettings>([
 export interface SettingsProperties {
     /** Callback function to close the settings modal/view */
     onClose: () => void;
+}
+
+/**
+ * Parameters for {@link renderSettingsSection} helper.
+ *
+ * @internal
+ */
+interface SettingsSectionParameters {
+    readonly children: ReactNode;
+    readonly description?: string;
+    readonly icon: IconType;
+    readonly title: string;
+}
+
+/**
+ * Decorative wrapper that renders a titled settings section with iconography.
+ *
+ * @param props - Section layout configuration
+ *
+ * @returns Structured section markup for the settings modal body
+ */
+function renderSettingsSection({
+    children,
+    description,
+    icon: SectionIcon,
+    title,
+}: SettingsSectionParameters): JSX.Element {
+    return (
+        <section className="settings-section">
+            <div className="settings-section__header">
+                <div className="settings-section__icon">
+                    <SectionIcon size={18} />
+                </div>
+                <div>
+                    <ThemedText
+                        className="settings-section__title"
+                        size="md"
+                        weight="semibold"
+                    >
+                        {title}
+                    </ThemedText>
+                    {description ? (
+                        <ThemedText
+                            className="settings-section__description"
+                            size="xs"
+                            variant="secondary"
+                        >
+                            {description}
+                        </ThemedText>
+                    ) : null}
+                </div>
+            </div>
+            <div className="settings-section__content">{children}</div>
+        </section>
+    );
 }
 
 /*
@@ -305,332 +364,392 @@ export const Settings = ({
         void handleReset();
     }, [handleReset]);
 
+    const CloseIcon = AppIcons.ui.close;
+    const SettingsHeaderIcon = AppIcons.settings.gearFilled;
+    const SuccessIcon = AppIcons.status.upFilled;
+    const MonitoringIcon = AppIcons.metrics.monitor;
+    const NotificationsIcon = AppIcons.ui.bell;
+    const ApplicationIcon = AppIcons.ui.home;
+    const MaintenanceIcon = AppIcons.ui.database;
+    const DownloadIcon = AppIcons.actions.download;
+    const RefreshIcon = AppIcons.actions.refresh;
+    const ResetIcon = AppIcons.actions.remove;
+    const showSyncSuccessBanner = syncSuccess && !lastError;
+
     return (
-        <div className="modal-overlay">
+        <div className="modal-overlay modal-overlay--settings">
             <ThemedBox
                 as="dialog"
-                className="modal-container"
+                className="settings-modal"
                 data-testid="settings-modal"
                 open
-                padding="md"
-                rounded="lg"
+                padding="lg"
+                rounded="xl"
                 shadow="xl"
                 surface="overlay"
             >
-                {/* Header */}
-                <ThemedBox
-                    border
-                    className="border-b"
-                    padding="lg"
-                    rounded="none"
-                    surface="elevated"
-                >
-                    <div className="flex items-center justify-between">
-                        <ThemedText size="xl" weight="semibold">
-                            ⚙️ Settings
-                        </ThemedText>
-                        <ThemedButton
-                            aria-label="Close settings"
-                            className="hover-opacity"
-                            onClick={onClose}
-                            size="sm"
-                            title="Close settings"
-                            variant="secondary"
-                        >
-                            ✕
-                        </ThemedButton>
+                <header className="settings-modal__header">
+                    <div className="settings-modal__header-left">
+                        <div className="settings-modal__header-icon">
+                            <SettingsHeaderIcon size={22} />
+                        </div>
+                        <div>
+                            <ThemedText
+                                className="settings-modal__heading"
+                                size="xl"
+                                weight="semibold"
+                            >
+                                Settings
+                            </ThemedText>
+                            <ThemedText size="xs" variant="secondary">
+                                Fine-tune monitoring, notifications, and data
+                                workflows.
+                            </ThemedText>
+                        </div>
                     </div>
-                </ThemedBox>
+                    <Tooltip content="Close settings" position="left">
+                        {(triggerProps) => (
+                            <button
+                                {...triggerProps}
+                                aria-label="Close settings"
+                                className="settings-modal__close"
+                                onClick={onClose}
+                                type="button"
+                            >
+                                <CloseIcon size={18} />
+                            </button>
+                        )}
+                    </Tooltip>
+                </header>
 
-                {/* Error Display */}
-                {lastError ? (
-                    <ErrorAlert
-                        message={lastError}
-                        onDismiss={clearError}
-                        variant="error"
-                    />
-                ) : null}
-                {/* Sync Success Display */}
-                {syncSuccess && !lastError ? (
-                    <ThemedBox
-                        className="success-alert"
-                        padding="md"
-                        rounded="md"
-                        surface="base"
-                    >
-                        <ThemedText size="sm" variant="success">
-                            ✅ Data synced from database.
-                        </ThemedText>
-                    </ThemedBox>
-                ) : null}
+                <div className="settings-modal__body">
+                    {lastError ? (
+                        <ErrorAlert
+                            message={lastError}
+                            onDismiss={clearError}
+                            variant="error"
+                        />
+                    ) : null}
 
-                {/* Content */}
-                <ThemedBox className="space-y-6" padding="lg" surface="base">
-                    {/* Monitoring Settings */}
-                    <section>
-                        <ThemedText className="mb-4" size="lg" weight="medium">
-                            🔍 Monitoring
-                        </ThemedText>
-                        <div className="space-y-4">
+                    {showSyncSuccessBanner ? (
+                        <output
+                            aria-live="polite"
+                            className="settings-modal__banner settings-modal__banner--success"
+                        >
+                            <SuccessIcon
+                                aria-hidden="true"
+                                className="settings-modal__banner-icon"
+                                size={18}
+                            />
                             <div>
-                                <ThemedText
-                                    className="mb-2 block"
-                                    size="sm"
-                                    variant="secondary"
-                                    weight="medium"
-                                >
-                                    History Limit
+                                <ThemedText size="sm" weight="medium">
+                                    Sync complete
                                 </ThemedText>
-                                <ThemedSelect
-                                    aria-label="Maximum number of history records to keep per site"
-                                    disabled={isLoading}
-                                    onChange={handleHistoryLimitSelectChange}
-                                    value={settings.historyLimit}
-                                >
-                                    {HISTORY_LIMIT_OPTIONS.map((option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </ThemedSelect>
-                                <ThemedText
-                                    className="mt-1"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    Maximum number of check results to store per
-                                    site
+                                <ThemedText size="xs" variant="secondary">
+                                    Latest data loaded from the monitoring
+                                    database.
                                 </ThemedText>
                             </div>
-                        </div>
-                    </section>
+                        </output>
+                    ) : null}
 
-                    {/* Notification Settings */}
-                    <section>
-                        <ThemedText className="mb-4" size="lg" weight="medium">
-                            🔔 Notifications
-                        </ThemedText>
-                        <div className="space-y-4">
-                            {}
-                            <SettingItem
-                                control={useMemo(
-                                    () => (
-                                        <ThemedCheckbox
-                                            aria-label="Enable desktop notifications"
-                                            checked={settings.notifications}
-                                            disabled={isLoading}
-                                            onChange={handleNotificationsChange}
-                                        />
-                                    ),
-                                    [
-                                        handleNotificationsChange,
-                                        isLoading,
-                                        settings.notifications,
-                                    ]
-                                )}
-                                description="Show notifications when sites go up or down"
-                                title="Desktop Notifications"
-                            />
-
-                            <SettingItem
-                                control={useMemo(
-                                    () => (
-                                        <ThemedCheckbox
-                                            aria-label="Enable sound alerts"
-                                            checked={settings.soundAlerts}
-                                            disabled={isLoading}
-                                            onChange={handleSoundAlertsChange}
-                                        />
-                                    ),
-                                    [
-                                        handleSoundAlertsChange,
-                                        isLoading,
-                                        settings.soundAlerts,
-                                    ]
-                                )}
-                                description="Play sound when status changes occur"
-                                title="Sound Alerts"
-                            />
-                        </div>
-                    </section>
-
-                    {/* Application Settings */}
-                    <section>
-                        <ThemedText className="mb-4" size="lg" weight="medium">
-                            🖥️ Application
-                        </ThemedText>
-                        <div className="space-y-4">
-                            <div>
-                                <ThemedText
-                                    className="mb-2 block"
-                                    size="sm"
-                                    variant="secondary"
-                                    weight="medium"
-                                >
-                                    Theme
-                                </ThemedText>
-                                <ThemedSelect
-                                    aria-label="Select application theme"
-                                    disabled={isLoading}
-                                    onChange={handleThemeSelectChange}
-                                    value={settings.theme}
-                                >
-                                    {availableThemes.map((theme) => (
-                                        <option key={theme} value={theme}>
-                                            {theme.charAt(0).toUpperCase() +
-                                                theme.slice(1)}
-                                        </option>
-                                    ))}
-                                </ThemedSelect>
-                                <div className="mt-2 flex items-center gap-2">
-                                    <ThemedText size="xs" variant="tertiary">
-                                        Current theme preview:
-                                    </ThemedText>
-                                    <StatusIndicator size="sm" status="up" />
-                                    <StatusIndicator size="sm" status="down" />
-                                    <StatusIndicator
+                    <div className="settings-modal__sections">
+                        {renderSettingsSection({
+                            description:
+                                "Control how much monitoring history is retained.",
+                            icon: MonitoringIcon,
+                            title: "Monitoring",
+                            children: (
+                                <div className="settings-field">
+                                    <ThemedText
+                                        className="settings-field__label"
                                         size="sm"
-                                        status="pending"
+                                        variant="secondary"
+                                        weight="medium"
+                                    >
+                                        History limit
+                                    </ThemedText>
+                                    <ThemedSelect
+                                        aria-label="Maximum number of history records to keep per site"
+                                        disabled={isLoading}
+                                        onChange={
+                                            handleHistoryLimitSelectChange
+                                        }
+                                        value={settings.historyLimit}
+                                    >
+                                        {HISTORY_LIMIT_OPTIONS.map((option) => (
+                                            <option
+                                                key={option.value}
+                                                value={option.value}
+                                            >
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </ThemedSelect>
+                                    <ThemedText
+                                        className="settings-field__helper"
+                                        size="xs"
+                                        variant="tertiary"
+                                    >
+                                        Limits the number of response records
+                                        stored for each monitor.
+                                    </ThemedText>
+                                </div>
+                            ),
+                        })}
+
+                        {renderSettingsSection({
+                            description:
+                                "Choose how Uptime Watcher keeps you informed.",
+                            icon: NotificationsIcon,
+                            title: "Notifications",
+                            children: (
+                                <div className="settings-toggle-stack">
+                                    <SettingItem
+                                        control={useMemo(
+                                            () => (
+                                                <ThemedCheckbox
+                                                    aria-label="Enable desktop notifications"
+                                                    checked={
+                                                        settings.notifications
+                                                    }
+                                                    disabled={isLoading}
+                                                    onChange={
+                                                        handleNotificationsChange
+                                                    }
+                                                />
+                                            ),
+                                            [
+                                                handleNotificationsChange,
+                                                isLoading,
+                                                settings.notifications,
+                                            ]
+                                        )}
+                                        description="Show desktop alerts whenever a site changes status."
+                                        title="Desktop notifications"
+                                    />
+                                    <SettingItem
+                                        control={useMemo(
+                                            () => (
+                                                <ThemedCheckbox
+                                                    aria-label="Enable sound alerts"
+                                                    checked={
+                                                        settings.soundAlerts
+                                                    }
+                                                    disabled={isLoading}
+                                                    onChange={
+                                                        handleSoundAlertsChange
+                                                    }
+                                                />
+                                            ),
+                                            [
+                                                handleSoundAlertsChange,
+                                                isLoading,
+                                                settings.soundAlerts,
+                                            ]
+                                        )}
+                                        description="Play an audible chime alongside desktop alerts."
+                                        title="Sound alerts"
                                     />
                                 </div>
-                            </div>
+                            ),
+                        })}
 
-                            <SettingItem
-                                control={useMemo(
-                                    () => (
-                                        <ThemedCheckbox
-                                            aria-label="Start application automatically"
-                                            checked={settings.autoStart}
+                        {renderSettingsSection({
+                            description: "Personalize the desktop experience.",
+                            icon: ApplicationIcon,
+                            title: "Application",
+                            children: (
+                                <>
+                                    <div className="settings-field">
+                                        <ThemedText
+                                            className="settings-field__label"
+                                            size="sm"
+                                            variant="secondary"
+                                            weight="medium"
+                                        >
+                                            Theme
+                                        </ThemedText>
+                                        <ThemedSelect
+                                            aria-label="Select application theme"
                                             disabled={isLoading}
-                                            onChange={handleAutoStartChange}
+                                            onChange={handleThemeSelectChange}
+                                            value={settings.theme}
+                                        >
+                                            {availableThemes.map((theme) => (
+                                                <option
+                                                    key={theme}
+                                                    value={theme}
+                                                >
+                                                    {theme
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        theme.slice(1)}
+                                                </option>
+                                            ))}
+                                        </ThemedSelect>
+                                        <div className="settings-theme-preview">
+                                            <ThemedText
+                                                size="xs"
+                                                variant="tertiary"
+                                            >
+                                                Preview:
+                                            </ThemedText>
+                                            <StatusIndicator
+                                                size="sm"
+                                                status="up"
+                                            />
+                                            <StatusIndicator
+                                                size="sm"
+                                                status="down"
+                                            />
+                                            <StatusIndicator
+                                                size="sm"
+                                                status="pending"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="settings-toggle-stack">
+                                        <SettingItem
+                                            control={useMemo(
+                                                () => (
+                                                    <ThemedCheckbox
+                                                        aria-label="Start Uptime Watcher automatically"
+                                                        checked={
+                                                            settings.autoStart
+                                                        }
+                                                        disabled={isLoading}
+                                                        onChange={
+                                                            handleAutoStartChange
+                                                        }
+                                                    />
+                                                ),
+                                                [
+                                                    handleAutoStartChange,
+                                                    isLoading,
+                                                    settings.autoStart,
+                                                ]
+                                            )}
+                                            description="Launch Uptime Watcher when you sign in to your computer (requires restart)."
+                                            title="Start at login"
                                         />
-                                    ),
-                                    [
-                                        handleAutoStartChange,
-                                        isLoading,
-                                        settings.autoStart,
-                                    ]
-                                )}
-                                description="Launch Uptime Watcher when your computer starts"
-                                title="Auto-start with System"
-                            />
-
-                            <SettingItem
-                                control={useMemo(
-                                    () => (
-                                        <ThemedCheckbox
-                                            aria-label="Minimize to system tray"
-                                            checked={settings.minimizeToTray}
-                                            disabled={isLoading}
-                                            onChange={
-                                                handleMinimizeToTrayChange
-                                            }
+                                        <SettingItem
+                                            control={useMemo(
+                                                () => (
+                                                    <ThemedCheckbox
+                                                        aria-label="Minimize Uptime Watcher to the system tray"
+                                                        checked={
+                                                            settings.minimizeToTray
+                                                        }
+                                                        disabled={isLoading}
+                                                        onChange={
+                                                            handleMinimizeToTrayChange
+                                                        }
+                                                    />
+                                                ),
+                                                [
+                                                    handleMinimizeToTrayChange,
+                                                    isLoading,
+                                                    settings.minimizeToTray,
+                                                ]
+                                            )}
+                                            description="Keep the app running in the background without cluttering the taskbar."
+                                            title="Minimize to tray"
                                         />
-                                    ),
-                                    [
-                                        handleMinimizeToTrayChange,
-                                        isLoading,
-                                        settings.minimizeToTray,
-                                    ]
-                                )}
-                                description="Keep app running in system tray when window is closed"
-                                title="Minimize to System Tray"
-                            />
-                        </div>
-                    </section>
+                                    </div>
+                                </>
+                            ),
+                        })}
 
-                    {/* Data Management */}
-                    <section>
-                        <ThemedText className="mb-4" size="lg" weight="medium">
-                            📂 Data Management
-                        </ThemedText>
-                        <div className="space-y-4">
-                            {/* Sync Data Button */}
+                        {renderSettingsSection({
+                            description:
+                                "Manage data exports and advanced utilities.",
+                            icon: MaintenanceIcon,
+                            title: "Data & Maintenance",
+                            children: (
+                                <div className="settings-actions">
+                                    <ThemedButton
+                                        className="settings-actions__primary"
+                                        icon={<DownloadIcon size={16} />}
+                                        loading={showButtonLoading}
+                                        onClick={handleDownloadSQLiteClick}
+                                        size="sm"
+                                        variant="primary"
+                                    >
+                                        Export monitoring data
+                                    </ThemedButton>
+                                    <Tooltip content="Refreshes monitoring history from the database">
+                                        {(triggerProps) => (
+                                            <ThemedButton
+                                                {...triggerProps}
+                                                icon={<RefreshIcon size={16} />}
+                                                loading={showButtonLoading}
+                                                onClick={handleSyncNowClick}
+                                                size="sm"
+                                                variant="secondary"
+                                            >
+                                                Refresh history
+                                            </ThemedButton>
+                                        )}
+                                    </Tooltip>
+                                    <Tooltip content="Clear all monitoring data and reset settings">
+                                        {(triggerProps) => (
+                                            <ThemedButton
+                                                {...triggerProps}
+                                                icon={<ResetIcon size={16} />}
+                                                loading={showButtonLoading}
+                                                onClick={handleResetClick}
+                                                size="sm"
+                                                variant="error"
+                                            >
+                                                Reset everything
+                                            </ThemedButton>
+                                        )}
+                                    </Tooltip>
+                                </div>
+                            ),
+                        })}
+                    </div>
+                </div>
+
+                <footer className="settings-modal__footer">
+                    <Tooltip
+                        content="Restore the default monitoring preferences."
+                        position="top"
+                    >
+                        {(triggerProps) => (
                             <ThemedButton
-                                className="w-full"
+                                {...triggerProps}
                                 disabled={isLoading}
                                 loading={showButtonLoading}
-                                onClick={handleSyncNowClick}
+                                onClick={handleResetClick}
                                 size="sm"
-                                variant="secondary"
+                                variant="error"
                             >
-                                🔄 Sync Data
+                                <ResetIcon size={16} />
+                                <span>Reset to defaults</span>
                             </ThemedButton>
-
-                            {/* SQLite direct download */}
-                            <div>
-                                <ThemedText
-                                    className="mb-2 block"
-                                    size="sm"
-                                    variant="secondary"
-                                    weight="medium"
-                                >
-                                    Export SQLite Database
-                                </ThemedText>
-                                <ThemedButton
-                                    disabled={isLoading || showButtonLoading}
-                                    loading={showButtonLoading}
-                                    onClick={handleDownloadSQLiteClick}
-                                    size="sm"
-                                    variant="primary"
-                                >
-                                    Download SQLite Backup
-                                </ThemedButton>
-                                <ThemedText
-                                    className="mt-1 block"
-                                    size="xs"
-                                    variant="tertiary"
-                                >
-                                    Download a direct backup of the raw SQLite
-                                    database file for advanced backup or
-                                    migration.
-                                </ThemedText>
-                            </div>
-                        </div>
-                    </section>
-                </ThemedBox>
-
-                {/* Footer */}
-                <ThemedBox
-                    border
-                    className="border-t"
-                    padding="lg"
-                    rounded="none"
-                    surface="elevated"
-                >
-                    <div className="flex items-center justify-between">
+                        )}
+                    </Tooltip>
+                    <div className="settings-modal__footer-actions">
                         <ThemedButton
                             disabled={isLoading}
-                            loading={showButtonLoading}
-                            onClick={handleResetClick}
+                            onClick={onClose}
                             size="sm"
-                            variant="error"
+                            variant="secondary"
                         >
-                            Reset to Defaults
+                            Cancel
                         </ThemedButton>
-                        <div className="flex items-center space-x-3">
-                            <ThemedButton
-                                disabled={isLoading}
-                                onClick={onClose}
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Cancel
-                            </ThemedButton>
-                            <ThemedButton
-                                loading={showButtonLoading}
-                                onClick={onClose}
-                                size="sm"
-                                variant="primary"
-                            >
-                                Close
-                            </ThemedButton>
-                        </div>
+                        <ThemedButton
+                            loading={showButtonLoading}
+                            onClick={onClose}
+                            size="sm"
+                            variant="primary"
+                        >
+                            Close
+                        </ThemedButton>
                     </div>
-                </ThemedBox>
+                </footer>
             </ThemedBox>
         </div>
     );

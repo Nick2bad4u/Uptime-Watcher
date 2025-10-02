@@ -21,6 +21,7 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
+import { AppIcons } from "../../utils/icons";
 import { AddSiteForm } from "./AddSiteForm";
 
 /**
@@ -47,6 +48,7 @@ export interface AddSiteModalProperties {
 export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
     function AddSiteModal({ onClose }: AddSiteModalProperties) {
         const { isDark } = useTheme();
+        const CloseIcon = AppIcons.ui.close;
 
         const handleBackdropClick = useCallback(
             (event: MouseEvent) => {
@@ -86,7 +88,7 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                             title="Close"
                             variant="secondary"
                         >
-                            ✕
+                            <CloseIcon size={16} />
                         </ThemedButton>
                     </div>
 

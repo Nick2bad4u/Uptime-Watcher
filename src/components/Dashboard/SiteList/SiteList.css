@@ -21,54 +21,130 @@
 }
 
 .site-list__layout-selector {
-    display: inline-flex;
+    display: flex;
     flex-wrap: wrap;
-    align-items: stretch;
+    align-items: center;
     gap: 0.75rem;
-    padding: 0.5rem;
-    border-radius: 999px;
-    background: rgb(15 23 42 / 16%);
-    border: 1px solid rgb(255 255 255 / 12%);
+}
+
+.site-list__layout-options {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.65rem;
+    background: rgb(15 23 42 / 40%);
+    border: 1px solid rgb(255 255 255 / 10%);
+    backdrop-filter: blur(14px);
 }
 
 .site-list__layout-button {
-    display: grid;
-    grid-template-columns: auto;
-    grid-template-rows: auto auto;
+    display: flex;
     align-items: center;
-    justify-items: center;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    border-radius: 999px;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.45rem;
     border: 1px solid transparent;
-    background: rgb(255 255 255 / 6%);
-    color: inherit;
-    transition:
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        border-color var(--transition-fast),
-        background var(--transition-fast);
-    min-inline-size: 6rem;
+    background: transparent;
+    color: rgb(203 213 225);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .site-list__layout-button:hover {
+    background: rgb(59 130 246 / 14%);
+    border-color: rgb(96 165 250 / 30%);
+    color: rgb(248 250 252);
     transform: translateY(-1px);
-    box-shadow: 0 10px 30px rgb(37 99 235 / 18%);
-    border-color: rgb(96 165 250 / 35%);
 }
 
 .site-list__layout-button--active {
     background: linear-gradient(
         135deg,
-        rgb(59 130 246 / 35%),
-        rgb(129 140 248 / 28%)
+        rgb(59 130 246 / 32%),
+        rgb(99 102 241 / 28%)
     );
-    border-color: rgb(129 140 248 / 60%);
-    box-shadow: 0 16px 40px rgb(99 102 241 / 25%);
+    border-color: rgb(129 140 248 / 45%);
+    color: rgb(255 255 255);
+    box-shadow:
+        0 4px 12px rgb(59 130 246 / 15%),
+        inset 0 1px 0 rgb(255 255 255 / 10%);
 }
 
 .site-list__layout-icon {
-    font-size: 1.1rem;
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex-shrink: 0;
+}
+
+.site-list__layout-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.site-list__presentation-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgb(148 163 184 / 24%);
+    background: rgb(15 23 42 / 45%);
+    backdrop-filter: blur(14px);
+}
+
+.site-list__presentation-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.45rem;
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgb(203 213 225);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-list__presentation-button:hover {
+    background: rgb(148 163 184 / 16%);
+    border-color: rgb(96 165 250 / 30%);
+    color: rgb(248 250 252);
+}
+
+.site-list__presentation-button--active {
+    background: linear-gradient(
+        135deg,
+        rgb(129 140 248 / 35%),
+        rgb(56 189 248 / 30%)
+    );
+    color: rgb(255 255 255);
+    border-color: rgb(129 140 248 / 45%);
+    box-shadow:
+        0 6px 16px rgb(59 130 246 / 18%),
+        inset 0 1px 0 rgb(255 255 255 / 12%);
+}
+
+.site-list__presentation-icon {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+}
+
+.site-list__presentation-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .site-table {

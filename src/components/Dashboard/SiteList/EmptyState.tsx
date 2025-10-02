@@ -40,6 +40,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { AppIcons } from "../../../utils/icons";
 
 /**
  * Empty state component for displaying when no sites are configured.
@@ -52,20 +53,26 @@ import { ThemedText } from "../../../theme/components/ThemedText";
  *
  * @public
  */
-export const EmptyState = (): JSX.Element => (
-    <ThemedBox
-        className="text-center"
-        data-testid="empty-state"
-        padding="xl"
-        surface="base"
-    >
-        {/* empty-state-icon class provides styling from src/theme/components.css */}
-        <div className="empty-state-icon">🌐</div>
-        <ThemedText className="mb-2" size="lg" weight="medium">
-            No sites are being monitored
-        </ThemedText>
-        <ThemedText variant="secondary">
-            Add your first website to start monitoring its uptime.
-        </ThemedText>
-    </ThemedBox>
-);
+export const EmptyState = (): JSX.Element => {
+    const MonitorIcon = AppIcons.metrics.monitor;
+
+    return (
+        <ThemedBox
+            className="text-center"
+            data-testid="empty-state"
+            padding="xl"
+            surface="base"
+        >
+            {/* empty-state-icon class provides styling from src/theme/components.css */}
+            <div className="empty-state-icon">
+                <MonitorIcon className="empty-state-icon__symbol" size={56} />
+            </div>
+            <ThemedText className="mb-2" size="lg" weight="medium">
+                No sites are being monitored
+            </ThemedText>
+            <ThemedText variant="secondary">
+                Add your first website to start monitoring its uptime.
+            </ThemedText>
+        </ThemedBox>
+    );
+};

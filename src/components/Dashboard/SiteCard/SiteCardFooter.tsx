@@ -34,7 +34,7 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 export const SiteCardFooter: NamedExoticComponent<object> = memo(
     function SiteCardFooter() {
         return (
-            <div className="mt-2 border-t pt-2">
+            <div className="site-card__footer mt-2 border-t pt-2">
                 <ThemedText
                     className="text-center opacity-0 transition-opacity group-hover:opacity-100"
                     size="xs"
