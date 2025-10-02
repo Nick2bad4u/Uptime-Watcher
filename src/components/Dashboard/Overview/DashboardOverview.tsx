@@ -70,6 +70,14 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
                     value: `${metrics.activeMonitors}/${metrics.totalMonitors}`,
                 },
                 {
+                    description: "Monitors currently healthy and online",
+                    Icon: AppIcons.status.up,
+                    id: "healthy-monitors",
+                    label: "Healthy Monitors",
+                    trend: `${metrics.monitorStatusCounts.paused} paused · ${metrics.monitorStatusCounts.pending} pending`,
+                    value: metrics.monitorStatusCounts.up.toString(),
+                },
+                {
                     description: "Global uptime across all monitors",
                     Icon: AppIcons.metrics.uptime,
                     id: "uptime",
@@ -98,6 +106,9 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
             metrics.incidentCount,
             metrics.monitorStatusCounts.degraded,
             metrics.monitorStatusCounts.down,
+            metrics.monitorStatusCounts.paused,
+            metrics.monitorStatusCounts.pending,
+            metrics.monitorStatusCounts.up,
             metrics.totalMonitors,
             metrics.totalSites,
             metrics.uptimePercentage,
@@ -115,7 +126,7 @@ export const DashboardOverview: NamedExoticComponent<DashboardOverviewProperties
                             card;
                         return (
                             <ThemedBox
-                                className="dashboard-overview__card"
+                                className={`dashboard-overview__card dashboard-overview__card--${id}`}
                                 key={id}
                                 padding="lg"
                                 rounded="lg"

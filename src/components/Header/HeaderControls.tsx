@@ -8,8 +8,6 @@
 
 import type { JSX } from "react";
 
-import { ThemedBox } from "../../theme/components/ThemedBox";
-import { ThemedButton } from "../../theme/components/ThemedButton";
 import { AppIcons } from "../../utils/icons";
 import {
     Tooltip,
@@ -48,31 +46,24 @@ export const HeaderControls = ({
     const SettingsIcon = AppIcons.settings.gear;
 
     return (
-        <div className="flex shrink-0 items-center space-x-2">
-            {/* Add Site Button */}
+        <div className="header-controls">
             <Tooltip content="Add new site to monitor" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
-                    <ThemedBox
-                        className="header-controls-box flex items-center"
-                        padding="xs"
-                        rounded="md"
-                        variant="tertiary"
+                    <button
+                        aria-label="Add new site"
+                        className="header-controls__button header-controls__button--add"
+                        onClick={onShowAddSiteModal}
+                        type="button"
+                        {...triggerProps}
                     >
-                        <ThemedButton
-                            aria-label="Add new site"
-                            className="themed-button--icon p-2"
-                            onClick={onShowAddSiteModal}
-                            size="sm"
-                            variant="secondary"
-                            {...triggerProps}
-                        >
+                        <span className="header-controls__icon">
                             <AddIcon size={18} />
-                        </ThemedButton>
-                    </ThemedBox>
+                        </span>
+                        <span className="header-controls__label">Add Site</span>
+                    </button>
                 )}
             </Tooltip>
 
-            {/* Theme Toggle */}
             <Tooltip
                 content={
                     isDark ? "Switch to light theme" : "Switch to dark theme"
@@ -80,50 +71,39 @@ export const HeaderControls = ({
                 position="bottom"
             >
                 {(triggerProps: TooltipTriggerProperties) => (
-                    <ThemedBox
-                        className="header-controls-box flex items-center"
-                        padding="xs"
-                        rounded="md"
-                        variant="tertiary"
+                    <button
+                        aria-label={
+                            isDark
+                                ? "Switch to light theme"
+                                : "Switch to dark theme"
+                        }
+                        className="header-controls__button header-controls__button--theme"
+                        onClick={onToggleTheme}
+                        type="button"
+                        {...triggerProps}
                     >
-                        <ThemedButton
-                            aria-label={
-                                isDark
-                                    ? "Switch to light theme"
-                                    : "Switch to dark theme"
-                            }
-                            className="themed-button--icon p-2"
-                            onClick={onToggleTheme}
-                            size="sm"
-                            variant="secondary"
-                            {...triggerProps}
-                        >
+                        <span className="header-controls__icon">
                             <ThemeIcon size={18} />
-                        </ThemedButton>
-                    </ThemedBox>
+                        </span>
+                        <span className="header-controls__label">Theme</span>
+                    </button>
                 )}
             </Tooltip>
 
-            {/* Settings Button */}
             <Tooltip content="Open application settings" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
-                    <ThemedBox
-                        className="header-controls-box flex items-center"
-                        padding="xs"
-                        rounded="md"
-                        variant="tertiary"
+                    <button
+                        aria-label="Open settings"
+                        className="header-controls__button header-controls__button--settings"
+                        onClick={onShowSettings}
+                        type="button"
+                        {...triggerProps}
                     >
-                        <ThemedButton
-                            aria-label="Open settings"
-                            className="themed-button--icon p-2"
-                            onClick={onShowSettings}
-                            size="sm"
-                            variant="secondary"
-                            {...triggerProps}
-                        >
+                        <span className="header-controls__icon">
                             <SettingsIcon size={18} />
-                        </ThemedButton>
-                    </ThemedBox>
+                        </span>
+                        <span className="header-controls__label">Settings</span>
+                    </button>
                 )}
             </Tooltip>
         </div>

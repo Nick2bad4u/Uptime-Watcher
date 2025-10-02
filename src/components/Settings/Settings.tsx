@@ -35,8 +35,8 @@
  */
 
 import type { ChangeEvent, ReactNode } from "react";
-import type { JSX } from "react/jsx-runtime";
 import type { IconType } from "react-icons";
+import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
@@ -455,10 +455,6 @@ export const Settings = ({
 
                     <div className="settings-modal__sections">
                         {renderSettingsSection({
-                            description:
-                                "Control how much monitoring history is retained.",
-                            icon: MonitoringIcon,
-                            title: "Monitoring",
                             children: (
                                 <div className="settings-field">
                                     <ThemedText
@@ -496,13 +492,13 @@ export const Settings = ({
                                     </ThemedText>
                                 </div>
                             ),
+                            description:
+                                "Control how much monitoring history is retained.",
+                            icon: MonitoringIcon,
+                            title: "Monitoring",
                         })}
 
                         {renderSettingsSection({
-                            description:
-                                "Choose how Uptime Watcher keeps you informed.",
-                            icon: NotificationsIcon,
-                            title: "Notifications",
                             children: (
                                 <div className="settings-toggle-stack">
                                     <SettingItem
@@ -553,12 +549,13 @@ export const Settings = ({
                                     />
                                 </div>
                             ),
+                            description:
+                                "Choose how Uptime Watcher keeps you informed.",
+                            icon: NotificationsIcon,
+                            title: "Notifications",
                         })}
 
                         {renderSettingsSection({
-                            description: "Personalize the desktop experience.",
-                            icon: ApplicationIcon,
-                            title: "Application",
                             children: (
                                 <>
                                     <div className="settings-field">
@@ -659,13 +656,12 @@ export const Settings = ({
                                     </div>
                                 </>
                             ),
+                            description: "Personalize the desktop experience.",
+                            icon: ApplicationIcon,
+                            title: "Application",
                         })}
 
                         {renderSettingsSection({
-                            description:
-                                "Manage data exports and advanced utilities.",
-                            icon: MaintenanceIcon,
-                            title: "Data & Maintenance",
                             children: (
                                 <div className="settings-actions">
                                     <ThemedButton
@@ -708,6 +704,10 @@ export const Settings = ({
                                     </Tooltip>
                                 </div>
                             ),
+                            description:
+                                "Manage data exports and advanced utilities.",
+                            icon: MaintenanceIcon,
+                            title: "Data & Maintenance",
                         })}
                     </div>
                 </div>

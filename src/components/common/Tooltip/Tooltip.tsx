@@ -19,7 +19,16 @@ import type {
     TouchEventHandler,
 } from "react";
 
-import { memo, useCallback, useId, useMemo, useRef, useState } from "react";
+import {
+    memo,
+    useCallback,
+    useId,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
+import { createPortal } from "react-dom";
 
 import { useMount } from "../../../hooks/useMount";
 import "./tooltip.css";
@@ -68,6 +77,12 @@ export interface TooltipProperties {
     readonly maxWidth?: number;
     /** Tooltip position relative to trigger */
     readonly position?: TooltipPosition;
+    /**
+     * Layout mode for the trigger wrapper to avoid layout shifts.
+     *
+     * @defaultValue "inline"
+     */
+    readonly wrapMode?: "block" | "inline";
 }
 
 /**
@@ -89,6 +104,13 @@ const noop = (): void => {
     // No-op default for useMount convenience
 };
 
+/**
+ * Ensures tooltip position switches remain exhaustive.
+ */
+const assertUnreachable = (value: never): never => {
+    throw new Error(`Unhandled tooltip position: ${String(value)}`);
+};
+
 export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
     function Tooltip({
         children,
@@ -99,12 +121,15 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         disabled = false,
         maxWidth = 250,
         position = "top",
+        wrapMode = "inline",
     }: TooltipProperties) {
         const [isVisible, setIsVisible] = useState(false);
         const [shouldRender, setShouldRender] = useState(false);
         const showTimerRef = useRef<NodeJS.Timeout | null>(null);
         const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
         const tooltipId = useId();
+        const containerRef = useRef<HTMLDivElement | null>(null);
+        const tooltipRef = useRef<HTMLDivElement | null>(null);
 
         const clearTimers = useCallback((): void => {
             if (showTimerRef.current) {
@@ -261,27 +286,198 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         const containerClasses = useMemo(
             () =>
-                ["tooltip-container", containerClassName]
+                [
+                    "tooltip-container",
+                    wrapMode === "block"
+                        ? "tooltip-container--block"
+                        : "tooltip-container--inline",
+                    containerClassName,
+                ]
                     .filter(Boolean)
                     .join(" "),
-            [containerClassName]
+            [containerClassName, wrapMode]
         );
 
+        const applyTooltipPosition = useCallback((): void => {
+            const triggerNode = containerRef.current;
+            const tooltipNode = tooltipRef.current;
+
+            if (!triggerNode || !tooltipNode) {
+                return;
+            }
+
+            const triggerRect = triggerNode.getBoundingClientRect();
+            const tooltipRect = tooltipNode.getBoundingClientRect();
+            const offset = 10;
+            const viewportPadding = 12;
+
+            const clamp = (
+                value: number,
+                minimum: number,
+                maximum: number
+            ): number => {
+                if (Number.isNaN(value)) {
+                    return minimum;
+                }
+
+                if (minimum > maximum) {
+                    return minimum;
+                }
+
+                return Math.min(Math.max(value, minimum), maximum);
+            };
+
+            let top = triggerRect.top - tooltipRect.height - offset;
+            let left =
+                triggerRect.left +
+                triggerRect.width / 2 -
+                tooltipRect.width / 2;
+            let transformOrigin = "center bottom";
+            let arrowInlineOffset = 0;
+            let arrowBlockOffset = 0;
+
+            switch (position) {
+                case "bottom": {
+                    top = triggerRect.bottom + offset;
+                    left =
+                        triggerRect.left +
+                        triggerRect.width / 2 -
+                        tooltipRect.width / 2;
+                    transformOrigin = "center top";
+                    break;
+                }
+                case "left": {
+                    top =
+                        triggerRect.top +
+                        triggerRect.height / 2 -
+                        tooltipRect.height / 2;
+                    left = triggerRect.left - tooltipRect.width - offset;
+                    transformOrigin = "right center";
+                    break;
+                }
+                case "right": {
+                    top =
+                        triggerRect.top +
+                        triggerRect.height / 2 -
+                        tooltipRect.height / 2;
+                    left = triggerRect.right + offset;
+                    transformOrigin = "left center";
+                    break;
+                }
+                case "top": {
+                    break;
+                }
+                default: {
+                    assertUnreachable(position);
+                }
+            }
+
+            const baseTop = top;
+            const baseLeft = left;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const clampedLeft = clamp(
+                left,
+                viewportPadding,
+                viewportWidth - tooltipRect.width - viewportPadding
+            );
+            const clampedTop = clamp(
+                top,
+                viewportPadding,
+                viewportHeight - tooltipRect.height - viewportPadding
+            );
+
+            if (position === "left" || position === "right") {
+                arrowBlockOffset = baseTop - clampedTop;
+            } else {
+                arrowInlineOffset = baseLeft - clampedLeft;
+            }
+
+            tooltipNode.style.setProperty(
+                "--tooltip-arrow-offset-inline",
+                `${arrowInlineOffset}px`
+            );
+            tooltipNode.style.setProperty(
+                "--tooltip-arrow-offset-block",
+                `${arrowBlockOffset}px`
+            );
+            tooltipNode.style.setProperty(
+                "inset-inline-start",
+                `${clampedLeft}px`
+            );
+            tooltipNode.style.setProperty(
+                "inset-block-start",
+                `${clampedTop}px`
+            );
+            tooltipNode.style.transformOrigin = transformOrigin;
+        }, [position]);
+
+        useLayoutEffect(() => {
+            if (!shouldRender || disabled) {
+                return (): void => {};
+            }
+
+            applyTooltipPosition();
+
+            const handleReposition = (): void => {
+                applyTooltipPosition();
+            };
+
+            window.addEventListener("resize", handleReposition);
+            window.addEventListener("scroll", handleReposition, true);
+
+            const tooltipNode = tooltipRef.current;
+            const triggerNode = containerRef.current;
+            let resizeObserver: null | ResizeObserver = null;
+
+            if (typeof ResizeObserver === "function") {
+                resizeObserver = new ResizeObserver(() => {
+                    applyTooltipPosition();
+                });
+
+                if (tooltipNode) {
+                    resizeObserver.observe(tooltipNode);
+                }
+
+                if (triggerNode) {
+                    resizeObserver.observe(triggerNode);
+                }
+            }
+
+            return (): void => {
+                window.removeEventListener("resize", handleReposition);
+                window.removeEventListener("scroll", handleReposition, true);
+
+                resizeObserver?.disconnect();
+            };
+        }, [
+            applyTooltipPosition,
+            disabled,
+            shouldRender,
+        ]);
+
         return (
-            <span className={containerClasses}>
-                {children(triggerProps)}
-                {shouldRender && !disabled ? (
-                    <div
-                        className={tooltipClasses}
-                        id={tooltipId}
-                        role="tooltip"
-                        style={tooltipStyle}
-                    >
-                        <div className="tooltip__content">{content}</div>
-                        <div className="tooltip__arrow" />
-                    </div>
-                ) : null}
-            </span>
+            <>
+                <div className={containerClasses} ref={containerRef}>
+                    {children(triggerProps)}
+                </div>
+                {shouldRender && !disabled
+                    ? createPortal(
+                          <div
+                              className={tooltipClasses}
+                              data-position={position}
+                              id={tooltipId}
+                              ref={tooltipRef}
+                              role="tooltip"
+                              style={tooltipStyle}
+                          >
+                              <div className="tooltip__content">{content}</div>
+                              <div className="tooltip__arrow" />
+                          </div>,
+                          document.body
+                      )
+                    : null}
+            </>
         );
     }
 );

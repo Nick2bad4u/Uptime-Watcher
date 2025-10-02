@@ -119,21 +119,29 @@ function getHeaderStyle(
     isCollapsed: boolean,
     isDarkMode: boolean
 ): CSSProperties {
-    const darkGradient =
-        "linear-gradient(120deg, rgba(37, 99, 235, 0.15) 0%, rgba(147, 51, 234, 0.15) 60%, rgba(31, 41, 55, 0.8) 100%)";
-    const lightGradient =
-        "linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 60%, rgba(249, 250, 251, 0.9) 100%)";
+    // Layered gradients create a neutral base with restrained accent glow to avoid overpowering blues.
+    const darkGradient = [
+        "radial-gradient(circle at 18% 18%, rgba(79, 70, 229, 0.24), transparent 55%)",
+        "linear-gradient(110deg, rgba(37, 99, 235, 0.22) 0%, rgba(59, 130, 246, 0.12) 42%, rgba(99, 102, 241, 0.08) 70%, rgba(14, 22, 35, 0) 100%)",
+        "linear-gradient(136deg, rgba(6, 9, 16, 0.98) 0%, rgba(9, 14, 22, 0.95) 52%, rgba(14, 22, 35, 0.92) 100%)",
+    ].join(", ");
+    const lightGradient = [
+        "radial-gradient(circle at 16% 18%, rgba(79, 70, 229, 0.12), transparent 60%)",
+        "linear-gradient(110deg, rgba(59, 130, 246, 0.12) 0%, rgba(96, 165, 250, 0.06) 55%, rgba(79, 70, 229, 0) 100%)",
+        "linear-gradient(135deg, rgba(245, 247, 252, 0.98) 0%, rgba(233, 239, 255, 0.94) 52%, rgba(221, 231, 255, 0.9) 100%)",
+    ].join(", ");
 
     const darkShadow =
-        "0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2)";
+        "0 24px 60px -22px rgba(4, 8, 18, 0.7), 0 2px 18px -12px rgba(30, 64, 175, 0.32), inset 0 0 0 1px rgba(148, 163, 184, 0.07)";
     const lightShadow =
-        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+        "0 22px 48px -24px rgba(15, 23, 42, 0.2), 0 4px 14px -10px rgba(59, 130, 246, 0.18), inset 0 0 0 1px rgba(30, 64, 175, 0.08)";
 
     return {
         background: isDarkMode ? darkGradient : lightGradient,
+        backgroundColor: isDarkMode ? "#060910" : "#f8fafc",
         borderRadius: "0.75rem",
         boxShadow: isDarkMode ? darkShadow : lightShadow,
-        color: isDarkMode ? "#f3f4f6" : "#111827",
+        color: isDarkMode ? "#f5f7fa" : "#0f172a",
         height: isCollapsed ? "80px" : "auto",
         marginBottom: "1.25rem",
         minHeight: isCollapsed ? "80px" : "140px",

@@ -4,97 +4,271 @@
 
 .dashboard-overview__grid {
     display: grid;
-    gap: 1rem;
+    align-items: stretch;
+    gap: 1.1rem;
     grid-auto-flow: dense;
-    grid-auto-rows: minmax(0, 1fr);
+    grid-auto-rows: minmax(14.5rem, auto);
+
     /* Adaptive grid to minimize gaps across breakpoints */
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
 }
 
 /* Ensure optimal layout at different breakpoints */
-@media (min-width: 1024px) {
+@media (width >= 1440px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (width >= 1024px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(18.5rem, 1fr));
+    }
+}
+
+@media (width >= 768px) and (width <= 1023px) {
+    .dashboard-overview__grid {
+        grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
     }
 }
 
 .dashboard-overview__card {
+    --dashboard-overview-card-accent: var(--color-primary-500);
+    --dashboard-overview-card-accent-soft: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 18%,
+        transparent
+    );
+    --dashboard-overview-card-accent-strong: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 32%,
+        transparent
+    );
+    --dashboard-overview-card-sheen: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 12%,
+        var(--color-surface-overlay) 88%
+    );
+
     position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
     overflow: hidden;
+    flex-direction: column;
+    border: 1px solid
+        color-mix(
+            in srgb,
+            var(--color-border-primary) 52%,
+            var(--dashboard-overview-card-accent-soft) 48%
+        );
     background: linear-gradient(
-        135deg,
-        rgb(30 64 175 / 16%),
-        rgb(15 23 42 / 70%)
+        140deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent),
+        color-mix(
+            in srgb,
+            var(--color-surface-overlay) 74%,
+            var(--dashboard-overview-card-accent-soft) 26%
+        )
     );
-    border: 1px solid rgb(255 255 255 / 12%);
+    block-size: 100%;
+    gap: 0.6rem;
+    isolation: isolate;
+    min-block-size: 15rem;
     transition:
         transform var(--transition-normal),
         box-shadow var(--transition-normal);
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        --dashboard-overview-card-accent: var(--color-primary-500);
+        --dashboard-overview-card-accent-soft: color-mix(
+            in srgb,
+            var(--dashboard-overview-card-accent) 18%,
+            transparent
+        );
+        --dashboard-overview-card-accent-strong: color-mix(
+            in srgb,
+            var(--dashboard-overview-card-accent) 32%,
+            transparent
+        );
+        --dashboard-overview-card-sheen: color-mix(
+            in srgb,
+            var(--dashboard-overview-card-accent) 12%,
+            var(--color-surface-overlay) 88%
+        );
+
+        position: relative;
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
+        border: 1px solid
+            color-mix(
+                in srgb,
+                var(--color-border-primary) 52%,
+                var(--dashboard-overview-card-accent-soft) 48%
+            );
+        background: linear-gradient(
+            140deg,
+            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent),
+            color-mix(
+                in srgb,
+                var(--color-surface-overlay) 74%,
+                var(--dashboard-overview-card-accent-soft) 26%
+            )
+        );
+        block-size: 100%;
+        gap: 0.6rem;
+        isolation: isolate;
+        min-block-size: 15rem;
+        transition: none;
+    }
+
+    &::before {
+        position: absolute;
+        z-index: 0;
+        background: linear-gradient(
+            135deg,
+            color-mix(
+                    in srgb,
+                    var(--dashboard-overview-card-accent) 12%,
+                    transparent
+                )
+                0%,
+            transparent 55%
+        );
+        content: "";
+        inset: 0;
+        opacity: 0.75;
+        pointer-events: none;
+    }
+
+    &::after {
+        position: absolute;
+        z-index: 0;
+        border-radius: 50%;
+        background: radial-gradient(
+            circle,
+            color-mix(
+                    in srgb,
+                    var(--dashboard-overview-card-accent-strong) 46%,
+                    transparent
+                )
+                0%,
+            transparent 70%
+        );
+        block-size: 56%;
+        content: "";
+        inline-size: 56%;
+        inset-block-start: 38%;
+        inset-inline-end: -28%;
+        opacity: 0.42;
+        pointer-events: none;
+    }
 }
 
-.dashboard-overview__card::after {
-    position: absolute;
-    inset-inline-end: -30%;
-    inset-block-start: 40%;
-    inline-size: 60%;
-    block-size: 60%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgb(59 130 246 / 40%), transparent 70%);
-    content: "";
-    opacity: 0.6;
+.dashboard-overview__card--sites,
+.dashboard-overview__card--healthy-monitors {
+    --dashboard-overview-card-accent: var(--color-status-up);
 }
 
-.dashboard-overview__card:hover {
+.dashboard-overview__card--incidents {
+    --dashboard-overview-card-accent: var(--color-status-down);
+}
+
+.dashboard-overview__card--response {
+    --dashboard-overview-card-accent: var(--color-status-pending);
+}
+
+.dashboard-overview__card--active-monitors {
+    --dashboard-overview-card-accent: var(--color-primary-500);
+}
+
+.dashboard-overview__card--uptime {
+    --dashboard-overview-card-accent: color-mix(
+        in srgb,
+        var(--color-primary-500) 60%,
+        var(--color-status-up) 40%
+    );
+}
+
+.dashboard-overview__card:hover,
+.dashboard-overview__card:focus {
+    box-shadow:
+        0 22px 50px rgb(6 11 23 / 45%),
+        0 0 0 1px color-mix(in srgb, var(--color-primary-500) 18%, transparent);
     transform: translateY(-4px);
-    box-shadow: 0 18px 45px rgb(37 99 235 / 25%);
 }
 
 .dashboard-overview__card-header {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
 .dashboard-overview__card-icon {
+    position: relative;
+    z-index: 1;
     display: grid;
-    place-items: center;
-    inline-size: 2.5rem;
-    block-size: 2.5rem;
     border-radius: var(--border-radius-full);
-    background: rgb(37 99 235 / 18%);
-    font-size: 1.15rem;
-    backdrop-filter: blur(6px);
+    backdrop-filter: blur(8px);
+    background: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 26%,
+        var(--color-surface-elevated) 74%
+    );
+    block-size: 2.6rem;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 6%),
+        0 12px 28px
+            color-mix(
+                in srgb,
+                var(--dashboard-overview-card-accent) 24%,
+                transparent
+            );
+    color: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 82%,
+        white 18%
+    );
+    font-size: 1.25rem;
+    inline-size: 2.6rem;
+    place-items: center;
 }
 
 .dashboard-overview__card-value {
-    font-size: 1.75rem;
+    position: relative;
+    z-index: 1;
+    color: var(--color-text-primary);
+    font-size: clamp(1.5rem, 1.5rem + 0.6vi, 2rem);
+    letter-spacing: -0.015em;
 }
 
 .dashboard-overview__card-description {
-    opacity: 0.75;
+    position: relative;
+    z-index: 1;
+    max-inline-size: 25ch;
+    opacity: 0.76;
 }
 
 .dashboard-overview__card-trend {
-    margin-block-start: auto;
+    position: relative;
+    z-index: 1;
+    color: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 68%,
+        var(--color-text-secondary) 32%
+    );
     font-weight: var(--font-weight-medium);
+    margin-block-start: auto;
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dashboard-overview {
         margin-block-end: 1rem;
     }
 
     .dashboard-overview__grid {
-        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
         gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
     }
 }

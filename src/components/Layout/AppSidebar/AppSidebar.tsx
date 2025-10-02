@@ -18,13 +18,14 @@ import {
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
-import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
 import "./AppSidebar.css";
+
+const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
 
 /**
  * Application sidebar containing global navigation and site quick-switching.
@@ -155,6 +156,15 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
 
             setShowSiteDetails(true);
 
+            if (
+                typeof window !== "undefined" &&
+                typeof window.matchMedia === "function" &&
+                window.matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY).matches &&
+                isSidebarOpen
+            ) {
+                toggleSidebar();
+            }
+
             // Scroll to the site card in the main content area
             requestAnimationFrame(() => {
                 const cardElement = document.querySelector(
@@ -169,10 +179,12 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
             });
         },
         [
+            isSidebarOpen,
             selectSite,
             setSelectedMonitorId,
             setShowSiteDetails,
             sites,
+            toggleSidebar,
         ]
     );
 
@@ -264,6 +276,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                     content={statusDescription}
                                     key={site.identifier}
                                     position="right"
+                                    wrapMode="block"
                                 >
                                     {(triggerProps) => (
                                         <button
@@ -304,20 +317,25 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                 </nav>
 
                 <div className="app-sidebar__footer">
-                    <Tooltip content="Add a new site" position="right">
+                    <Tooltip
+                        content="Add a new site"
+                        position="right"
+                        wrapMode="block"
+                    >
                         {(triggerProps) => (
-                            <ThemedButton
+                            <button
                                 {...triggerProps}
-                                className="app-sidebar__footer-action"
+                                className="app-sidebar__primary-cta"
                                 onClick={handleAddSite}
-                                size="sm"
-                                variant="primary"
+                                type="button"
                             >
-                                <AddIcon className="app-sidebar__action-icon" />
-                                <span className="app-sidebar__action-label">
+                                <span className="app-sidebar__primary-cta-icon">
+                                    <AddIcon size={18} />
+                                </span>
+                                <span className="app-sidebar__primary-cta-text">
                                     Add Site
                                 </span>
-                            </ThemedButton>
+                            </button>
                         )}
                     </Tooltip>
                     <div className="app-sidebar__footer-controls">
@@ -326,34 +344,32 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             position="right"
                         >
                             {(triggerProps) => (
-                                <ThemedButton
+                                <button
                                     {...triggerProps}
-                                    className="app-sidebar__footer-control"
+                                    className="app-sidebar__secondary-cta app-sidebar__secondary-cta--settings"
                                     onClick={handleOpenSettings}
-                                    size="sm"
-                                    variant="secondary"
+                                    type="button"
                                 >
-                                    <SettingsIcon className="app-sidebar__action-icon" />
-                                    <span className="app-sidebar__action-label">
+                                    <SettingsIcon size={16} />
+                                    <span className="app-sidebar__secondary-text">
                                         Settings
                                     </span>
-                                </ThemedButton>
+                                </button>
                             )}
                         </Tooltip>
                         <Tooltip content={themeButtonLabel} position="right">
                             {(triggerProps) => (
-                                <ThemedButton
+                                <button
                                     {...triggerProps}
-                                    className="app-sidebar__footer-control"
+                                    className="app-sidebar__secondary-cta app-sidebar__secondary-cta--theme"
                                     onClick={toggleTheme}
-                                    size="sm"
-                                    variant="secondary"
+                                    type="button"
                                 >
-                                    <ThemeIcon className="app-sidebar__action-icon" />
-                                    <span className="app-sidebar__action-label">
+                                    <ThemeIcon size={16} />
+                                    <span className="app-sidebar__secondary-text">
                                         {themeButtonText}
                                     </span>
-                                </ThemedButton>
+                                </button>
                             )}
                         </Tooltip>
                     </div>

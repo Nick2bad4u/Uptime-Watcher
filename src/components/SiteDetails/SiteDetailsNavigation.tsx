@@ -15,8 +15,8 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
-import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 import { AppIcons } from "../../utils/icons";
+import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary
@@ -176,14 +176,14 @@ export const SiteDetailsNavigation = ({
 
     return (
         <ThemedBox
-            className="space-y-4 border-b"
+            className="site-details-navigation"
             padding="lg"
             variant="secondary"
         >
             {/* Tab Navigation and Monitor Selection */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="site-details-navigation__grid">
                 {/* Tab navigation buttons (left) */}
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="site-details-navigation__tabs">
                     <ThemedButton
                         className="flex items-center gap-2"
                         onClick={handleSiteOverviewClick}
@@ -254,9 +254,9 @@ export const SiteDetailsNavigation = ({
                 </div>
 
                 {/* Monitor Selection and Site-level Controls (right) */}
-                <div className="flex items-center gap-4">
+                <div className="site-details-navigation__controls">
                     {/* Site-level monitoring controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="site-details-navigation__control-group">
                         <SiteMonitoringButton
                             allMonitorsRunning={allMonitorsRunning}
                             isLoading={isLoading}
@@ -299,7 +299,7 @@ export const SiteDetailsNavigation = ({
                     </div>
 
                     {/* Monitor Selection */}
-                    <div className="flex items-center gap-2">
+                    <div className="site-details-navigation__select">
                         <ThemedText size="sm" variant="secondary">
                             Monitor:
                         </ThemedText>

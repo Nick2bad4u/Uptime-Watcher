@@ -24,7 +24,6 @@ import {
 } from "../../../constants";
 import { logger } from "../../../services/logger";
 import { ThemedBadge } from "../../../theme/components/ThemedBadge";
-import { AppIcons } from "../../../utils/icons";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedCard } from "../../../theme/components/ThemedCard";
@@ -38,6 +37,7 @@ import {
     getMonitorTypeDisplayLabel,
     UiDefaults,
 } from "../../../utils/fallbacks";
+import { AppIcons } from "../../../utils/icons";
 import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 
@@ -143,7 +143,13 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
 }
 
 /**
- * Component that displays the identifier label for a monitor type.
+ * Resolves and renders the primary identifier label for the selected monitor
+ * type.
+ *
+ * @param selectedMonitor - Monitor whose identifier metadata should be
+ *   displayed.
+ *
+ * @returns Localised label string for the monitor identifier field.
  */
 function IdentifierLabel({
     selectedMonitor,
@@ -215,6 +221,14 @@ export const SettingsTab = ({
     timeoutChanged,
 }: SettingsTabProperties): JSX.Element => {
     const { currentTheme } = useTheme();
+    const trimmedSiteName = localName.trim();
+    const isSiteNameValid = trimmedSiteName.length > 0;
+    const isTimeoutValid =
+        localTimeout >= TIMEOUT_CONSTRAINTS.MIN &&
+        localTimeout <= TIMEOUT_CONSTRAINTS.MAX;
+    const isRetryAttemptsValid =
+        localRetryAttempts >= RETRY_CONSTRAINTS.MIN &&
+        localRetryAttempts <= RETRY_CONSTRAINTS.MAX;
 
     // Icon colors configuration
     const getIconColors = (): {
@@ -235,7 +249,7 @@ export const SettingsTab = ({
 
     const loggedHandleSaveName = useCallback(async () => {
         logger.user.action("Settings: Save site name initiated", {
-            newName: localName.trim(),
+            newName: trimmedSiteName,
             oldName: currentSite.name,
             siteId: currentSite.identifier,
         });
@@ -356,17 +370,18 @@ export const SettingsTab = ({
         <div className="space-y-6" data-testid="settings-tab">
             {/* Site Configuration */}
             <ThemedCard icon={settingsIcon} title="Site Configuration">
-                <div className="space-y-6">
+                <div className="site-settings-section">
                     {/* Site Name */}
-                    <div className="space-y-2">
+                    <div className="site-settings-field">
                         <ThemedText
+                            className="site-settings-field__label"
                             size="sm"
                             variant="secondary"
                             weight="medium"
                         >
                             Site Name
                         </ThemedText>
-                        <div className="flex items-center gap-3">
+                        <div className="site-settings-field__controls">
                             <ThemedInput
                                 className="flex-1"
                                 onChange={handleNameChange}
@@ -375,7 +390,11 @@ export const SettingsTab = ({
                                 value={localName}
                             />
                             <ThemedButton
-                                disabled={!hasUnsavedChanges || isLoading}
+                                disabled={
+                                    !hasUnsavedChanges ||
+                                    isLoading ||
+                                    !isSiteNameValid
+                                }
                                 icon={saveIcon}
                                 loading={isLoading}
                                 onClick={handleSaveNameClick}
@@ -393,11 +412,17 @@ export const SettingsTab = ({
                                 <span className="ml-1">Unsaved changes</span>
                             </ThemedBadge>
                         ) : null}
+                        {isSiteNameValid ? null : (
+                            <ThemedText size="xs" variant="error">
+                                Enter a name before saving.
+                            </ThemedText>
+                        )}
                     </div>
 
                     {/* Site Identifier */}
-                    <div className="space-y-2">
+                    <div className="site-settings-field">
                         <ThemedText
+                            className="site-settings-field__label"
                             size="sm"
                             variant="secondary"
                             weight="medium"
@@ -424,17 +449,18 @@ export const SettingsTab = ({
 
             {/* Monitoring Configuration */}
             <ThemedCard icon={timerIcon} title="Monitoring Configuration">
-                <div className="space-y-6">
+                <div className="site-settings-section">
                     {/* Check Interval */}
-                    <div className="space-y-2">
+                    <div className="site-settings-field">
                         <ThemedText
+                            className="site-settings-field__label"
                             size="sm"
                             variant="secondary"
                             weight="medium"
                         >
                             Check Interval
                         </ThemedText>
-                        <div className="flex items-center gap-3">
+                        <div className="site-settings-field__controls">
                             <ThemedSelect
                                 className="flex-1"
                                 onChange={handleIntervalChange}
@@ -472,15 +498,16 @@ export const SettingsTab = ({
                     </div>
 
                     {/* Timeout Configuration */}
-                    <div className="space-y-2">
+                    <div className="site-settings-field">
                         <ThemedText
+                            className="site-settings-field__label"
                             size="sm"
                             variant="secondary"
                             weight="medium"
                         >
                             Timeout (seconds)
                         </ThemedText>
-                        <div className="flex items-center gap-3">
+                        <div className="site-settings-field__controls">
                             <ThemedInput
                                 className="flex-1"
                                 max={TIMEOUT_CONSTRAINTS.MAX}
@@ -492,7 +519,7 @@ export const SettingsTab = ({
                                 value={localTimeout}
                             />
                             <ThemedButton
-                                disabled={!timeoutChanged}
+                                disabled={!timeoutChanged || !isTimeoutValid}
                                 icon={saveIconThree}
                                 onClick={handleSaveTimeoutClick}
                                 size="sm"
@@ -506,18 +533,25 @@ export const SettingsTab = ({
                         <ThemedText size="xs" variant="tertiary">
                             Request timeout: {localTimeout} seconds
                         </ThemedText>
+                        {isTimeoutValid ? null : (
+                            <ThemedText size="xs" variant="error">
+                                Allowed range: {TIMEOUT_CONSTRAINTS.MIN}–
+                                {TIMEOUT_CONSTRAINTS.MAX} seconds.
+                            </ThemedText>
+                        )}
                     </div>
 
                     {/* Retry Attempts Configuration */}
-                    <div className="space-y-2">
+                    <div className="site-settings-field">
                         <ThemedText
+                            className="site-settings-field__label"
                             size="sm"
                             variant="secondary"
                             weight="medium"
                         >
                             Retry Attempts
                         </ThemedText>
-                        <div className="flex items-center gap-3">
+                        <div className="site-settings-field__controls">
                             <ThemedInput
                                 className="flex-1"
                                 max={RETRY_CONSTRAINTS.MAX}
@@ -529,7 +563,10 @@ export const SettingsTab = ({
                                 value={localRetryAttempts}
                             />
                             <ThemedButton
-                                disabled={!retryAttemptsChanged}
+                                disabled={
+                                    !retryAttemptsChanged ||
+                                    !isRetryAttemptsValid
+                                }
                                 icon={saveIconFour}
                                 onClick={handleSaveRetryAttemptsClick}
                                 size="sm"
@@ -545,6 +582,13 @@ export const SettingsTab = ({
                         <ThemedText size="xs" variant="tertiary">
                             {formatRetryAttemptsText(localRetryAttempts)}
                         </ThemedText>
+                        {isRetryAttemptsValid ? null : (
+                            <ThemedText size="xs" variant="error">
+                                Retry attempts must be between{" "}
+                                {RETRY_CONSTRAINTS.MIN} and{" "}
+                                {RETRY_CONSTRAINTS.MAX}.
+                            </ThemedText>
+                        )}
                     </div>
 
                     {/* Total monitoring time indicator */}
@@ -572,8 +616,8 @@ export const SettingsTab = ({
 
             {/* Site Information */}
             <ThemedCard icon={infoIcon} title="Site Information">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="space-y-3">
+                <div className="site-settings-info-grid">
+                    <div className="site-settings-info-grid__column">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
                                 <IdentifierLabel
@@ -597,7 +641,7 @@ export const SettingsTab = ({
                             </ThemedBadge>
                         </div>
                     </div>
-                    <div className="space-y-3">
+                    <div className="site-settings-info-grid__column">
                         <div className="flex items-center justify-between">
                             <ThemedText size="sm" variant="secondary">
                                 Last Checked:
@@ -620,8 +664,8 @@ export const SettingsTab = ({
                 icon={dangerIcon}
                 title="Danger Zone"
             >
-                <div className="space-y-4">
-                    <div>
+                <div className="site-settings-section">
+                    <div className="site-settings-field">
                         <ThemedText
                             className="mb-2"
                             size="sm"
@@ -639,7 +683,7 @@ export const SettingsTab = ({
                             this site will be lost.
                         </ThemedText>
                         <ThemedButton
-                            className="w-full"
+                            className="site-settings-field__cta"
                             icon={trashIcon}
                             loading={isLoading}
                             onClick={handleRemoveSiteClick}

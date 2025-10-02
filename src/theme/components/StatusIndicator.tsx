@@ -12,6 +12,11 @@ import { memo, useMemo } from "react";
 import { getStatusIcon } from "../../utils/status";
 import { useTheme } from "../useTheme";
 
+type StatusIndicatorStyle = CSSProperties & {
+    readonly "--status-indicator-color"?: string;
+    readonly "--status-indicator-size"?: string;
+};
+
 /**
  * Props for the StatusIndicator component
  *
@@ -36,96 +41,92 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
         const { currentTheme, getStatusColor } = useTheme();
 
         const getSizeStyles = (): {
-            fontSize?: string;
-            height?: string;
-            iconSize: string;
-            width?: string;
+            readonly badgeSize: string;
+            readonly dotSize: string;
+            readonly fontSize: string;
+            readonly iconSize: string;
         } => {
-            switch (size) {
-                case "lg": {
-                    return {
-                        fontSize: currentTheme.typography.fontSize.base,
-                        height: "16px",
-                        iconSize: "20px",
-                        width: "16px",
-                    };
-                }
-                case "md": {
-                    return {
-                        fontSize: currentTheme.typography.fontSize.sm,
-                        height: "12px",
-                        iconSize: "16px",
-                        width: "12px",
-                    };
-                }
-                case "sm": {
-                    return {
-                        fontSize: currentTheme.typography.fontSize.xs,
-                        height: "8px",
-                        iconSize: "12px",
-                        width: "8px",
-                    };
-                }
-                default: {
-                    return { iconSize: "16px" };
-                }
+            if (size === "lg") {
+                return {
+                    badgeSize: "2.25rem",
+                    dotSize: "18px",
+                    fontSize: currentTheme.typography.fontSize.base,
+                    iconSize: "22px",
+                };
             }
+
+            if (size === "sm") {
+                return {
+                    badgeSize: "1.5rem",
+                    dotSize: "10px",
+                    fontSize: currentTheme.typography.fontSize.xs,
+                    iconSize: "14px",
+                };
+            }
+
+            return {
+                badgeSize: "1.85rem",
+                dotSize: "14px",
+                fontSize: currentTheme.typography.fontSize.sm,
+                iconSize: "18px",
+            };
         };
 
         const sizeStyles = getSizeStyles();
         const StatusIconComponent = getStatusIcon(status);
         const iconPixelSize = Number.parseInt(sizeStyles.iconSize, 10) || 16;
 
-        const indicatorStyle: CSSProperties = useMemo(
+        const baseColor = getStatusColor(status);
+
+        const dotStyle = useMemo<StatusIndicatorStyle>(
             () => ({
+                "--status-indicator-color": baseColor,
+                "--status-indicator-size": sizeStyles.dotSize,
                 animation:
                     status === "pending"
                         ? "pulse 1.5s ease-in-out infinite"
                         : undefined,
-                backgroundColor: getStatusColor(status),
                 borderRadius: currentTheme.borderRadius.full,
-                boxShadow: `0 0 0 2px ${currentTheme.colors.background.primary}`,
-                height: sizeStyles.height,
-                position: "relative",
-                width: sizeStyles.width,
             }),
             [
+                baseColor,
                 currentTheme.borderRadius.full,
-                currentTheme.colors.background.primary,
-                getStatusColor,
-                sizeStyles.height,
-                sizeStyles.width,
+                sizeStyles.dotSize,
                 status,
             ]
         );
 
-        const iconStyle: CSSProperties = useMemo(
+        const iconStyle = useMemo<StatusIndicatorStyle>(
             () => ({
+                "--status-indicator-color": baseColor,
+                "--status-indicator-size": sizeStyles.badgeSize,
                 alignItems: "center",
+                borderRadius: currentTheme.borderRadius.full,
                 display: "flex",
-                fontSize: sizeStyles.iconSize,
                 justifyContent: "center",
-                lineHeight: "1",
             }),
-            [sizeStyles.iconSize]
+            [
+                baseColor,
+                currentTheme.borderRadius.full,
+                sizeStyles.badgeSize,
+            ]
         );
 
         const textStyle: CSSProperties = useMemo(
             () => ({
                 alignItems: "center",
-                color: getStatusColor(status),
+                color: baseColor,
                 display: "flex",
                 fontSize: sizeStyles.fontSize,
                 fontWeight: currentTheme.typography.fontWeight.medium,
                 gap: currentTheme.spacing.xs,
-                marginLeft: currentTheme.spacing.xs,
+                marginInlineStart: currentTheme.spacing.xs,
             }),
             [
+                baseColor,
                 currentTheme.spacing.xs,
                 currentTheme.typography.fontWeight.medium,
-                getStatusColor,
                 sizeStyles.fontSize,
-                status,
             ]
         );
 
@@ -140,13 +141,19 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                 style={containerStyle}
             >
                 {showText ? (
-                    <div style={iconStyle}>
-                        <StatusIconComponent size={iconPixelSize} />
+                    <div
+                        className="themed-status-indicator__icon"
+                        style={iconStyle}
+                    >
+                        <StatusIconComponent
+                            color={baseColor}
+                            size={iconPixelSize}
+                        />
                     </div>
                 ) : (
                     <div
                         className="themed-status-indicator__dot"
-                        style={indicatorStyle}
+                        style={dotStyle}
                     />
                 )}
                 {showText ? (

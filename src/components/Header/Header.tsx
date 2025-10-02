@@ -162,6 +162,7 @@ export const Header = (): JSX.Element => {
                     <Tooltip
                         content={`Monitoring ${totalSites} site${totalSites === 1 ? "" : "s"} with ${totalMonitors} total monitor${totalMonitors === 1 ? "" : "s"}`}
                         position="bottom"
+                        wrapMode="block"
                     >
                         {(triggerProps) => (
                             <div

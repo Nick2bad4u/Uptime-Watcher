@@ -36,9 +36,8 @@
  * @public
  */
 
-/* eslint-disable tailwind/no-arbitrary-value -- Modal component with specific layout requirements */
-
 import type { Site } from "@shared/types";
+import type { MouseEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
@@ -48,6 +47,7 @@ import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
+import { AppIcons } from "../../utils/icons";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import { formatStatusWithIcon } from "../../utils/status";
 import "./SiteDetails.css";
@@ -101,9 +101,10 @@ export const SiteDetails = ({
     onClose,
     site,
 }: SiteDetailsProperties): JSX.Element | null => {
-    const { currentTheme } = useTheme();
+    const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+    const CloseIcon = AppIcons.ui.close;
 
     // Add global escape key handler
     const modalConfigs = useMemo(
@@ -310,6 +311,19 @@ export const SiteDetails = ({
         void handleSaveInterval();
     }, [handleSaveInterval]);
 
+    /**
+     * Handles overlay click interactions to support closing the dialog when the
+     * user clicks outside the modal surface.
+     */
+    const handleOverlayClick = useCallback(
+        (event: MouseEvent<HTMLDivElement>): void => {
+            if (event.target === event.currentTarget) {
+                onClose();
+            }
+        },
+        [onClose]
+    );
+
     // Extract tab JSX to avoid IIFE pattern and complex conditional rendering
     const monitorOverviewTab =
         activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
@@ -409,26 +423,35 @@ export const SiteDetails = ({
     }
 
     return (
-        <div className="modal-overlay p-4 md:p-8">
-            <button
-                aria-label="Close modal"
-                className="absolute inset-0 cursor-pointer border-none bg-transparent"
-                onClick={onClose}
-                type="button"
-            />
+        <div
+            className={`modal-overlay modal-overlay--immersive site-details-modal-overlay ${
+                isDark ? "dark" : ""
+            }`}
+            onClick={handleOverlayClick}
+        >
             <ThemedBox
                 aria-label="Site details"
                 as="dialog"
-                className="relative mx-auto flex max-h-[90vh] w-full max-w-[1400px] flex-col sm:max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-[1400px]"
+                className="modal-shell modal-shell--site-details site-details-modal"
                 open
+                padding="xl"
+                rounded="xl"
+                shadow="xl"
+                surface="overlay"
             >
-                <ThemedBox
-                    className="flex h-[90vh] flex-col overflow-hidden"
-                    padding="lg"
-                    rounded="lg"
-                    shadow="xl"
-                    surface="overlay"
-                >
+                <div className="modal-shell__actions site-details-modal__actions">
+                    <button
+                        aria-label="Close site details"
+                        className="modal-shell__close site-details-modal__close"
+                        onClick={onClose}
+                        title="Close"
+                        type="button"
+                    >
+                        <CloseIcon size={18} />
+                    </button>
+                </div>
+
+                <div className="site-details-modal__body">
                     <SiteDetailsHeader
                         site={currentSite}
                         {...(selectedMonitor ? { selectedMonitor } : {})}
@@ -450,10 +473,11 @@ export const SiteDetails = ({
                         setActiveSiteDetailsTab={setActiveSiteDetailsTab}
                     />
 
-                    {/* Tab Content */}
                     <ThemedBox
-                        className={`custom-scrollbar flex-1 overflow-y-auto ${currentTheme.isDark ? "dark" : ""}`}
+                        className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""}`}
                         padding="lg"
+                        rounded="lg"
+                        surface="elevated"
                         variant="primary"
                     >
                         {activeSiteDetailsTab === "site-overview" && (
@@ -481,10 +505,8 @@ export const SiteDetails = ({
 
                         {settingsTab}
                     </ThemedBox>
-                </ThemedBox>
+                </div>
             </ThemedBox>
         </div>
     );
 };
-
-/* eslint-enable tailwind/no-arbitrary-value -- Re-enable after custom CSS values for dynamic positioning */

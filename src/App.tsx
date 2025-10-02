@@ -66,6 +66,8 @@ const UI_MESSAGES = {
     UPDATE_RESTART_BUTTON: "Restart Now",
 } as const;
 
+const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
+
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
  *
@@ -148,7 +150,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         if (typeof matchMedia !== "function") {
             return true;
         }
-        return !matchMedia("(max-width: 1024px)").matches;
+        return !matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY).matches;
     });
 
     // Ref to store cache sync cleanup function
@@ -300,7 +302,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 return;
             }
 
-            const mediaQuery = matchMedia("(max-width: 1024px)");
+            const mediaQuery = matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY);
             sidebarMediaQueryRef.current = mediaQuery;
             mediaQuery.addEventListener(
                 "change",

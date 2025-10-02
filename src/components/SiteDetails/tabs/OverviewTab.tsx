@@ -26,8 +26,8 @@ import { ThemedInput } from "../../../theme/components/ThemedInput";
 import { ThemedProgress } from "../../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
-import { AppIcons } from "../../../utils/icons";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
 import { parseUptimeValue } from "../../../utils/monitoring/dataValidation";
 import { getIntervalLabel } from "../../../utils/time";
 
