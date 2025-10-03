@@ -52,8 +52,8 @@ import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
  * @public
  */
 export interface ThemedTextProperties
-    extends CoreComponentProperties,
-        AccessibilityProperties {
+    extends AccessibilityProperties,
+        CoreComponentProperties {
     /** Text alignment within the container */
     readonly align?: TextAlign;
     /** Font size variant for the text */

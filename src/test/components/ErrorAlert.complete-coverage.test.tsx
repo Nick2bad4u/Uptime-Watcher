@@ -9,29 +9,45 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ErrorAlert } from "../../components/common/ErrorAlert/ErrorAlert";
 import type { ErrorAlertVariant } from "../../components/common/ErrorAlert/ErrorAlert";
 
-// Mock react-icons/fi
-vi.mock("react-icons/fi", () => ({
-    FiAlertCircle: ({ className, ...props }: any) => (
-        <div data-testid="alert-circle-icon" className={className} {...props}>
-            alert-circle
-        </div>
-    ),
-    FiAlertTriangle: ({ className, ...props }: any) => (
-        <div data-testid="alert-triangle-icon" className={className} {...props}>
-            alert-triangle
-        </div>
-    ),
-    FiInfo: ({ className, ...props }: any) => (
-        <div data-testid="info-icon" className={className} {...props}>
-            info
-        </div>
-    ),
-    FiX: ({ className, ...props }: any) => (
-        <div data-testid="x-icon" className={className} {...props}>
-            x
-        </div>
-    ),
-}));
+// Mock react-icons/fi while preserving untouched exports
+vi.mock("react-icons/fi", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/fi")>(
+            "react-icons/fi"
+        );
+
+    return {
+        ...actual,
+        FiAlertCircle: ({ className, ...props }: any) => (
+            <div
+                data-testid="alert-circle-icon"
+                className={className}
+                {...props}
+            >
+                alert-circle
+            </div>
+        ),
+        FiAlertTriangle: ({ className, ...props }: any) => (
+            <div
+                data-testid="alert-triangle-icon"
+                className={className}
+                {...props}
+            >
+                alert-triangle
+            </div>
+        ),
+        FiInfo: ({ className, ...props }: any) => (
+            <div data-testid="info-icon" className={className} {...props}>
+                info
+            </div>
+        ),
+        FiX: ({ className, ...props }: any) => (
+            <div data-testid="x-icon" className={className} {...props}>
+                x
+            </div>
+        ),
+    } satisfies typeof actual;
+});
 
 describe("ErrorAlert - Complete Coverage", () => {
     beforeEach(() => {

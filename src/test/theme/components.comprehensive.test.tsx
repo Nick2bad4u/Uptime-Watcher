@@ -7,7 +7,8 @@
  */
 
 import { render, screen, fireEvent } from "@testing-library/react";
-import { vi } from "vitest";
+import { createElement } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -31,9 +32,32 @@ vi.mock("../../theme/useTheme", () => ({
 }));
 
 // Mock status utilities
-vi.mock("../../utils/status", () => ({
-    getStatusIcon: vi.fn((status: string) => `icon-${status}`),
-}));
+vi.mock("../../utils/status", () => {
+    const formatStatusLabel = vi.fn(
+        (status: string) => status.charAt(0).toUpperCase() + status.slice(1)
+    );
+    const getStatusIcon = vi.fn((status: string) => `icon-${status}`);
+    const MockStatusIcon = ({
+        color,
+        size,
+    }: {
+        color?: string;
+        size?: number;
+    }) =>
+        createElement("span", {
+            "data-testid": "mock-status-icon",
+            "data-color": color,
+            "data-size": size,
+        });
+
+    const getStatusIconComponent = vi.fn(() => MockStatusIcon);
+
+    return {
+        formatStatusLabel,
+        getStatusIcon,
+        getStatusIconComponent,
+    };
+});
 
 // Mock time utilities
 vi.mock("../../utils/time", () => ({

@@ -66,110 +66,149 @@ const metricsFixture = {
     uptimePercentage: 92,
 } as const;
 
+type UseThemeState = ReturnType<typeof useTheme>;
+
+const createThemeState = (
+    overrides: Partial<UseThemeState> = {}
+): UseThemeState => ({
+    availableThemes: ["light", "dark"],
+    currentTheme: {
+        borderRadius: {
+            full: "9999px",
+            lg: "0.75rem",
+            md: "0.5rem",
+            none: "0",
+            sm: "0.25rem",
+            xl: "1rem",
+        },
+        colors: {
+            background: {
+                modal: "#ffffff",
+                primary: "#ffffff",
+                secondary: "#f5f5f5",
+                tertiary: "#f0f0f0",
+            },
+            border: {
+                focus: "#000000",
+                primary: "#e0e0e0",
+                secondary: "#cfcfcf",
+            },
+            error: "#ff0000",
+            errorAlert: "#ff0000",
+            hover: {
+                dark: "#222222",
+                light: "#f0f0f0",
+                medium: "#cccccc",
+            },
+            info: "#2196f3",
+            primary: {
+                50: "#f9fafb",
+                100: "#f4f6fb",
+                200: "#e4e9fb",
+                300: "#c6cef7",
+                400: "#9ca9f0",
+                500: "#6b7fe8",
+                600: "#4b5ee0",
+                700: "#3a4bbd",
+                800: "#2c3a95",
+                900: "#1f296e",
+            },
+            shadows: {
+                degraded: "rgba(245, 158, 11, 0.4)",
+                error: "rgba(239, 68, 68, 0.4)",
+                paused: "rgba(156, 163, 175, 0.35)",
+                success: "rgba(34, 197, 94, 0.4)",
+                warning: "rgba(249, 115, 22, 0.4)",
+            },
+            status: {
+                degraded: "#f59e0b",
+                down: "#ef4444",
+                mixed: "#6366f1",
+                paused: "#9ca3af",
+                pending: "#f97316",
+                unknown: "#6b7280",
+                up: "#22c55e",
+            },
+            success: "#22c55e",
+            surface: {
+                base: "#ffffff",
+                elevated: "#f8fafc",
+                overlay: "rgba(15, 23, 42, 0.7)",
+            },
+            text: {
+                inverse: "#ffffff",
+                primary: "#111827",
+                secondary: "#475569",
+                tertiary: "#64748b",
+            },
+            warning: "#f59e0b",
+            white: "#ffffff",
+        },
+        isDark: false,
+        name: "light",
+        shadows: {
+            inner: "inset 0 2px 4px rgba(0,0,0,0.06)",
+            lg: "0 10px 30px rgba(0,0,0,0.12)",
+            md: "0 4px 12px rgba(0,0,0,0.1)",
+            sm: "0 2px 4px rgba(0,0,0,0.08)",
+            xl: "0 20px 40px rgba(0,0,0,0.14)",
+        },
+        spacing: {
+            "2xl": "2.5rem",
+            "3xl": "3rem",
+            lg: "1.5rem",
+            md: "1rem",
+            sm: "0.5rem",
+            xl: "2rem",
+            xs: "0.25rem",
+        },
+        typography: {
+            fontFamily: {
+                mono: ["Fira Code", "monospace"],
+                sans: ["Inter", "sans-serif"],
+            },
+            fontSize: {
+                "2xl": "1.5rem",
+                "3xl": "1.875rem",
+                "4xl": "2.25rem",
+                base: "1rem",
+                lg: "1.125rem",
+                sm: "0.875rem",
+                xl: "1.25rem",
+                xs: "0.75rem",
+            },
+            fontWeight: {
+                bold: "700",
+                medium: "500",
+                normal: "400",
+                semibold: "600",
+            },
+            lineHeight: {
+                normal: "1.5",
+                relaxed: "1.75",
+                tight: "1.25",
+            },
+        },
+    },
+    getColor: vi.fn(() => "#ffffff"),
+    getStatusColor: vi.fn(() => "#22c55e"),
+    isDark: false,
+    setTheme: vi.fn(),
+    systemTheme: "light",
+    themeManager: {} as never,
+    themeName: "light",
+    themeVersion: 1,
+    toggleTheme: vi.fn(),
+    ...overrides,
+});
+
 beforeEach(() => {
     vi.clearAllMocks();
 
     const uiState = createUiState();
-    mockUseUIStore.mockImplementation((selector) => selector(uiState));
+    mockUseUIStore.mockReturnValue(uiState);
 
-    mockUseTheme.mockReturnValue({
-        availableThemes: ["light", "dark"],
-        currentTheme: {
-            borderRadius: {
-                full: "9999px",
-                lg: "0.75rem",
-                md: "0.5rem",
-                none: "0",
-                sm: "0.25rem",
-                xl: "1rem",
-            },
-            colors: {
-                background: {
-                    modal: "#ffffff",
-                    primary: "#ffffff",
-                    secondary: "#f5f5f5",
-                    tertiary: "#f0f0f0",
-                },
-                border: {
-                    focus: "#000000",
-                    primary: "#e0e0e0",
-                    secondary: "#cfcfcf",
-                },
-                error: "#ff0000",
-                errorAlert: "#ff0000",
-                hover: {
-                    dark: "#222222",
-                    light: "#f0f0f0",
-                    medium: "#cccccc",
-                },
-                info: "#2196f3",
-                primary: {
-                    50: "#f9fafb",
-                    100: "#f4f6fb",
-                    200: "#e4e9fb",
-                    300: "#c6cef7",
-                    400: "#9ca9f0",
-                    500: "#6b7fe8",
-                    600: "#4b5ee0",
-                    700: "#3a4bbd",
-                    800: "#2c3a95",
-                    900: "#1f296e",
-                },
-                status: {
-                    degraded: "#f59e0b",
-                    down: "#ef4444",
-                    paused: "#9ca3af",
-                    pending: "#f97316",
-                    unknown: "#6b7280",
-                    up: "#22c55e",
-                },
-                success: "#22c55e",
-                warning: "#f59e0b",
-            },
-            isDark: false,
-            name: "light",
-            shadows: {
-                lg: "0 10px 30px rgba(0,0,0,0.12)",
-                md: "0 4px 12px rgba(0,0,0,0.1)",
-                none: "none",
-                sm: "0 2px 4px rgba(0,0,0,0.08)",
-                xl: "0 20px 40px rgba(0,0,0,0.14)",
-            },
-            spacing: {
-                lg: "1.5rem",
-                md: "1rem",
-                none: "0",
-                sm: "0.5rem",
-                xl: "2rem",
-                xs: "0.25rem",
-            },
-            typography: {
-                fontFamily: "Inter, sans-serif",
-                fontSize: {
-                    base: "1rem",
-                    lg: "1.125rem",
-                    sm: "0.875rem",
-                    xl: "1.25rem",
-                    xs: "0.75rem",
-                },
-                fontWeight: {
-                    bold: "700",
-                    medium: "500",
-                    regular: "400",
-                    semibold: "600",
-                },
-            },
-        },
-        getColor: vi.fn(() => "#ffffff"),
-        getStatusColor: vi.fn(() => "#22c55e"),
-        isDark: false,
-        setTheme: vi.fn(),
-        systemTheme: "light",
-        themeManager: {} as never,
-        themeName: "light",
-        themeVersion: 1,
-        toggleTheme: vi.fn(),
-    } as unknown as ReturnType<typeof useTheme>);
+    mockUseTheme.mockReturnValue(createThemeState());
 
     mockUseAvailabilityColors.mockReturnValue({
         getAvailabilityColor: vi.fn(() => "status-success"),
@@ -193,8 +232,12 @@ describe(Header, () => {
 
         expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
         expect(screen.getByText("Global uptime")).toBeInTheDocument();
-        expect(screen.getByText("92%")).toBeInTheDocument();
-        expect(screen.getByText(/tracking 5 sites/i)).toBeInTheDocument();
+        expect(screen.getAllByText("92%", { selector: "span" })).toHaveLength(
+            2
+        );
+        const trackingText = screen.getByTestId("header-site-count");
+        expect(trackingText).toHaveTextContent("Tracking");
+        expect(trackingText).toHaveTextContent("5 sites");
     });
 
     it("toggles sidebar when nav button clicked", () => {
@@ -209,7 +252,7 @@ describe(Header, () => {
 
     it("opens add site modal", () => {
         const uiState = createUiState();
-        mockUseUIStore.mockImplementation((selector) => selector(uiState));
+        mockUseUIStore.mockReturnValue(uiState);
 
         render(<Header />);
         fireEvent.click(screen.getByLabelText("Add new site"));
@@ -219,23 +262,25 @@ describe(Header, () => {
 
     it("opens settings modal", () => {
         const uiState = createUiState();
-        mockUseUIStore.mockImplementation((selector) => selector(uiState));
+        mockUseUIStore.mockReturnValue(uiState);
 
         render(<Header />);
-        fireEvent.click(screen.getByLabelText("Settings"));
+        fireEvent.click(screen.getByLabelText("Open settings"));
 
         expect(uiState.setShowSettings).toHaveBeenCalledWith(true);
     });
 
     it("toggles theme when requested", () => {
         const toggleTheme = vi.fn();
-        mockUseTheme.mockReturnValue({
-            isDark: false,
-            toggleTheme,
-        } as unknown as ReturnType<typeof useTheme>);
+        mockUseTheme.mockReturnValue(
+            createThemeState({
+                isDark: false,
+                toggleTheme,
+            })
+        );
 
         render(<Header />);
-        fireEvent.click(screen.getByLabelText("Toggle theme"));
+        fireEvent.click(screen.getByLabelText("Switch to dark theme"));
 
         expect(toggleTheme).toHaveBeenCalledTimes(1);
     });

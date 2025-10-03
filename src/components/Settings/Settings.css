@@ -12,17 +12,23 @@
     overflow: hidden;
     flex-direction: column;
     border: 1px solid
-        color-mix(in srgb, var(--color-border-subtle) 72%, transparent);
+        color-mix(in srgb, var(--color-border-subtle) 60%, transparent);
     border-radius: var(--border-radius-2xl);
-    background: color-mix(
-        in srgb,
-        var(--color-background-secondary) 92%,
-        #0f172a 8%
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(
+                in srgb,
+                var(--color-surface-overlay) 88%,
+                var(--color-primary-500) 4%
+            )
+            100%
     );
     box-shadow:
-        0 24px 60px rgb(15 23 42 / 45%),
-        0 0 0 1px rgb(148 163 184 / 15%);
-    inline-size: min(640px, 92vi);
+        0 28px 70px rgb(15 23 42 / 52%),
+        0 0 0 1px rgb(148 163 184 / 12%),
+        inset 0 0 0 1px rgb(255 255 255 / 4%);
+    inline-size: min(680px, 94vi);
 }
 
 .settings-modal__header {
@@ -30,13 +36,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-xl) var(--spacing-2xl);
     background: linear-gradient(
-        115deg,
-        rgb(37 99 235 / 90%),
-        rgb(79 70 229 / 78%)
+        125deg,
+        color-mix(in srgb, var(--color-primary-600) 94%, transparent),
+        color-mix(in srgb, var(--color-primary-500) 86%, transparent)
     );
-    border-block-end: 1px solid rgb(148 163 184 / 15%);
+    border-block-end: 1px solid rgb(148 163 184 / 12%);
     color: var(--color-text-inverse);
 
     &::after {
@@ -44,8 +50,8 @@
         z-index: 0;
         background: radial-gradient(
             circle at top right,
-            rgb(255 255 255 / 25%),
-            transparent 55%
+            rgb(255 255 255 / 22%),
+            transparent 60%
         );
         content: "";
         inset: 0;
@@ -58,18 +64,19 @@
     z-index: 1;
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
 }
 
 .settings-modal__header-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgb(255 255 255 / 18%);
+    border: 1px solid rgb(255 255 255 / 16%);
     border-radius: var(--border-radius-xl);
-    background: rgb(15 23 42 / 25%);
-    block-size: 42px;
-    inline-size: 42px;
+    background: rgb(15 23 42 / 22%);
+    block-size: 48px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
+    inline-size: 48px;
 }
 
 .settings-modal__heading {
@@ -121,21 +128,26 @@
 .settings-modal__body {
     display: flex;
     flex-direction: column;
-    padding: var(--spacing-xl);
-    gap: var(--spacing-lg);
+    padding: var(--spacing-2xl);
+    gap: var(--spacing-xl);
 }
 
 .settings-modal__banner {
     display: flex;
     align-items: center;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
     border-radius: var(--border-radius-xl);
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
 }
 
 .settings-modal__banner--success {
-    border: 1px solid rgb(34 197 94 / 28%);
-    background: rgb(34 197 94 / 12%);
+    border: 1px solid rgb(34 197 94 / 24%);
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, rgb(34 197 94) 16%, transparent),
+        color-mix(in srgb, rgb(34 197 94) 8%, transparent)
+    );
+    box-shadow: 0 8px 20px rgb(34 197 94 / 14%);
     color: rgb(34 197 94);
 }
 
@@ -152,35 +164,38 @@
 .settings-section {
     display: flex;
     flex-direction: column;
-    padding: var(--spacing-lg);
-    border: 1px solid rgb(148 163 184 / 16%);
+    padding: var(--spacing-xl);
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
     border-radius: var(--border-radius-xl);
-    background: color-mix(
-        in srgb,
-        var(--color-background-primary) 94%,
-        #0b1220 6%
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-surface-elevated) 98%, transparent) 0%,
+        color-mix(
+                in srgb,
+                var(--color-surface-overlay) 92%,
+                var(--color-primary-500) 2%
+            )
+            100%
     );
-    gap: var(--spacing-md);
-    transition: border-color 0.2s ease;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 3%),
+        0 8px 20px rgb(8 12 24 / 12%);
+    gap: var(--spacing-lg);
+    transition:
+        border-color 0.22s ease,
+        box-shadow 0.22s ease;
 
     @media screen and (prefers-reduced-motion: reduce) {
-        display: flex;
-        flex-direction: column;
-        padding: var(--spacing-lg);
-        border: 1px solid rgb(148 163 184 / 16%);
-        border-radius: var(--border-radius-xl);
-        background: color-mix(
-            in srgb,
-            var(--color-background-primary) 94%,
-            #0b1220 6%
-        );
-        gap: var(--spacing-md);
         transition: none;
     }
 
     &:hover,
-    &:focus {
-        border-color: rgb(129 140 248 / 35%);
+    &:focus-within {
+        border-color: rgb(129 140 248 / 28%);
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 4%),
+            0 12px 28px rgb(129 140 248 / 18%);
     }
 }
 
@@ -263,13 +278,19 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: color-mix(
-        in srgb,
-        var(--color-background-secondary) 96%,
-        #0b1220 4%
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-surface-elevated) 98%, transparent) 0%,
+        color-mix(
+                in srgb,
+                var(--color-surface-overlay) 94%,
+                var(--color-primary-500) 2%
+            )
+            100%
     );
-    border-block-start: 1px solid rgb(148 163 184 / 18%);
+    border-block-start: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 24%, transparent);
 }
 
 .settings-modal__footer-actions {

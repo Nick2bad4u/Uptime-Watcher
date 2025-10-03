@@ -7,7 +7,7 @@
  * condition.
  */
 
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, within, act } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import type { UnknownRecord } from "type-fest";
@@ -284,6 +284,39 @@ vi.mock("../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
 }));
 
+/**
+ * Retrieves the rendered settings modal element and validates its core
+ * controls.
+ *
+ * @returns The settings modal element for additional assertions.
+ */
+const getSettingsModal = (): HTMLElement => {
+    const settingsModal = screen.getByTestId("settings-modal");
+    const closeButton = within(settingsModal).getByRole("button", {
+        name: "Close settings",
+    });
+
+    expect(closeButton).toHaveAttribute("aria-label", "Close settings");
+    expect(closeButton).toHaveAttribute("type", "button");
+
+    return settingsModal;
+};
+
+/**
+ * Creates the canonical set of allowed settings keys used by the mocked store.
+ *
+ * @returns Read-only set containing the allowed settings keys.
+ */
+const createAllowedSettingsKeySet = (): ReadonlySet<
+    keyof typeof mockUseStore.settings
+> => {
+    const keys = Object.keys(mockUseStore.settings) as Array<
+        keyof typeof mockUseStore.settings
+    >;
+
+    return new Set<keyof typeof mockUseStore.settings>(keys);
+};
+
 describe("Settings Component - Invalid Key Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -300,19 +333,11 @@ describe("Settings Component - Invalid Key Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Data Update", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: Settings.invalid-key", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Data Update", "type");
-
         // This test will trigger the lines 87-89 by directly testing the handleSettingChange method
         render(<Settings onClose={vi.fn()} />);
 
-        // Get the Settings component from the render result
-        const settingsComponent = screen
-            .getByRole("button", { name: "Close settings", hidden: true })
-            .closest(".modal-container");
-        expect(settingsComponent).toBeTruthy();
+        // Ensure the modal structure matches expectations after recent UI updates
+        getSettingsModal();
 
         // We need to simulate the internal handleSettingChange call
         // Since we can't directly access the method, we'll test it by creating a scenario
@@ -324,20 +349,13 @@ describe("Settings Component - Invalid Key Coverage", () => {
 
         // For now, let's test by directly calling the logic that would be in handleSettingChange
         await act(async () => {
-            const allowedKeys = [
-                "notifications",
-                "autoStart",
-                "minimizeToTray",
-                "theme",
-                "soundAlerts",
-                "historyLimit",
-            ];
+            const allowedKeys = createAllowedSettingsKeySet();
 
             const invalidKey = "invalidKey";
 
             // Simulate the exact logic from handleSettingChange (lines 86-89)
             if (
-                !allowedKeys.includes(
+                !allowedKeys.has(
                     invalidKey as keyof typeof mockUseStore.settings
                 )
             ) {
@@ -372,30 +390,18 @@ describe("Settings Component - Invalid Key Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: Settings.invalid-key", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
         render(<Settings onClose={vi.fn()} />);
 
+        getSettingsModal();
+
         await act(async () => {
-            const allowedKeys = [
-                "notifications",
-                "autoStart",
-                "minimizeToTray",
-                "theme",
-                "soundAlerts",
-                "historyLimit",
-            ];
+            const allowedKeys = createAllowedSettingsKeySet();
 
             const validKey = "notifications";
 
             // Simulate the logic from handleSettingChange with valid key
             if (
-                !allowedKeys.includes(
-                    validKey as keyof typeof mockUseStore.settings
-                )
+                !allowedKeys.has(validKey as keyof typeof mockUseStore.settings)
             ) {
                 logger.warn(
                     "Attempted to update invalid settings key",

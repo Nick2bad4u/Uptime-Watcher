@@ -39,6 +39,14 @@ import type { ButtonSize } from "../../../theme/components/types";
 
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { AppIcons } from "../../../utils/icons";
+import { Tooltip } from "../Tooltip/Tooltip";
+
+/**
+ * Contextual reason applied when the monitoring button becomes disabled.
+ *
+ * @public
+ */
+export type SiteMonitoringDisabledReason = "loading" | "unconfigured";
 
 /**
  * Props for the SiteMonitoringButton component.
@@ -56,6 +64,8 @@ export interface SiteMonitoringButtonProperties
     readonly allMonitorsRunning: boolean;
     /** Whether to show compact text (for smaller spaces) */
     readonly compact?: boolean;
+    /** Optional reason describing why the control is disabled. */
+    readonly disabledReason?: SiteMonitoringDisabledReason;
     /** Whether any operation is currently loading - disables button */
     readonly isLoading: boolean;
     /** Handler for starting site-level monitoring */
@@ -116,6 +126,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
         allMonitorsRunning,
         className = "",
         compact = false,
+        disabledReason,
         isLoading,
         onStartSiteMonitoring,
         onStopSiteMonitoring,
@@ -140,41 +151,78 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
 
         const iconSize = size === "xs" ? 14 : 16;
         const StopIcon = AppIcons.actions.pauseFilled;
-        const StartIcon = AppIcons.actions.playAll;
+        const StartIcon = AppIcons.actions.playFilled;
+
+        // Mirror ActionButtonGroup tooltip behaviour so site-level controls
+        // surface a consistent reason when disabled.
+        const decorateTooltip = useCallback(
+            (baseMessage: string): string => {
+                if (disabledReason === "unconfigured") {
+                    return `${baseMessage} • Configure a monitor to enable this control.`;
+                }
+                if (disabledReason === "loading") {
+                    return `${baseMessage} • Finishing the previous request.`;
+                }
+                return baseMessage;
+            },
+            [disabledReason]
+        );
 
         if (allMonitorsRunning) {
             return (
-                <ThemedButton
-                    aria-label="Stop All Monitoring"
-                    className={`flex items-center gap-1 ${className}`}
-                    disabled={isLoading}
-                    onClick={handleStopClick}
-                    size={size}
-                    variant="error"
-                >
-                    <StopIcon size={iconSize} />
-                    {!compact && (
-                        <span className="hidden text-xs sm:inline">
-                            Stop All
-                        </span>
+                <Tooltip
+                    content={decorateTooltip(
+                        "Stop monitoring all monitors for this site"
                     )}
-                </ThemedButton>
+                    position="top"
+                >
+                    {(triggerProps) => (
+                        <ThemedButton
+                            {...triggerProps}
+                            aria-label="Stop All Monitoring"
+                            className={`flex items-center gap-1 ${className}`}
+                            disabled={isLoading}
+                            onClick={handleStopClick}
+                            size={size}
+                            variant="error"
+                        >
+                            <StopIcon size={iconSize} />
+                            {!compact && (
+                                <span className="hidden text-xs sm:inline">
+                                    Stop All
+                                </span>
+                            )}
+                        </ThemedButton>
+                    )}
+                </Tooltip>
             );
         }
 
         return (
-            <ThemedButton
-                aria-label="Start All Monitoring"
-                className={`flex items-center gap-1 ${className}`}
-                disabled={isLoading}
-                onClick={handleStartClick}
-                size={size}
-                variant="success"
-            >
-                <StartIcon size={iconSize} />
-                {!compact && (
-                    <span className="hidden text-xs sm:inline">Start All</span>
+            <Tooltip
+                content={decorateTooltip(
+                    "Start monitoring all monitors for this site"
                 )}
-            </ThemedButton>
+                position="top"
+            >
+                {(triggerProps) => (
+                    <ThemedButton
+                        {...triggerProps}
+                        aria-label="Start All Monitoring"
+                        className={`flex items-center gap-1 ${className}`}
+                        disabled={isLoading}
+                        onClick={handleStartClick}
+                        size={size}
+                        variant="success"
+                    >
+                        <StartIcon size={iconSize} />
+                        {!compact && (
+                            <span className="hidden text-xs sm:inline">
+                                Start All
+                            </span>
+                        )}
+                    </ThemedButton>
+                )}
+            </Tooltip>
         );
     });

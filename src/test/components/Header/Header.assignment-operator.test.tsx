@@ -13,6 +13,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Header } from "../../../components/Header/Header";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
+import type { SitesStore } from "../../../stores/sites/types";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import type { Site } from "../../../../shared/types";
@@ -26,6 +27,53 @@ const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
+
+const createMockSitesStoreState = (sites: Site[]): SitesStore => {
+    const unsubscribe = vi.fn();
+
+    return {
+        addMonitorToSite: vi.fn(async () => {}),
+        addSite: vi.fn(),
+        checkSiteNow: vi.fn(async () => {}),
+        createSite: vi.fn(async () => {}),
+        deleteSite: vi.fn(async () => {}),
+        downloadSqliteBackup: vi.fn(async () => {}),
+        fullResyncSites: vi.fn(async () => {}),
+        getSelectedMonitorId: vi.fn(() => undefined),
+        getSelectedSite: vi.fn(() => undefined),
+        getSyncStatus: vi.fn(async () => ({
+            lastSyncAt: null,
+            siteCount: sites.length,
+            source: "frontend" as const,
+            synchronized: true,
+        })),
+        initializeSites: vi.fn(async () => ({
+            message: "",
+            sitesLoaded: sites.length,
+            success: true,
+        })),
+        modifySite: vi.fn(async () => {}),
+        removeMonitorFromSite: vi.fn(async () => {}),
+        removeSite: vi.fn(),
+        selectSite: vi.fn(),
+        setSelectedMonitorId: vi.fn(),
+        setSites: vi.fn(),
+        startSiteMonitoring: vi.fn(async () => {}),
+        startSiteMonitorMonitoring: vi.fn(async () => {}),
+        stopSiteMonitoring: vi.fn(async () => {}),
+        stopSiteMonitorMonitoring: vi.fn(async () => {}),
+        subscribeToStatusUpdates: vi.fn(),
+        subscribeToSyncEvents: vi.fn(() => unsubscribe),
+        syncSites: vi.fn(async () => {}),
+        unsubscribeFromStatusUpdates: vi.fn(),
+        updateMonitorRetryAttempts: vi.fn(async () => {}),
+        updateMonitorTimeout: vi.fn(async () => {}),
+        updateSiteCheckInterval: vi.fn(async () => {}),
+        selectedMonitorIds: {},
+        selectedSiteId: undefined,
+        sites,
+    };
+};
 
 describe("Header Assignment Operator Mutations", () => {
     beforeEach(() => {
@@ -156,15 +204,16 @@ describe("Header Assignment Operator Mutations", () => {
             },
         ];
 
-        mockUseSitesStore.mockReturnValue({
-            sites: sitesWithPausedMonitors,
-            isLoading: false,
-            refreshSites: vi.fn(),
-            addSite: vi.fn(),
-            updateSite: vi.fn(),
-            deleteSite: vi.fn(),
-            getSiteById: vi.fn(),
-        } as any);
+        const mockStoreState = createMockSitesStoreState(
+            sitesWithPausedMonitors
+        );
+
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 
@@ -265,15 +314,16 @@ describe("Header Assignment Operator Mutations", () => {
             },
         ];
 
-        mockUseSitesStore.mockReturnValue({
-            sites: sitesWithPendingMonitors,
-            isLoading: false,
-            refreshSites: vi.fn(),
-            addSite: vi.fn(),
-            updateSite: vi.fn(),
-            deleteSite: vi.fn(),
-            getSiteById: vi.fn(),
-        } as any);
+        const mockStoreState = createMockSitesStoreState(
+            sitesWithPendingMonitors
+        );
+
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 
@@ -377,15 +427,14 @@ describe("Header Assignment Operator Mutations", () => {
             },
         ];
 
-        mockUseSitesStore.mockReturnValue({
-            sites: sitesWithMixedStatus,
-            isLoading: false,
-            refreshSites: vi.fn(),
-            addSite: vi.fn(),
-            updateSite: vi.fn(),
-            deleteSite: vi.fn(),
-            getSiteById: vi.fn(),
-        } as any);
+        const mockStoreState = createMockSitesStoreState(sitesWithMixedStatus);
+
+        mockUseSitesStore.mockImplementation(
+            (selector?: (state: SitesStore) => unknown) =>
+                typeof selector === "function"
+                    ? selector(mockStoreState)
+                    : mockStoreState
+        );
 
         const { container } = render(<Header />);
 

@@ -17,7 +17,10 @@ import type { ButtonSize } from "../../../../theme/components/types";
 
 import { ThemedButton } from "../../../../theme/components/ThemedButton";
 import { AppIcons } from "../../../../utils/icons";
-import { SiteMonitoringButton } from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
+import {
+    SiteMonitoringButton,
+    type SiteMonitoringDisabledReason,
+} from "../../../common/SiteMonitoringButton/SiteMonitoringButton";
 import { Tooltip } from "../../../common/Tooltip/Tooltip";
 
 /**
@@ -127,10 +130,35 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
         const PauseIcon = AppIcons.actions.pause;
         const PlayIcon = AppIcons.actions.play;
 
+        let disabledContext: null | SiteMonitoringDisabledReason = null;
+
+        if (disabled) {
+            disabledContext = "unconfigured";
+        } else if (isLoading) {
+            disabledContext = "loading";
+        }
+
+        // Ensure tooltip copy explains why a control is disabled without
+        // masking the primary action description.
+        const buildActionTooltip = useCallback(
+            (baseMessage: string): string => {
+                if (disabledContext === "unconfigured") {
+                    return `${baseMessage} • Select a monitor to enable this action.`;
+                }
+                if (disabledContext === "loading") {
+                    return `${baseMessage} • Finishing the previous request.`;
+                }
+                return baseMessage;
+            },
+            [disabledContext]
+        );
+
         return (
             <div className={`flex flex-wrap items-center ${clusterGapClass}`}>
                 <Tooltip
-                    content="Trigger an immediate availability check"
+                    content={buildActionTooltip(
+                        "Trigger an immediate availability check"
+                    )}
                     position="top"
                 >
                     {(triggerProps) => (
@@ -156,11 +184,16 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                     onStartSiteMonitoring={onStartSiteMonitoring}
                     onStopSiteMonitoring={onStopSiteMonitoring}
                     size={buttonSize}
+                    {...(disabledContext
+                        ? { disabledReason: disabledContext }
+                        : {})}
                 />
 
                 {isMonitoring ? (
                     <Tooltip
-                        content="Pause monitoring for this site"
+                        content={buildActionTooltip(
+                            "Pause monitoring for this monitor"
+                        )}
                         position="top"
                     >
                         {(triggerProps) => (
@@ -179,7 +212,9 @@ export const ActionButtonGroup: NamedExoticComponent<ActionButtonGroupProperties
                     </Tooltip>
                 ) : (
                     <Tooltip
-                        content="Resume monitoring for this site"
+                        content={buildActionTooltip(
+                            "Resume monitoring for this monitor"
+                        )}
                         position="top"
                     >
                         {(triggerProps) => (

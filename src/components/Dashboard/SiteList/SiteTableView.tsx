@@ -25,7 +25,7 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
         return (
             <ThemedBox
                 className="site-table"
-                padding="md"
+                padding="sm"
                 rounded="lg"
                 shadow="sm"
                 surface="elevated"

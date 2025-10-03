@@ -85,7 +85,7 @@ vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
 
 vi.mock("../components/Settings/Settings", () => ({
     Settings: () => (
-        <div data-testid="settings">
+        <div data-testid="settings-modal">
             <div>Settings</div>
         </div>
     ),
@@ -168,10 +168,14 @@ const mockErrorStoreState = {
 const mockUIStoreState = {
     showAddSiteModal: false,
     showSettings: false,
+    showSiteDetails: false,
     selectedSiteId: undefined as string | undefined,
     setShowAddSiteModal: vi.fn(),
     setShowSettings: vi.fn(),
+    setShowSiteDetails: vi.fn(),
     selectSite: vi.fn(),
+    siteListLayout: "card-large" as const,
+    setSiteListLayout: vi.fn(),
 };
 
 const mockSettingsStoreState = {
@@ -301,6 +305,42 @@ const mockUseTheme = vi.mocked(useTheme.useTheme);
 const mockUseAvailabilityColors = vi.mocked(useTheme.useAvailabilityColors);
 const mockUseThemeClasses = vi.mocked(useTheme.useThemeClasses);
 
+/**
+ * Retrieves the dashboard overview card that displays the monitored sites
+ * metric.
+ *
+ * @returns The overview card element containing the monitored sites label.
+ */
+function getMonitoredSitesCard(): HTMLElement {
+    const labelElements = screen.getAllByText("Monitored Sites");
+
+    for (const labelElement of labelElements) {
+        const card = labelElement.closest(".dashboard-overview__card");
+        if (card) {
+            return card as HTMLElement;
+        }
+    }
+
+    throw new Error("Unable to locate monitored sites overview card");
+}
+
+/**
+ * Retrieves the site count value rendered inside the monitored sites overview
+ * card.
+ *
+ * @returns Trimmed text content representing the monitored site total.
+ */
+function getMonitoredSitesCardValue(): string {
+    const card = getMonitoredSitesCard();
+    const valueElement = card.querySelector(".dashboard-overview__card-value");
+
+    if (!valueElement) {
+        throw new Error("Unable to locate monitored sites value element");
+    }
+
+    return valueElement.textContent?.trim() ?? "";
+}
+
 describe("App Additional Coverage Tests", () => {
     // Declare mock functions that need to be shared across tests
     let initializeSitesMock: MockedFunction<() => Promise<void>>;
@@ -397,6 +437,8 @@ describe("App Additional Coverage Tests", () => {
             setShowSettings: vi.fn(),
             setShowSiteDetails: vi.fn(),
             selectSite: vi.fn(),
+            siteListLayout: "card-large" as const,
+            setSiteListLayout: vi.fn(),
         });
 
         Object.assign(mockSettingsStoreState, {
@@ -491,8 +533,10 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Verify main components are rendered using actual DOM structure
-        expect(screen.getByText("Uptime Watcher")).toBeInTheDocument(); // Header title
-        expect(screen.getByText("Monitored Sites (1)")).toBeInTheDocument(); // Site list section
+        expect(
+            screen.getAllByText("Uptime Watcher").length
+        ).toBeGreaterThanOrEqual(1); // Header and sidebar branding
+        expect(getMonitoredSitesCardValue()).toBe("1");
         // AddSiteModal is rendered but may not be visible without proper state
     });
 
@@ -517,7 +561,7 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Check that site count uses the proper constant
-        expect(screen.getByText("Monitored Sites (1)")).toBeInTheDocument();
+        expect(getMonitoredSitesCardValue()).toBe("1");
     });
 
     it("should show loading overlay with correct message", async ({
@@ -611,7 +655,14 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Check update error alert - should show the actual error message
-        expect(screen.getByText("Update failed error")).toBeInTheDocument();
+        const message = screen.getByText("Update failed error");
+        expect(message).toBeInTheDocument();
+
+        const alert = message.closest(".update-alert");
+        expect(alert).not.toBeNull();
+        expect(alert).toHaveClass("update-alert--error");
+        expect(alert?.querySelector(".update-alert__icon svg")).not.toBeNull();
+
         // Check for dismiss button text from UI_MESSAGES.UPDATE_DISMISS_BUTTON
         expect(screen.getByText("Dismiss")).toBeInTheDocument();
     });
@@ -636,7 +687,15 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Check update error fallback message
-        expect(screen.getByText("Update failed.")).toBeInTheDocument();
+        const fallback = screen.getByText("Update failed.");
+        expect(fallback).toBeInTheDocument();
+
+        const fallbackAlert = fallback.closest(".update-alert");
+        expect(fallbackAlert).not.toBeNull();
+        expect(fallbackAlert).toHaveClass("update-alert--error");
+        expect(
+            fallbackAlert?.querySelector(".update-alert__icon svg")
+        ).not.toBeNull();
     });
 
     it("should display update available notification", async ({
@@ -658,11 +717,16 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        // Check update available message
-        expect(
-            screen.getByText("A new update is available. Downloading...")
-        ).toBeInTheDocument();
-        expect(screen.getByText("⬇️")).toBeInTheDocument();
+        // Check update available message and ensure icon is rendered
+        const message = screen.getByText(
+            "A new update is available. Downloading..."
+        );
+        expect(message).toBeInTheDocument();
+
+        const alert = message.closest(".update-alert");
+        expect(alert).not.toBeNull();
+        expect(alert).toHaveClass("update-alert--available");
+        expect(alert?.querySelector(".update-alert__icon svg")).not.toBeNull();
     });
 
     it("should display update downloading notification", async ({
@@ -684,11 +748,14 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        // Check update downloading message
-        expect(
-            screen.getByText("Update is downloading...")
-        ).toBeInTheDocument();
-        expect(screen.getByText("⏬")).toBeInTheDocument();
+        // Check update downloading message and ensure icon is rendered
+        const message = screen.getByText("Update is downloading...");
+        expect(message).toBeInTheDocument();
+
+        const alert = message.closest(".update-alert");
+        expect(alert).not.toBeNull();
+        expect(alert).toHaveClass("update-alert--downloading");
+        expect(alert?.querySelector(".update-alert__icon svg")).not.toBeNull();
     });
 
     it("should display update downloaded notification with restart button", async ({
@@ -712,11 +779,16 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        // Check update downloaded message and restart button
-        expect(
-            screen.getByText("Update downloaded! Restart to apply.")
-        ).toBeInTheDocument();
-        expect(screen.getByText("✅")).toBeInTheDocument();
+        // Check update downloaded message and ensure icon plus action are rendered
+        const message = screen.getByText(
+            "Update downloaded! Restart to apply."
+        );
+        expect(message).toBeInTheDocument();
+
+        const alert = message.closest(".update-alert");
+        expect(alert).not.toBeNull();
+        expect(alert).toHaveClass("update-alert--downloaded");
+        expect(alert?.querySelector(".update-alert__icon svg")).not.toBeNull();
         expect(screen.getByText("Restart Now")).toBeInTheDocument();
 
         // Test restart button click
@@ -766,8 +838,8 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        const appContainer = document.querySelector(".app-container");
-        expect(appContainer).toHaveClass("dark");
+        const appContainer = screen.getByTestId("app-container");
+        expect(appContainer).toHaveClass("app-shell--dark");
     });
 
     it("should handle update action dismiss when status is not downloaded", async ({
@@ -1162,7 +1234,7 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Check that site count reflects multiple sites
-        expect(screen.getByText("Monitored Sites (2)")).toBeInTheDocument();
+        expect(getMonitoredSitesCardValue()).toBe("2");
     });
 
     it("should handle empty sites list", async ({ task, annotate }) => {
@@ -1181,7 +1253,7 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         // Check that site count shows zero
-        expect(screen.getByText("Monitored Sites (0)")).toBeInTheDocument();
+        expect(getMonitoredSitesCardValue()).toBe("0");
     });
 
     it("should handle error clearing timeout", async ({ task, annotate }) => {
@@ -1225,10 +1297,10 @@ describe("App Additional Coverage Tests", () => {
 
         render(<App />);
 
-        // Verify the main container has the app-container class
-        const appContainer = document.querySelector(".app-container");
+        // Verify the main container has the expected shell class
+        const appContainer = screen.getByTestId("app-container");
         expect(appContainer).toBeInTheDocument();
-        expect(appContainer).toHaveClass("app-container");
+        expect(appContainer).toHaveClass("app-shell");
     });
 
     it("should handle keyboard events for accessibility", async ({

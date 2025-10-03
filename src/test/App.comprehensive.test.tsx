@@ -32,6 +32,8 @@ vi.mock("../services/logger", () => ({
             started: vi.fn(),
         },
         debug: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
     },
 }));
 
@@ -115,7 +117,7 @@ describe("App Component - Comprehensive Coverage", () => {
     };
 
     const defaultSitesStore = {
-        sites: [],
+        sites: [] as any[],
         initializeSites: vi.fn().mockResolvedValue(undefined),
         subscribeToStatusUpdates: vi.fn(),
         unsubscribeFromStatusUpdates: vi.fn(),
@@ -123,10 +125,15 @@ describe("App Component - Comprehensive Coverage", () => {
     };
 
     const defaultUIStore = {
+        setShowAddSiteModal: vi.fn(),
         setShowSettings: vi.fn(),
         setShowSiteDetails: vi.fn(),
+        setSiteListLayout: vi.fn(),
+        selectSite: vi.fn(),
+        showAddSiteModal: false,
         showSettings: false,
         showSiteDetails: false,
+        siteListLayout: "card-large" as const,
     };
 
     const defaultUpdatesStore = {
@@ -160,20 +167,80 @@ describe("App Component - Comprehensive Coverage", () => {
             toggleTheme: vi.fn(),
         }) as any;
 
+    /**
+     * Retrieves the dashboard overview card that displays the monitored sites
+     * metric.
+     *
+     * @returns The overview card element containing the monitored sites label.
+     */
+    const getMonitoredSitesCard = (): HTMLElement => {
+        const labelElements = screen.getAllByText("Monitored Sites");
+
+        for (const labelElement of labelElements) {
+            const card = labelElement.closest(".dashboard-overview__card");
+            if (card) {
+                return card as HTMLElement;
+            }
+        }
+
+        throw new Error("Unable to locate monitored sites overview card");
+    };
+
+    /**
+     * Retrieves the site count value rendered within the monitored sites
+     * overview card.
+     *
+     * @returns Trimmed string representing the total monitored sites value.
+     */
+    const getMonitoredSitesCardValue = (): string => {
+        const card = getMonitoredSitesCard();
+        const valueElement = card.querySelector(
+            ".dashboard-overview__card-value"
+        );
+
+        if (!valueElement) {
+            throw new Error("Unable to locate monitored sites value element");
+        }
+
+        return valueElement.textContent?.trim() ?? "";
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
 
         // Reset all mocks to default state
-        mockUseErrorStore.mockReturnValue(defaultErrorStore);
-        mockUseSettingsStore.mockReturnValue(defaultSettingsStore);
-        mockUseSitesStore.mockReturnValue(defaultSitesStore);
-        mockUseUIStore.mockReturnValue(defaultUIStore);
-        mockUseUpdatesStore.mockReturnValue(defaultUpdatesStore);
+        mockUseErrorStore.mockImplementation(() => defaultErrorStore);
+        mockUseSettingsStore.mockImplementation(() => defaultSettingsStore);
+        mockUseSitesStore.mockImplementation((selector: any) =>
+            typeof selector === "function"
+                ? selector(defaultSitesStore)
+                : defaultSitesStore
+        );
+        mockUseUIStore.mockImplementation((selector: any) =>
+            typeof selector === "function"
+                ? selector(defaultUIStore)
+                : defaultUIStore
+        );
+        mockUseUpdatesStore.mockImplementation(() => defaultUpdatesStore);
         mockUseTheme.mockReturnValue(createMockTheme());
 
         // Set up getState mocks
         defaultSitesStore.getState.mockReturnValue(defaultSitesStore);
         defaultSettingsStore.getState.mockReturnValue(defaultSettingsStore);
+
+        // Reset mutable store state between tests
+        defaultSitesStore.sites = [];
+        Object.assign(defaultUIStore, {
+            setShowAddSiteModal: vi.fn(),
+            setShowSettings: vi.fn(),
+            setShowSiteDetails: vi.fn(),
+            setSiteListLayout: vi.fn(),
+            selectSite: vi.fn(),
+            showAddSiteModal: false,
+            showSettings: false,
+            showSiteDetails: false,
+            siteListLayout: "card-large" as const,
+        });
 
         // Mock store static functions
         (mockUseSitesStore as any).getState = vi
@@ -203,7 +270,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             expect(screen.getByTestId("header")).toBeInTheDocument();
             expect(screen.getByTestId("site-list")).toBeInTheDocument();
-            expect(screen.getByText("Monitored Sites (0)")).toBeInTheDocument();
+            expect(getMonitoredSitesCardValue()).toBe("0");
             // AddSiteModal is conditionally rendered and not visible by default
         });
 
@@ -225,8 +292,8 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            const appContainer = document.querySelector(".app-container");
-            expect(appContainer).toHaveClass("dark");
+            const appContainer = screen.getByTestId("app-container");
+            expect(appContainer).toHaveClass("app-shell--dark");
         });
 
         it("should not apply dark theme class when isDark is false", async ({
@@ -247,8 +314,8 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            const appContainer = document.querySelector(".app-container");
-            expect(appContainer).not.toHaveClass("dark");
+            const appContainer = screen.getByTestId("app-container");
+            expect(appContainer).not.toHaveClass("app-shell--dark");
         });
 
         it("should display correct site count", async ({ task, annotate }) => {
@@ -262,14 +329,14 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            mockUseSitesStore.mockReturnValue({
-                ...defaultSitesStore,
-                sites: [mockSite, { ...mockSite, identifier: "test-site-2" }],
-            });
+            defaultSitesStore.sites = [
+                mockSite,
+                { ...mockSite, identifier: "test-site-2" },
+            ];
 
             render(<App />);
 
-            expect(screen.getByText("Monitored Sites (2)")).toBeInTheDocument();
+            expect(getMonitoredSitesCardValue()).toBe("2");
         });
     });
 
@@ -477,10 +544,17 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
+            const message = screen.getByText(
+                "A new update is available. Downloading..."
+            );
+            expect(message).toBeInTheDocument();
+
+            const alert = message.closest(".update-alert");
+            expect(alert).not.toBeNull();
+            expect(alert).toHaveClass("update-alert--available");
             expect(
-                screen.getByText("A new update is available. Downloading...")
-            ).toBeInTheDocument();
-            expect(screen.getByText("⬇️")).toBeInTheDocument();
+                alert?.querySelector(".update-alert__icon svg")
+            ).not.toBeNull();
         });
 
         it("should display downloading update notification", async ({
@@ -504,10 +578,15 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
+            const message = screen.getByText("Update is downloading...");
+            expect(message).toBeInTheDocument();
+
+            const alert = message.closest(".update-alert");
+            expect(alert).not.toBeNull();
+            expect(alert).toHaveClass("update-alert--downloading");
             expect(
-                screen.getByText("Update is downloading...")
-            ).toBeInTheDocument();
-            expect(screen.getByText("⏬")).toBeInTheDocument();
+                alert?.querySelector(".update-alert__icon svg")
+            ).not.toBeNull();
         });
 
         it("should display downloaded update notification with restart button", async ({
@@ -531,10 +610,17 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
+            const message = screen.getByText(
+                "Update downloaded! Restart to apply."
+            );
+            expect(message).toBeInTheDocument();
+
+            const alert = message.closest(".update-alert");
+            expect(alert).not.toBeNull();
+            expect(alert).toHaveClass("update-alert--downloaded");
             expect(
-                screen.getByText("Update downloaded! Restart to apply.")
-            ).toBeInTheDocument();
-            expect(screen.getByText("✅")).toBeInTheDocument();
+                alert?.querySelector(".update-alert__icon svg")
+            ).not.toBeNull();
             expect(screen.getByText("Restart Now")).toBeInTheDocument();
         });
 
@@ -560,9 +646,15 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
+            const message = screen.getByText("Custom error message");
+            expect(message).toBeInTheDocument();
+
+            const alert = message.closest(".update-alert");
+            expect(alert).not.toBeNull();
+            expect(alert).toHaveClass("update-alert--error");
             expect(
-                screen.getByText("Custom error message")
-            ).toBeInTheDocument();
+                alert?.querySelector(".update-alert__icon svg")
+            ).not.toBeNull();
             expect(screen.getByText("Dismiss")).toBeInTheDocument();
         });
 
@@ -588,7 +680,15 @@ describe("App Component - Comprehensive Coverage", () => {
 
             render(<App />);
 
-            expect(screen.getByText("Update failed.")).toBeInTheDocument();
+            const fallback = screen.getByText("Update failed.");
+            expect(fallback).toBeInTheDocument();
+
+            const alert = fallback.closest(".update-alert");
+            expect(alert).not.toBeNull();
+            expect(alert).toHaveClass("update-alert--error");
+            expect(
+                alert?.querySelector(".update-alert__icon svg")
+            ).not.toBeNull();
         });
 
         it("should apply update when restart button is clicked", async ({

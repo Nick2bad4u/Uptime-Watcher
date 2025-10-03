@@ -53,7 +53,14 @@ const STATUS_ICON_COMPONENTS: Record<string, IconType> = {
  */
 export function getStatusIcon(status: string): string {
     const normalizedStatus = status.toLowerCase();
-    return STATUS_ICON_GLYPHS[normalizedStatus] ?? "⚪";
+    const glyph = Object.prototype.hasOwnProperty.call(
+        STATUS_ICON_GLYPHS,
+        normalizedStatus
+    )
+        ? STATUS_ICON_GLYPHS[normalizedStatus]
+        : undefined;
+
+    return typeof glyph === "string" ? glyph : "⚪";
 }
 
 /**

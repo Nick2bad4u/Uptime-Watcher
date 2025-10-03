@@ -47,7 +47,8 @@ import { StatusSummary } from "./StatusSummary";
  * @returns JSX element containing the application header
  */
 export const Header = (): JSX.Element => {
-    const { setShowAddSiteModal, setShowSettings } = useUIStore();
+    const { setShowAddSiteModal, setShowSettings, siteListLayout } =
+        useUIStore();
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
     const { toggleSidebar } = useSidebarLayout();
@@ -93,14 +94,22 @@ export const Header = (): JSX.Element => {
             >
                 <div className="app-topbar__row">
                     <div className="app-topbar__identity">
-                        <button
-                            aria-label="Toggle navigation sidebar"
-                            className="app-topbar__sidebar-toggle"
-                            onClick={toggleSidebar}
-                            type="button"
+                        <Tooltip
+                            content="Toggle navigation sidebar"
+                            position="bottom"
                         >
-                            <SidebarToggleIcon size={20} />
-                        </button>
+                            {(triggerProps) => (
+                                <button
+                                    {...triggerProps}
+                                    aria-label="Toggle navigation sidebar"
+                                    className="app-topbar__sidebar-toggle"
+                                    onClick={toggleSidebar}
+                                    type="button"
+                                >
+                                    <SidebarToggleIcon size={20} />
+                                </button>
+                            )}
+                        </Tooltip>
                         <div className="app-topbar__identity-text">
                             <ThemedText
                                 className="app-topbar__title"
@@ -149,16 +158,18 @@ export const Header = (): JSX.Element => {
                 </div>
 
                 <div className="app-topbar__summary">
-                    <StatusSummary
-                        degradedMonitors={degradedMonitors}
-                        downMonitors={downMonitors}
-                        getAvailabilityColor={getAvailabilityColor}
-                        pausedMonitors={pausedMonitors}
-                        pendingMonitors={pendingMonitors}
-                        totalMonitors={totalStatusMonitors}
-                        upMonitors={upMonitors}
-                        uptimePercentage={uptimePercentage}
-                    />
+                    {siteListLayout !== "card-large" && (
+                        <StatusSummary
+                            degradedMonitors={degradedMonitors}
+                            downMonitors={downMonitors}
+                            getAvailabilityColor={getAvailabilityColor}
+                            pausedMonitors={pausedMonitors}
+                            pendingMonitors={pendingMonitors}
+                            totalMonitors={totalStatusMonitors}
+                            upMonitors={upMonitors}
+                            uptimePercentage={uptimePercentage}
+                        />
+                    )}
                     <Tooltip
                         content={`Monitoring ${totalSites} site${totalSites === 1 ? "" : "s"} with ${totalMonitors} total monitor${totalMonitors === 1 ? "" : "s"}`}
                         position="bottom"
@@ -173,7 +184,10 @@ export const Header = (): JSX.Element => {
                                     className="app-topbar__site-chip-icon"
                                     size={18}
                                 />
-                                <div className="app-topbar__site-chip-text">
+                                <div
+                                    className="app-topbar__site-chip-text"
+                                    data-testid="header-site-count"
+                                >
                                     <ThemedText
                                         className="app-topbar__site-chip-label"
                                         size="xs"

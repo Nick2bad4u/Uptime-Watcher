@@ -110,9 +110,9 @@ describe(useThemeStyles, () => {
         const { result } = renderHook(() => useThemeStyles());
 
         expect(result.current.headerStyle.background).toContain(
-            "rgba(59, 130, 246, 0.1)"
+            "rgba(59, 130, 246, 0.12)"
         );
-        expect(result.current.headerStyle.color).toBe("#111827");
+        expect(result.current.headerStyle.color).toBe("#0f172a");
     });
 
     it("should handle dark mode", async ({ task, annotate }) => {
@@ -136,9 +136,9 @@ describe(useThemeStyles, () => {
         const { result } = renderHook(() => useThemeStyles());
 
         expect(result.current.headerStyle.background).toContain(
-            "rgba(37, 99, 235, 0.15)"
+            "rgba(37, 99, 235, 0.22)"
         );
-        expect(result.current.headerStyle.color).toBe("#f3f4f6");
+        expect(result.current.headerStyle.color).toBe("#f5f7fa");
     });
 
     it("should provide collapse button styles", async ({ task, annotate }) => {

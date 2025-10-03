@@ -81,6 +81,25 @@ const renderActionButtonGroup = (props = {}) =>
             <ActionButtonGroup {...defaultProps} {...props} />
         </ThemeProvider>
     );
+const REFRESH_ICON_PATH =
+    "M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15";
+const PLAY_ICON_PATH =
+    "M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z";
+const PAUSE_ICON_PATH =
+    "M5.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75A.75.75 0 0 0 7.25 3h-1.5ZM12.75 3a.75.75 0 0 0-.75.75v12.5c0 .414.336.75.75.75h1.5a.75.75 0 0 0 .75-.75V3.75a.75.75 0 0 0-.75-.75h-1.5Z";
+
+const expectButtonIconPath = (
+    button: HTMLElement,
+    expectedPath: string
+): void => {
+    const icon = button.querySelector("svg");
+    expect(icon).not.toBeNull();
+    const pathElements = icon?.querySelectorAll("path") ?? [];
+    const pathValues = Array.from(pathElements).map((path) =>
+        path.getAttribute("d")
+    );
+    expect(pathValues).toContain(expectedPath);
+};
 
 describe("ActionButtonGroup - Complete Coverage", () => {
     beforeEach(() => {
@@ -114,7 +133,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
                 name: "Check Now",
             });
             expect(checkButton).toBeInTheDocument();
-            expect(checkButton).toHaveTextContent("🔄");
+            expectButtonIconPath(checkButton, REFRESH_ICON_PATH);
         });
 
         it("should call onCheckNow when clicked", async ({
@@ -299,7 +318,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
                 name: "Start Monitoring",
             });
             expect(startButton).toBeInTheDocument();
-            expect(startButton).toHaveTextContent("▶️");
+            expectButtonIconPath(startButton, PLAY_ICON_PATH);
 
             const stopButton = screen.queryByRole("button", {
                 name: "Stop Monitoring",
@@ -333,7 +352,7 @@ describe("ActionButtonGroup - Complete Coverage", () => {
                 name: "Stop Monitoring",
             });
             expect(stopButton).toBeInTheDocument();
-            expect(stopButton).toHaveTextContent("⏸️");
+            expectButtonIconPath(stopButton, PAUSE_ICON_PATH);
 
             const startButton = screen.queryByRole("button", {
                 name: "Start Monitoring",

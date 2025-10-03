@@ -186,8 +186,12 @@ describe("Form Utilities", () => {
 
                     const convertedValue = Number.parseInt(nonNumericValue, 10);
                     expect(setValue).toHaveBeenCalledWith(convertedValue);
-                    // Should be NaN for strings that don't begin with an optional sign followed by a digit
-                    if (!/^[+-]?\d/.test(nonNumericValue)) {
+
+                    // Allow leading whitespace before optional sign/digit for numeric conversions
+                    const trimmedValue = nonNumericValue.replace(/^\s+/, "");
+                    const numericPattern = /^[+-]?\d/;
+
+                    if (!numericPattern.test(trimmedValue)) {
                         expect(Number.isNaN(convertedValue)).toBeTruthy();
                     }
                 }

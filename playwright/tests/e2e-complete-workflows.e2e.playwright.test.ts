@@ -234,7 +234,7 @@ test.describe(
 
                 // Go to settings tab where remove functionality might be
                 await window
-                    .locator(".site-details-navigation__tabs")
+                    .getByRole("navigation", { name: /site details/i })
                     .getByRole("button", { name: "Settings" })
                     .click();
                 await window.waitForTimeout(1000);
@@ -378,7 +378,7 @@ test.describe(
                 // Navigate to site settings using the specific modal settings button
                 await window.getByText(TEST_SITES.custom.name).click();
                 await window
-                    .locator(".site-details-navigation__tabs")
+                    .getByRole("navigation", { name: /site details/i })
                     .getByRole("button", { name: "Settings" })
                     .click();
 
@@ -531,7 +531,7 @@ test.describe(
                     .getByText(TEST_SITES.primary.name)
                     .click();
                 await window
-                    .locator(".site-details-navigation__tabs")
+                    .getByRole("navigation", { name: /site details/i })
                     .getByRole("button", { name: "History" })
                     .click();
 
@@ -540,7 +540,7 @@ test.describe(
 
                 // Test analytics data
                 await window
-                    .locator(".site-details-navigation__tabs")
+                    .getByRole("navigation", { name: /site details/i })
                     .getByRole("button", { name: /HTTP Analytics/i })
                     .click();
                 await expect(window.getByText("HTTP Analytics")).toBeVisible();

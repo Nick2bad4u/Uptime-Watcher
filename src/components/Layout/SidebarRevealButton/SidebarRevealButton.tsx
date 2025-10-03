@@ -8,6 +8,7 @@ import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
 
 const RevealIcon = AppIcons.layout.viewColumns;
@@ -32,14 +33,19 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
         }
 
         return (
-            <button
-                aria-label="Open navigation"
-                className={className}
-                onClick={toggleSidebar}
-                type="button"
-            >
-                <RevealIcon aria-hidden="true" size={18} />
-            </button>
+            <Tooltip content="Open navigation sidebar" position="right">
+                {(triggerProps) => (
+                    <button
+                        {...triggerProps}
+                        aria-label="Open navigation"
+                        className={className}
+                        onClick={toggleSidebar}
+                        type="button"
+                    >
+                        <RevealIcon aria-hidden="true" size={18} />
+                    </button>
+                )}
+            </Tooltip>
         );
     }
 );

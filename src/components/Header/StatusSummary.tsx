@@ -55,12 +55,12 @@ export const StatusSummary = ({
 }: StatusSummaryProperties): JSX.Element => (
     <ThemedBox
         className="header-status-summary"
-        padding="md"
+        padding="sm"
         rounded="lg"
-        shadow="md"
+        shadow="sm"
         variant="secondary"
     >
-        <div className="header-status-summary__group">
+        <div className="header-status-summary__container">
             {totalMonitors > 0 ? (
                 <Tooltip
                     content={`${uptimePercentage}% uptime across ${totalMonitors} monitor${totalMonitors === 1 ? "" : "s"}`}
@@ -68,7 +68,7 @@ export const StatusSummary = ({
                 >
                     {(triggerProps) => (
                         <div
-                            className="header-status-summary__pill"
+                            className="header-status-summary__pill header-status-summary__pill--health"
                             {...triggerProps}
                         >
                             <HealthIndicator
@@ -88,18 +88,10 @@ export const StatusSummary = ({
                     >
                         <StatusIndicator size="sm" status="up" />
                         <div className="header-status-summary__pill-text">
-                            <ThemedText
-                                size="sm"
-                                variant="primary"
-                                weight="semibold"
-                            >
+                            <ThemedText size="sm" weight="semibold">
                                 {upMonitors}
                             </ThemedText>
-                            <ThemedText
-                                className="leading-none"
-                                size="xs"
-                                variant="secondary"
-                            >
+                            <ThemedText size="xs" variant="secondary">
                                 Up
                             </ThemedText>
                         </div>
@@ -119,18 +111,10 @@ export const StatusSummary = ({
                         >
                             <StatusIndicator size="sm" status="degraded" />
                             <div className="header-status-summary__pill-text">
-                                <ThemedText
-                                    size="sm"
-                                    variant="primary"
-                                    weight="semibold"
-                                >
+                                <ThemedText size="sm" weight="semibold">
                                     {degradedMonitors}
                                 </ThemedText>
-                                <ThemedText
-                                    className="leading-none"
-                                    size="xs"
-                                    variant="secondary"
-                                >
+                                <ThemedText size="xs" variant="secondary">
                                     Degraded
                                 </ThemedText>
                             </div>
@@ -147,58 +131,16 @@ export const StatusSummary = ({
                     >
                         <StatusIndicator size="sm" status="down" />
                         <div className="header-status-summary__pill-text">
-                            <ThemedText
-                                size="sm"
-                                variant="primary"
-                                weight="semibold"
-                            >
+                            <ThemedText size="sm" weight="semibold">
                                 {downMonitors}
                             </ThemedText>
-                            <ThemedText
-                                className="leading-none"
-                                size="xs"
-                                variant="secondary"
-                            >
+                            <ThemedText size="xs" variant="secondary">
                                 Down
                             </ThemedText>
                         </div>
                     </div>
                 )}
             </Tooltip>
-        </div>
-
-        <div className="header-status-summary__group">
-            {totalMonitors > 0 ? (
-                <Tooltip
-                    content="Total configured monitors across all sites"
-                    position="bottom"
-                >
-                    {(triggerProps) => (
-                        <div
-                            className="header-status-summary__pill total-sites-badge"
-                            {...triggerProps}
-                        >
-                            <div className="header-status-summary__dot" />
-                            <div className="header-status-summary__pill-text">
-                                <ThemedText
-                                    size="sm"
-                                    variant="primary"
-                                    weight="semibold"
-                                >
-                                    {totalMonitors}
-                                </ThemedText>
-                                <ThemedText
-                                    className="leading-none"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    Total Monitors
-                                </ThemedText>
-                            </div>
-                        </div>
-                    )}
-                </Tooltip>
-            ) : null}
 
             <Tooltip
                 content="Monitoring jobs awaiting verification"
@@ -211,18 +153,10 @@ export const StatusSummary = ({
                     >
                         <StatusIndicator size="sm" status="pending" />
                         <div className="header-status-summary__pill-text">
-                            <ThemedText
-                                size="sm"
-                                variant="primary"
-                                weight="semibold"
-                            >
+                            <ThemedText size="sm" weight="semibold">
                                 {pendingMonitors}
                             </ThemedText>
-                            <ThemedText
-                                className="leading-none"
-                                size="xs"
-                                variant="secondary"
-                            >
+                            <ThemedText size="xs" variant="secondary">
                                 Pending
                             </ThemedText>
                         </div>
@@ -241,24 +175,40 @@ export const StatusSummary = ({
                     >
                         <StatusIndicator size="sm" status="paused" />
                         <div className="header-status-summary__pill-text">
-                            <ThemedText
-                                size="sm"
-                                variant="primary"
-                                weight="semibold"
-                            >
+                            <ThemedText size="sm" weight="semibold">
                                 {pausedMonitors}
                             </ThemedText>
-                            <ThemedText
-                                className="leading-none"
-                                size="xs"
-                                variant="secondary"
-                            >
+                            <ThemedText size="xs" variant="secondary">
                                 Paused
                             </ThemedText>
                         </div>
                     </div>
                 )}
             </Tooltip>
+
+            {totalMonitors > 0 ? (
+                <Tooltip
+                    content="Total configured monitors across all sites"
+                    position="bottom"
+                >
+                    {(triggerProps) => (
+                        <div
+                            className="header-status-summary__pill total-sites-badge"
+                            {...triggerProps}
+                        >
+                            <div className="header-status-summary__dot" />
+                            <div className="header-status-summary__pill-text">
+                                <ThemedText size="sm" weight="semibold">
+                                    {totalMonitors}
+                                </ThemedText>
+                                <ThemedText size="xs" variant="secondary">
+                                    Total
+                                </ThemedText>
+                            </div>
+                        </div>
+                    )}
+                </Tooltip>
+            ) : null}
         </div>
     </ThemedBox>
 );

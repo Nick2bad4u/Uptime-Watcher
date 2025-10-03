@@ -38,7 +38,7 @@ describe(SiteCardMetrics, () => {
         const cards = screen.getAllByTestId("metric-card");
         expect(
             cards.find((card) => card.dataset["label"] === "Status")
-        ).toHaveAttribute("data-value", "UP");
+        ).toHaveAttribute("data-value", "Up");
         expect(
             cards.find((card) => card.dataset["label"] === "Uptime")
         ).toHaveAttribute("data-value", "99.5%");
@@ -63,7 +63,7 @@ describe(SiteCardMetrics, () => {
         const cards = screen.getAllByTestId("metric-card");
         expect(
             cards.find((card) => card.dataset["label"] === "Status")
-        ).toHaveAttribute("data-value", "UNKNOWN");
+        ).toHaveAttribute("data-value", "Unknown");
     });
 
     it("renders correct number of metric cards", ({ task, annotate }) => {

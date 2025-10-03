@@ -98,6 +98,9 @@ export const SiteList = (): JSX.Element => {
         if (layout === "card-large" && cardPresentation === "stacked") {
             classes.push("site-grid--stacked");
         }
+        if (layout === "card-large" && cardPresentation === "grid") {
+            classes.push("site-grid--balanced");
+        }
         if (isDark) {
             classes.push("site-grid--dark");
         }

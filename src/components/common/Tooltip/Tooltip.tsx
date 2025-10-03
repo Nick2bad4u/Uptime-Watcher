@@ -221,6 +221,43 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 hideTooltip();
             }, [hideTooltip]);
 
+        /**
+         * Pointer enter handler applied to the tooltip container to ensure
+         * hover-based tooltips activate even when the trigger element cannot
+         * fire pointer events (for example, disabled buttons).
+         */
+        const handleContainerMouseEnter: MouseEventHandler<HTMLDivElement> =
+            useCallback(() => {
+                showTooltip();
+            }, [showTooltip]);
+
+        /**
+         * Pointer leave handler on the tooltip container. Keeps tooltip
+         * dismissal consistent across trigger/container interactions.
+         */
+        const handleContainerMouseLeave: MouseEventHandler<HTMLDivElement> =
+            useCallback(() => {
+                hideTooltip();
+            }, [hideTooltip]);
+
+        /**
+         * Touch start handler applied to the tooltip container. Mirrors button
+         * behaviour so touch-only controls continue to surface help text.
+         */
+        const handleContainerTouchStart: TouchEventHandler<HTMLDivElement> =
+            useCallback(() => {
+                showTooltip();
+            }, [showTooltip]);
+
+        /**
+         * Touch end handler applied to the tooltip container to keep the
+         * tooltip lifecycle symmetric for touch interactions.
+         */
+        const handleContainerTouchEnd: TouchEventHandler<HTMLDivElement> =
+            useCallback(() => {
+                hideTooltip();
+            }, [hideTooltip]);
+
         const handleTriggerKeyDown = useCallback(
             (event: KeyboardEvent<HTMLElement>): void => {
                 if (event.key === "Escape") {
@@ -466,7 +503,20 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
 
         return (
             <>
-                <div className={containerClasses} ref={containerRef}>
+                <div
+                    className={containerClasses}
+                    onMouseEnter={
+                        disabled ? undefined : handleContainerMouseEnter
+                    }
+                    onMouseLeave={
+                        disabled ? undefined : handleContainerMouseLeave
+                    }
+                    onTouchEnd={disabled ? undefined : handleContainerTouchEnd}
+                    onTouchStart={
+                        disabled ? undefined : handleContainerTouchStart
+                    }
+                    ref={containerRef}
+                >
                     {children(triggerProps)}
                 </div>
                 {shouldRender && !disabled

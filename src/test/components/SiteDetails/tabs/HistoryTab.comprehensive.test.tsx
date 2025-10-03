@@ -31,15 +31,31 @@ vi.mock("../../../../theme/useTheme", () => ({
     })),
 }));
 
-// Mock icon imports
-vi.mock("react-icons/fi", () => ({
-    FiFilter: () => <div data-testid="filter-icon">FiFilter</div>,
-    FiInbox: () => <div data-testid="inbox-icon">FiInbox</div>,
-}));
+// Mock icon imports while merging with actual modules
+vi.mock("react-icons/fi", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/fi")>(
+            "react-icons/fi"
+        );
 
-vi.mock("react-icons/md", () => ({
-    MdHistory: () => <div data-testid="history-icon">MdHistory</div>,
-}));
+    return {
+        ...actual,
+        FiFilter: () => <div data-testid="filter-icon">FiFilter</div>,
+        FiInbox: () => <div data-testid="inbox-icon">FiInbox</div>,
+    } satisfies typeof actual;
+});
+
+vi.mock("react-icons/md", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/md")>(
+            "react-icons/md"
+        );
+
+    return {
+        ...actual,
+        MdHistory: () => <div data-testid="history-icon">MdHistory</div>,
+    } satisfies typeof actual;
+});
 
 // Mock themed components
 vi.mock("../../../../theme/components", () => ({
@@ -329,7 +345,9 @@ describe(HistoryTab, () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             // Get the filter button specifically (not any text containing "down")
-            const downButton = screen.getByRole("button", { name: "❌ Down" });
+            const downButton = screen.getByRole("button", {
+                name: /^down$/i,
+            });
             await userEvent.click(downButton);
 
             // Should show only down status records (every odd index)
@@ -533,7 +551,16 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
-            expect(screen.getByText("Up")).toBeInTheDocument();
+            const statusLabel = screen.getByText("Up", {
+                selector: ".history-status-label span",
+            });
+            expect(statusLabel).toBeInTheDocument();
+            const statusIcon = statusLabel
+                .closest(".history-status-label")
+                ?.querySelector(
+                    ".history-status-label__icon"
+                ) as SVGElement | null;
+            expect(statusIcon).not.toBeNull();
         });
     });
 
@@ -811,8 +838,8 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            const upButton = screen.getByRole("button", { name: "✅ Up" });
-            const downButton = screen.getByRole("button", { name: "❌ Down" });
+            const upButton = screen.getByRole("button", { name: /^up$/i });
+            const downButton = screen.getByRole("button", { name: /^down$/i });
 
             // Rapid clicks
             await userEvent.click(upButton);

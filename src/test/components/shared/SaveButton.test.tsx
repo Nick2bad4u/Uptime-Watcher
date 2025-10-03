@@ -41,9 +41,17 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
     ),
 }));
 
-vi.mock("react-icons/fi", () => ({
-    FiSave: () => <svg data-testid="save-icon">Save Icon</svg>,
-}));
+vi.mock("react-icons/fi", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/fi")>(
+            "react-icons/fi"
+        );
+
+    return {
+        ...actual,
+        FiSave: () => <svg data-testid="save-icon">Save Icon</svg>,
+    } satisfies typeof actual;
+});
 
 describe(SaveButton, () => {
     const defaultProps: SaveButtonProperties = {

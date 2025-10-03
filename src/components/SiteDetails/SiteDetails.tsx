@@ -41,9 +41,10 @@ import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
+import { useMount } from "../../hooks/useMount";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
@@ -103,6 +104,8 @@ export const SiteDetails = ({
     const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+    const contentElementRef = useRef<HTMLDivElement>(null);
+    const scrollHandlerRef = useRef<(() => void) | null>(null);
     const CloseIcon = AppIcons.ui.close;
 
     // Add global escape key handler
@@ -118,6 +121,40 @@ export const SiteDetails = ({
     );
 
     useEscapeKeyModalHandler(modalConfigs);
+
+    // Memoize scroll container style to avoid inline object creation
+    const scrollContainerStyle = useMemo(
+        () => ({ flex: 1, minHeight: 0, overflow: "auto" as const }),
+        []
+    );
+
+    // Auto-collapse header on scroll
+    useMount(
+        useCallback(function setupScrollListener(): void {
+            const contentElement = contentElementRef.current;
+            if (!contentElement) {
+                return;
+            }
+
+            const handleScroll = (): void => {
+                if (contentElement.scrollTop > 50) {
+                    setIsHeaderCollapsed(true);
+                } else {
+                    setIsHeaderCollapsed(false);
+                }
+            };
+
+            scrollHandlerRef.current = handleScroll;
+            contentElement.addEventListener("scroll", handleScroll);
+        }, []),
+        useCallback(function cleanupScrollListener(): void {
+            const contentElement = contentElementRef.current;
+            const handleScroll = scrollHandlerRef.current;
+            if (contentElement && handleScroll) {
+                contentElement.removeEventListener("scroll", handleScroll);
+            }
+        }, [])
+    );
 
     // Use our custom hook to get all the data and functionality we need
     const {
@@ -495,38 +532,40 @@ export const SiteDetails = ({
                         setActiveSiteDetailsTab={setActiveSiteDetailsTab}
                     />
 
-                    <ThemedBox
-                        className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""} flex flex-col gap-6`}
-                        padding="xl"
-                        rounded="lg"
-                        surface="elevated"
-                        variant="primary"
-                    >
-                        {activeSiteDetailsTab === "site-overview" && (
-                            <SiteOverviewTab
-                                avgResponseTime={analytics.avgResponseTime}
-                                handleRemoveSite={handleRemoveSite}
-                                handleStartSiteMonitoring={
-                                    handleStartSiteMonitoring
-                                }
-                                handleStopSiteMonitoring={
-                                    handleStopSiteMonitoring
-                                }
-                                isLoading={isLoading}
-                                site={currentSite}
-                                totalChecks={analytics.totalChecks}
-                                uptime={parseUptimeValue(analytics.uptime)}
-                            />
-                        )}
+                    <div ref={contentElementRef} style={scrollContainerStyle}>
+                        <ThemedBox
+                            className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""} flex flex-col gap-6`}
+                            padding="xl"
+                            rounded="lg"
+                            surface="elevated"
+                            variant="primary"
+                        >
+                            {activeSiteDetailsTab === "site-overview" && (
+                                <SiteOverviewTab
+                                    avgResponseTime={analytics.avgResponseTime}
+                                    handleRemoveSite={handleRemoveSite}
+                                    handleStartSiteMonitoring={
+                                        handleStartSiteMonitoring
+                                    }
+                                    handleStopSiteMonitoring={
+                                        handleStopSiteMonitoring
+                                    }
+                                    isLoading={isLoading}
+                                    site={currentSite}
+                                    totalChecks={analytics.totalChecks}
+                                    uptime={parseUptimeValue(analytics.uptime)}
+                                />
+                            )}
 
-                        {monitorOverviewTab}
+                            {monitorOverviewTab}
 
-                        {analyticsTab}
+                            {analyticsTab}
 
-                        {historyTab}
+                            {historyTab}
 
-                        {settingsTab}
-                    </ThemedBox>
+                            {settingsTab}
+                        </ThemedBox>
+                    </div>
                 </div>
             </ThemedBox>
         </div>

@@ -266,12 +266,13 @@ describe("Settings - Branch Coverage Tests", () => {
 
             await waitFor(() => {
                 expect(screen.getByText("Sync complete")).toBeInTheDocument();
-                expect(
-                    screen.getByText(
-                        "Latest data loaded from the monitoring database."
-                    )
-                ).toBeInTheDocument();
             });
+
+            expect(
+                screen.getByText(
+                    "Latest data loaded from the monitoring database."
+                )
+            ).toBeInTheDocument();
         });
 
         it("should not render sync success when error is present", ({
@@ -320,7 +321,8 @@ describe("Settings - Branch Coverage Tests", () => {
             fireEvent.click(notificationsCheckbox);
 
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
-                notifications: false, // Inverted from initial true
+                // Inverted from initial true
+                notifications: false,
             });
         });
 

@@ -3,7 +3,7 @@
 .site-list {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: clamp(1rem, 0.75rem + 0.35vi, 1.5rem);
 }
 
 .site-list__toolbar {
@@ -203,7 +203,7 @@
 
     & th,
     & td {
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.85rem;
         border-block-end: 1px solid rgb(255 255 255 / 8%);
         text-align: start;
     }
@@ -228,7 +228,7 @@
 }
 
 .site-table__monitor-selector {
-    inline-size: 16rem;
+    inline-size: clamp(13rem, 28vi, 16rem);
     max-inline-size: 100%;
 }
 
@@ -268,14 +268,14 @@
 .site-card__compact-metrics {
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.55rem;
 }
 
 .site-card__compact-metric {
     display: flex;
     flex-direction: column;
-    gap: 0.125rem;
-    min-inline-size: 6rem;
+    gap: 0.1rem;
+    min-inline-size: 5.5rem;
 }
 
 .site-card__compact-metric-label {
@@ -293,11 +293,11 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 .site-card__compact-selector {
-    inline-size: 14rem;
+    inline-size: clamp(11rem, 28vi, 13.5rem);
     max-inline-size: 100%;
 }
 

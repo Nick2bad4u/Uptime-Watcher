@@ -461,15 +461,11 @@ export const Settings = ({
                             <SettingsHeaderIcon size={22} />
                         </div>
                         <div>
-                            <ThemedText
-                                aria-level={1}
-                                className="settings-modal__heading"
-                                role="heading"
-                                size="xl"
-                                weight="semibold"
-                            >
-                                Settings
-                            </ThemedText>
+                            <h1 className="settings-modal__heading">
+                                <ThemedText size="xl" weight="semibold">
+                                    Settings
+                                </ThemedText>
+                            </h1>
                             <ThemedText size="xs" variant="secondary">
                                 Fine-tune monitoring, notifications, and data
                                 workflows.

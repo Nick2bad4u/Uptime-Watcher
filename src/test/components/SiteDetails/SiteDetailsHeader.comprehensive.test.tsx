@@ -71,10 +71,22 @@ vi.mock("../../../theme/components", () => ({
 }));
 
 // Mock icons
-vi.mock("react-icons/md", () => ({
-    MdExpandLess: () => <div data-testid="expand-less-icon">ExpandLess</div>,
-    MdExpandMore: () => <div data-testid="expand-more-icon">ExpandMore</div>,
-}));
+vi.mock("react-icons/md", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/md")>(
+            "react-icons/md"
+        );
+
+    return {
+        ...actual,
+        MdExpandLess: () => (
+            <div data-testid="expand-less-icon">ExpandLess</div>
+        ),
+        MdExpandMore: () => (
+            <div data-testid="expand-more-icon">ExpandMore</div>
+        ),
+    } satisfies typeof actual;
+});
 
 describe(SiteDetailsHeader, () => {
     const mockSite: Site = {

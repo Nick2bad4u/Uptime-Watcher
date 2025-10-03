@@ -119,6 +119,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         showAddSiteModal,
         showSettings,
         showSiteDetails,
+        siteListLayout,
     } = useUIStore();
 
     const { cancel: closeConfirmDialog, isOpen: isConfirmDialogOpen } =
@@ -345,12 +346,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             }
 
             const mediaQuery = matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY);
-            if (!mediaQuery) {
-                return;
-            }
-
             sidebarMediaQueryRef.current = mediaQuery;
-            const matches = mediaQuery?.matches;
+            const { matches } = mediaQuery;
             if (typeof matches === "boolean") {
                 setIsSidebarOpen(!matches);
             }
@@ -632,12 +629,14 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                             <Header />
 
                             <div className="app-shell__content">
-                                <DashboardOverview
-                                    metrics={globalMetrics}
-                                    siteCountLabel={
-                                        UI_MESSAGES.SITE_COUNT_LABEL
-                                    }
-                                />
+                                {siteListLayout === "card-large" && (
+                                    <DashboardOverview
+                                        metrics={globalMetrics}
+                                        siteCountLabel={
+                                            UI_MESSAGES.SITE_COUNT_LABEL
+                                        }
+                                    />
+                                )}
 
                                 <div className="app-shell__panel">
                                     <SiteList />

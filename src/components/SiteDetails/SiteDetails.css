@@ -4,7 +4,21 @@
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
 
 .site-details-modal-overlay {
+    position: fixed;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 60%);
+    backdrop-filter: blur(8px);
+    inset: 0;
+    overflow: hidden;
     padding: clamp(1rem, 0.6rem + 1.2vi, 2.5rem);
+}
+
+/* Prevent body scroll when modal is open */
+body:has(.site-details-modal-overlay) {
+    overflow: hidden;
 }
 
 .site-details-modal {

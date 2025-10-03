@@ -72,9 +72,17 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
 }));
 
 // Mock React Icons
-vi.mock("react-icons/fi", () => ({
-    FiSave: () => <span data-testid="save-icon">💾</span>,
-}));
+vi.mock("react-icons/fi", async () => {
+    const actual =
+        await vi.importActual<typeof import("react-icons/fi")>(
+            "react-icons/fi"
+        );
+
+    return {
+        ...actual,
+        FiSave: () => <span data-testid="save-icon">💾</span>,
+    } satisfies typeof actual;
+});
 
 /**
  * Fast-check arbitraries for generating test data

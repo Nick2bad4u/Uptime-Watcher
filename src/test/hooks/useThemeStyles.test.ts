@@ -72,9 +72,9 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles(false));
 
             expect(result.current.headerStyle.background).toContain(
-                "rgba(59, 130, 246, 0.1)"
+                "rgba(59, 130, 246, 0.12)"
             );
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
             expect(result.current.headerStyle.height).toBe("auto");
             expect(result.current.headerStyle.minHeight).toBe("fit-content");
             expect(result.current.titleStyle.color).toBe("#111827");
@@ -109,9 +109,9 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Header styles
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
             expect(result.current.headerStyle.background).toContain(
-                "rgba(59, 130, 246, 0.1)"
+                "rgba(59, 130, 246, 0.12)"
             );
 
             // Title styles
@@ -142,7 +142,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             expect(result.current.headerStyle.boxShadow).toContain(
-                "rgba(0, 0, 0, 0.1)"
+                "rgba(15, 23, 42, 0.2)"
             );
             expect(result.current.titleStyle.textShadow).toContain(
                 "rgba(59, 130, 246, 0.1)"
@@ -168,9 +168,9 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles(false));
 
             expect(result.current.headerStyle.background).toContain(
-                "rgba(37, 99, 235, 0.15)"
+                "rgba(37, 99, 235, 0.22)"
             );
-            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.headerStyle.color).toBe("#f5f7fa");
             expect(result.current.titleStyle.color).toBe("#f3f4f6");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
         });
@@ -203,9 +203,9 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Header styles
-            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.headerStyle.color).toBe("#f5f7fa");
             expect(result.current.headerStyle.background).toContain(
-                "rgba(37, 99, 235, 0.15)"
+                "rgba(37, 99, 235, 0.22)"
             );
 
             // Title styles
@@ -236,7 +236,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             expect(result.current.headerStyle.boxShadow).toContain(
-                "rgba(0, 0, 0, 0.4)"
+                "rgba(4, 8, 18, 0.7)"
             );
             expect(result.current.titleStyle.textShadow).toContain(
                 "rgba(59, 130, 246, 0.3)"
@@ -261,7 +261,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Initial light mode
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
 
             // Simulate theme change to dark mode
             Reflect.set(
@@ -282,7 +282,7 @@ describe("useThemeStyles Hook", () => {
             });
 
             // Should now be dark mode
-            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.headerStyle.color).toBe("#f5f7fa");
         });
 
         it("should react to theme changes from dark to light", async ({
@@ -301,7 +301,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Initial dark mode
-            expect(result.current.headerStyle.color).toBe("#f3f4f6");
+            expect(result.current.headerStyle.color).toBe("#f5f7fa");
 
             // Simulate theme change to light mode
             Reflect.set(
@@ -322,7 +322,7 @@ describe("useThemeStyles Hook", () => {
             });
 
             // Should now be light mode
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
         });
 
         it("should properly register and cleanup media query listeners", async ({
@@ -424,7 +424,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Should default to light mode styles
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
             expect(result.current.titleStyle.color).toBe("#111827");
         });
 
@@ -448,7 +448,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             // Should fallback to light mode styles
-            expect(result.current.headerStyle.color).toBe("#111827");
+            expect(result.current.headerStyle.color).toBe("#0f172a");
             expect(result.current.titleStyle.color).toBe("#111827");
         });
     });
