@@ -92,7 +92,6 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 <td>
                     <MonitorSelector
                         className="site-table__monitor-selector"
-                        fluid={false}
                         monitors={latestSite.monitors}
                         onChange={handleMonitorIdChange}
                         selectedMonitorId={selectedMonitorId}

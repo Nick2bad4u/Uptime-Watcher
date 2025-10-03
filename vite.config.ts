@@ -115,19 +115,19 @@ export default defineConfig(({ mode }) => {
             rollupOptions: {
                 output: {
                     // Manual chunk splitting to optimize bundle sizes and improve caching
-                    manualChunks: {
-                        // React core ecosystem kept together to avoid empty single-module chunks
-                        "react-vendor": ["react", "react-dom"],
-                        // UI and icon libraries - separate chunk for visual components
-                        "ui-vendor": ["react-icons"],
-                        // Utility libraries - separate chunk for utilities and validation
-                        "utils-vendor": [
-                            "axios",
-                            "validator",
-                            "zod",
-                            "zustand",
-                        ],
-                    },
+                    // manualChunks: {
+                    //     // React core ecosystem kept together to avoid empty single-module chunks
+                    //     "react-vendor": ["react", "react-dom"],
+                    //     // UI and icon libraries - separate chunk for visual components
+                    //     "ui-vendor": ["react-icons"],
+                    //     // Utility libraries - separate chunk for utilities and validation
+                    //     "utils-vendor": [
+                    //         "axios",
+                    //         "validator",
+                    //         "zod",
+                    //         "zustand",
+                    //     ],
+                    // },
                 },
             },
             sourcemap: true, // Recommended for Electron debugging
@@ -709,7 +709,7 @@ export default defineConfig(({ mode }) => {
                     ...coverageConfigDefaults.exclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
-                experimentalAstAwareRemapping: true, // Temporarily disabled due to ast-v8-to-istanbul column parsing error
+                experimentalAstAwareRemapping: true, // Enabled: may cause ast-v8-to-istanbul column parsing errors
                 ignoreEmptyLines: true, // Ignore empty lines, comments, and TypeScript interfaces
                 // V8 Provider Configuration (Recommended since Vitest v3.2.0)
                 provider: "v8" as const, // Switch to V8 for better TypeScript support

@@ -4,7 +4,7 @@
  */
 
 import { render, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -71,7 +71,19 @@ vi.mock("../stores/ui/useUiStore");
 vi.mock("../stores/updates/useUpdatesStore");
 vi.mock("../theme/useTheme");
 
+const originalMatchMedia = globalThis.matchMedia;
+
 describe("App Development Logging Coverage", () => {
+    let mockSettingsStoreState: {
+        initializeSettings: ReturnType<typeof vi.fn>;
+    };
+    let mockSitesStoreState: {
+        initializeSites: ReturnType<typeof vi.fn>;
+        subscribeToStatusUpdates: ReturnType<typeof vi.fn>;
+        unsubscribeFromStatusUpdates: ReturnType<typeof vi.fn>;
+        sites: never[];
+    };
+
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -125,30 +137,50 @@ describe("App Development Logging Coverage", () => {
             themeVersion: 1,
         });
 
-        // Mock sites store with statusUpdates subscription
-        const subscribeToStatusUpdatesMock = vi.fn();
-        vi.mocked(useSitesStore).mockReturnValue({
+        mockSettingsStoreState = {
+            initializeSettings: vi.fn().mockResolvedValue(undefined),
+        };
+
+        vi.mocked(useSettingsStore).mockImplementation(((
+            selector?: (state: typeof mockSettingsStoreState) => unknown
+        ) =>
+            selector
+                ? selector(mockSettingsStoreState)
+                : mockSettingsStoreState) as any);
+        vi.mocked(useSettingsStore).getState = vi
+            .fn()
+            .mockReturnValue(mockSettingsStoreState as any);
+
+        mockSitesStoreState = {
+            initializeSites: vi.fn().mockResolvedValue(undefined),
+            subscribeToStatusUpdates: vi.fn(),
+            unsubscribeFromStatusUpdates: vi.fn(),
             sites: [],
-            initializeSites: vi.fn().mockResolvedValue(undefined),
-            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
-            unsubscribeFromStatusUpdates: vi.fn(),
-        });
+        };
 
-        // Mock settings store
-        vi.mocked(useSettingsStore).mockReturnValue({
-            initializeSettings: vi.fn().mockResolvedValue(undefined),
-        });
+        vi.mocked(useSitesStore).mockImplementation(((
+            selector?: (state: typeof mockSitesStoreState) => unknown
+        ) =>
+            selector
+                ? selector(mockSitesStoreState)
+                : mockSitesStoreState) as any);
+        vi.mocked(useSitesStore).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState as any);
 
-        // Mock store getState methods for initialization
-        vi.mocked(useSitesStore).getState = vi.fn().mockReturnValue({
-            initializeSites: vi.fn().mockResolvedValue(undefined),
-            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
-            unsubscribeFromStatusUpdates: vi.fn(),
-        });
+        globalThis.matchMedia = vi.fn().mockImplementation(() => ({
+            matches: false,
+            media: "(max-width: 1280px)",
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })) as typeof globalThis.matchMedia;
+    });
 
-        vi.mocked(useSettingsStore).getState = vi.fn().mockReturnValue({
-            initializeSettings: vi.fn().mockResolvedValue(undefined),
-        });
+    afterEach(() => {
+        globalThis.matchMedia = originalMatchMedia;
     });
 
     it("should execute development logging in status updates callback", async ({
@@ -168,11 +200,14 @@ describe("App Development Logging Coverage", () => {
         const subscribeToStatusUpdatesMock = vi.fn();
 
         // Update sites store mock to capture callback
-        vi.mocked(useSitesStore).getState = vi.fn().mockReturnValue({
-            initializeSites: vi.fn().mockResolvedValue(undefined),
-            subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
-            unsubscribeFromStatusUpdates: vi.fn(),
-        });
+        mockSitesStoreState.subscribeToStatusUpdates =
+            subscribeToStatusUpdatesMock;
+        mockSitesStoreState.initializeSites = vi
+            .fn()
+            .mockResolvedValue(undefined);
+        vi.mocked(useSitesStore).getState = vi
+            .fn()
+            .mockReturnValue(mockSitesStoreState as any);
 
         render(<App />);
 

@@ -37,12 +37,16 @@ const createUiState = (): UIStore => ({
     setShowAdvancedMetrics: vi.fn(),
     setShowSettings: vi.fn(),
     setShowSiteDetails: vi.fn(),
+    setSiteCardPresentation: vi.fn(),
     setSiteDetailsChartTimeRange: vi.fn(),
+    setSiteListLayout: vi.fn(),
     showAddSiteModal: false,
     showAdvancedMetrics: false,
     showSettings: false,
     showSiteDetails: false,
+    siteCardPresentation: "grid",
     siteDetailsChartTimeRange: "24h",
+    siteListLayout: "card-compact",
 });
 
 const metricsFixture = {

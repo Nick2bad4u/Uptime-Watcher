@@ -81,9 +81,13 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
 
         render(<EmptyState />);
 
-        const icon = screen.getByText("🌐");
-        expect(icon).toBeInTheDocument();
-        expect(icon.closest("div")).toHaveClass("empty-state-icon");
+        const iconContainer = document.querySelector(
+            ".empty-state-icon"
+        ) as HTMLElement | null;
+        expect(iconContainer).toBeInTheDocument();
+        expect(
+            iconContainer?.querySelector(".empty-state-icon__symbol")
+        ).toBeInTheDocument();
     });
 
     it("should render the main heading text", ({ task, annotate }) => {
@@ -143,7 +147,10 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         render(<EmptyState />);
 
         // Check icon container
-        const iconContainer = screen.getByText("🌐").closest("div");
+        const iconContainer = document.querySelector(
+            ".empty-state-icon"
+        ) as HTMLElement | null;
+        expect(iconContainer).not.toBeNull();
         expect(iconContainer).toHaveClass("empty-state-icon");
 
         // Check main container CSS classes
@@ -172,9 +179,10 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         const container = document.querySelector(".themed-box");
 
         // Check that all child elements are present within the container
-        expect(container).toContainElement(
-            screen.getByText("🌐").closest("div")
-        );
+        const emptyState = screen.getByTestId("empty-state");
+        const iconContainer = emptyState.querySelector(".empty-state-icon");
+        expect(iconContainer).not.toBeNull();
+        expect(emptyState).toContainElement(iconContainer as HTMLElement);
 
         const themedTexts = document.querySelectorAll(".themed-text");
         for (const element of themedTexts) {
@@ -204,7 +212,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
                 "Add your first website to start monitoring its uptime."
             )
         ).toBeInTheDocument();
-        expect(screen.getByText("🌐")).toBeInTheDocument();
+        expect(
+            document.querySelector(".empty-state-icon__symbol")
+        ).toBeInTheDocument();
     });
 
     it("should maintain consistent prop structure", ({ task, annotate }) => {
@@ -257,7 +267,9 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         ).toBeInTheDocument();
 
         // Icon should be present
-        expect(screen.getByText("🌐")).toBeInTheDocument();
+        expect(
+            document.querySelector(".empty-state-icon__symbol")
+        ).toBeInTheDocument();
     });
 
     it("should use themed components correctly", ({ task, annotate }) => {

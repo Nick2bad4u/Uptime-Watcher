@@ -75,9 +75,6 @@ describe(HistoryTab, () => {
         new Date(timestamp).toISOString()
     );
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
-    const mockFormatStatusWithIcon = vi.fn((status: string) =>
-        status === "up" ? "✅ Up" : "❌ Down"
-    );
 
     const createMockMonitor = (historyLength: number = 5): Monitor => ({
         id: "test-monitor",
@@ -100,7 +97,6 @@ describe(HistoryTab, () => {
     const defaultProps = {
         formatFullTimestamp: mockFormatFullTimestamp,
         formatResponseTime: mockFormatResponseTime,
-        formatStatusWithIcon: mockFormatStatusWithIcon,
         selectedMonitor: createMockMonitor(),
     };
 
@@ -192,7 +188,11 @@ describe(HistoryTab, () => {
 
             expect(mockFormatFullTimestamp).toHaveBeenCalled();
             expect(mockFormatResponseTime).toHaveBeenCalled();
-            expect(mockFormatStatusWithIcon).toHaveBeenCalled();
+            const upLabels = screen.getAllByText("Up");
+            expect(upLabels.length).toBeGreaterThan(0);
+            for (const label of upLabels) {
+                expect(label).toBeInTheDocument();
+            }
         });
     });
 

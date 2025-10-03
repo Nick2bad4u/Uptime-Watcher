@@ -14,14 +14,29 @@ import type { CamelCase } from "type-fest";
 import { AppIcons } from "./icons";
 
 /**
- * Normalized representation of a status decorated with an icon component.
+ * Normalized representation of a status decorated with an icon glyph.
  */
-export interface StatusWithIcon {
-    /** Icon component conveying the status visually. */
-    readonly icon: IconType;
-    /** Human-friendly status label. */
-    readonly label: string;
-}
+export type StatusWithIcon = `${string} ${string}`;
+
+const STATUS_ICON_GLYPHS: Record<string, string> = {
+    degraded: "⚠️",
+    down: "❌",
+    mixed: "🔄",
+    paused: "⏸️",
+    pending: "⏳",
+    unknown: "❓",
+    up: "✅",
+};
+
+const STATUS_ICON_COMPONENTS: Record<string, IconType> = {
+    degraded: AppIcons.status.warning,
+    down: AppIcons.status.downFilled,
+    mixed: AppIcons.actions.refresh,
+    paused: AppIcons.status.pausedFilled,
+    pending: AppIcons.status.pendingFilled,
+    unknown: AppIcons.ui.info,
+    up: AppIcons.status.upFilled,
+};
 /**
  * Get the icon component for a given status. Provides visual indicators for
  * different monitoring states using the shared {@link AppIcons} catalog.
@@ -36,20 +51,9 @@ export interface StatusWithIcon {
  * @returns Icon component representing the status (defaults to neutral info
  *   icon for unknown statuses)
  */
-export function getStatusIcon(status: string): IconType {
+export function getStatusIcon(status: string): string {
     const normalizedStatus = status.toLowerCase();
-
-    const statusIconMap: Record<string, IconType> = {
-        degraded: AppIcons.status.warning,
-        down: AppIcons.status.downFilled,
-        mixed: AppIcons.actions.refresh,
-        paused: AppIcons.status.pausedFilled,
-        pending: AppIcons.status.pendingFilled,
-        unknown: AppIcons.ui.info,
-        up: AppIcons.status.upFilled,
-    };
-
-    return statusIconMap[normalizedStatus] ?? AppIcons.ui.info;
+    return STATUS_ICON_GLYPHS[normalizedStatus] ?? "⚪";
 }
 
 /**
@@ -64,13 +68,23 @@ export function getStatusIcon(status: string): IconType {
  *
  * @returns Object containing icon component and formatted label
  */
+export function formatStatusLabel(status: string): string {
+    if (status.length === 0) {
+        return "";
+    }
+
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+}
+
 export function formatStatusWithIcon(status: string): StatusWithIcon {
     const icon = getStatusIcon(status);
-    const text = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
-    return {
-        icon,
-        label: text,
-    };
+    const label = formatStatusLabel(status);
+    return `${icon} ${label}`;
+}
+
+export function getStatusIconComponent(status: string): IconType {
+    const normalizedStatus = status.toLowerCase();
+    return STATUS_ICON_COMPONENTS[normalizedStatus] ?? AppIcons.ui.info;
 }
 
 /**

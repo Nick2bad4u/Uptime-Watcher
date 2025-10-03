@@ -108,10 +108,12 @@ test.describe(
                 try {
                     // Test settings access
                     await window
-                        .getByRole("button", { name: "Settings" })
+                        .getByRole("button", { name: "Open settings" })
                         .click();
                     await window.waitForTimeout(1000);
-                    await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                    await expect(
+                        window.getByTestId("settings-modal")
+                    ).toBeVisible();
                     await window.getByTestId("button-close-settings").click();
                     await window.waitForTimeout(500);
 

@@ -258,7 +258,7 @@ export const SettingsTab = ({
         currentSite.identifier,
         currentSite.name,
         handleSaveName,
-        localName,
+        trimmedSiteName,
     ]);
 
     const loggedHandleSaveInterval = useCallback(() => {

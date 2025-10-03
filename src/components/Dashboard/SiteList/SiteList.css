@@ -234,6 +234,7 @@
 
 .site-table__actions {
     text-align: end;
+    display: table-caption;
 }
 
 .site-table__actions-heading {

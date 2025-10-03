@@ -261,7 +261,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
                 <AddSiteModal onClose={mockOnClose} />
             );
             expect(container.firstChild).not.toBeNull();
-            expect(screen.getByTestId("modal-outer-box")).toBeDefined();
+            const modalShell = document.querySelector(".modal-shell");
+            expect(modalShell).not.toBeNull();
             expect(screen.getByText("Add New Site")).toBeDefined();
         });
 
@@ -294,7 +295,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal onClose={mockOnClose} />);
-            expect(screen.getByTestId("modal-outer-box")).toBeDefined();
+            const modalShell = document.querySelector(".modal-shell");
+            expect(modalShell).not.toBeNull();
             expect(screen.getByText("Add New Site")).toBeDefined();
         });
     });
@@ -343,7 +345,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
 
             render(<AddSiteModal onClose={mockOnClose} />);
-            const backdrop = document.querySelector(".fixed.inset-0");
+            const backdrop = document.querySelector(".modal-overlay");
+            expect(backdrop).not.toBeNull();
             expect(backdrop?.classList.contains("dark")).toBeTruthy();
         });
 
@@ -391,7 +394,8 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal onClose={mockOnClose} />);
             // Check that the backdrop div exists and verify dark class is absent
-            const backdrop = document.querySelector(".fixed.inset-0");
+            const backdrop = document.querySelector(".modal-overlay");
+            expect(backdrop).not.toBeNull();
             expect(backdrop?.classList.contains("dark")).toBeFalsy();
         });
     });
@@ -454,8 +458,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             render(<AddSiteModal onClose={mockOnClose} />);
 
             // Get the backdrop by testing the event directly
-            const backdrop = document.querySelector(".fixed.inset-0")!;
-            fireEvent.click(backdrop);
+            const backdrop = document.querySelector(".modal-overlay");
+            expect(backdrop).not.toBeNull();
+            fireEvent.click(backdrop as Element);
 
             expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
@@ -476,8 +481,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
 
             render(<AddSiteModal onClose={mockOnClose} />);
 
-            const modalContent = screen.getByTestId("modal-outer-box");
-            fireEvent.click(modalContent);
+            const modalContent = document.querySelector(".modal-shell");
+            expect(modalContent).not.toBeNull();
+            fireEvent.click(modalContent as Element);
 
             expect(mockOnClose).not.toHaveBeenCalled();
         });

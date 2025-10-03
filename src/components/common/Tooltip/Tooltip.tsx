@@ -148,22 +148,30 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
                 return;
             }
 
-            if (hideTimerRef.current) {
-                clearTimeout(hideTimerRef.current);
-                hideTimerRef.current = null;
-            }
+            clearTimers();
 
-            if (showTimerRef.current) {
-                clearTimeout(showTimerRef.current);
-            }
+            const commitVisible = (): void => {
+                if (
+                    typeof window !== "undefined" &&
+                    typeof window.requestAnimationFrame === "function"
+                ) {
+                    window.requestAnimationFrame(() => {
+                        setIsVisible(true);
+                    });
+                } else {
+                    setIsVisible(true);
+                }
+            };
 
             showTimerRef.current = setTimeout(() => {
                 setShouldRender(true);
-                requestAnimationFrame(() => {
-                    setIsVisible(true);
-                });
+                commitVisible();
             }, delay);
-        }, [delay, disabled]);
+        }, [
+            clearTimers,
+            delay,
+            disabled,
+        ]);
 
         const hideTooltip = useCallback(() => {
             if (showTimerRef.current) {

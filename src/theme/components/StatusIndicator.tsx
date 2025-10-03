@@ -9,7 +9,7 @@ import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
 import { memo, useMemo } from "react";
 
-import { getStatusIcon } from "../../utils/status";
+import { formatStatusLabel, getStatusIconComponent } from "../../utils/status";
 import { useTheme } from "../useTheme";
 
 type StatusIndicatorStyle = CSSProperties & {
@@ -73,7 +73,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
         };
 
         const sizeStyles = getSizeStyles();
-        const StatusIconComponent = getStatusIcon(status);
+        const StatusIconComponent = getStatusIconComponent(status);
         const iconPixelSize = Number.parseInt(sizeStyles.iconSize, 10) || 16;
 
         const baseColor = getStatusColor(status);
@@ -161,7 +161,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                         className="themed-status-indicator__text"
                         style={textStyle}
                     >
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {formatStatusLabel(status)}
                     </span>
                 ) : null}
             </div>

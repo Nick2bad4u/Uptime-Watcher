@@ -36,7 +36,10 @@
  * @public
  */
 
-import type { CoreComponentProperties } from "@shared/types/componentProps";
+import type {
+    AccessibilityProperties,
+    CoreComponentProperties,
+} from "@shared/types/componentProps";
 import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
 import { memo } from "react";
@@ -48,7 +51,9 @@ import type { TextAlign, TextSize, TextVariant, TextWeight } from "./types";
  *
  * @public
  */
-export interface ThemedTextProperties extends CoreComponentProperties {
+export interface ThemedTextProperties
+    extends CoreComponentProperties,
+        AccessibilityProperties {
     /** Text alignment within the container */
     readonly align?: TextAlign;
     /** Font size variant for the text */
@@ -96,6 +101,7 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
         style = DEFAULT_THEMED_BOX_STYLE,
         variant = "primary",
         weight = "normal",
+        ...accessibilityProps
     }: ThemedTextProperties): JSX.Element {
         const classNames = [
             "themed-text",
@@ -108,8 +114,26 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
             .filter(Boolean)
             .join(" ");
 
+        const {
+            "aria-describedby": ariaDescribedBy,
+            "aria-label": ariaLabel,
+            "aria-labelledby": ariaLabelledBy,
+            "aria-level": ariaLevel,
+            role,
+            tabIndex,
+        } = accessibilityProps;
+
         return (
-            <span className={classNames} style={style}>
+            <span
+                aria-describedby={ariaDescribedBy}
+                aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
+                aria-level={ariaLevel}
+                className={classNames}
+                role={role}
+                style={style}
+                tabIndex={tabIndex}
+            >
                 {children}
             </span>
         );

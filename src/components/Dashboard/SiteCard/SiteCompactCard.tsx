@@ -169,7 +169,6 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                 <div className="site-card__compact-controls">
                     <MonitorSelector
                         className="site-card__compact-selector"
-                        fluid={false}
                         monitors={latestSite.monitors}
                         onChange={handleMonitorIdChange}
                         selectedMonitorId={selectedMonitorId}

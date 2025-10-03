@@ -86,7 +86,7 @@ vi.mock("../components/AddSiteForm/AddSiteModal", () => ({
 vi.mock("../components/Settings/Settings", () => ({
     Settings: () => (
         <div data-testid="settings">
-            <div>⚙️ Settings</div>
+            <div>Settings</div>
         </div>
     ),
 }));
@@ -744,7 +744,7 @@ describe("App Additional Coverage Tests", () => {
         render(<App />);
 
         await expect(
-            screen.findByText("⚙️ Settings")
+            screen.findByTestId("settings-modal")
         ).resolves.toBeInTheDocument();
     });
 

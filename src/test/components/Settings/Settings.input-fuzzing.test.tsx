@@ -20,7 +20,7 @@
  *             }).not.toThrow();
  *
  *             // Component should still render with defensive programming
- *             expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+ *             expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
  *
  *         }
  *     );valid settings configurations",
@@ -39,7 +39,7 @@
  *             }).not.toThrow();
  *
  *             // Verify settings modal renders
- *             expect(screen.getAllByText("⚙️ Settings")[0]).toBeInTheDocument();
+ *             expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
  *
  *         }
  *     );omponent handles:
@@ -59,7 +59,7 @@
  *
  *   render(<Settings onClose={mockOnClose} />);
  *
- *   const resetButton = screen.getAllByText("Reset to Defaults")[0];
+ *   const resetButton = screen.getByRole("button", { name: /reset everything/i });
  *   fireEvent.click(resetButton);
  *
  *   expect(window.confirm).toHaveBeenCalledWith(
@@ -68,8 +68,6 @@
  *
  *   if (confirmReset) {
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
- * ```
- *
  * ```
  *
  * - Error handling and recovery
@@ -82,7 +80,6 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -407,7 +404,6 @@ const errorScenarioArbitrary = fc.record({
 
 describe("Settings Component - Property-Based Fuzzing", () => {
     beforeEach(() => {
-        // Reset mocks
         vi.clearAllMocks();
         confirmMock.mockReset();
         confirmMock.mockResolvedValue(true);
@@ -456,7 +452,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 // Verify settings modal renders
                 expect(
-                    screen.getAllByText("⚙️ Settings")[0]
+                    screen.getByRole("heading", { name: "Settings" })
                 ).toBeInTheDocument();
             }
         );
@@ -479,7 +475,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 // Component should still render with defensive programming
                 expect(
-                    screen.getAllByText("⚙️ Settings")[0]
+                    screen.getByRole("heading", { name: "Settings" })
                 ).toBeInTheDocument();
             }
         );
@@ -629,13 +625,13 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 // Test auto start checkbox
                 const autoStartCheckbox = screen.getByLabelText(
-                    "Start application automatically"
+                    "Launch Uptime Watcher automatically at login"
                 );
                 fireEvent.click(autoStartCheckbox);
 
                 // Test minimize to tray checkbox
                 const minimizeToTrayCheckbox = screen.getByLabelText(
-                    "Minimize to system tray"
+                    "Minimize Uptime Watcher to the system tray"
                 );
                 fireEvent.click(minimizeToTrayCheckbox);
 
@@ -685,7 +681,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
 
             // Click the button directly without waiting for state updates
             fireEvent.click(syncButton);
@@ -750,8 +748,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 render(<Settings onClose={mockOnClose} />);
 
-                const resetButton =
-                    screen.getAllByText("Reset to Defaults")[0]!;
+                const resetButton = screen.getByRole("button", {
+                    name: /reset everything/i,
+                });
 
                 fireEvent.click(resetButton);
 
@@ -861,10 +860,14 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                     screen.getByLabelText("Enable sound alerts")
                 ).toBeInTheDocument();
                 expect(
-                    screen.getByLabelText("Start application automatically")
+                    screen.getByLabelText(
+                        "Launch Uptime Watcher automatically at login"
+                    )
                 ).toBeInTheDocument();
                 expect(
-                    screen.getByLabelText("Minimize to system tray")
+                    screen.getByLabelText(
+                        "Minimize Uptime Watcher to the system tray"
+                    )
                 ).toBeInTheDocument();
 
                 // Verify form elements are properly labeled

@@ -235,11 +235,13 @@ test.describe(
                 });
 
                 // Test settings changes (another IPC operation)
-                await window.getByRole("button", { name: "Settings" }).click();
+                await window
+                    .getByRole("button", { name: "Open settings" })
+                    .click();
                 await window.waitForTimeout(1000);
 
                 // Verify settings interface is available
-                const settingsDialog = window.getByRole("dialog");
+                const settingsDialog = window.getByTestId("settings-modal");
                 await expect(settingsDialog).toBeVisible();
 
                 await window.screenshot({

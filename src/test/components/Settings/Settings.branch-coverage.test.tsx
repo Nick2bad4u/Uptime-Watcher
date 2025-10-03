@@ -259,12 +259,17 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             // Trigger sync to set success state
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
             fireEvent.click(syncButton);
 
             await waitFor(() => {
+                expect(screen.getByText("Sync complete")).toBeInTheDocument();
                 expect(
-                    screen.getByText("✅ Data synced from database.")
+                    screen.getByText(
+                        "Latest data loaded from the monitoring database."
+                    )
                 ).toBeInTheDocument();
             });
         });
@@ -291,9 +296,7 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             // Sync success should not be visible when error is present
-            expect(
-                screen.queryByText("✅ Data synced from database.")
-            ).not.toBeInTheDocument();
+            expect(screen.queryByText("Sync complete")).not.toBeInTheDocument();
         });
     });
 
@@ -377,7 +380,9 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(
                 screen.getByLabelText("Enable desktop notifications")
             ).toBeDisabled();
-            expect(screen.getByText("🔄 Sync Data")).toBeDisabled();
+            expect(
+                screen.getByRole("button", { name: /refresh history/i })
+            ).toBeDisabled();
         });
 
         it("should enable inputs when loading is false", ({
@@ -409,7 +414,9 @@ describe("Settings - Branch Coverage Tests", () => {
             expect(
                 screen.getByLabelText("Enable desktop notifications")
             ).not.toBeDisabled();
-            expect(screen.getByText("🔄 Sync Data")).not.toBeDisabled();
+            expect(
+                screen.getByRole("button", { name: /refresh history/i })
+            ).not.toBeDisabled();
         });
     });
 
@@ -436,7 +443,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
             fireEvent.click(syncButton);
 
             await waitFor(() => {
@@ -468,7 +477,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const backupButton = screen.getByText("Download SQLite Backup");
+            const backupButton = screen.getByRole("button", {
+                name: /export monitoring data/i,
+            });
             fireEvent.click(backupButton);
 
             await waitFor(() => {
@@ -535,7 +546,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const resetButton = screen.getByText("Reset to Defaults");
+            const resetButton = screen.getByRole("button", {
+                name: /reset everything/i,
+            });
             fireEvent.click(resetButton);
 
             await waitFor(() => {
@@ -573,7 +586,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const resetButton = screen.getByText("Reset to Defaults");
+            const resetButton = screen.getByRole("button", {
+                name: /reset everything/i,
+            });
             fireEvent.click(resetButton);
 
             expect(confirmMock).toHaveBeenCalledWith(
@@ -662,7 +677,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
             fireEvent.click(syncButton);
 
             await waitFor(() => {
@@ -696,7 +713,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const backupButton = screen.getByText("Download SQLite Backup");
+            const backupButton = screen.getByRole("button", {
+                name: /export monitoring data/i,
+            });
             fireEvent.click(backupButton);
 
             await waitFor(() => {
@@ -728,7 +747,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
             fireEvent.click(syncButton);
 
             await waitFor(() => {
@@ -755,7 +776,7 @@ describe("Settings - Branch Coverage Tests", () => {
 
             // Test all checkbox handlers
             const autoStartCheckbox = screen.getByLabelText(
-                "Start application automatically"
+                "Launch Uptime Watcher automatically at login"
             );
             fireEvent.click(autoStartCheckbox);
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
@@ -763,7 +784,7 @@ describe("Settings - Branch Coverage Tests", () => {
             });
 
             const minimizeToTrayCheckbox = screen.getByLabelText(
-                "Minimize to system tray"
+                "Minimize Uptime Watcher to the system tray"
             );
             fireEvent.click(minimizeToTrayCheckbox);
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
@@ -853,7 +874,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const syncButton = screen.getByText("🔄 Sync Data");
+            const syncButton = screen.getByRole("button", {
+                name: /refresh history/i,
+            });
             await user.click(syncButton);
 
             await waitFor(() => {
@@ -885,7 +908,9 @@ describe("Settings - Branch Coverage Tests", () => {
 
             render(<Settings onClose={mockOnClose} />);
 
-            const backupButton = screen.getByText("Download SQLite Backup");
+            const backupButton = screen.getByRole("button", {
+                name: /export monitoring data/i,
+            });
             await user.click(backupButton);
 
             await waitFor(() => {

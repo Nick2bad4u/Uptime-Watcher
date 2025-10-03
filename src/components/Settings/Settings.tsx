@@ -148,8 +148,6 @@ function renderSettingsSection({
  * - react/no-unstable-nested-components forbids components in render
  * These requirements are mutually exclusive for complex forms.
  */
-/* eslint-disable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components -- Performance vs clean code tradeoff: Form validation requires memoization but also needs nested components for dynamic validation rules */
-
 /**
  * Settings component providing comprehensive application configuration.
  *
@@ -226,7 +224,6 @@ export const Settings = ({
         },
         [persistHistoryLimit, settings.historyLimit]
     );
-
     const handleReset = useCallback(async () => {
         const confirmed = await requestConfirmation({
             cancelLabel: "Keep Settings",
@@ -303,6 +300,70 @@ export const Settings = ({
         [handleThemeChange]
     );
 
+    const notificationsControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Enable desktop notifications"
+                checked={settings.notifications}
+                disabled={isLoading}
+                onChange={handleNotificationsChange}
+            />
+        ),
+        [
+            handleNotificationsChange,
+            isLoading,
+            settings.notifications,
+        ]
+    );
+
+    const soundAlertsControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Enable sound alerts"
+                checked={settings.soundAlerts}
+                disabled={isLoading}
+                onChange={handleSoundAlertsChange}
+            />
+        ),
+        [
+            handleSoundAlertsChange,
+            isLoading,
+            settings.soundAlerts,
+        ]
+    );
+
+    const autoStartControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Launch Uptime Watcher automatically at login"
+                checked={settings.autoStart}
+                disabled={isLoading}
+                onChange={handleAutoStartChange}
+            />
+        ),
+        [
+            handleAutoStartChange,
+            isLoading,
+            settings.autoStart,
+        ]
+    );
+
+    const minimizeToTrayControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Minimize Uptime Watcher to the system tray"
+                checked={settings.minimizeToTray}
+                disabled={isLoading}
+                onChange={handleMinimizeToTrayChange}
+            />
+        ),
+        [
+            handleMinimizeToTrayChange,
+            isLoading,
+            settings.minimizeToTray,
+        ]
+    );
+
     // Manual Sync Now handler (moved from Header)
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error message extraction with runtime validation */
     const handleSyncNow = useCallback(async () => {
@@ -374,6 +435,12 @@ export const Settings = ({
     const DownloadIcon = AppIcons.actions.download;
     const RefreshIcon = AppIcons.actions.refresh;
     const ResetIcon = AppIcons.actions.remove;
+    // prettier-ignore
+    const downloadButtonIcon = useMemo(() => <DownloadIcon size={16} />, [DownloadIcon]);
+    // prettier-ignore
+    const refreshButtonIcon = useMemo(() => <RefreshIcon size={16} />, [RefreshIcon]);
+    // prettier-ignore
+    const resetButtonIcon = useMemo(() => <ResetIcon size={16} />, [ResetIcon]);
     const showSyncSuccessBanner = syncSuccess && !lastError;
 
     return (
@@ -383,7 +450,7 @@ export const Settings = ({
                 className="settings-modal"
                 data-testid="settings-modal"
                 open
-                padding="lg"
+                padding="xl"
                 rounded="xl"
                 shadow="xl"
                 surface="overlay"
@@ -395,7 +462,9 @@ export const Settings = ({
                         </div>
                         <div>
                             <ThemedText
+                                aria-level={1}
                                 className="settings-modal__heading"
+                                role="heading"
                                 size="xl"
                                 weight="semibold"
                             >
@@ -463,7 +532,7 @@ export const Settings = ({
                                         variant="secondary"
                                         weight="medium"
                                     >
-                                        History limit
+                                        History Limit
                                     </ThemedText>
                                     <ThemedSelect
                                         aria-label="Maximum number of history records to keep per site"
@@ -502,48 +571,12 @@ export const Settings = ({
                             children: (
                                 <div className="settings-toggle-stack">
                                     <SettingItem
-                                        control={useMemo(
-                                            () => (
-                                                <ThemedCheckbox
-                                                    aria-label="Enable desktop notifications"
-                                                    checked={
-                                                        settings.notifications
-                                                    }
-                                                    disabled={isLoading}
-                                                    onChange={
-                                                        handleNotificationsChange
-                                                    }
-                                                />
-                                            ),
-                                            [
-                                                handleNotificationsChange,
-                                                isLoading,
-                                                settings.notifications,
-                                            ]
-                                        )}
+                                        control={notificationsControl}
                                         description="Show desktop alerts whenever a site changes status."
                                         title="Desktop notifications"
                                     />
                                     <SettingItem
-                                        control={useMemo(
-                                            () => (
-                                                <ThemedCheckbox
-                                                    aria-label="Enable sound alerts"
-                                                    checked={
-                                                        settings.soundAlerts
-                                                    }
-                                                    disabled={isLoading}
-                                                    onChange={
-                                                        handleSoundAlertsChange
-                                                    }
-                                                />
-                                            ),
-                                            [
-                                                handleSoundAlertsChange,
-                                                isLoading,
-                                                settings.soundAlerts,
-                                            ]
-                                        )}
+                                        control={soundAlertsControl}
                                         description="Play an audible chime alongside desktop alerts."
                                         title="Sound alerts"
                                     />
@@ -608,48 +641,12 @@ export const Settings = ({
                                     </div>
                                     <div className="settings-toggle-stack">
                                         <SettingItem
-                                            control={useMemo(
-                                                () => (
-                                                    <ThemedCheckbox
-                                                        aria-label="Start Uptime Watcher automatically"
-                                                        checked={
-                                                            settings.autoStart
-                                                        }
-                                                        disabled={isLoading}
-                                                        onChange={
-                                                            handleAutoStartChange
-                                                        }
-                                                    />
-                                                ),
-                                                [
-                                                    handleAutoStartChange,
-                                                    isLoading,
-                                                    settings.autoStart,
-                                                ]
-                                            )}
+                                            control={autoStartControl}
                                             description="Launch Uptime Watcher when you sign in to your computer (requires restart)."
                                             title="Start at login"
                                         />
                                         <SettingItem
-                                            control={useMemo(
-                                                () => (
-                                                    <ThemedCheckbox
-                                                        aria-label="Minimize Uptime Watcher to the system tray"
-                                                        checked={
-                                                            settings.minimizeToTray
-                                                        }
-                                                        disabled={isLoading}
-                                                        onChange={
-                                                            handleMinimizeToTrayChange
-                                                        }
-                                                    />
-                                                ),
-                                                [
-                                                    handleMinimizeToTrayChange,
-                                                    isLoading,
-                                                    settings.minimizeToTray,
-                                                ]
-                                            )}
+                                            control={minimizeToTrayControl}
                                             description="Keep the app running in the background without cluttering the taskbar."
                                             title="Minimize to tray"
                                         />
@@ -666,7 +663,8 @@ export const Settings = ({
                                 <div className="settings-actions">
                                     <ThemedButton
                                         className="settings-actions__primary"
-                                        icon={<DownloadIcon size={16} />}
+                                        disabled={isLoading}
+                                        icon={downloadButtonIcon}
                                         loading={showButtonLoading}
                                         onClick={handleDownloadSQLiteClick}
                                         size="sm"
@@ -678,7 +676,8 @@ export const Settings = ({
                                         {(triggerProps) => (
                                             <ThemedButton
                                                 {...triggerProps}
-                                                icon={<RefreshIcon size={16} />}
+                                                disabled={isLoading}
+                                                icon={refreshButtonIcon}
                                                 loading={showButtonLoading}
                                                 onClick={handleSyncNowClick}
                                                 size="sm"
@@ -692,7 +691,8 @@ export const Settings = ({
                                         {(triggerProps) => (
                                             <ThemedButton
                                                 {...triggerProps}
-                                                icon={<ResetIcon size={16} />}
+                                                disabled={isLoading}
+                                                icon={resetButtonIcon}
                                                 loading={showButtonLoading}
                                                 onClick={handleResetClick}
                                                 size="sm"
@@ -754,5 +754,3 @@ export const Settings = ({
         </div>
     );
 };
-
-/* eslint-enable @arthurgeron/react-usememo/require-usememo, react/no-unstable-nested-components -- Re-enable rules after complex form component */

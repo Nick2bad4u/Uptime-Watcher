@@ -231,7 +231,8 @@ describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
                     // Close button should be present
                     const closeButton = screen.getByTestId("themed-button");
                     expect(closeButton).toBeInTheDocument();
-                    expect(closeButton).toHaveTextContent("✕");
+                    const closeIcon = closeButton.querySelector("svg");
+                    expect(closeIcon).not.toBeNull();
                 } else {
                     // No error should mean no rendered content
                     const alertBoxes = screen.queryAllByTestId("themed-box");

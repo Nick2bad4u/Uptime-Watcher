@@ -4,7 +4,13 @@
  */
 
 import "@testing-library/jest-dom";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+    within,
+} from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ThemeName } from "../../../theme/types";
@@ -201,8 +207,10 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        expect(screen.getByText("⚙️ Settings")).toBeInTheDocument();
-        expect(screen.getByText("History Limit")).toBeInTheDocument();
+        const modal = screen.getByTestId("settings-modal");
+        expect(modal).toBeInTheDocument();
+        expect(within(modal).getByText("Settings")).toBeInTheDocument();
+        expect(within(modal).getByText(/history limit/i)).toBeInTheDocument();
     });
 
     it("should call onClose when close button is clicked", ({
@@ -221,7 +229,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const closeButton = screen.getByText("✕");
+        const closeButton = screen.getByRole("button", {
+            name: /close settings/i,
+        });
         fireEvent.click(closeButton);
 
         expect(mockOnClose).toHaveBeenCalled();
@@ -299,7 +309,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const resetButton = screen.getByText("Reset to Defaults");
+        const resetButton = screen.getByRole("button", {
+            name: /reset everything/i,
+        });
         fireEvent.click(resetButton);
 
         await waitFor(() =>
@@ -332,7 +344,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const resetButton = screen.getByText("Reset to Defaults");
+        const resetButton = screen.getByRole("button", {
+            name: /reset everything/i,
+        });
         fireEvent.click(resetButton);
 
         await waitFor(() =>
@@ -353,7 +367,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const syncButton = screen.getByText("🔄 Sync Data");
+        const syncButton = screen.getByRole("button", {
+            name: /refresh history/i,
+        });
         fireEvent.click(syncButton);
 
         expect(mockSitesStore.fullResyncSites).toHaveBeenCalled();
@@ -372,7 +388,9 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const downloadButton = screen.getByText("Download SQLite Backup");
+        const downloadButton = screen.getByRole("button", {
+            name: /export monitoring data/i,
+        });
         fireEvent.click(downloadButton);
 
         expect(mockSitesStore.downloadSqliteBackup).toHaveBeenCalled();
@@ -466,9 +484,7 @@ describe("Settings Component", () => {
 
         render(<Settings onClose={mockOnClose} />);
 
-        const container = screen
-            .getByText("⚙️ Settings")
-            .closest(".modal-container");
+        const container = screen.getByTestId("settings-modal");
         expect(container).toBeInTheDocument();
     });
 
@@ -489,7 +505,9 @@ describe("Settings Component", () => {
         const { unmount } = render(<Settings onClose={mockOnClose} />);
 
         // Trigger an async operation
-        const syncButton = screen.getByText("🔄 Sync Data");
+        const syncButton = screen.getByRole("button", {
+            name: /refresh history/i,
+        });
         fireEvent.click(syncButton);
 
         // Unmount component

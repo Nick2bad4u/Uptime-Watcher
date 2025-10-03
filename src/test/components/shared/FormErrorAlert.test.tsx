@@ -112,7 +112,8 @@ describe(FormErrorAlert, () => {
             render(<FormErrorAlert {...defaultProps} />);
 
             const closeButton = screen.getByTestId("themed-button");
-            expect(closeButton).toHaveTextContent("✕");
+            const closeIcon = closeButton.querySelector("svg");
+            expect(closeIcon).not.toBeNull();
             expect(closeButton).toHaveAttribute("data-size", "xs");
             expect(closeButton).toHaveAttribute("data-variant", "secondary");
         });
@@ -861,7 +862,10 @@ describe(FormErrorAlert, () => {
             expect(screen.getByTestId("themed-text")).toHaveTextContent(
                 "Integration test error"
             );
-            expect(screen.getByTestId("themed-button")).toHaveTextContent("✕");
+            const closeIcon = screen
+                .getByTestId("themed-button")
+                .querySelector("svg");
+            expect(closeIcon).not.toBeNull();
 
             // Test interaction
             await user.click(screen.getByTestId("themed-button"));

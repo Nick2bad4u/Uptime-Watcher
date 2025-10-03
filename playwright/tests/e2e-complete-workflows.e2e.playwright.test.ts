@@ -234,12 +234,15 @@ test.describe(
 
                 // Go to settings tab where remove functionality might be
                 await window
-                    .getByRole("button", { name: "⚙️ Settings" })
+                    .locator(".site-details-navigation__tabs")
+                    .getByRole("button", { name: "Settings" })
                     .click();
                 await window.waitForTimeout(1000);
 
                 // Verify settings are accessible (this is sufficient for the workflow test)
-                await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                await expect(
+                    window.getByText("Site Configuration")
+                ).toBeVisible();
 
                 // Go back to main dashboard
                 await window.keyboard.press("Escape");
@@ -330,8 +333,12 @@ test.describe(
             },
             async () => {
                 // Test global settings access using the specific testid
-                await window.getByTestId("button-settings").click();
-                await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                await window
+                    .getByRole("button", { name: "Open settings" })
+                    .click();
+                await expect(
+                    window.getByTestId("settings-modal")
+                ).toBeVisible();
 
                 // Test theme configuration using the actual combobox
                 const themeSelector = window.getByRole("combobox", {
@@ -351,12 +358,12 @@ test.describe(
 
                 // Test sync functionality
                 await window
-                    .getByRole("button", { name: "🔄 Sync Data" })
+                    .getByRole("button", { name: "Refresh history" })
                     .click();
 
                 // Close settings using the specific close button
                 await window.getByTestId("button-close-settings").click();
-                await expect(window.getByText("⚙️ Settings")).toBeHidden();
+                await expect(window.getByTestId("settings-modal")).toBeHidden();
 
                 // Test site-specific settings
                 await window
@@ -371,11 +378,14 @@ test.describe(
                 // Navigate to site settings using the specific modal settings button
                 await window.getByText(TEST_SITES.custom.name).click();
                 await window
-                    .getByRole("button", { name: "⚙️ Settings" })
+                    .locator(".site-details-navigation__tabs")
+                    .getByRole("button", { name: "Settings" })
                     .click();
 
                 // Test site configuration options - simplified approach
-                await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                await expect(
+                    window.getByText("Site Configuration")
+                ).toBeVisible();
 
                 // Just verify we can see configuration elements without changing them
                 await expect(window.getByText("Check Interval")).toBeVisible();
@@ -498,9 +508,11 @@ test.describe(
                 await window.waitForTimeout(3000);
 
                 // Test data sync functionality using the specific testid
-                await window.getByTestId("button-settings").click();
                 await window
-                    .getByRole("button", { name: "🔄 Sync Data" })
+                    .getByRole("button", { name: "Open settings" })
+                    .click();
+                await window
+                    .getByRole("button", { name: "Refresh history" })
                     .click();
                 await window.waitForTimeout(1000);
                 await window.getByTestId("button-close-settings").click();
@@ -519,7 +531,8 @@ test.describe(
                     .getByText(TEST_SITES.primary.name)
                     .click();
                 await window
-                    .getByRole("button", { name: "📜 History" })
+                    .locator(".site-details-navigation__tabs")
+                    .getByRole("button", { name: "History" })
                     .click();
 
                 // Check for history elements - be more specific to avoid ambiguity
@@ -527,7 +540,8 @@ test.describe(
 
                 // Test analytics data
                 await window
-                    .getByRole("button", { name: "📈 HTTP Analytics" })
+                    .locator(".site-details-navigation__tabs")
+                    .getByRole("button", { name: /HTTP Analytics/i })
                     .click();
                 await expect(window.getByText("HTTP Analytics")).toBeVisible();
             }

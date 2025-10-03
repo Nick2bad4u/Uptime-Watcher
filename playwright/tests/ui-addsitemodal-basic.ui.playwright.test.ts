@@ -160,7 +160,7 @@ test.describe(
                         page.getByRole("button", { name: "Toggle theme" })
                     ).toBeVisible();
                     await expect(
-                        page.getByRole("button", { name: "Settings" })
+                        page.getByRole("button", { name: "Open settings" })
                     ).toBeVisible();
 
                     // Test theme toggle
@@ -174,15 +174,19 @@ test.describe(
 
                     // Test settings button
                     await page
-                        .getByRole("button", { name: "Settings" })
+                        .getByRole("button", { name: "Open settings" })
                         .click();
-                    await expect(page.getByRole("dialog")).toBeVisible({
+                    await expect(
+                        page.getByTestId("settings-modal")
+                    ).toBeVisible({
                         timeout: WAIT_TIMEOUTS.MEDIUM,
                     });
 
                     // Close settings modal
                     await page.keyboard.press("Escape");
-                    await expect(page.getByRole("dialog")).toBeHidden();
+                    await expect(
+                        page.getByTestId("settings-modal")
+                    ).toBeHidden();
                 } finally {
                     await electronApp.close();
                 }

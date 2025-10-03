@@ -12,3 +12,8 @@ declare module "vitest" {
         // Provides jest-dom matchers like toBeInTheDocument, toHaveTextContent, etc.
     }
 }
+
+declare module "@vitest/expect" {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface Assertion<T = any> extends TestingLibraryMatchers<T, void> {}
+}

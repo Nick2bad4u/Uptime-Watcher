@@ -227,8 +227,10 @@ describe(SiteList, () => {
 
             // Assert
             const containerDiv = container.firstChild as HTMLElement;
-            expect(containerDiv).toHaveClass("divider-y");
+            expect(containerDiv).toHaveClass("site-list");
             expect(containerDiv).not.toHaveClass("dark");
+            const firstCard = screen.getByTestId("site-card-site-1");
+            expect(firstCard.parentElement).not.toHaveClass("site-grid--dark");
         });
 
         it("should render with correct container className in dark theme", ({
@@ -254,8 +256,10 @@ describe(SiteList, () => {
 
             // Assert
             const containerDiv = container.firstChild as HTMLElement;
-            expect(containerDiv).toHaveClass("divider-y");
-            expect(containerDiv).toHaveClass("dark");
+            expect(containerDiv).toHaveClass("site-list");
+            const firstCard = screen.getByTestId("site-card-site-1");
+            expect(firstCard.parentElement).toHaveClass("site-grid");
+            expect(firstCard.parentElement).toHaveClass("site-grid--dark");
         });
 
         it("should render single site correctly", ({ task, annotate }) => {
@@ -380,11 +384,11 @@ describe(SiteList, () => {
             mockUseTheme.mockReturnValue(mockTheme);
 
             // Act
-            const { container } = render(<SiteList />);
+            render(<SiteList />);
 
             // Assert
-            const containerDiv = container.firstChild as HTMLElement;
-            expect(containerDiv).toHaveClass("dark");
+            const firstCard = screen.getByTestId("site-card-site-1");
+            expect(firstCard.parentElement).toHaveClass("site-grid--dark");
         });
     });
 
@@ -482,7 +486,9 @@ describe(SiteList, () => {
 
             // Assert
             const containerDiv = container.firstChild as HTMLElement;
-            expect(containerDiv.className).toBe("divider-y");
+            expect(containerDiv.className).toBe("site-list");
+            const firstCard = screen.getByTestId("site-card-site-1");
+            expect(firstCard.parentElement).not.toHaveClass("site-grid--dark");
         });
 
         it("should handle isDark: true condition", ({ task, annotate }) => {
@@ -505,7 +511,9 @@ describe(SiteList, () => {
 
             // Assert
             const containerDiv = container.firstChild as HTMLElement;
-            expect(containerDiv.className).toBe("divider-y dark");
+            expect(containerDiv.className).toBe("site-list");
+            const firstCard = screen.getByTestId("site-card-site-1");
+            expect(firstCard.parentElement).toHaveClass("site-grid--dark");
         });
 
         it("should handle sites.length === 0 condition", ({

@@ -74,7 +74,7 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                     as="dialog"
                     className="modal-shell modal-shell--form modal-shell--accent-success"
                     open
-                    padding="lg"
+                    padding="xl"
                     rounded="xl"
                     shadow="xl"
                     surface="overlay"

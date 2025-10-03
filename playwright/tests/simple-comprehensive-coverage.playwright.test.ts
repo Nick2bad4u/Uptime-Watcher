@@ -68,7 +68,7 @@ test.describe(
                     window.getByRole("button", { name: "Toggle theme" })
                 ).toBeVisible();
                 await expect(
-                    window.getByRole("button", { name: "Settings" })
+                    window.getByRole("button", { name: "Open settings" })
                 ).toBeVisible();
 
                 await window.screenshot({
@@ -170,11 +170,15 @@ test.describe(
             },
             async () => {
                 // Open settings
-                await window.getByRole("button", { name: "Settings" }).click();
+                await window
+                    .getByRole("button", { name: "Open settings" })
+                    .click();
                 await window.waitForTimeout(1000);
 
                 // Verify settings dialog
-                await expect(window.getByRole("dialog")).toBeVisible();
+                await expect(
+                    window.getByTestId("settings-modal")
+                ).toBeVisible();
 
                 // Close settings
                 await window.keyboard.press("Escape");

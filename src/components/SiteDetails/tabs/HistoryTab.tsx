@@ -41,7 +41,10 @@ import { ThemedSelect } from "../../../theme/components/ThemedSelect";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
-import { getStatusIcon, type StatusWithIcon } from "../../../utils/status";
+import {
+    formatStatusLabel,
+    getStatusIconComponent,
+} from "../../../utils/status";
 import { DetailLabel } from "../../common/MonitorUiComponents";
 
 /**
@@ -59,8 +62,6 @@ export interface HistoryTabProperties {
     readonly formatFullTimestamp: (timestamp: number) => string;
     /** Function to format response times for display */
     readonly formatResponseTime: (time: number) => string;
-    /** Function to format status with appropriate icon metadata */
-    readonly formatStatusWithIcon: (status: string) => StatusWithIcon;
     /** Currently selected monitor to display history for */
     readonly selectedMonitor: Monitor;
 }
@@ -110,7 +111,6 @@ const FILTER_OPTIONS: ReadonlyArray<{
 export const HistoryTab = ({
     formatFullTimestamp,
     formatResponseTime,
-    formatStatusWithIcon,
     selectedMonitor,
 }: HistoryTabProperties): JSX.Element => {
     const { settings } = useSettingsStore();
@@ -308,7 +308,7 @@ export const HistoryTab = ({
                             {FILTER_OPTIONS.map(({ status, value }) => {
                                 const isActive = historyFilter === value;
                                 const FilterIconComponent = status
-                                    ? getStatusIcon(status)
+                                    ? getStatusIconComponent(status)
                                     : FilterAllIcon;
 
                                 return (
@@ -365,10 +365,14 @@ export const HistoryTab = ({
             <ThemedCard icon={historyIcon} title="Check History">
                 <div className="max-h-96 space-y-2 overflow-y-auto">
                     {filteredHistoryRecords.map((record) => {
-                        const StatusLabelIcon = getStatusIcon(record.status);
-                        const { label: statusLabel } = formatStatusWithIcon(
-                            record.status
-                        ) satisfies StatusWithIcon;
+                        const rawStatus = record.status as
+                            | SiteStatus
+                            | undefined;
+                        const resolvedStatus: SiteStatus =
+                            rawStatus ?? "unknown";
+                        const StatusIconComponent =
+                            getStatusIconComponent(resolvedStatus);
+                        const statusLabel = formatStatusLabel(resolvedStatus);
 
                         return (
                             <div
@@ -378,7 +382,7 @@ export const HistoryTab = ({
                                 <div className="flex items-center space-x-3">
                                     <StatusIndicator
                                         size="sm"
-                                        status={record.status}
+                                        status={resolvedStatus}
                                     />
                                     <div>
                                         <ThemedText size="sm" weight="medium">
@@ -413,7 +417,7 @@ export const HistoryTab = ({
                                         size="xs"
                                         variant="secondary"
                                     >
-                                        <StatusLabelIcon
+                                        <StatusIconComponent
                                             className="history-status-label__icon"
                                             size={14}
                                         />

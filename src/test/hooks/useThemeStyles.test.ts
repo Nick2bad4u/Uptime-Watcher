@@ -76,7 +76,7 @@ describe("useThemeStyles Hook", () => {
             );
             expect(result.current.headerStyle.color).toBe("#111827");
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.headerStyle.minHeight).toBe("fit-content");
             expect(result.current.titleStyle.color).toBe("#111827");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
         });
@@ -370,7 +370,7 @@ describe("useThemeStyles Hook", () => {
 
             // Initially not collapsed
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.headerStyle.minHeight).toBe("fit-content");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
 
             // Change to collapsed
@@ -384,7 +384,7 @@ describe("useThemeStyles Hook", () => {
             rerender({ collapsed: false });
 
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.headerStyle.minHeight).toBe("fit-content");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
         });
 
@@ -400,7 +400,7 @@ describe("useThemeStyles Hook", () => {
             const { result } = renderHook(() => useThemeStyles());
 
             expect(result.current.headerStyle.height).toBe("auto");
-            expect(result.current.headerStyle.minHeight).toBe("140px");
+            expect(result.current.headerStyle.minHeight).toBe("fit-content");
             expect(result.current.contentStyle.padding).toBe("1.5rem");
         });
     });

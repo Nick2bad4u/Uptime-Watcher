@@ -17,8 +17,8 @@ vi.mock("../../../../constants", () => ({
         300_000,
         600_000,
     ],
-    TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000, STEP: 1000 },
-    RETRY_CONSTRAINTS: { MIN: 0, MAX: 5, STEP: 1 },
+    TIMEOUT_CONSTRAINTS: { MIN: 1, MAX: 300, STEP: 1 },
+    RETRY_CONSTRAINTS: { MIN: 0, MAX: 10, STEP: 1 },
     TRANSITION_ALL: "all 0.2s ease-in-out",
     ARIA_LABEL: "aria-label",
 }));
@@ -416,9 +416,12 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            const retryInput = screen.getByDisplayValue("3");
+            const retryInput = screen.getByPlaceholderText(
+                "Enter retry attempts"
+            ) as HTMLInputElement;
             expect(retryInput).toBeInTheDocument();
             expect(retryInput).toHaveAttribute("type", "number");
+            expect(retryInput).toHaveValue(3);
         });
     });
 
@@ -527,7 +530,9 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} hasUnsavedChanges={true} />);
 
-            expect(screen.getByText("⚠️ Unsaved changes")).toBeInTheDocument();
+            const unsavedBadge = screen.getByText("Unsaved changes");
+            expect(unsavedBadge).toBeInTheDocument();
+            expect(unsavedBadge.closest(".themed-badge")).not.toBeNull();
         });
     });
 
@@ -671,7 +676,9 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            const retryInput = screen.getByDisplayValue("3");
+            const retryInput = screen.getByPlaceholderText(
+                "Enter retry attempts"
+            );
             fireEvent.change(retryInput, { target: { value: "5" } });
 
             expect(baseProps.handleRetryAttemptsChange).toHaveBeenCalledTimes(
@@ -1102,12 +1109,15 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} />);
 
             const timeoutInput = screen.getByDisplayValue("10");
-            expect(timeoutInput).toHaveAttribute("min", "1000");
-            expect(timeoutInput).toHaveAttribute("max", "30000");
+            expect(timeoutInput).toHaveAttribute("min", "1");
+            expect(timeoutInput).toHaveAttribute("max", "300");
+            expect(timeoutInput).toHaveAttribute("step", "1");
 
-            const retryInput = screen.getByDisplayValue("3");
+            const retryInput = screen.getByPlaceholderText(
+                "Enter retry attempts"
+            );
             expect(retryInput).toHaveAttribute("min", "0");
-            expect(retryInput).toHaveAttribute("max", "5");
+            expect(retryInput).toHaveAttribute("max", "10");
         });
     });
 });

@@ -11,7 +11,6 @@
     display: flex;
     overflow: hidden;
     flex-direction: column;
-    padding: 0;
     border: 1px solid
         color-mix(in srgb, var(--color-border-subtle) 72%, transparent);
     border-radius: var(--border-radius-2xl);
@@ -24,10 +23,6 @@
         0 24px 60px rgb(15 23 42 / 45%),
         0 0 0 1px rgb(148 163 184 / 15%);
     inline-size: min(640px, 92vi);
-
-    &.themed-box--padding-lg {
-        padding: 0;
-    }
 }
 
 .settings-modal__header {

@@ -527,13 +527,14 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 expect(themedBox).toHaveClass(
                     "group",
                     "site-card",
+                    "site-card--modern",
                     "flex",
                     "w-full",
                     "cursor-pointer",
                     "flex-col",
-                    "gap-2",
                     "text-left"
                 );
+                expect(themedBox).toHaveClass("gap-4");
                 expect(themedBox).toHaveAttribute(
                     "aria-label",
                     `View details for ${site.name}`

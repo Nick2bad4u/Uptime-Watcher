@@ -51,6 +51,8 @@ export interface AccessibilityProperties {
     readonly "aria-label"?: string;
     /** ARIA labelledby reference for complex labeling */
     readonly "aria-labelledby"?: string;
+    /** ARIA heading level for elements using role="heading" */
+    readonly "aria-level"?: number;
     /** Role attribute for semantic meaning */
     readonly role?: string;
     /** Tab index for keyboard navigation */

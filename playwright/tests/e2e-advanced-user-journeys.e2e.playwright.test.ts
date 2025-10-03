@@ -290,11 +290,15 @@ test.describe(
                 await window.waitForTimeout(2000);
 
                 // Test global settings configuration
-                await window.getByRole("button", { name: "Settings" }).click();
+                await window
+                    .getByRole("button", { name: "Open settings" })
+                    .click();
                 await window.waitForTimeout(1000);
 
                 // Verify settings dialog opened (using actual text from UI)
-                await expect(window.getByText("⚙️ Settings")).toBeVisible();
+                await expect(
+                    window.getByTestId("settings-modal")
+                ).toBeVisible();
 
                 // Test theme configuration using the theme selector in settings
                 const themeSelector = window.getByRole("combobox", {
@@ -315,7 +319,7 @@ test.describe(
                 await window.waitForTimeout(500);
 
                 // Verify settings closed
-                await expect(window.getByTestId("app-root")).toBeVisible();
+                await expect(window.getByTestId("settings-modal")).toBeHidden();
 
                 await window.screenshot({
                     path: "playwright/test-results/advanced-configuration.png",

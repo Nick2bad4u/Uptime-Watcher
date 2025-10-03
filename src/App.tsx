@@ -143,15 +143,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
     // Sidebar responsive state management
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(() => {
-        const { matchMedia } = globalThis as typeof globalThis & {
-            matchMedia?: (query: string) => MediaQueryList;
-        };
-        if (typeof matchMedia !== "function") {
-            return true;
-        }
-        return !matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY).matches;
-    });
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
 
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
@@ -224,12 +216,36 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         }
 
         // Get fresh references to avoid stale closures
-        const sitesStore = useSitesStore.getState();
-        const settingsStore = useSettingsStore.getState();
+        const sitesStoreGetter =
+            typeof useSitesStore.getState === "function"
+                ? useSitesStore.getState
+                : undefined;
+        const settingsStoreGetter =
+            typeof useSettingsStore.getState === "function"
+                ? useSettingsStore.getState
+                : undefined;
+
+        const sitesStore = sitesStoreGetter?.();
+        const settingsStore = settingsStoreGetter?.();
 
         // Initialize stores sequentially to avoid state conflicts during startup
-        await settingsStore.initializeSettings();
-        await sitesStore.initializeSites();
+        const initializeSettings = settingsStore?.initializeSettings;
+        if (typeof initializeSettings === "function") {
+            await initializeSettings.call(settingsStore);
+        } else if (isDevelopment()) {
+            logger.warn(
+                "Settings store missing initializeSettings implementation during app bootstrap"
+            );
+        }
+
+        const initializeSites = sitesStore?.initializeSites;
+        if (typeof initializeSites === "function") {
+            await initializeSites.call(sitesStore);
+        } else if (isDevelopment()) {
+            logger.warn(
+                "Sites store missing initializeSites implementation during app bootstrap"
+            );
+        }
 
         // Set up cache synchronization with backend and store cleanup
         // function
@@ -238,15 +254,23 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         cacheSyncCleanupRef.current = cacheSyncCleanup;
 
         // Subscribe to status updates
-        sitesStore.subscribeToStatusUpdates((update) => {
-            // Optional callback for additional processing if needed
-            if (isDevelopment()) {
-                const timestamp = new Date().toLocaleTimeString();
-                logger.debug(
-                    `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
-                );
-            }
-        });
+        const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
+
+        if (typeof subscribeToStatusUpdates === "function") {
+            subscribeToStatusUpdates((update) => {
+                // Optional callback for additional processing if needed
+                if (isDevelopment()) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    logger.debug(
+                        `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
+                    );
+                }
+            });
+        } else if (isDevelopment()) {
+            logger.warn(
+                "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
+            );
+        }
 
         // Mark initialization as complete to enable loading overlay for future operations
         setIsInitialized(true);
@@ -260,8 +284,21 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
      * prevent memory leaks and background operations.
      */
     const cleanupApp = useCallback(() => {
-        const currentSitesStore = useSitesStore.getState();
-        currentSitesStore.unsubscribeFromStatusUpdates();
+        const currentSitesStore =
+            typeof useSitesStore.getState === "function"
+                ? useSitesStore.getState()
+                : undefined;
+
+        const unsubscribeFromStatusUpdates =
+            currentSitesStore?.unsubscribeFromStatusUpdates;
+
+        if (typeof unsubscribeFromStatusUpdates === "function") {
+            unsubscribeFromStatusUpdates();
+        } else if (isDevelopment()) {
+            logger.warn(
+                "Sites store missing unsubscribeFromStatusUpdates implementation during app cleanup"
+            );
+        }
 
         // Clean up cache sync
         if (cacheSyncCleanupRef.current) {
@@ -289,7 +326,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             return;
         }
 
-        mediaQuery.removeEventListener("change", handleSidebarBreakpointChange);
+        if (typeof mediaQuery.removeEventListener === "function") {
+            mediaQuery.removeEventListener(
+                "change",
+                handleSidebarBreakpointChange
+            );
+        }
         sidebarMediaQueryRef.current = null;
     }, [handleSidebarBreakpointChange]);
 
@@ -303,11 +345,22 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             }
 
             const mediaQuery = matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY);
+            if (!mediaQuery) {
+                return;
+            }
+
             sidebarMediaQueryRef.current = mediaQuery;
-            mediaQuery.addEventListener(
-                "change",
-                handleSidebarBreakpointChange
-            );
+            const matches = mediaQuery?.matches;
+            if (typeof matches === "boolean") {
+                setIsSidebarOpen(!matches);
+            }
+
+            if (typeof mediaQuery.addEventListener === "function") {
+                mediaQuery.addEventListener(
+                    "change",
+                    handleSidebarBreakpointChange
+                );
+            }
         }, [handleSidebarBreakpointChange]),
         cleanupSidebarListener
     );

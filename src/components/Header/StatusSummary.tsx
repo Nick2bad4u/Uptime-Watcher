@@ -13,7 +13,6 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { HealthIndicator } from "./HealthIndicator";
-import { StatusCounter } from "./StatusCounter";
 
 /**
  * Properties for the StatusSummary component.
@@ -69,25 +68,13 @@ export const StatusSummary = ({
                 >
                     {(triggerProps) => (
                         <div
-                            className="header-status-summary__health"
+                            className="header-status-summary__pill"
                             {...triggerProps}
                         >
                             <HealthIndicator
                                 getAvailabilityColor={getAvailabilityColor}
                                 uptimePercentage={uptimePercentage}
                             />
-                            <div className="header-status-summary__health-meta">
-                                <ThemedText
-                                    size="xs"
-                                    variant="secondary"
-                                    weight="medium"
-                                >
-                                    Global Health
-                                </ThemedText>
-                                <ThemedText size="lg" weight="semibold">
-                                    {uptimePercentage}%
-                                </ThemedText>
-                            </div>
                         </div>
                     )}
                 </Tooltip>
@@ -95,13 +82,27 @@ export const StatusSummary = ({
 
             <Tooltip content="Monitors operating normally" position="bottom">
                 {(triggerProps) => (
-                    <div {...triggerProps}>
-                        <StatusCounter
-                            className="status-up-badge"
-                            count={upMonitors}
-                            label="Up"
-                            status="up"
-                        />
+                    <div
+                        className="header-status-summary__pill status-up-badge"
+                        {...triggerProps}
+                    >
+                        <StatusIndicator size="sm" status="up" />
+                        <div className="header-status-summary__pill-text">
+                            <ThemedText
+                                size="sm"
+                                variant="primary"
+                                weight="semibold"
+                            >
+                                {upMonitors}
+                            </ThemedText>
+                            <ThemedText
+                                className="leading-none"
+                                size="xs"
+                                variant="secondary"
+                            >
+                                Up
+                            </ThemedText>
+                        </div>
                     </div>
                 )}
             </Tooltip>
@@ -112,13 +113,27 @@ export const StatusSummary = ({
                     position="bottom"
                 >
                     {(triggerProps) => (
-                        <div {...triggerProps}>
-                            <StatusCounter
-                                className="status-degraded-badge"
-                                count={degradedMonitors}
-                                label="Degraded"
-                                status="degraded"
-                            />
+                        <div
+                            className="header-status-summary__pill status-degraded-badge"
+                            {...triggerProps}
+                        >
+                            <StatusIndicator size="sm" status="degraded" />
+                            <div className="header-status-summary__pill-text">
+                                <ThemedText
+                                    size="sm"
+                                    variant="primary"
+                                    weight="semibold"
+                                >
+                                    {degradedMonitors}
+                                </ThemedText>
+                                <ThemedText
+                                    className="leading-none"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    Degraded
+                                </ThemedText>
+                            </div>
                         </div>
                     )}
                 </Tooltip>
@@ -126,19 +141,65 @@ export const StatusSummary = ({
 
             <Tooltip content="Monitors currently down" position="bottom">
                 {(triggerProps) => (
-                    <div {...triggerProps}>
-                        <StatusCounter
-                            className="status-down-badge"
-                            count={downMonitors}
-                            label="Down"
-                            status="down"
-                        />
+                    <div
+                        className="header-status-summary__pill status-down-badge"
+                        {...triggerProps}
+                    >
+                        <StatusIndicator size="sm" status="down" />
+                        <div className="header-status-summary__pill-text">
+                            <ThemedText
+                                size="sm"
+                                variant="primary"
+                                weight="semibold"
+                            >
+                                {downMonitors}
+                            </ThemedText>
+                            <ThemedText
+                                className="leading-none"
+                                size="xs"
+                                variant="secondary"
+                            >
+                                Down
+                            </ThemedText>
+                        </div>
                     </div>
                 )}
             </Tooltip>
         </div>
 
-        <div className="header-status-summary__group header-status-summary__group--secondary">
+        <div className="header-status-summary__group">
+            {totalMonitors > 0 ? (
+                <Tooltip
+                    content="Total configured monitors across all sites"
+                    position="bottom"
+                >
+                    {(triggerProps) => (
+                        <div
+                            className="header-status-summary__pill total-sites-badge"
+                            {...triggerProps}
+                        >
+                            <div className="header-status-summary__dot" />
+                            <div className="header-status-summary__pill-text">
+                                <ThemedText
+                                    size="sm"
+                                    variant="primary"
+                                    weight="semibold"
+                                >
+                                    {totalMonitors}
+                                </ThemedText>
+                                <ThemedText
+                                    className="leading-none"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    Total Monitors
+                                </ThemedText>
+                            </div>
+                        </div>
+                    )}
+                </Tooltip>
+            ) : null}
+
             <Tooltip
                 content="Monitoring jobs awaiting verification"
                 position="bottom"
@@ -198,38 +259,6 @@ export const StatusSummary = ({
                     </div>
                 )}
             </Tooltip>
-
-            {totalMonitors > 0 ? (
-                <Tooltip
-                    content="Total configured monitors across all sites"
-                    position="bottom"
-                >
-                    {(triggerProps) => (
-                        <div
-                            className="header-status-summary__pill total-sites-badge"
-                            {...triggerProps}
-                        >
-                            <div className="header-status-summary__dot" />
-                            <div className="header-status-summary__pill-text">
-                                <ThemedText
-                                    size="sm"
-                                    variant="primary"
-                                    weight="semibold"
-                                >
-                                    {totalMonitors}
-                                </ThemedText>
-                                <ThemedText
-                                    className="leading-none"
-                                    size="xs"
-                                    variant="secondary"
-                                >
-                                    Total Monitors
-                                </ThemedText>
-                            </div>
-                        </div>
-                    )}
-                </Tooltip>
-            ) : null}
         </div>
     </ThemedBox>
 );

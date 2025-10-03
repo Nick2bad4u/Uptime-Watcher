@@ -37,7 +37,7 @@
  */
 
 import type { Site } from "@shared/types";
-import type { MouseEvent } from "react";
+import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
@@ -49,7 +49,6 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
-import { formatStatusWithIcon } from "../../utils/status";
 import "./SiteDetails.css";
 import {
     formatDuration,
@@ -324,6 +323,25 @@ export const SiteDetails = ({
         [onClose]
     );
 
+    const handleOverlayKeyDown = useCallback(
+        (event: ReactKeyboardEvent<HTMLDivElement>): void => {
+            if (event.target !== event.currentTarget) {
+                return;
+            }
+
+            const shouldClose =
+                event.key === "Escape" ||
+                event.key === "Enter" ||
+                event.key === " ";
+
+            if (shouldClose) {
+                event.preventDefault();
+                onClose();
+            }
+        },
+        [onClose]
+    );
+
     // Extract tab JSX to avoid IIFE pattern and complex conditional rendering
     const monitorOverviewTab =
         activeSiteDetailsTab === "monitor-overview" && selectedMonitor ? (
@@ -386,7 +404,6 @@ export const SiteDetails = ({
             <HistoryTab
                 formatFullTimestamp={formatFullTimestamp}
                 formatResponseTime={formatResponseTime}
-                formatStatusWithIcon={formatStatusWithIcon}
                 selectedMonitor={selectedMonitor}
             />
         ) : null;
@@ -423,11 +440,16 @@ export const SiteDetails = ({
     }
 
     return (
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal backdrop uses button role to provide keyboard-equivalent dismissal without invalid nested button markup
         <div
+            aria-label="Close site details"
             className={`modal-overlay modal-overlay--immersive site-details-modal-overlay ${
                 isDark ? "dark" : ""
             }`}
             onClick={handleOverlayClick}
+            onKeyDown={handleOverlayKeyDown}
+            role="button"
+            tabIndex={0}
         >
             <ThemedBox
                 aria-label="Site details"
@@ -474,8 +496,8 @@ export const SiteDetails = ({
                     />
 
                     <ThemedBox
-                        className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""}`}
-                        padding="lg"
+                        className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""} flex flex-col gap-6`}
+                        padding="xl"
                         rounded="lg"
                         surface="elevated"
                         variant="primary"

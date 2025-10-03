@@ -139,14 +139,15 @@ function getHeaderStyle(
     return {
         background: isDarkMode ? darkGradient : lightGradient,
         backgroundColor: isDarkMode ? "#060910" : "#f8fafc",
+        border: "1px solid color-mix(in srgb, var(--color-border-secondary, #1b2535) 48%, transparent)",
         borderRadius: "0.75rem",
         boxShadow: isDarkMode ? darkShadow : lightShadow,
         color: isDarkMode ? "#f5f7fa" : "#0f172a",
         height: isCollapsed ? "80px" : "auto",
         marginBottom: "1.25rem",
-        minHeight: isCollapsed ? "80px" : "140px",
+        minHeight: isCollapsed ? "80px" : "fit-content",
         overflow: "hidden",
-        padding: "1.5rem",
+        padding: isCollapsed ? "1.15rem 1.5rem" : "1.75rem",
         position: "relative",
         transition: `all ${TRANSITION_EASING}`,
     };

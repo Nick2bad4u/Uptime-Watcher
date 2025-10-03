@@ -39,12 +39,16 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     setShowAdvancedMetrics: (_show: boolean) => {},
     setShowSettings: (_show: boolean) => {},
     setShowSiteDetails: (_show: boolean) => {},
+    setSiteCardPresentation: (_presentation) => {},
     setSiteDetailsChartTimeRange: (_range: ChartTimeRange) => {},
+    setSiteListLayout: (_layout) => {},
     showAddSiteModal: false,
     showAdvancedMetrics: false,
     showSettings: false,
     showSiteDetails: false,
+    siteCardPresentation: "grid",
     siteDetailsChartTimeRange: defaultChartTimeRange,
+    siteListLayout: "card-compact",
     ...overrides,
 });
 
