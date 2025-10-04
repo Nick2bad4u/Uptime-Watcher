@@ -186,7 +186,7 @@ describe("SiteCard Component - Complete Coverage", () => {
         );
         expect(
             screen.getByTestId("site-card-metrics-content")
-        ).toHaveTextContent("Uptime: 98%");
+        ).toHaveTextContent(/Uptime: 98\.0%/);
         expect(screen.getByTestId("site-card-history")).toHaveTextContent(
             "History: 0 items"
         );

@@ -897,7 +897,85 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise resolving to true if removed, false otherwise.
      */
     public async removeSite(identifier: string): Promise<boolean> {
-        return this.siteManager.removeSite(identifier);
+        const siteSnapshot = this.siteManager.getSiteFromCache(identifier);
+        const activeMonitorIds = siteSnapshot
+            ? siteSnapshot.monitors
+                  .filter((monitor): monitor is Monitor & { id: string } =>
+                      Boolean(monitor.id && monitor.monitoring)
+                  )
+                  .map((monitor) => monitor.id)
+            : [];
+
+        if (!siteSnapshot) {
+            logger.debug(
+                `[UptimeOrchestrator] removeSite(${identifier}) invoked for site missing from cache`
+            );
+        }
+
+        try {
+            const monitoringStopped =
+                await this.monitorManager.stopMonitoringForSite(identifier);
+
+            if (!monitoringStopped) {
+                logger.warn(
+                    `[UptimeOrchestrator] Aborting removal of ${identifier} because monitoring could not be stopped`
+                );
+                return false;
+            }
+
+            const siteRemoved = await this.siteManager.removeSite(identifier);
+
+            if (siteRemoved) {
+                return true;
+            }
+
+            logger.warn(
+                `[UptimeOrchestrator] Site ${identifier} deletion failed after monitoring shutdown; attempting compensation`
+            );
+
+            if (activeMonitorIds.length === 0) {
+                logger.info(
+                    `[UptimeOrchestrator] No active monitors recorded for ${identifier}; skipping restart after failed removal`
+                );
+                return false;
+            }
+
+            /* eslint-disable no-await-in-loop -- Compensation sequence must restart monitors sequentially */
+            for (const monitorId of activeMonitorIds) {
+                const restartSucceeded =
+                    await this.monitorManager.startMonitoringForSite(
+                        identifier,
+                        monitorId
+                    );
+
+                if (!restartSucceeded) {
+                    const criticalError = new Error(
+                        `Critical state inconsistency: Monitoring stopped for ${identifier} (monitor ${monitorId}) but restart failed after deletion failure`
+                    );
+                    logger.error(
+                        `[UptimeOrchestrator] ${criticalError.message}`
+                    );
+                    await this.emitTyped("system:error", {
+                        context: "site-removal-compensation",
+                        error: criticalError,
+                        recovery:
+                            "Inspect monitor scheduler state and database entries for the affected site",
+                        severity: "critical",
+                        timestamp: Date.now(),
+                    });
+                    throw criticalError;
+                }
+            }
+            /* eslint-enable no-await-in-loop -- Re-enable after sequential compensation */
+
+            return false;
+        } catch (error) {
+            logger.error(
+                `[UptimeOrchestrator] Failed to remove site ${identifier}:`,
+                error
+            );
+            throw error;
+        }
     }
 
     /**
@@ -919,6 +997,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws If database operation fails.
      */
     public async deleteAllSites(): Promise<number> {
+        try {
+            await this.monitorManager.stopMonitoring();
+        } catch (error) {
+            logger.error(
+                "[UptimeOrchestrator] Failed to stop monitoring prior to bulk site deletion:",
+                error
+            );
+            throw error;
+        }
+
         return this.siteManager.deleteAllSites();
     }
 

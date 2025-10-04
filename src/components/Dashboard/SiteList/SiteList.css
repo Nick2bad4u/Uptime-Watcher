@@ -1,5 +1,4 @@
 /* Dashboard site list layout enhancements */
-/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .site-list {
@@ -16,7 +15,8 @@
     gap: 1rem;
 }
 
-.site-list__toolbar-title {
+.site-list__toolbar-title,
+.site-card__compact-title {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -188,6 +188,8 @@
 
 .site-table {
     overflow-inline: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
 }
 
 .site-table__table {
@@ -257,12 +259,6 @@
     justify-content: space-between;
     gap: 1rem;
     row-gap: 0.75rem;
-}
-
-.site-card__compact-title {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
 }
 
 .site-card__compact-status {

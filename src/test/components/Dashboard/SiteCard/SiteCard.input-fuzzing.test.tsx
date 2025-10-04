@@ -84,8 +84,9 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
 
         return (
             <div
-                data-testid={`site-card-metrics-content-${siteId}`}
+                data-site-id={siteId}
                 data-status={statusValue}
+                data-testid="site-card-metrics-content"
             >
                 Metrics: {summary}
             </div>
@@ -506,11 +507,20 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                     ).toHaveTextContent("History: 0 entries");
                 }
 
-                expect(
-                    screen.getByTestId(
-                        `site-card-metrics-${site.identifier}-up`
-                    )
-                ).toHaveTextContent(/Metrics: 99\.5% \| 150ms \| 100 checks/);
+                const metricsContainer = screen.getByTestId(
+                    `site-card-metrics-${site.identifier}-up`
+                );
+                expect(metricsContainer).toBeInTheDocument();
+
+                const metricsSummary = screen.getByTestId(
+                    `site-card-metrics-summary-${site.identifier}`
+                );
+                expect(metricsSummary).toHaveTextContent(/Uptime: 99\.5%/);
+
+                const metricsContent = screen.getByTestId(
+                    "site-card-metrics-content"
+                );
+                expect(metricsContent).toHaveTextContent(/Metrics:/);
                 expect(
                     screen.getByTestId(`site-card-footer-${site.identifier}`)
                 ).toHaveTextContent("Click to view details");

@@ -91,6 +91,7 @@ describe("SiteWriterService Coverage Tests", () => {
             updateInternal: vi.fn(),
             deleteInternal: vi.fn(),
             deleteBySiteIdentifierInternal: vi.fn(),
+            deleteAllInternal: vi.fn(),
             findBySiteIdentifierInternal: vi.fn().mockReturnValue([
                 {
                     id: "monitor-1",
@@ -111,6 +112,7 @@ describe("SiteWriterService Coverage Tests", () => {
         mockSiteRepository = {
             upsertInternal: vi.fn(),
             deleteInternal: vi.fn(),
+            deleteAllInternal: vi.fn(),
         } as any;
 
         // Mock logger
@@ -127,6 +129,7 @@ describe("SiteWriterService Coverage Tests", () => {
             set: vi.fn(),
             delete: vi.fn().mockReturnValue(true),
             has: vi.fn(),
+            getAll: vi.fn(() => [mockSite]),
             clear: vi.fn(),
         } as any;
 
@@ -386,6 +389,74 @@ describe("SiteWriterService Coverage Tests", () => {
             await expect(
                 siteWriterService.deleteSite(mockSitesCache, "test-site")
             ).rejects.toThrow("Database deletion failed");
+        });
+    });
+
+    describe("deleteAllSites", () => {
+        beforeEach(() => {
+            (
+                mockDatabaseService.executeTransaction as MockedFunction<any>
+            ).mockImplementation(async (callback: any) => callback(mockDb));
+        });
+
+        it("should delete all sites and return snapshot", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Deletion", "type");
+
+            (mockSitesCache.getAll as MockedFunction<any>).mockReturnValue([
+                mockSite,
+            ]);
+
+            const result =
+                await siteWriterService.deleteAllSites(mockSitesCache);
+
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
+            expect(
+                mockMonitorRepository.deleteAllInternal
+            ).toHaveBeenCalledWith(mockDb);
+            expect(mockSiteRepository.deleteAllInternal).toHaveBeenCalledWith(
+                mockDb
+            );
+            expect(mockSitesCache.clear).toHaveBeenCalled();
+            expect(result.deletedCount).toBe(1);
+            expect(result.deletedSites).toEqual([
+                expect.objectContaining({ identifier: "test-site" }),
+            ]);
+        });
+
+        it("should short-circuit when no sites exist", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Business Logic", "type");
+
+            (mockSitesCache.getAll as MockedFunction<any>).mockReturnValue([]);
+
+            const result =
+                await siteWriterService.deleteAllSites(mockSitesCache);
+
+            expect(result).toEqual({ deletedCount: 0, deletedSites: [] });
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "[SiteWriterService] No sites available for bulk deletion"
+            );
+            expect(
+                mockDatabaseService.executeTransaction
+            ).not.toHaveBeenCalled();
+            expect(mockSitesCache.clear).not.toHaveBeenCalled();
         });
     });
 

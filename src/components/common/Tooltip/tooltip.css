@@ -1,5 +1,4 @@
 /* Tooltip component styles */
-/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .tooltip-container {
@@ -21,18 +20,47 @@
 .tooltip {
     --tooltip-arrow-offset-inline: 0;
     --tooltip-arrow-offset-block: 0;
+    --tooltip-surface-base: var(
+        --color-surface-overlay,
+        var(--shadow-base-color, rgb(15 23 42))
+    );
+    --tooltip-border-color: color-mix(
+        in srgb,
+        var(--shadow-inverse-color) 12%,
+        transparent
+    );
+    --tooltip-outline-color: color-mix(
+        in srgb,
+        var(--shadow-inverse-color) 5%,
+        transparent
+    );
+    --tooltip-shadow-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 30%,
+        transparent
+    );
+    --tooltip-text-color: color-mix(
+        in srgb,
+        var(--shadow-inverse-color) 95%,
+        transparent
+    );
+    --tooltip-surface-color: color-mix(
+        in srgb,
+        var(--tooltip-surface-base) 95%,
+        transparent
+    );
 
     position: fixed;
     z-index: 9999;
     padding: 0.5rem 0.75rem;
-    border: 1px solid rgb(255 255 255 / 12%);
+    border: 1px solid var(--tooltip-border-color);
     border-radius: 0.5rem;
     backdrop-filter: blur(12px);
-    background: rgb(15 23 42 / 95%);
+    background: var(--tooltip-surface-color);
     box-shadow:
-        0 10px 30px rgb(0 0 0 / 30%),
-        0 0 0 1px rgb(255 255 255 / 5%);
-    color: rgb(255 255 255 / 95%);
+        0 10px 30px var(--tooltip-shadow-color),
+        0 0 0 1px var(--tooltip-outline-color);
+    color: var(--tooltip-text-color);
     font-size: 0.875rem;
     font-weight: 500;
     inset-block-start: 0;
@@ -48,31 +76,8 @@
     will-change: opacity, transform;
 
     @media screen and (prefers-reduced-motion: reduce) {
-        --tooltip-arrow-offset-inline: 0;
-        --tooltip-arrow-offset-block: 0;
-
-        position: fixed;
-        z-index: 9999;
-        padding: 0.5rem 0.75rem;
-        border: 1px solid rgb(255 255 255 / 12%);
-        border-radius: 0.5rem;
-        backdrop-filter: blur(12px);
-        background: rgb(15 23 42 / 95%);
-        box-shadow:
-            0 10px 30px rgb(0 0 0 / 30%),
-            0 0 0 1px rgb(255 255 255 / 5%);
-        color: rgb(255 255 255 / 95%);
-        font-size: 0.875rem;
-        font-weight: 500;
-        inset-block-start: 0;
-        inset-inline-start: 0;
-        line-height: 1.375;
-        opacity: 0;
-        pointer-events: none;
         transform: scale(0.95);
         transition: none;
-        white-space: normal;
-        will-change: opacity, transform;
     }
 }
 
@@ -97,7 +102,7 @@
 /* Position variants */
 .tooltip[data-position="top"] .tooltip__arrow {
     border-block-end-width: 0;
-    border-block-start-color: rgb(15 23 42 / 95%);
+    border-block-start-color: var(--tooltip-surface-color);
     border-block-start-width: 6px;
     border-inline-width: 6px;
     inset-block-start: 100%;
@@ -106,7 +111,7 @@
 }
 
 .tooltip[data-position="bottom"] .tooltip__arrow {
-    border-block-end-color: rgb(15 23 42 / 95%);
+    border-block-end-color: var(--tooltip-surface-color);
     border-block-end-width: 6px;
     border-block-start-width: 0;
     border-inline-width: 6px;
@@ -118,7 +123,7 @@
 .tooltip[data-position="left"] .tooltip__arrow {
     border-block-width: 6px;
     border-inline-end-width: 0;
-    border-inline-start-color: rgb(15 23 42 / 95%);
+    border-inline-start-color: var(--tooltip-surface-color);
     border-inline-start-width: 6px;
     inset-block-start: 50%;
     inset-inline-start: 100%;
@@ -127,7 +132,7 @@
 
 .tooltip[data-position="right"] .tooltip__arrow {
     border-block-width: 6px;
-    border-inline-end-color: rgb(15 23 42 / 95%);
+    border-inline-end-color: var(--tooltip-surface-color);
     border-inline-end-width: 6px;
     border-inline-start-width: 0;
     inset-block-start: 50%;
@@ -136,27 +141,70 @@
 }
 
 /* Light theme adjustments */
+.theme-light .tooltip,
 [data-theme="light"] .tooltip {
-    border-color: rgb(0 0 0 / 8%);
-    background: rgb(255 255 255 / 98%);
-    box-shadow:
-        0 10px 30px rgb(0 0 0 / 15%),
-        0 0 0 1px rgb(0 0 0 / 5%);
-    color: rgb(15 23 42 / 95%);
+    --tooltip-border-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 8%,
+        transparent
+    );
+    --tooltip-outline-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 5%,
+        transparent
+    );
+    --tooltip-shadow-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 15%,
+        transparent
+    );
+    --tooltip-surface-base: var(
+        --surface-light-color,
+        var(--shadow-inverse-color)
+    );
+    --tooltip-surface-color: color-mix(
+        in srgb,
+        var(--tooltip-surface-base) 98%,
+        transparent
+    );
+    --tooltip-text-color: color-mix(
+        in srgb,
+        var(--shadow-base-color) 95%,
+        transparent
+    );
+}
 
-    &[data-position="top"] .tooltip__arrow {
-        border-block-start-color: rgb(255 255 255 / 98%);
-    }
-
-    &[data-position="bottom"] .tooltip__arrow {
-        border-block-end-color: rgb(255 255 255 / 98%);
-    }
-
-    &[data-position="left"] .tooltip__arrow {
-        border-inline-start-color: rgb(255 255 255 / 98%);
-    }
-
-    &[data-position="right"] .tooltip__arrow {
-        border-inline-end-color: rgb(255 255 255 / 98%);
-    }
+/* Dark & high contrast theme adjustments */
+.theme-dark .tooltip,
+.theme-high-contrast .tooltip,
+[data-theme="dark"] .tooltip {
+    --tooltip-border-color: color-mix(
+        in srgb,
+        var(--color-border-primary, #1b2535) 58%,
+        transparent
+    );
+    --tooltip-outline-color: color-mix(
+        in srgb,
+        var(--color-primary-500, #3a63a6) 22%,
+        transparent
+    );
+    --tooltip-shadow-color: color-mix(
+        in srgb,
+        var(--color-shadow-overlay, rgb(8 12 24)) 45%,
+        transparent
+    );
+    --tooltip-surface-base: var(
+        --color-surface-overlay,
+        var(--shadow-base-color, rgb(15 23 42))
+    );
+    --tooltip-surface-color: color-mix(
+        in srgb,
+        var(--tooltip-surface-base) 96%,
+        transparent
+    );
+    --tooltip-text-color: color-mix(
+        in srgb,
+        var(--color-text-primary, #f2f4f8) 98%,
+        transparent
+    );
 }

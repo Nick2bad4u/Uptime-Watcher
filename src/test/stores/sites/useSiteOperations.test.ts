@@ -79,6 +79,10 @@ describe(createSiteOperationsActions, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
+            true
+        );
+
         mockMonitor = {
             checkInterval: 60_000,
             history: [],
@@ -257,7 +261,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Data Deletion", "type");
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
             mockElectronAPI.sites.removeSite.mockResolvedValue(true);
 
@@ -284,6 +288,24 @@ describe(createSiteOperationsActions, () => {
             await expect(actions.deleteSite("test-site")).rejects.toThrow(
                 "Delete failed"
             );
+            expect(mockDeps.removeSite).not.toHaveBeenCalled();
+        });
+
+        it("should not remove from store when backend reports failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
+
+            await expect(actions.deleteSite("test-site")).rejects.toThrow(
+                /Backend operation returned false/
+            );
+            expect(mockDeps.removeSite).not.toHaveBeenCalled();
         });
     });
 
@@ -402,7 +424,7 @@ describe(createSiteOperationsActions, () => {
             mockDeps.getSites = vi.fn(() => [siteWithMultipleMonitors]);
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                undefined
+                true
             );
             mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(true);
 

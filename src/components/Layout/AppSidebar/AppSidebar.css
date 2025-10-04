@@ -1,4 +1,3 @@
-/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 .app-sidebar {
     position: relative;
@@ -92,7 +91,11 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 5%),
         0 12px 26px rgb(5 12 24 / 35%);
-    color: color-mix(in srgb, var(--color-text-primary) 78%, white 22%);
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary) 78%,
+        rgb(255 255 255) 22%
+    );
     inline-size: 2.2rem;
     place-items: center;
     transition:
@@ -114,7 +117,11 @@
         box-shadow:
             inset 0 0 0 1px rgb(255 255 255 / 5%),
             0 12px 26px rgb(5 12 24 / 35%);
-        color: color-mix(in srgb, var(--color-text-primary) 78%, white 22%);
+        color: color-mix(
+            in srgb,
+            var(--color-text-primary) 78%,
+            rgb(255 255 255) 22%
+        );
         inline-size: 2.2rem;
         place-items: center;
         transition: none;
@@ -162,12 +169,16 @@
     opacity: 0.7;
 }
 
-.app-sidebar__search {
-    position: relative;
+.app-sidebar__status-up {
+    color: color-mix(in srgb, var(--color-status-up) 78%, rgb(255 255 255) 22%);
 }
 
 .app-sidebar__search-label {
-    display: block;
+    color: color-mix(
+        in srgb,
+        var(--color-status-down) 78%,
+        rgb(255 255 255) 22%
+    );
 }
 
 .app-sidebar__search-input {
@@ -179,24 +190,8 @@
     color: var(--color-text-primary);
     inline-size: 100%;
     transition:
-        border-color var(--transition-fast),
         background var(--transition-fast),
         box-shadow var(--transition-fast);
-
-    @media screen and (prefers-reduced-motion: reduce) {
-        padding: 0.625rem 0.75rem;
-        border: 1px solid
-            color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
-        border-radius: 0.875rem;
-        background: color-mix(
-            in srgb,
-            var(--color-surface-base) 82%,
-            transparent
-        );
-        color: var(--color-text-primary);
-        inline-size: 100%;
-        transition: none;
-    }
 
     .app-sidebar--light & {
         border-color: color-mix(
@@ -225,7 +220,10 @@
         );
         box-shadow: 0 0 0 4px
             color-mix(in srgb, var(--color-primary-500) 18%, transparent);
-        outline: none;
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        transition: none;
     }
 }
 
@@ -239,6 +237,8 @@
     flex-direction: column;
     gap: 0.5rem;
     overflow-block: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
     padding-inline-end: 0.25rem;
     scrollbar-width: thin;
 }
@@ -387,7 +387,7 @@
     background: color-mix(in srgb, var(--color-status-up) 22%, transparent);
     box-shadow: 0 18px 34px
         color-mix(in srgb, var(--color-status-up) 30%, transparent);
-    color: color-mix(in srgb, var(--color-status-up) 78%, white 22%);
+    color: color-mix(in srgb, var(--color-status-up) 78%, rgb(255 255 255) 22%);
 }
 
 .app-sidebar__item-status--down {
@@ -395,7 +395,11 @@
     background: color-mix(in srgb, var(--color-status-down) 20%, transparent);
     box-shadow: 0 18px 34px
         color-mix(in srgb, var(--color-status-down) 30%, transparent);
-    color: color-mix(in srgb, var(--color-status-down) 78%, white 22%);
+    color: color-mix(
+        in srgb,
+        var(--color-status-down) 78%,
+        rgb(255 255 255) 22%
+    );
 }
 
 .app-sidebar__item-status--degraded {
@@ -411,7 +415,11 @@
     );
     box-shadow: 0 18px 32px
         color-mix(in srgb, var(--color-status-degraded) 28%, transparent);
-    color: color-mix(in srgb, var(--color-status-degraded) 75%, white 25%);
+    color: color-mix(
+        in srgb,
+        var(--color-status-degraded) 75%,
+        rgb(255 255 255) 25%
+    );
 }
 
 .app-sidebar__item-status--pending {
@@ -427,7 +435,11 @@
     );
     box-shadow: 0 18px 34px
         color-mix(in srgb, var(--color-status-pending) 30%, transparent);
-    color: color-mix(in srgb, var(--color-status-pending) 78%, white 22%);
+    color: color-mix(
+        in srgb,
+        var(--color-status-pending) 78%,
+        rgb(255 255 255) 22%
+    );
 }
 
 .app-sidebar__item-status--paused {
@@ -439,7 +451,11 @@
     background: color-mix(in srgb, var(--color-status-paused) 18%, transparent);
     box-shadow: 0 16px 28px
         color-mix(in srgb, var(--color-status-paused) 28%, transparent);
-    color: color-mix(in srgb, var(--color-status-paused) 78%, white 22%);
+    color: color-mix(
+        in srgb,
+        var(--color-status-paused) 78%,
+        rgb(255 255 255) 22%
+    );
 }
 
 .app-sidebar__item-status--mixed {
@@ -455,7 +471,11 @@
     );
     box-shadow: 0 18px 32px
         color-mix(in srgb, var(--color-status-degraded) 26%, transparent);
-    color: color-mix(in srgb, var(--color-status-degraded) 74%, white 26%);
+    color: color-mix(
+        in srgb,
+        var(--color-status-degraded) 74%,
+        rgb(255 255 255) 26%
+    );
 }
 
 .app-sidebar__item-status--unknown {
@@ -478,7 +498,7 @@
     color: color-mix(
         in srgb,
         var(--color-status-unknown, var(--color-border-secondary)) 70%,
-        white 30%
+        rgb(255 255 255) 30%
     );
 }
 
@@ -537,7 +557,7 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 6%),
         0 24px 48px color-mix(in srgb, var(--color-status-up) 32%, transparent);
-    color: color-mix(in srgb, var(--color-status-up) 78%, white 22%);
+    color: color-mix(in srgb, var(--color-status-up) 78%, rgb(255 255 255) 22%);
     cursor: pointer;
     font-weight: var(--font-weight-semibold);
     gap: 0.65rem;
@@ -572,7 +592,11 @@
             inset 0 0 0 1px rgb(255 255 255 / 6%),
             0 24px 48px
                 color-mix(in srgb, var(--color-status-up) 32%, transparent);
-        color: color-mix(in srgb, var(--color-status-up) 78%, white 22%);
+        color: color-mix(
+            in srgb,
+            var(--color-status-up) 78%,
+            rgb(255 255 255) 22%
+        );
         cursor: pointer;
         font-weight: var(--font-weight-semibold);
         gap: 0.65rem;
@@ -599,7 +623,6 @@
             inset 0 0 0 1px rgb(255 255 255 / 12%),
             0 0 0 4px
                 color-mix(in srgb, var(--color-status-up) 26%, transparent);
-        outline: none;
     }
 }
 
@@ -617,7 +640,7 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 8%),
         0 12px 26px color-mix(in srgb, var(--color-status-up) 26%, transparent);
-    color: color-mix(in srgb, var(--color-status-up) 82%, white 18%);
+    color: color-mix(in srgb, var(--color-status-up) 82%, rgb(255 255 255) 18%);
     inline-size: 2rem;
 }
 
@@ -642,7 +665,11 @@
         var(--color-surface-elevated) 90%,
         transparent
     );
-    color: color-mix(in srgb, var(--color-text-primary) 85%, white 15%);
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary) 85%,
+        rgb(255 255 255) 15%
+    );
     cursor: pointer;
     font-weight: var(--font-weight-medium);
     gap: 0.4rem;
@@ -665,7 +692,11 @@
             var(--color-surface-elevated) 90%,
             transparent
         );
-        color: color-mix(in srgb, var(--color-text-primary) 85%, white 15%);
+        color: color-mix(
+            in srgb,
+            var(--color-text-primary) 85%,
+            rgb(255 255 255) 15%
+        );
         cursor: pointer;
         font-weight: var(--font-weight-medium);
         gap: 0.4rem;
@@ -686,7 +717,6 @@
     &:focus-visible {
         box-shadow: 0 0 0 3px
             color-mix(in srgb, var(--color-primary-500) 22%, transparent);
-        outline: none;
     }
 }
 
@@ -699,7 +729,7 @@
 
     border-color: color-mix(in srgb, var(--cta-accent) 35%, transparent);
     background: color-mix(in srgb, var(--cta-accent) 14%, transparent);
-    color: color-mix(in srgb, var(--cta-accent) 72%, white 28%);
+    color: color-mix(in srgb, var(--cta-accent) 72%, rgb(255 255 255) 28%);
 }
 
 .app-sidebar__secondary-cta--theme {
@@ -711,7 +741,7 @@
 
     border-color: color-mix(in srgb, var(--cta-accent) 32%, transparent);
     background: color-mix(in srgb, var(--cta-accent) 12%, transparent);
-    color: color-mix(in srgb, var(--cta-accent) 74%, white 26%);
+    color: color-mix(in srgb, var(--cta-accent) 74%, rgb(255 255 255) 26%);
 }
 
 .app-sidebar__secondary-text {

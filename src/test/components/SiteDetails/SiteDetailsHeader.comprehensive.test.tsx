@@ -136,8 +136,11 @@ describe(SiteDetailsHeader, () => {
         history: [],
     };
 
+    const noop = vi.fn();
+
     beforeEach(() => {
         vi.clearAllMocks();
+        noop.mockClear();
     });
 
     describe("Basic Rendering", () => {
@@ -152,7 +155,7 @@ describe(SiteDetailsHeader, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<SiteDetailsHeader site={mockSite} />);
+            render(<SiteDetailsHeader onClose={noop} site={mockSite} />);
             expect(screen.getByText("Test Site")).toBeInTheDocument();
         });
 
@@ -169,6 +172,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     selectedMonitor={mockHttpMonitor}
                 />
@@ -193,8 +197,37 @@ describe(SiteDetailsHeader, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<SiteDetailsHeader site={mockSite} />);
+            render(<SiteDetailsHeader onClose={noop} site={mockSite} />);
             expect(screen.getByText("Test Site")).toBeInTheDocument();
+        });
+
+        it("should render close control that triggers onClose", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: SiteDetailsHeader", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            const handleClose = vi.fn();
+            const user = userEvent.setup();
+            render(<SiteDetailsHeader onClose={handleClose} site={mockSite} />);
+
+            const closeButton = screen.getByRole("button", {
+                name: "Close site details",
+            });
+
+            await act(async () => {
+                await user.click(closeButton);
+            });
+
+            expect(handleClose).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -215,6 +248,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={true}
                     selectedMonitor={mockHttpMonitor}
@@ -241,6 +275,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={true}
                     selectedMonitor={mockHttpMonitor}
@@ -268,7 +303,11 @@ describe(SiteDetailsHeader, () => {
                 monitors: [mockHttpMonitor],
             };
             render(
-                <SiteDetailsHeader site={siteWithMonitors} isCollapsed={true} />
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={siteWithMonitors}
+                    isCollapsed={true}
+                />
             );
             // When collapsed, detailed monitoring display should not be visible
             // The basic status indicator should still be present
@@ -291,6 +330,7 @@ describe(SiteDetailsHeader, () => {
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={true}
                     onToggleCollapse={onToggleCollapse}
@@ -317,6 +357,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
@@ -345,6 +386,7 @@ describe(SiteDetailsHeader, () => {
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     onToggleCollapse={onToggleCollapse}
@@ -373,6 +415,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -401,6 +444,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
@@ -429,6 +473,7 @@ describe(SiteDetailsHeader, () => {
             const user = userEvent.setup();
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
@@ -465,6 +510,7 @@ describe(SiteDetailsHeader, () => {
             const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={monitorWithoutUrl}
@@ -490,6 +536,7 @@ describe(SiteDetailsHeader, () => {
             const { url, ...monitorWithoutUrl } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={monitorWithoutUrl}
@@ -514,6 +561,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockPingMonitor}
@@ -535,6 +583,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockPortMonitor}
@@ -559,6 +608,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockPingMonitor}
@@ -584,7 +634,13 @@ describe(SiteDetailsHeader, () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            render(<SiteDetailsHeader site={mockSite} isCollapsed={false} />);
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    isCollapsed={false}
+                />
+            );
             expect(
                 screen.getByText("No monitor data available for this site.")
             ).toBeInTheDocument();
@@ -604,7 +660,13 @@ describe(SiteDetailsHeader, () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            render(<SiteDetailsHeader site={mockSite} isCollapsed={true} />);
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    isCollapsed={true}
+                />
+            );
             expect(
                 screen.queryByText("No monitor data available for this site.")
             ).not.toBeInTheDocument();
@@ -631,6 +693,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     onToggleCollapse={onToggleCollapse}
@@ -659,7 +722,13 @@ describe(SiteDetailsHeader, () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<SiteDetailsHeader site={mockSite} isCollapsed={false} />);
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    isCollapsed={false}
+                />
+            );
             expect(screen.queryByRole("button")).not.toBeInTheDocument();
         });
 
@@ -680,6 +749,7 @@ describe(SiteDetailsHeader, () => {
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={true}
                     onToggleCollapse={onToggleCollapse}
@@ -707,6 +777,7 @@ describe(SiteDetailsHeader, () => {
             const onToggleCollapse = vi.fn();
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     onToggleCollapse={onToggleCollapse}
@@ -720,7 +791,13 @@ describe(SiteDetailsHeader, () => {
 
     describe("MonitoringStatusDisplay", () => {
         it("should show 'No monitors configured' when no monitors", () => {
-            render(<SiteDetailsHeader site={mockSite} isCollapsed={false} />);
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    isCollapsed={false}
+                />
+            );
             expect(
                 screen.getByText("No monitors configured")
             ).toBeInTheDocument();
@@ -747,6 +824,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -774,6 +852,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -804,6 +883,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -829,6 +909,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -859,6 +940,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={invalidUrlMonitor}
@@ -882,6 +964,7 @@ describe(SiteDetailsHeader, () => {
             const { status, ...monitorWithoutStatus } = mockHttpMonitor;
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={{
@@ -918,6 +1001,7 @@ describe(SiteDetailsHeader, () => {
             };
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteWithMonitors}
                     isCollapsed={false}
                 />
@@ -943,6 +1027,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
@@ -971,6 +1056,7 @@ describe(SiteDetailsHeader, () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}

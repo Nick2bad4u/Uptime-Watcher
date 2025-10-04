@@ -58,6 +58,7 @@ describe(SiteManager, () => {
                 bulkCreate: vi.fn(),
                 deleteBySiteIdentifier: vi.fn(),
                 deleteBySiteIdentifierInternal: vi.fn(), // Add the missing internal method
+                deleteAllInternal: vi.fn(),
                 delete: vi.fn().mockResolvedValue(true), // Add missing delete method
             },
             monitoringOperations: {
@@ -78,6 +79,7 @@ describe(SiteManager, () => {
                 upsertInternal: vi.fn(), // Add the missing internal method
                 delete: vi.fn(),
                 deleteInternal: vi.fn(), // Add the missing internal method
+                deleteAllInternal: vi.fn(),
                 exists: vi.fn(),
             },
         };

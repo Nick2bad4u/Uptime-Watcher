@@ -101,6 +101,12 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
         history: [],
     };
 
+    const noop = vi.fn();
+
+    beforeEach(() => {
+        noop.mockClear();
+    });
+
     describe("URL Click Handler Coverage (Line 72)", () => {
         it("should call openExternal with proper parameters when URL link is clicked", async ({
             task,
@@ -129,6 +135,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
@@ -189,6 +196,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={mockSite}
                     isCollapsed={false}
                     selectedMonitor={httpMonitorNoUrl}
@@ -257,6 +265,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             render(
                 <SiteDetailsHeader
+                    onClose={noop}
                     site={siteSpecial}
                     isCollapsed={false}
                     selectedMonitor={httpMonitorSpecial}

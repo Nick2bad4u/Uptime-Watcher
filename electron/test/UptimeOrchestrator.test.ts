@@ -64,6 +64,16 @@ const mockSiteManager = {
         } as Site)
     ),
     removeSite: vi.fn(() => Promise.resolve(true)),
+    getSiteFromCache: vi.fn(() => ({
+        identifier: "test-site",
+        name: "Test Site",
+        monitors: [
+            { id: "monitor-1", monitoring: true },
+            { id: "monitor-2", monitoring: false },
+        ] as unknown as Monitor[],
+        monitoring: true,
+    })),
+    deleteAllSites: vi.fn(() => Promise.resolve(0)),
     updateSite: vi.fn(() =>
         Promise.resolve({
             identifier: "test-site",
@@ -376,12 +386,107 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Deletion", "type");
 
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockResolvedValueOnce(true);
+            vi.mocked(mockSiteManager.removeSite).mockResolvedValueOnce(true);
+
             const result = await orchestrator.removeSite("test-site");
 
+            expect(
+                mockMonitorManager.stopMonitoringForSite
+            ).toHaveBeenCalledWith("test-site");
             expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
                 "test-site"
             );
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).not.toHaveBeenCalled();
             expect(result).toBeTruthy();
+        });
+
+        it("should abort removal when monitoring stop fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockResolvedValueOnce(false);
+
+            const result = await orchestrator.removeSite("site-failure");
+
+            expect(result).toBeFalsy();
+            expect(mockSiteManager.removeSite).not.toHaveBeenCalled();
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).not.toHaveBeenCalled();
+        });
+
+        it("should restart monitoring when deletion fails but monitoring stopped", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockResolvedValueOnce(true);
+            vi.mocked(mockSiteManager.removeSite).mockResolvedValueOnce(false);
+
+            const result = await orchestrator.removeSite("test-site");
+
+            expect(result).toBeFalsy();
+            expect(
+                mockMonitorManager.startMonitoringForSite
+            ).toHaveBeenCalledWith("test-site", "monitor-1");
+        });
+
+        it("should emit critical error when monitor restart fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.mocked(
+                mockMonitorManager.stopMonitoringForSite
+            ).mockResolvedValueOnce(true);
+            vi.mocked(mockSiteManager.removeSite).mockResolvedValueOnce(false);
+            vi.mocked(
+                mockMonitorManager.startMonitoringForSite
+            ).mockResolvedValueOnce(false);
+
+            await expect(orchestrator.removeSite("test-site")).rejects.toThrow(
+                /Critical state inconsistency/
+            );
+        });
+
+        it("should stop monitoring before deleting all sites", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
+            vi.mocked(mockSiteManager.deleteAllSites).mockResolvedValueOnce(4);
+
+            const result = await orchestrator.deleteAllSites();
+
+            expect(mockMonitorManager.stopMonitoring).toHaveBeenCalled();
+            expect(mockSiteManager.deleteAllSites).toHaveBeenCalled();
+            expect(result).toBe(4);
         });
 
         it("should update site successfully", async ({ task, annotate }) => {

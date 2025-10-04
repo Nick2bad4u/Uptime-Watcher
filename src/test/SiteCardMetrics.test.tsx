@@ -72,8 +72,13 @@ describe(SiteCardMetrics, () => {
         expect(screen.getAllByTestId("metric-card")).toHaveLength(2);
         const tooltipWrappers = screen.getAllByTestId("tooltip-wrapper");
         expect(tooltipWrappers).toHaveLength(1);
-        expect(
-            tooltipWrappers[0].querySelector('[data-label="Uptime"]')
-        ).not.toBeNull();
+
+        const [tooltipWrapper] = tooltipWrappers;
+        expect(tooltipWrapper).toBeDefined();
+
+        const uptimeCard = tooltipWrapper?.querySelector(
+            '[data-label="Uptime"]'
+        );
+        expect(uptimeCard).not.toBeNull();
     });
 });

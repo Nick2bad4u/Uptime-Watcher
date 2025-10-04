@@ -1,4 +1,5 @@
 /* Modernized settings modal visuals */
+/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .modal-overlay--settings {
     display: flex;
@@ -25,9 +26,11 @@
             100%
     );
     box-shadow:
-        0 28px 70px rgb(15 23 42 / 52%),
-        0 0 0 1px rgb(148 163 184 / 12%),
-        inset 0 0 0 1px rgb(255 255 255 / 4%);
+        0 28px 70px
+            color-mix(in srgb, var(--shadow-base-color) 52%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--accent-muted-color) 12%, transparent),
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent);
     inline-size: min(680px, 94vi);
 }
 
@@ -42,7 +45,8 @@
         color-mix(in srgb, var(--color-primary-600) 94%, transparent),
         color-mix(in srgb, var(--color-primary-500) 86%, transparent)
     );
-    border-block-end: 1px solid rgb(148 163 184 / 12%);
+    border-block-end: 1px solid
+        color-mix(in srgb, var(--accent-muted-color) 12%, transparent);
     color: var(--color-text-inverse);
 
     &::after {
@@ -50,7 +54,7 @@
         z-index: 0;
         background: radial-gradient(
             circle at top right,
-            rgb(255 255 255 / 22%),
+            color-mix(in srgb, var(--shadow-inverse-color) 22%, transparent),
             transparent 60%
         );
         content: "";
@@ -71,11 +75,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgb(255 255 255 / 16%);
+    border: 1px solid
+        color-mix(in srgb, var(--shadow-inverse-color) 16%, transparent);
     border-radius: var(--border-radius-xl);
-    background: rgb(15 23 42 / 22%);
+    background: color-mix(in srgb, var(--shadow-base-color) 22%, transparent);
     block-size: 48px;
-    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
+    box-shadow: 0 8px 20px
+        color-mix(in srgb, var(--shadow-neutral-color) 18%, transparent);
     inline-size: 48px;
 }
 
@@ -89,34 +95,32 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgb(255 255 255 / 20%);
+    border: 1px solid
+        color-mix(in srgb, var(--shadow-inverse-color) 20%, transparent);
     border-radius: var(--border-radius-lg);
-    background: rgb(15 23 42 / 20%);
+    background: color-mix(in srgb, var(--shadow-base-color) 20%, transparent);
     color: var(--color-text-inverse);
     cursor: pointer;
     inline-size: 36px;
     min-block-size: 36px;
-    transition: all 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 
     @media screen and (prefers-reduced-motion: reduce) {
-        position: relative;
-        z-index: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid rgb(255 255 255 / 20%);
-        border-radius: var(--border-radius-lg);
-        background: rgb(15 23 42 / 20%);
-        color: var(--color-text-inverse);
-        cursor: pointer;
-        inline-size: 36px;
-        min-block-size: 36px;
         transition: none;
+        transform: none;
     }
 
     &:hover,
     &:focus {
-        background: rgb(15 23 42 / 35%);
+        background: color-mix(
+            in srgb,
+            var(--shadow-base-color) 35%,
+            transparent
+        );
         transform: translateY(-1px);
     }
 
@@ -141,14 +145,16 @@
 }
 
 .settings-modal__banner--success {
-    border: 1px solid rgb(34 197 94 / 24%);
+    border: 1px solid
+        color-mix(in srgb, var(--accent-success-color) 24%, transparent);
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, rgb(34 197 94) 16%, transparent),
-        color-mix(in srgb, rgb(34 197 94) 8%, transparent)
+        color-mix(in srgb, var(--accent-success-color) 16%, transparent),
+        color-mix(in srgb, var(--accent-success-color) 8%, transparent)
     );
-    box-shadow: 0 8px 20px rgb(34 197 94 / 14%);
-    color: rgb(34 197 94);
+    box-shadow: 0 8px 20px
+        color-mix(in srgb, var(--accent-success-color) 14%, transparent);
+    color: var(--accent-success-color, rgb(34 197 94));
 }
 
 .settings-modal__banner-icon {
@@ -179,8 +185,10 @@
             100%
     );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 3%),
-        0 8px 20px rgb(8 12 24 / 12%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 3%, transparent),
+        0 8px 20px
+            color-mix(in srgb, var(--shadow-overlay-color) 12%, transparent);
     gap: var(--spacing-lg);
     transition:
         border-color 0.22s ease,
@@ -192,10 +200,11 @@
 
     &:hover,
     &:focus-within {
-        border-color: rgb(129 140 248 / 28%);
+        border-color: color-mix(in srgb, rgb(129 140 248) 28%, transparent);
         box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 4%),
-            0 12px 28px rgb(129 140 248 / 18%);
+            inset 0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent),
+            0 12px 28px color-mix(in srgb, rgb(129 140 248) 18%, transparent);
     }
 }
 
@@ -210,7 +219,7 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius-lg);
-    background: rgb(96 165 250 / 14%);
+    background: color-mix(in srgb, rgb(96 165 250) 14%, transparent);
     block-size: 36px;
     inline-size: 36px;
 }
@@ -223,13 +232,15 @@
     margin-block-start: 2px;
 }
 
-.settings-section__content {
+.settings-section__content,
+.settings-actions {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
 }
 
-.settings-field {
+.settings-field,
+.settings-toggle-stack {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
@@ -253,18 +264,6 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-sm);
-}
-
-.settings-toggle-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-}
-
-.settings-actions {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
 }
 
 .settings-actions__primary {

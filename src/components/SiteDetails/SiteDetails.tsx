@@ -48,7 +48,6 @@ import { useMount } from "../../hooks/useMount";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
-import { AppIcons } from "../../utils/icons";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
 import "./SiteDetails.css";
 import {
@@ -63,6 +62,9 @@ import { HistoryTab } from "./tabs/HistoryTab";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
+
+const HEADER_COLLAPSE_SCROLL_THRESHOLD = 96;
+const HEADER_EXPAND_SCROLL_THRESHOLD = 32;
 
 /**
  * Props for the SiteDetails component
@@ -106,7 +108,6 @@ export const SiteDetails = ({
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
     const contentElementRef = useRef<HTMLDivElement>(null);
     const scrollHandlerRef = useRef<(() => void) | null>(null);
-    const CloseIcon = AppIcons.ui.close;
 
     // Add global escape key handler
     const modalConfigs = useMemo(
@@ -137,15 +138,32 @@ export const SiteDetails = ({
             }
 
             const handleScroll = (): void => {
-                if (contentElement.scrollTop > 50) {
-                    setIsHeaderCollapsed(true);
-                } else {
-                    setIsHeaderCollapsed(false);
-                }
+                const { scrollTop } = contentElement;
+
+                setIsHeaderCollapsed((previous) => {
+                    if (
+                        scrollTop <= HEADER_EXPAND_SCROLL_THRESHOLD &&
+                        previous
+                    ) {
+                        return false;
+                    }
+
+                    if (
+                        scrollTop >= HEADER_COLLAPSE_SCROLL_THRESHOLD &&
+                        !previous
+                    ) {
+                        return true;
+                    }
+
+                    return previous;
+                });
             };
 
             scrollHandlerRef.current = handleScroll;
-            contentElement.addEventListener("scroll", handleScroll);
+            contentElement.addEventListener("scroll", handleScroll, {
+                passive: true,
+            });
+            handleScroll();
         }, []),
         useCallback(function cleanupScrollListener(): void {
             const contentElement = contentElementRef.current;
@@ -153,6 +171,7 @@ export const SiteDetails = ({
             if (contentElement && handleScroll) {
                 contentElement.removeEventListener("scroll", handleScroll);
             }
+            scrollHandlerRef.current = null;
         }, [])
     );
 
@@ -498,20 +517,9 @@ export const SiteDetails = ({
                 shadow="xl"
                 surface="overlay"
             >
-                <div className="modal-shell__actions site-details-modal__actions">
-                    <button
-                        aria-label="Close site details"
-                        className="modal-shell__close site-details-modal__close"
-                        onClick={onClose}
-                        title="Close"
-                        type="button"
-                    >
-                        <CloseIcon size={18} />
-                    </button>
-                </div>
-
                 <div className="site-details-modal__body">
                     <SiteDetailsHeader
+                        onClose={onClose}
                         site={currentSite}
                         {...(selectedMonitor ? { selectedMonitor } : {})}
                         isCollapsed={isHeaderCollapsed}

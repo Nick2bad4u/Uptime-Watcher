@@ -228,6 +228,65 @@ export class SiteWriterService {
     }
 
     /**
+     * Delete all sites and associated monitors from the database and cache.
+     *
+     * @remarks
+     * Performs an atomic transaction that removes every monitor record prior to
+     * deleting the related site entries. The in-memory cache is cleared only
+     * after the transaction succeeds. Operational hooks wrap the process to
+     * provide consistent logging, metrics, and retry semantics.
+     *
+     * The method returns the snapshot of sites that were removed so callers can
+     * emit domain events without querying the cache after it has been cleared.
+     *
+     * @param sitesCache - Sites cache to clear after successful deletion.
+     *
+     * @returns Object containing the deleted site snapshot and record count.
+     */
+    public async deleteAllSites(sitesCache: StandardizedCache<Site>): Promise<{
+        /** Total number of sites removed */
+        deletedCount: number;
+        /** Immutable snapshot of sites deleted during the operation */
+        deletedSites: Site[];
+    }> {
+        const sitesToDelete = sitesCache.getAll();
+
+        if (sitesToDelete.length === 0) {
+            this.logger.debug(
+                "[SiteWriterService] No sites available for bulk deletion"
+            );
+            return {
+                deletedCount: 0,
+                deletedSites: [],
+            };
+        }
+
+        return withDatabaseOperation(
+            async () => {
+                await this.databaseService.executeTransaction((db) => {
+                    this.repositories.monitor.deleteAllInternal(db);
+                    this.repositories.site.deleteAllInternal(db);
+                    return Promise.resolve();
+                });
+
+                sitesCache.clear();
+
+                this.logger.info(
+                    `[SiteWriterService] Deleted ${sitesToDelete.length} sites from database`
+                );
+
+                return {
+                    deletedCount: sitesToDelete.length,
+                    deletedSites: sitesToDelete,
+                };
+            },
+            "site-writer-delete-all",
+            undefined,
+            { deletedCount: sitesToDelete.length }
+        );
+    }
+
+    /**
      * Handle monitoring state changes when monitor intervals are modified. Side
      * effect operation separated from data updates.
      */

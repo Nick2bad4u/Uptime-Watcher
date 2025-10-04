@@ -39,8 +39,8 @@ export const SiteCardFooter: NamedExoticComponent<object> = memo(
                 data-testid="site-card-footer"
             >
                 <ThemedText
-                    className="text-center opacity-0 transition-opacity group-hover:opacity-100"
                     aria-hidden="true"
+                    className="text-center opacity-0 transition-opacity group-hover:opacity-100"
                     size="xs"
                     variant="tertiary"
                 >

@@ -12,23 +12,46 @@
     --transition-normal: 0.25s ease-out;
     --transition-slow: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    --shadow-elevation-1: 0 2px 4px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 10%);
-    --shadow-elevation-2: 0 4px 6px rgb(0 0 0 / 7%), 0 2px 4px rgb(0 0 0 / 6%);
+    --shadow-elevation-1:
+        0 2px 4px
+            color-mix(in srgb, var(--shadow-neutral-color) 6%, transparent),
+        0 1px 2px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent);
+    --shadow-elevation-2:
+        0 4px 6px
+            color-mix(in srgb, var(--shadow-neutral-color) 7%, transparent),
+        0 2px 4px
+            color-mix(in srgb, var(--shadow-neutral-color) 6%, transparent);
     --shadow-elevation-3:
-        0 10px 15px rgb(0 0 0 / 10%), 0 4px 6px rgb(0 0 0 / 5%);
+        0 10px 15px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent),
+        0 4px 6px
+            color-mix(in srgb, var(--shadow-neutral-color) 5%, transparent);
     --shadow-elevation-4:
-        0 20px 25px rgb(0 0 0 / 10%), 0 10px 10px rgb(0 0 0 / 4%);
+        0 20px 25px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent),
+        0 10px 10px
+            color-mix(in srgb, var(--shadow-neutral-color) 4%, transparent);
     --border-radius-sm: 0.375rem;
     --border-radius-md: 0.5rem;
     --border-radius-lg: 0.75rem;
     --border-radius-xl: 1rem;
+    --shadow-neutral-color: var(--color-shadow-neutral, rgb(0 0 0));
+    --shadow-base-color: var(--color-shadow-base, rgb(15 23 42));
+    --shadow-deep-color: var(--color-shadow-deep, rgb(6 11 24));
+    --shadow-overlay-color: var(--color-shadow-overlay, rgb(8 12 24));
+    --shadow-inverse-color: var(--color-text-inverse, rgb(255 255 255));
+    --accent-primary-strong-color: var(--color-primary-strong, rgb(37 99 235));
+    --accent-primary-color: var(--color-primary-500, rgb(59 130 246));
+    --accent-success-color: var(--color-success-500, rgb(34 197 94));
+    --accent-muted-color: var(--color-text-muted, rgb(148 163 184));
+    --surface-light-color: var(--color-surface-light, rgb(248 250 252));
+    --overlay-highlight-color: var(--color-overlay-highlight, rgb(148 163 255));
+    --overlay-deep-color: var(--color-overlay-deep, rgb(21 30 46));
+    --overlay-mid-color: var(--color-overlay-mid, rgb(30 41 67));
 }
 
 /* Themed Box Classes */
-.themed-box {
-    transition: all var(--transition-normal);
-}
-
 .themed-box--border {
     border: 1px solid var(--color-border-primary);
 }
@@ -41,7 +64,6 @@
         transition:
             background-color var(--transition-normal),
             border-color var(--transition-normal),
-            box-shadow var(--transition-normal),
             transform var(--transition-normal);
     }
 
@@ -119,110 +141,104 @@
     }
 
     .themed-box--shadow-sm {
-        box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 12%));
+        box-shadow: var(
+            --shadow-sm,
+            0 1px 2px
+                color-mix(in srgb, var(--shadow-base-color) 12%, transparent)
+        );
     }
 
     .themed-box--shadow-md {
-        box-shadow: var(--shadow-md, 0 10px 25px rgb(15 23 42 / 18%));
+        box-shadow: var(
+            --shadow-md,
+            0 10px 25px
+                color-mix(in srgb, var(--shadow-base-color) 18%, transparent)
+        );
     }
 
     .themed-box--shadow-lg {
-        box-shadow: var(--shadow-lg, 0 18px 40px rgb(15 23 42 / 32%));
+        box-shadow: var(
+            --shadow-lg,
+            0 18px 40px
+                color-mix(in srgb, var(--shadow-base-color) 32%, transparent)
+        );
     }
 
     .themed-box--shadow-xl {
-        box-shadow: var(--shadow-xl, 0 28px 60px rgb(8 12 24 / 42%));
+        box-shadow: var(
+            --shadow-xl,
+            0 28px 60px
+                color-mix(in srgb, var(--shadow-overlay-color) 42%, transparent)
+        );
     }
 
     .themed-box--shadow-inner {
-        box-shadow: var(--shadow-inner, inset 0 2px 8px rgb(8 12 24 / 35%));
+        box-shadow: var(
+            --shadow-inner,
+            inset 0 2px 8px
+                color-mix(in srgb, var(--shadow-overlay-color) 35%, transparent)
+        );
     }
 
     .themed-box--surface-base {
         border: 1px solid
-            color-mix(
-                in srgb,
-                var(--color-border-secondary, rgb(148 163 184)) 38%,
-                transparent
-            );
+            color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
         background: color-mix(
             in srgb,
-            var(--color-surface-base, rgb(15 23 42)) 96%,
+            var(--color-surface-base) 96%,
             transparent
         );
     }
 
     .themed-box--surface-elevated {
         border: 1px solid
-            color-mix(
-                in srgb,
-                var(--color-border-secondary, rgb(148 163 184)) 44%,
-                transparent
-            );
+            color-mix(in srgb, var(--color-border-secondary) 44%, transparent);
         background: linear-gradient(
             140deg,
-            color-mix(
-                    in srgb,
-                    var(--color-surface-elevated, rgb(27 40 62)) 94%,
-                    transparent
-                )
+            color-mix(in srgb, var(--color-surface-elevated) 94%, transparent)
                 0%,
-            color-mix(
-                    in srgb,
-                    var(--color-surface-overlay, rgb(20 30 49)) 82%,
-                    transparent
-                )
+            color-mix(in srgb, var(--color-surface-overlay) 82%, transparent)
                 100%
         );
         box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 4%),
-            0 24px 60px rgb(8 12 24 / 32%);
+            inset 0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent),
+            0 24px 60px
+                color-mix(in srgb, var(--shadow-overlay-color) 32%, transparent);
     }
 
     .themed-box--surface-overlay {
         border: 1px solid
-            color-mix(
-                in srgb,
-                var(--color-border-secondary, rgb(148 163 184)) 52%,
-                transparent
-            );
+            color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
         backdrop-filter: blur(18px) saturate(1.08);
         background: linear-gradient(
             145deg,
+            color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
             color-mix(
                     in srgb,
-                    var(--color-surface-overlay, rgb(20 30 49)) 95%,
-                    transparent
-                )
-                0%,
-            color-mix(
-                    in srgb,
-                    var(--color-primary-500, rgb(95 140 255)) 8%,
-                    var(--color-surface-elevated, rgb(27 40 62)) 92%
+                    var(--color-primary-500) 8%,
+                    var(--color-surface-elevated) 92%
                 )
                 55%,
-            color-mix(
-                    in srgb,
-                    var(--color-surface-base, rgb(15 23 42)) 90%,
-                    transparent
-                )
-                100%
+            color-mix(in srgb, var(--color-surface-base) 90%, transparent) 100%
         );
         box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 6%),
-            0 32px 70px rgb(6 12 24 / 45%);
+            inset 0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+            0 32px 70px
+                color-mix(in srgb, var(--shadow-deep-color) 45%, transparent);
     }
 
     .themed-box--background-primary {
-        color: var(--color-text-primary, rgb(236 242 255));
+        color: var(--color-text-primary);
     }
 
     .themed-box--background-secondary {
-        color: var(--color-text-secondary, rgb(148 163 184));
+        color: var(--color-text-secondary);
     }
 
     .themed-box--background-tertiary {
-        color: var(--color-text-tertiary, rgb(100 116 139));
+        color: var(--color-text-tertiary);
     }
 
     .themed-card__content {
@@ -260,11 +276,12 @@
         )
     );
     block-size: 2.75rem;
-    box-shadow: 0 18px 48px rgb(15 23 42 / 35%);
+    box-shadow: 0 18px 48px
+        color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
     color: color-mix(
         in srgb,
         var(--color-primary-500) 72%,
-        rgb(226 232 240) 28%
+        var(--color-surface-base, rgb(226 232 240)) 28%
     );
     grid-column: 1 / -1;
     grid-row: 1;
@@ -278,7 +295,12 @@
         color var(--transition-fast);
 
     &:hover {
-        box-shadow: 0 24px 56px rgb(37 99 235 / 36%);
+        box-shadow: 0 24px 56px
+            color-mix(
+                in srgb,
+                var(--accent-primary-strong-color) 36%,
+                transparent
+            );
         transform: translateY(-0.125rem);
     }
 }
@@ -294,11 +316,13 @@
         color-mix(in srgb, var(--color-surface-overlay) 78%, transparent),
         color-mix(in srgb, var(--color-surface-elevated) 88%, transparent)
     );
-    box-shadow: 0 16px 42px rgb(15 23 42 / 50%);
-    color: rgb(224 231 255);
+    box-shadow: 0 16px 42px
+        color-mix(in srgb, var(--shadow-base-color) 50%, transparent);
+    color: var(--color-primary-200, rgb(224 231 255));
 
     &:hover {
-        box-shadow: 0 20px 48px rgb(15 23 42 / 56%);
+        box-shadow: 0 20px 48px
+            color-mix(in srgb, var(--shadow-base-color) 56%, transparent);
     }
 }
 
@@ -392,7 +416,11 @@
     gap: var(--spacing-xs);
     text-align: center;
     transform: translateY(0);
-    transition: all var(--transition-normal);
+    transition:
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        color var(--transition-normal),
+        border-color var(--transition-normal);
     white-space: nowrap;
 
     &::after {
@@ -553,15 +581,12 @@
     color: var(--color-status-unknown);
 }
 
-.themed-button:hover::after {
-    opacity: 0.18;
-    transform: scale(1.02);
-}
-
 .themed-button:active {
     box-shadow: var(--shadow-elevation-1);
     transform: translateY(0);
-    transition: all var(--transition-fast);
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .themed-button:disabled {
@@ -676,7 +701,10 @@
     display: inline-block;
     flex-shrink: 0;
     border-radius: 50%;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
 
     &::after {
         position: absolute;
@@ -686,7 +714,9 @@
         inset: -2px;
         opacity: 0;
         transform: scale(0.8);
-        transition: all var(--transition-normal);
+        transition:
+            opacity var(--transition-normal),
+            transform var(--transition-normal);
     }
 
     &:hover::after {
@@ -737,7 +767,9 @@
     background: transparent;
     font-size: 0.875rem;
     line-height: 1.25rem;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:focus {
         box-shadow: 0 0 0 3px var(--color-primary-200);
@@ -771,7 +803,9 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
     padding-inline-end: 2.5rem;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:focus {
         box-shadow: 0 0 0 3px var(--color-primary-200);
@@ -802,7 +836,9 @@
     color: var(--color-primary-600);
     cursor: pointer;
     inline-size: 1.25rem;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:focus {
         box-shadow: 0 0 0 3px var(--color-primary-200);
@@ -844,7 +880,10 @@
     cursor: pointer;
     inline-size: 6px;
     opacity: 0.8;
-    transition: all var(--transition-normal);
+    transition:
+        inline-size var(--transition-normal),
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         inline-size: 8px;
@@ -872,14 +911,22 @@
     position: relative;
     overflow: hidden;
     border-radius: var(--border-radius-lg);
-    transition: all var(--transition-normal);
+    transition:
+        background-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &::before {
         position: absolute;
         background: linear-gradient(
             135deg,
             transparent 0%,
-            rgb(255 255 255 / 2%) 50%,
+            color-mix(
+                    in srgb,
+                    var(--color-text-inverse, rgb(255 255 255)) 2%,
+                    transparent
+                )
+                50%,
             transparent 100%
         );
         content: "";
@@ -902,7 +949,10 @@
     &:active {
         box-shadow: var(--shadow-elevation-2);
         transform: translateY(-1px);
-        transition: all var(--transition-fast);
+        transition:
+            background-color var(--transition-fast),
+            box-shadow var(--transition-fast),
+            transform var(--transition-fast);
     }
 }
 
@@ -988,8 +1038,10 @@
         ),
         color-mix(in srgb, var(--color-surface-overlay) 96%, transparent);
     box-shadow:
-        0 34px 82px rgb(6 12 24 / 52%),
-        inset 0 0 0 1px rgb(255 255 255 / 3%);
+        0 34px 82px
+            color-mix(in srgb, var(--shadow-deep-color) 52%, transparent),
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 3%, transparent);
     gap: clamp(1.15rem, 0.9rem + 0.9vi, 1.9rem);
     inline-size: min(96vi, 46rem);
     isolation: isolate;
@@ -1117,14 +1169,18 @@
         transparent
     );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 4%),
-        0 12px 32px rgb(8 12 24 / 24%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent),
+        0 12px 32px
+            color-mix(in srgb, var(--shadow-overlay-color) 24%, transparent);
 }
 
 .modal-shell__body-scrollable {
     overflow: auto;
     flex: 1;
     min-block-size: 0;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
 }
 
 .modal-shell--form {
@@ -1211,7 +1267,10 @@
     border-radius: var(--border-radius-sm);
     color: var(--color-error);
     margin-inline-start: auto;
-    transition: all var(--transition-normal);
+    transition:
+        background-color var(--transition-normal),
+        color var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         background-color: var(--color-background-tertiary);
@@ -1234,7 +1293,10 @@
     backdrop-filter: blur(10px);
     background-color: var(--color-background-secondary);
     box-shadow: var(--shadow-elevation-3);
-    transition: all var(--transition-normal);
+    transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &::before {
         position: absolute;
@@ -1323,9 +1385,10 @@
     }
 }
 
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .update-alert__action {
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         box-shadow: var(--shadow-elevation-2);
@@ -1334,7 +1397,7 @@
 
     &:active {
         transform: translateY(0);
-        transition: all var(--transition-fast);
+        transition: transform var(--transition-fast);
     }
 }
 
@@ -1342,6 +1405,8 @@
 .site-card {
     position: relative;
     cursor: pointer;
+    padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
+        clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
     border: 1px solid
         color-mix(in srgb, var(--color-primary-400) 32%, transparent);
     border-radius: 1rem;
@@ -1351,12 +1416,12 @@
         color-mix(in srgb, var(--color-primary-500) 16%, transparent) 88%
     );
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 10%),
-        0 16px 36px rgb(6 11 24 / 32%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
+        0 16px 36px
+            color-mix(in srgb, var(--shadow-deep-color) 32%, transparent);
     gap: 0.4rem;
     min-block-size: 100%;
-    padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
-        clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
 }
 
 /* Header Components - Enhanced */
@@ -1369,7 +1434,7 @@
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
-    transition: all var(--transition-normal);
+    transition: background var(--transition-normal);
 
     &:hover {
         background: linear-gradient(
@@ -1384,7 +1449,9 @@
 
 .health-dot {
     box-shadow: 0 0 0 2px var(--color-background-primary);
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         box-shadow: 0 0 8px 2px currentcolor;
@@ -1403,10 +1470,13 @@
     background: linear-gradient(
         135deg,
         var(--color-background-secondary) 0%,
-        rgb(34 197 94 / 5%) 100%
+        color-mix(in srgb, var(--accent-success-color) 5%, transparent) 100%
     );
-    box-shadow: 0 2px 8px rgb(34 197 94 / 10%);
-    transition: all var(--transition-normal);
+    box-shadow: 0 2px 8px
+        color-mix(in srgb, var(--accent-success-color) 10%, transparent);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &::before {
         position: absolute;
@@ -1424,7 +1494,8 @@
     }
 
     &:hover {
-        box-shadow: 0 4px 12px rgb(34 197 94 / 15%);
+        box-shadow: 0 4px 12px
+            color-mix(in srgb, var(--accent-success-color) 15%, transparent);
         transform: translateY(-1px);
     }
 }
@@ -1438,7 +1509,7 @@
     );
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    transition: all var(--transition-normal);
+    transition: background var(--transition-normal);
 }
 
 .site-details-status-indicator {
@@ -1449,7 +1520,11 @@
     border: 1px solid var(--color-border-primary);
     border-radius: var(--border-radius-md);
     background: var(--color-background-secondary);
-    transition: all var(--transition-normal);
+    transition:
+        background-color var(--transition-normal),
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         box-shadow: var(--shadow-elevation-2);
@@ -1465,12 +1540,6 @@
     gap: 1rem;
 }
 
-/* Setting Control */
-.setting-control {
-    flex-shrink: 0;
-    min-inline-size: fit-content;
-}
-
 /* Theme-based Error Classes */
 .border-error-default,
 .update-alert--error {
@@ -1478,41 +1547,47 @@
 }
 
 .bg-error-muted {
-    background-color: rgb(239 68 68 / 10%);
+    background-color: color-mix(in srgb, var(--color-error) 10%, transparent);
 }
 
 .bg-error-default {
     background-color: var(--color-error);
 }
 
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .text-primary-inverse {
     color: var(--color-text-inverse);
 }
 
 .bg-error-muted\/50 {
-    background-color: rgb(239 68 68 / 5%);
+    background-color: color-mix(in srgb, var(--color-error) 5%, transparent);
 }
 
 /* Tailwind-style arbitrary value classes for borders */
 .border-primary\/20 {
-    border-color: rgb(59 130 246 / 20%);
+    border-color: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 .border-error\/30 {
-    border-color: rgb(239 68 68 / 30%);
+    border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
 }
 
-/* stylelint-disable-next-line plugin/stylelint-group-selectors -- Semantic Seperation */
 .bg-error\/5 {
-    background-color: rgb(239 68 68 / 5%);
+    background-color: color-mix(in srgb, var(--color-error) 5%, transparent);
 }
 
 .bg-overlay-default\/10 {
-    background-color: rgb(0 0 0 / 10%);
+    background-color: color-mix(
+        in srgb,
+        var(--color-background-primary, rgb(15 23 42)) 10%,
+        transparent
+    );
 
     @media (prefers-color-scheme: dark) {
-        background-color: rgb(255 255 255 / 10%);
+        background-color: color-mix(
+            in srgb,
+            var(--color-text-inverse, rgb(255 255 255)) 10%,
+            transparent
+        );
     }
 }
 
@@ -1541,7 +1616,10 @@
     border-radius: var(--border-radius-sm);
     background: transparent;
     gap: 0.375rem;
-    transition: all var(--transition-normal);
+    transition:
+        background-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         background-color: var(--color-hover-medium);
@@ -1609,7 +1687,9 @@
     border-radius: var(--border-radius-md);
     block-size: 2.5rem;
     inline-size: 2.5rem;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     & .icon {
         font-size: 1.125rem;
@@ -1648,7 +1728,10 @@
     border-radius: var(--border-radius-xl);
     backdrop-filter: blur(10px);
     background: var(--color-surface-elevated);
-    transition: all var(--transition-normal);
+    transition:
+        border-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &::after {
         position: absolute;
@@ -1722,11 +1805,15 @@
     padding: 0.5rem 1rem;
     border-radius: var(--border-radius-md);
     animation: fadeInUp var(--transition-normal) ease-out;
-    background: rgb(59 130 246 / 8%);
+    background: color-mix(in srgb, var(--accent-primary-color) 8%, transparent);
     gap: 0.5rem;
 
     &.dark {
-        background: rgb(59 130 246 / 12%);
+        background: color-mix(
+            in srgb,
+            var(--accent-primary-color) 12%,
+            transparent
+        );
     }
 }
 
@@ -1784,7 +1871,7 @@
 }
 
 .empty-state-icon__symbol {
-    color: rgb(148 163 184 / 80%);
+    color: color-mix(in srgb, var(--accent-muted-color) 80%, transparent);
 }
 
 @keyframes float {
@@ -1819,7 +1906,11 @@
     &::after {
         position: absolute;
         border-radius: 50%;
-        background: rgb(255 255 255 / 40%);
+        background: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 40%,
+            transparent
+        );
         block-size: 0;
         content: "";
         inline-size: 0;
@@ -1847,28 +1938,44 @@
 
 .custom-scrollbar::-webkit-scrollbar-track {
     border-radius: 4px;
-    background: rgb(0 0 0 / 5%);
+    background: color-mix(in srgb, var(--shadow-neutral-color) 5%, transparent);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
     border-radius: 4px;
-    background: rgb(0 0 0 / 20%);
+    background: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 20%,
+        transparent
+    );
     transition: background var(--transition-normal);
 
     &:hover {
-        background: rgb(0 0 0 / 30%);
+        background: color-mix(
+            in srgb,
+            var(--shadow-neutral-color) 30%,
+            transparent
+        );
     }
 }
 
 .custom-scrollbar.dark::-webkit-scrollbar-track {
-    background: rgb(255 255 255 / 5%);
+    background: color-mix(in srgb, var(--shadow-inverse-color) 5%, transparent);
 }
 
 .custom-scrollbar.dark::-webkit-scrollbar-thumb {
-    background: rgb(255 255 255 / 20%);
+    background: color-mix(
+        in srgb,
+        var(--shadow-inverse-color) 20%,
+        transparent
+    );
 
     &:hover {
-        background: rgb(255 255 255 / 30%);
+        background: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 30%,
+            transparent
+        );
     }
 }
 
@@ -1900,7 +2007,8 @@
 }
 
 .shadow-sm {
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+    box-shadow: 0 1px 2px 0
+        color-mix(in srgb, var(--shadow-neutral-color) 5%, transparent);
 }
 
 .hover-opacity {
@@ -1997,7 +2105,7 @@
         border-radius: inherit;
         background: radial-gradient(
             circle at 30% 30%,
-            rgb(255 255 255 / 25%),
+            color-mix(in srgb, var(--shadow-inverse-color) 25%, transparent),
             transparent 70%
         );
         content: "";
@@ -2018,7 +2126,11 @@
     block-size: 32px;
     cursor: pointer;
     inline-size: 8px;
-    transition: all var(--transition-normal);
+    transition:
+        block-size var(--transition-normal),
+        inline-size var(--transition-normal),
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 /* Layout Utilities */
@@ -2094,14 +2206,18 @@
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(16px);
-    background: rgb(15 23 42 / 65%);
+    background: color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
     grid-column: 2 / -1;
     grid-row: 1;
     min-block-size: 100vb;
     min-inline-size: 0;
 
     .app-shell--light & {
-        background: rgb(248 250 252 / 90%);
+        background: color-mix(
+            in srgb,
+            var(--surface-light-color) 90%,
+            transparent
+        );
     }
 }
 
@@ -2116,18 +2232,29 @@
 
 .app-shell__panel {
     padding: clamp(1rem, 0.8rem + 0.6vi, 1.5rem);
-    border: 1px solid rgb(255 255 255 / 8%);
+    border: 1px solid
+        color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent);
     border-radius: 1.25rem;
-    background: rgb(15 23 42 / 40%);
-    box-shadow: 0 18px 48px rgb(15 23 42 / 35%);
+    background: color-mix(in srgb, var(--shadow-base-color) 40%, transparent);
+    box-shadow: 0 18px 48px
+        color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
     inline-size: 100%;
     margin-inline: auto;
     max-inline-size: min(105rem, 100%);
 
     .app-shell--light & {
-        border-color: rgb(15 23 42 / 6%);
-        background: rgb(255 255 255 / 80%);
-        box-shadow: 0 12px 32px rgb(15 23 42 / 12%);
+        border-color: color-mix(
+            in srgb,
+            var(--shadow-base-color) 6%,
+            transparent
+        );
+        background: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 80%,
+            transparent
+        );
+        box-shadow: 0 12px 32px
+            color-mix(in srgb, var(--shadow-base-color) 12%, transparent);
     }
 }
 
@@ -2207,8 +2334,10 @@
             color-mix(in srgb, var(--color-surface-base) 68%, transparent) 100%
         );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 6%),
-        0 32px 70px rgb(6 11 24 / 44%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+        0 32px 70px
+            color-mix(in srgb, var(--shadow-deep-color) 44%, transparent);
     transition:
         transform var(--transition-normal),
         box-shadow var(--transition-normal),
@@ -2219,8 +2348,10 @@
     border-radius: 1.35rem;
     backdrop-filter: blur(20px) saturate(1.08);
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 8%),
-        0 36px 96px rgb(6 11 24 / 50%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent),
+        0 36px 96px
+            color-mix(in srgb, var(--shadow-deep-color) 50%, transparent);
     isolation: isolate;
     transition:
         transform var(--transition-normal),
@@ -2240,8 +2371,10 @@
 .site-card--active {
     border-color: color-mix(in srgb, var(--color-primary-500) 56%, transparent);
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 6%),
-        0 32px 84px rgb(6 11 24 / 52%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+        0 32px 84px
+            color-mix(in srgb, var(--shadow-deep-color) 52%, transparent);
 
     &::before {
         opacity: 0.85;
@@ -2297,10 +2430,15 @@
     position: absolute;
     border-radius: inherit;
     background:
-        linear-gradient(180deg, rgb(255 255 255 / 9%), transparent 58%),
+        linear-gradient(
+            180deg,
+            color-mix(in srgb, var(--shadow-inverse-color) 9%, transparent),
+            transparent 58%
+        ),
         radial-gradient(
             circle at 16% 0%,
-            rgb(148 163 255 / 18%) 0%,
+            color-mix(in srgb, var(--overlay-highlight-color) 18%, transparent)
+                0%,
             transparent 60%
         );
     content: "";
@@ -2311,14 +2449,17 @@
 }
 
 .site-card--modern:hover {
-    box-shadow: 0 28px 82px rgb(5 12 24 / 48%);
+    box-shadow: 0 28px 82px
+        color-mix(in srgb, var(--shadow-deep-color) 48%, transparent);
     transform: translateY(-6px);
 }
 
 .site-grid--balanced :is(.site-card--modern:hover) {
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 12%),
-        0 44px 120px rgb(6 11 24 / 60%);
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 12%, transparent),
+        0 44px 120px
+            color-mix(in srgb, var(--shadow-deep-color) 60%, transparent);
     transform: translateY(-10px);
 }
 
@@ -2335,7 +2476,8 @@
     row-gap: 0.75rem;
 }
 
-.site-card__title-container {
+.site-card__title-container,
+.loading-content {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -2357,7 +2499,8 @@
 .site-card__title {
     color: rgb(226 232 255);
     letter-spacing: 0.01em;
-    text-shadow: 0 6px 20px rgb(59 130 246 / 25%);
+    text-shadow: 0 6px 20px
+        color-mix(in srgb, var(--accent-primary-color) 25%, transparent);
 }
 
 .site-card__control-cluster {
@@ -2422,8 +2565,10 @@
         color-mix(in srgb, var(--color-primary-500) 16%, transparent) 85%
     );
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 10%),
-        0 20px 48px rgb(6 11 24 / 40%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
+        0 20px 48px
+            color-mix(in srgb, var(--shadow-deep-color) 40%, transparent);
 }
 
 .site-card__stacked-column--monitors {
@@ -2437,8 +2582,10 @@
         color-mix(in srgb, var(--color-primary-500) 12%, transparent) 92%
     );
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 8%),
-        0 18px 40px rgb(6 11 24 / 36%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent),
+        0 18px 40px
+            color-mix(in srgb, var(--shadow-deep-color) 36%, transparent);
 }
 
 .site-card__stacked-column--history {
@@ -2452,8 +2599,10 @@
         color-mix(in srgb, var(--color-primary-500) 10%, transparent) 95%
     );
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 6%),
-        0 16px 32px rgb(6 11 24 / 30%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+        0 16px 32px
+            color-mix(in srgb, var(--shadow-deep-color) 30%, transparent);
     grid-column: 1 / -1;
 }
 
@@ -2481,8 +2630,10 @@
         color-mix(in srgb, var(--color-primary-500) 18%, transparent) 86%
     );
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 10%),
-        0 18px 40px rgb(6 11 24 / 38%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
+        0 18px 40px
+            color-mix(in srgb, var(--shadow-deep-color) 38%, transparent);
     gap: clamp(0.65rem, 0.55rem + 0.25vi, 0.85rem);
     min-block-size: 100%;
     transition:
@@ -2497,8 +2648,10 @@
             transparent
         );
         box-shadow:
-            0 22px 52px rgb(6 11 24 / 42%),
-            inset 0 1px 0 rgb(255 255 255 / 12%);
+            0 22px 52px
+                color-mix(in srgb, var(--shadow-deep-color) 42%, transparent),
+            inset 0 1px 0
+                color-mix(in srgb, var(--shadow-inverse-color) 12%, transparent);
         transform: translateY(-2px);
     }
 }
@@ -2519,8 +2672,10 @@
         );
     block-size: clamp(2.1rem, 2rem + 0.25vi, 2.35rem);
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 16%),
-        0 12px 26px rgb(59 130 246 / 28%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 16%, transparent),
+        0 12px 26px
+            color-mix(in srgb, var(--accent-primary-color) 28%, transparent);
     color: rgb(248 250 252);
     inline-size: clamp(2.1rem, 2rem + 0.25vi, 2.35rem);
     place-items: center;
@@ -2554,7 +2709,8 @@
     font-size: clamp(1.125rem, 1rem + 0.35vi, 1.25rem);
     font-weight: var(--font-weight-semibold, 600);
     line-height: 1.25;
-    text-shadow: 0 4px 18px rgb(15 23 42 / 35%);
+    text-shadow: 0 4px 18px
+        color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
 }
 
 .site-card__monitor-panel {
@@ -2594,7 +2750,8 @@
         color-mix(in srgb, var(--color-surface-overlay) 94%, transparent) 0%,
         color-mix(in srgb, var(--color-surface-base) 82%, transparent) 100%
     );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+    box-shadow: inset 0 1px 0
+        color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent);
     gap: 0.65rem;
     transition:
         border-color var(--transition-fast),
@@ -2641,7 +2798,8 @@
     box-shadow:
         0 14px 30px
             color-mix(in srgb, var(--color-primary-500) 28%, transparent),
-        inset 0 1px 0 rgb(255 255 255 / 8%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent);
 }
 
 .site-card__monitor-item-header {
@@ -2790,9 +2948,9 @@
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-    min-block-size: 100%;
     padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
         clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
+    min-block-size: 100%;
     border: 1px solid
         color-mix(in srgb, var(--color-primary-400) 32%, transparent);
     border-radius: 1rem;
@@ -2801,23 +2959,31 @@
         color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
         color-mix(in srgb, var(--color-primary-500) 16%, transparent) 88%
     );
-    box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 10%),
-        0 16px 36px rgb(6 11 24 / 32%);
-    transition:
-        border-color var(--transition-fast),
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast);
+    &:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-400) 52%,
+            transparent
+        );
+        box-shadow:
+            inset 0 1px 0
+                color-mix(in srgb, var(--shadow-inverse-color) 14%, transparent),
+            0 20px 48px
+                color-mix(in srgb, var(--shadow-deep-color) 42%, transparent);
+        transform: translateY(-2px);
+    }
 }
 
 .metric-card:hover {
     border-color: color-mix(in srgb, var(--color-primary-400) 52%, transparent);
     box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 14%),
-        0 20px 48px rgb(6 11 24 / 42%);
+        inset 0 1px 0
+            color-mix(in srgb, var(--shadow-inverse-color) 14%, transparent),
+        0 20px 48px
+            color-mix(in srgb, var(--shadow-deep-color) 42%, transparent);
     transform: translateY(-2px);
 }
-
+font-size: clamp(0.75rem, 0.75rem + 0.15vi, 0.875rem);
 .metric-card__label {
     color: color-mix(
         in srgb,
@@ -2830,25 +2996,25 @@
     text-transform: uppercase;
     text-wrap: balance;
 }
-
+font-size: clamp(1rem, 0.95rem + 0.35vi, 1.25rem);
 .metric-card__value {
     color: color-mix(
-        in srgb,
-        var(--color-text-primary, rgb(248 250 252)) 96%,
+        line-height: 1.25; var(--color-text-primary, rgb(248 250 252)) 96%,
         transparent
     );
     font-size: clamp(1.05rem, 1rem + 0.3vi, 1.32rem);
     font-weight: var(--font-weight-semibold, 600);
     line-height: 1.2;
-    text-shadow: 0 4px 16px rgb(15 23 42 / 28%);
+    text-shadow: 0 4px 16px
+        color-mix(in srgb, var(--shadow-base-color) 28%, transparent);
 }
 
 .site-grid--dark .metric-card {
     border-color: color-mix(in srgb, var(--color-primary-500) 28%, transparent);
     background: linear-gradient(
         160deg,
-        rgb(21 30 46 / 92%),
-        rgb(30 41 67 / 65%)
+        color-mix(in srgb, var(--overlay-deep-color) 92%, transparent),
+        color-mix(in srgb, var(--overlay-mid-color) 65%, transparent)
     );
 }
 
@@ -2941,14 +3107,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgb(0 0 0 / 50%);
+    background-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 50%,
+        transparent
+    );
     inset: 0;
-}
-
-.loading-content {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
 }
 
 .loading-spinner {
@@ -3084,6 +3248,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: var(--spacing-sm);
+    flex-shrink: 0;
     min-inline-size: 8rem;
 }
 
@@ -3095,7 +3260,9 @@
     padding: 0;
     border-radius: 50%;
     min-inline-size: unset;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         box-shadow: var(--shadow-elevation-2);
@@ -3107,7 +3274,9 @@
 .themed-card {
     position: relative;
     overflow: hidden;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 .themed-card--hoverable:hover,
@@ -3146,7 +3315,7 @@
     font-weight: 500;
     gap: 0.25rem;
     line-height: 1;
-    transition: all var(--transition-fast);
+    transition: transform var(--transition-fast);
     white-space: nowrap;
 }
 
@@ -3175,7 +3344,10 @@
     overflow: hidden;
     border-radius: 9999px;
     inline-size: 100%;
-    transition: all var(--transition-normal);
+    transition:
+        background-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 .themed-progress__bar {
@@ -3191,7 +3363,7 @@
         background: linear-gradient(
             90deg,
             transparent,
-            rgb(255 255 255 / 30%),
+            color-mix(in srgb, var(--shadow-inverse-color) 30%, transparent),
             transparent
         );
         block-size: 100%;
@@ -3220,14 +3392,20 @@
         z-index: 1000;
         opacity: 0;
         pointer-events: none;
-        transition: all var(--transition-normal);
+        transition:
+            opacity var(--transition-normal),
+            transform var(--transition-normal);
         visibility: hidden;
     }
 
     &::before {
         padding: 0.5rem 0.75rem;
         border-radius: var(--border-radius-sm);
-        background: rgb(0 0 0 / 90%);
+        background: color-mix(
+            in srgb,
+            var(--color-background-primary, rgb(15 23 42)) 90%,
+            transparent
+        );
         color: var(--color-text-inverse);
         content: attr(title);
         font-size: 0.875rem;
@@ -3239,7 +3417,11 @@
 
     &::after {
         border: 4px solid transparent;
-        border-block-start-color: rgb(0 0 0 / 90%);
+        border-block-start-color: color-mix(
+            in srgb,
+            var(--color-background-primary, rgb(15 23 42)) 90%,
+            transparent
+        );
         content: "";
         inset-block-end: 100%;
         inset-inline-start: 50%;
@@ -3361,12 +3543,20 @@
 /* Dark Mode Specific Enhancements */
 @media (prefers-color-scheme: dark) {
     .themed-tooltip::before {
-        background: rgb(255 255 255 / 90%);
+        background: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 90%,
+            transparent
+        );
         color: var(--color-black);
     }
 
     .themed-tooltip::after {
-        border-block-start-color: rgb(255 255 255 / 90%);
+        border-block-start-color: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 90%,
+            transparent
+        );
     }
 
     .themed-checkbox {
@@ -3421,7 +3611,9 @@
     border-radius: var(--radius-md);
     block-size: 2rem;
     inline-size: 2rem;
-    transition: all var(--transition-normal);
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 .site-icon-fallback {
@@ -3437,7 +3629,9 @@
     inset-block-start: 0;
     inset-inline-start: 0;
     line-height: 1;
-    transition: all var(--transition-normal);
+    transition:
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
 }
 
 .site-icon-fallback-hidden,

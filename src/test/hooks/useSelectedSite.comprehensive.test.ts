@@ -48,7 +48,9 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     showSiteDetails: false,
     siteCardPresentation: "grid",
     siteDetailsChartTimeRange: defaultChartTimeRange,
+    siteDetailsTabState: {},
     siteListLayout: "card-compact",
+    syncActiveSiteDetailsTab: () => {},
     ...overrides,
 });
 

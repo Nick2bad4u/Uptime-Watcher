@@ -18,6 +18,7 @@ import { useUIStore } from "../../stores/ui/useUiStore";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
+import { AppIcons } from "../../utils/icons";
 import { formatFullTimestamp, formatRelativeTimestamp } from "../../utils/time";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { MonitoringStatusDisplay } from "./MonitoringStatusDisplay";
@@ -31,6 +32,8 @@ import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 export interface SiteDetailsHeaderProperties {
     /** Whether the header is collapsed */
     readonly isCollapsed?: boolean;
+    /** Callback invoked when the modal should close */
+    readonly onClose: () => void;
     /** Callback to toggle the header collapse state */
     readonly onToggleCollapse?: () => void;
     /** The currently selected monitor for the site */
@@ -358,6 +361,7 @@ function useSiteDetailsHeaderModel(
 export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties> =
     memo(function SiteDetailsHeader({
         isCollapsed,
+        onClose,
         onToggleCollapse,
         selectedMonitor,
         site,
@@ -382,6 +386,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
         } = useSiteDetailsHeaderModel(site, selectedMonitor);
 
         const monitorStatus = selectedMonitor?.status ?? "unknown";
+        const CloseIcon = AppIcons.ui.close;
 
         // Memoized click handler for URL link
         const handleUrlClick = useCallback(
@@ -424,6 +429,10 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                 {selectedMonitorUrl}
             </a>
         ) : null;
+
+        const handleCloseClick = useCallback(() => {
+            onClose();
+        }, [onClose]);
 
         return (
             <div className={headerClassName} style={styles.headerStyle}>
@@ -508,17 +517,28 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                                     monitors={site.monitors}
                                 />
                             ) : null}
-                            {onToggleCollapse ? (
+                            <div className="site-details-header-actions__controls">
+                                {onToggleCollapse ? (
+                                    <button
+                                        aria-label={collapseLabel}
+                                        onClick={onToggleCollapse}
+                                        style={styles.collapseButtonStyle}
+                                        title={collapseLabel}
+                                        type="button"
+                                    >
+                                        <CollapseIcon className="themed-text-secondary h-5 w-5" />
+                                    </button>
+                                ) : null}
                                 <button
-                                    aria-label={collapseLabel}
-                                    onClick={onToggleCollapse}
-                                    style={styles.collapseButtonStyle}
-                                    title={collapseLabel}
+                                    aria-label="Close site details"
+                                    className="modal-shell__close site-details-modal__close site-details-header__close"
+                                    onClick={handleCloseClick}
+                                    title="Close site details"
                                     type="button"
                                 >
-                                    <CollapseIcon className="themed-text-secondary h-5 w-5" />
+                                    <CloseIcon size={18} />
                                 </button>
-                            ) : null}
+                            </div>
                         </div>
                     </div>
                     {isExpanded && headerMeta.length > 0 ? (

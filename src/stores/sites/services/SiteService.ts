@@ -168,7 +168,15 @@ export const SiteService = {
      */
     async removeSite(identifier: string): Promise<boolean> {
         await this.initialize();
-        return window.electronAPI.sites.removeSite(identifier);
+        const removed = await window.electronAPI.sites.removeSite(identifier);
+
+        if (!removed) {
+            throw new Error(
+                `Site removal failed for site ${identifier}: Backend operation returned false`
+            );
+        }
+
+        return true;
     },
 
     /**

@@ -167,7 +167,12 @@ export const createSiteOperationsActions = (
                         }
                     }
                 }
-                await SiteService.removeSite(identifier);
+                const removed = await SiteService.removeSite(identifier);
+                if (!removed) {
+                    throw new Error(
+                        `Site removal failed for ${identifier}: Backend returned false`
+                    );
+                }
                 deps.removeSite(identifier);
             },
             { identifier },

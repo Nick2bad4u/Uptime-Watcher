@@ -472,32 +472,34 @@ export class SiteManager {
      * @throws If database operation fails.
      */
     public async deleteAllSites(): Promise<number> {
-        try {
-            // Get all sites before deletion for event emission
-            const sitesToDelete = this.sitesCache.getAll();
-            const deleteCount = sitesToDelete.length;
+        // Capture snapshot prior to deletion for consistent logging and
+        // downstream event emission.
+        const sitesSnapshot = this.sitesCache.getAll();
+        const snapshotCount = sitesSnapshot.length;
 
-            if (deleteCount === 0) {
-                logger.debug("[SiteManager] No sites to delete");
+        if (snapshotCount === 0) {
+            logger.debug("[SiteManager] No sites to delete");
+            return 0;
+        }
+
+        logger.info(`[SiteManager] Deleting all ${snapshotCount} sites`);
+
+        try {
+            const { deletedCount, deletedSites } =
+                await this.siteWriterService.deleteAllSites(this.sitesCache);
+
+            if (deletedCount === 0) {
+                logger.warn(
+                    `[SiteManager] Bulk delete reported zero deletions despite ${snapshotCount} cached sites`
+                );
                 return 0;
             }
 
-            logger.info(`[SiteManager] Deleting all ${deleteCount} sites`);
-
-            // Use transaction to delete all sites atomically
-            await this.repositories.databaseService.executeTransaction((db) => {
-                // Delete all monitors first (foreign key constraint)
-                this.repositories.monitorRepository.deleteAllInternal(db);
-                // Delete all sites
-                this.repositories.siteRepository.deleteAllInternal(db);
-                return Promise.resolve();
-            });
-
-            // Clear the cache
-            this.sitesCache.clear();
+            const eventSites =
+                deletedSites.length > 0 ? deletedSites : sitesSnapshot;
 
             // Emit events for each deleted site for consistency
-            for (const site of sitesToDelete) {
+            for (const site of eventSites) {
                 /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
                 await this.eventEmitter.emitTyped("site:removed", {
                     cascade: true,
@@ -517,9 +519,9 @@ export class SiteManager {
             });
 
             logger.info(
-                `[SiteManager] Successfully deleted all ${deleteCount} sites`
+                `[SiteManager] Successfully deleted all ${deletedCount} sites`
             );
-            return deleteCount;
+            return deletedCount;
         } catch (error) {
             logger.error("[SiteManager] Failed to delete all sites", error);
             throw error;

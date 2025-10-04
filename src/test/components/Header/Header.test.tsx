@@ -46,7 +46,9 @@ const createUiState = (): UIStore => ({
     showSiteDetails: false,
     siteCardPresentation: "grid",
     siteDetailsChartTimeRange: "24h",
+    siteDetailsTabState: {},
     siteListLayout: "card-compact",
+    syncActiveSiteDetailsTab: vi.fn(),
 });
 
 const metricsFixture = {

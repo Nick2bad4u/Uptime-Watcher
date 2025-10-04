@@ -1,6 +1,5 @@
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .app-topbar {
@@ -107,7 +106,11 @@
     block-size: 2.5rem;
     box-shadow: 0 14px 32px
         color-mix(in srgb, var(--color-primary-500) 30%, transparent);
-    color: color-mix(in srgb, var(--color-primary-500) 68%, white 32%);
+    color: color-mix(
+        in srgb,
+        var(--color-primary-500) 68%,
+        rgb(255 255 255) 32%
+    );
     inline-size: 2.5rem;
     line-height: 1;
     transition:
@@ -176,6 +179,23 @@
     gap: 0.3rem;
 }
 
+.app-topbar__badge-label {
+    color: color-mix(
+        in srgb,
+        var(--color-text-secondary) 88%,
+        rgb(255 255 255) 12%
+    );
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.app-topbar__badge-value {
+    color: var(--color-text-primary);
+    font-size: clamp(1rem, 1rem + 0.22vi, 1.25rem);
+    font-weight: var(--font-weight-semibold);
+}
+
 .app-topbar__badge--primary {
     border-color: color-mix(in srgb, var(--color-primary-500) 32%, transparent);
     background: linear-gradient(
@@ -189,25 +209,20 @@
             color-mix(in srgb, var(--color-primary-500) 28%, transparent);
 
     & .app-topbar__badge-label {
-        color: color-mix(in srgb, var(--color-primary-500) 58%, white 42%);
+        color: color-mix(
+            in srgb,
+            var(--color-primary-500) 58%,
+            rgb(255 255 255) 42%
+        );
     }
 
     & .app-topbar__badge-value {
-        color: color-mix(in srgb, var(--color-primary-500) 74%, white 26%);
+        color: color-mix(
+            in srgb,
+            var(--color-primary-500) 74%,
+            rgb(255 255 255) 26%
+        );
     }
-}
-
-.app-topbar__badge-label {
-    color: color-mix(in srgb, var(--color-text-secondary) 88%, white 12%);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-.app-topbar__badge-value {
-    color: var(--color-text-primary);
-    font-size: clamp(1rem, 1rem + 0.22vi, 1.25rem);
-    font-weight: var(--font-weight-semibold);
 }
 
 .app-topbar__controls {
@@ -244,7 +259,11 @@
     );
     box-shadow: 0 14px 30px
         color-mix(in srgb, var(--header-control-color) 28%, transparent);
-    color: color-mix(in srgb, var(--header-control-color) 74%, white 26%);
+    color: color-mix(
+        in srgb,
+        var(--header-control-color) 74%,
+        rgb(255 255 255) 26%
+    );
     gap: 0.45rem;
     transition:
         transform var(--transition-fast),
@@ -276,7 +295,11 @@
 }
 
 .header-controls__label {
-    color: color-mix(in srgb, var(--header-control-color) 82%, white 18%);
+    color: color-mix(
+        in srgb,
+        var(--header-control-color) 82%,
+        rgb(255 255 255) 18%
+    );
     font-size: 0.75rem;
     font-weight: var(--font-weight-medium);
     letter-spacing: 0.08em;
@@ -403,7 +426,11 @@
 
 .header-status-summary__dot {
     border-radius: 999px;
-    background: color-mix(in srgb, var(--color-text-secondary) 60%, white 20%);
+    background: color-mix(
+        in srgb,
+        var(--color-text-secondary) 60%,
+        rgb(255 255 255) 20%
+    );
     block-size: 0.55rem;
     box-shadow: 0 0 0 2px
         color-mix(in srgb, var(--color-surface-elevated) 70%, transparent);

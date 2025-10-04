@@ -376,10 +376,28 @@ describe("SiteService", () => {
             const identifier = "site-to-remove";
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(true);
 
-            await SiteService.removeSite(identifier);
+            const result = await SiteService.removeSite(identifier);
 
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
                 identifier
+            );
+            expect(result).toBeTruthy();
+        });
+
+        it("should throw when backend returns false", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const identifier = "site-to-remove";
+            mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
+
+            await expect(SiteService.removeSite(identifier)).rejects.toThrow(
+                /Backend operation returned false/
             );
         });
 
