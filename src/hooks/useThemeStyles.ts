@@ -144,10 +144,10 @@ function getHeaderStyle(
         boxShadow: isDarkMode ? darkShadow : lightShadow,
         color: isDarkMode ? "#f5f7fa" : "#0f172a",
         height: isCollapsed ? "80px" : "auto",
-        marginBottom: "1.25rem",
+        marginBottom: isCollapsed ? "0.65rem" : "1.25rem",
         minHeight: isCollapsed ? "80px" : "fit-content",
         overflow: "hidden",
-        padding: isCollapsed ? "1.15rem 1.5rem" : "1.75rem",
+        padding: isCollapsed ? "1rem 1.5rem" : "1.75rem",
         position: "relative",
         transition: `all ${TRANSITION_EASING}`,
     };

@@ -310,9 +310,9 @@ const getSettingsModal = (): HTMLElement => {
 const createAllowedSettingsKeySet = (): ReadonlySet<
     keyof typeof mockUseStore.settings
 > => {
-    const keys = Object.keys(mockUseStore.settings) as Array<
-        keyof typeof mockUseStore.settings
-    >;
+    const keys = Object.keys(
+        mockUseStore.settings
+    ) as (keyof typeof mockUseStore.settings)[];
 
     return new Set<keyof typeof mockUseStore.settings>(keys);
 };

@@ -54,6 +54,7 @@ describe(useUIStore, () => {
         // Reset store state before each test
         const store = useUIStore.getState();
         act(() => {
+            useUIStore.setState({ siteDetailsTabState: {} });
             store.setActiveSiteDetailsTab("site-overview");
             store.selectSite(undefined);
             store.setShowAdvancedMetrics(false);
@@ -187,6 +188,74 @@ describe(useUIStore, () => {
             });
 
             expect(result.current.activeSiteDetailsTab).toBe(specialTab);
+        });
+
+        it("should persist tab selection per site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Persistence", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.selectSite(mockSite);
+                result.current.setActiveSiteDetailsTab("history");
+            });
+
+            expect(result.current.activeSiteDetailsTab).toBe("history");
+            expect(
+                result.current.siteDetailsTabState[mockSite.identifier]
+            ).toBe("history");
+        });
+
+        it("should sync tab from persisted state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Persistence", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.selectSite(mockSite);
+                result.current.setActiveSiteDetailsTab("analytics");
+            });
+
+            act(() => {
+                result.current.selectSite(undefined);
+                result.current.setActiveSiteDetailsTab("site-overview");
+            });
+
+            act(() => {
+                result.current.syncActiveSiteDetailsTab(mockSite.identifier);
+            });
+
+            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+        });
+
+        it("should fall back to default tab when no persisted state exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Persistence", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.syncActiveSiteDetailsTab("non-existent-site");
+            });
+
+            expect(result.current.activeSiteDetailsTab).toBe("site-overview");
         });
     });
 

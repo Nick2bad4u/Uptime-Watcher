@@ -1,3 +1,5 @@
+/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
+/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 .dashboard-overview {
     margin-block-end: 1.5rem;
 }
@@ -16,15 +18,15 @@
 /* Ensure optimal layout at different breakpoints */
 @media (width >= 1920px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1.5rem;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
 @media (width >= 1440px) and (width < 1920px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 1.35rem;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -36,8 +38,8 @@
 
 @media (width >= 1024px) and (width < 1200px) {
     .dashboard-overview__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1.1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -254,7 +256,7 @@
     position: relative;
     z-index: 1;
     color: var(--color-text-primary);
-    font-size: clamp(1.6rem, 1.6rem + 0.6vi, 2.2rem);
+    font-size: clamp(1.5rem, 1.5rem + 0.6vi, 2rem);
     font-weight: var(--font-weight-semibold);
     letter-spacing: -0.02em;
 }

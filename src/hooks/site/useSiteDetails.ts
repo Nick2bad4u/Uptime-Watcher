@@ -211,6 +211,7 @@ export function useSiteDetails({
         setSiteDetailsChartTimeRange,
         showAdvancedMetrics,
         siteDetailsChartTimeRange,
+        syncActiveSiteDetailsTab,
     } = useUIStore();
 
     const requestConfirmation = useConfirmDialog();
@@ -227,6 +228,15 @@ export function useSiteDetails({
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
         getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
+
+    useEffect(
+        function synchronizeSiteDetailsTab(): void {
+            if (typeof syncActiveSiteDetailsTab === "function") {
+                syncActiveSiteDetailsTab(currentSite.identifier);
+            }
+        },
+        [currentSite.identifier, syncActiveSiteDetailsTab]
+    );
 
     // Find the selected monitor, and if it doesn't exist, update the selection
     // to the first monitor

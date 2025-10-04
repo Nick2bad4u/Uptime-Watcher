@@ -239,8 +239,6 @@
 .sidebar-reveal-button {
     position: fixed;
     z-index: var(--z-elevated-fixed);
-    grid-column: 1 / -1;
-    grid-row: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -268,6 +266,8 @@
         var(--color-primary-500) 72%,
         rgb(226 232 240) 28%
     );
+    grid-column: 1 / -1;
+    grid-row: 1;
     inline-size: 2.75rem;
     inset-block-end: clamp(1rem, 0.75rem + 1.4vi, 2.3rem);
     inset-inline-start: clamp(1rem, 0.75rem + 1.4vi, 2.3rem);
@@ -440,7 +440,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-primary-500) 18%,
-        white 82%
+        #fff 82%
     );
 
     border-color: color-mix(in srgb, var(--color-primary-500) 55%, transparent);
@@ -466,7 +466,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-success) 25%,
-        white 75%
+        #fff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-success) 55%, transparent);
@@ -477,7 +477,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-warning) 25%,
-        white 75%
+        #fff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
@@ -488,7 +488,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-error) 25%,
-        white 75%
+        #fff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
@@ -503,7 +503,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-text-secondary) 88%,
-        white 12%
+        #fff 12%
     );
 
     border-color: color-mix(
@@ -1051,7 +1051,7 @@
 
 .modal-shell__subtitle {
     margin: 0;
-    color: color-mix(in srgb, var(--color-text-secondary) 88%, white 12%);
+    color: color-mix(in srgb, var(--color-text-secondary) 88%, #fff 12%);
     font-size: 1rem;
     max-inline-size: 46ch;
 }
@@ -1077,7 +1077,7 @@
     block-size: 2.5rem;
     box-shadow: 0 16px 36px
         color-mix(in srgb, var(--modal-accent) 28%, transparent);
-    color: color-mix(in srgb, var(--modal-accent) 72%, white 28%);
+    color: color-mix(in srgb, var(--modal-accent) 72%, #fff 28%);
     cursor: pointer;
     inline-size: 2.5rem;
     transition:
@@ -1342,17 +1342,21 @@
 .site-card {
     position: relative;
     cursor: pointer;
-    transition: all var(--transition-normal);
-
-    &:hover {
-        box-shadow: var(--shadow-elevation-3);
-        transform: translateY(-2px);
-    }
-
-    &:active {
-        transform: translateY(-1px);
-        transition: all var(--transition-fast);
-    }
+    border: 1px solid
+        color-mix(in srgb, var(--color-primary-400) 32%, transparent);
+    border-radius: 1rem;
+    background: linear-gradient(
+        158deg,
+        color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 16%, transparent) 88%
+    );
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 10%),
+        0 16px 36px rgb(6 11 24 / 32%);
+    gap: 0.4rem;
+    min-block-size: 100%;
+    padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
+        clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
 }
 
 /* Header Components - Enhanced */
@@ -1933,7 +1937,7 @@
     border-radius: 999px;
     background: radial-gradient(
         circle at 30% 28%,
-        color-mix(in srgb, var(--status-indicator-color) 65%, white 35%),
+        color-mix(in srgb, var(--status-indicator-color) 65%, #fff 35%),
         var(--status-indicator-color)
     );
     block-size: var(--status-indicator-size);
@@ -1973,7 +1977,7 @@
     border-radius: 999px;
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--status-indicator-color) 58%, white 24%),
+        color-mix(in srgb, var(--status-indicator-color) 58%, #fff 24%),
         var(--status-indicator-color)
     );
     block-size: var(--status-indicator-size);
@@ -1982,7 +1986,7 @@
             color-mix(in srgb, var(--status-indicator-color) 20%, transparent),
         0 20px 32px
             color-mix(in srgb, var(--status-indicator-color) 32%, transparent);
-    color: color-mix(in srgb, var(--status-indicator-color) 68%, white 32%);
+    color: color-mix(in srgb, var(--status-indicator-color) 68%, #fff 32%);
     inline-size: var(--status-indicator-size);
     transition:
         transform var(--transition-fast),
@@ -2049,18 +2053,18 @@
 
 .app-shell {
     display: grid;
-    inline-size: 100%;
     background: linear-gradient(180deg, rgb(15 23 42) 0%, rgb(8 11 19) 100%);
     grid-template-columns: minmax(18rem, 20rem) minmax(0, 1fr);
+    inline-size: 100%;
     min-block-size: 100vb;
     transition:
         background var(--transition-normal),
         grid-template-columns var(--transition-normal);
-}
 
-.app-shell > .app-sidebar {
-    grid-column: 1;
-    grid-row: 1 / -1;
+    & > .app-sidebar {
+        grid-column: 1;
+        grid-row: 1 / -1;
+    }
 }
 
 .app-shell--sidebar-closed {
@@ -2089,10 +2093,10 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    grid-column: 2 / -1;
-    grid-row: 1;
     backdrop-filter: blur(16px);
     background: rgb(15 23 42 / 65%);
+    grid-column: 2 / -1;
+    grid-row: 1;
     min-block-size: 100vb;
     min-inline-size: 0;
 
@@ -2116,9 +2120,9 @@
     border-radius: 1.25rem;
     background: rgb(15 23 42 / 40%);
     box-shadow: 0 18px 48px rgb(15 23 42 / 35%);
+    inline-size: 100%;
     margin-inline: auto;
     max-inline-size: min(105rem, 100%);
-    inline-size: 100%;
 
     .app-shell--light & {
         border-color: rgb(15 23 42 / 6%);
@@ -2132,36 +2136,33 @@
     --site-grid-gap: clamp(1.25rem, 1rem + 0.75vi, 1.75rem);
 
     display: grid;
+    justify-content: center;
     gap: var(--site-grid-gap);
     grid-template-columns: repeat(
         auto-fit,
         minmax(var(--site-grid-column-min), 1fr)
     );
-    justify-content: center;
 }
 
 .site-grid--compact {
-    --site-grid-column-min: clamp(12.5rem, 11vw, 16.5rem);
+    --site-grid-column-min: clamp(12.5rem, 11vi, 16.5rem);
     --site-grid-gap: clamp(0.85rem, 0.7rem + 0.45vi, 1.35rem);
 }
 
 .site-grid--balanced {
-    --site-grid-column-min: clamp(18rem, 18vw, 24rem);
+    --site-grid-column-min: clamp(18rem, 18vi, 24rem);
     --site-grid-gap: clamp(1.5rem, 1.25rem + 0.9vi, 2.5rem);
+
     padding: clamp(0.75rem, 0.55rem + 2vi, 2.25rem)
         clamp(0.65rem, 0.45rem + 1.8vi, 2rem);
-}
 
-@media (width >= 80rem) {
-    .site-grid--balanced {
-        --site-grid-column-min: clamp(20rem, 17vw, 26rem);
+    @media (width >= 80rem) {
+        --site-grid-column-min: clamp(20rem, 17vi, 26rem);
         --site-grid-gap: clamp(1.75rem, 1.35rem + 1.3vi, 3rem);
     }
-}
 
-@media (width >= 96rem) {
-    .site-grid--balanced {
-        --site-grid-column-min: clamp(22rem, 16vw, 28rem);
+    @media (width >= 96rem) {
+        --site-grid-column-min: clamp(22rem, 16vi, 28rem);
         --site-grid-gap: clamp(2rem, 1.5rem + 1.5vi, 3.5rem);
     }
 }
@@ -2226,14 +2227,14 @@
         box-shadow var(--transition-normal),
         border-color var(--transition-fast),
         backdrop-filter var(--transition-normal);
-}
 
-.site-grid--balanced :where(.site-card--modern)::before {
-    opacity: 0.74;
-}
+    &::before {
+        opacity: 0.74;
+    }
 
-.site-grid--balanced :where(.site-card--modern)::after {
-    opacity: 0.64;
+    &::after {
+        opacity: 0.64;
+    }
 }
 
 .site-card--active {
@@ -2294,7 +2295,6 @@
 
 .site-card--modern::after {
     position: absolute;
-    inset: 0;
     border-radius: inherit;
     background:
         linear-gradient(180deg, rgb(255 255 255 / 9%), transparent 58%),
@@ -2304,6 +2304,7 @@
             transparent 60%
         );
     content: "";
+    inset: 0;
     opacity: 0.58;
     pointer-events: none;
     transition: opacity var(--transition-normal);
@@ -2327,9 +2328,9 @@
 
 .site-card__header-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 1rem;
     row-gap: 0.75rem;
 }
@@ -2387,10 +2388,13 @@
 
 .site-card__metrics {
     position: relative;
+    --site-card-metric-min-width: clamp(9.5rem, 8.8rem + 1.2vi, 11.75rem);
+    --site-card-metric-gap: clamp(0.7rem, 0.62rem + 0.25vi, 0.95rem);
 }
 
-.site-card__metrics--expanded .site-card__metrics-grid {
-    grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+.site-card__metrics--expanded {
+    --site-card-metric-min-width: clamp(11.5rem, 10.5rem + 1.35vi, 13.75rem);
+    --site-card-metric-gap: clamp(0.85rem, 0.75rem + 0.35vi, 1.15rem);
 }
 
 .site-card__stacked-grid {
@@ -2407,107 +2411,150 @@
 }
 
 .site-card__stacked-column--overview {
-    padding: 1.1rem;
+    padding: clamp(1rem, 0.85rem + 0.65vi, 1.35rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
-    border-radius: 0.9rem;
-    background: color-mix(
-        in srgb,
-        var(--color-surface-overlay) 92%,
-        transparent
+        color-mix(in srgb, var(--color-primary-500) 28%, transparent);
+    border-radius: 1rem;
+    backdrop-filter: blur(14px) saturate(1.08);
+    background: linear-gradient(
+        152deg,
+        color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 16%, transparent) 85%
     );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 10%),
+        0 20px 48px rgb(6 11 24 / 40%);
 }
 
 .site-card__stacked-column--monitors {
-    padding: 1.1rem;
+    padding: clamp(1rem, 0.85rem + 0.55vi, 1.3rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
-    border-radius: 0.9rem;
-    background: color-mix(
-        in srgb,
-        var(--color-surface-elevated) 95%,
-        transparent
+        color-mix(in srgb, var(--color-border-secondary) 36%, transparent);
+    border-radius: 1rem;
+    background: linear-gradient(
+        150deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 12%, transparent) 92%
     );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 8%),
+        0 18px 40px rgb(6 11 24 / 36%);
 }
 
 .site-card__stacked-column--history {
-    padding: 1rem;
+    padding: clamp(0.95rem, 0.85rem + 0.45vi, 1.2rem);
     border: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 32%, transparent);
-    border-radius: 0.9rem;
-    background: color-mix(
-        in srgb,
-        var(--color-surface-overlay) 90%,
-        transparent
+    border-radius: 1rem;
+    background: linear-gradient(
+        160deg,
+        color-mix(in srgb, var(--color-surface-overlay) 92%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 10%, transparent) 95%
     );
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 6%),
+        0 16px 32px rgb(6 11 24 / 30%);
     grid-column: 1 / -1;
 }
 
 .site-card__insights {
     display: grid;
-    gap: 0.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    align-items: stretch;
+    gap: 1rem;
+    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
 }
 
 .site-card__insight {
+    position: relative;
     display: flex;
-    align-items: center;
-    padding: 0.75rem 0.85rem;
+    overflow: hidden;
+    align-items: flex-start;
+    padding: clamp(0.95rem, 0.85rem + 0.4vi, 1.25rem)
+        clamp(1.1rem, 0.95rem + 0.6vi, 1.45rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-primary-500) 22%, transparent);
-    border-radius: 0.85rem;
+        color-mix(in srgb, var(--color-primary-500) 34%, transparent);
+    border-radius: 1rem;
     background: linear-gradient(
-        155deg,
-        color-mix(in srgb, var(--color-surface-overlay) 92%, transparent) 0%,
-        color-mix(in srgb, var(--color-primary-500) 12%, transparent) 85%
+        158deg,
+        color-mix(in srgb, var(--color-surface-overlay) 96%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 18%, transparent) 86%
     );
     box-shadow:
-        0 10px 28px rgb(6 12 24 / 28%),
-        inset 0 1px 0 rgb(255 255 255 / 6%);
-    gap: 0.65rem;
+        inset 0 1px 0 rgb(255 255 255 / 10%),
+        0 18px 40px rgb(6 11 24 / 38%);
+    gap: clamp(0.65rem, 0.55rem + 0.25vi, 0.85rem);
+    min-block-size: 100%;
     transition:
         border-color var(--transition-fast),
         transform var(--transition-fast),
         box-shadow var(--transition-fast);
-}
 
-.site-card__insight:hover {
-    border-color: color-mix(in srgb, var(--color-primary-500) 32%, transparent);
-    box-shadow:
-        0 14px 34px rgb(6 12 24 / 32%),
-        inset 0 1px 0 rgb(255 255 255 / 8%);
-    transform: translateY(-1px);
+    &:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 42%,
+            transparent
+        );
+        box-shadow:
+            0 22px 52px rgb(6 11 24 / 42%),
+            inset 0 1px 0 rgb(255 255 255 / 12%);
+        transform: translateY(-2px);
+    }
 }
 
 .site-card__insight-icon {
     display: grid;
-    border-radius: 0.7rem;
-    background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--color-primary-500) 38%, transparent),
-        color-mix(in srgb, var(--color-primary-400) 26%, transparent)
-    );
-    block-size: 2rem;
+    border-radius: 0.8rem;
+    background:
+        radial-gradient(
+            110% 110% at 30% 20%,
+            color-mix(in srgb, var(--color-primary-400) 65%, transparent),
+            transparent 72%
+        ),
+        linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-primary-500) 52%, transparent),
+            color-mix(in srgb, var(--color-primary-400) 30%, transparent)
+        );
+    block-size: clamp(2.1rem, 2rem + 0.25vi, 2.35rem);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 16%),
+        0 12px 26px rgb(59 130 246 / 28%);
     color: rgb(248 250 252);
-    inline-size: 2rem;
+    inline-size: clamp(2.1rem, 2rem + 0.25vi, 2.35rem);
     place-items: center;
 }
 
 .site-card__insight-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.25rem;
 }
 
 .site-card__insight-label {
-    letter-spacing: 0.08em;
+    color: color-mix(
+        in srgb,
+        var(--color-text-secondary, rgb(148 163 184)) 86%,
+        transparent
+    );
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium, 500);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    text-wrap: balance;
 }
 
 .site-card__insight-value {
-    color: rgb(248 250 252);
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary, rgb(248 250 252)) 96%,
+        transparent
+    );
+    font-size: clamp(1.125rem, 1rem + 0.35vi, 1.25rem);
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.25;
+    text-shadow: 0 4px 18px rgb(15 23 42 / 35%);
 }
 
 .site-card__monitor-panel {
@@ -2654,7 +2701,7 @@
     padding: 0.15rem 0.5rem;
     border-radius: 9999px;
     background: color-mix(in srgb, var(--color-primary-500) 16%, transparent);
-    color: color-mix(in srgb, var(--color-primary-500) 72%, white 28%);
+    color: color-mix(in srgb, var(--color-primary-500) 72%, #fff 28%);
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -2722,53 +2769,87 @@
 
 .site-card__metrics-grid {
     display: grid;
-    gap: 0.75rem;
-    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--site-card-metric-gap, 0.85rem);
+    grid-auto-flow: dense;
+    grid-auto-rows: minmax(0, 1fr);
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(var(--site-card-metric-min-width, 9.5rem), 1fr)
+    );
+}
+
+.metric-card__tooltip {
+    block-size: 100%;
+
+    & > .metric-card {
+        block-size: 100%;
+    }
 }
 
 .metric-card {
     display: flex;
     flex-direction: column;
+    gap: 0.4rem;
+    min-block-size: 100%;
+    padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
+        clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-primary-400) 26%, transparent);
-    border-radius: 0.85rem;
+        color-mix(in srgb, var(--color-primary-400) 32%, transparent);
+    border-radius: 1rem;
     background: linear-gradient(
-        160deg,
-        color-mix(in srgb, var(--color-surface-overlay) 94%, transparent) 0%,
-        color-mix(in srgb, var(--color-primary-500) 14%, transparent) 90%
+        158deg,
+        color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 16%, transparent) 88%
     );
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
-    gap: 0.35rem;
-    padding: 0.75rem 0.9rem;
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 10%),
+        0 16px 36px rgb(6 11 24 / 32%);
+    transition:
+        border-color var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.metric-card:hover {
+    border-color: color-mix(in srgb, var(--color-primary-400) 52%, transparent);
+    box-shadow:
+        inset 0 1px 0 rgb(255 255 255 / 14%),
+        0 20px 48px rgb(6 11 24 / 42%);
+    transform: translateY(-2px);
 }
 
 .metric-card__label {
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
     color: color-mix(
         in srgb,
         var(--color-text-secondary, rgb(148 163 184)) 92%,
         transparent
     );
+    font-size: clamp(0.68rem, 0.65rem + 0.2vi, 0.85rem);
+    font-weight: var(--font-weight-medium, 500);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-wrap: balance;
 }
 
 .metric-card__value {
-    font-size: clamp(1rem, 0.95rem + 0.2vi, 1.2rem);
-    font-weight: var(--font-weight-semibold, 600);
     color: color-mix(
         in srgb,
         var(--color-text-primary, rgb(248 250 252)) 96%,
         transparent
     );
+    font-size: clamp(1.05rem, 1rem + 0.3vi, 1.32rem);
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1.2;
+    text-shadow: 0 4px 16px rgb(15 23 42 / 28%);
 }
 
 .site-grid--dark .metric-card {
+    border-color: color-mix(in srgb, var(--color-primary-500) 28%, transparent);
     background: linear-gradient(
         160deg,
         rgb(21 30 46 / 92%),
         rgb(30 41 67 / 65%)
     );
-    border-color: color-mix(in srgb, var(--color-primary-500) 28%, transparent);
 }
 
 @media (width <= 1024px) {
@@ -2797,7 +2878,7 @@
     }
 
     .site-grid {
-        --site-grid-column-min: clamp(18rem, 86vw, 20rem);
+        --site-grid-column-min: clamp(18rem, 86vi, 20rem);
         --site-grid-gap: clamp(0.75rem, 0.65rem + 0.5vi, 1rem);
     }
 }

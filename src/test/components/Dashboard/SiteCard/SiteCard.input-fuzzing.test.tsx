@@ -65,23 +65,29 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
     SiteCardMetrics: ({
-        status,
-        uptime,
-        responseTime,
-        checkCount,
+        metrics,
     }: {
-        status: string;
-        uptime: number;
-        responseTime?: number;
-        checkCount: number;
+        metrics: readonly {
+            readonly key: string;
+            readonly label: string;
+            readonly value: string | number;
+        }[];
     }) => {
-        // Get unique site identifier from mock data
         const siteId = mockSiteData?.identifier || "default";
+        const statusMetric = metrics.find((metric) => metric.key === "status");
+        const statusValue = String(
+            statusMetric?.value ?? "unknown"
+        ).toLowerCase();
+        const summary = metrics
+            .map((metric) => `${metric.label}: ${metric.value}`)
+            .join(" | ");
+
         return (
-            <div data-testid={`site-card-metrics-${siteId}-${status}`}>
-                Metrics: {uptime}% |{" "}
-                {responseTime ? `${responseTime}ms` : "N/A"} | {checkCount}{" "}
-                checks
+            <div
+                data-testid={`site-card-metrics-content-${siteId}`}
+                data-status={statusValue}
+            >
+                Metrics: {summary}
             </div>
         );
     },

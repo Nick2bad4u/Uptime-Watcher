@@ -1,16 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+
 import { SiteCardMetrics } from "../components/Dashboard/SiteCard/SiteCardMetrics";
 
 // Mock MetricCard to isolate SiteCardMetrics logic
 vi.mock("../components/Dashboard/SiteCard/components/MetricCard", () => ({
-    MetricCard: (props: any) => (
-        <div
-            data-testid="metric-card"
-            data-label={props.label}
-            data-value={props.value}
-        >
-            {props.label}:{props.value}
+    MetricCard: ({ label, value }: any) => (
+        <div data-testid="metric-card" data-label={label} data-value={value}>
+            {label}:{value}
+        </div>
+    ),
+}));
+
+// Simplify Tooltip behaviour for deterministic rendering
+vi.mock("../components/common/Tooltip/Tooltip", () => ({
+    Tooltip: ({ children }: any) => (
+        <div data-testid="tooltip-wrapper">
+            {typeof children === "function" ? children({}) : children}
         </div>
     ),
 }));
@@ -22,94 +28,52 @@ describe(SiteCardMetrics, () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: SiteCardMetrics", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
+        const metrics = [
+            { key: "status", label: "Status", value: "Up" },
+            { key: "uptime", label: "Uptime", value: "99.5%" },
+            {
+                key: "response",
+                label: "Last Response",
+                value: "123 ms",
+            },
+            { key: "checks", label: "Checks", value: "42" },
+        ] as const;
 
-        render(
-            <SiteCardMetrics
-                status="up"
-                uptime={99.5}
-                responseTime={123}
-                checkCount={42}
-            />
-        );
+        render(<SiteCardMetrics metrics={metrics} />);
+
         const cards = screen.getAllByTestId("metric-card");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Status")
-        ).toHaveAttribute("data-value", "Up");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Uptime")
-        ).toHaveAttribute("data-value", "99.5%");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Response")
-        ).toHaveAttribute("data-value", "123 ms");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Checks")
-        ).toHaveAttribute("data-value", "42");
+        expect(cards).toHaveLength(metrics.length);
+        for (const { label, value } of metrics) {
+            const card = cards.find(
+                (element) => element.dataset["label"] === label
+            );
+
+            if (!card) {
+                throw new Error(`Metric card with label ${label} not found.`);
+            }
+
+            expect(card).toHaveAttribute("data-value", String(value));
+        }
     });
 
-    it("renders response time as '-' when undefined", () => {
-        render(<SiteCardMetrics status="down" uptime={0} checkCount={0} />);
-        const cards = screen.getAllByTestId("metric-card");
+    it("supports tooltip-enabled metrics", () => {
+        const metrics = [
+            { key: "status", label: "Status", value: "Paused" },
+            {
+                key: "uptime",
+                label: "Uptime",
+                tooltip: "Calculated from recent checks",
+                value: "77.7%",
+            },
+        ] as const;
+
+        render(<SiteCardMetrics metrics={metrics} />);
+
+        expect(screen.getAllByTestId("metric-card")).toHaveLength(2);
+        const tooltipWrappers = screen.getAllByTestId("tooltip-wrapper");
+        expect(tooltipWrappers).toHaveLength(1);
         expect(
-            cards.find((card) => card.dataset["label"] === "Response")
-        ).toHaveAttribute("data-value", "-");
-    });
-
-    it("renders status as 'UNKNOWN' if status is empty", () => {
-        render(<SiteCardMetrics status="" uptime={100} checkCount={1} />);
-        const cards = screen.getAllByTestId("metric-card");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Status")
-        ).toHaveAttribute("data-value", "Unknown");
-    });
-
-    it("renders correct number of metric cards", ({ task, annotate }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: SiteCardMetrics", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: SiteCardMetrics", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        render(
-            <SiteCardMetrics
-                status="up"
-                uptime={100}
-                responseTime={50}
-                checkCount={10}
-            />
-        );
-        expect(screen.getAllByTestId("metric-card")).toHaveLength(4);
-    });
-
-    it("renders uptime with percent sign", ({ task, annotate }) => {
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: SiteCardMetrics", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: SiteCardMetrics", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Business Logic", "type");
-
-        render(
-            <SiteCardMetrics
-                status="up"
-                uptime={87.65}
-                responseTime={200}
-                checkCount={5}
-            />
-        );
-        const cards = screen.getAllByTestId("metric-card");
-        expect(
-            cards.find((card) => card.dataset["label"] === "Uptime")
-        ).toHaveAttribute("data-value", "87.7%");
+            tooltipWrappers[0].querySelector('[data-label="Uptime"]')
+        ).not.toBeNull();
     });
 });

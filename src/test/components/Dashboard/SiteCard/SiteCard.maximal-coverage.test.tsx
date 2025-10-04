@@ -56,12 +56,24 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardStatus", () => ({
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
-    SiteCardMetrics: vi.fn(({ status, uptime, checkCount, responseTime }) => (
-        <div data-testid="site-card-metrics">
-            Metrics: {status} | Uptime: {uptime}% | Checks: {checkCount} |
-            Response: {responseTime}ms
-        </div>
-    )),
+    SiteCardMetrics: vi.fn(
+        ({
+            metrics,
+        }: {
+            metrics: readonly {
+                readonly key: string;
+                readonly label: string;
+                readonly value: string | number;
+            }[];
+        }) => (
+            <div data-testid="site-card-metrics-content">
+                Metrics:{" "}
+                {metrics
+                    .map((metric) => `${metric.label}: ${metric.value}`)
+                    .join(" | ")}
+            </div>
+        )
+    ),
 }));
 
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
@@ -106,7 +118,9 @@ describe("SiteCard Component - Complete Coverage", () => {
 
         expect(screen.getByTestId("site-card-header")).toBeInTheDocument();
         expect(screen.getByTestId("site-card-status")).toBeInTheDocument();
-        expect(screen.getByTestId("site-card-metrics")).toBeInTheDocument();
+        expect(
+            screen.getByTestId("site-card-metrics-content")
+        ).toBeInTheDocument();
         expect(screen.getByTestId("site-card-history")).toBeInTheDocument();
         expect(screen.getByTestId("site-card-footer")).toBeInTheDocument();
     });
@@ -170,9 +184,9 @@ describe("SiteCard Component - Complete Coverage", () => {
         expect(screen.getByTestId("site-card-status")).toHaveTextContent(
             "operational"
         );
-        expect(screen.getByTestId("site-card-metrics")).toHaveTextContent(
-            "Uptime: 98%"
-        );
+        expect(
+            screen.getByTestId("site-card-metrics-content")
+        ).toHaveTextContent("Uptime: 98%");
         expect(screen.getByTestId("site-card-history")).toHaveTextContent(
             "History: 0 items"
         );

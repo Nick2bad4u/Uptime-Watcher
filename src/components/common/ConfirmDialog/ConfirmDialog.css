@@ -1,0 +1,89 @@
+.modal-overlay.confirm-dialog__overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 1.1rem + 2vi, 2.5rem);
+    background: rgb(5 10 20 / 72%);
+    backdrop-filter: blur(18px) saturate(1.05);
+    z-index: var(--z-index-modal, 90);
+}
+
+.confirm-dialog__container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 0.9rem + 0.4vi, 1.35rem);
+    inline-size: min(30rem, 100%);
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
+    border-radius: clamp(1rem, 0.9rem + 0.35vi, 1.25rem);
+    background:
+        radial-gradient(
+            130% 110% at 0% -15%,
+            color-mix(in srgb, var(--color-primary-500) 18%, transparent),
+            transparent 68%
+        ),
+        linear-gradient(
+            150deg,
+            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent)
+                0%,
+            color-mix(in srgb, var(--color-surface-overlay) 90%, transparent)
+                100%
+        );
+    box-shadow:
+        0 28px 68px rgb(8 12 24 / 48%),
+        inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+.confirm-dialog__container.themed-box--padding-lg {
+    padding: clamp(1.35rem, 1.1rem + 0.65vi, 1.8rem)
+        clamp(1.5rem, 1.2rem + 0.75vi, 2.1rem);
+}
+
+.confirm-dialog__header {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.35rem, 0.3rem + 0.15vi, 0.55rem);
+}
+
+.confirm-dialog__title {
+    letter-spacing: 0.015em;
+    text-shadow: 0 10px 24px rgb(15 23 42 / 38%);
+}
+
+.confirm-dialog__body {
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary, rgb(248 250 252)) 96%,
+        transparent
+    );
+    line-height: 1.45;
+}
+
+.confirm-dialog__details {
+    margin-block-start: clamp(0.65rem, 0.55rem + 0.25vi, 0.85rem);
+    color: color-mix(
+        in srgb,
+        var(--color-text-secondary, rgb(148 163 184)) 90%,
+        transparent
+    );
+}
+
+.confirm-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: clamp(0.75rem, 0.65rem + 0.3vi, 1rem);
+}
+
+@media (width <= 520px) {
+    .confirm-dialog__container {
+        inline-size: min(100%, 24rem);
+    }
+
+    .confirm-dialog__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

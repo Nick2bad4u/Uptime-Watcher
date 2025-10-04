@@ -756,7 +756,7 @@ const config = defineConfig({
                  * Empty array allows modern CSS features that may have limited
                  * support but are acceptable for this project.
                  */
-                ignore: [], // Allow modern CSS features
+                ignore: ["multicolumn"], // Allow modern CSS features
                 /**
                  * Severity level for unsupported feature detection.
                  *

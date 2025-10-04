@@ -146,9 +146,21 @@ export interface UIStore {
     siteDetailsChartTimeRange: ChartTimeRange;
 
     /**
+     * Map of site identifiers to the last active site details tab.
+     */
+    siteDetailsTabState: Record<string, string>;
+
+    /**
      * The currently active presentation layout for the dashboard site list.
      */
     siteListLayout: SiteListLayoutMode;
+
+    /**
+     * Synchronizes the active tab with the last tab opened for a site.
+     *
+     * @param siteId - Identifier of the site being viewed.
+     */
+    syncActiveSiteDetailsTab: (siteId: string) => void;
 
     // NOTE: getSelectedSite removed - use useSelectedSite hook instead
     // (src/hooks/useSelectedSite.ts)

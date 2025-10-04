@@ -46,6 +46,15 @@ import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
+interface UIPersistedState {
+    activeSiteDetailsTab: string;
+    showAdvancedMetrics: boolean;
+    siteCardPresentation: SiteCardPresentation;
+    siteDetailsChartTimeRange: ChartTimeRange;
+    siteDetailsTabState: Record<string, string>;
+    siteListLayout: SiteListLayoutMode;
+}
+
 /**
  * Interface for the UI store with persistence capabilities.
  */
@@ -54,34 +63,14 @@ type UIStoreWithPersist = UseBoundStore<
         persist: {
             clearStorage: () => void;
             getOptions: () => Partial<
-                PersistOptions<
-                    UIStore,
-                    {
-                        activeSiteDetailsTab: string;
-                        showAdvancedMetrics: boolean;
-                        siteCardPresentation: SiteCardPresentation;
-                        siteDetailsChartTimeRange: ChartTimeRange;
-                        siteListLayout: SiteListLayoutMode;
-                    }
-                >
+                PersistOptions<UIStore, UIPersistedState>
             >;
             hasHydrated: () => boolean;
             onFinishHydration: (fn: (state: UIStore) => void) => () => void;
             onHydrate: (fn: (state: UIStore) => void) => () => void;
             rehydrate: () => Promise<void> | void;
             setOptions: (
-                options: Partial<
-                    PersistOptions<
-                        UIStore,
-                        {
-                            activeSiteDetailsTab: string;
-                            showAdvancedMetrics: boolean;
-                            siteCardPresentation: SiteCardPresentation;
-                            siteDetailsChartTimeRange: ChartTimeRange;
-                            siteListLayout: SiteListLayoutMode;
-                        }
-                    >
-                >
+                options: Partial<PersistOptions<UIStore, UIPersistedState>>
             ) => void;
         };
     }
@@ -100,28 +89,20 @@ type UIStoreWithPersist = UseBoundStore<
 export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({
-            // State
             activeSiteDetailsTab: "site-overview",
-            // Actions
             openExternal: (
                 url: string,
                 context?: { siteName?: string }
             ): void => {
                 logStoreAction("UIStore", "openExternal", { context, url });
 
-                // Log user action for analytics
                 logger.user.action("External URL opened", {
                     url,
                     ...(context && { siteName: context.siteName }),
                 });
 
-                // Use electronAPI to open external URL
-                // In test environments, this might fallback to window.open via
-                // mocking
                 /* eslint-disable-next-line promise/prefer-await-to-then -- Fire-and-forget pattern for external URL opening */
                 void SystemService.openExternal(url).catch(() => {
-                    // Fallback for test environments where electronAPI might
-                    // throw
                     window.open(url, "_blank", "noopener");
                 });
             },
@@ -132,7 +113,20 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             },
             setActiveSiteDetailsTab: (tab: string): void => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
-                set({ activeSiteDetailsTab: tab });
+                set((state) => {
+                    const { selectedSiteId, siteDetailsTabState } = state;
+                    if (!selectedSiteId) {
+                        return { activeSiteDetailsTab: tab };
+                    }
+
+                    return {
+                        activeSiteDetailsTab: tab,
+                        siteDetailsTabState: {
+                            ...siteDetailsTabState,
+                            [selectedSiteId]: tab,
+                        },
+                    };
+                });
             },
             setShowAddSiteModal: (show: boolean): void => {
                 logStoreAction("UIStore", "setShowAddSiteModal", { show });
@@ -174,7 +168,17 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showSiteDetails: false,
             siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
+            siteDetailsTabState: {},
             siteListLayout: "card-large",
+            syncActiveSiteDetailsTab: (siteId: string): void => {
+                logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
+                    siteId,
+                });
+                set((state) => ({
+                    activeSiteDetailsTab:
+                        state.siteDetailsTabState[siteId] ?? "site-overview",
+                }));
+            },
         }),
         {
             name: "uptime-watcher-ui",
@@ -192,8 +196,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
              *
              * - ActiveSiteDetailsTab: Remember which tab was last active
              * - ShowAdvancedMetrics: User preference for advanced metrics
-             *   visibility - siteDetailsChartTimeRange: User preference for
-             *   chart time range
+             *   visibility
+             * - SiteDetailsTabState: Per-site tab preferences for the details
+             *   modal
+             * - SiteDetailsChartTimeRange: User preference for chart time range
              *
              * Non-persisted state:
              *
@@ -206,6 +212,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 showAdvancedMetrics: state.showAdvancedMetrics,
                 siteCardPresentation: state.siteCardPresentation,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                siteDetailsTabState: state.siteDetailsTabState,
                 siteListLayout: state.siteListLayout,
                 // Don't persist modal states or selected site
             }),

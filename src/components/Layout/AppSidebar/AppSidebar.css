@@ -1,3 +1,5 @@
+/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
+/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 .app-sidebar {
     position: relative;
     display: flex;

@@ -3,9 +3,26 @@
  * site monitoring statistics.
  */
 
-import { memo, type NamedExoticComponent, useMemo } from "react";
+import { memo, type NamedExoticComponent } from "react";
 
+import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { MetricCard } from "./components/MetricCard";
+
+/**
+ * Descriptor for an individual metric pill displayed on the site card.
+ *
+ * @public
+ */
+export interface SiteCardMetricDescriptor {
+    /** Stable key used as the React list key for efficient rendering */
+    readonly key: string;
+    /** Label describing the metric */
+    readonly label: string;
+    /** Optional helper text shown as a tooltip */
+    readonly tooltip?: string;
+    /** Display value for the metric */
+    readonly value: number | string;
+}
 
 /**
  * Props for the SiteCardMetrics component.
@@ -13,90 +30,50 @@ import { MetricCard } from "./components/MetricCard";
  * @public
  */
 export interface SiteCardMetricsProperties {
-    /** Total number of checks performed */
-    readonly checkCount: number;
-    /** Average response time in milliseconds */
-    readonly responseTime?: number;
-    /** Current status of the site */
-    readonly status: string;
-    /** Uptime percentage (0-100) */
-    readonly uptime: number;
+    /** Collection of metrics to render in the pill grid */
+    readonly metrics: readonly SiteCardMetricDescriptor[];
 }
 
 /**
  * Metrics grid component displaying key site monitoring statistics.
  *
- * Features:
+ * @remarks
+ * Renders a responsive grid of "pills" using {@link MetricCard}. Each metric can
+ * optionally include a tooltip for additional context. The component is
+ * memoized to avoid unnecessary re-renders when the metrics array reference is
+ * stable.
  *
- * - Four-column grid layout for status, uptime, response time, and check count
- * - Optimized with React.memo and useMemo to prevent unnecessary re-renders
- * - Consistent metric card formatting
- * - Handles undefined response times gracefully (displays "-" when not available)
- * - Formats uptime to 1 decimal place for consistency
+ * @param props - Component props containing the metrics to display
  *
- * @example
- *
- * ```tsx
- * <SiteCardMetrics
- *     status="up"
- *     uptime={98.5}
- *     responseTime={250}
- *     checkCount={144}
- * />;
- * ```
- *
- * @param props - Component props
- *
- * @returns JSX.Element containing the metrics grid
+ * @returns JSX element containing the metrics grid
  */
 export const SiteCardMetrics: NamedExoticComponent<SiteCardMetricsProperties> =
-    memo(function SiteCardMetrics({
-        checkCount,
-        responseTime,
-        status,
-        uptime,
-    }: SiteCardMetricsProperties) {
-        // Memoize the computed values to avoid recalculation on every render
-        const metrics = useMemo(
-            () => [
-                {
-                    label: "Status",
-                    value: status
-                        ? status.charAt(0).toUpperCase() +
-                          status.slice(1).toLowerCase()
-                        : "Unknown",
-                },
-                {
-                    label: "Uptime",
-                    value: `${uptime.toFixed(1)}%`,
-                },
-                {
-                    label: "Response",
-                    value:
-                        responseTime === undefined ? "-" : `${responseTime} ms`,
-                },
-                {
-                    label: "Checks",
-                    value: checkCount,
-                },
-            ],
-            [
-                checkCount,
-                responseTime,
-                status,
-                uptime,
-            ]
-        );
-
+    memo(function SiteCardMetrics({ metrics }: SiteCardMetricsProperties) {
         return (
-            <div className="site-card__metrics-grid">
-                {metrics.map((metric) => (
-                    <MetricCard
-                        key={metric.label}
-                        label={metric.label}
-                        value={metric.value}
-                    />
-                ))}
+            <div
+                className="site-card__metrics-grid"
+                data-testid="site-card-metrics-content"
+            >
+                {metrics.map(({ key, label, tooltip, value }) => {
+                    if (!tooltip) {
+                        return (
+                            <MetricCard key={key} label={label} value={value} />
+                        );
+                    }
+
+                    return (
+                        <Tooltip content={tooltip} key={key} position="bottom">
+                            {(triggerProps) => (
+                                <div
+                                    {...triggerProps}
+                                    className="metric-card__tooltip"
+                                >
+                                    <MetricCard label={label} value={value} />
+                                </div>
+                            )}
+                        </Tooltip>
+                    );
+                })}
             </div>
         );
     });

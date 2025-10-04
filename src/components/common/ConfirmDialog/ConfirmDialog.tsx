@@ -21,14 +21,13 @@ import { useConfirmDialogControls } from "../../../stores/ui/useConfirmDialogSto
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedText } from "../../../theme/components/ThemedText";
-import { useTheme } from "../../../theme/useTheme";
+import "./ConfirmDialog.css";
 
 /**
  * Confirmation dialog component rendered globally.
  */
 export const ConfirmDialog: NamedExoticComponent = memo(
     function ConfirmDialog(): JSX.Element | null {
-        const { isDark } = useTheme();
         const descriptionId = useId();
         const titleId = useId();
         const { cancel, confirm, request } = useConfirmDialogControls();
@@ -53,9 +52,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
         return (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler; keyboard dismissal handled globally via escape key handler
             <div
-                className={`modal-overlay modal-overlay--confirm fixed inset-0 flex items-center justify-center backdrop-blur-sm ${
-                    isDark ? "dark" : ""
-                }`}
+                className="modal-overlay modal-overlay--confirm confirm-dialog__overlay"
                 onClick={handleBackdropClick}
             >
                 <ThemedBox
@@ -63,7 +60,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                     aria-labelledby={titleId}
                     aria-modal="true"
                     as="section"
-                    className="m-4 w-full max-w-md"
+                    className="confirm-dialog__container"
                     open
                     padding="lg"
                     role="alertdialog"
@@ -71,23 +68,31 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                     shadow="lg"
                     surface="elevated"
                 >
-                    <div className="mb-4" id={titleId}>
-                        <ThemedText size="lg" weight="medium">
+                    <header className="confirm-dialog__header" id={titleId}>
+                        <ThemedText
+                            className="confirm-dialog__title"
+                            size="lg"
+                            weight="medium"
+                        >
                             {title}
                         </ThemedText>
-                    </div>
+                    </header>
 
-                    <div id={descriptionId}>
+                    <div className="confirm-dialog__body" id={descriptionId}>
                         <ThemedText size="md">{message}</ThemedText>
                     </div>
 
                     {details ? (
-                        <ThemedText className="mt-3" size="sm" variant="info">
+                        <ThemedText
+                            className="confirm-dialog__details"
+                            size="sm"
+                            variant="info"
+                        >
                             {details}
                         </ThemedText>
                     ) : null}
 
-                    <div className="mt-6 flex justify-end gap-3">
+                    <footer className="confirm-dialog__actions">
                         <ThemedButton onClick={cancel} variant="secondary">
                             {cancelLabel}
                         </ThemedButton>
@@ -97,7 +102,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                         >
                             {confirmLabel}
                         </ThemedButton>
-                    </div>
+                    </footer>
                 </ThemedBox>
             </div>
         );

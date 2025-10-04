@@ -98,6 +98,15 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             []
         );
 
+        const uptimeDisplay =
+            typeof uptime === "number" && Number.isFinite(uptime)
+                ? `${uptime.toFixed(1)}%`
+                : "—";
+        const responseDisplay =
+            responseTime === undefined ? "—" : `${responseTime} ms`;
+        const checksDisplay = checkCount.toLocaleString();
+        const runningSummary = `${runningMonitors}/${latestSite.monitors.length}`;
+
         return (
             <ThemedBox
                 aria-label={`View details for ${latestSite.name}`}
@@ -123,6 +132,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                         </ThemedText>
                     </div>
                     <StatusBadge
+                        className="site-card__compact-status"
                         formatter={statusFormatter}
                         label="Status"
                         showIcon
@@ -137,7 +147,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             Uptime
                         </span>
                         <span className="site-card__compact-metric-value">
-                            {uptime}%
+                            {uptimeDisplay}
                         </span>
                     </div>
                     <div className="site-card__compact-metric">
@@ -145,7 +155,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             Resp.
                         </span>
                         <span className="site-card__compact-metric-value">
-                            {responseTime ? `${responseTime} ms` : "—"}
+                            {responseDisplay}
                         </span>
                     </div>
                     <div className="site-card__compact-metric">
@@ -153,7 +163,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             Checks
                         </span>
                         <span className="site-card__compact-metric-value">
-                            {checkCount}
+                            {checksDisplay}
                         </span>
                     </div>
                     <div className="site-card__compact-metric">
@@ -161,7 +171,7 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             Running
                         </span>
                         <span className="site-card__compact-metric-value">
-                            {runningMonitors}/{latestSite.monitors.length}
+                            {runningSummary}
                         </span>
                     </div>
                 </div>

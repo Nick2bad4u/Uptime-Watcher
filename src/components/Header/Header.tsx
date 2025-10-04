@@ -58,7 +58,6 @@ export const Header = (): JSX.Element => {
         activeMonitors,
         monitorStatusCounts,
         totalMonitors,
-        totalSites,
         uptimePercentage,
     } = metrics;
 
@@ -80,7 +79,6 @@ export const Header = (): JSX.Element => {
         setShowSettings(true);
     }, [setShowSettings]);
 
-    const SiteCountIcon = AppIcons.metrics.monitor;
     const SidebarToggleIcon = AppIcons.layout.viewColumns;
 
     return (
@@ -157,8 +155,8 @@ export const Header = (): JSX.Element => {
                     </div>
                 </div>
 
-                <div className="app-topbar__summary">
-                    {siteListLayout !== "card-large" && (
+                {siteListLayout === "card-large" ? null : (
+                    <div className="app-topbar__summary">
                         <StatusSummary
                             degradedMonitors={degradedMonitors}
                             downMonitors={downMonitors}
@@ -169,46 +167,8 @@ export const Header = (): JSX.Element => {
                             upMonitors={upMonitors}
                             uptimePercentage={uptimePercentage}
                         />
-                    )}
-                    <Tooltip
-                        content={`Monitoring ${totalSites} site${totalSites === 1 ? "" : "s"} with ${totalMonitors} total monitor${totalMonitors === 1 ? "" : "s"}`}
-                        position="bottom"
-                        wrapMode="block"
-                    >
-                        {(triggerProps) => (
-                            <div
-                                className="app-topbar__site-chip"
-                                {...triggerProps}
-                            >
-                                <SiteCountIcon
-                                    className="app-topbar__site-chip-icon"
-                                    size={18}
-                                />
-                                <div
-                                    className="app-topbar__site-chip-text"
-                                    data-testid="header-site-count"
-                                >
-                                    <ThemedText
-                                        className="app-topbar__site-chip-label"
-                                        size="xs"
-                                        variant="secondary"
-                                        weight="medium"
-                                    >
-                                        Tracking
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="app-topbar__site-chip-count"
-                                        size="lg"
-                                        weight="semibold"
-                                    >
-                                        {totalSites} site
-                                        {totalSites === 1 ? "" : "s"}
-                                    </ThemedText>
-                                </div>
-                            </div>
-                        )}
-                    </Tooltip>
-                </div>
+                    </div>
+                )}
             </ThemedBox>
         </header>
     );

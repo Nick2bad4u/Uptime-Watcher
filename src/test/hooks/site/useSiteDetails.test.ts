@@ -96,6 +96,7 @@ vi.mock("../../../stores/ui/useUiStore", () => ({
         setActiveSiteDetailsTab: vi.fn(),
         setShowAdvancedMetrics: vi.fn(),
         setSiteDetailsChartTimeRange: vi.fn(),
+        syncActiveSiteDetailsTab: vi.fn(),
         showAdvancedMetrics: false,
         siteDetailsChartTimeRange: "1h",
     })),

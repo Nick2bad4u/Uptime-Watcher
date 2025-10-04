@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -235,9 +235,18 @@ describe(Header, () => {
         expect(screen.getAllByText("92%", { selector: "span" })).toHaveLength(
             2
         );
-        const trackingText = screen.getByTestId("header-site-count");
-        expect(trackingText).toHaveTextContent("Tracking");
-        expect(trackingText).toHaveTextContent("5 sites");
+
+        const summary = document.querySelector(
+            ".header-status-summary__container"
+        );
+        expect(summary).not.toBeNull();
+        const summaryWithin = within(summary as HTMLElement);
+        expect(summaryWithin.getByText("Total")).toBeInTheDocument();
+        expect(
+            summaryWithin.getByText(
+                metricsFixture.monitorStatusCounts.total.toString()
+            )
+        ).toBeInTheDocument();
     });
 
     it("toggles sidebar when nav button clicked", () => {

@@ -17,7 +17,7 @@
  * @packageDocumentation
  */
 
-import type { Site } from "@shared/types";
+import type { Site, StatusHistory } from "@shared/types";
 
 import { memo, type NamedExoticComponent, useMemo } from "react";
 
@@ -28,6 +28,11 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import {
+    formatFullTimestamp,
+    formatIntervalDuration,
+    formatRelativeTimestamp,
+} from "../../../utils/time";
 import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";
@@ -51,6 +56,34 @@ type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
 const selectSelectedSiteId = (state: UiStoreState): string | undefined =>
     state.selectedSiteId;
+
+const formatStatus = (value: string): string => {
+    if (!value) {
+        return "Unknown";
+    }
+    const lowerCased = value.toLowerCase();
+    return lowerCased.charAt(0).toUpperCase() + lowerCased.slice(1);
+};
+
+const getLatestHistoryTimestamp = (
+    history: readonly StatusHistory[]
+): number | undefined => {
+    let latestTimestamp: number | undefined = undefined;
+
+    for (const record of history) {
+        const timestamp =
+            typeof record.timestamp === "number" ? record.timestamp : undefined;
+
+        if (
+            timestamp !== undefined &&
+            (latestTimestamp === undefined || timestamp > latestTimestamp)
+        ) {
+            latestTimestamp = timestamp;
+        }
+    }
+
+    return latestTimestamp;
+};
 
 /**
  * Main site card component using composition of smaller, focused
@@ -86,6 +119,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
     function SiteCard({ presentation = "grid", site }: SiteCardProperties) {
         // Use our custom hook to get all the data and functionality we need
         const {
+            averageResponseTime,
             checkCount,
             filteredHistory,
             handleCardClick,
@@ -156,9 +190,76 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
             </div>
         );
 
-        const ResponseIcon = AppIcons.metrics.response;
         const ActivityIcon = AppIcons.metrics.activity;
         const TimeIcon = AppIcons.metrics.time;
+        const HistoryIcon = AppIcons.ui.history;
+
+        const statusLabel = formatStatus(status);
+        const uptimeDisplay = Number.isFinite(uptime)
+            ? `${uptime.toFixed(1)}%`
+            : "—";
+        const lastResponseDisplay =
+            responseTime === undefined ? "—" : `${responseTime} ms`;
+        const avgResponseDisplay =
+            checkCount === 0 ? "—" : `${averageResponseTime} ms`;
+        const checksDisplay = checkCount.toLocaleString();
+        const lastCheckTimestamp = monitor
+            ? getLatestHistoryTimestamp(monitor.history)
+            : undefined;
+        const lastCheckLabel = lastCheckTimestamp
+            ? formatRelativeTimestamp(lastCheckTimestamp)
+            : "No data";
+        const lastCheckTooltip = lastCheckTimestamp
+            ? formatFullTimestamp(lastCheckTimestamp)
+            : undefined;
+
+        const siteMetrics = useMemo(
+            () => [
+                {
+                    key: "status",
+                    label: "Status",
+                    value: statusLabel,
+                },
+                {
+                    key: "uptime",
+                    label: "Uptime",
+                    tooltip: "Overall uptime calculated from monitor history",
+                    value: uptimeDisplay,
+                },
+                {
+                    key: "last-response",
+                    label: "Last Response",
+                    value: lastResponseDisplay,
+                },
+                {
+                    key: "avg-response",
+                    label: "Avg Response",
+                    tooltip:
+                        "Average response time across recent successful checks",
+                    value: avgResponseDisplay,
+                },
+                {
+                    key: "checks",
+                    label: "Checks Logged",
+                    value: checksDisplay,
+                },
+                {
+                    key: "last-check",
+                    label: "Last Check",
+                    value: lastCheckLabel,
+                    ...(lastCheckTooltip && { tooltip: lastCheckTooltip }),
+                },
+            ],
+            [
+                avgResponseDisplay,
+                checksDisplay,
+                lastCheckLabel,
+                lastCheckTooltip,
+                lastResponseDisplay,
+                statusLabel,
+                uptimeDisplay,
+            ]
+        );
 
         const stackedInsights = isStacked ? (
             <div className="site-card__insights">
@@ -194,21 +295,23 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                             size="xs"
                             variant="secondary"
                         >
-                            Checks Logged
+                            Check Interval
                         </ThemedText>
                         <ThemedText
                             className="site-card__insight-value"
                             size="sm"
                             weight="semibold"
                         >
-                            {checkCount}
+                            {monitor?.checkInterval
+                                ? formatIntervalDuration(monitor.checkInterval)
+                                : "Manual"}
                         </ThemedText>
                     </div>
                 </div>
 
                 <div className="site-card__insight">
                     <div className="site-card__insight-icon">
-                        <ResponseIcon size={16} />
+                        <HistoryIcon size={16} />
                     </div>
                     <div className="site-card__insight-meta">
                         <ThemedText
@@ -216,30 +319,37 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                             size="xs"
                             variant="secondary"
                         >
-                            Last Response
+                            Last Check
                         </ThemedText>
                         <ThemedText
                             className="site-card__insight-value"
                             size="sm"
                             weight="semibold"
                         >
-                            {responseTime === undefined
-                                ? "No data"
-                                : `${responseTime} ms`}
+                            {lastCheckLabel}
                         </ThemedText>
                     </div>
                 </div>
             </div>
         ) : null;
 
+        const normalizedStatusLabel = statusLabel.toLowerCase();
+        const metricsSummary = siteMetrics
+            .map(({ label, value }) => `${label}: ${value}`)
+            .join(" | ");
+
         const metricsSection = (
-            <div className={metricsClassName}>
-                <SiteCardMetrics
-                    checkCount={checkCount}
-                    status={status}
-                    {...(responseTime !== undefined && { responseTime })}
-                    uptime={uptime}
-                />
+            <div
+                className={metricsClassName}
+                data-testid={`site-card-metrics-${latestSite.identifier}-${normalizedStatusLabel}`}
+            >
+                <span
+                    className="sr-only"
+                    data-testid={`site-card-metrics-summary-${latestSite.identifier}`}
+                >
+                    {metricsSummary}
+                </span>
+                <SiteCardMetrics metrics={siteMetrics} />
             </div>
         );
 

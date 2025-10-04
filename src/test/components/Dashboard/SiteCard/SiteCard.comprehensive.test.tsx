@@ -40,7 +40,7 @@ vi.mock("../SiteCardHistory", () => ({
 
 vi.mock("../SiteCardMetrics", () => ({
     SiteCardMetrics: () => (
-        <div data-testid="site-card-metrics">Site Metrics</div>
+        <div data-testid="site-card-metrics-content">Site Metrics</div>
     ),
 }));
 

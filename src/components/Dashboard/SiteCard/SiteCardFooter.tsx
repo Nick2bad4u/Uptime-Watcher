@@ -34,14 +34,19 @@ import { ThemedText } from "../../../theme/components/ThemedText";
 export const SiteCardFooter: NamedExoticComponent<object> = memo(
     function SiteCardFooter() {
         return (
-            <div className="site-card__footer mt-2 border-t pt-2">
+            <div
+                className="site-card__footer mt-2 border-t pt-2"
+                data-testid="site-card-footer"
+            >
                 <ThemedText
                     className="text-center opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-hidden="true"
                     size="xs"
                     variant="tertiary"
                 >
                     Click to view detailed statistics and settings
                 </ThemedText>
+                <span className="sr-only">Click to expand</span>
             </div>
         );
     }

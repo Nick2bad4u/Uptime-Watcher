@@ -1,4 +1,6 @@
 /* Dashboard site list layout enhancements */
+/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
+/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .site-list {
     display: flex;
@@ -233,8 +235,8 @@
 }
 
 .site-table__actions {
-    text-align: end;
     display: table-caption;
+    text-align: end;
 }
 
 .site-table__actions-heading {
@@ -250,9 +252,11 @@
 }
 
 .site-card__compact-header {
-    align-items: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+    row-gap: 0.75rem;
 }
 
 .site-card__compact-title {
@@ -261,21 +265,38 @@
     gap: 0.25rem;
 }
 
+.site-card__compact-status {
+    display: inline-flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.2rem clamp(0.35rem, 0.25rem + 0.3vi, 0.6rem);
+    margin-inline-start: auto;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+
+    & .themed-text {
+        line-height: 1.125;
+        text-wrap: balance;
+    }
+}
+
 .site-card__compact-subtitle {
     opacity: 0.75;
 }
 
 .site-card__compact-metrics {
     flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 0.55rem;
+    justify-content: flex-start;
+    gap: clamp(0.6rem, 0.5rem + 0.3vi, 0.85rem);
 }
 
 .site-card__compact-metric {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
-    min-inline-size: 5.5rem;
+    min-inline-size: clamp(5.25rem, 42%, 6.35rem);
 }
 
 .site-card__compact-metric-label {
@@ -318,5 +339,10 @@
     .site-card__compact-controls {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .site-card__compact-status {
+        justify-content: flex-start;
+        inline-size: 100%;
     }
 }

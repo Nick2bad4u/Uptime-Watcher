@@ -74,6 +74,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
         showAdvancedMetrics: false,
         siteDetailsChartTimeRange: "1h" as const,
         setActiveSiteDetailsTab: vi.fn(),
+        syncActiveSiteDetailsTab: vi.fn(),
         setShowAdvancedMetrics: vi.fn(),
         setSiteDetailsChartTimeRange: vi.fn(),
     };

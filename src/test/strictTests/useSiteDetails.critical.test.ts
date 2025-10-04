@@ -95,7 +95,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         };
 
         // Mock UI store
-        let activeTab = "overview";
+        let activeTab = "site-overview";
         (useUIStore as any).mockReturnValue({
             activeSiteDetailsTab: activeTab,
             setActiveSiteDetailsTab: vi.fn((tab: string) => {
@@ -103,8 +103,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             }),
             setShowAdvancedMetrics: vi.fn(),
             setSiteDetailsChartTimeRange: vi.fn(),
+            syncActiveSiteDetailsTab: vi.fn(),
             showAdvancedMetrics: false,
-            siteDetailsChartTimeRange: "last24Hours" as const,
+            siteDetailsChartTimeRange: "24h" as const,
         });
     });
 
@@ -225,24 +226,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
     });
 
     it("should handle removeSite confirmation dialog cancellation", async () => {
-        const mockStore = {
-            getSiteById: vi.fn().mockReturnValue(mockSite),
-            removeSite: vi.fn(),
-            getSelectedMonitorId: vi.fn().mockReturnValue(null),
-            setSelectedMonitorId: vi.fn(),
-            sites: [mockSite],
-            removeMonitorFromSite: vi.fn(),
-            deleteSite: vi.fn(),
-            modifySite: vi.fn(),
-            checkSiteNow: vi.fn(),
-            startSiteMonitoring: vi.fn(),
-            stopSiteMonitoring: vi.fn(),
-            startSiteMonitorMonitoring: vi.fn(),
-            stopSiteMonitorMonitoring: vi.fn(),
-            updateMonitorTimeout: vi.fn(),
-            updateMonitorRetryAttempts: vi.fn(),
-            updateSiteCheckInterval: vi.fn(),
-        };
+        const mockStore = createMockStore();
 
         (useSitesStore as any).mockReturnValue(mockStore);
 
@@ -347,12 +331,13 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
     it("should handle activeTab change events", async () => {
         const mockUIStore = {
-            activeSiteDetailsTab: "overview",
+            activeSiteDetailsTab: "site-overview",
             setActiveSiteDetailsTab: vi.fn(),
+            syncActiveSiteDetailsTab: vi.fn(),
             setShowAdvancedMetrics: vi.fn(),
             setSiteDetailsChartTimeRange: vi.fn(),
             showAdvancedMetrics: false,
-            siteDetailsChartTimeRange: "last24Hours" as const,
+            siteDetailsChartTimeRange: "24h" as const,
         };
 
         (useUIStore as any).mockReturnValue(mockUIStore);

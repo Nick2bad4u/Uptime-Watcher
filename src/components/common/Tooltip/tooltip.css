@@ -1,4 +1,6 @@
 /* Tooltip component styles */
+/* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
+/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .tooltip-container {
     position: relative;

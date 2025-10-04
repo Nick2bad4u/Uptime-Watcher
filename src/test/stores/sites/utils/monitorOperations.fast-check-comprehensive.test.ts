@@ -154,7 +154,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
         identifier: siteIdArb,
         name: fc.string({ minLength: 1, maxLength: 100 }),
         monitoring: fc.boolean(),
-        monitors: fc.array(monitorArb, { maxLength: 10 }),
+        monitors: fc.uniqueArray(monitorArb, {
+            maxLength: 10,
+            selector: (monitor) => monitor.id,
+        }),
     }) as fc.Arbitrary<Site>;
 
     // Create a partial monitor generator that properly handles Partial<Monitor> type
