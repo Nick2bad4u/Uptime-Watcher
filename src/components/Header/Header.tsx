@@ -80,6 +80,8 @@ export const Header = (): JSX.Element => {
     }, [setShowSettings]);
 
     const SidebarToggleIcon = AppIcons.layout.viewColumns;
+    const ActiveIcon = AppIcons.metrics.monitor;
+    const GlobalUptimeIcon = AppIcons.metrics.uptime;
 
     return (
         <header className="app-topbar" role="banner">
@@ -90,7 +92,7 @@ export const Header = (): JSX.Element => {
                 shadow="md"
                 surface="elevated"
             >
-                <div className="app-topbar__row">
+                <div className="app-topbar__grid">
                     <div className="app-topbar__identity">
                         <Tooltip
                             content="Toggle navigation sidebar"
@@ -126,23 +128,56 @@ export const Header = (): JSX.Element => {
                         </div>
                     </div>
 
-                    <div className="app-topbar__badges">
-                        <div className="app-topbar__badge">
-                            <span className="app-topbar__badge-label">
-                                Active
-                            </span>
-                            <span className="app-topbar__badge-value">
-                                {activeMonitors}/{totalMonitors}
-                            </span>
+                    <div className="app-topbar__metrics">
+                        <div className="app-topbar__badges">
+                            <div className="app-topbar__badge">
+                                <span
+                                    aria-hidden="true"
+                                    className="app-topbar__badge-icon"
+                                >
+                                    <ActiveIcon size={18} />
+                                </span>
+                                <div className="app-topbar__badge-body">
+                                    <span className="app-topbar__badge-label">
+                                        Active
+                                    </span>
+                                    <span className="app-topbar__badge-value">
+                                        {activeMonitors}/{totalMonitors}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="app-topbar__badge app-topbar__badge--primary">
+                                <span
+                                    aria-hidden="true"
+                                    className="app-topbar__badge-icon"
+                                >
+                                    <GlobalUptimeIcon size={18} />
+                                </span>
+                                <div className="app-topbar__badge-body">
+                                    <span className="app-topbar__badge-label">
+                                        Global Uptime
+                                    </span>
+                                    <span className="app-topbar__badge-value">
+                                        {uptimePercentage}%
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <div className="app-topbar__badge app-topbar__badge--primary">
-                            <span className="app-topbar__badge-label">
-                                Global uptime
-                            </span>
-                            <span className="app-topbar__badge-value">
-                                {uptimePercentage}%
-                            </span>
-                        </div>
+
+                        {siteListLayout === "card-large" ? null : (
+                            <div className="app-topbar__summary">
+                                <StatusSummary
+                                    degradedMonitors={degradedMonitors}
+                                    downMonitors={downMonitors}
+                                    getAvailabilityColor={getAvailabilityColor}
+                                    pausedMonitors={pausedMonitors}
+                                    pendingMonitors={pendingMonitors}
+                                    totalMonitors={totalStatusMonitors}
+                                    upMonitors={upMonitors}
+                                    uptimePercentage={uptimePercentage}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="app-topbar__controls">
@@ -151,24 +186,10 @@ export const Header = (): JSX.Element => {
                             onShowAddSiteModal={handleShowAddSiteModal}
                             onShowSettings={handleShowSettings}
                             onToggleTheme={toggleTheme}
+                            orientation="vertical"
                         />
                     </div>
                 </div>
-
-                {siteListLayout === "card-large" ? null : (
-                    <div className="app-topbar__summary">
-                        <StatusSummary
-                            degradedMonitors={degradedMonitors}
-                            downMonitors={downMonitors}
-                            getAvailabilityColor={getAvailabilityColor}
-                            pausedMonitors={pausedMonitors}
-                            pendingMonitors={pendingMonitors}
-                            totalMonitors={totalStatusMonitors}
-                            upMonitors={upMonitors}
-                            uptimePercentage={uptimePercentage}
-                        />
-                    </div>
-                )}
             </ThemedBox>
         </header>
     );

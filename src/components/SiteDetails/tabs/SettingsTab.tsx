@@ -10,12 +10,7 @@ import type { ChangeEvent, JSX } from "react";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiSave, FiTrash2 } from "react-icons/fi";
-import {
-    MdDangerous,
-    MdInfoOutline,
-    MdSettings,
-    MdTimer,
-} from "react-icons/md";
+import { MdDangerous, MdInfoOutline, MdSettings } from "react-icons/md";
 
 import {
     CHECK_INTERVALS,
@@ -42,6 +37,10 @@ import { getMonitorTypeConfig } from "../../../utils/monitorTypeHelper";
 import { formatRetryAttemptsText, getIntervalLabel } from "../../../utils/time";
 
 const WarningIcon = AppIcons.status.warning;
+const DurationIcon = AppIcons.metrics.time;
+const IdentifierIcon = AppIcons.ui.link;
+const HistoryIcon = AppIcons.metrics.activity;
+const LastCheckedIcon = AppIcons.ui.history;
 
 /**
  * Props for the SettingsTab component.
@@ -351,7 +350,7 @@ export const SettingsTab = ({
     );
     const saveIcon = useMemo(() => <FiSave />, []);
     const timerIcon = useMemo(
-        () => <MdTimer color={iconColors.timing} />,
+        () => <DurationIcon color={iconColors.timing} size={18} />,
         [iconColors.timing]
     );
     const saveIconTwo = useMemo(() => <FiSave />, []);
@@ -535,7 +534,7 @@ export const SettingsTab = ({
                         </ThemedText>
                         {isTimeoutValid ? null : (
                             <ThemedText size="xs" variant="error">
-                                Allowed range: {TIMEOUT_CONSTRAINTS.MIN}–
+                                Allowed range: {TIMEOUT_CONSTRAINTS.MIN}-
                                 {TIMEOUT_CONSTRAINTS.MAX} seconds.
                             </ThemedText>
                         )}
@@ -594,21 +593,41 @@ export const SettingsTab = ({
                     {/* Total monitoring time indicator */}
                     {localRetryAttempts > 0 && (
                         <ThemedBox
-                            className="bg-surface-elevated border-primary/20 border"
+                            className="site-settings-duration"
                             padding="md"
                             rounded="lg"
                             variant="tertiary"
                         >
-                            <ThemedText size="xs" variant="secondary">
-                                💡 <strong>Maximum check duration:</strong> ~
-                                {calculateMaxDuration(
-                                    localTimeout,
-                                    localRetryAttempts
-                                )}{" "}
-                                ({localTimeout}s per attempt ×{" "}
-                                {localRetryAttempts + 1} attempts + backoff
-                                delays)
-                            </ThemedText>
+                            <div className="site-settings-duration__body">
+                                <span
+                                    aria-hidden="true"
+                                    className="site-settings-duration__icon"
+                                >
+                                    <DurationIcon size={18} />
+                                </span>
+                                <div className="site-settings-duration__content">
+                                    <ThemedText
+                                        size="sm"
+                                        variant="primary"
+                                        weight="medium"
+                                    >
+                                        Maximum check duration ~{" "}
+                                        {calculateMaxDuration(
+                                            localTimeout,
+                                            localRetryAttempts
+                                        )}
+                                    </ThemedText>
+                                    <ThemedText
+                                        className="site-settings-duration__meta"
+                                        size="xs"
+                                        variant="secondary"
+                                    >
+                                        {localTimeout}s per attempt x{" "}
+                                        {localRetryAttempts + 1} attempts +{" "}
+                                        backoff delays
+                                    </ThemedText>
+                                </div>
+                            </div>
                         </ThemedBox>
                     )}
                 </div>
@@ -618,41 +637,80 @@ export const SettingsTab = ({
             <ThemedCard icon={infoIcon} title="Site Information">
                 <div className="site-settings-info-grid">
                     <div className="site-settings-info-grid__column">
-                        <div className="flex items-center justify-between">
-                            <ThemedText size="sm" variant="secondary">
-                                <IdentifierLabel
-                                    selectedMonitor={selectedMonitor}
-                                />
-                                :
-                            </ThemedText>
-                            <ThemedBadge size="sm" variant="secondary">
-                                {getDisplayIdentifier(
-                                    currentSite,
-                                    selectedMonitor
-                                )}
-                            </ThemedBadge>
+                        <div className="site-settings-info-item">
+                            <span
+                                aria-hidden="true"
+                                className="site-settings-info-item__icon"
+                            >
+                                <IdentifierIcon size={18} />
+                            </span>
+                            <div className="site-settings-info-item__content">
+                                <ThemedText
+                                    className="site-settings-info-item__label"
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    <IdentifierLabel
+                                        selectedMonitor={selectedMonitor}
+                                    />
+                                </ThemedText>
+                                <ThemedBadge size="sm" variant="secondary">
+                                    {getDisplayIdentifier(
+                                        currentSite,
+                                        selectedMonitor
+                                    )}
+                                </ThemedBadge>
+                            </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                            <ThemedText size="sm" variant="secondary">
-                                History Records:
-                            </ThemedText>
-                            <ThemedBadge size="sm" variant="info">
-                                {selectedMonitor.history.length}
-                            </ThemedBadge>
+                        <div className="site-settings-info-item">
+                            <span
+                                aria-hidden="true"
+                                className="site-settings-info-item__icon"
+                            >
+                                <HistoryIcon size={18} />
+                            </span>
+                            <div className="site-settings-info-item__content">
+                                <ThemedText
+                                    className="site-settings-info-item__label"
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    History Records
+                                </ThemedText>
+                                <ThemedBadge size="sm" variant="info">
+                                    {selectedMonitor.history.length}
+                                </ThemedBadge>
+                            </div>
                         </div>
                     </div>
                     <div className="site-settings-info-grid__column">
-                        <div className="flex items-center justify-between">
-                            <ThemedText size="sm" variant="secondary">
-                                Last Checked:
-                            </ThemedText>
-                            <ThemedText size="xs" variant="tertiary">
-                                {selectedMonitor.lastChecked
-                                    ? new Date(
-                                          selectedMonitor.lastChecked
-                                      ).toLocaleString()
-                                    : "Never"}
-                            </ThemedText>
+                        <div className="site-settings-info-item">
+                            <span
+                                aria-hidden="true"
+                                className="site-settings-info-item__icon"
+                            >
+                                <LastCheckedIcon size={18} />
+                            </span>
+                            <div className="site-settings-info-item__content">
+                                <ThemedText
+                                    className="site-settings-info-item__label"
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    Last Checked
+                                </ThemedText>
+                                <ThemedText
+                                    className="site-settings-info-item__value"
+                                    size="xs"
+                                    variant="primary"
+                                >
+                                    {selectedMonitor.lastChecked
+                                        ? new Date(
+                                              selectedMonitor.lastChecked
+                                          ).toLocaleString()
+                                        : "Never"}
+                                </ThemedText>
+                            </div>
                         </div>
                     </div>
                 </div>

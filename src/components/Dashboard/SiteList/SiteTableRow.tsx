@@ -7,6 +7,7 @@ import type { MonitorStatus, Site } from "@shared/types";
 import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
+import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { StatusBadge } from "../../common/StatusBadge";
 import { ActionButtonGroup } from "../SiteCard/components/ActionButtonGroup";
@@ -50,6 +51,21 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             uptime,
         } = useSite(site);
 
+        const marqueeDependencies = useMemo(
+            () => [latestSite.name, site.identifier],
+            [latestSite.name, site.identifier]
+        );
+
+        const marqueeOptions = useMemo(
+            () => ({ dependencies: marqueeDependencies }),
+            [marqueeDependencies]
+        );
+
+        const {
+            containerRef: tableNameRef,
+            isOverflowing: isTableNameOverflowing,
+        } = useOverflowMarquee<HTMLDivElement>(marqueeOptions);
+
         const runningMonitors = useMemo(
             () =>
                 latestSite.monitors.filter(
@@ -81,9 +97,34 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         onClick={handleCardClick}
                         type="button"
                     >
-                        <ThemedText size="md" weight="semibold">
-                            {latestSite.name}
-                        </ThemedText>
+                        <div
+                            className={`site-card__compact-name ${
+                                isTableNameOverflowing
+                                    ? "site-card__compact-name--marquee"
+                                    : ""
+                            }`}
+                            ref={tableNameRef}
+                        >
+                            <div className="site-card__compact-name-track">
+                                <ThemedText
+                                    className="site-card__compact-name-segment"
+                                    size="md"
+                                    weight="semibold"
+                                >
+                                    {latestSite.name}
+                                </ThemedText>
+                                {isTableNameOverflowing ? (
+                                    <ThemedText
+                                        aria-hidden="true"
+                                        className="site-card__compact-name-segment site-card__compact-name-segment--clone"
+                                        size="md"
+                                        weight="semibold"
+                                    >
+                                        {latestSite.name}
+                                    </ThemedText>
+                                ) : null}
+                            </div>
+                        </div>
                         <ThemedText size="xs" variant="tertiary">
                             {site.identifier}
                         </ThemedText>

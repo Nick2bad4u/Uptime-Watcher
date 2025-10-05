@@ -17,6 +17,8 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
+import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
+import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
 import type { Site } from "../../../shared/types.js";
 
 describe(SiteManager, () => {
@@ -32,6 +34,22 @@ describe(SiteManager, () => {
         //     has: vi.fn(),
         //     clear: vi.fn(),
         // };
+
+        const monitorAdapter = {
+            clearActiveOperations: vi.fn(),
+            create: vi.fn().mockReturnValue("mock-monitor-id"),
+            deleteAll: vi.fn(),
+            deleteById: vi.fn(),
+            deleteBySiteIdentifier: vi.fn(),
+            findBySiteIdentifier: vi.fn().mockReturnValue([]),
+            update: vi.fn(),
+        } satisfies MonitorRepositoryTransactionAdapter;
+
+        const siteAdapter = {
+            delete: vi.fn().mockReturnValue(true),
+            deleteAll: vi.fn(),
+            upsert: vi.fn(),
+        } satisfies SiteRepositoryTransactionAdapter;
 
         mockDependencies = {
             configurationManager: {
@@ -52,13 +70,13 @@ describe(SiteManager, () => {
                 deleteAll: vi.fn(),
             },
             monitorRepository: {
+                createTransactionAdapter: vi
+                    .fn()
+                    .mockImplementation(() => monitorAdapter),
                 findBySiteIdentifier: vi.fn(),
                 create: vi.fn(),
-                createInternal: vi.fn().mockReturnValue("mock-monitor-id"), // Add the missing internal method
                 bulkCreate: vi.fn(),
                 deleteBySiteIdentifier: vi.fn(),
-                deleteBySiteIdentifierInternal: vi.fn(), // Add the missing internal method
-                deleteAllInternal: vi.fn(),
                 delete: vi.fn().mockResolvedValue(true), // Add missing delete method
             },
             monitoringOperations: {
@@ -73,13 +91,13 @@ describe(SiteManager, () => {
                 set: vi.fn(),
             },
             siteRepository: {
+                createTransactionAdapter: vi
+                    .fn()
+                    .mockImplementation(() => siteAdapter),
                 findAll: vi.fn().mockResolvedValue([]), // Return empty array for initialization
                 findByIdentifier: vi.fn(),
                 upsert: vi.fn(),
-                upsertInternal: vi.fn(), // Add the missing internal method
                 delete: vi.fn(),
-                deleteInternal: vi.fn(), // Add the missing internal method
-                deleteAllInternal: vi.fn(),
                 exists: vi.fn(),
             },
         };
@@ -163,11 +181,13 @@ describe(SiteManager, () => {
                 async (fn: any) => await fn()
             );
 
+            const createSiteSpy = vi
+                .spyOn(manager["siteWriterService"], "createSite")
+                .mockResolvedValue(newSite);
+
             const result = await manager.addSite(newSite);
 
-            expect(
-                mockDependencies.siteRepository.upsertInternal
-            ).toHaveBeenCalled();
+            expect(createSiteSpy).toHaveBeenCalledWith(newSite);
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -180,6 +200,8 @@ describe(SiteManager, () => {
                 })
             );
             expect(result).toEqual(newSite);
+
+            createSiteSpy.mockRestore();
         });
 
         it("should handle database errors during site addition", async ({
@@ -381,13 +403,16 @@ describe(SiteManager, () => {
                 "purpose"
             );
 
-            mockDependencies.siteRepository.delete.mockResolvedValue(false);
-            mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => await fn()
-            );
+            const deleteSiteSpy = vi
+                .spyOn(manager["siteWriterService"], "deleteSite")
+                .mockResolvedValue(false);
 
             const result = await manager.removeSite("nonexistent");
 
+            expect(deleteSiteSpy).toHaveBeenCalledWith(
+                expect.anything(),
+                "nonexistent"
+            );
             expect(result).toBeFalsy();
         });
     });

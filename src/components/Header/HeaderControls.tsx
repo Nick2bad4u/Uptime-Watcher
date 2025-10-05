@@ -26,6 +26,8 @@ interface HeaderControlsProperties {
     readonly onShowSettings: () => void;
     /** Callback to toggle theme */
     readonly onToggleTheme: () => void;
+    /** Layout orientation for the control cluster */
+    readonly orientation?: "horizontal" | "vertical";
 }
 
 /**
@@ -40,13 +42,20 @@ export const HeaderControls = ({
     onShowAddSiteModal,
     onShowSettings,
     onToggleTheme,
+    orientation = "horizontal",
 }: HeaderControlsProperties): JSX.Element => {
     const AddIcon = AppIcons.actions.add;
     const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
     const SettingsIcon = AppIcons.settings.gear;
+    const rootClassName = [
+        "header-controls",
+        orientation === "vertical" ? "header-controls--vertical" : "",
+    ]
+        .filter(Boolean)
+        .join(" ");
 
     return (
-        <div className="header-controls">
+        <div className={rootClassName}>
             <Tooltip content="Add new site to monitor" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button

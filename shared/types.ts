@@ -10,14 +10,92 @@
  */
 
 /**
+ * Canonical status kinds shared across monitors, sites, and history records.
+ */
+export const STATUS_KIND = {
+    DEGRADED: "degraded",
+    DOWN: "down",
+    MIXED: "mixed",
+    PAUSED: "paused",
+    PENDING: "pending",
+    UNKNOWN: "unknown",
+    UP: "up",
+} as const;
+
+/**
+ * Union of all recognized status kinds.
+ */
+export type StatusKind = (typeof STATUS_KIND)[keyof typeof STATUS_KIND];
+
+type MonitorStatusTuple = readonly [
+    typeof STATUS_KIND.DEGRADED,
+    typeof STATUS_KIND.DOWN,
+    typeof STATUS_KIND.PAUSED,
+    typeof STATUS_KIND.PENDING,
+    typeof STATUS_KIND.UP,
+];
+
+type SiteStatusTuple = readonly [
+    typeof STATUS_KIND.DEGRADED,
+    typeof STATUS_KIND.DOWN,
+    typeof STATUS_KIND.MIXED,
+    typeof STATUS_KIND.PAUSED,
+    typeof STATUS_KIND.PENDING,
+    typeof STATUS_KIND.UNKNOWN,
+    typeof STATUS_KIND.UP,
+];
+
+type StatusHistoryTuple = readonly [
+    typeof STATUS_KIND.UP,
+    typeof STATUS_KIND.DOWN,
+    typeof STATUS_KIND.DEGRADED,
+];
+
+/**
+ * Ordered list of monitor-specific status values.
+ */
+export const MONITOR_STATUS_VALUES: MonitorStatusTuple = [
+    STATUS_KIND.DEGRADED,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.PAUSED,
+    STATUS_KIND.PENDING,
+    STATUS_KIND.UP,
+];
+
+/**
+ * Ordered list of site status values (monitor statuses plus computed kinds).
+ */
+export const SITE_STATUS_VALUES: SiteStatusTuple = [
+    STATUS_KIND.DEGRADED,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.MIXED,
+    STATUS_KIND.PAUSED,
+    STATUS_KIND.PENDING,
+    STATUS_KIND.UNKNOWN,
+    STATUS_KIND.UP,
+];
+
+/**
+ * Valid status values recorded in monitor history entries.
+ */
+export const STATUS_HISTORY_VALUES: StatusHistoryTuple = [
+    STATUS_KIND.UP,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.DEGRADED,
+];
+
+/**
+ * Status values captured in historical monitor records.
+ */
+export type StatusHistoryStatus = StatusHistoryTuple[number];
+
+/**
  * Status values for monitors.
  *
  * @remarks
  * Used throughout the system to represent the current state of a monitor.
- *
- * @public
  */
-export type MonitorStatus = "degraded" | "down" | "paused" | "pending" | "up";
+export type MonitorStatus = MonitorStatusTuple[number];
 
 /**
  * HTTP method types supported by the application.
@@ -60,11 +138,11 @@ export const BASE_MONITOR_TYPES = [
  * @public
  */
 export interface MonitorStatusConstants {
-    DEGRADED: "degraded";
-    DOWN: "down";
-    PAUSED: "paused";
-    PENDING: "pending";
-    UP: "up";
+    DEGRADED: typeof STATUS_KIND.DEGRADED;
+    DOWN: typeof STATUS_KIND.DOWN;
+    PAUSED: typeof STATUS_KIND.PAUSED;
+    PENDING: typeof STATUS_KIND.PENDING;
+    UP: typeof STATUS_KIND.UP;
 }
 
 /**
@@ -85,7 +163,7 @@ export type MonitorType = (typeof BASE_MONITOR_TYPES)[number];
  *
  * @public
  */
-export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
+export type SiteStatus = SiteStatusTuple[number];
 
 /**
  * Monitor status constants to avoid hardcoded strings.
@@ -96,11 +174,11 @@ export type SiteStatus = "mixed" | "unknown" | MonitorStatus;
  * @public
  */
 export const MONITOR_STATUS: MonitorStatusConstants = {
-    DEGRADED: "degraded" as const,
-    DOWN: "down" as const,
-    PAUSED: "paused" as const,
-    PENDING: "pending" as const,
-    UP: "up" as const,
+    DEGRADED: STATUS_KIND.DEGRADED,
+    DOWN: STATUS_KIND.DOWN,
+    PAUSED: STATUS_KIND.PAUSED,
+    PENDING: STATUS_KIND.PENDING,
+    UP: STATUS_KIND.UP,
 } satisfies Record<string, MonitorStatus>;
 
 /**
@@ -119,7 +197,7 @@ export const DEFAULT_MONITOR_STATUS: MonitorStatus = MONITOR_STATUS.PENDING;
  *
  * @public
  */
-export const DEFAULT_SITE_STATUS: SiteStatus = "unknown";
+export const DEFAULT_SITE_STATUS: SiteStatus = STATUS_KIND.UNKNOWN;
 
 /**
  * Core monitor interface representing a single monitoring configuration.
@@ -261,7 +339,7 @@ export interface SiteForStatus {
 export interface StatusHistory {
     details?: string;
     responseTime: number;
-    status: "degraded" | "down" | "up";
+    status: StatusHistoryStatus;
     timestamp: number;
 }
 
@@ -302,30 +380,16 @@ function isValidActiveOperations(
 
 export function isComputedSiteStatus(
     status: string
-): status is "mixed" | "unknown" {
-    return ["mixed", "unknown"].includes(status);
+): status is typeof STATUS_KIND.MIXED | typeof STATUS_KIND.UNKNOWN {
+    return status === STATUS_KIND.MIXED || status === STATUS_KIND.UNKNOWN;
 }
 
 export function isMonitorStatus(status: string): status is MonitorStatus {
-    return [
-        "degraded",
-        "down",
-        "paused",
-        "pending",
-        "up",
-    ].includes(status);
+    return (MONITOR_STATUS_VALUES as readonly string[]).includes(status);
 }
 
 export function isSiteStatus(status: string): status is SiteStatus {
-    return [
-        "degraded",
-        "down",
-        "mixed",
-        "paused",
-        "pending",
-        "unknown",
-        "up",
-    ].includes(status);
+    return (SITE_STATUS_VALUES as readonly string[]).includes(status);
 }
 
 /**

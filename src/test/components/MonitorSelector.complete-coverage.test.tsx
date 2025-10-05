@@ -105,7 +105,10 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector();
 
             const select = screen.getByTestId("themed-select");
-            expect(select).toHaveClass("min-w-20");
+            const wrapper = select.closest(".monitor-selector__wrapper");
+            expect(wrapper).not.toBeNull();
+            expect(wrapper).toHaveClass("monitor-selector");
+            expect(wrapper).toHaveClass("min-w-20");
         });
 
         it("should render with custom className", ({ task, annotate }) => {
@@ -128,7 +131,10 @@ describe("MonitorSelector - Complete Coverage", () => {
             renderMonitorSelector({ className: "custom-class" });
 
             const select = screen.getByTestId("themed-select");
-            expect(select).toHaveClass("custom-class");
+            const wrapper = select.closest(".monitor-selector__wrapper");
+            expect(wrapper).not.toBeNull();
+            expect(wrapper).toHaveClass("monitor-selector");
+            expect(wrapper).toHaveClass("custom-class");
         });
 
         it("should render all monitor options", ({ task, annotate }) => {

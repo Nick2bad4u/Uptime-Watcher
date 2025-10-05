@@ -264,7 +264,12 @@ describe("Enhanced Database Operations Benchmarks", () => {
             async () => {
                 await databaseService.executeTransaction(async (db) => {
                     const site = generateSite(9999);
-                    siteRepository.upsertInternal(db, site);
+                    const siteAdapter =
+                        siteRepository.createTransactionAdapter(db);
+                    const monitorAdapter =
+                        monitorRepository.createTransactionAdapter(db);
+
+                    siteAdapter.upsert(site);
 
                     const monitors: Monitor[] = [];
                     for (let i = 0; i < 5; i++) {
@@ -273,11 +278,11 @@ describe("Enhanced Database Operations Benchmarks", () => {
 
                     // Create monitors within transaction
                     for (const monitor of monitors) {
-                        monitorRepository.createInternal(
-                            db,
+                        const newId = monitorAdapter.create(
                             site.identifier,
                             monitor
                         );
+                        monitor.id = newId;
                     }
                 });
             },
@@ -290,7 +295,9 @@ describe("Enhanced Database Operations Benchmarks", () => {
                 try {
                     await databaseService.executeTransaction(async (db) => {
                         const site = generateSite(8888);
-                        siteRepository.upsertInternal(db, site);
+                        const siteAdapter =
+                            siteRepository.createTransactionAdapter(db);
+                        siteAdapter.upsert(site);
 
                         // Simulate an error that would cause rollback
                         throw new Error("Simulated error for rollback");

@@ -18,6 +18,7 @@ import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../../utils/fallbacks";
+import { AppIcons } from "../../../../utils/icons";
 import { formatTitleSuffix } from "../../../../utils/monitorTitleFormatters";
 
 const DEFAULT_PORT_VALUES = new Set<number>([80, 443]);
@@ -143,20 +144,46 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             .filter(Boolean)
             .join(" ");
 
+        const wrapperClassName = [
+            "monitor-selector__wrapper",
+            composedClassName,
+        ]
+            .filter(Boolean)
+            .join(" ");
+
+        const MonitorIcon = AppIcons.metrics.monitor;
+        const ChevronIcon = AppIcons.ui.expand;
+
         return (
-            <ThemedSelect
-                className={composedClassName}
-                fluid={false}
-                onChange={onChange}
-                onClick={handleClick}
-                onMouseDown={handleMouseDown}
-                value={selectedMonitorId}
-            >
-                {monitors.map((monitor) => (
-                    <option key={monitor.id} value={monitor.id}>
-                        {formatMonitorOption(monitor)}
-                    </option>
-                ))}
-            </ThemedSelect>
+            <div className={wrapperClassName}>
+                <span
+                    aria-hidden="true"
+                    className="monitor-selector__icon monitor-selector__icon--leading"
+                >
+                    <MonitorIcon size={16} />
+                </span>
+                <ThemedSelect
+                    aria-label="Select monitor"
+                    className="monitor-selector__input"
+                    fluid={false}
+                    onChange={onChange}
+                    onClick={handleClick}
+                    onMouseDown={handleMouseDown}
+                    tone="transparent"
+                    value={selectedMonitorId}
+                >
+                    {monitors.map((monitor) => (
+                        <option key={monitor.id} value={monitor.id}>
+                            {formatMonitorOption(monitor)}
+                        </option>
+                    ))}
+                </ThemedSelect>
+                <span
+                    aria-hidden="true"
+                    className="monitor-selector__icon monitor-selector__icon--trailing"
+                >
+                    <ChevronIcon size={14} />
+                </span>
+            </div>
         );
     });

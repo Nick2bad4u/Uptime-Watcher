@@ -41,6 +41,8 @@ export interface SiteDetailsNavigationProperties {
     readonly handleStopMonitoring: () => Promise<void>;
     /** Handler for stopping site-level monitoring */
     readonly handleStopSiteMonitoring: () => Promise<void>;
+    /** Whether the Site Details header is currently collapsed */
+    readonly isHeaderCollapsed?: boolean;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
     /** Whether monitoring is currently active */
@@ -70,6 +72,7 @@ export const SiteDetailsNavigation = ({
     handleStartSiteMonitoring,
     handleStopMonitoring,
     handleStopSiteMonitoring,
+    isHeaderCollapsed = false,
     isLoading,
     isMonitoring,
     selectedMonitorId,
@@ -174,9 +177,13 @@ export const SiteDetailsNavigation = ({
     const PauseIcon = AppIcons.actions.pauseFilled;
     const PlayIcon = AppIcons.actions.playFilled;
 
+    const navigationClassName = isHeaderCollapsed
+        ? "site-details-navigation site-details-navigation--collapsed"
+        : "site-details-navigation";
+
     return (
         <ThemedBox
-            className="site-details-navigation"
+            className={navigationClassName}
             padding="lg"
             variant="secondary"
         >

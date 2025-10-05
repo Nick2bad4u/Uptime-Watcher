@@ -192,7 +192,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Type: Constructor", "type");
 
             const siteIdentifier = "site-123";
-            const monitor: Omit<Site["monitors"][0], "id"> = {
+            const monitor: Site["monitors"][0] = {
+                id: "",
                 type: "http",
                 url: "https://example.com",
                 checkInterval: 60_000,
@@ -221,7 +222,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             const siteIdentifier = "site-123";
-            const monitor: Omit<Site["monitors"][0], "id"> = {
+            const monitor: Site["monitors"][0] = {
+                id: "",
                 type: "port",
                 host: "localhost",
                 port: 8080,
@@ -252,6 +254,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
 
             await expect(
                 repository.create("site-123", {
+                    id: "",
                     type: "http",
                     url: "https://example.com",
                     checkInterval: 60_000,
@@ -493,7 +496,8 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             // Test with minimal monitor data
-            const monitor: Omit<Site["monitors"][0], "id"> = {
+            const monitor: Site["monitors"][0] = {
+                id: "",
                 type: "http",
                 url: "",
                 checkInterval: 0,

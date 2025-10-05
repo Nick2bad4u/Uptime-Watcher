@@ -700,7 +700,9 @@ describe(SiteDetailsHeader, () => {
                 />
             );
 
-            const button = screen.getByRole("button");
+            const button = screen.getByRole("button", {
+                name: "Collapse header",
+            });
             await act(async () => {
                 await user.click(button);
             });
@@ -729,7 +731,9 @@ describe(SiteDetailsHeader, () => {
                     isCollapsed={false}
                 />
             );
-            expect(screen.queryByRole("button")).not.toBeInTheDocument();
+            expect(
+                screen.queryByRole("button", { name: "Collapse header" })
+            ).not.toBeInTheDocument();
         });
 
         it("should have correct aria-label when collapsed", ({
@@ -755,7 +759,9 @@ describe(SiteDetailsHeader, () => {
                     onToggleCollapse={onToggleCollapse}
                 />
             );
-            const button = screen.getByRole("button");
+            const button = screen.getByRole("button", {
+                name: "Expand header",
+            });
             expect(button).toHaveAttribute("aria-label", "Expand header");
             expect(button).toHaveAttribute("title", "Expand header");
         });
@@ -783,7 +789,9 @@ describe(SiteDetailsHeader, () => {
                     onToggleCollapse={onToggleCollapse}
                 />
             );
-            const button = screen.getByRole("button");
+            const button = screen.getByRole("button", {
+                name: "Collapse header",
+            });
             expect(button).toHaveAttribute("aria-label", "Collapse header");
             expect(button).toHaveAttribute("title", "Collapse header");
         });

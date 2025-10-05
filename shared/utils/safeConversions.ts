@@ -326,13 +326,13 @@ export function safeParseTimestamp(
     value: unknown,
     defaultValue?: number
 ): number {
-    const fallback = defaultValue ?? Date.now();
+    const currentTime = Date.now();
+    const fallback = defaultValue ?? currentTime;
+    const upperBound = currentTime + 86_400_000;
     const parsed = safeNumberConversion(value, fallback);
 
     // Basic timestamp validation (must be positive, finite, and reasonable)
-    return parsed > 0 &&
-        Number.isFinite(parsed) &&
-        parsed <= Date.now() + 86_400_000
+    return parsed > 0 && Number.isFinite(parsed) && parsed <= upperBound
         ? parsed
         : fallback;
 }

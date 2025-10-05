@@ -76,6 +76,22 @@ export interface SiteRepositoryDependencies {
 }
 
 /**
+ * Operations available within a site repository transaction context.
+ *
+ * @remarks
+ * Instances of this adapter are scoped to a single transaction and should not
+ * be retained beyond the transaction boundary.
+ */
+export interface SiteRepositoryTransactionAdapter {
+    /** Delete a site by identifier within the active transaction. */
+    delete: (identifier: string) => boolean;
+    /** Delete all sites within the active transaction. */
+    deleteAll: () => void;
+    /** Upsert a site record within the active transaction. */
+    upsert: (site: Pick<SiteRow, "identifier" | "monitoring" | "name">) => void;
+}
+
+/**
  * Standard site data defaults for normalization across repository operations.
  *
  * @remarks
@@ -159,6 +175,26 @@ export class SiteRepository {
             undefined,
             { count: sites.length }
         );
+    }
+
+    /**
+     * Create a transaction-scoped adapter exposing encapsulated write
+     * operations.
+     *
+     * @param db - Active transaction database connection.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): SiteRepositoryTransactionAdapter {
+        return {
+            delete: (identifier: string) => this.deleteInternal(db, identifier),
+            deleteAll: () => this.deleteAllInternal(db),
+            upsert: (
+                site: Pick<SiteRow, "identifier" | "monitoring" | "name">
+            ) => {
+                this.upsertInternal(db, site);
+            },
+        } satisfies SiteRepositoryTransactionAdapter;
     }
 
     /**
@@ -417,7 +453,7 @@ export class SiteRepository {
      *
      * @throws {@link Error} When database operations fail.
      */
-    public bulkInsertInternal(db: Database, sites: SiteRow[]): void {
+    private bulkInsertInternal(db: Database, sites: SiteRow[]): void {
         if (sites.length === 0) {
             return;
         }
@@ -458,7 +494,7 @@ export class SiteRepository {
      *
      * @returns Void
      */
-    public deleteAllInternal(db: Database): void {
+    private deleteAllInternal(db: Database): void {
         db.run(SITE_QUERIES.DELETE_ALL);
         logger.debug("[SiteRepository] All sites deleted (internal)");
     }
@@ -478,7 +514,7 @@ export class SiteRepository {
      *
      * @throws {@link Error} When database operations fail.
      */
-    public deleteInternal(db: Database, identifier: string): boolean {
+    private deleteInternal(db: Database, identifier: string): boolean {
         try {
             const result = db.run(SITE_QUERIES.DELETE_BY_ID, [identifier]);
             const deleted = result.changes > 0;
@@ -512,7 +548,7 @@ export class SiteRepository {
      *   transaction).
      * @param site - Site data to create or update.
      */
-    public upsertInternal(
+    private upsertInternal(
         db: Database,
         site: Pick<SiteRow, "identifier" | "monitoring" | "name">
     ): void {

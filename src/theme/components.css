@@ -2517,10 +2517,89 @@
     }
 }
 
-.monitor-selector {
+.monitor-selector__wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid
+        color-mix(in srgb, var(--color-primary-400) 28%, transparent);
+    border-radius: 0.9rem;
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-surface-overlay) 92%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 12%, transparent) 100%
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 4%),
+        0 12px 28px
+            color-mix(in srgb, var(--shadow-base-color) 24%, transparent);
     inline-size: clamp(10rem, 18vi, 15rem);
     max-inline-size: 100%;
     min-inline-size: 10rem;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
+
+    &:hover,
+    &:focus-within {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-400) 46%,
+            transparent
+        );
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 6%),
+            0 16px 34px
+                color-mix(in srgb, var(--color-primary-500) 26%, transparent);
+        transform: translateY(-1px);
+    }
+
+    &.monitor-selector {
+        inline-size: clamp(10rem, 18vi, 15rem);
+    }
+
+    & .monitor-selector__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: color-mix(
+            in srgb,
+            var(--color-primary-400) 72%,
+            rgb(255 255 255) 28%
+        );
+        transition: color var(--transition-fast);
+    }
+
+    &:hover .monitor-selector__icon,
+    &:focus-within .monitor-selector__icon {
+        color: color-mix(
+            in srgb,
+            var(--color-primary-300) 55%,
+            rgb(255 255 255) 45%
+        );
+    }
+}
+
+.monitor-selector__input {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    padding-inline: 0;
+
+    & option {
+        background-color: var(--color-surface-overlay);
+        color: var(--color-text-primary);
+    }
+}
+
+.monitor-selector__icon--trailing {
+    padding-inline-start: 0.25rem;
 }
 
 .site-card--modern .site-card__status {

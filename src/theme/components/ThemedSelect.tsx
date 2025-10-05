@@ -83,6 +83,8 @@ export interface ThemedSelectProperties
     readonly required?: boolean;
     /** Tooltip text that appears on hover */
     readonly title?: string;
+    /** Visual tone applied to the control surface */
+    readonly tone?: "default" | "transparent";
     /** Current selected value */
     readonly value?: number | string;
 }
@@ -130,6 +132,7 @@ const ThemedSelectComponent = ({
     onMouseDown,
     required = false,
     title,
+    tone = "default",
     value,
 }: ThemedSelectProperties): JSX.Element => {
     const { currentTheme } = useTheme();
@@ -147,25 +150,29 @@ const ThemedSelectComponent = ({
             ...getBorderClass("primary"),
             borderRadius: currentTheme.borderRadius.md,
             borderStyle: "solid",
-            borderWidth: "1px",
+            borderWidth: tone === "transparent" ? "0" : "1px",
             fontSize: currentTheme.typography.fontSize.sm,
             padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
             transition: TRANSITION_ALL,
             ...(fluid ? { width: "100%" } : {}),
+            ...(tone === "transparent"
+                ? {
+                      backgroundColor: "transparent",
+                      borderColor: "transparent",
+                      padding: "0",
+                  }
+                : {}),
         }),
         [
             currentTheme.borderRadius.md,
             currentTheme.spacing.md,
             currentTheme.spacing.sm,
             currentTheme.typography.fontSize.sm,
-
             fluid,
-
             getBackgroundClass,
-
             getBorderClass,
-
             getTextClass,
+            tone,
         ]
     );
     return (

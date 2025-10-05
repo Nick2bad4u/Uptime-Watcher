@@ -8,16 +8,17 @@
 
 import type { MonitorStatus, Site } from "@shared/types";
 
-import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
+import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
+import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
+import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../utils/fallbacks";
-import { StatusBadge } from "../../common/StatusBadge";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
 
@@ -60,6 +61,21 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             uptime,
         } = useSite(site);
 
+        const marqueeDependencies = useMemo(
+            () => [latestSite.name, site.identifier],
+            [latestSite.name, site.identifier]
+        );
+
+        const marqueeOptions = useMemo(
+            () => ({ dependencies: marqueeDependencies }),
+            [marqueeDependencies]
+        );
+
+        const {
+            containerRef: nameContainerRef,
+            isOverflowing: isNameOverflowing,
+        } = useOverflowMarquee<HTMLDivElement>(marqueeOptions);
+
         const allMonitorsRunning = useMemo(() => {
             if (latestSite.monitors.length === 0) {
                 return false;
@@ -92,10 +108,31 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             return monitorTypeLabel;
         }, [monitor]);
 
-        const statusFormatter = useCallback(
-            (label: string, monitorStatus: MonitorStatus) =>
-                `${label}: ${toSentenceCase(monitorStatus)}`,
-            []
+        const monitorStatus: MonitorStatus = monitor?.status ?? status;
+        const monitorStatusLabel = monitor
+            ? getMonitorTypeDisplayLabel(monitor.type)
+            : "Monitor";
+
+        const compactStatusEntries = useMemo(
+            () => [
+                {
+                    id: "site",
+                    label: "Site",
+                    status,
+                    value: toSentenceCase(status),
+                },
+                {
+                    id: "monitor",
+                    label: monitorStatusLabel,
+                    status: monitorStatus,
+                    value: toSentenceCase(monitorStatus),
+                },
+            ],
+            [
+                monitorStatus,
+                monitorStatusLabel,
+                status,
+            ]
         );
 
         const uptimeDisplay =
@@ -120,9 +157,34 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             >
                 <div className="site-card__compact-header">
                     <div className="site-card__compact-title">
-                        <ThemedText size="lg" weight="semibold">
-                            {latestSite.name}
-                        </ThemedText>
+                        <div
+                            className={`site-card__compact-name ${
+                                isNameOverflowing
+                                    ? "site-card__compact-name--marquee"
+                                    : ""
+                            }`}
+                            ref={nameContainerRef}
+                        >
+                            <div className="site-card__compact-name-track">
+                                <ThemedText
+                                    className="site-card__compact-name-segment"
+                                    size="lg"
+                                    weight="semibold"
+                                >
+                                    {latestSite.name}
+                                </ThemedText>
+                                {isNameOverflowing ? (
+                                    <ThemedText
+                                        aria-hidden="true"
+                                        className="site-card__compact-name-segment site-card__compact-name-segment--clone"
+                                        size="lg"
+                                        weight="semibold"
+                                    >
+                                        {latestSite.name}
+                                    </ThemedText>
+                                ) : null}
+                            </div>
+                        </div>
                         <ThemedText
                             className="site-card__compact-subtitle"
                             size="xs"
@@ -131,14 +193,29 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             {monitorSummary}
                         </ThemedText>
                     </div>
-                    <StatusBadge
-                        className="site-card__compact-status"
-                        formatter={statusFormatter}
-                        label="Status"
-                        showIcon
-                        size="xs"
-                        status={status}
-                    />
+                    <div className="site-card__compact-status">
+                        {compactStatusEntries.map(
+                            ({ id, label, status: statusValue, value }) => (
+                                <div
+                                    className="site-card__compact-status-item"
+                                    key={id}
+                                >
+                                    <StatusIndicator
+                                        size="sm"
+                                        status={statusValue}
+                                    />
+                                    <div className="site-card__compact-status-meta">
+                                        <span className="site-card__compact-status-label">
+                                            {label}
+                                        </span>
+                                        <span className="site-card__compact-status-value">
+                                            {value}
+                                        </span>
+                                    </div>
+                                </div>
+                            )
+                        )}
+                    </div>
                 </div>
 
                 <div className="site-card__compact-metrics">

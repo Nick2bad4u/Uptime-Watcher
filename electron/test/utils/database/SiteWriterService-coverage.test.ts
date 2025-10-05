@@ -19,8 +19,14 @@ import { SiteWriterService } from "../../../utils/database/SiteWriterService";
 import { SiteNotFoundError } from "../../../utils/database/interfaces";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { MonitorRepository } from "../../../services/database/MonitorRepository";
-import type { SiteRepository } from "../../../services/database/SiteRepository";
+import type {
+    MonitorRepository,
+    MonitorRepositoryTransactionAdapter,
+} from "../../../services/database/MonitorRepository";
+import type {
+    SiteRepository,
+    SiteRepositoryTransactionAdapter,
+} from "../../../services/database/SiteRepository";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { MonitoringConfig } from "../../../utils/database/interfaces";
 
@@ -49,6 +55,8 @@ describe("SiteWriterService Coverage Tests", () => {
     let mockLogger: Logger;
     let mockSitesCache: StandardizedCache<Site>;
     let mockDb: Database;
+    let monitorAdapter: MonitorRepositoryTransactionAdapter;
+    let siteAdapter: SiteRepositoryTransactionAdapter;
 
     const mockSite: Site = {
         identifier: "test-site",
@@ -85,14 +93,14 @@ describe("SiteWriterService Coverage Tests", () => {
             getDatabase: vi.fn().mockResolvedValue(mockDb),
         } as any;
 
-        // Mock repositories
-        mockMonitorRepository = {
-            createInternal: vi.fn().mockReturnValue("new-monitor-id"),
-            updateInternal: vi.fn(),
-            deleteInternal: vi.fn(),
-            deleteBySiteIdentifierInternal: vi.fn(),
-            deleteAllInternal: vi.fn(),
-            findBySiteIdentifierInternal: vi.fn().mockReturnValue([
+        // Mock repositories with transaction adapters
+        monitorAdapter = {
+            clearActiveOperations: vi.fn(),
+            create: vi.fn().mockReturnValue("new-monitor-id"),
+            deleteAll: vi.fn(),
+            deleteById: vi.fn(),
+            deleteBySiteIdentifier: vi.fn(),
+            findBySiteIdentifier: vi.fn().mockReturnValue([
                 {
                     id: "monitor-1",
                     type: "http",
@@ -107,13 +115,26 @@ describe("SiteWriterService Coverage Tests", () => {
                     history: [],
                 },
             ]),
-        } as any;
+            update: vi.fn(),
+        } satisfies MonitorRepositoryTransactionAdapter as MonitorRepositoryTransactionAdapter;
+
+        mockMonitorRepository = {
+            createTransactionAdapter: vi
+                .fn()
+                .mockImplementation(() => monitorAdapter),
+        } as unknown as MonitorRepository;
+
+        siteAdapter = {
+            delete: vi.fn().mockReturnValue(true),
+            deleteAll: vi.fn(),
+            upsert: vi.fn(),
+        } satisfies SiteRepositoryTransactionAdapter as SiteRepositoryTransactionAdapter;
 
         mockSiteRepository = {
-            upsertInternal: vi.fn(),
-            deleteInternal: vi.fn(),
-            deleteAllInternal: vi.fn(),
-        } as any;
+            createTransactionAdapter: vi
+                .fn()
+                .mockImplementation(() => siteAdapter),
+        } as unknown as SiteRepository;
 
         // Mock logger
         mockLogger = {
@@ -186,15 +207,17 @@ describe("SiteWriterService Coverage Tests", () => {
             const result = await siteWriterService.createSite(siteData);
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-            expect(mockSiteRepository.upsertInternal).toHaveBeenCalledWith(
-                mockDb,
-                siteData
-            );
             expect(
-                mockMonitorRepository.deleteBySiteIdentifierInternal
-            ).toHaveBeenCalledWith(mockDb, siteData.identifier);
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalledWith(
-                mockDb,
+                mockSiteRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(siteAdapter.upsert).toHaveBeenCalledWith(siteData);
+            expect(monitorAdapter.deleteBySiteIdentifier).toHaveBeenCalledWith(
+                siteData.identifier
+            );
+            expect(monitorAdapter.create).toHaveBeenCalledWith(
                 siteData.identifier,
                 siteData.monitors[0]!
             );
@@ -234,9 +257,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             const result = await siteWriterService.createSite(siteData);
 
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalledTimes(
-                2
-            );
+            expect(monitorAdapter.create).toHaveBeenCalledTimes(2);
             expect(result.monitors).toHaveLength(2);
             expect(result.monitors[0]!.id).toBe("new-monitor-id");
             expect(result.monitors[1]!.id).toBe("new-monitor-id");
@@ -258,7 +279,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             const result = await siteWriterService.createSite(siteData);
 
-            expect(mockMonitorRepository.createInternal).not.toHaveBeenCalled();
+            expect(monitorAdapter.create).not.toHaveBeenCalled();
             expect(result.monitors).toHaveLength(0);
         });
 
@@ -305,9 +326,7 @@ describe("SiteWriterService Coverage Tests", () => {
             await annotate("Type: Data Deletion", "type");
 
             // Mock successful database deletion and cache presence
-            (
-                mockSiteRepository.deleteInternal as MockedFunction<any>
-            ).mockReturnValue(true);
+            (siteAdapter.delete as MockedFunction<any>).mockReturnValue(true);
             (mockSitesCache.has as MockedFunction<any>).mockReturnValue(true);
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 true
@@ -321,12 +340,15 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockSitesCache.delete).toHaveBeenCalledWith("test-site");
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
-                mockMonitorRepository.deleteBySiteIdentifierInternal
-            ).toHaveBeenCalledWith(mockDb, "test-site");
-            expect(mockSiteRepository.deleteInternal).toHaveBeenCalledWith(
-                mockDb,
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockSiteRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.deleteBySiteIdentifier).toHaveBeenCalledWith(
                 "test-site"
             );
+            expect(siteAdapter.delete).toHaveBeenCalledWith("test-site");
             expect(result).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Site removed successfully from database: test-site"
@@ -346,9 +368,7 @@ describe("SiteWriterService Coverage Tests", () => {
             await annotate("Type: Caching", "type");
 
             // Mock database deletion failure (site not found in database)
-            (
-                mockSiteRepository.deleteInternal as MockedFunction<any>
-            ).mockReturnValue(false);
+            (siteAdapter.delete as MockedFunction<any>).mockReturnValue(false);
             (mockSitesCache.delete as MockedFunction<any>).mockReturnValue(
                 false
             );
@@ -360,9 +380,15 @@ describe("SiteWriterService Coverage Tests", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
-                mockMonitorRepository.deleteBySiteIdentifierInternal
-            ).toHaveBeenCalled();
-            expect(mockSiteRepository.deleteInternal).toHaveBeenCalled();
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(
+                mockSiteRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.deleteBySiteIdentifier).toHaveBeenCalledWith(
+                "nonexistent-site"
+            );
+            expect(siteAdapter.delete).toHaveBeenCalledWith("nonexistent-site");
             expect(result).toBeFalsy();
             expect(mockLogger.warn).toHaveBeenCalledWith(
                 "Site not found in database for removal: nonexistent-site"
@@ -420,11 +446,13 @@ describe("SiteWriterService Coverage Tests", () => {
 
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
-                mockMonitorRepository.deleteAllInternal
+                mockMonitorRepository.createTransactionAdapter
             ).toHaveBeenCalledWith(mockDb);
-            expect(mockSiteRepository.deleteAllInternal).toHaveBeenCalledWith(
-                mockDb
-            );
+            expect(
+                mockSiteRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.deleteAll).toHaveBeenCalledWith();
+            expect(siteAdapter.deleteAll).toHaveBeenCalledWith();
             expect(mockSitesCache.clear).toHaveBeenCalled();
             expect(result.deletedCount).toBe(1);
             expect(result.deletedSites).toEqual([
@@ -486,7 +514,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             // Set up default monitor repository response
             (
-                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
             ).mockReturnValue([
                 {
                     id: "monitor-1",
@@ -524,7 +552,7 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(mockSitesCache.get).toHaveBeenCalledWith("test-site");
             expect(mockSitesCache.set).toHaveBeenCalled();
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
-            expect(mockSiteRepository.upsertInternal).toHaveBeenCalled();
+            expect(siteAdapter.upsert).toHaveBeenCalled();
             expect(result.name).toBe("Updated Site Name");
             expect(result.monitoring).toBeTruthy();
         });
@@ -558,8 +586,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 updates
             );
 
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalledWith(
-                mockDb,
+            expect(
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.create).toHaveBeenCalledWith(
                 "test-site",
                 newMonitor
             );
@@ -582,10 +612,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 updates
             );
 
-            expect(mockMonitorRepository.deleteInternal).toHaveBeenCalledWith(
-                mockDb,
-                "monitor-1"
-            );
+            expect(
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.deleteById).toHaveBeenCalledWith("monitor-1");
         });
 
         it("should throw SiteNotFoundError when site not in cache", async ({
@@ -1016,7 +1046,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             // Set up default monitor repository response for this describe block
             (
-                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
             ).mockReturnValue([
                 {
                     id: "monitor-1",
@@ -1089,7 +1119,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             // Configure monitor repository to return an existing monitor
             (
-                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
             ).mockReturnValueOnce([
                 {
                     id: "monitor-1",
@@ -1111,8 +1141,8 @@ describe("SiteWriterService Coverage Tests", () => {
             });
 
             // Since monitor has no ID, it should create a new monitor instead of updating
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalled();
-            expect(mockMonitorRepository.updateInternal).not.toHaveBeenCalled();
+            expect(monitorAdapter.create).toHaveBeenCalled();
+            expect(monitorAdapter.update).not.toHaveBeenCalled();
         });
 
         it("should cover orphaned monitor handling in handleExistingMonitor", async ({
@@ -1137,8 +1167,10 @@ describe("SiteWriterService Coverage Tests", () => {
                 monitors: [orphanedMonitor],
             });
 
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalledWith(
-                mockDb,
+            expect(
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.create).toHaveBeenCalledWith(
                 "test-site",
                 orphanedMonitor
             );
@@ -1274,7 +1306,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
             // Configure monitor repository to return two existing monitors
             (
-                mockMonitorRepository.findBySiteIdentifierInternal as MockedFunction<any>
+                monitorAdapter.findBySiteIdentifier as MockedFunction<any>
             ).mockReturnValueOnce([
                 {
                     id: "monitor-1",
@@ -1325,17 +1357,15 @@ describe("SiteWriterService Coverage Tests", () => {
                 updates
             );
 
-            expect(mockMonitorRepository.updateInternal).toHaveBeenCalledWith(
-                mockDb,
+            expect(
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledWith(mockDb);
+            expect(monitorAdapter.update).toHaveBeenCalledWith(
                 "monitor-1",
                 expect.any(Object)
             );
-            expect(mockMonitorRepository.deleteInternal).toHaveBeenCalledWith(
-                mockDb,
-                "monitor-2"
-            );
-            expect(mockMonitorRepository.createInternal).toHaveBeenCalledWith(
-                mockDb,
+            expect(monitorAdapter.deleteById).toHaveBeenCalledWith("monitor-2");
+            expect(monitorAdapter.create).toHaveBeenCalledWith(
                 "test-site",
                 expect.objectContaining({ url: "https://newsite.com" })
             );

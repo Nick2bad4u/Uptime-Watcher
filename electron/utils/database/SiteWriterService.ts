@@ -12,10 +12,12 @@
 
 import type { Monitor, Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { Database } from "node-sqlite3-wasm";
 
 import type { DatabaseService } from "../../services/database/DatabaseService";
-import type { MonitorRepository } from "../../services/database/MonitorRepository";
+import type {
+    MonitorRepository,
+    MonitorRepositoryTransactionAdapter,
+} from "../../services/database/MonitorRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
@@ -98,20 +100,17 @@ export class SiteWriterService {
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction((db) => {
-                    // Persist site to database using internal method
-                    this.repositories.site.upsertInternal(db, site);
+                    const siteTx =
+                        this.repositories.site.createTransactionAdapter(db);
+                    const monitorTx =
+                        this.repositories.monitor.createTransactionAdapter(db);
 
-                    // Remove all existing monitors for this site, then insert
-                    // new ones
-                    this.repositories.monitor.deleteBySiteIdentifierInternal(
-                        db,
-                        site.identifier
-                    );
+                    siteTx.upsert(site);
 
-                    // Create monitors and assign IDs using internal method
+                    monitorTx.deleteBySiteIdentifier(site.identifier);
+
                     for (const monitor of site.monitors) {
-                        const newId = this.repositories.monitor.createInternal(
-                            db,
+                        const newId = monitorTx.create(
                             site.identifier,
                             monitor
                         );
@@ -185,16 +184,15 @@ export class SiteWriterService {
                 // Use executeTransaction for atomic multi-table deletion and capture result
                 const dbDeletionSuccess =
                     await this.databaseService.executeTransaction((db) => {
-                        // Remove from database using internal methods
-                        this.repositories.monitor.deleteBySiteIdentifierInternal(
-                            db,
-                            identifier
-                        );
-                        const deletionResult =
-                            this.repositories.site.deleteInternal(
-                                db,
-                                identifier
+                        const siteTx =
+                            this.repositories.site.createTransactionAdapter(db);
+                        const monitorTx =
+                            this.repositories.monitor.createTransactionAdapter(
+                                db
                             );
+
+                        monitorTx.deleteBySiteIdentifier(identifier);
+                        const deletionResult = siteTx.delete(identifier);
                         return Promise.resolve(deletionResult);
                     });
 
@@ -264,8 +262,13 @@ export class SiteWriterService {
         return withDatabaseOperation(
             async () => {
                 await this.databaseService.executeTransaction((db) => {
-                    this.repositories.monitor.deleteAllInternal(db);
-                    this.repositories.site.deleteAllInternal(db);
+                    const siteTx =
+                        this.repositories.site.createTransactionAdapter(db);
+                    const monitorTx =
+                        this.repositories.monitor.createTransactionAdapter(db);
+
+                    monitorTx.deleteAll();
+                    siteTx.deleteAll();
                     return Promise.resolve();
                 });
 
@@ -413,14 +416,16 @@ export class SiteWriterService {
 
                 // Use executeTransaction for atomic multi-step operation
                 await this.databaseService.executeTransaction((db) => {
-                    // Persist to database using internal method
-                    this.repositories.site.upsertInternal(db, updatedSite);
+                    const siteTx =
+                        this.repositories.site.createTransactionAdapter(db);
+                    const monitorTx =
+                        this.repositories.monitor.createTransactionAdapter(db);
 
-                    // Update monitors if provided - UPDATE existing monitors
-                    // instead of recreating
+                    siteTx.upsert(updatedSite);
+
                     if (updates.monitors) {
                         this.updateMonitorsPreservingHistory(
-                            db,
+                            monitorTx,
                             identifier,
                             updates.monitors
                         );
@@ -567,18 +572,13 @@ export class SiteWriterService {
      * Create a new monitor in the database.
      */
     private createNewMonitor(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitor: Monitor,
         reason?: string
     ): void {
-        const newId = this.repositories.monitor.createInternal(
-            db,
-            siteIdentifier,
-            newMonitor
-        );
+        const newId = monitorTx.create(siteIdentifier, newMonitor);
         newMonitor.id = newId;
-
         const reasonSuffix = reason ? ` (${reason})` : "";
         this.logger.debug(
             `Created new monitor ${newId} for site ${siteIdentifier}${reasonSuffix}`
@@ -589,7 +589,7 @@ export class SiteWriterService {
      * Handle a monitor that has an ID (existing or orphaned).
      */
     private handleExistingMonitor(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitor: Monitor,
         existingMonitors: Site["monitors"]
@@ -600,14 +600,14 @@ export class SiteWriterService {
 
         if (existingMonitor) {
             this.updateExistingMonitor(
-                db,
+                monitorTx,
                 siteIdentifier,
                 newMonitor,
                 existingMonitor
             );
         } else {
             this.createNewMonitor(
-                db,
+                monitorTx,
                 siteIdentifier,
                 newMonitor,
                 "ID not found"
@@ -619,20 +619,20 @@ export class SiteWriterService {
      * Process a single monitor: update if exists, create if new.
      */
     private processIndividualMonitor(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitor: Monitor,
         existingMonitors: Site["monitors"]
     ): void {
         if (newMonitor.id) {
             this.handleExistingMonitor(
-                db,
+                monitorTx,
                 siteIdentifier,
                 newMonitor,
                 existingMonitors
             );
         } else {
-            this.createNewMonitor(db, siteIdentifier, newMonitor);
+            this.createNewMonitor(monitorTx, siteIdentifier, newMonitor);
         }
     }
 
@@ -640,14 +640,14 @@ export class SiteWriterService {
      * Process monitor updates and creations.
      */
     private processMonitorUpdates(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitors: Site["monitors"],
         existingMonitors: Site["monitors"]
     ): void {
         for (const newMonitor of newMonitors) {
             this.processIndividualMonitor(
-                db,
+                monitorTx,
                 siteIdentifier,
                 newMonitor,
                 existingMonitors
@@ -659,7 +659,7 @@ export class SiteWriterService {
      * Remove monitors that are no longer in the site configuration.
      */
     private removeObsoleteMonitors(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitors: Site["monitors"],
         existingMonitors: Site["monitors"]
@@ -670,10 +670,7 @@ export class SiteWriterService {
 
         for (const existingMonitor of existingMonitors) {
             if (!newMonitorIds.has(existingMonitor.id)) {
-                this.repositories.monitor.deleteInternal(
-                    db,
-                    existingMonitor.id
-                );
+                monitorTx.deleteById(existingMonitor.id);
                 this.logger.debug(
                     `Removed monitor ${existingMonitor.id} from site ${siteIdentifier}`
                 );
@@ -685,7 +682,7 @@ export class SiteWriterService {
      * Update an existing monitor in the database.
      */
     private updateExistingMonitor(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitor: Monitor,
         existingMonitor: Monitor
@@ -705,7 +702,7 @@ export class SiteWriterService {
             newMonitor,
             existingMonitor
         );
-        this.repositories.monitor.updateInternal(db, newMonitor.id, updateData);
+        monitorTx.update(newMonitor.id, updateData);
         this.logger.debug(
             `Updated existing monitor ${newMonitor.id} for site ${siteIdentifier}`
         );
@@ -728,21 +725,17 @@ export class SiteWriterService {
      * @returns Promise that resolves when all monitor updates are complete
      */
     private updateMonitorsPreservingHistory(
-        db: Database,
+        monitorTx: MonitorRepositoryTransactionAdapter,
         siteIdentifier: string,
         newMonitors: Site["monitors"]
     ): void {
         // Fetch existing monitors using the transaction database instance
         // This ensures consistent reads within the transaction boundary
-        const existingMonitors =
-            this.repositories.monitor.findBySiteIdentifierInternal(
-                db,
-                siteIdentifier
-            );
+        const existingMonitors = monitorTx.findBySiteIdentifier(siteIdentifier);
 
         // Process each monitor: update existing or create new
         this.processMonitorUpdates(
-            db,
+            monitorTx,
             siteIdentifier,
             newMonitors,
             existingMonitors
@@ -750,7 +743,7 @@ export class SiteWriterService {
 
         // Clean up monitors that are no longer needed
         this.removeObsoleteMonitors(
-            db,
+            monitorTx,
             siteIdentifier,
             newMonitors,
             existingMonitors

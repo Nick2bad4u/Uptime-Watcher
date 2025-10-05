@@ -11,6 +11,7 @@
  * @packageDocumentation
  */
 
+import type { MonitorStatus, StatusHistoryStatus } from "@shared/types";
 import type {
     BaseMonitorSchemaType,
     CdnEdgeConsistencyMonitorSchemaType,
@@ -34,10 +35,26 @@ import type { ValidationResult } from "@shared/types/validation";
 import type { UnknownRecord } from "type-fest";
 
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { STATUS_KIND } from "@shared/types";
 import validator from "validator";
 import * as z from "zod";
 
 import { isValidHost, isValidPort } from "./validatorUtils";
+
+const statusHistoryEnumValues: [StatusHistoryStatus, ...StatusHistoryStatus[]] =
+    [
+        STATUS_KIND.UP,
+        STATUS_KIND.DOWN,
+        STATUS_KIND.DEGRADED,
+    ];
+
+const monitorStatusEnumValues: [MonitorStatus, ...MonitorStatus[]] = [
+    STATUS_KIND.DEGRADED,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.PAUSED,
+    STATUS_KIND.PENDING,
+    STATUS_KIND.UP,
+];
 
 /**
  * Result object returned by validation functions.
@@ -65,11 +82,7 @@ const statusHistorySchema = z
     .object({
         details: z.string().optional(),
         responseTime: z.number(),
-        status: z.enum([
-            "up",
-            "down",
-            "degraded",
-        ]),
+        status: z.enum(statusHistoryEnumValues),
         timestamp: z.number(),
     })
     .strict();
@@ -136,13 +149,7 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
                 VALIDATION_CONSTRAINTS.RETRY_ATTEMPTS.MAX,
                 "Retry attempts cannot exceed 10"
             ),
-        status: z.enum([
-            "up",
-            "down",
-            "degraded",
-            "pending",
-            "paused",
-        ]),
+        status: z.enum(monitorStatusEnumValues),
         timeout: z
             .number()
             .min(

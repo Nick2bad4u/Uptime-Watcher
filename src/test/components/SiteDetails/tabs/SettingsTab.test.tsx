@@ -797,7 +797,7 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            expect(screen.getByText("History Records:")).toBeInTheDocument();
+            expect(screen.getByText("History Records")).toBeInTheDocument();
             expect(screen.getByText("2")).toBeInTheDocument();
         });
 
@@ -814,7 +814,7 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            expect(screen.getByText("Last Checked:")).toBeInTheDocument();
+            expect(screen.getByText("Last Checked")).toBeInTheDocument();
             // Should show formatted date - use getAllByText to handle multiple dates
             const dateElements = screen.getAllByText(
                 (content) => content.includes("/") && content.includes(":")

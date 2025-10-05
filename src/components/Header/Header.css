@@ -70,13 +70,16 @@
     }
 }
 
-.app-topbar__row {
+.app-topbar__grid {
     position: relative;
     z-index: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: clamp(1rem, 2vi, 1.5rem);
+    display: grid;
+    align-items: stretch;
+    gap: clamp(1rem, 1.2rem + 1vi, 2rem);
+    grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(0, 1.5fr)
+        minmax(200px, 0.65fr);
 }
 
 .app-topbar__identity {
@@ -153,18 +156,25 @@
 
 .app-topbar__badges {
     display: flex;
-    flex: 1 1 260px;
-    align-items: stretch;
-    gap: clamp(0.75rem, 0.5rem + 0.6vi, 1rem);
+    flex-wrap: wrap;
+    gap: clamp(0.85rem, 0.7rem + 0.6vi, 1.1rem);
+    min-inline-size: 0;
+}
+
+.app-topbar__metrics {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 0.85rem + 0.5vi, 1.4rem);
     min-inline-size: 0;
 }
 
 .app-topbar__badge {
     display: flex;
-    flex: 1 1 0;
-    flex-direction: column;
-    padding: clamp(0.8rem, 0.75rem + 0.2vi, 0.95rem)
-        clamp(0.9rem, 0.85rem + 0.35vi, 1.1rem);
+    flex: 1 1 clamp(12rem, 11rem + 2vi, 14rem);
+    align-items: center;
+    gap: 0.75rem;
+    padding: clamp(0.9rem, 0.8rem + 0.3vi, 1.1rem)
+        clamp(0.95rem, 0.85rem + 0.4vi, 1.25rem);
     border: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 42%, transparent);
     border-radius: 1rem;
@@ -176,7 +186,50 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 2%),
         0 16px 38px rgb(8 12 24 / 26%);
-    gap: 0.3rem;
+    min-inline-size: clamp(10.5rem, 9.5rem + 2vi, 12.5rem);
+}
+
+.app-topbar__badge-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.85rem;
+    background: color-mix(
+        in srgb,
+        var(--color-primary-500) 12%,
+        var(--color-surface-overlay) 88%
+    );
+    block-size: 2.25rem;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 6%),
+        0 12px 28px rgb(8 12 24 / 24%);
+    color: color-mix(
+        in srgb,
+        var(--color-primary-500) 72%,
+        rgb(255 255 255) 28%
+    );
+    inline-size: 2.25rem;
+    pointer-events: none;
+}
+
+.app-topbar__badge--primary .app-topbar__badge-icon {
+    background: color-mix(
+        in srgb,
+        var(--color-primary-500) 26%,
+        var(--color-surface-overlay) 74%
+    );
+    color: color-mix(
+        in srgb,
+        var(--color-primary-500) 82%,
+        rgb(255 255 255) 18%
+    );
+}
+
+.app-topbar__badge-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-inline-size: 0;
 }
 
 .app-topbar__badge-label {
@@ -229,9 +282,14 @@
     position: relative;
     z-index: 1;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-inline-start: auto;
+    align-items: stretch;
+    justify-content: center;
+    align-self: stretch;
+}
+
+.app-topbar__controls--stacked {
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .header-controls {
@@ -239,6 +297,19 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
+}
+
+.header-controls--vertical {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0.65rem;
+    inline-size: 100%;
+}
+
+.header-controls--vertical .header-controls__button {
+    inline-size: 100%;
+    justify-content: space-between;
 }
 
 .header-controls__button {
@@ -335,7 +406,6 @@
     justify-content: flex-start;
     gap: 1.1rem;
     inline-size: 100%;
-    margin-block-start: 1.25rem;
     min-inline-size: 0;
 }
 
@@ -672,42 +742,31 @@
 }
 
 @media (width <= 1024px) {
-    .app-topbar__row {
-        align-items: stretch;
-        gap: 1.25rem;
+    .app-topbar__grid {
+        grid-template-columns: 1fr;
     }
 
     .app-topbar__controls {
         justify-content: flex-start;
-        order: 3;
         inline-size: 100%;
-        margin-inline-start: 0;
     }
 
     .header-controls {
-        justify-content: flex-start;
-    }
-
-    .app-topbar__badges {
-        order: 2;
         inline-size: 100%;
-    }
-
-    .app-topbar__identity {
-        order: 1;
     }
 }
 
 @media (width <= 768px) {
-    .header-controls {
+    .header-controls--vertical {
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 0.5rem;
     }
 
-    .header-controls__button {
+    .header-controls--vertical .header-controls__button {
         flex: 1 1 calc(50% - 0.5rem);
         justify-content: center;
         padding: 0.55rem 0.75rem;
-        min-inline-size: 0;
     }
 
     .header-controls__label {

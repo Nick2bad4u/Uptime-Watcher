@@ -188,7 +188,9 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ]
     );
 
-    const MenuIcon = AppIcons.layout.viewColumns;
+    const SidebarToggleIcon = isSidebarOpen
+        ? AppIcons.ui.collapse
+        : AppIcons.ui.expand;
     const AddIcon = AppIcons.actions.add;
     const SettingsIcon = AppIcons.settings.gear;
     const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;
@@ -196,6 +198,12 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         ? "Switch to light mode"
         : "Switch to dark mode";
     const themeButtonText = isDark ? "Light Mode" : "Dark Mode";
+    const sidebarToggleLabel = isSidebarOpen
+        ? "Collapse sidebar"
+        : "Expand sidebar";
+    const sidebarToggleTooltip = isSidebarOpen
+        ? "Collapse navigation sidebar"
+        : "Expand navigation sidebar";
 
     return (
         <aside
@@ -206,14 +214,19 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
         >
             <div className="app-sidebar__inner">
                 <div className="app-sidebar__brand">
-                    <button
-                        aria-label="Collapse sidebar"
-                        className="app-sidebar__brand-trigger"
-                        onClick={toggleSidebar}
-                        type="button"
-                    >
-                        <MenuIcon size={18} />
-                    </button>
+                    <Tooltip content={sidebarToggleTooltip} position="bottom">
+                        {(triggerProps) => (
+                            <button
+                                {...triggerProps}
+                                aria-label={sidebarToggleLabel}
+                                className="app-sidebar__brand-trigger"
+                                onClick={toggleSidebar}
+                                type="button"
+                            >
+                                <SidebarToggleIcon size={18} />
+                            </button>
+                        )}
+                    </Tooltip>
                     <div>
                         <ThemedText
                             className="app-sidebar__brand-title"
@@ -325,16 +338,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                         {(triggerProps) => (
                             <button
                                 {...triggerProps}
-                                className="app-sidebar__primary-cta"
+                                aria-label="Add new site"
+                                className="app-sidebar__icon-button app-sidebar__icon-button--primary"
                                 onClick={handleAddSite}
                                 type="button"
                             >
-                                <span className="app-sidebar__primary-cta-icon">
-                                    <AddIcon size={18} />
-                                </span>
-                                <span className="app-sidebar__primary-cta-text">
-                                    Add Site
-                                </span>
+                                <AddIcon size={18} />
+                                <span className="sr-only">Add Site</span>
                             </button>
                         )}
                     </Tooltip>
@@ -346,14 +356,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             {(triggerProps) => (
                                 <button
                                     {...triggerProps}
-                                    className="app-sidebar__secondary-cta app-sidebar__secondary-cta--settings"
+                                    aria-label="Open application settings"
+                                    className="app-sidebar__icon-button"
                                     onClick={handleOpenSettings}
                                     type="button"
                                 >
-                                    <SettingsIcon size={16} />
-                                    <span className="app-sidebar__secondary-text">
-                                        Settings
-                                    </span>
+                                    <SettingsIcon size={18} />
+                                    <span className="sr-only">Settings</span>
                                 </button>
                             )}
                         </Tooltip>
@@ -361,12 +370,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             {(triggerProps) => (
                                 <button
                                     {...triggerProps}
-                                    className="app-sidebar__secondary-cta app-sidebar__secondary-cta--theme"
+                                    aria-label={themeButtonLabel}
+                                    className="app-sidebar__icon-button"
                                     onClick={toggleTheme}
                                     type="button"
                                 >
-                                    <ThemeIcon size={16} />
-                                    <span className="app-sidebar__secondary-text">
+                                    <ThemeIcon size={18} />
+                                    <span className="sr-only">
                                         {themeButtonText}
                                     </span>
                                 </button>

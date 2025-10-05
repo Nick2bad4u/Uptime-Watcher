@@ -11,6 +11,8 @@
 
 import type { SiteForStatus, SiteStatus } from "@shared/types";
 
+import { isMonitorStatus, STATUS_KIND } from "@shared/types";
+
 /**
  * Calculates the overall monitoring state for a site based on its monitors.
  *
@@ -89,38 +91,33 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
     const { monitors } = site;
 
     if (monitors.length === 0) {
-        return "unknown";
+        return STATUS_KIND.UNKNOWN;
     }
 
     // Get unique statuses and validate they exist
-    const statuses = Array.from(
-        new Set(monitors.map((m) => m.status).filter(Boolean))
-    );
+    const statuses = Array.from(new Set(monitors.map((m) => m.status)));
 
     // Handle case where no valid statuses found
     if (statuses.length === 0) {
-        return "unknown";
+        return STATUS_KIND.UNKNOWN;
     }
 
     // Single status - all monitors have the same status
     if (statuses.length === 1) {
-        const [status] = statuses;
+        const [singleStatus] = statuses;
+        if (!singleStatus) {
+            return STATUS_KIND.UNKNOWN;
+        }
         // Validate the status is a valid SiteStatus before returning
-        if (
-            status === "up" ||
-            status === "down" ||
-            status === "degraded" ||
-            status === "pending" ||
-            status === "paused"
-        ) {
-            return status;
+        if (isMonitorStatus(singleStatus)) {
+            return singleStatus;
         }
         // Fallback for invalid status values
-        return "unknown";
+        return STATUS_KIND.UNKNOWN;
     }
 
     // Multiple statuses - mixed state
-    return "mixed";
+    return STATUS_KIND.MIXED;
 }
 
 /**
@@ -155,18 +152,18 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
 
     // If no monitors exist, show as unknown
     if (site.monitors.length === 0) {
-        return "unknown";
+        return STATUS_KIND.UNKNOWN;
     }
 
     // If no monitoring is active, show as paused regardless of operational
     // status
     if (monitoringStatus === "stopped") {
-        return "paused";
+        return STATUS_KIND.PAUSED;
     }
 
     // If monitoring is partial, show as mixed
     if (monitoringStatus === "partial") {
-        return "mixed";
+        return STATUS_KIND.MIXED;
     }
 
     // All monitors are running, return the operational status
@@ -198,29 +195,28 @@ export function getSiteStatusDescription(site: SiteForStatus): string {
     const runningCount = site.monitors.filter((m) => m.monitoring).length;
 
     switch (status) {
-        case "degraded": {
+        case STATUS_KIND.DEGRADED: {
             return `All ${monitorCount} monitors are degraded`;
         }
-        case "down": {
+        case STATUS_KIND.DOWN: {
             return `All ${monitorCount} monitors are down`;
         }
-        case "mixed": {
+        case STATUS_KIND.MIXED: {
             return `Mixed status (${runningCount}/${monitorCount} monitoring active)`;
         }
-        case "paused": {
+        case STATUS_KIND.PAUSED: {
             return `Monitoring is paused (${runningCount}/${monitorCount} active)`;
         }
-        case "pending": {
+        case STATUS_KIND.PENDING: {
             return `All ${monitorCount} monitors are pending`;
         }
-        case "unknown": {
-            // Distinguish between no monitors and unknown due to invalid statuses
+        case STATUS_KIND.UNKNOWN: {
             if (monitorCount === 0) {
                 return "No monitors configured";
             }
             return "Unknown status";
         }
-        case "up": {
+        case STATUS_KIND.UP: {
             return `All ${monitorCount} monitors are up and running`;
         }
         default: {
@@ -255,25 +251,25 @@ export function getSiteStatusVariant(
     status: SiteStatus
 ): "error" | "info" | "success" | "warning" {
     switch (status) {
-        case "degraded": {
+        case STATUS_KIND.DEGRADED: {
             return "warning";
         }
-        case "down": {
+        case STATUS_KIND.DOWN: {
             return "error";
         }
-        case "mixed": {
+        case STATUS_KIND.MIXED: {
             return "warning";
         }
-        case "paused": {
+        case STATUS_KIND.PAUSED: {
             return "warning";
         }
-        case "pending": {
+        case STATUS_KIND.PENDING: {
             return "info";
         }
-        case "unknown": {
+        case STATUS_KIND.UNKNOWN: {
             return "error";
         }
-        case "up": {
+        case STATUS_KIND.UP: {
             return "success";
         }
         default: {

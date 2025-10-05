@@ -9,7 +9,7 @@
     padding: clamp(1.5rem, 1.1rem + 2vi, 2.5rem);
     inset: 0;
     backdrop-filter: blur(18px) saturate(1.05);
-    background: color-mix(
+    background-color: color-mix(
         in srgb,
         var(--color-surface-overlay, rgb(15 23 42)) 82%,
         var(--color-background-primary, rgb(15 23 42)) 18%
@@ -20,22 +20,24 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
+    --confirm-dialog-border: color-mix(
+        in srgb,
+        var(--color-border-secondary) 38%,
+        transparent
+    );
+    --confirm-dialog-glow: radial-gradient(
+        130% 110% at 0% -15%,
+        color-mix(in srgb, var(--color-primary-500) 18%, transparent),
+        transparent 68%
+    );
+    --confirm-dialog-surface: linear-gradient(
+        150deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-overlay) 90%, transparent) 100%
+    );
+    border: 1px solid var(--confirm-dialog-border);
     border-radius: clamp(1rem, 0.9rem + 0.35vi, 1.25rem);
-    background:
-        radial-gradient(
-            130% 110% at 0% -15%,
-            color-mix(in srgb, var(--color-primary-500) 18%, transparent),
-            transparent 68%
-        ),
-        linear-gradient(
-            150deg,
-            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent)
-                0%,
-            color-mix(in srgb, var(--color-surface-overlay) 90%, transparent)
-                100%
-        );
+    background: var(--confirm-dialog-glow), var(--confirm-dialog-surface);
     box-shadow:
         0 28px 68px rgb(8 12 24 / 48%),
         inset 0 1px 0 rgb(255 255 255 / 6%);

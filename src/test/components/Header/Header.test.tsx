@@ -233,10 +233,13 @@ describe(Header, () => {
         render(<Header />);
 
         expect(screen.getByText("Uptime Watcher")).toBeInTheDocument();
-        expect(screen.getByText("Global uptime")).toBeInTheDocument();
+        expect(screen.getByText("Global Uptime")).toBeInTheDocument();
         expect(screen.getAllByText("92%", { selector: "span" })).toHaveLength(
             2
         );
+
+        const controls = document.querySelector(".header-controls");
+        expect(controls).toHaveClass("header-controls--vertical");
 
         const summary = document.querySelector(
             ".header-status-summary__container"

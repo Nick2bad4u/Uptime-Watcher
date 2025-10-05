@@ -125,7 +125,12 @@ export const SiteDetails = ({
 
     // Memoize scroll container style to avoid inline object creation
     const scrollContainerStyle = useMemo(
-        () => ({ flex: 1, minHeight: 0, overflow: "auto" as const }),
+        () => ({
+            display: "flex",
+            flex: 1,
+            flexDirection: "column" as const,
+            minHeight: 0,
+        }),
         []
     );
 
@@ -534,15 +539,20 @@ export const SiteDetails = ({
                         handleStartSiteMonitoring={handleStartSiteMonitoring}
                         handleStopMonitoring={handleStopMonitoring}
                         handleStopSiteMonitoring={handleStopSiteMonitoring}
+                        isHeaderCollapsed={isHeaderCollapsed}
                         isLoading={isLoading}
                         isMonitoring={isMonitoring}
                         selectedMonitorId={selectedMonitorId}
                         setActiveSiteDetailsTab={setActiveSiteDetailsTab}
                     />
 
-                    <div ref={contentElementRef} style={scrollContainerStyle}>
+                    <div
+                        className={`site-details-modal__content-wrapper custom-scrollbar ${isDark ? "dark" : ""}`}
+                        ref={contentElementRef}
+                        style={scrollContainerStyle}
+                    >
                         <ThemedBox
-                            className={`site-details-modal__content custom-scrollbar ${currentTheme.isDark ? "dark" : ""} flex flex-col gap-6`}
+                            className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
                             padding="xl"
                             rounded="lg"
                             surface="elevated"
