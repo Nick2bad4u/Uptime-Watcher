@@ -155,6 +155,7 @@ const ThemedSelectComponent = ({
             padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
             transition: TRANSITION_ALL,
             ...(fluid ? { width: "100%" } : {}),
+            cursor: disabled ? "not-allowed" : "pointer",
             ...(tone === "transparent"
                 ? {
                       backgroundColor: "transparent",
@@ -172,6 +173,7 @@ const ThemedSelectComponent = ({
             getBackgroundClass,
             getBorderClass,
             getTextClass,
+            disabled,
             tone,
         ]
     );

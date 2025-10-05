@@ -46,6 +46,12 @@ vi.mock("../../electron/utils/logger", () => ({
         debug: vi.fn(),
         error: vi.fn(),
     },
+    diagnosticsLogger: {
+        info: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+        error: vi.fn(),
+    },
 }));
 
 // Mock MonitorTypeRegistry

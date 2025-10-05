@@ -208,6 +208,12 @@ Standardized documentation patterns for inline code examples:
 - **Example Accuracy** - Ensure code examples remain current and accurate
 - **Cross-References** - Maintain links between related documents
 
+### Automation & Review Cadence
+
+- **Link Validation** - `npm run docs:check-links` verifies internal Markdown links and runs on every `lint:ci`
+- **Quarterly Sync** - Architecture documentation reviewed during the first week of each quarter; action items tracked in `TODO.md`
+- **CI Enforcement** - Documentation checks block merges alongside linting and IPC analysis to prevent drift
+
 ## 📊 Compliance Tracking
 
 ### Repository Pattern

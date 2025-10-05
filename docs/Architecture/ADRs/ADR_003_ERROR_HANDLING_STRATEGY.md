@@ -581,6 +581,6 @@ All layers implement this error handling strategy:
 
 ## Related ADRs
 
-- [ADR-001: Repository Pattern](./ADR-001-Repository-Pattern.md)
-- [ADR-002: Event-Driven Architecture](./ADR-002-Event-Driven-Architecture.md)
-- [ADR-005: IPC Communication Protocol](./ADR-005-IPC-Communication-Protocol.md)
+- [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
+- [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
+- [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)

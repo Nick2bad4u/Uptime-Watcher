@@ -1,25 +1,23 @@
 /* stylelint-disable selector-class-pattern -- BEM naming is intentional for confirm dialog */
+/* stylelint-disable scss/function-color-relative -- color-mix enables token-driven surface blending for the dialog. */
 
 .modal-overlay.confirm-dialog__overlay {
     position: fixed;
-    z-index: var(--z-index-modal, 90);
+    z-index: calc(var(--z-index-modal, 90) + 12);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: clamp(1.5rem, 1.1rem + 2vi, 2.5rem);
-    inset: 0;
     backdrop-filter: blur(18px) saturate(1.05);
-    background-color: color-mix(
-        in srgb,
-        var(--color-surface-overlay, rgb(15 23 42)) 82%,
-        var(--color-background-primary, rgb(15 23 42)) 18%
-    );
+    background-color: rgb(15 23 42 / 86%);
+    inset: 0;
 }
 
 .confirm-dialog__container {
     position: relative;
     display: flex;
     flex-direction: column;
+
     --confirm-dialog-border: color-mix(
         in srgb,
         var(--color-border-secondary) 38%,
@@ -35,6 +33,7 @@
         color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
         color-mix(in srgb, var(--color-surface-overlay) 90%, transparent) 100%
     );
+
     border: 1px solid var(--confirm-dialog-border);
     border-radius: clamp(1rem, 0.9rem + 0.35vi, 1.25rem);
     background: var(--confirm-dialog-glow), var(--confirm-dialog-surface);

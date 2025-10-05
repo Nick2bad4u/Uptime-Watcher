@@ -3,7 +3,7 @@
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .app-topbar {
-    position: sticky;
+    position: relative;
     z-index: var(--z-index-header, 50);
     padding: clamp(0.8rem, 1.25vi, 1.15rem) clamp(0.75rem, 2.4vi, 2rem)
         clamp(0.55rem, 0.8vi, 0.9rem);
@@ -24,7 +24,7 @@
             36%,
         transparent 100%
     );
-    inset-block-start: 0;
+    inset-block-start: auto;
 }
 
 .app-topbar__container {
@@ -41,7 +41,7 @@
     box-shadow:
         0 28px 60px rgb(8 12 24 / 42%),
         inset 0 0 0 1px rgb(255 255 255 / 2%);
-    inline-size: min(100%, 105rem);
+    inline-size: min(100%, 120rem);
     margin-inline: auto;
 
     &::after {
@@ -90,7 +90,8 @@
     min-inline-size: 0;
 }
 
-.app-topbar__identity-text {
+.app-topbar__identity-text,
+.app-topbar__badge-body {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -172,7 +173,6 @@
     display: flex;
     flex: 1 1 clamp(12rem, 11rem + 2vi, 14rem);
     align-items: center;
-    gap: 0.75rem;
     padding: clamp(0.9rem, 0.8rem + 0.3vi, 1.1rem)
         clamp(0.95rem, 0.85rem + 0.4vi, 1.25rem);
     border: 1px solid
@@ -186,6 +186,7 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 2%),
         0 16px 38px rgb(8 12 24 / 26%);
+    gap: 0.75rem;
     min-inline-size: clamp(10.5rem, 9.5rem + 2vi, 12.5rem);
 }
 
@@ -210,26 +211,19 @@
     );
     inline-size: 2.25rem;
     pointer-events: none;
-}
 
-.app-topbar__badge--primary .app-topbar__badge-icon {
-    background: color-mix(
-        in srgb,
-        var(--color-primary-500) 26%,
-        var(--color-surface-overlay) 74%
-    );
-    color: color-mix(
-        in srgb,
-        var(--color-primary-500) 82%,
-        rgb(255 255 255) 18%
-    );
-}
-
-.app-topbar__badge-body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-inline-size: 0;
+    .app-topbar__badge--primary & {
+        background: color-mix(
+            in srgb,
+            var(--color-primary-500) 26%,
+            var(--color-surface-overlay) 74%
+        );
+        color: color-mix(
+            in srgb,
+            var(--color-primary-500) 82%,
+            rgb(255 255 255) 18%
+        );
+    }
 }
 
 .app-topbar__badge-label {
@@ -283,8 +277,8 @@
     z-index: 1;
     display: flex;
     align-items: stretch;
-    justify-content: center;
     align-self: stretch;
+    justify-content: center;
 }
 
 .app-topbar__controls--stacked {
@@ -297,19 +291,6 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 0.75rem;
-}
-
-.header-controls--vertical {
-    flex-direction: column;
-    align-items: stretch;
-    flex-wrap: nowrap;
-    gap: 0.65rem;
-    inline-size: 100%;
-}
-
-.header-controls--vertical .header-controls__button {
-    inline-size: 100%;
-    justify-content: space-between;
 }
 
 .header-controls__button {
@@ -336,10 +317,11 @@
         rgb(255 255 255) 26%
     );
     gap: 0.45rem;
+    scale: 1;
     transition:
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        border-color var(--transition-fast);
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+    translate: 0;
 
     &:hover {
         border-color: color-mix(
@@ -349,11 +331,25 @@
         );
         box-shadow: 0 18px 34px
             color-mix(in srgb, var(--header-control-color) 36%, transparent);
-        transform: translateY(-1px) scale(1.02);
+        scale: 1.02;
+        translate: 0 -1px;
     }
 
     &:active {
-        transform: scale(0.97);
+        scale: 0.97;
+        translate: 0;
+    }
+}
+
+.header-controls--vertical {
+    flex-flow: column nowrap;
+    align-items: stretch;
+    gap: 0.65rem;
+    inline-size: 100%;
+
+    & .header-controls__button {
+        justify-content: space-between;
+        inline-size: 100%;
     }
 }
 
@@ -758,15 +754,14 @@
 
 @media (width <= 768px) {
     .header-controls--vertical {
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-flow: row wrap;
         gap: 0.5rem;
-    }
 
-    .header-controls--vertical .header-controls__button {
-        flex: 1 1 calc(50% - 0.5rem);
-        justify-content: center;
-        padding: 0.55rem 0.75rem;
+        & .header-controls__button {
+            flex: 1 1 calc(50% - 0.5rem);
+            justify-content: center;
+            padding: 0.55rem 0.75rem;
+        }
     }
 
     .header-controls__label {

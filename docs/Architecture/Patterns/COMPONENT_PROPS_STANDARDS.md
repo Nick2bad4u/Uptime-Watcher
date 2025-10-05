@@ -567,10 +567,10 @@ export default FormComponent;
 
 ## 📚 **Related Documentation**
 
-- [UI Feature Development Guide](../Guides/UI-Feature-Development-Guide.md)
-- [Development Patterns Guide](./Development-Patterns-Guide.md)
-- [Accessibility Guidelines](./Accessibility-Guidelines.md)
-- [TypeScript Standards](./TypeScript-Standards.md)
+- [UI Feature Development Guide](../../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)
+- [Development Patterns Guide](./DEVELOPMENT_PATTERNS_GUIDE.md)
+- [Compliance Checklists](../UsageGuides/Compliance-Checklists.md)
+- [TSDoc Standards](../TSDOC_STANDARDS.md)
 
 ---
 

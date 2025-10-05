@@ -948,7 +948,7 @@ describe(useUIStore, () => {
             });
 
             // Others should remain unchanged
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
             expect(result.current.showSettings).toBeTruthy();
             expect(result.current.showAdvancedMetrics).toBeFalsy();
         });

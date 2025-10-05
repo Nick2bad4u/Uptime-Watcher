@@ -91,7 +91,11 @@ describe("Logger Implementation Coverage", () => {
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Test error message",
-                { message: "Test error", stack: "Stack trace here" },
+                expect.objectContaining({
+                    message: "Test error",
+                    name: "Error",
+                    stack: "Stack trace here",
+                }),
                 { context: "test" }
             );
         });
@@ -128,8 +132,7 @@ describe("Logger Implementation Coverage", () => {
             logger.error("Test error message without error object");
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
-                "[BACKEND] Test error message without error object",
-                undefined
+                "[BACKEND] Test error message without error object"
             );
         });
     });
@@ -205,7 +208,11 @@ describe("Logger Implementation Coverage", () => {
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[DB] Database operation failed",
-                { message: "Connection failed", stack: "Database stack trace" }
+                expect.objectContaining({
+                    message: "Connection failed",
+                    name: "Error",
+                    stack: "Database stack trace",
+                })
             );
         });
 
@@ -300,7 +307,11 @@ describe("Logger Implementation Coverage", () => {
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[MONITOR] Monitor check failed",
-                { message: "Timeout", stack: "Monitor error stack" },
+                expect.objectContaining({
+                    message: "Timeout",
+                    name: "Error",
+                    stack: "Monitor error stack",
+                }),
                 { retries: 3 }
             );
         });
@@ -340,7 +351,10 @@ describe("Logger Implementation Coverage", () => {
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Error without stack",
-                { message: "Error without stack", stack: undefined }
+                expect.objectContaining({
+                    message: "Error without stack",
+                    name: "Error",
+                })
             );
         });
 
@@ -371,7 +385,6 @@ describe("Logger Implementation Coverage", () => {
 
             expect(mockElectronLog.error).toHaveBeenCalledWith(
                 "[BACKEND] Undefined error test",
-                undefined,
                 { extra: "data" }
             );
         });
@@ -419,10 +432,7 @@ describe("Logger Implementation Coverage", () => {
             expect(mockElectronLog.debug).toHaveBeenCalledWith("[BACKEND] ");
             expect(mockElectronLog.info).toHaveBeenCalledWith("[BACKEND] ");
             expect(mockElectronLog.warn).toHaveBeenCalledWith("[BACKEND] ");
-            expect(mockElectronLog.error).toHaveBeenCalledWith(
-                "[BACKEND] ",
-                undefined
-            );
+            expect(mockElectronLog.error).toHaveBeenCalledWith("[BACKEND] ");
         });
     });
 

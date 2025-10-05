@@ -2,10 +2,15 @@
 /* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .modal-overlay--settings {
+    position: fixed;
+    z-index: calc(var(--z-index-modal, 90) + 6);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--spacing-2xl);
+    backdrop-filter: blur(18px) saturate(1.08);
+    background: color-mix(in srgb, rgb(8 11 22) 78%, transparent);
+    inset: 0;
 }
 
 .settings-modal {
@@ -32,6 +37,8 @@
         inset 0 0 0 1px
             color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent);
     inline-size: min(680px, 94vi);
+    max-block-size: -webkit-fill-available;
+    color: var(--color-text-primary);
 }
 
 .settings-modal__header {
@@ -47,7 +54,7 @@
     );
     border-block-end: 1px solid
         color-mix(in srgb, var(--accent-muted-color) 12%, transparent);
-    color: var(--color-text-inverse);
+    color: var(--color-text-inverse, rgb(248 250 252));
 
     &::after {
         position: absolute;
@@ -99,19 +106,15 @@
         color-mix(in srgb, var(--shadow-inverse-color) 20%, transparent);
     border-radius: var(--border-radius-lg);
     background: color-mix(in srgb, var(--shadow-base-color) 20%, transparent);
-    color: var(--color-text-inverse);
+    color: var(--color-text-inverse, rgb(248 250 252));
     cursor: pointer;
     inline-size: 36px;
     min-block-size: 36px;
-    transition:
-        background-color 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
+    translate: 0;
 
     @media screen and (prefers-reduced-motion: reduce) {
         transition: none;
-        transform: none;
+        translate: 0;
     }
 
     &:hover,
@@ -121,11 +124,11 @@
             var(--shadow-base-color) 35%,
             transparent
         );
-        transform: translateY(-1px);
+        translate: 0 -1px;
     }
 
     &:active {
-        transform: translateY(0);
+        translate: 0;
     }
 }
 
@@ -134,6 +137,8 @@
     flex-direction: column;
     padding: var(--spacing-2xl);
     gap: var(--spacing-xl);
+    overflow-y: auto;
+    min-block-size: 0;
 }
 
 .settings-modal__banner {

@@ -89,7 +89,9 @@ graph TB
 6. [Standardized Cache Configuration](#standardized-cache-configuration)
 7. [Memory Management](#memory-management)
 8. [Race Condition Prevention](#race-condition-prevention)
-9. [Testing Patterns](#testing-patterns)
+9. [Shared Utility Imports](#shared-utility-imports)
+10. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
+11. [Testing Patterns](#testing-patterns)
 
 ## Repository Pattern
 
@@ -178,7 +180,7 @@ The application uses a TypedEventBus for decoupled communication between compone
 
 ### Event-Driven Implementation Template
 
-```typescript
+````typescript
 // 1. Define event interfaces
 interface DomainEvents extends Record<string, unknown> {
  "domain:action-completed": {
@@ -193,40 +195,97 @@ interface DomainEvents extends Record<string, unknown> {
  };
 }
 
+## Shared Utility Imports
+
+### Shared Utility Import Overview
+
+All consumers must import helpers from explicit module paths under `@shared/utils/*`. Barrel imports are disallowed to keep dependency graphs predictable and prevent circular references across Electron, renderer, and shared packages.
+
+### Guidelines
+
+- ✅ Import directly from the feature module (e.g., `@shared/utils/errorHandling`, `@shared/utils/logTemplates`)
+- ✅ Prefer named exports and avoid default exports for utilities
+- ✅ Keep renderer and Electron imports symmetrical to ensure identical logic paths
+- ❌ Do not re-export `@shared/utils` helpers from new barrels
+- ❌ Do not rely on relative `../../utils` hops inside shared code
+
+### Example
+
+```typescript
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+
+export async function invokeOperation(): Promise<Result> {
+    return withUtilityErrorHandling(async () => {
+        // ...operation logic
+    }, LOG_TEMPLATES.utilities.OPERATION_FAILED);
+}
+````
+
+## Logging Format & Prefix Standards
+
+### Logging Overview
+
+Logging across main and renderer processes uses structured prefixes and reusable templates to keep telemetry consistent. Prefixes originate from `electron/utils/logger.ts` (BACKEND, DB, MONITOR) and renderer-side adapters, while message templates live in `@shared/utils/logTemplates`.
+
+### Guidelines
+
+- ✅ Use `LOG_TEMPLATES` when available to standardize message structure
+- ✅ Include contextual metadata objects instead of string concatenation
+- ✅ Preserve correlation IDs and site identifiers in log payloads
+- ✅ Prefer logger instances created via `createLogger` for new domains (supply uppercase prefix)
+- ❌ Do not log raw errors without using `buildErrorLogArguments`; surfaces stack traces improperly
+- ❌ Do not invent ad-hoc prefixes or bypass shared logger helpers
+
+### Example
+
+```typescript
+import { logger } from "electron/utils/logger";
+import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+
+export function recordMissingHandler(channel: string): void {
+ logger.error(LOG_TEMPLATES.ipc.MISSING_HANDLER, undefined, {
+  channel,
+  timestamp: Date.now(),
+ });
+}
+```
+
 // 2. Emit events in services
 export class ExampleService {
- constructor(private eventBus: TypedEventBus<UptimeEvents>) {}
+constructor(private eventBus: TypedEventBus<UptimeEvents>) {}
 
- async performAction(id: string): Promise<void> {
-  try {
-   // Perform operation
-   const result = await this.doSomething(id);
+async performAction(id: string): Promise<void> {
+try {
+// Perform operation
+const result = await this.doSomething(id);
 
-   // Emit success event
-   await this.eventBus.emitTyped("domain:action-completed", {
-    entityId: id,
-    result,
-    timestamp: Date.now(),
-   });
-  } catch (error) {
-   // Emit failure event
-   await this.eventBus.emitTyped("domain:action-failed", {
-    entityId: id,
-    error: error instanceof Error ? error.message : "Unknown error",
-    timestamp: Date.now(),
-   });
-   throw error;
-  }
- }
+// Emit success event
+await this.eventBus.emitTyped("domain:action-completed", {
+entityId: id,
+result,
+timestamp: Date.now(),
+});
+} catch (error) {
+// Emit failure event
+await this.eventBus.emitTyped("domain:action-failed", {
+entityId: id,
+error: error instanceof Error ? error.message : "Unknown error",
+timestamp: Date.now(),
+});
+throw error;
+}
+}
 }
 
 // 3. Listen to events
 eventBus.onTyped("domain:action-completed", (data) => {
- // data is properly typed and includes _meta
- console.log(`Action completed for ${data.entityId} at ${data.timestamp}`);
- console.log(`Correlation ID: ${data._meta.correlationId}`);
+// data is properly typed and includes \_meta
+console.log(`Action completed for ${data.entityId} at ${data.timestamp}`);
+console.log(`Correlation ID: ${data._meta.correlationId}`);
 });
-```
+
+````
 
 ### Event-Driven Usage Guidelines
 
@@ -256,7 +315,7 @@ const handleUserAction = async () => {
   return result;
  }, errorStore); // Automatically manages loading/error state
 };
-```
+````
 
 #### Backend with Logger Integration
 

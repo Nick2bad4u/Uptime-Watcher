@@ -138,3 +138,12 @@ export const dbLogger: Logger = createLogger("DB");
  * @public
  */
 export const monitorLogger: Logger = createLogger("MONITOR");
+
+/**
+ * Diagnostics-focused logger for IPC bridge and runtime health metrics.
+ *
+ * @remarks
+ * Prefixed with "DIAGNOSTICS" so structured log pipelines and dashboards can
+ * filter runtime health snapshots independently of general backend logs.
+ */
+export const diagnosticsLogger: Logger = createLogger("DIAGNOSTICS");

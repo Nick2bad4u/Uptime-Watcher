@@ -105,6 +105,61 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             },
         };
 
+        const attachTransactionAdapter = (
+            repository: Record<string, any>,
+            builders: Record<string, Function>
+        ) => {
+            repository.createTransactionAdapter = vi
+                .fn()
+                .mockImplementation((db: unknown) => {
+                    const adapter: Record<string, any> = {};
+
+                    for (const [key, factory] of Object.entries(builders)) {
+                        adapter[key] = vi.fn((...args: unknown[]) =>
+                            factory(db, ...args)
+                        );
+                    }
+
+                    return adapter;
+                });
+        };
+
+        attachTransactionAdapter(mockRepositories.site, {
+            bulkInsert: (db: unknown, rows: unknown) =>
+                mockRepositories.site.bulkInsertInternal(db, rows),
+            deleteAll: (db: unknown) =>
+                mockRepositories.site.deleteAllInternal(db),
+        });
+
+        attachTransactionAdapter(mockRepositories.monitor, {
+            deleteAll: (db: unknown) =>
+                mockRepositories.monitor.deleteAllInternal(db),
+        });
+
+        attachTransactionAdapter(mockRepositories.history, {
+            deleteAll: (db: unknown) =>
+                mockRepositories.history.deleteAllInternal?.(db),
+            addEntry: (
+                db: unknown,
+                monitorId: unknown,
+                entry: unknown,
+                details: unknown
+            ) =>
+                mockRepositories.history.addEntryInternal(
+                    db,
+                    monitorId,
+                    entry,
+                    details
+                ),
+        });
+
+        attachTransactionAdapter(mockRepositories.settings, {
+            deleteAll: (db: unknown) =>
+                mockRepositories.settings.deleteAllInternal(db),
+            bulkInsert: (db: unknown, values: unknown) =>
+                mockRepositories.settings.bulkInsertInternal(db, values),
+        });
+
         mockDatabaseService = {
             executeTransaction: vi
                 .fn()

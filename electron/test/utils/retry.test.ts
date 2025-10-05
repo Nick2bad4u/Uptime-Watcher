@@ -27,6 +27,12 @@ vi.mock("../../utils/logger", () => ({
         warn: vi.fn(),
         debug: vi.fn(),
     },
+    diagnosticsLogger: {
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
 }));
 
 describe(withRetry, () => {

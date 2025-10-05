@@ -66,6 +66,59 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
             },
         };
 
+        const attachAdapter = (
+            repository: Record<string, any>,
+            builders: Record<string, Function>
+        ) => {
+            repository.createTransactionAdapter = vi
+                .fn()
+                .mockImplementation((db: unknown) => {
+                    const adapter: Record<string, any> = {};
+                    for (const [key, factory] of Object.entries(builders)) {
+                        adapter[key] = vi.fn((...args: unknown[]) =>
+                            factory(db, ...args)
+                        );
+                    }
+                    return adapter;
+                });
+        };
+
+        attachAdapter(mockConfig.repositories.site, {
+            bulkInsert: (db: unknown, rows: unknown) =>
+                mockConfig.repositories.site.bulkInsertInternal(db, rows),
+            deleteAll: (db: unknown) =>
+                mockConfig.repositories.site.deleteAllInternal(db),
+        });
+
+        attachAdapter(mockConfig.repositories.settings, {
+            bulkInsert: (db: unknown, values: unknown) =>
+                mockConfig.repositories.settings.bulkInsertInternal(db, values),
+            deleteAll: (db: unknown) =>
+                mockConfig.repositories.settings.deleteAllInternal(db),
+        });
+
+        attachAdapter(mockConfig.repositories.monitor, {
+            deleteAll: (db: unknown) =>
+                mockConfig.repositories.monitor.deleteAllInternal(db),
+        });
+
+        attachAdapter(mockConfig.repositories.history, {
+            deleteAll: (db: unknown) =>
+                mockConfig.repositories.history.deleteAllInternal(db),
+            addEntry: (
+                db: unknown,
+                monitorId: unknown,
+                entry: unknown,
+                details: unknown
+            ) =>
+                mockConfig.repositories.history.addEntryInternal(
+                    db,
+                    monitorId,
+                    entry,
+                    details
+                ),
+        });
+
         service = new DataImportExportService(mockConfig);
         vi.clearAllMocks();
     });

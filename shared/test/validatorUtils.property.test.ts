@@ -253,7 +253,16 @@ describe("Validator Utils Property-Based Tests", () => {
             "should return true for fast-check generated URLs",
             (url) => {
                 const result = isValidUrl(url);
-                expect(result).toBeTruthy();
+                const schemeIndex = url.indexOf("://");
+                const hasExtraSchemeSeparator =
+                    schemeIndex !== -1 &&
+                    url.slice(schemeIndex + 3).includes("://");
+
+                if (hasExtraSchemeSeparator) {
+                    expect(result).toBeFalsy();
+                } else {
+                    expect(result).toBeTruthy();
+                }
             }
         );
 

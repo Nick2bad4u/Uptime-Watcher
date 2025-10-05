@@ -13,6 +13,12 @@ vi.mock("../../utils/logger", () => ({
         debug: vi.fn(),
         warn: vi.fn(),
     },
+    diagnosticsLogger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // First add the same mocks as the main test

@@ -629,5 +629,5 @@ All frontend state follows these patterns:
 
 ## Related ADRs
 
-- [ADR-003: Error Handling Strategy](./ADR-003-Error-Handling-Strategy.md)
-- [ADR-005: IPC Communication Protocol](./ADR-005-IPC-Communication-Protocol.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+- [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)

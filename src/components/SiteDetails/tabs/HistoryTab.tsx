@@ -25,10 +25,10 @@
  */
 
 import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
-import type { ChangeEvent, ReactElement } from "react";
+import type { ChangeEvent, NamedExoticComponent, ReactElement } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
@@ -108,345 +108,354 @@ const FILTER_OPTIONS: ReadonlyArray<{
  *
  * @returns JSX element displaying history interface
  */
-export const HistoryTab = ({
-    formatFullTimestamp,
-    formatResponseTime,
-    selectedMonitor,
-}: HistoryTabProperties): JSX.Element => {
-    const { settings } = useSettingsStore();
-    const { currentTheme } = useTheme();
-    const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("all");
-    const historyLength = selectedMonitor.history.length;
+export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
+    function HistoryTab({
+        formatFullTimestamp,
+        formatResponseTime,
+        selectedMonitor,
+    }: HistoryTabProperties): JSX.Element {
+        const { settings } = useSettingsStore();
+        const { currentTheme } = useTheme();
+        const [historyFilter, setHistoryFilter] =
+            useState<HistoryFilter>("all");
+        const historyLength = selectedMonitor.history.length;
 
-    const backendLimit = settings.historyLimit || 25;
+        const backendLimit = settings.historyLimit || 25;
 
-    // Track the last monitor ID and type we logged for to prevent duplicate
-    // logging
-    const lastLoggedMonitorRef = useRef<null | {
-        id: string;
-        type: string;
-    }>(null);
+        // Track the last monitor ID and type we logged for to prevent duplicate
+        // logging
+        const lastLoggedMonitorRef = useRef<null | {
+            id: string;
+            type: string;
+        }>(null);
 
-    // Icon colors configuration
-    const getIconColors = (): {
-        filters: string;
-        history: string;
-        timeline: string;
-    } => ({
-        filters: currentTheme.colors.primary[600],
-        history: currentTheme.colors.primary[500],
-        timeline: currentTheme.colors.warning,
-    });
+        // Icon colors configuration
+        const getIconColors = (): {
+            filters: string;
+            history: string;
+            timeline: string;
+        } => ({
+            filters: currentTheme.colors.primary[600],
+            history: currentTheme.colors.primary[500],
+            timeline: currentTheme.colors.warning,
+        });
 
-    const iconColors = getIconColors();
+        const iconColors = getIconColors();
 
-    const FilterAllIcon = AppIcons.ui.analytics;
+        const FilterAllIcon = AppIcons.ui.analytics;
 
-    // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
-    // available history)
-    const maxShow = Math.min(backendLimit, historyLength);
-    const showOptions = [
-        10,
-        25,
-        50,
-        100,
-        250,
-        500,
-        1000,
-        10_000,
-    ].filter((opt) => opt <= maxShow);
+        // Dropdown options: 25, 50, 100, All (clamped to backendLimit and
+        // available history)
+        const maxShow = Math.min(backendLimit, historyLength);
+        const showOptions = [
+            10,
+            25,
+            50,
+            100,
+            250,
+            500,
+            1000,
+            10_000,
+        ].filter((opt) => opt <= maxShow);
 
-    // Always include 'All' if there are fewer than backendLimit
-    if (
-        historyLength > 0 &&
-        historyLength <= backendLimit &&
-        !showOptions.includes(historyLength)
-    ) {
-        showOptions.push(historyLength);
-    }
-
-    // Ensure we always have at least one valid option, even for small history
-    // counts
-    if (showOptions.length === 0) {
-        if (historyLength > 0) {
+        // Always include 'All' if there are fewer than backendLimit
+        if (
+            historyLength > 0 &&
+            historyLength <= backendLimit &&
+            !showOptions.includes(historyLength)
+        ) {
             showOptions.push(historyLength);
-        } else {
-            showOptions.push(10);
         }
-    }
 
-    // Track user's manual history limit selection
-    const [userHistoryLimit, setUserHistoryLimit] = useState<number>();
+        // Ensure we always have at least one valid option, even for small history
+        // counts
+        if (showOptions.length === 0) {
+            if (historyLength > 0) {
+                showOptions.push(historyLength);
+            } else {
+                showOptions.push(10);
+            }
+        }
 
-    // Compute effective history limit - use user preference or auto-calculated
-    // value
-    const safeHistoryLength = selectedMonitor.history.length || 0;
-    const autoLimit = Math.min(
-        50,
-        backendLimit,
-        Math.max(1, safeHistoryLength)
-    );
+        // Track user's manual history limit selection
+        const [userHistoryLimit, setUserHistoryLimit] = useState<number>();
 
-    // Use user preference if set, otherwise use auto-calculated limit
-    const historyLimit = userHistoryLimit ?? autoLimit;
+        // Compute effective history limit - use user preference or auto-calculated
+        // value
+        const safeHistoryLength = selectedMonitor.history.length || 0;
+        const autoLimit = Math.min(
+            50,
+            backendLimit,
+            Math.max(1, safeHistoryLength)
+        );
 
-    // Ensure historyLimit is always valid
-    const safeHistoryLimit =
-        Number.isFinite(historyLimit) && historyLimit > 0
-            ? historyLimit
-            : Math.min(10, Math.max(1, historyLength));
+        // Use user preference if set, otherwise use auto-calculated limit
+        const historyLimit = userHistoryLimit ?? autoLimit;
 
-    // Log when history tab is viewed - only when monitor actually changes
-    useEffect(
-        function logHistoryTabViewed() {
-            const currentMonitor = {
-                id: selectedMonitor.id,
-                type: selectedMonitor.type,
-            };
-            const lastLogged = lastLoggedMonitorRef.current;
+        // Ensure historyLimit is always valid
+        const safeHistoryLimit =
+            Number.isFinite(historyLimit) && historyLimit > 0
+                ? historyLimit
+                : Math.min(10, Math.max(1, historyLength));
 
-            // Only log if monitor ID or type has changed (not just history
-            // length)
-            if (
-                !lastLogged ||
-                lastLogged.id !== currentMonitor.id ||
-                lastLogged.type !== currentMonitor.type
-            ) {
-                logger.user.action("History tab viewed", {
+        // Log when history tab is viewed - only when monitor actually changes
+        useEffect(
+            function logHistoryTabViewed() {
+                const currentMonitor = {
+                    id: selectedMonitor.id,
+                    type: selectedMonitor.type,
+                };
+                const lastLogged = lastLoggedMonitorRef.current;
+
+                // Only log if monitor ID or type has changed (not just history
+                // length)
+                if (
+                    !lastLogged ||
+                    lastLogged.id !== currentMonitor.id ||
+                    lastLogged.type !== currentMonitor.type
+                ) {
+                    logger.user.action("History tab viewed", {
+                        monitorId: selectedMonitor.id,
+                        monitorType: selectedMonitor.type,
+                        totalRecords: selectedMonitor.history.length,
+                    });
+                    lastLoggedMonitorRef.current = currentMonitor;
+                }
+            },
+            [
+                selectedMonitor.history.length,
+                selectedMonitor.id,
+                selectedMonitor.type,
+            ]
+        );
+
+        const filteredHistoryRecords = selectedMonitor.history
+            .filter(
+                (record: StatusHistory) =>
+                    historyFilter === "all" || record.status === historyFilter
+            )
+            .slice(0, safeHistoryLimit);
+
+        // Helper to render details with label using dynamic formatting
+        function renderDetails(record: StatusHistory): null | ReactElement {
+            if (!record.details) {
+                return null;
+            }
+
+            return (
+                <DetailLabel
+                    details={record.details}
+                    monitorType={selectedMonitor.type}
+                />
+            );
+        }
+
+        // Memoized event handlers
+        const createFilterHandler = useCallback(
+            (filter: HistoryFilter) => (): void => {
+                setHistoryFilter(filter);
+                logger.user.action("History filter changed", {
+                    filter: filter,
                     monitorId: selectedMonitor.id,
                     monitorType: selectedMonitor.type,
-                    totalRecords: selectedMonitor.history.length,
+                    totalRecords: historyLength,
                 });
-                lastLoggedMonitorRef.current = currentMonitor;
-            }
-        },
-        [
-            selectedMonitor.history.length,
-            selectedMonitor.id,
-            selectedMonitor.type,
-        ]
-    );
-
-    const filteredHistoryRecords = selectedMonitor.history
-        .filter(
-            (record: StatusHistory) =>
-                historyFilter === "all" || record.status === historyFilter
-        )
-        .slice(0, safeHistoryLimit);
-
-    // Helper to render details with label using dynamic formatting
-    function renderDetails(record: StatusHistory): null | ReactElement {
-        if (!record.details) {
-            return null;
-        }
-
-        return (
-            <DetailLabel
-                details={record.details}
-                monitorType={selectedMonitor.type}
-            />
+            },
+            [
+                historyLength,
+                selectedMonitor.id,
+                selectedMonitor.type,
+            ]
         );
-    }
 
-    // Memoized event handlers
-    const createFilterHandler = useCallback(
-        (filter: HistoryFilter) => (): void => {
-            setHistoryFilter(filter);
-            logger.user.action("History filter changed", {
-                filter: filter,
-                monitorId: selectedMonitor.id,
-                monitorType: selectedMonitor.type,
-                totalRecords: historyLength,
-            });
-        },
-        [
-            historyLength,
-            selectedMonitor.id,
-            selectedMonitor.type,
-        ]
-    );
-
-    const handleHistoryLimitChange = useCallback(
-        (event: ChangeEvent<HTMLSelectElement>) => {
-            const newLimit = Math.min(
-                Number.parseInt(event.target.value, 10),
+        const handleHistoryLimitChange = useCallback(
+            (event: ChangeEvent<HTMLSelectElement>) => {
+                const newLimit = Math.min(
+                    Number.parseInt(event.target.value, 10),
+                    backendLimit,
+                    historyLength
+                );
+                setUserHistoryLimit(newLimit);
+                logger.user.action("History limit changed", {
+                    monitorId: selectedMonitor.id,
+                    newLimit: newLimit,
+                    totalRecords: historyLength,
+                });
+            },
+            [
                 backendLimit,
-                historyLength
-            );
-            setUserHistoryLimit(newLimit);
-            logger.user.action("History limit changed", {
-                monitorId: selectedMonitor.id,
-                newLimit: newLimit,
-                totalRecords: historyLength,
-            });
-        },
-        [
-            backendLimit,
-            historyLength,
-            selectedMonitor.id,
-        ]
-    );
+                historyLength,
+                selectedMonitor.id,
+            ]
+        );
 
-    const filterIcon = useMemo(
-        () => <FiFilter color={iconColors.filters} />,
-        [iconColors.filters]
-    );
-    const historyIcon = useMemo(
-        () => <MdHistory color={iconColors.history} />,
-        [iconColors.history]
-    );
-    return (
-        <div className="space-y-6" data-testid="history-tab">
-            {/* History Controls */}
-            <ThemedCard icon={filterIcon} title="History Filters">
-                <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center space-x-3">
-                        <ThemedText size="sm" variant="secondary">
-                            Filter by status:
-                        </ThemedText>
-                        <div className="flex space-x-1">
-                            {FILTER_OPTIONS.map(({ status, value }) => {
-                                const isActive = historyFilter === value;
-                                const FilterIconComponent = status
-                                    ? getStatusIconComponent(status)
-                                    : FilterAllIcon;
+        const filterIcon = useMemo(
+            () => <FiFilter color={iconColors.filters} />,
+            [iconColors.filters]
+        );
+        const historyIcon = useMemo(
+            () => <MdHistory color={iconColors.history} />,
+            [iconColors.history]
+        );
+        return (
+            <div className="space-y-6" data-testid="history-tab">
+                {/* History Controls */}
+                <ThemedCard icon={filterIcon} title="History Filters">
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex items-center space-x-3">
+                            <ThemedText size="sm" variant="secondary">
+                                Filter by status:
+                            </ThemedText>
+                            <div className="flex space-x-1">
+                                {FILTER_OPTIONS.map(({ status, value }) => {
+                                    const isActive = historyFilter === value;
+                                    const FilterIconComponent = status
+                                        ? getStatusIconComponent(status)
+                                        : FilterAllIcon;
 
-                                return (
-                                    <ThemedButton
-                                        className="capitalize"
-                                        key={value}
-                                        onClick={createFilterHandler(value)}
-                                        size="xs"
-                                        variant={isActive ? "primary" : "ghost"}
-                                    >
-                                        <span className="history-filter__content">
-                                            <FilterIconComponent
-                                                aria-hidden="true"
-                                                className="history-filter__icon"
-                                                size={14}
-                                            />
-                                            <span className="history-filter__label">
-                                                {FILTER_LABELS[value]}
+                                    return (
+                                        <ThemedButton
+                                            className="capitalize"
+                                            key={value}
+                                            onClick={createFilterHandler(value)}
+                                            size="xs"
+                                            variant={
+                                                isActive ? "primary" : "ghost"
+                                            }
+                                        >
+                                            <span className="history-filter__content">
+                                                <FilterIconComponent
+                                                    aria-hidden="true"
+                                                    className="history-filter__icon"
+                                                    size={14}
+                                                />
+                                                <span className="history-filter__label">
+                                                    {FILTER_LABELS[value]}
+                                                </span>
                                             </span>
-                                        </span>
-                                    </ThemedButton>
-                                );
-                            })}
+                                        </ThemedButton>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                            <ThemedText size="sm" variant="secondary">
+                                Show:
+                            </ThemedText>
+                            <ThemedSelect
+                                onChange={handleHistoryLimitChange}
+                                value={safeHistoryLimit}
+                            >
+                                {showOptions.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option === historyLength
+                                            ? `All (${option})`
+                                            : option}
+                                    </option>
+                                ))}
+                            </ThemedSelect>
+                            <ThemedText size="xs" variant="secondary">
+                                {filteredHistoryRecords.length} of{" "}
+                                {historyLength} records
+                                {historyFilter !== "all" &&
+                                    ` (${historyFilter} filter)`}
+                            </ThemedText>
                         </div>
                     </div>
+                </ThemedCard>
 
-                    <div className="flex items-center space-x-3">
-                        <ThemedText size="sm" variant="secondary">
-                            Show:
-                        </ThemedText>
-                        <ThemedSelect
-                            onChange={handleHistoryLimitChange}
-                            value={safeHistoryLimit}
-                        >
-                            {showOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option === historyLength
-                                        ? `All (${option})`
-                                        : option}
-                                </option>
-                            ))}
-                        </ThemedSelect>
-                        <ThemedText size="xs" variant="secondary">
-                            {filteredHistoryRecords.length} of {historyLength}{" "}
-                            records
-                            {historyFilter !== "all" &&
-                                ` (${historyFilter} filter)`}
-                        </ThemedText>
-                    </div>
-                </div>
-            </ThemedCard>
+                {/* History List */}
+                <ThemedCard icon={historyIcon} title="Check History">
+                    <div className="history-tab__list space-y-2">
+                        {filteredHistoryRecords.map((record) => {
+                            const rawStatus = record.status as
+                                | SiteStatus
+                                | undefined;
+                            const resolvedStatus: SiteStatus =
+                                rawStatus ?? "unknown";
+                            const StatusIconComponent =
+                                getStatusIconComponent(resolvedStatus);
+                            const statusLabel =
+                                formatStatusLabel(resolvedStatus);
 
-            {/* History List */}
-            <ThemedCard icon={historyIcon} title="Check History">
-                <div className="max-h-96 space-y-2 overflow-y-auto">
-                    {filteredHistoryRecords.map((record) => {
-                        const rawStatus = record.status as
-                            | SiteStatus
-                            | undefined;
-                        const resolvedStatus: SiteStatus =
-                            rawStatus ?? "unknown";
-                        const StatusIconComponent =
-                            getStatusIconComponent(resolvedStatus);
-                        const statusLabel = formatStatusLabel(resolvedStatus);
-
-                        return (
-                            <div
-                                className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
-                                key={record.timestamp}
-                            >
-                                <div className="flex items-center space-x-3">
-                                    <StatusIndicator
-                                        size="sm"
-                                        status={resolvedStatus}
-                                    />
-                                    <div>
+                            return (
+                                <div
+                                    className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
+                                    key={record.timestamp}
+                                >
+                                    <div className="flex items-center space-x-3">
+                                        <StatusIndicator
+                                            size="sm"
+                                            status={resolvedStatus}
+                                        />
+                                        <div>
+                                            <ThemedText
+                                                size="sm"
+                                                weight="medium"
+                                            >
+                                                {formatFullTimestamp(
+                                                    record.timestamp
+                                                )}
+                                            </ThemedText>
+                                            <ThemedText
+                                                className="ml-4"
+                                                size="xs"
+                                                variant="secondary"
+                                            >
+                                                Record #
+                                                {historyLength -
+                                                    selectedMonitor.history.findIndex(
+                                                        (r) =>
+                                                            r.timestamp ===
+                                                            record.timestamp
+                                                    )}
+                                            </ThemedText>
+                                            {renderDetails(record)}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
                                         <ThemedText size="sm" weight="medium">
-                                            {formatFullTimestamp(
-                                                record.timestamp
+                                            {formatResponseTime(
+                                                record.responseTime
                                             )}
                                         </ThemedText>
                                         <ThemedText
-                                            className="ml-4"
+                                            className="history-status-label"
                                             size="xs"
                                             variant="secondary"
                                         >
-                                            Record #
-                                            {historyLength -
-                                                selectedMonitor.history.findIndex(
-                                                    (r) =>
-                                                        r.timestamp ===
-                                                        record.timestamp
-                                                )}
+                                            <StatusIconComponent
+                                                className="history-status-label__icon"
+                                                size={14}
+                                            />
+                                            <span>{statusLabel}</span>
                                         </ThemedText>
-                                        {renderDetails(record)}
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <ThemedText size="sm" weight="medium">
-                                        {formatResponseTime(
-                                            record.responseTime
-                                        )}
-                                    </ThemedText>
-                                    <ThemedText
-                                        className="history-status-label"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        <StatusIconComponent
-                                            className="history-status-label__icon"
-                                            size={14}
-                                        />
-                                        <span>{statusLabel}</span>
-                                    </ThemedText>
-                                </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
 
-                    {filteredHistoryRecords.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <FiInbox className="mb-4 text-4xl opacity-50" />
-                            <ThemedText
-                                className="mb-2"
-                                size="lg"
-                                variant="secondary"
-                            >
-                                No records found
-                            </ThemedText>
-                            <ThemedText size="sm" variant="secondary">
-                                {historyFilter === "all"
-                                    ? "No monitoring records are available yet."
-                                    : `No "${historyFilter}" records found. Try adjusting your filter.`}
-                            </ThemedText>
-                        </div>
-                    )}
-                </div>
-            </ThemedCard>
-        </div>
-    );
-};
+                        {filteredHistoryRecords.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                                <FiInbox className="mb-4 text-4xl opacity-50" />
+                                <ThemedText
+                                    className="mb-2"
+                                    size="lg"
+                                    variant="secondary"
+                                >
+                                    No records found
+                                </ThemedText>
+                                <ThemedText size="sm" variant="secondary">
+                                    {historyFilter === "all"
+                                        ? "No monitoring records are available yet."
+                                        : `No "${historyFilter}" records found. Try adjusting your filter.`}
+                                </ThemedText>
+                            </div>
+                        )}
+                    </div>
+                </ThemedCard>
+            </div>
+        );
+    }
+);

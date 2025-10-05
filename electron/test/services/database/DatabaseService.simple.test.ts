@@ -32,6 +32,12 @@ vi.mock("../../utils/logger", () => ({
         warn: vi.fn(),
         debug: vi.fn(),
     },
+    diagnosticsLogger: {
+        info: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+        debug: vi.fn(),
+    },
 }));
 
 vi.mock("./utils/databaseSchema", () => ({

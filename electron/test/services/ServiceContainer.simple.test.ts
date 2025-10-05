@@ -80,6 +80,12 @@ vi.mock("../../utils/logger", () => ({
         error: vi.fn(),
         warn: vi.fn(),
     },
+    diagnosticsLogger: {
+        info: vi.fn(),
+        debug: vi.fn(),
+        error: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // Mock all other required dependencies

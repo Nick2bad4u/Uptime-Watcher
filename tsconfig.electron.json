@@ -11,6 +11,9 @@
             "@electron/*": [
                 "electron/*"
             ],
+            "@assets/*": [
+                "assets/*"
+            ],
             "@shared/*": [
                 "shared/*"
             ]

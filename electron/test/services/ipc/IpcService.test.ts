@@ -5,6 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { IpcService } from "../../../services/ipc/IpcService";
+import {
+    getDiagnosticsMetrics,
+    resetDiagnosticsMetrics,
+} from "../../../services/ipc/diagnosticsMetrics";
 
 // Use vi.hoisted to fix hoisting issues with mocks
 const {
@@ -115,6 +119,7 @@ vi.mock("electron", () => ({
 
 vi.mock("../../utils/logger", () => ({
     logger: mockLogger,
+    diagnosticsLogger: mockLogger,
 }));
 
 vi.mock("../monitoring/MonitorTypeRegistry", () => ({
@@ -143,6 +148,7 @@ describe(IpcService, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        resetDiagnosticsMetrics();
         ipcService = new IpcService(
             mockUptimeOrchestrator as any,
             mockAutoUpdaterService as any
@@ -193,6 +199,46 @@ describe(IpcService, () => {
             expect(handleCalls).toContain("get-sites");
             expect(handleCalls).toContain("remove-site");
             expect(handleCalls).toContain("update-site");
+        });
+        it("records diagnostics metrics during handler verification", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
+
+            const diagnosticsEntry = mockIpcMain.handle.mock.calls.find(
+                ([channel]) => channel === "diagnostics:verify-ipc-handler"
+            );
+
+            expect(diagnosticsEntry).toBeDefined();
+
+            const diagnosticsHandler = diagnosticsEntry?.[1];
+            expect(typeof diagnosticsHandler).toBe("function");
+
+            const successResponse = await (diagnosticsHandler as any)(
+                undefined,
+                "get-history-limit"
+            );
+            expect(successResponse.success).toBeTruthy();
+            expect(successResponse.data?.registered).toBeTruthy();
+
+            let metrics = getDiagnosticsMetrics();
+            expect(metrics.successfulHandlerChecks).toBe(1);
+            expect(metrics.missingHandlerChecks).toBe(0);
+
+            const failureResponse = await (diagnosticsHandler as any)(
+                undefined,
+                "missing-channel"
+            );
+            expect(failureResponse.success).toBeTruthy();
+            expect(failureResponse.data?.registered).toBeFalsy();
+
+            metrics = getDiagnosticsMetrics();
+            expect(metrics.missingHandlerChecks).toBe(1);
+            expect(metrics.lastMissingChannel).toBe("missing-channel");
         });
         it("should setup monitoring handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

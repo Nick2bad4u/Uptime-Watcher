@@ -35,6 +35,12 @@ vi.mock("../../utils/logger", () => ({
         warn: vi.fn(),
         error: vi.fn(),
     },
+    diagnosticsLogger: {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
 }));
 
 vi.mock("../../electronUtils", () => ({
@@ -122,6 +128,17 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 history: {},
                 monitor: {
                     updateInternal: vi.fn(),
+                    createTransactionAdapter: vi
+                        .fn()
+                        .mockImplementation((db: unknown) => ({
+                            update: vi.fn((id: string, changes: unknown) =>
+                                mockDependencies.repositories.monitor.updateInternal(
+                                    db,
+                                    id,
+                                    changes
+                                )
+                            ),
+                        })),
                 },
                 site: {},
             },

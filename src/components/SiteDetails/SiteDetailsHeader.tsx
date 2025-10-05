@@ -412,6 +412,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             ? "Expand header"
             : "Collapse header";
         const CollapseIcon = isHeaderCollapsed ? MdExpandMore : MdExpandLess;
+        const SummaryIcon = AppIcons.ui.history;
         const headerClassName = isHeaderCollapsed
             ? "site-details-header site-details-header--collapsed"
             : "site-details-header";
@@ -499,6 +500,11 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                                                 {...triggerProps}
                                                 className="site-details-header-collapsed-summary"
                                             >
+                                                <SummaryIcon
+                                                    aria-hidden="true"
+                                                    className="site-details-header-summary-icon"
+                                                    size={14}
+                                                />
                                                 {collapsedSummary}
                                             </span>
                                         )}

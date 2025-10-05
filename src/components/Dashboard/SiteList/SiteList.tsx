@@ -23,6 +23,9 @@ import { SiteCompactCard } from "../SiteCard/SiteCompactCard";
 import { EmptyState } from "./EmptyState";
 import { SiteListLayoutSelector } from "./SiteListLayoutSelector";
 import { SiteTableView } from "./SiteTableView";
+import { AppIcons } from "../../../utils/icons";
+
+const SitesIcon = AppIcons.metrics.monitor;
 import "./SiteList.css";
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
@@ -71,7 +74,6 @@ export const SiteList = (): JSX.Element => {
     const cardPresentation = useUIStore(selectSiteCardPresentation);
     const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
     const { isDark } = useTheme();
-
     if (sites.length === 0) {
         return <EmptyState />;
     }
@@ -116,7 +118,14 @@ export const SiteList = (): JSX.Element => {
             <div className="site-list__toolbar">
                 <div className="site-list__toolbar-title">
                     <ThemedText size="lg" weight="semibold">
-                        Sites
+                        <span className="site-list__toolbar-heading">
+                            <SitesIcon
+                                aria-hidden="true"
+                                className="site-list__toolbar-icon"
+                                size={18}
+                            />
+                            Sites
+                        </span>
                     </ThemedText>
                     <ThemedText size="xs" variant="tertiary">
                         Tracking {sites.length} site

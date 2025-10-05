@@ -544,8 +544,17 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     );
                     const containsDisallowedCharacters =
                         validUrl.includes("'") || validUrl.includes("`");
+                    const schemeSeparatorIndex = validUrl.indexOf("://");
+                    const hasAdditionalSchemeSeparator =
+                        schemeSeparatorIndex !== -1 &&
+                        validUrl
+                            .slice(schemeSeparatorIndex + 3)
+                            .includes("://");
 
-                    if (containsDisallowedCharacters) {
+                    if (
+                        containsDisallowedCharacters ||
+                        hasAdditionalSchemeSeparator
+                    ) {
                         expect(result).toBeFalsy();
                     } else {
                         expect(result).toBeTruthy();

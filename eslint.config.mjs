@@ -6877,6 +6877,28 @@ export default [
             },
         },
     },
+    {
+        files: [
+            "shared/utils/index.{ts,tsx,cts,mts,js,jsx,cjs,mjs}",
+            "shared/utils/**/index.{ts,tsx,cts,mts,js,jsx,cjs,mjs}",
+        ],
+        name: "Shared Utils Barrel Guard",
+        rules: {
+            "no-restricted-syntax": [
+                "error",
+                {
+                    message:
+                        "Barrel exports are disallowed in shared utils; import from concrete modules instead.",
+                    selector: "ExportAllDeclaration",
+                },
+                {
+                    message:
+                        "Barrel exports are disallowed in shared utils; import from concrete modules instead.",
+                    selector: "ExportNamedDeclaration[source]",
+                },
+            ],
+        },
+    },
     // ═══════════════════════════════════════════════════════════════════════════════
     // MARK: Tests (Frontend)
     // ═══════════════════════════════════════════════════════════════════════════════

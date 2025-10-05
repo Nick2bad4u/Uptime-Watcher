@@ -19,6 +19,12 @@ vi.mock("../../utils/logger", () => ({
         info: vi.fn(),
         warn: vi.fn(),
     },
+    diagnosticsLogger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // Mock correlation ID generator to get predictable results

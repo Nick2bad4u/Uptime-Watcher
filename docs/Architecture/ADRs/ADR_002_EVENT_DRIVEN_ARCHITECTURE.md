@@ -319,6 +319,6 @@ All communication follows this pattern:
 
 ## Related ADRs
 
-- [ADR-001: Repository Pattern](./ADR-001-Repository-Pattern.md)
-- [ADR-003: Error Handling Strategy](./ADR-003-Error-Handling-Strategy.md)
-- [ADR-004: Frontend State Management](./ADR-004-Frontend-State-Management.md)
+- [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+- [ADR-004: Frontend State Management](./ADR_004_FRONTEND_STATE_MANAGEMENT.md)

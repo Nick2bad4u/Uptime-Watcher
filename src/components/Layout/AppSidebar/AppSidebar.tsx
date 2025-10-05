@@ -23,6 +23,7 @@ import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
+import MascotLogo from "@assets/UptimeWatcherMascot.png";
 import "./AppSidebar.css";
 
 const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
@@ -227,7 +228,14 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             </button>
                         )}
                     </Tooltip>
-                    <div>
+                    <div aria-hidden="true" className="app-sidebar__brand-logo">
+                        <img
+                            alt="Uptime Watcher mascot"
+                            className="app-sidebar__brand-logo-image"
+                            src={MascotLogo}
+                        />
+                    </div>
+                    <div className="app-sidebar__brand-copy">
                         <ThemedText
                             className="app-sidebar__brand-title"
                             size="md"
@@ -348,41 +356,39 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                             </button>
                         )}
                     </Tooltip>
-                    <div className="app-sidebar__footer-controls">
-                        <Tooltip
-                            content="Open application settings"
-                            position="right"
-                        >
-                            {(triggerProps) => (
-                                <button
-                                    {...triggerProps}
-                                    aria-label="Open application settings"
-                                    className="app-sidebar__icon-button"
-                                    onClick={handleOpenSettings}
-                                    type="button"
-                                >
-                                    <SettingsIcon size={18} />
-                                    <span className="sr-only">Settings</span>
-                                </button>
-                            )}
-                        </Tooltip>
-                        <Tooltip content={themeButtonLabel} position="right">
-                            {(triggerProps) => (
-                                <button
-                                    {...triggerProps}
-                                    aria-label={themeButtonLabel}
-                                    className="app-sidebar__icon-button"
-                                    onClick={toggleTheme}
-                                    type="button"
-                                >
-                                    <ThemeIcon size={18} />
-                                    <span className="sr-only">
-                                        {themeButtonText}
-                                    </span>
-                                </button>
-                            )}
-                        </Tooltip>
-                    </div>
+                    <Tooltip
+                        content="Open application settings"
+                        position="right"
+                    >
+                        {(triggerProps) => (
+                            <button
+                                {...triggerProps}
+                                aria-label="Open application settings"
+                                className="app-sidebar__icon-button"
+                                onClick={handleOpenSettings}
+                                type="button"
+                            >
+                                <SettingsIcon size={18} />
+                                <span className="sr-only">Settings</span>
+                            </button>
+                        )}
+                    </Tooltip>
+                    <Tooltip content={themeButtonLabel} position="right">
+                        {(triggerProps) => (
+                            <button
+                                {...triggerProps}
+                                aria-label={themeButtonLabel}
+                                className="app-sidebar__icon-button"
+                                onClick={toggleTheme}
+                                type="button"
+                            >
+                                <ThemeIcon size={18} />
+                                <span className="sr-only">
+                                    {themeButtonText}
+                                </span>
+                            </button>
+                        )}
+                    </Tooltip>
                 </div>
             </div>
         </aside>

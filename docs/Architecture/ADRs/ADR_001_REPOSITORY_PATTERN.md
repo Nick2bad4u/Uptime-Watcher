@@ -433,5 +433,5 @@ All repository classes implement this pattern:
 
 ## Related ADRs
 
-- [ADR-002: Event-Driven Architecture](./ADR-002-Event-Driven-Architecture.md)
-- [ADR-003: Error Handling Strategy](./ADR-003-Error-Handling-Strategy.md)
+- [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)

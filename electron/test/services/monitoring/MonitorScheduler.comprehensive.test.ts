@@ -35,6 +35,7 @@ vi.mock("../../electronUtils", () => ({
 
 vi.mock("../../utils/logger", () => ({
     logger: mockLogger,
+    diagnosticsLogger: mockLogger,
 }));
 
 // Import after mocking

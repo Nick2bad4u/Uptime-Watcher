@@ -13,6 +13,12 @@ vi.mock("../../utils/logger", () => ({
         warn: vi.fn(),
         error: vi.fn(),
     },
+    diagnosticsLogger: {
+        debug: vi.fn(),
+        warn: vi.fn(),
+        info: vi.fn(),
+        error: vi.fn(),
+    },
 }));
 
 // Mock environment check

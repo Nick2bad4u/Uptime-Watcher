@@ -40,7 +40,14 @@ import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
-import { useCallback, useMemo, useState } from "react";
+import {
+    memo,
+    useCallback,
+    useMemo,
+    useState,
+    type MouseEvent,
+    type NamedExoticComponent,
+} from "react";
 
 import type { AppSettings } from "../../stores/types";
 import type { ThemeName } from "../../theme/types";
@@ -177,7 +184,7 @@ export const Settings = ({
     const { downloadSqliteBackup, fullResyncSites } = useSitesStore();
     const requestConfirmation = useConfirmDialog();
 
-    const { availableThemes, setTheme } = useTheme();
+    const { availableThemes, isDark, setTheme } = useTheme();
 
     // Delayed loading state for button spinners (managed by custom hook)
     const showButtonLoading = useDelayedButtonLoading(isLoading);
@@ -425,6 +432,19 @@ export const Settings = ({
         void handleReset();
     }, [handleReset]);
 
+    /**
+     * Handles overlay clicks to support closing the modal when the user clicks
+     * outside the dialog content.
+     */
+    const handleOverlayClick = useCallback(
+        (event: MouseEvent<HTMLDivElement>) => {
+            if (event.target === event.currentTarget) {
+                onClose();
+            }
+        },
+        [onClose]
+    );
+
     const CloseIcon = AppIcons.ui.close;
     const SettingsHeaderIcon = AppIcons.settings.gearFilled;
     const SuccessIcon = AppIcons.status.upFilled;
@@ -444,10 +464,16 @@ export const Settings = ({
     const showSyncSuccessBanner = syncSuccess && !lastError;
 
     return (
-        <div className="modal-overlay modal-overlay--settings">
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler for UX; keyboard support provided by modal focus management
+        <div
+            className={`modal-overlay modal-overlay--frosted ${
+                isDark ? "dark" : ""
+            }`}
+            onClick={handleOverlayClick}
+        >
             <ThemedBox
                 as="dialog"
-                className="settings-modal"
+                className="modal-shell modal-shell--form modal-shell--accent-primary"
                 data-testid="settings-modal"
                 open
                 padding="xl"
@@ -455,39 +481,43 @@ export const Settings = ({
                 shadow="xl"
                 surface="overlay"
             >
-                <header className="settings-modal__header">
-                    <div className="settings-modal__header-left">
-                        <div className="settings-modal__header-icon">
-                            <SettingsHeaderIcon size={22} />
-                        </div>
-                        <div>
-                            <h1 className="settings-modal__heading">
-                                <ThemedText size="xl" weight="semibold">
-                                    Settings
-                                </ThemedText>
-                            </h1>
-                            <ThemedText size="xs" variant="secondary">
-                                Fine-tune monitoring, notifications, and data
-                                workflows.
+                <div className="modal-shell__header">
+                    <div className="modal-shell__title-group">
+                        <div className="flex items-center gap-2">
+                            <div className="settings-modal__header-icon">
+                                <SettingsHeaderIcon size={22} />
+                            </div>
+                            <ThemedText
+                                className="modal-shell__title"
+                                size="xl"
+                                weight="semibold"
+                            >
+                                Settings
                             </ThemedText>
                         </div>
+                        <ThemedText
+                            className="modal-shell__subtitle"
+                            size="sm"
+                            variant="secondary"
+                        >
+                            Fine-tune monitoring, notifications, and data
+                            workflows.
+                        </ThemedText>
                     </div>
-                    <Tooltip content="Close settings" position="left">
-                        {(triggerProps) => (
-                            <button
-                                {...triggerProps}
-                                aria-label="Close settings"
-                                className="settings-modal__close"
-                                onClick={onClose}
-                                type="button"
-                            >
-                                <CloseIcon size={18} />
-                            </button>
-                        )}
-                    </Tooltip>
-                </header>
+                    <div className="modal-shell__actions">
+                        <button
+                            aria-label="Close settings"
+                            className="modal-shell__close"
+                            onClick={onClose}
+                            title="Close"
+                            type="button"
+                        >
+                            <CloseIcon size={18} />
+                        </button>
+                    </div>
+                </div>
 
-                <div className="settings-modal__body">
+                <div className="modal-shell__body modal-shell__body-scrollable">
                     {lastError ? (
                         <ErrorAlert
                             message={lastError}
@@ -706,46 +736,20 @@ export const Settings = ({
                             title: "Data & Maintenance",
                         })}
                     </div>
-                </div>
 
-                <footer className="settings-modal__footer">
-                    <Tooltip
-                        content="Restore the default monitoring preferences."
-                        position="top"
-                    >
-                        {(triggerProps) => (
+                    <footer className="settings-modal__footer">
+                        <div className="settings-modal__footer-actions">
                             <ThemedButton
-                                {...triggerProps}
                                 disabled={isLoading}
-                                loading={showButtonLoading}
-                                onClick={handleResetClick}
+                                onClick={onClose}
                                 size="sm"
-                                variant="error"
+                                variant="secondary"
                             >
-                                <ResetIcon size={16} />
-                                <span>Reset to defaults</span>
+                                Close
                             </ThemedButton>
-                        )}
-                    </Tooltip>
-                    <div className="settings-modal__footer-actions">
-                        <ThemedButton
-                            disabled={isLoading}
-                            onClick={onClose}
-                            size="sm"
-                            variant="secondary"
-                        >
-                            Cancel
-                        </ThemedButton>
-                        <ThemedButton
-                            loading={showButtonLoading}
-                            onClick={onClose}
-                            size="sm"
-                            variant="primary"
-                        >
-                            Close
-                        </ThemedButton>
-                    </div>
-                </footer>
+                        </div>
+                    </footer>
+                </div>
             </ThemedBox>
         </div>
     );

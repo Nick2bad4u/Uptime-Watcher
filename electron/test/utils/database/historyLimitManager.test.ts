@@ -24,6 +24,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Mock } from "vitest";
 import {
     setHistoryLimit,
     getHistoryLimit,
@@ -37,15 +38,47 @@ import type { Database } from "node-sqlite3-wasm";
 // Mock database
 const mockDatabase = {} as Database;
 
-const mockHistoryRepository = {
+const mockHistoryRepositoryBase: {
+    pruneAllHistory: Mock;
+    pruneAllHistoryInternal: Mock;
+    createTransactionAdapter: Mock;
+} = {
     pruneAllHistory: vi.fn(),
     pruneAllHistoryInternal: vi.fn(),
-} as unknown as HistoryRepository;
+    createTransactionAdapter: vi.fn(),
+};
 
-const mockSettingsRepository = {
+mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation(
+    (db: Database) => ({
+        pruneAllHistory: vi.fn((limit: number) =>
+            mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)
+        ),
+    })
+);
+
+const mockHistoryRepository =
+    mockHistoryRepositoryBase as unknown as HistoryRepository;
+
+const mockSettingsRepositoryBase: {
+    set: Mock;
+    setInternal: Mock;
+    createTransactionAdapter: Mock;
+} = {
     set: vi.fn(),
     setInternal: vi.fn(),
-} as unknown as SettingsRepository;
+    createTransactionAdapter: vi.fn(),
+};
+
+mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation(
+    (db: Database) => ({
+        set: vi.fn((key: string, value: string) =>
+            mockSettingsRepositoryBase.setInternal(db, key, value)
+        ),
+    })
+);
+
+const mockSettingsRepository =
+    mockSettingsRepositoryBase as unknown as SettingsRepository;
 
 // Mock database service
 const mockDatabaseService = {
@@ -64,6 +97,22 @@ const mockLogger = {
 describe("historyLimitManager", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation(
+            (db: Database) => ({
+                pruneAllHistory: vi.fn((limit: number) =>
+                    mockHistoryRepositoryBase.pruneAllHistoryInternal(db, limit)
+                ),
+            })
+        );
+
+        mockSettingsRepositoryBase.createTransactionAdapter.mockImplementation(
+            (db: Database) => ({
+                set: vi.fn((key: string, value: string) =>
+                    mockSettingsRepositoryBase.setInternal(db, key, value)
+                ),
+            })
+        );
     });
 
     afterEach(() => {

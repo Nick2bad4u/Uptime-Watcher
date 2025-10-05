@@ -149,6 +149,7 @@ vi.mock("../../ServiceContainer", () => ({
 
 vi.mock("../../utils/logger", () => ({
     logger: mockLogger,
+    diagnosticsLogger: mockLogger,
 }));
 
 vi.mock("../../electronUtils", () => ({

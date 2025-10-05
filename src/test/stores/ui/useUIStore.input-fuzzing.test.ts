@@ -905,14 +905,19 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 ).toBe("string");
 
                 // Verify valid values
-                expect([
-                    "overview",
-                    "monitors",
+                const activeTab = useUIStore.getState().activeSiteDetailsTab;
+                const allowedStaticTabs = new Set([
+                    "site-overview",
+                    "monitor-overview",
                     "analytics",
-                    "settings",
                     "history",
-                    "logs",
-                ]).toContain(useUIStore.getState().activeSiteDetailsTab);
+                    "settings",
+                ]);
+
+                expect(
+                    allowedStaticTabs.has(activeTab) ||
+                        activeTab.endsWith("-analytics")
+                ).toBeTruthy();
                 expect([
                     "1h",
                     "24h",

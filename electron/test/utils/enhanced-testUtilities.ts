@@ -125,7 +125,7 @@ export function createTestMonitor(
  * Creates a comprehensive mock for a database repository
  */
 export function createMockRepository(): any {
-    return {
+    const repository: Record<string, any> = {
         // Standard CRUD operations
         getAll: vi.fn().mockResolvedValue([]),
         getByIdentifier: vi.fn().mockResolvedValue(undefined),
@@ -143,6 +143,13 @@ export function createMockRepository(): any {
         bulkInsert: vi.fn().mockResolvedValue(undefined),
         deleteAll: vi.fn().mockResolvedValue(undefined),
         exportAll: vi.fn().mockResolvedValue([]),
+        bulkInsertInternal: vi.fn(),
+        deleteAllInternal: vi.fn(),
+        deleteInternal: vi.fn(),
+        deleteBySiteIdentifierInternal: vi.fn(),
+        createInternal: vi.fn(),
+        updateInternal: vi.fn(),
+        clearActiveOperationsInternal: vi.fn(),
 
         // Settings-specific operations
         get: vi.fn().mockResolvedValue("500"),
@@ -152,12 +159,113 @@ export function createMockRepository(): any {
         upsert: vi.fn().mockResolvedValue(undefined),
 
         // History-specific operations
+        addEntryInternal: vi.fn(),
         deleteAllHistory: vi.fn().mockResolvedValue(undefined),
+        deleteByMonitorIdInternal: vi.fn(),
+        getHistoryCountInternal: vi.fn(),
         pruneAllHistoryInternal: vi.fn().mockResolvedValue(undefined),
 
         // Monitor-specific operations
         getAllMonitorIds: vi.fn().mockResolvedValue([]),
     };
+
+    repository.createTransactionAdapter = vi
+        .fn()
+        .mockImplementation((db: unknown) => {
+            const adapter: Record<string, any> = {};
+
+            if (repository.bulkInsertInternal.mock) {
+                adapter.bulkInsert = vi.fn((payload: unknown) =>
+                    repository.bulkInsertInternal(db, payload)
+                );
+            }
+
+            if (repository.deleteAllInternal.mock) {
+                adapter.deleteAll = vi.fn(() =>
+                    repository.deleteAllInternal(db)
+                );
+            }
+
+            if (repository.deleteInternal.mock) {
+                adapter.delete = vi.fn((identifier: unknown) =>
+                    repository.deleteInternal(db, identifier)
+                );
+                adapter.deleteByKey = vi.fn((key: unknown) =>
+                    repository.deleteInternal(db, key)
+                );
+                adapter.deleteById = vi.fn((identifier: unknown) =>
+                    repository.deleteInternal(db, identifier)
+                );
+            }
+
+            if (repository.deleteBySiteIdentifierInternal.mock) {
+                adapter.deleteBySiteIdentifier = vi.fn(
+                    (siteIdentifier: unknown) =>
+                        repository.deleteBySiteIdentifierInternal(
+                            db,
+                            siteIdentifier
+                        )
+                );
+            }
+
+            if (repository.createInternal.mock) {
+                adapter.create = vi.fn((...args: unknown[]) =>
+                    repository.createInternal(db, ...args)
+                );
+            }
+
+            if (repository.updateInternal.mock) {
+                adapter.update = vi.fn((...args: unknown[]) =>
+                    repository.updateInternal(db, ...args)
+                );
+            }
+
+            if (repository.clearActiveOperationsInternal.mock) {
+                adapter.clearActiveOperations = vi.fn((monitorId: unknown) =>
+                    repository.clearActiveOperationsInternal(db, monitorId)
+                );
+            }
+
+            if (repository.addEntryInternal.mock) {
+                adapter.addEntry = vi.fn(
+                    (monitorId: unknown, entry: unknown, details?: unknown) =>
+                        repository.addEntryInternal(
+                            db,
+                            monitorId,
+                            entry,
+                            details
+                        )
+                );
+            }
+
+            if (repository.deleteByMonitorIdInternal.mock) {
+                adapter.deleteByMonitorId = vi.fn((monitorId: unknown) =>
+                    repository.deleteByMonitorIdInternal(db, monitorId)
+                );
+            }
+
+            if (repository.getHistoryCountInternal.mock) {
+                adapter.getHistoryCount = vi.fn((monitorId: unknown) =>
+                    repository.getHistoryCountInternal(db, monitorId)
+                );
+            }
+
+            if (repository.pruneAllHistoryInternal.mock) {
+                adapter.pruneAllHistory = vi.fn((limit: unknown) =>
+                    repository.pruneAllHistoryInternal(db, limit)
+                );
+            }
+
+            if (repository.setInternal.mock) {
+                adapter.set = vi.fn((key: unknown, value: unknown) =>
+                    repository.setInternal(db, key, value)
+                );
+            }
+
+            return adapter;
+        });
+
+    return repository;
 }
 
 /**

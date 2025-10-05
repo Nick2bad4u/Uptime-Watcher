@@ -122,6 +122,17 @@ describe("MonitorManager arithmetic mutations", () => {
             repositories: {
                 monitor: {
                     updateInternal: vi.fn().mockResolvedValue({}),
+                    createTransactionAdapter: vi
+                        .fn()
+                        .mockImplementation((db: unknown) => ({
+                            update: vi.fn((id: string, changes: unknown) =>
+                                mockDependencies.repositories.monitor.updateInternal(
+                                    db,
+                                    id,
+                                    changes
+                                )
+                            ),
+                        })),
                 },
             },
             getSitesCache: vi.fn().mockReturnValue({

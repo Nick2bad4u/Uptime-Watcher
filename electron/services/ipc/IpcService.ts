@@ -22,6 +22,10 @@ import {
     getMonitorTypeConfig,
 } from "../monitoring/MonitorTypeRegistry";
 import {
+    recordMissingHandler,
+    recordSuccessfulHandlerCheck,
+} from "./diagnosticsMetrics";
+import {
     createValidationResponse,
     registerStandardizedIpcHandler,
 } from "./utils";
@@ -1091,7 +1095,10 @@ export class IpcService {
 
                 const isRegistered = this.registeredIpcHandlers.has(channelRaw);
 
-                if (!isRegistered) {
+                if (isRegistered) {
+                    recordSuccessfulHandlerCheck();
+                } else {
+                    recordMissingHandler(channelRaw);
                     logger.error(
                         "[IpcService] Missing IPC handler requested by preload bridge",
                         { availableChannels, channel: channelRaw }

@@ -12,6 +12,7 @@ import {
     createVoidInvoker,
     createEventManager,
     IpcError,
+    resetDiagnosticsVerificationStateForTesting,
     type IpcResponse,
 } from "../../../preload/core/bridgeFactory";
 import type {
@@ -62,10 +63,17 @@ function createHandshakeFailure(
 
 describe("bridgeFactory", function describeBridgeFactorySuite() {
     beforeEach(() => {
+        (globalThis as Record<string, unknown>)[
+            "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
+        ] = false;
+        resetDiagnosticsVerificationStateForTesting();
         vi.clearAllMocks();
     });
 
     afterEach(() => {
+        delete (globalThis as Record<string, unknown>)[
+            "__UPTIME_ALLOW_IPC_DIAGNOSTICS_FALLBACK__"
+        ];
         vi.clearAllMocks();
     });
 

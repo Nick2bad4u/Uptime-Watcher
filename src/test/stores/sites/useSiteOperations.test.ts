@@ -347,7 +347,7 @@ describe(createSiteOperationsActions, () => {
             mockElectronAPI.sites.removeSite.mockResolvedValueOnce(false);
 
             await expect(actions.deleteSite("test-site")).rejects.toThrow(
-                /Backend operation returned false/
+                "Site removal failed for test-site: Backend returned false"
             );
             expect(mockDeps.removeSite).not.toHaveBeenCalled();
         });

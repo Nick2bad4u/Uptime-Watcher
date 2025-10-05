@@ -71,10 +71,10 @@
 }
 
 .app-sidebar__brand {
-    display: flex;
+    display: grid;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    grid-template-columns: auto auto 1fr;
+    gap: 0.9rem;
 }
 
 .app-sidebar__brand-trigger {
@@ -102,6 +102,7 @@
         transform var(--transition-fast),
         box-shadow var(--transition-fast),
         border-color var(--transition-fast);
+    cursor: pointer;
 
     @media screen and (prefers-reduced-motion: reduce) {
         display: grid;
@@ -158,6 +159,49 @@
     }
 }
 
+.app-sidebar__brand-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    background: color-mix(
+        in srgb,
+        var(--color-primary-500) 16%,
+        var(--color-surface-overlay) 84%
+    );
+    block-size: 2.5rem;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 8%),
+        0 14px 28px rgb(5 12 24 / 32%);
+    inline-size: 2.5rem;
+    overflow: hidden;
+}
+
+.app-sidebar--light .app-sidebar__brand-logo {
+    background: color-mix(
+        in srgb,
+        var(--color-background-secondary) 85%,
+        transparent
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 10%),
+        0 10px 18px rgb(148 163 184 / 26%);
+}
+
+.app-sidebar__brand-logo-image {
+    display: block;
+    block-size: 100%;
+    inline-size: 100%;
+    object-fit: contain;
+}
+
+.app-sidebar__brand-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-inline-size: 0;
+}
+
 .app-sidebar__brand-title {
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -193,35 +237,35 @@
         background var(--transition-fast),
         border-color var(--transition-fast),
         box-shadow var(--transition-fast);
-}
 
-.app-sidebar__search-input:focus-visible {
-    border-color: color-mix(
-        in srgb,
-        var(--color-primary-500) 45%,
-        transparent
-    );
-    background: color-mix(
-        in srgb,
-        var(--color-primary-500) 12%,
-        transparent
-    );
-    box-shadow: 0 0 0 4px
-        color-mix(in srgb, var(--color-primary-500) 18%, transparent);
-}
+    &:focus-visible {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 45%,
+            transparent
+        );
+        background: color-mix(
+            in srgb,
+            var(--color-primary-500) 12%,
+            transparent
+        );
+        box-shadow: 0 0 0 4px
+            color-mix(in srgb, var(--color-primary-500) 18%, transparent);
+    }
 
-.app-sidebar--light .app-sidebar__search-input {
-    border-color: color-mix(
-        in srgb,
-        var(--color-border-primary) 35%,
-        transparent
-    );
-    background: color-mix(
-        in srgb,
-        var(--color-background-secondary) 92%,
-        transparent
-    );
-    color: var(--color-text-primary);
+    .app-sidebar--light & {
+        border-color: color-mix(
+            in srgb,
+            var(--color-border-primary) 35%,
+            transparent
+        );
+        background: color-mix(
+            in srgb,
+            var(--color-background-secondary) 92%,
+            transparent
+        );
+        color: var(--color-text-primary);
+    }
 }
 
 .app-sidebar--light .app-sidebar__search-input:focus-visible {
@@ -241,8 +285,8 @@
     gap: 0.5rem;
     overflow-block: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable both-edges;
     padding-inline-end: 0.25rem;
+    scrollbar-gutter: stable both-edges;
     scrollbar-width: thin;
 }
 
@@ -268,6 +312,7 @@
         transform var(--transition-fast),
         border-color var(--transition-fast),
         background var(--transition-fast);
+    cursor: pointer;
 
     @media screen and (prefers-reduced-motion: reduce) {
         position: relative;
@@ -526,14 +571,10 @@
 
 .app-sidebar__footer {
     display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    margin-block-start: auto;
-}
-
-.app-sidebar__footer-controls {
-    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     gap: 0.6rem;
+    margin-block-start: auto;
 }
 
 .app-sidebar__icon-button {
@@ -562,6 +603,7 @@
         transform var(--transition-fast),
         border-color var(--transition-fast),
         box-shadow var(--transition-fast);
+    cursor: pointer;
 
     @media screen and (prefers-reduced-motion: reduce) {
         transition: none;
@@ -592,6 +634,21 @@
     }
 }
 
+@media (width <= 640px) {
+    .app-sidebar__brand {
+        grid-template-columns: auto 1fr;
+        gap: 0.75rem;
+    }
+
+    .app-sidebar__brand-logo {
+        display: none;
+    }
+
+    .app-sidebar__footer {
+        justify-content: flex-start;
+    }
+}
+
 .app-sidebar__icon-button--primary {
     border-color: color-mix(in srgb, var(--color-status-up) 34%, transparent);
     background: linear-gradient(
@@ -599,11 +656,7 @@
         color-mix(in srgb, var(--color-status-up) 22%, transparent),
         color-mix(in srgb, var(--color-surface-elevated) 78%, transparent)
     );
-    color: color-mix(
-        in srgb,
-        var(--color-status-up) 78%,
-        rgb(255 255 255) 22%
-    );
+    color: color-mix(in srgb, var(--color-status-up) 78%, rgb(255 255 255) 22%);
 
     &:hover,
     &:focus {

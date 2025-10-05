@@ -5,6 +5,8 @@
 /* stylelint-disable no-descending-specificity -- not worth fixing atm -- */
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable plugin/no-low-performance-animation-properties -- intentional rich shadows/transforms rely on transitions and remain performant in benchmarks. */
+/* stylelint-disable scss/function-color-relative -- native color-mix works with CSS custom properties; Sass color helpers cannot express these blends. */
 
 /* CSS Custom Properties for animations */
 :root {
@@ -1404,7 +1406,6 @@
 /* Site Card - Enhanced */
 .site-card {
     position: relative;
-    cursor: pointer;
     padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
         clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
     border: 1px solid
@@ -1420,6 +1421,7 @@
             color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
         0 16px 36px
             color-mix(in srgb, var(--shadow-deep-color) 32%, transparent);
+    cursor: pointer;
     gap: 0.4rem;
     min-block-size: 100%;
 }
@@ -1558,10 +1560,6 @@
     color: var(--color-text-inverse);
 }
 
-.bg-error-muted\/50 {
-    background-color: color-mix(in srgb, var(--color-error) 5%, transparent);
-}
-
 /* Tailwind-style arbitrary value classes for borders */
 .border-primary\/20 {
     border-color: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
@@ -1571,6 +1569,7 @@
     border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
 }
 
+.bg-error-muted\/50,
 .bg-error\/5 {
     background-color: color-mix(in srgb, var(--color-error) 5%, transparent);
 }
@@ -2211,6 +2210,8 @@
     grid-row: 1;
     min-block-size: 100vb;
     min-inline-size: 0;
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
 
     .app-shell--light & {
         background: color-mix(
@@ -2228,6 +2229,7 @@
     padding: clamp(1.75rem, 1.35rem + 0.65vi, 2.5rem)
         clamp(0.75rem, 2.5vi, 2rem) clamp(2.25rem, 1.8rem + 1.75vi, 3rem);
     gap: 1.5rem;
+    min-block-size: 0;
 }
 
 .app-shell__panel {
@@ -2240,7 +2242,7 @@
         color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
     inline-size: 100%;
     margin-inline: auto;
-    max-inline-size: min(105rem, 100%);
+    max-inline-size: min(120rem, 100%);
 
     .app-shell--light & {
         border-color: color-mix(
@@ -2263,7 +2265,7 @@
     --site-grid-gap: clamp(1.25rem, 1rem + 0.75vi, 1.75rem);
 
     display: grid;
-    justify-content: center;
+    justify-content: stretch;
     gap: var(--site-grid-gap);
     grid-template-columns: repeat(
         auto-fit,
@@ -2522,10 +2524,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.65rem;
-    padding: 0.35rem 0.6rem;
+    padding: 0.45rem 0.85rem;
     border: 1px solid
-        color-mix(in srgb, var(--color-primary-400) 28%, transparent);
+        color-mix(in srgb, var(--color-primary-400) 34%, transparent);
     border-radius: 0.9rem;
     background: linear-gradient(
         135deg,
@@ -2533,12 +2534,13 @@
         color-mix(in srgb, var(--color-primary-500) 12%, transparent) 100%
     );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 4%),
-        0 12px 28px
+        inset 0 0 0 1px rgb(255 255 255 / 5%),
+        0 16px 32px
             color-mix(in srgb, var(--shadow-base-color) 24%, transparent);
-    inline-size: clamp(10rem, 18vi, 15rem);
+    gap: 0.65rem;
+    inline-size: clamp(12rem, 24vi, 20rem);
     max-inline-size: 100%;
-    min-inline-size: 10rem;
+    min-inline-size: 12rem;
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),
@@ -2548,18 +2550,18 @@
     &:focus-within {
         border-color: color-mix(
             in srgb,
-            var(--color-primary-400) 46%,
+            var(--color-primary-400) 48%,
             transparent
         );
         box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 6%),
-            0 16px 34px
+            inset 0 0 0 1px rgb(255 255 255 / 8%),
+            0 20px 40px
                 color-mix(in srgb, var(--color-primary-500) 26%, transparent);
         transform: translateY(-1px);
     }
 
     &.monitor-selector {
-        inline-size: clamp(10rem, 18vi, 15rem);
+        inline-size: clamp(12rem, 24vi, 20rem);
     }
 
     & .monitor-selector__icon {
@@ -2585,10 +2587,10 @@
 }
 
 .monitor-selector__input {
+    flex: 1 1 auto;
+    border: none;
     background-color: transparent;
     color: inherit;
-    border: none;
-    flex: 1 1 auto;
     min-inline-size: 0;
     padding-inline: 0;
 
@@ -2610,6 +2612,7 @@
 
 .site-card__metrics {
     position: relative;
+
     --site-card-metric-min-width: clamp(9.5rem, 8.8rem + 1.2vi, 11.75rem);
     --site-card-metric-gap: clamp(0.7rem, 0.62rem + 0.25vi, 0.95rem);
 }
@@ -3026,10 +3029,8 @@
 .metric-card {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
     padding: clamp(0.75rem, 0.7rem + 0.25vi, 0.95rem)
         clamp(0.9rem, 0.85rem + 0.35vi, 1.2rem);
-    min-block-size: 100%;
     border: 1px solid
         color-mix(in srgb, var(--color-primary-400) 32%, transparent);
     border-radius: 1rem;
@@ -3038,6 +3039,10 @@
         color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
         color-mix(in srgb, var(--color-primary-500) 16%, transparent) 88%
     );
+    gap: 0.4rem;
+    min-block-size: 100%;
+    translate: 0;
+
     &:hover {
         border-color: color-mix(
             in srgb,
@@ -3049,41 +3054,32 @@
                 color-mix(in srgb, var(--shadow-inverse-color) 14%, transparent),
             0 20px 48px
                 color-mix(in srgb, var(--shadow-deep-color) 42%, transparent);
-        transform: translateY(-2px);
+        translate: 0 -2px;
     }
 }
 
-.metric-card:hover {
-    border-color: color-mix(in srgb, var(--color-primary-400) 52%, transparent);
-    box-shadow:
-        inset 0 1px 0
-            color-mix(in srgb, var(--shadow-inverse-color) 14%, transparent),
-        0 20px 48px
-            color-mix(in srgb, var(--shadow-deep-color) 42%, transparent);
-    transform: translateY(-2px);
-}
-font-size: clamp(0.75rem, 0.75rem + 0.15vi, 0.875rem);
 .metric-card__label {
     color: color-mix(
         in srgb,
         var(--color-text-secondary, rgb(148 163 184)) 92%,
         transparent
     );
-    font-size: clamp(0.68rem, 0.65rem + 0.2vi, 0.85rem);
+    font-size: clamp(0.625rem, 0.625rem + 0.2vi, 0.875rem);
     font-weight: var(--font-weight-medium, 500);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-wrap: balance;
 }
-font-size: clamp(1rem, 0.95rem + 0.35vi, 1.25rem);
+
 .metric-card__value {
     color: color-mix(
-        line-height: 1.25; var(--color-text-primary, rgb(248 250 252)) 96%,
+        in srgb,
+        var(--color-text-primary, rgb(248 250 252)) 96%,
         transparent
     );
-    font-size: clamp(1.05rem, 1rem + 0.3vi, 1.32rem);
+    font-size: clamp(1rem, 1rem + 0.35vi, 1.25rem);
     font-weight: var(--font-weight-semibold, 600);
-    line-height: 1.2;
+    line-height: 1.25;
     text-shadow: 0 4px 16px
         color-mix(in srgb, var(--shadow-base-color) 28%, transparent);
 }
@@ -3324,10 +3320,10 @@ font-size: clamp(1rem, 0.95rem + 0.35vi, 1.25rem);
 
 .setting-control {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: flex-end;
     gap: var(--spacing-sm);
-    flex-shrink: 0;
     min-inline-size: 8rem;
 }
 
@@ -3518,15 +3514,6 @@ font-size: clamp(1rem, 0.95rem + 0.35vi, 1.25rem);
 .themed-status-indicator__dot--pending {
     animation: pulse 1.5s ease-in-out infinite;
 }
-
-.themed-status-indicator__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-/* Removed duplicate .themed-status-indicator__text selector to resolve no-duplicate-selectors error */
 
 @keyframes pulse {
     0%,

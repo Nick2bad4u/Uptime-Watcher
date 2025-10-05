@@ -126,6 +126,12 @@ vi.mock("../../utils/logger", () => ({
         warn: vi.fn(),
         error: vi.fn(),
     },
+    diagnosticsLogger: {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    },
 }));
 
 vi.mock("../../shared/utils/errorHandling", () => {

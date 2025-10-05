@@ -171,20 +171,22 @@ const mockHistoryRepository = {
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
     deleteAll: vi.fn(() => Promise.resolve()),
     deleteOldHistoryEntriesBySiteId: vi.fn(() => Promise.resolve()),
-    pruneAllHistoryInternal: vi.fn(() => Promise.resolve()),
+    pruneAllHistoryInternal: vi.fn(),
+    deleteAllInternal: vi.fn(),
 } as any;
 
 const mockMonitorRepository = {
     findBySiteIdentifier: vi.fn(() => Promise.resolve([])),
     findByIdentifier: vi.fn(() => Promise.resolve(undefined)),
     getAllMonitorIds: vi.fn(() => Promise.resolve([])),
+    deleteAllInternal: vi.fn(),
 } as any;
 
 const mockSettingsRepository = {
     findByKey: vi.fn(() => Promise.resolve(undefined)),
     get: vi.fn(() => Promise.resolve(undefined)),
     upsert: vi.fn(() => Promise.resolve()),
-    setInternal: vi.fn(() => Promise.resolve()),
+    setInternal: vi.fn(),
     exportAll: vi.fn(() => Promise.resolve([])),
 } as any;
 
@@ -197,7 +199,49 @@ const mockSiteRepository = {
     exists: vi.fn(() => Promise.resolve(false)),
     bulkInsert: vi.fn(() => Promise.resolve()),
     exportAll: vi.fn(() => Promise.resolve([])),
+    bulkInsertInternal: vi.fn(),
+    deleteAllInternal: vi.fn(),
 } as any;
+
+const attachTransactionAdapter = (
+    repository: Record<string, any>,
+    builders: Record<string, Function>
+) => {
+    repository.createTransactionAdapter = vi
+        .fn()
+        .mockImplementation((db: unknown) => {
+            const adapter: Record<string, any> = {};
+            for (const [key, factory] of Object.entries(builders)) {
+                adapter[key] = vi.fn((...args: unknown[]) =>
+                    factory(db, ...args)
+                );
+            }
+            return adapter;
+        });
+};
+
+const initializeTransactionAdapters = (): void => {
+    attachTransactionAdapter(mockSettingsRepository, {
+        set: (db: unknown, key: unknown, value: unknown) =>
+            mockSettingsRepository.setInternal(db, key, value),
+    });
+
+    attachTransactionAdapter(mockHistoryRepository, {
+        pruneAllHistory: (db: unknown, limit: unknown) =>
+            mockHistoryRepository.pruneAllHistoryInternal(db, limit),
+        deleteAll: (db: unknown) => mockHistoryRepository.deleteAllInternal(db),
+    });
+
+    attachTransactionAdapter(mockMonitorRepository, {
+        deleteAll: (db: unknown) => mockMonitorRepository.deleteAllInternal(db),
+    });
+
+    attachTransactionAdapter(mockSiteRepository, {
+        bulkInsert: (db: unknown, rows: unknown) =>
+            mockSiteRepository.bulkInsertInternal(db, rows),
+        deleteAll: (db: unknown) => mockSiteRepository.deleteAllInternal(db),
+    });
+};
 
 // Helper function to create proper mocks
 const createSiteLoadingOrchestratorMock = (overrides = {}) => ({
@@ -228,6 +272,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
     beforeEach(async () => {
         vi.clearAllMocks();
+
+        initializeTransactionAdapters();
 
         // Set up the orchestrator mock before creating DatabaseManager
         mockOrchestrator = createSiteLoadingOrchestratorMock();
@@ -650,6 +696,20 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 setInternal: mockSetInternal,
             };
 
+            mockSettingsRepository.setInternal = mockSetInternal;
+            attachTransactionAdapter(mockSettingsRepository, {
+                set: (db: unknown, key: unknown, value: unknown) =>
+                    mockSetInternal(db, key, value),
+            });
+
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
+
             await expect(databaseManager.setHistoryLimit(100)).rejects.toThrow(
                 "Failed to set limit"
             );
@@ -891,6 +951,57 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 pruneAllHistoryInternal: mockPruneAllHistoryInternal,
             };
 
+            mockSettingsRepository.setInternal = mockSetInternal;
+            attachTransactionAdapter(mockSettingsRepository, {
+                set: (db: unknown, key: unknown, value: unknown) =>
+                    mockSetInternal(db, key, value),
+            });
+
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.history,
+                {
+                    pruneAllHistory: (db: unknown, limit: unknown) =>
+                        mockPruneAllHistoryInternal(db, limit),
+                }
+            );
+
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.history,
+                {
+                    pruneAllHistory: (db: unknown, limit: unknown) =>
+                        mockPruneAllHistoryInternal(db, limit),
+                }
+            );
+
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.history,
+                {
+                    pruneAllHistory: (db: unknown, limit: unknown) =>
+                        mockPruneAllHistoryInternal(db, limit),
+                }
+            );
+
             await databaseManager.setHistoryLimit(300);
 
             expect(mockSetInternal).toHaveBeenCalledWith(
@@ -959,6 +1070,22 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 pruneAllHistoryInternal: mockPruneAllHistoryInternal,
             };
 
+            mockSettingsRepository.setInternal = mockSetInternal;
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.history,
+                {
+                    pruneAllHistory: (db: unknown, limit: unknown) =>
+                        mockPruneAllHistoryInternal(db, limit),
+                }
+            );
+
             await databaseManager.setHistoryLimit(10);
 
             // Utility enforces minimum of 10, not ConfigurationManager's minLimit
@@ -1002,6 +1129,14 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 ...mockSettingsRepository,
                 setInternal: mockSetInternal,
             };
+
+            attachTransactionAdapter(
+                (databaseManager as any).dependencies.repositories.settings,
+                {
+                    set: (db: unknown, key: unknown, value: unknown) =>
+                        mockSetInternal(db, key, value),
+                }
+            );
 
             await expect(databaseManager.setHistoryLimit(200)).rejects.toThrow(
                 "Database write error"
@@ -1141,7 +1276,25 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 undefined,
             ]);
 
-            expect(mockSetInternal).toHaveBeenCalledTimes(3);
+            const settingsAdapterMock = vi.mocked(
+                (databaseManager as any).dependencies.repositories.settings
+                    .createTransactionAdapter
+            );
+
+            let totalSetInvocations = 0;
+            for (const invocation of settingsAdapterMock.mock.results) {
+                if (invocation.type === "return") {
+                    const adapter = invocation.value as {
+                        set?: ReturnType<typeof vi.fn>;
+                    };
+
+                    if (adapter?.set) {
+                        totalSetInvocations += adapter.set.mock.calls.length;
+                    }
+                }
+            }
+
+            expect(totalSetInvocations).toBe(3);
         });
     });
 });
