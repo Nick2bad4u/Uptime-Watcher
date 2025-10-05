@@ -540,6 +540,7 @@ export class IpcService {
         this.setupDataHandlers();
         this.setupSystemHandlers();
         this.setupStateSyncHandlers();
+        this.setupDiagnosticsHandlers();
     }
 
     /**
@@ -1067,5 +1068,44 @@ export class IpcService {
             logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
             this.autoUpdaterService.quitAndInstall();
         });
+    }
+
+    /**
+     * Registers diagnostics handlers used by the preload bridge for runtime
+     * validation.
+     */
+    private setupDiagnosticsHandlers(): void {
+        registerStandardizedIpcHandler(
+            "diagnostics:verify-ipc-handler",
+            (...args: unknown[]) => {
+                const [channelRaw] = args;
+                if (typeof channelRaw !== "string") {
+                    throw new TypeError(
+                        "Channel name must be a non-empty string"
+                    );
+                }
+
+                const availableChannels = Array.from(
+                    this.registeredIpcHandlers
+                ).toSorted((left, right) => left.localeCompare(right));
+
+                const isRegistered = this.registeredIpcHandlers.has(channelRaw);
+
+                if (!isRegistered) {
+                    logger.error(
+                        "[IpcService] Missing IPC handler requested by preload bridge",
+                        { availableChannels, channel: channelRaw }
+                    );
+                }
+
+                return {
+                    availableChannels,
+                    channel: channelRaw,
+                    registered: isRegistered,
+                };
+            },
+            SystemHandlerValidators.verifyIpcHandler,
+            this.registeredIpcHandlers
+        );
     }
 }

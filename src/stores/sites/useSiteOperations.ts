@@ -16,10 +16,7 @@ import { getErrorMessage } from "@shared/utils/errorUtils";
 import type { BaseSiteOperations } from "./baseTypes";
 import type { SiteOperationsDependencies } from "./types";
 
-import { DataService } from "../../services/DataService";
 import { logger } from "../../services/logger";
-import { MonitoringService } from "./services/MonitoringService";
-import { SiteService } from "./services/SiteService";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
@@ -88,7 +85,7 @@ export const createSiteOperationsActions = (
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, normalizedMonitor];
-                await SiteService.updateSite(siteId, {
+                await deps.services.site.updateSite(siteId, {
                     monitors: updatedMonitors,
                 });
             },
@@ -129,7 +126,7 @@ export const createSiteOperationsActions = (
                 };
 
                 // Preload now returns extracted data directly
-                const newSite = await SiteService.addSite(completeSite);
+                const newSite = await deps.services.site.addSite(completeSite);
                 deps.addSite(newSite);
             },
             { siteData },
@@ -150,7 +147,7 @@ export const createSiteOperationsActions = (
                     for (const monitor of site.monitors) {
                         try {
                             // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop operations required
-                            await MonitoringService.stopMonitoring(
+                            await deps.services.monitoring.stopMonitoring(
                                 identifier,
                                 monitor.id
                             );
@@ -167,7 +164,7 @@ export const createSiteOperationsActions = (
                         }
                     }
                 }
-                const removed = await SiteService.removeSite(identifier);
+                const removed = await deps.services.site.removeSite(identifier);
                 if (!removed) {
                     throw new Error(
                         `Site removal failed for ${identifier}: Backend returned false`
@@ -186,7 +183,7 @@ export const createSiteOperationsActions = (
             async () => {
                 try {
                     await handleSQLiteBackupDownload(() =>
-                        DataService.downloadSqliteBackup()
+                        deps.services.site.downloadSqliteBackup()
                     );
                 } catch (error) {
                     const resolvedError = ensureError(error);
@@ -211,7 +208,7 @@ export const createSiteOperationsActions = (
             "initializeSites",
             async () => {
                 // Preload now returns extracted data directly
-                const sites = await SiteService.getSites();
+                const sites = await deps.services.site.getSites();
                 deps.setSites(sites);
                 return {
                     message: `Successfully loaded ${sites.length} sites`,
@@ -230,7 +227,7 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "modifySite",
             async () => {
-                await SiteService.updateSite(identifier, updates);
+                await deps.services.site.updateSite(identifier, updates);
             },
             { identifier, updates },
             deps
@@ -250,7 +247,10 @@ export const createSiteOperationsActions = (
 
                 // Stop monitoring for this specific monitor first
                 try {
-                    await MonitoringService.stopMonitoring(siteId, monitorId);
+                    await deps.services.monitoring.stopMonitoring(
+                        siteId,
+                        monitorId
+                    );
                 } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
@@ -264,7 +264,7 @@ export const createSiteOperationsActions = (
                 }
 
                 // Remove the monitor via backend
-                await SiteService.removeMonitor(siteId, monitorId);
+                await deps.services.site.removeMonitor(siteId, monitorId);
             },
             { monitorId, siteId },
             deps

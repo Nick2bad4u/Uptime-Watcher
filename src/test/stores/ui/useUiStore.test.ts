@@ -7,7 +7,10 @@ import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "../../../../shared/types";
-import type { SiteListLayoutMode } from "../../../stores/ui/types";
+import type {
+    SiteDetailsTab,
+    SiteListLayoutMode,
+} from "../../../stores/ui/types";
 
 import { useUIStore } from "../../../stores/ui/useUiStore";
 
@@ -49,6 +52,8 @@ describe(useUIStore, () => {
             },
         ],
     };
+
+    const analyticsTab: SiteDetailsTab = "monitor-1-analytics";
 
     beforeEach(() => {
         // Reset store state before each test
@@ -126,10 +131,10 @@ describe(useUIStore, () => {
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
-                result.current.setActiveSiteDetailsTab("analytics");
+                result.current.setActiveSiteDetailsTab(analyticsTab);
             });
 
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
         });
 
         it("should handle different tab names", async ({ task, annotate }) => {
@@ -140,9 +145,10 @@ describe(useUIStore, () => {
 
             const { result } = renderHook(() => useUIStore());
 
-            const tabs = [
+            const tabs: SiteDetailsTab[] = [
                 "site-overview",
-                "analytics",
+                "monitor-overview",
+                analyticsTab,
                 "history",
                 "settings",
             ];
@@ -164,10 +170,12 @@ describe(useUIStore, () => {
             const { result } = renderHook(() => useUIStore());
 
             act(() => {
-                result.current.setActiveSiteDetailsTab("");
+                result.current.setActiveSiteDetailsTab("" as SiteDetailsTab);
             });
 
-            expect(result.current.activeSiteDetailsTab).toBe("");
+            expect(result.current.activeSiteDetailsTab).toBe(
+                "" as SiteDetailsTab
+            );
         });
 
         it("should handle special characters in tab names", async ({
@@ -181,7 +189,8 @@ describe(useUIStore, () => {
 
             const { result } = renderHook(() => useUIStore());
 
-            const specialTab = "tab-with-special-chars!@#$%";
+            const specialTab: SiteDetailsTab =
+                "tab-with-special-chars!@#$%-analytics";
 
             act(() => {
                 result.current.setActiveSiteDetailsTab(specialTab);
@@ -225,7 +234,7 @@ describe(useUIStore, () => {
 
             act(() => {
                 result.current.selectSite(mockSite);
-                result.current.setActiveSiteDetailsTab("analytics");
+                result.current.setActiveSiteDetailsTab(analyticsTab);
             });
 
             act(() => {
@@ -237,7 +246,7 @@ describe(useUIStore, () => {
                 result.current.syncActiveSiteDetailsTab(mockSite.identifier);
             });
 
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
         });
 
         it("should fall back to default tab when no persisted state exists", async ({
@@ -768,14 +777,14 @@ describe(useUIStore, () => {
                 result.current.setShowSettings(true);
                 result.current.setShowSiteDetails(true);
                 result.current.setShowAdvancedMetrics(true);
-                result.current.setActiveSiteDetailsTab("analytics");
+                result.current.setActiveSiteDetailsTab(analyticsTab);
                 result.current.setSiteDetailsChartTimeRange("7d");
             });
 
             expect(result.current.showSettings).toBeTruthy();
             expect(result.current.showSiteDetails).toBeTruthy();
             expect(result.current.showAdvancedMetrics).toBeTruthy();
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
     });
@@ -824,9 +833,9 @@ describe(useUIStore, () => {
 
             // User switches to analytics tab
             act(() => {
-                result.current.setActiveSiteDetailsTab("analytics");
+                result.current.setActiveSiteDetailsTab(analyticsTab);
             });
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
 
             // User changes time range
             act(() => {
@@ -843,7 +852,7 @@ describe(useUIStore, () => {
             // Advanced metrics should still be enabled
             expect(result.current.showAdvancedMetrics).toBeTruthy();
             // Tab and time range should be preserved
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
             expect(result.current.siteDetailsChartTimeRange).toBe("7d");
         });
 
@@ -921,7 +930,7 @@ describe(useUIStore, () => {
             // Set some state
             act(() => {
                 result.current.setShowAdvancedMetrics(true);
-                result.current.setActiveSiteDetailsTab("analytics");
+                result.current.setActiveSiteDetailsTab(analyticsTab);
             });
 
             // Verify they're independent
@@ -930,7 +939,7 @@ describe(useUIStore, () => {
             });
 
             expect(result.current.showAdvancedMetrics).toBeTruthy();
-            expect(result.current.activeSiteDetailsTab).toBe("analytics");
+            expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
             expect(result.current.showSettings).toBeTruthy();
 
             // Change one property
@@ -967,9 +976,9 @@ describe(useUIStore, () => {
 
             for (let i = 0; i < 5; i++) {
                 act(() => {
-                    result.current.setActiveSiteDetailsTab("analytics");
+                    result.current.setActiveSiteDetailsTab(analyticsTab);
                 });
-                expect(result.current.activeSiteDetailsTab).toBe("analytics");
+                expect(result.current.activeSiteDetailsTab).toBe(analyticsTab);
             }
         });
 

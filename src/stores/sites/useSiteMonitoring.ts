@@ -42,6 +42,27 @@ export interface SiteMonitoringActions {
 }
 
 /**
+ * External dependencies required for monitoring actions.
+ */
+export interface SiteMonitoringDependencies {
+    /** Monitoring service abstraction */
+    monitoringService: Pick<
+        typeof MonitoringService,
+        | "checkSiteNow"
+        | "startMonitoring"
+        | "startSiteMonitoring"
+        | "stopMonitoring"
+        | "stopSiteMonitoring"
+    >;
+}
+
+const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
+    {
+        monitoringService: MonitoringService,
+    }
+);
+
+/**
  * Creates site monitoring actions for managing monitoring lifecycle operations.
  *
  * @remarks
@@ -51,13 +72,15 @@ export interface SiteMonitoringActions {
  *
  * @returns Object containing all site monitoring action functions
  */
-export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
+export const createSiteMonitoringActions = (
+    deps: SiteMonitoringDependencies = defaultMonitoringDependencies
+): SiteMonitoringActions => ({
     checkSiteNow: async (siteId: string, monitorId: string): Promise<void> => {
         logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });
 
         await withErrorHandling(
             async () => {
-                await MonitoringService.checkSiteNow(siteId, monitorId);
+                await deps.monitoringService.checkSiteNow(siteId, monitorId);
                 // Backend will emit 'monitor:status-changed', which will
                 // trigger incremental update
             },
@@ -69,7 +92,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await MonitoringService.startSiteMonitoring(siteId);
+                await deps.monitoringService.startSiteMonitoring(siteId);
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -87,7 +110,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await MonitoringService.startMonitoring(siteId, monitorId);
+                await deps.monitoringService.startMonitoring(siteId, monitorId);
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -102,7 +125,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await MonitoringService.stopSiteMonitoring(siteId);
+                await deps.monitoringService.stopSiteMonitoring(siteId);
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -120,7 +143,7 @@ export const createSiteMonitoringActions = (): SiteMonitoringActions => ({
 
         await withErrorHandling(
             async () => {
-                await MonitoringService.stopMonitoring(siteId, monitorId);
+                await deps.monitoringService.stopMonitoring(siteId, monitorId);
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },

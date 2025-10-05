@@ -81,6 +81,20 @@ export interface SettingsRepositoryDependencies {
 }
 
 /**
+ * Operations exposed for settings manipulations within a transaction scope.
+ */
+export interface SettingsRepositoryTransactionAdapter {
+    /** Bulk insert settings key-value pairs. */
+    bulkInsert: (settings: Record<string, string>) => void;
+    /** Delete all settings. */
+    deleteAll: () => void;
+    /** Delete a single setting by key. */
+    deleteByKey: (key: string) => void;
+    /** Set a value for the provided key. */
+    set: (key: string, value: string) => void;
+}
+
+/**
  * Common SQL queries for settings persistence operations.
  *
  * @remarks
@@ -302,6 +316,47 @@ export class SettingsRepository {
      */
     public constructor(dependencies: SettingsRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
+    }
+
+    /**
+     * Creates a transaction-scoped adapter for settings repository operations.
+     *
+     * @param db - The active database connection bound to an open transaction.
+     *
+     * @returns An adapter exposing transactional variants of write operations.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): SettingsRepositoryTransactionAdapter {
+        const bulkInsert: SettingsRepositoryTransactionAdapter["bulkInsert"] = (
+            settings
+        ) => {
+            this.bulkInsertInternal(db, settings);
+        };
+
+        const deleteAll: SettingsRepositoryTransactionAdapter["deleteAll"] =
+            () => {
+                this.deleteAllInternal(db);
+            };
+
+        const deleteByKey: SettingsRepositoryTransactionAdapter["deleteByKey"] =
+            (key) => {
+                this.deleteInternal(db, key);
+            };
+
+        const set: SettingsRepositoryTransactionAdapter["set"] = (
+            key,
+            value
+        ) => {
+            this.setInternal(db, key, value);
+        };
+
+        return {
+            bulkInsert,
+            deleteAll,
+            deleteByKey,
+            set,
+        } satisfies SettingsRepositoryTransactionAdapter;
     }
 
     /**

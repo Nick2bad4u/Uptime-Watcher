@@ -10,6 +10,8 @@ import type { UnknownRecord } from "type-fest";
 
 import React, { useCallback } from "react";
 
+import type { SiteDetailsTab } from "../../stores/ui/types";
+
 import { logger } from "../../services/logger";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
@@ -26,7 +28,7 @@ import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitor
  */
 export interface SiteDetailsNavigationProperties {
     /** Currently active tab in the site details view */
-    readonly activeSiteDetailsTab: string;
+    readonly activeSiteDetailsTab: SiteDetailsTab;
     /** The site object being displayed */
     readonly currentSite: Site;
     /** Handler for monitor selection changes */
@@ -50,7 +52,7 @@ export interface SiteDetailsNavigationProperties {
     /** Currently selected monitor ID */
     readonly selectedMonitorId: string;
     /** Function to set the active tab */
-    readonly setActiveSiteDetailsTab: (tab: string) => void;
+    readonly setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void;
 }
 
 /**

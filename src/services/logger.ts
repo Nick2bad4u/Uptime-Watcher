@@ -24,6 +24,10 @@ import type {
 import type { RendererLogger } from "electron-log";
 import type { UnknownRecord } from "type-fest";
 
+import {
+    buildErrorLogArguments,
+    buildLogArguments,
+} from "@shared/utils/logger/common";
 import log from "electron-log/renderer";
 
 /**
@@ -118,103 +122,55 @@ if (fileTransport && typeof window !== "undefined") {
     fileTransport.level = "info";
 }
 
+const RENDERER_LOG_PREFIX = "UPTIME-WATCHER";
+
+const safeInvoke = (
+    invoke: (...arguments_: unknown[]) => void,
+    args: readonly unknown[]
+): void => {
+    try {
+        invoke(...args);
+    } catch {
+        // Silently ignore logging errors to prevent application crashes
+    }
+};
+
 // Create base logger methods
 const baseLoggerMethods = {
     // Debug level - for development debugging
     debug: (message: string, ...args: unknown[]): void => {
-        try {
-            if (args.length > 0) {
-                log.debug(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.debug(`[UPTIME-WATCHER] ${message}`);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
+        safeInvoke(log.debug.bind(log), logArgs);
     },
     // Error level - errors that should be investigated
     error: (message: string, error?: unknown, ...args: unknown[]): void => {
-        try {
-            if (error instanceof Error) {
-                const errorData = {
-                    message: error.message,
-                    name: error.name,
-                    stack: error.stack,
-                };
-                if (args.length > 0) {
-                    log.error(
-                        `[UPTIME-WATCHER] ${message}`,
-                        errorData,
-                        ...args
-                    );
-                } else {
-                    log.error(`[UPTIME-WATCHER] ${message}`, errorData);
-                }
-            } else if (error === undefined) {
-                // No error object, just message and args
-                if (args.length > 0) {
-                    log.error(`[UPTIME-WATCHER] ${message}`, ...args);
-                } else {
-                    log.error(`[UPTIME-WATCHER] ${message}`);
-                }
-            } else if (args.length > 0) {
-                // Error is defined but not an Error instance
-                log.error(`[UPTIME-WATCHER] ${message}`, error, ...args);
-            } else {
-                // Error is defined but not an Error instance, no additional args
-                log.error(`[UPTIME-WATCHER] ${message}`, error);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildErrorLogArguments(
+            RENDERER_LOG_PREFIX,
+            message,
+            error,
+            args
+        );
+        safeInvoke(log.error.bind(log), logArgs);
     },
     // Info level - general application flow
     info: (message: string, ...args: unknown[]): void => {
-        try {
-            if (args.length > 0) {
-                log.info(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.info(`[UPTIME-WATCHER] ${message}`);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
+        safeInvoke(log.info.bind(log), logArgs);
     },
     // Silly level - extremely detailed debugging
     silly: (message: string, ...args: unknown[]): void => {
-        try {
-            if (args.length > 0) {
-                log.silly(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.silly(`[UPTIME-WATCHER] ${message}`);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
+        safeInvoke(log.silly.bind(log), logArgs);
     },
     // Verbose level - very detailed debugging
     verbose: (message: string, ...args: unknown[]): void => {
-        try {
-            if (args.length > 0) {
-                log.verbose(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.verbose(`[UPTIME-WATCHER] ${message}`);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
+        safeInvoke(log.verbose.bind(log), logArgs);
     },
-    // Warn level - something unexpected but not an error
+    // Warn level - potential issues needing attention
     warn: (message: string, ...args: unknown[]): void => {
-        try {
-            if (args.length > 0) {
-                log.warn(`[UPTIME-WATCHER] ${message}`, ...args);
-            } else {
-                log.warn(`[UPTIME-WATCHER] ${message}`);
-            }
-        } catch {
-            // Silently ignore logging errors to prevent application crashes
-        }
+        const logArgs = buildLogArguments(RENDERER_LOG_PREFIX, message, args);
+        safeInvoke(log.warn.bind(log), logArgs);
     },
 };
 

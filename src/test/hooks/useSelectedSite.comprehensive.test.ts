@@ -7,7 +7,7 @@ import type { Mocked } from "vitest";
 import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../shared/types/stateSync";
 import type { SitesStore } from "../../stores/sites/types";
-import type { UIStore } from "../../stores/ui/types";
+import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
 import type { ChartTimeRange } from "../../stores/types";
 
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
@@ -30,11 +30,11 @@ let mockUseUIStore: Mocked<UiModule>["useUIStore"];
 const defaultChartTimeRange: ChartTimeRange = "24h";
 
 const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
-    activeSiteDetailsTab: "overview",
+    activeSiteDetailsTab: "site-overview",
     openExternal: (_url: string, _context?: { siteName?: string }) => {},
     selectedSiteId: undefined,
     selectSite: (_site: Site | undefined) => {},
-    setActiveSiteDetailsTab: (_tab: string) => {},
+    setActiveSiteDetailsTab: (_tab: SiteDetailsTab) => {},
     setShowAddSiteModal: (_show: boolean) => {},
     setShowAdvancedMetrics: (_show: boolean) => {},
     setShowSettings: (_show: boolean) => {},
@@ -50,7 +50,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     siteDetailsChartTimeRange: defaultChartTimeRange,
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
-    syncActiveSiteDetailsTab: () => {},
+    syncActiveSiteDetailsTab: (_siteId: string) => {},
     ...overrides,
 });
 

@@ -103,13 +103,57 @@ describe(createSiteOperationsActions, () => {
             name: "Test Site",
         };
 
+        const siteService = {
+            addSite: vi.fn(async (site: Site) =>
+                mockElectronAPI.sites.addSite(site)
+            ),
+            downloadSqliteBackup: vi.fn(async () =>
+                mockElectronAPI.data.downloadSqliteBackup()
+            ),
+            getSites: vi.fn(async () => mockElectronAPI.sites.getSites()),
+            removeMonitor: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.removeMonitor(siteId, monitorId)
+            ),
+            removeSite: vi.fn(async (identifier: string) =>
+                mockElectronAPI.sites.removeSite(identifier)
+            ),
+            updateSite: vi.fn(async (identifier: string, updates: unknown) =>
+                mockElectronAPI.sites.updateSite(identifier, updates)
+            ),
+        };
+
+        const monitoringService = {
+            startMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.startMonitoringForSite(
+                    siteId,
+                    monitorId
+                )
+            ),
+            startSiteMonitoring: vi.fn(async (siteId: string) =>
+                mockElectronAPI.monitoring.startMonitoringForSite(siteId)
+            ),
+            stopMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.stopMonitoringForSite(
+                    siteId,
+                    monitorId
+                )
+            ),
+            stopSiteMonitoring: vi.fn(async (siteId: string) =>
+                mockElectronAPI.monitoring.stopMonitoringForSite(siteId)
+            ),
+        };
+
         mockDeps = {
             addSite: vi.fn(),
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
-        };
+            services: {
+                monitoring: monitoringService,
+                site: siteService,
+            },
+        } satisfies SiteOperationsDependencies;
 
         actions = createSiteOperationsActions(mockDeps);
     });

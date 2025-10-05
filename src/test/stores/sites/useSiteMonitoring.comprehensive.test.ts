@@ -45,7 +45,31 @@ describe("useSiteMonitoring", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        actions = createSiteMonitoringActions();
+        const monitoringService = {
+            checkSiteNow: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.checkSiteNow(siteId, monitorId)
+            ),
+            startMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.startMonitoringForSite(
+                    siteId,
+                    monitorId
+                )
+            ),
+            startSiteMonitoring: vi.fn(async (siteId: string) =>
+                mockElectronAPI.monitoring.startMonitoringForSite(siteId)
+            ),
+            stopMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
+                mockElectronAPI.monitoring.stopMonitoringForSite(
+                    siteId,
+                    monitorId
+                )
+            ),
+            stopSiteMonitoring: vi.fn(async (siteId: string) =>
+                mockElectronAPI.monitoring.stopMonitoringForSite(siteId)
+            ),
+        };
+
+        actions = createSiteMonitoringActions({ monitoringService });
     });
 
     describe("checkSiteNow", () => {

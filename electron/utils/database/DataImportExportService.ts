@@ -8,7 +8,6 @@
 
 import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
-import type { Database } from "node-sqlite3-wasm";
 import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
@@ -20,7 +19,10 @@ import {
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { DatabaseService } from "../../services/database/DatabaseService";
-import type { HistoryRepository } from "../../services/database/HistoryRepository";
+import type {
+    HistoryRepository,
+    HistoryRepositoryTransactionAdapter,
+} from "../../services/database/HistoryRepository";
 import type { MonitorRepository } from "../../services/database/MonitorRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
 import type { SiteRepository } from "../../services/database/SiteRepository";
@@ -201,11 +203,19 @@ export class DataImportExportService {
             async () => {
                 // Use executeTransaction for atomic multi-table operation
                 await this.databaseService.executeTransaction(async (db) => {
-                    // Clear existing data using internal methods
-                    this.repositories.site.deleteAllInternal(db);
-                    this.repositories.settings.deleteAllInternal(db);
-                    this.repositories.monitor.deleteAllInternal(db);
-                    this.repositories.history.deleteAllInternal(db);
+                    const siteTransactionAdapter =
+                        this.repositories.site.createTransactionAdapter(db);
+                    const monitorTransactionAdapter =
+                        this.repositories.monitor.createTransactionAdapter(db);
+                    const historyTransactionAdapter =
+                        this.repositories.history.createTransactionAdapter(db);
+                    const settingsTransactionAdapter =
+                        this.repositories.settings.createTransactionAdapter(db);
+
+                    siteTransactionAdapter.deleteAll();
+                    settingsTransactionAdapter.deleteAll();
+                    monitorTransactionAdapter.deleteAll();
+                    historyTransactionAdapter.deleteAll();
 
                     // Import sites using bulk insert
                     const siteRows = sites.map((site) => ({
@@ -213,16 +223,15 @@ export class DataImportExportService {
                         ...(site.name && { name: site.name }),
                         monitoring: true, // Default monitoring to true for imported sites
                     }));
-                    this.repositories.site.bulkInsertInternal(db, siteRows);
+                    siteTransactionAdapter.bulkInsert(siteRows);
 
                     // Import monitors and history
-                    await this.importMonitorsWithHistory(db, sites);
-
-                    // Import settings using internal method
-                    this.repositories.settings.bulkInsertInternal(
-                        db,
-                        safeSettings
+                    await this.importMonitorsWithHistory(
+                        historyTransactionAdapter,
+                        sites
                     );
+
+                    settingsTransactionAdapter.bulkInsert(safeSettings);
                 });
 
                 this.logger.info(
@@ -243,7 +252,7 @@ export class DataImportExportService {
      * for monitor data persistence.
      */
     private async importMonitorsWithHistory(
-        db: Database,
+        historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
         sites: ImportSite[]
     ): Promise<void> {
         // Process sites in parallel since each site's monitor import
@@ -273,7 +282,7 @@ export class DataImportExportService {
 
                     // Import history for the created monitors
                     this.importHistoryForMonitors(
-                        db,
+                        historyRepositoryTransaction,
                         createdMonitors,
                         monitors
                     );
@@ -317,7 +326,7 @@ export class DataImportExportService {
      * Private helper method for history data persistence.
      */
     private importHistoryForMonitors(
-        db: Database,
+        historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
         createdMonitors: Site["monitors"],
         originalMonitors: Site["monitors"]
     ): void {
@@ -337,7 +346,7 @@ export class DataImportExportService {
                 createdMonitor.id
             ) {
                 this.importMonitorHistory(
-                    db,
+                    historyRepositoryTransaction,
                     Number(createdMonitor.id),
                     originalMonitor.history
                 );
@@ -350,13 +359,12 @@ export class DataImportExportService {
      * data persistence.
      */
     private importMonitorHistory(
-        db: Database,
+        historyRepositoryTransaction: HistoryRepositoryTransactionAdapter,
         monitorId: number,
         history: StatusHistory[]
     ): void {
         for (const entry of history) {
-            this.repositories.history.addEntryInternal(
-                db,
+            historyRepositoryTransaction.addEntry(
                 String(monitorId),
                 {
                     responseTime: entry.responseTime,

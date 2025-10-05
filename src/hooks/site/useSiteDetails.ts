@@ -23,6 +23,7 @@ import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";
 
 import type { ChartTimeRange } from "../../constants";
+import type { SiteDetailsTab } from "../../stores/ui/types";
 
 import { DEFAULT_CHECK_INTERVAL, RETRY_CONSTRAINTS } from "../../constants";
 import { logger } from "../../services/logger";
@@ -72,7 +73,7 @@ export interface UseSiteDetailsProperties {
 export interface UseSiteDetailsResult {
     // UI state
     /** Currently active tab in the site details view */
-    activeSiteDetailsTab: string;
+    activeSiteDetailsTab: SiteDetailsTab;
     // Analytics
     /** Comprehensive analytics data for the selected monitor */
     analytics: SiteAnalytics;
@@ -135,7 +136,7 @@ export interface UseSiteDetailsResult {
     selectedMonitorId: string;
     // Store actions
     /** Set the active tab in the site details view */
-    setActiveSiteDetailsTab: (tab: string) => void;
+    setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void;
     /** Update the local site name state */
     setLocalName: (name: string) => void;
     /** Toggle advanced metrics display in analytics */

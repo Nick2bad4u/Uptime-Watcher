@@ -46,6 +46,7 @@ describe(SiteManager, () => {
         } satisfies MonitorRepositoryTransactionAdapter;
 
         const siteAdapter = {
+            bulkInsert: vi.fn(),
             delete: vi.fn().mockReturnValue(true),
             deleteAll: vi.fn(),
             upsert: vi.fn(),

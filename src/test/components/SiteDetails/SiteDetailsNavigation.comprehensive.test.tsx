@@ -7,6 +7,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
+import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
+import type { Site } from "../../../../shared/types";
 
 // Mock BrowserRouter to avoid react-router-dom dependency
 const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
@@ -86,7 +88,7 @@ vi.mock(
     })
 );
 
-const mockSite = {
+const mockSite: Site = {
     identifier: "test-site-1",
     name: "Test Site",
     monitoring: true,
@@ -119,7 +121,7 @@ const mockSite = {
     ],
 };
 
-const defaultProps = {
+const defaultProps: SiteDetailsNavigationProperties = {
     activeSiteDetailsTab: "site-overview",
     currentSite: mockSite,
     handleMonitorIdChange: vi.fn(),
@@ -133,8 +135,13 @@ const defaultProps = {
     setActiveSiteDetailsTab: vi.fn(),
 };
 
-const renderSiteDetailsNavigation = (props = {}) => {
-    const finalProps = { ...defaultProps, ...props };
+const renderSiteDetailsNavigation = (
+    props: Partial<SiteDetailsNavigationProperties> = {}
+) => {
+    const finalProps: SiteDetailsNavigationProperties = {
+        ...defaultProps,
+        ...props,
+    };
     return render(
         <MockBrowserRouter>
             <SiteDetailsNavigation {...finalProps} />
@@ -717,18 +724,26 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const siteWithPingMonitor = {
+            const baseMonitor = mockSite.monitors[0];
+            if (!baseMonitor) {
+                throw new Error(
+                    "Mock site must include at least one monitor for testing"
+                );
+            }
+            const siteWithPingMonitor: Site = {
                 ...mockSite,
                 monitors: [
                     {
                         id: "ping-monitor",
                         type: "ping" as const,
                         host: "google.com",
-                        interval: 300_000,
-                        timeout: 30_000,
-                        retryAttempts: 3,
-                        isEnabled: true,
+                        checkInterval: baseMonitor.checkInterval,
+                        timeout: baseMonitor.timeout,
+                        retryAttempts: baseMonitor.retryAttempts,
                         monitoring: true,
+                        history: Array.from(baseMonitor.history),
+                        responseTime: baseMonitor.responseTime,
+                        status: baseMonitor.status,
                     },
                 ],
             };
@@ -776,9 +791,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            const siteWithAllMonitorsRunning = {
+            const siteWithAllMonitorsRunning: Site = {
                 ...mockSite,
-                monitors: mockSite.monitors.map((m) => ({
+                monitors: mockSite.monitors.map((m): Site["monitors"][0] => ({
                     ...m,
                     monitoring: true,
                 })),

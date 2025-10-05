@@ -23,6 +23,17 @@ export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 export type SiteCardPresentation = "grid" | "stacked";
 
 /**
+ * Supported tab identifiers for the site details view.
+ */
+export type SiteDetailsTab =
+    | "analytics"
+    | "history"
+    | "monitor-overview"
+    | "settings"
+    | "site-overview"
+    | `${string}-analytics`;
+
+/**
  * Interface for the UI store.
  *
  * @remarks
@@ -33,7 +44,7 @@ export interface UIStore {
     /**
      * The active tab in the site details modal.
      */
-    activeSiteDetailsTab: string;
+    activeSiteDetailsTab: SiteDetailsTab;
 
     /**
      * Opens an external URL using the system's default browser.
@@ -60,7 +71,7 @@ export interface UIStore {
      *
      * @param tab - The tab identifier to activate.
      */
-    setActiveSiteDetailsTab: (tab: string) => void;
+    setActiveSiteDetailsTab: (tab: SiteDetailsTab) => void;
 
     /**
      * Sets the visibility of the add site modal.
@@ -148,7 +159,7 @@ export interface UIStore {
     /**
      * Map of site identifiers to the last active site details tab.
      */
-    siteDetailsTabState: Record<string, string>;
+    siteDetailsTabState: Record<string, SiteDetailsTab>;
 
     /**
      * The currently active presentation layout for the dashboard site list.

@@ -60,7 +60,13 @@ const arbitraries = {
     booleanState: fc.boolean(),
 
     /** Generate valid tab identifier */
-    tabId: fc.constantFrom("site-overview", "analytics", "history", "settings"),
+    tabId: fc.constantFrom(
+        "site-overview",
+        "monitor-overview",
+        "analytics",
+        "history",
+        "settings"
+    ),
 
     /** Generate chart time range */
     chartTimeRange: fc.constantFrom(
@@ -219,12 +225,12 @@ const arbitraries = {
     /** Generate UI state configuration */
     uiState: fc.record({
         activeSiteDetailsTab: fc.constantFrom(
-            "overview",
-            "monitors",
+            "site-overview",
+            "monitor-overview",
             "analytics",
             "settings",
             "history",
-            "logs"
+            "site-overview-analytics"
         ),
         siteDetailsChartTimeRange: fc.constantFrom("1h", "24h", "7d", "30d"),
         showAdvancedMetrics: fc.boolean(),

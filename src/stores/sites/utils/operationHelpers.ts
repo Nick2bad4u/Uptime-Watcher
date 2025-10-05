@@ -13,7 +13,6 @@ import type { SiteOperationsDependencies } from "../types";
 import { logger } from "../../../services/logger";
 import { logStoreAction } from "../../utils";
 import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
-import { SiteService } from "../services/SiteService";
 import { updateMonitorInSite } from "./monitorOperations";
 
 /**
@@ -57,7 +56,7 @@ export const updateMonitorAndSave = async (
     try {
         const site = getSiteById(siteId, deps);
         const updatedSite = updateMonitorInSite(site, monitorId, updates);
-        await SiteService.updateSite(siteId, {
+        await deps.services.site.updateSite(siteId, {
             monitors: updatedSite.monitors,
         });
     } catch (error) {

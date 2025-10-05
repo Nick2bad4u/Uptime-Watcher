@@ -19,6 +19,9 @@ docs/Architecture/
 │   ├── Repository-Template.md
 │   ├── Zustand-Store-Template.md
 │   └── IPC-Handler-Template.md
+├── UsageGuides/                 # Onboarding & compliance guidance
+│   ├── Compliance-Checklists.md
+│   └── Using-This-Documentation.md
 └── tsdoc-standards.md           # Documentation standards
 ```
 
@@ -35,7 +38,7 @@ flowchart TD
     Docs --> Patterns["Patterns"]
     Docs --> Templates["Templates"]
     Docs --> Standards["Standards"]
-    Docs --> Onboarding["Usage Guides"]
+    Docs --> UsageGuides["Usage Guides"]
 
     ADRs --> ADR1["ADR-001 Repository Pattern"]
     ADRs --> ADR2["ADR-002 Event-Driven Architecture"]
@@ -48,8 +51,8 @@ flowchart TD
     Templates --> StoreTemplate["Zustand Store Template"]
     Templates --> IPCTemplate["IPC Handler Template"]
     Standards --> TsdocStandards["TSDoc Standards"]
-    Onboarding --> QuickStart["Using This Documentation"]
-    Onboarding --> Compliance["Compliance Checklists"]
+    UsageGuides --> QuickStart["Using This Documentation"]
+    UsageGuides --> Compliance["Compliance Checklists"]
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,Onboarding section;
@@ -60,7 +63,7 @@ flowchart TD
 
 ADRs document the key architectural decisions made during development, their context, consequences, and implementation guidelines.
 
-### [ADR-001: Repository Pattern](./ADRs/ADR-001-Repository-Pattern.md)
+### [ADR-001: Repository Pattern](./ADRs/ADR_001_REPOSITORY_PATTERN.md)
 
 **Status: Accepted** - Establishes the repository pattern for all database access
 
@@ -69,7 +72,7 @@ ADRs document the key architectural decisions made during development, their con
 - Consistent error handling and event emission
 - All repositories follow this pattern: `SiteRepository`, `MonitorRepository`, `HistoryRepository`, `SettingsRepository`
 
-### [ADR-002: Event-Driven Architecture](./ADRs/ADR-002-Event-Driven-Architecture.md)
+### [ADR-002: Event-Driven Architecture](./ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
 
 **Status: Accepted** - Core communication mechanism using TypedEventBus
 
@@ -78,7 +81,7 @@ ADRs document the key architectural decisions made during development, their con
 - Domain-based event naming (`domain:action`)
 - IPC event forwarding for frontend integration
 
-### [ADR-003: Error Handling Strategy](./ADRs/ADR-003-Error-Handling-Strategy.md)
+### [ADR-003: Error Handling Strategy](./ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)
 
 **Status: Accepted** - Multi-layered error handling across all application layers
 
@@ -87,7 +90,7 @@ ADRs document the key architectural decisions made during development, their con
 - Error preservation principles maintaining stack traces
 - Safe store operations preventing cascading failures
 
-### [ADR-004: Frontend State Management](./ADRs/ADR-004-Frontend-State-Management.md)
+### [ADR-004: Frontend State Management](./ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)
 
 **Status: Accepted** - Zustand-based state management with modular composition
 
@@ -96,7 +99,7 @@ ADRs document the key architectural decisions made during development, their con
 - Selective persistence for user preferences
 - Integration with error handling and IPC systems
 
-### [ADR-005: IPC Communication Protocol](./ADRs/ADR-005-IPC-Communication-Protocol.md)
+### [ADR-005: IPC Communication Protocol](./ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)
 
 **Status: Accepted** - Standardized Electron IPC communication
 
@@ -107,7 +110,7 @@ ADRs document the key architectural decisions made during development, their con
 
 ## 📋 Development Patterns
 
-### [Development Patterns Guide](./Patterns/Development-Patterns-Guide.md)
+### [Development Patterns Guide](./Patterns/DEVELOPMENT_PATTERNS_GUIDE.md)
 
 Comprehensive guide to all established patterns in the codebase:
 
@@ -122,7 +125,7 @@ Comprehensive guide to all established patterns in the codebase:
 
 Ready-to-use templates for implementing common patterns:
 
-### [Repository Template](./Templates/Repository-Template.md)
+### [Repository Template](./Templates/REPOSITORY_TEMPLATE.md)
 
 Complete template for creating new repository classes:
 
@@ -131,7 +134,7 @@ Complete template for creating new repository classes:
 - Comprehensive TSDoc documentation
 - Test template and integration checklist
 
-### [Zustand Store Template](./Templates/Zustand-Store-Template.md)
+### [Zustand Store Template](./Templates/ZUSTAND_STORE_TEMPLATE.md)
 
 Templates for both simple and complex Zustand stores:
 
@@ -140,7 +143,7 @@ Templates for both simple and complex Zustand stores:
 - Module templates for focused functionality
 - Testing patterns and error integration
 
-### [IPC Handler Template](./Templates/IPC-Handler-Template.md)
+### [IPC Handler Template](./Templates/IPC_HANDLER_TEMPLATE.md)
 
 Complete IPC communication implementation:
 
@@ -151,7 +154,7 @@ Complete IPC communication implementation:
 
 ## 📚 Documentation Standards
 
-### [TSDoc Standards](./tsdoc-standards.md)
+### [TSDoc Standards](./TSDOC_STANDARDS.md)
 
 Standardized documentation patterns for inline code examples:
 

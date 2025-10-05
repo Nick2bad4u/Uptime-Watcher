@@ -41,6 +41,8 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { SitesStore } from "./types";
 
+import { MonitoringService } from "./services/MonitoringService";
+import { SiteService } from "./services/SiteService";
 import { createSiteMonitoringActions } from "./useSiteMonitoring";
 import { createSiteOperationsActions } from "./useSiteOperations";
 import { createSitesStateActions, initialSitesState } from "./useSitesState";
@@ -78,13 +80,39 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         });
 
         // Create monitoring actions
-        const monitoringActions = createSiteMonitoringActions();
+        const monitoringActions = createSiteMonitoringActions({
+            monitoringService: MonitoringService,
+        });
 
         // Create operations actions
         const operationsActions = createSiteOperationsActions({
             addSite: stateActions.addSite,
             getSites,
             removeSite: stateActions.removeSite,
+            services: {
+                monitoring: {
+                    startMonitoring: (siteId: string, monitorId: string) =>
+                        MonitoringService.startMonitoring(siteId, monitorId),
+                    startSiteMonitoring: (siteId: string) =>
+                        MonitoringService.startSiteMonitoring(siteId),
+                    stopMonitoring: (siteId: string, monitorId: string) =>
+                        MonitoringService.stopMonitoring(siteId, monitorId),
+                    stopSiteMonitoring: (siteId: string) =>
+                        MonitoringService.stopSiteMonitoring(siteId),
+                },
+                site: {
+                    addSite: (site: Site) => SiteService.addSite(site),
+                    downloadSqliteBackup: () =>
+                        SiteService.downloadSqliteBackup(),
+                    getSites: () => SiteService.getSites(),
+                    removeMonitor: (siteId: string, monitorId: string) =>
+                        SiteService.removeMonitor(siteId, monitorId),
+                    removeSite: (identifier: string) =>
+                        SiteService.removeSite(identifier),
+                    updateSite: (identifier: string, updates: Partial<Site>) =>
+                        SiteService.updateSite(identifier, updates),
+                },
+            },
             setSites: stateActions.setSites,
             syncSites: syncActions.syncSites,
         });

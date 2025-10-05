@@ -611,6 +611,7 @@ describe("MonitorRepository - Comprehensive Coverage", () => {
             mockDatabase.get.mockReturnValue({ id: 999 });
 
             await repository.create("site-123", {
+                id: "monitor-temp-id",
                 type: "http",
                 url: "https://internal-test.com",
                 checkInterval: 60_000,

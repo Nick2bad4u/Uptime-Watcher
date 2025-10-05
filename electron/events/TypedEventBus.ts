@@ -10,27 +10,18 @@
  *
  * ```typescript
  * interface MyEvents {
- *   'user:login': { userId: string; timestamp: number };
- *   'data:updated': { table: string; records: nu        // Handle objects with potential _meta conflicts
- *         // Since T extends object, we know data is an object
- *         const hasExistingMeta = Object.hasOwn(data, "_meta");
- *         if (hasExistingMeta) {
- *             logger.debug(
- *                 `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
- *             );
- *             // Type-safe access to _meta property
- *             const existingMeta = (data as { _meta?: unknown })._meta;
- *             return {
- *                 ...data,
- *                 _meta: metadata,
- *                 _originalMeta: existingMeta,
- *             } as T & { _meta: EventMetadata };
- *         } *
- * const bus = new TypedEventBus<MyEvents>('app-events');
- * bus.onTyped('user:login', (data) => {
- *   console.log(`User ${data.userId} logged in at ${data.timestamp}`);
+ *     "user:login": { userId: string; timestamp: number };
+ *     "data:updated": { table: string; records: number };
+ * }
+ *
+ * const bus = new TypedEventBus<MyEvents>("app-events");
+ * bus.onTyped("user:login", (data) => {
+ *     console.log(`User ${data.userId} logged in at ${data.timestamp}`);
  * });
- * await bus.emitTyped('user:login', { userId: '123', timestamp: Date.now() });
+ * await bus.emitTyped("user:login", {
+ *     userId: "123",
+ *     timestamp: Date.now(),
+ * });
  * ```
  *
  * @packageDocumentation

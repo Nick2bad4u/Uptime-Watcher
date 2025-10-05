@@ -74,6 +74,7 @@ interface StateSyncHandlerValidatorsInterface {
  */
 interface SystemHandlerValidatorsInterface {
     openExternal: IpcParameterValidator;
+    verifyIpcHandler: IpcParameterValidator;
 }
 
 /**
@@ -583,4 +584,11 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * Expects exactly one string parameter (the URL to open).
      */
     openExternal: createSingleStringValidator("url"),
+    /**
+     * Validates parameters for the diagnostics handler verification channel.
+     *
+     * @remarks
+     * Expects the target channel name as a single non-empty string.
+     */
+    verifyIpcHandler: createSingleStringValidator("channelName"),
 } as const;

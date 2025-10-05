@@ -125,10 +125,11 @@ describe("SiteWriterService Coverage Tests", () => {
         } as unknown as MonitorRepository;
 
         siteAdapter = {
+            bulkInsert: vi.fn(),
             delete: vi.fn().mockReturnValue(true),
             deleteAll: vi.fn(),
             upsert: vi.fn(),
-        } satisfies SiteRepositoryTransactionAdapter as SiteRepositoryTransactionAdapter;
+        } satisfies SiteRepositoryTransactionAdapter;
 
         mockSiteRepository = {
             createTransactionAdapter: vi

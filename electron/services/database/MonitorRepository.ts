@@ -213,33 +213,6 @@ export class MonitorRepository {
     }
 
     /**
-     * Create a transaction adapter bound to the provided database connection.
-     */
-    public createTransactionAdapter(
-        db: Database
-    ): MonitorRepositoryTransactionAdapter {
-        return {
-            clearActiveOperations: (monitorId: string) =>
-                this.clearActiveOperationsInternal(db, monitorId),
-            create: (siteIdentifier: string, monitor: Site["monitors"][0]) =>
-                this.createInternal(db, siteIdentifier, monitor),
-            deleteAll: () => this.deleteAllInternal(db),
-            deleteById: (monitorId: string) =>
-                this.deleteInternal(db, monitorId),
-            deleteBySiteIdentifier: (siteIdentifier: string) =>
-                this.deleteBySiteIdentifierInternal(db, siteIdentifier),
-            findBySiteIdentifier: (siteIdentifier: string) =>
-                this.findBySiteIdentifierInternal(db, siteIdentifier),
-            update: (
-                monitorId: string,
-                monitor: Partial<Site["monitors"][0]>
-            ): void => {
-                this.updateInternal(db, monitorId, monitor);
-            },
-        } satisfies MonitorRepositoryTransactionAdapter;
-    }
-
-    /**
      * Clears all active operations for a monitor.
      *
      * @remarks
@@ -539,6 +512,58 @@ export class MonitorRepository {
             undefined,
             { monitorId }
         );
+    }
+
+    /**
+     * Create a transaction adapter bound to the provided database connection.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): MonitorRepositoryTransactionAdapter {
+        const clearActiveOperations: MonitorRepositoryTransactionAdapter["clearActiveOperations"] =
+            (monitorId) => {
+                this.clearActiveOperationsInternal(db, monitorId);
+            };
+
+        const create: MonitorRepositoryTransactionAdapter["create"] = (
+            siteIdentifier,
+            monitor
+        ) => this.createInternal(db, siteIdentifier, monitor);
+
+        const deleteAll: MonitorRepositoryTransactionAdapter["deleteAll"] =
+            () => {
+                this.deleteAllInternal(db);
+            };
+
+        const deleteById: MonitorRepositoryTransactionAdapter["deleteById"] = (
+            monitorId
+        ) => this.deleteInternal(db, monitorId);
+
+        const deleteBySiteIdentifier: MonitorRepositoryTransactionAdapter["deleteBySiteIdentifier"] =
+            (siteIdentifier) => {
+                this.deleteBySiteIdentifierInternal(db, siteIdentifier);
+            };
+
+        const findBySiteIdentifier: MonitorRepositoryTransactionAdapter["findBySiteIdentifier"] =
+            (siteIdentifier) =>
+                this.findBySiteIdentifierInternal(db, siteIdentifier);
+
+        const update: MonitorRepositoryTransactionAdapter["update"] = (
+            monitorId,
+            monitor
+        ) => {
+            this.updateInternal(db, monitorId, monitor);
+        };
+
+        return {
+            clearActiveOperations,
+            create,
+            deleteAll,
+            deleteById,
+            deleteBySiteIdentifier,
+            findBySiteIdentifier,
+            update,
+        } satisfies MonitorRepositoryTransactionAdapter;
     }
 
     /**

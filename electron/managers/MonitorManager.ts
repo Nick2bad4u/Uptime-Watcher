@@ -1115,12 +1115,15 @@ export class MonitorManager {
         await withDatabaseOperation(
             async () =>
                 this.dependencies.databaseService.executeTransaction((db) => {
-                    for (const monitor of monitorsNeedingRemediation) {
-                        this.dependencies.repositories.monitor.updateInternal(
-                            db,
-                            monitor.id,
-                            { checkInterval: DEFAULT_CHECK_INTERVAL }
+                    const monitorTx =
+                        this.dependencies.repositories.monitor.createTransactionAdapter(
+                            db
                         );
+
+                    for (const monitor of monitorsNeedingRemediation) {
+                        monitorTx.update(monitor.id, {
+                            checkInterval: DEFAULT_CHECK_INTERVAL,
+                        });
 
                         logger.debug(
                             interpolateLogTemplate(
@@ -1438,11 +1441,12 @@ export class MonitorManager {
         await withDatabaseOperation(
             async () =>
                 this.dependencies.databaseService.executeTransaction((db) => {
-                    this.dependencies.repositories.monitor.updateInternal(
-                        db,
-                        monitor.id,
-                        changes
-                    );
+                    const monitorTx =
+                        this.dependencies.repositories.monitor.createTransactionAdapter(
+                            db
+                        );
+
+                    monitorTx.update(monitor.id, changes);
                     return Promise.resolve();
                 }),
             "monitor-manager-apply-state-change",

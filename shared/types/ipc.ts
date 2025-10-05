@@ -41,6 +41,21 @@ export interface SerializedDatabaseBackupResult {
 }
 
 /**
+ * Response structure returned by the diagnostics IPC handler verification.
+ */
+export interface IpcHandlerVerificationResult {
+    /** Ordered list of registered IPC channels exposed by the main process. */
+    availableChannels: readonly string[];
+    /** Channel name that was requested by the preload bridge. */
+    channel: string;
+    /**
+     * Indicates whether the requested channel is registered in the main
+     * process.
+     */
+    registered: boolean;
+}
+
+/**
  * Mapping of IPC invoke channel names to their parameter tuples and result
  * payloads.
  */
@@ -56,6 +71,10 @@ export interface IpcInvokeChannelMap {
     "delete-all-sites": {
         params: readonly [];
         result: number;
+    };
+    "diagnostics:verify-ipc-handler": {
+        params: readonly [channel: string];
+        result: IpcHandlerVerificationResult;
     };
     "download-sqlite-backup": {
         params: readonly [];

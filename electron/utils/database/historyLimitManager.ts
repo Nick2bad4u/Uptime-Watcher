@@ -107,9 +107,13 @@ export async function setHistoryLimit(
     await withDatabaseOperation(
         async () =>
             databaseService.executeTransaction((db) => {
+                const settingsTransactionAdapter =
+                    repositories.settings.createTransactionAdapter(db);
+                const historyTransactionAdapter =
+                    repositories.history.createTransactionAdapter(db);
+
                 // Save to settings using internal method
-                repositories.settings.setInternal(
-                    db,
+                settingsTransactionAdapter.set(
                     "historyLimit",
                     finalLimit.toString()
                 );
@@ -117,10 +121,7 @@ export async function setHistoryLimit(
                 // Prune history for all monitors if limit > 0 using internal
                 // method
                 if (finalLimit > 0) {
-                    repositories.history.pruneAllHistoryInternal(
-                        db,
-                        finalLimit
-                    );
+                    historyTransactionAdapter.pruneAllHistory(finalLimit);
                 }
 
                 return Promise.resolve();

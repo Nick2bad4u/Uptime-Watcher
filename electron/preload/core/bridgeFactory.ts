@@ -21,6 +21,17 @@ import type { IpcRendererEvent } from "electron";
 
 import { ipcRenderer } from "electron";
 
+const DIAGNOSTICS_CHANNEL = "diagnostics:verify-ipc-handler" as const;
+
+interface HandlerVerificationResponse {
+    readonly availableChannels: readonly string[];
+    readonly channel: string;
+    readonly registered: boolean;
+}
+
+const verifiedChannels = new Set<string>([DIAGNOSTICS_CHANNEL]);
+const pendingVerifications = new Map<string, Promise<void>>();
+
 /**
  * Standard IPC response interface matching backend implementation
  */
@@ -134,6 +145,97 @@ function validateVoidIpcResponse(response: unknown): void {
     }
 }
 
+function isHandlerVerificationResponse(
+    value: unknown
+): value is HandlerVerificationResponse {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    const candidate = value as Partial<HandlerVerificationResponse>;
+    if (
+        typeof candidate.channel !== "string" ||
+        typeof candidate.registered !== "boolean" ||
+        !Array.isArray(candidate.availableChannels)
+    ) {
+        return false;
+    }
+
+    return candidate.availableChannels.every(
+        (channel) => typeof channel === "string"
+    );
+}
+
+async function verifyChannelOrThrow(channel: string): Promise<void> {
+    if (verifiedChannels.has(channel) || channel === DIAGNOSTICS_CHANNEL) {
+        return;
+    }
+
+    let verification = pendingVerifications.get(channel);
+
+    if (!verification) {
+        verification = (async (): Promise<void> => {
+            try {
+                const rawResponse: unknown = await ipcRenderer.invoke(
+                    DIAGNOSTICS_CHANNEL,
+                    channel
+                );
+
+                const verificationResult =
+                    validateIpcResponse<HandlerVerificationResponse>(
+                        rawResponse
+                    );
+
+                if (!isHandlerVerificationResponse(verificationResult)) {
+                    throw new Error(
+                        "Invalid diagnostics verification response"
+                    );
+                }
+
+                if (!verificationResult.registered) {
+                    console.error(
+                        `[IPC Bridge] No handler registered for channel '${channel}'.`,
+                        {
+                            availableChannels:
+                                verificationResult.availableChannels,
+                        }
+                    );
+                    throw new IpcError(
+                        `No handler registered for channel '${channel}'`,
+                        channel,
+                        undefined,
+                        {
+                            availableChannels:
+                                verificationResult.availableChannels,
+                        }
+                    );
+                }
+
+                verifiedChannels.add(channel);
+            } catch (error) {
+                if (error instanceof IpcError) {
+                    throw error;
+                }
+
+                // eslint-disable-next-line ex/use-error-cause -- IpcError constructor preserves original error via dedicated field
+                throw new IpcError(
+                    `Failed verifying handler for channel '${channel}': ${
+                        error instanceof Error ? error.message : String(error)
+                    }`,
+                    channel,
+                    error instanceof Error ? error : undefined
+                );
+            } finally {
+                pendingVerifications.delete(channel);
+            }
+        })();
+
+        pendingVerifications.set(channel, verification);
+    }
+
+    await verification;
+}
+
 /**
  * Creates a typed IPC invoker function
  *
@@ -149,6 +251,7 @@ export function createTypedInvoker<TChannel extends IpcInvokeChannel>(
     return async function invokeTypedChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<IpcInvokeChannelResult<TChannel>> {
+        await verifyChannelOrThrow(channel);
         try {
             const response: unknown = await ipcRenderer.invoke(
                 channel,
@@ -184,6 +287,7 @@ export function createVoidInvoker<TChannel extends VoidIpcInvokeChannel>(
     return async function invokeVoidChannel(
         ...args: IpcInvokeChannelParams<TChannel>
     ): Promise<void> {
+        await verifyChannelOrThrow(channel);
         try {
             const response: unknown = await ipcRenderer.invoke(
                 channel,

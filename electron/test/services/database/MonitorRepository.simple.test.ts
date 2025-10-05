@@ -366,7 +366,7 @@ describe("MonitorRepository Coverage Tests", () => {
             expect(error).toBeInstanceOf(Error);
         }
     });
-    it("should handle clearActiveOperationsInternal", async ({
+    it("should clear active operations via public method", async ({
         task,
         annotate,
     }) => {
@@ -388,11 +388,23 @@ describe("MonitorRepository Coverage Tests", () => {
                     run: vi.fn(),
                     finalize: vi.fn(),
                 })),
+                run: vi.fn(),
             };
 
-            // This should exercise the internal method
-            repository.clearActiveOperationsInternal(mockDb as any, "test-id");
-            expect(true).toBeTruthy();
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async (
+                    callback: (db: typeof mockDb) => Promise<void> | void
+                ) => {
+                    await callback(mockDb as never);
+                }
+            );
+
+            await repository.clearActiveOperations("test-id");
+
+            expect(mockDb.run).toHaveBeenCalledWith(
+                expect.stringContaining("UPDATE monitors SET"),
+                expect.arrayContaining(["test-id"])
+            );
         } catch (error) {
             expect(error).toBeInstanceOf(Error);
         }

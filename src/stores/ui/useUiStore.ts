@@ -38,6 +38,7 @@ import { persist, type PersistOptions } from "zustand/middleware";
 import type { ChartTimeRange } from "../types";
 import type {
     SiteCardPresentation,
+    SiteDetailsTab,
     SiteListLayoutMode,
     UIStore,
 } from "./types";
@@ -47,11 +48,11 @@ import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
 interface UIPersistedState {
-    activeSiteDetailsTab: string;
+    activeSiteDetailsTab: SiteDetailsTab;
     showAdvancedMetrics: boolean;
     siteCardPresentation: SiteCardPresentation;
     siteDetailsChartTimeRange: ChartTimeRange;
-    siteDetailsTabState: Record<string, string>;
+    siteDetailsTabState: Record<string, SiteDetailsTab>;
     siteListLayout: SiteListLayoutMode;
 }
 
@@ -111,7 +112,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "selectSite", { site });
                 set({ selectedSiteId: site ? site.identifier : undefined });
             },
-            setActiveSiteDetailsTab: (tab: string): void => {
+            setActiveSiteDetailsTab: (tab: SiteDetailsTab): void => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set((state) => {
                     const { selectedSiteId, siteDetailsTabState } = state;
@@ -168,7 +169,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showSiteDetails: false,
             siteCardPresentation: "grid",
             siteDetailsChartTimeRange: "24h",
-            siteDetailsTabState: {},
+            siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
             syncActiveSiteDetailsTab: (siteId: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {

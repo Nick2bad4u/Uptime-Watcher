@@ -15,6 +15,7 @@ import {
     type IpcResponse,
 } from "../../../preload/core/bridgeFactory";
 import type {
+    IpcHandlerVerificationResult,
     IpcInvokeChannel,
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
@@ -30,6 +31,34 @@ vi.mock("electron", () => ({
 const formatDetailChannel = "format-monitor-detail" satisfies IpcInvokeChannel;
 const startMonitoringChannel = "start-monitoring" satisfies IpcInvokeChannel;
 const resetSettingsChannel = "reset-settings" satisfies IpcInvokeChannel;
+
+function createHandshakeSuccess(
+    channel: string,
+    availableChannels: string[] = [channel]
+): IpcResponse<IpcHandlerVerificationResult> {
+    return {
+        success: true,
+        data: {
+            availableChannels,
+            channel,
+            registered: true,
+        },
+    };
+}
+
+function createHandshakeFailure(
+    channel: string,
+    availableChannels: string[] = []
+): IpcResponse<IpcHandlerVerificationResult> {
+    return {
+        success: true,
+        data: {
+            availableChannels,
+            channel,
+            registered: false,
+        },
+    };
+}
 
 describe("bridgeFactory", function describeBridgeFactorySuite() {
     beforeEach(() => {
@@ -47,7 +76,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 success: true,
                 data: "detail",
             };
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(response);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(formatDetailChannel)
+                )
+                .mockResolvedValueOnce(response);
 
             const invoke = createTypedInvoker(formatDetailChannel);
             const result = await invoke("http", "status-page");
@@ -65,7 +98,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 success: false,
                 error: "failure",
             };
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(errorResponse);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(startMonitoringChannel)
+                )
+                .mockResolvedValueOnce(errorResponse);
 
             const invoke = createTypedInvoker(startMonitoringChannel);
 
@@ -77,7 +114,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
 
         it("wraps unexpected exceptions in an IpcError", async () => {
             const error = new Error("ipc failure");
-            vi.mocked(ipcRenderer.invoke).mockRejectedValueOnce(error);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(startMonitoringChannel)
+                )
+                .mockRejectedValueOnce(error);
 
             const invoke = createTypedInvoker(startMonitoringChannel);
 
@@ -91,14 +132,37 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             const missingDataResponse: IpcResponse = {
                 success: true,
             };
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(
-                missingDataResponse
-            );
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(formatDetailChannel)
+                )
+                .mockResolvedValueOnce(missingDataResponse);
 
             const invoke = createTypedInvoker(formatDetailChannel);
 
             await expect(invoke("http", "detail")).rejects.toThrow(
                 "IPC response missing data field"
+            );
+        });
+
+        it("throws an IpcError when diagnostics reports an unregistered handler", async () => {
+            const missingChannel =
+                "request-full-sync" satisfies IpcInvokeChannel;
+
+            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(
+                createHandshakeFailure(missingChannel)
+            );
+
+            const invoke = createTypedInvoker(missingChannel);
+
+            await expect(invoke()).rejects.toMatchObject({
+                message: expect.stringContaining("No handler registered"),
+                channel: missingChannel,
+            });
+
+            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+                "diagnostics:verify-ipc-handler",
+                missingChannel
             );
         });
     });
@@ -107,7 +171,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
     describe("createVoidInvoker", () => {
         it("resolves when the response is successful", async () => {
             const response: IpcResponse = { success: true };
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(response);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(resetSettingsChannel)
+                )
+                .mockResolvedValueOnce(response);
 
             const reset = createVoidInvoker(resetSettingsChannel);
             await expect(reset()).resolves.toBeUndefined();
@@ -121,7 +189,11 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 success: false,
                 error: "reset-denied",
             };
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce(response);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(resetSettingsChannel)
+                )
+                .mockResolvedValueOnce(response);
 
             const reset = createVoidInvoker(resetSettingsChannel);
             await expect(reset()).rejects.toBeInstanceOf(IpcError);
@@ -165,9 +237,13 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
         it("rejects invalid channel usage", async () => {
             const invoke = createTypedInvoker(startMonitoringChannel);
 
-            vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
-                success: true,
-            });
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(
+                    createHandshakeSuccess(startMonitoringChannel)
+                )
+                .mockResolvedValueOnce({
+                    success: true,
+                });
 
             await expect(invoke()).rejects.toThrow(
                 "IPC response missing data field"

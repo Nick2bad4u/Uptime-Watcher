@@ -7,6 +7,7 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
@@ -177,8 +178,53 @@ export interface SiteOperationsDependencies {
     getSites: () => Site[];
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
+    /** External service dependencies required for operations */
+    services: SiteOperationsServiceDependencies;
     /** Replace all sites in the store */
     setSites: (sites: Site[]) => void;
     /** Synchronize sites from backend storage */
     syncSites: () => Promise<void>;
+}
+
+/**
+ * External services consumed by site operations.
+ */
+export interface SiteOperationsServiceDependencies {
+    /** Monitoring service operations */
+    monitoring: Pick<
+        SiteMonitoringService,
+        | "startMonitoring"
+        | "startSiteMonitoring"
+        | "stopMonitoring"
+        | "stopSiteMonitoring"
+    >;
+    /** Site service operations */
+    site: Pick<
+        SiteDataService,
+        | "addSite"
+        | "downloadSqliteBackup"
+        | "getSites"
+        | "removeMonitor"
+        | "removeSite"
+        | "updateSite"
+    >;
+}
+
+interface SiteMonitoringService {
+    startMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    startSiteMonitoring: (siteId: string) => Promise<void>;
+    stopMonitoring: (siteId: string, monitorId: string) => Promise<void>;
+    stopSiteMonitoring: (siteId: string) => Promise<void>;
+}
+
+interface SiteDataService {
+    addSite: (site: Site) => Promise<Site>;
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    getSites: () => Promise<Site[]>;
+    removeMonitor: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
+    removeSite: (identifier: string) => Promise<boolean>;
+    updateSite: (identifier: string, updates: Partial<Site>) => Promise<void>;
 }

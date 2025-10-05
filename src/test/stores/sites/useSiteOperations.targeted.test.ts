@@ -153,16 +153,64 @@ describe("useSiteOperations - Targeted Coverage", () => {
             electronAPI: mockElectronAPI,
         } as any;
 
+        const getSitesFn = vi.fn(() => [
+            mockSiteWithMultipleMonitors,
+            mockSiteWithSingleMonitor,
+        ]);
+
+        const siteService = {
+            addSite: vi.fn(async (site: Site) => site),
+            downloadSqliteBackup: vi.fn(async () =>
+                mockElectronAPI.data.downloadSqliteBackup()
+            ),
+            getSites: vi.fn(async () => getSitesFn()),
+            removeMonitor: vi.fn(async (siteId: string, monitorId: string) => {
+                await mockElectronAPI.monitoring.removeMonitor(
+                    siteId,
+                    monitorId
+                );
+                return true;
+            }),
+            removeSite: vi.fn(async (identifier: string) =>
+                mockElectronAPI.sites.removeSite(identifier)
+            ),
+            updateSite: vi.fn(async () => undefined),
+        };
+
+        const monitoringService = {
+            startMonitoring: vi.fn(
+                async (siteId: string, monitorId: string) => {
+                    await mockElectronAPI.monitoring.startMonitoringForSite(
+                        siteId,
+                        monitorId
+                    );
+                }
+            ),
+            startSiteMonitoring: vi.fn(async (siteId: string) => {
+                await mockElectronAPI.monitoring.startMonitoringForSite(siteId);
+            }),
+            stopMonitoring: vi.fn(async (siteId: string, monitorId: string) => {
+                await mockElectronAPI.monitoring.stopMonitoringForSite(
+                    siteId,
+                    monitorId
+                );
+            }),
+            stopSiteMonitoring: vi.fn(async (siteId: string) => {
+                await mockElectronAPI.monitoring.stopMonitoringForSite(siteId);
+            }),
+        };
+
         mockSiteDeps = {
-            getSites: vi.fn(() => [
-                mockSiteWithMultipleMonitors,
-                mockSiteWithSingleMonitor,
-            ]),
+            getSites: getSitesFn,
             removeSite: vi.fn(),
             addSite: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
-        };
+            services: {
+                monitoring: monitoringService,
+                site: siteService,
+            },
+        } satisfies SiteOperationsDependencies;
 
         actions = createSiteOperationsActions(mockSiteDeps);
     });

@@ -90,6 +90,26 @@ export interface HistoryRepositoryDependencies {
 }
 
 /**
+ * Operations exposed for history manipulations within a transaction scope.
+ */
+export interface HistoryRepositoryTransactionAdapter {
+    /** Add a history entry for the specified monitor. */
+    addEntry: (
+        monitorId: string,
+        entry: StatusHistory,
+        details?: string
+    ) => void;
+    /** Delete all history records. */
+    deleteAll: () => void;
+    /** Delete history entries for a single monitor. */
+    deleteByMonitorId: (monitorId: string) => void;
+    /** Get the history count for a monitor. */
+    getHistoryCount: (monitorId: string) => number;
+    /** Prune history globally across all monitors. */
+    pruneAllHistory: (limit: number) => void;
+}
+
+/**
  * Common SQL queries for history persistence operations.
  *
  * @remarks
@@ -480,6 +500,49 @@ export class HistoryRepository {
      */
     public constructor(dependencies: HistoryRepositoryDependencies) {
         this.databaseService = dependencies.databaseService;
+    }
+
+    /**
+     * Creates a transaction-scoped adapter for batched history operations.
+     *
+     * @param db - Active database connection bound to the transaction.
+     *
+     * @returns Adapter exposing write operations within the active transaction
+     *   scope.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): HistoryRepositoryTransactionAdapter {
+        const addEntryAdapter: HistoryRepositoryTransactionAdapter["addEntry"] =
+            (monitorId, entry, details) => {
+                this.addEntryInternal(db, monitorId, entry, details);
+            };
+
+        const deleteAllAdapter: HistoryRepositoryTransactionAdapter["deleteAll"] =
+            () => {
+                this.deleteAllInternal(db);
+            };
+
+        const deleteByMonitorIdAdapter: HistoryRepositoryTransactionAdapter["deleteByMonitorId"] =
+            (monitorId) => {
+                this.deleteByMonitorIdInternal(db, monitorId);
+            };
+
+        const getHistoryCountAdapter: HistoryRepositoryTransactionAdapter["getHistoryCount"] =
+            (monitorId) => this.getHistoryCountInternal(db, monitorId);
+
+        const pruneAllHistoryAdapter: HistoryRepositoryTransactionAdapter["pruneAllHistory"] =
+            (limit) => {
+                this.pruneAllHistoryInternal(db, limit);
+            };
+
+        return {
+            addEntry: addEntryAdapter,
+            deleteAll: deleteAllAdapter,
+            deleteByMonitorId: deleteByMonitorIdAdapter,
+            getHistoryCount: getHistoryCountAdapter,
+            pruneAllHistory: pruneAllHistoryAdapter,
+        } satisfies HistoryRepositoryTransactionAdapter;
     }
 
     /**

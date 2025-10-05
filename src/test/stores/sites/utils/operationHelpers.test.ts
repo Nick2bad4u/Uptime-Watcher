@@ -105,13 +105,43 @@ describe("OperationHelpers", () => {
             createMockSite("site3", "monitor3"),
         ];
 
+        const siteService = {
+            addSite: vi.fn(async (site: Site) => site),
+            downloadSqliteBackup: vi.fn(async () => ({
+                buffer: new ArrayBuffer(0),
+                fileName: "backup.db",
+                metadata: {
+                    createdAt: Date.now(),
+                    originalPath: "",
+                    sizeBytes: 0,
+                },
+            })),
+            getSites: vi.fn(async () => mockSites),
+            removeMonitor: vi.fn(async () => true),
+            removeSite: vi.fn(async () => true),
+            updateSite: vi.fn(async (identifier: string, updates: unknown) =>
+                mockElectronAPI.sites.updateSite(identifier, updates)
+            ),
+        };
+
+        const monitoringService = {
+            startMonitoring: vi.fn(async () => {}),
+            startSiteMonitoring: vi.fn(async () => {}),
+            stopMonitoring: vi.fn(async () => {}),
+            stopSiteMonitoring: vi.fn(async () => {}),
+        };
+
         mockDeps = {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
             addSite: vi.fn(),
-            removeSite: vi.fn().mockResolvedValue(true),
+            removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
-        };
+            services: {
+                monitoring: monitoringService,
+                site: siteService,
+            },
+        } satisfies SiteOperationsDependencies;
 
         // Default mock implementations
         mockWithErrorHandling.mockImplementation(async (fn) => fn());

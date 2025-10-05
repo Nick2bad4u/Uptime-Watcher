@@ -75,6 +75,8 @@ export interface SiteRepositoryDependencies {
     databaseService: DatabaseService;
 }
 
+type SiteRowUpsertFields = "identifier" | "monitoring" | "name";
+
 /**
  * Operations available within a site repository transaction context.
  *
@@ -83,12 +85,14 @@ export interface SiteRepositoryDependencies {
  * be retained beyond the transaction boundary.
  */
 export interface SiteRepositoryTransactionAdapter {
+    /** Bulk insert sites within the active transaction. */
+    bulkInsert: (sites: SiteRow[]) => void;
     /** Delete a site by identifier within the active transaction. */
     delete: (identifier: string) => boolean;
     /** Delete all sites within the active transaction. */
     deleteAll: () => void;
     /** Upsert a site record within the active transaction. */
-    upsert: (site: Pick<SiteRow, "identifier" | "monitoring" | "name">) => void;
+    upsert: (site: Pick<SiteRow, SiteRowUpsertFields>) => void;
 }
 
 /**
@@ -175,26 +179,6 @@ export class SiteRepository {
             undefined,
             { count: sites.length }
         );
-    }
-
-    /**
-     * Create a transaction-scoped adapter exposing encapsulated write
-     * operations.
-     *
-     * @param db - Active transaction database connection.
-     */
-    public createTransactionAdapter(
-        db: Database
-    ): SiteRepositoryTransactionAdapter {
-        return {
-            delete: (identifier: string) => this.deleteInternal(db, identifier),
-            deleteAll: () => this.deleteAllInternal(db),
-            upsert: (
-                site: Pick<SiteRow, "identifier" | "monitoring" | "name">
-            ) => {
-                this.upsertInternal(db, site);
-            },
-        } satisfies SiteRepositoryTransactionAdapter;
     }
 
     /**
@@ -368,7 +352,7 @@ export class SiteRepository {
      * @throws If the database operation fails.
      */
     public async upsert(
-        site: Pick<SiteRow, "identifier" | "monitoring" | "name">
+        site: Pick<SiteRow, SiteRowUpsertFields>
     ): Promise<void> {
         return withDatabaseOperation(
             () => {
@@ -421,6 +405,41 @@ export class SiteRepository {
             undefined,
             metadata
         );
+    }
+
+    /**
+     * Create a transaction-scoped adapter exposing encapsulated write
+     * operations.
+     *
+     * @param db - Active transaction database connection.
+     */
+    public createTransactionAdapter(
+        db: Database
+    ): SiteRepositoryTransactionAdapter {
+        const bulkInsert: SiteRepositoryTransactionAdapter["bulkInsert"] = (
+            sites
+        ) => {
+            this.bulkInsertInternal(db, sites);
+        };
+
+        const deleteSite: SiteRepositoryTransactionAdapter["delete"] = (
+            identifier
+        ) => this.deleteInternal(db, identifier);
+
+        const deleteAll: SiteRepositoryTransactionAdapter["deleteAll"] = () => {
+            this.deleteAllInternal(db);
+        };
+
+        const upsert: SiteRepositoryTransactionAdapter["upsert"] = (site) => {
+            this.upsertInternal(db, site);
+        };
+
+        return {
+            bulkInsert,
+            delete: deleteSite,
+            deleteAll,
+            upsert,
+        } satisfies SiteRepositoryTransactionAdapter;
     }
 
     /**

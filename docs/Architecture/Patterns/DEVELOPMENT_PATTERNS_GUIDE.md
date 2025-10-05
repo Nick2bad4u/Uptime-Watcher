@@ -459,6 +459,35 @@ export const useUIStore = create<UIStore>()(
 );
 ```
 
+### Overflow Marquee Hook
+
+Use `useOverflowMarquee` when headline or metric text may exceed its container.
+The hook measures horizontal overflow, re-checks on resize, and returns
+`isOverflowing` so components can apply marquee animations only when needed.
+
+```tsx
+import clsx from "clsx";
+import { useOverflowMarquee } from "../../hooks/ui/useOverflowMarquee";
+
+export function SiteTitle({ title }: { title: string }): JSX.Element {
+ const { containerRef, isOverflowing } = useOverflowMarquee<HTMLDivElement>();
+
+ return (
+  <div
+   ref={containerRef}
+   className={clsx("truncate", isOverflowing && "animate-marquee")}
+   title={title}
+  >
+   {title}
+  </div>
+ );
+}
+```
+
+> **CSS alignment:** Pair the hook with the shared marquee utility classes in
+> `tailwind.config.mjs` (`animate-marquee` / `marquee-pause-on-hover`) to ensure
+> consistent animation speed and pause-on-hover behavior.
+
 ### State Management Usage Guidelines
 
 - ✅ Use modular composition for complex stores
