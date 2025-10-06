@@ -180,7 +180,7 @@ The application uses a TypedEventBus for decoupled communication between compone
 
 ### Event-Driven Implementation Template
 
-````typescript
+```typescript
 // 1. Define event interfaces
 interface DomainEvents extends Record<string, unknown> {
  "domain:action-completed": {
@@ -194,6 +194,7 @@ interface DomainEvents extends Record<string, unknown> {
   timestamp: number;
  };
 }
+```
 
 ## Shared Utility Imports
 
@@ -201,7 +202,7 @@ interface DomainEvents extends Record<string, unknown> {
 
 All consumers must import helpers from explicit module paths under `@shared/utils/*`. Barrel imports are disallowed to keep dependency graphs predictable and prevent circular references across Electron, renderer, and shared packages.
 
-### Guidelines
+### Shared Utility Guidelines
 
 - ✅ Import directly from the feature module (e.g., `@shared/utils/errorHandling`, `@shared/utils/logTemplates`)
 - ✅ Prefer named exports and avoid default exports for utilities
@@ -209,18 +210,18 @@ All consumers must import helpers from explicit module paths under `@shared/util
 - ❌ Do not re-export `@shared/utils` helpers from new barrels
 - ❌ Do not rely on relative `../../utils` hops inside shared code
 
-### Example
+### Shared Utility Example
 
 ```typescript
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 
 export async function invokeOperation(): Promise<Result> {
-    return withUtilityErrorHandling(async () => {
-        // ...operation logic
-    }, LOG_TEMPLATES.utilities.OPERATION_FAILED);
+ return withUtilityErrorHandling(async () => {
+  // ...operation logic
+ }, LOG_TEMPLATES.utilities.OPERATION_FAILED);
 }
-````
+```
 
 ## Logging Format & Prefix Standards
 
@@ -228,7 +229,7 @@ export async function invokeOperation(): Promise<Result> {
 
 Logging across main and renderer processes uses structured prefixes and reusable templates to keep telemetry consistent. Prefixes originate from `electron/utils/logger.ts` (BACKEND, DB, MONITOR) and renderer-side adapters, while message templates live in `@shared/utils/logTemplates`.
 
-### Guidelines
+### Logging Guidelines
 
 - ✅ Use `LOG_TEMPLATES` when available to standardize message structure
 - ✅ Include contextual metadata objects instead of string concatenation
@@ -237,7 +238,7 @@ Logging across main and renderer processes uses structured prefixes and reusable
 - ❌ Do not log raw errors without using `buildErrorLogArguments`; surfaces stack traces improperly
 - ❌ Do not invent ad-hoc prefixes or bypass shared logger helpers
 
-### Example
+### Logging Example
 
 ```typescript
 import { logger } from "electron/utils/logger";
@@ -251,41 +252,41 @@ export function recordMissingHandler(channel: string): void {
 }
 ```
 
+```typescript
 // 2. Emit events in services
 export class ExampleService {
-constructor(private eventBus: TypedEventBus<UptimeEvents>) {}
+ constructor(private readonly eventBus: TypedEventBus<UptimeEvents>) {}
 
-async performAction(id: string): Promise<void> {
-try {
-// Perform operation
-const result = await this.doSomething(id);
+ async performAction(id: string): Promise<void> {
+  try {
+   // Perform operation
+   const result = await this.doSomething(id);
 
-// Emit success event
-await this.eventBus.emitTyped("domain:action-completed", {
-entityId: id,
-result,
-timestamp: Date.now(),
-});
-} catch (error) {
-// Emit failure event
-await this.eventBus.emitTyped("domain:action-failed", {
-entityId: id,
-error: error instanceof Error ? error.message : "Unknown error",
-timestamp: Date.now(),
-});
-throw error;
-}
-}
+   // Emit success event
+   await this.eventBus.emitTyped("domain:action-completed", {
+    entityId: id,
+    result,
+    timestamp: Date.now(),
+   });
+  } catch (error) {
+   // Emit failure event
+   await this.eventBus.emitTyped("domain:action-failed", {
+    entityId: id,
+    error: error instanceof Error ? error.message : "Unknown error",
+    timestamp: Date.now(),
+   });
+   throw error;
+  }
+ }
 }
 
 // 3. Listen to events
 eventBus.onTyped("domain:action-completed", (data) => {
-// data is properly typed and includes \_meta
-console.log(`Action completed for ${data.entityId} at ${data.timestamp}`);
-console.log(`Correlation ID: ${data._meta.correlationId}`);
+ // data is properly typed and includes _meta
+ console.log(`Action completed for ${data.entityId} at ${data.timestamp}`);
+ console.log(`Correlation ID: ${data._meta.correlationId}`);
 });
-
-````
+```
 
 ### Event-Driven Usage Guidelines
 
@@ -315,7 +316,7 @@ const handleUserAction = async () => {
   return result;
  }, errorStore); // Automatically manages loading/error state
 };
-````
+```
 
 #### Backend with Logger Integration
 

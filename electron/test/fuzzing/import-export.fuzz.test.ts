@@ -70,7 +70,7 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
             repository: Record<string, any>,
             builders: Record<string, Function>
         ) => {
-            repository.createTransactionAdapter = vi
+            repository["createTransactionAdapter"] = vi
                 .fn()
                 .mockImplementation((db: unknown) => {
                     const adapter: Record<string, any> = {};
@@ -85,33 +85,36 @@ describe("Data Import/Export Service Fuzzing Tests", () => {
 
         attachAdapter(mockConfig.repositories.site, {
             bulkInsert: (db: unknown, rows: unknown) =>
-                mockConfig.repositories.site.bulkInsertInternal(db, rows),
+                mockConfig.repositories.site["bulkInsertInternal"](db, rows),
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.site.deleteAllInternal(db),
+                mockConfig.repositories.site["deleteAllInternal"](db),
         });
 
         attachAdapter(mockConfig.repositories.settings, {
             bulkInsert: (db: unknown, values: unknown) =>
-                mockConfig.repositories.settings.bulkInsertInternal(db, values),
+                mockConfig.repositories.settings["bulkInsertInternal"](
+                    db,
+                    values
+                ),
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.settings.deleteAllInternal(db),
+                mockConfig.repositories.settings["deleteAllInternal"](db),
         });
 
         attachAdapter(mockConfig.repositories.monitor, {
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.monitor.deleteAllInternal(db),
+                mockConfig.repositories.monitor["deleteAllInternal"](db),
         });
 
         attachAdapter(mockConfig.repositories.history, {
             deleteAll: (db: unknown) =>
-                mockConfig.repositories.history.deleteAllInternal(db),
+                mockConfig.repositories.history["deleteAllInternal"](db),
             addEntry: (
                 db: unknown,
                 monitorId: unknown,
                 entry: unknown,
                 details: unknown
             ) =>
-                mockConfig.repositories.history.addEntryInternal(
+                mockConfig.repositories.history["addEntryInternal"](
                     db,
                     monitorId,
                     entry,

@@ -56,6 +56,8 @@ export interface ThemedTextProperties
         CoreComponentProperties {
     /** Text alignment within the container */
     readonly align?: TextAlign;
+    /** Semantic HTML element to render (defaults to `<span>`). */
+    readonly as?: keyof JSX.IntrinsicElements;
     /** Font size variant for the text */
     readonly size?: TextSize;
     /** Inline styles to apply to the text element */
@@ -95,6 +97,7 @@ const DEFAULT_THEMED_BOX_STYLE: CSSProperties = {};
 export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
     function ThemedText({
         align = "left",
+        as: elementTag = "span",
         children,
         className = "",
         size = "base",
@@ -123,8 +126,9 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
             tabIndex,
         } = accessibilityProps;
 
+        const Element = elementTag;
         return (
-            <span
+            <Element
                 aria-describedby={ariaDescribedBy}
                 aria-label={ariaLabel}
                 aria-labelledby={ariaLabelledBy}
@@ -135,7 +139,7 @@ export const ThemedText: NamedExoticComponent<ThemedTextProperties> = memo(
                 tabIndex={tabIndex}
             >
                 {children}
-            </span>
+            </Element>
         );
     }
 );

@@ -207,7 +207,7 @@ const attachTransactionAdapter = (
     repository: Record<string, any>,
     builders: Record<string, Function>
 ) => {
-    repository.createTransactionAdapter = vi
+    repository["createTransactionAdapter"] = vi
         .fn()
         .mockImplementation((db: unknown) => {
             const adapter: Record<string, any> = {};
@@ -223,23 +223,25 @@ const attachTransactionAdapter = (
 const initializeTransactionAdapters = (): void => {
     attachTransactionAdapter(mockSettingsRepository, {
         set: (db: unknown, key: unknown, value: unknown) =>
-            mockSettingsRepository.setInternal(db, key, value),
+            mockSettingsRepository["setInternal"](db, key, value),
     });
 
     attachTransactionAdapter(mockHistoryRepository, {
         pruneAllHistory: (db: unknown, limit: unknown) =>
-            mockHistoryRepository.pruneAllHistoryInternal(db, limit),
-        deleteAll: (db: unknown) => mockHistoryRepository.deleteAllInternal(db),
+            mockHistoryRepository["pruneAllHistoryInternal"](db, limit),
+        deleteAll: (db: unknown) =>
+            mockHistoryRepository["deleteAllInternal"](db),
     });
 
     attachTransactionAdapter(mockMonitorRepository, {
-        deleteAll: (db: unknown) => mockMonitorRepository.deleteAllInternal(db),
+        deleteAll: (db: unknown) =>
+            mockMonitorRepository["deleteAllInternal"](db),
     });
 
     attachTransactionAdapter(mockSiteRepository, {
         bulkInsert: (db: unknown, rows: unknown) =>
-            mockSiteRepository.bulkInsertInternal(db, rows),
-        deleteAll: (db: unknown) => mockSiteRepository.deleteAllInternal(db),
+            mockSiteRepository["bulkInsertInternal"](db, rows),
+        deleteAll: (db: unknown) => mockSiteRepository["deleteAllInternal"](db),
     });
 };
 

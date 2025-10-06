@@ -290,9 +290,9 @@
 
 .site-table__resize-handle {
     position: absolute;
-    top: 0;
-    right: -0.4rem;
-    bottom: 0;
+    inset-block-start: 0;
+    inset-inline-end: -0.4rem;
+    inset-block-end: 0;
     z-index: 2;
     display: inline-flex;
     align-items: center;
@@ -336,7 +336,7 @@
 }
 
 .site-table__resize-handle--last {
-    right: -0.2rem;
+    inset-inline-end: -0.2rem;
 }
 
 .site-card__compact-header,

@@ -564,6 +564,7 @@ const config = defineConfig({
         // A11y Plugin Rules (@double-great/stylelint-a11y)
         // Disable static content rule as we use it legitimately for checkmarks, tooltips, and visual indicators
         "a11y/content-property-no-static-value": null,
+
         "a11y/font-size-is-readable": [
             true,
             {
@@ -591,7 +592,6 @@ const config = defineConfig({
         "a11y/no-spread-text": true,
         "a11y/no-text-align-justify": true,
         "a11y/selector-pseudo-class-focus": true,
-
         /**
          * Core Stylelint built-in rules for standard CSS validation.
          *
@@ -604,6 +604,7 @@ const config = defineConfig({
          */
         // Stylelint built in rules
         "at-rule-allowed-list": null,
+
         "at-rule-disallowed-list": null,
         // Disable unknown at-rules to prevent conflicts with modern CSS features and build tools
         "at-rule-no-unknown": null,
@@ -616,16 +617,16 @@ const config = defineConfig({
         "color-no-invalid-hex": true, // Disallow invalid hex colors like #xyz or #1234567 (verified working)
         "comment-pattern": null,
         "comment-word-disallowed-list": null,
-
         // CSS Tools Rules (@csstools/postcss-plugins)
         "csstools/media-use-custom-media": null,
+
         // CSS nesting and tools
         "csstools/use-nesting": "always",
         "csstools/value-no-unknown-custom-properties": null,
-
         // Stylelint built in rules
         // Declaration rules
         "declaration-no-important": true,
+
         "declaration-property-max-values": null,
         "declaration-property-unit-allowed-list": null,
         "declaration-property-unit-disallowed-list": null,
@@ -661,7 +662,6 @@ const config = defineConfig({
         "order/properties-alphabetical-order": null,
         // Plugin rules
         "plugin/declaration-block-no-ignored-properties": true,
-
         /**
          * Browser compatibility rules with specific browser support targets.
          *
@@ -688,6 +688,7 @@ const config = defineConfig({
                 ],
             },
         ],
+
         /**
          * Performance optimization rules for animations and high-impact
          * properties.
@@ -871,6 +872,7 @@ const config = defineConfig({
          * improved internationalization and writing mode support.
          */
         "plugin/use-logical-units": [true, { severity: "warning" }],
+        "prettier/prettier": true,
 
         /**
          * Prettier integration for code formatting.
@@ -881,12 +883,10 @@ const config = defineConfig({
          */
         // Prettier integration
 
-        "prettier/prettier": true,
         "property-allowed-list": null,
         "property-disallowed-list": null,
         "rule-nesting-at-rule-required-list": null,
         "rule-selector-property-disallowed-list": null,
-
         /**
          * Scale-based design system rules.
          *
@@ -899,6 +899,7 @@ const config = defineConfig({
          */
         // Scale rules (stylelint-scales)
         "scale-unlimited/declaration-strict-value": null,
+
         "scales/alpha-values": null,
         "scales/border-widths": null,
         /**
@@ -989,7 +990,6 @@ const config = defineConfig({
         "scales/space": null,
         "scales/word-spacings": null,
         "scales/z-indices": null,
-
         /**
          * SCSS (Sass) specific linting rules.
          *
@@ -1002,6 +1002,7 @@ const config = defineConfig({
          */
         // SCSS specific rules (stylelint-scss)
         "scss/at-each-key-value-single-line": true,
+
         "scss/at-function-named-arguments": "always",
         "scss/at-import-partial-extension-allowed-list": null,
         "scss/at-import-partial-extension-disallowed-list": null,
@@ -1041,6 +1042,16 @@ const config = defineConfig({
         "selector-attribute-name-disallowed-list": null,
         "selector-attribute-operator-allowed-list": null,
         "selector-attribute-operator-disallowed-list": null,
+        /**
+        * Rule to enforce consistent class selector patterns.
+        *
+        * @remarks
+        * Disabled to allow flexibility with utility-first CSS frameworks
+        * like Tailwind CSS, which use diverse class naming conventions.
+        *
+        * @see {@link https://stylelint.io/user-guide/rules/selector-class-pattern | selector-class-pattern Documentation}
+        */
+        "selector-class-pattern": null,
         "selector-combinator-allowed-list": null,
         "selector-combinator-disallowed-list": null,
         "selector-disallowed-list": null,

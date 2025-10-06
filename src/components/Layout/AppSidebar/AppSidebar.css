@@ -48,10 +48,10 @@
 @media (width >= 1024px) {
     .app-sidebar {
         position: sticky;
-        top: var(--app-sidebar-sticky-offset);
+        inset-block-start: var(--app-sidebar-sticky-offset);
         align-self: flex-start;
-        block-size: calc(100vh - (var(--app-sidebar-sticky-offset) * 2));
-        max-block-size: calc(100vh - (var(--app-sidebar-sticky-offset) * 2));
+        block-size: calc(100vb - (var(--app-sidebar-sticky-offset) * 2));
+        max-block-size: calc(100vb - (var(--app-sidebar-sticky-offset) * 2));
     }
 }
 

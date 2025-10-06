@@ -1,10 +1,12 @@
-import MascotLogo from "@assets/UptimeWatcherMascot.png";
 import type { Site, SiteStatus } from "@shared/types";
+import type { IconType } from "react-icons";
+
+// eslint-disable-next-line sonarjs/no-implicit-dependencies -- Uses configured Vite alias for shared asset resolution
+import MascotLogo from "@assets/UptimeWatcherMascot.png";
 import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
 } from "@shared/utils/siteStatus";
-import type { IconType } from "react-icons";
 import {
     type ChangeEvent,
     memo,

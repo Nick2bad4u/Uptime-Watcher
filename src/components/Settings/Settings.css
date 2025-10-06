@@ -94,7 +94,7 @@
     flex-direction: column;
     padding: var(--spacing-2xl);
     gap: var(--spacing-xl);
-    overflow-y: auto;
+    overflow-block: auto;
     min-block-size: 0;
 }
 
@@ -125,6 +125,7 @@
 
 .settings-modal__sections {
     display: flex;
+    overflow-block: auto;
     flex-direction: column;
     gap: var(--spacing-lg);
 }

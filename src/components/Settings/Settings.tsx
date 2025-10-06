@@ -34,13 +34,13 @@
  * @public
  */
 
-import { useCallback, useMemo, useState } from "react";
 import type { ChangeEvent, MouseEvent, ReactNode } from "react";
 import type { IconType } from "react-icons";
 import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
+import { useCallback, useMemo, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 import type { ThemeName } from "../../theme/types";
@@ -480,8 +480,12 @@ export const Settings = ({
                             <div className="settings-modal__header-icon">
                                 <SettingsHeaderIcon size={22} />
                             </div>
+                            {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
                             <ThemedText
+                                aria-level={1}
+                                as="h2"
                                 className="modal-shell__title"
+                                role="heading"
                                 size="xl"
                                 weight="semibold"
                             >

@@ -363,47 +363,56 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     );
 
     // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
-    useEffect(() => {
-        const { matchMedia } = globalThis as typeof globalThis & {
-            matchMedia?: (query: string) => MediaQueryList;
-        };
-        const mediaQuery =
-            sidebarMediaQueryRef.current ??
-            (typeof matchMedia === "function"
-                ? matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY)
-                : null);
+    useEffect(
+        function handleCompactSidebarAutoDismissal(): () => void {
+            const { matchMedia } = globalThis as typeof globalThis & {
+                matchMedia?: (query: string) => MediaQueryList;
+            };
+            const mediaQuery =
+                sidebarMediaQueryRef.current ??
+                (typeof matchMedia === "function"
+                    ? matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY)
+                    : undefined);
 
-        if (!isSidebarOpen || !mediaQuery?.matches) {
-            return () => {};
-        }
-
-        const handlePointerDown = (event: PointerEvent): void => {
-            const target = event.target;
-            if (!(target instanceof HTMLElement)) {
-                return;
+            if (!isSidebarOpen || !(mediaQuery?.matches ?? false)) {
+                return () => {};
             }
 
-            if (
-                target.closest(".app-sidebar") ||
-                target.closest(".app-topbar__sidebar-toggle") ||
-                target.closest(".sidebar-reveal-button")
-            ) {
-                return;
-            }
+            const handlePointerDown = (event: PointerEvent): void => {
+                const { target } = event;
+                if (!(target instanceof HTMLElement)) {
+                    return;
+                }
 
-            setIsSidebarOpen(false);
-        };
+                const interactiveSelectors: readonly string[] = [
+                    ".app-sidebar",
+                    ".app-topbar__sidebar-toggle",
+                    ".sidebar-reveal-button",
+                ];
 
-        document.addEventListener("pointerdown", handlePointerDown, true);
+                const interactedWithinSidebar = interactiveSelectors.some(
+                    (selector) => target.closest(selector) !== null
+                );
 
-        return () => {
-            document.removeEventListener(
-                "pointerdown",
-                handlePointerDown,
-                true
-            );
-        };
-    }, [isSidebarOpen]);
+                if (interactedWithinSidebar) {
+                    return;
+                }
+
+                setIsSidebarOpen(false);
+            };
+
+            document.addEventListener("pointerdown", handlePointerDown, true);
+
+            return () => {
+                document.removeEventListener(
+                    "pointerdown",
+                    handlePointerDown,
+                    true
+                );
+            };
+        },
+        [isSidebarOpen, setIsSidebarOpen]
+    );
 
     const toggleSidebar = useCallback(() => {
         setIsSidebarOpen((previous) => !previous);

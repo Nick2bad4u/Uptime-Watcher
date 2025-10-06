@@ -169,67 +169,67 @@ export function createMockRepository(): any {
         getAllMonitorIds: vi.fn().mockResolvedValue([]),
     };
 
-    repository.createTransactionAdapter = vi
+    repository["createTransactionAdapter"] = vi
         .fn()
         .mockImplementation((db: unknown) => {
             const adapter: Record<string, any> = {};
 
-            if (repository.bulkInsertInternal.mock) {
-                adapter.bulkInsert = vi.fn((payload: unknown) =>
-                    repository.bulkInsertInternal(db, payload)
+            if (repository["bulkInsertInternal"].mock) {
+                adapter["bulkInsert"] = vi.fn((payload: unknown) =>
+                    repository["bulkInsertInternal"](db, payload)
                 );
             }
 
-            if (repository.deleteAllInternal.mock) {
-                adapter.deleteAll = vi.fn(() =>
-                    repository.deleteAllInternal(db)
+            if (repository["deleteAllInternal"].mock) {
+                adapter["deleteAll"] = vi.fn(() =>
+                    repository["deleteAllInternal"](db)
                 );
             }
 
-            if (repository.deleteInternal.mock) {
-                adapter.delete = vi.fn((identifier: unknown) =>
-                    repository.deleteInternal(db, identifier)
+            if (repository["deleteInternal"].mock) {
+                adapter["delete"] = vi.fn((identifier: unknown) =>
+                    repository["deleteInternal"](db, identifier)
                 );
-                adapter.deleteByKey = vi.fn((key: unknown) =>
-                    repository.deleteInternal(db, key)
+                adapter["deleteByKey"] = vi.fn((key: unknown) =>
+                    repository["deleteInternal"](db, key)
                 );
-                adapter.deleteById = vi.fn((identifier: unknown) =>
-                    repository.deleteInternal(db, identifier)
+                adapter["deleteById"] = vi.fn((identifier: unknown) =>
+                    repository["deleteInternal"](db, identifier)
                 );
             }
 
-            if (repository.deleteBySiteIdentifierInternal.mock) {
-                adapter.deleteBySiteIdentifier = vi.fn(
+            if (repository["deleteBySiteIdentifierInternal"].mock) {
+                adapter["deleteBySiteIdentifier"] = vi.fn(
                     (siteIdentifier: unknown) =>
-                        repository.deleteBySiteIdentifierInternal(
+                        repository["deleteBySiteIdentifierInternal"](
                             db,
                             siteIdentifier
                         )
                 );
             }
 
-            if (repository.createInternal.mock) {
-                adapter.create = vi.fn((...args: unknown[]) =>
-                    repository.createInternal(db, ...args)
+            if (repository["createInternal"].mock) {
+                adapter["create"] = vi.fn((...args: unknown[]) =>
+                    repository["createInternal"](db, ...args)
                 );
             }
 
-            if (repository.updateInternal.mock) {
-                adapter.update = vi.fn((...args: unknown[]) =>
-                    repository.updateInternal(db, ...args)
+            if (repository["updateInternal"].mock) {
+                adapter["update"] = vi.fn((...args: unknown[]) =>
+                    repository["updateInternal"](db, ...args)
                 );
             }
 
-            if (repository.clearActiveOperationsInternal.mock) {
-                adapter.clearActiveOperations = vi.fn((monitorId: unknown) =>
-                    repository.clearActiveOperationsInternal(db, monitorId)
+            if (repository["clearActiveOperationsInternal"].mock) {
+                adapter["clearActiveOperations"] = vi.fn((monitorId: unknown) =>
+                    repository["clearActiveOperationsInternal"](db, monitorId)
                 );
             }
 
-            if (repository.addEntryInternal.mock) {
-                adapter.addEntry = vi.fn(
+            if (repository["addEntryInternal"].mock) {
+                adapter["addEntry"] = vi.fn(
                     (monitorId: unknown, entry: unknown, details?: unknown) =>
-                        repository.addEntryInternal(
+                        repository["addEntryInternal"](
                             db,
                             monitorId,
                             entry,
@@ -238,27 +238,27 @@ export function createMockRepository(): any {
                 );
             }
 
-            if (repository.deleteByMonitorIdInternal.mock) {
-                adapter.deleteByMonitorId = vi.fn((monitorId: unknown) =>
-                    repository.deleteByMonitorIdInternal(db, monitorId)
+            if (repository["deleteByMonitorIdInternal"].mock) {
+                adapter["deleteByMonitorId"] = vi.fn((monitorId: unknown) =>
+                    repository["deleteByMonitorIdInternal"](db, monitorId)
                 );
             }
 
-            if (repository.getHistoryCountInternal.mock) {
-                adapter.getHistoryCount = vi.fn((monitorId: unknown) =>
-                    repository.getHistoryCountInternal(db, monitorId)
+            if (repository["getHistoryCountInternal"].mock) {
+                adapter["getHistoryCount"] = vi.fn((monitorId: unknown) =>
+                    repository["getHistoryCountInternal"](db, monitorId)
                 );
             }
 
-            if (repository.pruneAllHistoryInternal.mock) {
-                adapter.pruneAllHistory = vi.fn((limit: unknown) =>
-                    repository.pruneAllHistoryInternal(db, limit)
+            if (repository["pruneAllHistoryInternal"].mock) {
+                adapter["pruneAllHistory"] = vi.fn((limit: unknown) =>
+                    repository["pruneAllHistoryInternal"](db, limit)
                 );
             }
 
-            if (repository.setInternal.mock) {
-                adapter.set = vi.fn((key: unknown, value: unknown) =>
-                    repository.setInternal(db, key, value)
+            if (repository["setInternal"].mock) {
+                adapter["set"] = vi.fn((key: unknown, value: unknown) =>
+                    repository["setInternal"](db, key, value)
                 );
             }
 

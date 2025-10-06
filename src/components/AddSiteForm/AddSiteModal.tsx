@@ -81,8 +81,12 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                 >
                     <div className="modal-shell__header">
                         <div className="modal-shell__title-group">
+                            {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
                             <ThemedText
+                                aria-level={1}
+                                as="h2"
                                 className="modal-shell__title"
+                                role="heading"
                                 size="xl"
                                 weight="semibold"
                             >

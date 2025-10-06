@@ -186,17 +186,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         ...state.siteTableColumnWidths,
                     };
 
-                    for (const [column, width] of Object.entries(widths)) {
-                        if (width === undefined || Number.isNaN(width)) {
-                            continue;
-                        }
-
-                        if (
-                            SITE_TABLE_COLUMN_KEYS.includes(
-                                column as SiteTableColumnKey
-                            )
-                        ) {
-                            updated[column as SiteTableColumnKey] = width;
+                    for (const columnKey of SITE_TABLE_COLUMN_KEYS) {
+                        const width = widths[columnKey];
+                        if (width !== undefined && !Number.isNaN(width)) {
+                            updated[columnKey] = width;
                         }
                     }
 

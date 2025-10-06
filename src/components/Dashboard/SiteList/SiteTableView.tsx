@@ -6,14 +6,14 @@
 import type { Site } from "@shared/types";
 
 import {
+    type CSSProperties,
     memo,
     type NamedExoticComponent,
     type PointerEvent as ReactPointerEvent,
     type RefObject,
-    useCallback,
+    useMemo,
     useRef,
 } from "react";
-import type { JSX } from "react/jsx-runtime";
 
 import type { SiteTableColumnKey } from "../../../stores/ui/types";
 
@@ -23,9 +23,12 @@ import { SiteTableRow } from "./SiteTableRow";
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
-const selectColumnWidths = (state: UiStoreState) => state.siteTableColumnWidths;
-const selectSetColumnWidths = (state: UiStoreState) =>
-    state.setSiteTableColumnWidths;
+const selectColumnWidths = (
+    state: UiStoreState
+): UiStoreState["siteTableColumnWidths"] => state.siteTableColumnWidths;
+const selectSetColumnWidths = (
+    state: UiStoreState
+): UiStoreState["setSiteTableColumnWidths"] => state.setSiteTableColumnWidths;
 
 interface ColumnDefinition {
     readonly align?: "end" | "start";
@@ -49,13 +52,10 @@ const MAX_COLUMN_WIDTH = 48;
 const clamp = (value: number, min: number, max: number): number =>
     Math.min(Math.max(value, min), max);
 
-interface ResizableColumnHeaderProperties {
+interface ColumnResizeContext {
     readonly adjacentColumnKey: SiteTableColumnKey;
-    readonly align: "end" | "start";
     readonly columnKey: SiteTableColumnKey;
     readonly columnWidths: Record<SiteTableColumnKey, number>;
-    readonly isLast: boolean;
-    readonly label: string;
     readonly resizable: boolean;
     readonly setColumnWidths: (
         widths: Partial<Record<SiteTableColumnKey, number>>
@@ -63,141 +63,130 @@ interface ResizableColumnHeaderProperties {
     readonly tableRef: RefObject<HTMLTableElement | null>;
 }
 
-const ResizableColumnHeader = ({
+const noopPointerDown = (): void => {};
+
+/**
+ * Creates a pointer handler that manages interactive column resizing.
+ *
+ * @param context - Runtime context needed to compute width adjustments.
+ *
+ * @returns Pointer handler bound to the supplied column configuration.
+ */
+function createPointerDownHandler({
     adjacentColumnKey,
-    align,
     columnKey,
     columnWidths,
-    isLast,
-    label,
     resizable,
     setColumnWidths,
     tableRef,
-}: ResizableColumnHeaderProperties): JSX.Element => {
-    const handlePointerDown = useCallback(
-        (event: ReactPointerEvent<HTMLButtonElement>) => {
-            if (!resizable) {
-                return;
-            }
+}: ColumnResizeContext): (event: ReactPointerEvent<HTMLButtonElement>) => void {
+    if (!resizable) {
+        return noopPointerDown;
+    }
 
-            const tableElement = tableRef.current;
-            if (!tableElement) {
-                return;
-            }
+    return (event: ReactPointerEvent<HTMLButtonElement>): void => {
+        const tableElement = tableRef.current;
+        if (!tableElement) {
+            return;
+        }
 
-            const tableRect = tableElement.getBoundingClientRect();
-            if (tableRect.width <= 0) {
-                return;
-            }
+        const tableRect = tableElement.getBoundingClientRect();
+        if (tableRect.width <= 0) {
+            return;
+        }
 
-            const startingWidth = columnWidths[columnKey];
-            const adjacentStartingWidth = columnWidths[adjacentColumnKey];
+        const startingWidth = columnWidths[columnKey];
+        const adjacentStartingWidth = columnWidths[adjacentColumnKey];
+        const totalPairPercent = startingWidth + adjacentStartingWidth;
+
+        const effectiveMin = Math.max(
+            MIN_COLUMN_WIDTH,
+            totalPairPercent - MAX_COLUMN_WIDTH
+        );
+        const effectiveMax = Math.min(
+            MAX_COLUMN_WIDTH,
+            totalPairPercent - MIN_COLUMN_WIDTH
+        );
+
+        if (effectiveMin > effectiveMax) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const resizeHandle = event.currentTarget;
+        const { clientX: startX, pointerId } = event;
+
+        resizeHandle.setPointerCapture(pointerId);
+
+        const originalCursor = document.body.style.cursor;
+        const originalUserSelect = document.body.style.userSelect;
+
+        document.body.style.cursor = "col-resize";
+        document.body.style.userSelect = "none";
+
+        const handlePointerMove = (moveEvent: PointerEvent): void => {
+            const deltaPx = moveEvent.clientX - startX;
+            const deltaPercent = (deltaPx / tableRect.width) * 100;
+            const desiredWidth = clamp(
+                startingWidth + deltaPercent,
+                effectiveMin,
+                effectiveMax
+            );
+            const adjustedAdjacent = totalPairPercent - desiredWidth;
 
             if (
-                startingWidth === undefined ||
-                adjacentStartingWidth === undefined
+                Math.abs(desiredWidth - startingWidth) < 0.01 &&
+                Math.abs(adjustedAdjacent - adjacentStartingWidth) < 0.01
             ) {
                 return;
             }
 
-            const totalPairPercent = startingWidth + adjacentStartingWidth;
-            const effectiveMin = Math.max(
-                MIN_COLUMN_WIDTH,
-                totalPairPercent - MAX_COLUMN_WIDTH
-            );
-            const effectiveMax = Math.min(
-                MAX_COLUMN_WIDTH,
-                totalPairPercent - MIN_COLUMN_WIDTH
-            );
+            setColumnWidths({
+                [adjacentColumnKey]: Number(adjustedAdjacent.toFixed(2)),
+                [columnKey]: Number(desiredWidth.toFixed(2)),
+            });
+        };
 
-            if (effectiveMin > effectiveMax) {
-                return;
+        const handlePointerEnd = (): void => {
+            if (resizeHandle.hasPointerCapture(pointerId)) {
+                resizeHandle.releasePointerCapture(pointerId);
             }
 
-            event.preventDefault();
-            event.stopPropagation();
+            document.removeEventListener("pointermove", handlePointerMove);
+            document.removeEventListener("pointerup", handlePointerEnd);
+            document.removeEventListener("pointercancel", handlePointerEnd);
+            document.body.style.cursor = originalCursor;
+            document.body.style.userSelect = originalUserSelect;
+        };
 
-            const resizeHandle = event.currentTarget;
-            const { clientX: startX, pointerId } = event;
+        document.addEventListener("pointermove", handlePointerMove);
+        document.addEventListener("pointerup", handlePointerEnd);
+        document.addEventListener("pointercancel", handlePointerEnd);
+    };
+}
 
-            resizeHandle.setPointerCapture(pointerId);
-
-            const originalCursor = document.body.style.cursor;
-            const originalUserSelect = document.body.style.userSelect;
-
-            document.body.style.cursor = "col-resize";
-            document.body.style.userSelect = "none";
-
-            const handlePointerMove = (moveEvent: PointerEvent): void => {
-                const deltaPx = moveEvent.clientX - startX;
-                const deltaPercent = (deltaPx / tableRect.width) * 100;
-                let desiredWidth = startingWidth + deltaPercent;
-                desiredWidth = clamp(desiredWidth, effectiveMin, effectiveMax);
-                const adjustedAdjacent = totalPairPercent - desiredWidth;
-
-                if (
-                    Math.abs(desiredWidth - startingWidth) < 0.01 &&
-                    Math.abs(adjustedAdjacent - adjacentStartingWidth) < 0.01
-                ) {
-                    return;
-                }
-
-                setColumnWidths({
-                    [adjacentColumnKey]: Number(adjustedAdjacent.toFixed(2)),
-                    [columnKey]: Number(desiredWidth.toFixed(2)),
-                });
-            };
-
-            const handlePointerEnd = (): void => {
-                if (resizeHandle.hasPointerCapture(pointerId)) {
-                    resizeHandle.releasePointerCapture(pointerId);
-                }
-                document.removeEventListener("pointermove", handlePointerMove);
-                document.removeEventListener("pointerup", handlePointerEnd);
-                document.removeEventListener("pointercancel", handlePointerEnd);
-                document.body.style.cursor = originalCursor;
-                document.body.style.userSelect = originalUserSelect;
-            };
-
-            document.addEventListener("pointermove", handlePointerMove);
-            document.addEventListener("pointerup", handlePointerEnd);
-            document.addEventListener("pointercancel", handlePointerEnd);
-        },
-        [
-            adjacentColumnKey,
-            columnKey,
-            columnWidths,
-            resizable,
-            setColumnWidths,
-            tableRef,
-        ]
-    );
-
-    const headingClass =
-        align === "end"
-            ? "site-table__heading site-table__heading--end"
-            : "site-table__heading";
-
-    return (
-        <th className={headingClass} scope="col">
-            <div className="site-table__heading-content">
-                <span>{label}</span>
-                {resizable ? (
-                    <button
-                        aria-label={`Resize ${label} column`}
-                        className={
-                            isLast
-                                ? "site-table__resize-handle site-table__resize-handle--last"
-                                : "site-table__resize-handle"
-                        }
-                        onPointerDown={handlePointerDown}
-                        type="button"
-                    />
-                ) : null}
-            </div>
-        </th>
-    );
-};
+/**
+ * Builds a memoizable style map for the current column widths.
+ *
+ * @param columnWidths - Width percentages keyed by column identifier.
+ *
+ * @returns Mapping of column keys to inline style objects.
+ */
+function computeColumnStyles(
+    columnWidths: Record<SiteTableColumnKey, number>
+): Record<SiteTableColumnKey, CSSProperties> {
+    return {
+        controls: { width: `${columnWidths.controls}%` },
+        monitor: { width: `${columnWidths.monitor}%` },
+        response: { width: `${columnWidths.response}%` },
+        running: { width: `${columnWidths.running}%` },
+        site: { width: `${columnWidths.site}%` },
+        status: { width: `${columnWidths.status}%` },
+        uptime: { width: `${columnWidths.uptime}%` },
+    } satisfies Record<SiteTableColumnKey, CSSProperties>;
+}
 
 /**
  * Properties for {@link SiteTableView}.
@@ -215,6 +204,10 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
         const tableRef = useRef<HTMLTableElement | null>(null);
         const columnWidths = useUIStore(selectColumnWidths);
         const setColumnWidths = useUIStore(selectSetColumnWidths);
+        const columnStyles = useMemo(
+            () => computeColumnStyles(columnWidths),
+            [columnWidths]
+        );
 
         return (
             <ThemedBox
@@ -227,10 +220,7 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                 <table className="site-table__table" ref={tableRef}>
                     <colgroup>
                         {COLUMN_DEFINITIONS.map(({ key }) => (
-                            <col
-                                key={key}
-                                style={{ width: `${columnWidths[key]}%` }}
-                            />
+                            <col key={key} style={columnStyles[key]} />
                         ))}
                     </colgroup>
                     <thead>
@@ -239,26 +229,50 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                 const next = COLUMN_DEFINITIONS[index + 1];
                                 const previous = COLUMN_DEFINITIONS[index - 1];
                                 const adjacent = next ?? previous;
-                                const resizable = Boolean(adjacent);
+                                const resizable = adjacent !== undefined;
+                                const adjacentColumnKey =
+                                    adjacent?.key ?? column.key;
+                                const headingClass =
+                                    column.align === "end"
+                                        ? "site-table__heading site-table__heading--end"
+                                        : "site-table__heading";
+                                const isLastColumn =
+                                    index === COLUMN_DEFINITIONS.length - 1;
+                                const pointerDownHandler =
+                                    createPointerDownHandler({
+                                        adjacentColumnKey,
+                                        columnKey: column.key,
+                                        columnWidths,
+                                        resizable,
+                                        setColumnWidths,
+                                        tableRef,
+                                    });
+                                const resizeHandleClass = isLastColumn
+                                    ? "site-table__resize-handle site-table__resize-handle--last"
+                                    : "site-table__resize-handle";
 
                                 return (
-                                    <ResizableColumnHeader
-                                        adjacentColumnKey={
-                                            adjacent?.key ?? column.key
-                                        }
-                                        align={column.align ?? "start"}
-                                        columnKey={column.key}
-                                        columnWidths={columnWidths}
-                                        isLast={
-                                            index ===
-                                            COLUMN_DEFINITIONS.length - 1
-                                        }
+                                    <th
+                                        className={headingClass}
                                         key={column.key}
-                                        label={column.label}
-                                        resizable={resizable}
-                                        setColumnWidths={setColumnWidths}
-                                        tableRef={tableRef}
-                                    />
+                                        scope="col"
+                                    >
+                                        <div className="site-table__heading-content">
+                                            <span>{column.label}</span>
+                                            {resizable ? (
+                                                <button
+                                                    aria-label={`Resize ${column.label} column`}
+                                                    className={
+                                                        resizeHandleClass
+                                                    }
+                                                    onPointerDown={
+                                                        pointerDownHandler
+                                                    }
+                                                    type="button"
+                                                />
+                                            ) : null}
+                                        </div>
+                                    </th>
                                 );
                             })}
                         </tr>

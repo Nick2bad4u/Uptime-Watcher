@@ -109,7 +109,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             repository: Record<string, any>,
             builders: Record<string, Function>
         ) => {
-            repository.createTransactionAdapter = vi
+            repository["createTransactionAdapter"] = vi
                 .fn()
                 .mockImplementation((db: unknown) => {
                     const adapter: Record<string, any> = {};
@@ -126,26 +126,26 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
         attachTransactionAdapter(mockRepositories.site, {
             bulkInsert: (db: unknown, rows: unknown) =>
-                mockRepositories.site.bulkInsertInternal(db, rows),
+                mockRepositories.site["bulkInsertInternal"](db, rows),
             deleteAll: (db: unknown) =>
-                mockRepositories.site.deleteAllInternal(db),
+                mockRepositories.site["deleteAllInternal"](db),
         });
 
         attachTransactionAdapter(mockRepositories.monitor, {
             deleteAll: (db: unknown) =>
-                mockRepositories.monitor.deleteAllInternal(db),
+                mockRepositories.monitor["deleteAllInternal"](db),
         });
 
         attachTransactionAdapter(mockRepositories.history, {
             deleteAll: (db: unknown) =>
-                mockRepositories.history.deleteAllInternal?.(db),
+                mockRepositories.history["deleteAllInternal"]?.(db),
             addEntry: (
                 db: unknown,
                 monitorId: unknown,
                 entry: unknown,
                 details: unknown
             ) =>
-                mockRepositories.history.addEntryInternal(
+                mockRepositories.history["addEntryInternal"](
                     db,
                     monitorId,
                     entry,
@@ -155,9 +155,9 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
 
         attachTransactionAdapter(mockRepositories.settings, {
             deleteAll: (db: unknown) =>
-                mockRepositories.settings.deleteAllInternal(db),
+                mockRepositories.settings["deleteAllInternal"](db),
             bulkInsert: (db: unknown, values: unknown) =>
-                mockRepositories.settings.bulkInsertInternal(db, values),
+                mockRepositories.settings["bulkInsertInternal"](db, values),
         });
 
         mockDatabaseService = {
