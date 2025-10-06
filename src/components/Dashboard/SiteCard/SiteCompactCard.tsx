@@ -11,7 +11,6 @@ import type { MonitorStatus, Site } from "@shared/types";
 import { memo, type NamedExoticComponent, useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
-import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -19,8 +18,15 @@ import {
     getMonitorDisplayIdentifier,
     getMonitorTypeDisplayLabel,
 } from "../../../utils/fallbacks";
+import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
+import { toSentenceCase } from "../../../utils/text/toSentenceCase";
+import {
+    MarqueeText,
+    type MarqueeTextProperties,
+} from "../../common/MarqueeText/MarqueeText";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
+import "./SiteCompactCard.css";
 
 /**
  * Properties for {@link SiteCompactCard}.
@@ -29,13 +35,6 @@ export interface SiteCompactCardProperties {
     /** Site entity to render. */
     readonly site: Site;
 }
-
-const toSentenceCase = (value: string): string => {
-    if (!value) {
-        return "";
-    }
-    return value.charAt(0).toUpperCase() + value.slice(1);
-};
 
 /**
  * Condensed site card used for the "Mini" layout option.
@@ -66,30 +65,22 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             [latestSite.name, site.identifier]
         );
 
-        const marqueeOptions = useMemo(
-            () => ({ dependencies: marqueeDependencies }),
-            [marqueeDependencies]
+        const marqueeTextProps = useMemo<
+            NonNullable<MarqueeTextProperties["textProps"]>
+        >(
+            () => ({
+                size: "lg",
+                weight: "semibold",
+            }),
+            []
         );
 
         const {
-            containerRef: nameContainerRef,
-            isOverflowing: isNameOverflowing,
-        } = useOverflowMarquee<HTMLDivElement>(marqueeOptions);
-
-        const allMonitorsRunning = useMemo(() => {
-            if (latestSite.monitors.length === 0) {
-                return false;
-            }
-            return latestSite.monitors.every(
-                (siteMonitor) => siteMonitor.monitoring
-            );
-        }, [latestSite.monitors]);
-
-        const runningMonitors = useMemo(
-            () =>
-                latestSite.monitors.filter(
-                    (siteMonitor) => siteMonitor.monitoring
-                ).length,
+            allRunning: allMonitorsRunning,
+            runningCount: runningMonitors,
+            totalCount: totalMonitors,
+        } = useMemo(
+            () => getMonitorRuntimeSummary(latestSite.monitors),
             [latestSite.monitors]
         );
 
@@ -142,7 +133,10 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
         const responseDisplay =
             responseTime === undefined ? "—" : `${responseTime} ms`;
         const checksDisplay = checkCount.toLocaleString();
-        const runningSummary = `${runningMonitors}/${latestSite.monitors.length}`;
+        const runningSummary = useMemo(
+            () => `${runningMonitors}/${totalMonitors}`,
+            [runningMonitors, totalMonitors]
+        );
 
         return (
             <ThemedBox
@@ -157,34 +151,16 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             >
                 <div className="site-card__compact-header">
                     <div className="site-card__compact-title">
-                        <div
-                            className={`site-card__compact-name ${
-                                isNameOverflowing
-                                    ? "site-card__compact-name--marquee"
-                                    : ""
-                            }`}
-                            ref={nameContainerRef}
-                        >
-                            <div className="site-card__compact-name-track">
-                                <ThemedText
-                                    className="site-card__compact-name-segment"
-                                    size="lg"
-                                    weight="semibold"
-                                >
-                                    {latestSite.name}
-                                </ThemedText>
-                                {isNameOverflowing ? (
-                                    <ThemedText
-                                        aria-hidden="true"
-                                        className="site-card__compact-name-segment site-card__compact-name-segment--clone"
-                                        size="lg"
-                                        weight="semibold"
-                                    >
-                                        {latestSite.name}
-                                    </ThemedText>
-                                ) : null}
-                            </div>
-                        </div>
+                        <MarqueeText
+                            activeClassName="site-card__compact-name--marquee"
+                            className="site-card__compact-name"
+                            cloneClassName="site-card__compact-name-segment--clone"
+                            dependencies={marqueeDependencies}
+                            segmentClassName="site-card__compact-name-segment"
+                            text={latestSite.name}
+                            textProps={marqueeTextProps}
+                            trackClassName="site-card__compact-name-track"
+                        />
                         <ThemedText
                             className="site-card__compact-subtitle"
                             size="xs"

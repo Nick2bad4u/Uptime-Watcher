@@ -1,8 +1,10 @@
 ---
 name: Feature Request
 about: Submit a new feature or enhancement
-title: "[FEATURE] "
-labels: ["enhancement", "feature"]
+title: "Feature"
+labels:
+	- enhancement
+	- feature
 ---
 
 ## Feature Description
@@ -20,6 +22,7 @@ Describe the problem this feature addresses or the use case it enables.
 - [ ] Core functionality implemented
 - [ ] UI/UX components added/modified
 - [ ] Data processing logic updated
+- [ ] Repository adapters reviewed (transaction adapters updated, rollback coverage confirmed)
 - [ ] Visualization/charting enhancements
 - [ ] Map functionality improvements
 - [ ] Theme system updates
@@ -67,6 +70,7 @@ If applicable, add screenshots or GIFs demonstrating the new feature:
 
 - [ ] Code comments added/updated
 - [ ] JSDoc documentation updated
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes)
 - [ ] README.md updated (if needed)
 - [ ] CHANGELOG.md updated
 

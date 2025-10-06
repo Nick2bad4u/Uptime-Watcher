@@ -1,7 +1,7 @@
 /* Theme Components CSS - Professional UI Enhancement */
 
 /* stylelint-disable keyframes-name-pattern -- already kebab case just -- */
-/* stylelint-disable selector-class-pattern -- already kebab case just -- */
+
 /* stylelint-disable no-descending-specificity -- not worth fixing atm -- */
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
@@ -2211,6 +2211,7 @@
     min-block-size: 100vb;
     min-inline-size: 0;
     overflow-block: auto;
+    overscroll-behavior: contain;
     scrollbar-gutter: stable both-edges;
 
     .app-shell--light & {
@@ -2691,8 +2692,8 @@
 .site-card__insights {
     display: flex;
     flex-wrap: wrap;
-    gap: clamp(0.9rem, 0.7rem + 0.75vi, 1.4rem);
     justify-content: stretch;
+    gap: clamp(0.9rem, 0.7rem + 0.75vi, 1.4rem);
     margin-inline: auto;
     max-inline-size: min(100%, 56rem);
 }
@@ -2702,7 +2703,6 @@
     display: flex;
     flex: 1 1 min(18rem, 100%);
     align-items: center;
-    gap: clamp(0.65rem, 0.5rem + 0.35vi, 0.95rem);
     padding: clamp(0.95rem, 0.85rem + 0.35vi, 1.25rem)
         clamp(1.1rem, 0.95rem + 0.65vi, 1.5rem);
     border: 1px solid
@@ -2718,6 +2718,7 @@
             color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent),
         0 14px 32px
             color-mix(in srgb, var(--shadow-deep-color) 28%, transparent);
+    gap: clamp(0.65rem, 0.5rem + 0.35vi, 0.95rem);
     min-block-size: clamp(3.8rem, 3.4rem + 0.6vi, 4.4rem);
     transition:
         border-color var(--transition-fast),
@@ -2791,9 +2792,9 @@
         var(--color-text-primary, rgb(248 250 252)) 96%,
         transparent
     );
-    font-size: clamp(1rem, 0.9rem + 0.45vi, 1.2rem);
+    font-size: clamp(1rem, 0.875rem + 0.45vi, 1.25rem);
     font-weight: var(--font-weight-semibold, 600);
-    line-height: 1.2;
+    line-height: 1.25;
 }
 
 .site-card__monitor-panel {

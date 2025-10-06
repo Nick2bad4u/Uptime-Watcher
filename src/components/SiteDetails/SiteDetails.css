@@ -2,7 +2,6 @@
 
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .site-details-modal-overlay {
     position: fixed;
@@ -79,7 +78,7 @@ body:has(.site-details-modal-overlay) {
         inset 0 0 0 1px rgb(255 255 255 / 3%),
         0 18px 40px rgb(8 12 24 / 28%);
     gap: clamp(1rem, 0.8rem + 0.8vi, 1.6rem);
-    min-block-size: 1;
+    min-block-size: auto;
 
     &.dark {
         border-color: color-mix(
@@ -514,8 +513,8 @@ body:has(.site-details-modal-overlay) {
 .site-details-header {
     position: relative;
     display: flex;
-    flex-direction: column;
     overflow: hidden;
+    flex-direction: column;
 }
 
 .site-details-header__content {
@@ -539,8 +538,8 @@ body:has(.site-details-modal-overlay) {
     gap: clamp(1rem, 0.75rem + 0.8vi, 2rem);
 
     .site-details-header--collapsed & {
-        align-items: center;
         flex-wrap: nowrap;
+        align-items: center;
         gap: clamp(0.75rem, 0.6rem + 0.6vi, 1.25rem);
         min-inline-size: 0;
     }
@@ -555,8 +554,8 @@ body:has(.site-details-modal-overlay) {
     min-inline-size: 0;
 
     .site-details-header--collapsed & {
-        align-items: center;
         flex-wrap: nowrap;
+        align-items: center;
         gap: clamp(0.75rem, 0.6rem + 0.4vi, 1rem);
         min-inline-size: 0;
     }
@@ -615,6 +614,7 @@ body:has(.site-details-modal-overlay) {
 
 .site-details-header-collapsed-summary {
     display: inline-flex;
+    overflow: hidden;
     align-items: center;
     padding: 0.35rem 0.7rem;
     border: 1px solid
@@ -634,10 +634,9 @@ body:has(.site-details-modal-overlay) {
     font-weight: var(--font-weight-medium);
     gap: 0.4rem;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     max-inline-size: 100%;
-    overflow: hidden;
     text-overflow: ellipsis;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 
@@ -658,9 +657,9 @@ body:has(.site-details-modal-overlay) {
     min-inline-size: 0;
 
     .site-details-header--collapsed & {
+        flex: 0 0 auto;
         align-items: center;
         gap: clamp(0.5rem, 0.4rem + 0.4vi, 0.9rem);
-        flex: 0 0 auto;
     }
 }
 

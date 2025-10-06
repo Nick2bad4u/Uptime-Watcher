@@ -28,6 +28,7 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
 import {
     formatFullTimestamp,
     formatIntervalDuration,
@@ -145,15 +146,16 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
 
         const selectedSiteId = useUIStore(selectSelectedSiteId);
 
-        const runningMonitorCount = useMemo(
-            () => latestSite.monitors.filter((mon) => mon.monitoring).length,
+        const monitorRuntime = useMemo(
+            () => getMonitorRuntimeSummary(latestSite.monitors),
             [latestSite.monitors]
         );
 
-        // Calculate if all monitors are running for the site monitoring button
-        const allMonitorsRunning =
-            latestSite.monitors.length > 0 &&
-            latestSite.monitors.every((mon) => mon.monitoring);
+        const {
+            allRunning: allMonitorsRunning,
+            runningCount: runningMonitorCount,
+            totalCount: totalMonitorCount,
+        } = monitorRuntime;
 
         const isStacked = presentation === "stacked";
 
@@ -280,7 +282,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                             size="sm"
                             weight="semibold"
                         >
-                            {runningMonitorCount}/{latestSite.monitors.length}
+                            {runningMonitorCount}/{totalMonitorCount}
                         </ThemedText>
                     </div>
                 </div>

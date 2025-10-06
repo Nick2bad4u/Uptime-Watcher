@@ -7,8 +7,13 @@ import type { MonitorStatus, Site } from "@shared/types";
 import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
-import { useOverflowMarquee } from "../../../hooks/ui/useOverflowMarquee";
 import { ThemedText } from "../../../theme/components/ThemedText";
+import { getMonitorRuntimeSummary } from "../../../utils/monitoring/monitorRuntime";
+import { toSentenceCase } from "../../../utils/text/toSentenceCase";
+import {
+    MarqueeText,
+    type MarqueeTextProperties,
+} from "../../common/MarqueeText/MarqueeText";
 import { StatusBadge } from "../../common/StatusBadge";
 import { ActionButtonGroup } from "../SiteCard/components/ActionButtonGroup";
 import { MonitorSelector } from "../SiteCard/components/MonitorSelector";
@@ -20,13 +25,6 @@ export interface SiteTableRowProperties {
     /** Site to present in the table row. */
     readonly site: Site;
 }
-
-const toSentenceCase = (value: string): string => {
-    if (!value) {
-        return "";
-    }
-    return value.charAt(0).toUpperCase() + value.slice(1);
-};
 
 /**
  * Table row displaying monitoring information for a single site.
@@ -56,32 +54,24 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             [latestSite.name, site.identifier]
         );
 
-        const marqueeOptions = useMemo(
-            () => ({ dependencies: marqueeDependencies }),
-            [marqueeDependencies]
+        const marqueeTextProps = useMemo<
+            NonNullable<MarqueeTextProperties["textProps"]>
+        >(
+            () => ({
+                size: "md",
+                weight: "semibold",
+            }),
+            []
         );
 
         const {
-            containerRef: tableNameRef,
-            isOverflowing: isTableNameOverflowing,
-        } = useOverflowMarquee<HTMLDivElement>(marqueeOptions);
-
-        const runningMonitors = useMemo(
-            () =>
-                latestSite.monitors.filter(
-                    (siteMonitor) => siteMonitor.monitoring
-                ).length,
+            allRunning: allMonitorsRunning,
+            runningCount: runningMonitors,
+            totalCount: totalMonitors,
+        } = useMemo(
+            () => getMonitorRuntimeSummary(latestSite.monitors),
             [latestSite.monitors]
         );
-
-        const allMonitorsRunning = useMemo(() => {
-            if (latestSite.monitors.length === 0) {
-                return false;
-            }
-            return latestSite.monitors.every(
-                (siteMonitor) => siteMonitor.monitoring
-            );
-        }, [latestSite.monitors]);
 
         const statusFormatter = useCallback(
             (label: string, monitorStatus: MonitorStatus) =>
@@ -97,34 +87,16 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         onClick={handleCardClick}
                         type="button"
                     >
-                        <div
-                            className={`site-card__compact-name ${
-                                isTableNameOverflowing
-                                    ? "site-card__compact-name--marquee"
-                                    : ""
-                            }`}
-                            ref={tableNameRef}
-                        >
-                            <div className="site-card__compact-name-track">
-                                <ThemedText
-                                    className="site-card__compact-name-segment"
-                                    size="md"
-                                    weight="semibold"
-                                >
-                                    {latestSite.name}
-                                </ThemedText>
-                                {isTableNameOverflowing ? (
-                                    <ThemedText
-                                        aria-hidden="true"
-                                        className="site-card__compact-name-segment site-card__compact-name-segment--clone"
-                                        size="md"
-                                        weight="semibold"
-                                    >
-                                        {latestSite.name}
-                                    </ThemedText>
-                                ) : null}
-                            </div>
-                        </div>
+                        <MarqueeText
+                            activeClassName="site-card__compact-name--marquee"
+                            className="site-card__compact-name"
+                            cloneClassName="site-card__compact-name-segment--clone"
+                            dependencies={marqueeDependencies}
+                            segmentClassName="site-card__compact-name-segment"
+                            text={latestSite.name}
+                            textProps={marqueeTextProps}
+                            trackClassName="site-card__compact-name-track"
+                        />
                         <ThemedText size="xs" variant="tertiary">
                             {site.identifier}
                         </ThemedText>
@@ -157,7 +129,7 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                 </td>
                 <td>
                     <ThemedText size="sm">
-                        {runningMonitors}/{latestSite.monitors.length}
+                        {runningMonitors}/{totalMonitors}
                     </ThemedText>
                 </td>
                 <td className="site-table__actions">

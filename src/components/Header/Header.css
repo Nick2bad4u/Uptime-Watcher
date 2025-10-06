@@ -1,6 +1,5 @@
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
-/* stylelint-disable selector-class-pattern -- already kebab case just -- */
 
 .app-topbar {
     position: relative;

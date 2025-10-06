@@ -20,6 +20,7 @@ import type { SiteTableColumnKey } from "../../../stores/ui/types";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { SiteTableRow } from "./SiteTableRow";
+import "./SiteTableView.css";
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 

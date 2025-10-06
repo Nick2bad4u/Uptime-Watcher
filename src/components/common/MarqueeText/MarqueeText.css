@@ -1,0 +1,53 @@
+/* Shared marquee text styling */
+
+.marquee-text {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    min-inline-size: 0;
+}
+
+.marquee-text__track {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--marquee-gap, 1.5rem);
+    min-inline-size: max-content;
+    will-change: transform;
+
+    .marquee-text--active & {
+        animation: marquee-text-scroll var(--marquee-duration, 14s) linear
+            infinite;
+    }
+
+    .marquee-text--active:hover &,
+    .marquee-text--active:focus-within & {
+        animation-play-state: paused;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-text--active & {
+            animation: none;
+            transform: translateX(0);
+        }
+    }
+}
+
+.marquee-text__segment {
+    display: inline-block;
+    min-inline-size: max-content;
+    white-space: nowrap;
+}
+
+.marquee-text__segment--clone {
+    pointer-events: none;
+}
+
+@keyframes marquee-text-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}

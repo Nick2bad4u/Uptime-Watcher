@@ -94,8 +94,10 @@
     flex-direction: column;
     padding: var(--spacing-2xl);
     gap: var(--spacing-xl);
-    overflow-block: auto;
     min-block-size: 0;
+    overflow-block: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
 }
 
 .settings-modal__banner {
@@ -125,22 +127,24 @@
 
 .settings-modal__sections {
     display: flex;
-    overflow-block: auto;
     flex-direction: column;
     gap: var(--spacing-lg);
+    overflow-block: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
 }
 
 .settings-section {
     display: flex;
     flex-direction: column;
     padding: var(--spacing-xl);
-    border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
+    /* stylelint-disable scss/function-color-relative -- Runtime opacity derived from theme tokens requires CSS relative color syntax. */
+    border: 1px solid color(from var(--color-border-secondary) srgb r g b / 38%);
     border-radius: var(--border-radius-xl);
     backdrop-filter: blur(18px) saturate(1.05);
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--color-surface-elevated) 98%, transparent) 0%,
+        color(from var(--color-surface-elevated) srgb r g b / 98%) 0%,
         color-mix(
                 in srgb,
                 var(--color-surface-overlay) 92%,
@@ -149,11 +153,10 @@
             100%
     );
     box-shadow:
-        inset 0 0 0 1px
-            color-mix(in srgb, var(--shadow-inverse-color) 3%, transparent),
-        0 8px 20px
-            color-mix(in srgb, var(--shadow-overlay-color) 12%, transparent);
+        inset 0 0 0 1px color(from var(--shadow-inverse-color) srgb r g b / 3%),
+        0 8px 20px color(from var(--shadow-overlay-color) srgb r g b / 12%);
     gap: var(--spacing-lg);
+    /* stylelint-enable scss/function-color-relative */
     transition:
         border-color 0.22s ease,
         box-shadow 0.22s ease;
@@ -164,11 +167,11 @@
 
     &:hover,
     &:focus-within {
-        border-color: color-mix(in srgb, rgb(129 140 248) 28%, transparent);
+        border-color: rgb(129 140 248 / 28%);
         box-shadow:
             inset 0 0 0 1px
-                color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent),
-            0 12px 28px color-mix(in srgb, rgb(129 140 248) 18%, transparent);
+                color(from var(--shadow-inverse-color) srgb r g b / 4%),
+            0 12px 28px rgb(129 140 248 / 18%);
     }
 }
 

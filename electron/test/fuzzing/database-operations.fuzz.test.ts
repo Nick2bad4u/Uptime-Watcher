@@ -27,9 +27,55 @@ import {
     type MockedFunction,
 } from "vitest";
 import fc from "fast-check";
+import type { SiteRow } from "../../services/database/utils/siteMapper";
 import { HistoryRepository } from "../../services/database/HistoryRepository";
 import { MonitorRepository } from "../../services/database/MonitorRepository";
 import { SiteRepository } from "../../services/database/SiteRepository";
+
+const SIMULATED_TRANSACTION_FAILURE = new Error(
+    "Simulated transaction failure"
+);
+
+const SITE_ROW_ARBITRARY: fc.Arbitrary<SiteRow> = fc
+    .record({
+        identifier: fc.string({ minLength: 1, maxLength: 64 }),
+        name: fc.option(fc.string({ minLength: 1, maxLength: 128 }), {
+            nil: undefined,
+        }),
+        monitoring: fc.option(fc.boolean(), { nil: undefined }),
+    })
+    .map<SiteRow>(({ identifier, monitoring, name }) => {
+        const siteRow: SiteRow = { identifier };
+
+        if (name !== undefined) {
+            siteRow.name = name;
+        }
+
+        if (monitoring !== undefined) {
+            siteRow.monitoring = monitoring;
+        }
+
+        return siteRow;
+    });
+
+const SITE_ROWS_ARBITRARY = fc.array(SITE_ROW_ARBITRARY, {
+    maxLength: 6,
+    minLength: 1,
+});
+
+/**
+ * Minimal prepared statement contract tracked during transaction rollbacks.
+ *
+ * @remarks
+ * Captures the subset of mocked methods inspected when verifying that failed
+ * transactions clean up resources and rerun statements as expected.
+ */
+interface PreparedStatementMock {
+    /** Finalizer invoked whenever the statement lifecycle completes. */
+    readonly finalize: ReturnType<typeof vi.fn>;
+    /** Prepared statement executor tracking invocation counts. */
+    readonly run: ReturnType<typeof vi.fn>;
+}
 
 describe("Database Operations Fuzzing Tests", () => {
     let mockDatabaseService: any;
@@ -116,16 +162,9 @@ describe("Database Operations Fuzzing Tests", () => {
                         );
                         mockDb.run.mockReturnValue({ lastInsertRowid: 1 });
 
-                        // Should not throw for valid-looking data
-                        try {
-                            await siteRepository.upsert(siteData);
-                        } catch (error) {
-                            // Method may throw for invalid data, which is acceptable
-                            // But we can still check if it was validated before hitting database
-                        }
-
-                        // Either it succeeded and called the database, or it failed early (which is good)
-                        expect(true).toBeTruthy(); // Test that we can run without crashing
+                        const operation = siteRepository.upsert(siteData);
+                        expect(operation).toBeInstanceOf(Promise);
+                        await operation.catch(() => undefined);
                     }
                 ),
                 { numRuns: 20 }
@@ -147,20 +186,13 @@ describe("Database Operations Fuzzing Tests", () => {
                         );
                         mockDb.get.mockReturnValue(null);
 
-                        // Should not throw even for malicious identifiers
-                        let result: any;
-                        try {
-                            result =
-                                await siteRepository.findByIdentifier(
-                                    identifier
-                                );
-                            // Should be null or undefined for non-existent items
-                            expect(
-                                result === null || result === undefined
-                            ).toBeTruthy(); // null or undefined
-                        } catch (error) {
-                            // Method may throw for invalid identifiers, which is acceptable
-                        }
+                        const result = await siteRepository
+                            .findByIdentifier(identifier)
+                            .catch(() => undefined);
+
+                        expect(
+                            result === null || result === undefined
+                        ).toBeTruthy();
 
                         // Verify SQL injection protection if database was called
                         if (mockDb.get.mock.calls.length > 0) {
@@ -204,16 +236,91 @@ describe("Database Operations Fuzzing Tests", () => {
                     );
                     mockDb.get.mockReturnValue(null);
 
-                    // Should handle any identifier gracefully
-                    try {
-                        const result = await siteRepository.exists(identifier);
+                    const result = await siteRepository
+                        .exists(identifier)
+                        .catch(() => undefined);
+
+                    if (result !== undefined) {
                         expect(typeof result).toBe("boolean");
-                    } catch (error) {
-                        // Method may throw for invalid identifiers, which is acceptable
-                        expect(true).toBeTruthy(); // Test passes if it throws or succeeds
                     }
                 }),
                 { numRuns: 20 }
+            );
+        });
+
+        it("rolls back bulk inserts when a statement fails mid-transaction", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    SITE_ROWS_ARBITRARY,
+                    fc.nat(),
+                    async (sites: SiteRow[], failureSeed: number) => {
+                        const failureIndex = failureSeed % (sites.length + 1);
+
+                        const preparedStatements: PreparedStatementMock[] = [];
+
+                        mockDatabaseService.executeTransaction.mockClear();
+                        mockDb.prepare.mockReset();
+
+                        mockDatabaseService.executeTransaction.mockImplementation(
+                            async (callback: any) => await callback(mockDb)
+                        );
+
+                        mockDb.prepare.mockImplementation(() => {
+                            let invocationCount = 0;
+
+                            const statement: PreparedStatementMock = {
+                                finalize: vi.fn(),
+                                run: vi.fn(() => {
+                                    const shouldFail =
+                                        failureIndex < sites.length &&
+                                        invocationCount === failureIndex;
+
+                                    invocationCount += 1;
+
+                                    if (shouldFail) {
+                                        throw SIMULATED_TRANSACTION_FAILURE;
+                                    }
+
+                                    return { changes: 1 };
+                                }),
+                            };
+
+                            preparedStatements.push(statement);
+                            return statement;
+                        });
+
+                        const resultPromise = siteRepository.bulkInsert(sites);
+
+                        const expectedAttempts =
+                            failureIndex < sites.length ? 3 : 1;
+
+                        await (failureIndex < sites.length
+                            ? expect(resultPromise).rejects.toThrow(
+                                  SIMULATED_TRANSACTION_FAILURE
+                              )
+                            : expect(resultPromise).resolves.toBeUndefined());
+
+                        expect(
+                            mockDatabaseService.executeTransaction
+                        ).toHaveBeenCalledTimes(expectedAttempts);
+                        expect(preparedStatements).toHaveLength(
+                            expectedAttempts
+                        );
+
+                        const expectedRuns =
+                            failureIndex < sites.length
+                                ? failureIndex + 1
+                                : sites.length;
+
+                        for (const statement of preparedStatements) {
+                            expect(statement.finalize).toHaveBeenCalledTimes(1);
+                            expect(statement.run).toHaveBeenCalledTimes(
+                                expectedRuns
+                            );
+                        }
+                    }
+                ),
+                { numRuns: 25 }
             );
         });
     });

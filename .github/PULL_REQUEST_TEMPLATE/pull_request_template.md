@@ -96,6 +96,7 @@ A clear and concise description of what this pull request accomplishes.
 
 - [ ] Code is commented where needed (TSDoc standards)
 - [ ] Documentation updated (if applicable)
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes)
 - [ ] CHANGELOG.md updated (for significant changes)
 - [ ] README.md updated (if needed)
 
@@ -105,6 +106,7 @@ A clear and concise description of what this pull request accomplishes.
 - [ ] TypeScript compiles without errors
 - [ ] All tests pass locally
 - [ ] Code follows project style guidelines
+- [ ] Repository adapters reviewed (transaction adapters updated, rollback tests added if data layer touched)
 - [ ] Self-review completed
 
 ## 📋 Checklist

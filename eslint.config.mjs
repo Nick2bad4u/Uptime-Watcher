@@ -1178,6 +1178,7 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
+            // @ts-expect-error -- react-hooks plugin doesn't expose typed configs
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -2540,6 +2541,7 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
+            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -4086,6 +4088,7 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
+            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -5446,6 +5449,7 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
+            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -7077,6 +7081,7 @@ export default [
             "vitest/no-import-node-test": "warn",
             "vitest/no-interpolation-in-snapshots": "warn",
             "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-exactly-once-with": "off",
             "vitest/prefer-called-once": "off",
             "vitest/prefer-called-times": "warn",
             "vitest/prefer-called-with": "off",
@@ -7299,6 +7304,7 @@ export default [
             "vitest/no-import-node-test": "warn",
             "vitest/no-interpolation-in-snapshots": "warn",
             "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-exactly-once-with": "off",
             "vitest/prefer-called-once": "off",
             "vitest/prefer-called-times": "warn",
             "vitest/prefer-called-with": "off",
@@ -7498,6 +7504,7 @@ export default [
             "vitest/no-import-node-test": "warn",
             "vitest/no-interpolation-in-snapshots": "warn",
             "vitest/no-test-prefixes": "warn",
+            "vitest/prefer-called-exactly-once-with": "off",
             "vitest/prefer-called-once": "off",
             "vitest/prefer-called-times": "warn",
             "vitest/prefer-called-with": "off",
@@ -8544,6 +8551,7 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
+            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,

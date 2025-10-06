@@ -1,0 +1,147 @@
+/* Site table layout styling */
+
+.site-table {
+    overflow-inline: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+}
+
+.site-table__table {
+    border-collapse: separate;
+    border-spacing: 0;
+    inline-size: 100%;
+    table-layout: fixed;
+
+    & thead {
+        position: sticky;
+        z-index: 1;
+        backdrop-filter: blur(8px);
+        background: rgb(15 23 42 / 35%);
+        inset-block-start: 0;
+    }
+
+    & th,
+    & td {
+        padding: 0.6rem 0.85rem;
+        border-block-end: 1px solid rgb(255 255 255 / 8%);
+        text-align: start;
+        overflow: clip;
+    }
+}
+
+.site-table__row:hover,
+.site-table__row:focus {
+    background: rgb(59 130 246 / 8%);
+}
+
+.site-table__site {
+    inline-size: 100%;
+}
+
+.site-table__site-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    gap: 0.25rem;
+    text-align: start;
+}
+
+.site-table__monitor-selector {
+    inline-size: clamp(13rem, 28vi, 16rem);
+    max-inline-size: 100%;
+
+    @media (width <= 768px) {
+        inline-size: 100%;
+    }
+}
+
+.site-table__actions,
+.site-table__actions-heading,
+.site-table__heading--end {
+    text-align: end;
+}
+
+.site-table__actions {
+    vertical-align: middle;
+}
+
+.site-table__heading {
+    position: relative;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.01em;
+    text-align: start;
+    user-select: none;
+}
+
+.site-table__heading-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-inline-end: 0.6rem;
+
+    .site-table__heading--end & {
+        justify-content: flex-end;
+    }
+}
+
+.site-table__resize-handle {
+    position: absolute;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    block-size: 100%;
+    cursor: col-resize;
+    inline-size: 0.85rem;
+    inset-block: 0;
+    inset-inline-end: -0.4rem;
+    transition: background var(--transition-fast);
+
+    @media (hover: hover) {
+        &:hover,
+        &:focus {
+            background: color-mix(
+                in srgb,
+                var(--color-border-secondary) 28%,
+                transparent
+            );
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary-400);
+        outline-offset: 2px;
+    }
+
+    &::after {
+        position: relative;
+        display: block;
+        background: color-mix(
+            in srgb,
+            var(--color-border-secondary) 58%,
+            transparent
+        );
+        block-size: 60%;
+        content: "";
+        inline-size: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
+}
+
+.site-table__resize-handle--last {
+    inset-inline-end: -0.2rem;
+}

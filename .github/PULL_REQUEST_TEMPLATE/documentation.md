@@ -1,8 +1,9 @@
 ---
 name: Documentation
 about: Improve or add documentation
-title: "[DOCS] "
-labels: ["documentation"]
+title: "Documentation"
+labels:
+	- documentation
 ---
 
 ## Documentation Changes
@@ -81,6 +82,7 @@ List the documentation files that were changed:
 - [ ] Links verified
 - [ ] Screenshots updated
 - [ ] Cross-referenced with code
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes)
 
 ## User Impact
 

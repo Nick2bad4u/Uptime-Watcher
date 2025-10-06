@@ -1,0 +1,189 @@
+/* Compact site card layout styling */
+
+.site-card__compact-header,
+.site-card__compact-metrics,
+.site-card__compact-controls,
+.site-card__compact-footer {
+    display: flex;
+    inline-size: 100%;
+}
+
+.site-card__compact-header {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+}
+
+.site-card__compact-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    inline-size: 100%;
+    text-align: center;
+}
+
+.site-card__compact-name {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    inline-size: min(100%, clamp(12rem, 64vi, 24rem));
+    min-inline-size: 0;
+
+    .site-table__site & {
+        inline-size: 100%;
+    }
+}
+
+.site-card__compact-name-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-inline-size: max-content;
+
+    .site-table__site & {
+        gap: 1.5rem;
+    }
+}
+
+.site-card__compact-name-segment {
+    display: inline-block;
+    min-inline-size: max-content;
+    white-space: nowrap;
+}
+
+.site-card__compact-status {
+    display: inline-flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 0.4rem + 0.35vi, 0.85rem);
+    max-inline-size: 100%;
+    min-inline-size: 0;
+
+    @media (width <= 768px) {
+        justify-content: flex-start;
+        inline-size: 100%;
+    }
+}
+
+.site-card__compact-status-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.site-card__compact-status-meta {
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-inline-size: 0;
+}
+
+.site-card__compact-status-label {
+    color: color-mix(in srgb, var(--color-text-secondary) 86%, transparent);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.site-card__compact-status-value {
+    overflow: hidden;
+    color: var(--color-text-primary);
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-card__compact-subtitle {
+    display: block;
+    overflow: hidden;
+    max-inline-size: 100%;
+    opacity: 0.75;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-card__compact-subtitle-text {
+    display: inline-block;
+    overflow: hidden;
+    max-inline-size: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-card__compact-metrics {
+    display: grid;
+    gap: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.site-card__compact-metric {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.65rem 0.5rem;
+    border-radius: 0.75rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-elevated) 82%,
+        transparent
+    );
+    gap: 0.2rem;
+}
+
+.site-card__compact-metric-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    opacity: 0.7;
+    text-transform: uppercase;
+}
+
+.site-card__compact-metric-value {
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+}
+
+.site-card__compact-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: clamp(0.5rem, 0.4rem + 0.35vi, 0.75rem);
+}
+
+.site-card__compact-selector {
+    inline-size: clamp(12rem, 30vi, 15rem);
+    max-inline-size: 100%;
+}
+
+.site-card__compact-footer {
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    max-block-size: 0;
+    opacity: 0;
+    padding-block-start: 0;
+    transform: translateY(0.25rem);
+    transition:
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
+
+    .site-card--compact:hover &,
+    .site-card--compact:focus-within & {
+        max-block-size: 2.5rem;
+        opacity: 1;
+        padding-block-start: 0.4rem;
+        transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transform: translateY(0);
+        transition: none;
+    }
+}

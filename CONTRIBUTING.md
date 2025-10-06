@@ -195,25 +195,27 @@ Use the feature request template and include:
 
 - Update relevant docs when changing functionality
 - Ensure markdown passes linting (use markdownlint)
+- Run `npm run docs:check-links` to verify Architecture and Docusaurus routes
 
 ## 🔧 Development Tasks
 
 ### Available Scripts
 
-| Category         | Script                   | Description                              |
-| ---------------- | ------------------------ | ---------------------------------------- |
-| **Development**  | `npm run dev`            | Start Vite dev server                    |
-|                  | `npm run start`          | Launch complete application              |
-|                  | `npm run start-both`     | Start dev server + electron concurrently |
-| **Building**     | `npm run build`          | Build for production                     |
-|                  | `npm run clean`          | Clean all build artifacts                |
-| **Code Quality** | `npm run lint`           | Run ESLint checks                        |
-|                  | `npm run lint:fix`       | Fix ESLint issues automatically          |
-|                  | `npm run format`         | Format code with Prettier                |
-|                  | `npm run type-check:all` | TypeScript type checking                 |
-| **Testing**      | `npm run test`           | Run all test suites                      |
-|                  | `npm run test:coverage`  | Generate coverage reports                |
-|                  | `npm run test:electron`  | Run Electron-specific tests              |
+| Category          | Script                     | Description                                                       |
+| ----------------- | -------------------------- | ----------------------------------------------------------------- |
+| **Development**   | `npm run dev`              | Start Vite dev server                                             |
+|                   | `npm run start`            | Launch complete application                                       |
+|                   | `npm run start-both`       | Start dev server + electron concurrently                          |
+| **Building**      | `npm run build`            | Build for production                                              |
+|                   | `npm run clean`            | Clean all build artifacts                                         |
+| **Code Quality**  | `npm run lint`             | Run ESLint checks                                                 |
+|                   | `npm run lint:fix`         | Fix ESLint issues automatically                                   |
+|                   | `npm run format`           | Format code with Prettier                                         |
+|                   | `npm run type-check:all`   | TypeScript type checking                                          |
+| **Documentation** | `npm run docs:check-links` | Validate internal documentation links (Architecture & Docusaurus) |
+| **Testing**       | `npm run test`             | Run all test suites                                               |
+|                   | `npm run test:coverage`    | Generate coverage reports                                         |
+|                   | `npm run test:electron`    | Run Electron-specific tests                                       |
 
 ### Testing Requirements
 

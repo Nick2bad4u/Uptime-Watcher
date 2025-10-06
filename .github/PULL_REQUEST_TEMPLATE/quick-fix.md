@@ -1,8 +1,9 @@
 ---
 name: Quick Fix
 about: Simple changes, typos, or minor improvements
-title: "[QUICK] "
-labels: ["quick-fix"]
+title: "Quick Fix"
+labels:
+	- quick-fix
 ---
 
 ## Quick Fix Description
@@ -43,3 +44,5 @@ Any additional context or notes about this change.
 - [ ] No new dependencies added
 - [ ] No breaking changes introduced
 - [ ] Basic testing completed
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes) if documentation affected
+- [ ] Repository adapters unaffected or updated when touching data layer

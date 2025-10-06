@@ -1,8 +1,10 @@
 ---
 name: Bug Fix
 about: Fix a bug or issue
-title: "[BUG FIX] "
-labels: ["bug", "fix"]
+title: "Bug Fix"
+labels:
+	- bug
+	- fix
 ---
 
 ## Bug Description
@@ -43,6 +45,7 @@ Explain your approach to fixing the bug.
 - [ ] Performance optimizations
 - [ ] Memory leak fixes
 - [ ] Validation improvements
+- [ ] Repository adapters reviewed (transaction adapters updated, rollback coverage confirmed)
 
 **Files Modified:**
 
@@ -83,6 +86,12 @@ If applicable, add screenshots showing the bug before and after the fix:
 - [ ] Performance improved
 - [ ] Memory usage optimized
 - [ ] Startup time maintained/improved
+
+## Documentation
+
+- [ ] Code comments updated where necessary
+- [ ] User-facing docs updated (if needed)
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes)
 
 ## Compatibility
 

@@ -14,7 +14,11 @@ import process from "node:process";
 
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
-const DOCS_DIRECTORIES = ["docs/Architecture"];
+const DOCS_DIRECTORIES = [
+    "docs/Architecture",
+    "docs/docusaurus/docs",
+    "docs/docusaurus/src/pages",
+];
 const IGNORED_DIRECTORIES = new Set([
     "node_modules",
     ".git",

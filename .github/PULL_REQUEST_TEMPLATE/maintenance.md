@@ -1,8 +1,10 @@
 ---
 name: Maintenance/Refactoring
 about: Code maintenance, refactoring, or technical improvements
-title: "[MAINT] "
-labels: ["maintenance", "refactoring"]
+title: "Maintenance"
+labels:
+	- maintenance
+	- refactoring
 ---
 
 ## Maintenance Type
@@ -60,6 +62,7 @@ List the main files that were changed:
 - [ ] Removed deprecated code
 - [ ] Added/improved tests
 - [ ] Updated build configuration
+- [ ] Repository adapters reviewed (transaction adapters updated, rollback coverage confirmed)
 
 ## Impact Assessment
 
@@ -141,6 +144,7 @@ If applicable, include before/after performance metrics.
 - [ ] JSDoc documentation maintained
 - [ ] README updated if needed
 - [ ] Developer documentation updated
+- [ ] `npm run docs:check-links` (Architecture & Docusaurus routes)
 
 ## Migration Guide
 
@@ -163,5 +167,5 @@ Add any other context about the maintenance work here.
 - [ ] My changes generate no new warnings or errors
 - [ ] All existing tests pass with my changes
 - [ ] I have added tests for new functionality
-- [ ] I have verified backward compatibility (or documented breaking changes)
+- [ ] I have removed outdated compatibility shims or documented required migrations
 - [ ] Any dependent changes have been merged and published
