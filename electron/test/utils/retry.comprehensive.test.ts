@@ -18,14 +18,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock the logger dependency before importing the module under test
-vi.mock("../../utils/logger.js", () => ({
-    dbLogger: {
+vi.mock("../../utils/logger.js", () => {
+    const createLoggerMock = () => ({
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
         debug: vi.fn(),
-    },
-}));
+    });
+    return {
+        dbLogger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Import the module under test and mocked dependencies
 import { withDbRetry, withRetry } from "../../utils/retry.js";

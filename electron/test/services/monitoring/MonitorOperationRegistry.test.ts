@@ -16,11 +16,22 @@ import {
 import { monitorLogger as logger } from "../../../utils/logger";
 
 // Mock the logger
-vi.mock("../../../utils/logger", () => ({
-    monitorLogger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
-    },
-}));
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+    });
+
+    return {
+        monitorLogger: {
+            debug: vi.fn(),
+        },
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Mock crypto.randomUUID for predictable test results
 const mockUUIDCounter = { value: 0 };

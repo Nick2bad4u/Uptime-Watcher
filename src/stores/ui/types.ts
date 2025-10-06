@@ -26,13 +26,13 @@ export type SiteCardPresentation = "grid" | "stacked";
  * Resizable column identifiers for the list layout table.
  */
 export type SiteTableColumnKey =
-    | "site"
+    | "controls"
     | "monitor"
-    | "status"
-    | "uptime"
     | "response"
     | "running"
-    | "controls";
+    | "site"
+    | "status"
+    | "uptime";
 
 /**
  * Supported tab identifiers for the site details view.

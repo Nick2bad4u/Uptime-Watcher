@@ -146,12 +146,12 @@ function getHeaderStyle(
         borderRadius: "0.75rem",
         boxShadow: isDarkMode ? darkShadow : lightShadow,
         color: isDarkMode ? "#f5f7fa" : "#0f172a",
+        height: "auto",
         marginBottom: isCollapsed ? "0.5rem" : "1.25rem",
         minHeight: collapsedMinHeight,
         overflow: "hidden",
         padding: collapsedPadding,
         position: "relative",
-        height: "auto",
         transition: `all ${TRANSITION_EASING}`,
     };
 }

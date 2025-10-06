@@ -8,13 +8,15 @@ import type { Site } from "@shared/types";
 import {
     memo,
     type NamedExoticComponent,
-    useCallback,
-    useRef,
     type PointerEvent as ReactPointerEvent,
     type RefObject,
+    useCallback,
+    useRef,
 } from "react";
+import type { JSX } from "react/jsx-runtime";
 
 import type { SiteTableColumnKey } from "../../../stores/ui/types";
+
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { SiteTableRow } from "./SiteTableRow";
@@ -26,7 +28,7 @@ const selectSetColumnWidths = (state: UiStoreState) =>
     state.setSiteTableColumnWidths;
 
 interface ColumnDefinition {
-    align?: "start" | "end";
+    readonly align?: "end" | "start";
     readonly key: SiteTableColumnKey;
     readonly label: string;
 }
@@ -38,7 +40,7 @@ const COLUMN_DEFINITIONS: readonly ColumnDefinition[] = [
     { key: "uptime", label: "Uptime" },
     { key: "response", label: "Response" },
     { key: "running", label: "Running" },
-    { key: "controls", label: "Controls", align: "end" },
+    { align: "end", key: "controls", label: "Controls" },
 ] as const;
 
 const MIN_COLUMN_WIDTH = 8;
@@ -48,22 +50,22 @@ const clamp = (value: number, min: number, max: number): number =>
     Math.min(Math.max(value, min), max);
 
 interface ResizableColumnHeaderProperties {
-    align: "start" | "end";
-    adjacentColumnKey: SiteTableColumnKey;
-    columnKey: SiteTableColumnKey;
-    columnWidths: Record<SiteTableColumnKey, number>;
-    isLast: boolean;
-    label: string;
-    resizable: boolean;
-    setColumnWidths: (
+    readonly adjacentColumnKey: SiteTableColumnKey;
+    readonly align: "end" | "start";
+    readonly columnKey: SiteTableColumnKey;
+    readonly columnWidths: Record<SiteTableColumnKey, number>;
+    readonly isLast: boolean;
+    readonly label: string;
+    readonly resizable: boolean;
+    readonly setColumnWidths: (
         widths: Partial<Record<SiteTableColumnKey, number>>
     ) => void;
-    tableRef: RefObject<HTMLTableElement | null>;
+    readonly tableRef: RefObject<HTMLTableElement | null>;
 }
 
 const ResizableColumnHeader = ({
-    align,
     adjacentColumnKey,
+    align,
     columnKey,
     columnWidths,
     isLast,
@@ -71,7 +73,7 @@ const ResizableColumnHeader = ({
     resizable,
     setColumnWidths,
     tableRef,
-}: ResizableColumnHeaderProperties) => {
+}: ResizableColumnHeaderProperties): JSX.Element => {
     const handlePointerDown = useCallback(
         (event: ReactPointerEvent<HTMLButtonElement>) => {
             if (!resizable) {
@@ -115,10 +117,10 @@ const ResizableColumnHeader = ({
             event.preventDefault();
             event.stopPropagation();
 
-            const pointerId = event.pointerId;
-            const startX = event.clientX;
+            const resizeHandle = event.currentTarget;
+            const { clientX: startX, pointerId } = event;
 
-            event.currentTarget.setPointerCapture(pointerId);
+            resizeHandle.setPointerCapture(pointerId);
 
             const originalCursor = document.body.style.cursor;
             const originalUserSelect = document.body.style.userSelect;
@@ -141,13 +143,15 @@ const ResizableColumnHeader = ({
                 }
 
                 setColumnWidths({
-                    [columnKey]: Number(desiredWidth.toFixed(2)),
                     [adjacentColumnKey]: Number(adjustedAdjacent.toFixed(2)),
+                    [columnKey]: Number(desiredWidth.toFixed(2)),
                 });
             };
 
             const handlePointerEnd = (): void => {
-                event.currentTarget.releasePointerCapture(pointerId);
+                if (resizeHandle.hasPointerCapture(pointerId)) {
+                    resizeHandle.releasePointerCapture(pointerId);
+                }
                 document.removeEventListener("pointermove", handlePointerMove);
                 document.removeEventListener("pointerup", handlePointerEnd);
                 document.removeEventListener("pointercancel", handlePointerEnd);
@@ -239,7 +243,6 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
 
                                 return (
                                     <ResizableColumnHeader
-                                        key={column.key}
                                         adjacentColumnKey={
                                             adjacent?.key ?? column.key
                                         }
@@ -250,6 +253,7 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                             index ===
                                             COLUMN_DEFINITIONS.length - 1
                                         }
+                                        key={column.key}
                                         label={column.label}
                                         resizable={resizable}
                                         setColumnWidths={setColumnWidths}

@@ -15,14 +15,20 @@ import type {
 } from "../../../services/monitoring/MonitorOperationRegistry";
 
 // Mock the logger
-vi.mock("../../../utils/logger", () => ({
-    monitorLogger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
         error: vi.fn(),
-    },
-}));
+    });
+
+    return {
+        monitorLogger: createLoggerMock(),
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Mock log templates
 vi.mock("@shared/utils/logTemplates", () => ({

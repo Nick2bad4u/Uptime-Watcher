@@ -18,14 +18,18 @@ describe("operationalHooks.ts - Branch Coverage", () => {
         vi.clearAllMocks();
 
         // Mock logger
-        vi.mock("../../utils/logger.js", () => ({
-            logger: {
+        vi.mock("../../utils/logger.js", () => {
+            const createLoggerMock = () => ({
                 info: vi.fn(),
                 warn: vi.fn(),
                 error: vi.fn(),
                 debug: vi.fn(),
-            },
-        }));
+            });
+            return {
+                logger: createLoggerMock(),
+                diagnosticsLogger: createLoggerMock(),
+            };
+        });
 
         // Mock TypedEventBus
         mockEventEmitter = {

@@ -16,26 +16,21 @@ import { logger } from "../../../utils/logger";
 
 // Mock dependencies - logger is mocked globally in setup.ts
 vi.mock("../../../electronUtils");
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
         error: vi.fn(),
-    },
-    dbLogger: {
-        debug: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-    },
-    monitorLogger: {
-        debug: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-    },
-}));
+    });
+
+    return {
+        logger: createLoggerMock(),
+        dbLogger: createLoggerMock(),
+        monitorLogger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");

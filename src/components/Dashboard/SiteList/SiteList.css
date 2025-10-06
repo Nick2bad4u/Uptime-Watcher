@@ -255,8 +255,8 @@
 }
 
 .site-table__actions {
-    display: table-caption;
     text-align: end;
+    vertical-align: middle;
 }
 
 .site-table__actions-heading {
@@ -264,6 +264,7 @@
 }
 
 .site-table__heading {
+    position: relative;
     text-align: start;
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.01em;
@@ -275,10 +276,12 @@
 }
 
 .site-table__heading-content {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
+    padding-inline-end: 0.6rem;
 }
 
 .site-table__heading--end .site-table__heading-content {
@@ -286,7 +289,11 @@
 }
 
 .site-table__resize-handle {
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: -0.4rem;
+    bottom: 0;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -294,8 +301,8 @@
     border: none;
     border-radius: 9999px;
     background: transparent;
-    block-size: 1.85rem;
-    inline-size: 0.8rem;
+    block-size: 100%;
+    inline-size: 0.85rem;
     cursor: col-resize;
     transition: background var(--transition-fast);
 
@@ -315,21 +322,21 @@
     }
 
     &::after {
-        position: absolute;
+        position: relative;
         display: block;
         background: color-mix(
             in srgb,
             var(--color-border-secondary) 58%,
             transparent
         );
-        block-size: 70%;
+        block-size: 60%;
         content: "";
         inline-size: 2px;
     }
 }
 
 .site-table__resize-handle--last {
-    margin-inline-end: -0.25rem;
+    right: -0.2rem;
 }
 
 .site-card__compact-header,
@@ -360,7 +367,7 @@
     position: relative;
     display: flex;
     overflow: hidden;
-    inline-size: clamp(12rem, 64vi, 24rem);
+    inline-size: min(100%, clamp(12rem, 64vi, 24rem));
     min-inline-size: 0;
 
     .site-table__site & {
@@ -486,10 +493,11 @@
 }
 
 .site-card__compact-controls {
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 0.4rem + 0.35vi, 0.75rem);
 }
 
 .site-card__compact-selector {
@@ -497,17 +505,26 @@
     max-inline-size: 100%;
 }
 
+
 .site-card__compact-footer {
+    display: flex;
     justify-content: center;
+    max-block-size: 0;
     opacity: 0;
-    transform: translateY(0.25rem);
+    overflow: hidden;
+    padding-block-start: 0;
     transition:
+        max-block-size var(--transition-normal),
         opacity var(--transition-normal),
+        padding-block-start var(--transition-normal),
         transform var(--transition-normal);
+    transform: translateY(0.25rem);
 
     .site-card--compact:hover &,
     .site-card--compact:focus-within & {
+        max-block-size: 2.5rem;
         opacity: 1;
+        padding-block-start: 0.4rem;
         transform: translateY(0);
     }
 }

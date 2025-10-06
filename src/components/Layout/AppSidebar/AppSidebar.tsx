@@ -1,10 +1,10 @@
+import MascotLogo from "@assets/UptimeWatcherMascot.png";
 import type { Site, SiteStatus } from "@shared/types";
-import type { IconType } from "react-icons";
-
 import {
     getSiteDisplayStatus,
     getSiteStatusDescription,
 } from "@shared/utils/siteStatus";
+import type { IconType } from "react-icons";
 import {
     type ChangeEvent,
     memo,
@@ -23,7 +23,6 @@ import { useTheme } from "../../../theme/useTheme";
 import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
-import MascotLogo from "@assets/UptimeWatcherMascot.png";
 import "./AppSidebar.css";
 
 const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";

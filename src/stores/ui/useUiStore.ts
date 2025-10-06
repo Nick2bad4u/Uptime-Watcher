@@ -102,18 +102,6 @@ type UIStoreWithPersist = UseBoundStore<
 export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({
-            /**
-             * Default width allocation (percentages) for list mode columns.
-             */
-            siteTableColumnWidths: {
-                site: 24,
-                monitor: 14,
-                status: 12,
-                uptime: 12,
-                response: 12,
-                running: 10,
-                controls: 16,
-            },
             activeSiteDetailsTab: "site-overview",
             openExternal: (
                 url: string,
@@ -225,6 +213,18 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             siteDetailsChartTimeRange: "24h",
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
+            /**
+             * Default width allocation (percentages) for list mode columns.
+             */
+            siteTableColumnWidths: {
+                controls: 16,
+                monitor: 14,
+                response: 12,
+                running: 10,
+                site: 24,
+                status: 12,
+                uptime: 12,
+            },
             syncActiveSiteDetailsTab: (siteId: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteId,

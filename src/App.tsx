@@ -362,6 +362,49 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         cleanupSidebarListener
     );
 
+    // Auto-dismiss the navigation drawer on compact viewports once focus leaves it.
+    useEffect(() => {
+        const { matchMedia } = globalThis as typeof globalThis & {
+            matchMedia?: (query: string) => MediaQueryList;
+        };
+        const mediaQuery =
+            sidebarMediaQueryRef.current ??
+            (typeof matchMedia === "function"
+                ? matchMedia(SIDEBAR_COLLAPSE_MEDIA_QUERY)
+                : null);
+
+        if (!isSidebarOpen || !mediaQuery?.matches) {
+            return () => {};
+        }
+
+        const handlePointerDown = (event: PointerEvent): void => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) {
+                return;
+            }
+
+            if (
+                target.closest(".app-sidebar") ||
+                target.closest(".app-topbar__sidebar-toggle") ||
+                target.closest(".sidebar-reveal-button")
+            ) {
+                return;
+            }
+
+            setIsSidebarOpen(false);
+        };
+
+        document.addEventListener("pointerdown", handlePointerDown, true);
+
+        return () => {
+            document.removeEventListener(
+                "pointerdown",
+                handlePointerDown,
+                true
+            );
+        };
+    }, [isSidebarOpen]);
+
     const toggleSidebar = useCallback(() => {
         setIsSidebarOpen((previous) => !previous);
     }, []);
@@ -579,6 +622,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     isSidebarOpen={isSidebarOpen}
                     toggleSidebar={toggleSidebar}
                 >
+                    <ConfirmDialog />
                     <div
                         className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
                         data-testid="app-container"
@@ -587,8 +631,6 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                         <SidebarRevealButton />
 
                         <div className="app-shell__main">
-                            <ConfirmDialog />
-
                             {showLoadingOverlay ? (
                                 <output
                                     aria-label="Loading application"

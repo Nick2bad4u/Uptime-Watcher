@@ -6,14 +6,18 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fc } from "@fast-check/vitest";
 
 // Mock external dependencies
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         info: vi.fn(),
         error: vi.fn(),
         warn: vi.fn(),
         debug: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 vi.mock("../DatabaseService", () => ({
     DatabaseService: {

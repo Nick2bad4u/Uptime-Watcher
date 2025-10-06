@@ -11,14 +11,20 @@ import {
 } from "../../../services/monitoring/MonitorStatusUpdateService";
 
 // Mock external dependencies
-vi.mock("../../../utils/logger", () => ({
-    monitorLogger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    });
+
+    return {
+        monitorLogger: createLoggerMock(),
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 vi.mock("../../../../shared/utils/logTemplates", () => ({
     interpolateLogTemplate: vi.fn(

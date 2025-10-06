@@ -18,15 +18,15 @@ import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { useTheme } from "../../../theme/useTheme";
+import { AppIcons } from "../../../utils/icons";
 import { SiteCard } from "../SiteCard/SiteCard";
 import { SiteCompactCard } from "../SiteCard/SiteCompactCard";
 import { EmptyState } from "./EmptyState";
 import { SiteListLayoutSelector } from "./SiteListLayoutSelector";
 import { SiteTableView } from "./SiteTableView";
-import { AppIcons } from "../../../utils/icons";
+import "./SiteList.css";
 
 const SitesIcon = AppIcons.metrics.monitor;
-import "./SiteList.css";
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 

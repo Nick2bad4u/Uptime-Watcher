@@ -116,6 +116,60 @@ function safeStoreOperation(
 }
 
 /**
+ * Type-safe error conversion result with enhanced type information.
+ */
+export interface ErrorConversionResult {
+    /** The resulting Error instance */
+    error: Error;
+    /** The original input type information */
+    originalType: string;
+    /** Whether the input was already an Error instance */
+    wasError: boolean;
+}
+
+/**
+ * Enhanced error conversion that provides detailed type information.
+ *
+ * @param error - Unknown error value from catch blocks
+ *
+ * @returns Detailed error conversion result
+ */
+export function convertError(error: unknown): ErrorConversionResult {
+    if (error instanceof Error) {
+        return {
+            error,
+            originalType: "Error",
+            wasError: true,
+        };
+    }
+
+    // Safely convert to string with fallback for problematic objects
+    // eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in try-catch below
+    let errorMessage: string;
+    try {
+        errorMessage = String(error);
+    } catch {
+        // Fallback for objects that can't be converted to string
+        try {
+            errorMessage = JSON.stringify(error);
+        } catch {
+            errorMessage = "[object cannot be converted to string]";
+        }
+    }
+
+    // Provide fallback for whitespace-only strings (but preserve truly empty strings)
+    if (errorMessage.trim().length === 0 && errorMessage.length > 0) {
+        errorMessage = `[whitespace-only ${typeof error}]`;
+    }
+
+    return {
+        error: new Error(errorMessage),
+        originalType: typeof error,
+        wasError: false,
+    };
+}
+
+/**
  * Handle backend operations with logger integration.
  *
  * @remarks
@@ -273,57 +327,6 @@ export async function withErrorHandling<T>(
 /**
  * Type-safe error conversion result with enhanced type information.
  */
-export interface ErrorConversionResult {
-    /** The resulting Error instance */
-    error: Error;
-    /** The original input type information */
-    originalType: string;
-    /** Whether the input was already an Error instance */
-    wasError: boolean;
-}
-
-/**
- * Enhanced error conversion that provides detailed type information.
- *
- * @param error - Unknown error value from catch blocks
- *
- * @returns Detailed error conversion result
- */
-export function convertError(error: unknown): ErrorConversionResult {
-    if (error instanceof Error) {
-        return {
-            error,
-            originalType: "Error",
-            wasError: true,
-        };
-    }
-
-    // Safely convert to string with fallback for problematic objects
-    // eslint-disable-next-line @typescript-eslint/init-declarations -- initialized in try-catch below
-    let errorMessage: string;
-    try {
-        errorMessage = String(error);
-    } catch {
-        // Fallback for objects that can't be converted to string
-        try {
-            errorMessage = JSON.stringify(error);
-        } catch {
-            errorMessage = "[object cannot be converted to string]";
-        }
-    }
-
-    // Provide fallback for whitespace-only strings (but preserve truly empty strings)
-    if (errorMessage.trim().length === 0 && errorMessage.length > 0) {
-        errorMessage = `[whitespace-only ${typeof error}]`;
-    }
-
-    return {
-        error: new Error(errorMessage),
-        originalType: typeof error,
-        wasError: false,
-    };
-}
-
 /**
  * Ensures an error object is properly typed and formatted. Converts unknown
  * error types to proper Error instances.

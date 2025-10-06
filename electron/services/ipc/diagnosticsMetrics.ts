@@ -27,30 +27,36 @@ interface DiagnosticsSnapshotContext {
     readonly event: "missing" | "success";
 }
 
+const consoleDiagnosticsLogger: Logger = {
+    debug: (...messages: unknown[]) => {
+        console.debug(...messages);
+    },
+    error: (...messages: unknown[]) => {
+        console.error(...messages);
+    },
+    info: (...messages: unknown[]) => {
+        console.info(...messages);
+    },
+    warn: (...messages: unknown[]) => {
+        console.warn(...messages);
+    },
+};
+
 function resolveDiagnosticsLogger(): Logger {
-    try {
-        const moduleWithDiagnostics = loggerModule as {
-            diagnosticsLogger?: Logger;
-        };
-        if (moduleWithDiagnostics.diagnosticsLogger) {
-            return moduleWithDiagnostics.diagnosticsLogger;
-        }
-    } catch (error) {
-        // Silently ignore lookup issues caused by partial test mocks.
+    const moduleWithDiagnostics = loggerModule as Partial<{
+        diagnosticsLogger: Logger;
+        logger: Logger;
+    }>;
+
+    if (moduleWithDiagnostics.diagnosticsLogger) {
+        return moduleWithDiagnostics.diagnosticsLogger;
     }
 
-    try {
-        return loggerModule.logger;
-    } catch (error) {
-        // Fallback to a minimal console-backed logger if the module mock is incomplete.
-        const noop = (): void => {};
-        return {
-            debug: noop,
-            error: (...args: unknown[]) => console.error(...args),
-            info: (...args: unknown[]) => console.info(...args),
-            warn: (...args: unknown[]) => console.warn(...args),
-        };
+    if (moduleWithDiagnostics.logger) {
+        return moduleWithDiagnostics.logger;
     }
+
+    return consoleDiagnosticsLogger;
 }
 
 const diagnosticsLog: Logger = resolveDiagnosticsLogger();

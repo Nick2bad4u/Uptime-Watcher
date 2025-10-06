@@ -36,14 +36,19 @@ vi.mock("../../../utils/database/DataBackupService");
 vi.mock("../../../utils/database/DataImportExportService");
 vi.mock("../../../utils/database/serviceFactory");
 vi.mock("../../../utils/database/SiteRepositoryService");
-vi.mock("../../../utils/logger", () => ({
-    monitorLogger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    });
+    return {
+        monitorLogger: createLoggerMock(),
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 describe(DatabaseServiceFactory, () => {
     let factory: DatabaseServiceFactory;

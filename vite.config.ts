@@ -259,11 +259,11 @@ export default defineConfig(({ mode }) => {
                                 "@app": normalizePath(
                                     path.resolve(dirname, "src")
                                 ),
-                                "@electron": normalizePath(
-                                    path.resolve(dirname, "electron")
-                                ),
                                 "@assets": normalizePath(
                                     path.resolve(dirname, "assets")
+                                ),
+                                "@electron": normalizePath(
+                                    path.resolve(dirname, "electron")
                                 ),
                                 "@shared": normalizePath(
                                     path.resolve(dirname, "shared")
@@ -571,8 +571,8 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 "@app": normalizePath(path.resolve(dirname, "src")),
-                "@electron": normalizePath(path.resolve(dirname, "electron")),
                 "@assets": normalizePath(path.resolve(dirname, "assets")),
+                "@electron": normalizePath(path.resolve(dirname, "electron")),
                 "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
             extensions: [
