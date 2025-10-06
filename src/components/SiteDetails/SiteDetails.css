@@ -722,7 +722,7 @@ body:has(.site-details-modal-overlay) {
 .site-details-navigation--collapsed {
     border-start-end-radius: 0.35rem;
     border-start-start-radius: 0.35rem;
-    margin-block-start: -0.8rem;
+    margin-block-start: -0.5rem;
 }
 
 .site-details-thumbnail-caption {

@@ -530,7 +530,7 @@ describe("withErrorHandling frontend fuzz integration", () => {
                 const expectedMessage =
                     errorValue instanceof Error
                         ? errorValue.message
-                        : String(errorValue);
+                        : convertError(errorValue).error.message;
                 expect(setErrorCall?.payload).toBe(expectedMessage);
 
                 const originalErrorLog = consoleErrorSpy.mock.calls.find(

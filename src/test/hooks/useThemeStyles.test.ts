@@ -92,8 +92,9 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles(true));
 
-            expect(result.current.headerStyle.height).toBe("80px");
-            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
         });
 
@@ -186,8 +187,9 @@ describe("useThemeStyles Hook", () => {
 
             const { result } = renderHook(() => useThemeStyles(true));
 
-            expect(result.current.headerStyle.height).toBe("80px");
-            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
         });
 
@@ -376,8 +378,9 @@ describe("useThemeStyles Hook", () => {
             // Change to collapsed
             rerender({ collapsed: true });
 
-            expect(result.current.headerStyle.height).toBe("80px");
-            expect(result.current.headerStyle.minHeight).toBe("80px");
+            expect(result.current.headerStyle.height).toBe("auto");
+            expect(result.current.headerStyle.minHeight).toBe("146px");
+            expect(result.current.headerStyle.marginBottom).toBe("0.5rem");
             expect(result.current.contentStyle.padding).toBe("1rem 1.5rem");
 
             // Change back to not collapsed
@@ -631,7 +634,10 @@ describe("useThemeStyles Hook", () => {
 
             // Both should be properly configured
             expect(result.current.lightStyles.headerStyle.height).toBe("auto");
-            expect(result.current.darkStyles.headerStyle.height).toBe("80px");
+            expect(result.current.darkStyles.headerStyle.height).toBe("auto");
+            expect(result.current.darkStyles.headerStyle.minHeight).toBe(
+                "146px"
+            );
         });
 
         it("should handle edge case values gracefully", async ({

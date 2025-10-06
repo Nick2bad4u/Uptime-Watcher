@@ -213,6 +213,7 @@
     border-collapse: separate;
     border-spacing: 0;
     inline-size: 100%;
+    table-layout: fixed;
 
     & thead {
         position: sticky;
@@ -262,6 +263,75 @@
     text-align: end;
 }
 
+.site-table__heading {
+    text-align: start;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.01em;
+    user-select: none;
+}
+
+.site-table__heading--end {
+    text-align: end;
+}
+
+.site-table__heading-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.site-table__heading--end .site-table__heading-content {
+    justify-content: flex-end;
+}
+
+.site-table__resize-handle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    block-size: 1.85rem;
+    inline-size: 0.8rem;
+    cursor: col-resize;
+    transition: background var(--transition-fast);
+
+    @media (hover: hover) {
+        &:hover {
+            background: color-mix(
+                in srgb,
+                var(--color-border-secondary) 28%,
+                transparent
+            );
+        }
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--color-primary-400);
+        outline-offset: 2px;
+    }
+
+    &::after {
+        position: absolute;
+        display: block;
+        background: color-mix(
+            in srgb,
+            var(--color-border-secondary) 58%,
+            transparent
+        );
+        block-size: 70%;
+        content: "";
+        inline-size: 2px;
+    }
+}
+
+.site-table__resize-handle--last {
+    margin-inline-end: -0.25rem;
+}
+
 .site-card__compact-header,
 .site-card__compact-metrics,
 .site-card__compact-controls,
@@ -272,17 +342,25 @@
 
 .site-card__compact-header {
     flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    row-gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+}
+
+.site-card__compact-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    inline-size: 100%;
+    text-align: center;
 }
 
 .site-card__compact-name {
     position: relative;
     display: flex;
     overflow: hidden;
-    inline-size: clamp(10rem, 72vi, 22rem);
+    inline-size: clamp(12rem, 64vi, 24rem);
     min-inline-size: 0;
 
     .site-table__site & {
@@ -293,7 +371,7 @@
 .site-card__compact-name-track {
     display: inline-flex;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
     min-inline-size: max-content;
 
     .site-table__site & {
@@ -321,9 +399,8 @@
     flex: 0 0 auto;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     gap: clamp(0.5rem, 0.4rem + 0.35vi, 0.85rem);
-    margin-inline-start: auto;
     max-inline-size: 100%;
     min-inline-size: 0;
 }
@@ -365,19 +442,35 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: center;
+}
+
+.site-card__compact-subtitle-text {
+    display: inline-block;
+    max-inline-size: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .site-card__compact-metrics {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: clamp(0.6rem, 0.5rem + 0.3vi, 0.85rem);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem);
 }
 
 .site-card__compact-metric {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
-    min-inline-size: clamp(5.25rem, 42%, 6.35rem);
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.65rem 0.5rem;
+    border-radius: 0.75rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-elevated) 82%,
+        transparent
+    );
 }
 
 .site-card__compact-metric-label {
@@ -388,23 +481,24 @@
 }
 
 .site-card__compact-metric-value {
+    text-align: center;
     font-weight: var(--font-weight-semibold);
 }
 
 .site-card__compact-controls {
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.75rem;
 }
 
 .site-card__compact-selector {
-    inline-size: clamp(11rem, 28vi, 13.5rem);
+    inline-size: clamp(12rem, 30vi, 15rem);
     max-inline-size: 100%;
 }
 
 .site-card__compact-footer {
-    justify-content: flex-start;
+    justify-content: center;
     opacity: 0;
     transform: translateY(0.25rem);
     transition:

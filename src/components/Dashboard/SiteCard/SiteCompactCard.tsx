@@ -190,7 +190,12 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             size="xs"
                             variant="secondary"
                         >
-                            {monitorSummary}
+                            <span
+                                className="site-card__compact-subtitle-text"
+                                title={monitorSummary}
+                            >
+                                {monitorSummary}
+                            </span>
                         </ThemedText>
                     </div>
                     <div className="site-card__compact-status">

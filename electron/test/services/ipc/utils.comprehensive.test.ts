@@ -31,13 +31,18 @@ vi.mock("../../../electronUtils", () => ({
 }));
 
 // Mock logger
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         error: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+        info: vi.fn(),
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Mock shared validation
 vi.mock("@shared/validation/validatorUtils", () => ({

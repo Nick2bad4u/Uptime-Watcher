@@ -14,14 +14,18 @@ import type { MonitorRepository } from "../../../services/database/MonitorReposi
 import type { SiteRepository } from "../../../services/database/SiteRepository";
 
 // Mock the logger module (must be hoisted before imports)
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         error: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 import { SiteService } from "../../../services/site/SiteService";
 import { logger } from "../../../utils/logger";

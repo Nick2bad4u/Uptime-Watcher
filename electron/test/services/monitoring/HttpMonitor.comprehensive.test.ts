@@ -28,14 +28,18 @@ vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
         error: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 vi.mock("../../../utils/operationalHooks", () => ({
     withOperationalHooks: vi.fn(),

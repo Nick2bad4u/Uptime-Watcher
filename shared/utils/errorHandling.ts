@@ -194,12 +194,11 @@ async function handleFrontendOperation<T>(
     try {
         return await operation();
     } catch (error) {
-        // Handle operation error
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+        // Handle operation error by converting to a normalized Error instance.
+        const { error: normalizedError } = convertError(error);
         safeStoreOperation(
             () => {
-                store.setError(errorMessage);
+                store.setError(normalizedError.message);
             },
             "set error state",
             error

@@ -27,8 +27,33 @@ interface DiagnosticsSnapshotContext {
     readonly event: "missing" | "success";
 }
 
-const diagnosticsLog: Logger =
-    loggerModule.diagnosticsLogger ?? loggerModule.logger;
+function resolveDiagnosticsLogger(): Logger {
+    try {
+        const moduleWithDiagnostics = loggerModule as {
+            diagnosticsLogger?: Logger;
+        };
+        if (moduleWithDiagnostics.diagnosticsLogger) {
+            return moduleWithDiagnostics.diagnosticsLogger;
+        }
+    } catch (error) {
+        // Silently ignore lookup issues caused by partial test mocks.
+    }
+
+    try {
+        return loggerModule.logger;
+    } catch (error) {
+        // Fallback to a minimal console-backed logger if the module mock is incomplete.
+        const noop = (): void => {};
+        return {
+            debug: noop,
+            error: (...args: unknown[]) => console.error(...args),
+            info: (...args: unknown[]) => console.info(...args),
+            warn: (...args: unknown[]) => console.warn(...args),
+        };
+    }
+}
+
+const diagnosticsLog: Logger = resolveDiagnosticsLogger();
 
 function logDiagnosticsSnapshot({
     channel,

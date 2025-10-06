@@ -6,14 +6,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock logger and environment utilities used indirectly via electronUtils.isDev()
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
         error: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Mock electronUtils isDev (actual utils.ts imports from ../../electronUtils)
 vi.mock("../../electronUtils", () => ({

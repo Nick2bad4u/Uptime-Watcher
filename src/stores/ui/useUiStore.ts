@@ -40,6 +40,7 @@ import type {
     SiteCardPresentation,
     SiteDetailsTab,
     SiteListLayoutMode,
+    SiteTableColumnKey,
     UIStore,
 } from "./types";
 
@@ -54,7 +55,18 @@ interface UIPersistedState {
     siteDetailsChartTimeRange: ChartTimeRange;
     siteDetailsTabState: Record<string, SiteDetailsTab>;
     siteListLayout: SiteListLayoutMode;
+    siteTableColumnWidths: Record<SiteTableColumnKey, number>;
 }
+
+const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
+    "site",
+    "monitor",
+    "status",
+    "uptime",
+    "response",
+    "running",
+    "controls",
+] as const;
 
 /**
  * Interface for the UI store with persistence capabilities.
@@ -90,6 +102,18 @@ type UIStoreWithPersist = UseBoundStore<
 export const useUIStore: UIStoreWithPersist = create<UIStore>()(
     persist(
         (set) => ({
+            /**
+             * Default width allocation (percentages) for list mode columns.
+             */
+            siteTableColumnWidths: {
+                site: 24,
+                monitor: 14,
+                status: 12,
+                uptime: 12,
+                response: 12,
+                running: 10,
+                controls: 16,
+            },
             activeSiteDetailsTab: "site-overview",
             openExternal: (
                 url: string,
@@ -163,11 +187,41 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "setSiteListLayout", { layout });
                 set({ siteListLayout: layout });
             },
+            setSiteTableColumnWidths: (
+                widths: Partial<Record<SiteTableColumnKey, number>>
+            ): void => {
+                logStoreAction("UIStore", "setSiteTableColumnWidths", {
+                    widths,
+                });
+                set((state) => {
+                    const updated: Record<SiteTableColumnKey, number> = {
+                        ...state.siteTableColumnWidths,
+                    };
+
+                    for (const [column, width] of Object.entries(widths)) {
+                        if (width === undefined || Number.isNaN(width)) {
+                            continue;
+                        }
+
+                        if (
+                            SITE_TABLE_COLUMN_KEYS.includes(
+                                column as SiteTableColumnKey
+                            )
+                        ) {
+                            updated[column as SiteTableColumnKey] = width;
+                        }
+                    }
+
+                    return {
+                        siteTableColumnWidths: updated,
+                    };
+                });
+            },
             showAddSiteModal: false,
             showAdvancedMetrics: false,
             showSettings: false,
             showSiteDetails: false,
-            siteCardPresentation: "grid",
+            siteCardPresentation: "stacked",
             siteDetailsChartTimeRange: "24h",
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
@@ -215,6 +269,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
                 siteDetailsTabState: state.siteDetailsTabState,
                 siteListLayout: state.siteListLayout,
+                siteTableColumnWidths: state.siteTableColumnWidths,
                 // Don't persist modal states or selected site
             }),
         }

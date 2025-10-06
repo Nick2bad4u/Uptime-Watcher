@@ -176,6 +176,22 @@ const mockUIStoreState = {
     selectSite: vi.fn(),
     siteListLayout: "card-large" as const,
     setSiteListLayout: vi.fn(),
+    setSiteCardPresentation: vi.fn(),
+    setSiteDetailsChartTimeRange: vi.fn(),
+    setSiteTableColumnWidths: vi.fn(),
+    siteCardPresentation: "stacked" as const,
+    siteDetailsChartTimeRange: "24h" as const,
+    siteDetailsTabState: {},
+    siteTableColumnWidths: {
+        controls: 16,
+        monitor: 14,
+        response: 12,
+        running: 10,
+        site: 24,
+        status: 12,
+        uptime: 12,
+    },
+    syncActiveSiteDetailsTab: vi.fn(),
 };
 
 const mockSettingsStoreState = {
@@ -439,6 +455,22 @@ describe("App Additional Coverage Tests", () => {
             selectSite: vi.fn(),
             siteListLayout: "card-large" as const,
             setSiteListLayout: vi.fn(),
+            setSiteCardPresentation: vi.fn(),
+            setSiteDetailsChartTimeRange: vi.fn(),
+            setSiteTableColumnWidths: vi.fn(),
+            siteCardPresentation: "stacked" as const,
+            siteDetailsChartTimeRange: "24h" as const,
+            siteDetailsTabState: {},
+            siteTableColumnWidths: {
+                controls: 16,
+                monitor: 14,
+                response: 12,
+                running: 10,
+                site: 24,
+                status: 12,
+                uptime: 12,
+            },
+            syncActiveSiteDetailsTab: vi.fn(),
         });
 
         Object.assign(mockSettingsStoreState, {

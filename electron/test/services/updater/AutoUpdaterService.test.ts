@@ -18,14 +18,18 @@ vi.mock("electron-updater", () => ({
     },
 }));
 
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         error: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 describe(AutoUpdaterService, () => {
     let autoUpdaterService: AutoUpdaterService;

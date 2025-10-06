@@ -137,7 +137,7 @@ function getHeaderStyle(
         "0 22px 48px -24px rgba(15, 23, 42, 0.2), 0 4px 14px -10px rgba(59, 130, 246, 0.18), inset 0 0 0 1px rgba(30, 64, 175, 0.08)";
 
     const collapsedPadding = isCollapsed ? "1rem 1.5rem" : "1.75rem";
-    const collapsedMinHeight = isCollapsed ? "112px" : "fit-content";
+    const collapsedMinHeight = isCollapsed ? "146px" : "fit-content";
 
     return {
         background: isDarkMode ? darkGradient : lightGradient,
@@ -146,7 +146,7 @@ function getHeaderStyle(
         borderRadius: "0.75rem",
         boxShadow: isDarkMode ? darkShadow : lightShadow,
         color: isDarkMode ? "#f5f7fa" : "#0f172a",
-        marginBottom: isCollapsed ? "0.65rem" : "1.25rem",
+        marginBottom: isCollapsed ? "0.5rem" : "1.25rem",
         minHeight: collapsedMinHeight,
         overflow: "hidden",
         padding: collapsedPadding,

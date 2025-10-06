@@ -2274,8 +2274,8 @@
 }
 
 .site-grid--compact {
-    --site-grid-column-min: clamp(12.5rem, 11vi, 16.5rem);
-    --site-grid-gap: clamp(0.85rem, 0.7rem + 0.45vi, 1.35rem);
+    --site-grid-column-min: clamp(15rem, 14vi, 21rem);
+    --site-grid-gap: clamp(0.95rem, 0.75rem + 0.55vi, 1.5rem);
 }
 
 .site-grid--balanced {
@@ -2691,18 +2691,21 @@
 .site-card__insights {
     display: grid;
     align-items: stretch;
+    justify-content: center;
     gap: 1rem;
     grid-auto-rows: 1fr;
-    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    margin-inline: auto;
+    max-inline-size: min(100%, 56rem);
 }
 
 .site-card__insight {
     position: relative;
     display: flex;
     overflow: hidden;
-    align-items: flex-start;
-    padding: clamp(0.95rem, 0.85rem + 0.4vi, 1.25rem)
-        clamp(1.1rem, 0.95rem + 0.6vi, 1.45rem);
+    align-items: center;
+    padding: clamp(0.9rem, 0.8rem + 0.35vi, 1.15rem)
+        clamp(1rem, 0.85rem + 0.55vi, 1.35rem);
     border: 1px solid
         color-mix(in srgb, var(--color-primary-500) 34%, transparent);
     border-radius: 1rem;
@@ -2716,7 +2719,7 @@
             color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
         0 18px 40px
             color-mix(in srgb, var(--shadow-deep-color) 38%, transparent);
-    gap: clamp(0.65rem, 0.55rem + 0.25vi, 0.85rem);
+    gap: clamp(0.6rem, 0.5rem + 0.25vi, 0.8rem);
     min-block-size: 100%;
     transition:
         border-color var(--transition-fast),
@@ -2766,7 +2769,9 @@
 .site-card__insight-meta {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 0.25rem;
+    text-align: center;
 }
 
 .site-card__insight-label {

@@ -34,14 +34,18 @@ vi.mock("electron", () => ({
 }));
 
 // Mock logger
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         info: vi.fn(),
         warn: vi.fn(),
         debug: vi.fn(),
         error: vi.fn(),
-    },
-}));
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Mock MonitorTypeRegistry
 vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({

@@ -18,13 +18,18 @@ import {
 } from "../../../services/monitoring/MigrationSystem";
 
 // Mock the logger to prevent console noise and test logging calls
-vi.mock("../../../utils/logger", () => ({
-    logger: {
+vi.mock("../../../utils/logger", () => {
+    const createLoggerMock = () => ({
         error: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+        debug: vi.fn(),
+    });
+    return {
+        logger: createLoggerMock(),
+        diagnosticsLogger: createLoggerMock(),
+    };
+});
 
 // Create test helper functions
 function createTestMigrationRule(

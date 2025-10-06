@@ -91,7 +91,17 @@ describe(useUIStore, () => {
             expect(result.current.showSettings).toBeFalsy();
             expect(result.current.showSiteDetails).toBeFalsy();
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
+            expect(result.current.siteCardPresentation).toBe("stacked");
             expect(result.current.siteListLayout).toBe("card-large");
+            expect(result.current.siteTableColumnWidths).toMatchObject({
+                controls: 16,
+                monitor: 14,
+                response: 12,
+                running: 10,
+                site: 24,
+                status: 12,
+                uptime: 12,
+            });
         });
 
         it("should have all required action methods", async ({
@@ -118,6 +128,34 @@ describe(useUIStore, () => {
                 "function"
             );
             expect(typeof result.current.setSiteListLayout).toBe("function");
+            expect(typeof result.current.setSiteTableColumnWidths).toBe(
+                "function"
+            );
+        });
+    });
+
+    describe("Table Column Resizing", () => {
+        it("should update specific column widths while leaving others intact", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.setSiteTableColumnWidths({
+                    site: 28,
+                    response: 10,
+                });
+            });
+
+            expect(result.current.siteTableColumnWidths.site).toBe(28);
+            expect(result.current.siteTableColumnWidths.response).toBe(10);
+            expect(result.current.siteTableColumnWidths.controls).toBe(16);
         });
     });
 

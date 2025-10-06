@@ -23,6 +23,18 @@ export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 export type SiteCardPresentation = "grid" | "stacked";
 
 /**
+ * Resizable column identifiers for the list layout table.
+ */
+export type SiteTableColumnKey =
+    | "site"
+    | "monitor"
+    | "status"
+    | "uptime"
+    | "response"
+    | "running"
+    | "controls";
+
+/**
  * Supported tab identifiers for the site details view.
  */
 export type SiteDetailsTab =
@@ -125,6 +137,16 @@ export interface UIStore {
     setSiteListLayout: (layout: SiteListLayoutMode) => void;
 
     /**
+     * Updates one or more table column widths for the list layout view.
+     *
+     * @param widths - Partial mapping of column identifiers to percentage
+     *   widths.
+     */
+    setSiteTableColumnWidths: (
+        widths: Partial<Record<SiteTableColumnKey, number>>
+    ) => void;
+
+    /**
      * Whether the add site modal is currently open.
      */
     showAddSiteModal: boolean;
@@ -165,6 +187,11 @@ export interface UIStore {
      * The currently active presentation layout for the dashboard site list.
      */
     siteListLayout: SiteListLayoutMode;
+
+    /**
+     * Current percentage widths for the list layout columns.
+     */
+    siteTableColumnWidths: Record<SiteTableColumnKey, number>;
 
     /**
      * Synchronizes the active tab with the last tab opened for a site.
