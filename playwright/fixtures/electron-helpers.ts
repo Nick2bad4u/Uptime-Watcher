@@ -6,6 +6,12 @@
  */
 
 import { _electron as electron } from "@playwright/test";
+import type { ElectronApplication } from "@playwright/test";
+
+import {
+    collectCoverageFromElectronApp,
+    isCoverageEnabled,
+} from "../utils/coverage";
 
 /**
  * Launch Electron with CI-compatible configuration.
@@ -30,8 +36,8 @@ import { _electron as electron } from "@playwright/test";
 export async function launchElectronApp(
     customArgs: string[] = [],
     customEnv: Record<string, string> = {}
-) {
-    return await electron.launch({
+): Promise<ElectronApplication> {
+    const app = await electron.launch({
         args: [
             ".", // Launch from project root like codegen script
             "--test-mode", // Enable lightweight mode for faster UI testing
@@ -58,4 +64,24 @@ export async function launchElectronApp(
         // cannot be directly fixed in user code. The warning does not affect
         // functionality and can be safely ignored.
     });
+
+    if (isCoverageEnabled) {
+        const originalClose = app.close.bind(app);
+        let coverageCollected = false;
+
+        (
+            app as ElectronApplication & {
+                close: ElectronApplication["close"];
+            }
+        ).close = (async () => {
+            if (!coverageCollected) {
+                await collectCoverageFromElectronApp(app);
+                coverageCollected = true;
+            }
+
+            await originalClose();
+        }) as ElectronApplication["close"];
+    }
+
+    return app;
 }

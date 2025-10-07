@@ -7793,6 +7793,7 @@ export default [
                         "playwright.config.ts",
                         "vitest.stryker.config.ts",
                         "config/tools/knip.config.ts",
+                        "config/tools/createPlaywrightCoveragePlugin.ts",
                     ],
                     defaultProject: "config/testing/tsconfig.configs.json",
                 },

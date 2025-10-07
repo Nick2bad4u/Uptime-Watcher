@@ -58,6 +58,12 @@ body:has(.site-details-modal-overlay) {
     scrollbar-gutter: stable both-edges;
 }
 
+.site-details-modal__sentinel {
+    block-size: 1px;
+    inline-size: 100%;
+    pointer-events: none;
+}
+
 .site-details-modal__content {
     display: flex;
     flex: 1;

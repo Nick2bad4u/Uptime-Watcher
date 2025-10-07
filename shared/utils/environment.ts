@@ -15,6 +15,7 @@
 interface KnownEnvironmentVariables {
     CODECOV_TOKEN?: string;
     NODE_ENV?: "development" | "production" | "test";
+    PLAYWRIGHT_COVERAGE?: string;
 }
 
 /**

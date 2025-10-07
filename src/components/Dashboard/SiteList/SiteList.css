@@ -5,6 +5,47 @@
     flex-direction: column;
     gap: clamp(1rem, 0.75rem + 0.35vi, 1.5rem);
     min-inline-size: 0;
+
+    --site-list-border-weak: color-mix(
+        in srgb,
+        var(--color-border-secondary) 24%,
+        transparent
+    );
+    --site-list-border-strong: color-mix(
+        in srgb,
+        var(--color-primary-400) 36%,
+        transparent
+    );
+    --site-list-overlay: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 42%,
+        transparent
+    );
+    --site-list-overlay-strong: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 48%,
+        transparent
+    );
+    --site-list-highlight: color-mix(
+        in srgb,
+        var(--color-primary-500) 18%,
+        transparent
+    );
+    --site-list-highlight-alt: color-mix(
+        in srgb,
+        var(--color-primary-400) 26%,
+        transparent
+    );
+    --site-list-text-muted: color-mix(
+        in srgb,
+        var(--color-text-secondary) 90%,
+        transparent
+    );
+    --site-list-text-strong: color-mix(
+        in srgb,
+        var(--color-text-primary) 98%,
+        transparent
+    );
 }
 
 .site-list__toolbar {
@@ -51,10 +92,10 @@
     display: inline-flex;
     align-items: stretch;
     padding: 0.25rem;
-    border: 1px solid rgb(255 255 255 / 10%);
+    border: 1px solid var(--site-list-border-weak);
     border-radius: 0.65rem;
     backdrop-filter: blur(14px);
-    background: rgb(15 23 42 / 40%);
+    background: var(--site-list-overlay);
     gap: 0.25rem;
 }
 
@@ -66,7 +107,7 @@
     border: 1px solid transparent;
     border-radius: 0.45rem;
     background: transparent;
-    color: rgb(203 213 225);
+    color: var(--site-list-text-muted);
     cursor: pointer;
     font-size: 0.75rem;
     font-weight: 600;
@@ -78,9 +119,9 @@
 
     &:hover,
     &:focus {
-        border-color: rgb(96 165 250 / 30%);
-        background: rgb(59 130 246 / 14%);
-        color: rgb(248 250 252);
+        border-color: var(--site-list-border-strong);
+        background: var(--site-list-highlight);
+        color: var(--site-list-text-strong);
         transform: translateY(-1px);
     }
 
@@ -90,16 +131,16 @@
 }
 
 .site-list__layout-button--active {
-    border-color: rgb(129 140 248 / 45%);
+    border-color: var(--site-list-border-strong);
     background: linear-gradient(
         135deg,
-        rgb(59 130 246 / 32%),
-        rgb(99 102 241 / 28%)
+        var(--site-list-highlight),
+        var(--site-list-highlight-alt)
     );
     box-shadow:
-        0 4px 12px rgb(59 130 246 / 15%),
-        inset 0 1px 0 rgb(255 255 255 / 10%);
-    color: rgb(255 255 255);
+        0 4px 12px color-mix(in srgb, var(--color-primary-500) 22%, transparent),
+        inset 0 1px 0 var(--site-list-border-weak);
+    color: var(--site-list-text-strong);
 }
 
 .site-list__layout-icon {
@@ -118,10 +159,10 @@
     display: inline-flex;
     align-items: center;
     padding: 0.25rem;
-    border: 1px solid rgb(148 163 184 / 24%);
+    border: 1px solid var(--site-list-border-weak);
     border-radius: 0.65rem;
     backdrop-filter: blur(14px);
-    background: rgb(15 23 42 / 45%);
+    background: var(--site-list-overlay-strong);
     cursor: pointer;
     gap: 0.25rem;
 }
@@ -133,7 +174,7 @@
     border: 1px solid transparent;
     border-radius: 0.45rem;
     background: transparent;
-    color: rgb(203 213 225);
+    color: var(--site-list-text-muted);
     cursor: pointer;
     font-size: 0.75rem;
     font-weight: 600;
@@ -144,9 +185,13 @@
 
     &:hover,
     &:focus {
-        border-color: rgb(96 165 250 / 30%);
-        background: rgb(148 163 184 / 16%);
-        color: rgb(248 250 252);
+        border-color: var(--site-list-border-strong);
+        background: color-mix(
+            in srgb,
+            var(--color-text-secondary) 22%,
+            transparent
+        );
+        color: var(--site-list-text-strong);
     }
 
     @media screen and (prefers-reduced-motion: reduce) {
@@ -155,16 +200,16 @@
 }
 
 .site-list__presentation-button--active {
-    border-color: rgb(129 140 248 / 45%);
+    border-color: var(--site-list-border-strong);
     background: linear-gradient(
         135deg,
-        rgb(129 140 248 / 35%),
-        rgb(56 189 248 / 30%)
+        var(--site-list-highlight-alt),
+        color-mix(in srgb, var(--color-primary-500) 24%, transparent)
     );
     box-shadow:
-        0 6px 16px rgb(59 130 246 / 18%),
-        inset 0 1px 0 rgb(255 255 255 / 12%);
-    color: rgb(255 255 255);
+        0 6px 16px color-mix(in srgb, var(--color-primary-500) 24%, transparent),
+        inset 0 1px 0 var(--site-list-border-weak);
+    color: var(--site-list-text-strong);
 }
 
 .site-list__presentation-icon {

@@ -106,8 +106,11 @@ export const SiteDetails = ({
     const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
     const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-    const contentElementRef = useRef<HTMLDivElement>(null);
-    const scrollHandlerRef = useRef<(() => void) | null>(null);
+    const contentElementRef = useRef<HTMLDivElement | null>(null);
+    const collapseSentinelRef = useRef<HTMLDivElement | null>(null);
+    const collapseObserverRef = useRef<IntersectionObserver | null>(null);
+    const expandObserverRef = useRef<IntersectionObserver | null>(null);
+    const manualCollapseRef = useRef(false);
 
     // Add global escape key handler
     const modalConfigs = useMemo(
@@ -134,49 +137,80 @@ export const SiteDetails = ({
         []
     );
 
-    // Auto-collapse header on scroll
+    // Drive header collapse via a sentinel instead of raw scrollTop to avoid
+    // oscillation when the header's height animates.
     useMount(
-        useCallback(function setupScrollListener(): void {
+        useCallback(function setupScrollObservers(): void {
             const contentElement = contentElementRef.current;
-            if (!contentElement) {
+            const sentinelElement = collapseSentinelRef.current;
+
+            if (!contentElement || !sentinelElement) {
                 return;
             }
 
-            const handleScroll = (): void => {
-                const { scrollTop } = contentElement;
+            const collapseObserver = new IntersectionObserver(
+                (entries) => {
+                    const [entry] = entries;
 
-                setIsHeaderCollapsed((previous) => {
-                    if (
-                        scrollTop <= HEADER_EXPAND_SCROLL_THRESHOLD &&
-                        previous
-                    ) {
-                        return false;
+                    if (!entry || entry.isIntersecting) {
+                        return;
                     }
 
-                    if (
-                        scrollTop >= HEADER_COLLAPSE_SCROLL_THRESHOLD &&
-                        !previous
-                    ) {
+                    setIsHeaderCollapsed((previous) => {
+                        if (previous) {
+                            return previous;
+                        }
+
+                        manualCollapseRef.current = false;
                         return true;
+                    });
+                },
+                {
+                    root: contentElement,
+                    rootMargin: `-${HEADER_COLLAPSE_SCROLL_THRESHOLD}px 0px 0px 0px`,
+                    threshold: 0,
+                }
+            );
+
+            const expandObserver = new IntersectionObserver(
+                (entries) => {
+                    const [entry] = entries;
+
+                    if (
+                        !entry ||
+                        manualCollapseRef.current ||
+                        !entry.isIntersecting
+                    ) {
+                        return;
                     }
 
-                    return previous;
-                });
-            };
+                    setIsHeaderCollapsed((previous) => {
+                        if (!previous) {
+                            return previous;
+                        }
 
-            scrollHandlerRef.current = handleScroll;
-            contentElement.addEventListener("scroll", handleScroll, {
-                passive: true,
-            });
-            handleScroll();
+                        manualCollapseRef.current = false;
+                        return false;
+                    });
+                },
+                {
+                    root: contentElement,
+                    rootMargin: `-${HEADER_EXPAND_SCROLL_THRESHOLD}px 0px 0px 0px`,
+                    threshold: 0,
+                }
+            );
+
+            collapseObserver.observe(sentinelElement);
+            expandObserver.observe(sentinelElement);
+
+            collapseObserverRef.current = collapseObserver;
+            expandObserverRef.current = expandObserver;
         }, []),
-        useCallback(function cleanupScrollListener(): void {
-            const contentElement = contentElementRef.current;
-            const handleScroll = scrollHandlerRef.current;
-            if (contentElement && handleScroll) {
-                contentElement.removeEventListener("scroll", handleScroll);
-            }
-            scrollHandlerRef.current = null;
+        useCallback(function cleanupScrollObservers(): void {
+            collapseObserverRef.current?.disconnect();
+            expandObserverRef.current?.disconnect();
+            collapseObserverRef.current = null;
+            expandObserverRef.current = null;
         }, [])
     );
 
@@ -360,8 +394,12 @@ export const SiteDetails = ({
 
     // Memoized event handlers to prevent unnecessary re-renders
     const handleToggleCollapse = useCallback(() => {
-        setIsHeaderCollapsed(!isHeaderCollapsed);
-    }, [isHeaderCollapsed]);
+        setIsHeaderCollapsed((previous) => {
+            const next = !previous;
+            manualCollapseRef.current = next;
+            return next;
+        });
+    }, []);
 
     const handleCheckNowClick = useCallback(() => {
         void handleCheckNow();
@@ -515,7 +553,7 @@ export const SiteDetails = ({
             <ThemedBox
                 aria-label="Site details"
                 as="dialog"
-                className="modal-shell modal-shell--site-details site-details-modal"
+                className="modal-shell modal-shell--site-details modal-shell--accent-success site-details-modal"
                 open
                 padding="xl"
                 rounded="xl"
@@ -551,6 +589,11 @@ export const SiteDetails = ({
                         ref={contentElementRef}
                         style={scrollContainerStyle}
                     >
+                        <div
+                            aria-hidden="true"
+                            className="site-details-modal__sentinel"
+                            ref={collapseSentinelRef}
+                        />
                         <ThemedBox
                             className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
                             padding="xl"

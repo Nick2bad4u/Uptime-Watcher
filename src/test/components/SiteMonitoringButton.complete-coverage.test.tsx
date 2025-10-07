@@ -37,22 +37,61 @@ vi.mock("../../theme/components/ThemedButton", () => ({
     ),
 }));
 
+vi.mock("../../utils/icons", () => {
+    const createIcon = (name: string) => {
+        const Icon = ({
+            className,
+            size = 16,
+        }: {
+            className?: string;
+            size?: number;
+        }) => (
+            <svg
+                aria-hidden="true"
+                className={className}
+                data-icon={name}
+                data-size={size}
+                focusable="false"
+                role="img"
+            />
+        );
+        Icon.displayName = `MockIcon(${name})`;
+        return Icon;
+    };
+
+    return {
+        AppIcons: {
+            actions: {
+                add: createIcon("add"),
+                checkNow: createIcon("check-now"),
+                download: createIcon("download"),
+                pause: createIcon("pause"),
+                pauseFilled: createIcon("pause-filled"),
+                play: createIcon("play"),
+                playAll: createIcon("play-all"),
+                playFilled: createIcon("play-filled"),
+                refresh: createIcon("refresh"),
+                refreshAlt: createIcon("refresh-alt"),
+                remove: createIcon("remove"),
+            },
+            layout: {},
+            metrics: {},
+            settings: {},
+            status: {},
+            theme: {},
+            ui: {},
+        },
+    };
+});
+
 /**
  * Test wrapper with theme provider
  */
 const renderWithTheme = (ui: React.ReactElement) =>
     render(<ThemeProvider>{ui}</ThemeProvider>);
-const PLAY_ICON_PATH =
-    "M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM10.6219 8.41459C10.5562 8.37078 10.479 8.34741 10.4 8.34741C10.1791 8.34741 10 8.52649 10 8.74741V15.2526C10 15.3316 10.0234 15.4088 10.0672 15.4745C10.1897 15.6583 10.4381 15.708 10.6219 15.5854L15.5008 12.3328C15.5447 12.3035 15.5824 12.2658 15.6117 12.2219C15.7343 12.0381 15.6846 11.7897 15.5008 11.6672L10.6219 8.41459Z";
-const PAUSE_ICON_PATH =
-    "M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM9 9V15H11V9H9ZM13 9V15H15V9H13Z";
-
-const expectButtonIconPath = (button: HTMLElement, iconPath: string): void => {
-    const icon = button.querySelector("svg");
+const expectButtonIcon = (button: HTMLElement, iconName: string): void => {
+    const icon = button.querySelector(`svg[data-icon="${iconName}"]`);
     expect(icon).not.toBeNull();
-    const pathElement = icon?.querySelector("path");
-    expect(pathElement).not.toBeNull();
-    expect(pathElement?.getAttribute("d")).toBe(iconPath);
 };
 
 describe("SiteMonitoringButton - Complete Coverage", () => {
@@ -103,7 +142,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
             expect(button).toHaveAttribute("data-variant", "success");
             expect(button).toHaveAttribute("data-size", "sm");
-            expectButtonIconPath(button, PLAY_ICON_PATH);
+            expectButtonIcon(button, "play-all");
             expect(screen.getByText("Start All")).toBeInTheDocument();
         });
 
@@ -139,7 +178,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toHaveAttribute("aria-label", "Stop All Monitoring");
             expect(button).toHaveAttribute("data-variant", "error");
             expect(button).toHaveAttribute("data-size", "sm");
-            expectButtonIconPath(button, PAUSE_ICON_PATH);
+            expectButtonIcon(button, "pause-filled");
             expect(screen.getByText("Stop All")).toBeInTheDocument();
         });
 
@@ -233,7 +272,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const button = screen.getByTestId("themed-button");
-            expectButtonIconPath(button, PLAY_ICON_PATH);
+            expectButtonIcon(button, "play-all");
             expect(screen.queryByText("Start All")).not.toBeInTheDocument();
         });
 
@@ -266,7 +305,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             );
 
             const button = screen.getByTestId("themed-button");
-            expectButtonIconPath(button, PAUSE_ICON_PATH);
+            expectButtonIcon(button, "pause-filled");
             expect(screen.queryByText("Stop All")).not.toBeInTheDocument();
         });
 
@@ -729,7 +768,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             expect(screen.getByText("Start All")).toBeInTheDocument();
             let button = screen.getByTestId("themed-button");
-            expectButtonIconPath(button, PLAY_ICON_PATH);
+            expectButtonIcon(button, "play-all");
 
             rerender(
                 <SiteMonitoringButton {...defaultProps} allMonitorsRunning />
@@ -737,7 +776,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
 
             expect(screen.getByText("Stop All")).toBeInTheDocument();
             button = screen.getByTestId("themed-button");
-            expectButtonIconPath(button, PAUSE_ICON_PATH);
+            expectButtonIcon(button, "pause-filled");
         });
 
         it("should maintain button attributes during state transitions", ({
@@ -1303,7 +1342,7 @@ describe("SiteMonitoringButton - Complete Coverage", () => {
             expect(button).toHaveClass("test-class");
             expect(button).toHaveAttribute("data-variant", "success");
             expect(button).not.toBeDisabled();
-            expectButtonIconPath(button, PLAY_ICON_PATH);
+            expectButtonIcon(button, "play-all");
             expect(screen.queryByText("Start All")).not.toBeInTheDocument(); // Compact mode
         });
 

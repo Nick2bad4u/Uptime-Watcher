@@ -4,6 +4,22 @@
     overflow-inline: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable both-edges;
+
+    --site-table-header-surface: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 35%,
+        transparent
+    );
+    --site-table-border: color-mix(
+        in srgb,
+        var(--color-border-secondary) 26%,
+        transparent
+    );
+    --site-table-hover: color-mix(
+        in srgb,
+        var(--color-primary-500) 14%,
+        transparent
+    );
 }
 
 .site-table__table {
@@ -16,22 +32,22 @@
         position: sticky;
         z-index: 1;
         backdrop-filter: blur(8px);
-        background: rgb(15 23 42 / 35%);
+        background: var(--site-table-header-surface);
         inset-block-start: 0;
     }
 
     & th,
     & td {
-        padding: 0.6rem 0.85rem;
-        border-block-end: 1px solid rgb(255 255 255 / 8%);
-        text-align: start;
         overflow: clip;
+        padding: 0.6rem 0.85rem;
+        border-block-end: 1px solid var(--site-table-border);
+        text-align: start;
     }
 }
 
 .site-table__row:hover,
 .site-table__row:focus {
-    background: rgb(59 130 246 / 8%);
+    background: var(--site-table-hover);
 }
 
 .site-table__site {

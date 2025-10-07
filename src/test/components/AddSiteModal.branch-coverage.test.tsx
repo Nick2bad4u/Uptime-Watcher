@@ -263,6 +263,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(container.firstChild).not.toBeNull();
             const modalShell = document.querySelector(".modal-shell");
             expect(modalShell).not.toBeNull();
+            expect(
+                modalShell?.classList.contains("modal-shell--accent-success")
+            ).toBeTruthy();
             expect(screen.getByText("Add New Site")).toBeDefined();
         });
 
@@ -297,6 +300,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             render(<AddSiteModal onClose={mockOnClose} />);
             const modalShell = document.querySelector(".modal-shell");
             expect(modalShell).not.toBeNull();
+            expect(
+                modalShell?.classList.contains("modal-shell--accent-success")
+            ).toBeTruthy();
             expect(screen.getByText("Add New Site")).toBeDefined();
         });
     });

@@ -10,6 +10,7 @@
 
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type { Site } from "@/shared/types";
 
 /**
  * Wait strategies for different UI operations.
@@ -51,6 +52,31 @@ export const FORM_SELECTORS = {
 } as const;
 
 /**
+ * Options for creating a site through the Add Site modal during Playwright
+ * tests.
+ */
+export interface CreateSiteOptions {
+    /** Optional monitor type identifier supported by the application (defaults
+to HTTP). */
+    readonly monitorType?: string;
+    /** Optional site name; a unique name is generated when omitted. */
+    readonly name?: string;
+    /** Optional site URL to associate with the new monitor (defaults to
+https://example.com). */
+    readonly url?: string;
+}
+
+/**
+ * Result details returned after creating a site via the modal workflow.
+ */
+export interface CreatedSiteResult {
+    /** Database identifier resolved from the sites store when available. */
+    readonly identifier?: string;
+    /** Resolved site name used during creation. */
+    readonly name: string;
+}
+
+/**
  * Waits for the Electron app to be fully initialized and ready for interaction.
  *
  * @param page - The Playwright page instance
@@ -90,6 +116,39 @@ export async function waitForAppInitialization(
             "Dashboard container not immediately visible, continuing..."
         );
     }
+}
+
+/**
+ * Removes every persisted site in the application by calling the electron
+ * bridge.
+ *
+ * @param page - Playwright page bound to the primary renderer window.
+ */
+export async function removeAllSites(page: Page): Promise<void> {
+    await waitForAppInitialization(page);
+
+    await page.evaluate(async () => {
+        const globalTarget = globalThis as typeof globalThis & {
+            electronAPI?: {
+                sites?: {
+                    deleteAllSites?: () => Promise<unknown>;
+                };
+            };
+        };
+
+        try {
+            const deleteAllSites =
+                globalTarget.electronAPI?.sites?.deleteAllSites;
+            if (deleteAllSites) {
+                await deleteAllSites();
+            }
+        } catch (error) {
+            console.warn(
+                "Failed to remove all sites during Playwright cleanup",
+                error
+            );
+        }
+    });
 }
 
 /**
@@ -139,6 +198,78 @@ export async function openAddSiteModal(page: Page): Promise<void> {
         },
         { timeout: WAIT_TIMEOUTS.MODAL_ANIMATION }
     );
+}
+
+/**
+ * Creates a fully configured site through the Add Site modal workflow.
+ *
+ * @param page - Playwright page instance representing the renderer.
+ * @param options - Optional overrides for the generated monitor configuration.
+ *
+ * @returns Resolved site metadata including the durable identifier when
+ *   available.
+ */
+export async function createSiteViaModal(
+    page: Page,
+    options: CreateSiteOptions = {}
+): Promise<CreatedSiteResult> {
+    const siteName =
+        options.name ??
+        `Playwright Site ${Date.now().toString(36)}-${Math.floor(Math.random() * 10_000)}`;
+    const siteUrl = options.url ?? "https://example.com";
+    const monitorType = options.monitorType ?? "http";
+
+    await openAddSiteModal(page);
+    await fillAddSiteForm(page, {
+        name: siteName,
+        url: siteUrl,
+        monitorType,
+    });
+    await submitAddSiteForm(page);
+
+    await page
+        .getByText(siteName, { exact: true })
+        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+
+    const siteIdentifier = await page.evaluate<
+        string | null,
+        { targetName: string }
+    >(
+        async ({ targetName }) => {
+            const globalTarget = globalThis as typeof globalThis & {
+                electronAPI?: {
+                    sites?: {
+                        getSites?: () => Promise<Site[]>;
+                    };
+                };
+            };
+
+            try {
+                const sites =
+                    await globalTarget.electronAPI?.sites?.getSites?.();
+                return (
+                    sites?.find((site) => site.name === targetName)
+                        ?.identifier ?? null
+                );
+            } catch (error) {
+                console.warn(
+                    "Failed to resolve site identifier after creation",
+                    error
+                );
+                return null;
+            }
+        },
+        { targetName: siteName }
+    );
+
+    if (siteIdentifier) {
+        return {
+            identifier: siteIdentifier,
+            name: siteName,
+        } satisfies CreatedSiteResult;
+    }
+
+    return { name: siteName } satisfies CreatedSiteResult;
 }
 
 /**
@@ -262,6 +393,28 @@ export async function submitAddSiteForm(page: Page): Promise<void> {
 }
 
 /**
+ * Opens the Site Details modal for a specific site card by name.
+ *
+ * @param page - Playwright page instance representing the renderer.
+ * @param siteName - Visible site name text rendered on the dashboard.
+ */
+export async function openSiteDetails(
+    page: Page,
+    siteName: string
+): Promise<void> {
+    const siteCard = page
+        .getByTestId("site-card")
+        .filter({ has: page.getByText(siteName, { exact: true }) });
+
+    await siteCard.waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+    await siteCard.click();
+
+    await page
+        .getByRole("dialog", { name: "Site details" })
+        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+}
+
+/**
  * Opens the settings modal by clicking the settings button.
  *
  * @param page - The Playwright page instance
@@ -269,7 +422,7 @@ export async function submitAddSiteForm(page: Page): Promise<void> {
 export async function openSettingsModal(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
-    const settingsButton = page.getByRole("button", { name: "Settings" });
+    const settingsButton = page.getByRole("button", { name: "Open settings" });
     await settingsButton.click();
 
     // Wait for settings modal to appear
@@ -295,7 +448,9 @@ export async function openSettingsModal(page: Page): Promise<void> {
 export async function toggleTheme(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
-    const themeToggle = page.getByRole("button", { name: "Toggle theme" });
+    const themeToggle = page.getByRole("button", {
+        name: /Switch to (light|dark) theme/i,
+    });
     await themeToggle.click();
 
     // Wait for theme change to apply
@@ -328,6 +483,31 @@ export async function ensureCleanUIState(page: Page): Promise<void> {
     await page.waitForFunction(() => document.readyState === "complete", {
         timeout: WAIT_TIMEOUTS.SHORT,
     });
+}
+
+/**
+ * Closes the Site Details modal if it is currently open.
+ *
+ * @param page - Playwright page instance representing the renderer.
+ */
+export async function closeSiteDetails(page: Page): Promise<void> {
+    const dialog = page.getByRole("dialog", { name: "Site details" });
+    const isVisible = await dialog.isVisible().catch(() => false);
+
+    if (!isVisible) {
+        return;
+    }
+
+    const closeButton = page.getByRole("button", {
+        name: "Close site details",
+    });
+    if (await closeButton.isVisible().catch(() => false)) {
+        await closeButton.click();
+    } else {
+        await page.getByLabel("Close site details").click();
+    }
+
+    await dialog.waitFor({ state: "hidden", timeout: WAIT_TIMEOUTS.MEDIUM });
 }
 
 /**

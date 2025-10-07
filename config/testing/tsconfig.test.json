@@ -63,6 +63,7 @@
         "../../shared/test/**/*.tsx",
         "../../tailwind.config.mjs",
         "vitest.config.ts",
-        "vitest.shared.config.ts"
+        "vitest.shared.config.ts",
+        "../../playwright/utils/createPlaywrightCoveragePlugin.ts"
     ]
 }

@@ -466,7 +466,7 @@ export const Settings = ({
         >
             <ThemedBox
                 as="dialog"
-                className="modal-shell modal-shell--form modal-shell--accent-primary"
+                className="modal-shell modal-shell--form modal-shell--accent-success settings-modal"
                 data-testid="settings-modal"
                 open
                 padding="xl"

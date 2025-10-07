@@ -151,7 +151,7 @@ export const SiteMonitoringButton: NamedExoticComponent<SiteMonitoringButtonProp
 
         const iconSize = size === "xs" ? 14 : 16;
         const StopIcon = AppIcons.actions.pauseFilled;
-        const StartIcon = AppIcons.actions.playFilled;
+        const StartIcon = AppIcons.actions.playAll;
 
         // Mirror ActionButtonGroup tooltip behaviour so site-level controls
         // surface a consistent reason when disabled.

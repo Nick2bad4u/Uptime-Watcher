@@ -39,13 +39,18 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid
-        color-mix(in srgb, var(--shadow-inverse-color) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--modal-accent) 35%, transparent);
     border-radius: var(--border-radius-xl);
-    background: color-mix(in srgb, var(--shadow-base-color) 22%, transparent);
+    background: linear-gradient(
+        140deg,
+        color-mix(in srgb, var(--modal-accent) 22%, transparent),
+        color-mix(in srgb, var(--color-surface-overlay) 82%, transparent)
+    );
     block-size: 48px;
-    box-shadow: 0 8px 20px
-        color-mix(in srgb, var(--shadow-neutral-color) 18%, transparent);
+    box-shadow:
+        0 8px 20px color-mix(in srgb, var(--modal-accent) 18%, transparent),
+        inset 0 1px 0 rgb(255 255 255 / 6%);
+    color: color-mix(in srgb, var(--modal-accent) 78%, rgb(255 255 255) 22%);
     inline-size: 48px;
 }
 
@@ -139,7 +144,7 @@
     flex-direction: column;
     padding: var(--spacing-xl);
     /* stylelint-disable scss/function-color-relative -- Runtime opacity derived from theme tokens requires CSS relative color syntax. */
-    border: 1px solid color(from var(--color-border-secondary) srgb r g b / 38%);
+    border: 1px solid color-mix(in srgb, var(--modal-accent) 24%, transparent);
     border-radius: var(--border-radius-xl);
     backdrop-filter: blur(18px) saturate(1.05);
     background: linear-gradient(
@@ -148,13 +153,13 @@
         color-mix(
                 in srgb,
                 var(--color-surface-overlay) 92%,
-                var(--color-primary-500) 2%
+                var(--modal-accent) 2%
             )
             100%
     );
     box-shadow:
         inset 0 0 0 1px color(from var(--shadow-inverse-color) srgb r g b / 3%),
-        0 8px 20px color(from var(--shadow-overlay-color) srgb r g b / 12%);
+        0 8px 20px color-mix(in srgb, var(--modal-accent) 14%, transparent);
     gap: var(--spacing-lg);
     /* stylelint-enable scss/function-color-relative */
     transition:
@@ -167,11 +172,11 @@
 
     &:hover,
     &:focus-within {
-        border-color: rgb(129 140 248 / 28%);
+        border-color: color-mix(in srgb, var(--modal-accent) 38%, transparent);
         box-shadow:
             inset 0 0 0 1px
                 color(from var(--shadow-inverse-color) srgb r g b / 4%),
-            0 12px 28px rgb(129 140 248 / 18%);
+            0 12px 28px color-mix(in srgb, var(--modal-accent) 20%, transparent);
     }
 }
 
@@ -186,7 +191,7 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--border-radius-lg);
-    background: color-mix(in srgb, rgb(96 165 250) 14%, transparent);
+    background: color-mix(in srgb, var(--modal-accent) 18%, transparent);
     block-size: 36px;
     inline-size: 36px;
 }
@@ -246,17 +251,17 @@
     justify-content: space-between;
     padding: var(--spacing-xl) var(--spacing-2xl);
     background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--color-surface-elevated) 98%, transparent) 0%,
+        145deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
         color-mix(
                 in srgb,
-                var(--color-surface-overlay) 94%,
-                var(--color-primary-500) 2%
+                var(--color-surface-overlay) 88%,
+                var(--modal-accent) 6%
             )
             100%
     );
     border-block-start: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 24%, transparent);
+        color-mix(in srgb, var(--modal-accent) 28%, transparent);
 }
 
 .settings-modal__footer-actions {

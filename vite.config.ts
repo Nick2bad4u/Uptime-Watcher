@@ -14,6 +14,7 @@ import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";
 import {
     defineConfig,
+    type IndexHtmlTransformContext,
     normalizePath,
     type PluginOption,
     type UserConfigFnObject,
@@ -26,6 +27,7 @@ import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 
+import { createPlaywrightCoveragePlugin } from "./playwright/utils/createPlaywrightCoveragePlugin";
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
 const dirname = import.meta.dirname;
@@ -90,12 +92,34 @@ const getWasmSourcePath = (): string => {
  * Vite configuration for Uptime Watcher Electron app.
  */
 
-export default defineConfig(({ mode }) => {
+const createViteConfig = (async ({
+    mode,
+}: Parameters<UserConfigFnObject>[0]) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
+    const isPlaywrightCoverage = Boolean(
+        getEnvironmentVariable("PLAYWRIGHT_COVERAGE")
+    );
     const wasmSourcePath = getWasmSourcePath();
+
+    const instrumentationPlugin = await createPlaywrightCoveragePlugin({
+        enabled: isPlaywrightCoverage,
+        exclude: [
+            ...defaultExclude,
+            "src/test/**",
+            "playwright/**",
+            "**/*.d.ts",
+        ],
+        include: [
+            "src/**/*.ts",
+            "src/**/*.tsx",
+            "electron/**/*.ts",
+            "shared/**/*.ts",
+        ],
+        projectRoot: dirname,
+    });
 
     return {
         appType: "spa", // Required for Electron renderer process (SPA mode ensures correct routing and asset loading)
@@ -226,7 +250,10 @@ export default defineConfig(({ mode }) => {
              */
             {
                 name: "csp-dev-fix",
-                transformIndexHtml(html, context) {
+                transformIndexHtml(
+                    html: string,
+                    context: IndexHtmlTransformContext
+                ) {
                     if (context.server) {
                         // Development mode: Add 'unsafe-eval' for zod compatibility
                         return html.replace(
@@ -318,6 +345,7 @@ export default defineConfig(({ mode }) => {
                 // Use automatic JSX runtime (default, but explicit for clarity)
                 jsxRuntime: "automatic",
             }),
+            ...(instrumentationPlugin ? [instrumentationPlugin] : []),
             // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
             // checker({
             //     typescript: {
@@ -871,4 +899,10 @@ export default defineConfig(({ mode }) => {
             },
         },
     };
-}) satisfies UserConfigFnObject as UserConfigFnObject;
+}) as unknown as UserConfigFnObject;
+
+const viteConfig: UserConfigFnObject = defineConfig(
+    createViteConfig
+) as unknown as UserConfigFnObject;
+
+export default viteConfig;

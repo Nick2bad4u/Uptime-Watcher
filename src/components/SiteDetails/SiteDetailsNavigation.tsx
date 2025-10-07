@@ -8,7 +8,13 @@ import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 import type { UnknownRecord } from "type-fest";
 
-import React, { useCallback } from "react";
+import {
+    type ChangeEvent,
+    memo,
+    type NamedExoticComponent,
+    useCallback,
+    useMemo,
+} from "react";
 
 import type { SiteDetailsTab } from "../../stores/ui/types";
 
@@ -19,6 +25,7 @@ import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
+import { Tooltip } from "../common/Tooltip/Tooltip";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary
@@ -33,7 +40,7 @@ export interface SiteDetailsNavigationProperties {
     readonly currentSite: Site;
     /** Handler for monitor selection changes */
     readonly handleMonitorIdChange: (
-        event: React.ChangeEvent<HTMLSelectElement>
+        event: ChangeEvent<HTMLSelectElement>
     ) => void;
     /** Handler for starting monitoring */
     readonly handleStartMonitoring: () => Promise<void>;
@@ -66,265 +73,318 @@ export interface SiteDetailsNavigationProperties {
  *
  * @returns JSX element containing navigation controls
  */
-export const SiteDetailsNavigation = ({
-    activeSiteDetailsTab,
-    currentSite,
-    handleMonitorIdChange,
-    handleStartMonitoring,
-    handleStartSiteMonitoring,
-    handleStopMonitoring,
-    handleStopSiteMonitoring,
-    isHeaderCollapsed = false,
-    isLoading,
-    isMonitoring,
-    selectedMonitorId,
-    setActiveSiteDetailsTab,
-}: SiteDetailsNavigationProperties): JSX.Element => {
-    /**
-     * Logs tab change events for analytics and debugging purposes.
-     *
-     * @param tab - The tab name being changed to
-     * @param additionalData - Optional additional data to include in the log
-     */
-    const logTabChange = useCallback(
-        (tab: string, additionalData?: UnknownRecord) => {
-            logger.user.action("Site details tab changed", {
-                siteId: currentSite.identifier,
-                tab,
-                ...additionalData,
+export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationProperties> =
+    memo(function SiteDetailsNavigationComponent({
+        activeSiteDetailsTab,
+        currentSite,
+        handleMonitorIdChange,
+        handleStartMonitoring,
+        handleStartSiteMonitoring,
+        handleStopMonitoring,
+        handleStopSiteMonitoring,
+        isHeaderCollapsed = false,
+        isLoading,
+        isMonitoring,
+        selectedMonitorId,
+        setActiveSiteDetailsTab,
+    }: SiteDetailsNavigationProperties): JSX.Element {
+        /**
+         * Logs tab change events for analytics and debugging purposes.
+         *
+         * @param tab - The tab name being changed to
+         * @param additionalData - Optional additional data to include in the
+         *   log
+         */
+        const logTabChange = useCallback(
+            (tab: string, additionalData?: UnknownRecord) => {
+                logger.user.action("Site details tab changed", {
+                    siteId: currentSite.identifier,
+                    tab,
+                    ...additionalData,
+                });
+            },
+            [currentSite.identifier]
+        );
+
+        // Memoized handlers to prevent unnecessary re-renders of
+        // SiteMonitoringButton
+        const handleStartSiteMonitoringMemoized = useCallback(() => {
+            void handleStartSiteMonitoring();
+        }, [handleStartSiteMonitoring]);
+
+        const handleStopSiteMonitoringMemoized = useCallback(() => {
+            void handleStopSiteMonitoring();
+        }, [handleStopSiteMonitoring]);
+
+        // Site-level monitoring state calculation
+        const allMonitorsRunning = useMemo(
+            () =>
+                currentSite.monitors.length > 0 &&
+                currentSite.monitors.every((monitor) => monitor.monitoring),
+            [currentSite.monitors]
+        );
+
+        // Find selected monitor to get its type for better labeling
+        const selectedMonitor = useMemo(
+            () =>
+                currentSite.monitors.find(
+                    (monitor) => monitor.id === selectedMonitorId
+                ),
+            [currentSite.monitors, selectedMonitorId]
+        );
+        const monitorTypeLabel = useMemo(() => {
+            if (!selectedMonitor) {
+                return "ANALYTICS";
+            }
+
+            return selectedMonitor.type.toUpperCase();
+        }, [selectedMonitor]);
+
+        const monitorOptions = useMemo(
+            () =>
+                currentSite.monitors.map((monitor) => ({
+                    id: monitor.id,
+                    label: monitor.type.toUpperCase(),
+                })),
+            [currentSite.monitors]
+        );
+
+        // Button variant constants
+        const BUTTON_VARIANT_PRIMARY = "primary";
+        const BUTTON_VARIANT_SECONDARY = "secondary";
+
+        // Memoized tab click handlers
+        const handleSiteOverviewClick = useCallback(() => {
+            setActiveSiteDetailsTab("site-overview");
+            logTabChange("site-overview");
+        }, [logTabChange, setActiveSiteDetailsTab]);
+
+        const handleHistoryClick = useCallback(() => {
+            setActiveSiteDetailsTab("history");
+            logTabChange("history");
+        }, [logTabChange, setActiveSiteDetailsTab]);
+
+        const handleSettingsClick = useCallback(() => {
+            setActiveSiteDetailsTab("settings");
+            logTabChange("settings");
+        }, [logTabChange, setActiveSiteDetailsTab]);
+
+        // Additional handlers for monitor-specific tabs and actions
+        const handleMonitorOverviewClick = useCallback(() => {
+            setActiveSiteDetailsTab("monitor-overview");
+            logTabChange("monitor-overview", {
+                monitorId: selectedMonitorId,
             });
-        },
-        [currentSite.identifier]
-    );
+        }, [
+            logTabChange,
+            selectedMonitorId,
+            setActiveSiteDetailsTab,
+        ]);
 
-    // Memoized handlers to prevent unnecessary re-renders of
-    // SiteMonitoringButton
-    const handleStartSiteMonitoringMemoized = useCallback(() => {
-        void handleStartSiteMonitoring();
-    }, [handleStartSiteMonitoring]);
+        const handleMonitorAnalyticsClick = useCallback(() => {
+            setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
+            logTabChange("monitor-analytics", {
+                monitorId: selectedMonitorId,
+            });
+        }, [
+            logTabChange,
+            selectedMonitorId,
+            setActiveSiteDetailsTab,
+        ]);
 
-    const handleStopSiteMonitoringMemoized = useCallback(() => {
-        void handleStopSiteMonitoring();
-    }, [handleStopSiteMonitoring]);
+        const handleStopMonitoringClick = useCallback(() => {
+            void handleStopMonitoring();
+        }, [handleStopMonitoring]);
 
-    // Site-level monitoring state calculation
-    const allMonitorsRunning =
-        currentSite.monitors.length > 0 &&
-        currentSite.monitors.every((monitor) => monitor.monitoring);
+        const handleStartMonitoringClick = useCallback(() => {
+            void handleStartMonitoring();
+        }, [handleStartMonitoring]);
 
-    // Find selected monitor to get its type for better labeling
-    const selectedMonitor = currentSite.monitors.find(
-        (monitor) => monitor.id === selectedMonitorId
-    );
-    const monitorTypeLabel = selectedMonitor
-        ? selectedMonitor.type.toUpperCase()
-        : "ANALYTICS";
+        const SiteOverviewIcon = AppIcons.ui.home;
+        const MonitorOverviewIcon = AppIcons.metrics.activity;
+        const AnalyticsIcon = AppIcons.ui.analytics;
+        const HistoryIcon = AppIcons.ui.history;
+        const SettingsIcon = AppIcons.settings.gear;
+        const PauseIcon = AppIcons.actions.pause;
+        const PlayIcon = AppIcons.actions.play;
 
-    // Button variant constants
-    const BUTTON_VARIANT_PRIMARY = "primary";
-    const BUTTON_VARIANT_SECONDARY = "secondary";
+        const buildMonitorActionTooltip = useCallback(
+            (baseMessage: string): string => {
+                if (isLoading) {
+                    return `${baseMessage} • Finishing the previous request.`;
+                }
 
-    // Memoized tab click handlers
-    const handleSiteOverviewClick = useCallback(() => {
-        setActiveSiteDetailsTab("site-overview");
-        logTabChange("site-overview");
-    }, [logTabChange, setActiveSiteDetailsTab]);
+                return baseMessage;
+            },
+            [isLoading]
+        );
 
-    const handleHistoryClick = useCallback(() => {
-        setActiveSiteDetailsTab("history");
-        logTabChange("history");
-    }, [logTabChange, setActiveSiteDetailsTab]);
+        const navigationClassName = isHeaderCollapsed
+            ? "site-details-navigation site-details-navigation--collapsed"
+            : "site-details-navigation";
 
-    const handleSettingsClick = useCallback(() => {
-        setActiveSiteDetailsTab("settings");
-        logTabChange("settings");
-    }, [logTabChange, setActiveSiteDetailsTab]);
-
-    // Additional handlers for monitor-specific tabs and actions
-    const handleMonitorOverviewClick = useCallback(() => {
-        setActiveSiteDetailsTab("monitor-overview");
-        logTabChange("monitor-overview", {
-            monitorId: selectedMonitorId,
-        });
-    }, [
-        logTabChange,
-        selectedMonitorId,
-        setActiveSiteDetailsTab,
-    ]);
-
-    const handleMonitorAnalyticsClick = useCallback(() => {
-        setActiveSiteDetailsTab(`${selectedMonitorId}-analytics`);
-        logTabChange("monitor-analytics", {
-            monitorId: selectedMonitorId,
-        });
-    }, [
-        logTabChange,
-        selectedMonitorId,
-        setActiveSiteDetailsTab,
-    ]);
-
-    const handleStopMonitoringClick = useCallback(() => {
-        void handleStopMonitoring();
-    }, [handleStopMonitoring]);
-
-    const handleStartMonitoringClick = useCallback(() => {
-        void handleStartMonitoring();
-    }, [handleStartMonitoring]);
-
-    const SiteOverviewIcon = AppIcons.ui.home;
-    const MonitorOverviewIcon = AppIcons.metrics.activity;
-    const AnalyticsIcon = AppIcons.ui.analytics;
-    const HistoryIcon = AppIcons.ui.history;
-    const SettingsIcon = AppIcons.settings.gear;
-    const PauseIcon = AppIcons.actions.pauseFilled;
-    const PlayIcon = AppIcons.actions.playFilled;
-
-    const navigationClassName = isHeaderCollapsed
-        ? "site-details-navigation site-details-navigation--collapsed"
-        : "site-details-navigation";
-
-    return (
-        <ThemedBox
-            className={navigationClassName}
-            padding="lg"
-            variant="secondary"
-        >
-            {/* Tab Navigation and Monitor Selection */}
-            <div className="site-details-navigation__grid">
-                {/* Tab navigation buttons (left) */}
-                <div className="site-details-navigation__tabs">
-                    <ThemedButton
-                        className="flex items-center gap-2"
-                        onClick={handleSiteOverviewClick}
-                        size="sm"
-                        variant={
-                            activeSiteDetailsTab === "site-overview"
-                                ? BUTTON_VARIANT_PRIMARY
-                                : BUTTON_VARIANT_SECONDARY
-                        }
-                    >
-                        <SiteOverviewIcon size={16} />
-                        <span>Site Overview</span>
-                    </ThemedButton>
-                    <ThemedButton
-                        className="flex items-center gap-2"
-                        onClick={handleMonitorOverviewClick}
-                        size="sm"
-                        variant={
-                            activeSiteDetailsTab === "monitor-overview"
-                                ? BUTTON_VARIANT_PRIMARY
-                                : BUTTON_VARIANT_SECONDARY
-                        }
-                    >
-                        <MonitorOverviewIcon size={16} />
-                        <span>Monitor Overview</span>
-                    </ThemedButton>
-                    {/* Render analytics tab for selected monitor type only */}
-                    <ThemedButton
-                        className="flex items-center gap-2"
-                        onClick={handleMonitorAnalyticsClick}
-                        size="sm"
-                        variant={
-                            activeSiteDetailsTab ===
-                            `${selectedMonitorId}-analytics`
-                                ? BUTTON_VARIANT_PRIMARY
-                                : BUTTON_VARIANT_SECONDARY
-                        }
-                    >
-                        <AnalyticsIcon size={16} />
-                        <span>{`${monitorTypeLabel} Analytics`}</span>
-                    </ThemedButton>
-                    <ThemedButton
-                        className="flex items-center gap-2"
-                        onClick={handleHistoryClick}
-                        size="sm"
-                        variant={
-                            activeSiteDetailsTab === "history"
-                                ? BUTTON_VARIANT_PRIMARY
-                                : BUTTON_VARIANT_SECONDARY
-                        }
-                    >
-                        <HistoryIcon size={16} />
-                        <span>History</span>
-                    </ThemedButton>
-                    <ThemedButton
-                        className="flex items-center gap-2"
-                        onClick={handleSettingsClick}
-                        size="sm"
-                        variant={
-                            activeSiteDetailsTab === "settings"
-                                ? BUTTON_VARIANT_PRIMARY
-                                : BUTTON_VARIANT_SECONDARY
-                        }
-                    >
-                        <SettingsIcon size={16} />
-                        <span>Settings</span>
-                    </ThemedButton>
-                </div>
-
-                {/* Monitor Selection and Site-level Controls (right) */}
-                <div className="site-details-navigation__controls">
-                    {/* Site-level monitoring controls */}
-                    <div className="site-details-navigation__control-group">
-                        <SiteMonitoringButton
-                            allMonitorsRunning={allMonitorsRunning}
-                            isLoading={isLoading}
-                            onStartSiteMonitoring={
-                                handleStartSiteMonitoringMemoized
+        return (
+            <ThemedBox
+                className={navigationClassName}
+                padding="lg"
+                variant="secondary"
+            >
+                {/* Tab Navigation and Monitor Selection */}
+                <div className="site-details-navigation__grid">
+                    {/* Tab navigation buttons (left) */}
+                    <div className="site-details-navigation__tabs">
+                        <ThemedButton
+                            className="flex items-center gap-2"
+                            onClick={handleSiteOverviewClick}
+                            size="sm"
+                            variant={
+                                activeSiteDetailsTab === "site-overview"
+                                    ? BUTTON_VARIANT_PRIMARY
+                                    : BUTTON_VARIANT_SECONDARY
                             }
-                            onStopSiteMonitoring={
-                                handleStopSiteMonitoringMemoized
-                            }
-                        />
-
-                        {/* Individual monitor controls */}
-                        {isMonitoring ? (
-                            <ThemedButton
-                                aria-label="Stop Monitoring"
-                                className="flex items-center gap-2"
-                                onClick={handleStopMonitoringClick}
-                                size="sm"
-                                variant="warning"
-                            >
-                                <PauseIcon size={16} />
-                                <span className="hidden text-xs sm:inline">
-                                    Stop
-                                </span>
-                            </ThemedButton>
-                        ) : (
-                            <ThemedButton
-                                aria-label="Start Monitoring"
-                                className="flex items-center gap-2"
-                                onClick={handleStartMonitoringClick}
-                                size="sm"
-                                variant="success"
-                            >
-                                <PlayIcon size={16} />
-                                <span className="hidden text-xs sm:inline">
-                                    Start
-                                </span>
-                            </ThemedButton>
-                        )}
-                    </div>
-
-                    {/* Monitor Selection */}
-                    <div className="site-details-navigation__select">
-                        <ThemedText size="sm" variant="secondary">
-                            Monitor:
-                        </ThemedText>
-                        <ThemedSelect
-                            onChange={handleMonitorIdChange}
-                            value={selectedMonitorId}
                         >
-                            {currentSite.monitors.map((monitor) => (
-                                <option key={monitor.id} value={monitor.id}>
-                                    {monitor.type.toUpperCase()}
-                                </option>
-                            ))}
-                        </ThemedSelect>
+                            <SiteOverviewIcon size={16} />
+                            <span>Site Overview</span>
+                        </ThemedButton>
+                        <ThemedButton
+                            className="flex items-center gap-2"
+                            onClick={handleMonitorOverviewClick}
+                            size="sm"
+                            variant={
+                                activeSiteDetailsTab === "monitor-overview"
+                                    ? BUTTON_VARIANT_PRIMARY
+                                    : BUTTON_VARIANT_SECONDARY
+                            }
+                        >
+                            <MonitorOverviewIcon size={16} />
+                            <span>Monitor Overview</span>
+                        </ThemedButton>
+                        {/* Render analytics tab for selected monitor type only */}
+                        <ThemedButton
+                            className="flex items-center gap-2"
+                            onClick={handleMonitorAnalyticsClick}
+                            size="sm"
+                            variant={
+                                activeSiteDetailsTab ===
+                                `${selectedMonitorId}-analytics`
+                                    ? BUTTON_VARIANT_PRIMARY
+                                    : BUTTON_VARIANT_SECONDARY
+                            }
+                        >
+                            <AnalyticsIcon size={16} />
+                            <span>{`${monitorTypeLabel} Analytics`}</span>
+                        </ThemedButton>
+                        <ThemedButton
+                            className="flex items-center gap-2"
+                            onClick={handleHistoryClick}
+                            size="sm"
+                            variant={
+                                activeSiteDetailsTab === "history"
+                                    ? BUTTON_VARIANT_PRIMARY
+                                    : BUTTON_VARIANT_SECONDARY
+                            }
+                        >
+                            <HistoryIcon size={16} />
+                            <span>History</span>
+                        </ThemedButton>
+                        <ThemedButton
+                            className="flex items-center gap-2"
+                            onClick={handleSettingsClick}
+                            size="sm"
+                            variant={
+                                activeSiteDetailsTab === "settings"
+                                    ? BUTTON_VARIANT_PRIMARY
+                                    : BUTTON_VARIANT_SECONDARY
+                            }
+                        >
+                            <SettingsIcon size={16} />
+                            <span>Settings</span>
+                        </ThemedButton>
+                    </div>
+
+                    {/* Monitor Selection and Site-level Controls (right) */}
+                    <div className="site-details-navigation__controls">
+                        {/* Site-level monitoring controls */}
+                        <div className="site-details-navigation__control-group">
+                            <SiteMonitoringButton
+                                allMonitorsRunning={allMonitorsRunning}
+                                isLoading={isLoading}
+                                onStartSiteMonitoring={
+                                    handleStartSiteMonitoringMemoized
+                                }
+                                onStopSiteMonitoring={
+                                    handleStopSiteMonitoringMemoized
+                                }
+                            />
+
+                            {/* Individual monitor controls */}
+                            {isMonitoring ? (
+                                <Tooltip
+                                    content={buildMonitorActionTooltip(
+                                        "Pause monitoring for this monitor"
+                                    )}
+                                    position="top"
+                                >
+                                    {(triggerProps) => (
+                                        <ThemedButton
+                                            {...triggerProps}
+                                            aria-label="Stop Monitoring"
+                                            className="flex items-center gap-2"
+                                            onClick={handleStopMonitoringClick}
+                                            size="sm"
+                                            variant="warning"
+                                        >
+                                            <PauseIcon size={16} />
+                                            <span className="hidden text-xs sm:inline">
+                                                Stop
+                                            </span>
+                                        </ThemedButton>
+                                    )}
+                                </Tooltip>
+                            ) : (
+                                <Tooltip
+                                    content={buildMonitorActionTooltip(
+                                        "Resume monitoring for this monitor"
+                                    )}
+                                    position="top"
+                                >
+                                    {(triggerProps) => (
+                                        <ThemedButton
+                                            {...triggerProps}
+                                            aria-label="Start Monitoring"
+                                            className="flex items-center gap-2"
+                                            onClick={handleStartMonitoringClick}
+                                            size="sm"
+                                            variant="success"
+                                        >
+                                            <PlayIcon size={16} />
+                                            <span className="hidden text-xs sm:inline">
+                                                Start
+                                            </span>
+                                        </ThemedButton>
+                                    )}
+                                </Tooltip>
+                            )}
+                        </div>
+
+                        {/* Monitor Selection */}
+                        <div className="site-details-navigation__select">
+                            <ThemedText size="sm" variant="secondary">
+                                Monitor:
+                            </ThemedText>
+                            <ThemedSelect
+                                onChange={handleMonitorIdChange}
+                                value={selectedMonitorId}
+                            >
+                                {monitorOptions.map(({ id, label }) => (
+                                    <option key={id} value={id}>
+                                        {label}
+                                    </option>
+                                ))}
+                            </ThemedSelect>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ThemedBox>
-    );
-};
+            </ThemedBox>
+        );
+    });
