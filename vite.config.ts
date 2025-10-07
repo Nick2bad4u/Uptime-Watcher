@@ -25,9 +25,9 @@ import devtoolsJson from "vite-plugin-devtools-json";
 import electron from "vite-plugin-electron";
 import packageVersion from "vite-plugin-package-version";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 
-import { createPlaywrightCoveragePlugin } from "./playwright/utils/createPlaywrightCoveragePlugin";
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
 const dirname = import.meta.dirname;
@@ -92,34 +92,12 @@ const getWasmSourcePath = (): string => {
  * Vite configuration for Uptime Watcher Electron app.
  */
 
-const createViteConfig = (async ({
-    mode,
-}: Parameters<UserConfigFnObject>[0]) => {
+export default defineConfig(({ mode }) => {
     // Prefer Vite's provided mode over raw NODE_ENV for consistency.
     const codecovToken = getEnvironmentVariable("CODECOV_TOKEN");
     const isTestMode = mode === "test";
     const isDev = mode === "development";
-    const isPlaywrightCoverage = Boolean(
-        getEnvironmentVariable("PLAYWRIGHT_COVERAGE")
-    );
     const wasmSourcePath = getWasmSourcePath();
-
-    const instrumentationPlugin = await createPlaywrightCoveragePlugin({
-        enabled: isPlaywrightCoverage,
-        exclude: [
-            ...defaultExclude,
-            "src/test/**",
-            "playwright/**",
-            "**/*.d.ts",
-        ],
-        include: [
-            "src/**/*.ts",
-            "src/**/*.tsx",
-            "electron/**/*.ts",
-            "shared/**/*.ts",
-        ],
-        projectRoot: dirname,
-    });
 
     return {
         appType: "spa", // Required for Electron renderer process (SPA mode ensures correct routing and asset loading)
@@ -218,6 +196,7 @@ const createViteConfig = (async ({
                   ],
         },
         plugins: [
+            tsconfigPaths(),
             // CSS Modules patch to fix Vite's CSS Modules handling
             patchCssModules({
                 generateSourceTypes: true, // Generate .d.ts files for TypeScript support
@@ -345,7 +324,6 @@ const createViteConfig = (async ({
                 // Use automatic JSX runtime (default, but explicit for clarity)
                 jsxRuntime: "automatic",
             }),
-            ...(instrumentationPlugin ? [instrumentationPlugin] : []),
             // // TypeScript checking in development (ESLint disabled due to flat config compatibility)
             // checker({
             //     typescript: {
@@ -858,6 +836,7 @@ const createViteConfig = (async ({
                 "vitest.electron.config.ts",
                 "vitest.shared.config.ts",
                 "vitest.storybook.config.ts",
+                "vitest.vite.playwright-coverage.config",
             ],
             // Improve test output
             reporters: [
@@ -899,10 +878,4 @@ const createViteConfig = (async ({
             },
         },
     };
-}) as unknown as UserConfigFnObject;
-
-const viteConfig: UserConfigFnObject = defineConfig(
-    createViteConfig
-) as unknown as UserConfigFnObject;
-
-export default viteConfig;
+}) satisfies UserConfigFnObject as UserConfigFnObject;

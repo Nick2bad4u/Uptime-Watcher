@@ -230,7 +230,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
     });
 
     describe("typed channel utility", () => {
-        it("enforces parameter tuples at compile time", () => {
+        it("enforces parameter tuples at compile time", async () => {
             const invoke = createTypedInvoker("remove-monitor");
 
             const args: IpcInvokeChannelParams<"remove-monitor"> = [
@@ -238,7 +238,14 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 "monitor-1",
             ];
 
-            void invoke(...args);
+            vi.mocked(ipcRenderer.invoke)
+                .mockResolvedValueOnce(createHandshakeSuccess("remove-monitor"))
+                .mockResolvedValueOnce({
+                    data: true,
+                    success: true,
+                });
+
+            await expect(invoke(...args)).resolves.toBeTruthy();
             expect(typeof invoke).toBe("function");
         });
 

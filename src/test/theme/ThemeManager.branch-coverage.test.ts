@@ -122,10 +122,20 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: mockRemoveEventListener,
             };
 
-            // Mock window.matchMedia
-            Object.defineProperty(globalThis, "matchMedia", {
+            const originalWindowMatchMedia = window.matchMedia;
+            const originalGlobalMatchMedia = globalThis.matchMedia;
+
+            const matchMediaStub = vi.fn(() => mockMediaQuery);
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
                 writable: true,
-                value: vi.fn(() => mockMediaQuery),
+                value: matchMediaStub,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: matchMediaStub,
             });
 
             // Setup the theme change listener
@@ -151,6 +161,17 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 "change",
                 handler
             );
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalWindowMatchMedia,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalGlobalMatchMedia,
+            });
         });
 
         it("should handle theme change from light to dark", async ({
@@ -175,9 +196,19 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: vi.fn(),
             };
 
-            Object.defineProperty(globalThis, "matchMedia", {
+            const originalWindowMatchMedia = window.matchMedia;
+            const originalGlobalMatchMedia = globalThis.matchMedia;
+            const matchMediaStub = vi.fn(() => mockMediaQuery);
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
                 writable: true,
-                value: vi.fn(() => mockMediaQuery),
+                value: matchMediaStub,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: matchMediaStub,
             });
 
             themeManager.onSystemThemeChange(mockCallback);
@@ -192,6 +223,17 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // Simulate theme change to light
             handler({ matches: false } as MediaQueryListEvent);
             expect(mockCallback).toHaveBeenCalledWith(false);
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalWindowMatchMedia,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalGlobalMatchMedia,
+            });
         });
     });
 
@@ -355,9 +397,19 @@ describe("ThemeManager - Branch Coverage Completion", () => {
                 removeEventListener: mockRemoveEventListener,
             };
 
-            Object.defineProperty(globalThis, "matchMedia", {
+            const originalWindowMatchMedia = window.matchMedia;
+            const originalGlobalMatchMedia = globalThis.matchMedia;
+            const matchMediaStub = vi.fn(() => mockMediaQuery);
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
                 writable: true,
-                value: vi.fn(() => mockMediaQuery),
+                value: matchMediaStub,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: matchMediaStub,
             });
 
             const cleanup = themeManager.onSystemThemeChange(() => {});
@@ -365,6 +417,17 @@ describe("ThemeManager - Branch Coverage Completion", () => {
             // Test that cleanup function actually calls removeEventListener
             cleanup();
             expect(mockRemoveEventListener).toHaveBeenCalled();
+
+            Object.defineProperty(window, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalWindowMatchMedia,
+            });
+            Object.defineProperty(globalThis, "matchMedia", {
+                configurable: true,
+                writable: true,
+                value: originalGlobalMatchMedia,
+            });
         });
     });
 });

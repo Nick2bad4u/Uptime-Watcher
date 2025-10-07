@@ -27,6 +27,10 @@
  */
 
 const isProduction = process.env.NODE_ENV === "production";
+const enableDuplicateSelectorCombine =
+    process.env["ENABLE_POSTCSS_DUPLICATE_COMBINE"] === "true";
+const enableMediaQuerySort =
+    process.env["ENABLE_POSTCSS_SORT_MEDIA_QUERIES"] === "true";
 
 export default {
     /**
@@ -129,16 +133,25 @@ export default {
         // This ordering prevents unexpected side effects and ensures correct processing.
         // Optimization plugins for production builds:
         ...(isProduction && {
-            // Combine duplicate selectors for smaller bundles
-            "postcss-combine-duplicated-selectors": {
-                removeDuplicatedProperties: true,
-                removeDuplicatedValues: true,
-            },
+            ...(enableDuplicateSelectorCombine && {
+                // Combine duplicate selectors for smaller bundles
+                "postcss-combine-duplicated-selectors": {
+                    removeDuplicatedProperties: true,
+                    removeDuplicatedValues: true,
+                },
+            }),
 
-            // Sort and optimize media queries
-            "postcss-sort-media-queries": {
-                sort: "mobile-first", // Mobile-first sorting
-            },
+            ...(enableMediaQuerySort && {
+                // Sort and optimize media queries
+                // NOTE: Disabled by default because the plugin currently
+                // mis-handles nested at-rules produced by CSS nesting and
+                // Tailwind, stripping the selector and triggering esbuild
+                // syntax warnings during minification. Enable only when the
+                // upstream bug is resolved.
+                "postcss-sort-media-queries": {
+                    sort: "mobile-first", // Mobile-first sorting
+                },
+            }),
 
             // Advanced CSS minification and optimization (should be last)
             cssnano: {

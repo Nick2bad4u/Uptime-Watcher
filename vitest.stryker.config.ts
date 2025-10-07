@@ -8,6 +8,7 @@ import type { UserConfig } from "vite";
 
 import path from "node:path";
 import { normalizePath } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 const dirname = import.meta.dirname;
@@ -22,8 +23,12 @@ const config: UserConfig = defineConfig({
         namedExports: true,
         stringify: true,
     },
+    plugins: [tsconfigPaths()],
     resolve: {
         alias: {
+            "@app": normalizePath(path.resolve(dirname, "src")),
+            "@assets": normalizePath(path.resolve(dirname, "assets")),
+            "@electron": normalizePath(path.resolve(dirname, "electron")),
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
     },

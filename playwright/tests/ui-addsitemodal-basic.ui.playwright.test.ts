@@ -15,9 +15,9 @@ import {
     removeAllSites,
     submitAddSiteForm,
     waitForAppInitialization,
+    WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
-
-const TEST_SITE_URL = "https://example.com";
+import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
 
 test.describe(
     "add site modal - modern ui",
@@ -56,7 +56,9 @@ test.describe(
             async () => {
                 await openAddSiteModal(page);
 
-                const dialog = page.getByRole("dialog");
+                const dialog = page.getByRole("dialog").filter({
+                    has: page.getByTestId("add-site-form"),
+                });
                 await expect(dialog).toBeVisible();
                 await expect(dialog).toHaveClass(/modal-shell/);
 
@@ -67,7 +69,7 @@ test.describe(
                     "modal-shell--accent-success"
                 );
 
-                const submitButton = page.getByRole("button", {
+                const submitButton = dialog.getByRole("button", {
                     name: /Add Site/i,
                 });
                 await submitButton.click();
@@ -77,7 +79,9 @@ test.describe(
                 );
                 await expect(validationMessage).toBeVisible();
 
-                await page.getByRole("button", { name: "Close modal" }).click();
+                await dialog
+                    .getByRole("button", { name: "Close modal" })
+                    .click();
                 await expect(dialog).toBeHidden();
             }
         );
@@ -88,25 +92,61 @@ test.describe(
                 tag: ["@workflow", "@happy-path"],
             },
             async () => {
-                const uniqueName = `Playwright Demo Site ${Date.now()}`;
+                const uniqueName = generateSiteName("Playwright Demo Site");
 
                 await openAddSiteModal(page);
                 await fillAddSiteForm(page, {
                     name: uniqueName,
-                    url: TEST_SITE_URL,
+                    url: DEFAULT_TEST_SITE_URL,
                     monitorType: "http",
                 });
                 await submitAddSiteForm(page);
 
-                const siteNameLocator = page.getByText(uniqueName, {
-                    exact: true,
+                const siteCardLocator = page
+                    .getByTestId("site-card")
+                    .filter({ hasText: uniqueName });
+                await expect(siteCardLocator).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
                 });
-                await expect(siteNameLocator).toBeVisible({ timeout: 15000 });
 
                 await page.screenshot({
                     path: "playwright/test-results/add-site-modal-success.png",
                     fullPage: true,
                 });
+            }
+        );
+
+        test(
+            "should present comprehensive monitor type catalog",
+            {
+                tag: ["@options", "@modal"],
+            },
+            async () => {
+                await openAddSiteModal(page);
+
+                const monitorTypeSelect = page.getByLabel(/Monitor Type/i);
+                await expect(monitorTypeSelect).toBeVisible();
+
+                const monitorTypeValues = await monitorTypeSelect.evaluate(
+                    (element) =>
+                        Array.from(
+                            element.querySelectorAll("option"),
+                            (option) => ({
+                                label: option.label,
+                                value: option.value,
+                            })
+                        )
+                );
+
+                expect(monitorTypeValues.length).toBeGreaterThanOrEqual(5);
+                expect(
+                    monitorTypeValues.some((option) => option.value === "http")
+                ).toBe(true);
+                expect(
+                    monitorTypeValues.every(
+                        (option) => option.label.trim().length > 0
+                    )
+                ).toBe(true);
             }
         );
     }

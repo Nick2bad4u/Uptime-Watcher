@@ -10,6 +10,7 @@ import react from "@vitejs/plugin-react";
 import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
+import tsconfigPaths from "vite-tsconfig-paths";
 import {
     defineConfig,
     type UserConfigExport,
@@ -142,6 +143,7 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
             ],
         },
         plugins: [
+            tsconfigPaths(),
             react(reactPluginOptions) as PluginOption,
             storybookTest(storybookPluginOptions),
         ],
@@ -149,6 +151,7 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
         resolve: {
             alias: {
                 "@app": path.resolve(projectRoot, "src"),
+                "@assets": path.resolve(projectRoot, "assets"),
                 "@electron": path.resolve(projectRoot, "electron"),
                 "@shared": path.resolve(projectRoot, "shared"),
             },

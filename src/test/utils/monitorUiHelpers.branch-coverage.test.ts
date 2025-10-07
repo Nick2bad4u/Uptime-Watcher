@@ -1,27 +1,66 @@
 /**
- * Comprehensive branch coverage tests for monitorUiHelpers.ts Specifically
- * targeting the ternary operator in getTypesWithFeature function to ensure both
- * responseTime and advancedAnalytics branches are covered.
+ * Comprehensive branch coverage tests for monitorUiHelpers.ts. Focuses on
+ * exercising the ternary logic in getTypesWithFeature so both the responseTime
+ * and advancedAnalytics branches are covered under varied inputs.
  */
 
-import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock the actual function to avoid error handling wrapper interference
-vi.mock("../../utils/monitorTypeHelper", () => ({
-    getAvailableMonitorTypes: vi.fn(),
-}));
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+
+/**
+ * Creates a minimal {@link MonitorTypeConfig} suitable for branch-coverage
+ * scenarios. Ensures required properties such as `description` and `version`
+ * are always populated while allowing targeted overrides per test.
+ */
+const createMonitorConfig = (
+    type: MonitorTypeConfig["type"],
+    overrides: Partial<Omit<MonitorTypeConfig, "type">> = {}
+): MonitorTypeConfig => {
+    const baseConfig: MonitorTypeConfig = {
+        description: overrides.description ?? `${type.toUpperCase()} monitor`,
+        displayName: overrides.displayName ?? type.toUpperCase(),
+        fields: overrides.fields ?? ([] as MonitorTypeConfig["fields"]),
+        type,
+        version: overrides.version ?? "1.0.0",
+    };
+
+    if (overrides.uiConfig) {
+        baseConfig.uiConfig = overrides.uiConfig;
+    }
+
+    return baseConfig;
+};
+
+interface MonitorMockContext {
+    getTypesWithFeature: (
+        feature: "responseTime" | "advancedAnalytics"
+    ) => Promise<string[]>;
+    spy: ReturnType<typeof vi.spyOn>;
+}
+
+async function setupMonitorTypesMock(
+    configs: MonitorTypeConfig[]
+): Promise<MonitorMockContext> {
+    const monitorModule = await import("../../utils/monitorTypeHelper");
+    const spy = vi
+        .spyOn(monitorModule, "getAvailableMonitorTypes")
+        .mockResolvedValue(configs);
+
+    const { getTypesWithFeature } = await import(
+        "../../utils/monitorUiHelpers"
+    );
+
+    return {
+        getTypesWithFeature,
+        spy,
+    };
+}
 
 describe("monitorUiHelpers - Branch Coverage", () => {
-    let getAvailableMonitorTypes: Mock;
-
-    beforeEach(async () => {
+    beforeEach(() => {
+        vi.resetModules();
         vi.clearAllMocks();
-
-        // Get the mock after clearing
-        const monitorModule = vi.mocked(
-            await import("../../utils/monitorTypeHelper")
-        );
-        getAvailableMonitorTypes = monitorModule.getAvailableMonitorTypes;
     });
 
     describe("getTypesWithFeature - Ternary Branch Coverage", () => {
@@ -37,35 +76,30 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Import the module fresh to avoid cached mocks
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock data that will trigger the responseTime branch
-            getAvailableMonitorTypes.mockResolvedValue([
-                {
-                    type: "http",
+            const { getTypesWithFeature, spy } = await setupMonitorTypesMock([
+                createMonitorConfig("http", {
+                    description: "HTTP monitor",
+                    displayName: "HTTP",
                     uiConfig: {
-                        supportsResponseTime: true,
                         supportsAdvancedAnalytics: false,
+                        supportsResponseTime: true,
                     },
-                },
-                {
-                    type: "port",
+                }),
+                createMonitorConfig("port", {
+                    description: "Port monitor",
+                    displayName: "Port",
                     uiConfig: {
-                        supportsResponseTime: false,
                         supportsAdvancedAnalytics: true,
+                        supportsResponseTime: false,
                     },
-                },
+                }),
             ]);
 
             const result = await getTypesWithFeature("responseTime");
 
-            // Verify that responseTime condition was evaluated
-            expect(getAvailableMonitorTypes).toHaveBeenCalled();
-            // Result depends on error handling wrapper, but we've exercised the branch
+            expect(spy).toHaveBeenCalledTimes(1);
             expect(Array.isArray(result)).toBeTruthy();
+            expect(result).toContain("http");
         });
 
         it("should hit advancedAnalytics branch in ternary operator", async ({
@@ -80,35 +114,30 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Import the module fresh to avoid cached mocks
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Mock data that will trigger the advancedAnalytics branch
-            getAvailableMonitorTypes.mockResolvedValue([
-                {
-                    type: "http",
+            const { getTypesWithFeature, spy } = await setupMonitorTypesMock([
+                createMonitorConfig("http", {
+                    description: "HTTP monitor",
+                    displayName: "HTTP",
                     uiConfig: {
-                        supportsResponseTime: false,
                         supportsAdvancedAnalytics: true,
+                        supportsResponseTime: false,
                     },
-                },
-                {
-                    type: "tcp",
+                }),
+                createMonitorConfig("ping", {
+                    description: "Ping monitor",
+                    displayName: "Ping",
                     uiConfig: {
-                        supportsResponseTime: true,
                         supportsAdvancedAnalytics: false,
+                        supportsResponseTime: true,
                     },
-                },
+                }),
             ]);
 
             const result = await getTypesWithFeature("advancedAnalytics");
 
-            // Verify that advancedAnalytics condition was evaluated
-            expect(getAvailableMonitorTypes).toHaveBeenCalled();
-            // Result depends on error handling wrapper, but we've exercised the branch
+            expect(spy).toHaveBeenCalledTimes(1);
             expect(Array.isArray(result)).toBeTruthy();
+            expect(result).toContain("http");
         });
 
         it("should handle both branches with mixed support", async ({
@@ -123,72 +152,58 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Test data with mixed capabilities
-            getAvailableMonitorTypes.mockResolvedValue([
-                {
-                    type: "http",
+            const baseConfigs: MonitorTypeConfig[] = [
+                createMonitorConfig("http", {
+                    description: "HTTP monitor",
+                    displayName: "HTTP",
                     uiConfig: {
-                        supportsResponseTime: true,
                         supportsAdvancedAnalytics: true,
-                    },
-                },
-                {
-                    type: "port",
-                    uiConfig: {
-                        supportsResponseTime: false,
-                        supportsAdvancedAnalytics: false,
-                    },
-                },
-                {
-                    type: "tcp",
-                    uiConfig: {
                         supportsResponseTime: true,
-                        supportsAdvancedAnalytics: false,
                     },
-                },
-            ]);
+                }),
+                createMonitorConfig("port", {
+                    description: "Port monitor",
+                    displayName: "Port",
+                    uiConfig: {
+                        supportsAdvancedAnalytics: false,
+                        supportsResponseTime: false,
+                    },
+                }),
+                createMonitorConfig("ping", {
+                    description: "Ping monitor",
+                    displayName: "Ping",
+                    uiConfig: {
+                        supportsAdvancedAnalytics: false,
+                        supportsResponseTime: true,
+                    },
+                }),
+            ];
 
-            // Test responseTime branch
+            const { getTypesWithFeature, spy } =
+                await setupMonitorTypesMock(baseConfigs);
+
             const responseTimeResult =
                 await getTypesWithFeature("responseTime");
             expect(Array.isArray(responseTimeResult)).toBeTruthy();
+            expect(responseTimeResult).toEqual(["http", "ping"]);
 
-            // Reset mock for second test
-            getAvailableMonitorTypes.mockResolvedValue([
-                {
-                    type: "http",
+            spy.mockResolvedValue([
+                baseConfigs[0],
+                baseConfigs[1],
+                createMonitorConfig("ssl", {
+                    description: "SSL monitor",
+                    displayName: "SSL",
                     uiConfig: {
-                        supportsResponseTime: true,
                         supportsAdvancedAnalytics: true,
-                    },
-                },
-                {
-                    type: "port",
-                    uiConfig: {
                         supportsResponseTime: false,
-                        supportsAdvancedAnalytics: false,
                     },
-                },
-                {
-                    type: "ping",
-                    uiConfig: {
-                        supportsResponseTime: false,
-                        supportsAdvancedAnalytics: true,
-                    },
-                },
+                }),
             ]);
 
-            // Test advancedAnalytics branch
             const analyticsResult =
                 await getTypesWithFeature("advancedAnalytics");
             expect(Array.isArray(analyticsResult)).toBeTruthy();
-
-            // Verify both calls were made
-            expect(getAvailableMonitorTypes).toHaveBeenCalledTimes(2);
+            expect(analyticsResult).toEqual(["http", "ssl"]);
         });
 
         it("should handle undefined uiConfig values in both branches", async ({
@@ -203,33 +218,33 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { getTypesWithFeature } = await import(
-                "../../utils/monitorUiHelpers"
-            );
-
-            // Test with undefined values to ensure branch coverage
-            getAvailableMonitorTypes.mockResolvedValue([
-                {
-                    type: "http",
-                    uiConfig: {
-                        supportsResponseTime: undefined,
-                        supportsAdvancedAnalytics: undefined,
-                    },
-                },
-                {
-                    type: "port",
+            const { getTypesWithFeature, spy } = await setupMonitorTypesMock([
+                createMonitorConfig("http", {
+                    description: "HTTP monitor",
+                    displayName: "HTTP",
                     uiConfig: {},
-                },
-                {
-                    type: "tcp", // No uiConfig at all
-                },
+                }),
+                createMonitorConfig("port", {
+                    description: "Port monitor",
+                    displayName: "Port",
+                    uiConfig: {},
+                }),
+                createMonitorConfig("ping", {
+                    description: "Ping monitor",
+                    displayName: "Ping",
+                }),
             ]);
 
-            // Test both branches with undefined conditions
-            await getTypesWithFeature("responseTime");
-            await getTypesWithFeature("advancedAnalytics");
+            const responseTimeResult =
+                await getTypesWithFeature("responseTime");
+            const analyticsResult =
+                await getTypesWithFeature("advancedAnalytics");
 
-            expect(getAvailableMonitorTypes).toHaveBeenCalledTimes(2);
+            expect(spy).toHaveBeenCalledTimes(2);
+            expect(Array.isArray(responseTimeResult)).toBeTruthy();
+            expect(Array.isArray(analyticsResult)).toBeTruthy();
+            expect(responseTimeResult).toHaveLength(0);
+            expect(analyticsResult).toHaveLength(0);
         });
     });
 });

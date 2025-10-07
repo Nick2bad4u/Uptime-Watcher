@@ -19,8 +19,12 @@ async function globalSetup(_config: FullConfig): Promise<void> {
 
     // Ensure the Electron app is built
     try {
-        console.log("📦 Building Electron app...");
-        execSync("npm run build:electron-main", {
+        const buildCommand = process.env["PLAYWRIGHT_COVERAGE"]
+            ? "npm run build:playwright-coverage"
+            : "npm run build:electron-main";
+
+        console.log(`📦 Building Electron app via: ${buildCommand}`);
+        execSync(buildCommand, {
             stdio: "inherit",
             cwd: path.resolve(__dirname, "../.."),
             env: { ...process.env, HEADLESS: "true" },

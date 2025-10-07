@@ -13,6 +13,7 @@ import {
     createSiteViaModal,
     removeAllSites,
     waitForAppInitialization,
+    WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
 test.describe(
@@ -117,6 +118,60 @@ test.describe(
                     );
                 });
                 expect(compactClasses).toContain("site-grid--compact");
+            }
+        );
+
+        test(
+            "should toggle large card presentation between grid and stacked",
+            {
+                tag: ["@workflow", "@presentation"],
+            },
+            async () => {
+                await createSiteViaModal(page, {
+                    name: `Dashboard Presentation ${Date.now()}`,
+                });
+
+                await expect(page.getByTestId("site-card").first()).toBeVisible(
+                    {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    }
+                );
+
+                const largeButton = page.getByRole("button", { name: "Large" });
+                await largeButton.click();
+
+                const gridButton = page.getByRole("button", { name: "Grid" });
+                await expect(gridButton).toHaveAttribute(
+                    "aria-pressed",
+                    /true|false/
+                );
+
+                await gridButton.click();
+                await expect(gridButton).toHaveAttribute(
+                    "aria-pressed",
+                    "true"
+                );
+                await page.waitForFunction(
+                    () =>
+                        document
+                            .querySelector(".site-grid")
+                            ?.classList.contains("site-grid--balanced") ?? false
+                );
+
+                const stackedButton = page.getByRole("button", {
+                    name: "Stacked",
+                });
+                await stackedButton.click();
+                await expect(stackedButton).toHaveAttribute(
+                    "aria-pressed",
+                    "true"
+                );
+                await page.waitForFunction(
+                    () =>
+                        document
+                            .querySelector(".site-grid")
+                            ?.classList.contains("site-grid--stacked") ?? false
+                );
             }
         );
     }

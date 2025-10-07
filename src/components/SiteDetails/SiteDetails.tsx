@@ -111,6 +111,8 @@ export const SiteDetails = ({
     const collapseObserverRef = useRef<IntersectionObserver | null>(null);
     const expandObserverRef = useRef<IntersectionObserver | null>(null);
     const manualCollapseRef = useRef(false);
+    const scrollFallbackHandlerRef = useRef<EventListener | null>(null);
+    const scrollFallbackContainerRef = useRef<HTMLElement | null>(null);
 
     // Add global escape key handler
     const modalConfigs = useMemo(
@@ -205,12 +207,68 @@ export const SiteDetails = ({
 
             collapseObserverRef.current = collapseObserver;
             expandObserverRef.current = expandObserver;
+            scrollFallbackContainerRef.current = contentElement;
+
+            const handleScroll: EventListener = (_event) => {
+                const { scrollTop } = contentElement;
+                const shouldCollapse =
+                    scrollTop > HEADER_COLLAPSE_SCROLL_THRESHOLD;
+
+                if (shouldCollapse) {
+                    setIsHeaderCollapsed((previous) => {
+                        if (previous) {
+                            return previous;
+                        }
+
+                        manualCollapseRef.current = false;
+                        return true;
+                    });
+                    return;
+                }
+
+                if (manualCollapseRef.current) {
+                    return;
+                }
+
+                setIsHeaderCollapsed((previous) => {
+                    if (!previous) {
+                        return previous;
+                    }
+
+                    manualCollapseRef.current = false;
+                    return false;
+                });
+            };
+
+            scrollFallbackHandlerRef.current = handleScroll;
+            contentElement.addEventListener("scroll", handleScroll, {
+                passive: true,
+            });
+
+            handleScroll(new Event("scroll"));
         }, []),
         useCallback(function cleanupScrollObservers(): void {
             collapseObserverRef.current?.disconnect();
             expandObserverRef.current?.disconnect();
             collapseObserverRef.current = null;
             expandObserverRef.current = null;
+
+            const handler = scrollFallbackHandlerRef.current;
+            const container = scrollFallbackContainerRef.current;
+
+            if (handler && container) {
+                container.removeEventListener("scroll", handler);
+            }
+
+            if (handler) {
+                contentElementRef.current?.removeEventListener(
+                    "scroll",
+                    handler
+                );
+            }
+
+            scrollFallbackHandlerRef.current = null;
+            scrollFallbackContainerRef.current = null;
         }, [])
     );
 

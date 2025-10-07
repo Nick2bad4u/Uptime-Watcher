@@ -7791,6 +7791,7 @@ export default [
                     allowDefaultProject: [
                         "*.js",
                         "playwright.config.ts",
+                        "vite.playwright-coverage.config.ts",
                         "vitest.stryker.config.ts",
                         "config/tools/knip.config.ts",
                         "config/tools/createPlaywrightCoveragePlugin.ts",

@@ -58,6 +58,7 @@
         "**/vitest.stryker.config.ts",
         "../../vitest.shared.config.ts",
         "../../vitest.stryker.config.ts",
+        "../../vite.playwright-coverage.config.ts",
         "docs/docusaurus/stylelint.config.mjs",
         "**/playwright.config.ts",
         "../../playwright/utils/createPlaywrightCoveragePlugin.ts"

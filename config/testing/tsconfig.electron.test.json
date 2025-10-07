@@ -12,6 +12,9 @@
             "@app/*": [
                 "src/*"
             ],
+            "@assets/*": [
+                "assets/*"
+            ],
             "@electron/*": [
                 "electron/*"
             ],

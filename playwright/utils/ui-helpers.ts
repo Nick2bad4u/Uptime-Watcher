@@ -52,18 +52,48 @@ export const FORM_SELECTORS = {
 } as const;
 
 /**
+ * Declarative description of a dynamic monitor-specific field that must be
+ * populated during automated add-site workflows.
+ */
+export interface DynamicFieldInput {
+    /** Accessible label associated with the underlying form control. */
+    readonly label: string;
+    /** Value that should be applied to the control. */
+    readonly value: string;
+    /**
+     * Optional hint describing the control type. The helper treats fields as
+     * text inputs by default and switches to select handling when this value is
+     * set to "select".
+     */
+    readonly inputType?: "text" | "select";
+}
+
+/**
  * Options for creating a site through the Add Site modal during Playwright
  * tests.
+ *
+ * @remarks
+ * Dynamic monitor configurations can be supplied through
+ * {@link CreateSiteOptions.dynamicFields}, enabling the helper to populate
+ * monitor-specific inputs such as host names or ports when non-HTTP monitor
+ * types are exercised.
  */
 export interface CreateSiteOptions {
-    /** Optional monitor type identifier supported by the application (defaults
-to HTTP). */
+    /**
+     * Optional monitor type identifier supported by the application (defaults
+     * to HTTP).
+     */
     readonly monitorType?: string;
     /** Optional site name; a unique name is generated when omitted. */
     readonly name?: string;
-    /** Optional site URL to associate with the new monitor (defaults to
-https://example.com). */
+    /**
+     * ```
+     * /** Optional site URL to associate with the new monitor.
+     * ```
+     */
     readonly url?: string;
+    /** Optional collection of monitor-specific dynamic fields to populate. */
+    readonly dynamicFields?: readonly DynamicFieldInput[];
 }
 
 /**
@@ -74,6 +104,10 @@ export interface CreatedSiteResult {
     readonly identifier?: string;
     /** Resolved site name used during creation. */
     readonly name: string;
+}
+
+function escapeForRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 /**
@@ -105,17 +139,11 @@ export async function waitForAppInitialization(
         timeout: WAIT_TIMEOUTS.SHORT,
     });
 
-    // Try to wait for dashboard container, but don't fail if it's not there immediately
-    try {
-        await expect(page.getByTestId("dashboard-container")).toBeVisible({
-            timeout: WAIT_TIMEOUTS.MEDIUM,
-        });
-    } catch {
-        // Dashboard might still be loading, continue anyway
-        console.log(
-            "Dashboard container not immediately visible, continuing..."
-        );
-    }
+    await expect(
+        page
+            .getByRole("banner")
+            .getByRole("button", { name: /Add (new )?site/i })
+    ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 }
 
 /**
@@ -164,9 +192,9 @@ export async function waitForDashboard(
     page: Page,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    await expect(page.getByTestId("dashboard-container")).toBeVisible({
-        timeout,
-    });
+    await expect(
+        page.getByRole("region", { name: /Monitoring overview/i })
+    ).toBeVisible({ timeout });
 }
 
 /**
@@ -181,27 +209,47 @@ export async function openAddSiteModal(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
     // Find and click the add site button
-    const addSiteButton = page.getByRole("button", { name: "Add new site" });
+    const addSiteButton = page
+        .getByRole("banner")
+        .getByRole("button", { name: /Add (new )?site/i });
     await expect(addSiteButton).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
     await addSiteButton.click();
 
     // Wait for modal overlay to appear
-    await expect(page.getByRole("dialog")).toBeVisible({
+    const addSiteFormContainer = page.getByTestId("add-site-form");
+    await expect(addSiteFormContainer).toBeVisible({
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
-    // Wait for modal animation to complete
+    // Wait for modal animation to complete using opacity threshold to avoid string precision issues
     await page.waitForFunction(
         () => {
-            const modal = document.querySelector('[role="dialog"]');
-            return modal && getComputedStyle(modal).opacity === "1";
+            const formContainer = document.querySelector(
+                '[data-testid="add-site-form"]'
+            );
+            if (!formContainer) {
+                return false;
+            }
+            const modal = formContainer.closest("dialog");
+            if (!modal) {
+                return false;
+            }
+            const opacityValue = Number.parseFloat(
+                getComputedStyle(modal).opacity ?? "0"
+            );
+            return Number.isFinite(opacityValue) && opacityValue >= 0.99;
         },
-        { timeout: WAIT_TIMEOUTS.MODAL_ANIMATION }
+        { timeout: WAIT_TIMEOUTS.MEDIUM }
     );
 }
 
 /**
  * Creates a fully configured site through the Add Site modal workflow.
+ *
+ * @remarks
+ * Automatically selects the correct monitor type, applies default URLs for
+ * HTTP-based monitors, and populates any supplied dynamic monitor fields (such
+ * as host or port inputs) before submitting the form.
  *
  * @param page - Playwright page instance representing the renderer.
  * @param options - Optional overrides for the generated monitor configuration.
@@ -216,20 +264,57 @@ export async function createSiteViaModal(
     const siteName =
         options.name ??
         `Playwright Site ${Date.now().toString(36)}-${Math.floor(Math.random() * 10_000)}`;
-    const siteUrl = options.url ?? "https://example.com";
     const monitorType = options.monitorType ?? "http";
+    const siteUrl =
+        options.url ??
+        (monitorType.startsWith("http") ? "https://example.com" : undefined);
 
     await openAddSiteModal(page);
-    await fillAddSiteForm(page, {
+
+    const formData: Parameters<typeof fillAddSiteForm>[1] = {
         name: siteName,
-        url: siteUrl,
         monitorType,
-    });
+        ...(siteUrl ? { url: siteUrl } : {}),
+        ...(options.dynamicFields
+            ? { dynamicFields: options.dynamicFields }
+            : {}),
+    };
+
+    await fillAddSiteForm(page, formData);
     await submitAddSiteForm(page);
 
-    await page
-        .getByText(siteName, { exact: true })
-        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+    const sidebarEntry = page
+        .getByRole("navigation", { name: "Monitored sites" })
+        .getByRole("button", {
+            name: new RegExp(`^${escapeForRegex(siteName)}`),
+        })
+        .first();
+
+    await sidebarEntry.waitFor({
+        state: "visible",
+        timeout: WAIT_TIMEOUTS.LONG,
+    });
+
+    const siteCard = page
+        .getByTestId("site-card")
+        .filter({ hasText: siteName })
+        .first();
+
+    const cardVisible = await siteCard
+        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => false);
+
+    if (!cardVisible) {
+        const tableRow = page
+            .getByRole("row", {
+                name: new RegExp(`^${escapeForRegex(siteName)}`),
+            })
+            .first();
+        await tableRow.waitFor({
+            state: "visible",
+            timeout: WAIT_TIMEOUTS.LONG,
+        });
+    }
 
     const siteIdentifier = await page.evaluate<
         string | null,
@@ -326,9 +411,7 @@ export async function getAddSiteFormElements(page: Page): Promise<{
     const siteUrlInput = page
         .getByLabel(/URL/i)
         .or(page.getByRole("textbox", { name: /url/i }));
-    const monitorTypeSelect = page
-        .getByLabel(/Monitor Type/i)
-        .or(page.getByRole("combobox"));
+    const monitorTypeSelect = page.getByLabel(/Monitor Type/i);
     const submitButton = page.getByRole("button", {
         name: /Add Site|Create|Submit/i,
     });
@@ -344,15 +427,22 @@ export async function getAddSiteFormElements(page: Page): Promise<{
 /**
  * Fills out the Add Site form with provided data.
  *
- * @param page - The Playwright page instance
- * @param siteData - Data to fill in the form
+ * @remarks
+ * Supports monitor-type switching to surface dynamic fields before populating
+ * any monitor-specific inputs. Optional URL and dynamic field values are only
+ * applied when provided, allowing reuse across monitor configurations that do
+ * not surface those controls (for example ping or port monitors).
+ *
+ * @param page - The Playwright page instance.
+ * @param siteData - Data to fill in the form including optional dynamic fields.
  */
 export async function fillAddSiteForm(
     page: Page,
     siteData: {
         name: string;
-        url: string;
+        url?: string;
         monitorType?: string;
+        dynamicFields?: readonly DynamicFieldInput[];
     }
 ): Promise<void> {
     const formElements = await getAddSiteFormElements(page);
@@ -360,10 +450,8 @@ export async function fillAddSiteForm(
     // Fill site name
     await formElements.siteNameInput.fill(siteData.name);
 
-    // Fill site URL
-    await formElements.siteUrlInput.fill(siteData.url);
-
-    // Select monitor type if provided
+    // Select monitor type if provided to ensure dynamic fields render before
+    // additional inputs are processed.
     if (siteData.monitorType) {
         const monitorTypeVisible =
             await formElements.monitorTypeSelect.isVisible();
@@ -371,6 +459,29 @@ export async function fillAddSiteForm(
             await formElements.monitorTypeSelect.selectOption(
                 siteData.monitorType
             );
+        }
+    }
+
+    if (siteData.url) {
+        const urlInputVisible = await formElements.siteUrlInput
+            .isVisible()
+            .catch(() => false);
+        if (urlInputVisible) {
+            await formElements.siteUrlInput.fill(siteData.url);
+        }
+    }
+
+    for (const field of siteData.dynamicFields ?? []) {
+        const fieldLocator = page.getByLabel(field.label, { exact: false });
+        await fieldLocator.waitFor({
+            state: "visible",
+            timeout: WAIT_TIMEOUTS.MEDIUM,
+        });
+
+        if (field.inputType === "select") {
+            await fieldLocator.selectOption(field.value);
+        } else {
+            await fieldLocator.fill(field.value);
         }
     }
 }
@@ -404,13 +515,61 @@ export async function openSiteDetails(
 ): Promise<void> {
     const siteCard = page
         .getByTestId("site-card")
-        .filter({ has: page.getByText(siteName, { exact: true }) });
+        .filter({ has: page.getByText(siteName, { exact: true }) })
+        .first();
 
-    await siteCard.waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
-    await siteCard.click();
+    let cardVisible = await siteCard
+        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => false);
+
+    if (!cardVisible) {
+        const largeLayoutButton = page.getByRole("button", { name: "Large" });
+        const canSwitchToCards = await largeLayoutButton
+            .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+            .catch(() => false);
+
+        if (canSwitchToCards) {
+            await largeLayoutButton.click();
+            cardVisible = await siteCard
+                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+                .catch(() => false);
+        }
+    }
+
+    if (cardVisible) {
+        await siteCard.click();
+    } else {
+        const navigationEntry = page
+            .getByRole("navigation", { name: "Monitored sites" })
+            .getByRole("button", {
+                name: new RegExp(`^${escapeForRegex(siteName)}`),
+            })
+            .first();
+
+        const expandSidebarButton = page
+            .getByRole("button", { name: "Expand sidebar" })
+            .first();
+
+        const sidebarCollapsed = await expandSidebarButton
+            .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
+            .catch(() => false);
+
+        if (sidebarCollapsed) {
+            await expandSidebarButton.click();
+        }
+
+        await navigationEntry.waitFor({
+            state: "visible",
+            timeout: WAIT_TIMEOUTS.LONG,
+        });
+        await navigationEntry.scrollIntoViewIfNeeded();
+        await navigationEntry.click();
+    }
 
     await page
-        .getByRole("dialog", { name: "Site details" })
+        .getByRole("dialog")
+        .filter({ has: page.getByText("Monitoring Status") })
+        .first()
         .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
 }
 
@@ -422,21 +581,36 @@ export async function openSiteDetails(
 export async function openSettingsModal(page: Page): Promise<void> {
     await waitForAppInitialization(page);
 
-    const settingsButton = page.getByRole("button", { name: "Open settings" });
+    const settingsButton = page
+        .getByRole("banner")
+        .getByRole("button", { name: "Open settings" });
     await settingsButton.click();
 
     // Wait for settings modal to appear
-    await page.getByRole("dialog").waitFor({
+    const settingsModal = page.getByTestId("settings-modal");
+    await settingsModal.waitFor({
         state: "visible",
         timeout: WAIT_TIMEOUTS.MEDIUM,
     });
 
     await page.waitForFunction(
         () => {
-            const modal = document.querySelector('[role="dialog"]');
-            return modal && getComputedStyle(modal).opacity === "1";
+            const settingsRoot = document.querySelector(
+                '[data-testid="settings-modal"]'
+            );
+            if (!settingsRoot) {
+                return false;
+            }
+            const modal = settingsRoot.closest("dialog") ?? settingsRoot;
+            if (!modal) {
+                return false;
+            }
+            const opacityValue = Number.parseFloat(
+                getComputedStyle(modal).opacity ?? "0"
+            );
+            return Number.isFinite(opacityValue) && opacityValue >= 0.99;
         },
-        { timeout: WAIT_TIMEOUTS.MODAL_ANIMATION }
+        { timeout: WAIT_TIMEOUTS.MEDIUM }
     );
 }
 

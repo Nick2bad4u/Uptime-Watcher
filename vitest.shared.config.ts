@@ -9,8 +9,8 @@
 
 import path from "node:path";
 import pc from "picocolors";
-import { normalizePath } from "vite";
-import { type UserConfig } from "vite";
+import { normalizePath, type UserConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 import {
     coverageConfigDefaults,
     defaultExclude,
@@ -32,6 +32,7 @@ const vitestConfig = defineConfig({
         namedExports: true,
         stringify: true,
     },
+    plugins: [tsconfigPaths()],
     resolve: {
         alias: {
             "@app": normalizePath(path.resolve(dirname, "src")),

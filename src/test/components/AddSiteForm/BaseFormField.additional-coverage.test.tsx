@@ -1,3 +1,4 @@
+/* @vitest-environment jsdom */
 /**
  * Additional test coverage for BaseFormField component.
  *
@@ -9,6 +10,7 @@
  * - Verifying proper ARIA attribute generation and FormField prop spreading
  */
 
+import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
