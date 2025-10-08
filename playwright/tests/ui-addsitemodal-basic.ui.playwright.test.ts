@@ -11,10 +11,12 @@ import {
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
     fillAddSiteForm,
+    getSiteCardLocator,
     openAddSiteModal,
     removeAllSites,
+    resetApplicationState,
+    waitForMonitorCount,
     submitAddSiteForm,
-    waitForAppInitialization,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -35,8 +37,7 @@ test.describe(
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -102,9 +103,9 @@ test.describe(
                 });
                 await submitAddSiteForm(page);
 
-                const siteCardLocator = page
-                    .getByTestId("site-card")
-                    .filter({ hasText: uniqueName });
+                await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
+
+                const siteCardLocator = getSiteCardLocator(page, uniqueName);
                 await expect(siteCardLocator).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });

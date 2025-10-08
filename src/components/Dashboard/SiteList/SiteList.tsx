@@ -114,7 +114,7 @@ export const SiteList = (): JSX.Element => {
     ]);
 
     return (
-        <div className="site-list">
+        <div className="site-list" data-testid="site-list">
             <div className="site-list__toolbar">
                 <div className="site-list__toolbar-title">
                     <ThemedText size="lg" weight="semibold">
@@ -128,8 +128,10 @@ export const SiteList = (): JSX.Element => {
                         </span>
                     </ThemedText>
                     <ThemedText size="xs" variant="tertiary">
-                        Tracking {sites.length} site
-                        {sites.length === 1 ? "" : "s"}
+                        <span data-testid="site-count-label">
+                            Tracking {sites.length} site
+                            {sites.length === 1 ? "" : "s"}
+                        </span>
                     </ThemedText>
                 </div>
                 <SiteListLayoutSelector

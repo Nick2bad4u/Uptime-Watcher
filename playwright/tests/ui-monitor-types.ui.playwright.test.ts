@@ -25,6 +25,7 @@ import {
     openAddSiteModal,
     openSiteDetails,
     removeAllSites,
+    resetApplicationState,
     submitAddSiteForm,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
@@ -47,7 +48,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-monitor-types");
             page = await electronApp.firstWindow();
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -67,6 +68,7 @@ test.describe(
             async () => {
                 const httpSiteName = generateSiteName("HTTP Monitor");
                 const httpUrl = `${DEFAULT_TEST_SITE_URL}/status/204`;
+                const httpHost = new URL(httpUrl).hostname;
 
                 await createSiteViaModal(page, {
                     name: httpSiteName,
@@ -75,8 +77,12 @@ test.describe(
                 });
 
                 await openSiteDetails(page, httpSiteName);
+                const siteOverviewTab = page.getByTestId("site-overview-tab");
+                await expect(siteOverviewTab).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
                 await expect(
-                    page.getByText(httpUrl, { exact: false })
+                    siteOverviewTab.getByText(httpHost, { exact: false })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }
@@ -102,8 +108,14 @@ test.describe(
                 });
 
                 await openSiteDetails(page, portSiteName);
+                const siteOverviewTab = page.getByTestId("site-overview-tab");
+                await expect(siteOverviewTab).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
                 await expect(
-                    page.getByText(`${hostValue}:${portValue}`)
+                    siteOverviewTab.getByText(`${hostValue}:${portValue}`, {
+                        exact: false,
+                    })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }
@@ -125,8 +137,12 @@ test.describe(
                 });
 
                 await openSiteDetails(page, pingSiteName);
+                const siteOverviewTab = page.getByTestId("site-overview-tab");
+                await expect(siteOverviewTab).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
                 await expect(
-                    page.getByText(pingHost, { exact: false })
+                    siteOverviewTab.getByText(pingHost, { exact: false })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
                 await closeSiteDetails(page);
             }

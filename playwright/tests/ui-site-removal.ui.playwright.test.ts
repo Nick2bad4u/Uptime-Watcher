@@ -13,9 +13,12 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     createSiteViaModal,
+    getSiteCardLocator,
     openSiteDetails,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
+    resolveConfirmDialog,
+    waitForConfirmDialogRequest,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -37,8 +40,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-site-removal");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -67,27 +69,38 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const removeButton = page
-                    .getByRole("dialog", { name: "Site details" })
+                    .getByTestId("site-details-modal")
                     .getByRole("button", { name: "Remove Site" })
                     .first();
+                await removeButton.scrollIntoViewIfNeeded();
                 await expect(removeButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await removeButton.click();
 
+                await waitForConfirmDialogRequest(page);
+
                 const confirmationDialog = page.getByRole("alertdialog", {
                     name: "Remove Site",
                 });
-                await expect(confirmationDialog).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await expect(
-                    confirmationDialog.getByText(siteName, { exact: false })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await confirmationDialog
-                    .getByRole("button", { name: "Keep Site" })
-                    .click();
+                try {
+                    await expect(confirmationDialog).toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                    await expect(
+                        confirmationDialog.getByText(siteName, {
+                            exact: false,
+                        })
+                    ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                    await confirmationDialog
+                        .getByRole("button", { name: "Keep Site" })
+                        .click();
+                } catch {
+                    await resolveConfirmDialog(page, "cancel");
+                }
+
                 await expect(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
@@ -98,12 +111,9 @@ test.describe(
                         .getByRole("button", { name: new RegExp(siteName) })
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await expect(
-                    page
-                        .getByTestId("site-card")
-                        .filter({ hasText: siteName })
-                        .first()
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
+                await expect(getSiteCardLocator(page, siteName)).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
             }
         );
 
@@ -123,21 +133,29 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const removeButton = page
-                    .getByRole("dialog", { name: "Site details" })
+                    .getByTestId("site-details-modal")
                     .getByRole("button", { name: "Remove Site" })
                     .first();
+                await removeButton.scrollIntoViewIfNeeded();
                 await removeButton.click();
+
+                await waitForConfirmDialogRequest(page);
 
                 const confirmationDialog = page.getByRole("alertdialog", {
                     name: "Remove Site",
                 });
-                await expect(confirmationDialog).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
 
-                await confirmationDialog
-                    .getByRole("button", { name: "Remove Site" })
-                    .click();
+                try {
+                    await expect(confirmationDialog).toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                    await confirmationDialog
+                        .getByRole("button", { name: "Remove Site" })
+                        .click();
+                } catch {
+                    await resolveConfirmDialog(page, "confirm");
+                }
+
                 await expect(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });

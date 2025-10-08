@@ -12,9 +12,10 @@ import {
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
 import {
+    closeSiteDetails,
     createSiteViaModal,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -43,8 +44,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-site-table-view");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
 
             const searchBox = page.getByRole("searchbox", {
                 name: "Search monitored sites",
@@ -131,11 +131,6 @@ test.describe(
                 tag: ["@navigation", "@table"],
             },
             async () => {
-                test.fixme(
-                    true,
-                    "Table row site detail trigger does not surface the modal reliably in automated runs; tracked for follow-up."
-                );
-
                 const listButton = page.getByRole("button", { name: "List" });
                 await listButton.click();
 
@@ -146,6 +141,7 @@ test.describe(
 
                 const firstSiteName = createdSites[0];
                 assertSiteName(firstSiteName);
+
                 const triggerButton = table
                     .getByRole("button")
                     .filter({ hasText: firstSiteName })
@@ -156,13 +152,18 @@ test.describe(
                 await triggerButton.scrollIntoViewIfNeeded();
                 await triggerButton.click();
 
-                const siteDetailsDialog = page
-                    .getByRole("dialog")
-                    .filter({ has: page.getByText("Monitoring Status") })
-                    .first();
-                await expect(siteDetailsDialog).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.APP_INITIALIZATION,
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                await expect(siteDetailsModal).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
                 });
+                await expect(
+                    siteDetailsModal
+                        .locator(".site-details-title")
+                        .filter({ hasText: firstSiteName })
+                        .first()
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                await closeSiteDetails(page);
             }
         );
     }

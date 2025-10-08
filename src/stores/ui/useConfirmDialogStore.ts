@@ -11,6 +11,8 @@
 import { useMemo } from "react";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
+import { isPlaywrightAutomation } from "../../utils/environment";
+
 /** Visual tone for the confirm action button. */
 export type ConfirmDialogTone = "danger" | "default";
 
@@ -97,6 +99,33 @@ export const useConfirmDialogStore: UseBoundStore<
         resolve: null,
     };
 });
+
+if (isPlaywrightAutomation()) {
+    const automationTarget = globalThis as typeof globalThis & {
+        playwrightConfirmDialog?: {
+            cancel: () => void;
+            confirm: () => void;
+            getState: () => ConfirmDialogStoreState;
+            subscribe: (
+                listener: (state: ConfirmDialogStoreState) => void
+            ) => () => void;
+        };
+    };
+
+    automationTarget.playwrightConfirmDialog = {
+        cancel: () => {
+            useConfirmDialogStore.getState().cancel();
+        },
+        confirm: () => {
+            useConfirmDialogStore.getState().confirm();
+        },
+        getState: () => useConfirmDialogStore.getState(),
+        subscribe: (listener) =>
+            useConfirmDialogStore.subscribe((state) => {
+                listener(state);
+            }),
+    };
+}
 
 /** State shape of the confirmation dialog store. */
 export type ConfirmDialogStoreState = ReturnType<

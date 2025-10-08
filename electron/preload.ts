@@ -26,6 +26,20 @@ import { sitesApi } from "./preload/domains/sitesApi";
 import { stateSyncApi } from "./preload/domains/stateSyncApi";
 import { systemApi } from "./preload/domains/systemApi";
 
+const automationFlag =
+    typeof process !== "undefined" &&
+    typeof process.env?.["PLAYWRIGHT_TEST"] === "string" &&
+    process.env["PLAYWRIGHT_TEST"].toLowerCase() === "true";
+
+if (automationFlag) {
+    const automationTarget = globalThis as typeof globalThis & {
+        playwrightAutomation?: boolean;
+    };
+    automationTarget.playwrightAutomation = true;
+
+    contextBridge.exposeInMainWorld("playwrightAutomation", true);
+}
+
 /**
  * Complete electron API interface with all domain APIs
  */

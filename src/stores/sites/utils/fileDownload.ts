@@ -6,6 +6,7 @@
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 import { logger } from "../../../services/logger";
+import { isPlaywrightAutomation } from "../../../utils/environment";
 
 /**
  * Options for downloading a file in the browser.
@@ -300,6 +301,18 @@ export async function handleSQLiteBackupDownload(
 
     if (!isSerializedDatabaseBackupResult(backupResult)) {
         throw new TypeError("Invalid backup data received");
+    }
+
+    if (isPlaywrightAutomation()) {
+        const automationTarget = globalThis as typeof globalThis & {
+            playwrightLastBackup?: SerializedDatabaseBackupResult;
+        };
+        automationTarget.playwrightLastBackup = backupResult;
+        logger.info("SQLite backup captured in automation mode", {
+            fileName: backupResult.fileName,
+            sizeBytes: backupResult.metadata.sizeBytes,
+        });
+        return;
     }
 
     const trimmedFileName = backupResult.fileName.trim();

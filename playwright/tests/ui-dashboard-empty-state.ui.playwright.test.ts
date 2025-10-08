@@ -15,8 +15,10 @@ import {
     closeModal,
     fillAddSiteForm,
     removeAllSites,
+    getSiteCardLocator,
     submitAddSiteForm,
-    waitForAppInitialization,
+    resetApplicationState,
+    ensureCardLayout,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -38,8 +40,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-dashboard-empty-state");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -89,13 +90,17 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                await expect(page.getByText(/Tracking 1 site/i)).toBeVisible({
+                await expect(
+                    page.getByTestId("site-count-label")
+                ).toContainText("Tracking 1 site", {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await expect(
-                    page.getByText(siteName, { exact: true })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await ensureCardLayout(page);
+
+                await expect(getSiteCardLocator(page, siteName)).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
             }
         );
     }

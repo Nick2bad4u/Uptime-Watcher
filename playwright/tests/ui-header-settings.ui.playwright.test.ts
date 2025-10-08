@@ -9,10 +9,7 @@ import {
     type Page,
 } from "@playwright/test";
 import { launchElectronApp } from "../fixtures/electron-helpers";
-import {
-    openSettingsModal,
-    waitForAppInitialization,
-} from "../utils/ui-helpers";
+import { openSettingsModal, resetApplicationState } from "../utils/ui-helpers";
 
 test.describe(
     "header controls - modern accessibility",
@@ -30,7 +27,7 @@ test.describe(
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -45,13 +42,15 @@ test.describe(
                 tag: ["@smoke", "@a11y"],
             },
             async () => {
-                const addSiteButton = page.getByRole("button", {
-                    name: "Add new site",
-                });
+                const addSiteButton = page
+                    .getByRole("banner")
+                    .getByRole("button", {
+                        name: "Add new site",
+                    });
                 await expect(addSiteButton).toBeVisible();
 
-                const initialTheme = await page.evaluate(() =>
-                    document.body.classList.contains("dark") ? "dark" : "light"
+                const initialIsDark = await page.evaluate(() =>
+                    document.documentElement.classList.contains("dark")
                 );
 
                 const themeButton = page.getByRole("button", {
@@ -64,18 +63,17 @@ test.describe(
 
                 await themeButton.click();
 
-                await page.waitForFunction(() => {
-                    const body = document.body;
-                    return (
-                        body.classList.contains("dark") ||
-                        body.classList.contains("light")
-                    );
-                });
-
-                const toggledTheme = await page.evaluate(() =>
-                    document.body.classList.contains("dark") ? "dark" : "light"
+                await page.waitForFunction(
+                    (wasDark) =>
+                        document.documentElement.classList.contains("dark") !==
+                        wasDark,
+                    initialIsDark
                 );
-                expect(toggledTheme).not.toBe(initialTheme);
+
+                const toggledIsDark = await page.evaluate(() =>
+                    document.documentElement.classList.contains("dark")
+                );
+                expect(toggledIsDark).not.toBe(initialIsDark);
 
                 const updatedThemeButton = page.getByRole("button", {
                     name: /Switch to (light|dark) theme/i,

@@ -15,7 +15,7 @@ import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     createSiteViaModal,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -38,8 +38,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-sidebar-search");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
 
             createdSiteNames.length = 0;
             const sitePrefixes = [

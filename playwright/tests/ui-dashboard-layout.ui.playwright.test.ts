@@ -11,8 +11,10 @@ import {
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import {
     createSiteViaModal,
+    getSiteCardLocator,
+    ensureCardLayout,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -32,8 +34,7 @@ test.describe(
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -91,6 +92,8 @@ test.describe(
                     name: `Dashboard Layout Toggle ${Date.now()}`,
                 });
 
+                await ensureCardLayout(page);
+
                 const initialClasses = await page.evaluate(() => {
                     return (
                         document.querySelector(".site-grid")?.className ?? ""
@@ -127,15 +130,17 @@ test.describe(
                 tag: ["@workflow", "@presentation"],
             },
             async () => {
-                await createSiteViaModal(page, {
+                const createdSite = await createSiteViaModal(page, {
                     name: `Dashboard Presentation ${Date.now()}`,
                 });
 
-                await expect(page.getByTestId("site-card").first()).toBeVisible(
-                    {
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    }
-                );
+                await ensureCardLayout(page);
+
+                await expect(
+                    getSiteCardLocator(page, createdSite.name)
+                ).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
 
                 const largeButton = page.getByRole("button", { name: "Large" });
                 await largeButton.click();

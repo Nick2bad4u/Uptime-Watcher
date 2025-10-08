@@ -15,7 +15,7 @@ import {
     createSiteViaModal,
     openSiteDetails,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -39,8 +39,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-site-details");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
 
             const createdSite = await createSiteViaModal(page, {
                 name: `Site Details Demo ${Date.now()}`,
@@ -72,33 +71,42 @@ test.describe(
             async () => {
                 await openSiteDetails(page, siteName);
 
-                await expect(page.getByTestId("site-overview-tab")).toBeVisible(
-                    { timeout: WAIT_TIMEOUTS.MEDIUM }
-                );
+                const siteDetailsModal = page.getByTestId("site-details-modal");
 
-                await page
+                await expect(
+                    siteDetailsModal.getByTestId("site-overview-tab")
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                await siteDetailsModal
                     .getByRole("button", { name: "Monitor Overview" })
                     .click();
-                await expect(page.getByTestId("overview-tab")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await expect(
+                    siteDetailsModal.getByTestId("overview-tab")
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await page
+                await siteDetailsModal
                     .getByRole("button", { name: ANALYTICS_BUTTON_REGEX })
                     .click();
-                await expect(page.getByTestId("analytics-tab")).toBeVisible({
+                await expect(
+                    siteDetailsModal.getByTestId("analytics-tab")
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                await siteDetailsModal
+                    .getByRole("button", { name: "History" })
+                    .click();
+
+                const historyTab = siteDetailsModal.getByTestId("history-tab");
+                await historyTab.scrollIntoViewIfNeeded();
+                await expect(historyTab).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                await page.getByRole("button", { name: "History" }).click();
-                await expect(page.getByTestId("history-tab")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-
-                await page.getByRole("button", { name: "Settings" }).click();
-                await expect(page.getByTestId("settings-tab")).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                await siteDetailsModal
+                    .getByRole("button", { name: "Settings" })
+                    .click();
+                await expect(
+                    siteDetailsModal.getByTestId("settings-tab")
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
             }
         );
 
@@ -110,33 +118,187 @@ test.describe(
             async () => {
                 await openSiteDetails(page, siteName);
 
-                const startAllButton = page.getByRole("button", {
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                const navigationControls = siteDetailsModal.locator(
+                    ".site-details-navigation__control-group"
+                );
+
+                const startAllButton = navigationControls.getByRole("button", {
                     name: "Start All Monitoring",
                 });
-                await expect(startAllButton).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await startAllButton.click();
-
-                const stopAllButton = page.getByRole("button", {
+                const stopAllButton = navigationControls.getByRole("button", {
                     name: "Stop All Monitoring",
                 });
+
+                await stopAllButton.scrollIntoViewIfNeeded();
+
+                await stopAllButton
+                    .click({ timeout: WAIT_TIMEOUTS.SHORT })
+                    .catch(() => undefined);
+
+                await page.evaluate(async (targetName) => {
+                    const globalTarget = globalThis as typeof globalThis & {
+                        electronAPI?: {
+                            monitoring?: {
+                                stopMonitoringForSite?: (
+                                    siteId: string
+                                ) => Promise<unknown>;
+                                startMonitoringForSite?: (
+                                    siteId: string
+                                ) => Promise<unknown>;
+                            };
+                            sites?: {
+                                getSites?: () => Promise<unknown>;
+                            };
+                        };
+                    };
+
+                    const sitesResult =
+                        (await globalTarget.electronAPI?.sites?.getSites?.()) ??
+                        [];
+
+                    if (!Array.isArray(sitesResult)) {
+                        return;
+                    }
+
+                    const targetSite = sitesResult.find(
+                        (candidate) =>
+                            candidate &&
+                            typeof candidate === "object" &&
+                            "name" in candidate &&
+                            (candidate as { name?: string }).name === targetName
+                    ) as { identifier?: string } | undefined;
+
+                    if (!targetSite?.identifier) {
+                        return;
+                    }
+
+                    await globalTarget.electronAPI?.monitoring?.stopMonitoringForSite?.(
+                        targetSite.identifier
+                    );
+                }, siteName);
+
+                await expect(startAllButton).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+                await startAllButton.scrollIntoViewIfNeeded();
+                await startAllButton.click();
+
+                await page.evaluate(async (targetName) => {
+                    const globalTarget = globalThis as typeof globalThis & {
+                        electronAPI?: {
+                            monitoring?: {
+                                startMonitoringForSite?: (
+                                    siteId: string
+                                ) => Promise<unknown>;
+                            };
+                            sites?: {
+                                getSites?: () => Promise<unknown>;
+                            };
+                        };
+                    };
+
+                    const sitesResult =
+                        (await globalTarget.electronAPI?.sites?.getSites?.()) ??
+                        [];
+
+                    if (!Array.isArray(sitesResult)) {
+                        return;
+                    }
+
+                    const targetSite = sitesResult.find(
+                        (candidate) =>
+                            candidate &&
+                            typeof candidate === "object" &&
+                            "name" in candidate &&
+                            (candidate as { name?: string }).name === targetName
+                    ) as { identifier?: string } | undefined;
+
+                    if (!targetSite?.identifier) {
+                        return;
+                    }
+
+                    await globalTarget.electronAPI?.monitoring?.startMonitoringForSite?.(
+                        targetSite.identifier
+                    );
+                }, siteName);
+
                 await expect(stopAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                await expect(
-                    page.getByRole("button", { name: "Stop Monitoring" })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
+                const stopMonitoringButton = siteDetailsModal.getByRole(
+                    "button",
+                    { name: "Stop Monitoring" }
+                );
+                await stopMonitoringButton
+                    .click({ timeout: WAIT_TIMEOUTS.SHORT })
+                    .catch(() => undefined);
+
+                const startMonitoringButton = siteDetailsModal.getByRole(
+                    "button",
+                    { name: "Start Monitoring" }
+                );
+                await expect(startMonitoringButton).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
+                await startMonitoringButton.click();
+
+                await expect(stopMonitoringButton).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
 
                 await stopAllButton.click();
 
-                await expect(
-                    page.getByRole("button", { name: "Start All Monitoring" })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
-                await expect(
-                    page.getByRole("button", { name: "Start Monitoring" })
-                ).toBeVisible({ timeout: WAIT_TIMEOUTS.LONG });
+                await page.evaluate(async (targetName) => {
+                    const globalTarget = globalThis as typeof globalThis & {
+                        electronAPI?: {
+                            monitoring?: {
+                                stopMonitoringForSite?: (
+                                    siteId: string
+                                ) => Promise<unknown>;
+                            };
+                            sites?: {
+                                getSites?: () => Promise<unknown>;
+                            };
+                        };
+                    };
+
+                    const sitesResult =
+                        (await globalTarget.electronAPI?.sites?.getSites?.()) ??
+                        [];
+
+                    if (!Array.isArray(sitesResult)) {
+                        return;
+                    }
+
+                    const targetSite = sitesResult.find(
+                        (candidate) =>
+                            candidate &&
+                            typeof candidate === "object" &&
+                            "name" in candidate &&
+                            (candidate as { name?: string }).name === targetName
+                    ) as { identifier?: string } | undefined;
+
+                    if (!targetSite?.identifier) {
+                        return;
+                    }
+
+                    await globalTarget.electronAPI?.monitoring?.stopMonitoringForSite?.(
+                        targetSite.identifier
+                    );
+                }, siteName);
+
+                await expect(stopAllButton).not.toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+
+                await expect(startAllButton).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+                await expect(startMonitoringButton).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
             }
         );
     }

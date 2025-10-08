@@ -209,7 +209,10 @@ export const SiteDetails = ({
             expandObserverRef.current = expandObserver;
             scrollFallbackContainerRef.current = contentElement;
 
-            const handleScroll: EventListener = (_event) => {
+            const handleScroll: EventListener = ({ type }) => {
+                if (type !== "scroll") {
+                    return;
+                }
                 const { scrollTop } = contentElement;
                 const shouldCollapse =
                     scrollTop > HEADER_COLLAPSE_SCROLL_THRESHOLD;
@@ -241,6 +244,7 @@ export const SiteDetails = ({
             };
 
             scrollFallbackHandlerRef.current = handleScroll;
+            // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Cleanup removes the listener via stored handler/container references.
             contentElement.addEventListener("scroll", handleScroll, {
                 passive: true,
             });
@@ -612,6 +616,7 @@ export const SiteDetails = ({
                 aria-label="Site details"
                 as="dialog"
                 className="modal-shell modal-shell--site-details modal-shell--accent-success site-details-modal"
+                data-testid="site-details-modal"
                 open
                 padding="xl"
                 rounded="xl"

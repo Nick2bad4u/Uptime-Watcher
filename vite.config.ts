@@ -836,7 +836,6 @@ export default defineConfig(({ mode }) => {
                 "vitest.electron.config.ts",
                 "vitest.shared.config.ts",
                 "vitest.storybook.config.ts",
-                "vitest.vite.playwright-coverage.config",
             ],
             // Improve test output
             reporters: [

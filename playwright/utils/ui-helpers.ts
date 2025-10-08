@@ -11,6 +11,7 @@
 import type { Page, Locator } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type { Site } from "@/shared/types";
+import type { ConfirmDialogRequest } from "@/stores/ui/useConfirmDialogStore";
 
 /**
  * Wait strategies for different UI operations.
@@ -28,7 +29,7 @@ export const WAIT_TIMEOUTS = {
  */
 export const UI_SELECTORS = {
     APP_CONTAINER: '[data-testid="app-container"]',
-    DASHBOARD_CONTAINER: '[data-testid="dashboard-container"]',
+    DASHBOARD_CONTAINER: '[data-testid="site-list"]',
     ADD_SITE_BUTTON: 'button[aria-label="Add new site"]',
     MODAL_OVERLAY: ".modal-overlay",
     MODAL_DIALOG: '.modal-overlay dialog, .modal-overlay [role="dialog"]', // Look for dialog within overlay
@@ -111,6 +112,51 @@ function escapeForRegex(value: string): string {
 }
 
 /**
+ * Resolves the site card locator for a given site name within the dashboard.
+ *
+ * @param page - Active Playwright page targeting the renderer window.
+ * @param siteName - Exact site name to match.
+ *
+ * @returns Locator scoped to the matching site card.
+ */
+export function getSiteCardLocator(page: Page, siteName: string): Locator {
+    const namePattern = new RegExp(escapeForRegex(siteName), "i");
+    return page
+        .getByTestId("site-card")
+        .filter({ hasText: namePattern })
+        .first();
+}
+
+/**
+ * Ensures the dashboard is displaying site cards using the "Large" layout.
+ *
+ * @param page - Playwright page targeting the renderer window.
+ */
+export async function ensureCardLayout(page: Page): Promise<void> {
+    const largeLayoutButton = page.getByRole("button", { name: "Large" });
+    const layoutSelectorVisible = await largeLayoutButton
+        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => false);
+
+    if (!layoutSelectorVisible) {
+        return;
+    }
+
+    const pressedState = await largeLayoutButton
+        .getAttribute("aria-pressed")
+        .catch(() => null);
+    if (pressedState !== "true") {
+        await largeLayoutButton.click();
+    }
+
+    await page
+        .getByTestId("site-card")
+        .first()
+        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => undefined);
+}
+
+/**
  * Waits for the Electron app to be fully initialized and ready for interaction.
  *
  * @param page - The Playwright page instance
@@ -177,6 +223,48 @@ export async function removeAllSites(page: Page): Promise<void> {
             );
         }
     });
+
+    await waitForMonitorCount(page, 0).catch(() => undefined);
+}
+
+/**
+ * Resets persisted UI preferences and site data to ensure deterministic test
+ * state.
+ *
+ * @remarks
+ * Clears both local and session storage to discard any persisted Zustand store
+ * snapshots before reloading the renderer window. After the reload completes,
+ * the helper invokes {@link removeAllSites} to guarantee that the dashboard
+ * starts without any persisted site records.
+ *
+ * @param page - The Playwright page bound to the primary renderer window.
+ */
+export async function resetApplicationState(page: Page): Promise<void> {
+    await page.waitForLoadState("domcontentloaded");
+
+    await page.evaluate(() => {
+        try {
+            globalThis.localStorage?.clear();
+        } catch (error) {
+            console.warn(
+                "Failed to clear localStorage during test reset",
+                error
+            );
+        }
+
+        try {
+            globalThis.sessionStorage?.clear();
+        } catch (error) {
+            console.warn(
+                "Failed to clear sessionStorage during test reset",
+                error
+            );
+        }
+    });
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+
+    await removeAllSites(page);
 }
 
 /**
@@ -261,6 +349,7 @@ export async function createSiteViaModal(
     page: Page,
     options: CreateSiteOptions = {}
 ): Promise<CreatedSiteResult> {
+    const existingSiteCount = await getMonitorCount(page).catch(() => 0);
     const siteName =
         options.name ??
         `Playwright Site ${Date.now().toString(36)}-${Math.floor(Math.random() * 10_000)}`;
@@ -283,6 +372,11 @@ export async function createSiteViaModal(
     await fillAddSiteForm(page, formData);
     await submitAddSiteForm(page);
 
+    const expectedSiteCount = existingSiteCount + 1;
+    await waitForMonitorCount(page, expectedSiteCount, WAIT_TIMEOUTS.LONG);
+
+    await ensureCardLayout(page);
+
     const sidebarEntry = page
         .getByRole("navigation", { name: "Monitored sites" })
         .getByRole("button", {
@@ -295,26 +389,11 @@ export async function createSiteViaModal(
         timeout: WAIT_TIMEOUTS.LONG,
     });
 
-    const siteCard = page
-        .getByTestId("site-card")
-        .filter({ hasText: siteName })
-        .first();
-
-    const cardVisible = await siteCard
-        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
-        .catch(() => false);
-
-    if (!cardVisible) {
-        const tableRow = page
-            .getByRole("row", {
-                name: new RegExp(`^${escapeForRegex(siteName)}`),
-            })
-            .first();
-        await tableRow.waitFor({
-            state: "visible",
-            timeout: WAIT_TIMEOUTS.LONG,
-        });
-    }
+    const siteCard = getSiteCardLocator(page, siteName);
+    await siteCard.waitFor({
+        state: "visible",
+        timeout: WAIT_TIMEOUTS.LONG,
+    });
 
     const siteIdentifier = await page.evaluate<
         string | null,
@@ -513,32 +592,14 @@ export async function openSiteDetails(
     page: Page,
     siteName: string
 ): Promise<void> {
-    const siteCard = page
-        .getByTestId("site-card")
-        .filter({ has: page.getByText(siteName, { exact: true }) })
-        .first();
+    await ensureCardLayout(page);
 
-    let cardVisible = await siteCard
+    const siteCard = getSiteCardLocator(page, siteName);
+    const cardVisible = await siteCard
         .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
         .catch(() => false);
 
     if (!cardVisible) {
-        const largeLayoutButton = page.getByRole("button", { name: "Large" });
-        const canSwitchToCards = await largeLayoutButton
-            .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
-            .catch(() => false);
-
-        if (canSwitchToCards) {
-            await largeLayoutButton.click();
-            cardVisible = await siteCard
-                .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
-                .catch(() => false);
-        }
-    }
-
-    if (cardVisible) {
-        await siteCard.click();
-    } else {
         const navigationEntry = page
             .getByRole("navigation", { name: "Monitored sites" })
             .getByRole("button", {
@@ -564,13 +625,30 @@ export async function openSiteDetails(
         });
         await navigationEntry.scrollIntoViewIfNeeded();
         await navigationEntry.click();
+    } else {
+        await siteCard.click();
     }
 
+    const siteDetailsModal = page.getByTestId("site-details-modal");
+    await siteDetailsModal.waitFor({
+        state: "visible",
+        timeout: WAIT_TIMEOUTS.LONG,
+    });
+
+    await siteDetailsModal.evaluate((element) => {
+        const scrollContainer = element.querySelector(
+            ".site-details-modal__content-wrapper"
+        );
+        if (scrollContainer instanceof HTMLElement) {
+            scrollContainer.scrollTo({ left: 0, top: 0 });
+        }
+    });
+
     await page
-        .getByRole("dialog")
-        .filter({ has: page.getByText("Monitoring Status") })
-        .first()
-        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG });
+        .getByRole("dialog", { name: "Site details" })
+        .getByText("Site Actions", { exact: true })
+        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG })
+        .catch(() => undefined);
 }
 
 /**
@@ -660,19 +738,86 @@ export async function ensureCleanUIState(page: Page): Promise<void> {
 }
 
 /**
+ * Waits for a confirmation dialog request to be registered in automation mode.
+ */
+export async function waitForConfirmDialogRequest(
+    page: Page,
+    timeout: number = WAIT_TIMEOUTS.MEDIUM
+): Promise<ConfirmDialogRequest | null> {
+    await page.waitForFunction(
+        () => {
+            const automationTarget = globalThis as typeof globalThis & {
+                playwrightConfirmDialog?: {
+                    getState: () => {
+                        request: ConfirmDialogRequest | null;
+                    };
+                };
+            };
+            return Boolean(
+                automationTarget.playwrightConfirmDialog?.getState().request
+            );
+        },
+        { timeout }
+    );
+
+    return page.evaluate(() => {
+        const automationTarget = globalThis as typeof globalThis & {
+            playwrightConfirmDialog?: {
+                getState: () => {
+                    request: ConfirmDialogRequest | null;
+                };
+            };
+        };
+
+        return (
+            automationTarget.playwrightConfirmDialog?.getState().request ?? null
+        );
+    });
+}
+
+/**
+ * Resolves the active confirmation dialog using automation helpers when running
+ * in Playwright.
+ */
+export async function resolveConfirmDialog(
+    page: Page,
+    action: "confirm" | "cancel"
+): Promise<void> {
+    await page.evaluate((desiredAction) => {
+        const automationTarget = globalThis as typeof globalThis & {
+            playwrightConfirmDialog?: {
+                cancel: () => void;
+                confirm: () => void;
+            };
+        };
+
+        const bridge = automationTarget.playwrightConfirmDialog;
+        if (!bridge) {
+            return;
+        }
+
+        if (desiredAction === "confirm") {
+            bridge.confirm();
+        } else {
+            bridge.cancel();
+        }
+    }, action);
+}
+
+/**
  * Closes the Site Details modal if it is currently open.
  *
  * @param page - Playwright page instance representing the renderer.
  */
 export async function closeSiteDetails(page: Page): Promise<void> {
-    const dialog = page.getByRole("dialog", { name: "Site details" });
+    const dialog = page.getByTestId("site-details-modal");
     const isVisible = await dialog.isVisible().catch(() => false);
 
     if (!isVisible) {
         return;
     }
 
-    const closeButton = page.getByRole("button", {
+    const closeButton = dialog.getByRole("button", {
         name: "Close site details",
     });
     if (await closeButton.isVisible().catch(() => false)) {
@@ -694,18 +839,24 @@ export async function closeSiteDetails(page: Page): Promise<void> {
 export async function getMonitorCount(page: Page): Promise<number> {
     await waitForAppInitialization(page);
 
-    // Look for monitor count in the dashboard header
-    const dashboardContainer = page.getByTestId("dashboard-container");
-    const monitorCountText = await dashboardContainer
-        .getByText(/Monitored Sites \((\d+)\)/)
-        .textContent();
+    const emptyStateVisible = await page
+        .getByTestId("empty-state")
+        .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
+        .catch(() => false);
 
-    if (monitorCountText) {
-        const match = monitorCountText.match(/\((\d+)\)/);
-        return match && match[1] ? parseInt(match[1], 10) : 0;
+    if (emptyStateVisible) {
+        return 0;
     }
 
-    return 0;
+    const countLabel = page.getByTestId("site-count-label");
+    const labelText = await countLabel.textContent();
+
+    if (!labelText) {
+        return 0;
+    }
+
+    const match = labelText.match(/Tracking\s+(\d+)/i);
+    return match && match[1] ? Number.parseInt(match[1], 10) : 0;
 }
 
 /**
@@ -720,19 +871,30 @@ export async function waitForMonitorCount(
     expectedCount: number,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    const startTime = Date.now();
+    await page.waitForFunction(
+        (count) => {
+            const emptyState = document.querySelector(
+                '[data-testid="empty-state"]'
+            );
+            if (emptyState && count === 0) {
+                return true;
+            }
 
-    while (Date.now() - startTime < timeout) {
-        const currentCount = await getMonitorCount(page);
-        if (currentCount === expectedCount) {
-            return;
-        }
-        await page.waitForFunction(() => Date.now() > Date.now() + 500, {
-            timeout: 600,
-        });
-    }
+            const label = document.querySelector(
+                '[data-testid="site-count-label"]'
+            );
+            if (!label) {
+                return false;
+            }
 
-    throw new Error(
-        `Expected monitor count ${expectedCount} not reached within ${timeout}ms`
+            const match = label.textContent?.match(/Tracking\s+(\d+)/i);
+            if (!match || !match[1]) {
+                return false;
+            }
+
+            return Number.parseInt(match[1], 10) === count;
+        },
+        expectedCount,
+        { timeout }
     );
 }

@@ -17,8 +17,9 @@ import {
     fillAddSiteForm,
     openAddSiteModal,
     removeAllSites,
+    waitForMonitorCount,
     submitAddSiteForm,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL } from "../utils/testData";
@@ -39,8 +40,7 @@ test.describe(
             tagElectronAppCoverage(electronApp, "ui-resilience");
             page = await electronApp.firstWindow();
 
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
@@ -77,6 +77,8 @@ test.describe(
                     url: DEFAULT_TEST_SITE_URL,
                 });
                 await submitAddSiteForm(page);
+
+                await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
 
                 const maliciousCard = page
                     .getByTestId("site-card")
@@ -128,19 +130,17 @@ test.describe(
             },
             async () => {
                 await page.setViewportSize({ width: 360, height: 640 });
-                await expect(
-                    page.getByTestId("dashboard-container")
-                ).toBeVisible({
+                await expect(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await expect(
-                    page.getByRole("button", { name: /add new site/i })
+                    page
+                        .getByRole("banner")
+                        .getByRole("button", { name: /add new site/i })
                 ).toBeVisible();
 
                 await page.setViewportSize({ width: 1920, height: 1080 });
-                await expect(
-                    page.getByTestId("dashboard-container")
-                ).toBeVisible({
+                await expect(page.getByTestId("empty-state")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await expect(

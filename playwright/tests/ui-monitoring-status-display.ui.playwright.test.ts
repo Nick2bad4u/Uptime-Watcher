@@ -16,7 +16,7 @@ import {
     createSiteViaModal,
     openSiteDetails,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -39,8 +39,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-monitoring-status-display");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
 
             const createdSite = await createSiteViaModal(page, {
                 name: generateSiteName("Monitoring Status"),
@@ -68,6 +67,17 @@ test.describe(
             },
             async () => {
                 await openSiteDetails(page, siteName);
+
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                const expandHeaderButton = siteDetailsModal
+                    .getByRole("button", { name: "Expand header" })
+                    .first();
+                const canExpand = await expandHeaderButton
+                    .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
+                    .catch(() => false);
+                if (canExpand) {
+                    await expandHeaderButton.click();
+                }
 
                 const statusDisplay = page.getByTestId(
                     "monitoring-status-display"

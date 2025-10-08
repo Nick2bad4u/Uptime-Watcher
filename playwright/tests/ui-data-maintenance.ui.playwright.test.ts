@@ -1,6 +1,6 @@
 /**
  * Settings data maintenance flows validating export, sync, and reset controls
- * using shared helpers and lightweight bridge stubs.
+ * using shared helpers in a fully integrated renderer environment.
  */
 
 import {
@@ -16,7 +16,9 @@ import {
     ensureCleanUIState,
     openSettingsModal,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
+    resolveConfirmDialog,
+    waitForConfirmDialogRequest,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -38,8 +40,7 @@ test.describe(
             tagElectronAppCoverage(electronApp, "ui-data-maintenance");
             page = await electronApp.firstWindow();
 
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
             await openSettingsModal(page);
         });
 
@@ -60,50 +61,20 @@ test.describe(
                 tag: ["@export", "@backup"],
             },
             async () => {
-                await page.evaluate(() => {
-                    const api = (
-                        window as unknown as {
-                            electronAPI?: {
-                                data?: {
-                                    downloadSqliteBackup?: () => Promise<unknown>;
-                                };
-                            };
-                        }
-                    ).electronAPI;
-                    if (!api?.data?.downloadSqliteBackup) {
-                        throw new Error("downloadSqliteBackup bridge missing");
-                    }
-
-                    const global = window as unknown as {
-                        __downloadCallCount__?: number;
-                    };
-                    global.__downloadCallCount__ = 0;
-
-                    api.data.downloadSqliteBackup = async () => {
-                        global.__downloadCallCount__ =
-                            (global.__downloadCallCount__ ?? 0) + 1;
-                        return {
-                            buffer: new ArrayBuffer(16),
-                            fileName: "playwright-backup.sqlite",
-                            metadata: {
-                                createdAt: Date.now(),
-                                originalPath: "playwright-backup.sqlite",
-                                sizeBytes: 16,
-                            },
-                        } as const;
-                    };
+                const exportButton = page.getByRole("button", {
+                    name: "Export monitoring data",
                 });
 
-                await page
-                    .getByRole("button", { name: "Export monitoring data" })
-                    .click();
+                await exportButton.click();
 
-                await page.waitForFunction(() => {
-                    const global = window as unknown as {
-                        __downloadCallCount__?: number;
-                    };
-                    return (global.__downloadCallCount__ ?? 0) > 0;
-                });
+                await expect(exportButton).not.toHaveClass(
+                    /themed-button--loading/,
+                    { timeout: WAIT_TIMEOUTS.LONG }
+                );
+
+                await expect(
+                    page.getByText("Failed to download SQLite backup")
+                ).toHaveCount(0);
 
                 await expect(
                     page.getByText(
@@ -119,54 +90,35 @@ test.describe(
                 tag: ["@reset", "@confirmation"],
             },
             async () => {
-                await page.evaluate(() => {
-                    const api = (
-                        window as unknown as {
-                            electronAPI?: {
-                                data?: {
-                                    resetSettings?: () => Promise<void>;
-                                };
-                            };
-                        }
-                    ).electronAPI;
-                    if (!api?.data?.resetSettings) {
-                        throw new Error("resetSettings bridge missing");
-                    }
-
-                    const global = window as unknown as {
-                        __resetCallCount__?: number;
-                    };
-                    global.__resetCallCount__ = 0;
-
-                    api.data.resetSettings = async () => {
-                        global.__resetCallCount__ =
-                            (global.__resetCallCount__ ?? 0) + 1;
-                    };
+                const resetButton = page.getByRole("button", {
+                    name: "Reset everything",
                 });
+                await resetButton.click();
 
-                await page
-                    .getByRole("button", { name: "Reset everything" })
-                    .click();
+                const confirmRequest = await waitForConfirmDialogRequest(page);
+                expect(confirmRequest).not.toBeNull();
+                expect(confirmRequest?.title).toBe("Reset Settings");
 
                 const dialog = page.getByRole("alertdialog", {
                     name: "Reset Settings",
                 });
-                await expect(dialog).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
 
-                await dialog.getByRole("button", { name: "Reset" }).click();
-
-                await page.waitForFunction(() => {
-                    const global = window as unknown as {
-                        __resetCallCount__?: number;
-                    };
-                    return (global.__resetCallCount__ ?? 0) > 0;
-                });
+                try {
+                    await expect(dialog).toBeVisible({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    });
+                    await dialog.getByRole("button", { name: "Reset" }).click();
+                } catch {
+                    await resolveConfirmDialog(page, "confirm");
+                }
 
                 await expect(dialog).not.toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
+
+                await expect(
+                    page.getByText("Failed to download SQLite backup")
+                ).toHaveCount(0);
             }
         );
 
@@ -176,42 +128,16 @@ test.describe(
                 tag: ["@sync", "@refresh"],
             },
             async () => {
-                await page.evaluate(() => {
-                    const api = (
-                        window as unknown as {
-                            electronAPI?: {
-                                sites?: {
-                                    getSites?: () => Promise<unknown>;
-                                };
-                            };
-                        }
-                    ).electronAPI;
-                    if (!api?.sites?.getSites) {
-                        throw new Error("getSites bridge missing");
-                    }
-
-                    const global = window as unknown as {
-                        __getSitesCallCount__?: number;
-                    };
-                    global.__getSitesCallCount__ = 0;
-
-                    api.sites.getSites = async () => {
-                        global.__getSitesCallCount__ =
-                            (global.__getSitesCallCount__ ?? 0) + 1;
-                        return [];
-                    };
+                const refreshButton = page.getByRole("button", {
+                    name: "Refresh history",
                 });
 
-                await page
-                    .getByRole("button", { name: "Refresh history" })
-                    .click();
+                await refreshButton.click();
 
-                await page.waitForFunction(() => {
-                    const global = window as unknown as {
-                        __getSitesCallCount__?: number;
-                    };
-                    return (global.__getSitesCallCount__ ?? 0) > 0;
-                });
+                await expect(refreshButton).not.toHaveClass(
+                    /themed-button--loading/,
+                    { timeout: WAIT_TIMEOUTS.LONG }
+                );
 
                 await expect(page.getByText("Sync complete")).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,

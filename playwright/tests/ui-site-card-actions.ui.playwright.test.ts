@@ -6,6 +6,7 @@ import {
     expect,
     test,
     type ElectronApplication,
+    type Locator,
     type Page,
 } from "@playwright/test";
 
@@ -13,8 +14,9 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     createSiteViaModal,
+    getSiteCardLocator,
     removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
@@ -40,13 +42,13 @@ test.describe(
         let electronApp: ElectronApplication;
         let page: Page;
         let createdSite: CreatedSiteResult;
+        let siteCardLocator: Locator;
 
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-site-card-actions");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
 
             const siteName = generateSiteName("Site Card Action");
             createdSite = await createSiteViaModal(page, {
@@ -54,9 +56,10 @@ test.describe(
                 url: DEFAULT_TEST_SITE_URL,
                 monitorType: "http",
             });
-            await expect(page.getByText(siteName, { exact: true })).toBeVisible(
-                { timeout: WAIT_TIMEOUTS.MEDIUM }
-            );
+            siteCardLocator = getSiteCardLocator(page, siteName);
+            await expect(siteCardLocator).toBeVisible({
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            });
         });
 
         test.afterEach(async () => {
@@ -75,32 +78,42 @@ test.describe(
                 tag: ["@workflow", "@quick-actions"],
             },
             async () => {
-                const startAllButton = page.getByRole("button", {
+                const startAllButton = siteCardLocator.getByRole("button", {
                     name: "Start All Monitoring",
                 });
+                const stopAllButton = siteCardLocator.getByRole("button", {
+                    name: "Stop All Monitoring",
+                });
+
+                await stopAllButton
+                    .click({ timeout: WAIT_TIMEOUTS.SHORT })
+                    .catch(() => undefined);
+
                 await expect(startAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await startAllButton.click();
 
-                const stopAllButton = page.getByRole("button", {
-                    name: "Stop All Monitoring",
-                });
                 await expect(stopAllButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 
-                const startMonitoring = page.getByRole("button", {
+                const startMonitoring = siteCardLocator.getByRole("button", {
                     name: "Start Monitoring",
                 });
+                const stopMonitoring = siteCardLocator.getByRole("button", {
+                    name: "Stop Monitoring",
+                });
+
+                await stopMonitoring
+                    .click({ timeout: WAIT_TIMEOUTS.SHORT })
+                    .catch(() => undefined);
+
                 await expect(startMonitoring).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await startMonitoring.click();
 
-                const stopMonitoring = page.getByRole("button", {
-                    name: "Stop Monitoring",
-                });
                 await expect(stopMonitoring).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
@@ -123,7 +136,7 @@ test.describe(
                 tag: ["@a11y", "@selectors"],
             },
             async () => {
-                const monitorSelector = page.getByRole("combobox", {
+                const monitorSelector = siteCardLocator.getByRole("combobox", {
                     name: "Select monitor",
                 });
                 await expect(monitorSelector).toBeVisible({

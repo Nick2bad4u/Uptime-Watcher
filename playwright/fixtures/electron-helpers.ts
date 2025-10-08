@@ -37,6 +37,12 @@ export async function launchElectronApp(
     customArgs: string[] = [],
     customEnv: Record<string, string> = {}
 ): Promise<ElectronApplication> {
+    const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
+    const disableWarningOption = "--disable-warning=DEP0190";
+    const nodeOptions = existingNodeOptions.includes(disableWarningOption)
+        ? existingNodeOptions
+        : [existingNodeOptions, disableWarningOption].filter(Boolean).join(" ");
+
     const app = await electron.launch({
         args: [
             ".", // Launch from project root like codegen script
@@ -53,16 +59,13 @@ export async function launchElectronApp(
             // This allows proper development vs production detection
             // Enable headless mode for Electron during testing
             HEADLESS: "true",
+            PLAYWRIGHT_TEST: "true",
+            NODE_OPTIONS: nodeOptions,
             // Disable Electron sandbox in CI
             ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
             ...customEnv,
         },
         timeout: 30000, // Add timeout like codegen script
-        // NOTE: The DEP0190 deprecation warning about shell injection comes from
-        // Playwright's internal Electron launcher implementation, not our code.
-        // This is a known issue with Playwright's Electron integration and
-        // cannot be directly fixed in user code. The warning does not affect
-        // functionality and can be safely ignored.
     });
 
     if (isCoverageEnabled) {

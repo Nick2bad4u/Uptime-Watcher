@@ -14,8 +14,7 @@ import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     openSettingsModal,
-    removeAllSites,
-    waitForAppInitialization,
+    resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -106,12 +105,33 @@ async function waitForThemeApplication(
 ): Promise<void> {
     await page.waitForFunction(
         (targetTheme) => {
-            const normalizedClass = `theme-${targetTheme}`;
             const root = document.documentElement;
-            const bodyHasThemeClass =
-                document.body.classList.contains(normalizedClass);
+            const themeClasses = Array.from(document.body.classList).filter(
+                (className) => className.startsWith("theme-")
+            );
 
-            if (!bodyHasThemeClass) {
+            if (themeClasses.length === 0) {
+                return false;
+            }
+
+            const [activeThemeClass] = themeClasses;
+            if (!activeThemeClass) {
+                return false;
+            }
+
+            const activeTheme = activeThemeClass.replace("theme-", "");
+
+            if (targetTheme === "system") {
+                if (activeTheme !== "dark" && activeTheme !== "light") {
+                    return false;
+                }
+
+                return (
+                    root.classList.contains("dark") === (activeTheme === "dark")
+                );
+            }
+
+            if (activeTheme !== targetTheme) {
                 return false;
             }
 
@@ -147,8 +167,7 @@ test.describe(
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-settings-preferences");
             page = await electronApp.firstWindow();
-            await waitForAppInitialization(page);
-            await removeAllSites(page);
+            await resetApplicationState(page);
         });
 
         test.afterEach(async () => {
