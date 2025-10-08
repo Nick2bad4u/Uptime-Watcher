@@ -55,12 +55,13 @@ export const HeaderControls = ({
         .join(" ");
 
     return (
-        <div className={rootClassName}>
+        <div className={rootClassName} data-testid="header-controls">
             <Tooltip content="Add new site to monitor" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button
                         aria-label="Add new site"
                         className="header-controls__button header-controls__button--add"
+                        data-testid="header-control-add-site"
                         onClick={onShowAddSiteModal}
                         type="button"
                         {...triggerProps}
@@ -87,6 +88,7 @@ export const HeaderControls = ({
                                 : "Switch to dark theme"
                         }
                         className="header-controls__button header-controls__button--theme"
+                        data-testid="header-control-toggle-theme"
                         onClick={onToggleTheme}
                         type="button"
                         {...triggerProps}
@@ -104,6 +106,7 @@ export const HeaderControls = ({
                     <button
                         aria-label="Open settings"
                         className="header-controls__button header-controls__button--settings"
+                        data-testid="header-control-open-settings"
                         onClick={onShowSettings}
                         type="button"
                         {...triggerProps}

@@ -26,10 +26,31 @@ import { sitesApi } from "./preload/domains/sitesApi";
 import { stateSyncApi } from "./preload/domains/stateSyncApi";
 import { systemApi } from "./preload/domains/systemApi";
 
-const automationFlag =
-    typeof process !== "undefined" &&
-    typeof process.env?.["PLAYWRIGHT_TEST"] === "string" &&
-    process.env["PLAYWRIGHT_TEST"].toLowerCase() === "true";
+interface AutomationProcess {
+    readonly env?: Record<string, string | undefined>;
+}
+
+function isPlaywrightAutomationFlagSet(
+    processContext?: AutomationProcess
+): boolean {
+    if (!processContext?.env) {
+        return false;
+    }
+
+    const automationFlagValue = processContext.env["PLAYWRIGHT_TEST"];
+    return (
+        typeof automationFlagValue === "string" &&
+        automationFlagValue.toLowerCase() === "true"
+    );
+}
+
+const automationProcess = (
+    globalThis as typeof globalThis & {
+        process?: AutomationProcess;
+    }
+).process;
+
+const automationFlag = isPlaywrightAutomationFlagSet(automationProcess);
 
 if (automationFlag) {
     const automationTarget = globalThis as typeof globalThis & {

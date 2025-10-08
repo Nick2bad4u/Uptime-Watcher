@@ -84,9 +84,10 @@ export const Header = (): JSX.Element => {
     const GlobalUptimeIcon = AppIcons.metrics.uptime;
 
     return (
-        <header className="app-topbar" role="banner">
+        <header className="app-topbar" data-testid="app-header" role="banner">
             <ThemedBox
                 className="app-topbar__container"
+                data-testid="app-header-container"
                 padding="lg"
                 rounded="xl"
                 shadow="md"
@@ -103,6 +104,7 @@ export const Header = (): JSX.Element => {
                                     {...triggerProps}
                                     aria-label="Toggle navigation sidebar"
                                     className="app-topbar__sidebar-toggle"
+                                    data-testid="header-sidebar-toggle"
                                     onClick={toggleSidebar}
                                     type="button"
                                 >

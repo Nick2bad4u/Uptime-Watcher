@@ -96,6 +96,7 @@ interface SettingsSectionParameters {
     readonly children: ReactNode;
     readonly description?: string;
     readonly icon: IconType;
+    readonly testId?: string;
     readonly title: string;
 }
 
@@ -110,10 +111,11 @@ function renderSettingsSection({
     children,
     description,
     icon: SectionIcon,
+    testId,
     title,
 }: SettingsSectionParameters): JSX.Element {
     return (
-        <section className="settings-section">
+        <section className="settings-section" data-testid={testId}>
             <div className="settings-section__header">
                 <div className="settings-section__icon">
                     <SectionIcon size={18} />
@@ -462,6 +464,7 @@ export const Settings = ({
             className={`modal-overlay modal-overlay--frosted ${
                 isDark ? "dark" : ""
             }`}
+            data-testid="settings-modal-overlay"
             onClick={handleOverlayClick}
         >
             <ThemedBox
@@ -505,6 +508,7 @@ export const Settings = ({
                         <button
                             aria-label="Close settings"
                             className="modal-shell__close"
+                            data-testid="settings-modal-close"
                             onClick={onClose}
                             title="Close"
                             type="button"
@@ -527,6 +531,7 @@ export const Settings = ({
                         <output
                             aria-live="polite"
                             className="settings-modal__banner settings-modal__banner--success"
+                            data-testid="settings-sync-success"
                         >
                             <SuccessIcon
                                 aria-hidden="true"
@@ -587,6 +592,7 @@ export const Settings = ({
                             description:
                                 "Control how much monitoring history is retained.",
                             icon: MonitoringIcon,
+                            testId: "settings-section-monitoring",
                             title: "Monitoring",
                         })}
 
@@ -608,6 +614,7 @@ export const Settings = ({
                             description:
                                 "Choose how Uptime Watcher keeps you informed.",
                             icon: NotificationsIcon,
+                            testId: "settings-section-notifications",
                             title: "Notifications",
                         })}
 
@@ -678,6 +685,7 @@ export const Settings = ({
                             ),
                             description: "Personalize the desktop experience.",
                             icon: ApplicationIcon,
+                            testId: "settings-section-application",
                             title: "Application",
                         })}
 
@@ -686,6 +694,7 @@ export const Settings = ({
                                 <div className="settings-actions">
                                     <ThemedButton
                                         className="settings-actions__primary"
+                                        data-testid="settings-export-data"
                                         disabled={isLoading}
                                         icon={downloadButtonIcon}
                                         loading={showButtonLoading}
@@ -699,6 +708,7 @@ export const Settings = ({
                                         {(triggerProps) => (
                                             <ThemedButton
                                                 {...triggerProps}
+                                                data-testid="settings-refresh-history"
                                                 disabled={isLoading}
                                                 icon={refreshButtonIcon}
                                                 loading={showButtonLoading}
@@ -714,6 +724,7 @@ export const Settings = ({
                                         {(triggerProps) => (
                                             <ThemedButton
                                                 {...triggerProps}
+                                                data-testid="settings-reset-all"
                                                 disabled={isLoading}
                                                 icon={resetButtonIcon}
                                                 loading={showButtonLoading}
@@ -730,6 +741,7 @@ export const Settings = ({
                             description:
                                 "Manage data exports and advanced utilities.",
                             icon: MaintenanceIcon,
+                            testId: "settings-section-data",
                             title: "Data & Maintenance",
                         })}
                     </div>
@@ -737,6 +749,7 @@ export const Settings = ({
                     <footer className="settings-modal__footer">
                         <div className="settings-modal__footer-actions">
                             <ThemedButton
+                                data-testid="settings-close"
                                 disabled={isLoading}
                                 onClick={onClose}
                                 size="sm"

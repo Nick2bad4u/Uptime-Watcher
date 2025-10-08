@@ -158,8 +158,7 @@ test.describe(
                 });
                 await expect(
                     siteDetailsModal
-                        .locator(".site-details-title")
-                        .filter({ hasText: firstSiteName })
+                        .getByText(firstSiteName, { exact: true })
                         .first()
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 

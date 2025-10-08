@@ -633,6 +633,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     />
 
                     <ThemedButton
+                        data-testid="add-site-submit"
                         disabled={isLoading}
                         fullWidth
                         loading={showButtonLoading}

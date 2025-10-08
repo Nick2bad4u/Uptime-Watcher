@@ -119,14 +119,10 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                const navigationControls = siteDetailsModal.locator(
-                    ".site-details-navigation__control-group"
-                );
-
-                const startAllButton = navigationControls.getByRole("button", {
+                const startAllButton = page.getByRole("button", {
                     name: "Start All Monitoring",
                 });
-                const stopAllButton = navigationControls.getByRole("button", {
+                const stopAllButton = page.getByRole("button", {
                     name: "Stop All Monitoring",
                 });
 

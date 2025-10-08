@@ -53,6 +53,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- Modal backdrop requires click handler; keyboard dismissal handled globally via escape key handler
             <div
                 className="modal-overlay modal-overlay--confirm confirm-dialog__overlay"
+                data-testid="confirm-dialog-overlay"
                 onClick={handleBackdropClick}
             >
                 <ThemedBox
@@ -61,6 +62,7 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                     aria-modal="true"
                     as="section"
                     className="confirm-dialog__container"
+                    data-testid="confirm-dialog"
                     open
                     padding="lg"
                     role="alertdialog"
@@ -93,10 +95,15 @@ export const ConfirmDialog: NamedExoticComponent = memo(
                     ) : null}
 
                     <footer className="confirm-dialog__actions">
-                        <ThemedButton onClick={cancel} variant="secondary">
+                        <ThemedButton
+                            data-testid="confirm-dialog-cancel"
+                            onClick={cancel}
+                            variant="secondary"
+                        >
                             {cancelLabel}
                         </ThemedButton>
                         <ThemedButton
+                            data-testid="confirm-dialog-confirm"
                             onClick={confirm}
                             variant={confirmVariant}
                         >

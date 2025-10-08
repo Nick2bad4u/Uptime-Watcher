@@ -5,15 +5,15 @@
 const PLAYWRIGHT_FLAG = "PLAYWRIGHT_TEST" as const;
 const PLAYWRIGHT_UA_PATTERN = /playwright|pw-test|pwtest/iv;
 
-type MaybeProcess = typeof globalThis & {
-    process?: {
+interface MaybeProcess {
+    readonly process?: {
         env?: Record<string, string | undefined>;
     };
-};
+}
 
-type MaybeNavigator = typeof globalThis & {
-    navigator?: Navigator;
-};
+interface MaybeNavigator {
+    readonly navigator?: Navigator;
+}
 
 /**
  * Reads an environment variable from the ambient Node.js process if available.
@@ -22,7 +22,16 @@ type MaybeNavigator = typeof globalThis & {
  */
 export function readProcessEnv(key: string): string | undefined {
     const automationProcess = (globalThis as MaybeProcess).process;
-    return automationProcess?.env?.[key];
+    if (automationProcess === undefined) {
+        return undefined;
+    }
+
+    const { env } = automationProcess;
+    if (env === undefined) {
+        return undefined;
+    }
+
+    return env[key];
 }
 
 /**
@@ -47,7 +56,7 @@ export function isPlaywrightAutomation(): boolean {
         playwrightAutomation?: boolean;
     };
 
-    return Boolean(automationTarget.playwrightAutomation);
+    return automationTarget.playwrightAutomation === true;
 }
 
 /**

@@ -68,11 +68,13 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                 className={`modal-overlay modal-overlay--frosted ${
                     isDark ? "dark" : ""
                 }`}
+                data-testid="add-site-modal-overlay"
                 onClick={handleOverlayClick}
             >
                 <ThemedBox
                     as="dialog"
                     className="modal-shell modal-shell--form modal-shell--accent-success"
+                    data-testid="add-site-modal"
                     open
                     padding="xl"
                     rounded="xl"
@@ -105,6 +107,7 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                             <button
                                 aria-label="Close modal"
                                 className="modal-shell__close"
+                                data-testid="add-site-modal-close"
                                 onClick={onClose}
                                 title="Close"
                                 type="button"

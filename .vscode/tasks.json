@@ -91,11 +91,6 @@
             "type": "npm"
         },
         {
-            "args": [
-                "install",
-                "--force"
-            ],
-            "command": "npm",
             "detail": "Installs npm dependencies forcefully",
             "group": "build",
             "icon": {
@@ -104,7 +99,7 @@
             },
             "label": "Install Dependencies (Force)",
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "presentation": {
                 "clear": false,
@@ -122,7 +117,8 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "type": "shell"
+            "script": "updateDeps",
+            "type": "npm"
         },
         {
             "detail": "Lints all source files using ESLint.",
@@ -393,6 +389,68 @@
                 "instancePolicy": "terminateOldest"
             },
             "script": "test:coverage",
+            "type": "npm"
+        },
+        {
+            "detail": "Runs all linters: TypeScript type-checking, ESLint, Stylelint, Madge, and Knip.",
+            "group": "test",
+            "icon": {
+                "color": "terminal.ansiYellow",
+                "id": "checklist"
+            },
+            "label": "Lint:All",
+            "presentation": {
+                "clear": true,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "test",
+                "panel": "shared",
+                "reveal": "silent",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": [
+                {
+                    "owner": "typescript",
+                    "pattern": {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 4,
+                        "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(.*)$"
+                    },
+                    "severity": "error"
+                },
+                {
+                    "owner": "eslint",
+                    "pattern": {
+                        "column": 2,
+                        "file": 1,
+                        "line": 3,
+                        "message": 4,
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
+                        "severity": 5
+                    },
+                    "severity": "error"
+                },
+                {
+                    "owner": "stylelint",
+                    "pattern": {
+                        "column": 3,
+                        "file": 1,
+                        "line": 2,
+                        "message": 4,
+                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$"
+                    },
+                    "severity": "error"
+                }
+            ],
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "lint:all",
             "type": "npm"
         }
     ],

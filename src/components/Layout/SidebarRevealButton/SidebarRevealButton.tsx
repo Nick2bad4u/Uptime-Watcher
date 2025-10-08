@@ -39,6 +39,7 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
                         {...triggerProps}
                         aria-label="Open navigation"
                         className={className}
+                        data-testid="sidebar-reveal-button"
                         onClick={toggleSidebar}
                         type="button"
                     >

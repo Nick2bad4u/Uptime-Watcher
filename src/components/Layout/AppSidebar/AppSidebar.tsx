@@ -213,6 +213,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
             className={`app-sidebar ${isDark ? "app-sidebar--dark" : "app-sidebar--light"} ${
                 isSidebarOpen ? "app-sidebar--open" : "app-sidebar--collapsed"
             }`}
+            data-testid="app-sidebar"
         >
             <div className="app-sidebar__inner">
                 <div className="app-sidebar__brand">
@@ -222,6 +223,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                 {...triggerProps}
                                 aria-label={sidebarToggleLabel}
                                 className="app-sidebar__brand-trigger"
+                                data-testid="sidebar-toggle"
                                 onClick={toggleSidebar}
                                 type="button"
                             >
@@ -263,6 +265,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                         <input
                             autoComplete="off"
                             className="app-sidebar__search-input"
+                            data-testid="sidebar-search-input"
                             id="sidebar-search"
                             onChange={handleSearchChange}
                             placeholder="Search sites"
@@ -272,7 +275,11 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                     </label>
                 </div>
 
-                <nav aria-label="Monitored sites" className="app-sidebar__list">
+                <nav
+                    aria-label="Monitored sites"
+                    className="app-sidebar__list"
+                    data-testid="sidebar-site-list"
+                >
                     {filteredSites.length === 0 ? (
                         <ThemedText
                             className="app-sidebar__empty"
@@ -310,6 +317,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                                     : ""
                                             }`}
                                             data-site-id={site.identifier}
+                                            data-testid="sidebar-site-item"
                                             onClick={handleSelectSite}
                                             type="button"
                                         >
@@ -338,7 +346,10 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                     )}
                 </nav>
 
-                <div className="app-sidebar__footer">
+                <div
+                    className="app-sidebar__footer"
+                    data-testid="sidebar-footer-controls"
+                >
                     <Tooltip
                         content="Add a new site"
                         position="right"

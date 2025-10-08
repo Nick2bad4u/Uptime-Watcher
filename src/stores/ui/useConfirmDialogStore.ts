@@ -113,14 +113,17 @@ if (isPlaywrightAutomation()) {
     };
 
     automationTarget.playwrightConfirmDialog = {
-        cancel: () => {
+        cancel: (): void => {
             useConfirmDialogStore.getState().cancel();
         },
-        confirm: () => {
+        confirm: (): void => {
             useConfirmDialogStore.getState().confirm();
         },
-        getState: () => useConfirmDialogStore.getState(),
-        subscribe: (listener) =>
+        getState: (): ConfirmDialogStoreState =>
+            useConfirmDialogStore.getState(),
+        subscribe: (
+            listener: (state: ConfirmDialogStoreState) => void
+        ): (() => void) =>
             useConfirmDialogStore.subscribe((state) => {
                 listener(state);
             }),

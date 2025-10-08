@@ -55,6 +55,7 @@ export const StatusSummary = ({
 }: StatusSummaryProperties): JSX.Element => (
     <ThemedBox
         className="header-status-summary"
+        data-testid="header-status-summary"
         padding="sm"
         rounded="lg"
         shadow="sm"
