@@ -106,7 +106,8 @@
         "**/node_modules/**": true,
         "**/release/**": true,
         "**/report/**": true,
-        "**/reports/**": true
+        "**/reports/**": true,
+        "**/todo.md": false
     },
     "files.watcherExclude": {
         "**/.cache/**": true,
