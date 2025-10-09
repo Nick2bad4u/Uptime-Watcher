@@ -39,6 +39,7 @@ const createUiState = (): UIStore => ({
     setShowSiteDetails: vi.fn(),
     setSiteCardPresentation: vi.fn(),
     setSiteDetailsChartTimeRange: vi.fn(),
+    setSiteDetailsHeaderCollapsed: vi.fn(),
     setSiteListLayout: vi.fn(),
     setSiteTableColumnWidths: vi.fn(),
     showAddSiteModal: false,
@@ -47,6 +48,7 @@ const createUiState = (): UIStore => ({
     showSiteDetails: false,
     siteCardPresentation: "stacked",
     siteDetailsChartTimeRange: "24h",
+    siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
     siteTableColumnWidths: {
@@ -59,6 +61,7 @@ const createUiState = (): UIStore => ({
         uptime: 12,
     },
     syncActiveSiteDetailsTab: vi.fn(),
+    toggleSiteDetailsHeaderCollapsed: vi.fn(),
 });
 
 const metricsFixture = {

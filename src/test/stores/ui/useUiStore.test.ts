@@ -59,7 +59,10 @@ describe(useUIStore, () => {
         // Reset store state before each test
         const store = useUIStore.getState();
         act(() => {
-            useUIStore.setState({ siteDetailsTabState: {} });
+            useUIStore.setState({
+                siteDetailsHeaderCollapsedState: {},
+                siteDetailsTabState: {},
+            });
             store.setActiveSiteDetailsTab("site-overview");
             store.selectSite(undefined);
             store.setShowAdvancedMetrics(false);
@@ -93,6 +96,7 @@ describe(useUIStore, () => {
             expect(result.current.siteDetailsChartTimeRange).toBe("24h");
             expect(result.current.siteCardPresentation).toBe("stacked");
             expect(result.current.siteListLayout).toBe("card-large");
+            expect(result.current.siteDetailsHeaderCollapsedState).toEqual({});
             expect(result.current.siteTableColumnWidths).toMatchObject({
                 controls: 16,
                 monitor: 14,
@@ -129,6 +133,12 @@ describe(useUIStore, () => {
             );
             expect(typeof result.current.setSiteListLayout).toBe("function");
             expect(typeof result.current.setSiteTableColumnWidths).toBe(
+                "function"
+            );
+            expect(typeof result.current.setSiteDetailsHeaderCollapsed).toBe(
+                "function"
+            );
+            expect(typeof result.current.toggleSiteDetailsHeaderCollapsed).toBe(
                 "function"
             );
         });
@@ -303,6 +313,82 @@ describe(useUIStore, () => {
             });
 
             expect(result.current.activeSiteDetailsTab).toBe("site-overview");
+            expect(
+                result.current.siteDetailsTabState["non-existent-site"]
+            ).toBe("site-overview");
+        });
+    });
+
+    describe("Site Details Header Collapse", () => {
+        it("should set collapse state for a site", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: State", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.setSiteDetailsHeaderCollapsed(
+                    mockSite.identifier,
+                    true
+                );
+            });
+
+            expect(
+                result.current.siteDetailsHeaderCollapsedState[
+                    mockSite.identifier
+                ]
+            ).toBeTruthy();
+
+            act(() => {
+                result.current.setSiteDetailsHeaderCollapsed(
+                    mockSite.identifier,
+                    false
+                );
+            });
+
+            expect(
+                result.current.siteDetailsHeaderCollapsedState[
+                    mockSite.identifier
+                ]
+            ).toBeFalsy();
+        });
+
+        it("should toggle collapse state", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUiStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: State", "type");
+
+            const { result } = renderHook(() => useUIStore());
+
+            act(() => {
+                result.current.toggleSiteDetailsHeaderCollapsed(
+                    mockSite.identifier
+                );
+            });
+
+            expect(
+                result.current.siteDetailsHeaderCollapsedState[
+                    mockSite.identifier
+                ]
+            ).toBeTruthy();
+
+            act(() => {
+                result.current.toggleSiteDetailsHeaderCollapsed(
+                    mockSite.identifier
+                );
+            });
+
+            expect(
+                result.current.siteDetailsHeaderCollapsedState[
+                    mockSite.identifier
+                ]
+            ).toBeFalsy();
         });
     });
 

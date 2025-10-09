@@ -53,6 +53,7 @@ interface UIPersistedState {
     showAdvancedMetrics: boolean;
     siteCardPresentation: SiteCardPresentation;
     siteDetailsChartTimeRange: ChartTimeRange;
+    siteDetailsHeaderCollapsedState: Record<string, boolean>;
     siteDetailsTabState: Record<string, SiteDetailsTab>;
     siteListLayout: SiteListLayoutMode;
     siteTableColumnWidths: Record<SiteTableColumnKey, number>;
@@ -171,6 +172,21 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 });
                 set({ siteDetailsChartTimeRange: range });
             },
+            setSiteDetailsHeaderCollapsed: (
+                siteId: string,
+                collapsed: boolean
+            ): void => {
+                logStoreAction("UIStore", "setSiteDetailsHeaderCollapsed", {
+                    collapsed,
+                    siteId,
+                });
+                set((state) => ({
+                    siteDetailsHeaderCollapsedState: {
+                        ...state.siteDetailsHeaderCollapsedState,
+                        [siteId]: collapsed,
+                    },
+                }));
+            },
             setSiteListLayout: (layout: SiteListLayoutMode): void => {
                 logStoreAction("UIStore", "setSiteListLayout", { layout });
                 set({ siteListLayout: layout });
@@ -204,6 +220,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showSiteDetails: false,
             siteCardPresentation: "stacked",
             siteDetailsChartTimeRange: "24h",
+            siteDetailsHeaderCollapsedState: {},
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
             /**
@@ -222,10 +239,39 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteId,
                 });
-                set((state) => ({
-                    activeSiteDetailsTab:
-                        state.siteDetailsTabState[siteId] ?? "site-overview",
-                }));
+                set((state) => {
+                    const existingTab = state.siteDetailsTabState[siteId];
+
+                    if (existingTab === undefined) {
+                        return {
+                            activeSiteDetailsTab: "site-overview",
+                            siteDetailsTabState: {
+                                ...state.siteDetailsTabState,
+                                [siteId]: "site-overview",
+                            },
+                        };
+                    }
+
+                    return {
+                        activeSiteDetailsTab: existingTab,
+                        siteDetailsTabState: state.siteDetailsTabState,
+                    };
+                });
+            },
+            toggleSiteDetailsHeaderCollapsed: (siteId: string): void => {
+                logStoreAction("UIStore", "toggleSiteDetailsHeaderCollapsed", {
+                    siteId,
+                });
+                set((state) => {
+                    const current =
+                        state.siteDetailsHeaderCollapsedState[siteId] ?? false;
+                    return {
+                        siteDetailsHeaderCollapsedState: {
+                            ...state.siteDetailsHeaderCollapsedState,
+                            [siteId]: !current,
+                        },
+                    };
+                });
             },
         }),
         {
@@ -260,6 +306,8 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 showAdvancedMetrics: state.showAdvancedMetrics,
                 siteCardPresentation: state.siteCardPresentation,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
+                siteDetailsHeaderCollapsedState:
+                    state.siteDetailsHeaderCollapsedState,
                 siteDetailsTabState: state.siteDetailsTabState,
                 siteListLayout: state.siteListLayout,
                 siteTableColumnWidths: state.siteTableColumnWidths,

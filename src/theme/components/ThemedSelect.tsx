@@ -49,14 +49,16 @@ import type {
     CoreComponentProperties,
     EventHandlers,
 } from "@shared/types/componentProps";
-
-import {
-    type CSSProperties,
-    type JSX,
-    memo,
-    type NamedExoticComponent,
-    useMemo,
+import type {
+    CSSProperties,
+    ForwardedRef,
+    ForwardRefExoticComponent,
+    JSX,
+    MemoExoticComponent,
+    RefAttributes,
 } from "react";
+
+import { forwardRef, memo, useMemo } from "react";
 
 import { ARIA_LABEL, TRANSITION_ALL } from "../../constants";
 import { useTheme, useThemeClasses } from "../useTheme";
@@ -73,12 +75,18 @@ export interface ThemedSelectProperties
     readonly fluid?: boolean;
     /** Unique identifier for the select element */
     readonly id?: string;
+    /** Name attribute for form submissions */
+    readonly name?: string;
     /** Change handler for selection updates */
     readonly onChange?: EventHandlers.ChangeWithEvent<HTMLSelectElement>;
     /** Click handler for the select element */
     readonly onClick?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
     /** Mouse down handler for the select element */
     readonly onMouseDown?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
+    /** Focus handler for the select element */
+    readonly onFocus?: EventHandlers.Focus<HTMLSelectElement>;
+    /** Blur handler for the select element */
+    readonly onBlur?: EventHandlers.Focus<HTMLSelectElement>;
     /** Whether the select is required for form validation */
     readonly required?: boolean;
     /** Tooltip text that appears on hover */
@@ -89,114 +97,104 @@ export interface ThemedSelectProperties
     readonly value?: number | string;
 }
 
-/**
- * Themed select dropdown component with consistent styling and accessibility
- * support.
- *
- * @remarks
- * This component provides a styled select dropdown with automatic theme
- * integration, focus states, and accessibility features. The select supports
- * various event handlers and automatically applies appropriate styling based on
- * the current theme and state.
- *
- * @example Timeout selection dropdown:
- *
- * ```tsx
- * <ThemedSelect
- *     value={timeout}
- *     onChange={handleTimeoutChange}
- *     title="Request timeout in seconds"
- * >
- *     <option value={5}>5 seconds</option>
- *     <option value={10}>10 seconds</option>
- *     <option value={30}>30 seconds</option>
- * </ThemedSelect>;
- * ```
- *
- * @param props - The component properties
- *
- * @returns The themed select JSX element
- *
- * @public
- */
-const ThemedSelectComponent = ({
-    "aria-describedby": ariaDescribedBy,
-    [ARIA_LABEL]: ariaLabel,
-    children,
-    className = "",
-    disabled = false,
-    fluid = true,
-    id,
-    onChange,
-    onClick,
-    onMouseDown,
-    required = false,
-    title,
-    tone = "default",
-    value,
-}: ThemedSelectProperties): JSX.Element => {
-    const { currentTheme } = useTheme();
-    const { getBackgroundClass, getBorderClass, getTextClass } =
-        useThemeClasses();
+/* eslint-disable-next-line @eslint-react/no-forward-ref -- Required to expose the native select ref for focus and picker control. */
+const ForwardedSelect = forwardRef<HTMLSelectElement, ThemedSelectProperties>(
+    function ForwardedSelect(
+        {
+            "aria-describedby": ariaDescribedBy,
+            [ARIA_LABEL]: ariaLabel,
+            children,
+            className = "",
+            disabled = false,
+            fluid = true,
+            id,
+            name,
+            onBlur,
+            onChange,
+            onClick,
+            onFocus,
+            onMouseDown,
+            required = false,
+            title,
+            tone = "default",
+            value,
+            ...restProps
+        }: ThemedSelectProperties,
+        ref: ForwardedRef<HTMLSelectElement>
+    ): JSX.Element {
+        const { currentTheme } = useTheme();
+        const { getBackgroundClass, getBorderClass, getTextClass } =
+            useThemeClasses();
 
-    // Ensure value is always defined to prevent controlled/uncontrolled
-    // warnings
-    const selectValue = value ?? "";
+        const selectValue = value ?? "";
 
-    const styles = useMemo(
-        (): CSSProperties => ({
-            ...getBackgroundClass("primary"),
-            ...getTextClass("primary"),
-            ...getBorderClass("primary"),
-            borderRadius: currentTheme.borderRadius.md,
-            borderStyle: "solid",
-            borderWidth: tone === "transparent" ? "0" : "1px",
-            fontSize: currentTheme.typography.fontSize.sm,
-            padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
-            transition: TRANSITION_ALL,
-            ...(fluid ? { width: "100%" } : {}),
-            cursor: disabled ? "not-allowed" : "pointer",
-            ...(tone === "transparent"
-                ? {
-                      backgroundColor: "transparent",
-                      borderColor: "transparent",
-                      padding: "0",
-                  }
-                : {}),
-        }),
-        [
-            currentTheme.borderRadius.md,
-            currentTheme.spacing.md,
-            currentTheme.spacing.sm,
-            currentTheme.typography.fontSize.sm,
-            disabled,
-            fluid,
-            getBackgroundClass,
-            getBorderClass,
-            getTextClass,
-            tone,
-        ]
-    );
-    return (
-        <select
-            aria-describedby={ariaDescribedBy}
-            aria-label={ariaLabel}
-            className={`themed-select ${className}`}
-            disabled={disabled}
-            id={id}
-            onChange={onChange}
-            onClick={onClick}
-            onMouseDown={onMouseDown}
-            required={required}
-            style={styles}
-            title={title}
-            {...(value === undefined ? {} : { value: selectValue })}
-        >
-            {children}
-        </select>
-    );
-};
+        const styles = useMemo(
+            (): CSSProperties => ({
+                ...getBackgroundClass("primary"),
+                ...getTextClass("primary"),
+                ...getBorderClass("primary"),
+                borderRadius: currentTheme.borderRadius.md,
+                borderStyle: "solid",
+                borderWidth: tone === "transparent" ? "0" : "1px",
+                cursor: disabled ? "not-allowed" : "pointer",
+                fontSize: currentTheme.typography.fontSize.sm,
+                padding: `${currentTheme.spacing.sm} ${currentTheme.spacing.md}`,
+                transition: TRANSITION_ALL,
+                ...(fluid ? { width: "100%" } : {}),
+                ...(tone === "transparent"
+                    ? {
+                          backgroundColor: "transparent",
+                          borderColor: "transparent",
+                          padding: "0",
+                      }
+                    : {}),
+            }),
+            [
+                currentTheme.borderRadius.md,
+                currentTheme.spacing.md,
+                currentTheme.spacing.sm,
+                currentTheme.typography.fontSize.sm,
+                disabled,
+                fluid,
+                getBackgroundClass,
+                getBorderClass,
+                getTextClass,
+                tone,
+            ]
+        );
 
-export const ThemedSelect: NamedExoticComponent<ThemedSelectProperties> = memo(
-    ThemedSelectComponent
+        return (
+            <select
+                aria-describedby={ariaDescribedBy}
+                aria-label={ariaLabel}
+                className={`themed-select ${className}`}
+                disabled={disabled}
+                id={id}
+                name={name}
+                onBlur={onBlur}
+                onChange={onChange}
+                onClick={onClick}
+                onFocus={onFocus}
+                onMouseDown={onMouseDown}
+                ref={ref}
+                required={required}
+                style={styles}
+                title={title}
+                {...restProps}
+                {...(value === undefined ? {} : { value: selectValue })}
+            >
+                {children}
+            </select>
+        );
+    }
 );
+
+type ForwardedSelectComponent = ForwardRefExoticComponent<
+    RefAttributes<HTMLSelectElement> & ThemedSelectProperties
+>;
+type MemoizedSelectComponent = MemoExoticComponent<ForwardedSelectComponent>;
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- React.memo loses forwardRef signature fidelity without an explicit assertion.
+const themedSelectComponent = memo(ForwardedSelect) as MemoizedSelectComponent;
+
+export { themedSelectComponent as ThemedSelect };

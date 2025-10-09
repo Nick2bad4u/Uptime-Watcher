@@ -41,10 +41,9 @@ import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
-import { useMount } from "../../hooks/useMount";
 import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
@@ -63,9 +62,6 @@ import { HistoryTab } from "./tabs/HistoryTab";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { SettingsTab } from "./tabs/SettingsTab";
 import { SiteOverviewTab } from "./tabs/SiteOverviewTab";
-
-const HEADER_COLLAPSE_SCROLL_THRESHOLD = 96;
-const HEADER_EXPAND_SCROLL_THRESHOLD = 32;
 
 /**
  * Props for the SiteDetails component
@@ -106,14 +102,6 @@ export const SiteDetails = ({
 }: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
-    const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-    const contentElementRef = useRef<HTMLDivElement | null>(null);
-    const collapseSentinelRef = useRef<HTMLDivElement | null>(null);
-    const collapseObserverRef = useRef<IntersectionObserver | null>(null);
-    const expandObserverRef = useRef<IntersectionObserver | null>(null);
-    const manualCollapseRef = useRef(false);
-    const scrollFallbackHandlerRef = useRef<EventListener | null>(null);
-    const scrollFallbackContainerRef = useRef<HTMLElement | null>(null);
 
     // Add global escape key handler
     const modalConfigs = useMemo(
@@ -138,143 +126,6 @@ export const SiteDetails = ({
             minHeight: 0,
         }),
         []
-    );
-
-    // Drive header collapse via a sentinel instead of raw scrollTop to avoid
-    // oscillation when the header's height animates.
-    useMount(
-        useCallback(function setupScrollObservers(): void {
-            const contentElement = contentElementRef.current;
-            const sentinelElement = collapseSentinelRef.current;
-
-            if (!contentElement || !sentinelElement) {
-                return;
-            }
-
-            const collapseObserver = new IntersectionObserver(
-                (entries) => {
-                    const [entry] = entries;
-
-                    if (!entry || entry.isIntersecting) {
-                        return;
-                    }
-
-                    setIsHeaderCollapsed((previous) => {
-                        if (previous) {
-                            return previous;
-                        }
-
-                        manualCollapseRef.current = false;
-                        return true;
-                    });
-                },
-                {
-                    root: contentElement,
-                    rootMargin: `-${HEADER_COLLAPSE_SCROLL_THRESHOLD}px 0px 0px 0px`,
-                    threshold: 0,
-                }
-            );
-
-            const expandObserver = new IntersectionObserver(
-                (entries) => {
-                    const [entry] = entries;
-
-                    if (
-                        !entry ||
-                        manualCollapseRef.current ||
-                        !entry.isIntersecting
-                    ) {
-                        return;
-                    }
-
-                    setIsHeaderCollapsed((previous) => {
-                        if (!previous) {
-                            return previous;
-                        }
-
-                        manualCollapseRef.current = false;
-                        return false;
-                    });
-                },
-                {
-                    root: contentElement,
-                    rootMargin: `-${HEADER_EXPAND_SCROLL_THRESHOLD}px 0px 0px 0px`,
-                    threshold: 0,
-                }
-            );
-
-            collapseObserver.observe(sentinelElement);
-            expandObserver.observe(sentinelElement);
-
-            collapseObserverRef.current = collapseObserver;
-            expandObserverRef.current = expandObserver;
-            scrollFallbackContainerRef.current = contentElement;
-
-            const handleScroll: EventListener = ({ type }) => {
-                if (type !== "scroll") {
-                    return;
-                }
-                const { scrollTop } = contentElement;
-                const shouldCollapse =
-                    scrollTop > HEADER_COLLAPSE_SCROLL_THRESHOLD;
-
-                if (shouldCollapse) {
-                    setIsHeaderCollapsed((previous) => {
-                        if (previous) {
-                            return previous;
-                        }
-
-                        manualCollapseRef.current = false;
-                        return true;
-                    });
-                    return;
-                }
-
-                if (manualCollapseRef.current) {
-                    return;
-                }
-
-                setIsHeaderCollapsed((previous) => {
-                    if (!previous) {
-                        return previous;
-                    }
-
-                    manualCollapseRef.current = false;
-                    return false;
-                });
-            };
-
-            scrollFallbackHandlerRef.current = handleScroll;
-            // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Cleanup removes the listener via stored handler/container references.
-            contentElement.addEventListener("scroll", handleScroll, {
-                passive: true,
-            });
-
-            handleScroll(new Event("scroll"));
-        }, []),
-        useCallback(function cleanupScrollObservers(): void {
-            collapseObserverRef.current?.disconnect();
-            expandObserverRef.current?.disconnect();
-            collapseObserverRef.current = null;
-            expandObserverRef.current = null;
-
-            const handler = scrollFallbackHandlerRef.current;
-            const container = scrollFallbackContainerRef.current;
-
-            if (handler && container) {
-                container.removeEventListener("scroll", handler);
-            }
-
-            if (handler) {
-                contentElementRef.current?.removeEventListener(
-                    "scroll",
-                    handler
-                );
-            }
-
-            scrollFallbackHandlerRef.current = null;
-            scrollFallbackContainerRef.current = null;
-        }, [])
     );
 
     // Use our custom hook to get all the data and functionality we need
@@ -455,15 +306,6 @@ export const SiteDetails = ({
         currentTheme,
     ]);
 
-    // Memoized event handlers to prevent unnecessary re-renders
-    const handleToggleCollapse = useCallback(() => {
-        setIsHeaderCollapsed((previous) => {
-            const next = !previous;
-            manualCollapseRef.current = next;
-            return next;
-        });
-    }, []);
-
     const handleCheckNowClick = useCallback(() => {
         void handleCheckNow();
     }, [handleCheckNow]);
@@ -629,8 +471,6 @@ export const SiteDetails = ({
                         onClose={onClose}
                         site={currentSite}
                         {...(selectedMonitor ? { selectedMonitor } : {})}
-                        isCollapsed={isHeaderCollapsed}
-                        onToggleCollapse={handleToggleCollapse}
                     />
 
                     <SiteDetailsNavigation
@@ -641,7 +481,6 @@ export const SiteDetails = ({
                         handleStartSiteMonitoring={handleStartSiteMonitoring}
                         handleStopMonitoring={handleStopMonitoring}
                         handleStopSiteMonitoring={handleStopSiteMonitoring}
-                        isHeaderCollapsed={isHeaderCollapsed}
                         isLoading={isLoading}
                         isMonitoring={isMonitoring}
                         selectedMonitorId={selectedMonitorId}
@@ -650,14 +489,8 @@ export const SiteDetails = ({
 
                     <div
                         className={`site-details-modal__content-wrapper custom-scrollbar ${isDark ? "dark" : ""}`}
-                        ref={contentElementRef}
                         style={scrollContainerStyle}
                     >
-                        <div
-                            aria-hidden="true"
-                            className="site-details-modal__sentinel"
-                            ref={collapseSentinelRef}
-                        />
                         <SurfaceContainer
                             className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
                             padding="xl"

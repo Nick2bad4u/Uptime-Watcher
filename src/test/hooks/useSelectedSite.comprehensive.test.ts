@@ -41,6 +41,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     setShowSiteDetails: (_show: boolean) => {},
     setSiteCardPresentation: (_presentation) => {},
     setSiteDetailsChartTimeRange: (_range: ChartTimeRange) => {},
+    setSiteDetailsHeaderCollapsed: vi.fn(),
     setSiteListLayout: (_layout) => {},
     setSiteTableColumnWidths: () => {},
     showAddSiteModal: false,
@@ -49,6 +50,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     showSiteDetails: false,
     siteCardPresentation: "stacked",
     siteDetailsChartTimeRange: defaultChartTimeRange,
+    siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
     siteTableColumnWidths: {
@@ -61,6 +63,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
         uptime: 12,
     },
     syncActiveSiteDetailsTab: (_siteId: string) => {},
+    toggleSiteDetailsHeaderCollapsed: vi.fn(),
     ...overrides,
 });
 

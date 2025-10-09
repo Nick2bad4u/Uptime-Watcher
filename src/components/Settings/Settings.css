@@ -27,6 +27,23 @@
     }
 }
 
+.settings-modal .modal-shell__header {
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.settings-modal .modal-shell__actions {
+    margin-inline-start: auto;
+}
+
+.settings-modal .modal-shell__close {
+    block-size: 2.125rem;
+    inline-size: 2.125rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 12px 24px
+        color-mix(in srgb, var(--modal-accent) 22%, transparent);
+}
+
 .settings-modal__header-left {
     position: relative;
     z-index: 1;

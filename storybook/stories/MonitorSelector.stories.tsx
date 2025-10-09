@@ -62,3 +62,10 @@ export const PortMonitorSelected: Story = {
         selectedMonitorId: baseMonitors[1]?.id ?? "",
     },
 };
+
+export const EmptyState: Story = {
+    args: {
+        monitors: [],
+        selectedMonitorId: "",
+    },
+};

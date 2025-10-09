@@ -249,7 +249,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText(/HTTP Analytics/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Website URL Analytics/)
+            ).toBeInTheDocument();
         });
     });
 
@@ -306,8 +308,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText("HTTP")).toBeInTheDocument();
-            expect(screen.getByText("PORT")).toBeInTheDocument();
+            expect(screen.getByText("Website URL")).toBeInTheDocument();
+            expect(screen.getByText("Host & Port")).toBeInTheDocument();
         });
 
         it("should handle monitor change", ({ task, annotate }) => {
@@ -456,7 +458,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 setActiveSiteDetailsTab,
             });
 
-            fireEvent.click(screen.getByText(/HTTP Analytics/));
+            fireEvent.click(screen.getByText(/Website URL Analytics/));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
                 "monitor-1-analytics"
@@ -553,7 +555,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             const monitorButton = screen.getByRole("button", {
-                name: /http analytics/i,
+                name: /website url analytics/i,
             });
             expect(monitorButton).toHaveClass("themed-button--primary");
         });
@@ -753,7 +755,9 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 selectedMonitorId: "ping-monitor",
             });
 
-            expect(screen.getByText(/PING Analytics/)).toBeInTheDocument();
+            expect(
+                screen.getByText(/Ping Monitor Analytics/)
+            ).toBeInTheDocument();
         });
 
         it("should handle missing selected monitor", ({ task, annotate }) => {
@@ -772,7 +776,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             });
 
             // Should still render navigation with fallback label
-            expect(screen.getByText(/ANALYTICS Analytics/)).toBeInTheDocument();
+            expect(screen.getByText(/Monitor Analytics/)).toBeInTheDocument();
         });
     });
 

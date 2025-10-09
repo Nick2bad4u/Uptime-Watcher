@@ -24,7 +24,7 @@ import {
 describe("MonitorSelector - Additional Coverage Tests", () => {
     const defaultProps: MonitorSelectorProperties = {
         monitors: [],
-        selectedMonitorId: "monitor-1",
+        selectedMonitorId: "",
         onChange: vi.fn(),
     };
 
@@ -72,6 +72,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             renderWithTheme({
                 ...defaultProps,
                 monitors: [unknownMonitor],
+                selectedMonitorId: unknownMonitor.id,
             });
 
             // Should display the unknown type with port
@@ -123,6 +124,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             renderWithTheme({
                 ...defaultProps,
                 monitors: [unknownMonitorWithUrl],
+                selectedMonitorId: unknownMonitorWithUrl.id,
             });
 
             // Should display the unknown type with URL
@@ -169,6 +171,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             renderWithTheme({
                 ...defaultProps,
                 monitors: [unknownMonitorEmpty],
+                selectedMonitorId: unknownMonitorEmpty.id,
             });
 
             // Should display just the type name with no additional details
@@ -213,6 +216,7 @@ describe("MonitorSelector - Additional Coverage Tests", () => {
             renderWithTheme({
                 ...defaultProps,
                 monitors: [unknownMonitorBoth],
+                selectedMonitorId: unknownMonitorBoth.id,
             });
 
             // Should display the port, not the URL (port has priority)

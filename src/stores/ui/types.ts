@@ -130,6 +130,15 @@ export interface UIStore {
     setSiteDetailsChartTimeRange: (range: ChartTimeRange) => void;
 
     /**
+     * Persists the collapsed state of the site details header for a specific
+     * site.
+     *
+     * @param siteId - Identifier of the site being viewed.
+     * @param collapsed - Whether the header should be collapsed.
+     */
+    setSiteDetailsHeaderCollapsed: (siteId: string, collapsed: boolean) => void;
+
+    /**
      * Updates the active presentation layout for the dashboard site list.
      *
      * @param layout - The target layout mode to activate.
@@ -179,6 +188,12 @@ export interface UIStore {
     siteDetailsChartTimeRange: ChartTimeRange;
 
     /**
+     * Map of site identifiers to the persisted collapsed state of the site
+     * details header.
+     */
+    siteDetailsHeaderCollapsedState: Record<string, boolean>;
+
+    /**
      * Map of site identifiers to the last active site details tab.
      */
     siteDetailsTabState: Record<string, SiteDetailsTab>;
@@ -199,6 +214,14 @@ export interface UIStore {
      * @param siteId - Identifier of the site being viewed.
      */
     syncActiveSiteDetailsTab: (siteId: string) => void;
+
+    /**
+     * Toggles the collapsed state of the site details header for the provided
+     * site.
+     *
+     * @param siteId - Identifier of the site being viewed.
+     */
+    toggleSiteDetailsHeaderCollapsed: (siteId: string) => void;
 
     // NOTE: getSelectedSite removed - use useSelectedSite hook instead
     // (src/hooks/useSelectedSite.ts)

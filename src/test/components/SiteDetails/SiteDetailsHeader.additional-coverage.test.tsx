@@ -13,10 +13,20 @@ import type { Monitor, Site } from "../../../../shared/types";
 
 // Mock the UI store
 const mockOpenExternal = vi.fn();
+const mockToggleHeaderCollapsed = vi.fn();
+const mockSetHeaderCollapsed = vi.fn();
+const mockStoreState = {
+    openExternal: mockOpenExternal,
+    setSiteDetailsHeaderCollapsed: mockSetHeaderCollapsed,
+    siteDetailsHeaderCollapsedState: {} as Record<string, boolean>,
+    toggleSiteDetailsHeaderCollapsed: mockToggleHeaderCollapsed,
+};
+
 vi.mock("../../../stores/ui/useUiStore", () => ({
-    useUIStore: () => ({
-        openExternal: mockOpenExternal,
-    }),
+    useUIStore: (selector?: (state: typeof mockStoreState) => unknown) =>
+        typeof selector === "function"
+            ? selector(mockStoreState)
+            : mockStoreState,
 }));
 
 // Mock the theme hooks
@@ -25,7 +35,6 @@ vi.mock("../../../hooks/useThemeStyles", () => ({
         headerStyle: { backgroundColor: "#ffffff" },
         overlayStyle: { opacity: 0.1 },
         contentStyle: { padding: "16px" },
-        collapseButtonStyle: { border: "none" },
     }),
 }));
 
@@ -105,6 +114,10 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
     beforeEach(() => {
         noop.mockClear();
+        mockOpenExternal.mockClear();
+        mockSetHeaderCollapsed.mockClear();
+        mockToggleHeaderCollapsed.mockClear();
+        mockStoreState.siteDetailsHeaderCollapsedState = {};
     });
 
     describe("URL Click Handler Coverage (Line 72)", () => {
@@ -137,7 +150,6 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 <SiteDetailsHeader
                     onClose={noop}
                     site={mockSite}
-                    isCollapsed={false}
                     selectedMonitor={mockHttpMonitor}
                 />
             );
@@ -198,7 +210,6 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 <SiteDetailsHeader
                     onClose={noop}
                     site={mockSite}
-                    isCollapsed={false}
                     selectedMonitor={httpMonitorNoUrl}
                 />
             );
@@ -267,7 +278,6 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 <SiteDetailsHeader
                     onClose={noop}
                     site={siteSpecial}
-                    isCollapsed={false}
                     selectedMonitor={httpMonitorSpecial}
                 />
             );
@@ -285,6 +295,212 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                     siteName: "Test Site & Co. #1",
                 }
             );
+        });
+
+        it("should trim monitor URLs before invoking openExternal", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Business Logic", "type");
+
+            const user = userEvent.setup();
+            const monitorWithWhitespace: Monitor = {
+                ...mockHttpMonitor,
+                id: "trim-test-monitor",
+                url: "   https://trimmed-url.example.com/path   ",
+            };
+
+            mockOpenExternal.mockClear();
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    selectedMonitor={monitorWithWhitespace}
+                />
+            );
+
+            const link = screen.getByRole("link");
+            await act(async () => {
+                await user.click(link);
+            });
+
+            expect(mockOpenExternal).toHaveBeenCalledTimes(1);
+            expect(mockOpenExternal).toHaveBeenCalledWith(
+                "https://trimmed-url.example.com/path",
+                {
+                    siteName: mockSite.name,
+                }
+            );
+        });
+
+        it("should suppress link rendering when URL fails validation", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Safeguard", "type");
+
+            const invalidUrlMonitor: Monitor = {
+                ...mockHttpMonitor,
+                id: "invalid-url-monitor",
+                url: "not-a-valid-url",
+            };
+
+            mockOpenExternal.mockClear();
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={mockSite}
+                    selectedMonitor={invalidUrlMonitor}
+                />
+            );
+
+            expect(screen.queryByRole("link")).toBeNull();
+            expect(mockOpenExternal).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("Collapsed Header Controls", () => {
+        it("should toggle collapse state when collapse button is clicked", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Interaction", "type");
+
+            const user = userEvent.setup();
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    selectedMonitor={mockHttpMonitor}
+                    site={mockSite}
+                />
+            );
+
+            const collapseButton = screen.getByRole("button", {
+                name: /collapse header/i,
+            });
+
+            await act(async () => {
+                await user.click(collapseButton);
+            });
+
+            expect(mockToggleHeaderCollapsed).toHaveBeenCalledTimes(1);
+            expect(mockToggleHeaderCollapsed).toHaveBeenCalledWith(
+                mockSite.identifier
+            );
+        });
+
+        it("should hide thumbnail and monitoring summary when collapsed", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Presentation", "type");
+
+            mockStoreState.siteDetailsHeaderCollapsedState = {
+                [mockSite.identifier]: true,
+            };
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    selectedMonitor={mockHttpMonitor}
+                    site={mockSite}
+                />
+            );
+
+            expect(
+                screen.queryByTestId("screenshot-thumbnail")
+            ).not.toBeInTheDocument();
+            expect(
+                screen.queryByTestId("monitoring-status-display")
+            ).not.toBeInTheDocument();
+            expect(
+                screen.getByRole("button", { name: /expand header/i })
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe("Expanded layout assertions", () => {
+        it("should always render screenshot thumbnail for HTTP monitors", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: UI", "type");
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={{
+                        ...mockSite,
+                        monitors: [mockHttpMonitor],
+                    }}
+                    selectedMonitor={mockHttpMonitor}
+                />
+            );
+
+            expect(
+                screen.getByTestId("screenshot-thumbnail")
+            ).toBeInTheDocument();
+        });
+
+        it("should render monitoring status display alongside header details", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: SiteDetailsHeader.additional-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Monitoring", "type");
+
+            render(
+                <SiteDetailsHeader
+                    onClose={noop}
+                    site={{
+                        ...mockSite,
+                        monitors: [mockHttpMonitor],
+                    }}
+                    selectedMonitor={mockHttpMonitor}
+                />
+            );
+
+            expect(
+                screen.getByTestId("monitoring-status-display")
+            ).toHaveTextContent("Monitoring 1 monitors");
         });
     });
 });

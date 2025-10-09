@@ -11,7 +11,8 @@ import type { JSX } from "react/jsx-runtime";
 
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { memo, useCallback, useMemo } from "react";
-import { MdExpandLess, MdExpandMore } from "react-icons/md";
+
+import type { UIStore } from "../../stores/ui/types";
 
 import { useThemeStyles } from "../../hooks/useThemeStyles";
 import { useUIStore } from "../../stores/ui/useUiStore";
@@ -24,18 +25,22 @@ import { Tooltip } from "../common/Tooltip/Tooltip";
 import { MonitoringStatusDisplay } from "./MonitoringStatusDisplay";
 import { ScreenshotThumbnail } from "./ScreenshotThumbnail";
 
+const selectOpenExternal = (state: UIStore): UIStore["openExternal"] =>
+    state.openExternal;
+
+const selectToggleSiteDetailsHeaderCollapsed = (
+    state: UIStore
+): UIStore["toggleSiteDetailsHeaderCollapsed"] =>
+    state.toggleSiteDetailsHeaderCollapsed;
+
 /**
  * Props for the SiteDetailsHeader component
  *
  * @public
  */
 export interface SiteDetailsHeaderProperties {
-    /** Whether the header is collapsed */
-    readonly isCollapsed?: boolean;
     /** Callback invoked when the modal should close */
     readonly onClose: () => void;
-    /** Callback to toggle the header collapse state */
-    readonly onToggleCollapse?: () => void;
     /** The currently selected monitor for the site */
     readonly selectedMonitor?: Monitor;
     /** The site object to display information for */
@@ -189,23 +194,7 @@ function buildHeaderMeta(parameters: HeaderMetaParameters): HeaderMetaItem[] {
     return items;
 }
 
-/**
- * Generates the collapsed summary copy when the header is minimized.
- *
- * @param lastCheckRelative - Relative description of the last check time.
- *
- * @returns Collapsed summary string, if available.
- */
-function getCollapsedSummary(lastCheckRelative?: string): string | undefined {
-    if (!lastCheckRelative) {
-        return undefined;
-    }
-
-    return `Last check ${lastCheckRelative}`;
-}
-
 interface SiteDetailsHeaderModel {
-    collapsedSummary?: string;
     hasHttpMonitorUrl: boolean;
     hasMonitorData: boolean;
     headerMeta: HeaderMetaItem[];
@@ -293,12 +282,7 @@ function useSiteDetailsHeaderModel(
         totalMonitors,
     ]);
 
-    const collapsedSummary = useMemo(
-        () => getCollapsedSummary(lastCheckRelative),
-        [lastCheckRelative]
-    );
-
-    const selectedMonitorUrl = selectedMonitor?.url ?? "";
+    const selectedMonitorUrl = (selectedMonitor?.url ?? "").trim();
     const hasMonitorData = Boolean(selectedMonitor);
     const hasHttpMonitorUrl =
         selectedMonitor?.type === "http" && selectedMonitorUrl.length > 0;
@@ -321,10 +305,6 @@ function useSiteDetailsHeaderModel(
             selectedMonitorUrl,
         };
 
-        if (collapsedSummary) {
-            baseModel.collapsedSummary = collapsedSummary;
-        }
-
         if (lastCheckExact) {
             baseModel.lastCheckExact = lastCheckExact;
         }
@@ -335,7 +315,6 @@ function useSiteDetailsHeaderModel(
 
         return baseModel;
     }, [
-        collapsedSummary,
         hasHttpMonitorUrl,
         hasMonitorData,
         headerMeta,
@@ -360,39 +339,52 @@ function useSiteDetailsHeaderModel(
  */
 export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties> =
     memo(function SiteDetailsHeader({
-        isCollapsed,
         onClose,
-        onToggleCollapse,
         selectedMonitor,
         site,
     }: SiteDetailsHeaderProperties): JSX.Element {
-        const isHeaderCollapsed = Boolean(isCollapsed);
-
-        const isExpanded = !isHeaderCollapsed;
-
-        // Use theme-aware styles
-        const styles = useThemeStyles(isHeaderCollapsed);
-        const { openExternal } = useUIStore();
+        const styles = useThemeStyles();
+        const openExternal = useUIStore(selectOpenExternal);
+        const toggleSiteDetailsHeaderCollapsed = useUIStore(
+            selectToggleSiteDetailsHeaderCollapsed
+        );
+        const isHeaderCollapsed = useUIStore(
+            useCallback(
+                (state) =>
+                    state.siteDetailsHeaderCollapsedState[site.identifier] ??
+                    false,
+                [site.identifier]
+            )
+        );
         const {
-            collapsedSummary,
             hasHttpMonitorUrl,
             hasMonitorData,
             headerMeta,
-            lastCheckExact,
             monitorState,
             monitorTypeLabel,
             screenshotUrl,
             selectedMonitorUrl,
         } = useSiteDetailsHeaderModel(site, selectedMonitor);
 
+        const isMonitorUrlValid = useMemo(
+            () => hasHttpMonitorUrl && isValidUrl(selectedMonitorUrl),
+            [hasHttpMonitorUrl, selectedMonitorUrl]
+        );
+
         const monitorStatus = selectedMonitor?.status ?? "unknown";
         const CloseIcon = AppIcons.ui.close;
+        const CollapseIcon = isHeaderCollapsed
+            ? AppIcons.ui.expand
+            : AppIcons.ui.collapse;
+        const collapseTooltip = isHeaderCollapsed
+            ? "Expand header"
+            : "Collapse header";
 
         // Memoized click handler for URL link
         const handleUrlClick = useCallback(
             (event: MouseEvent) => {
                 event.preventDefault();
-                if (!selectedMonitorUrl) {
+                if (!isMonitorUrlValid) {
                     return;
                 }
 
@@ -401,21 +393,21 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                 });
             },
             [
+                isMonitorUrlValid,
                 openExternal,
                 selectedMonitorUrl,
                 site.name,
             ]
         );
 
-        const shouldShowUrl = isExpanded && hasHttpMonitorUrl;
-        const collapseLabel = isHeaderCollapsed
-            ? "Expand header"
-            : "Collapse header";
-        const CollapseIcon = isHeaderCollapsed ? MdExpandMore : MdExpandLess;
-        const SummaryIcon = AppIcons.ui.history;
-        const headerClassName = isHeaderCollapsed
-            ? "site-details-header site-details-header--collapsed"
-            : "site-details-header";
+        const shouldShowUrl = isMonitorUrlValid;
+        const headerClassName = `site-details-header${
+            isHeaderCollapsed ? " site-details-header--collapsed" : ""
+        }`;
+
+        const handleCollapseToggle = useCallback(() => {
+            toggleSiteDetailsHeaderCollapsed(site.identifier);
+        }, [site.identifier, toggleSiteDetailsHeaderCollapsed]);
 
         const urlElement = shouldShowUrl ? (
             <a
@@ -436,7 +428,11 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
         }, [onClose]);
 
         return (
-            <div className={headerClassName} style={styles.headerStyle}>
+            <div
+                className={headerClassName}
+                data-collapsed={isHeaderCollapsed}
+                style={styles.headerStyle}
+            >
                 <div
                     className="site-details-header__overlay"
                     style={styles.overlayStyle}
@@ -448,12 +444,14 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                     <div className="site-details-header-accent" />
                     <div className="site-details-header-info">
                         <div className="site-details-header-main">
-                            {isExpanded ? (
-                                <ScreenshotThumbnail
-                                    siteName={site.name}
-                                    url={screenshotUrl}
-                                />
-                            ) : null}
+                            {isHeaderCollapsed ? null : (
+                                <div className="site-details-header-thumbnail">
+                                    <ScreenshotThumbnail
+                                        siteName={site.name}
+                                        url={screenshotUrl}
+                                    />
+                                </div>
+                            )}
                             <div className="site-details-status">
                                 <StatusIndicator
                                     size="lg"
@@ -479,62 +477,44 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                                     {site.name}
                                 </ThemedText>
                                 {urlElement}
-                                {isExpanded ? (
-                                    <ThemedText
-                                        className="site-details-header-state"
-                                        size="xs"
-                                        variant="secondary"
-                                    >
-                                        {monitorState.description}
-                                    </ThemedText>
-                                ) : null}
-                                {isHeaderCollapsed && collapsedSummary ? (
-                                    <Tooltip
-                                        content={
-                                            lastCheckExact ?? collapsedSummary
-                                        }
-                                        position="bottom"
-                                    >
-                                        {(triggerProps) => (
-                                            <span
-                                                {...triggerProps}
-                                                className="site-details-header-collapsed-summary"
-                                            >
-                                                <SummaryIcon
-                                                    aria-hidden="true"
-                                                    className="site-details-header-summary-icon"
-                                                    size={14}
-                                                />
-                                                {collapsedSummary}
-                                            </span>
-                                        )}
-                                    </Tooltip>
-                                ) : null}
-                                {isExpanded && !hasMonitorData ? (
+                                <ThemedText
+                                    className="site-details-header-state"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    {monitorState.description}
+                                </ThemedText>
+                                {hasMonitorData ? null : (
                                     <ThemedText size="base" variant="warning">
                                         No monitor data available for this site.
                                     </ThemedText>
-                                ) : null}
+                                )}
                             </div>
                         </div>
                         <div className="site-details-header-actions">
-                            {isExpanded ? (
+                            {isHeaderCollapsed ? null : (
                                 <MonitoringStatusDisplay
                                     monitors={site.monitors}
                                 />
-                            ) : null}
+                            )}
                             <div className="site-details-header-actions__controls">
-                                {onToggleCollapse ? (
-                                    <button
-                                        aria-label={collapseLabel}
-                                        onClick={onToggleCollapse}
-                                        style={styles.collapseButtonStyle}
-                                        title={collapseLabel}
-                                        type="button"
-                                    >
-                                        <CollapseIcon className="themed-text-secondary h-5 w-5" />
-                                    </button>
-                                ) : null}
+                                <Tooltip
+                                    content={collapseTooltip}
+                                    position="bottom"
+                                >
+                                    {(triggerProps) => (
+                                        <button
+                                            {...triggerProps}
+                                            aria-label={collapseTooltip}
+                                            aria-pressed={isHeaderCollapsed}
+                                            className="site-details-header__control site-details-header__collapse"
+                                            onClick={handleCollapseToggle}
+                                            type="button"
+                                        >
+                                            <CollapseIcon size={16} />
+                                        </button>
+                                    )}
+                                </Tooltip>
                                 <button
                                     aria-label="Close site details"
                                     className="modal-shell__close site-details-modal__close site-details-header__close"
@@ -547,7 +527,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                             </div>
                         </div>
                     </div>
-                    {isExpanded && headerMeta.length > 0 ? (
+                    {!isHeaderCollapsed && headerMeta.length > 0 ? (
                         <ul className="site-details-header-meta">
                             {headerMeta.map(
                                 ({ key, label, tooltip, value }) => {

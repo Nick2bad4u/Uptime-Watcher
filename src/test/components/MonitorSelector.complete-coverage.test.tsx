@@ -3,8 +3,9 @@
  * uncovered lines and edge cases to achieve 100% coverage.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { forwardRef } from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MonitorSelector } from "../../components/Dashboard/SiteCard/components/MonitorSelector";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
@@ -13,24 +14,17 @@ import { createValidMonitor } from "../../../shared/test/testHelpers";
 
 // Mock ThemedSelect
 vi.mock("../../theme/components/ThemedSelect", () => ({
-    ThemedSelect: ({
-        children,
-        onChange,
-        onClick,
-        onMouseDown,
-        value,
-        className,
-    }: any) => (
-        <select
-            className={className}
-            onChange={onChange}
-            onClick={onClick}
-            onMouseDown={onMouseDown}
-            value={value}
-            data-testid="themed-select"
-        >
-            {children}
-        </select>
+    ThemedSelect: forwardRef<HTMLSelectElement, any>(
+        ({ children, className, fluid, tone, ...rest }, ref) => (
+            <select
+                {...rest}
+                className={className}
+                data-testid="themed-select"
+                ref={ref}
+            >
+                {children}
+            </select>
+        )
     ),
 }));
 
@@ -78,6 +72,11 @@ const renderMonitorSelector = (props = {}) =>
             <MonitorSelector {...defaultProps} {...props} />
         </ThemeProvider>
     );
+
+const getSelectableOptions = () =>
+    screen
+        .queryAllByRole("option")
+        .filter((option) => option.getAttribute("value") !== "");
 
 describe("MonitorSelector - Complete Coverage", () => {
     beforeEach(() => {
@@ -185,6 +184,114 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             const select = screen.getByTestId("themed-select");
             expect(select).toHaveValue("monitor-2");
+        });
+
+        it("should disable selector and show empty state when no monitors available", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Accessibility", "type");
+
+            renderMonitorSelector({ monitors: [], selectedMonitorId: "" });
+
+            const select = screen.getByTestId("themed-select");
+            const wrapper = select.closest(
+                ".monitor-selector__wrapper"
+            ) as HTMLElement;
+
+            expect(select).toBeDisabled();
+            expect(select).toHaveValue("");
+            expect(wrapper).toHaveAttribute("aria-disabled", "true");
+            expect(wrapper).toHaveAttribute("data-disabled", "true");
+            expect(wrapper).toHaveAttribute("tabindex", "-1");
+            expect(
+                screen.getByText("No monitors available")
+            ).toBeInTheDocument();
+        });
+
+        it("should surface placeholder when selection is no longer valid", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Resilience", "type");
+
+            renderMonitorSelector({ selectedMonitorId: "missing-monitor" });
+
+            const select = screen.getByTestId("themed-select");
+            const wrapper = select.closest(
+                ".monitor-selector__wrapper"
+            ) as HTMLElement;
+
+            expect(select).not.toBeDisabled();
+            expect(select).toHaveValue("");
+            expect(wrapper).toHaveAttribute("aria-disabled", "false");
+            expect(screen.getByText("Select a monitor")).toBeInTheDocument();
+        });
+
+        it("should render trailing chevron icon for affordance", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Accessibility", "type");
+
+            renderMonitorSelector();
+
+            expect(
+                document.querySelector(".monitor-selector__icon--trailing")
+            ).toBeInTheDocument();
+        });
+    });
+
+    describe("Interactions", () => {
+        it("should focus the select when the wrapper is clicked", async ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate(
+                "Component: MonitorSelector.complete-coverage",
+                "component"
+            );
+            annotate("Category: Component", "category");
+            annotate("Type: Interaction", "type");
+
+            const user = userEvent.setup();
+            renderMonitorSelector();
+
+            const select = screen.getByTestId("themed-select");
+            const focusSpy = vi
+                .spyOn(select, "focus")
+                .mockImplementation(() => undefined);
+            const wrapper = select.closest(
+                ".monitor-selector__wrapper"
+            ) as HTMLElement;
+
+            await user.click(wrapper);
+            fireEvent.focus(select);
+
+            expect(focusSpy).toHaveBeenCalled();
+            expect(defaultProps.onChange).not.toHaveBeenCalled();
+            expect(wrapper).toHaveAttribute("aria-expanded", "true");
+
+            focusSpy.mockRestore();
         });
     });
 
@@ -605,11 +712,15 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             rerender(
                 <ThemeProvider>
-                    <MonitorSelector {...defaultProps} monitors={newMonitors} />
+                    <MonitorSelector
+                        {...defaultProps}
+                        monitors={newMonitors}
+                        selectedMonitorId="new-monitor"
+                    />
                 </ThemeProvider>
             );
 
-            const newOptions = screen.getAllByRole("option");
+            const newOptions = getSelectableOptions();
             expect(newOptions).toHaveLength(1);
             expect(newOptions[0]).toHaveValue("new-monitor");
             expect(newOptions[0]).toHaveTextContent(
@@ -636,13 +747,15 @@ describe("MonitorSelector - Complete Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            renderMonitorSelector({ monitors: [] });
+            renderMonitorSelector({ monitors: [], selectedMonitorId: "" });
 
             const select = screen.getByTestId("themed-select");
             expect(select).toBeInTheDocument();
 
             const options = screen.queryAllByRole("option");
-            expect(options).toHaveLength(0);
+            expect(options).toHaveLength(1);
+            expect(options[0]).toHaveTextContent("No monitors available");
+            expect(options[0]).toBeDisabled();
         });
 
         it("should handle single monitor", ({ task, annotate }) => {
@@ -663,9 +776,12 @@ describe("MonitorSelector - Complete Coverage", () => {
             annotate("Type: Monitoring", "type");
 
             const singleMonitor = [createMockMonitor("only-monitor", "ping")];
-            renderMonitorSelector({ monitors: singleMonitor });
+            renderMonitorSelector({
+                monitors: singleMonitor,
+                selectedMonitorId: "only-monitor",
+            });
 
-            const options = screen.getAllByRole("option");
+            const options = getSelectableOptions();
             expect(options).toHaveLength(1);
             expect(options[0]).toHaveTextContent("Ping Monitor");
         });
@@ -795,7 +911,7 @@ describe("MonitorSelector - Complete Coverage", () => {
             expect(select).toBeInTheDocument();
 
             // Options should still be available
-            const options = screen.getAllByRole("option");
+            const options = getSelectableOptions();
             expect(options).toHaveLength(3);
         });
 
@@ -955,7 +1071,7 @@ describe("MonitorSelector - Complete Coverage", () => {
 
             renderMonitorSelector({ monitors });
 
-            const options = screen.getAllByRole("option");
+            const options = getSelectableOptions();
 
             // Check that each option has expected format
             expect(options[0]).toHaveTextContent(/^Website URL:/);
@@ -987,7 +1103,9 @@ describe("MonitorSelector - Complete Coverage", () => {
             const select = screen.getByTestId("themed-select");
 
             // Focus the select
-            select.focus();
+            await act(async () => {
+                select.focus();
+            });
             expect(select).toHaveFocus();
 
             // Should be able to change selection with keyboard

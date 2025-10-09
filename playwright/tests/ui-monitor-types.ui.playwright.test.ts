@@ -14,6 +14,7 @@ import {
     type ElectronApplication,
     type Page,
 } from "@playwright/test";
+import { BASE_MONITOR_TYPES } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
@@ -281,11 +282,30 @@ test.describe(
 
                 expect(typedConfigs.length).toBeGreaterThan(0);
 
+                const actualTypes = Array.from(
+                    new Set(
+                        typedConfigs
+                            .map((config) => config.type)
+                            .filter(
+                                (type): type is string =>
+                                    typeof type === "string" && type.length > 0
+                            )
+                    )
+                ).sort((first, second) => first.localeCompare(second));
+
+                const expectedTypes = Array.from(BASE_MONITOR_TYPES).sort(
+                    (first, second) => first.localeCompare(second)
+                );
+
+                expect(actualTypes).toStrictEqual(expectedTypes);
+
                 const scenarios = typedConfigs
                     .map(buildMonitorScenario)
                     .sort((first, second) =>
                         first.monitorType.localeCompare(second.monitorType)
                     );
+
+                expect(scenarios).toHaveLength(expectedTypes.length);
 
                 const createdSiteNames: string[] = [];
 

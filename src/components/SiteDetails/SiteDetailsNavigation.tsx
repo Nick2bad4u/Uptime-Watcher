@@ -22,6 +22,7 @@ import { logger } from "../../services/logger";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
 import { AppIcons } from "../../utils/icons";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 import { Tooltip } from "../common/Tooltip/Tooltip";
@@ -50,8 +51,6 @@ export interface SiteDetailsNavigationProperties {
     readonly handleStopMonitoring: () => Promise<void>;
     /** Handler for stopping site-level monitoring */
     readonly handleStopSiteMonitoring: () => Promise<void>;
-    /** Whether the Site Details header is currently collapsed */
-    readonly isHeaderCollapsed?: boolean;
     /** Whether any async operation is in progress */
     readonly isLoading: boolean;
     /** Whether monitoring is currently active */
@@ -82,7 +81,6 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         handleStartSiteMonitoring,
         handleStopMonitoring,
         handleStopSiteMonitoring,
-        isHeaderCollapsed = false,
         isLoading,
         isMonitoring,
         selectedMonitorId,
@@ -134,17 +132,17 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         );
         const monitorTypeLabel = useMemo(() => {
             if (!selectedMonitor) {
-                return "ANALYTICS";
+                return "Monitor";
             }
 
-            return selectedMonitor.type.toUpperCase();
+            return getMonitorTypeDisplayLabel(selectedMonitor.type);
         }, [selectedMonitor]);
 
         const monitorOptions = useMemo(
             () =>
                 currentSite.monitors.map((monitor) => ({
                     id: monitor.id,
-                    label: monitor.type.toUpperCase(),
+                    label: getMonitorTypeDisplayLabel(monitor.type),
                 })),
             [currentSite.monitors]
         );
@@ -219,13 +217,9 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
             [isLoading]
         );
 
-        const navigationClassName = isHeaderCollapsed
-            ? "site-details-navigation site-details-navigation--collapsed"
-            : "site-details-navigation";
-
         return (
             <SurfaceContainer
-                className={navigationClassName}
+                className="site-details-navigation"
                 padding="lg"
                 variant="secondary"
             >
