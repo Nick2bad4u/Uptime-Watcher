@@ -7,14 +7,37 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[b766d28](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b766d289b85b357df9a424c15843829582cea293)...
+[b766d28](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b766d289b85b357df9a424c15843829582cea293)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b766d289b85b357df9a424c15843829582cea293...b766d289b85b357df9a424c15843829582cea293))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 16.3.0 [`(b766d28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b766d289b85b357df9a424c15843829582cea293)
+
+
+
+
+
+
+## [16.3.0] - 2025-10-09
+
+
 [[6035369](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)...
-[6035369](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6035369a2e91c4b2e8ad61bb64d672d0d853104f...6035369a2e91c4b2e8ad61bb64d672d0d853104f))
+[ba05c48](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba05c4868c3f7b59967d6c613f80e33840eb95e6)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6035369a2e91c4b2e8ad61bb64d672d0d853104f...ba05c4868c3f7b59967d6c613f80e33840eb95e6))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 16.2.0 [`(6035369)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v16.2.0 [skip ci] [`(ba05c48)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ba05c4868c3f7b59967d6c613f80e33840eb95e6)
 
 
 
