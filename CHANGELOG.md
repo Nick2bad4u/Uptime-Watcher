@@ -7,14 +7,580 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[3a6fde5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)...
-[3a6fde5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3a6fde5f3faee473677c0f0d2c59b13148c327b1...3a6fde5f3faee473677c0f0d2c59b13148c327b1))
+[[6035369](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)...
+[6035369](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6035369a2e91c4b2e8ad61bb64d672d0d853104f...6035369a2e91c4b2e8ad61bb64d672d0d853104f))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 16.2.0 [`(6035369)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6035369a2e91c4b2e8ad61bb64d672d0d853104f)
+
+
+
+
+
+
+## [16.2.0] - 2025-10-09
+
+
+[[3a6fde5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)...
+[a7204e4](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a7204e4be77bd67efcd4275e381587720e464adb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3a6fde5f3faee473677c0f0d2c59b13148c327b1...a7204e4be77bd67efcd4275e381587720e464adb))
+
+
+### ✨ Features
+
+- ✨ [feat] Extends UI monitor type coverage
+
+Extends UI monitor type coverage to include all registered types.
+
+- ✨ [feat] Introduces comprehensive monitor type coverage to the UI, ensuring all registered monitor types can be created and managed through the UI.
+ - This significantly enhances the UI's ability to handle a variety of monitoring configurations, improving user experience and feature completeness.
+ - Leverages runtime monitor type registry to dynamically generate monitor creation scenarios, ensuring compatibility with newly registered monitor types without requiring code updates.
+  - Introduces `MonitorCreationScenario` to encapsulate monitor type, dynamic fields, and site label for streamlined monitor creation.
+  - Implements `DEFAULT_FIELD_VALUES` and `FIELD_TYPE_OVERRIDES` to inject default and specialized data for monitor-specific dynamic fields, ensuring realistic configurations during bulk creation.
+  - Adds `ensureFieldValue`, `deriveNumericValue`, and `normalizeFieldValue` to resolve and normalize dynamic field values based on type configuration and constraints, ensuring data integrity and compatibility.
+  - Defines `buildMonitorScenario` to construct monitor creation scenarios from runtime configuration definitions, enabling automated scenario generation.
+  - Implements `filterMonitorTypeConfigs` to normalizes monitor type configuration data returned from the renderer, ensuring data consistency and reliability.
+- 🧪 [test] Adds UI tests to validate the creation of monitors for every supported type
+ - Which validates the end-to-end workflow of creating monitors for all registered types
+ - Adds a new test case that iterates through all monitor types registered in the system, creates a monitor for each type using the UI, and verifies that the monitors are created successfully.
+ - Adds UI tests to assert that site details render correctly after bulk creation, ensuring UI stability and data integrity.
+- 🚜 [refactor] Refactors the `AddSiteForm` component to use a `SurfaceContainer` for consistent styling.
+ - This change improves the visual consistency of the form by applying a standard surface style.
+- 🎨 [style] Updates the styling of the `EmptyState` component to use a `SurfaceContainer` for consistent appearance.
+ - This ensures that the empty state message is displayed with a consistent background and padding.
+- 🎨 [style] Implements a `SurfaceContainer` component to standardize padding, rounding, and surface variants for card-like layouts
+ - Improves UI consistency by providing a reusable component with predefined surface styles.
+- 🛠️ [fix] Improves the reliability of UI tests and fixes minor UI issues.
+ - 🛠️ [fix] Awaits the visibility of the confirmation dialog before proceeding with the test, ensuring that the dialog is fully loaded and ready for interaction.
+ - 🛠️ [fix] Forces the click on the remove button to avoid stability issues caused by animations.
+ - 🛠️ [fix] Adds a fallback mechanism to close the site details modal using the Escape key if the close button click fails.
+ - 🛠️ [fix] Adds a timeout to the history tab click to avoid flakiness.
+ - 🛠️ [fix] Adds a check to ensure that the site count matches the expected count.
+ - 🛠️ [fix] Improves the reliability of the `resolveConfirmDialog` function by adding a fallback mechanism to click the confirm or cancel button directly if the bridge is not available.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a7204e4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a7204e4be77bd67efcd4275e381587720e464adb)
+
+
+- ✨ [feat] Enhance UI and automation capabilities
+
+This commit introduces several enhancements to the UI and improves automation capabilities across the application.
+
+- 🎨 [style] Introduces data-testid attributes to various UI components.
+  - Improves testability and targetability of UI elements for automation and testing.
+  - Includes components like: Header, Sidebar, AddSiteModal, ConfirmDialog, and Settings modals.
+- 🧪 [test] Adds a function to expand the header if it is collapsed in UI tests.
+  - Ensures that tests can reliably interact with header elements regardless of their initial state.
+- 🛠️ [fix] Corrects the working directory for dependency installation.
+  - Fixes the install dependencies (force) task to use the workspace folder instead of the file directory.
+- 🚜 [refactor] Improves the logic for detecting Playwright automation.
+  - Enhances the reliability of automation detection by checking the process context and environment variables.
+- 🧪 [test] Refactors UI tests to use more specific locators.
+  - Improves the robustness and accuracy of UI tests by targeting elements more precisely.
+- ✨ [feat] Adds a new task to lint all source files.
+  - Integrates comprehensive linting checks (TypeScript, ESLint, Stylelint, Madge, Knip) into the build process.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8bec040)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8bec04097e32d68eb2db0684595349f9f34ffdec)
+
+
+- ✨ [feat] Enhance testing and automation support
+
+This commit improves the project's testability and automation capabilities by introducing features and configurations to streamline testing workflows and facilitate integration with Playwright.
+
+- ⚙️ Updates project dependencies, including `@putout/eslint-flat`, `electron`, `@types/react`, `@types/react-dom`, `eslint-plugin-testing-library`, and `istanbul-reports` to their latest versions.
+- 🧪 Adds a flag to expose Playwright automation in main world, enabling automated tests to interact with the application more effectively.
+ - Allows tests to determine if they are running in automation mode, which can be used to conditionally enable or disable certain features.
+ - 🧪 Configures `NODE_OPTIONS` to suppress a specific deprecation warning during Playwright tests.
+ - 🧪 Modifies the `launchElectronApp` helper function to set the `PLAYWRIGHT_TEST` environment variable to `true`, indicating that the application is running under Playwright automation.
+ - 🧪 Introduces a `resetApplicationState` helper function to clear persisted UI preferences and site data, ensuring deterministic test state.
+ - 🧪Adds a `getSiteCardLocator` helper function to reliably locate site cards on the dashboard.
+ - 🧪 Enhances the `createSiteViaModal` helper function to wait for the expected monitor count after creating a site.
+- 🧪 Implements `waitForConfirmDialogRequest` and `resolveConfirmDialog` to handle confirmation dialogs during automated tests.
+- 🧪 Updates tests to use the new `resetApplicationState` helper function, ensuring deterministic test state.
+ - 🧪 Modifies tests to use `getSiteCardLocator` for locating site cards.
+ - 🧪 Updates tests to wait for the expected monitor count after creating a site.
+- 🧪 Updates tests to use `waitForConfirmDialogRequest` and `resolveConfirmDialog` for handling confirmation dialogs.
+- 📝 Refactors the Copilot instructions to:
+ - 🤖 Refines the AI coding assistant's role and capabilities, emphasizing expertise in modern web technologies and best practices.
+ - 📐 Clarifies the architecture overview, focusing on frontend and backend technologies, IPC, state management, and database.
+ - 🛠️ Enhances code quality standards, emphasizing documentation, type safety, and testing.
+ - 🚫 Streamlines instructions, focusing on verifying system behavior, prioritizing robust solutions, and delivering maintainable fixes.
+ - ⏳ Removes time constraints and emphasizes leveraging available tools and resources.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8b27b7e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8b27b7e2bcb41556374ed63b4a73beeca9d950ee)
+
+
+- ✨ [feat] Enhance project setup and testing
+
+This commit enhances the project's development and testing infrastructure.
+
+- ➕ [feat] Adds `vite-tsconfig-paths` to resolve `tsconfig.json` paths in Vite configurations, improving module resolution during development and testing.
+- ⚙️ [feat] Modifies various `tsconfig.json` files to include `@assets/*` path mappings, enabling easier access to static assets.
+- 🧪 [feat] Updates `global-setup.ts` to conditionally execute `build:playwright-coverage` when the `PLAYWRIGHT_COVERAGE` environment variable is set, facilitating coverage collection during Playwright tests.
+ - 📦 [build] Integrates a new build command for Playwright coverage, streamlining the process of generating coverage reports during end-to-end tests.
+- 📝 [build] Adds new build commands to `package.json` for playwright coverage, adding the necessary scripts.
+- 🧹 [chore] Removes deprecated E2E tests, streamlining the test suite and focusing on more robust and maintainable tests.
+- 📝 [build] Updates `eslint.config.mjs` to allow default project in `vite.playwright-coverage.config.ts`, allowing the new vite config to be linted.
+- 🛠️ [fix] Modifies a test to use `async` and `await` for better test stability and reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f32d4b3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f32d4b3701eeea22833de14c3a81089c73c72203)
+
+
+- ✨ [feat] Refreshes UI with new styling and coverage
+
+This commit introduces UI enhancements and improved test coverage tooling.
+
+- 🎨 [style] Implements refreshed UI across key components:
+  - Applies new styles for modals, dashboard elements, and settings sections using CSS custom properties for theme consistency.
+  - Updates the site list layout selector with enhanced visuals and interactive states.
+  - Introduces styling to the site details modal and navigation.
+ - 🧪 [test] Adds Playwright coverage collection:
+  - Integrates Istanbul for Playwright coverage reporting and threshold enforcement.
+  - Adds utilities for collecting coverage data from Electron renderer windows.
+  - Creates a Vite plugin for enabling coverage instrumentation during Playwright runs.
+  - Sets up a script for aggregating coverage fragments and generating reports.
+- 🛠️ [fix] Removes old E2E tests:
+  - Deletes many old, unmaintained E2E tests related to site managemement, component UI, cross browser compatibility, complete workflows, edge cases, and electron features.
+- 📝 [docs] Adds a style and layout guide.
+- 🚜 [refactor] Updates config files:
+  - Adds coverage utils to test and config files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f505de0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f505de0f5c1c2d4033eab38ef2acdb5c28006a7c)
+
+
+- ✨ [feat] Add Storybook stories for new components
+
+Adds Storybook stories for `ActionButtonGroup`, `MarqueeText`, `MonitorSelector`, `SiteCompactCard`, and `SiteTableView` components.
+
+ - 📝 Adds documentation and examples for each component to Storybook.
+ - ➕ Creates stories to showcase different states and configurations of the components.
+ - 🎨 Enhances the visual representation of the components in Storybook.
+ - 🧪 Improves the testability and maintainability of the components.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(27de75b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/27de75bae2577fe74e7a2e3e3067ececfa2d32e8)
+
+
+- ✨ [feat] Enhance UI with link checking and card layouts
+
+This commit introduces several enhancements to the user interface and development workflow.
+
+- 🎨 Adds a new compact card layout for sites, improving UI flexibility.
+   - Implements a marquee text component for handling long site names in limited spaces ➡️ ensures readability and a polished look.
+   - Enhances the site card to display key monitoring metrics in a compact format.
+- 📝 Updates pull request templates with repository adapter review and documentation link checks.
+   - Adds a documentation link check (`npm run docs:check-links`) to ensure documentation integrity.
+   - Includes a repository adapter review step in PR templates 🔄 to confirm transaction adapter updates and rollback coverage.
+- 🛠️ Updates documentation and development tasks to include link validation.
+   - Integrates link validation into the contribution guide and development scripts 🔗, improving doc quality.
+- 🧪 Adds fuzzing tests for bulk database inserts with transaction rollback verification.
+   - Implements database operation fuzzing tests 🧪 to ensure data integrity during bulk operations.
+   - Verifies transaction rollbacks ⏪ when statement fails during bulk inserts.
+- 🚜 Refactors ESLint and package configurations.
+   - Updates ESLint configurations and dependencies ⚙️, ensuring code quality and compatibility.
+   - Sets `prefer-called-exactly-once-with` to off in vitest config.
+   - Upgrades React and related dependencies to latest versions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e7b1e0a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e7b1e0a1e2eea39a6159c65416ec776d08c0b37e)
+
+
+- ✨ [feat] Enhance app architecture and UI
+
+- ✨ [feat] Introduces an overflow marquee hook for UI elements
+ - ➕ Adds `useOverflowMarquee` hook to handle text overflow in containers, applying marquee animations when necessary.
+ - 🎨 Includes CSS utility classes (`animate-marquee` / `marquee-pause-on-hover`) for consistent animation styling.
+- 🚜 [refactor] Improves database transaction handling across repositories
+ - 🔄 Refactors `MonitorManager` to use transaction adapters for database operations, ensuring atomicity.
+ - 💱 Introduces transaction adapters for `HistoryRepository` and `SettingsRepository` to encapsulate transactional write operations.
+ - 🧩 Implements transaction adapters in `SiteRepository` and `MonitorRepository` to expose encapsulated write operations.
+- 🛠️ [fix] Implements handler verification for IPC channels
+ - ✅ Adds diagnostics channel to verify IPC handler registration, enhancing preload bridge reliability.
+ - 🔍 Implements middleware to verify channel or throw an error to ensure handler registration.
+- 📝 [docs] Updates architecture documentation
+ - 📚 Modifies directory structure and architecture documentation map for clarity.
+ - ✏️Updates ADR links and development patterns guide links to reflect file name changes.
+- ⚡ [perf] Improves logging and codebase maintainability
+ - 🪵 Enhances logging in `electron/utils/logger.ts` by using shared logging helpers, centralizing message formatting and error serialization for consistent output.
+- 🧪 [test] Adds comprehensive test coverage
+ - 🧪 Adds test coverage in `electron/test/managers/SiteManager.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds comprehensive bridge factory tests in `electron/test/preload/core/bridgeFactory.comprehensive.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds comprehensive monitor repository tests in `electron/test/services/database/MonitorRepository.comprehensive.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds comprehensive site details navigation tests in `src/test/components/SiteDetails/SiteDetailsNavigation.comprehensive.test.tsx` to ensure all functions are properly tested.
+ - 🧪 Adds comprehensive store tests in `src/test/hooks/useSelectedSite.comprehensive.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds comprehensive store tests in `src/test/stores/sites/useSiteMonitoring.comprehensive.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds targeted store tests in `src/test/stores/sites/useSiteOperations.targeted.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds store tests in `src/test/stores/sites/useSiteOperations.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds store tests in `src/test/stores/sites/utils/operationHelpers.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds fuzzing tests in `src/test/stores/ui/useUIStore.input-fuzzing.test.ts` to ensure all functions are properly tested.
+ - 🧪 Adds store tests in `src/test/stores/ui/useUIStore.test.ts` to ensure all functions are properly tested.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f06123f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f06123f0e356b1190e49284f7b1ae0072a8a7132)
+
+
+- ✨ [feat] Introduce application shell layout
+
+Adds a responsive application shell with sidebar navigation.
+
+ - 🚀 Introduces a new `AppSidebar` component for global navigation, including site search and quick actions.
+ - 📱 Implements responsive sidebar behavior, collapsing on smaller screens with a reveal button.
+ - 🎨 Applies themed styling to the sidebar, reveal button, and application shell for visual consistency.
+ - 🏠 Introduces `DashboardOverview` component to display global metrics in a grid of cards, offering a high-level summary of monitoring health, such as total sites, active monitors, uptime, and incident counts.
+ - 🔄 Refactors `SiteList` to support different layout modes (card, compact, list) via a segmented control, enhancing usability and information density.
+ - 📝 Adds CSS modules for new components and modifies existing ones to align with the new layout and styling.
+ - 📊 Integrates global monitoring metrics into the header, providing key status indicators at a glance.
+ - 🔗 Uses `SidebarLayoutProvider` and `useSidebarLayout` to manage and share sidebar state across components.
+ - 🧪 Adds `useGlobalMonitoringMetrics` hook to calculate and memoize aggregated monitoring metrics, improving performance.
+ - 🧰 Updates `useUIStore` to manage the active site list layout and provide actions for updating layout preferences.
+ - 🚜 Migrates site card styles to CSS modules and introduces a compact card variant for the "Mini" layout option.
+ - ⚡ Optimizes site card rendering and layout for improved performance and visual appeal.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b382add)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b382addcf262b7cc20c40338efd3f282e030da89)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Enhance diagnostics and UI interactions
+
+This commit improves diagnostics logging and enhances UI interactions for a smoother user experience.
+
+- 🛠️ **Enhances diagnostics logging**:
+ - Introduces a `consoleDiagnosticsLogger` for fallback logging.
+ - Updates `resolveDiagnosticsLogger` to prioritize `diagnosticsLogger`, then `logger`, and finally fall back to `consoleDiagnosticsLogger`.
+ - Improves robustness in environments with incomplete mocks.
+ - 🎨 **Improves UI interactions**:
+ - Adds auto-dismissal of the navigation drawer on compact viewports when focus leaves it, improving usability on smaller screens 📱.
+ - 🎨 **Refines site list table**:
+ - Fixes alignment issues in the site table, ensuring consistent presentation.
+ - Improves the resizing behavior of table columns for better user control 🖱️.
+ - 🧪 **Updates test mocks**:
+ - Updates logger mocks in tests to include both `logger` and `diagnosticsLogger` for more comprehensive testing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7d51276)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d51276ba0b9349546ed87b71255d3cb3355f67c)
+
+
+- 🛠️ [fix] Improves logger initialization and table UI
+
+This commit addresses issues with logger initialization and enhances the table UI for improved user experience.
+
+- 🛠️ [fix] Implements a more robust logger initialization process:
+ -  Ensures a fallback mechanism for logger initialization, preventing failures due to incomplete mocks or module lookup issues.
+ -  This change avoids silent failures and provides a minimal console-backed logger as a last resort 🗄️.
+- 🎨 [style] Enhances the site list table UI for better usability:
+ -  Introduces resizable columns ↔️, allowing users to customize the table layout.
+ -  Improves the compact site card layout with better alignment and text wrapping 📰.
+- 🧪 [test] Updates mocks for logger to include diagnosticsLogger
+ -  This ensures tests accurately reflect the availability of both standard and diagnostics loggers.
+- 📝 [docs] Adds a comment to explain the change to the error message.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(19c3e60)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/19c3e6001ad7aa2c8291a7ac31b7e1516960f26f)
+
+
+- 🛠️ [fix] Improve site removal and deletion
+
+Improves the reliability of site removal and deletion processes.
+
+- 🗑️ Ensures monitoring is stopped before site removal to prevent inconsistencies.
+   - Introduces compensation logic to restart monitoring if site deletion fails after monitoring has been stopped.
+   - Emits a system error event if monitor restart fails during compensation, indicating a critical state inconsistency.
+ - 🛑 Stops monitoring before deleting all sites in bulk to avoid orphaned monitors.
+ - 📝 Adds logging for site removal and deletion processes to improve traceability.
+- 🎨 Updates UI theming and styling to improve visual consistency and user experience.
+   - 💅 Updates the styling of various UI components such as dashboard overview cards, header badges, and tooltips to improve visual appeal and consistency.
+   - 🌈 Introduces new color variables for shadows and accents to enhance theming capabilities.
+   - ♿ Improves accessibility by adjusting color contrasts and focus states.
+- ✅ Updates tests to reflect changes in site removal and deletion logic.
+   - Adds tests for error handling during site removal, including scenarios where monitoring stop or site deletion fails.
+   - Updates mocks and test assertions to align with the new site removal and deletion behavior.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e0f43e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e0f43e99af0d8cfe94e70f68c1917f0f15ca167)
+
+
+- 🛠️ [fix] Enhance UI/UX for settings and site details
+
+This commit improves the user interface and experience across the application, focusing on settings and site details views.
+
+- 🎨 Updates settings modal UI for better clarity and usability:
+   - Replaces text-based settings access with icon-based buttons for improved visual recognition.
+   - Improves layout and spacing within the settings modal to enhance information hierarchy.
+   - Enhances accessibility by adding ARIA labels and roles to settings elements.
+- ✨ Improves site details modal for better navigation and information display:
+   - Modifies the site details modal to enhance keyboard navigation and accessibility.
+   - Improves status summary in the header with more detailed monitor status and global health information. 📊
+- 🔧 Refactors internal logic for improved maintainability:
+   - Updates component properties to enhance type safety and reduce potential errors.
+   - Improves the overall structure and theming of UI components for consistency.
+- 🧪 Updates tests to reflect UI changes:
+   - Updates tests to use `getByTestId` for more robust element selection.
+   - Adjusts tests to verify the visibility of settings elements based on the updated UI.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(98d6078)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/98d607861e2906360a3fafce95673c08d90f9565)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 6 updates (#81) [`(3ab4250)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3ab4250078cf8586cac34f946355516d891e8121)
+
+
 - [dependency] Update version 16.1.0 [`(3a6fde5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3a6fde5f3faee473677c0f0d2c59b13148c327b1)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Implement transaction adapters
+
+This commit refactors the database operations to use transaction adapters for `SiteRepository` and `MonitorRepository`.
+
+- 🛠️ **Transaction Adapters**: Introduces `SiteRepositoryTransactionAdapter` and `MonitorRepositoryTransactionAdapter` interfaces to encapsulate database operations within a transaction.
+   - This ensures that operations are atomic and consistent, especially when dealing with multiple related entities.
+- 🧪 **Benchmark Updates**: Updates benchmarks to use transaction adapters for site and monitor operations, improving test isolation and reliability.
+- 🔄 **Repository Method Visibility**: Changes the visibility of several internal repository methods (`createInternal`, `updateInternal`, `deleteInternal`, etc.) to private, encapsulating them within the repository and exposing transaction-scoped operations via the new adapters.
+- 📝 **Type Updates**: Updates type definitions for Monitor and Site statuses to use constants, enhancing code clarity and maintainability. ➕ Adds new status kinds and updates related logic.
+- 🎨 **UI Enhancements**: Implements UI improvements in the `SiteCompactCard` and `SiteTableRow` components, including marquee effect for overflowing site names and improved status display.
+   - ✨ Adds marquee effect to site names to improve UI experience.
+   -  Updates status display in `SiteCompactCard` for better readability.
+- 🧪 **Comprehensive Test Updates**: Updates comprehensive tests for `MonitorRepository` and `SiteWriterService` to align with adapter pattern. Mock transaction adapter functions.
+- 🧹 **Code Cleanup**: Removes unused internal methods from repositories and streamlines database operation logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(47e7fe5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47e7fe52a35bc3bfc05361b85a7a117540f3522f)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Enhance architecture documentation
+
+Updates architecture documentation for clarity and consistency.
+
+- 📝 [docs] Corrects broken links in ADRs and patterns documentation
+   - Ensures internal links between architecture documents point to the correct files, improving navigation and discoverability.
+- 📝 [docs] Introduces a "Using This Documentation" guide
+   - Provides guidance for new contributors, feature owners, and reviewers on how to effectively navigate the architecture knowledge base.
+- 📝 [docs] Adds automation and review cadence details
+   - Documents the link validation process via `npm run docs:check-links` and the quarterly review cycle for architecture documentation, enhancing maintainability.
+- 📝 [docs] Enhances the Development Patterns Guide
+   - Adds sections on shared utility imports and logging format standards, promoting consistent code practices across the application.
+     - ✅ Explains the requirements for explicit module paths under `@shared/utils/*` and the prohibition of barrel imports.
+     - ✅ Details logging practices, structured prefixes, and the use of `LOG_TEMPLATES` for consistent telemetry.
+- 📝 [docs] Refactors architecture documentation
+   - Improves example accuracy and cross-references between related documents.
+- 📝 [docs] Updates the component prop standards guide
+   - Specifies compliance checklists and TSDoc standards, ensuring new code remains well-documented.
+- 🛠️ [fix] Adds diagnostics metrics collector for IPC bridge verification
+   - Tracks runtime statistics exposed by the preload diagnostics handshake, allowing for detection of missing handler registrations during CI and in production logs.
+   - Adds diagnostics logger to track IPC bridge and runtime health metrics.
+- 🛠️ [fix] Modifies the preload bridge factory to allow diagnostics fallback
+   - Adds a mechanism to bypass IPC diagnostics during testing and development, preventing false negatives in environments without full backend support.
+   - Resets verification caches to support deterministic testing.
+- 🛠️ [fix] Updates IpcService to record missing handler metrics
+   - Implements diagnostics metrics recording for IPC handler verification, improving observability and issue detection.
+- 🧹 [chore] Adds enhanced test utilities
+   - Creates a comprehensive mock for database repositories.
+- 🧪 [test] Adds comprehensive tests for IpcService
+   - Verifies diagnostics metrics recording during handler verification.
+- 🎨 [style] Improves site list component styling
+   - Improves the layout and appearance of the site list component, enhancing the user interface.
+- 🎨 [style] Enhances header component styling
+   - Improves the appearance and layout of the header component, enhancing the user experience.
+- 🎨 [style] Imrpoves the AppSidebar styling
+   - Improves the styling of the AppSidebar component, enhancing the appearance and usability of the application's sidebar navigation.
+- 🎨 [style] Enhances the Settings modal styling
+   - Improves the appearance and layout of the Settings modal, enhancing the user experience.
+- 🎨 [style] Enhances the SiteDetails styling
+   - Improves the styling of the SiteDetails component, enhancing the user experience.
+- 🎨 [style] Enhances the ConfirmDialog styling
+   - Improves the styling of the ConfirmDialog component, enhancing the user experience.
+- 🎨 [style] Updates themed select styling
+   - Implements cursor style changes for disabled select elements.
+- 🚜 [refactor] Refactors the useThemeStyles hook
+   - Improves site details header styling.
+- 🧪 [test] Adds comprehensive tests for the useSiteOperations
+   - Improves error handling for `deleteSite` to provide more informative error messages.
+- 🧪 [test] Adds input fuzzing tests for the UI Store
+   - Adds tests to validate valid values.
+- 🛠️ [fix] Improves URL validation
+   - Prevents false positives by checking for disallowed characters and improving URL validation logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5088d2d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5088d2d3b1e75ebc5d68d12c2a0779468364bb50)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Improves code style and documentation
+
+Improves code style and documentation across multiple files for consistency and readability.
+
+- 📝 [docs] Updates the development patterns guide to improve clarity and provide better examples.
+ -  ✅ Uses proper code fences for Typescript code blocks.
+ -  ✅ Clarifies shared utility import guidelines and provides examples.
+ -  ✅ Refines logging guidelines and examples.
+ -  ✅ Updates event-driven implementation template with improved formatting and clarity.
+- 🎨 [style] Updates the `App` component to improve the auto-dismissal logic of the navigation sidebar on compact viewports.
+ -  ✅ Uses a named function expression for the `useEffect` hook to improve readability.
+ -  ✅ Adds type annotations for better type safety.
+ -  ✅ Improves logic to determine if the sidebar should be closed based on user interaction.
+- 🎨 [style] Enhances the `AddSiteModal` and `Settings` components by adding explicit roles and aria-level attributes to the modal headers, improving accessibility.
+- 🎨 [style] Improves the styling of the `SiteList` component.
+ -  ✅ Uses `inset-inline-end` and `inset-block-start` instead of `top`, `right`, and `bottom` for positioning the resize handle. 📐
+ -   - This change makes the code more modern and flexible.
+ -  ✅ Fixes a minor issue where the resize handle was slightly misaligned in the last column.
+- 🎨 [style] Enhances the `SiteTableView` component by refactoring the column resizing logic.
+ -  ✅ Uses `useMemo` to compute column styles based on column widths. 🔄
+ -   - This optimization ensures that the styles are only recomputed when the column widths change.
+ -  ✅ Creates a pointer handler that manages interactive column resizing. 🖱️
+ -   - This change improves the user experience by providing a more intuitive way to resize columns.
+- 🎨 [style] Updates the `AppSidebar` component to use a configured Vite alias for shared asset resolution.
+- 🎨 [style] Improves the styling of the `Settings` component by using `overflow-block` instead of `overflow-y`.
+ -  ✅ This change ensures that the content overflows in the block direction, which is more appropriate for vertical scrolling.
+- 🚜 [refactor] Modifies several test files to use bracket notation for accessing properties on mock repository objects.
+ -  ✅ This change avoids potential issues with reserved keywords or special characters in property names.
+ -   - Files: `import-export.fuzz.test.ts`, `DatabaseManager.comprehensive.test.ts`, `DataImportExportService.comprehensive.test.ts`, `enhanced-testUtilities.ts`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(05ee016)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05ee016b9607ff8a753c6d4cd6d8393998f56aea)
+
+
+- 🎨 [style] Enhance dashboard site card UI
+
+This commit enhances the dashboard site card UI to improve readability and information density.
+
+- ✨ Introduces responsive font sizing and layout adjustments for the dashboard overview grid to ensure optimal display across various screen sizes 💻.
+   - Adjusts the font size of the `dashboard-overview__card-value` class to improve readability on different screen sizes.
+   - Modifies the grid layout of the `dashboard-overview__grid` class for different screen sizes to ensure optimal display.
+- 🛠️ Refactors the `SiteCard` component to improve information presentation and add metrics 📊.
+   - Improves the presentation of site metrics such as uptime, response time, and check status.
+   - Adds tooltips to metrics for additional context and clarity.
+   - Introduces a collapsed summary for the site details header to provide a concise overview when the header is minimized.
+   - Enhances the display of check intervals and last check times.
+- 🎨 Improves the header and compact card styles for better information density and visual appeal 💅.
+   - Adjusts the layout of the compact card to improve the presentation of key metrics.
+   - Enhances the header's appearance with improved spacing, typography, and badge styling.
+ - ➕ Introduces a new `ConfirmDialog` component for consistent confirmation prompts throughout the application ✅.
+   - Implements a styled confirm dialog for user confirmations.
+- 🧹 Cleans up and restyles various components for consistency and improved aesthetics ✨.
+   - Applies consistent styling to the site list, site details, and tooltip components.
+   - Introduces stylelint disables for existing kebab case class names and keyframe names.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(30e429f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/30e429f10f8efb19f2bad763fca8976c412abef0)
+
+
+- 🎨 [style] Polish UI and enhance UX
+
+This commit focuses on improving the user interface and overall user experience through various visual and functional enhancements.
+
+- 🎨 Revamps dashboard overview grid for better responsiveness across different screen sizes, ensuring optimal layout and minimizing gaps.
+ -  Updates grid templates and gaps for 1024px, 1200px, 1440px, and 1920px widths.
+- 🛠️ Fixes Site Details modal scroll and header collapse behavior.
+ -  Implements auto-collapse of the header on scroll within the Site Details modal for better content visibility.
+ -  Adds a scroll listener to the content area to trigger header collapse.
+- 🎨 Enhances the appearance of the settings modal with a new gradient background, refined borders, and updated shadows 💎.
+- ✨ Introduces tooltips to action buttons and site monitoring controls, providing contextual information for disabled states 💡.
+ -  Adds logic to `ActionButtonGroup` and `SiteMonitoringButton` to display tooltips explaining why certain actions are disabled (e.g., "Select a monitor to enable this action").
+- ⚡ Improves header status summary by refining the layout and styles of status pills, enhancing readability and visual appeal 💊.
+ -  Adjusts padding, borders, and shadows for the status summary container.
+ -  Removes the secondary status group container to simplify the layout.
+- ✨ Adds conditional rendering of the DashboardOverview component based on the `siteListLayout` state to allow for alternatives to the card layout.
+- 🎨 Refines the appearance of Site Cards in the "balanced" grid layout, applying new shadows, borders, and background effects for a more visually appealing presentation 🃏.
+- 🎨 Adjusts padding and font sizes in SiteList and SiteTableView components for improved information density and visual balance.
+- 🎨 Adds tooltips to the sidebar toggle button and makes it keyboard accessible.
+- 🧪 Adds tests for the settings modal and ensures that all keys are valid.
+- 🧪 Adds test coverage for the header site count and ensures that the values are displayed correctly.
+- 🧪 Adds tests for the app container and verifies that the correct classes are being applied.
+- 🧪 Adds tests for update notifications and ensures that the messages and icons are displayed correctly.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5a91529)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a915291c00a25aa0ef0ab799db66dd0198dd820)
+
+
+- 🎨 [style] Revamps UI components and layout
+
+Updates the application's UI with new styles, improved layouts, and enhanced user experience.
+
+- 🎨 Updates the styling of various UI components to improve visual appeal and consistency.
+   - Includes changes to button styles, modal layouts, card designs, and general theme adjustments.
+   - Uses color mixing and gradients to create depth and visual interest.
+- ✨ Introduces new UI elements and features to enhance the user experience.
+   - Adds a new "Add Site" button with improved styling and placement.
+   - Implements a new sidebar reveal button for collapsed navigation.
+- 🚜 Refactors the application layout to improve responsiveness and usability.
+   - Modifies the grid system for dashboard overview cards to adapt to different screen sizes.
+   - Adjusts the header and site list layouts for better mobile and desktop experiences.
+- 🛠️ Fixes minor issues and inconsistencies in the UI.
+   - Corrects spacing and alignment issues in various components.
+   - Improves the visual appearance of tooltips and badges.
+- ⚡ Improves the performance of UI components by optimizing rendering and transitions.
+   - Reduces unnecessary re-renders and layout shifts.
+- 📝 Updates documentation and comments to reflect the UI changes.
+   - Adds descriptions and explanations for new UI elements and styles.
+- 🧪 No test changes in this commit.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1d1a5b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1d1a5b0a5eaf74afe09d5bdbda38d52ecede08b6)
+
+
+- 🎨 [style] Enhance UI with icons and layout tweaks
+
+This commit enhances the user interface by replacing text-based status indicators with more visually intuitive icons and improves the layout of several components for better responsiveness and aesthetics.
+
+- ✨ Introduces `AppIcons` catalog for consistent icon usage across the app, sourced from `react-icons`. This promotes visual consistency and reduces bundle size compared to using emoji.
+- 🎨 **Replaces text-based status indicators with icons:**
+ -  - Replaces text indicators in the update notification with dedicated icons based on the update status (warning, available, downloading, ready).
+ -  - Replaces emoji in the dashboard overview cards with descriptive icons for each metric (sites, active monitors, uptime, incidents, response time).
+ -  - Replaces basic symbols in the empty state, site list, action buttons, site details and sidebar with more descriptive icons.
+- 🚜 **Refactors SiteCard:**
+ -  - Introduces `SiteCardMonitorList` component for detailed monitor information in stacked layout.
+ -  - Implements a stacked presentation mode for large site cards, providing a richer view of monitor health and activity.
+ -  - Modifies `SiteCard` to support different presentation modes (grid and stacked) and refactors its internal structure.
+- 🎨 **Enhances Header component:**
+ -  - Updates the header to include a site count chip with an icon, and restyles the status summary for better visual appeal.
+- 🎨 **Improves SiteList layout:**
+ -  - Introduces layout selector for switching between card and list views.
+ -  - Adds presentation toggle for large cards (grid/stacked).
+ -  - Implements responsive grid layout for site cards, adapting to different screen sizes.
+- 🎨 **Updates Settings modal:**
+ -  - Modernizes the settings modal with new styles, icons, and layout.
+- 🎨 **Enhances AppSidebar:**
+ -  - Updates the sidebar to use icons for site status and actions, improving visual clarity.
+- 🎨 **Updates SiteDetailsNavigation:**
+ -  - Enhance the Site Details navigation bar to use icons for each tab
+- 🎨 **Enhances HistoryTab:**
+ -  - Enhance the History tab to use icons to filter history more clearly.
+- 🎨 **Enhances OverviewTab:**
+ -  - Enhance the Overview tab to use icons to indicate actions.
+- 🎨 **Enhances FormErrorAlert:**
+ -  - Enhance the FormErrorAlert to use icons to indicate actions.
+- 🎨 **Enhances SiteMonitoringButton:**
+ -  - Enhance the SiteMonitoringButton to use icons to indicate actions.
+- 🎨 **Adds Tooltip component:**
+ -  - adds a Tooltip component that handles the display of information on hover.
+- 🎨 **Adds Settings.css:**
+ -  - adds styling for a new settings modal.
+- 🎨 **Adds tooltip.css:**
+ -  - adds styling for a new tooltip component.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ee4729a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ee4729ad22fc06b9e9397af1e1607dee5a07f91a)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Updates copilot instructions and gitignore
+
+Updates the copilot instructions, gitignore and vscode settings.
+
+- 📝 Updates copilot instructions to emphasize expertise and task tracking.
+  - Updates the phrase "broad but deep expertise" to "extensive and deep expertise" to better reflect the AI's capabilities.
+  - Specifies the use of the `todo` tool or `TODO.md` file for tracking multi-step tasks.
+- 🧹 Adds `TODO.md` to `.gitignore`.
+  - Prevents the `TODO.md` file from being tracked in the repository.
+- 🧹 Excludes `todo.md` from VS Code's search scope.
+  - This prevents it from showing up when searching through the project, reducing noise.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1a26410)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1a26410c2fd7a4c839b54b8343715200eedac6b1)
+
+
+- Update changelogs for v16.1.0 [skip ci] [`(c045594)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c045594190d32fd46494e8f9ece7031e46c6345f)
 
 
 
