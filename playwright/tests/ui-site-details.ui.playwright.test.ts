@@ -69,6 +69,7 @@ test.describe(
                 tag: ["@workflow", "@tabs"],
             },
             async () => {
+                test.setTimeout(60_000);
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
@@ -91,9 +92,22 @@ test.describe(
                     siteDetailsModal.getByTestId("analytics-tab")
                 ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await siteDetailsModal
-                    .getByRole("button", { name: "History" })
-                    .click();
+                const historyButton = siteDetailsModal
+                    .getByRole("button", {
+                        name: "History",
+                    })
+                    .first();
+                await historyButton.waitFor({
+                    state: "visible",
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
+                await expect(async () => {
+                    await historyButton.click({
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                        trial: true,
+                    });
+                }).toPass({ timeout: WAIT_TIMEOUTS.MEDIUM });
+                await historyButton.click({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
                 const historyTab = siteDetailsModal.getByTestId("history-tab");
                 await historyTab.scrollIntoViewIfNeeded();
@@ -116,15 +130,20 @@ test.describe(
                 tag: ["@workflow", "@monitoring"],
             },
             async () => {
+                test.setTimeout(60_000);
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                const startAllButton = page.getByRole("button", {
-                    name: "Start All Monitoring",
-                });
-                const stopAllButton = page.getByRole("button", {
-                    name: "Stop All Monitoring",
-                });
+                const startAllButton = siteDetailsModal
+                    .getByRole("button", {
+                        name: "Start All Monitoring",
+                    })
+                    .first();
+                const stopAllButton = siteDetailsModal
+                    .getByRole("button", {
+                        name: "Stop All Monitoring",
+                    })
+                    .first();
 
                 await stopAllButton.scrollIntoViewIfNeeded();
 

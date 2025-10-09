@@ -38,9 +38,9 @@
 
 import type { JSX } from "react/jsx-runtime";
 
-import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { AppIcons } from "../../../utils/icons";
+import { SurfaceContainer } from "../../shared/SurfaceContainer";
 
 /**
  * Empty state component for displaying when no sites are configured.
@@ -57,11 +57,10 @@ export const EmptyState = (): JSX.Element => {
     const MonitorIcon = AppIcons.metrics.monitor;
 
     return (
-        <ThemedBox
+        <SurfaceContainer
             className="text-center"
             data-testid="empty-state"
             padding="xl"
-            surface="base"
         >
             {/* empty-state-icon class provides styling from src/theme/components.css */}
             <div className="empty-state-icon">
@@ -73,6 +72,6 @@ export const EmptyState = (): JSX.Element => {
             <ThemedText variant="secondary">
                 Add your first website to start monitoring its uptime.
             </ThemedText>
-        </ThemedBox>
+        </SurfaceContainer>
     );
 };

@@ -55,6 +55,7 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
+import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
 import { AnalyticsTab } from "./tabs/AnalyticsTab";
@@ -657,7 +658,7 @@ export const SiteDetails = ({
                             className="site-details-modal__sentinel"
                             ref={collapseSentinelRef}
                         />
-                        <ThemedBox
+                        <SurfaceContainer
                             className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
                             padding="xl"
                             rounded="lg"
@@ -688,7 +689,7 @@ export const SiteDetails = ({
                             {historyTab}
 
                             {settingsTab}
-                        </ThemedBox>
+                        </SurfaceContainer>
                     </div>
                 </div>
             </ThemedBox>

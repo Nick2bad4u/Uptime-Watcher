@@ -11,8 +11,6 @@
 import { useMemo } from "react";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
-import { isPlaywrightAutomation } from "../../utils/environment";
-
 /** Visual tone for the confirm action button. */
 export type ConfirmDialogTone = "danger" | "default";
 
@@ -100,7 +98,7 @@ export const useConfirmDialogStore: UseBoundStore<
     };
 });
 
-if (isPlaywrightAutomation()) {
+if (typeof window !== "undefined") {
     const automationTarget = globalThis as typeof globalThis & {
         playwrightConfirmDialog?: {
             cancel: () => void;

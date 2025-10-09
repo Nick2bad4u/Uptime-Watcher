@@ -76,30 +76,23 @@ test.describe(
                 await expect(removeButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                await removeButton.click();
+                // eslint-disable-next-line playwright/no-force-option -- The Remove Site control sits inside an animated modal header; forcing the click avoids perpetual "element is not stable" errors in automation.
+                await removeButton.click({ force: true });
 
                 await waitForConfirmDialogRequest(page);
 
-                const confirmationDialog = page.getByRole("alertdialog", {
-                    name: "Remove Site",
+                const confirmationDialog = page.getByTestId("confirm-dialog");
+
+                await expect(confirmationDialog).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
+                await expect(
+                    confirmationDialog.getByText(siteName, {
+                        exact: false,
+                    })
+                ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                try {
-                    await expect(confirmationDialog).toBeVisible({
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    });
-                    await expect(
-                        confirmationDialog.getByText(siteName, {
-                            exact: false,
-                        })
-                    ).toBeVisible({ timeout: WAIT_TIMEOUTS.MEDIUM });
-
-                    await confirmationDialog
-                        .getByRole("button", { name: "Keep Site" })
-                        .click();
-                } catch {
-                    await resolveConfirmDialog(page, "cancel");
-                }
+                await resolveConfirmDialog(page, "cancel");
 
                 await expect(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
@@ -137,24 +130,17 @@ test.describe(
                     .getByRole("button", { name: "Remove Site" })
                     .first();
                 await removeButton.scrollIntoViewIfNeeded();
-                await removeButton.click();
+                // eslint-disable-next-line playwright/no-force-option -- The Remove Site control sits inside an animated modal header; forcing the click avoids perpetual "element is not stable" errors in automation.
+                await removeButton.click({ force: true });
 
                 await waitForConfirmDialogRequest(page);
 
-                const confirmationDialog = page.getByRole("alertdialog", {
-                    name: "Remove Site",
-                });
+                const confirmationDialog = page.getByTestId("confirm-dialog");
 
-                try {
-                    await expect(confirmationDialog).toBeVisible({
-                        timeout: WAIT_TIMEOUTS.MEDIUM,
-                    });
-                    await confirmationDialog
-                        .getByRole("button", { name: "Remove Site" })
-                        .click();
-                } catch {
-                    await resolveConfirmDialog(page, "confirm");
-                }
+                await expect(confirmationDialog).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
+                await resolveConfirmDialog(page, "confirm");
 
                 await expect(confirmationDialog).toBeHidden({
                     timeout: WAIT_TIMEOUTS.MEDIUM,

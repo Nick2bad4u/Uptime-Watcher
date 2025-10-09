@@ -19,13 +19,13 @@ import {
 import type { SiteDetailsTab } from "../../stores/ui/types";
 
 import { logger } from "../../services/logger";
-import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 import { Tooltip } from "../common/Tooltip/Tooltip";
+import { SurfaceContainer } from "../shared/SurfaceContainer";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary
@@ -224,7 +224,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
             : "site-details-navigation";
 
         return (
-            <ThemedBox
+            <SurfaceContainer
                 className={navigationClassName}
                 padding="lg"
                 variant="secondary"
@@ -385,6 +385,6 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                         </div>
                     </div>
                 </div>
-            </ThemedBox>
+            </SurfaceContainer>
         );
     });

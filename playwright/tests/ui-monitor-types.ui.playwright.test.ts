@@ -3,7 +3,7 @@
  * workflows across core monitor configurations.
  *
  * @remarks
- * Exercises HTTP, Port, and Ping monitors through the add-site modal using
+ * Exercises every registered monitor type through the add-site modal using
  * shared helpers to ensure dynamic form fields and monitor switching logic
  * remain stable.
  */
@@ -14,6 +14,7 @@ import {
     type ElectronApplication,
     type Page,
 } from "@playwright/test";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { launchElectronApp } from "../fixtures/electron-helpers";
 import { tagElectronAppCoverage } from "../utils/coverage";
@@ -29,7 +30,197 @@ import {
     submitAddSiteForm,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
+import type { DynamicFieldInput } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
+
+/**
+ * Monitor creation metadata derived from the runtime monitor type registry.
+ */
+interface MonitorCreationScenario {
+    readonly dynamicFields: DynamicFieldInput[];
+    readonly monitorType: string;
+    readonly siteLabel: string;
+}
+
+/**
+ * Default values injected for monitor-specific dynamic fields during bulk
+ * creation coverage.
+ */
+const DEFAULT_FIELD_VALUES: Record<string, string> = {
+    baselineUrl: `${DEFAULT_TEST_SITE_URL}/origin`,
+    bodyKeyword: "uptime",
+    certificateWarningDays: "30",
+    edgeLocations:
+        "https://edge1.example.com/status,https://edge2.example.com/status",
+    expectedHeaderValue: "application/json",
+    expectedJsonValue: "ok",
+    expectedStatusCode: "200",
+    expectedValue: "93.184.216.34",
+    headerName: "content-type",
+    heartbeatExpectedStatus: "ok",
+    heartbeatMaxDriftSeconds: "60",
+    heartbeatStatusField: "data.status",
+    heartbeatTimestampField: "data.timestamp",
+    host: "status.example.com",
+    jsonPath: "$.status",
+    maxPongDelayMs: "3000",
+    maxReplicationLagSeconds: "45",
+    maxResponseTime: "2000",
+    port: "443",
+    primaryStatusUrl: `${DEFAULT_TEST_SITE_URL}/primary-status`,
+    recordType: "A",
+    replicaStatusUrl: `${DEFAULT_TEST_SITE_URL}/replica-status`,
+    replicationTimestampField: "metrics.replication.timestamp",
+    url: `${DEFAULT_TEST_SITE_URL}/health`,
+};
+
+/**
+ * Monitor-type specific overrides applied on top of {@link DEFAULT_FIELD_VALUES}
+ * when specialised data is required.
+ */
+const FIELD_TYPE_OVERRIDES: Record<string, Partial<Record<string, string>>> = {
+    dns: {
+        expectedValue: "edge.example.net",
+        host: "example.com",
+    },
+    ping: {
+        host: "1.1.1.1",
+    },
+    port: {
+        host: "db.example.com",
+        port: "5432",
+    },
+    "server-heartbeat": {
+        url: `${DEFAULT_TEST_SITE_URL}/heartbeat`,
+    },
+    ssl: {
+        host: "secure.example.com",
+        port: "443",
+    },
+    "websocket-keepalive": {
+        url: "wss://example.com/socket",
+    },
+};
+
+/**
+ * Resolves the value that should be applied to a specific dynamic field.
+ *
+ * @param config - Source monitor type configuration.
+ * @param fieldName - Dynamic field identifier.
+ */
+const ensureFieldValue = (
+    config: MonitorTypeConfig,
+    fieldName: string
+): string => {
+    const override = FIELD_TYPE_OVERRIDES[config.type]?.[fieldName];
+    if (override) {
+        return override;
+    }
+
+    const defaultValue = DEFAULT_FIELD_VALUES[fieldName];
+    if (defaultValue) {
+        return defaultValue;
+    }
+
+    return `${config.type}-${fieldName}`;
+};
+
+/**
+ * Resolves the numeric value for a dynamic field based on its constraints.
+ */
+const deriveNumericValue = (
+    field: MonitorTypeConfig["fields"][number]
+): string => {
+    const fallback = field.min ?? 1;
+    const ceiling = field.max ?? fallback;
+    if (!Number.isFinite(fallback)) {
+        return "1";
+    }
+
+    if (Number.isFinite(ceiling) && ceiling < fallback) {
+        return String(fallback);
+    }
+
+    return String(Math.min(fallback, ceiling));
+};
+
+const normalizeFieldValue = (
+    config: MonitorTypeConfig,
+    field: MonitorTypeConfig["fields"][number]
+): string => {
+    const candidate = ensureFieldValue(config, field.name).trim();
+
+    if (field.type === "select") {
+        const optionValue = field.options?.[0]?.value ?? candidate;
+        return optionValue ?? "";
+    }
+
+    if (field.type === "number") {
+        const numericCandidate = Number.parseFloat(candidate);
+        if (Number.isFinite(numericCandidate)) {
+            return String(numericCandidate);
+        }
+        return deriveNumericValue(field);
+    }
+
+    if (field.type === "url") {
+        if (
+            candidate.startsWith("http://") ||
+            candidate.startsWith("https://")
+        ) {
+            return candidate;
+        }
+        return `${DEFAULT_TEST_SITE_URL}/${field.name}`;
+    }
+
+    return candidate.length > 0 ? candidate : `${config.type}-${field.name}`;
+};
+
+/**
+ * Builds a monitor creation scenario from a runtime configuration definition.
+ */
+const buildMonitorScenario = (
+    config: MonitorTypeConfig
+): MonitorCreationScenario => {
+    const dynamicFields: DynamicFieldInput[] = config.fields
+        .filter((field) => field.required)
+        .map((field) => {
+            const isSelect = field.type === "select";
+            const value = normalizeFieldValue(config, field);
+
+            return {
+                inputType: isSelect ? "select" : "text",
+                label: field.label,
+                value,
+            } satisfies DynamicFieldInput;
+        });
+
+    return {
+        dynamicFields,
+        monitorType: config.type,
+        siteLabel: config.displayName,
+    } satisfies MonitorCreationScenario;
+};
+
+/**
+ * Normalizes monitor type configuration data returned from the renderer.
+ *
+ * @param candidate - Raw data returned from the Electron bridge.
+ *
+ * @returns Strict array of {@link MonitorTypeConfig} entries.
+ */
+function filterMonitorTypeConfigs(candidate: unknown): MonitorTypeConfig[] {
+    if (!Array.isArray(candidate)) {
+        return [];
+    }
+
+    return candidate.filter(
+        (item): item is MonitorTypeConfig =>
+            Boolean(item) &&
+            typeof (item as MonitorTypeConfig).type === "string" &&
+            Array.isArray((item as MonitorTypeConfig).fields)
+    );
+}
 
 test.describe(
     "monitor types - modern ui",
@@ -59,6 +250,81 @@ test.describe(
                 await electronApp.close();
             }
         });
+
+        test(
+            "should create monitors for every supported type",
+            {
+                tag: ["@workflow", "@all-monitor-types"],
+            },
+            async () => {
+                test.setTimeout(120_000);
+                const monitorConfigs = (await page.evaluate(async () => {
+                    const scopedWindow = window as typeof window & {
+                        electronAPI?: {
+                            monitorTypes?: {
+                                getMonitorTypes?: () => Promise<
+                                    MonitorTypeConfig[]
+                                >;
+                            };
+                        };
+                    };
+
+                    const requestMonitorTypes =
+                        scopedWindow.electronAPI?.monitorTypes?.getMonitorTypes;
+
+                    return typeof requestMonitorTypes === "function"
+                        ? await requestMonitorTypes()
+                        : ([] as MonitorTypeConfig[]);
+                })) as unknown;
+
+                const typedConfigs = filterMonitorTypeConfigs(monitorConfigs);
+
+                expect(typedConfigs.length).toBeGreaterThan(0);
+
+                const scenarios = typedConfigs
+                    .map(buildMonitorScenario)
+                    .sort((first, second) =>
+                        first.monitorType.localeCompare(second.monitorType)
+                    );
+
+                const createdSiteNames: string[] = [];
+
+                for (const scenario of scenarios) {
+                    const siteName = generateSiteName(
+                        `${scenario.siteLabel} Coverage`
+                    );
+                    createdSiteNames.push(siteName);
+
+                    await test.step(`create monitor type: ${scenario.monitorType}`, async () => {
+                        await createSiteViaModal(page, {
+                            dynamicFields: scenario.dynamicFields,
+                            monitorType: scenario.monitorType,
+                            name: siteName,
+                        });
+                    });
+                }
+
+                const expectedSiteCount = scenarios.length;
+                const siteCountLabel = page.getByTestId("site-count-label");
+                await expect(siteCountLabel).toHaveText(
+                    new RegExp(`Tracking ${expectedSiteCount} sites?`)
+                );
+
+                // Open one of the created sites to ensure details render after bulk creation.
+                expect(
+                    createdSiteNames.length,
+                    "expected at least one created site"
+                ).toBeGreaterThan(0);
+                const lastSite = createdSiteNames[createdSiteNames.length - 1]!;
+                await openSiteDetails(page, lastSite);
+                await expect(page.getByTestId("site-overview-tab")).toBeVisible(
+                    {
+                        timeout: WAIT_TIMEOUTS.MEDIUM,
+                    }
+                );
+                await closeSiteDetails(page);
+            }
+        );
 
         test(
             "should create an HTTP monitor using URL configuration",

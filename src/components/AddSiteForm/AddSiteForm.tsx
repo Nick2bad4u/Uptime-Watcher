@@ -31,11 +31,11 @@ import { useMonitorTypes } from "../../hooks/useMonitorTypes";
 import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
-import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
+import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { RadioGroup } from "./RadioGroup";
@@ -536,12 +536,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         );
 
         return (
-            <ThemedBox
+            <SurfaceContainer
                 className="mx-auto max-w-md"
                 data-testid="add-site-form-container"
-                padding="lg"
-                rounded="lg"
-                surface="base"
             >
                 <form
                     aria-label="Add Site Form"
@@ -675,7 +672,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         </ThemedText>
                     </div>
                 </form>
-            </ThemedBox>
+            </SurfaceContainer>
         );
     }
 );
