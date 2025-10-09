@@ -237,7 +237,7 @@ jobs:
 
             - name: Install NPM dependencies (.package.json)
               id: install_dependencies
-              run: npm install
+              run: npm install --force
               continue-on-error: true
 
             - name: Build Vite Frontend and Electron Backend
