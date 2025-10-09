@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.schemastore.org/package.json",
   "name": "uptime-watcher",
-  "version": "16.5.0",
+  "version": "16.6.0",
   "description": "An Electron app to monitor website uptime status",
   "keywords": [
     "electron",
