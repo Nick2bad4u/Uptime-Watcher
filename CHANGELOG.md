@@ -7,14 +7,86 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3635611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)...
+[3635611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/36356112fae3366f87179fa1fdb97ae16b2a618a...36356112fae3366f87179fa1fdb97ae16b2a618a))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 16.6.0 [`(3635611)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)
+
+
+
+
+
+
+## [16.6.0] - 2025-10-09
+
+
+[[c91c27e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c91c27e5be69c781347b9028ba7eff78ec5103c1)...
+[a366b3c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a366b3c214845117b6c8b8b1f448a2a6ade70060)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c91c27e5be69c781347b9028ba7eff78ec5103c1...a366b3c214845117b6c8b8b1f448a2a6ade70060))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 16.5.0 [`(c91c27e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c91c27e5be69c781347b9028ba7eff78ec5103c1)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Overhauls build & release workflow for multi-platform automation
+
+- Refactors the CI workflow to use consistent YAML indentation, improving readability and maintainability.
+- Expands the build matrix to support more OS and architecture combinations, explicitly handling exclusions for unsupported targets.
+- Automates artifact collection, renaming, and organization by platform/arch, ensuring assets are consistently named and easy to locate.
+- Adds comprehensive hash generation steps for build artifacts across all OS types, strengthening release integrity and verification.
+- Introduces steps to fix and verify sha512 checksums in update metadata files, preventing update failures due to incorrect hashes.
+- Implements detailed release note generation and attaches a structured, user-friendly release asset download matrix for all supported platforms.
+- Automates CHANGELOG.md generation for the repo root and key subdirectories, committing updates directly to the repository post-release.
+- Improves job summaries and adds in-progress status reporting via GitHub Checks API for changelog updates, enhancing workflow transparency.
+- Updates Node.js version to 24 for the build environment.
+- Motivated by a need for robust, repeatable, and transparent multi-platform releases with verifiable assets, automated changelog management, and better user experience for download and update flows.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a366b3c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a366b3c214845117b6c8b8b1f448a2a6ade70060)
+
+
+
+
+
+
+## [16.5.0] - 2025-10-09
+
+
 [[c07ea48](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c07ea486fd0008a61003d658440e1b52250d2680)...
-[c07ea48](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c07ea486fd0008a61003d658440e1b52250d2680)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c07ea486fd0008a61003d658440e1b52250d2680...c07ea486fd0008a61003d658440e1b52250d2680))
+[2c7f5aa](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2c7f5aab6e8987ff060d6637921d3b2671c8fae3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c07ea486fd0008a61003d658440e1b52250d2680...2c7f5aab6e8987ff060d6637921d3b2671c8fae3))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 16.4.0 [`(c07ea48)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c07ea486fd0008a61003d658440e1b52250d2680)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v16.4.0 [skip ci] [`(5ebe5d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ebe5d93eefb1dae14c92c043827529eff3e82c4)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Upgrade node-abi to v4.14.0 and update dependencies
+
+- [dependency] Updates the node-abi package version from 3.75.0 to 4.14.0 in dev dependencies to ensure compatibility with newer Node.js versions and tooling.
+- Updates lockfile to reflect new node-abi version, including updated sub-dependencies and their required Node.js engine versions.
+- Adds node-abi to the main devDependencies for improved consistency and reliability in native module management.
+- Maintains alignment with upstream ecosystem and prevents potential build issues with native dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2c7f5aa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2c7f5aab6e8987ff060d6637921d3b2671c8fae3)
 
 
 
