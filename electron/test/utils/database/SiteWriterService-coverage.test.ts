@@ -338,6 +338,9 @@ describe("SiteWriterService Coverage Tests", () => {
                 "test-site"
             );
 
+            expect(monitorAdapter.findBySiteIdentifier).toHaveBeenCalledWith(
+                "test-site"
+            );
             expect(mockSitesCache.delete).toHaveBeenCalledWith("test-site");
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
@@ -353,6 +356,9 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result).toBeTruthy();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Site removed successfully from database: test-site"
+            );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "Removed 1 monitors for site: test-site"
             );
         });
 
@@ -379,6 +385,9 @@ describe("SiteWriterService Coverage Tests", () => {
                 "nonexistent-site"
             );
 
+            expect(monitorAdapter.findBySiteIdentifier).toHaveBeenCalledWith(
+                "nonexistent-site"
+            );
             expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
             expect(
                 mockMonitorRepository.createTransactionAdapter

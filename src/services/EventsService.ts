@@ -20,10 +20,9 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-import { waitForElectronAPI } from "../stores/utils";
-import { logger } from "./logger";
+const { ensureInitialized, wrap } = createIpcServiceHelpers("EventsService");
 
 /**
  * Service for managing event operations through Electron IPC.
@@ -46,17 +45,7 @@ export const EventsService = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize EventsService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
     /**
      * Register a callback for cache invalidation events.
@@ -76,12 +65,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onCacheInvalidated(
-        callback: (data: CacheInvalidatedEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onCacheInvalidated(callback);
-    },
+    onCacheInvalidated: wrap(
+        "onCacheInvalidated",
+        async (api, callback: (data: CacheInvalidatedEventData) => void) =>
+            api.events.onCacheInvalidated(callback)
+    ),
 
     /**
      * Register a callback for monitor down events.
@@ -101,12 +89,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onMonitorDown(
-        callback: (data: MonitorDownEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onMonitorDown(callback);
-    },
+    onMonitorDown: wrap(
+        "onMonitorDown",
+        async (api, callback: (data: MonitorDownEventData) => void) =>
+            api.events.onMonitorDown(callback)
+    ),
 
     /**
      * Register a callback for monitoring started events.
@@ -126,12 +113,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onMonitoringStarted(
-        callback: (data: MonitoringControlEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onMonitoringStarted(callback);
-    },
+    onMonitoringStarted: wrap(
+        "onMonitoringStarted",
+        async (api, callback: (data: MonitoringControlEventData) => void) =>
+            api.events.onMonitoringStarted(callback)
+    ),
 
     /**
      * Register a callback for monitoring stopped events.
@@ -151,12 +137,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onMonitoringStopped(
-        callback: (data: MonitoringControlEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onMonitoringStopped(callback);
-    },
+    onMonitoringStopped: wrap(
+        "onMonitoringStopped",
+        async (api, callback: (data: MonitoringControlEventData) => void) =>
+            api.events.onMonitoringStopped(callback)
+    ),
 
     /**
      * Register a callback for monitor status changes.
@@ -178,12 +163,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onMonitorStatusChanged(
-        callback: (update: StatusUpdate) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onMonitorStatusChanged(callback);
-    },
+    onMonitorStatusChanged: wrap(
+        "onMonitorStatusChanged",
+        async (api, callback: (update: StatusUpdate) => void) =>
+            api.events.onMonitorStatusChanged(callback)
+    ),
 
     /**
      * Register a callback for monitor up events.
@@ -203,12 +187,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onMonitorUp(
-        callback: (data: MonitorUpEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onMonitorUp(callback);
-    },
+    onMonitorUp: wrap(
+        "onMonitorUp",
+        async (api, callback: (data: MonitorUpEventData) => void) =>
+            api.events.onMonitorUp(callback)
+    ),
 
     /**
      * Register a callback for test events (development/debugging).
@@ -228,12 +211,11 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onTestEvent(
-        callback: (data: TestEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onTestEvent(callback);
-    },
+    onTestEvent: wrap(
+        "onTestEvent",
+        async (api, callback: (data: TestEventData) => void) =>
+            api.events.onTestEvent(callback)
+    ),
 
     /**
      * Register a callback for application update status events.
@@ -253,10 +235,9 @@ export const EventsService = {
      *
      * @throws If the electron API is unavailable.
      */
-    async onUpdateStatus(
-        callback: (data: UpdateStatusEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        return window.electronAPI.events.onUpdateStatus(callback);
-    },
+    onUpdateStatus: wrap(
+        "onUpdateStatus",
+        async (api, callback: (data: UpdateStatusEventData) => void) =>
+            api.events.onUpdateStatus(callback)
+    ),
 };

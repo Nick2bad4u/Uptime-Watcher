@@ -14,10 +14,11 @@
 import type { Monitor } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-import { waitForElectronAPI } from "../stores/utils";
-import { logger } from "./logger";
+const { ensureInitialized, wrap } = createIpcServiceHelpers(
+    "MonitorTypesService"
+);
 
 /**
  * Service for managing monitor types operations through Electron IPC.
@@ -51,22 +52,11 @@ export const MonitorTypesService = {
      * @throws If the electron API is unavailable or the formatting operation
      *   fails.
      */
-    async formatMonitorDetail(type: string, details: string): Promise<string> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.monitoring.formatMonitorDetail(
-                type,
-                details
-            );
-        } catch (error) {
-            const typedError = ensureError(error);
-            logger.error("Failed to format monitor detail", typedError, {
-                tag: "MonitorTypesService",
-            });
-            // Re-throw to allow store error handling
-            throw typedError;
-        }
-    },
+    formatMonitorDetail: wrap(
+        "formatMonitorDetail",
+        async (api, type: string, details: string) =>
+            api.monitoring.formatMonitorDetail(type, details)
+    ),
 
     /**
      * Generates formatted title suffix for a monitor.
@@ -88,25 +78,11 @@ export const MonitorTypesService = {
      * @throws If the electron API is unavailable or the formatting operation
      *   fails.
      */
-    async formatMonitorTitleSuffix(
-        type: string,
-        monitor: Monitor
-    ): Promise<string> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.monitoring.formatMonitorTitleSuffix(
-                type,
-                monitor
-            );
-        } catch (error) {
-            const typedError = ensureError(error);
-            logger.error("Failed to format monitor title suffix", typedError, {
-                tag: "MonitorTypesService",
-            });
-            // Re-throw to allow store error handling
-            throw typedError;
-        }
-    },
+    formatMonitorTitleSuffix: wrap(
+        "formatMonitorTitleSuffix",
+        async (api, type: string, monitor: Monitor) =>
+            api.monitoring.formatMonitorTitleSuffix(type, monitor)
+    ),
 
     /**
      * Gets all available monitor types from backend registry.
@@ -122,19 +98,9 @@ export const MonitorTypesService = {
      *
      * @throws If the electron API is unavailable or the operation fails.
      */
-    async getMonitorTypes(): Promise<unknown> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.monitorTypes.getMonitorTypes();
-        } catch (error) {
-            const typedError = ensureError(error);
-            logger.error("Failed to get monitor types", typedError, {
-                tag: "MonitorTypesService",
-            });
-            // Re-throw to allow store error handling
-            throw typedError;
-        }
-    },
+    getMonitorTypes: wrap("getMonitorTypes", async (api) =>
+        api.monitorTypes.getMonitorTypes()
+    ),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -146,17 +112,7 @@ export const MonitorTypesService = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize MonitorTypesService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
     /**
      * Validates monitor data using backend registry.
@@ -185,23 +141,9 @@ export const MonitorTypesService = {
      * @throws If the electron API is unavailable or the validation operation
      *   fails.
      */
-    async validateMonitorData(
-        type: string,
-        data: unknown
-    ): Promise<ValidationResult> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.monitoring.validateMonitorData(
-                type,
-                data
-            );
-        } catch (error) {
-            const typedError = ensureError(error);
-            logger.error("Failed to validate monitor data", typedError, {
-                tag: "MonitorTypesService",
-            });
-            // Re-throw to allow store error handling
-            throw typedError;
-        }
-    },
+    validateMonitorData: wrap(
+        "validateMonitorData",
+        async (api, type: string, data: unknown): Promise<ValidationResult> =>
+            api.monitoring.validateMonitorData(type, data)
+    ),
 };

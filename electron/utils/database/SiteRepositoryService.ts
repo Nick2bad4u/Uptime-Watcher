@@ -206,6 +206,47 @@ export class SiteRepositoryService {
     }
 
     /**
+     * Get a single site from the database with monitors and history.
+     *
+     * @remarks
+     * Fetches a specific site by identifier and constructs the full site object
+     * including associated monitors and their historical data. If the site does
+     * not exist, `undefined` is returned without throwing.
+     *
+     * @param identifier - Unique site identifier to locate.
+     *
+     * @returns Promise resolving to the complete site object or `undefined`
+     *   when not found.
+     *
+     * @throws {@link SiteLoadingError} When the database query fails.
+     */
+    public async getSiteFromDatabase(
+        identifier: string
+    ): Promise<Site | undefined> {
+        try {
+            const siteRow =
+                await this.repositories.site.findByIdentifier(identifier);
+
+            if (!siteRow) {
+                this.logger.debug(
+                    `[SiteRepositoryService] Site not found: ${identifier}`
+                );
+                return undefined;
+            }
+
+            return await this.buildSiteWithMonitorsAndHistory(siteRow);
+        } catch (error) {
+            const message = `Failed to fetch site ${identifier} from database: ${getErrorMessage(error)}`;
+            this.logger.error(message, error);
+            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
+            throw new SiteLoadingError(
+                message,
+                error instanceof Error ? error : undefined
+            );
+        }
+    }
+
+    /**
      * Load sites into cache. Pure data operation that populates the cache.
      */
     public async loadSitesIntoCache(

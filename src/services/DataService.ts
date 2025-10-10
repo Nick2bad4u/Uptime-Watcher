@@ -12,10 +12,7 @@
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
-import { ensureError } from "@shared/utils/errorHandling";
-
-import { waitForElectronAPI } from "../stores/utils";
-import { logger } from "./logger";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 interface DataServiceContract {
     downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
@@ -34,6 +31,8 @@ interface DataServiceContract {
  *
  * @public
  */
+const { ensureInitialized, wrap } = createIpcServiceHelpers("DataService");
+
 export const DataService: DataServiceContract = {
     /**
      * Downloads a complete SQLite database backup.
@@ -52,10 +51,9 @@ export const DataService: DataServiceContract = {
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult> {
-        await this.initialize();
-        return window.electronAPI.data.downloadSqliteBackup();
-    },
+    downloadSqliteBackup: wrap("downloadSqliteBackup", async (api) =>
+        api.data.downloadSqliteBackup()
+    ),
 
     /**
      * Exports all application data as a JSON string.
@@ -71,10 +69,7 @@ export const DataService: DataServiceContract = {
      *
      * @throws If the electron API is unavailable or the export operation fails.
      */
-    async exportData(): Promise<string> {
-        await this.initialize();
-        return window.electronAPI.data.exportData();
-    },
+    exportData: wrap("exportData", async (api) => api.data.exportData()),
 
     /**
      * Imports application data from a JSON string.
@@ -96,10 +91,9 @@ export const DataService: DataServiceContract = {
      *
      * @throws If the electron API is unavailable or the import operation fails.
      */
-    async importData(data: string): Promise<boolean> {
-        await this.initialize();
-        return window.electronAPI.data.importData(data);
-    },
+    importData: wrap("importData", async (api, payload: string) =>
+        api.data.importData(payload)
+    ),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -111,15 +105,5 @@ export const DataService: DataServiceContract = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize DataService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 };

@@ -10,11 +10,10 @@
 import type { Site } from "@shared/types";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
-import { ensureError } from "@shared/utils/errorHandling";
-
 import { DataService } from "../../../services/DataService";
-import { logger } from "../../../services/logger";
-import { waitForElectronAPI } from "../../utils";
+import { createIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+
+const { ensureInitialized, wrap } = createIpcServiceHelpers("SiteService");
 
 /**
  * Service for managing site operations through Electron IPC.
@@ -46,11 +45,9 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async addSite(site: Site): Promise<Site> {
-        await this.initialize();
-        // Preload now returns extracted data directly
-        return window.electronAPI.sites.addSite(site);
-    },
+    addSite: wrap("addSite", async (api, site: Site) =>
+        api.sites.addSite(site)
+    ),
 
     /**
      * Downloads a backup of the SQLite database.
@@ -65,11 +62,9 @@ export const SiteService = {
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
-    async downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult> {
-        await this.initialize();
-        // Preload now returns extracted data directly
-        return DataService.downloadSqliteBackup();
-    },
+    downloadSqliteBackup: wrap("downloadSqliteBackup", async () =>
+        DataService.downloadSqliteBackup()
+    ),
 
     /**
      * Retrieves all sites from the backend.
@@ -85,11 +80,7 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async getSites(): Promise<Site[]> {
-        await this.initialize();
-        // Preload now returns extracted data directly
-        return window.electronAPI.sites.getSites();
-    },
+    getSites: wrap("getSites", async (api) => api.sites.getSites()),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -101,18 +92,7 @@ export const SiteService = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize SiteService:",
-
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
     /**
      * Removes a monitor from a site.
@@ -131,24 +111,23 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async removeMonitor(
-        siteIdentifier: string,
-        monitorId: string
-    ): Promise<boolean> {
-        await this.initialize();
-        const removed = await window.electronAPI.monitoring.removeMonitor(
-            siteIdentifier,
-            monitorId
-        );
-
-        if (!removed) {
-            throw new Error(
-                `Monitor removal failed for monitor ${monitorId} on site ${siteIdentifier}`
+    removeMonitor: wrap(
+        "removeMonitor",
+        async (api, siteIdentifier: string, monitorId: string) => {
+            const removed = await api.monitoring.removeMonitor(
+                siteIdentifier,
+                monitorId
             );
-        }
 
-        return true;
-    },
+            if (!removed) {
+                throw new Error(
+                    `Monitor removal failed for monitor ${monitorId} on site ${siteIdentifier}`
+                );
+            }
+
+            return true;
+        }
+    ),
 
     /**
      * Removes a site from the backend.
@@ -166,9 +145,8 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async removeSite(identifier: string): Promise<boolean> {
-        await this.initialize();
-        const removed = await window.electronAPI.sites.removeSite(identifier);
+    removeSite: wrap("removeSite", async (api, identifier: string) => {
+        const removed = await api.sites.removeSite(identifier);
 
         if (!removed) {
             throw new Error(
@@ -177,7 +155,7 @@ export const SiteService = {
         }
 
         return true;
-    },
+    }),
 
     /**
      * Updates an existing site with the provided changes.
@@ -196,11 +174,10 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async updateSite(
-        identifier: string,
-        updates: Partial<Site>
-    ): Promise<void> {
-        await this.initialize();
-        await window.electronAPI.sites.updateSite(identifier, updates);
-    },
+    updateSite: wrap(
+        "updateSite",
+        async (api, identifier: string, updates: Partial<Site>) => {
+            await api.sites.updateSite(identifier, updates);
+        }
+    ),
 };

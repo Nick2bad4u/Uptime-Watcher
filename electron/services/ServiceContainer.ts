@@ -568,7 +568,6 @@ export class ServiceContainer {
                         monitor: this.getMonitorRepository(),
                         site: this.getSiteRepository(),
                     },
-                    siteService: this.getSiteService(),
                 },
                 enhancedServices
             );
@@ -784,10 +783,7 @@ export class ServiceContainer {
     public getSiteService(): SiteService {
         if (!this.siteService) {
             this.siteService = new SiteService({
-                databaseService: this.getDatabaseService(),
-                historyRepository: this.getHistoryRepository(),
-                monitorRepository: this.getMonitorRepository(),
-                siteRepository: this.getSiteRepository(),
+                siteManager: this.getSiteManager(),
             });
             if (this.config.enableDebugLogging) {
                 logger.debug("[ServiceContainer] Created SiteService");

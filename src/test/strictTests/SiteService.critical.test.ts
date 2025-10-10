@@ -293,7 +293,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 "API unavailable"
             );
             expect(logger.error).toHaveBeenCalledWith(
-                "Failed to initialize SiteService:",
+                "[SiteService] Failed to initialize:",
                 expect.any(Error)
             );
         });

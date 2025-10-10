@@ -10,11 +10,12 @@
  * @packageDocumentation
  */
 
-import { ensureError } from "@shared/utils/errorHandling";
 import { safeNumberConversion } from "@shared/utils/safeConversions";
 
-import { waitForElectronAPI } from "../stores/utils";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 import { logger } from "./logger";
+
+const { ensureInitialized, wrap } = createIpcServiceHelpers("SettingsService");
 
 /**
  * Service for managing application settings through Electron IPC.
@@ -42,10 +43,9 @@ export const SettingsService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async getHistoryLimit(): Promise<number> {
-        await SettingsService.initialize();
-        return window.electronAPI.settings.getHistoryLimit();
-    },
+    getHistoryLimit: wrap("getHistoryLimit", async (api) =>
+        api.settings.getHistoryLimit()
+    ),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -57,17 +57,7 @@ export const SettingsService = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize SettingsService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
     /**
      * Resets all application settings to their default values.
@@ -84,10 +74,9 @@ export const SettingsService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async resetSettings(): Promise<void> {
-        await SettingsService.initialize();
-        await window.electronAPI.data.resetSettings();
-    },
+    resetSettings: wrap("resetSettings", async (api) => {
+        await api.data.resetSettings();
+    }),
 
     /**
      * Updates the history retention limit and prunes existing history.
@@ -109,23 +98,24 @@ export const SettingsService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    async updateHistoryLimit(limit: number): Promise<number> {
-        await SettingsService.initialize();
-        const updatedLimit =
-            await window.electronAPI.settings.updateHistoryLimit(limit);
-        const sanitizedLimit = safeNumberConversion(updatedLimit, limit);
+    updateHistoryLimit: wrap(
+        "updateHistoryLimit",
+        async (api, limit: number): Promise<number> => {
+            const updatedLimit = await api.settings.updateHistoryLimit(limit);
+            const sanitizedLimit = safeNumberConversion(updatedLimit, limit);
 
-        if (sanitizedLimit !== updatedLimit) {
-            logger.warn(
-                "Received invalid history limit from backend; falling back to requested value",
-                {
-                    receivedValue: updatedLimit,
-                    requestedLimit: limit,
-                    sanitizedLimit,
-                }
-            );
+            if (sanitizedLimit !== updatedLimit) {
+                logger.warn(
+                    "Received invalid history limit from backend; falling back to requested value",
+                    {
+                        receivedValue: updatedLimit,
+                        requestedLimit: limit,
+                        sanitizedLimit,
+                    }
+                );
+            }
+
+            return sanitizedLimit;
         }
-
-        return sanitizedLimit;
-    },
+    ),
 };

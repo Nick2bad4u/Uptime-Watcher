@@ -105,7 +105,7 @@ describe("SettingsService", () => {
                 "Electron API unavailable"
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to initialize SettingsService:",
+                "[SettingsService] Failed to initialize:",
                 error
             );
         });

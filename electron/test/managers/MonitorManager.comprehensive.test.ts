@@ -142,7 +142,6 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 },
                 site: {},
             },
-            siteService: {},
         };
 
         mockEnhancedServices = {

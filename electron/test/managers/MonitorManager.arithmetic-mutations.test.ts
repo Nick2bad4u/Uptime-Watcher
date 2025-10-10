@@ -140,9 +140,6 @@ describe("MonitorManager arithmetic mutations", () => {
                 set: vi.fn(),
                 delete: vi.fn(),
             }),
-            siteService: {
-                findByIdentifierWithDetails: vi.fn(),
-            },
         };
 
         mockEnhancedServices = {

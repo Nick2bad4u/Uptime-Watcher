@@ -23,6 +23,7 @@ import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
+import { deleteSiteWithAdapters } from "./siteDeletion";
 import { SiteNotFoundError } from "./interfaces";
 
 /**
@@ -182,7 +183,7 @@ export class SiteWriterService {
                 this.logger.info(`Removing site: ${identifier}`);
 
                 // Use executeTransaction for atomic multi-table deletion and capture result
-                const dbDeletionSuccess =
+                const deletionResult =
                     await this.databaseService.executeTransaction((db) => {
                         const siteTx =
                             this.repositories.site.createTransactionAdapter(db);
@@ -191,20 +192,27 @@ export class SiteWriterService {
                                 db
                             );
 
-                        monitorTx.deleteBySiteIdentifier(identifier);
-                        const deletionResult = siteTx.delete(identifier);
-                        return Promise.resolve(deletionResult);
+                        const result = deleteSiteWithAdapters({
+                            identifier,
+                            monitorAdapter: monitorTx,
+                            siteAdapter: siteTx,
+                        });
+
+                        return Promise.resolve(result);
                     });
 
                 // Only remove from cache if database deletion was successful
                 let removed = false;
-                if (dbDeletionSuccess && sitesCache.has(identifier)) {
+                if (deletionResult.siteDeleted && sitesCache.has(identifier)) {
                     removed = sitesCache.delete(identifier);
                 }
 
-                if (dbDeletionSuccess) {
+                if (deletionResult.siteDeleted) {
                     this.logger.info(
                         `Site removed successfully from database: ${identifier}`
+                    );
+                    this.logger.debug(
+                        `Removed ${deletionResult.monitorCount} monitors for site: ${identifier}`
                     );
                 } else {
                     this.logger.warn(
@@ -217,7 +225,7 @@ export class SiteWriterService {
                 }
 
                 // Return actual database deletion result, not cache status
-                return dbDeletionSuccess;
+                return deletionResult.siteDeleted;
             },
             "site-writer-delete",
             undefined,

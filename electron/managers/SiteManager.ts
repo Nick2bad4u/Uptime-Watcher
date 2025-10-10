@@ -281,6 +281,42 @@ export class SiteManager {
     }
 
     /**
+     * Retrieves a single site with full details from cache or database.
+     *
+     * @remarks
+     * Attempts to resolve the site from the in-memory cache first. When the
+     * site is not cached, the database is queried and the cache is updated with
+     * the fresh result. Returns `undefined` when the site does not exist.
+     *
+     * @param identifier - Unique identifier of the site to retrieve.
+     *
+     * @returns Promise resolving to the site or `undefined` when not found.
+     *
+     * @throws Error if the provided identifier is invalid.
+     */
+    public async getSiteWithDetails(
+        identifier: string
+    ): Promise<Site | undefined> {
+        if (!identifier || typeof identifier !== "string") {
+            throw new Error(`Invalid site identifier: ${identifier}`);
+        }
+
+        const cachedSite = this.sitesCache.get(identifier);
+        if (cachedSite) {
+            return cachedSite;
+        }
+
+        const site =
+            await this.siteRepositoryService.getSiteFromDatabase(identifier);
+
+        if (site) {
+            this.sitesCache.set(identifier, site);
+        }
+
+        return site;
+    }
+
+    /**
      * Initializes the SiteManager by loading all sites into cache.
      *
      * @remarks

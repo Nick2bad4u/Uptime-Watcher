@@ -36,7 +36,6 @@ describe(MonitorManager, () => {
                 monitor: {},
                 site: {},
             },
-            siteService: {},
         };
 
         enhancedServices = {

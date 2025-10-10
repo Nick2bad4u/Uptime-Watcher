@@ -14,10 +14,9 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-import { waitForElectronAPI } from "../stores/utils";
-import { logger } from "./logger";
+const { ensureInitialized, wrap } = createIpcServiceHelpers("StateSyncService");
 
 /**
  * Contract for renderer-facing state synchronization operations.
@@ -32,13 +31,17 @@ interface StateSyncServiceContract {
     getSyncStatus: () => Promise<StateSyncStatusSummary>;
     /** Ensures the preload bridge is available prior to IPC usage. */
     initialize: () => Promise<void>;
-    /** Registers a handler for incremental state sync events and returns a
-cleanup callback. */
+    /**
+     * Registers a handler for incremental state sync events and returns a
+     * cleanup callback.
+     */
     onStateSyncEvent: (
         callback: (event: StateSyncEventData) => void
     ) => Promise<() => void>;
-    /** Requests a full synchronization cycle and returns the backend result
-payload. */
+    /**
+     * Requests a full synchronization cycle and returns the backend result
+     * payload.
+     */
     requestFullSync: () => Promise<StateSyncFullSyncResult>;
 }
 
@@ -48,56 +51,19 @@ payload. */
  * @public
  */
 export const StateSyncService: StateSyncServiceContract = {
-    async getSyncStatus(): Promise<StateSyncStatusSummary> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.stateSync.getSyncStatus();
-        } catch (error) {
-            logger.error(
-                "Failed to retrieve state sync status:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    getSyncStatus: wrap("getSyncStatus", async (api) =>
+        api.stateSync.getSyncStatus()
+    ),
 
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize StateSyncService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
-    async onStateSyncEvent(
-        callback: (event: StateSyncEventData) => void
-    ): Promise<() => void> {
-        await this.initialize();
-        try {
-            return window.electronAPI.stateSync.onStateSyncEvent(callback);
-        } catch (error) {
-            logger.error(
-                "Failed to register state sync event listener:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    onStateSyncEvent: wrap(
+        "onStateSyncEvent",
+        async (api, callback: (event: StateSyncEventData) => void) =>
+            api.stateSync.onStateSyncEvent(callback)
+    ),
 
-    async requestFullSync(): Promise<StateSyncFullSyncResult> {
-        await this.initialize();
-        try {
-            return await window.electronAPI.stateSync.requestFullSync();
-        } catch (error) {
-            logger.error(
-                "Failed to request full state synchronization:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    requestFullSync: wrap("requestFullSync", async (api) =>
+        api.stateSync.requestFullSync()
+    ),
 };

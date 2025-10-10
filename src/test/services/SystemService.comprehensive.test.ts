@@ -90,7 +90,7 @@ describe("SystemService", () => {
                 "Electron API unavailable"
             );
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to initialize SystemService:",
+                "[SystemService] Failed to initialize:",
                 error
             );
         });

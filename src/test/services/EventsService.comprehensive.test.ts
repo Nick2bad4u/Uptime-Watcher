@@ -117,7 +117,7 @@ describe("EventsService", () => {
             expect(mockWaitForElectronAPI).toHaveBeenCalled();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to initialize EventsService:",
+                "[EventsService] Failed to initialize:",
                 initializationError
             );
         });

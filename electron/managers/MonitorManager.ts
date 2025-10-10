@@ -73,7 +73,6 @@ import type { HistoryRepository } from "../services/database/HistoryRepository";
 import type { MonitorRepository } from "../services/database/MonitorRepository";
 import type { SiteRepository } from "../services/database/SiteRepository";
 import type { EnhancedMonitoringServices } from "../services/monitoring/EnhancedMonitoringServiceFactory";
-import type { SiteService } from "../services/site/SiteService";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
 import { DEFAULT_CHECK_INTERVAL } from "../constants";
@@ -141,13 +140,6 @@ export interface MonitorManagerDependencies {
         /** Repository for managing site configuration and data */
         site: SiteRepository;
     };
-    /**
-     * Service for site-level business logic.
-     *
-     * @remarks
-     * Used for site-related business operations and orchestration.
-     */
-    siteService: SiteService;
 }
 
 /**
@@ -429,7 +421,6 @@ export class MonitorManager {
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                siteService: this.dependencies.siteService,
             },
             this.isMonitoring
         );
@@ -486,7 +477,6 @@ export class MonitorManager {
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                siteService: this.dependencies.siteService,
             },
             identifier,
             monitorId,
@@ -557,7 +547,6 @@ export class MonitorManager {
             monitorRepository: this.dependencies.repositories.monitor,
             monitorScheduler: this.monitorScheduler,
             sites: this.dependencies.getSitesCache(),
-            siteService: this.dependencies.siteService,
         });
 
         // Emit typed monitoring stopped event
@@ -607,7 +596,6 @@ export class MonitorManager {
                 monitorRepository: this.dependencies.repositories.monitor,
                 monitorScheduler: this.monitorScheduler,
                 sites: this.dependencies.getSitesCache(),
-                siteService: this.dependencies.siteService,
             },
             identifier,
             monitorId,
@@ -683,11 +671,6 @@ export class MonitorManager {
             monitorRepository: MonitorRepository;
             monitorScheduler: MonitorScheduler;
             sites: StandardizedCache<Site>;
-            siteService?: {
-                findByIdentifierWithDetails: (
-                    identifier: string
-                ) => Promise<Site | undefined>;
-            };
         },
         isMonitoring: boolean
     ): Promise<boolean> {
@@ -763,11 +746,6 @@ export class MonitorManager {
         monitorRepository: MonitorRepository;
         monitorScheduler: MonitorScheduler;
         sites: StandardizedCache<Site>;
-        siteService?: {
-            findByIdentifierWithDetails: (
-                identifier: string
-            ) => Promise<Site | undefined>;
-        };
     }): Promise<boolean> {
         config.logger.info(
             "Stopping all monitoring operations (enhanced system)"
@@ -841,11 +819,6 @@ export class MonitorManager {
             monitorRepository: MonitorRepository;
             monitorScheduler: MonitorScheduler;
             sites: StandardizedCache<Site>;
-            siteService?: {
-                findByIdentifierWithDetails: (
-                    identifier: string
-                ) => Promise<Site | undefined>;
-            };
         },
         identifier: string,
         monitorId?: string,
@@ -967,11 +940,6 @@ export class MonitorManager {
             monitorRepository: MonitorRepository;
             monitorScheduler: MonitorScheduler;
             sites: StandardizedCache<Site>;
-            siteService?: {
-                findByIdentifierWithDetails: (
-                    identifier: string
-                ) => Promise<Site | undefined>;
-            };
         },
         identifier: string,
         monitorId?: string,

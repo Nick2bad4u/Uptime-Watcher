@@ -10,10 +10,9 @@
  * @packageDocumentation
  */
 
-import { ensureError } from "@shared/utils/errorHandling";
+import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-import { waitForElectronAPI } from "../stores/utils";
-import { logger } from "./logger";
+const { ensureInitialized, wrap } = createIpcServiceHelpers("SystemService");
 
 /**
  * Service for managing system operations through Electron IPC.
@@ -36,17 +35,7 @@ export const SystemService = {
      *
      * @throws If the electron API is not available.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize SystemService:",
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
 
     /**
      * Opens a URL in the user's default external browser.
@@ -61,8 +50,7 @@ export const SystemService = {
      *
      * @throws If the electron API is unavailable or the operation fails.
      */
-    async openExternal(url: string): Promise<void> {
-        await this.initialize();
-        await window.electronAPI.system.openExternal(url);
-    },
+    openExternal: wrap("openExternal", async (api, url: string) => {
+        await api.system.openExternal(url);
+    }),
 };

@@ -124,7 +124,7 @@ describe("DataService", () => {
             expect(mockWaitForElectronAPI).toHaveBeenCalled();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
-                "Failed to initialize DataService:",
+                "[DataService] Failed to initialize:",
                 initializationError
             );
         });

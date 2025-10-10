@@ -51,8 +51,9 @@ Follow current, supported patterns and best practices; propose migrations when l
 Prioritize code quality, maintainability, readability.
 Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root.
 Integrate new features or changes into the existing architecture and patterns.
+Tedious, systematic work is often the correct solution. Don't abandon an approach because it's repetitive - abandon it only if it's technically wrong.
 Write tests only after the source code is in a working state without lint or type errors.
 You have no time constraints. Any previous time constraint or limit has been removed. You have unlimited time to solve the problem in the best way possible.
-Remember you have access to tools, MCP servers and resources beyond just your own codebase knowledge. Leverage these resources when needed.
+Remember you have access to tools, MCP servers and resources beyond just your own codebase knowledge - Leverage these resources when needed.
 </coding>
 </instructions>

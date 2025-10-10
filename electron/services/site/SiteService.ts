@@ -1,152 +1,77 @@
 /**
- * Site service for coordinating site-related operations across multiple
- * repositories. Handles complex site loading with related entities (monitors
- * and history).
+ * Site service delegating operations to {@link SiteManager} to ensure a single
+ * orchestration entry point for site management.
  */
 
 import type { Site } from "@shared/types";
-
 import { withErrorHandling } from "@shared/utils/errorHandling";
 
-import type { DatabaseService } from "../database/DatabaseService";
-import type { HistoryRepository } from "../database/HistoryRepository";
-import type { MonitorRepository } from "../database/MonitorRepository";
-import type { SiteRepository } from "../database/SiteRepository";
-
+import type { SiteManager } from "../../managers/SiteManager";
 import { logger } from "../../utils/logger";
 
 /**
- * Defines the dependencies required by {@link SiteService} for site operations.
- *
- * @remarks
- * Includes all repositories and the database service needed for coordinating
- * site, monitor, and history operations.
+ * Dependencies required by {@link SiteService}.
  *
  * @public
  */
 export interface SiteServiceDependencies {
-    databaseService: DatabaseService;
-    historyRepository: HistoryRepository;
-    monitorRepository: MonitorRepository;
-    siteRepository: SiteRepository;
+    /** Site manager coordinating site mutations and cache state. */
+    siteManager: SiteManager;
 }
 
 /**
- * Service for coordinating site operations across multiple repositories.
+ * Facade for site operations routed through {@link SiteManager}.
  *
  * @remarks
- * Handles complex operations that require coordination between site, monitor,
- * and history data. Provides atomic deletion, detailed loading, and batch
- * operations for sites and their related entities.
+ * Maintains the historical SiteService API surface for internal consumers while
+ * guaranteeing that all work is executed via the consolidated
+ * SiteManager/SiteWriterService pipeline.
  *
  * @public
  */
 export class SiteService {
-    /**
-     * Default name for sites when no name is provided.
-     *
-     * @remarks
-     * Used as a fallback when a site does not have a name in the database.
-     *
-     * @defaultValue "Unnamed Site"
-     *
-     * @internal
-     */
-    private static readonly DEFAULT_SITE_NAME = "Unnamed Site";
+    private readonly siteManager: SiteManager;
 
-    private readonly databaseService: DatabaseService;
-
-    private readonly historyRepository: HistoryRepository;
-
-    private readonly monitorRepository: MonitorRepository;
-
-    private readonly siteRepository: SiteRepository;
+    public constructor(dependencies: SiteServiceDependencies) {
+        this.siteManager = dependencies.siteManager;
+    }
 
     /**
-     * Deletes a site and all its related data (monitors and history)
-     * atomically.
+     * Deletes a site and all related data using {@link SiteManager.removeSite}.
      *
-     * @remarks
-     * Uses a transaction to ensure atomicity. Deletes all monitor history,
-     * monitors, and the site itself. Throws if any operation fails.
+     * @param identifier - Unique identifier of the site to delete.
      *
-     * @param identifier - The site identifier to delete.
-     *
-     * @returns Promise resolving to true if all deletions succeeded.
-     *
-     * @throws Error when any deletion operation fails.
-     *
-     * @public
+     * @returns Resolves to `true` when the site existed and was removed.
      */
     public async deleteSiteWithRelatedData(
         identifier: string
     ): Promise<boolean> {
         return withErrorHandling(
             async () => {
-                // Validate input
                 if (!identifier || typeof identifier !== "string") {
                     throw new Error(`Invalid site identifier: ${identifier}`);
                 }
 
-                const result = await this.databaseService.executeTransaction(
-                    async (db) => {
-                        logger.debug(
-                            `[SiteService] Starting deletion of site ${identifier} with related data`
-                        );
+                const siteSnapshot =
+                    await this.siteManager.getSiteWithDetails(identifier);
+                const monitorCount = siteSnapshot?.monitors.length ?? 0;
 
-                        const siteTx =
-                            this.siteRepository.createTransactionAdapter(db);
-                        const monitorTx =
-                            this.monitorRepository.createTransactionAdapter(db);
+                const deleted = await this.siteManager.removeSite(identifier);
 
-                        const monitors =
-                            monitorTx.findBySiteIdentifier(identifier);
-                        logger.debug(
-                            `[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`
-                        );
+                if (deleted) {
+                    logger.info(
+                        `[SiteService] Successfully deleted site ${identifier} with all related data`
+                    );
+                    logger.debug(
+                        `[SiteService] Deletion summary for site ${identifier}: ${monitorCount} monitors removed`
+                    );
+                } else {
+                    logger.warn(
+                        `[SiteService] Site ${identifier} not found during deletion`
+                    );
+                }
 
-                        try {
-                            monitorTx.deleteBySiteIdentifier(identifier);
-                        } catch (error) {
-                            throw new Error(
-                                `Failed to delete monitors for site ${identifier}: ${
-                                    error instanceof Error
-                                        ? error.message
-                                        : String(error)
-                                }`,
-                                {
-                                    cause:
-                                        error instanceof Error
-                                            ? error
-                                            : undefined,
-                                }
-                            );
-                        }
-                        logger.debug(
-                            `[SiteService] Deleted history for ${monitors.length} monitors`
-                        );
-                        logger.debug(
-                            `[SiteService] Deleted monitors for site ${identifier}`
-                        );
-
-                        const siteDeleted = siteTx.delete(identifier);
-                        if (!siteDeleted) {
-                            throw new Error(
-                                `Failed to delete site ${identifier}`
-                            );
-                        }
-
-                        return { monitorCount: monitors.length } as const;
-                    }
-                );
-
-                logger.info(
-                    `[SiteService] Successfully deleted site ${identifier} with all related data`
-                );
-                logger.debug(
-                    `[SiteService] Deletion summary for site ${identifier}: ${result.monitorCount} monitors removed`
-                );
-                return true;
+                return deleted;
             },
             {
                 logger,
@@ -156,65 +81,33 @@ export class SiteService {
     }
 
     /**
-     * Finds a site by identifier with all related monitors and history data.
+     * Retrieves a single site via {@link SiteManager.getSiteWithDetails}.
      *
-     * @remarks
-     * Replaces the complex logic that was previously in SiteRepository. Loads
-     * the site, its monitors, and all monitor history in a single operation.
+     * @param identifier - Unique identifier of the site to load.
      *
-     * @param identifier - The site identifier to find.
-     *
-     * @returns Promise resolving to the site with details, or undefined if not
-     *   found.
-     *
-     * @public
+     * @returns Promise resolving to the site or `undefined` when not found.
      */
     public async findByIdentifierWithDetails(
         identifier: string
     ): Promise<Site | undefined> {
         return withErrorHandling(
             async () => {
-                // Validate input
                 if (!identifier || typeof identifier !== "string") {
                     throw new Error(`Invalid site identifier: ${identifier}`);
                 }
 
-                // First get the site data
-                const siteRow =
-                    await this.siteRepository.findByIdentifier(identifier);
-                if (!siteRow) {
+                const site =
+                    await this.siteManager.getSiteWithDetails(identifier);
+
+                if (!site) {
                     logger.debug(`[SiteService] Site not found: ${identifier}`);
-                    // eslint-disable-next-line unicorn/no-useless-undefined -- Explicitly returning undefined for clarity in this public API method
                     return undefined;
                 }
 
-                // Then get monitors for this site
-                const monitors =
-                    await this.monitorRepository.findBySiteIdentifier(
-                        identifier
-                    );
-
-                // Fetch monitor history in parallel for better performance
-                const monitorsWithHistory = await Promise.all(
-                    monitors.map(async (monitor) => {
-                        const history =
-                            await this.historyRepository.findByMonitorId(
-                                monitor.id
-                            );
-                        return { ...monitor, history };
-                    })
-                );
-
-                // Combine into complete site object and return
                 logger.debug(
-                    `[SiteService] Found site ${identifier} with ${monitorsWithHistory.length} monitors`
+                    `[SiteService] Found site ${identifier} with ${site.monitors.length} monitors`
                 );
-                return {
-                    identifier: siteRow.identifier,
-                    monitoring: siteRow.monitoring ?? false,
-                    monitors: monitorsWithHistory,
-                    name: this.getDisplayName(siteRow.name),
-                };
+                return site;
             },
             {
                 logger,
@@ -224,54 +117,17 @@ export class SiteService {
     }
 
     /**
-     * Gets all sites with their related monitors and history data.
+     * Retrieves all sites with full details via {@link SiteManager.getSites}.
      *
-     * @remarks
-     * Replaces the complex logic that was previously in SiteRepository.
-     * Optimized to fetch monitor history in parallel for better performance.
-     * Returns all sites with complete details.
-     *
-     * @returns Promise resolving to an array of sites with complete data.
-     *
-     * @public
+     * @returns Promise resolving to the full site collection.
      */
     public async getAllWithDetails(): Promise<Site[]> {
         return withErrorHandling(
             async () => {
-                // Get all site rows
-                const siteRows = await this.siteRepository.findAll();
                 logger.debug(
-                    `[SiteService] Loading details for ${siteRows.length} sites`
+                    "[SiteService] Loading details for all sites via SiteManager"
                 );
-
-                // Process sites in parallel for better performance
-                const sites = await Promise.all(
-                    siteRows.map(async (siteRow) => {
-                        const monitors =
-                            await this.monitorRepository.findBySiteIdentifier(
-                                siteRow.identifier
-                            );
-
-                        // Fetch monitor history in parallel
-                        const monitorsWithHistory = await Promise.all(
-                            monitors.map(async (monitor) => {
-                                const history =
-                                    await this.historyRepository.findByMonitorId(
-                                        monitor.id
-                                    );
-                                return { ...monitor, history };
-                            })
-                        );
-
-                        return {
-                            identifier: siteRow.identifier,
-                            monitoring: siteRow.monitoring ?? false,
-                            monitors: monitorsWithHistory,
-                            name: this.getDisplayName(siteRow.name),
-                        };
-                    })
-                );
-
+                const sites = await this.siteManager.getSites();
                 logger.info(
                     `[SiteService] Loaded ${sites.length} sites with complete details`
                 );
@@ -282,34 +138,5 @@ export class SiteService {
                 operationName: "Get all sites with details",
             }
         );
-    }
-
-    /**
-     * Constructs a new {@link SiteService} instance.
-     *
-     * @param dependencies - The {@link SiteServiceDependencies} required for
-     *   service operations.
-     */
-    public constructor(dependencies: SiteServiceDependencies) {
-        this.databaseService = dependencies.databaseService;
-        this.historyRepository = dependencies.historyRepository;
-        this.monitorRepository = dependencies.monitorRepository;
-        this.siteRepository = dependencies.siteRepository;
-    }
-
-    /**
-     * Gets the display name for a site, using the default if none is provided.
-     *
-     * @remarks
-     * Used internally to ensure all sites have a displayable name.
-     *
-     * @param siteName - The site name from the database.
-     *
-     * @returns Display name with fallback to the default.
-     *
-     * @internal
-     */
-    private getDisplayName(siteName: null | string | undefined): string {
-        return siteName ?? SiteService.DEFAULT_SITE_NAME;
     }
 }
