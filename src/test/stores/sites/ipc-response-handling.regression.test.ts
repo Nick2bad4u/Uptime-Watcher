@@ -39,6 +39,17 @@ const mockElectronAPI = {
     },
 };
 
+const mockStateSyncService = vi.hoisted(() => ({
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn(),
+}));
+
+vi.mock("../../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
 // Mock global window.electronAPI
 Object.defineProperty(window, "electronAPI", {
     value: mockElectronAPI,

@@ -88,66 +88,65 @@ export class SiteService {
                     throw new Error(`Invalid site identifier: ${identifier}`);
                 }
 
-                return this.databaseService.executeTransaction(async () => {
-                    logger.debug(
-                        `[SiteService] Starting deletion of site ${identifier} with related data`
-                    );
-
-                    // First get monitors to delete their history
-                    const monitors =
-                        await this.monitorRepository.findBySiteIdentifier(
-                            identifier
+                const result = await this.databaseService.executeTransaction(
+                    async (db) => {
+                        logger.debug(
+                            `[SiteService] Starting deletion of site ${identifier} with related data`
                         );
-                    logger.debug(
-                        `[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`
-                    );
 
-                    // Delete history for each monitor in parallel
-                    const historyDeletions = monitors.map(async (monitor) => {
+                        const siteTx =
+                            this.siteRepository.createTransactionAdapter(db);
+                        const monitorTx =
+                            this.monitorRepository.createTransactionAdapter(db);
+
+                        const monitors =
+                            monitorTx.findBySiteIdentifier(identifier);
+                        logger.debug(
+                            `[SiteService] Found ${monitors.length} monitors to delete for site ${identifier}`
+                        );
+
                         try {
-                            await this.historyRepository.deleteByMonitorId(
-                                monitor.id
-                            );
+                            monitorTx.deleteBySiteIdentifier(identifier);
                         } catch (error) {
                             throw new Error(
-                                `Failed to delete history for monitor ${monitor.id} in site ${identifier}: ${error instanceof Error ? error.message : String(error)}`,
-                                { cause: error }
+                                `Failed to delete monitors for site ${identifier}: ${
+                                    error instanceof Error
+                                        ? error.message
+                                        : String(error)
+                                }`,
+                                {
+                                    cause:
+                                        error instanceof Error
+                                            ? error
+                                            : undefined,
+                                }
                             );
                         }
-                    });
-
-                    await Promise.all(historyDeletions);
-                    logger.debug(
-                        `[SiteService] Deleted history for ${monitors.length} monitors`
-                    );
-
-                    // Delete monitors for the site
-                    try {
-                        await this.monitorRepository.deleteBySiteIdentifier(
-                            identifier
+                        logger.debug(
+                            `[SiteService] Deleted history for ${monitors.length} monitors`
                         );
-                    } catch (error) {
-                        throw new Error(
-                            `Failed to delete monitors for site ${identifier}: ${error instanceof Error ? error.message : String(error)}`,
-                            { cause: error }
+                        logger.debug(
+                            `[SiteService] Deleted monitors for site ${identifier}`
                         );
-                    }
-                    logger.debug(
-                        `[SiteService] Deleted monitors for site ${identifier}`
-                    );
 
-                    // Finally delete the site itself
-                    const siteDeleted =
-                        await this.siteRepository.delete(identifier);
-                    if (!siteDeleted) {
-                        throw new Error(`Failed to delete site ${identifier}`);
-                    }
+                        const siteDeleted = siteTx.delete(identifier);
+                        if (!siteDeleted) {
+                            throw new Error(
+                                `Failed to delete site ${identifier}`
+                            );
+                        }
 
-                    logger.info(
-                        `[SiteService] Successfully deleted site ${identifier} with all related data`
-                    );
-                    return true;
-                });
+                        return { monitorCount: monitors.length } as const;
+                    }
+                );
+
+                logger.info(
+                    `[SiteService] Successfully deleted site ${identifier} with all related data`
+                );
+                logger.debug(
+                    `[SiteService] Deletion summary for site ${identifier}: ${result.monitorCount} monitors removed`
+                );
+                return true;
             },
             {
                 logger,

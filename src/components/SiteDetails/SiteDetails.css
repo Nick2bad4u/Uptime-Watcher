@@ -167,7 +167,9 @@ body:has(.site-details-modal-overlay) {
     gap: 0.5rem;
     min-inline-size: clamp(11rem, 26vi, 16rem);
 
-    & .themed-select {
+    & .monitor-selector__wrapper {
+        flex: 1 1 auto;
+        inline-size: 100%;
         min-inline-size: 0;
     }
 }

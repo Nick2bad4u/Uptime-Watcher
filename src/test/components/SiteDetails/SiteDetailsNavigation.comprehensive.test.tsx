@@ -3,12 +3,14 @@
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
 import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
 import type { Site } from "../../../../shared/types";
+import type { Monitor } from "../../../../shared/types";
+import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
 
 // Mock BrowserRouter to avoid react-router-dom dependency
 const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
@@ -44,22 +46,48 @@ vi.mock("../../../theme/components", () => ({
             </button>
         )
     ),
-    ThemedSelect: vi.fn(({ children, onChange, value, ...props }) => (
-        <select
-            onChange={onChange}
-            value={value}
-            data-testid="monitor-select"
-            {...props}
-        >
-            {children}
-        </select>
-    )),
     ThemedText: vi.fn(({ children, size, variant, ...props }) => (
         <span data-size={size} data-variant={variant} {...props}>
             {children}
         </span>
     )),
 }));
+
+vi.mock(
+    "../../../components/Dashboard/SiteCard/components/MonitorSelector",
+    () => ({
+        MonitorSelector: ({
+            className,
+            monitors,
+            onChange,
+            selectedMonitorId,
+        }: {
+            className?: string;
+            monitors: Monitor[];
+            onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+            selectedMonitorId: string;
+        }) => (
+            <select
+                className={`monitor-selector-mock ${className ?? ""}`.trim()}
+                data-testid="monitor-selector"
+                disabled={monitors.length === 0}
+                onChange={onChange}
+                value={selectedMonitorId}
+            >
+                {monitors.length === 0 ? (
+                    <option value="" disabled>
+                        No monitors available
+                    </option>
+                ) : null}
+                {monitors.map((monitor) => (
+                    <option key={monitor.id} value={monitor.id}>
+                        {getMonitorTypeDisplayLabel(monitor.type)}
+                    </option>
+                ))}
+            </select>
+        ),
+    })
+);
 
 // Mock the SiteMonitoringButton
 vi.mock(
@@ -269,10 +297,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            // Use CSS class selector instead of data-testid
-            expect(
-                document.querySelector(".themed-select")
-            ).toBeInTheDocument();
+            expect(screen.getByTestId("monitor-selector")).toBeInTheDocument();
         });
 
         it("should show selected monitor in selector", ({ task, annotate }) => {
@@ -288,9 +313,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            // Use CSS class selector and getByRole for semantic selection
-            const selector = document.querySelector(
-                ".themed-select"
+            const selector = screen.getByTestId(
+                "monitor-selector"
             ) as HTMLSelectElement;
             expect(selector).toHaveValue("monitor-1");
         });
@@ -308,8 +332,17 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
 
             renderSiteDetailsNavigation();
 
-            expect(screen.getByText("Website URL")).toBeInTheDocument();
-            expect(screen.getByText("Host & Port")).toBeInTheDocument();
+            const selector = screen.getByTestId("monitor-selector");
+            expect(
+                within(selector).getByRole("option", {
+                    name: /Website URL/i,
+                })
+            ).toBeInTheDocument();
+            expect(
+                within(selector).getByRole("option", {
+                    name: /Host & Port/i,
+                })
+            ).toBeInTheDocument();
         });
 
         it("should handle monitor change", ({ task, annotate }) => {
@@ -328,9 +361,8 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
                 handleMonitorIdChange,
             });
 
-            // Use CSS class selector instead of data-testid
-            const selector = document.querySelector(
-                ".themed-select"
+            const selector = screen.getByTestId(
+                "monitor-selector"
             ) as HTMLSelectElement;
             fireEvent.change(selector, { target: { value: "monitor-2" } });
 

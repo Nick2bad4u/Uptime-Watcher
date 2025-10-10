@@ -10,8 +10,14 @@ import type { Site } from "../../../../shared/types.js";
 import type { Monitor, StatusHistory } from "../../../../shared/types.js";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../../services/database/HistoryRepository";
-import type { MonitorRepository } from "../../../services/database/MonitorRepository";
-import type { SiteRepository } from "../../../services/database/SiteRepository";
+import type {
+    MonitorRepository,
+    MonitorRepositoryTransactionAdapter,
+} from "../../../services/database/MonitorRepository";
+import type {
+    SiteRepository,
+    SiteRepositoryTransactionAdapter,
+} from "../../../services/database/SiteRepository";
 
 // Mock the logger module (must be hoisted before imports)
 vi.mock("../../../utils/logger", () => {
@@ -35,11 +41,13 @@ const mockSiteRepository = {
     findByIdentifier: vi.fn(),
     findAll: vi.fn(),
     delete: vi.fn(),
+    createTransactionAdapter: vi.fn(),
 } as unknown as SiteRepository;
 
 const mockMonitorRepository = {
     findBySiteIdentifier: vi.fn(),
     deleteBySiteIdentifier: vi.fn(),
+    createTransactionAdapter: vi.fn(),
 } as unknown as MonitorRepository;
 
 const mockHistoryRepository = {
@@ -110,21 +118,42 @@ describe(SiteService, () => {
             },
         ];
 
+        let monitorTransactionAdapter: MonitorRepositoryTransactionAdapter;
+        let siteTransactionAdapter: SiteRepositoryTransactionAdapter;
+
         beforeEach(() => {
-            // Mock transaction to execute the callback immediately
+            const mockDbConnection = Symbol("db-connection");
+
+            monitorTransactionAdapter = {
+                clearActiveOperations: vi.fn(),
+                create: vi.fn(),
+                deleteAll: vi.fn(),
+                deleteById: vi.fn(),
+                deleteBySiteIdentifier: vi.fn(),
+                findBySiteIdentifier: vi.fn().mockReturnValue(mockMonitors),
+                update: vi.fn(),
+            } satisfies MonitorRepositoryTransactionAdapter;
+
+            siteTransactionAdapter = {
+                bulkInsert: vi.fn(),
+                delete: vi.fn().mockReturnValue(true),
+                deleteAll: vi.fn(),
+                upsert: vi.fn(),
+            } satisfies SiteRepositoryTransactionAdapter;
+
+            mockMonitorRepository.createTransactionAdapter = vi
+                .fn()
+                .mockReturnValue(monitorTransactionAdapter);
+            mockSiteRepository.createTransactionAdapter = vi
+                .fn()
+                .mockReturnValue(siteTransactionAdapter);
+
             mockDatabaseService.executeTransaction = vi
                 .fn()
-                .mockImplementation(async (callback) => callback());
-            mockMonitorRepository.findBySiteIdentifier = vi
-                .fn()
-                .mockResolvedValue(mockMonitors);
-            mockHistoryRepository.deleteByMonitorId = vi
-                .fn()
-                .mockResolvedValue(true);
-            mockMonitorRepository.deleteBySiteIdentifier = vi
-                .fn()
-                .mockResolvedValue(true);
-            mockSiteRepository.delete = vi.fn().mockResolvedValue(true);
+                .mockImplementation(
+                    async (callback: (db: unknown) => unknown) =>
+                        callback(mockDbConnection)
+                );
         });
 
         it("should successfully delete site with all related data", async ({
@@ -144,22 +173,28 @@ describe(SiteService, () => {
                 mockDatabaseService.executeTransaction
             ).toHaveBeenCalledTimes(1);
             expect(
-                mockMonitorRepository.findBySiteIdentifier
+                mockMonitorRepository.createTransactionAdapter
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                mockSiteRepository.createTransactionAdapter
+            ).toHaveBeenCalledTimes(1);
+            expect(
+                monitorTransactionAdapter.findBySiteIdentifier
             ).toHaveBeenCalledWith(mockSiteIdentifier);
             expect(
-                mockHistoryRepository.deleteByMonitorId
-            ).toHaveBeenCalledTimes(2);
-            expect(
-                mockHistoryRepository.deleteByMonitorId
-            ).toHaveBeenCalledWith("monitor-1");
-            expect(
-                mockHistoryRepository.deleteByMonitorId
-            ).toHaveBeenCalledWith("monitor-2");
-            expect(
-                mockMonitorRepository.deleteBySiteIdentifier
+                monitorTransactionAdapter.deleteBySiteIdentifier
             ).toHaveBeenCalledWith(mockSiteIdentifier);
-            expect(mockSiteRepository.delete).toHaveBeenCalledWith(
+            expect(siteTransactionAdapter.delete).toHaveBeenCalledWith(
                 mockSiteIdentifier
+            );
+            expect(mockLogger.info).toHaveBeenCalledWith(
+                `[SiteService] Successfully deleted site ${mockSiteIdentifier} with all related data`
+            );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[SiteService] Deletion summary for site ${mockSiteIdentifier}: 2 monitors removed`
+            );
+            expect(mockLogger.warn).not.toHaveBeenCalledWith(
+                expect.stringContaining("Nested transaction detected")
             );
         });
 
@@ -186,6 +221,9 @@ describe(SiteService, () => {
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 `[SiteService] Deleted monitors for site ${mockSiteIdentifier}`
             );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[SiteService] Deletion summary for site ${mockSiteIdentifier}: 2 monitors removed`
+            );
             expect(mockLogger.info).toHaveBeenCalledWith(
                 `[SiteService] Successfully deleted site ${mockSiteIdentifier} with all related data`
             );
@@ -200,19 +238,25 @@ describe(SiteService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Monitoring", "type");
 
-            mockMonitorRepository.findBySiteIdentifier = vi
+            monitorTransactionAdapter.findBySiteIdentifier = vi
                 .fn()
-                .mockResolvedValue([]);
+                .mockReturnValue([]);
 
             const result =
                 await siteService.deleteSiteWithRelatedData(mockSiteIdentifier);
 
             expect(result).toBeTruthy();
             expect(
-                mockHistoryRepository.deleteByMonitorId
-            ).not.toHaveBeenCalled();
+                monitorTransactionAdapter.deleteBySiteIdentifier
+            ).toHaveBeenCalledWith(mockSiteIdentifier);
+            expect(siteTransactionAdapter.delete).toHaveBeenCalledWith(
+                mockSiteIdentifier
+            );
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 `[SiteService] Found 0 monitors to delete for site ${mockSiteIdentifier}`
+            );
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                `[SiteService] Deletion summary for site ${mockSiteIdentifier}: 0 monitors removed`
             );
         });
 
@@ -233,27 +277,6 @@ describe(SiteService, () => {
             ).rejects.toThrow("Invalid site identifier: null");
         });
 
-        it("should throw error when history deletion fails", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const error = new Error("History deletion failed");
-            mockHistoryRepository.deleteByMonitorId = vi
-                .fn()
-                .mockRejectedValueOnce(error);
-
-            await expect(
-                siteService.deleteSiteWithRelatedData(mockSiteIdentifier)
-            ).rejects.toThrow(
-                "Failed to delete history for monitor monitor-1 in site test-site-id: History deletion failed"
-            );
-        });
-
         it("should throw error when monitor deletion fails", async ({
             task,
             annotate,
@@ -264,15 +287,18 @@ describe(SiteService, () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Monitor deletion failed");
-            mockMonitorRepository.deleteBySiteIdentifier = vi
+            monitorTransactionAdapter.deleteBySiteIdentifier = vi
                 .fn()
-                .mockRejectedValueOnce(error);
+                .mockImplementation(() => {
+                    throw error;
+                });
 
             await expect(
                 siteService.deleteSiteWithRelatedData(mockSiteIdentifier)
             ).rejects.toThrow(
                 "Failed to delete monitors for site test-site-id: Monitor deletion failed"
             );
+            expect(siteTransactionAdapter.delete).not.toHaveBeenCalled();
         });
 
         it("should throw error when site deletion fails", async ({
@@ -284,31 +310,11 @@ describe(SiteService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockSiteRepository.delete = vi.fn().mockResolvedValue(false);
+            siteTransactionAdapter.delete = vi.fn().mockReturnValue(false);
 
             await expect(
                 siteService.deleteSiteWithRelatedData(mockSiteIdentifier)
             ).rejects.toThrow("Failed to delete site test-site-id");
-        });
-
-        it("should handle string error objects when history deletion fails", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Error Handling", "type");
-
-            mockHistoryRepository.deleteByMonitorId = vi
-                .fn()
-                .mockRejectedValueOnce("String error");
-
-            await expect(
-                siteService.deleteSiteWithRelatedData(mockSiteIdentifier)
-            ).rejects.toThrow(
-                "Failed to delete history for monitor monitor-1 in site test-site-id: String error"
-            );
         });
 
         it("should handle string error objects when monitor deletion fails", async ({
@@ -320,15 +326,18 @@ describe(SiteService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockMonitorRepository.deleteBySiteIdentifier = vi
+            monitorTransactionAdapter.deleteBySiteIdentifier = vi
                 .fn()
-                .mockRejectedValueOnce("String error");
+                .mockImplementation(() => {
+                    throw "String error";
+                });
 
             await expect(
                 siteService.deleteSiteWithRelatedData(mockSiteIdentifier)
             ).rejects.toThrow(
                 "Failed to delete monitors for site test-site-id: String error"
             );
+            expect(siteTransactionAdapter.delete).not.toHaveBeenCalled();
         });
     });
 

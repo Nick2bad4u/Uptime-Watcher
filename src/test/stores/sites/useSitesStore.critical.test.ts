@@ -13,6 +13,17 @@ import type { Site } from "../../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 
+const mockStateSyncService = vi.hoisted(() => ({
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn(),
+}));
+
+vi.mock("../../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
 // Mock services first - these need to be hoisted above imports
 vi.mock("../../../services/DataService", () => ({
     DataService: {
@@ -132,16 +143,14 @@ describe("useSitesStore Function Coverage Tests", () => {
             name: "Default Site",
         });
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
-        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
+        mockStateSyncService.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,
             source: "cache",
             synchronized: true,
         });
-        mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(() =>
-            vi.fn()
-        );
-        mockElectronAPI.stateSync.requestFullSync.mockResolvedValue({
+        mockStateSyncService.onStateSyncEvent.mockResolvedValue(vi.fn());
+        mockStateSyncService.requestFullSync.mockResolvedValue({
             completedAt: Date.now(),
             sites: [],
             siteCount: 0,
@@ -295,7 +304,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                 synchronized: true,
             };
 
-            mockElectronAPI.stateSync.getSyncStatus.mockResolvedValueOnce(
+            mockStateSyncService.getSyncStatus.mockResolvedValueOnce(
                 mockSyncStatus
             );
 
@@ -306,9 +315,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
                 const syncStatus = await store.getSyncStatus();
                 expect(syncStatus).toEqual(mockSyncStatus);
-                expect(
-                    mockElectronAPI.stateSync.getSyncStatus
-                ).toHaveBeenCalled();
+                expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
 
                 await store.syncSites();
                 await store.fullResyncSites();
@@ -436,7 +443,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             const store = useSitesStore.getState();
 
             // Mock error for sync
-            mockElectronAPI.stateSync.getSyncStatus.mockRejectedValueOnce(
+            mockStateSyncService.getSyncStatus.mockRejectedValueOnce(
                 new Error("Sync error")
             );
 

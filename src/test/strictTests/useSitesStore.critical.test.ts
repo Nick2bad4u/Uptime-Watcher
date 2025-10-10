@@ -12,6 +12,17 @@ import { mockElectronAPI } from "../setup";
 import { SiteService } from "../../stores/sites/services/SiteService";
 import { MonitoringService } from "../../stores/sites/services/MonitoringService";
 
+const mockStateSyncService = vi.hoisted(() => ({
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn(),
+}));
+
+vi.mock("../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
 // Mock IPC functions that are used by the store operations
 vi.mock("../../types/ipc", () => ({
     extractIpcData: vi.fn((data) => data),
@@ -52,7 +63,7 @@ describe("useSitesStore Function Coverage Tests", () => {
         mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
         mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
-        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
+        mockStateSyncService.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,
             source: "cache",
@@ -215,7 +226,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         it("should exercise sync status functions", async () => {
             // Mock sync status response
-            mockElectronAPI.stateSync.getSyncStatus.mockResolvedValueOnce({
+            mockStateSyncService.getSyncStatus.mockResolvedValueOnce({
                 lastSyncAt: Date.now(),
                 siteCount: 2,
                 source: "database",
@@ -236,7 +247,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     typeof syncStatus.lastSyncAt === "number"
             ).toBeTruthy();
             expect(typeof syncStatus.source).toBe("string");
-            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
         });
 
         it("should exercise initialization functions", async () => {
@@ -346,7 +357,7 @@ describe("useSitesStore Function Coverage Tests", () => {
     describe("Error Handling and Edge Cases", () => {
         it("should handle getSyncStatus errors with fallback", async () => {
             // Mock error response
-            mockElectronAPI.stateSync.getSyncStatus.mockRejectedValueOnce(
+            mockStateSyncService.getSyncStatus.mockRejectedValueOnce(
                 new Error("Sync failed")
             );
 

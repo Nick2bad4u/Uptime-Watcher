@@ -5,6 +5,7 @@
 
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { EventsService } from "../services/EventsService";
 import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
@@ -126,10 +127,7 @@ function clearSiteRelatedCaches(identifier?: string): void {
  *   leaks and avoid processing events after cleanup.
  */
 export function setupCacheSync(): () => void {
-    // Check if we're in an Electron environment with cache invalidation events
-    // available
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- window.electronAPI can be undefined outside Electron environments
-    if (typeof window === "undefined" || !window.electronAPI?.events) {
+    if (typeof window === "undefined") {
         logger.warn(
             "Cache invalidation events not available - frontend cache sync disabled"
         );
@@ -138,85 +136,105 @@ export function setupCacheSync(): () => void {
         };
     }
 
-    const cleanup = window.electronAPI.events.onCacheInvalidated(
-        (data: CacheInvalidationData) => {
-            try {
-                logger.debug("Received cache invalidation event", data);
+    let cleanupHandler: (() => void) | null = null;
+    let disposed = false;
 
-                const syncSitesFromBackend = async (
-                    context: "all" | "site"
-                ): Promise<void> => {
-                    try {
-                        await useSitesStore.getState().fullResyncSites();
-                    } catch (error) {
-                        logger.error(
-                            `Failed to resynchronize sites after cache invalidation (${context}):`,
-                            ensureError(error)
-                        );
-                    }
-                };
+    const handleInvalidation = (data: CacheInvalidationData): void => {
+        try {
+            logger.debug("Received cache invalidation event", data);
 
-                // Clear appropriate frontend caches based on invalidation type
-                switch (data.type) {
-                    case "all": {
-                        clearAllFrontendCaches();
-                        // Refresh monitor types after clearing all caches
-                        const refreshMonitorTypes = async (): Promise<void> => {
+            const syncSitesFromBackend = async (
+                context: "all" | "site"
+            ): Promise<void> => {
+                try {
+                    await useSitesStore.getState().fullResyncSites();
+                } catch (error) {
+                    logger.error(
+                        `Failed to resynchronize sites after cache invalidation (${context}):`,
+                        ensureError(error)
+                    );
+                }
+            };
+
+            switch (data.type) {
+                case "all": {
+                    clearAllFrontendCaches();
+                    const refreshMonitorTypes = async (): Promise<void> => {
+                        try {
+                            await useMonitorTypesStore
+                                .getState()
+                                .refreshMonitorTypes();
+                        } catch (error) {
+                            logger.error(
+                                "Failed to refresh monitor types after cache invalidation:",
+                                ensureError(error)
+                            );
+                        }
+                    };
+                    void refreshMonitorTypes();
+                    void syncSitesFromBackend("all");
+                    break;
+                }
+                case "monitor": {
+                    clearMonitorRelatedCaches(data.identifier);
+                    const refreshMonitorTypesMonitor =
+                        async (): Promise<void> => {
                             try {
                                 await useMonitorTypesStore
                                     .getState()
                                     .refreshMonitorTypes();
                             } catch (error) {
                                 logger.error(
-                                    "Failed to refresh monitor types after cache invalidation:",
+                                    "Failed to refresh monitor types after monitor cache invalidation:",
                                     ensureError(error)
                                 );
                             }
                         };
-                        void refreshMonitorTypes();
-                        void syncSitesFromBackend("all");
-                        break;
-                    }
-                    case "monitor": {
-                        clearMonitorRelatedCaches(data.identifier);
-                        // Refresh monitor types when monitor-related caches are cleared
-                        const refreshMonitorTypesMonitor =
-                            async (): Promise<void> => {
-                                try {
-                                    await useMonitorTypesStore
-                                        .getState()
-                                        .refreshMonitorTypes();
-                                } catch (error) {
-                                    logger.error(
-                                        "Failed to refresh monitor types after monitor cache invalidation:",
-                                        ensureError(error)
-                                    );
-                                }
-                            };
-                        void refreshMonitorTypesMonitor();
-                        break;
-                    }
-                    case "site": {
-                        clearSiteRelatedCaches(data.identifier);
-                        void syncSitesFromBackend("site");
-                        break;
-                    }
-                    default: {
-                        logger.warn(
-                            "Unknown cache invalidation type:",
-                            data.type
-                        );
-                    }
+                    void refreshMonitorTypesMonitor();
+                    break;
                 }
-            } catch (error) {
-                logger.error(
-                    "Error handling cache invalidation:",
-                    ensureError(error)
-                );
+                case "site": {
+                    clearSiteRelatedCaches(data.identifier);
+                    void syncSitesFromBackend("site");
+                    break;
+                }
+                default: {
+                    logger.warn("Unknown cache invalidation type:", data.type);
+                }
             }
+        } catch (error) {
+            logger.error(
+                "Error handling cache invalidation:",
+                ensureError(error)
+            );
         }
-    );
+    };
+
+    void (async () => {
+        try {
+            const serviceCleanup =
+                await EventsService.onCacheInvalidated(handleInvalidation);
+
+            if (disposed) {
+                serviceCleanup();
+                return;
+            }
+
+            cleanupHandler = serviceCleanup;
+        } catch (error) {
+            logger.warn(
+                "Cache invalidation events not available - frontend cache sync disabled",
+                ensureError(error)
+            );
+        }
+    })();
 
     logger.debug("[CacheSync] Cache synchronization enabled");
-    return cleanup;
+    return (): void => {
+        disposed = true;
+        if (cleanupHandler) {
+            cleanupHandler();
+            cleanupHandler = null;
+        }
+    };
 }

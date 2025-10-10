@@ -47,17 +47,21 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     })),
 }));
 
-// Mock window.electronAPI
-const mockElectronAPI = {
-    stateSync: {
-        onStateSyncEvent: vi.fn(),
-        getSyncStatus: vi.fn(),
-    },
-};
+const mockStateSyncService = vi.hoisted(() => ({
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn(),
+}));
 
+vi.mock("../../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
+// Mock window.electronAPI
 Object.defineProperty(globalThis, "window", {
     value: {
-        electronAPI: mockElectronAPI,
+        electronAPI: {},
     },
     writable: true,
 });
@@ -149,9 +153,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
             } satisfies StateSyncStatusSummary;
 
             // Mock electronAPI response
-            vi.mocked(
-                mockElectronAPI.stateSync.getSyncStatus
-            ).mockResolvedValue(mockStatus);
+            mockStateSyncService.getSyncStatus.mockResolvedValue(mockStatus);
 
             // Mock withErrorHandling to execute operation normally
             vi.mocked(withErrorHandling).mockImplementation(
@@ -160,7 +162,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
 
             const result = await syncActions.getSyncStatus();
 
-            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
+            expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
             expect(logStoreAction).toHaveBeenCalledWith(
                 "SitesStore",
                 "getSyncStatus",
@@ -194,9 +196,9 @@ describe("useSiteSync - Final 100% Coverage", () => {
                 async (operation) => await operation()
             );
 
-            vi.mocked(
-                mockElectronAPI.stateSync.getSyncStatus
-            ).mockRejectedValue(new Error("status fetch failed"));
+            mockStateSyncService.getSyncStatus.mockRejectedValue(
+                new Error("Status fetch failed")
+            );
 
             const result = await syncActions.getSyncStatus();
 

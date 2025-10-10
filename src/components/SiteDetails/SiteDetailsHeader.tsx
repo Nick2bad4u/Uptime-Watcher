@@ -431,6 +431,7 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
             <div
                 className={headerClassName}
                 data-collapsed={isHeaderCollapsed}
+                data-testid="site-details-header"
                 style={styles.headerStyle}
             >
                 <div

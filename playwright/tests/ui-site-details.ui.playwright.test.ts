@@ -13,6 +13,8 @@ import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     closeSiteDetails,
     createSiteViaModal,
+    ensureSiteDetailsHeaderCollapsed,
+    ensureSiteDetailsHeaderExpanded,
     openSiteDetails,
     removeAllSites,
     resetApplicationState,
@@ -314,6 +316,50 @@ test.describe(
                 await expect(startMonitoringButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
+            }
+        );
+
+        test(
+            "should persist collapsed header state between sessions",
+            {
+                tag: ["@workflow", "@header"],
+            },
+            async () => {
+                await openSiteDetails(page, siteName);
+
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                const header = siteDetailsModal.getByTestId(
+                    "site-details-header"
+                );
+
+                await ensureSiteDetailsHeaderExpanded(siteDetailsModal);
+
+                await ensureSiteDetailsHeaderCollapsed(siteDetailsModal);
+
+                await expect(header).toHaveAttribute("data-collapsed", "true");
+                await expect(
+                    siteDetailsModal.locator(".site-details-header-thumbnail")
+                ).toHaveCount(0);
+
+                await closeSiteDetails(page);
+
+                await openSiteDetails(page, siteName);
+
+                const reopenedModal = page.getByTestId("site-details-modal");
+                const reopenedHeader = reopenedModal.getByTestId(
+                    "site-details-header"
+                );
+
+                await expect(reopenedHeader).toHaveAttribute(
+                    "data-collapsed",
+                    "true"
+                );
+
+                await ensureSiteDetailsHeaderExpanded(reopenedModal);
+
+                await expect(
+                    reopenedModal.locator(".site-details-header-thumbnail")
+                ).toHaveCount(1);
             }
         );
     }

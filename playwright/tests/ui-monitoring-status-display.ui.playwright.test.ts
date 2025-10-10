@@ -6,7 +6,6 @@ import {
     expect,
     test,
     type ElectronApplication,
-    type Locator,
     type Page,
 } from "@playwright/test";
 
@@ -15,30 +14,13 @@ import { tagElectronAppCoverage } from "../utils/coverage";
 import {
     closeSiteDetails,
     createSiteViaModal,
+    ensureSiteDetailsHeaderExpanded,
     openSiteDetails,
     removeAllSites,
     resetApplicationState,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 import { DEFAULT_TEST_SITE_URL, generateSiteName } from "../utils/testData";
-
-async function expandHeaderIfCollapsed(
-    siteDetailsModal: Locator
-): Promise<void> {
-    const expandHeaderButton = siteDetailsModal
-        .getByRole("button", { name: "Expand header" })
-        .first();
-
-    const canExpand = await expandHeaderButton
-        .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
-        .catch(() => false);
-
-    if (!canExpand) {
-        return;
-    }
-
-    await expandHeaderButton.click();
-}
 
 test.describe(
     "monitoring status display - modern ui",
@@ -88,7 +70,7 @@ test.describe(
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
-                await expandHeaderIfCollapsed(siteDetailsModal);
+                await ensureSiteDetailsHeaderExpanded(siteDetailsModal);
 
                 const statusDisplay = page.getByTestId(
                     "monitoring-status-display"

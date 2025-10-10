@@ -20,13 +20,13 @@ import type { SiteDetailsTab } from "../../stores/ui/types";
 
 import { logger } from "../../services/logger";
 import { ThemedButton } from "../../theme/components/ThemedButton";
-import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
 import { AppIcons } from "../../utils/icons";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
+import { MonitorSelector } from "../Dashboard/SiteCard/components/MonitorSelector";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary
@@ -137,15 +137,6 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
 
             return getMonitorTypeDisplayLabel(selectedMonitor.type);
         }, [selectedMonitor]);
-
-        const monitorOptions = useMemo(
-            () =>
-                currentSite.monitors.map((monitor) => ({
-                    id: monitor.id,
-                    label: getMonitorTypeDisplayLabel(monitor.type),
-                })),
-            [currentSite.monitors]
-        );
 
         // Button variant constants
         const BUTTON_VARIANT_PRIMARY = "primary";
@@ -366,16 +357,12 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
                             <ThemedText size="sm" variant="secondary">
                                 Monitor:
                             </ThemedText>
-                            <ThemedSelect
+                            <MonitorSelector
+                                className="site-details-navigation__monitor-selector"
+                                monitors={currentSite.monitors}
                                 onChange={handleMonitorIdChange}
-                                value={selectedMonitorId}
-                            >
-                                {monitorOptions.map(({ id, label }) => (
-                                    <option key={id} value={id}>
-                                        {label}
-                                    </option>
-                                ))}
-                            </ThemedSelect>
+                                selectedMonitorId={selectedMonitorId}
+                            />
                         </div>
                     </div>
                 </div>

@@ -140,3 +140,24 @@ export const Collapsed: Story = {
         );
     },
 };
+
+export const InvalidMonitorUrl: Story = {
+    render: (args) => {
+        const { httpMonitor, pingMonitor, site } = createSiteScenario();
+        const invalidMonitor = {
+            ...httpMonitor,
+            url: "not-a-valid-url",
+        } satisfies Monitor;
+
+        return (
+            <SiteDetailsHeader
+                {...args}
+                selectedMonitor={invalidMonitor}
+                site={{
+                    ...site,
+                    monitors: [invalidMonitor, pingMonitor],
+                }}
+            />
+        );
+    },
+};

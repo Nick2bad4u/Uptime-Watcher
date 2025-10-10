@@ -63,17 +63,21 @@ vi.mock("../../../utils/errorHandling", () => ({
     ensureError: vi.fn((error) => error),
 }));
 
-// Mock window.electronAPI
-const mockElectronAPI = {
-    stateSync: {
-        onStateSyncEvent: vi.fn(),
-        getSyncStatus: vi.fn(),
-    },
-};
+const mockStateSyncService = vi.hoisted(() => ({
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn(),
+}));
 
+vi.mock("../../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
+// Mock window.electronAPI
 Object.defineProperty(globalThis, "window", {
     value: {
-        electronAPI: mockElectronAPI,
+        electronAPI: {},
     },
     writable: true,
 });
@@ -135,9 +139,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 async (operation) => await operation()
             );
 
-            vi.mocked(
-                mockElectronAPI.stateSync.getSyncStatus
-            ).mockRejectedValue(new Error("status fetch failed"));
+            mockStateSyncService.getSyncStatus.mockRejectedValue(
+                new Error("status fetch failed")
+            );
 
             const result = await syncActions.getSyncStatus();
 
@@ -202,8 +206,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Deletion", "type");
 
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
-                (handler) => {
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
                     eventHandler = handler;
                     return vi.fn();
                 }
@@ -243,8 +247,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Data Update", "type");
 
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
-                (handler) => {
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
                     eventHandler = handler;
                     return vi.fn();
                 }
@@ -282,8 +286,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Error Handling", "type");
 
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
-                (handler) => {
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
                     eventHandler = handler;
                     return vi.fn();
                 }
@@ -385,8 +389,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             await annotate("Type: Business Logic", "type");
 
             let eventHandler: any;
-            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementation(
-                (handler) => {
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
                     eventHandler = handler;
                     return vi.fn();
                 }

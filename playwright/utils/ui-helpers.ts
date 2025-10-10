@@ -673,6 +673,71 @@ export async function openSiteDetails(
 }
 
 /**
+ * Ensures the site details header is in the requested collapsed or expanded
+ * state.
+ *
+ * @param siteDetailsModal - Locator scoped to the active site details modal.
+ * @param desiredState - Target header state.
+ */
+export async function ensureSiteDetailsHeaderState(
+    siteDetailsModal: Locator,
+    desiredState: "collapsed" | "expanded"
+): Promise<void> {
+    const header = siteDetailsModal.getByTestId("site-details-header");
+    await header.waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.MEDIUM });
+
+    const expectedCollapsedValue =
+        desiredState === "collapsed" ? "true" : "false";
+    const currentValue = await header
+        .getAttribute("data-collapsed")
+        .catch(() => null);
+
+    if (currentValue === expectedCollapsedValue) {
+        return;
+    }
+
+    const toggleButtonName =
+        desiredState === "collapsed" ? "Collapse header" : "Expand header";
+    const toggleButton = siteDetailsModal
+        .getByRole("button", { name: toggleButtonName })
+        .first();
+
+    const isToggleVisible = await toggleButton
+        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
+        .catch(() => false);
+
+    if (isToggleVisible) {
+        await toggleButton.click();
+    }
+
+    await expect(header).toHaveAttribute(
+        "data-collapsed",
+        expectedCollapsedValue,
+        {
+            timeout: WAIT_TIMEOUTS.MEDIUM,
+        }
+    );
+}
+
+/**
+ * Expands the site details header when it is collapsed.
+ */
+export async function ensureSiteDetailsHeaderExpanded(
+    siteDetailsModal: Locator
+): Promise<void> {
+    await ensureSiteDetailsHeaderState(siteDetailsModal, "expanded");
+}
+
+/**
+ * Collapses the site details header when it is expanded.
+ */
+export async function ensureSiteDetailsHeaderCollapsed(
+    siteDetailsModal: Locator
+): Promise<void> {
+    await ensureSiteDetailsHeaderState(siteDetailsModal, "collapsed");
+}
+
+/**
  * Opens the settings modal by clicking the settings button.
  *
  * @param page - The Playwright page instance

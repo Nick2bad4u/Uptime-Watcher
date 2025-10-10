@@ -29,6 +29,14 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));
 
+const mockEventsService = {
+    onCacheInvalidated: vi.fn(),
+};
+
+vi.mock("../../services/EventsService", () => ({
+    EventsService: mockEventsService,
+}));
+
 const mockRefreshMonitorTypes = vi.fn(async () => {
     // No-op default implementation
 });
@@ -106,6 +114,10 @@ type MockElectronAPI = ReturnType<typeof createMockElectronAPI>;
 const setOnCacheInvalidatedHandler = (
     handler: ReturnType<typeof vi.fn>
 ): void => {
+    mockEventsService.onCacheInvalidated.mockImplementation(async (callback) =>
+        handler(callback)
+    );
+
     const electronWindow = globalThis.window as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
     };
@@ -167,6 +179,9 @@ describe("cacheSync", () => {
         mockClearMonitorTypeCache.mockImplementation(() => {
             // No-op default implementation
         });
+        mockEventsService.onCacheInvalidated.mockRejectedValue(
+            new Error("Events service not configured")
+        );
 
         // Clean up any existing window.electronAPI
         if (globalThis.window !== undefined) {
@@ -218,10 +233,17 @@ describe("cacheSync", () => {
 
                 (globalThis as any).window = {};
 
+                mockEventsService.onCacheInvalidated.mockRejectedValue(
+                    new Error("Events API unavailable")
+                );
+
                 const cleanup = setupCacheSync();
 
+                await flushAsyncOperations();
+
                 expect(mockLogger.warn).toHaveBeenCalledWith(
-                    "Cache invalidation events not available - frontend cache sync disabled"
+                    "Cache invalidation events not available - frontend cache sync disabled",
+                    expect.any(Error)
                 );
                 expect(cleanup).toBeInstanceOf(Function);
 
@@ -257,13 +279,18 @@ describe("cacheSync", () => {
 
                 const cleanup = setupCacheSync();
 
+                await flushAsyncOperations();
+
                 expect(mockOnCacheInvalidated).toHaveBeenCalledWith(
                     expect.any(Function)
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Cache synchronization enabled"
                 );
-                expect(cleanup).toBe(mockCleanup);
+                expect(typeof cleanup).toBe("function");
+
+                cleanup();
+                expect(mockCleanup).toHaveBeenCalled();
             });
 
             it("should handle 'all' cache invalidation type", async ({
@@ -722,10 +749,16 @@ describe("cacheSync", () => {
                     },
                 } as any;
 
+                mockEventsService.onCacheInvalidated.mockRejectedValueOnce(
+                    new Error("Events interface missing")
+                );
+
                 const cleanup = setupCacheSync();
+                await flushAsyncOperations();
 
                 expect(mockLogger.warn).toHaveBeenCalledWith(
-                    "Cache invalidation events not available - frontend cache sync disabled"
+                    "Cache invalidation events not available - frontend cache sync disabled",
+                    expect.any(Error)
                 );
                 expect(cleanup).toBeInstanceOf(Function);
 
@@ -1049,13 +1082,19 @@ describe("cacheSync", () => {
             }),
         ])(
             "should handle setupCacheSync environment variations",
-            (environment) => {
+            async (environment) => {
+                const normalizedEnvironment = {
+                    ...environment,
+                    hasEvents:
+                        environment.hasElectronAPI && environment.hasEvents,
+                };
+
                 // Setup different environment configurations
-                if (!environment.hasWindow) {
+                if (!normalizedEnvironment.hasWindow) {
                     delete (globalThis as any).window;
-                } else if (!environment.hasElectronAPI) {
+                } else if (!normalizedEnvironment.hasElectronAPI) {
                     (globalThis as any).window = {};
-                } else if (!environment.hasEvents) {
+                } else if (!normalizedEnvironment.hasEvents) {
                     (globalThis as any).window = {
                         electronAPI: {
                             ...createMockElectronAPI(true, false),
@@ -1063,6 +1102,19 @@ describe("cacheSync", () => {
                         },
                     };
                 }
+
+                mockEventsService.onCacheInvalidated.mockImplementation(
+                    async (callback) => {
+                        if (
+                            !normalizedEnvironment.hasElectronAPI ||
+                            !normalizedEnvironment.hasEvents
+                        ) {
+                            throw new Error("Cache events unavailable");
+                        }
+
+                        return mockOnCacheInvalidated(callback);
+                    }
+                );
 
                 // Property: setupCacheSync should always return a function
                 const cleanup = setupCacheSync();
@@ -1072,14 +1124,22 @@ describe("cacheSync", () => {
                 expect(() => cleanup()).not.toThrow();
 
                 // Property: Warning should be logged when cache sync is not available
-                if (
-                    !environment.hasWindow ||
-                    !environment.hasElectronAPI ||
-                    !environment.hasEvents
-                ) {
+                if (!normalizedEnvironment.hasWindow) {
                     expect(mockLogger.warn).toHaveBeenCalledWith(
                         "Cache invalidation events not available - frontend cache sync disabled"
                     );
+                } else if (
+                    !normalizedEnvironment.hasElectronAPI ||
+                    !normalizedEnvironment.hasEvents
+                ) {
+                    await flushAsyncOperations();
+                    await flushAsyncOperations();
+                    const warnCalls = mockLogger.warn.mock.calls.filter(
+                        ([message]) =>
+                            message ===
+                            "Cache invalidation events not available - frontend cache sync disabled"
+                    );
+                    expect(warnCalls.length).toBeGreaterThan(0);
                 }
             }
         );
