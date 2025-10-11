@@ -7,15 +7,7 @@ import type { Monitor } from "@shared/types";
 import type { EventHandlers } from "@shared/types/componentProps";
 import type { KeyboardEvent, MouseEvent, NamedExoticComponent } from "react";
 
-import {
-    memo,
-    useCallback,
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import { memo, useCallback, useId, useMemo, useRef, useState } from "react";
 
 import { ThemedSelect } from "../../../../theme/components/ThemedSelect";
 import {
@@ -68,8 +60,10 @@ const preferHostPortIdentifier = (
 export interface MonitorSelectorProperties {
     /** Optional CSS classes for custom styling */
     readonly className?: string;
-    /** Whether the selector should be rendered in a disabled state. Defaults to
-disabled when no monitors are available. */
+    /**
+     * Whether the selector should be rendered in a disabled state. Defaults to
+     * disabled when no monitors are available.
+     */
     readonly disabled?: boolean;
     /** Array of available monitors to choose from */
     readonly monitors: Monitor[];
@@ -116,12 +110,16 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         const selectRef = useRef<HTMLSelectElement | null>(null);
         const rawGeneratedId = useId();
         const controlId = useMemo(
-            () => `monitor-selector-${rawGeneratedId.replace(/:/g, "")}`,
+            () => `monitor-selector-${rawGeneratedId.replaceAll(":", "")}`,
             [rawGeneratedId]
         );
         const [isSelectFocused, setIsSelectFocused] = useState(false);
+        const resetFocusState = useCallback(() => {
+            setIsSelectFocused(false);
+        }, []);
 
         const isDisabled = (disabled ?? false) || monitors.length === 0;
+        const isFocusActive = isSelectFocused && !isDisabled;
 
         const hasSelection = useMemo(
             () => monitors.some((monitor) => monitor.id === selectedMonitorId),
@@ -135,12 +133,6 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 ? PLACEHOLDER_LABEL_EMPTY
                 : PLACEHOLDER_LABEL_DEFAULT;
 
-        useEffect(() => {
-            if (isDisabled) {
-                setIsSelectFocused(false);
-            }
-        }, [isDisabled]);
-
         // Memoize event handlers to prevent recreation on every render
         const handleClick = useCallback((event: MouseEvent) => {
             event.stopPropagation();
@@ -151,12 +143,15 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         }, []);
 
         const handleSelectFocus = useCallback(() => {
+            if (isDisabled) {
+                return;
+            }
             setIsSelectFocused(true);
-        }, []);
+        }, [isDisabled]);
 
         const handleSelectBlur = useCallback(() => {
-            setIsSelectFocused(false);
-        }, []);
+            resetFocusState();
+        }, [resetFocusState]);
 
         const openSelect = useCallback(() => {
             const selectElement = selectRef.current;
@@ -277,11 +272,11 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
         return (
             // eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Div wrapper is required to nest the native select control.
             <div
-                className={wrapperClassName}
                 aria-controls={controlId}
                 aria-disabled={isDisabled}
-                aria-expanded={isSelectFocused}
+                aria-expanded={isFocusActive}
                 aria-haspopup="listbox"
+                className={wrapperClassName}
                 data-disabled={isDisabled}
                 onClick={handleWrapperClick}
                 onKeyDown={handleWrapperKeyDown}
@@ -300,8 +295,8 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                     disabled={isDisabled}
                     fluid={false}
                     id={controlId}
-                    onChange={onChange}
                     onBlur={handleSelectBlur}
+                    onChange={onChange}
                     onClick={handleClick}
                     onFocus={handleSelectFocus}
                     onMouseDown={handleMouseDown}
@@ -309,11 +304,11 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                     tone="transparent"
                     value={selectValue}
                 >
-                    {!hasSelection ? (
-                        <option value="" disabled>
+                    {hasSelection ? null : (
+                        <option disabled value="">
                             {placeholderLabel}
                         </option>
-                    ) : null}
+                    )}
                     {monitors.map((monitor) => (
                         <option key={monitor.id} value={monitor.id}>
                             {formatMonitorOption(monitor)}

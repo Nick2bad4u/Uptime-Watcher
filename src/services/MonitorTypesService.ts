@@ -14,11 +14,23 @@
 import type { Monitor } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers(
-    "MonitorTypesService"
-);
+const { ensureInitialized, wrap } = getIpcServiceHelpers("MonitorTypesService");
+
+interface MonitorTypesServiceContract {
+    formatMonitorDetail: (type: string, details: string) => Promise<string>;
+    formatMonitorTitleSuffix: (
+        type: string,
+        monitor: Monitor
+    ) => Promise<string>;
+    getMonitorTypes: () => Promise<unknown>;
+    initialize: () => Promise<void>;
+    validateMonitorData: (
+        type: string,
+        data: unknown
+    ) => Promise<ValidationResult>;
+}
 
 /**
  * Service for managing monitor types operations through Electron IPC.
@@ -31,7 +43,7 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers(
  *
  * @public
  */
-export const MonitorTypesService = {
+export const MonitorTypesService: MonitorTypesServiceContract = {
     /**
      * Formats monitor detail text using backend registry.
      *

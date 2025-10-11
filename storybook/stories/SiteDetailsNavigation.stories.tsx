@@ -179,19 +179,15 @@ export const LoadingState: Story = {
     },
 };
 
-const noMonitorScenario = (() => {
-    const emptySite = createMockSite({
+const noMonitorScenario = {
+    primaryMonitorId: "",
+    site: createMockSite({
         identifier: "storybook-site-navigation-empty",
         monitors: [],
         monitoring: false,
         name: "Navigation No Monitors",
-    });
-
-    return {
-        primaryMonitorId: "",
-        site: emptySite,
-    } as const;
-})();
+    }),
+} as const;
 
 export const NoMonitorsConfigured: Story = {
     args: {

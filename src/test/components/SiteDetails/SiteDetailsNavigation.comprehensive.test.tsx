@@ -335,12 +335,12 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             const selector = screen.getByTestId("monitor-selector");
             expect(
                 within(selector).getByRole("option", {
-                    name: /Website URL/i,
+                    name: /website url/i,
                 })
             ).toBeInTheDocument();
             expect(
                 within(selector).getByRole("option", {
-                    name: /Host & Port/i,
+                    name: /host & port/i,
                 })
             ).toBeInTheDocument();
         });

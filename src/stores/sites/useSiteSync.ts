@@ -21,8 +21,8 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
-import { StateSyncService } from "../../services/StateSyncService";
 import { logger } from "../../services/logger";
+import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { SiteService } from "./services/SiteService";
@@ -317,6 +317,7 @@ export const createSiteSyncActions = (
                     const serviceCleanup =
                         await StateSyncService.onStateSyncEvent(handleEvent);
 
+                    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- disposed may flip while awaiting subscription.
                     if (disposed) {
                         serviceCleanup();
                         return;

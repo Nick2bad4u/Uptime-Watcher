@@ -454,49 +454,6 @@ describe("SiteService", () => {
         });
     });
 
-    describe("downloadSqliteBackup", () => {
-        it("should successfully download SQLite backup", async () => {
-            // Mock the API response
-            const mockBackupData = new ArrayBuffer(1024);
-            const mockResponse = {
-                buffer: mockBackupData,
-                fileName: "backup_20240101_120000.sqlite",
-                metadata: {
-                    createdAt: 0,
-                    originalPath: "/tmp/backup.sqlite",
-                    sizeBytes: 1024,
-                },
-            };
-
-            mockElectronAPI.data.downloadSqliteBackup.mockResolvedValueOnce(
-                mockResponse
-            );
-
-            const result = await SiteService.downloadSqliteBackup();
-
-            expect(result).toEqual(mockResponse);
-            expect(
-                mockElectronAPI.data.downloadSqliteBackup
-            ).toHaveBeenCalledTimes(1);
-        });
-
-        it("should handle download errors", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const error = new Error("Failed to download backup");
-            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValueOnce(
-                error
-            );
-
-            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
-                "Failed to download backup"
-            );
-        });
-    });
-
     describe("Service availability", () => {
         it("should work when window.electronAPI is available", async ({
             task,
@@ -511,7 +468,6 @@ describe("SiteService", () => {
             expect(SiteService.addSite).toBeDefined();
             expect(SiteService.updateSite).toBeDefined();
             expect(SiteService.removeSite).toBeDefined();
-            expect(SiteService.downloadSqliteBackup).toBeDefined();
         });
 
         it("should handle undefined window.electronAPI gracefully", async ({
@@ -544,9 +500,6 @@ describe("SiteService", () => {
                 "ElectronAPI not available"
             );
             await expect(SiteService.removeSite("test")).rejects.toThrow(
-                "ElectronAPI not available"
-            );
-            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
                 "ElectronAPI not available"
             );
 
@@ -772,25 +725,6 @@ describe("SiteService", () => {
 
             await expect(SiteService.updateSite("test", {})).rejects.toThrow(
                 "Request timeout"
-            );
-        });
-
-        it("should handle database connection errors", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteService", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            const dbError = new Error("Database connection failed");
-            mockElectronAPI.data.downloadSqliteBackup.mockRejectedValueOnce(
-                dbError
-            );
-
-            await expect(SiteService.downloadSqliteBackup()).rejects.toThrow(
-                "Database connection failed"
             );
         });
     });

@@ -7,10 +7,6 @@ import { describe, expect, it, vi, afterEach } from "vitest";
 
 import type { Site } from "../../../shared/types.js";
 
-import { ConfigurationManager } from "../../managers/ConfigurationManager";
-import { SiteManager } from "../../managers/SiteManager";
-import { TypedEventBus } from "../../events/TypedEventBus";
-import type { UptimeEvents } from "../../events/eventTypes";
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type {
     MonitorRepository,
@@ -22,9 +18,8 @@ import type {
 } from "../../services/database/SiteRepository";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
 import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import { SiteService } from "../../services/site/SiteService";
-import { SiteWriterService } from "../../utils/database/SiteWriterService";
 import { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import { SiteWriterService } from "../../utils/database/SiteWriterService";
 
 class FakeDatabaseService {
     public nestedTransactions = 0;
@@ -82,9 +77,7 @@ const createRepositoryBundle = (
             monitorAdapters.push(adapter);
             return adapter;
         }),
-        findBySiteIdentifier: vi.fn(async (identifier: string) => {
-            return monitorsBySite.get(identifier) ?? [];
-        }),
+        findBySiteIdentifier: vi.fn(async (identifier: string) => monitorsBySite.get(identifier) ?? []),
     } as unknown as MonitorRepository;
 
     const siteAdapters: SiteRepositoryTransactionAdapter[] = [];
@@ -102,7 +95,7 @@ const createRepositoryBundle = (
             return adapter;
         }),
         findAll: vi.fn(async () =>
-            Array.from(sites.values()).map((site) => ({
+            Array.from(sites.values(), (site) => ({
                 identifier: site.identifier,
                 monitoring: site.monitoring,
                 name: site.name,
@@ -204,57 +197,6 @@ describe("Site deletion orchestration", () => {
         expect(sitesCache.has(siteId)).toBeFalsy();
         expect(sites.has(siteId)).toBeFalsy();
         expect(monitorsBySite.get(siteId)).toEqual([]);
-        expect(
-            repositories.monitorAdapters.at(0)?.deleteBySiteIdentifier
-        ).toHaveBeenCalledWith(siteId);
-        expect(repositories.siteAdapters.at(0)?.delete).toHaveBeenCalledWith(
-            siteId
-        );
-    });
-
-    it("shares the same deletion logic through SiteService", async () => {
-        const siteId = "site-service";
-        const sampleSite = createSampleSite(siteId);
-
-        const monitorsBySite = new Map<string, Site["monitors"]>();
-        monitorsBySite.set(siteId, Array.from(sampleSite.monitors));
-
-        const sites = new Map<string, Site>();
-        sites.set(siteId, { ...sampleSite });
-
-        const fakeDatabaseService = new FakeDatabaseService();
-        const repositories = createRepositoryBundle(monitorsBySite, sites);
-
-        const configurationManager = new ConfigurationManager();
-        const eventBus = new TypedEventBus<UptimeEvents>(
-            "integration-site-service"
-        );
-
-        const siteManager = new SiteManager({
-            configurationManager,
-            databaseService: fakeDatabaseService as unknown as DatabaseService,
-            eventEmitter: eventBus,
-            historyRepository: repositories.historyRepository,
-            monitorRepository: repositories.monitorRepository,
-            settingsRepository: repositories.settingsRepository,
-            siteRepository: repositories.siteRepository,
-        });
-
-        siteManager.getSitesCache().set(siteId, { ...sampleSite });
-
-        const siteService = new SiteService({
-            siteManager,
-        });
-
-        const result = await siteService.deleteSiteWithRelatedData(siteId);
-
-        expect(result).toBeTruthy();
-        expect(fakeDatabaseService.nestedTransactions).toBe(0);
-        expect(sites.has(siteId)).toBeFalsy();
-        expect(monitorsBySite.get(siteId)).toEqual([]);
-        expect(
-            repositories.monitorAdapters.at(0)?.findBySiteIdentifier
-        ).toHaveBeenCalledWith(siteId);
         expect(
             repositories.monitorAdapters.at(0)?.deleteBySiteIdentifier
         ).toHaveBeenCalledWith(siteId);

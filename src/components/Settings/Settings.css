@@ -37,11 +37,11 @@
 }
 
 .settings-modal .modal-shell__close {
-    block-size: 2.125rem;
-    inline-size: 2.125rem;
     border-radius: var(--border-radius-md);
+    block-size: 2.125rem;
     box-shadow: 0 12px 24px
         color-mix(in srgb, var(--modal-accent) 22%, transparent);
+    inline-size: 2.125rem;
 }
 
 .settings-modal__header-left {

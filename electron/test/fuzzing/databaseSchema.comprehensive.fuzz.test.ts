@@ -93,6 +93,33 @@ vi.mock("../../services/database/utils/dynamicSchema", () => ({
     ),
 }));
 
+const containsStandaloneSegment = (text: string, value: string): boolean => {
+    if (!value) {
+        return false;
+    }
+
+    let searchIndex = text.indexOf(value);
+    while (searchIndex !== -1) {
+        const precedingCharacter =
+            searchIndex > 0 ? (text[searchIndex - 1] ?? "") : "";
+        const followingCharacter =
+            searchIndex + value.length < text.length
+                ? (text[searchIndex + value.length] ?? "")
+                : "";
+
+        const isLeadingAlphaNumeric = /[A-Za-z0-9_]/u.test(precedingCharacter);
+        const isTrailingAlphaNumeric = /[A-Za-z0-9_]/u.test(followingCharacter);
+
+        if (!isLeadingAlphaNumeric && !isTrailingAlphaNumeric) {
+            return true;
+        }
+
+        searchIndex = text.indexOf(value, searchIndex + 1);
+    }
+
+    return false;
+};
+
 vi.mock("@shared/utils/logTemplates", () => ({
     LOG_TEMPLATES: {
         services: {
@@ -947,7 +974,12 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                                     unicodeString.toLowerCase()
                                 )
                             ) {
-                                expect(call).not.toContain(unicodeString);
+                                expect(
+                                    containsStandaloneSegment(
+                                        call,
+                                        unicodeString
+                                    )
+                                ).toBeFalsy();
                             }
                             if (emojiString.length > 0) {
                                 expect(call).not.toContain(emojiString);

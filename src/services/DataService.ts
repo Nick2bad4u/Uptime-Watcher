@@ -12,13 +12,13 @@
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 interface DataServiceContract {
-    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
-    exportData: () => Promise<string>;
-    importData: (data: string) => Promise<boolean>;
-    initialize: () => Promise<void>;
+    readonly downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
+    readonly exportData: () => Promise<string>;
+    readonly importData: (data: string) => Promise<boolean>;
+    readonly initialize: () => Promise<void>;
 }
 
 /**
@@ -31,7 +31,7 @@ interface DataServiceContract {
  *
  * @public
  */
-const { ensureInitialized, wrap } = createIpcServiceHelpers("DataService");
+const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService");
 
 export const DataService: DataServiceContract = {
     /**

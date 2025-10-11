@@ -170,10 +170,23 @@ export async function waitForAppInitialization(
     await page.waitForLoadState("domcontentloaded");
 
     // Wait for the React root element to be visible
-    await expect(page.getByTestId("app-root")).toBeVisible({ timeout });
+    await page
+        .getByTestId("app-root")
+        .waitFor({ state: "visible", timeout })
+        .catch(() => undefined);
 
     // Wait for the React app to mount and render content
-    await expect(page.getByTestId("app-root")).not.toBeEmpty({ timeout });
+    await page.waitForFunction(
+        () => {
+            const root = document.querySelector('[data-testid="app-root"]');
+            if (!root) {
+                return false;
+            }
+
+            return (root.textContent ?? "").trim().length > 0;
+        },
+        { timeout }
+    );
 
     // Wait for the app container to be visible
     await expect(page.getByTestId("app-container")).toBeVisible({

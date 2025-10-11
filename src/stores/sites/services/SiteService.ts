@@ -8,12 +8,38 @@
  */
 
 import type { Site } from "@shared/types";
-import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
-import { DataService } from "../../../services/DataService";
-import { createIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+import { ensureError } from "@shared/utils/errorHandling";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers("SiteService");
+import { getIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("SiteService");
+    } catch (error) {
+        throw ensureError(error);
+    }
+})();
+
+/**
+ * Renderer-side contract for site operations routed through the preload bridge.
+ */
+interface SiteServiceContract {
+    readonly addSite: (site: Site) => Promise<Site>;
+    readonly getSites: () => Promise<Site[]>;
+    readonly initialize: () => Promise<void>;
+    readonly removeMonitor: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<boolean>;
+    readonly removeSite: (identifier: string) => Promise<boolean>;
+    readonly updateSite: (
+        identifier: string,
+        updates: Partial<Site>
+    ) => Promise<void>;
+}
 
 /**
  * Service for managing site operations through Electron IPC.
@@ -25,7 +51,7 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers("SiteService");
  *
  * @public
  */
-export const SiteService = {
+export const SiteService: SiteServiceContract = {
     /**
      * Adds a new site to the backend.
      *
@@ -50,23 +76,6 @@ export const SiteService = {
     ),
 
     /**
-     * Downloads a backup of the SQLite database.
-     *
-     * @example
-     *
-     * ```typescript
-     * const backup = await SiteService.downloadSqliteBackup();
-     * ```
-     *
-     * @returns An object containing the backup buffer and the file name.
-     *
-     * @throws If the electron API is unavailable or the backup operation fails.
-     */
-    downloadSqliteBackup: wrap("downloadSqliteBackup", async () =>
-        DataService.downloadSqliteBackup()
-    ),
-
-    /**
      * Retrieves all sites from the backend.
      *
      * @example
@@ -80,7 +89,7 @@ export const SiteService = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    getSites: wrap("getSites", async (api) => api.sites.getSites()),
+    getSites: wrap("getSites", (api) => api.sites.getSites()),
 
     /**
      * Ensures the electron API is available before making backend calls.

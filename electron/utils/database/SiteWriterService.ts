@@ -23,8 +23,8 @@ import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 
 import { withDatabaseOperation } from "../operationalHooks";
-import { deleteSiteWithAdapters } from "./siteDeletion";
 import { SiteNotFoundError } from "./interfaces";
+import { deleteSiteWithAdapters } from "./siteDeletion";
 
 /**
  * Service for handling site writing operations. Separates data operations from

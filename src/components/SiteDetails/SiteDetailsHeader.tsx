@@ -446,7 +446,10 @@ export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties
                     <div className="site-details-header-info">
                         <div className="site-details-header-main">
                             {isHeaderCollapsed ? null : (
-                                <div className="site-details-header-thumbnail">
+                                <div
+                                    className="site-details-header-thumbnail"
+                                    data-testid="site-details-header-thumbnail"
+                                >
                                     <ScreenshotThumbnail
                                         siteName={site.name}
                                         url={screenshotUrl}

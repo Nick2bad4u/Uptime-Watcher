@@ -14,9 +14,9 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers("StateSyncService");
+const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService");
 
 /**
  * Contract for renderer-facing state synchronization operations.
@@ -28,21 +28,21 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers("StateSyncService");
  */
 interface StateSyncServiceContract {
     /** Retrieves the latest synchronization status snapshot from the backend. */
-    getSyncStatus: () => Promise<StateSyncStatusSummary>;
+    readonly getSyncStatus: () => Promise<StateSyncStatusSummary>;
     /** Ensures the preload bridge is available prior to IPC usage. */
-    initialize: () => Promise<void>;
+    readonly initialize: () => Promise<void>;
     /**
      * Registers a handler for incremental state sync events and returns a
      * cleanup callback.
      */
-    onStateSyncEvent: (
+    readonly onStateSyncEvent: (
         callback: (event: StateSyncEventData) => void
     ) => Promise<() => void>;
     /**
      * Requests a full synchronization cycle and returns the backend result
      * payload.
      */
-    requestFullSync: () => Promise<StateSyncFullSyncResult>;
+    readonly requestFullSync: () => Promise<StateSyncFullSyncResult>;
 }
 
 /**
@@ -51,7 +51,8 @@ interface StateSyncServiceContract {
  * @public
  */
 export const StateSyncService: StateSyncServiceContract = {
-    getSyncStatus: wrap("getSyncStatus", async (api) =>
+    getSyncStatus: wrap("getSyncStatus", (api) =>
+        // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
         api.stateSync.getSyncStatus()
     ),
 
@@ -59,11 +60,13 @@ export const StateSyncService: StateSyncServiceContract = {
 
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
-        async (api, callback: (event: StateSyncEventData) => void) =>
-            api.stateSync.onStateSyncEvent(callback)
+        (api, callback: (event: StateSyncEventData) => void) =>
+            // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
+            Promise.resolve(api.stateSync.onStateSyncEvent(callback))
     ),
 
-    requestFullSync: wrap("requestFullSync", async (api) =>
+    requestFullSync: wrap("requestFullSync", (api) =>
+        // eslint-disable-next-line n/no-sync -- IPC bridge exposes async method with "Sync" suffix.
         api.stateSync.requestFullSync()
     ),
 };

@@ -6,7 +6,64 @@
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { waitForElectronAPI } from "../../stores/utils";
-import { logger as defaultLogger } from "../logger";
+import * as loggerModule from "../logger";
+
+interface LoggerLike {
+    debug?: (message: string, ...details: unknown[]) => void;
+    error: (message: string, ...details: unknown[]) => void;
+}
+
+const consoleFallbackLogger: LoggerLike = {
+    debug: (...details) => {
+        console.debug(...details);
+    },
+    error: (...details) => {
+        console.error(...details);
+    },
+};
+
+const isLoggerLike = (candidate: unknown): candidate is LoggerLike => {
+    if (typeof candidate !== "object" || candidate === null) {
+        return false;
+    }
+
+    return typeof Reflect.get(candidate, "error") === "function";
+};
+
+const safeGetModuleExport = (
+    module: unknown,
+    property: PropertyKey
+): unknown => {
+    if (typeof module !== "object" || module === null) {
+        return undefined;
+    }
+
+    try {
+        if (Reflect.has(module, property)) {
+            return Reflect.get(module, property);
+        }
+    } catch {
+        return undefined;
+    }
+
+    return undefined;
+};
+
+const resolveDefaultLogger = (): LoggerLike => {
+    const lowercaseCandidate = safeGetModuleExport(loggerModule, "logger");
+    if (isLoggerLike(lowercaseCandidate)) {
+        return lowercaseCandidate;
+    }
+
+    const uppercaseCandidate = safeGetModuleExport(loggerModule, "Logger");
+    if (isLoggerLike(uppercaseCandidate)) {
+        return uppercaseCandidate;
+    }
+
+    return consoleFallbackLogger;
+};
+
+const defaultLogger: LoggerLike = resolveDefaultLogger();
 
 /**
  * Options for configuring {@link createIpcServiceHelpers} behavior.
@@ -26,13 +83,13 @@ export interface GuardedIpcServiceHelpers {
      * Wraps a handler so it automatically waits for initialization and logs
      * failures using a consistent format.
      */
-    wrap<Args extends unknown[], Result>(
+    wrap: <Args extends unknown[], Result>(
         methodName: string,
         handler: (
             api: typeof window.electronAPI,
             ...args: Args
         ) => Promise<Result>
-    ): (...args: Args) => Promise<Result>;
+    ) => (...args: Args) => Promise<Result>;
 }
 
 /**
@@ -60,13 +117,16 @@ export function createIpcServiceHelpers(
         }
     };
 
-    const wrap = <Args extends unknown[], Result>(
+    const wrap: GuardedIpcServiceHelpers["wrap"] = function wrap<
+        Args extends unknown[],
+        Result,
+    >(
         methodName: string,
         handler: (
             api: typeof window.electronAPI,
             ...args: Args
         ) => Promise<Result>
-    ): ((...args: Args) => Promise<Result>) => {
+    ): (...args: Args) => Promise<Result> {
         return async (...args: Args): Promise<Result> => {
             await ensureInitialized();
 
@@ -86,4 +146,36 @@ export function createIpcServiceHelpers(
         ensureInitialized,
         wrap,
     };
+}
+
+/**
+ * Creates IPC service helpers with guarded error handling.
+ *
+ * @remarks
+ * Ensures that unexpected failures during helper construction are surfaced with
+ * a descriptive error message and attached cause to aid diagnostics.
+ *
+ * @param serviceName - Human-readable service name used for log messages.
+ * @param options - Optional configuration overrides.
+ *
+ * @returns Guarded IPC helper utilities.
+ */
+export function getIpcServiceHelpers(
+    serviceName: string,
+    options: CreateIpcServiceHelpersOptions = {}
+): GuardedIpcServiceHelpers {
+    try {
+        return createIpcServiceHelpers(serviceName, options);
+    } catch (error) {
+        const ensuredError = ensureError(error);
+        const logger = options.logger ?? defaultLogger;
+        logger.error(
+            `[${serviceName}] Failed to create IPC service helpers`,
+            ensuredError
+        );
+        throw new Error(
+            `[${serviceName}] Failed to create IPC service helpers`,
+            { cause: error }
+        );
+    }
 }

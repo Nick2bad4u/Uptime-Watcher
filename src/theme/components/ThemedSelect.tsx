@@ -77,16 +77,16 @@ export interface ThemedSelectProperties
     readonly id?: string;
     /** Name attribute for form submissions */
     readonly name?: string;
+    /** Blur handler for the select element */
+    readonly onBlur?: EventHandlers.Focus<HTMLSelectElement>;
     /** Change handler for selection updates */
     readonly onChange?: EventHandlers.ChangeWithEvent<HTMLSelectElement>;
     /** Click handler for the select element */
     readonly onClick?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
-    /** Mouse down handler for the select element */
-    readonly onMouseDown?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
     /** Focus handler for the select element */
     readonly onFocus?: EventHandlers.Focus<HTMLSelectElement>;
-    /** Blur handler for the select element */
-    readonly onBlur?: EventHandlers.Focus<HTMLSelectElement>;
+    /** Mouse down handler for the select element */
+    readonly onMouseDown?: EventHandlers.ClickWithEvent<HTMLSelectElement>;
     /** Whether the select is required for form validation */
     readonly required?: boolean;
     /** Tooltip text that appears on hover */

@@ -338,7 +338,9 @@ test.describe(
 
                 await expect(header).toHaveAttribute("data-collapsed", "true");
                 await expect(
-                    siteDetailsModal.locator(".site-details-header-thumbnail")
+                    siteDetailsModal.getByTestId(
+                        "site-details-header-thumbnail"
+                    )
                 ).toHaveCount(0);
 
                 await closeSiteDetails(page);
@@ -358,7 +360,7 @@ test.describe(
                 await ensureSiteDetailsHeaderExpanded(reopenedModal);
 
                 await expect(
-                    reopenedModal.locator(".site-details-header-thumbnail")
+                    reopenedModal.getByTestId("site-details-header-thumbnail")
                 ).toHaveCount(1);
             }
         );

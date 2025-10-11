@@ -192,29 +192,6 @@ describe("IPC Response Handling Regression Tests", () => {
         });
     });
 
-    describe("SQLite Backup Failure Propagation", () => {
-        it("should propagate backend failures in backup download", async () => {
-            // Mock the DataService to throw an error (not electronAPI directly)
-            const { DataService } = await import(
-                "../../../services/DataService"
-            );
-            vi.mocked(DataService.downloadSqliteBackup).mockRejectedValue(
-                new Error("Backup generation failed")
-            );
-
-            const { SiteService } = await import(
-                "../../../stores/sites/services/SiteService"
-            );
-
-            try {
-                await SiteService.downloadSqliteBackup();
-                expect.fail("Expected error to be thrown");
-            } catch (error) {
-                expect(String(error)).toContain("Backup generation failed");
-            }
-        });
-    });
-
     describe("Sync Status Failure Propagation", () => {
         it("should handle backend failures in sync status retrieval gracefully", async () => {
             // Mock a backend failure response

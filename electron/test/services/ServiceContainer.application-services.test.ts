@@ -12,20 +12,36 @@ vi.mock("../../events/TypedEventBus.js", () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports, unicorn/prefer-module -- Required for mock
     const { EventEmitter } = require("node:events");
 
-    return {
-        TypedEventBus: vi.fn().mockImplementation((name?: string) => {
-            // Create an actual EventEmitter instance
-            // eslint-disable-next-line unicorn/prefer-event-target -- Required for Node.js EventEmitter compatibility
-            const eventEmitter = new EventEmitter();
+    // eslint-disable-next-line unicorn/prefer-event-target -- Tests rely on Node.js EventEmitter semantics for parity with production TypedEventBus.
+    class MockTypedEventBus extends EventEmitter {
+        public readonly busId: string;
 
-            // Add TypedEventBus-specific methods
-            return Object.assign(eventEmitter, {
-                onTyped: vi.fn(),
-                emitTyped: vi.fn().mockResolvedValue(undefined),
-                busId: name || "test-bus",
-                destroy: vi.fn(),
-            });
-        }),
+        public readonly emitTyped = vi.fn().mockResolvedValue(undefined);
+
+        public readonly destroy = vi.fn();
+
+        public constructor(name?: string) {
+            super();
+            this.busId = name ?? "test-bus";
+        }
+
+        public onTyped(
+            event: string,
+            listener: (payload: unknown) => void
+        ): this {
+            const emitter = this as unknown as {
+                on: (
+                    eventName: string,
+                    registered: (payload: unknown) => void
+                ) => MockTypedEventBus;
+            };
+            emitter.on(event, listener);
+            return this;
+        }
+    }
+
+    return {
+        TypedEventBus: MockTypedEventBus,
     };
 });
 
@@ -36,10 +52,6 @@ vi.mock("../../managers/ConfigurationManager.js", () => ({
 
 vi.mock("../../managers/DatabaseManager.js", () => ({
     DatabaseManager: vi.fn(),
-}));
-
-vi.mock("../../services/site/SiteService.js", () => ({
-    SiteService: vi.fn(),
 }));
 
 // Mock dependencies for application services
@@ -147,8 +159,8 @@ describe("ServiceContainer - Application Services", () => {
         });
     });
 
-    describe("Site Services", () => {
-        it("should create SiteService singleton", async ({
+    describe("Site Manager", () => {
+        it("should create SiteManager singleton", async ({
             task,
             annotate,
         }) => {
@@ -161,11 +173,11 @@ describe("ServiceContainer - Application Services", () => {
             await annotate("Type: Constructor", "type");
 
             expect(() => {
-                container.getSiteService();
+                container.getSiteManager();
             }).not.toThrow();
         });
 
-        it("should handle SiteService dependencies correctly", async ({
+        it("should handle SiteManager dependencies correctly", async ({
             task,
             annotate,
         }) => {
@@ -177,8 +189,8 @@ describe("ServiceContainer - Application Services", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteService = container.getSiteService();
-            expect(siteService).toBeDefined();
+            const siteManager = container.getSiteManager();
+            expect(siteManager).toBeDefined();
         });
     });
 
@@ -198,7 +210,7 @@ describe("ServiceContainer - Application Services", () => {
             expect(() => {
                 container.getConfigurationManager();
                 container.getDatabaseManager();
-                container.getSiteService();
+                container.getSiteManager();
             }).not.toThrow();
         });
 
@@ -216,11 +228,11 @@ describe("ServiceContainer - Application Services", () => {
 
             const config = container.getConfigurationManager();
             const dbManager = container.getDatabaseManager();
-            const siteService = container.getSiteService();
+            const siteManager = container.getSiteManager();
 
             expect(config).not.toBe(dbManager);
-            expect(dbManager).not.toBe(siteService);
-            expect(config).not.toBe(siteService);
+            expect(dbManager).not.toBe(siteManager);
+            expect(config).not.toBe(siteManager);
         });
     });
 });

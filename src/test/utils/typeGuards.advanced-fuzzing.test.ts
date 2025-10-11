@@ -380,7 +380,9 @@ describe("Type Guards Advanced Fuzzing Tests", () => {
             "hasProperties should validate multiple properties correctly",
             (obj, properties) => {
                 const result = hasProperties(obj, properties);
-                const expectedResult = properties.every((prop) => prop in obj);
+                const expectedResult = properties.every((prop) =>
+                    Object.hasOwn(obj, prop)
+                );
 
                 expect(result).toBe(expectedResult);
             }

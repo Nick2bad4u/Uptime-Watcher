@@ -25,8 +25,8 @@ import { getMonitorTypeDisplayLabel } from "../../utils/fallbacks";
 import { AppIcons } from "../../utils/icons";
 import { SiteMonitoringButton } from "../common/SiteMonitoringButton/SiteMonitoringButton";
 import { Tooltip } from "../common/Tooltip/Tooltip";
-import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { MonitorSelector } from "../Dashboard/SiteCard/components/MonitorSelector";
+import { SurfaceContainer } from "../shared/SurfaceContainer";
 
 /**
  * Props for the SiteDetailsNavigation component. Contains all necessary

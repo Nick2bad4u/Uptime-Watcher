@@ -18,6 +18,7 @@ import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
+import type { EventMetadata } from "../events/TypedEventBus";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
@@ -36,9 +37,31 @@ import { SiteRepository } from "./database/SiteRepository";
 import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { NotificationService } from "./notifications/NotificationService";
-import { SiteService } from "./site/SiteService";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
+
+/**
+ * Supported payload formats for manager events forwarded to the orchestrator.
+ *
+ * @remarks
+ * Manager event buses attach metadata to payloads via {@link EventMetadata}. The
+ * orchestrator should receive the original payload shape without
+ * EventEmitter-specific metadata. This helper type captures both
+ * representations so forwarding helpers can normalize payloads safely while
+ * preserving type safety.
+ */
+type ForwardableEventPayload<EventName extends keyof UptimeEvents> =
+    | UptimeEvents[EventName]
+    | (UptimeEvents[EventName] & {
+          _meta: EventMetadata;
+          _originalMeta?: unknown;
+      });
+
+type ForwardablePayloadWithMeta<EventName extends keyof UptimeEvents> =
+    ForwardableEventPayload<EventName> & {
+        _meta: EventMetadata;
+        _originalMeta?: unknown;
+    };
 
 /**
  * Configuration options for {@link ServiceContainer}.
@@ -229,13 +252,6 @@ export class ServiceContainer {
     private siteRepository?: SiteRepository;
 
     /**
-     * Singleton instance of {@link SiteService}.
-     *
-     * @internal
-     */
-    private siteService?: SiteService;
-
-    /**
      * Singleton instance of {@link UptimeOrchestrator}.
      *
      * @internal
@@ -306,7 +322,6 @@ export class ServiceContainer {
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
-        this.getSiteService();
         this.getSiteManager();
         this.getMonitorManager();
         const databaseManager = this.getDatabaseManager();
@@ -445,7 +460,6 @@ export class ServiceContainer {
             SettingsRepository: this.settingsRepository !== undefined,
             SiteManager: this.siteManager !== undefined,
             SiteRepository: this.siteRepository !== undefined,
-            SiteService: this.siteService !== undefined,
             UptimeOrchestrator: this.uptimeOrchestrator !== undefined,
             WindowService: this.windowService !== undefined,
         };
@@ -476,7 +490,6 @@ export class ServiceContainer {
             SettingsRepository: this.settingsRepository,
             SiteManager: this.siteManager,
             SiteRepository: this.siteRepository,
-            SiteService: this.siteService,
             UptimeOrchestrator: this.uptimeOrchestrator,
             WindowService: this.windowService,
         };
@@ -776,23 +789,6 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the {@link SiteService} singleton.
-     *
-     * @returns The {@link SiteService} instance.
-     */
-    public getSiteService(): SiteService {
-        if (!this.siteService) {
-            this.siteService = new SiteService({
-                siteManager: this.getSiteManager(),
-            });
-            if (this.config.enableDebugLogging) {
-                logger.debug("[ServiceContainer] Created SiteService");
-            }
-        }
-        return this.siteService;
-    }
-
-    /**
      * Gets the {@link UptimeOrchestrator} singleton.
      *
      * @remarks
@@ -880,38 +876,165 @@ export class ServiceContainer {
             "sites:state-synchronized",
             "site:cache-miss",
             "system:error",
-        ] as const;
+        ] as const satisfies ReadonlyArray<keyof UptimeEvents>;
 
-        for (const eventType of eventsToForward) {
-            managerEventBus.on(eventType, (data: unknown) => {
-                const mainOrchestrator = this.getMainOrchestrator();
-                if (mainOrchestrator) {
-                    void (async (): Promise<void> => {
-                        try {
-                            await mainOrchestrator.emitTyped(
-                                eventType,
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Event data is validated by the typed event system and matches the event type
-                                data as UptimeEvents[typeof eventType]
-                            );
-                        } catch (error) {
-                            logger.error(
-                                `[ServiceContainer] Error forwarding ${eventType} from ${managerName}:`,
-                                error
-                            );
-                        }
-                    })();
-                    if (this.config.enableDebugLogging) {
-                        logger.debug(
-                            `[ServiceContainer] Forwarded ${eventType} from ${managerName} to main orchestrator`
+        const maybeTypedBus = managerEventBus as {
+            on?: TypedEventBus<UptimeEvents>["on"];
+            onTyped?: TypedEventBus<UptimeEvents>["onTyped"];
+        };
+
+        if (typeof maybeTypedBus.onTyped === "function") {
+            for (const eventName of eventsToForward) {
+                maybeTypedBus.onTyped(
+                    eventName,
+                    (
+                        payloadWithMeta: ForwardablePayloadWithMeta<
+                            typeof eventName
+                        >
+                    ): void => {
+                        this.emitForwardedEvent(
+                            eventName,
+                            payloadWithMeta,
+                            managerName
                         );
                     }
+                );
+            }
+        } else {
+            for (const eventName of eventsToForward) {
+                const rawOn = (
+                    managerEventBus as {
+                        on?: TypedEventBus<UptimeEvents>["on"];
+                    }
+                ).on;
+
+                if (typeof rawOn === "function") {
+                    rawOn.call(
+                        managerEventBus,
+                        eventName,
+                        (
+                            payload: ForwardableEventPayload<typeof eventName>
+                        ): void => {
+                            this.emitForwardedEvent(
+                                eventName,
+                                payload,
+                                managerName
+                            );
+                        }
+                    );
+                } else if (this.config.enableDebugLogging) {
+                    logger.warn(
+                        `[ServiceContainer] Skipping forwarding for ${eventName} because manager event bus for ${managerName} lacks an on() method`
+                    );
                 }
-            });
+            }
         }
+
         if (this.config.enableDebugLogging) {
             logger.debug(
                 `[ServiceContainer] Set up event forwarding for ${managerName} (${eventsToForward.length} events)`
             );
         }
+    }
+
+    /**
+     * Emits a manager event through the main orchestrator after metadata
+     * cleanup.
+     *
+     * @typeParam EventName - Event identifier forwarded to the orchestrator.
+     *
+     * @param eventName - Name of the event being forwarded.
+     * @param payload - Raw payload emitted by the manager event bus.
+     * @param managerName - Name of the originating manager for diagnostics.
+     */
+    private emitForwardedEvent<EventName extends keyof UptimeEvents>(
+        eventName: EventName,
+        payload: ForwardableEventPayload<EventName>,
+        managerName: string
+    ): void {
+        const mainOrchestrator = this.getMainOrchestrator();
+        if (!mainOrchestrator) {
+            return;
+        }
+
+        const sanitizedPayload = this.stripEventMetadata(eventName, payload);
+        const eventLabel = String(eventName);
+
+        void (async (): Promise<void> => {
+            try {
+                await mainOrchestrator.emitTyped(eventName, sanitizedPayload);
+            } catch (error: unknown) {
+                logger.error(
+                    `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}:`,
+                    error
+                );
+            }
+        })();
+
+        if (this.config.enableDebugLogging) {
+            logger.debug(
+                `[ServiceContainer] Forwarded ${eventLabel} from ${managerName} to main orchestrator`
+            );
+        }
+    }
+
+    /**
+     * Removes event bus metadata from a payload before forwarding it upstream.
+     *
+     * @typeParam EventName - Event identifier forwarded to the orchestrator.
+     *
+     * @param eventName - Name of the event being forwarded (for logging
+     *   context).
+     * @param payload - Payload that may include event bus metadata artifacts.
+     *
+     * @returns Payload suitable for {@link UptimeOrchestrator.emitTyped}.
+     */
+    private stripEventMetadata<EventName extends keyof UptimeEvents>(
+        eventName: EventName,
+        payload: ForwardableEventPayload<EventName>
+    ): UptimeEvents[EventName] {
+        if (Array.isArray(payload)) {
+            return Array.from(payload) as UptimeEvents[EventName];
+        }
+
+        if (!this.isPayloadWithMetadata(payload)) {
+            return payload;
+        }
+
+        const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
+        const {
+            _meta: metadata,
+            _originalMeta: originalMetadata,
+            ...sanitizedPayload
+        }: ForwardablePayloadWithMeta<EventName> = payloadWithMeta;
+
+        if (this.config.enableDebugLogging) {
+            const eventLabel = String(eventName);
+            logger.debug(
+                `[ServiceContainer] Stripped metadata from ${eventLabel} payload before forwarding`,
+                { metadata, originalMetadata }
+            );
+        }
+
+        return sanitizedPayload as UptimeEvents[EventName];
+    }
+
+    /**
+     * Determines whether a payload contains event bus metadata properties.
+     *
+     * @typeParam EventName - Event identifier forwarded to the orchestrator.
+     *
+     * @param payload - Payload emitted by the manager event bus.
+     *
+     * @returns True when metadata is present and needs to be removed.
+     */
+    private isPayloadWithMetadata<EventName extends keyof UptimeEvents>(
+        payload: ForwardableEventPayload<EventName>
+    ): payload is ForwardablePayloadWithMeta<EventName> {
+        return (
+            typeof payload === "object" &&
+            payload !== null &&
+            "_meta" in payload
+        );
     }
 }

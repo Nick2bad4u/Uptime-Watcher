@@ -183,12 +183,6 @@ vi.mock("../../services/updater/AutoUpdaterService", () => ({
     })),
 }));
 
-vi.mock("../../services/site/SiteService", () => ({
-    SiteService: vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-    })),
-}));
-
 // Import ServiceContainer after all mocks are set up
 import { ServiceContainer } from "../../services/ServiceContainer";
 

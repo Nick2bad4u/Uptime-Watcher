@@ -210,11 +210,12 @@ export function setupCacheSync(): () => void {
         }
     };
 
-    void (async () => {
+    void (async (): Promise<void> => {
         try {
             const serviceCleanup =
                 await EventsService.onCacheInvalidated(handleInvalidation);
 
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Disposed flag can flip while awaiting subscription.
             if (disposed) {
                 serviceCleanup();
                 return;

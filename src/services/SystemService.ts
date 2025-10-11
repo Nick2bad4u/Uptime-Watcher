@@ -10,9 +10,14 @@
  * @packageDocumentation
  */
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers("SystemService");
+const { ensureInitialized, wrap } = getIpcServiceHelpers("SystemService");
+
+interface SystemServiceContract {
+    initialize: () => Promise<void>;
+    openExternal: (url: string) => Promise<void>;
+}
 
 /**
  * Service for managing system operations through Electron IPC.
@@ -24,7 +29,7 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers("SystemService");
  *
  * @public
  */
-export const SystemService = {
+export const SystemService: SystemServiceContract = {
     /**
      * Ensures the electron API is available before making backend calls.
      *

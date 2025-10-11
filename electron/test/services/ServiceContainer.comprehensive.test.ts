@@ -291,19 +291,6 @@ vi.mock("../../services/notifications/NotificationService", () => ({
     },
 }));
 
-vi.mock("../../services/site/SiteService", () => ({
-    SiteService: function MockSiteService() {
-        return {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            getAllSites: vi.fn().mockResolvedValue([]),
-            addSite: vi.fn().mockResolvedValue(undefined),
-            updateSite: vi.fn().mockResolvedValue(undefined),
-            deleteSite: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true),
-        };
-    },
-}));
-
 vi.mock("../../services/updater/AutoUpdaterService", () => ({
     AutoUpdaterService: function MockAutoUpdaterService() {
         return {
@@ -538,7 +525,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             expect(manager1).toBeDefined();
         });
 
-        it("should create SiteService singleton", async ({
+        it("should create SiteManager singleton", async ({
             task,
             annotate,
         }) => {
@@ -547,11 +534,11 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Constructor", "type");
 
-            const service1 = container.getSiteService();
-            const service2 = container.getSiteService();
+            const manager1 = container.getSiteManager();
+            const manager2 = container.getSiteManager();
 
-            expect(service1).toBe(service2);
-            expect(service1).toBeDefined();
+            expect(manager1).toBe(manager2);
+            expect(manager1).toBeDefined();
         });
 
         it("should create UptimeOrchestrator singleton with dependencies", async ({
@@ -801,7 +788,6 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container.getMonitorRepository();
             container.getSettingsRepository();
             container.getSiteRepository();
-            container.getSiteService();
             container.getSiteManager();
             container.getMonitorManager();
             container.getUptimeOrchestrator();
@@ -849,7 +835,6 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
                 SettingsRepository: false,
                 SiteManager: false,
                 SiteRepository: false,
-                SiteService: false,
                 UptimeOrchestrator: false,
                 WindowService: false,
             });
@@ -934,7 +919,6 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
             container.getMonitorRepository();
             container.getSettingsRepository();
             container.getSiteRepository();
-            container.getSiteService();
             container.getSiteManager();
             container.getNotificationService();
             container.getUptimeOrchestrator();
@@ -942,7 +926,7 @@ describe("ServiceContainer - Comprehensive Coverage", () => {
 
             const services = container.getInitializedServices();
 
-            expect(services).toHaveLength(14); // All services except IpcService and MonitorManager
+            expect(services).toHaveLength(13); // All services except IpcService and MonitorManager
             expect(services.every((s) => s.name && s.service)).toBeTruthy();
         });
     });

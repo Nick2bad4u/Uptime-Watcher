@@ -10,6 +10,8 @@
 
 import type { Site } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
 
@@ -23,13 +25,13 @@ export interface SiteDeletionOperationOptions {
     identifier: string;
     /** Transaction-scoped monitor repository adapter. */
     monitorAdapter: MonitorRepositoryTransactionAdapter;
-    /** Transaction-scoped site repository adapter. */
-    siteAdapter: SiteRepositoryTransactionAdapter;
     /**
      * Optional monitors already fetched by the caller. When provided, the
      * helper reuses the list instead of performing an additional lookup.
      */
     preloadedMonitors?: Site["monitors"];
+    /** Transaction-scoped site repository adapter. */
+    siteAdapter: SiteRepositoryTransactionAdapter;
 }
 
 /**
@@ -56,18 +58,21 @@ export class SiteDeletionError extends Error {
     public constructor(
         stage: "monitors" | "site",
         identifier: string,
-        cause?: unknown
+        options: { cause?: unknown } = {}
     ) {
-        const causeMessage = cause instanceof Error ? cause.message : cause;
+        const normalizedCause =
+            options.cause === undefined
+                ? undefined
+                : ensureError(options.cause);
+        const causeMessage =
+            normalizedCause?.message ?? "Unknown site deletion cause";
         const message =
             stage === "monitors"
-                ? `Failed to delete monitors for site ${identifier}: ${String(
-                      causeMessage
-                  )}`
+                ? `Failed to delete monitors for site ${identifier}: ${causeMessage}`
                 : `Failed to delete site ${identifier}`;
 
         super(message, {
-            cause: cause instanceof Error ? cause : undefined,
+            cause: normalizedCause,
         });
         this.name = "SiteDeletionError";
         this.stage = stage;
@@ -79,9 +84,9 @@ export class SiteDeletionError extends Error {
  *
  * @remarks
  * Encapsulates the canonical repository operations for site deletion so that
- * higher level services (`SiteService`, `SiteWriterService`, etc.) share the
- * same implementation. This prevents divergent logic that could introduce
- * nested transaction attempts or inconsistent cache behavior.
+ * higher level services (for example, `SiteManager` and `SiteWriterService`)
+ * share the same implementation. This prevents divergent logic that could
+ * introduce nested transaction attempts or inconsistent cache behavior.
  *
  * @param options - Context required to execute the deletion.
  *
@@ -90,16 +95,17 @@ export class SiteDeletionError extends Error {
 export function deleteSiteWithAdapters(
     options: SiteDeletionOperationOptions
 ): SiteDeletionOperationResult {
-    const { identifier, monitorAdapter, siteAdapter } = options;
+    const { identifier, monitorAdapter, preloadedMonitors, siteAdapter } =
+        options;
 
     const monitors =
-        options.preloadedMonitors ??
-        monitorAdapter.findBySiteIdentifier(identifier);
+        preloadedMonitors ?? monitorAdapter.findBySiteIdentifier(identifier);
 
     try {
         monitorAdapter.deleteBySiteIdentifier(identifier);
     } catch (error) {
-        throw new SiteDeletionError("monitors", identifier, error);
+        // eslint-disable-next-line ex/use-error-cause -- SiteDeletionError normalizes the provided cause internally.
+        throw new SiteDeletionError("monitors", identifier, { cause: error });
     }
     const siteDeleted = siteAdapter.delete(identifier);
 

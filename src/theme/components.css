@@ -2538,11 +2538,11 @@
         inset 0 0 0 1px rgb(255 255 255 / 5%),
         0 16px 32px
             color-mix(in srgb, var(--shadow-base-color) 24%, transparent);
+    cursor: pointer;
     gap: 0.65rem;
     inline-size: clamp(12rem, 24vi, 20rem);
     max-inline-size: 100%;
     min-inline-size: 12rem;
-    cursor: pointer;
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),
@@ -2563,21 +2563,22 @@
     }
 
     &[data-disabled="true"] {
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 4%),
+            0 8px 18px
+                color-mix(in srgb, var(--shadow-base-color) 14%, transparent);
         cursor: not-allowed;
         opacity: 0.62;
         pointer-events: none;
-        box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 4%),
-            0 8px 18px color-mix(in srgb, var(--shadow-base-color) 14%, transparent);
         transform: none;
-    }
 
-    &[data-disabled="true"] .monitor-selector__icon {
-        color: color-mix(
-            in srgb,
-            var(--color-primary-400) 38%,
-            rgb(255 255 255) 62%
-        );
+        & .monitor-selector__icon {
+            color: color-mix(
+                in srgb,
+                var(--color-primary-400) 38%,
+                rgb(255 255 255) 62%
+            );
+        }
     }
 
     &.monitor-selector {

@@ -41,6 +41,7 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 import type { SitesStore } from "./types";
 
+import { DataService } from "../../services/DataService";
 import { MonitoringService } from "./services/MonitoringService";
 import { SiteService } from "./services/SiteService";
 import { createSiteMonitoringActions } from "./useSiteMonitoring";
@@ -103,7 +104,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),
                     downloadSqliteBackup: () =>
-                        SiteService.downloadSqliteBackup(),
+                        DataService.downloadSqliteBackup(),
                     getSites: () => SiteService.getSites(),
                     removeMonitor: (siteId: string, monitorId: string) =>
                         SiteService.removeMonitor(siteId, monitorId),

@@ -12,10 +12,17 @@
 
 import { safeNumberConversion } from "@shared/utils/safeConversions";
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 import { logger } from "./logger";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers("SettingsService");
+const { ensureInitialized, wrap } = getIpcServiceHelpers("SettingsService");
+
+interface SettingsServiceContract {
+    getHistoryLimit: () => Promise<number>;
+    initialize: () => Promise<void>;
+    resetSettings: () => Promise<void>;
+    updateHistoryLimit: (limit: number) => Promise<number>;
+}
 
 /**
  * Service for managing application settings through Electron IPC.
@@ -27,7 +34,7 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers("SettingsService");
  *
  * @public
  */
-export const SettingsService = {
+export const SettingsService: SettingsServiceContract = {
     /**
      * Gets the current history retention limit.
      *

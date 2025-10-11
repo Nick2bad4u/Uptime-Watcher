@@ -263,18 +263,6 @@ vi.mock("../../services/WindowService", () => ({
     },
 }));
 
-// Mock SiteService
-vi.mock("../../services/SiteService", () => ({
-    SiteService: function MockSiteService() {
-        return {
-            initialize: vi.fn().mockResolvedValue(undefined),
-            getAllSites: vi.fn().mockResolvedValue([]),
-            getSiteById: vi.fn().mockResolvedValue(null),
-            isInitialized: vi.fn().mockReturnValue(true),
-        };
-    },
-}));
-
 // Import ServiceContainer after mocks are set up
 import {
     ServiceContainer,

@@ -271,17 +271,6 @@ describe(ServiceContainer, () => {
             const service2 = container.getNotificationService();
             expect(service).toBe(service2);
         });
-        it("should get site service", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: ServiceContainer", "component");
-
-            const service = container.getSiteService();
-            expect(service).toBeDefined();
-
-            // Should return same instance on subsequent calls
-            const service2 = container.getSiteService();
-            expect(service).toBe(service2);
-        });
     });
     describe("Utility Service Getters", () => {
         it("should get auto updater service", async ({ task, annotate }) => {
@@ -534,7 +523,6 @@ describe(ServiceContainer, () => {
                 container.getDatabaseManager(),
                 container.getSiteManager(),
                 container.getNotificationService(),
-                container.getSiteService(),
                 container.getAutoUpdaterService(),
                 container.getWindowService(),
             ];

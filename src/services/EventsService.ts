@@ -20,9 +20,37 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import { createIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = createIpcServiceHelpers("EventsService");
+const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService");
+
+interface EventsServiceContract {
+    initialize: () => Promise<void>;
+    onCacheInvalidated: (
+        callback: (data: CacheInvalidatedEventData) => void
+    ) => Promise<() => void>;
+    onMonitorDown: (
+        callback: (data: MonitorDownEventData) => void
+    ) => Promise<() => void>;
+    onMonitoringStarted: (
+        callback: (data: MonitoringControlEventData) => void
+    ) => Promise<() => void>;
+    onMonitoringStopped: (
+        callback: (data: MonitoringControlEventData) => void
+    ) => Promise<() => void>;
+    onMonitorStatusChanged: (
+        callback: (update: StatusUpdate) => void
+    ) => Promise<() => void>;
+    onMonitorUp: (
+        callback: (data: MonitorUpEventData) => void
+    ) => Promise<() => void>;
+    onTestEvent: (
+        callback: (data: TestEventData) => void
+    ) => Promise<() => void>;
+    onUpdateStatus: (
+        callback: (data: UpdateStatusEventData) => void
+    ) => Promise<() => void>;
+}
 
 /**
  * Service for managing event operations through Electron IPC.
@@ -34,7 +62,7 @@ const { ensureInitialized, wrap } = createIpcServiceHelpers("EventsService");
  *
  * @public
  */
-export const EventsService = {
+export const EventsService: EventsServiceContract = {
     /**
      * Ensures the electron API is available before making backend calls.
      *
@@ -67,8 +95,8 @@ export const EventsService = {
      */
     onCacheInvalidated: wrap(
         "onCacheInvalidated",
-        async (api, callback: (data: CacheInvalidatedEventData) => void) =>
-            api.events.onCacheInvalidated(callback)
+        (api, callback: (data: CacheInvalidatedEventData) => void) =>
+            Promise.resolve(api.events.onCacheInvalidated(callback))
     ),
 
     /**
@@ -91,8 +119,8 @@ export const EventsService = {
      */
     onMonitorDown: wrap(
         "onMonitorDown",
-        async (api, callback: (data: MonitorDownEventData) => void) =>
-            api.events.onMonitorDown(callback)
+        (api, callback: (data: MonitorDownEventData) => void) =>
+            Promise.resolve(api.events.onMonitorDown(callback))
     ),
 
     /**
@@ -115,8 +143,8 @@ export const EventsService = {
      */
     onMonitoringStarted: wrap(
         "onMonitoringStarted",
-        async (api, callback: (data: MonitoringControlEventData) => void) =>
-            api.events.onMonitoringStarted(callback)
+        (api, callback: (data: MonitoringControlEventData) => void) =>
+            Promise.resolve(api.events.onMonitoringStarted(callback))
     ),
 
     /**
@@ -139,8 +167,8 @@ export const EventsService = {
      */
     onMonitoringStopped: wrap(
         "onMonitoringStopped",
-        async (api, callback: (data: MonitoringControlEventData) => void) =>
-            api.events.onMonitoringStopped(callback)
+        (api, callback: (data: MonitoringControlEventData) => void) =>
+            Promise.resolve(api.events.onMonitoringStopped(callback))
     ),
 
     /**
@@ -165,8 +193,8 @@ export const EventsService = {
      */
     onMonitorStatusChanged: wrap(
         "onMonitorStatusChanged",
-        async (api, callback: (update: StatusUpdate) => void) =>
-            api.events.onMonitorStatusChanged(callback)
+        (api, callback: (update: StatusUpdate) => void) =>
+            Promise.resolve(api.events.onMonitorStatusChanged(callback))
     ),
 
     /**
@@ -189,8 +217,8 @@ export const EventsService = {
      */
     onMonitorUp: wrap(
         "onMonitorUp",
-        async (api, callback: (data: MonitorUpEventData) => void) =>
-            api.events.onMonitorUp(callback)
+        (api, callback: (data: MonitorUpEventData) => void) =>
+            Promise.resolve(api.events.onMonitorUp(callback))
     ),
 
     /**
@@ -213,8 +241,8 @@ export const EventsService = {
      */
     onTestEvent: wrap(
         "onTestEvent",
-        async (api, callback: (data: TestEventData) => void) =>
-            api.events.onTestEvent(callback)
+        (api, callback: (data: TestEventData) => void) =>
+            Promise.resolve(api.events.onTestEvent(callback))
     ),
 
     /**
@@ -237,7 +265,7 @@ export const EventsService = {
      */
     onUpdateStatus: wrap(
         "onUpdateStatus",
-        async (api, callback: (data: UpdateStatusEventData) => void) =>
-            api.events.onUpdateStatus(callback)
+        (api, callback: (data: UpdateStatusEventData) => void) =>
+            Promise.resolve(api.events.onUpdateStatus(callback))
     ),
 };
