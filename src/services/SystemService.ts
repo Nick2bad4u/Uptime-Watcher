@@ -10,9 +10,19 @@
  * @packageDocumentation
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = getIpcServiceHelpers("SystemService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("SystemService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 interface SystemServiceContract {
     initialize: () => Promise<void>;

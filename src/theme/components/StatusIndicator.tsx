@@ -7,7 +7,7 @@ import type { SiteStatus } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
-import { memo, useMemo } from "react";
+import { createElement, memo, useMemo } from "react";
 
 import { formatStatusLabel, getStatusIconComponent } from "../../utils/status";
 import { useTheme } from "../useTheme";
@@ -15,6 +15,11 @@ import { useTheme } from "../useTheme";
 type StatusIndicatorStyle = CSSProperties & {
     readonly "--status-indicator-color"?: string;
     readonly "--status-indicator-size"?: string;
+};
+
+const STATUS_CONTAINER_STYLE: CSSProperties = {
+    alignItems: "center",
+    display: "flex",
 };
 
 /**
@@ -40,19 +45,14 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
     }: StatusIndicatorProperties): JSX.Element {
         const { currentTheme, getStatusColor } = useTheme();
 
-        const getSizeStyles = (): {
-            readonly badgeSize: string;
-            readonly dotSize: string;
-            readonly fontSize: string;
-            readonly iconSize: string;
-        } => {
+        const sizeStyles = useMemo(() => {
             if (size === "lg") {
                 return {
                     badgeSize: "2.25rem",
                     dotSize: "18px",
                     fontSize: currentTheme.typography.fontSize.base,
                     iconSize: "22px",
-                };
+                } as const;
             }
 
             if (size === "sm") {
@@ -61,7 +61,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                     dotSize: "10px",
                     fontSize: currentTheme.typography.fontSize.xs,
                     iconSize: "14px",
-                };
+                } as const;
             }
 
             return {
@@ -69,13 +69,18 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                 dotSize: "14px",
                 fontSize: currentTheme.typography.fontSize.sm,
                 iconSize: "18px",
-            };
-        };
-
-        const sizeStyles = getSizeStyles();
-        const StatusIconComponent = getStatusIconComponent(status);
+            } as const;
+        }, [
+            currentTheme.typography.fontSize.base,
+            currentTheme.typography.fontSize.sm,
+            currentTheme.typography.fontSize.xs,
+            size,
+        ]);
+        const statusIconComponent = useMemo(
+            () => getStatusIconComponent(status),
+            [status]
+        );
         const iconPixelSize = Number.parseInt(sizeStyles.iconSize, 10) || 16;
-
         const baseColor = getStatusColor(status);
 
         const dotStyle = useMemo<StatusIndicatorStyle>(
@@ -91,7 +96,7 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
             [
                 baseColor,
                 currentTheme.borderRadius.full,
-                sizeStyles.dotSize,
+                sizeStyles,
                 status,
             ]
         );
@@ -108,11 +113,11 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
             [
                 baseColor,
                 currentTheme.borderRadius.full,
-                sizeStyles.badgeSize,
+                sizeStyles,
             ]
         );
 
-        const textStyle: CSSProperties = useMemo(
+        const textStyle = useMemo<CSSProperties>(
             () => ({
                 alignItems: "center",
                 color: baseColor,
@@ -126,14 +131,11 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                 baseColor,
                 currentTheme.spacing.xs,
                 currentTheme.typography.fontWeight.medium,
-                sizeStyles.fontSize,
+                sizeStyles,
             ]
         );
 
-        const containerStyle: CSSProperties = useMemo(
-            () => ({ alignItems: "center", display: "flex" }),
-            []
-        );
+        const containerStyle = STATUS_CONTAINER_STYLE;
 
         return (
             <div
@@ -145,10 +147,10 @@ export const StatusIndicator: NamedExoticComponent<StatusIndicatorProperties> =
                         className="themed-status-indicator__icon"
                         style={iconStyle}
                     >
-                        <StatusIconComponent
-                            color={baseColor}
-                            size={iconPixelSize}
-                        />
+                        {createElement(statusIconComponent, {
+                            color: baseColor,
+                            size: iconPixelSize,
+                        })}
                     </div>
                 ) : (
                     <div

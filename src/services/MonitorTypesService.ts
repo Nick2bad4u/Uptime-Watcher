@@ -14,9 +14,19 @@
 import type { Monitor } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = getIpcServiceHelpers("MonitorTypesService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("MonitorTypesService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 interface MonitorTypesServiceContract {
     formatMonitorDetail: (type: string, details: string) => Promise<string>;

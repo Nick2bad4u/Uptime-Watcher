@@ -201,26 +201,6 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             hideTooltip();
         }, [hideTooltip]);
 
-        const handleMouseEnter: MouseEventHandler<HTMLElement> =
-            useCallback(() => {
-                showTooltip();
-            }, [showTooltip]);
-
-        const handleMouseLeave: MouseEventHandler<HTMLElement> =
-            useCallback(() => {
-                hideTooltip();
-            }, [hideTooltip]);
-
-        const handleTouchStart: TouchEventHandler<HTMLElement> =
-            useCallback(() => {
-                showTooltip();
-            }, [showTooltip]);
-
-        const handleTouchEnd: TouchEventHandler<HTMLElement> =
-            useCallback(() => {
-                hideTooltip();
-            }, [hideTooltip]);
-
         /**
          * Pointer enter handler applied to the tooltip container to ensure
          * hover-based tooltips activate even when the trigger element cannot
@@ -297,37 +277,14 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
         const describedBy = disabled ? undefined : tooltipId;
 
         const triggerProps = useMemo<TooltipTriggerProperties>(() => {
-            if (disabled) {
+            if (disabled || !describedBy) {
                 return {};
             }
 
-            const handlers: TooltipTriggerProperties = {
-                onBlur: handleBlur,
-                onFocus: handleFocus,
-                onKeyDown: handleTriggerKeyDown,
-                onMouseEnter: handleMouseEnter,
-                onMouseLeave: handleMouseLeave,
-                onTouchEnd: handleTouchEnd,
-                onTouchStart: handleTouchStart,
+            return {
+                "aria-describedby": describedBy,
             };
-
-            return describedBy
-                ? {
-                      ...handlers,
-                      "aria-describedby": describedBy,
-                  }
-                : handlers;
-        }, [
-            describedBy,
-            disabled,
-            handleBlur,
-            handleFocus,
-            handleMouseEnter,
-            handleMouseLeave,
-            handleTouchEnd,
-            handleTouchStart,
-            handleTriggerKeyDown,
-        ]);
+        }, [describedBy, disabled]);
 
         const containerClasses = useMemo(
             () =>
@@ -505,6 +462,9 @@ export const Tooltip: NamedExoticComponent<TooltipProperties> = memo(
             <>
                 <div
                     className={containerClasses}
+                    onBlur={disabled ? undefined : handleBlur}
+                    onFocus={disabled ? undefined : handleFocus}
+                    onKeyDown={disabled ? undefined : handleTriggerKeyDown}
                     onMouseEnter={
                         disabled ? undefined : handleContainerMouseEnter
                     }

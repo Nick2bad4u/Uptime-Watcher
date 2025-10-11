@@ -101,7 +101,6 @@ import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
 import * as pluginReactFormFields from "eslint-plugin-react-form-fields";
 import pluginReactHookForm from "eslint-plugin-react-hook-form";
-// eslint-disable-next-line import-x/default -- Works fine
 import reactHooks from "eslint-plugin-react-hooks";
 import reactHooksAddons from "eslint-plugin-react-hooks-addons";
 import eslintReactHooksExtra from "eslint-plugin-react-hooks-extra";
@@ -2541,7 +2540,6 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
-            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -2647,7 +2645,6 @@ export default [
                         "vite",
                         "@app/theme",
                         "@storybook/react",
-                        "@storybook/types",
                     ],
                 },
             ],
@@ -4088,7 +4085,6 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
-            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -4185,7 +4181,6 @@ export default [
                         "vite",
                         "@app/theme",
                         "@storybook/react",
-                        "@storybook/types",
                     ],
                 },
             ],
@@ -5449,7 +5444,6 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
-            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,
@@ -5553,7 +5547,6 @@ export default [
                         "vite",
                         "@app/theme",
                         "@storybook/react",
-                        "@storybook/types",
                     ],
                 },
             ],
@@ -8553,7 +8546,6 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
-            // @ts-expect-error -- react-hooks plugin typings omit configs helpers
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,

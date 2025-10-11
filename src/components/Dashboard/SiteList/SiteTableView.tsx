@@ -10,9 +10,7 @@ import {
     memo,
     type NamedExoticComponent,
     type PointerEvent as ReactPointerEvent,
-    type RefObject,
     useMemo,
-    useRef,
 } from "react";
 
 import type { SiteTableColumnKey } from "../../../stores/ui/types";
@@ -61,7 +59,6 @@ interface ColumnResizeContext {
     readonly setColumnWidths: (
         widths: Partial<Record<SiteTableColumnKey, number>>
     ) => void;
-    readonly tableRef: RefObject<HTMLTableElement | null>;
 }
 
 const noopPointerDown = (): void => {};
@@ -79,14 +76,13 @@ function createPointerDownHandler({
     columnWidths,
     resizable,
     setColumnWidths,
-    tableRef,
 }: ColumnResizeContext): (event: ReactPointerEvent<HTMLButtonElement>) => void {
     if (!resizable) {
         return noopPointerDown;
     }
 
     return (event: ReactPointerEvent<HTMLButtonElement>): void => {
-        const tableElement = tableRef.current;
+        const tableElement = event.currentTarget.closest("table");
         if (!tableElement) {
             return;
         }
@@ -202,7 +198,6 @@ export interface SiteTableViewProperties {
  */
 export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
     memo(function SiteTableView({ sites }: SiteTableViewProperties) {
-        const tableRef = useRef<HTMLTableElement | null>(null);
         const columnWidths = useUIStore(selectColumnWidths);
         const setColumnWidths = useUIStore(selectSetColumnWidths);
         const columnStyles = useMemo(
@@ -218,7 +213,7 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                 shadow="sm"
                 surface="elevated"
             >
-                <table className="site-table__table" ref={tableRef}>
+                <table className="site-table__table">
                     <colgroup>
                         {COLUMN_DEFINITIONS.map(({ key }) => (
                             <col key={key} style={columnStyles[key]} />
@@ -246,7 +241,6 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                         columnWidths,
                                         resizable,
                                         setColumnWidths,
-                                        tableRef,
                                     });
                                 const resizeHandleClass = isLastColumn
                                     ? "site-table__resize-handle site-table__resize-handle--last"

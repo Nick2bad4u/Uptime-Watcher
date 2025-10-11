@@ -14,6 +14,12 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    CacheInvalidatedEventData,
+    MonitorDownEventData,
+    MonitoringControlEventData,
+    MonitorUpEventData,
+} from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 /**
@@ -44,51 +50,9 @@ export interface UptimeEvents extends UnknownRecord {
      * @remarks
      * Used to trigger cache refreshes or notify listeners of data changes.
      *
-     * @param identifier - Optional unique identifier for the cache entry.
-     * @param reason - Reason for invalidation ("delete", "expiry", "manual", or
-     *   "update").
-     * @param timestamp - Unix timestamp (ms) when invalidation occurred.
-     * @param type - Type of cache invalidated ("all", "monitor", or "site").
+     * @see {@link CacheInvalidatedEventData} for payload structure.
      */
-    "cache:invalidated": {
-        /**
-         * Optional unique identifier for the cache entry.
-         *
-         * @remarks
-         * Specifies which cache entry was invalidated when the invalidation is
-         * targeted to a specific entry rather than a broad invalidation.
-         */
-        identifier?: string;
-
-        /**
-         * Reason for invalidation.
-         *
-         * @remarks
-         * Indicates why the cache was invalidated: "delete" for item removal,
-         * "expiry" for TTL timeout, "manual" for user-initiated refresh, or
-         * "update" for data changes.
-         */
-        reason: "delete" | "expiry" | "manual" | "update";
-
-        /**
-         * Unix timestamp (ms) when invalidation occurred.
-         *
-         * @remarks
-         * Provides precise timing for invalidation events to support debugging
-         * and audit trails.
-         */
-        timestamp: number;
-
-        /**
-         * Type of cache invalidated.
-         *
-         * @remarks
-         * Specifies the scope of invalidation: "all" for full cache clear,
-         * "monitor" for monitor-specific cache, or "site" for site-specific
-         * cache.
-         */
-        type: "all" | "monitor" | "site";
-    };
+    "cache:invalidated": CacheInvalidatedEventData;
 
     /**
      * Emitted when a configuration setting is changed.
@@ -1075,21 +1039,9 @@ export interface UptimeEvents extends UnknownRecord {
     /**
      * Emitted when a monitor goes down.
      *
-     * @param monitor - The monitor object.
-     * @param site - The site object.
-     * @param siteId - The ID of the site.
-     * @param timestamp - Unix timestamp (ms) when the monitor went down.
+     * @see {@link MonitorDownEventData} for payload details.
      */
-    "monitor:down": {
-        /** The monitor object. */
-        monitor: Monitor;
-        /** The site object. */
-        site: Site;
-        /** The ID of the site. */
-        siteId: string;
-        /** Unix timestamp (ms) when the monitor went down. */
-        timestamp: number;
-    };
+    "monitor:down": MonitorDownEventData;
 
     /**
      * Emitted when a monitor is removed.
@@ -1141,52 +1093,32 @@ export interface UptimeEvents extends UnknownRecord {
     /**
      * Emitted when a monitor goes up.
      *
-     * @param monitor - The monitor object.
-     * @param site - The site object.
-     * @param siteId - The ID of the site.
-     * @param timestamp - Unix timestamp (ms) when the monitor went up.
+     * @see {@link MonitorUpEventData} for payload details.
      */
-    "monitor:up": {
-        /** The monitor object. */
-        monitor: Monitor;
-        /** The site object. */
-        site: Site;
-        /** The ID of the site. */
-        siteId: string;
-        /** Unix timestamp (ms) when the monitor went up. */
-        timestamp: number;
-    };
+    "monitor:up": MonitorUpEventData;
 
     /**
      * Emitted when monitoring is started.
      *
-     * @param monitorCount - The number of monitors started.
-     * @param siteCount - The number of sites involved.
-     * @param timestamp - Unix timestamp (ms) when monitoring started.
+     * @see {@link MonitoringControlEventData} for common metadata fields.
      */
-    "monitoring:started": {
+    "monitoring:started": MonitoringControlEventData & {
         /** The number of monitors started. */
         monitorCount: number;
         /** The number of sites involved. */
         siteCount: number;
-        /** Unix timestamp (ms) when monitoring started. */
-        timestamp: number;
     };
 
     /**
      * Emitted when monitoring is stopped.
      *
-     * @param activeMonitors - The number of monitors that were active.
-     * @param reason - The reason for stopping.
-     * @param timestamp - Unix timestamp (ms) when monitoring stopped.
+     * @see {@link MonitoringControlEventData} for common metadata fields.
      */
-    "monitoring:stopped": {
+    "monitoring:stopped": MonitoringControlEventData & {
         /** The number of monitors that were active. */
         activeMonitors: number;
         /** The reason for stopping. */
         reason: "error" | "shutdown" | "user";
-        /** Unix timestamp (ms) when monitoring stopped. */
-        timestamp: number;
     };
 
     /**

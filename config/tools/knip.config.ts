@@ -16,7 +16,6 @@ const knipConfig: KnipConfig = {
     ignore: [
         "shared/types/monitorTypes.ts",
         "shared/types/themeConfig.ts",
-        "src/types/events.ts",
         "**/*.test.ts",
         "**/*.spec.ts",
         "**/*.bench.ts",
@@ -57,7 +56,6 @@ const knipConfig: KnipConfig = {
     ignoreDependencies: [
         "bufferutil",
         "ws",
-        "@storybook/types",
         "@types/ws",
         "@shared/types",
         "@shared/utils",

@@ -14,9 +14,19 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = getIpcServiceHelpers("StateSyncService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("StateSyncService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 /**
  * Contract for renderer-facing state synchronization operations.

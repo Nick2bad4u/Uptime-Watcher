@@ -10,12 +10,21 @@
  * @packageDocumentation
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { safeNumberConversion } from "@shared/utils/safeConversions";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = getIpcServiceHelpers("SettingsService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("SettingsService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 interface SettingsServiceContract {
     getHistoryLimit: () => Promise<number>;

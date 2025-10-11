@@ -12,6 +12,8 @@
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 interface DataServiceContract {
@@ -31,7 +33,15 @@ interface DataServiceContract {
  *
  * @public
  */
-const { ensureInitialized, wrap } = getIpcServiceHelpers("DataService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("DataService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 export const DataService: DataServiceContract = {
     /**

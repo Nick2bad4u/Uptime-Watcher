@@ -54,6 +54,7 @@
         "vitest.config.ts",
         "vitest.electron.config.ts",
         "../../vitest.electron.config.ts",
+        "../../vitest.storybook.config.ts",
         "**/vitest.shared.config.ts",
         "**/vitest.stryker.config.ts",
         "../../vitest.shared.config.ts",
@@ -61,7 +62,8 @@
         "../../vite.playwright-coverage.config.ts",
         "docs/docusaurus/stylelint.config.mjs",
         "**/playwright.config.ts",
-        "../../playwright/utils/createPlaywrightCoveragePlugin.ts"
+        "../../playwright/utils/createPlaywrightCoveragePlugin.ts",
+        "../../storybook/viteSharedConfig.ts"
     ],
     "references": [
         {

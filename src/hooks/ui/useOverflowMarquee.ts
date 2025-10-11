@@ -82,11 +82,6 @@ export function useOverflowMarquee<
         []
     );
 
-    const updateOverflow = useCallback((): void => {
-        const next = measureOverflow(containerRef.current);
-        dispatchOverflow(next);
-    }, [containerRef, measureOverflow]);
-
     const dependencyFingerprint = useMemo(
         () => JSON.stringify(dependencies),
         [dependencies]
@@ -94,14 +89,20 @@ export function useOverflowMarquee<
 
     useEffect(
         function monitorOverflow() {
-            updateOverflow();
+            const runOverflowCheck = (): void => {
+                const element = containerRef.current;
+                const next = measureOverflow(element);
+                dispatchOverflow(next);
+            };
+
+            runOverflowCheck();
 
             const element = containerRef.current;
             const shouldAttachWindowListener =
                 typeof window !== "undefined" && element !== null;
 
             const handleResize = (): void => {
-                updateOverflow();
+                runOverflowCheck();
             };
 
             if (shouldAttachWindowListener) {
@@ -122,15 +123,22 @@ export function useOverflowMarquee<
                 resizeObserver?.disconnect();
             };
         },
-        [containerRef, updateOverflow]
+        [containerRef, measureOverflow]
     );
 
     useEffect(
         function syncOverflowOnDependencyChange() {
-            updateOverflow();
+            // eslint-disable-next-line sonarjs/void-use -- Access fingerprint to note dependency usage without additional logic.
+            void dependencyFingerprint;
+            const element = containerRef.current;
+            const next = measureOverflow(element);
+            dispatchOverflow(next);
         },
-        // eslint-disable-next-line react-hooks-addons/no-unused-deps -- fingerprint ensures overflow re-measurement when dependencies change
-        [dependencyFingerprint, updateOverflow]
+        [
+            containerRef,
+            dependencyFingerprint,
+            measureOverflow,
+        ]
     );
 
     return {

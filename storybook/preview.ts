@@ -3,8 +3,8 @@ import type { Decorator, Preview, ReactRenderer } from "@storybook/react";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import { initialize, mswLoader } from "msw-storybook-addon";
 import { useEffect } from "react";
-import { useDarkMode } from "storybook-dark-mode";
 import { themes } from "storybook/theming";
+import { INITIAL_VIEWPORTS } from "storybook/viewport";
 
 import "../src/index.css";
 import type { ThemeName } from "../src/theme/types";
@@ -31,13 +31,13 @@ const isStoryThemeName = (value: unknown): value is StoryThemeName =>
 
 const resolveStoryTheme = (
     candidate: unknown,
-    isDarkMode: boolean
+    fallback: StoryThemeName
 ): StoryThemeName => {
     if (isStoryThemeName(candidate)) {
         return candidate;
     }
 
-    return isDarkMode ? "dark" : DEFAULT_STORY_THEME;
+    return fallback;
 };
 
 const withTailwindThemeClasses = withThemeByClassName<ReactRenderer>({
@@ -50,15 +50,51 @@ const extractThemeFromGlobals = (globals: StoryGlobals): unknown => {
     return Object.hasOwn(record, "theme") ? record["theme"] : undefined;
 };
 
+const determineSystemFallbackTheme = (): StoryThemeName => {
+    const preference = themeManager.getSystemThemePreference();
+
+    return preference === "dark" ? "dark" : DEFAULT_STORY_THEME;
+};
+
 const initializeElectronMocks = (): void => {
     installElectronAPIMock();
 };
 
+const STORYBOOK_VIEWPORTS = {
+    ...INITIAL_VIEWPORTS,
+    desktop1440: {
+        name: "Desktop 1440p",
+        styles: {
+            height: "900px",
+            width: "1440px",
+        },
+        type: "desktop" as const,
+    },
+    desktopFullHD: {
+        name: "Desktop 1080p",
+        styles: {
+            height: "1080px",
+            width: "1920px",
+        },
+        type: "desktop" as const,
+    },
+} satisfies Record<
+    string,
+    {
+        name: string;
+        styles: {
+            height: string;
+            width: string;
+        };
+        type: "desktop" | "mobile" | "other" | "tablet";
+    }
+>;
+
 const withApplicationProviders: Decorator = (storyFn, context) => {
-    const isDarkMode = useDarkMode();
+    const fallbackTheme = determineSystemFallbackTheme();
     const storyTheme = resolveStoryTheme(
         extractThemeFromGlobals(context.globals),
-        isDarkMode
+        fallbackTheme
     );
 
     useMount(initializeElectronMocks);
@@ -88,24 +124,43 @@ initialize(mswInitializeOptions);
 
 const preview: Preview = {
     decorators: [withTailwindThemeClasses, withApplicationProviders],
+    initialGlobals: {
+        viewport: {
+            isRotated: false,
+            value: "desktop1440",
+        },
+    },
     loaders: [mswLoader],
     parameters: {
+        a11y: {
+            options: {
+                runOnly: {
+                    type: "tag",
+                    values: [
+                        "wcag2a",
+                        "wcag2aa",
+                        "wcag2aaa",
+                        "wcag21a",
+                        "wcag21aa",
+                        "section508",
+                        "best-practice",
+                    ],
+                },
+            },
+        },
         controls: {
             matchers: {
                 color: /(?<property>background|color)$/iv,
                 date: /(?<date>date)$/iv,
             },
         },
-        darkMode: {
-            classTarget: "html",
-            current: "light",
-            darkClass: ["dark"],
-            stylePreview: true,
-        },
         docs: {
             theme: themes.dark,
         },
         layout: "centered",
+        viewport: {
+            options: STORYBOOK_VIEWPORTS,
+        },
     },
     tags: ["autodocs"],
 };

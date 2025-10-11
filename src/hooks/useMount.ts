@@ -85,9 +85,19 @@ export function useMount(
     const mountCallbackRef = useRef(mountCallback);
     const unmountCallbackRef = useRef(unmountCallback);
 
-    // Update refs with latest callbacks
-    mountCallbackRef.current = mountCallback;
-    unmountCallbackRef.current = unmountCallback;
+    useEffect(
+        function syncMountCallbackRef() {
+            mountCallbackRef.current = mountCallback;
+        },
+        [mountCallback]
+    );
+
+    useEffect(
+        function syncUnmountCallbackRef() {
+            unmountCallbackRef.current = unmountCallback;
+        },
+        [unmountCallback]
+    );
 
     // eslint-disable-next-line canonical/prefer-use-mount -- This IS the useMount hook implementation; cannot use itself
     useEffect(function handleMountLifecycle() {

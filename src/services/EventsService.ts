@@ -20,9 +20,19 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
-const { ensureInitialized, wrap } = getIpcServiceHelpers("EventsService");
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("EventsService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
 
 interface EventsServiceContract {
     initialize: () => Promise<void>;
