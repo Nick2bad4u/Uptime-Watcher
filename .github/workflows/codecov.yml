@@ -52,6 +52,14 @@ jobs:
               env:
                   CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+            - name: Build Storybook Bundle
+              id: build-storybook
+              run: |
+                  npm run build-storybook
+              continue-on-error: true
+              env:
+                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
             # Run frontend tests with coverage
             - name: Run frontend tests
               id: test-frontend

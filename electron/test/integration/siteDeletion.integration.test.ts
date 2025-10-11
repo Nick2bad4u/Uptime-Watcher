@@ -77,7 +77,9 @@ const createRepositoryBundle = (
             monitorAdapters.push(adapter);
             return adapter;
         }),
-        findBySiteIdentifier: vi.fn(async (identifier: string) => monitorsBySite.get(identifier) ?? []),
+        findBySiteIdentifier: vi.fn(
+            async (identifier: string) => monitorsBySite.get(identifier) ?? []
+        ),
     } as unknown as MonitorRepository;
 
     const siteAdapters: SiteRepositoryTransactionAdapter[] = [];

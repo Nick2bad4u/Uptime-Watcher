@@ -1043,14 +1043,14 @@ const config = defineConfig({
         "selector-attribute-operator-allowed-list": null,
         "selector-attribute-operator-disallowed-list": null,
         /**
-        * Rule to enforce consistent class selector patterns.
-        *
-        * @remarks
-        * Disabled to allow flexibility with utility-first CSS frameworks
-        * like Tailwind CSS, which use diverse class naming conventions.
-        *
-        * @see {@link https://stylelint.io/user-guide/rules/selector-class-pattern | selector-class-pattern Documentation}
-        */
+         * Rule to enforce consistent class selector patterns.
+         *
+         * @remarks
+         * Disabled to allow flexibility with utility-first CSS frameworks like
+         * Tailwind CSS, which use diverse class naming conventions.
+         *
+         * @see {@link https://stylelint.io/user-guide/rules/selector-class-pattern | selector-class-pattern Documentation}
+         */
         "selector-class-pattern": null,
         "selector-combinator-allowed-list": null,
         "selector-combinator-disallowed-list": null,

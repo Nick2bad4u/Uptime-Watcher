@@ -50,7 +50,12 @@ async function isDirectory(entryPath) {
         const entryStat = await stat(entryPath);
         return entryStat.isDirectory();
     } catch (error) {
-        if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "ENOENT"
+        ) {
             return false;
         }
         throw error;
@@ -123,7 +128,7 @@ function normalizeLink(link) {
 /**
  * @param {string} markdownPath
  * @param {string} link
- * @param {{ file: any; link: any; resolvedPath: string; }[]} issues
+ * @param {{ file: any; link: any; resolvedPath: string }[]} issues
  */
 async function validateLink(markdownPath, link, issues) {
     const normalized = normalizeLink(link);
@@ -150,7 +155,12 @@ async function validateLink(markdownPath, link, issues) {
     try {
         await stat(candidatePath);
     } catch (error) {
-        if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") {
+        if (
+            error &&
+            typeof error === "object" &&
+            "code" in error &&
+            error.code === "ENOENT"
+        ) {
             issues.push({
                 file: markdownPath,
                 link,
@@ -213,7 +223,9 @@ async function main() {
 try {
     await main();
 } catch (error) {
-    console.error("Documentation link check failed due to an unexpected error.");
+    console.error(
+        "Documentation link check failed due to an unexpected error."
+    );
     console.error(error);
     process.exit(1);
 }

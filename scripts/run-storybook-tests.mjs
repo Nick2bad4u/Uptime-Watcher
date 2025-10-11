@@ -20,10 +20,14 @@ if (allowEmpty) {
     runnerArguments.splice(allowEmptyIndex, 1);
 }
 
-const childProcess = spawn(process.execPath, [cliEntryPoint, ...runnerArguments], {
-    shell: false,
-    stdio: "inherit",
-});
+const childProcess = spawn(
+    process.execPath,
+    [cliEntryPoint, ...runnerArguments],
+    {
+        shell: false,
+        stdio: "inherit",
+    }
+);
 
 childProcess.on("exit", (code, signal) => {
     if (typeof code === "number") {

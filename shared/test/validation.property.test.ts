@@ -250,6 +250,13 @@ describe("Validation Utils Property-Based Tests", () => {
             expect(isValidUrl(url)).toBeTruthy();
         });
 
+        test("should accept URLs containing protocol-like sequences in the path", () => {
+            expect(isValidUrl("https://95.ud//////a/)/://T")).toBeTruthy();
+            expect(
+                isValidUrl("http://example.com/path/with/ftp://reference")
+            ).toBeTruthy();
+        });
+
         test("should accept localhost URLs", () => {
             expect(isValidUrl("http://localhost")).toBeTruthy();
             expect(isValidUrl("http://localhost:3000")).toBeTruthy();
