@@ -7,14 +7,185 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[3635611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)...
-[3635611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/36356112fae3366f87179fa1fdb97ae16b2a618a...36356112fae3366f87179fa1fdb97ae16b2a618a))
+[[543b134](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)...
+[543b134](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/543b134cdb3bfdf1acd0b876f293900efc94c320...543b134cdb3bfdf1acd0b876f293900efc94c320))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 16.7.0 [`(543b134)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)
+
+
+
+
+
+
+## [16.7.0] - 2025-10-11
+
+
+[[3635611](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)...
+[d9c62fd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9c62fd22d7af27284eeeff8fa788ad5896aba80)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/36356112fae3366f87179fa1fdb97ae16b2a618a...d9c62fd22d7af27284eeeff8fa788ad5896aba80))
+
+
+### ✨ Features
+
+- ✨ [feat] Upgrade dependencies and enhance Storybook
+
+This commit upgrades various dependencies and enhances the Storybook configuration to improve the application's functionality and development experience.
+
+- 🧪 **Core Dependency Updates**:
+ - Updates `node-sqlite3-wasm` to version `0.8.50` to incorporate latest fixes and improvements.
+ - Upgrades `@eslint/css` to version `0.13.0` to ensure code style consistency.
+ - [dependency] Updates `typedoc` to version `0.28.14` for better documentation generation.
+ - ⬆️ Updates various `@storybook/*` packages to version `9.1.10` for the newest features and bug fixes.
+ - ⬆️ Updates many other dependencies to their latest versions, including testing libraries and build tools.
+- ✨ **Storybook Enhancements**:
+ - Adds `@storybook/addon-designs` and `@storybook/addon-links` for enhanced design and navigation capabilities within Storybook.
+ - ➕ Introduces a new script, `run-storybook-tests.mjs`, to run Storybook tests in a CI environment.
+ - ⚙️ Modifies the Storybook configuration to include shared Vite configuration for consistency across environments.
+- 🔧 **Testing Configuration**:
+ - Adds `test:storybook:runner` and related scripts to facilitate automated testing of Storybook stories.
+ - ➖ Removes `storybook-dark-mode` because it's not compatible with storybook 9.
+ - 🧩 Introduces `storybook/viteSharedConfig.ts` to centralize Vite configuration for Storybook.
+ - 📝 Updates `test:all` and related scripts to include Storybook tests.
+- 🎨 **UI Component Modifications**:
+ - 🛠️ Fixes the `SiteTableView` component to correctly handle column resizing by using the table element found by walking up the DOM tree.
+ - 🛠️ Improves the `Tooltip` component by removing unnecessary event handlers and simplifying the trigger properties.
+ - ⚡ Optimizes the `useOverflowMarquee` hook to improve performance and reduce redundant calculations.
+- 🧹 **Code Cleanup and Refactoring**:
+ - ➖ Removes unused type definitions and improves type safety.
+ - 🔄 Refactors the service initialization to handle potential errors during IPC service setup.
+ - ⬆️ Updates and organizes dependencies in `package.json` and `package-lock.json`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d9c62fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9c62fd22d7af27284eeeff8fa788ad5896aba80)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update softprops/action-gh-release (#82) [`(bdb8b9a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bdb8b9a98896e3c5553e92436465966853c5e48f)
+
+
 - [dependency] Update version 16.6.0 [`(3635611)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/36356112fae3366f87179fa1fdb97ae16b2a618a)
+
+
+
+### 🛡️ Security
+
+- [StepSecurity] Apply security best practices (#83)
+
+* [StepSecurity] Apply security best practices
+
+Signed-off-by: StepSecurity Bot <bot@stepsecurity.io>
+
+* Update Dependabot schedule to weekly
+
+Changed the update schedule from daily to weekly for multiple package ecosystems.
+
+---------
+
+Signed-off-by: StepSecurity Bot <bot@stepsecurity.io>
+Co-authored-by: Typpi <20943337+Nick2bad4u@users.noreply.github.com> [`(5be858b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5be858b537176212bf0c80502988042b1e770437)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Consolidates site management logic
+
+This commit refactors the site management logic by removing the `SiteService` and delegating its responsibilities to the `SiteManager`.
+
+- 🗑️ Removes `SiteService` and its associated tests, as its functionality is now integrated into `SiteManager`.
+ - This simplifies the service container and reduces redundancy.
+- ➕ Introduces `ForwardableEventPayload` and `ForwardablePayloadWithMeta` types to handle event metadata when forwarding manager events to the orchestrator.
+ -  Ensures type safety when normalizing payloads while preserving the original data shape.
+- ♻️ Modifies the event forwarding mechanism in `ServiceContainer` to strip event metadata before emitting events to the main orchestrator.
+ -  This ensures that the orchestrator receives clean payloads without EventEmitter-specific metadata.
+ - 🧪 Updates fuzzing tests to handle unicode strings correctly.
+ - 📝 Updates integration tests to reflect the removal of `SiteService`.
+ - 🎨 Updates UI components to reflect the removal of `SiteService`.
+ - 🛠️ Fixes a bug where focus state was not being reset correctly in `MonitorSelector`.
+ - 📝 Updates the `DataService` and `SiteService` to have readonly properties.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1354660)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1354660c57784db4d00a5e08fbf9c8183b981cdf)
+
+
+- 🚜 [refactor] Consolidates site management logic
+
+This commit refactors the site management logic to improve maintainability and reduce code duplication.
+
+- ♻️ Removes `SiteService` dependencies from `MonitorManager` to decouple components.
+- ➕ Introduces `SiteManager.getSiteWithDetails` to centralize site retrieval logic.
+- 🏗️ Modifies `SiteService` to delegate operations to `SiteManager`, ensuring a single entry point for site management.
+ - This simplifies the service and ensures consistency in site operations.
+- 🗑️ Removes database access logic from `SiteService`, streamlining its responsibilities.
+- 🧪 Adds integration tests for site deletion flows to verify transactional behavior.
+- 📝 Updates copilot instructions to emphasize systematic work and resource utilization.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(196f825)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/196f825431b59a269b4802f16ab536634cf03468)
+
+
+- 🚜 [refactor] Streamline site deletion process
+
+Refactors the site deletion process to improve efficiency and data consistency.
+
+- 🛠️ Introduces transaction adapters for site and monitor repositories to ensure atomicity during deletion.
+ -  This change ensures that either all deletion operations succeed, or none at all, preventing data inconsistencies.
+- 🧹 Removes redundant history deletion logic, as monitor deletion now cascades history deletion.
+- ✨ Adds monitor count to deletion summary for better logging and debugging.
+- 🧪 Updates tests to reflect changes in the site deletion process, using mocks for transaction adapters.
+- 🎨 Improves UI by persisting the collapsed state of the site details header between sessions.
+ -  Adds new helper functions for ensuring the header state.
+- 🎨 Enhances the monitor selection in the site details navigation using a dedicated `MonitorSelector` component.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1c6a9c9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1c6a9c9e23e3ed7c6e7db8db573fff096f11b6d6)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v16.6.0 [skip ci] [`(cb1ae08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb1ae08aab9aeba915a06b5c85f8b82f26f5abda)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Updates Node.js version and UI components
+
+Updates the build environment and enhances UI elements for improved functionality and user experience.
+
+- 🔧 [build] Updates Node.js environment in the build workflow to version 24
+ - [dependency] Updates the `node-version` in `.github/workflows/Build.yml` to `24`, ensuring the project uses the latest LTS version for builds, which provides access to the newest features, performance improvements, and security updates.
+- 🛠️ [fix] Enhances MonitorSelector component for better usability
+ - Improves the `MonitorSelector` component by adding disabled state handling, placeholder labels, and focus management.
+ - Adds a `disabled` property to conditionally disable the selector, enhancing UX by preventing interactions when no monitors are available.
+ - Introduces `PLACEHOLDER_LABEL_DEFAULT` and `PLACEHOLDER_LABEL_EMPTY` to provide contextual feedback to the user based on the availability of monitors.
+ - Implements focus and blur handlers (`handleSelectFocus`, `handleSelectBlur`) to manage the visual state of the selector, improving accessibility and user feedback.
+ - Introduces click and keydown handlers on the wrapper to open the select, improving keyboard accessibility and clickability.
+ - Adds `aria-controls`, `aria-disabled`, `aria-expanded`, `aria-haspopup`, and `role="button"` to the wrapper `div` to improve accessibility.
+- 🎨 [style] Refactors SiteDetailsHeader for improved UI consistency
+ - Removes the header collapse functionality from `SiteDetails.tsx` and `SiteDetailsHeader.tsx` to simplify the component and improve maintainability.
+  - Removes scroll observers, collapse sentinels, and scroll fallback handlers, streamlining the component's logic.
+ - Implements state management for the collapsed state of the `SiteDetailsHeader` in `useUiStore.ts`, allowing the collapsed state to be persisted and managed across sessions.
+  - Introduces `setSiteDetailsHeaderCollapsed` and `toggleSiteDetailsHeaderCollapsed` actions to manage the collapsed state.
+ - Updates CSS for `Settings.css` and `SiteDetails.css` to improve the visual appearance and layout of the settings modal and site details header.
+  - Modifies styles for header alignment, action positioning, and control elements to enhance UI consistency.
+- 🧪 [test] Adds coverage for MonitorSelector and SiteDetailsHeader
+ - Adds additional coverage tests for the `MonitorSelector` to ensure proper handling of edge cases, such as unknown monitor types and empty states.
+ - Adds tests for accessibility and interaction, ensuring the component functions correctly for all users.
+ - Adds additional test coverage for `SiteDetailsHeader` to validate the rendering of URL links, collapsed header controls, and thumbnail rendering.
+- ✨ [feat] Adds `BASE_MONITOR_TYPES` to `@shared/types`
+ - Adds `BASE_MONITOR_TYPES` to `@shared/types/index.ts` to provide a centralized source of truth for monitor types.
+- 🛠️ [fix] Adds a check to ensure type is a string before filtering
+ - Adds a check to ensure type is a string before filtering in `playwright/tests/ui-monitor-types.ui.playwright.test.ts`.
+- ✨ [feat] Adds better labels for monitor types
+ - Improves the labels for monitor types using `getMonitorTypeDisplayLabel` in `SiteDetailsNavigation.tsx` and `MonitorSelector.tsx`, enhancing user understanding and consistency.
+- 🧪 [test] Adds tests to check `BASE_MONITOR_TYPES`
+ - Adds tests to check `BASE_MONITOR_TYPES` in `playwright/tests/ui-monitor-types.ui.playwright.test.ts`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(450b2c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/450b2c66603038cf873b45238df2dc6f33e4d107)
 
 
 
