@@ -16,7 +16,7 @@ updates:
           include: ["*"]
       directory: /
       schedule:
-          interval: daily
+          interval: weekly
           time: "05:30"
           timezone: "America/Detroit"
       assignees: ["Nick2bad4u"]
@@ -40,7 +40,7 @@ updates:
     - package-ecosystem: npm
       directory: /
       schedule:
-          interval: daily
+          interval: weekly
       assignees: ["Nick2bad4u"]
       versioning-strategy: increase
       allow:
@@ -83,3 +83,28 @@ updates:
               applies-to: version-updates
               patterns:
                   - "*"
+
+    - package-ecosystem: npm
+      directory: /docs/docusaurus
+      schedule:
+          interval: weekly
+      assignees: ["Nick2bad4u"]
+      versioning-strategy: increase
+      allow:
+          # Allow both direct and indirect updates for all packages
+          - dependency-type: "all"
+      ignore:
+      labels:
+          - "npm"
+          - "dependabot"
+          - "dependencies"
+      commit-message:
+          prefix: "[dependency][docusaurus]"
+          prefix-development: "[dev-dependency][docusaurus][skip-ci]"
+          include: "scope"
+      groups:
+          npm-all:
+              applies-to: version-updates
+              patterns:
+                  - "*"
+
