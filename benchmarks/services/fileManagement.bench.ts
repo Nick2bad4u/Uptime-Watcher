@@ -1,22 +1,16 @@
 /**
- * File Management Service Performance Benchmarks
+ * File Management Benchmarks.
  *
- * @file Performance benchmarks for file operations, storage, and data
- *   persistence.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-FileManagement
- *
- * @tags ["performance", "services", "file-management", "storage", "persistence"]
+ * Exercises file management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
+/**
+ * Represents file metadata data in the file management benchmark.
+ */
 interface FileMetadata {
     name: string;
     path: string;
@@ -30,6 +24,9 @@ interface FileMetadata {
     metadata: Record<string, any>;
 }
 
+/**
+ * Represents file permissions data in the file management benchmark.
+ */
 interface FilePermissions {
     read: boolean;
     write: boolean;
@@ -38,12 +35,18 @@ interface FilePermissions {
     group: string;
 }
 
+/**
+ * Represents file content data in the file management benchmark.
+ */
 interface FileContent {
     data: Buffer | string;
     encoding: "utf8" | "base64" | "binary";
     compressed: boolean;
 }
 
+/**
+ * Represents storage stats data in the file management benchmark.
+ */
 interface StorageStats {
     totalFiles: number;
     totalSize: number;
@@ -53,6 +56,9 @@ interface StorageStats {
     compressionRatio: number;
 }
 
+/**
+ * Represents backup info data in the file management benchmark.
+ */
 interface BackupInfo {
     id: string;
     timestamp: Date;
@@ -62,6 +68,9 @@ interface BackupInfo {
     metadata: Record<string, any>;
 }
 
+/**
+ * Represents file search options data in the file management benchmark.
+ */
 interface FileSearchOptions {
     pattern?: string;
     mimeType?: string;
@@ -72,6 +81,9 @@ interface FileSearchOptions {
     limit?: number;
 }
 
+/**
+ * Mock file system used to drive the file management benchmark.
+ */
 class MockFileSystem {
     private files = new Map<
         string,
@@ -359,6 +371,9 @@ class MockFileSystem {
     }
 }
 
+/**
+ * Mock backup service used to drive the file management benchmark.
+ */
 class MockBackupService {
     private backups = new Map<string, BackupInfo>();
     private nextId = 1;
@@ -434,6 +449,9 @@ class MockBackupService {
     }
 }
 
+/**
+ * Mock file management service used to drive the file management benchmark.
+ */
 class MockFileManagementService {
     private fileSystem: MockFileSystem;
     private backupService: MockBackupService;
@@ -724,6 +742,9 @@ class MockFileManagementService {
 }
 
 // Helper functions for creating test data
+/**
+ * Creates test files for the file management benchmark.
+ */
 function generateTestFiles(
     count: number,
     directory: string = "/test"
@@ -748,6 +769,9 @@ function generateTestFiles(
     }));
 }
 
+/**
+ * Creates large file for the file management benchmark.
+ */
 function generateLargeFile(sizeMB: number): string {
     const sizeBytes = sizeMB * 1024 * 1024;
     const chunkSize = 1024;

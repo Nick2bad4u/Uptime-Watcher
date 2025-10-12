@@ -17,7 +17,9 @@ import type { SitesDomainBridge } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the sites domain API operations
+ * Interface defining the sites domain API operations.
+ *
+ * @public
  */
 export interface SitesApiInterface extends SitesDomainBridge {
     /**
@@ -64,7 +66,9 @@ export interface SitesApiInterface extends SitesDomainBridge {
 }
 
 /**
- * Sites domain API providing all site management operations
+ * Sites domain API providing all site management operations.
+ *
+ * @public
  */
 export const sitesApi: SitesApiInterface = {
     /**
@@ -99,9 +103,22 @@ export const sitesApi: SitesApiInterface = {
      */
     removeSite: createTypedInvoker("remove-site"),
 
+    /**
+     * Updates an existing site's configuration.
+     *
+     * @param siteId - ID of the site to update.
+     * @param siteData - Partial site data to update.
+     *
+     * @returns Promise resolving to the updated site.
+     */
     updateSite: createTypedInvoker("update-site"),
 } as const;
 
+/**
+ * Type alias for the sites domain preload bridge.
+ *
+ * @public
+ */
 export type SitesApi = SitesDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

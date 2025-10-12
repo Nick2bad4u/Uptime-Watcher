@@ -1,28 +1,22 @@
 /**
- * Data Analytics Service Performance Benchmarks
+ * Data Analytics Service Performance Benchmarks.
  *
- * @file Performance benchmarks for data analytics, metrics calculation, and
- *   reporting.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-Analytics
- *
- * @tags ["performance", "services", "analytics", "metrics", "reporting"]
+ * Exercises synthetic metric ingestion, aggregation, and alerting pipelines to
+ * benchmark analytics workloads.
  */
 
 import { bench, describe } from "vitest";
 
+/** Represents a single metric sample. */
 interface MetricPoint {
     timestamp: Date;
     value: number;
     metadata?: Record<string, any>;
 }
 
+/** Groups metric points as a named series. */
 interface TimeSeries {
     name: string;
     points: MetricPoint[];
@@ -30,6 +24,7 @@ interface TimeSeries {
     tags: Record<string, string>;
 }
 
+/** Describes the result of aggregating a time range. */
 interface AggregatedMetric {
     name: string;
     value: number;
@@ -42,6 +37,7 @@ interface AggregatedMetric {
     tags: Record<string, string>;
 }
 
+/** Defines the aggregation request executed by the analytics service. */
 interface AnalyticsQuery {
     metricNames: string[];
     timeRange: {
@@ -57,6 +53,7 @@ interface AnalyticsQuery {
     groupBy?: string[];
 }
 
+/** Response payload returned by analytics queries. */
 interface AnalyticsResult {
     metrics: AggregatedMetric[];
     totalPoints: number;
@@ -68,6 +65,7 @@ interface AnalyticsResult {
     };
 }
 
+/** Synthetic dashboard definition used to profile widget refreshes. */
 interface Dashboard {
     id: string;
     name: string;
@@ -76,6 +74,7 @@ interface Dashboard {
     lastUpdated: Date;
 }
 
+/** Captures widget configuration and its backing query. */
 interface DashboardWidget {
     id: string;
     type: "chart" | "metric" | "table" | "status";
@@ -84,6 +83,7 @@ interface DashboardWidget {
     configuration: Record<string, any>;
 }
 
+/** Describes an alerting threshold derived from metrics. */
 interface AlertRule {
     id: string;
     name: string;
@@ -97,6 +97,7 @@ interface AlertRule {
     lastTriggered?: Date;
 }
 
+/** Represents alert instances emitted during the benchmarks. */
 interface Alert {
     id: string;
     ruleId: string;
@@ -107,11 +108,17 @@ interface Alert {
     status: "active" | "resolved";
 }
 
+/**
+ * In-memory time-series storage used to simulate analytics ingestion.
+ */
 class MockMetricsStorage {
     private timeSeries = new Map<string, TimeSeries>();
     private indexByTime = new Map<number, string[]>(); // Timestamp -> metric names
     private indexByTags = new Map<string, Set<string>>(); // Tag -> metric names
 
+    /**
+     * Stores metric points and updates secondary indexes.
+     */
     async store(
         name: string,
         points: MetricPoint[],
@@ -158,6 +165,7 @@ class MockMetricsStorage {
         );
     }
 
+    /** Executes an aggregation query over stored metrics. */
     async query(
         metricNames: string[],
         timeRange: { start: Date; end: Date },
@@ -202,6 +210,7 @@ class MockMetricsStorage {
         return results;
     }
 
+    /** Aggregates a series using the provided aggregation type. */
     async aggregate(
         series: TimeSeries[],
         aggregationType: string,
@@ -266,6 +275,7 @@ class MockMetricsStorage {
         return results;
     }
 
+    /** Returns summary statistics about stored series. */
     getStats(): any {
         const totalSeries = this.timeSeries.size;
         const totalPoints = Array.from(this.timeSeries.values()).reduce(
@@ -281,6 +291,7 @@ class MockMetricsStorage {
         };
     }
 
+    /** Clears all stored metrics and indexes. */
     clear(): void {
         this.timeSeries.clear();
         this.indexByTime.clear();
@@ -288,15 +299,20 @@ class MockMetricsStorage {
     }
 }
 
+/**
+ * Evaluates alert rules against aggregated metrics.
+ */
 class MockAlertEngine {
     private rules = new Map<string, AlertRule>();
     private alerts = new Map<string, Alert>();
     private nextAlertId = 1;
 
+    /** Registers an alert rule for evaluation. */
     addRule(rule: AlertRule): void {
         this.rules.set(rule.id, rule);
     }
 
+    /** Evaluates alert rules against the supplied aggregated metrics. */
     async evaluateRules(metrics: AggregatedMetric[]): Promise<Alert[]> {
         const newAlerts: Alert[] = [];
 
@@ -362,12 +378,14 @@ class MockAlertEngine {
         }
     }
 
+    /** Returns currently active alerts. */
     getActiveAlerts(): Alert[] {
         return Array.from(this.alerts.values()).filter(
             (alert) => alert.status === "active"
         );
     }
 
+    /** Marks an alert as resolved. */
     resolveAlert(alertId: string): void {
         const alert = this.alerts.get(alertId);
         if (alert) {
@@ -376,6 +394,7 @@ class MockAlertEngine {
         }
     }
 
+    /** Clears rules and alert history. */
     clear(): void {
         this.rules.clear();
         this.alerts.clear();
@@ -383,6 +402,7 @@ class MockAlertEngine {
     }
 }
 
+/** Caches recent analytics results for repeat queries. */
 class MockQueryCache {
     private cache = new Map<
         string,
@@ -390,6 +410,7 @@ class MockQueryCache {
     >();
     private cacheTimeout = 300_000; // 5 minutes
 
+    /** Returns a cached analytics result when available. */
     get(query: AnalyticsQuery): AnalyticsResult | null {
         const key = this.generateKey(query);
         const cached = this.cache.get(key);
@@ -408,6 +429,7 @@ class MockQueryCache {
         return null;
     }
 
+    /** Stores the result of a query for subsequent lookups. */
     set(query: AnalyticsQuery, result: AnalyticsResult): void {
         const key = this.generateKey(query);
         this.cache.set(key, {
@@ -426,10 +448,12 @@ class MockQueryCache {
         });
     }
 
+    /** Clears all cached entries. */
     clear(): void {
         this.cache.clear();
     }
 
+    /** Returns basic cache statistics for benchmarking output. */
     getStats(): any {
         return {
             cacheSize: this.cache.size,
@@ -438,6 +462,10 @@ class MockQueryCache {
     }
 }
 
+/**
+ * High-level analytics facade used by the benchmarks to orchestrate storage,
+ * aggregation, and alert evaluation.
+ */
 class MockAnalyticsService {
     private storage: MockMetricsStorage;
     private alertEngine: MockAlertEngine;
@@ -450,6 +478,7 @@ class MockAnalyticsService {
         this.cache = new MockQueryCache();
     }
 
+    /** Records a single metric sample. */
     async recordMetric(
         name: string,
         value: number,
@@ -465,6 +494,7 @@ class MockAnalyticsService {
         await this.storage.store(name, [point]);
     }
 
+    /** Stores multiple metric points grouped by series. */
     async recordBatchMetrics(
         metrics: {
             name: string;
@@ -492,6 +522,7 @@ class MockAnalyticsService {
         }
     }
 
+    /** Executes a query and records execution metrics. */
     async executeQuery(query: AnalyticsQuery): Promise<AnalyticsResult> {
         const startTime = Date.now();
 
@@ -539,6 +570,7 @@ class MockAnalyticsService {
         return result;
     }
 
+    /** Calculates uptime percentage for the specified site. */
     async calculateUptime(
         siteId: string,
         timeRange: { start: Date; end: Date }
@@ -558,6 +590,7 @@ class MockAnalyticsService {
         return result.metrics[0].value * 100; // Convert to percentage
     }
 
+    /** Derives response time statistics for a monitored site. */
     async calculateResponseTimeStats(
         siteId: string,
         timeRange: { start: Date; end: Date }
@@ -598,6 +631,7 @@ class MockAnalyticsService {
         };
     }
 
+    /** Refreshes all widgets for the specified dashboard. */
     async generateDashboard(dashboardId: string): Promise<Dashboard> {
         const dashboard = this.dashboards.get(dashboardId);
         if (!dashboard) {
@@ -617,6 +651,7 @@ class MockAnalyticsService {
         return { ...dashboard };
     }
 
+    /** Runs alert evaluation across recent metrics. */
     async runAlertEvaluation(): Promise<Alert[]> {
         // Get recent metrics for evaluation
         const now = new Date();
@@ -636,6 +671,7 @@ class MockAnalyticsService {
         return await this.alertEngine.evaluateRules(aggregatedMetrics);
     }
 
+    /** Generates a report summarizing metric behaviour for the given inputs. */
     async generateReport(
         timeRange: { start: Date; end: Date },
         metricNames: string[]
@@ -673,30 +709,37 @@ class MockAnalyticsService {
         };
     }
 
+    /** Registers an alert rule with the underlying engine. */
     addAlertRule(rule: AlertRule): void {
         this.alertEngine.addRule(rule);
     }
 
+    /** Exposes active alerts to consumers. */
     getActiveAlerts(): Alert[] {
         return this.alertEngine.getActiveAlerts();
     }
 
+    /** Stores a dashboard definition for future refreshes. */
     createDashboard(dashboard: Dashboard): void {
         this.dashboards.set(dashboard.id, dashboard);
     }
 
+    /** Exposes metrics storage statistics for benchmarks. */
     getStorageStats(): any {
         return this.storage.getStats();
     }
 
+    /** Exposes cache statistics for benchmarks. */
     getCacheStats(): any {
         return this.cache.getStats();
     }
 
+    /** Clears cached analytics results. */
     clearCache(): void {
         this.cache.clear();
     }
 
+    /** Clears storage, cache, alerts, and dashboards for a fresh run. */
     reset(): void {
         this.storage.clear();
         this.alertEngine.clear();
@@ -706,6 +749,8 @@ class MockAnalyticsService {
 }
 
 // Helper functions for creating test data
+
+/** Generates synthetic metric data for use in benchmarks. */
 function generateMetricData(
     metricName: string,
     count: number,
@@ -747,6 +792,7 @@ function generateMetricData(
     return data;
 }
 
+/** Builds a representative dashboard definition for testing. */
 function createTestDashboard(): Dashboard {
     return {
         id: "main-dashboard",

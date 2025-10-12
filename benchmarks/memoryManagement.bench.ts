@@ -18,16 +18,32 @@
 
 import { bench, describe } from "vitest";
 
-// Mock cache implementation for benchmarking
+/**
+ * Simplified LRU cache used to benchmark cache eviction and memory churn.
+ *
+ * @internal
+ */
 class MockLRUCache<K, V> {
     private capacity: number;
     private cache = new Map<K, V>();
     private accessOrder: K[] = [];
 
+    /**
+     * Creates an LRU cache instance with the provided capacity.
+     *
+     * @param capacity - Maximum number of entries retained before eviction.
+     */
     constructor(capacity: number) {
         this.capacity = capacity;
     }
 
+    /**
+     * Returns the cached value for the provided key, updating recency order.
+     *
+     * @param key - Cache key to look up.
+     *
+     * @returns Cached value or `undefined` when missing.
+     */
     get(key: K): V | undefined {
         const value = this.cache.get(key);
         if (value !== undefined) {
@@ -38,6 +54,13 @@ class MockLRUCache<K, V> {
         return value;
     }
 
+    /**
+     * Stores a value in the cache and evicts the least-recently-used entry when
+     * capacity is exceeded.
+     *
+     * @param key - Cache key for the stored value.
+     * @param value - Value to cache.
+     */
     set(key: K, value: V): void {
         if (this.cache.has(key)) {
             // Update existing
@@ -58,6 +81,13 @@ class MockLRUCache<K, V> {
         }
     }
 
+    /**
+     * Removes a cached value when present.
+     *
+     * @param key - Cache key to delete.
+     *
+     * @returns `true` when the key existed and was removed.
+     */
     delete(key: K): boolean {
         if (this.cache.has(key)) {
             this.cache.delete(key);
@@ -67,28 +97,57 @@ class MockLRUCache<K, V> {
         return false;
     }
 
+    /**
+     * Clears the entire cache and access order state.
+     */
     clear(): void {
         this.cache.clear();
         this.accessOrder = [];
     }
 
+    /**
+     * Provides the number of cached entries.
+     *
+     * @returns Current cache size.
+     */
     size(): number {
         return this.cache.size;
     }
 
+    /**
+     * Returns the cached keys in insertion order.
+     *
+     * @returns Snapshot of current cache keys.
+     */
     keys(): K[] {
         return Array.from(this.cache.keys());
     }
 
+    /**
+     * Returns the cached values in insertion order.
+     *
+     * @returns Snapshot of current cache values.
+     */
     values(): V[] {
         return Array.from(this.cache.values());
     }
 }
 
-// Memory pressure simulation utilities
+/**
+ * Utility that allocates and releases large objects to simulate memory
+ * pressure.
+ *
+ * @internal
+ */
 class MemoryPressureSimulator {
     private allocatedObjects: any[] = [];
 
+    /**
+     * Allocates pseudo-random memory chunks and retains references for later
+     * release.
+     *
+     * @param sizeInMB - Amount of memory to allocate in megabytes.
+     */
     allocateMemory(sizeInMB: number): void {
         const bytesPerMB = 1024 * 1024;
         const arraySize = (sizeInMB * bytesPerMB) / 8; // 8 bytes per number
@@ -98,10 +157,18 @@ class MemoryPressureSimulator {
         this.allocatedObjects.push(largeArray);
     }
 
+    /**
+     * Releases previously allocated objects, allowing garbage collection.
+     */
     releaseMemory(): void {
         this.allocatedObjects = [];
     }
 
+    /**
+     * Estimates retained memory volume in megabytes.
+     *
+     * @returns Approximate memory consumption of retained objects.
+     */
     getMemoryUsage(): number {
         return (
             this.allocatedObjects.reduce(
@@ -113,7 +180,11 @@ class MemoryPressureSimulator {
     }
 }
 
-// Test data generators
+/**
+ * Synthetic site data structure leveraged by memory benchmarks.
+ *
+ * @internal
+ */
 interface SiteData {
     identifier: string;
     name: string;
@@ -122,6 +193,11 @@ interface SiteData {
     metadata: Record<string, any>;
 }
 
+/**
+ * Synthetic monitor data structure used by memory benchmarks.
+ *
+ * @internal
+ */
 interface MonitorData {
     id: string;
     type: string;
@@ -132,6 +208,11 @@ interface MonitorData {
     history: HistoryEntry[];
 }
 
+/**
+ * Synthetic history entry describing monitoring results.
+ *
+ * @internal
+ */
 interface HistoryEntry {
     timestamp: number;
     status: string;
@@ -139,6 +220,11 @@ interface HistoryEntry {
     metadata?: Record<string, any>;
 }
 
+/**
+ * Generates a pseudo-random history entry for benchmarking datasets.
+ *
+ * @returns Synthetic {@link HistoryEntry} populated with random metadata.
+ */
 function generateHistoryEntry(): HistoryEntry {
     return {
         timestamp: Date.now() - Math.random() * 86_400_000,
@@ -155,6 +241,15 @@ function generateHistoryEntry(): HistoryEntry {
     };
 }
 
+/**
+ * Generates synthetic monitor data with randomized configuration and history.
+ *
+ * @param siteId - Identifier of the site the monitor belongs to.
+ * @param monitorIndex - Index used to diversify generated values.
+ * @param historySize - Number of history entries to produce for the monitor.
+ *
+ * @returns Synthetic {@link MonitorData} instance.
+ */
 function generateMonitorData(
     siteId: string,
     monitorIndex: number,
@@ -167,11 +262,7 @@ function generateMonitorData(
 
     return {
         id: `${siteId}-monitor-${monitorIndex}`,
-        type: [
-            "http",
-            "ping",
-            "port",
-        ][monitorIndex % 3],
+        type: ["http", "ping", "port"][monitorIndex % 3],
         url:
             monitorIndex % 3 === 0
                 ? `https://example${monitorIndex}.com`
@@ -194,6 +285,15 @@ function generateMonitorData(
     };
 }
 
+/**
+ * Generates synthetic site data with monitors and historical metadata.
+ *
+ * @param siteIndex - Index used to derive the site identifier and metadata.
+ * @param monitorCount - Number of monitors to synthesize for the site.
+ * @param historySize - History size applied to site and monitor datasets.
+ *
+ * @returns Synthetic {@link SiteData} instance used in benchmarks.
+ */
 function generateSiteData(
     siteIndex: number,
     monitorCount: number,

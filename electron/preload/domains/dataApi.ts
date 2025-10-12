@@ -19,7 +19,9 @@ import type { DataDomainBridge } from "@shared/types/preload";
 import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the data domain API operations
+ * Interface defining the data domain API operations.
+ *
+ * @public
  */
 export interface DataApiInterface extends DataDomainBridge {
     /**
@@ -54,7 +56,9 @@ export interface DataApiInterface extends DataDomainBridge {
 }
 
 /**
- * Data domain API providing all data management operations
+ * Data domain API providing all data management operations.
+ *
+ * @public
  */
 export const dataApi: DataApiInterface = {
     /**
@@ -88,6 +92,11 @@ export const dataApi: DataApiInterface = {
     resetSettings: createVoidInvoker("reset-settings"),
 } as const;
 
+/**
+ * Type alias for the data domain preload bridge.
+ *
+ * @public
+ */
 export type DataApi = DataDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

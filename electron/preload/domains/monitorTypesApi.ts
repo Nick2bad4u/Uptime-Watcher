@@ -17,7 +17,9 @@ import type { MonitorTypesDomainBridge } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the monitor types domain API operations
+ * Interface defining the monitor types domain API operations.
+ *
+ * @public
  */
 export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
     /**
@@ -29,7 +31,9 @@ export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
 }
 
 /**
- * Monitor types domain API providing monitor type registry operations
+ * Monitor types domain API providing monitor type registry operations.
+ *
+ * @public
  */
 export const monitorTypesApi: MonitorTypesApiInterface = {
     /**
@@ -40,6 +44,11 @@ export const monitorTypesApi: MonitorTypesApiInterface = {
     getMonitorTypes: createTypedInvoker("get-monitor-types"),
 } as const;
 
+/**
+ * Type alias for the monitor types domain preload bridge.
+ *
+ * @public
+ */
 export type MonitorTypesApi = MonitorTypesDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

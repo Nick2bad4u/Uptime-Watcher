@@ -1,11 +1,17 @@
 /**
- * Performance benchmarks for React event handling operations Tests the
- * performance of event listeners, synthetic events, and event delegation
+ * Performance benchmarks for React event handling operations.
+ *
+ * @packageDocumentation
+ *
+ * Simulates synthetic events, delegation, and propagation patterns to stress
+ * the renderer's event system utilities.
  */
 
 import { bench, describe } from "vitest";
 
-// Interface definitions for event handling
+/**
+ * Describes the shape of the synthetic events used within the benchmarks.
+ */
 interface SyntheticEvent {
     type: string;
     target: EventTarget | null;
@@ -21,6 +27,9 @@ interface SyntheticEvent {
     preventDefault(): void;
 }
 
+/**
+ * Captures metadata about registered event handlers.
+ */
 interface EventHandler {
     id: string;
     eventType: string;
@@ -36,6 +45,9 @@ interface EventHandler {
     lastExecuted: number;
 }
 
+/**
+ * Describes delegated listener registrations tracking selector matches.
+ */
 interface EventDelegator {
     id: string;
     containerElement: string;
@@ -47,6 +59,9 @@ interface EventDelegator {
     totalExecutionTime: number;
 }
 
+/**
+ * Metrics emitted after dispatching a synthetic event.
+ */
 interface EventMetrics {
     eventType: string;
     handlersTriggered: number;
@@ -58,6 +73,9 @@ interface EventMetrics {
     stoppedPropagation: boolean;
 }
 
+/**
+ * Represents custom events generated during delegation benchmarks.
+ */
 interface CustomEvent {
     id: string;
     type: string;
@@ -69,7 +87,9 @@ interface CustomEvent {
     source: string;
 }
 
-// Mock event system implementation
+/**
+ * Simulated event system closely mirroring React's synthetic event behaviour.
+ */
 class MockEventSystem {
     private handlers = new Map<string, EventHandler[]>();
     private delegators = new Map<string, EventDelegator[]>();
@@ -77,7 +97,16 @@ class MockEventSystem {
     private eventHistory: { event: SyntheticEvent; metrics: EventMetrics }[] =
         [];
 
-    // Event handler registration
+    /**
+     * Registers an event handler for the specified element and event type.
+     *
+     * @param element - Element identifier receiving the handler.
+     * @param eventType - Event type to listen for.
+     * @param handler - Callback invoked when the event is dispatched.
+     * @param options - Optional handler options.
+     *
+     * @returns Metadata for the registered handler.
+     */
     addEventListener(
         element: string,
         eventType: string,
@@ -104,6 +133,13 @@ class MockEventSystem {
         return eventHandler;
     }
 
+    /**
+     * Removes a previously registered event handler by identifier.
+     *
+     * @param handlerId - Identifier of the handler to remove.
+     *
+     * @returns `true` when a handler was located and removed.
+     */
     removeEventListener(handlerId: string): boolean {
         for (const [key, handlers] of this.handlers.entries()) {
             const index = handlers.findIndex((h) => h.id === handlerId);
@@ -115,7 +151,16 @@ class MockEventSystem {
         return false;
     }
 
-    // Event delegation
+    /**
+     * Registers a delegated handler on the provided container.
+     *
+     * @param containerElement - Container element receiving the delegation.
+     * @param eventType - Event type to observe.
+     * @param selector - Selector used to match descendant elements.
+     * @param handler - Callback invoked when a descendant matches the selector.
+     *
+     * @returns Metadata describing the registered delegator.
+     */
     addEventDelegator(
         containerElement: string,
         eventType: string,
@@ -142,7 +187,16 @@ class MockEventSystem {
         return delegator;
     }
 
-    // Event dispatching
+    /**
+     * Dispatches an event and captures resulting metrics.
+     *
+     * @param element - Element identifier dispatching the event.
+     * @param eventType - Event type being dispatched.
+     * @param eventData - Optional additional event data.
+     * @param options - Optional bubbling/cancelation overrides.
+     *
+     * @returns Performance metrics collected during dispatch.
+     */
     dispatchEvent(
         element: string,
         eventType: string,
@@ -183,6 +237,16 @@ class MockEventSystem {
         return metrics;
     }
 
+    /**
+     * Creates a synthetic event mirroring React's event wrapper.
+     *
+     * @param eventType - Event type to emulate.
+     * @param element - Element identifier used as the target.
+     * @param eventData - Optional payload merged into the synthetic event.
+     * @param options - Optional bubbling/cancelation overrides.
+     *
+     * @returns Mock synthetic event instance.
+     */
     private createSyntheticEvent(
         eventType: string,
         element: string,
@@ -223,6 +287,13 @@ class MockEventSystem {
         };
     }
 
+    /**
+     * Runs registered handlers and updates performance metrics.
+     *
+     * @param element - Element identifier associated with the handlers.
+     * @param event - Synthetic event instance being dispatched.
+     * @param metrics - Mutable metrics object tracking execution data.
+     */
     private processEventHandlers(
         element: string,
         event: SyntheticEvent,
@@ -261,6 +332,13 @@ class MockEventSystem {
         }
     }
 
+    /**
+     * Processes delegated handlers matching the event target.
+     *
+     * @param element - Element identifier originally receiving the event.
+     * @param event - Synthetic event instance being dispatched.
+     * @param metrics - Mutable metrics object tracking execution data.
+     */
     private processEventDelegation(
         element: string,
         event: SyntheticEvent,
@@ -295,6 +373,14 @@ class MockEventSystem {
         }
     }
 
+    /**
+     * Produces a list of potential container identifiers for delegation.
+     *
+     * @param element - Element identifier whose ancestor containers should be
+     *   inspected.
+     *
+     * @returns Candidate container identifiers.
+     */
     private findParentContainers(element: string): string[] {
         // Simulate DOM tree traversal to find parent containers
         const containers: string[] = [];
@@ -314,6 +400,14 @@ class MockEventSystem {
         return containers;
     }
 
+    /**
+     * Approximates selector matching for synthetic benchmark elements.
+     *
+     * @param element - Element identifier to evaluate.
+     * @param selector - Selector string being tested.
+     *
+     * @returns `true` when the selector is considered a match.
+     */
     private matchesSelector(element: string, selector: string): boolean {
         // Simplified selector matching
         if (selector.startsWith(".")) {
@@ -329,7 +423,13 @@ class MockEventSystem {
         return element.includes(selector);
     }
 
-    // Batch event processing
+    /**
+     * Dispatches a batch of events and returns their associated metrics.
+     *
+     * @param events - Batch of event specifications to dispatch.
+     *
+     * @returns Metrics for each dispatched event.
+     */
     batchProcessEvents(
         events: { element: string; type: string; data?: any }[]
     ): EventMetrics[] {
@@ -347,7 +447,11 @@ class MockEventSystem {
         return results;
     }
 
-    // Event system statistics
+    /**
+     * Aggregates statistics about registered handlers and processed events.
+     *
+     * @returns Summary statistics describing system state.
+     */
     getStatistics(): {
         totalHandlers: number;
         totalDelegators: number;

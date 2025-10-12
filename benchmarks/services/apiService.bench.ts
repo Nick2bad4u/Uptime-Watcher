@@ -1,22 +1,17 @@
 /**
- * API Service Performance Benchmarks
+ * API Service Performance Benchmarks.
  *
- * @file Performance benchmarks for API service, endpoint handling, middleware,
- *   and request processing.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-API
- *
- * @tags ["performance", "services", "api", "middleware", "endpoints"]
+ * Simulates routing, middleware execution, caching, authentication, and other
+ * API service behaviours to stress-test orchestration layers.
  */
 
 import { bench, describe } from "vitest";
 
+/**
+ * Synthetic representation of an API request handled by the benchmark harness.
+ */
 interface ApiRequest {
     id: string;
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -30,6 +25,9 @@ interface ApiRequest {
     metadata: Record<string, any>;
 }
 
+/**
+ * Synthetic API response structure tracked during benchmark execution.
+ */
 interface ApiResponse {
     id: string;
     requestId: string;
@@ -42,6 +40,9 @@ interface ApiResponse {
     timestamp: Date;
 }
 
+/**
+ * Describes a benchmark route and its associated policies.
+ */
 interface Route {
     id: string;
     method: string;
@@ -56,6 +57,9 @@ interface Route {
     metadata: Record<string, any>;
 }
 
+/**
+ * Middleware signature used by the benchmarked API runtime.
+ */
 interface Middleware {
     name: string;
     handler: (
@@ -68,6 +72,9 @@ interface Middleware {
     enabled: boolean;
 }
 
+/**
+ * Declarative validation rule applied to incoming requests.
+ */
 interface ValidationRule {
     field: string;
     type: "string" | "number" | "boolean" | "object" | "array";
@@ -75,6 +82,9 @@ interface ValidationRule {
     rules: string[];
 }
 
+/**
+ * Rate limiting configuration attached to routes or API keys.
+ */
 interface RateLimit {
     windowMs: number;
     maxRequests: number;
@@ -82,6 +92,9 @@ interface RateLimit {
     keyGenerator?: (req: ApiRequest) => string;
 }
 
+/**
+ * Response caching policy definition.
+ */
 interface CacheRule {
     ttl: number;
     keyGenerator: (req: ApiRequest) => string;
@@ -89,6 +102,9 @@ interface CacheRule {
     vary?: string[];
 }
 
+/**
+ * Aggregated metrics derived from the benchmarked API service.
+ */
 interface ApiMetrics {
     totalRequests: number;
     successfulRequests: number;
@@ -101,6 +117,9 @@ interface ApiMetrics {
     topEndpoints: { path: string; count: number }[];
 }
 
+/**
+ * Synthetic user entity consumed by the benchmark.
+ */
 interface User {
     id: string;
     username: string;
@@ -112,6 +131,9 @@ interface User {
     isActive: boolean;
 }
 
+/**
+ * Synthetic API key description used for authentication scenarios.
+ */
 interface ApiKey {
     id: string;
     name: string;
@@ -125,9 +147,22 @@ interface ApiKey {
     isActive: boolean;
 }
 
+/**
+ * In-memory rate limiter used to emulate throttling scenarios.
+ */
 class MockRateLimiter {
     private requests = new Map<string, number[]>();
 
+    /**
+     * Determines whether a request identified by `key` is permitted within the
+     * specified window.
+     *
+     * @param key - Identifier representing the request source.
+     * @param windowMs - Sliding window duration in milliseconds.
+     * @param maxRequests - Maximum permitted requests in the window.
+     *
+     * @returns `true` when the request should proceed.
+     */
     async isAllowed(
         key: string,
         windowMs: number,
@@ -156,6 +191,11 @@ class MockRateLimiter {
         return true;
     }
 
+    /**
+     * Resets tracked requests for a specific key or clears all counters.
+     *
+     * @param key - Optional key to reset.
+     */
     async reset(key?: string): Promise<void> {
         if (key) {
             this.requests.delete(key);
@@ -164,6 +204,14 @@ class MockRateLimiter {
         }
     }
 
+    /**
+     * Returns usage statistics for the provided key.
+     *
+     * @param key - Identifier representing the client.
+     * @param windowMs - Sliding window duration in milliseconds.
+     *
+     * @returns Current request count and reset time.
+     */
     async getUsage(
         key: string,
         windowMs: number
@@ -185,14 +233,25 @@ class MockRateLimiter {
         };
     }
 
+    /** Clears all tracked requests. */
     clear(): void {
         this.requests.clear();
     }
 }
 
+/**
+ * Minimal TTL cache to simulate response caching behaviour.
+ */
 class MockCache {
     private cache = new Map<string, { value: any; expiry: number }>();
 
+    /**
+     * Retrieves a cached value if present and not expired.
+     *
+     * @param key - Cache key.
+     *
+     * @returns Cached value or `null` when missing.
+     */
     async get(key: string): Promise<any | null> {
         const item = this.cache.get(key);
         if (!item) return null;
@@ -205,15 +264,36 @@ class MockCache {
         return item.value;
     }
 
+    /**
+     * Stores a value in the cache with a TTL expressed in seconds.
+     *
+     * @param key - Cache key.
+     * @param value - Value to store.
+     * @param ttlSeconds - Lifetime in seconds.
+     */
     async set(key: string, value: any, ttlSeconds: number): Promise<void> {
         const expiry = Date.now() + ttlSeconds * 1000;
         this.cache.set(key, { value, expiry });
     }
 
+    /**
+     * Removes the specified cache entry.
+     *
+     * @param key - Cache key.
+     *
+     * @returns `true` when an entry was deleted.
+     */
     async del(key: string): Promise<boolean> {
         return this.cache.delete(key);
     }
 
+    /**
+     * Tests whether a valid cache entry exists.
+     *
+     * @param key - Cache key.
+     *
+     * @returns `true` when the entry exists and has not expired.
+     */
     async exists(key: string): Promise<boolean> {
         const item = this.cache.get(key);
         if (!item) return false;
@@ -226,23 +306,38 @@ class MockCache {
         return true;
     }
 
+    /** Clears all cached entries. */
     async flush(): Promise<void> {
         this.cache.clear();
     }
 
+    /**
+     * Returns the number of items currently cached.
+     */
     size(): number {
         return this.cache.size;
     }
 
+    /** Clears all cached entries synchronously. */
     clear(): void {
         this.cache.clear();
     }
 }
 
+/**
+ * In-memory user repository used to emulate persistence operations.
+ */
 class MockUserRepository {
     private users = new Map<string, User>();
     private nextId = 1;
 
+    /**
+     * Creates a user record with sensible defaults.
+     *
+     * @param userData - Partial user data overrides.
+     *
+     * @returns Stored user copy.
+     */
     async create(userData: Partial<User>): Promise<User> {
         const user: User = {
             id: `user-${this.nextId++}`,
@@ -259,11 +354,15 @@ class MockUserRepository {
         return { ...user };
     }
 
+    /**
+     * Retrieves a user by identifier.
+     */
     async findById(id: string): Promise<User | null> {
         const user = this.users.get(id);
         return user ? { ...user } : null;
     }
 
+    /** Finds a user by email address. */
     async findByEmail(email: string): Promise<User | null> {
         for (const user of this.users.values()) {
             if (user.email === email) {
@@ -273,6 +372,9 @@ class MockUserRepository {
         return null;
     }
 
+    /**
+     * Retrieves the user associated with a hashed API key.
+     */
     async findByApiKey(apiKeyHash: string): Promise<User | null> {
         for (const user of this.users.values()) {
             if (user.apiKeyHash === apiKeyHash) {
@@ -282,6 +384,7 @@ class MockUserRepository {
         return null;
     }
 
+    /** Updates the `lastLoginAt` timestamp for the specified user. */
     async updateLastLogin(userId: string): Promise<void> {
         const user = this.users.get(userId);
         if (user) {
@@ -290,21 +393,33 @@ class MockUserRepository {
         }
     }
 
+    /** Determines whether the user holds the required permission. */
     async hasPermission(userId: string, permission: string): Promise<boolean> {
         const user = this.users.get(userId);
         return user ? user.permissions.includes(permission) : false;
     }
 
+    /** Clears repository state and resets identifiers. */
     clear(): void {
         this.users.clear();
         this.nextId = 1;
     }
 }
 
+/**
+ * In-memory API key repository supporting authentication scenarios.
+ */
 class MockApiKeyRepository {
     private apiKeys = new Map<string, ApiKey>();
     private nextId = 1;
 
+    /**
+     * Creates a synthetic API key.
+     *
+     * @param keyData - Partial key overrides.
+     *
+     * @returns Stored API key copy.
+     */
     async create(keyData: Partial<ApiKey>): Promise<ApiKey> {
         const apiKey: ApiKey = {
             id: `key-${this.nextId++}`,
@@ -323,6 +438,7 @@ class MockApiKeyRepository {
         return { ...apiKey };
     }
 
+    /** Retrieves an API key by hash. */
     async findByHash(hash: string): Promise<ApiKey | null> {
         for (const apiKey of this.apiKeys.values()) {
             if (apiKey.hash === hash) {
@@ -332,6 +448,7 @@ class MockApiKeyRepository {
         return null;
     }
 
+    /** Updates the last-used timestamp for the API key. */
     async updateLastUsed(keyId: string): Promise<void> {
         const apiKey = this.apiKeys.get(keyId);
         if (apiKey) {
@@ -340,21 +457,30 @@ class MockApiKeyRepository {
         }
     }
 
+    /** Generates a pseudo-random API key string. */
     private generateKey(): string {
         return `ak_${Math.random().toString(36).slice(2, 15)}${Math.random().toString(36).slice(2, 15)}`;
     }
 
+    /**
+     * Produces a deterministic hash for the supplied key string.
+     */
     private hashKey(key: string): string {
         // Simple hash implementation
         return `hash_${key.split("").reduce((hash, char) => hash + (char.codePointAt(0) ?? 0), 0)}`;
     }
 
+    /** Clears repository state and resets identifiers. */
     clear(): void {
         this.apiKeys.clear();
         this.nextId = 1;
     }
 }
 
+/**
+ * Synthetic API service orchestrator wiring together routing, middleware, rate
+ * limiting, and caching concerns for benchmark purposes.
+ */
 class MockApiService {
     private routes = new Map<string, Route>();
     private middleware: Middleware[] = [];
@@ -365,6 +491,7 @@ class MockApiService {
     private requestId = 1;
     private metrics: ApiMetrics;
 
+    /** Builds the mock service and its collaborators. */
     constructor() {
         this.rateLimiter = new MockRateLimiter();
         this.cache = new MockCache();
@@ -383,6 +510,16 @@ class MockApiService {
         };
     }
 
+    /**
+     * Registers a route with optional middleware, validation, and policy hooks.
+     *
+     * @param method - HTTP method descriptor.
+     * @param path - Route path pattern.
+     * @param handler - Async handler executed when the route matches.
+     * @param options - Additional configuration such as middleware and caching.
+     *
+     * @returns Registered route metadata.
+     */
     registerRoute(
         method: string,
         path: string,
@@ -416,11 +553,21 @@ class MockApiService {
         return route;
     }
 
+    /** Adds middleware to the global execution pipeline. */
     registerMiddleware(middleware: Middleware): void {
         this.middleware.push(middleware);
         this.middleware.sort((a, b) => b.priority - a.priority);
     }
 
+    /**
+     * Processes an API request through routing, middleware, and handler logic.
+     *
+     * @param method - HTTP method descriptor.
+     * @param path - Request path.
+     * @param requestData - Optional request overrides.
+     *
+     * @returns Generated API response.
+     */
     async processRequest(
         method: string,
         path: string,
@@ -590,6 +737,7 @@ class MockApiService {
         }
     }
 
+    /** Performs bearer token or API key authentication. */
     private async authenticate(request: ApiRequest): Promise<{
         success: boolean;
         status?: number;
@@ -638,6 +786,7 @@ class MockApiService {
         return { success: false, status: 401, error: "Invalid credentials" };
     }
 
+    /** Validates the request against the provided rule set. */
     private validateRequest(
         request: ApiRequest,
         rules: ValidationRule[]
@@ -671,6 +820,9 @@ class MockApiService {
         return { valid: errors.length === 0, errors };
     }
 
+    /**
+     * Completes the response lifecycle and updates service metrics.
+     */
     private finalizeResponse(
         request: ApiRequest,
         response: ApiResponse,
@@ -701,26 +853,32 @@ class MockApiService {
         return response;
     }
 
+    /** Hashes an API key into the pseudo storage format. */
     private hashApiKey(key: string): string {
         return `hash_${key.split("").reduce((hash, char) => hash + (char.codePointAt(0) ?? 0), 0)}`;
     }
 
+    /** Returns aggregated API metrics. */
     async getMetrics(): Promise<ApiMetrics> {
         return { ...this.metrics };
     }
 
+    /** Returns a snapshot of registered routes. */
     async getRoutes(): Promise<Route[]> {
         return Array.from(this.routes.values(), (route) => ({ ...route }));
     }
 
+    /** Persists a synthetic user. */
     async createUser(userData: Partial<User>): Promise<User> {
         return await this.userRepo.create(userData);
     }
 
+    /** Persists a synthetic API key. */
     async createApiKey(keyData: Partial<ApiKey>): Promise<ApiKey> {
         return await this.apiKeyRepo.create(keyData);
     }
 
+    /** Resets internal state and clears caches. */
     reset(): void {
         this.routes.clear();
         this.middleware = [];
@@ -744,6 +902,10 @@ class MockApiService {
 }
 
 // Helper functions for creating test data
+
+/**
+ * Produces a set of representative routes used during benchmarks.
+ */
 function createTestRoutes(): {
     method: string;
     path: string;
@@ -812,6 +974,9 @@ function createTestRoutes(): {
     ];
 }
 
+/**
+ * Produces global middleware used throughout the benchmarks.
+ */
 function createTestMiddleware(): Middleware[] {
     return [
         {

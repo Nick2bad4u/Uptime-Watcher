@@ -1,14 +1,24 @@
 /**
  * Global setup for Playwright Electron tests.
  *
- * This file runs once before all tests and sets up the environment. It can be
- * used for tasks like building the app, setting up databases, etc.
+ * @packageDocumentation
+ *
+ * This module runs once before the Playwright test suite begins. It prepares
+ * the Electron build output and configures environment flags required for
+ * stable headless execution during automated UI runs.
  */
 
 import type { FullConfig } from "@playwright/test";
 import { execSync } from "node:child_process";
 import path from "node:path";
 
+/**
+ * Builds the Electron entrypoints and primes shared environment flags so
+ * Playwright can launch the renderer in headless mode.
+ *
+ * @param _config - Playwright project configuration (unused, but required by
+ *   the framework callback signature).
+ */
 async function globalSetup(_config: FullConfig): Promise<void> {
     console.log("🔧 Setting up Playwright Electron tests...");
 

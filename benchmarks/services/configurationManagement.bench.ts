@@ -1,22 +1,16 @@
 /**
- * Configuration Management Service Performance Benchmarks
+ * Configuration Management Benchmarks.
  *
- * @file Performance benchmarks for application configuration and settings
- *   management.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-ConfigurationManagement
- *
- * @tags ["performance", "services", "configuration", "settings"]
+ * Exercises configuration management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
+/**
+ * Utility type describing configuration schema for the configuration management benchmark.
+ */
 type ConfigurationSchema = Record<
     string,
     {
@@ -29,6 +23,9 @@ type ConfigurationSchema = Record<
     }
 >;
 
+/**
+ * Represents configuration value data in the configuration management benchmark.
+ */
 interface ConfigurationValue {
     key: string;
     value: any;
@@ -38,6 +35,9 @@ interface ConfigurationValue {
     version: number;
 }
 
+/**
+ * Represents configuration group data in the configuration management benchmark.
+ */
 interface ConfigurationGroup {
     name: string;
     description?: string;
@@ -45,6 +45,9 @@ interface ConfigurationGroup {
     metadata: Record<string, any>;
 }
 
+/**
+ * Represents config change event data in the configuration management benchmark.
+ */
 interface ConfigChangeEvent {
     key: string;
     oldValue: any;
@@ -54,12 +57,18 @@ interface ConfigChangeEvent {
     userId?: string;
 }
 
+/**
+ * Represents config validation result data in the configuration management benchmark.
+ */
 interface ConfigValidationResult {
     isValid: boolean;
     errors: string[];
     warnings: string[];
 }
 
+/**
+ * Represents config backup data in the configuration management benchmark.
+ */
 interface ConfigBackup {
     id: string;
     timestamp: Date;
@@ -71,6 +80,9 @@ interface ConfigBackup {
     };
 }
 
+/**
+ * Mock configuration repository used to drive the configuration management benchmark.
+ */
 class MockConfigurationRepository {
     private configurations = new Map<string, ConfigurationValue>();
     private changeHistory: ConfigChangeEvent[] = [];
@@ -238,6 +250,9 @@ class MockConfigurationRepository {
     }
 }
 
+/**
+ * Mock event emitter used to drive the configuration management benchmark.
+ */
 class MockEventEmitter {
     private listeners = new Map<string, Function[]>();
 
@@ -274,6 +289,9 @@ class MockEventEmitter {
     }
 }
 
+/**
+ * Mock configuration management service used to drive the configuration management benchmark.
+ */
 class MockConfigurationManagementService {
     private repository: MockConfigurationRepository;
     private eventEmitter: MockEventEmitter;
@@ -681,6 +699,9 @@ class MockConfigurationManagementService {
 }
 
 // Helper functions for creating test configurations
+/**
+ * Creates test configuration for the configuration management benchmark.
+ */
 function createTestConfiguration(): Record<string, any> {
     return {
         "app.name": "Test Application",
@@ -694,6 +715,9 @@ function createTestConfiguration(): Record<string, any> {
     };
 }
 
+/**
+ * Creates large configuration for the configuration management benchmark.
+ */
 function createLargeConfiguration(count: number): Record<string, any> {
     const config: Record<string, any> = {};
 

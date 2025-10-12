@@ -1,21 +1,17 @@
 /**
- * TypedEventBus and Event Processing Performance Benchmarks
+ * Event Processing Benchmarks.
  *
- * @remarks
- * Comprehensive benchmarks for event processing operations including middleware
- * chains, correlation tracking, bulk event dispatching, subscription
- * management, and concurrent event handling that form the backbone of the
- * application's reactive architecture.
+ * @packageDocumentation
  *
- * Covers event emission, filtering, transformation, error handling, and complex
- * event processing scenarios with high throughput requirements.
- *
- * @author Uptime-Watcher Development Team
+ * Exercises event processing benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
 // Core event system interfaces
+/**
+ * Represents base event data in the event processing benchmark.
+ */
 interface BaseEvent {
     id: string;
     type: string;
@@ -25,6 +21,9 @@ interface BaseEvent {
     metadata?: Record<string, unknown>;
 }
 
+/**
+ * Represents site status changed event data in the event processing benchmark.
+ */
 interface SiteStatusChangedEvent extends BaseEvent {
     type: "site-status-changed";
     payload: {
@@ -36,6 +35,9 @@ interface SiteStatusChangedEvent extends BaseEvent {
     };
 }
 
+/**
+ * Represents monitor check completed event data in the event processing benchmark.
+ */
 interface MonitorCheckCompletedEvent extends BaseEvent {
     type: "monitor-check-completed";
     payload: {
@@ -48,6 +50,9 @@ interface MonitorCheckCompletedEvent extends BaseEvent {
     };
 }
 
+/**
+ * Represents alert triggered event data in the event processing benchmark.
+ */
 interface AlertTriggeredEvent extends BaseEvent {
     type: "alert-triggered";
     payload: {
@@ -59,6 +64,9 @@ interface AlertTriggeredEvent extends BaseEvent {
     };
 }
 
+/**
+ * Represents database operation event data in the event processing benchmark.
+ */
 interface DatabaseOperationEvent extends BaseEvent {
     type: "database-operation";
     payload: {
@@ -71,6 +79,9 @@ interface DatabaseOperationEvent extends BaseEvent {
     };
 }
 
+/**
+ * Utility type describing event type for the event processing benchmark.
+ */
 type EventType =
     | SiteStatusChangedEvent
     | MonitorCheckCompletedEvent
@@ -78,14 +89,23 @@ type EventType =
     | DatabaseOperationEvent;
 
 // Event handler types
+/**
+ * Utility type describing event handler for the event processing benchmark.
+ */
 type EventHandler<T extends BaseEvent = BaseEvent> = (
     event: T
 ) => Promise<void> | void;
+/**
+ * Utility type describing event middleware for the event processing benchmark.
+ */
 type EventMiddleware<T extends BaseEvent = BaseEvent> = (
     event: T,
     next: () => Promise<void>
 ) => Promise<void>;
 
+/**
+ * Represents event subscription data in the event processing benchmark.
+ */
 interface EventSubscription {
     id: string;
     eventType: string;
@@ -95,6 +115,9 @@ interface EventSubscription {
     metadata: Record<string, unknown>;
 }
 
+/**
+ * Represents event processing stats data in the event processing benchmark.
+ */
 interface EventProcessingStats {
     totalEvents: number;
     processedEvents: number;
@@ -106,6 +129,9 @@ interface EventProcessingStats {
 }
 
 // Mock TypedEventBus implementation
+/**
+ * Mock typed event bus used to drive the event processing benchmark.
+ */
 class MockTypedEventBus {
     private subscriptions = new Map<string, EventSubscription[]>();
     private middleware: EventMiddleware[] = [];
@@ -452,6 +478,9 @@ class MockTypedEventBus {
 }
 
 // Helper functions for generating test data
+/**
+ * Creates site status events for the event processing benchmark.
+ */
 function generateSiteStatusEvents(
     count: number,
     siteIds: string[]
@@ -490,6 +519,9 @@ function generateSiteStatusEvents(
     return events;
 }
 
+/**
+ * Creates monitor check events for the event processing benchmark.
+ */
 function generateMonitorCheckEvents(
     count: number,
     siteIds: string[]
@@ -528,6 +560,9 @@ function generateMonitorCheckEvents(
     return events;
 }
 
+/**
+ * Creates alert events for the event processing benchmark.
+ */
 function generateAlertEvents(
     count: number,
     siteIds: string[]
@@ -567,6 +602,9 @@ function generateAlertEvents(
     return events;
 }
 
+/**
+ * Creates database events for the event processing benchmark.
+ */
 function generateDatabaseEvents(count: number): DatabaseOperationEvent[] {
     const events: DatabaseOperationEvent[] = [];
     const operations = [
@@ -612,6 +650,9 @@ function generateDatabaseEvents(count: number): DatabaseOperationEvent[] {
     return events;
 }
 
+/**
+ * Creates mixed events for the event processing benchmark.
+ */
 function generateMixedEvents(count: number, siteIds: string[]): BaseEvent[] {
     const events: BaseEvent[] = [
         ...generateSiteStatusEvents(Math.floor(count * 0.4), siteIds),

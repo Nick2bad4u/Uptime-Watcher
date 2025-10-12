@@ -33,12 +33,19 @@ import { ipcRenderer } from "electron";
 import { createEventManager } from "../core/bridgeFactory";
 
 /**
- * Creates the events domain API with event listeners
+ * Type alias describing the events domain preload bridge surface.
  *
- * @returns Events API object with event listener functions
+ * @public
  */
 export type EventsApi = EventsDomainBridge;
 
+/**
+ * Creates the events domain API with event listeners.
+ *
+ * @returns Events API object with event listener functions.
+ *
+ * @public
+ */
 export function createEventsApi(): EventsApi {
     return {
         /**

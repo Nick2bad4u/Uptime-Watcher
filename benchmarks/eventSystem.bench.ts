@@ -18,11 +18,22 @@
 
 import { bench, describe } from "vitest";
 
-// Mock TypedEventBus implementation for benchmarking
+/**
+ * Lightweight in-memory event bus that mimics the TypedEventBus surface for
+ * benchmark scenarios.
+ *
+ * @internal
+ */
 class MockTypedEventBus {
     private listeners = new Map<string, Set<Function>>();
     private oneTimeListeners = new Map<string, Set<Function>>();
 
+    /**
+     * Registers a listener that fires on every emission of the matching event.
+     *
+     * @param event - Event identifier to subscribe to.
+     * @param listener - Callback invoked when the event is emitted.
+     */
     on(event: string, listener: Function): void {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, new Set());
@@ -30,6 +41,12 @@ class MockTypedEventBus {
         this.listeners.get(event)!.add(listener);
     }
 
+    /**
+     * Registers a listener that is removed after processing the first event.
+     *
+     * @param event - Event identifier to subscribe to once.
+     * @param listener - Callback invoked a single time when the event occurs.
+     */
     once(event: string, listener: Function): void {
         if (!this.oneTimeListeners.has(event)) {
             this.oneTimeListeners.set(event, new Set());
@@ -37,11 +54,24 @@ class MockTypedEventBus {
         this.oneTimeListeners.get(event)!.add(listener);
     }
 
+    /**
+     * Removes a previously registered listener for both persistent and one-time
+     * collections.
+     *
+     * @param event - Event identifier to remove the listener from.
+     * @param listener - Callback that should no longer receive events.
+     */
     off(event: string, listener: Function): void {
         this.listeners.get(event)?.delete(listener);
         this.oneTimeListeners.get(event)?.delete(listener);
     }
 
+    /**
+     * Synchronously emits an event to all registered listeners.
+     *
+     * @param event - Identifier of the event being emitted.
+     * @param args - Variadic payload forwarded to listeners.
+     */
     emit(event: string, ...args: any[]): void {
         // Emit to regular listeners
         this.listeners.get(event)?.forEach((listener) => {
@@ -66,6 +96,13 @@ class MockTypedEventBus {
         }
     }
 
+    /**
+     * Emits an event, waiting for any async listener responses before
+     * completing.
+     *
+     * @param event - Identifier of the event being emitted.
+     * @param args - Variadic payload forwarded to listeners.
+     */
     async emitAsync(event: string, ...args: any[]): Promise<void> {
         const promises: Promise<any>[] = [];
 
@@ -103,6 +140,12 @@ class MockTypedEventBus {
         await Promise.all(promises);
     }
 
+    /**
+     * Removes listeners for a specific event or clears the entire registry.
+     *
+     * @param event - Optional event identifier to prune. When omitted all
+     *   listeners are removed.
+     */
     removeAllListeners(event?: string): void {
         if (event) {
             this.listeners.delete(event);
@@ -113,6 +156,13 @@ class MockTypedEventBus {
         }
     }
 
+    /**
+     * Returns the number of listeners registered for the provided event.
+     *
+     * @param event - Event identifier to inspect.
+     *
+     * @returns Aggregate listener count across persistent and one-time sets.
+     */
     listenerCount(event: string): number {
         const regularCount = this.listeners.get(event)?.size || 0;
         const oneTimeCount = this.oneTimeListeners.get(event)?.size || 0;
@@ -120,7 +170,11 @@ class MockTypedEventBus {
     }
 }
 
-// Event payload types
+/**
+ * Represents site-centric payloads emitted from the event bus benchmarks.
+ *
+ * @internal
+ */
 interface SiteEvent {
     site: {
         identifier: string;
@@ -131,6 +185,11 @@ interface SiteEvent {
     correlationId: string;
 }
 
+/**
+ * Represents monitor-centric payloads exercised during benchmark runs.
+ *
+ * @internal
+ */
 interface MonitorEvent {
     monitor: {
         id: string;
@@ -142,6 +201,11 @@ interface MonitorEvent {
     correlationId: string;
 }
 
+/**
+ * Represents monitor status updates used by downstream benchmark listeners.
+ *
+ * @internal
+ */
 interface StatusUpdateEvent {
     monitorId: string;
     status: "up" | "down";
@@ -150,7 +214,11 @@ interface StatusUpdateEvent {
     correlationId: string;
 }
 
-// Mock event generators
+/**
+ * Creates a pseudo-random site event payload to drive benchmark iterations.
+ *
+ * @returns Synthetic {@link SiteEvent} data populated with randomized values.
+ */
 function generateSiteEvent(): SiteEvent {
     return {
         site: {
@@ -163,6 +231,11 @@ function generateSiteEvent(): SiteEvent {
     };
 }
 
+/**
+ * Creates a pseudo-random monitor event payload to simulate monitor operations.
+ *
+ * @returns Synthetic {@link MonitorEvent} data populated with randomized values.
+ */
 function generateMonitorEvent(): MonitorEvent {
     return {
         monitor: {
@@ -180,6 +253,11 @@ function generateMonitorEvent(): MonitorEvent {
     };
 }
 
+/**
+ * Creates a pseudo-random status update payload used by monitoring benchmarks.
+ *
+ * @returns Synthetic {@link StatusUpdateEvent} describing monitor health.
+ */
 function generateStatusUpdateEvent(): StatusUpdateEvent {
     return {
         monitorId: `monitor-${Math.floor(Math.random() * 1000)}`,
@@ -190,13 +268,28 @@ function generateStatusUpdateEvent(): StatusUpdateEvent {
     };
 }
 
-// Mock listeners
+/**
+ * Produces a synchronous listener that applies lightweight work to incoming
+ * data.
+ *
+ * @param id - Identifier used to differentiate listeners during debug runs.
+ *
+ * @returns Event listener that performs synchronous CPU-bound work.
+ */
 const createSyncListener = (id: string) => (data: any) => {
     // Simulate some processing
     JSON.stringify(data);
     Math.floor(Math.random() * 100);
 };
 
+/**
+ * Produces an asynchronous listener that optionally waits before resolving.
+ *
+ * @param id - Identifier used to differentiate listeners during debug runs.
+ * @param delay - Milliseconds to wait before completing.
+ *
+ * @returns Async event listener that simulates IO latency.
+ */
 const createAsyncListener =
     (id: string, delay: number = 0) =>
     async (data: any) => {
@@ -208,6 +301,14 @@ const createAsyncListener =
         Math.floor(Math.random() * 100);
     };
 
+/**
+ * Produces a listener that executes heavy CPU-bound work to simulate worst case
+ * scenarios.
+ *
+ * @param id - Identifier used to differentiate listeners during debug runs.
+ *
+ * @returns Event listener that stresses the CPU for benchmarking purposes.
+ */
 const createHeavyListener = (id: string) => (data: any) => {
     // Simulate heavy processing
     for (let i = 0; i < 1000; i++) {

@@ -1,22 +1,16 @@
 /**
- * Site Management Service Performance Benchmarks
+ * Site Management Benchmarks.
  *
- * @file Performance benchmarks for site management operations and business
- *   logic.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-SiteManagement
- *
- * @tags ["performance", "services", "site-management", "crud"]
+ * Exercises site management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
+/**
+ * Represents site data in the site management benchmark.
+ */
 interface Site {
     id: string;
     name: string;
@@ -30,6 +24,9 @@ interface Site {
     metadata: Record<string, any>;
 }
 
+/**
+ * Represents site create request data in the site management benchmark.
+ */
 interface SiteCreateRequest {
     name: string;
     url: string;
@@ -38,6 +35,9 @@ interface SiteCreateRequest {
     metadata?: Record<string, any>;
 }
 
+/**
+ * Represents site update request data in the site management benchmark.
+ */
 interface SiteUpdateRequest {
     name?: string;
     url?: string;
@@ -47,6 +47,9 @@ interface SiteUpdateRequest {
     metadata?: Record<string, any>;
 }
 
+/**
+ * Represents site filter data in the site management benchmark.
+ */
 interface SiteFilter {
     status?: string[];
     isActive?: boolean;
@@ -56,6 +59,9 @@ interface SiteFilter {
     createdBefore?: Date;
 }
 
+/**
+ * Represents site pagination options data in the site management benchmark.
+ */
 interface SitePaginationOptions {
     page: number;
     limit: number;
@@ -63,6 +69,9 @@ interface SitePaginationOptions {
     sortOrder?: "asc" | "desc";
 }
 
+/**
+ * Represents paginated result data in the site management benchmark.
+ */
 interface PaginatedResult<T> {
     data: T[];
     total: number;
@@ -71,6 +80,9 @@ interface PaginatedResult<T> {
     totalPages: number;
 }
 
+/**
+ * Mock site repository used to drive the site management benchmark.
+ */
 class MockSiteRepository {
     private sites = new Map<string, Site>();
     private nextId = 1;
@@ -256,6 +268,9 @@ class MockSiteRepository {
     }
 }
 
+/**
+ * Mock event bus used to drive the site management benchmark.
+ */
 class MockEventBus {
     private handlers = new Map<string, Function[]>();
 
@@ -286,6 +301,9 @@ class MockEventBus {
     }
 }
 
+/**
+ * Mock site management service used to drive the site management benchmark.
+ */
 class MockSiteManagementService {
     private repository: MockSiteRepository;
     private eventBus: MockEventBus;
@@ -497,6 +515,9 @@ class MockSiteManagementService {
 }
 
 // Helper functions for creating test data
+/**
+ * Creates site request for the site management benchmark.
+ */
 function createSiteRequest(index: number): SiteCreateRequest {
     return {
         name: `Site ${index}`,
@@ -511,6 +532,9 @@ function createSiteRequest(index: number): SiteCreateRequest {
     };
 }
 
+/**
+ * Creates bulk sites for the site management benchmark.
+ */
 function createBulkSites(count: number): SiteCreateRequest[] {
     return Array.from({ length: count }, (_, i) => createSiteRequest(i + 1));
 }

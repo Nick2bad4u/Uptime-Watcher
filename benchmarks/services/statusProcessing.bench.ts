@@ -1,27 +1,17 @@
 /**
- * Status Processing and Aggregation Performance Benchmarks
+ * Status Processing Benchmarks.
  *
- * @remarks
- * Comprehensive benchmarks for status processing, uptime calculations, SLA
- * compliance detectOutages( entries: StatusEntry[], minimumDuration: number =
- * 60_000, severityThresholds?: { minor: number; major: number } ):
- * OutageEvent[] { this.operationCount++;
+ * @packageDocumentation
  *
- * ```
- *     const thresholds = severityThresholds ?? { minor: 300_000, major: 1_800_000 };ing, outage detection, and statistical aggregation operations
- * ```
- *
- * That form the core of monitoring analytics and reporting functionality.
- *
- * Covers real-time status updates, historical data processing, trend analysis,
- * and complex aggregation operations across multiple time windows and sites.
- *
- * @author Uptime-Watcher Development Team
+ * Exercises status processing benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
 // Core interfaces for status processing
+/**
+ * Represents status entry data in the status processing benchmark.
+ */
 interface StatusEntry {
     timestamp: number;
     status: "up" | "down" | "degraded";
@@ -31,6 +21,9 @@ interface StatusEntry {
     siteId: string;
 }
 
+/**
+ * Represents uptime statistics data in the status processing benchmark.
+ */
 interface UptimeStatistics {
     uptime: number;
     downtime: number;
@@ -43,6 +36,9 @@ interface UptimeStatistics {
     meanTimeBetweenFailures: number;
 }
 
+/**
+ * Represents outage event data in the status processing benchmark.
+ */
 interface OutageEvent {
     start: number;
     end: number;
@@ -52,6 +48,9 @@ interface OutageEvent {
     impactScope: "single" | "multiple" | "site-wide";
 }
 
+/**
+ * Represents slacompliance data in the status processing benchmark.
+ */
 interface SLACompliance {
     compliant: boolean;
     actualUptime: number;
@@ -61,6 +60,9 @@ interface SLACompliance {
     violationCount: number;
 }
 
+/**
+ * Represents time window stats data in the status processing benchmark.
+ */
 interface TimeWindowStats {
     windowStart: number;
     windowEnd: number;
@@ -72,6 +74,9 @@ interface TimeWindowStats {
     uptimePercentage: number;
 }
 
+/**
+ * Represents status aggregation result data in the status processing benchmark.
+ */
 interface StatusAggregationResult {
     siteId: string;
     totalMonitors: number;
@@ -89,6 +94,9 @@ interface StatusAggregationResult {
 }
 
 // Mock status processing service
+/**
+ * Mock status processing service used to drive the status processing benchmark.
+ */
 class MockStatusProcessingService {
     private cache = new Map<string, StatusAggregationResult>();
     private operationCount = 0;
@@ -630,6 +638,9 @@ class MockStatusProcessingService {
 }
 
 // Helper functions for generating test data
+/**
+ * Creates status entries for the status processing benchmark.
+ */
 function generateStatusEntries(
     count: number,
     siteIds: string[],
@@ -680,6 +691,9 @@ function generateStatusEntries(
     return entries.toSorted((a, b) => a.timestamp - b.timestamp);
 }
 
+/**
+ * Creates site ids for the status processing benchmark.
+ */
 function generateSiteIds(count: number): string[] {
     return Array.from({ length: count }, (_, i) => `site-${i + 1}`);
 }

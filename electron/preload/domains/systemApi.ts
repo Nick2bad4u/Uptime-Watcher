@@ -19,7 +19,9 @@ import { ipcRenderer } from "electron";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the system domain API operations
+ * Interface defining the system domain API operations.
+ *
+ * @public
  */
 export interface SystemApiInterface extends SystemDomainBridge {
     /**
@@ -43,7 +45,9 @@ export interface SystemApiInterface extends SystemDomainBridge {
 }
 
 /**
- * System domain API providing system-level operations
+ * System domain API providing system-level operations.
+ *
+ * @public
  */
 export const systemApi: SystemApiInterface = {
     /**
@@ -68,6 +72,11 @@ export const systemApi: SystemApiInterface = {
     },
 } as const;
 
+/**
+ * Public system API surface exposed via the preload bridge.
+ *
+ * @public
+ */
 export interface SystemApi extends SystemDomainBridge {
     readonly quitAndInstall: () => void;
 }

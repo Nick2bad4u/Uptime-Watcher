@@ -17,7 +17,11 @@
 
 import { bench, describe } from "vitest";
 
-// Types for benchmarking
+/**
+ * Synthetic site representation used by heavy-operation benchmarks.
+ *
+ * @internal
+ */
 interface Site {
     identifier: string;
     name: string;
@@ -25,6 +29,11 @@ interface Site {
     monitoring: boolean;
 }
 
+/**
+ * Synthetic monitor structure leveraged by heavy-operation benchmarks.
+ *
+ * @internal
+ */
 interface Monitor {
     id: string;
     type: "http" | "ping" | "port";
@@ -37,12 +46,22 @@ interface Monitor {
     retryAttempts: number;
 }
 
+/**
+ * Synthetic monitor status entry used to simulate uptime history.
+ *
+ * @internal
+ */
 interface StatusEntry {
     timestamp: number;
     status: "up" | "down";
     responseTime: number;
 }
 
+/**
+ * Aggregated uptime metrics derived from status history.
+ *
+ * @internal
+ */
 interface UptimeStats {
     uptime: number;
     downtime: number;
@@ -51,7 +70,14 @@ interface UptimeStats {
     uptimePercentage: number;
 }
 
-// Data generators for realistic benchmarking
+/**
+ * Generates synthetic site data with monitor history for benchmark runs.
+ *
+ * @param count - Number of synthetic sites to create.
+ * @param monitorsPerSite - Number of monitors to attach to each site.
+ *
+ * @returns Array of synthetic {@link Site} entities with populated history.
+ */
 function generateSites(count: number, monitorsPerSite: number): Site[] {
     const sites: Site[] = [];
 
@@ -112,6 +138,13 @@ function generateSites(count: number, monitorsPerSite: number): Site[] {
     return sites;
 }
 
+/**
+ * Generates synthetic monitor status entries to stress-test algorithms.
+ *
+ * @param count - Number of status entries to create.
+ *
+ * @returns Array of {@link StatusEntry} items ordered by timestamp.
+ */
 function generateStatusUpdates(count: number): StatusEntry[] {
     const updates: StatusEntry[] = [];
     const now = Date.now();
@@ -127,7 +160,13 @@ function generateStatusUpdates(count: number): StatusEntry[] {
     return updates;
 }
 
-// Heavy computational operations
+/**
+ * Calculates uptime metrics from status history datasets.
+ *
+ * @param history - Status entries representing monitor execution history.
+ *
+ * @returns Derived {@link UptimeStats} summarizing uptime performance.
+ */
 function calculateUptimeStatistics(history: StatusEntry[]): UptimeStats {
     if (history.length === 0) {
         return {
@@ -167,6 +206,15 @@ function calculateUptimeStatistics(history: StatusEntry[]): UptimeStats {
     };
 }
 
+/**
+ * Filters monitor history by an inclusive timestamp range.
+ *
+ * @param history - Status entries to filter.
+ * @param startTime - Inclusive start timestamp.
+ * @param endTime - Inclusive end timestamp.
+ *
+ * @returns Subset of {@link StatusEntry} values within the range.
+ */
 function filterHistoryByTimeRange(
     history: StatusEntry[],
     startTime: number,
@@ -177,6 +225,13 @@ function filterHistoryByTimeRange(
     );
 }
 
+/**
+ * Aggregates uptime metrics across provided synthetic sites.
+ *
+ * @param sites - Collection of synthetic sites with monitors and history.
+ *
+ * @returns Map of site identifier to computed {@link UptimeStats}.
+ */
 function aggregateSiteStatistics(sites: Site[]): Map<string, UptimeStats> {
     const stats = new Map<string, UptimeStats>();
 
@@ -202,6 +257,14 @@ function aggregateSiteStatistics(sites: Site[]): Map<string, UptimeStats> {
     return stats;
 }
 
+/**
+ * Detects downtime windows exceeding a minimum duration within history.
+ *
+ * @param history - Status history to inspect.
+ * @param minimumDuration - Minimum outage length in milliseconds.
+ *
+ * @returns Array describing outage intervals that meet the threshold.
+ */
 function detectOutages(
     history: StatusEntry[],
     minimumDuration: number = 60_000
@@ -246,6 +309,14 @@ function detectOutages(
     return outages;
 }
 
+/**
+ * Determines whether uptime history complies with an SLA threshold.
+ *
+ * @param history - Status history to evaluate.
+ * @param slaThreshold - Required uptime percentage expressed as 0-100.
+ *
+ * @returns SLA compliance report containing actual and target uptime.
+ */
 function calculateSLACompliance(
     history: StatusEntry[],
     slaThreshold: number

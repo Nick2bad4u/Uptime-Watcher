@@ -26,7 +26,8 @@
  *
  * @packageDocumentation
  *
- * For comprehensive documentation, see docs/Packages/Chart.js/hybrid-type-system.md
+ * For comprehensive documentation see the hybrid type system guide in the
+ * architecture documentation set.
  */
 
 // Import official Chart.js types

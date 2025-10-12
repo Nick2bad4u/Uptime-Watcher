@@ -18,7 +18,9 @@ import type { MonitoringDomainBridge } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the monitoring domain API operations
+ * Interface defining the monitoring domain API operations.
+ *
+ * @public
  */
 export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
@@ -106,7 +108,9 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
 }
 
 /**
- * Monitoring domain API providing all monitoring control operations
+ * Monitoring domain API providing all monitoring control operations.
+ *
+ * @public
  */
 export const monitoringApi: MonitoringApiInterface = {
     /**
@@ -187,6 +191,11 @@ export const monitoringApi: MonitoringApiInterface = {
     validateMonitorData: createTypedInvoker("validate-monitor-data"),
 } as const;
 
+/**
+ * Type alias for the monitoring domain preload bridge.
+ *
+ * @public
+ */
 export type MonitoringApi = MonitoringApiInterface;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

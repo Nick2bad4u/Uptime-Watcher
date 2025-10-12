@@ -1,6 +1,8 @@
 /**
  * Electron test helpers for Playwright tests.
  *
+ * @packageDocumentation
+ *
  * Provides utilities for launching Electron with appropriate configurations for
  * different environments (local development vs CI).
  */

@@ -2,6 +2,8 @@
 /**
  * Aggregates Istanbul coverage collected during Playwright runs and enforces
  * thresholds.
+ *
+ * @packageDocumentation
  */
 
 import { createCoverageMap } from "istanbul-lib-coverage";

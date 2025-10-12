@@ -1,12 +1,19 @@
 /**
- * Performance benchmarks for React component lifecycle operations Tests the
- * performance of component mounting, updating, unmounting, and lifecycle
- * methods
+ * Performance benchmarks for React component lifecycle operations.
+ *
+ * @packageDocumentation
+ *
+ * Emulates mounting, updating, and unmounting flows to analyze lifecycle
+ * overhead and render scheduling behaviour.
  */
 
 import { bench, describe } from "vitest";
 
 // Interface definitions for component lifecycle
+
+/**
+ * Represents component instance state tracked by the benchmark harness.
+ */
 interface ComponentState {
     [key: string]: any;
     isInitialized: boolean;
@@ -15,6 +22,9 @@ interface ComponentState {
     updateQueue: ComponentUpdate[];
 }
 
+/**
+ * Synthetic component props shape used during benchmarking.
+ */
 interface ComponentProps {
     [key: string]: any;
     id: string;
@@ -23,6 +33,9 @@ interface ComponentProps {
     key?: string | number;
 }
 
+/**
+ * Describes a queued update applied to a component instance.
+ */
 interface ComponentUpdate {
     id: string;
     type: "props" | "state" | "force";
@@ -32,6 +45,9 @@ interface ComponentUpdate {
     priority: number;
 }
 
+/**
+ * In-memory representation of a component tree node.
+ */
 interface ComponentInstance {
     id: string;
     type: string;
@@ -49,6 +65,9 @@ interface ComponentInstance {
     refs: Map<string, any>;
 }
 
+/**
+ * Captures hook state registered against a component instance.
+ */
 interface HookState {
     id: string;
     type:
@@ -64,6 +83,9 @@ interface HookState {
     hasChanged: boolean;
 }
 
+/**
+ * Records lifecycle phase metrics emitted during simulation.
+ */
 interface LifecycleMetrics {
     phase: LifecyclePhase;
     componentId: string;
@@ -74,6 +96,7 @@ interface LifecycleMetrics {
     childrenAffected: number;
 }
 
+/** Lifecycle phases emitted during simulation. */
 type LifecyclePhase =
     | "constructing"
     | "mounting"
@@ -84,6 +107,9 @@ type LifecyclePhase =
     | "unmounted"
     | "error";
 
+/**
+ * Aggregates component tree metadata for scheduling and analytics.
+ */
 interface ComponentTree {
     root: ComponentInstance | null;
     componentCount: number;
@@ -94,6 +120,10 @@ interface ComponentTree {
 }
 
 // Mock React-like component lifecycle system
+
+/**
+ * Simulates a React-like component lifecycle manager for benchmarking.
+ */
 class MockComponentLifecycle {
     private componentTree: ComponentTree = {
         root: null,
@@ -109,6 +139,9 @@ class MockComponentLifecycle {
     private pendingEffects: (() => void)[] = [];
 
     // Component creation and mounting
+    /**
+     * Creates a synthetic component instance and attaches it to the tree.
+     */
     createComponent(
         type: string,
         props: ComponentProps,
@@ -145,6 +178,9 @@ class MockComponentLifecycle {
         return component;
     }
 
+    /**
+     * Executes the full mount lifecycle for a component instance.
+     */
     mountComponent(component: ComponentInstance): LifecycleMetrics {
         const startTime = performance.now();
         const startMemory = Math.random() * 1000; // Simulated memory usage
@@ -188,6 +224,9 @@ class MockComponentLifecycle {
         return metrics;
     }
 
+    /**
+     * Runs an update lifecycle including diffing and effect scheduling.
+     */
     updateComponent(
         component: ComponentInstance,
         newProps?: Partial<ComponentProps>,
@@ -254,6 +293,7 @@ class MockComponentLifecycle {
         return metrics;
     }
 
+    /** Executes the unmount lifecycle and cleans up descendants. */
     unmountComponent(component: ComponentInstance): LifecycleMetrics {
         const startTime = performance.now();
         const startMemory = Math.random() * 1000;

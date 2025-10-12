@@ -82,7 +82,9 @@ const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
 };
 
 /**
- * Interface defining the state sync domain API operations
+ * Interface defining the state sync domain API operations.
+ *
+ * @public
  */
 export interface StateSyncApiInterface extends StateSyncDomainBridge {
     /**
@@ -112,7 +114,9 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
 }
 
 /**
- * State sync domain API providing state synchronization operations
+ * State sync domain API providing state synchronization operations.
+ *
+ * @public
  */
 export const stateSyncApi: StateSyncApiInterface = {
     /**
@@ -147,4 +151,9 @@ export const stateSyncApi: StateSyncApiInterface = {
     requestFullSync: createTypedInvoker("request-full-sync"),
 } as const;
 
+/**
+ * Type alias for the state sync domain preload surface.
+ *
+ * @public
+ */
 export type StateSyncApi = StateSyncApiSurface;

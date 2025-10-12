@@ -7,7 +7,8 @@
  *
  * @public
  *
- * @see hybrid-type-system.md for hybrid type strategy.
+ * For background on the hybrid Chart.js type strategy refer to the internal
+ * hybrid type system guide documented alongside the architecture reference.
  */
 
 import type { ChartScalesConfig } from "@shared/types/chartConfig";

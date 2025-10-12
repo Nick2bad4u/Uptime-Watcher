@@ -1,21 +1,17 @@
 /**
- * Monitor Service Management Performance Benchmarks
+ * Monitor Service Management Benchmarks.
  *
- * @remarks
- * Comprehensive benchmarks for monitor service management operations including
- * concurrent monitor checks, service lifecycle management, monitor scheduling,
- * health monitoring, and bulk operations that handle the core monitoring
- * functionality across multiple monitor types and sites.
+ * @packageDocumentation
  *
- * Tests the performance of monitor registration, execution, coordination, and
- * resource management under various load conditions.
- *
- * @author Uptime-Watcher Development Team
+ * Exercises monitor service management benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
 // Core monitor management interfaces (aligned with shared/types.ts)
+/**
+ * Represents monitor data in the monitor service management benchmark.
+ */
 interface Monitor {
     id: string;
     siteId: string;
@@ -34,6 +30,9 @@ interface Monitor {
     metadata: Record<string, unknown>;
 }
 
+/**
+ * Represents monitor check result data in the monitor service management benchmark.
+ */
 interface MonitorCheckResult {
     monitorId: string;
     status: "up" | "down" | "degraded";
@@ -45,6 +44,9 @@ interface MonitorCheckResult {
     success: boolean;
 }
 
+/**
+ * Represents monitor schedule data in the monitor service management benchmark.
+ */
 interface MonitorSchedule {
     monitorId: string;
     nextCheck: number;
@@ -55,6 +57,9 @@ interface MonitorSchedule {
     adaptiveInterval: number;
 }
 
+/**
+ * Represents monitor service metrics data in the monitor service management benchmark.
+ */
 interface MonitorServiceMetrics {
     totalMonitors: number;
     activeMonitors: number;
@@ -73,6 +78,9 @@ interface MonitorServiceMetrics {
     };
 }
 
+/**
+ * Represents health check report data in the monitor service management benchmark.
+ */
 interface HealthCheckReport {
     serviceId: string;
     status: "healthy" | "degraded" | "unhealthy";
@@ -83,6 +91,9 @@ interface HealthCheckReport {
 }
 
 // Mock Monitor Service Management implementation
+/**
+ * Mock monitor service manager used to drive the monitor service management benchmark.
+ */
 class MockMonitorServiceManager {
     private monitors = new Map<string, Monitor>();
     private schedules = new Map<string, MonitorSchedule>();
@@ -692,6 +703,9 @@ class MockMonitorServiceManager {
 }
 
 // Helper functions for generating test data
+/**
+ * Creates monitors for the monitor service management benchmark.
+ */
 function generateMonitors(count: number, siteCount: number = 10): Monitor[] {
     const monitors: Monitor[] = [];
     const types = [

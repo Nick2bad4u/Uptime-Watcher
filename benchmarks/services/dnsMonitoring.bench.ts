@@ -1,21 +1,17 @@
 /**
- * DNS Monitoring Performance Benchmarks
+ * Dns Monitoring Benchmarks.
  *
- * @remarks
- * Comprehensive benchmarks for DNS monitoring operations including resolution
- * performance, retry logic efficiency, bulk DNS operations, and record type
- * processing to identify bottlenecks in DNS monitoring functionality.
+ * @packageDocumentation
  *
- * Covers all DNS record types (A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR,
- * NAPTR, SOA, TLSA, ANY) with varying timeout configurations and retry
- * strategies.
- *
- * @author Uptime-Watcher Development Team
+ * Exercises DNS monitoring benchmark scenarios to measure service throughput and resilience.
  */
 
 import { bench, describe } from "vitest";
 
 // Mock DNS resolution results for consistent benchmarking
+/**
+ * Represents dns result data in the DNS monitoring benchmark.
+ */
 interface MockDnsResult {
     recordType: string;
     host: string;
@@ -24,6 +20,9 @@ interface MockDnsResult {
     success: boolean;
 }
 
+/**
+ * Represents dns check request data in the DNS monitoring benchmark.
+ */
 interface DnsCheckRequest {
     id: string;
     host: string;
@@ -39,6 +38,9 @@ interface DnsCheckRequest {
     };
 }
 
+/**
+ * Represents dns monitor result data in the DNS monitoring benchmark.
+ */
 interface DnsMonitorResult {
     id: string;
     status: "up" | "down";
@@ -50,6 +52,9 @@ interface DnsMonitorResult {
 }
 
 // DNS monitoring service mock implementation
+/**
+ * Mock dns monitoring service used to drive the DNS monitoring benchmark.
+ */
 class MockDnsMonitoringService {
     private cache = new Map<string, MockDnsResult>();
     private operationCount = 0;
@@ -294,6 +299,9 @@ class MockDnsMonitoringService {
 }
 
 // Helper functions for generating test data
+/**
+ * Creates dns check requests for the DNS monitoring benchmark.
+ */
 function generateDnsCheckRequests(
     count: number,
     recordTypes: string[]

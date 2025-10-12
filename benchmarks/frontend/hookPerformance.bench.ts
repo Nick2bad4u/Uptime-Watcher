@@ -1,11 +1,19 @@
 /**
- * Performance benchmarks for React Hook operations Tests the performance of
- * useState, useEffect, useMemo, useCallback, and custom hooks
+ * Performance benchmarks for React hook operations.
+ *
+ * @packageDocumentation
+ *
+ * Exercises synthetic implementations of core and custom hooks to evaluate
+ * render scheduling, memoization, and dependency tracking costs.
  */
 
 import { bench, describe } from "vitest";
 
 // Interface definitions for React Hooks
+
+/**
+ * Captures common bookkeeping data for synthetic hook instances.
+ */
 interface HookState {
     id: string;
     type: HookType;
@@ -19,6 +27,9 @@ interface HookState {
     memoryUsage: number;
 }
 
+/**
+ * Extends {@link HookState} with `useState`-specific metadata.
+ */
 interface UseStateHook extends HookState {
     type: "useState";
     value: [any, (newValue: any) => void];
@@ -26,16 +37,21 @@ interface UseStateHook extends HookState {
     batchedUpdates: any[];
 }
 
+/**
+ * Extends {@link HookState} with `useEffect` execution tracking.
+ */
 interface UseEffectHook extends HookState {
     type: "useEffect";
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    value: () => void | (() => void);
+    value: EffectCallback;
     dependencies: any[];
     cleanup?: () => void;
     hasRun: boolean;
     skipCount: number;
 }
 
+/**
+ * Extends {@link HookState} with memoization-specific metrics.
+ */
 interface UseMemoHook extends HookState {
     type: "useMemo";
     value: any;
@@ -46,6 +62,9 @@ interface UseMemoHook extends HookState {
     computationTime: number;
 }
 
+/**
+ * Extends {@link HookState} with callable memoization metrics.
+ */
 interface UseCallbackHook extends HookState {
     type: "useCallback";
     value: (...args: any[]) => any;
@@ -55,12 +74,18 @@ interface UseCallbackHook extends HookState {
     memoizationHits: number;
 }
 
+/**
+ * Extends {@link HookState} for ref mutation tracking.
+ */
 interface UseRefHook extends HookState {
     type: "useRef";
     value: { current: any };
     mutationCount: number;
 }
 
+/**
+ * Represents custom hook executions composed from internal hooks.
+ */
 interface CustomHookState extends HookState {
     type: "custom";
     name: string;
@@ -69,6 +94,12 @@ interface CustomHookState extends HookState {
     complexity: number;
 }
 
+type EffectCleanup = undefined | (() => void);
+type EffectCallback = () => EffectCleanup;
+
+/**
+ * Enumerates supported hook types tracked by the benchmark.
+ */
 type HookType =
     | "useState"
     | "useEffect"
@@ -77,6 +108,9 @@ type HookType =
     | "useRef"
     | "custom";
 
+/**
+ * Tracks hook execution context for a single synthetic component.
+ */
 interface ComponentHookContext {
     componentId: string;
     hooks: HookState[];
@@ -86,6 +120,9 @@ interface ComponentHookContext {
     memoryFootprint: number;
 }
 
+/**
+ * Aggregated metrics describing hook execution characteristics.
+ */
 interface HookPerformanceMetrics {
     totalHooks: number;
     hookTypeDistribution: Record<HookType, number>;
@@ -97,6 +134,10 @@ interface HookPerformanceMetrics {
 }
 
 // Mock React Hooks system
+
+/**
+ * In-memory simulation of React's hook runtime supporting benchmarking flows.
+ */
 class MockReactHooks {
     private components = new Map<string, ComponentHookContext>();
     private globalHookIndex = 0;
@@ -105,6 +146,13 @@ class MockReactHooks {
     private dependencyComparator = new DependencyComparator();
 
     // Hook registration and execution
+    /**
+     * Registers a component and prepares hook bookkeeping structures.
+     *
+     * @param componentId - Identifier for the synthetic component.
+     *
+     * @returns The initialised component hook context.
+     */
     registerComponent(componentId: string): ComponentHookContext {
         const context: ComponentHookContext = {
             componentId,
@@ -119,11 +167,23 @@ class MockReactHooks {
         return context;
     }
 
+    /**
+     * Sets the component currently executing hooks.
+     *
+     * @param componentId - Identifier bound to subsequent hook calls.
+     */
     setCurrentComponent(componentId: string): void {
         this.currentComponentId = componentId;
     }
 
     // UseState implementation
+    /**
+     * Simulates React's `useState` hook.
+     *
+     * @param initialValue - Initial state value.
+     *
+     * @returns State tuple of value and setter.
+     */
     useState<T>(initialValue: T): [T, (newValue: T) => void] {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -166,6 +226,10 @@ class MockReactHooks {
         return hook.value;
     }
 
+    /**
+     * Updates the stored state for a component hook and schedules re-rendering
+     * when needed.
+     */
     private setStateValue(
         componentId: string,
         hookIndex: number,
@@ -194,8 +258,10 @@ class MockReactHooks {
     }
 
     // UseEffect implementation
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    useEffect(effect: () => void | (() => void), dependencies?: any[]): void {
+    /**
+     * Simulates React's `useEffect` hook.
+     */
+    useEffect(effect: EffectCallback, dependencies?: any[]): void {
         const startTime = performance.now();
         const context = this.getCurrentContext();
         const hookIndex = context.hooks.length;
@@ -263,6 +329,9 @@ class MockReactHooks {
     }
 
     // UseMemo implementation
+    /**
+     * Simulates React's `useMemo` hook.
+     */
     useMemo<T>(computationFunction: () => T, dependencies: any[]): T {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -332,6 +401,9 @@ class MockReactHooks {
     }
 
     // UseCallback implementation
+    /**
+     * Simulates React's `useCallback` hook.
+     */
     useCallback<T extends (...args: any[]) => any>(
         callback: T,
         dependencies: any[]
@@ -392,6 +464,9 @@ class MockReactHooks {
     }
 
     // UseRef implementation
+    /**
+     * Simulates React's `useRef` hook.
+     */
     useRef<T>(initialValue: T): { current: T } {
         const startTime = performance.now();
         const context = this.getCurrentContext();
@@ -426,6 +501,9 @@ class MockReactHooks {
     }
 
     // Custom hook implementation
+    /**
+     * Runs a synthetic custom hook, tracking nested hook usage.
+     */
     useCustomHook(
         name: string,
         hookFunction: () => any,
@@ -481,6 +559,13 @@ class MockReactHooks {
     }
 
     // Component rendering
+    /**
+     * Executes a synthetic render for the specified component.
+     *
+     * @param componentId - Component identifier.
+     *
+     * @returns Simulated render duration in milliseconds.
+     */
     renderComponent(componentId: string): number {
         const startTime = performance.now();
         const context = this.components.get(componentId);
@@ -504,6 +589,9 @@ class MockReactHooks {
         return endTime - startTime;
     }
 
+    /**
+     * Estimates render work based on registered hooks.
+     */
     private simulateRenderWork(context: ComponentHookContext): number {
         // Simulate render work based on hook complexity
         let work = 0;
@@ -545,12 +633,14 @@ class MockReactHooks {
     }
 
     // Dependency comparison and optimization
+    /** Synchronously triggers a render for benchmarking purposes. */
     private scheduleRerender(componentId: string): void {
         // Simulate scheduling a re-render synchronously for benchmarks
         // Using setTimeout(0) can cause hangs in benchmark environment
         this.renderComponent(componentId);
     }
 
+    /** Retrieves the active component context. */
     private getCurrentContext(): ComponentHookContext {
         if (!this.currentComponentId) {
             throw new Error("No current component set");
@@ -564,6 +654,7 @@ class MockReactHooks {
         return context;
     }
 
+    /** Performs a shallow equality comparison used by `useState`. */
     private shallowEqual(a: any, b: any): boolean {
         if (a === b) return true;
         if (
@@ -588,6 +679,7 @@ class MockReactHooks {
     }
 
     // Size calculation utilities
+    /** Approximates the memory footprint of a given value. */
     private calculateValueSize(value: any): number {
         if (value === null || value === undefined) return 0;
         if (typeof value === "boolean") return 1;
@@ -610,6 +702,7 @@ class MockReactHooks {
         return 8; // Default
     }
 
+    /** Estimates effect size including dependency contributions. */
     private calculateEffectSize(
         effect: Function,
         dependencies?: any[]
@@ -624,11 +717,15 @@ class MockReactHooks {
         return size;
     }
 
+    /** Approximates function size for memoization statistics. */
     private calculateFunctionSize(fn: Function): number {
         return fn.toString().length * 2 + 100; // Estimated overhead
     }
 
     // Performance analysis
+    /**
+     * Generates aggregate performance metrics across all components.
+     */
     analyzeHookPerformance(): HookPerformanceMetrics {
         const allHooks: HookState[] = [];
         let totalMemoryUsage = 0;
@@ -727,6 +824,7 @@ class MockReactHooks {
     }
 
     // Cleanup
+    /** Clears all hook state and resets counters. */
     reset(): void {
         this.components.clear();
         this.globalHookIndex = 0;
@@ -736,7 +834,14 @@ class MockReactHooks {
 }
 
 // Dependency comparison utility
+
+/**
+ * Provides helper utilities for dependency array comparison and analysis.
+ */
 class DependencyComparator {
+    /**
+     * Determines whether dependency arrays differ.
+     */
     hasDependenciesChanged(oldDeps: any[], newDeps: any[]): boolean {
         if (oldDeps.length !== newDeps.length) return true;
 
@@ -749,11 +854,17 @@ class DependencyComparator {
         return false;
     }
 
+    /**
+     * Filters dependency arrays by removing unstable placeholders.
+     */
     optimizeDependencies(dependencies: any[]): any[] {
         // Remove undefined and null values
         return dependencies.filter((dep) => dep !== undefined && dep !== null);
     }
 
+    /**
+     * Produces basic stability statistics for dependency arrays.
+     */
     analyzeDependencyStability(dependencies: any[]): {
         stableCount: number;
         unstableCount: number;

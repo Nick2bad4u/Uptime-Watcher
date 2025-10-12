@@ -1,22 +1,15 @@
 /**
- * Background Task Service Performance Benchmarks
+ * Background Task Service Performance Benchmarks.
  *
- * @file Performance benchmarks for background task processing, job queues, and
- *   scheduling.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-BackgroundTasks
- *
- * @tags ["performance", "services", "background-tasks", "jobs", "scheduling"]
+ * Models queuing, scheduling, and retry workflows to measure background task
+ * orchestration costs.
  */
 
 import { bench, describe } from "vitest";
 
+/** Represents a queued background task. */
 interface Task {
     id: string;
     type: string;
@@ -42,6 +35,7 @@ interface Task {
     metadata: Record<string, any>;
 }
 
+/** Captures execution outcomes for tasks. */
 interface TaskResult {
     taskId: string;
     success: boolean;
@@ -51,6 +45,7 @@ interface TaskResult {
     memoryUsage?: number;
 }
 
+/** Describes a worker capable of executing tasks. */
 interface Worker {
     id: string;
     name: string;
@@ -64,6 +59,7 @@ interface Worker {
     currentLoad: number;
 }
 
+/** Aggregated statistics emitted by the task queue. */
 interface QueueStats {
     pending: number;
     running: number;
@@ -75,6 +71,7 @@ interface QueueStats {
     workerUtilization: number;
 }
 
+/** Defines a scheduled job translated into queued tasks. */
 interface ScheduledJob {
     id: string;
     name: string;
@@ -89,6 +86,7 @@ interface ScheduledJob {
     metadata: Record<string, any>;
 }
 
+/** Hooks task types to their execution handlers. */
 interface TaskProcessor {
     type: string;
     handler: (payload: any, context: TaskExecutionContext) => Promise<any>;
@@ -96,6 +94,7 @@ interface TaskProcessor {
     retryPolicy?: RetryPolicy;
 }
 
+/** Context passed to task handlers while executing. */
 interface TaskExecutionContext {
     taskId: string;
     attempt: number;
@@ -104,6 +103,7 @@ interface TaskExecutionContext {
     progress: (percentage: number, message?: string) => void;
 }
 
+/** Configures retries for failed background tasks. */
 interface RetryPolicy {
     maxAttempts: number;
     delay: number;
@@ -111,11 +111,15 @@ interface RetryPolicy {
     maxDelay: number;
 }
 
+/**
+ * In-memory task queue backing the background task benchmarks.
+ */
 class MockTaskQueue {
     private tasks = new Map<string, Task>();
     private results = new Map<string, TaskResult>();
     private nextId = 1;
 
+    /** Enqueues a task with optional scheduling information. */
     async enqueue(
         taskType: string,
         payload: any,
@@ -161,6 +165,7 @@ class MockTaskQueue {
         return taskId;
     }
 
+    /** Retrieves the next eligible task for a worker. */
     async dequeue(workerCapabilities?: string[]): Promise<Task | null> {
         const now = new Date();
 
@@ -202,6 +207,7 @@ class MockTaskQueue {
         return { ...task };
     }
 
+    /** Marks a task as complete and stores its result. */
     async complete(taskId: string, result: any): Promise<void> {
         const task = this.tasks.get(taskId);
         if (!task) return;
@@ -223,6 +229,7 @@ class MockTaskQueue {
         this.tasks.set(taskId, task);
     }
 
+    /** Records a task failure, applying retry policy when eligible. */
     async fail(taskId: string, error: string): Promise<void> {
         const task = this.tasks.get(taskId);
         if (!task) return;
@@ -255,6 +262,7 @@ class MockTaskQueue {
         this.tasks.set(taskId, task);
     }
 
+    /** Cancels a pending task to prevent execution. */
     async cancel(taskId: string): Promise<boolean> {
         const task = this.tasks.get(taskId);
         if (!task || task.status === "running") {
@@ -266,16 +274,19 @@ class MockTaskQueue {
         return true;
     }
 
+    /** Retrieves a task snapshot by identifier. */
     async getTask(taskId: string): Promise<Task | null> {
         const task = this.tasks.get(taskId);
         return task ? { ...task } : null;
     }
 
+    /** Retrieves the execution result for a completed task. */
     async getResult(taskId: string): Promise<TaskResult | null> {
         const result = this.results.get(taskId);
         return result ? { ...result } : null;
     }
 
+    /** Aggregates queue statistics for reporting. */
     async getStats(): Promise<QueueStats> {
         const tasks = Array.from(this.tasks.values());
         const results = Array.from(this.results.values());
@@ -308,6 +319,7 @@ class MockTaskQueue {
         };
     }
 
+    /** Removes completed or failed tasks older than the specified cutoff. */
     async cleanup(olderThan: Date): Promise<number> {
         let cleaned = 0;
         for (const [taskId, task] of this.tasks) {
@@ -323,6 +335,7 @@ class MockTaskQueue {
         return cleaned;
     }
 
+    /** Clears tasks and results for a new benchmark iteration. */
     clear(): void {
         this.tasks.clear();
         this.results.clear();
@@ -334,11 +347,15 @@ class MockTaskQueue {
     }
 }
 
+/**
+ * Simulates worker lifecycle management and load tracking.
+ */
 class MockWorkerPool {
     private workers = new Map<string, Worker>();
     private activeWorkers = new Set<string>();
     private nextId = 1;
 
+    /** Registers a new worker definition. */
     createWorker(
         name: string,
         capabilities: string[],
@@ -361,6 +378,7 @@ class MockWorkerPool {
         return { ...worker };
     }
 
+    /** Activates a worker so it can receive tasks. */
     async startWorker(workerId: string): Promise<boolean> {
         const worker = this.workers.get(workerId);
         if (!worker) return false;
@@ -372,6 +390,7 @@ class MockWorkerPool {
         return true;
     }
 
+    /** Deactivates a worker and clears its load. */
     async stopWorker(workerId: string): Promise<boolean> {
         const worker = this.workers.get(workerId);
         if (!worker) return false;
@@ -384,6 +403,7 @@ class MockWorkerPool {
         return true;
     }
 
+    /** Assigns a task to a worker if capacity allows. */
     async assignTask(workerId: string, taskId: string): Promise<boolean> {
         const worker = this.workers.get(workerId);
         if (
@@ -401,6 +421,7 @@ class MockWorkerPool {
         return true;
     }
 
+    /** Records task completion and updates worker statistics. */
     async completeTask(workerId: string, success: boolean): Promise<void> {
         const worker = this.workers.get(workerId);
         if (!worker) return;
@@ -418,6 +439,7 @@ class MockWorkerPool {
         this.workers.set(workerId, worker);
     }
 
+    /** Returns active workers capable of handling the task type. */
     getAvailableWorkers(taskType?: string): Worker[] {
         return Array.from(this.workers.values()).filter(
             (worker) =>
@@ -427,12 +449,14 @@ class MockWorkerPool {
         );
     }
 
+    /** Returns clones of all registered workers. */
     getAllWorkers(): Worker[] {
         return Array.from(this.workers.values(), (worker) => ({
             ...worker,
         }));
     }
 
+    /** Summarises worker utilisation statistics. */
     getWorkerStats(): any {
         const workers = Array.from(this.workers.values());
         const activeWorkers = workers.filter((w) => w.isActive);
@@ -453,6 +477,7 @@ class MockWorkerPool {
         };
     }
 
+    /** Resets worker registrations and counters. */
     clear(): void {
         this.workers.clear();
         this.activeWorkers.clear();
@@ -460,10 +485,12 @@ class MockWorkerPool {
     }
 }
 
+/** Manages cron-based scheduled jobs for the benchmarks. */
 class MockScheduler {
     private jobs = new Map<string, ScheduledJob>();
     private nextId = 1;
 
+    /** Registers a new scheduled job. */
     createJob(
         name: string,
         cronExpression: string,
@@ -491,6 +518,7 @@ class MockScheduler {
         return { ...job };
     }
 
+    /** Returns active jobs that are due for execution. */
     async getJobsDue(): Promise<ScheduledJob[]> {
         const now = new Date();
         return Array.from(this.jobs.values())
@@ -498,6 +526,7 @@ class MockScheduler {
             .map((job) => ({ ...job }));
     }
 
+    /** Updates a job after execution, tracking success and scheduling next run. */
     async markJobExecuted(jobId: string, success: boolean): Promise<void> {
         const job = this.jobs.get(jobId);
         if (!job) return;
@@ -530,6 +559,7 @@ class MockScheduler {
         return new Date(now + 5 * 60 * 1000); // Default: 5 minutes
     }
 
+    /** Enables a previously disabled job. */
     enableJob(jobId: string): boolean {
         const job = this.jobs.get(jobId);
         if (!job) return false;
@@ -539,6 +569,7 @@ class MockScheduler {
         return true;
     }
 
+    /** Disables a job to prevent future scheduling. */
     disableJob(jobId: string): boolean {
         const job = this.jobs.get(jobId);
         if (!job) return false;
@@ -548,16 +579,21 @@ class MockScheduler {
         return true;
     }
 
+    /** Returns copies of all registered jobs. */
     getAllJobs(): ScheduledJob[] {
         return Array.from(this.jobs.values(), (job) => ({ ...job }));
     }
 
+    /** Clears all scheduled jobs and counters. */
     clear(): void {
         this.jobs.clear();
         this.nextId = 1;
     }
 }
 
+/**
+ * Coordinates queue operations, worker pools, and scheduling for benchmarks.
+ */
 class MockBackgroundTaskService {
     private queue: MockTaskQueue;
     private workerPool: MockWorkerPool;
@@ -572,6 +608,7 @@ class MockBackgroundTaskService {
         this.scheduler = new MockScheduler();
     }
 
+    /** Submits a single task to the queue. */
     async submitTask(
         taskType: string,
         payload: any,
@@ -586,6 +623,7 @@ class MockBackgroundTaskService {
         return await this.queue.enqueue(taskType, payload, options);
     }
 
+    /** Enqueues multiple tasks in one batch. */
     async submitBulkTasks(
         tasks: {
             type: string;
@@ -611,6 +649,7 @@ class MockBackgroundTaskService {
         return taskIds;
     }
 
+    /** Registers a task processor with optional timeout and retry policy. */
     registerProcessor(
         type: string,
         handler: (payload: any, context: TaskExecutionContext) => Promise<any>,
@@ -635,6 +674,7 @@ class MockBackgroundTaskService {
         this.processors.set(type, processor);
     }
 
+    /** Provisions a worker and returns its descriptor. */
     createWorker(
         name: string,
         capabilities: string[],
@@ -643,14 +683,17 @@ class MockBackgroundTaskService {
         return this.workerPool.createWorker(name, capabilities, maxConcurrency);
     }
 
+    /** Starts a worker so it can accept tasks. */
     async startWorker(workerId: string): Promise<boolean> {
         return await this.workerPool.startWorker(workerId);
     }
 
+    /** Stops a worker and clears its assignments. */
     async stopWorker(workerId: string): Promise<boolean> {
         return await this.workerPool.stopWorker(workerId);
     }
 
+    /** Registers a scheduled job that dispatches tasks on a cadence. */
     scheduleJob(
         name: string,
         cronExpression: string,
@@ -667,6 +710,7 @@ class MockBackgroundTaskService {
         );
     }
 
+    /** Starts the processing loop that drains the queue and scheduler. */
     startProcessing(intervalMs: number = 1000): void {
         if (this.processingInterval) {
             this.stopProcessing();
@@ -678,6 +722,7 @@ class MockBackgroundTaskService {
         }, intervalMs);
     }
 
+    /** Stops the processing loop if running. */
     stopProcessing(): void {
         if (this.processingInterval) {
             clearInterval(this.processingInterval);
@@ -744,8 +789,10 @@ class MockBackgroundTaskService {
 
             await this.queue.complete(task.id, result);
             await this.workerPool.completeTask(worker.id, true);
-        } catch (error) {
-            await this.queue.fail(task.id, error.message);
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error ? error.message : String(error);
+            await this.queue.fail(task.id, message);
             await this.workerPool.completeTask(worker.id, false);
         }
     }
@@ -767,31 +814,38 @@ class MockBackgroundTaskService {
         }
     }
 
+    /** Retrieves the latest snapshot of a task. */
     async getTaskStatus(taskId: string): Promise<Task | null> {
         return await this.queue.getTask(taskId);
     }
 
+    /** Retrieves the result payload for a task. */
     async getTaskResult(taskId: string): Promise<TaskResult | null> {
         return await this.queue.getResult(taskId);
     }
 
+    /** Attempts to cancel a pending task. */
     async cancelTask(taskId: string): Promise<boolean> {
         return await this.queue.cancel(taskId);
     }
 
+    /** Returns aggregated queue statistics. */
     async getQueueStats(): Promise<QueueStats> {
         return await this.queue.getStats();
     }
 
+    /** Fetches worker utilisation statistics. */
     async getWorkerStats(): Promise<any> {
         return this.workerPool.getWorkerStats();
     }
 
+    /** Cleans up completed tasks older than the provided window. */
     async cleanupCompletedTasks(olderThanHours: number = 24): Promise<number> {
         const cutoff = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
         return await this.queue.cleanup(cutoff);
     }
 
+    /** Resets queue, worker, and scheduler state. */
     reset(): void {
         this.stopProcessing();
         this.queue.clear();
@@ -803,6 +857,8 @@ class MockBackgroundTaskService {
 }
 
 // Helper functions for creating test data
+
+/** Generates synthetic tasks across the provided types. */
 function createTestTasks(
     count: number,
     types: string[] = [
@@ -834,6 +890,7 @@ function createTestTasks(
     });
 }
 
+/** Creates a mock processor simulating latency and occasional failures. */
 function createMockProcessor(
     type: string,
     processingTime: number = 100

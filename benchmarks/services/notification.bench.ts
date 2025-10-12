@@ -1,22 +1,17 @@
 /**
- * Notification Service Performance Benchmarks
+ * Notification Service Performance Benchmarks.
  *
- * @file Performance benchmarks for notification delivery, queuing, and
- *   management.
+ * @packageDocumentation
  *
- * @author GitHub Copilot
- *
- * @since 2025-08-19
- *
- * @category Performance
- *
- * @benchmark Services-Notification
- *
- * @tags ["performance", "services", "notifications", "alerts", "messaging"]
+ * Exercises synthetic notification queues, channel providers, and delivery
+ * pipelines to assess performance characteristics.
  */
 
 import { bench, describe } from "vitest";
 
+/**
+ * Synthetic notification channel configuration used in benchmarks.
+ */
 interface NotificationChannel {
     id: string;
     type: "email" | "sms" | "slack" | "webhook" | "push" | "in-app";
@@ -30,6 +25,9 @@ interface NotificationChannel {
     };
 }
 
+/**
+ * Template metadata describing notification content and variables.
+ */
 interface NotificationTemplate {
     id: string;
     name: string;
@@ -40,6 +38,9 @@ interface NotificationTemplate {
     metadata: Record<string, any>;
 }
 
+/**
+ * Represents a notification request entering the queue.
+ */
 interface NotificationRequest {
     templateId: string;
     channelIds: string[];
@@ -50,6 +51,9 @@ interface NotificationRequest {
     metadata?: Record<string, any>;
 }
 
+/**
+ * Captures queued notification state tracked by the dispatcher.
+ */
 interface QueuedNotification {
     id: string;
     request: NotificationRequest;
@@ -64,6 +68,9 @@ interface QueuedNotification {
     deliveryReceipts: DeliveryReceipt[];
 }
 
+/**
+ * Delivery receipt emitted by channel providers.
+ */
 interface DeliveryReceipt {
     channelId: string;
     recipient: string;
@@ -73,6 +80,9 @@ interface DeliveryReceipt {
     error?: string;
 }
 
+/**
+ * Aggregated statistics describing queue health.
+ */
 interface NotificationStats {
     total: number;
     sent: number;
@@ -82,11 +92,21 @@ interface NotificationStats {
     byPriority: Record<string, number>;
 }
 
+/**
+ * Simulates a notification queue with prioritised scheduling and retries.
+ */
 class MockNotificationQueue {
     private queue = new Map<string, QueuedNotification>();
     private processing = new Set<string>();
     private nextId = 1;
 
+    /**
+     * Enqueues a notification request and returns its identifier.
+     *
+     * @param request - Notification payload to store.
+     *
+     * @returns Identifier assigned to the queued notification.
+     */
     async enqueue(request: NotificationRequest): Promise<string> {
         const id = `notification-${this.nextId++}`;
         const now = new Date();
@@ -111,6 +131,14 @@ class MockNotificationQueue {
         return id;
     }
 
+    /**
+     * Dequeues the next eligible notification, optionally filtering by
+     * priority.
+     *
+     * @param priority - Optional priority filter (e.g. `urgent`).
+     *
+     * @returns Copy of the queued notification or `null` when none are ready.
+     */
     async dequeue(priority?: string): Promise<QueuedNotification | null> {
         const now = new Date();
 
@@ -150,6 +178,14 @@ class MockNotificationQueue {
         return notification ? { ...notification } : null;
     }
 
+    /**
+     * Marks a notification as completed, updating retry metadata accordingly.
+     *
+     * @param id - Identifier of the notification to update.
+     * @param success - Indicates whether delivery succeeded.
+     * @param receipts - Optional delivery receipts.
+     * @param error - Optional error message when delivery fails.
+     */
     async markComplete(
         id: string,
         success: boolean,
@@ -180,6 +216,12 @@ class MockNotificationQueue {
         this.queue.set(id, notification);
     }
 
+    /**
+     * Updates the status of a queued notification.
+     *
+     * @param id - Identifier of the notification to modify.
+     * @param status - New status value.
+     */
     async updateStatus(
         id: string,
         status: QueuedNotification["status"]
@@ -191,6 +233,11 @@ class MockNotificationQueue {
         }
     }
 
+    /**
+     * Aggregates queue statistics including totals by channel and priority.
+     *
+     * @returns Summary statistics describing the queue.
+     */
     async getStats(): Promise<NotificationStats> {
         const notifications = Array.from(this.queue.values());
 
@@ -235,6 +282,13 @@ class MockNotificationQueue {
         return stats;
     }
 
+    /**
+     * Removes completed notifications older than the supplied timestamp.
+     *
+     * @param olderThan - Cut-off timestamp for cleanup.
+     *
+     * @returns Number of entries removed.
+     */
     async cleanup(olderThan: Date): Promise<number> {
         let cleaned = 0;
         for (const [id, notification] of this.queue) {
@@ -250,16 +304,27 @@ class MockNotificationQueue {
         return cleaned;
     }
 
+    /** Clears all queue state. */
     clear(): void {
         this.queue.clear();
         this.processing.clear();
         this.nextId = 1;
     }
 
+    /**
+     * Returns the total number of queued notifications.
+     *
+     * @returns Queue size.
+     */
     size(): number {
         return this.queue.size;
     }
 
+    /**
+     * Counts notifications pending delivery or awaiting retries.
+     *
+     * @returns Number of pending notifications.
+     */
     getPendingCount(): number {
         return Array.from(this.queue.values()).filter(
             (n) => n.status === "pending" || n.status === "retrying"
@@ -267,6 +332,9 @@ class MockNotificationQueue {
     }
 }
 
+/**
+ * Simulates delivery channels with rate limiting and success modelling.
+ */
 class MockChannelProvider {
     private channels = new Map<string, NotificationChannel>();
     private rateLimitCounters = new Map<
@@ -274,10 +342,21 @@ class MockChannelProvider {
         { minute: number; hour: number; day: number; lastReset: Date }
     >();
 
+    /** Seeds the provider with default channel configurations. */
     constructor() {
         this.initializeDefaultChannels();
     }
 
+    /**
+     * Attempts to send a notification via the requested channel.
+     *
+     * @param channelId - Identifier of the target channel.
+     * @param recipient - Recipient identifier (email, phone, etc.).
+     * @param subject - Notification subject/title.
+     * @param body - Notification body content.
+     *
+     * @returns Delivery receipt describing success or failure.
+     */
     async send(
         channelId: string,
         recipient: string,
@@ -323,6 +402,13 @@ class MockChannelProvider {
         };
     }
 
+    /**
+     * Determines whether the channel has remaining rate-limit capacity.
+     *
+     * @param channelId - Identifier of the channel to evaluate.
+     *
+     * @returns `true` when limits permit another send.
+     */
     private checkRateLimit(channelId: string): boolean {
         const channel = this.channels.get(channelId);
         if (!channel) return false;
@@ -337,6 +423,11 @@ class MockChannelProvider {
         );
     }
 
+    /**
+     * Increments the rate-limit counters for the supplied channel.
+     *
+     * @param channelId - Identifier whose counters should be updated.
+     */
     private updateRateLimitCounters(channelId: string): void {
         const counters = this.getRateLimitCounters(channelId);
         counters.minute++;
@@ -346,6 +437,13 @@ class MockChannelProvider {
         this.rateLimitCounters.set(channelId, counters);
     }
 
+    /**
+     * Retrieves or initialises rate-limit counters for a channel.
+     *
+     * @param channelId - Identifier whose counters are required.
+     *
+     * @returns Mutable counter structure.
+     */
     private getRateLimitCounters(channelId: string): {
         minute: number;
         hour: number;
@@ -374,6 +472,13 @@ class MockChannelProvider {
         return existing;
     }
 
+    /**
+     * Provides per-channel success probabilities.
+     *
+     * @param type - Channel type key.
+     *
+     * @returns Probability of successful delivery.
+     */
     private getChannelSuccessRate(type: string): number {
         const rates = {
             email: 0.95,
@@ -386,6 +491,7 @@ class MockChannelProvider {
         return rates[type] || 0.9;
     }
 
+    /** Registers default channels used during benchmarks. */
     private initializeDefaultChannels(): void {
         const channels = [
             {
@@ -437,29 +543,53 @@ class MockChannelProvider {
         channels.forEach((channel) => this.channels.set(channel.id, channel));
     }
 
+    /**
+     * Retrieves a channel definition by identifier.
+     *
+     * @param id - Channel identifier to look up.
+     *
+     * @returns Channel clone or `null` when absent.
+     */
     getChannel(id: string): NotificationChannel | null {
         const channel = this.channels.get(id);
         return channel ? { ...channel } : null;
     }
 
+    /**
+     * Returns all configured channels.
+     */
     getAllChannels(): NotificationChannel[] {
         return Array.from(this.channels.values(), (channel) => ({
             ...channel,
         }));
     }
 
+    /** Clears channel rate-limit counters. */
     clear(): void {
         this.rateLimitCounters.clear();
     }
 }
 
+/**
+ * Minimal template engine used to substitute variables into notification
+ * payloads.
+ */
 class MockTemplateEngine {
     private templates = new Map<string, NotificationTemplate>();
 
+    /** Seeds the engine with default templates. */
     constructor() {
         this.initializeDefaultTemplates();
     }
 
+    /**
+     * Renders the specified template using the provided variables.
+     *
+     * @param templateId - Identifier of the template to render.
+     * @param variables - Key/value pairs used for substitution.
+     *
+     * @returns Subject and body strings with variables replaced.
+     */
     async render(
         templateId: string,
         variables: Record<string, any>
@@ -485,6 +615,7 @@ class MockTemplateEngine {
         return { subject, body };
     }
 
+    /** Registers default templates consumed by the benchmarks. */
     private initializeDefaultTemplates(): void {
         const templates = [
             {
@@ -556,12 +687,22 @@ class MockTemplateEngine {
         );
     }
 
+    /**
+     * Retrieves a template definition by identifier.
+     *
+     * @param id - Template identifier to resolve.
+     *
+     * @returns Template clone or `null` when missing.
+     */
     getTemplate(id: string): NotificationTemplate | null {
         const template = this.templates.get(id);
         return template ? { ...template } : null;
     }
 }
 
+/**
+ * High-level notification service coordinating queueing and delivery.
+ */
 class MockNotificationService {
     private queue: MockNotificationQueue;
     private channelProvider: MockChannelProvider;
@@ -569,12 +710,20 @@ class MockNotificationService {
     private processingInterval?: NodeJS.Timeout;
     private isProcessing = false;
 
+    /** Builds the service with fresh queue, provider, and template engine. */
     constructor() {
         this.queue = new MockNotificationQueue();
         this.channelProvider = new MockChannelProvider();
         this.templateEngine = new MockTemplateEngine();
     }
 
+    /**
+     * Validates and enqueues a notification for processing.
+     *
+     * @param request - Notification request to queue.
+     *
+     * @returns Identifier assigned to the queued notification.
+     */
     async sendNotification(request: NotificationRequest): Promise<string> {
         // Validate template exists
         const template = this.templateEngine.getTemplate(request.templateId);
@@ -594,6 +743,9 @@ class MockNotificationService {
         return await this.queue.enqueue(request);
     }
 
+    /**
+     * Attempts to enqueue a list of notifications, skipping invalid entries.
+     */
     async sendBulkNotifications(
         requests: NotificationRequest[]
     ): Promise<string[]> {
@@ -611,6 +763,7 @@ class MockNotificationService {
         return results;
     }
 
+    /** Starts the background queue processor with the provided interval. */
     startProcessing(intervalMs: number = 1000): void {
         if (this.processingInterval) {
             this.stopProcessing();
@@ -621,6 +774,7 @@ class MockNotificationService {
         }, intervalMs);
     }
 
+    /** Stops the background queue processor if active. */
     stopProcessing(): void {
         if (this.processingInterval) {
             clearInterval(this.processingInterval);
@@ -628,6 +782,9 @@ class MockNotificationService {
         }
     }
 
+    /**
+     * Processes queued notifications in priority order.
+     */
     async processQueue(): Promise<void> {
         if (this.isProcessing) return;
 
@@ -644,6 +801,12 @@ class MockNotificationService {
         }
     }
 
+    /**
+     * Processes a batch of notifications for the given priority tier.
+     *
+     * @param priority - Priority bucket to target.
+     * @param batchSize - Maximum number of notifications to process.
+     */
     private async processBatch(
         priority: string,
         batchSize: number
@@ -656,6 +819,11 @@ class MockNotificationService {
         }
     }
 
+    /**
+     * Renders the template and dispatches notifications across channels.
+     *
+     * @param notification - Queued notification being processed.
+     */
     private async processNotification(
         notification: QueuedNotification
     ): Promise<void> {
@@ -701,14 +869,31 @@ class MockNotificationService {
         }
     }
 
+    /**
+     * Retrieves current queue statistics.
+     *
+     * @returns Snapshot of queue metrics.
+     */
     async getQueueStats(): Promise<NotificationStats> {
         return await this.queue.getStats();
     }
 
+    /**
+     * Returns the configured delivery channels.
+     *
+     * @returns List of channel configurations.
+     */
     async getChannels(): Promise<NotificationChannel[]> {
         return this.channelProvider.getAllChannels();
     }
 
+    /**
+     * Removes old notifications from the queue.
+     *
+     * @param olderThanDays - Age threshold expressed in days.
+     *
+     * @returns Number of notifications purged.
+     */
     async cleanupOldNotifications(olderThanDays: number = 30): Promise<number> {
         const cutoffDate = new Date(
             Date.now() - olderThanDays * 24 * 60 * 60 * 1000
@@ -716,14 +901,25 @@ class MockNotificationService {
         return await this.queue.cleanup(cutoffDate);
     }
 
+    /**
+     * Returns the number of notifications pending delivery.
+     *
+     * @returns Pending notification count.
+     */
     getPendingCount(): number {
         return this.queue.getPendingCount();
     }
 
+    /**
+     * Returns the total queue size.
+     *
+     * @returns Total queued notification count.
+     */
     getQueueSize(): number {
         return this.queue.size();
     }
 
+    /** Clears queue state and stops background processing. */
     reset(): void {
         this.stopProcessing();
         this.queue.clear();

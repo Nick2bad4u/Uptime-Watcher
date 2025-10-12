@@ -87,11 +87,7 @@ export interface CreateSiteOptions {
     readonly monitorType?: string;
     /** Optional site name; a unique name is generated when omitted. */
     readonly name?: string;
-    /**
-     * ```
-     * /** Optional site URL to associate with the new monitor.
-     * ```
-     */
+    /** Optional site URL to associate with the new monitor. */
     readonly url?: string;
     /** Optional collection of monitor-specific dynamic fields to populate. */
     readonly dynamicFields?: readonly DynamicFieldInput[];
@@ -107,6 +103,13 @@ export interface CreatedSiteResult {
     readonly name: string;
 }
 
+/**
+ * Escapes a string so it can be interpolated into a regular expression.
+ *
+ * @param value - Raw string that may contain special regex tokens.
+ *
+ * @returns Safe pattern fragment with metacharacters escaped.
+ */
 function escapeForRegex(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

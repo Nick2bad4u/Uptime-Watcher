@@ -24,7 +24,13 @@ import type {
     SiteStatus,
 } from "../../shared/types";
 
-// Helper functions for benchmarking (since they don't exist in typeHelpers)
+/**
+ * Performs a deep clone of the provided structure for benchmark datasets.
+ *
+ * @param obj - Object or array to clone.
+ *
+ * @returns Copy of {@link obj} with nested references duplicated.
+ */
 function deepClone<T>(obj: T): T {
     if (obj === null || typeof obj !== "object") return obj;
     if (obj instanceof Date) return new Date(obj) as T;
@@ -39,6 +45,14 @@ function deepClone<T>(obj: T): T {
     return cloned;
 }
 
+/**
+ * Compares two structures deeply to determine semantic equality.
+ *
+ * @param a - First value to compare.
+ * @param b - Second value to compare.
+ *
+ * @returns `true` when the two values match recursively.
+ */
 function deepEquals(a: unknown, b: unknown): boolean {
     if (a === b) return true;
     if (a === null || b === null) return false;
@@ -65,6 +79,14 @@ function deepEquals(a: unknown, b: unknown): boolean {
     return true;
 }
 
+/**
+ * Resolves a deeply nested property via dotted path syntax.
+ *
+ * @param obj - Value to traverse.
+ * @param path - Dot-delimited path such as `foo.bar[0].baz`.
+ *
+ * @returns Nested value when resolved, otherwise `undefined`.
+ */
 function getNestedProperty(obj: unknown, path: string): unknown {
     if (!isRecord(obj)) return undefined;
 
@@ -84,6 +106,14 @@ function getNestedProperty(obj: unknown, path: string): unknown {
     return current;
 }
 
+/**
+ * Recursively merges two object graphs for synthetic test data.
+ *
+ * @param obj1 - Base object receiving merged values.
+ * @param obj2 - Overlay object whose properties replace or extend {@link obj1}.
+ *
+ * @returns New object containing merged properties.
+ */
 function mergeObjects<
     T extends Record<string, unknown>,
     U extends Record<string, unknown>,
@@ -106,6 +136,15 @@ function mergeObjects<
     return result;
 }
 
+/**
+ * Executes an async callback with exponential backoff retries.
+ *
+ * @param fn - Operation that may throw and should be retried.
+ * @param maxRetries - Maximum number of retry attempts before failing.
+ * @param baseDelay - Initial delay in milliseconds before the first retry.
+ *
+ * @returns Result of {@link fn} when it eventually resolves.
+ */
 async function retryWithBackoff<T>(
     fn: () => Promise<T>,
     maxRetries: number,
@@ -132,7 +171,13 @@ async function retryWithBackoff<T>(
     throw lastError!;
 }
 
-// Type guards for MonitorType (since isMonitorType doesn't exist)
+/**
+ * Type guard verifying input values represent supported monitor types.
+ *
+ * @param type - Unknown value to validate.
+ *
+ * @returns `true` when the value is one of the known monitor identifiers.
+ */
 function isMonitorType(type: unknown): type is MonitorType {
     return (
         typeof type === "string" &&

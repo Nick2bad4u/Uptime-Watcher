@@ -1,11 +1,17 @@
 /**
  * Global teardown for Playwright Electron tests.
  *
- * This file runs once after all tests and cleans up the environment.
+ * @packageDocumentation
+ *
+ * Invoked once after the Playwright suite wraps up to ensure Electron
+ * processes spawned during the run are terminated cleanly.
  */
 
 import { execSync } from "node:child_process";
 
+/**
+ * Terminates lingering Electron processes spawned during Playwright runs.
+ */
 async function globalTeardown(): Promise<void> {
     console.log("🧹 Cleaning up after Playwright tests...");
 

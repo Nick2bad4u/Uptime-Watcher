@@ -16,7 +16,9 @@ import type { SettingsDomainBridge } from "@shared/types/preload";
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the settings domain API operations
+ * Interface defining the settings domain API operations.
+ *
+ * @public
  */
 export interface SettingsApiInterface extends SettingsDomainBridge {
     /**
@@ -37,7 +39,9 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
 }
 
 /**
- * Settings domain API providing configuration management operations
+ * Settings domain API providing configuration management operations.
+ *
+ * @public
  */
 export const settingsApi: SettingsApiInterface = {
     /**
@@ -57,6 +61,11 @@ export const settingsApi: SettingsApiInterface = {
     updateHistoryLimit: createTypedInvoker("update-history-limit"),
 } as const;
 
+/**
+ * Type alias for the settings domain preload bridge.
+ *
+ * @public
+ */
 export type SettingsApi = SettingsDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

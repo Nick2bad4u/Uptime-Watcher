@@ -1,5 +1,14 @@
+/**
+ * Repository-specific configuration for Knip dependency analysis.
+ *
+ * @packageDocumentation
+ */
 import type { KnipConfig } from "knip";
 
+/**
+ * Knip configuration that scopes entry points and dependency heuristics to the
+ * Uptime Watcher monorepo layout.
+ */
 const knipConfig: KnipConfig = {
     $schema: "https://unpkg.com/knip@5/schema.json",
     entry: [

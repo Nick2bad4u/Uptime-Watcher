@@ -38,8 +38,19 @@ interface MonitorResult {
     metadata: Record<string, any>;
 }
 
-// Mock monitor implementations
+/**
+ * Simulated HTTP monitor used to benchmark request orchestration.
+ *
+ * @internal
+ */
 class MockHttpMonitor {
+    /**
+     * Fakes an HTTP request according to the supplied configuration.
+     *
+     * @param config - Monitor definition that controls timing and metadata.
+     *
+     * @returns Synthetic monitor result describing the execution outcome.
+     */
     async execute(config: MonitorConfig): Promise<MonitorResult> {
         const startTime = Date.now();
 
@@ -74,7 +85,19 @@ class MockHttpMonitor {
     }
 }
 
+/**
+ * Simulated ICMP monitor used to benchmark ping style workflows.
+ *
+ * @internal
+ */
 class MockPingMonitor {
+    /**
+     * Fakes a ping operation for the configured host.
+     *
+     * @param config - Monitor definition that controls timing and metadata.
+     *
+     * @returns Synthetic monitor result describing the execution outcome.
+     */
     async execute(config: MonitorConfig): Promise<MonitorResult> {
         const startTime = Date.now();
 
@@ -100,7 +123,19 @@ class MockPingMonitor {
     }
 }
 
+/**
+ * Simulated TCP port monitor used to benchmark port availability checks.
+ *
+ * @internal
+ */
 class MockPortMonitor {
+    /**
+     * Fakes a TCP connection attempt for the configured host and port.
+     *
+     * @param config - Monitor definition that controls timing and metadata.
+     *
+     * @returns Synthetic monitor result describing the execution outcome.
+     */
     async execute(config: MonitorConfig): Promise<MonitorResult> {
         const startTime = Date.now();
 
@@ -126,7 +161,19 @@ class MockPortMonitor {
     }
 }
 
+/**
+ * Simulated DNS monitor used to benchmark resolution workflows.
+ *
+ * @internal
+ */
 class MockDnsMonitor {
+    /**
+     * Fakes a DNS resolution for the configured record type.
+     *
+     * @param config - Monitor definition that controls timing and metadata.
+     *
+     * @returns Synthetic monitor result describing the execution outcome.
+     */
     async execute(config: MonitorConfig): Promise<MonitorResult> {
         const startTime = Date.now();
 
@@ -152,7 +199,12 @@ class MockDnsMonitor {
     }
 }
 
-// Main monitor service
+/**
+ * Benchmark-only monitor service that mimics the production orchestration
+ * layer.
+ *
+ * @internal
+ */
 class MockMonitorService {
     private monitors = new Map<string, any>();
     private executors = new Map<string, any>();
@@ -164,6 +216,7 @@ class MockMonitorService {
         this.initializeTestMonitors();
     }
 
+    /** Registers the simulated monitor executors for each type. */
     private initializeExecutors() {
         this.executors.set("http", new MockHttpMonitor());
         this.executors.set("ping", new MockPingMonitor());
@@ -171,6 +224,7 @@ class MockMonitorService {
         this.executors.set("dns", new MockDnsMonitor());
     }
 
+    /** Generates a pool of synthetic monitors used throughout the benchmarks. */
     private initializeTestMonitors() {
         const monitorTypes = [
             "http",
@@ -200,6 +254,9 @@ class MockMonitorService {
         }
     }
 
+    /**
+     * Resolves the target string for a synthetic monitor based on type.
+     */
     private generateTarget(type: string, index: number): string {
         switch (type) {
             case "http": {
@@ -220,6 +277,9 @@ class MockMonitorService {
         }
     }
 
+    /**
+     * Produces a settings payload tailored to the supplied monitor type.
+     */
     private generateSettings(type: string, index: number): Record<string, any> {
         switch (type) {
             case "http": {
@@ -267,6 +327,13 @@ class MockMonitorService {
         }
     }
 
+    /**
+     * Executes a monitor immediately, retrying according to its configuration.
+     *
+     * @param monitorId - Identifier of the simulated monitor to execute.
+     *
+     * @returns Synthetic monitor result after execution or failure.
+     */
     async executeMonitor(monitorId: string): Promise<MonitorResult> {
         const monitor = this.monitors.get(monitorId);
         if (!monitor) {
@@ -321,11 +388,21 @@ class MockMonitorService {
         return failureResult;
     }
 
+    /**
+     * Executes a batch of monitors in parallel.
+     *
+     * @param monitorIds - Collection of monitor identifiers to run.
+     */
     async executeBulkMonitors(monitorIds: string[]): Promise<MonitorResult[]> {
         const promises = monitorIds.map((id) => this.executeMonitor(id));
         return Promise.all(promises);
     }
 
+    /**
+     * Executes all monitors matching the provided type.
+     *
+     * @param type - Monitor type filter (http, ping, port, dns).
+     */
     async executeMonitorsByType(type: string): Promise<MonitorResult[]> {
         const monitorIds = Array.from(this.monitors.values())
             .filter((monitor) => monitor.type === type)
@@ -334,6 +411,11 @@ class MockMonitorService {
         return this.executeBulkMonitors(monitorIds);
     }
 
+    /**
+     * Schedules a monitor for repeated execution using `setInterval`.
+     *
+     * @param monitorId - Identifier of the monitor to schedule.
+     */
     scheduleMonitor(monitorId: string): void {
         const monitor = this.monitors.get(monitorId);
         if (!monitor) return;
@@ -359,6 +441,9 @@ class MockMonitorService {
         this.schedules.set(monitorId, intervalId);
     }
 
+    /**
+     * Cancels any active interval for the supplied monitor.
+     */
     unscheduleMonitor(monitorId: string): void {
         const intervalId = this.schedules.get(monitorId);
         if (intervalId) {
@@ -367,11 +452,22 @@ class MockMonitorService {
         }
     }
 
+    /**
+     * Returns the most recent monitor results limited to the requested count.
+     *
+     * @param monitorId - Monitor identifier whose results should be returned.
+     * @param limit - Maximum number of results to surface.
+     */
     getMonitorResults(monitorId: string, limit: number = 100): MonitorResult[] {
         const results = this.results.get(monitorId) || [];
         return results.slice(-limit).toReversed();
     }
 
+    /**
+     * Aggregates summary statistics for a monitor.
+     *
+     * @param monitorId - Monitor identifier whose statistics should be derived.
+     */
     getMonitorStats(monitorId: string): any {
         const results = this.results.get(monitorId) || [];
         if (results.length === 0) return null;
@@ -396,6 +492,9 @@ class MockMonitorService {
         };
     }
 
+    /**
+     * Builds a snapshot of statistics for every registered monitor.
+     */
     getAllMonitorStats(): Record<string, any> {
         const stats: Record<string, any> = {};
         for (const monitorId of this.monitors.keys()) {
@@ -404,6 +503,9 @@ class MockMonitorService {
         return stats;
     }
 
+    /**
+     * Derives system-wide metrics spanning all executed monitor runs.
+     */
     getSystemMetrics(): any {
         const allResults = Array.from(this.results.values()).flat();
         const successfulResults = allResults.filter((r) => r.success);
@@ -429,6 +531,11 @@ class MockMonitorService {
         };
     }
 
+    /**
+     * Purges historical results older than the configured retention window.
+     *
+     * @param retentionDays - Number of days of history to retain.
+     */
     cleanupOldResults(retentionDays: number = 30): number {
         const cutoff = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
         let cleaned = 0;
@@ -443,6 +550,7 @@ class MockMonitorService {
         return cleaned;
     }
 
+    /** Temporarily disables a monitor and clears any active schedule. */
     pauseMonitor(monitorId: string): void {
         this.unscheduleMonitor(monitorId);
         const monitor = this.monitors.get(monitorId);
@@ -451,6 +559,7 @@ class MockMonitorService {
         }
     }
 
+    /** Re-enables a paused monitor and re-establishes its schedule. */
     resumeMonitor(monitorId: string): void {
         const monitor = this.monitors.get(monitorId);
         if (monitor) {
@@ -459,6 +568,9 @@ class MockMonitorService {
         }
     }
 
+    /**
+     * Applies partial configuration updates and refreshes scheduling as needed.
+     */
     updateMonitorConfig(
         monitorId: string,
         updates: Partial<MonitorConfig>
@@ -475,6 +587,7 @@ class MockMonitorService {
         }
     }
 
+    /** Clears all scheduled monitors and resets interval handles. */
     shutdown(): void {
         // Clear all scheduled monitors
         for (const intervalId of this.schedules.values()) {
