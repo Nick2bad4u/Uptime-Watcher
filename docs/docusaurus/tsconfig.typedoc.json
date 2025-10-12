@@ -3,6 +3,7 @@
     "compilerOptions": {
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
+        "baseUrl": "../../",
         "checkJs": false,
         "declaration": true,
         "declarationDir": ".cache/builds/docusaurus/typedoc/types",
@@ -36,6 +37,9 @@
             "@app/*": [
                 "../../src/*"
             ],
+            "@assets/*": [
+                "../../assets/*"
+            ],
             "@electron/*": [
                 "../../electron/*"
             ],
@@ -48,7 +52,10 @@
         "sourceMap": true,
         "strict": true,
         "target": "ESNext",
-        "tsBuildInfoFile": "../../.cache/typedoc.tsbuildinfo"
+        "tsBuildInfoFile": "../../.cache/typedoc.tsbuildinfo",
+        "types": [
+            "vite/client"
+        ]
     },
     "exclude": [
         "../../node_modules/**",
