@@ -19,14 +19,16 @@ import {
 import validator from "validator";
 
 /**
- * Validates monitor type.
+ * Determines whether a value matches a supported monitor type.
  *
  * @remarks
- * Supports all monitor types: HTTP, port, ping, and DNS monitors.
+ * Valid monitor types are sourced from {@link BASE_MONITOR_TYPES}, covering all
+ * HTTP, port, ping, DNS, and extended monitor categories available in the
+ * platform.
  *
- * @param type - Value to check as monitor type
+ * @param type - Value to evaluate as a monitor type.
  *
- * @returns Type predicate indicating if the value is a valid MonitorType
+ * @returns `true` when the value is a member of {@link MonitorType}.
  */
 export function validateMonitorType(type: unknown): type is MonitorType {
     return (
@@ -36,26 +38,28 @@ export function validateMonitorType(type: unknown): type is MonitorType {
 }
 
 /**
- * Type guard to check if a value is a partial monitor object.
+ * Determines whether a value resembles a {@link Monitor} object without
+ * enforcing required fields.
  *
- * @param value - Value to check
+ * @param value - Arbitrary value supplied for validation.
  *
- * @returns Type predicate indicating if the value could be a partial monitor
+ * @returns `true` when the value is a non-null object.
+ *
+ * @internal
  */
 function isPartialMonitor(value: unknown): value is Partial<Monitor> {
     return typeof value === "object" && value !== null;
 }
 
 /**
- * Validates basic required monitor fields.
+ * Validates base monitor metadata shared across all monitor types.
  *
  * @remarks
- * Checks for required fields such as id, type, and status, and validates their
- * types. Adds error messages to the provided errors array for any missing or
- * invalid fields.
+ * Ensures identifiers, monitor type, and status are present alongside numeric
+ * guardrails for interval, timeout, and retry configuration.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -110,14 +114,14 @@ function validateBasicMonitorFields(
 }
 
 /**
- * Validates HTTP monitor-specific fields.
+ * Validates common HTTP monitor requirements.
  *
  * @remarks
- * Checks that the url field is present and a string. Adds an error message if
- * missing or invalid.
+ * Confirms HTTP monitors declare a URL string; additional HTTP variants layer
+ * on top of this base validation.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -131,15 +135,14 @@ function validateHttpMonitorFields(
 }
 
 /**
- * Validates HTTP keyword monitor-specific fields.
+ * Validates keyword-driven HTTP monitor requirements.
  *
  * @remarks
- * Checks that the url and bodyKeyword fields are present and valid. The
- * bodyKeyword field must be a non-empty string. Adds error messages for any
- * missing or invalid fields.
+ * Builds on {@link validateHttpMonitorFields} by ensuring the expected keyword
+ * is supplied and non-empty.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -156,7 +159,15 @@ function validateHttpKeywordMonitorFields(
 }
 
 /**
- * Validates HTTP header monitor-specific fields.
+ * Validates header inspection requirements for HTTP monitors.
+ *
+ * @remarks
+ * Ensures both the header name and expected value are supplied and non-empty.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateHttpHeaderMonitorFields(
     monitor: Partial<Monitor>,
@@ -183,15 +194,14 @@ function validateHttpHeaderMonitorFields(
 }
 
 /**
- * Validates HTTP status monitor-specific fields.
+ * Validates HTTP status monitor configuration.
  *
  * @remarks
- * Checks that the url field is present and a string, and that the
- * expectedStatusCode is a number between 100 and 599. Adds error messages for
- * any missing or invalid fields.
+ * Requires a numeric status code between 100 and 599 in addition to standard
+ * HTTP monitor fields.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -214,7 +224,16 @@ function validateHttpStatusMonitorFields(
 }
 
 /**
- * Validates HTTP JSON monitor-specific fields.
+ * Validates HTTP JSON monitor configuration.
+ *
+ * @remarks
+ * Ensures both the JSON path selector and expected value are provided and
+ * non-empty, layering on top of base HTTP requirements.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateHttpJsonMonitorFields(
     monitor: Partial<Monitor>,
@@ -239,7 +258,16 @@ function validateHttpJsonMonitorFields(
 }
 
 /**
- * Validates HTTP latency monitor-specific fields.
+ * Validates HTTP latency monitor thresholds.
+ *
+ * @remarks
+ * Confirms the maximum response time is declared and positive, in addition to
+ * the shared HTTP monitor requirements.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateHttpLatencyMonitorFields(
     monitor: Partial<Monitor>,
@@ -265,14 +293,14 @@ function validateHttpLatencyMonitorFields(
 }
 
 /**
- * Validates ping monitor-specific fields.
+ * Validates ping monitor configuration.
  *
  * @remarks
- * Checks that the host field is present and a string. Ping monitors only
- * require a host field, unlike port monitors which also require a port number.
+ * Ping monitors simply require a hostname, unlike port monitors which add
+ * numeric constraints.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -286,15 +314,14 @@ function validatePingMonitorFields(
 }
 
 /**
- * Validates port monitor-specific fields.
+ * Validates TCP port monitor configuration.
  *
  * @remarks
- * Checks that the host field is present and a string, and that the port is a
- * valid number in the range 1-65535. Adds error messages for any missing or
- * invalid fields.
+ * Builds on {@link validatePingMonitorFields} by ensuring the port number falls
+ * within the range 1-65,535.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -318,15 +345,13 @@ function validatePortMonitorFields(
 }
 
 /**
- * Validates DNS monitor-specific fields.
+ * Validates DNS monitor configuration.
  *
  * @remarks
- * Checks that the hostname field is present and a string, and that recordType
- * is a valid DNS record type. DNS monitors require hostname (not host) and
- * recordType fields for proper DNS resolution.
+ * Requires a hostname and known DNS record type prior to executing lookups.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -366,13 +391,14 @@ function validateDnsMonitorFields(
 }
 
 /**
- * Validates SSL monitor-specific fields.
+ * Validates SSL monitor configuration.
  *
  * @remarks
- * Ensures host, port, and certificate warning threshold are valid.
+ * Confirms host connectivity details and certificate warning thresholds fall
+ * within supported bounds.
  *
- * @param monitor - Partial monitor object to validate.
- * @param errors - Array to collect validation error messages.
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
  *
  * @internal
  */
@@ -404,9 +430,16 @@ function validateSslMonitorFields(
 }
 
 /**
- * Validates CDN edge consistency monitor fields.
+ * Validates CDN edge consistency monitor configuration.
  *
- * Adds error messages for missing baseline URL or invalid edge locations.
+ * @remarks
+ * Ensures a baseline URL is provided and that every listed edge endpoint is a
+ * valid HTTP or HTTPS URL. Entries may be separated by commas or newlines.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateCdnEdgeConsistencyMonitorFields(
     monitor: Partial<Monitor>,
@@ -456,9 +489,16 @@ function validateCdnEdgeConsistencyMonitorFields(
 }
 
 /**
- * Validates replication monitor fields.
+ * Validates replication monitor configuration.
  *
- * Ensures both endpoints, timestamp field, and lag threshold are present.
+ * @remarks
+ * Requires primary and replica endpoints alongside replication lag thresholds
+ * and timestamp metadata field names.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateReplicationMonitorFields(
     monitor: Partial<Monitor>,
@@ -500,9 +540,16 @@ function validateReplicationMonitorFields(
 }
 
 /**
- * Validates server heartbeat monitor fields.
+ * Validates server heartbeat monitor configuration.
  *
- * Checks expected status, drift tolerance, and JSON path fields.
+ * @remarks
+ * Confirms the expected status, acceptable drift tolerance, and JSON path
+ * selectors used to locate heartbeat information in responses.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateServerHeartbeatMonitorFields(
     monitor: Partial<Monitor>,
@@ -552,9 +599,16 @@ function validateServerHeartbeatMonitorFields(
 }
 
 /**
- * Validates WebSocket keepalive monitor fields.
+ * Validates WebSocket keepalive monitor configuration.
  *
- * Confirms URL presence and positive pong delay threshold.
+ * @remarks
+ * Requires a WebSocket URL and positive pong delay threshold to ensure the
+ * monitor detects stalled connections.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
  */
 function validateWebsocketKeepaliveMonitorFields(
     monitor: Partial<Monitor>,
@@ -575,6 +629,19 @@ function validateWebsocketKeepaliveMonitorFields(
     }
 }
 
+/**
+ * Applies monitor-type-specific validation routines.
+ *
+ * @remarks
+ * Delegates to individual validation helpers based on the monitor `type`. When
+ * the type is unrecognized, an error entry is appended. The function assumes
+ * core monitor fields have already been validated.
+ *
+ * @param monitor - Partial monitor under validation.
+ * @param errors - Collector populated with descriptive validation messages.
+ *
+ * @internal
+ */
 function validateTypeSpecificFields(
     monitor: Partial<Monitor>,
     errors: string[]
@@ -648,15 +715,15 @@ function validateTypeSpecificFields(
 }
 
 /**
- * Gets validation errors for monitor fields based on monitor type.
+ * Computes validation errors for a monitor payload.
  *
  * @remarks
- * Validates required fields and type-specific constraints for monitors. Returns
- * descriptive error messages for any validation failures.
+ * Invokes shared and type-specific validators to produce a deterministic list
+ * of error messages. The function never throws and always returns an array.
  *
- * @param monitor - Partial monitor data to validate
+ * @param monitor - Partial monitor data submitted for validation.
  *
- * @returns Array of validation error messages (empty if valid)
+ * @returns An array of human-readable error messages (empty when valid).
  */
 export function getMonitorValidationErrors(
     monitor: Partial<Monitor>
@@ -673,15 +740,16 @@ export function getMonitorValidationErrors(
 }
 
 /**
- * Validates site data structure.
+ * Determines whether a partial site payload satisfies the {@link Site} contract.
  *
  * @remarks
- * Performs comprehensive validation of site structure including all monitors.
- * Uses proper type guards to ensure runtime safety.
+ * Validates required site fields and executes monitor-level validation using
+ * {@link validateMonitor}. The guard is intentionally defensive to handle
+ * user-supplied data.
  *
- * @param site - Partial site data to validate
+ * @param site - Partial site data under validation.
  *
- * @returns Type predicate indicating if the site is valid
+ * @returns `true` when the payload represents a well-formed {@link Site}.
  */
 export function validateSite(site: Partial<Site>): site is Site {
     // Defensive null/undefined check is necessary for runtime safety with user input

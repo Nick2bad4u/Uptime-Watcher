@@ -1,21 +1,22 @@
 /**
- * Client-side monitor type suffix formatters. This provides dynamic suffix
- * generation for monitor types in the frontend.
+ * Client-side monitor type suffix formatters used for dynamic suffix generation
+ * in the frontend.
+ *
+ * @public
  */
 
 // Import shared Monitor type from shared validation schemas
 import type { Monitor } from "@shared/types";
 
 /**
- * Type for monitor title suffix formatter functions
+ * Type for monitor title suffix formatter functions.
  *
- * @param monitor - Monitor object to generate suffix for
+ * @param monitor - Monitor object to generate suffix for.
  *
- * @returns Formatted suffix string for display
+ * @returns Formatted suffix string for display.
  *
  * @public
  */
-
 export type TitleSuffixFormatter = (monitor: Monitor) => string;
 
 /**
@@ -76,15 +77,15 @@ const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
 };
 
 /**
- * Get title suffix formatter for a monitor type
+ * Get title suffix formatter for a monitor type.
  *
  * @remarks
- * Used internally by formatTitleSuffix to retrieve the appropriate formatter
- * function for a given monitor type.
+ * Used internally by {@link formatTitleSuffix} to retrieve the appropriate
+ * formatter function for a given monitor type.
  *
- * @param monitorType - Type of monitor to get formatter for
+ * @param monitorType - Type of monitor to get formatter for.
  *
- * @returns Formatter function if available, undefined otherwise
+ * @returns Formatter function when available; otherwise `undefined`.
  *
  * @public
  */
@@ -97,15 +98,16 @@ export function getTitleSuffixFormatter(
 }
 
 /**
- * Format title suffix for a monitor dynamically
+ * Format title suffix for a monitor dynamically.
  *
  * @remarks
  * Uses the monitor type to find an appropriate formatter and generate a
  * descriptive suffix for display purposes (e.g., URL for HTTP monitors).
  *
- * @param monitor - Monitor object to generate suffix for
+ * @param monitor - Monitor object to generate suffix for.
  *
- * @returns Formatted suffix string, or empty string if no formatter available
+ * @returns Formatted suffix string, or empty string when no formatter is
+ *   available.
  *
  * @public
  */
@@ -140,7 +142,9 @@ export function formatTitleSuffix(monitor: Monitor): string {
  *
  * @param monitorType - The monitor type identifier to register formatter for
  * @param formatter - The formatter function that takes a monitor and returns a
- *   suffix string
+ *   suffix string.
+ *
+ * @public
  */
 export function registerTitleSuffixFormatter(
     monitorType: string,

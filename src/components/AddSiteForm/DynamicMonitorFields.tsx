@@ -51,7 +51,8 @@ export interface DynamicMonitorFieldsProperties {
  * from backend.
  *
  * @remarks
- * - Fetches monitor type configuration using {@link getMonitorTypeConfig}.
+ * - Fetches monitor type configuration using `getMonitorTypeConfig` from
+ *   `monitorTypeHelper`.
  * - Displays loading and error states as appropriate.
  * - For each field in the configuration, renders a {@link DynamicField}.
  * - If a field's onChange handler is missing, logs an error.

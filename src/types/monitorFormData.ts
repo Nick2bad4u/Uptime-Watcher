@@ -2,20 +2,18 @@
  * Type definitions for monitor form data interfaces.
  *
  * @remarks
- * Provides type-safe interfaces for form handling and validation. form handling
- * and validation.
- * @remarks
- * These interfaces define the structure of form data used throughout the
- * application for creating and editing monitors. They help avoid index
- * signature access issues while maintaining type safety for form operations.
+ * Provides structured types that power renderer monitor forms, replacing loose
+ * index signatures with explicit shapes while preserving runtime flexibility.
  *
- * @packageDocumentation
+ * @public
  */
 
 import type { SetOptional, Simplify, UnknownRecord } from "type-fest";
 
 /**
  * Base form data interface with common properties.
+ *
+ * @public
  */
 export interface BaseFormData {
     /** Monitor check interval in milliseconds */
@@ -31,8 +29,13 @@ export interface BaseFormData {
 }
 
 /**
- * Dynamic form data for extensible monitor types. Used when monitor type is not
- * known at compile time.
+ * Dynamic form data for extensible monitor types.
+ *
+ * @remarks
+ * Used when the monitor type is not known at compile time but the renderer
+ * still wants autocomplete for shared primitives.
+ *
+ * @public
  */
 export interface DynamicFormData extends UnknownRecord {
     /** Monitor check interval in milliseconds */
@@ -49,6 +52,8 @@ export interface DynamicFormData extends UnknownRecord {
 
 /**
  * Form data for HTTP monitors.
+ *
+ * @public
  */
 export interface HttpFormData extends BaseFormData {
     type: "http";
@@ -58,6 +63,8 @@ export interface HttpFormData extends BaseFormData {
 
 /**
  * Form data for HTTP keyword monitors.
+ *
+ * @public
  */
 export interface HttpKeywordFormData extends BaseFormData {
     /** Keyword that must appear in the response body */
@@ -69,6 +76,8 @@ export interface HttpKeywordFormData extends BaseFormData {
 
 /**
  * Form data for HTTP header monitors.
+ *
+ * @public
  */
 export interface HttpHeaderFormData extends BaseFormData {
     /** Expected value for the specified response header */
@@ -82,6 +91,8 @@ export interface HttpHeaderFormData extends BaseFormData {
 
 /**
  * Form data for HTTP JSON monitors.
+ *
+ * @public
  */
 export interface HttpJsonFormData extends BaseFormData {
     /** Expected value at the JSON path */
@@ -95,6 +106,8 @@ export interface HttpJsonFormData extends BaseFormData {
 
 /**
  * Form data for HTTP status monitors.
+ *
+ * @public
  */
 export interface HttpStatusFormData extends BaseFormData {
     /** Expected HTTP status code */
@@ -106,6 +119,8 @@ export interface HttpStatusFormData extends BaseFormData {
 
 /**
  * Form data for HTTP latency monitors.
+ *
+ * @public
  */
 export interface HttpLatencyFormData extends BaseFormData {
     /** Maximum acceptable response time in milliseconds */
@@ -117,6 +132,8 @@ export interface HttpLatencyFormData extends BaseFormData {
 
 /**
  * Form data for ping monitors.
+ *
+ * @public
  */
 export interface PingFormData extends BaseFormData {
     /** Target host to ping */
@@ -126,6 +143,8 @@ export interface PingFormData extends BaseFormData {
 
 /**
  * Form data for port monitors.
+ *
+ * @public
  */
 export interface PortFormData extends BaseFormData {
     /** Target host to monitor */
@@ -137,6 +156,8 @@ export interface PortFormData extends BaseFormData {
 
 /**
  * Form data for DNS monitors.
+ *
+ * @public
  */
 export interface DnsFormData extends BaseFormData {
     /** Expected value for DNS record (optional) */
@@ -150,6 +171,8 @@ export interface DnsFormData extends BaseFormData {
 
 /**
  * Form data for SSL certificate monitors.
+ *
+ * @public
  */
 export interface SslFormData extends BaseFormData {
     /** Warning threshold in days before certificate expiry */
@@ -163,6 +186,8 @@ export interface SslFormData extends BaseFormData {
 
 /**
  * Form data for CDN edge consistency monitors.
+ *
+ * @public
  */
 export interface CdnEdgeConsistencyFormData extends BaseFormData {
     /** Origin baseline URL used for comparison */
@@ -174,6 +199,8 @@ export interface CdnEdgeConsistencyFormData extends BaseFormData {
 
 /**
  * Form data for replication monitors.
+ *
+ * @public
  */
 export interface ReplicationFormData extends BaseFormData {
     /** Maximum acceptable replication lag in seconds */
@@ -189,6 +216,8 @@ export interface ReplicationFormData extends BaseFormData {
 
 /**
  * Form data for server heartbeat monitors.
+ *
+ * @public
  */
 export interface ServerHeartbeatFormData extends BaseFormData {
     /** Expected status string reported by the heartbeat */
@@ -206,6 +235,8 @@ export interface ServerHeartbeatFormData extends BaseFormData {
 
 /**
  * Form data for WebSocket keepalive monitors.
+ *
+ * @public
  */
 export interface WebsocketKeepaliveFormData extends BaseFormData {
     /** Maximum allowed pong delay in milliseconds */
@@ -216,8 +247,12 @@ export interface WebsocketKeepaliveFormData extends BaseFormData {
 }
 
 /**
- * Union type for all supported monitor form data types. Simplified for better
- * IntelliSense display.
+ * Union type for all supported monitor form data types.
+ *
+ * @remarks
+ * Simplified to flatten nested intersections for improved IntelliSense output.
+ *
+ * @public
  */
 export type MonitorFormData = Simplify<
     | CdnEdgeConsistencyFormData
@@ -260,6 +295,8 @@ type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
  * @param type - Monitor type
  *
  * @returns Default form data for the specified type
+ *
+ * @public
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
 export function createDefaultFormData(
@@ -320,9 +357,11 @@ export function createDefaultFormData(
 /**
  * Type guard to check if form data is for HTTP monitor.
  *
- * @param data - Form data to check
+ * @param data - Form data to check.
  *
- * @returns True if data is HTTP form data
+ * @returns `true` if data satisfies the {@link HttpFormData} contract.
+ *
+ * @public
  */
 export function isHttpFormData(
     data: Partial<MonitorFormData>
@@ -336,6 +375,12 @@ export function isHttpFormData(
 
 /**
  * Type guard to check if form data is for HTTP header monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link HttpHeaderFormData} contract.
+ *
+ * @public
  */
 export function isHttpHeaderFormData(
     data: Partial<MonitorFormData>
@@ -353,6 +398,12 @@ export function isHttpHeaderFormData(
 
 /**
  * Type guard to check if form data is for HTTP JSON monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link HttpJsonFormData} contract.
+ *
+ * @public
  */
 export function isHttpJsonFormData(
     data: Partial<MonitorFormData>
@@ -370,6 +421,12 @@ export function isHttpJsonFormData(
 
 /**
  * Type guard to check if form data is for HTTP keyword monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link HttpKeywordFormData} contract.
+ *
+ * @public
  */
 export function isHttpKeywordFormData(
     data: Partial<MonitorFormData>
@@ -385,6 +442,12 @@ export function isHttpKeywordFormData(
 
 /**
  * Type guard to check if form data is for HTTP status monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link HttpStatusFormData} contract.
+ *
+ * @public
  */
 export function isHttpStatusFormData(
     data: Partial<MonitorFormData>
@@ -402,6 +465,12 @@ export function isHttpStatusFormData(
 
 /**
  * Type guard to check if form data is for HTTP latency monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link HttpLatencyFormData} contract.
+ *
+ * @public
  */
 export function isHttpLatencyFormData(
     data: Partial<MonitorFormData>
@@ -419,9 +488,11 @@ export function isHttpLatencyFormData(
 /**
  * Type guard to check if form data is for DNS monitor.
  *
- * @param data - Form data to check
+ * @param data - Form data to check.
  *
- * @returns True if data is DNS form data
+ * @returns `true` if data satisfies the {@link DnsFormData} contract.
+ *
+ * @public
  */
 export function isDnsFormData(
     data: Partial<MonitorFormData>
@@ -438,9 +509,11 @@ export function isDnsFormData(
 /**
  * Type guard to check if form data is for ping monitor.
  *
- * @param data - Form data to check
+ * @param data - Form data to check.
  *
- * @returns True if data is ping form data
+ * @returns `true` if data satisfies the {@link PingFormData} contract.
+ *
+ * @public
  */
 export function isPingFormData(
     data: Partial<MonitorFormData>
@@ -455,9 +528,11 @@ export function isPingFormData(
 /**
  * Type guard to check if form data is for port monitor.
  *
- * @param data - Form data to check
+ * @param data - Form data to check.
  *
- * @returns True if data is port form data
+ * @returns `true` if data satisfies the {@link PortFormData} contract.
+ *
+ * @public
  */
 export function isPortFormData(
     data: Partial<MonitorFormData>
@@ -475,9 +550,11 @@ export function isPortFormData(
 /**
  * Type guard to check if form data is for SSL monitor.
  *
- * @param data - Form data to check
+ * @param data - Form data to check.
  *
- * @returns True if data is SSL form data
+ * @returns `true` if data satisfies the {@link SslFormData} contract.
+ *
+ * @public
  */
 export function isSslFormData(
     data: Partial<MonitorFormData>
@@ -497,6 +574,13 @@ export function isSslFormData(
 
 /**
  * Type guard to check if form data is for CDN edge consistency monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link CdnEdgeConsistencyFormData}
+ *   contract.
+ *
+ * @public
  */
 export function isCdnEdgeConsistencyFormData(
     data: Partial<MonitorFormData>
@@ -512,6 +596,12 @@ export function isCdnEdgeConsistencyFormData(
 
 /**
  * Type guard to check if form data is for replication monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link ReplicationFormData} contract.
+ *
+ * @public
  */
 export function isReplicationFormData(
     data: Partial<MonitorFormData>
@@ -531,6 +621,13 @@ export function isReplicationFormData(
 
 /**
  * Type guard to check if form data is for server heartbeat monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link ServerHeartbeatFormData}
+ *   contract.
+ *
+ * @public
  */
 export function isServerHeartbeatFormData(
     data: Partial<MonitorFormData>
@@ -552,6 +649,13 @@ export function isServerHeartbeatFormData(
 
 /**
  * Type guard to check if form data is for WebSocket keepalive monitor.
+ *
+ * @param data - Form data to check.
+ *
+ * @returns `true` if data satisfies the {@link WebsocketKeepaliveFormData}
+ *   contract.
+ *
+ * @public
  */
 export function isWebsocketKeepaliveFormData(
     data: Partial<MonitorFormData>
@@ -566,8 +670,13 @@ export function isWebsocketKeepaliveFormData(
 }
 
 /**
- * Registry of type-specific validation functions. Add new monitor types here to
- * enable dynamic validation.
+ * Registry of type-specific validation functions.
+ *
+ * @remarks
+ * Non-exported helper powering {@link isValidMonitorFormData}. Extend this map
+ * whenever a new monitor type is introduced.
+ *
+ * @internal
  */
 const FORM_DATA_VALIDATORS = {
     "cdn-edge-consistency": isCdnEdgeConsistencyFormData,
@@ -589,9 +698,11 @@ const FORM_DATA_VALIDATORS = {
 /**
  * Type guard to check if form data is valid and complete.
  *
- * @param data - Form data to validate
+ * @param data - Form data candidate to validate.
  *
- * @returns True if data is valid monitor form data
+ * @returns `true` if data satisfies one of the supported monitor form types.
+ *
+ * @public
  */
 export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
     if (typeof data !== "object" || data === null) {
@@ -623,11 +734,13 @@ export function isValidMonitorFormData(data: unknown): data is MonitorFormData {
 /**
  * Safely get a property from dynamic form data.
  *
- * @param data - Form data object
- * @param property - Property name to access
- * @param defaultValue - Default value if property is undefined
+ * @param data - Form data object.
+ * @param property - Property name to access.
+ * @param defaultValue - Default value when the property is missing.
  *
- * @returns Property value or default
+ * @returns Property value or the provided default.
+ *
+ * @public
  */
 export function safeGetFormProperty<T>(
     data: DynamicFormData,
@@ -644,9 +757,11 @@ export function safeGetFormProperty<T>(
 /**
  * Safely set a property on dynamic form data.
  *
- * @param data - Form data object
- * @param property - Property name to set
- * @param value - Value to set
+ * @param data - Form data object.
+ * @param property - Property name to set.
+ * @param value - Value to store for the property.
+ *
+ * @public
  */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Type parameter ensures type safety for value at call site
 export function safeSetFormProperty<T>(

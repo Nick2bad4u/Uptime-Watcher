@@ -22,11 +22,13 @@ import type {
 } from "react";
 
 /**
- * Core properties that most components should support.
+ * Core set of structural properties shared by many UI components.
  *
  * @remarks
- * These are the fundamental props that provide basic styling and content
- * capabilities for components.
+ * Establishes common behavioral flags such as `disabled` and standard wrapper
+ * attributes that most interactive primitives expose.
+ *
+ * @public
  */
 export interface CoreComponentProperties {
     /** Component content (text, elements, or other components) */
@@ -43,6 +45,8 @@ export interface CoreComponentProperties {
  * @remarks
  * These props provide essential accessibility support for screen readers and
  * other assistive technologies.
+ *
+ * @public
  */
 export interface AccessibilityProperties {
     /** ARIA described-by reference for additional descriptions */
@@ -61,11 +65,15 @@ export interface AccessibilityProperties {
 
 /**
  * Standard size variants used across components.
+ *
+ * @public
  */
 export type ComponentSize = "lg" | "md" | "sm" | "xl" | "xs";
 
 /**
  * Standard visual variants for component theming.
+ *
+ * @public
  */
 export type ComponentVariant =
     | "danger"
@@ -81,6 +89,8 @@ export type ComponentVariant =
  * @remarks
  * These props control the visual appearance and behavior of components,
  * providing consistent theming across the application.
+ *
+ * @public
  */
 export interface StylingProperties {
     /** Whether component should take full width of its container */
@@ -99,6 +109,8 @@ export interface StylingProperties {
  * @remarks
  * These props represent common state indicators that components may need to
  * display visually.
+ *
+ * @public
  */
 export interface StateProperties {
     /** Whether the component is in an active state */
@@ -117,6 +129,8 @@ export interface StateProperties {
  * labeling, validation, and help text support. This serves as a base interface
  * that can be extended by components requiring additional properties like
  * children.
+ *
+ * @public
  */
 export interface FormFieldBaseProperties {
     /** Error message to display when validation fails */
@@ -137,6 +151,8 @@ export interface FormFieldBaseProperties {
  * @remarks
  * These props provide consistent icon integration patterns across components
  * that support icon display.
+ *
+ * @public
  */
 export interface IconProperties {
     /** Icon element to display */
@@ -153,22 +169,42 @@ export interface IconProperties {
  * Event handler types for consistent event handling patterns.
  */
 
-/** Simple click handler for basic interactions */
+/**
+ * Simple click handler for basic interactions.
+ *
+ * @public
+ */
 export type ClickHandler = () => void;
 
-/** Click handler with event object when event details are needed */
+/**
+ * Click handler with event object when event details are needed.
+ *
+ * @public
+ */
 export type ClickWithEventHandler<TElement extends HTMLElement = HTMLElement> =
     (event: MouseEvent<TElement>) => void;
 
-/** Flexible click handler supporting both event and no-event patterns */
+/**
+ * Flexible click handler supporting both event and no-event patterns.
+ *
+ * @public
+ */
 export type ClickFlexibleHandler<TElement extends HTMLElement = HTMLElement> =
     | (() => void)
     | ((event: MouseEvent<TElement>) => void);
 
-/** Value-based change handler for form components */
+/**
+ * Value-based change handler for form components.
+ *
+ * @public
+ */
 export type ChangeHandler = (value: string) => void;
 
-/** Event-based change handler for low-level input components */
+/**
+ * Event-based change handler for low-level input components.
+ *
+ * @public
+ */
 export type ChangeWithEventHandler<
     TElement extends HTMLInputElement | HTMLSelectElement = HTMLInputElement,
 > = (event: ChangeEvent<TElement>) => void;
@@ -183,48 +219,88 @@ export type ChangeWithEventHandler<
  */
 // eslint-disable-next-line @typescript-eslint/no-namespace -- Namespace provides organized access to event handler types for better developer experience and API consistency
 export namespace EventHandlers {
-    /** Click handler with event object when event details are needed */
+    /**
+     * Click handler with event object when event details are needed.
+     *
+     * @public
+     */
     export type ClickWithEvent<TElement extends HTMLElement = HTMLElement> =
         ClickWithEventHandler<TElement>;
 
-    /** Flexible click handler supporting both event and no-event patterns */
+    /**
+     * Flexible click handler supporting both event and no-event patterns.
+     *
+     * @public
+     */
     export type ClickFlexible<TElement extends HTMLElement = HTMLElement> =
         ClickFlexibleHandler<TElement>;
 
-    /** Event-based change handler for low-level input components */
+    /**
+     * Event-based change handler for low-level input components.
+     *
+     * @public
+     */
     export type ChangeWithEvent<
         TElement extends
             | HTMLInputElement
             | HTMLSelectElement = HTMLInputElement,
     > = ChangeWithEventHandler<TElement>;
 
-    /** Focus handler for input components */
+    /**
+     * Focus handler for input components.
+     *
+     * @public
+     */
     export type Focus<TElement extends HTMLElement = HTMLElement> =
         FocusHandler<TElement>;
 
-    /** Blur handler for input components */
+    /**
+     * Blur handler for input components.
+     *
+     * @public
+     */
     export type Blur<TElement extends HTMLElement = HTMLElement> =
         BlurHandler<TElement>;
 
-    /** Key press handler for keyboard interactions */
+    /**
+     * Key press handler for keyboard interactions.
+     *
+     * @public
+     */
     export type KeyPress<TElement extends HTMLElement = HTMLElement> =
         KeyPressHandler<TElement>;
 }
 
-/** Form submission handler */
+/**
+ * Form submission handler.
+ *
+ * @public
+ */
 export type SubmitHandler = (event: FormEvent<HTMLFormElement>) => void;
 
-/** Focus handler for input components */
+/**
+ * Focus handler for input components.
+ *
+ * @public
+ */
 export type FocusHandler<TElement extends HTMLElement = HTMLElement> = (
     event: FocusEvent<TElement>
 ) => void;
 
-/** Blur handler for input components */
+/**
+ * Blur handler for input components.
+ *
+ * @public
+ */
 export type BlurHandler<TElement extends HTMLElement = HTMLElement> = (
     event: FocusEvent<TElement>
 ) => void;
 
-/** Key press handler for keyboard interactions */
+/**
+ * Key press handler for keyboard interactions.
+ *
+ * @public
+ */
 export type KeyPressHandler<TElement extends HTMLElement = HTMLElement> = (
     event: KeyboardEvent<TElement>
 ) => void;
@@ -235,6 +311,8 @@ export type KeyPressHandler<TElement extends HTMLElement = HTMLElement> = (
  * @remarks
  * This interface combines the most common props needed for button components,
  * serving as a standard template.
+ *
+ * @public
  */
 export interface StandardButtonProperties
     extends AccessibilityProperties,
@@ -256,6 +334,8 @@ export interface StandardButtonProperties
  * @remarks
  * This interface provides a standard template for input components with
  * consistent typing and behavior patterns.
+ *
+ * @public
  */
 export interface StandardInputProperties
     extends AccessibilityProperties,
@@ -281,6 +361,8 @@ export interface StandardInputProperties
  * @remarks
  * This interface provides a standard template for select/dropdown components
  * with consistent option handling.
+ *
+ * @public
  */
 export interface StandardSelectProperties
     extends AccessibilityProperties,
@@ -300,6 +382,8 @@ export interface StandardSelectProperties
 
 /**
  * Option definition for select components.
+ *
+ * @public
  */
 export interface SelectOption {
     /** Whether this option is disabled */
@@ -318,6 +402,8 @@ export interface SelectOption {
  * @remarks
  * This interface provides a standard template for boolean input components like
  * checkboxes and radio buttons.
+ *
+ * @public
  */
 export interface StandardCheckableProperties
     extends AccessibilityProperties,
@@ -342,6 +428,8 @@ export interface StandardCheckableProperties
  * @remarks
  * This interface provides a standard template for container components like
  * cards, panels, and boxes.
+ *
+ * @public
  */
 export interface StandardContainerProperties
     extends AccessibilityProperties,
@@ -363,6 +451,8 @@ export interface StandardContainerProperties
  * @remarks
  * This interface provides a standard template for modal and dialog components
  * with proper accessibility support.
+ *
+ * @public
  */
 export interface StandardModalProperties
     extends AccessibilityProperties,
@@ -387,6 +477,8 @@ export interface StandardModalProperties
  * @remarks
  * This interface provides a standard template for components that display
  * collections of data.
+ *
+ * @public
  */
 export interface StandardDataDisplayProperties<TItem>
     extends AccessibilityProperties,
@@ -423,6 +515,8 @@ export interface StandardDataDisplayProperties<TItem>
  *     }
  * >;
  * ```
+ *
+ * @public
  */
 export type ComponentProperties<
     TBase,
@@ -440,6 +534,8 @@ export type ComponentProperties<
  *     "onClick"
  * >;
  * ```
+ *
+ * @public
  */
 export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
 
@@ -454,6 +550,8 @@ export type RequireProperties<T, K extends keyof T> = Required<Pick<T, K>> & T;
  *     "label"
  * >;
  * ```
+ *
+ * @public
  */
 export type OptionalProperties<T, K extends keyof T> = Omit<T, K> &
     Partial<Pick<T, K>>;

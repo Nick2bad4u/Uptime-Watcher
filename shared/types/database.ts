@@ -14,6 +14,8 @@ import type { UnknownRecord } from "type-fest";
  * @remarks
  * Provides a common optional `id` property for tables that use numeric or
  * string IDs.
+ *
+ * @public
  */
 export interface BaseRow {
     /**
@@ -30,6 +32,8 @@ export interface BaseRow {
  *
  * @remarks
  * Used for storing monitor status change history and related metadata.
+ *
+ * @public
  */
 export interface HistoryRow extends BaseRow {
     /**
@@ -59,6 +63,8 @@ export interface HistoryRow extends BaseRow {
  *
  * @remarks
  * Stores configuration and runtime state for each monitor.
+ *
+ * @public
  */
 export interface MonitorRow extends BaseRow {
     /**
@@ -152,6 +158,8 @@ export interface MonitorRow extends BaseRow {
  *
  * @remarks
  * Used for storing application-wide key-value settings.
+ *
+ * @public
  */
 export interface SettingsRow extends BaseRow {
     /**
@@ -169,6 +177,8 @@ export interface SettingsRow extends BaseRow {
  *
  * @remarks
  * Stores metadata and monitoring state for each site.
+ *
+ * @public
  */
 export interface SiteRow extends BaseRow {
     /**
@@ -188,6 +198,8 @@ export interface SiteRow extends BaseRow {
 /**
  * Validation utilities for database row type checking. Provides atomic
  * validation functions that can be composed for complex validation.
+ *
+ * @public
  */
 export const RowValidationUtils = {
     /**
@@ -225,8 +237,8 @@ export const RowValidationUtils = {
  *
  * @param obj - The object to check.
  *
- * @returns True if the object matches the {@link HistoryRow} structure;
- *   otherwise, false.
+ * @returns `true` when the object matches the {@link HistoryRow} structure;
+ *   otherwise `false`.
  */
 export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
     // Basic object validation
@@ -256,8 +268,8 @@ export function isValidHistoryRow(obj: unknown): obj is HistoryRow {
  *
  * @param obj - The object to check.
  *
- * @returns True if the object matches the {@link MonitorRow} structure;
- *   otherwise, false.
+ * @returns `true` when the object matches the {@link MonitorRow} structure;
+ *   otherwise `false`.
  */
 export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
     // Basic object validation
@@ -287,8 +299,8 @@ export function isValidMonitorRow(obj: unknown): obj is MonitorRow {
  *
  * @param obj - The object to check.
  *
- * @returns True if the object matches the {@link SettingsRow} structure;
- *   otherwise, false.
+ * @returns `true` when the object matches the {@link SettingsRow} structure;
+ *   otherwise `false`.
  */
 export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
     if (typeof obj !== "object" || obj === null) {
@@ -318,8 +330,8 @@ export function isValidSettingsRow(obj: unknown): obj is SettingsRow {
  *
  * @param obj - The object to check.
  *
- * @returns True if the object matches the {@link SiteRow} structure; otherwise,
- *   false.
+ * @returns `true` when the object matches the {@link SiteRow} structure;
+ *   otherwise `false`.
  */
 export function isValidSiteRow(obj: unknown): obj is SiteRow {
     if (typeof obj !== "object" || obj === null) {
@@ -362,6 +374,8 @@ export function isValidSiteRow(obj: unknown): obj is SiteRow {
  *   undefined.
  *
  * @returns The property value if present; otherwise, the default value.
+ *
+ * @public
  */
 export function safeGetRowProperty<T>(
     row: UnknownRecord,

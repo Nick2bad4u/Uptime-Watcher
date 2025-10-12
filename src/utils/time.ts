@@ -5,13 +5,11 @@
  * Provides consistent time formatting throughout the application with support
  * for various time scales: milliseconds for precise measurements,
  * seconds/minutes/hours for human-readable durations, and relative timestamps
- * for recent events.
- *
- * All functions handle edge cases gracefully and provide fallback values for
- * invalid inputs. Time formatting is optimized for readability in monitoring
+ * for recent events. All functions handle edge cases gracefully and provide
+ * fallback values for invalid inputs to optimize readability in monitoring
  * contexts.
  *
- * @packageDocumentation
+ * @public
  */
 
 import type { CHART_TIME_PERIODS } from "../constants";
@@ -20,6 +18,8 @@ import { UiDefaults } from "./fallbacks";
 
 /**
  * Type for time period keys used in chart configurations.
+ *
+ * @public
  */
 export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
 
@@ -39,9 +39,11 @@ export type TimePeriod = keyof typeof CHART_TIME_PERIODS;
  * formatDuration(45000); // "45s"
  * ```
  *
- * @param ms - Duration in milliseconds
+ * @param ms - Duration in milliseconds.
  *
- * @returns Formatted duration string
+ * @returns Formatted duration string.
+ *
+ * @public
  */
 export function formatDuration(ms: number): string {
     const seconds = Math.floor(ms / 1000);
@@ -71,9 +73,11 @@ export function formatDuration(ms: number): string {
  * formatFullTimestamp(1640995200000); // "12/31/2021, 4:00:00 PM" (US locale)
  * ```
  *
- * @param timestamp - Unix timestamp in milliseconds
+ * @param timestamp - Unix timestamp in milliseconds.
  *
- * @returns Localized date/time string
+ * @returns Localized date/time string.
+ *
+ * @public
  */
 export function formatFullTimestamp(timestamp: number): string {
     return new Date(timestamp).toLocaleString();
@@ -95,9 +99,11 @@ export function formatFullTimestamp(timestamp: number): string {
  * formatIntervalDuration(3600000); // "1h"
  * ```
  *
- * @param milliseconds - Time duration in milliseconds
+ * @param milliseconds - Time duration in milliseconds.
  *
- * @returns Concise formatted time string
+ * @returns Concise formatted time string.
+ *
+ * @public
  */
 export function formatIntervalDuration(milliseconds: number): string {
     if (milliseconds < 60_000) {
@@ -126,9 +132,11 @@ export function formatIntervalDuration(milliseconds: number): string {
  * formatRelativeTimestamp(Date.now() - 10000); // "Just now"
  * ```
  *
- * @param timestamp - Unix timestamp in milliseconds
+ * @param timestamp - Unix timestamp in milliseconds.
  *
- * @returns Relative time description
+ * @returns Relative time description.
+ *
+ * @public
  */
 export function formatRelativeTimestamp(timestamp: number): string {
     const now = Date.now();
@@ -158,9 +166,11 @@ export function formatRelativeTimestamp(timestamp: number): string {
  * Format time duration with milliseconds for response times (detailed format).
  * Used for displaying response times and performance metrics.
  *
- * @param milliseconds - Time duration in milliseconds
+ * @param milliseconds - Time duration in milliseconds.
  *
- * @returns Formatted time string (e.g., "123ms", "30s", "5m", "1h")
+ * @returns Formatted time string (e.g., "123ms", "30s", "5m", "1h").
+ *
+ * @public
  */
 export function formatResponseDuration(milliseconds: number): string {
     // Handle extremely small values (effectively zero) by rounding to 0
@@ -199,9 +209,11 @@ export function formatResponseDuration(milliseconds: number): string {
  * formatResponseTime(null); // "N/A" (or configured fallback)
  * ```
  *
- * @param time - Response time in milliseconds (optional)
+ * @param time - Response time in milliseconds (optional).
  *
- * @returns Formatted time string or fallback message
+ * @returns Formatted time string or fallback message.
+ *
+ * @public
  */
 export function formatResponseTime(time?: number): string {
     if (!time && time !== 0) {

@@ -18,6 +18,8 @@ import type {
 
 /**
  * Contract for the preload events bridge exposed to the renderer.
+ *
+ * @public
  */
 export interface EventsDomainBridge {
     readonly onCacheInvalidated: (

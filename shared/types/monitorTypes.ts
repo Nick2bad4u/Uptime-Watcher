@@ -16,6 +16,8 @@ import type { MonitorFieldDefinition } from "@shared/types";
  * Mirrors the structure provided by the backend registry and consumed by the
  * renderer. Kept in shared types to avoid circular dependencies between
  * src/utils helpers and Zustand stores.
+ *
+ * @public
  */
 export interface MonitorTypeConfig {
     /** Description of what this monitor checks */
@@ -59,6 +61,8 @@ export interface MonitorTypeConfig {
  * @remarks
  * Provides display-related preferences that can be used to control how monitor
  * types are presented in the UI.
+ *
+ * @public
  */
 export interface MonitorTypeDisplayCommons {
     /**
@@ -90,6 +94,8 @@ export interface MonitorTypeDisplayCommons {
  * @remarks
  * These properties provide UI hints, help texts, and feature support flags for
  * monitor types, enabling consistent rendering and feature gating.
+ *
+ * @public
  */
 export interface MonitorTypeUICommons {
     /**

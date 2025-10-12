@@ -46,15 +46,11 @@ import type {
  * logic.
  *
  * @remarks
- * This type extends Chart.js official `ChartOptions<TType>` with our custom
- * scale and plugin configurations for Uptime Watcher business logic while
- * maintaining compatibility with Chart.js APIs.
- *
- * @template TType - Chart type ('line' | 'bar' | 'doughnut' | etc.)
+ * Extends the core Chart.js option surface with our scale and plugin
+ * conveniences while remaining compatible with upstream APIs.
  *
  * @public
  */
-
 export interface UptimeChartOptions {
     /** Animation configuration */
     animation?: {
@@ -156,7 +152,7 @@ export interface ThemeAwareChartFactory {
      * @param data - Chart data
      * @param themeConfig - Theme configuration
      *
-     * @returns Complete chart configuration
+     * @returns Hybrid chart configuration with theme-driven styling.
      */
     createBarChart: (
         data: UptimeChartData,
@@ -169,7 +165,7 @@ export interface ThemeAwareChartFactory {
      * @param data - Chart data
      * @param themeConfig - Theme configuration
      *
-     * @returns Complete chart configuration
+     * @returns Hybrid chart configuration with theme-driven styling.
      */
     createDoughnutChart: (
         data: UptimeChartData,
@@ -182,7 +178,7 @@ export interface ThemeAwareChartFactory {
      * @param data - Chart data
      * @param themeConfig - Theme configuration
      *
-     * @returns Complete chart configuration
+     * @returns Hybrid chart configuration with theme-driven styling.
      */
     createLineChart: (
         data: UptimeChartData,
@@ -206,7 +202,7 @@ export interface ChartUtilities {
      * @param options - Chart options (hybrid or official)
      * @param pluginId - Plugin identifier
      *
-     * @returns Plugin configuration or undefined
+     * @returns The plugin configuration when available; otherwise `undefined`.
      */
     getPluginConfig: (
         options: ChartOptions | UptimeChartOptions,
@@ -219,7 +215,7 @@ export interface ChartUtilities {
      * @param options - Chart options (hybrid or official)
      * @param scaleId - Scale identifier
      *
-     * @returns Scale configuration or undefined
+     * @returns The scale configuration when available; otherwise `undefined`.
      */
     getScaleConfig: (
         options: ChartOptions | UptimeChartOptions,
@@ -231,7 +227,7 @@ export interface ChartUtilities {
      *
      * @param config - Hybrid chart configuration
      *
-     * @returns Chart.js compatible configuration
+     * @returns A Chart.js-compatible configuration bundle.
      */
     toChartJsConfig: <TType extends keyof ChartTypeRegistry>(
         config: UptimeChartConfig<TType>
@@ -283,11 +279,12 @@ export interface UptimeChartDataPoint extends ChartDataPoint {
 // Import ChartData, ChartOptions directly from "chart.js"
 
 /**
- * Type guard to check if chart options use our hybrid format.
+ * Determines whether chart options use the hybrid Uptime Watcher format.
  *
- * @param options - Chart options to check
+ * @param options - Chart options to inspect.
  *
- * @returns True if options use hybrid format
+ * @returns `true` when the options include plugin or scale metadata specific to
+ *   our hybrid format.
  *
  * @public
  */
@@ -302,11 +299,11 @@ export function isUptimeChartOptions(
 }
 
 /**
- * Type guard to check if chart data uses our hybrid format.
+ * Determines whether chart data uses the hybrid Uptime Watcher format.
  *
- * @param data - Chart data to check
+ * @param data - Chart data to inspect.
  *
- * @returns True if data uses hybrid format
+ * @returns `true` when the data exposes a `datasets` array; otherwise `false`.
  *
  * @public
  */

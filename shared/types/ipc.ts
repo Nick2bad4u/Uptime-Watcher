@@ -21,8 +21,11 @@ import type { ValidationResult } from "@shared/types/validation";
  * Serialized database backup result returned to the renderer process.
  *
  * @remarks
- * Mirrors {@link DatabaseBackupResult} but replaces the Node.js {@link Buffer}
- * with an {@link ArrayBuffer} that is transferable across the IPC boundary.
+ * Mirrors the {@link DatabaseBackupResult} structure from the Electron main
+ * process but replaces the Node.js {@link Buffer} with an {@link ArrayBuffer}
+ * that is transferable across the IPC boundary.
+ *
+ * @public
  */
 export interface SerializedDatabaseBackupResult {
     /** Array buffer containing the SQLite database backup payload. */
@@ -42,6 +45,8 @@ export interface SerializedDatabaseBackupResult {
 
 /**
  * Response structure returned by the diagnostics IPC handler verification.
+ *
+ * @public
  */
 export interface IpcHandlerVerificationResult {
     /** Ordered list of registered IPC channels exposed by the main process. */
@@ -58,6 +63,8 @@ export interface IpcHandlerVerificationResult {
 /**
  * Mapping of IPC invoke channel names to their parameter tuples and result
  * payloads.
+ *
+ * @public
  */
 export interface IpcInvokeChannelMap {
     "add-site": {
@@ -164,27 +171,40 @@ export interface IpcInvokeChannelMap {
 
 /**
  * Union of all IPC channel identifiers supported by {@link IpcInvokeChannelMap}.
+ *
+ * @public
  */
 export type IpcInvokeChannel = keyof IpcInvokeChannelMap;
 
 /**
- * Helper type extracting the parameter tuple for a specific IPC channel.
+ * Mutable clone of a readonly tuple.
+ *
+ * @internal
  */
 type MutableTuple<TTuple extends readonly unknown[]> = {
     -readonly [Index in keyof TTuple]: TTuple[Index];
 };
 
+/**
+ * Helper type extracting the parameter tuple for a specific IPC channel.
+ *
+ * @public
+ */
 export type IpcInvokeChannelParams<TChannel extends IpcInvokeChannel> =
     MutableTuple<IpcInvokeChannelMap[TChannel]["params"]>;
 
 /**
  * Helper type extracting the result payload for a specific IPC channel.
+ *
+ * @public
  */
 export type IpcInvokeChannelResult<TChannel extends IpcInvokeChannel> =
     IpcInvokeChannelMap[TChannel]["result"];
 
 /**
  * Union of channels whose IPC responses contain no payload (void results).
+ *
+ * @public
  */
 export type VoidIpcInvokeChannel = {
     [TChannel in IpcInvokeChannel]: IpcInvokeChannelResult<TChannel> extends undefined

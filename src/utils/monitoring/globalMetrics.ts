@@ -6,6 +6,8 @@
  * incident counts, response time averages, etc.). Centralising the logic in
  * this module keeps rendering components lean and guarantees the numbers stay
  * consistent across the app.
+ *
+ * @public
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -55,10 +57,18 @@ export interface GlobalMonitoringMetrics {
 /**
  * Calculates aggregated monitoring metrics for a collection of sites.
  *
+ * @remarks
+ * Iterates all monitors across the provided sites, deriving totals, incident
+ * counts, uptime percentage, and averaged response times. Results feed the
+ * dashboard summary cards and sparklines, ensuring renderer components remain
+ * presentation-focused.
+ *
  * @param sites - All sites available in the store.
  *
  * @returns A metrics object with totals, status counters, incidents, and
  *   derived figures used by the dashboard UI.
+ *
+ * @public
  */
 export function calculateGlobalMonitoringMetrics(
     sites: readonly Site[]

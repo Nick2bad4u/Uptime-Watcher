@@ -445,6 +445,11 @@ export type MonitorConfig = Simplify<
     | WebsocketKeepaliveMonitorConfig
 >;
 
+/**
+ * Internal helper narrowing a monitor configuration to a specific subtype.
+ *
+ * @internal
+ */
 function isMonitorConfigOfType<T extends MonitorConfig>(
     config: MonitorConfig | null | undefined,
     type: T["type"]
@@ -457,7 +462,8 @@ function isMonitorConfigOfType<T extends MonitorConfig>(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP monitor
+ * @returns `true` when the configuration targets an HTTP monitor; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -472,7 +478,8 @@ export function isHttpMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for a ping monitor
+ * @returns `true` when the configuration targets a ping monitor; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -487,7 +494,8 @@ export function isPingMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for a port monitor
+ * @returns `true` when the configuration targets a port monitor; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -502,7 +510,8 @@ export function isPortMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an SSL monitor
+ * @returns `true` when the configuration targets an SSL monitor; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -517,7 +526,8 @@ export function isSslMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP keyword monitor
+ * @returns `true` when the configuration targets an HTTP keyword monitor;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -535,7 +545,8 @@ export function isHttpKeywordMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP header monitor
+ * @returns `true` when the configuration targets an HTTP header monitor;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -553,7 +564,8 @@ export function isHttpHeaderMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP status monitor
+ * @returns `true` when the configuration targets an HTTP status monitor;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -571,7 +583,8 @@ export function isHttpStatusMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP JSON monitor
+ * @returns `true` when the configuration targets an HTTP JSON monitor;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -586,7 +599,8 @@ export function isHttpJsonMonitorConfig(
  *
  * @param config - The monitor configuration to check
  *
- * @returns True if the configuration is for an HTTP latency monitor
+ * @returns `true` when the configuration targets an HTTP latency monitor;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -601,6 +615,13 @@ export function isHttpLatencyMonitorConfig(
 
 /**
  * Type guard to check if configuration is for CDN edge consistency monitors.
+ *
+ * @param config - The monitor configuration to evaluate.
+ *
+ * @returns `true` when the configuration targets a CDN edge consistency
+ *   monitor; otherwise `false`.
+ *
+ * @public
  */
 export function isCdnEdgeConsistencyMonitorConfig(
     config: MonitorConfig | null | undefined
@@ -613,6 +634,13 @@ export function isCdnEdgeConsistencyMonitorConfig(
 
 /**
  * Type guard to check if configuration is for replication monitors.
+ *
+ * @param config - The monitor configuration to evaluate.
+ *
+ * @returns `true` when the configuration targets a replication monitor;
+ *   otherwise `false`.
+ *
+ * @public
  */
 export function isReplicationMonitorConfig(
     config: MonitorConfig | null | undefined
@@ -625,6 +653,13 @@ export function isReplicationMonitorConfig(
 
 /**
  * Type guard to check if configuration is for server heartbeat monitors.
+ *
+ * @param config - The monitor configuration to evaluate.
+ *
+ * @returns `true` when the configuration targets a server heartbeat monitor;
+ *   otherwise `false`.
+ *
+ * @public
  */
 export function isServerHeartbeatMonitorConfig(
     config: MonitorConfig | null | undefined
@@ -637,6 +672,13 @@ export function isServerHeartbeatMonitorConfig(
 
 /**
  * Type guard to check if configuration is for WebSocket keepalive monitors.
+ *
+ * @param config - The monitor configuration to evaluate.
+ *
+ * @returns `true` when the configuration targets a WebSocket keepalive monitor;
+ *   otherwise `false`.
+ *
+ * @public
  */
 export function isWebsocketKeepaliveMonitorConfig(
     config: MonitorConfig | null | undefined
@@ -797,17 +839,3 @@ export const DEFAULT_MONITOR_CONFIG = {
         type: "websocket-keepalive" as const,
     } as Partial<WebsocketKeepaliveMonitorConfig>,
 } as const;
-
-/**
- * Monitor configuration validation result.
- *
- * @remarks
- * Used to return validation results for monitor configurations. Import directly
- * from "./validation" for MonitorConfigValidationResult if needed.
- *
- * @public
- */
-
-/**
- * Configuration interface for port monitors.
- */

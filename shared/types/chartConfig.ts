@@ -487,11 +487,12 @@ export interface DefaultChartThemes {
 }
 
 /**
- * Type guard to check if an object has plugins configuration.
+ * Determines whether a configuration object includes Chart.js plugin options.
  *
- * @param config - Object to check
+ * @param config - Value to inspect for a `plugins` property.
  *
- * @returns True if the object has plugins configuration
+ * @returns `true` when the value exposes a non-null `plugins` object; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -508,11 +509,12 @@ export function hasPlugins(
 }
 
 /**
- * Type guard to check if an object has scales configuration.
+ * Determines whether a configuration object includes Chart.js scale options.
  *
- * @param config - Object to check
+ * @param config - Value to inspect for a `scales` property.
  *
- * @returns True if the object has scales configuration
+ * @returns `true` when the value exposes a non-null `scales` object; otherwise
+ *   `false`.
  *
  * @public
  */

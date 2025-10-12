@@ -1,15 +1,12 @@
 /**
- * Shared monitoring constants for interval management.
- *
- * @remarks
- * Defines the single source of truth for monitor interval defaults and
- * validation thresholds. Both the Electron backend and renderer should import
- * from this module to ensure consistency when normalizing monitor data.
- */
-
-/**
  * Default interval (in milliseconds) applied to monitors when no value is
  * provided or when incoming data fails validation.
+ *
+ * @remarks
+ * Serves as the shared minimum cadence for routine monitor execution across
+ * renderer and Electron processes.
+ *
+ * @public
  */
 export const DEFAULT_MONITOR_CHECK_INTERVAL_MS = 300_000;
 
@@ -19,6 +16,8 @@ export const DEFAULT_MONITOR_CHECK_INTERVAL_MS = 300_000;
  * @remarks
  * Values below this threshold are considered invalid and should be clamped to
  * {@link DEFAULT_MONITOR_CHECK_INTERVAL_MS} or rejected by validation.
+ *
+ * @public
  */
 export const MIN_MONITOR_CHECK_INTERVAL_MS = 5000;
 
@@ -27,8 +26,8 @@ export const MIN_MONITOR_CHECK_INTERVAL_MS = 5000;
  *
  * @param interval - The interval value to evaluate.
  *
- * @returns `true` if the interval is missing, not a finite positive number, or
- *   is below {@link MIN_MONITOR_CHECK_INTERVAL_MS}; otherwise, `false`.
+ * @returns `true` if the interval is missing, not a number, or is below
+ *   {@link MIN_MONITOR_CHECK_INTERVAL_MS}; otherwise, `false`.
  */
 export function shouldRemediateMonitorInterval(interval: unknown): boolean {
     if (typeof interval !== "number" || Number.isNaN(interval)) {

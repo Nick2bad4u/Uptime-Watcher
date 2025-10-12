@@ -99,7 +99,7 @@ export interface NotificationServiceDependencies {
  *
  * @see {@link NotificationConfig} for configuration options
  * @see {@link Site} for site data structure
- * @see {@link Monitor} for monitor data structure
+ * @see `Monitor` (shared type) for monitor data structure
  */
 export class NotificationService {
     private config: NotificationConfig;

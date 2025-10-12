@@ -7,14 +7,6 @@
  * This module ensures the application remains functional even when expected
  * data is missing or invalid.
  *
- * Key features:
- *
- * - Type-safe null/undefined checking utilities
- * - Async error handling wrappers for React event handlers
- * - Consistent default value patterns for UI components
- * - Graceful degradation strategies for missing data
- * - Centralized fallback value definitions
- *
  * @example
  *
  * ```typescript
@@ -26,7 +18,7 @@
  *
  * // Safe null checking
  * if (isNullOrUndefined(userInput)) {
- *     return UiDefaults.EMPTY_STRING;
+ *     return UiDefaults.unknownLabel;
  * }
  *
  * // Async event handler with error handling
@@ -34,12 +26,9 @@
  *     async () => await saveData(),
  *     "saveData"
  * );
- *
- * // Use default values for missing data
- * const displayName = siteName || UiDefaults.UNNAMED_SITE;
  * ```
  *
- * @packageDocumentation
+ * @public
  */
 
 import type { Monitor } from "@shared/types";
@@ -52,24 +41,32 @@ import { logger } from "../services/logger";
 /**
  * Enhanced null/undefined check utility.
  *
+ * @remarks
  * Replaces scattered `value === null || value === undefined` patterns.
  *
- * @param value - Value to check
+ * @param value - Value to check.
  *
- * @returns Whether value is null or undefined
+ * @returns `true` when the value is `null` or `undefined`; otherwise `false`.
+ *
+ * @public
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
     return value === null || value === undefined;
 }
 
 /**
- * Type-safe utility for React async event handlers. Prevents void return type
- * issues with async operations.
+ * Type-safe utility for React async event handlers.
  *
- * @param operation - Async operation to execute
- * @param operationName - Name for logging purposes
+ * @remarks
+ * Prevents void return type issues with async operations by returning a
+ * synchronous callback that internally awaits the supplied `operation`.
  *
- * @returns Sync function suitable for React event handlers
+ * @param operation - Async operation to execute.
+ * @param operationName - Name for logging purposes.
+ *
+ * @returns Synchronous callback suitable for React event handlers.
+ *
+ * @public
  */
 export function withAsyncErrorHandling(
     operation: () => Promise<void>,
@@ -88,14 +85,18 @@ export function withAsyncErrorHandling(
 
 /**
  * Synchronous error handling wrapper for operations that don't return promises.
- * Provides consistent error handling and fallback behavior for sync
+ *
+ * @remarks
+ * Provides consistent error handling and fallback behavior for synchronous
  * operations.
  *
- * @param operation - Synchronous operation to execute
- * @param operationName - Name for logging purposes
- * @param fallbackValue - Value to return if operation fails
+ * @param operation - Synchronous operation to execute.
+ * @param operationName - Name for logging purposes.
+ * @param fallbackValue - Value to return if operation fails.
  *
- * @returns Result of operation or fallback value
+ * @returns Result of operation or fallback value when an error occurs.
+ *
+ * @public
  */
 export function withSyncErrorHandling<T>(
     operation: () => T,
@@ -116,8 +117,10 @@ export function withSyncErrorHandling<T>(
  *
  * @remarks
  * Centralized defaults that ensure consistent behavior across the application
- * when data is missing or components need fallback values. Uses ReadonlyDeep to
- * guarantee immutability of the configuration object.
+ * when data is missing or components need fallback values. Uses
+ * {@link ReadonlyDeep} to guarantee immutability of the configuration object.
+ *
+ * @public
  */
 export const UiDefaults: ReadonlyDeep<{
     /** Default chart time period for data visualization */
@@ -165,10 +168,12 @@ export const UiDefaults: ReadonlyDeep<{
 /**
  * Get value with fallback, checking for null/undefined.
  *
- * @param value - The value to check for null or undefined
- * @param fallback - The fallback value to use if value is null or undefined
+ * @param value - The value to check for null or undefined.
+ * @param fallback - The fallback value to use if value is null or undefined.
  *
- * @returns The original value if not null/undefined, otherwise the fallback
+ * @returns The original value if not null/undefined; otherwise the fallback.
+ *
+ * @public
  */
 export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
@@ -179,8 +184,10 @@ export function withFallback<T>(value: null | T | undefined, fallback: T): T {
  *
  * @remarks
  * Standard defaults for monitor configuration to ensure consistent behavior
- * when monitors are created or when values are missing. Uses ReadonlyDeep to
- * guarantee immutability of the configuration object.
+ * when monitors are created or when values are missing. Uses
+ * {@link ReadonlyDeep} to guarantee immutability of the configuration object.
+ *
+ * @public
  */
 export const MonitorDefaults: ReadonlyDeep<{
     /** Default check interval in milliseconds (5 minutes) */
@@ -207,8 +214,13 @@ export const MonitorDefaults: ReadonlyDeep<{
 } as const;
 
 /**
- * Configuration for monitor display identifier generation. Maps monitor types
- * to functions that generate display identifiers.
+ * Configuration for monitor display identifier generation.
+ *
+ * @remarks
+ * Internal registry used by {@link getMonitorDisplayIdentifier}. Add new monitor
+ * types here to customize identifier extraction.
+ *
+ * @internal
  */
 const MONITOR_IDENTIFIER_GENERATORS = new Map<
     string,
@@ -298,8 +310,12 @@ const MONITOR_IDENTIFIER_GENERATORS = new Map<
 ]);
 
 /**
- * Generate identifier from common monitor fields. Extracted to reduce
- * complexity of main function.
+ * Generate identifier from common monitor fields.
+ *
+ * @remarks
+ * Extracted helper to reduce complexity of {@link getMonitorDisplayIdentifier}.
+ *
+ * @internal
  */
 function getGenericIdentifier(monitor: Monitor): string | undefined {
     // Check common identifier fields in order of preference
@@ -345,10 +361,12 @@ function getGenericIdentifier(monitor: Monitor): string | undefined {
  * // Returns: "My Site"
  * ```
  *
- * @param monitor - Monitor object
- * @param siteFallback - Fallback site identifier
+ * @param monitor - Monitor object.
+ * @param siteFallback - Fallback site identifier.
  *
- * @returns Display identifier string
+ * @returns Display identifier string when possible; otherwise the fallback.
+ *
+ * @public
  */
 export function getMonitorDisplayIdentifier(
     monitor: Monitor,
@@ -374,8 +392,13 @@ export function getMonitorDisplayIdentifier(
 }
 
 /**
- * Configuration for monitor type display labels. This makes it easy to add new
- * monitor types without code changes.
+ * Configuration for monitor type display labels.
+ *
+ * @remarks
+ * Internal registry supporting {@link getMonitorTypeDisplayLabel}. Extend as new
+ * monitor types are introduced.
+ *
+ * @internal
  */
 const MONITOR_TYPE_LABELS = new Map<string, string>([
     ["cdn-edge-consistency", "CDN Edge Consistency"],
@@ -413,9 +436,11 @@ const MONITOR_TYPE_LABELS = new Map<string, string>([
  * getMonitorTypeDisplayLabel("unknown"); // "Unknown Monitor"
  * ```
  *
- * @param monitorType - Type of monitor
+ * @param monitorType - Type of monitor.
  *
- * @returns Display label for the monitor type
+ * @returns Display label for the monitor type.
+ *
+ * @public
  */
 export function getMonitorTypeDisplayLabel(monitorType: string): string {
     return withSyncErrorHandling(
@@ -456,10 +481,12 @@ export function getMonitorTypeDisplayLabel(monitorType: string): string {
 /**
  * Truncate sensitive data for logging (privacy protection).
  *
- * @param value - Value to truncate
- * @param maxLength - Maximum length (default: 50)
+ * @param value - Value to truncate.
+ * @param maxLength - Maximum length in characters (default: 50).
  *
- * @returns Truncated string safe for logging
+ * @returns Truncated string safe for logging.
+ *
+ * @public
  */
 export function truncateForLogging(value: string, maxLength = 50): string {
     // Guard clause: return early if value is shorter than maxLength or empty
@@ -475,6 +502,8 @@ export function truncateForLogging(value: string, maxLength = 50): string {
  * @remarks
  * Standard defaults for site configuration to ensure consistent behavior when
  * sites are created or when values are missing.
+ *
+ * @public
  */
 export const SiteDefaults = {
     /** Default monitoring state for new sites */

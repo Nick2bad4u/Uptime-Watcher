@@ -6,6 +6,8 @@
  * module centralizes status formatting logic to ensure consistent display of
  * monitor and site statuses throughout the application interface. All status
  * values are expected to be lowercase single-word strings.
+ *
+ * @public
  */
 
 import type { IconType } from "react-icons";
@@ -15,6 +17,8 @@ import { AppIcons } from "./icons";
 
 /**
  * Normalized representation of a status decorated with an icon glyph.
+ *
+ * @public
  */
 export type StatusWithIcon = `${string} ${string}`;
 
@@ -46,10 +50,12 @@ const STATUS_ICON_COMPONENTS: Record<string, IconType> = {
  * down, mixed, paused, pending, unknown, up. Unknown statuses return a neutral
  * icon.
  *
- * @param status - The status string to get an icon for
+ * @param status - The status string to get an icon for.
  *
- * @returns Icon component representing the status (defaults to neutral info
- *   icon for unknown statuses)
+ * @returns Unicode glyph representing the status or a neutral icon for unknown
+ *   statuses.
+ *
+ * @public
  */
 export function getStatusIcon(status: string): string {
     const normalizedStatus = status.toLowerCase();
@@ -68,9 +74,11 @@ export function getStatusIcon(status: string): string {
  * and the capitalized label for display. For multi-word statuses, consider
  * using a more sophisticated formatting function for label generation.
  *
- * @param status - The status string to format (expected to be lowercase)
+ * @param status - The status string to format (expected to be lowercase).
  *
- * @returns Object containing icon component and formatted label
+ * @returns Status label with capitalized first letter.
+ *
+ * @public
  */
 export function formatStatusLabel(status: string): string {
     if (status.length === 0) {
@@ -80,12 +88,30 @@ export function formatStatusLabel(status: string): string {
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
 }
 
+/**
+ * Combine status glyph and formatted label for display.
+ *
+ * @param status - Status string to decorate.
+ *
+ * @returns Status string prefixed with its icon glyph.
+ *
+ * @public
+ */
 export function formatStatusWithIcon(status: string): StatusWithIcon {
     const icon = getStatusIcon(status);
     const label = formatStatusLabel(status);
     return `${icon} ${label}`;
 }
 
+/**
+ * Resolve the React icon component corresponding to a status string.
+ *
+ * @param status - Status string to convert to an icon component.
+ *
+ * @returns Icon component associated with the status or a neutral info icon.
+ *
+ * @public
+ */
 export function getStatusIconComponent(status: string): IconType {
     const normalizedStatus = status.toLowerCase();
     return STATUS_ICON_COMPONENTS[normalizedStatus] ?? AppIcons.ui.info;

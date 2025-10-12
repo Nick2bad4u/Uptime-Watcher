@@ -41,11 +41,9 @@ import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
  * Predefined application cache collection interface.
  *
  * @remarks
- * Each property is a reusable {@link TypedCache} instance configured for a
- * specific domain within the application. Consumers should treat these as
- * long-lived, shared caches.
+ * Internal helper used to describe the structure of {@link AppCaches}.
  *
- * @public
+ * @internal
  */
 interface AppCachesInterface {
     /**
@@ -193,6 +191,8 @@ export class TypedCache<K, V> {
      * Current number of entries in the cache.
      *
      * @returns Number of stored entries.
+     *
+     * @public
      */
     public get size(): number {
         return this.cache.size;
@@ -224,6 +224,8 @@ export class TypedCache<K, V> {
      *
      * @remarks
      * Clears the internal {@link Map} and resets the cache to empty.
+     *
+     * @public
      */
     public clear(): void {
         this.cache.clear();
@@ -235,6 +237,8 @@ export class TypedCache<K, V> {
      * @param key - The cache key to remove.
      *
      * @returns True if the key existed and was removed; false otherwise.
+     *
+     * @public
      */
     public delete(key: K): boolean {
         return this.cache.delete(key);
@@ -247,6 +251,8 @@ export class TypedCache<K, V> {
      *
      * @returns The cached value, or `undefined` when the key does not exist or
      *   the entry has expired.
+     *
+     * @public
      */
     public get(key: K): undefined | V {
         const entry = this.cache.get(key);
@@ -275,6 +281,8 @@ export class TypedCache<K, V> {
      *
      * @returns `true` when a valid (non-expired) value exists; `false`
      *   otherwise.
+     *
+     * @public
      */
     public has(key: K): boolean {
         return this.get(key) !== undefined;
@@ -293,6 +301,8 @@ export class TypedCache<K, V> {
      * @param value - The value to store under the provided key.
      * @param ttl - Optional per-entry TTL in milliseconds; when omitted the
      *   cache's `defaultTtl` (if any) will apply.
+     *
+     * @public
      */
     public set(key: K, value: V, ttl?: number): void {
         // Enforce max size by removing least recently used entries

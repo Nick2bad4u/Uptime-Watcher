@@ -1,71 +1,90 @@
 /**
- * AbortController utilities for enhanced operation cancellation management.
+ * Configuration for building a composite {@link AbortSignal}.
  *
  * @remarks
- * Provides utilities for combining abort signals, creating timeout signals, and
- * managing operation cancellation in a composable way. These utilities replace
- * manual cancellation patterns and provide standardized error handling.
- *
- * @packageDocumentation
- */
-
-/**
- * Options for creating combined abort signals.
+ * Combining signals allows a caller to share cancellation concerns such as
+ * upstream abort controllers, local timeouts, or explicit user requests. When a
+ * timeout is provided together with a reason message, the generated timeout
+ * signal uses that reason when aborting.
  *
  * @public
  */
 export interface CombineSignalsOptions {
-    /** Additional signals to combine */
+    /** Additional {@link AbortSignal} instances that should be observed. */
     additionalSignals?: AbortSignal[];
-    /** Optional reason for abort */
+    /**
+     * Optional abort reason message used for timeout-driven cancellation when
+     * {@link CombineSignalsOptions.timeoutMs} is specified.
+     */
     reason?: string;
-    /** Timeout in milliseconds */
+    /** Timeout window in milliseconds before the composite signal aborts. */
     timeoutMs?: number;
 }
 
 /**
- * Options for creating retry operations with abort support.
+ * Configuration for retry operations that respect an {@link AbortSignal}.
+ *
+ * @remarks
+ * Applies capped exponential backoff between attempts. When the supplied signal
+ * aborts, the retry loop stops immediately even between retries.
  *
  * @public
  */
 export interface RetryWithAbortOptions {
-    /** Multiplier for exponential backoff */
+    /**
+     * Multiplier applied after each retry to grow the delay window.
+     *
+     * @defaultValue 2
+     */
     backoffMultiplier?: number;
-    /** Initial delay between retries in milliseconds */
+    /**
+     * Initial delay between retries in milliseconds.
+     *
+     * @defaultValue 1000
+     */
     initialDelay?: number;
-    /** Maximum delay between retries in milliseconds */
+    /**
+     * Maximum delay between retries in milliseconds.
+     *
+     * @defaultValue 30000
+     */
     maxDelay?: number;
-    /** Maximum number of retry attempts */
+    /**
+     * Maximum number of retry attempts before giving up.
+     *
+     * @defaultValue 3
+     */
     maxRetries?: number;
-    /** AbortSignal to respect during retries */
+    /** AbortSignal observed between attempts and before invoking the operation. */
     signal?: AbortSignal;
 }
 
 /**
- * Creates a combined AbortSignal from multiple sources.
+ * Creates an {@link AbortSignal} that aborts when any configured source aborts.
  *
  * @remarks
- * Combines timeout, additional signals, and provides a unified cancellation
- * mechanism. Useful for operations that need to be cancelled by multiple
- * conditions (timeout, user action, system shutdown, etc.).
+ * The composite signal can observe additional caller-provided signals and an
+ * optional timeout window. When neither a timeout nor additional signals are
+ * provided, the function returns a signal that never aborts. Providing a
+ * timeout reason ensures the composed signal exposes a meaningful `reason`
+ * value when the timeout elapses.
  *
  * @example
  *
  * ```typescript
  * const controller = new AbortController();
- * const combinedSignal = combineAbortSignals({
+ * const combinedSignal = createCombinedAbortSignal({
  *     timeoutMs: 5000,
  *     additionalSignals: [controller.signal],
  *     reason: "Operation timeout or user cancellation",
  * });
  *
- * // Use in fetch request
- * fetch(url, { signal: combinedSignal });
+ * await fetch(url, { signal: combinedSignal });
  * ```
  *
- * @param options - Configuration for combining signals
+ * @param options - Composite signal configuration options.
  *
- * @returns Combined AbortSignal that triggers when any source signal triggers
+ * @returns An {@link AbortSignal} that mirrors the earliest abort condition.
  *
  * @public
  */
@@ -124,12 +143,15 @@ export function createCombinedAbortSignal(
 }
 
 /**
- * Creates an operation that can be aborted and provides cleanup.
+ * Executes an async operation with a composite abort signal and guaranteed
+ * cleanup.
  *
  * @remarks
- * Wraps an async operation with abort support and automatic cleanup. The
- * operation function receives an AbortSignal and should check it periodically
- * for cancellation.
+ * The generated signal honors every option supported by
+ * {@link CombineSignalsOptions}. Provide a `cleanup` callback to release
+ * resources regardless of whether the operation succeeds, fails, or the signal
+ * aborts. If the cleanup throws, its error overrides any pending rejection from
+ * the operation.
  *
  * @example
  *
@@ -140,16 +162,20 @@ export function createCombinedAbortSignal(
  *         return response.json();
  *     },
  *     {
- *         timeoutMs: 10000,
+ *         timeoutMs: 10_000,
  *         cleanup: () => console.log("Operation cleaned up"),
  *     }
  * );
  * ```
  *
- * @param operation - Async function that performs the operation
- * @param options - Configuration options
+ * @typeParam T - Resolved value produced by the operation.
  *
- * @returns Promise that resolves to the operation result
+ * @param operation - Async function to execute with the composite signal.
+ * @param options - Signal configuration plus an optional cleanup callback.
+ *
+ * @returns Promise that resolves with the operation output.
+ *
+ * @throws Re-throws errors from the operation or cleanup callbacks.
  *
  * @public
  */
@@ -171,11 +197,12 @@ export async function createAbortableOperation<T>(
 }
 
 /**
- * Promise-based sleep function with abort support.
+ * Promise-based sleep helper with {@link AbortSignal} support.
  *
  * @remarks
- * Creates a cancelable delay that can be aborted via AbortSignal. Throws when
- * the signal is aborted during the delay.
+ * Negative, zero, or non-finite durations resolve immediately. When the signal
+ * aborts during the delay window, the returned promise rejects with a new
+ * `Error` describing the cancellation.
  *
  * @example
  *
@@ -183,19 +210,21 @@ export async function createAbortableOperation<T>(
  * const controller = new AbortController();
  *
  * try {
- *     await sleep(5000, controller.signal);
+ *     await sleep(5_000, controller.signal);
  *     console.log("Delay completed");
  * } catch (error) {
- *     console.log("Delay was aborted");
+ *     if (isAbortError(error)) {
+ *         console.log("Delay was aborted");
+ *     }
  * }
  * ```
  *
- * @param ms - Delay in milliseconds
- * @param signal - Optional AbortSignal for cancellation
+ * @param ms - Delay duration in milliseconds.
+ * @param signal - Optional cancellation signal to observe.
  *
- * @returns Promise that resolves after the delay
+ * @returns Promise that resolves after the requested delay.
  *
- * @throws When the signal is aborted
+ * @throws When the supplied signal aborts before the delay completes.
  *
  * @public
  */
@@ -227,11 +256,13 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 }
 
 /**
- * Implements retry logic with abort signal support.
+ * Retries an async operation with capped exponential backoff and abort
+ * handling.
  *
  * @remarks
- * Provides exponential backoff retry logic that respects abort signals. Will
- * stop retrying immediately if the signal is aborted.
+ * The retry loop waits after failed attempts using {@link sleep}. If the
+ * operation succeeds, the resolved value bypasses any remaining retries. As
+ * soon as the provided signal aborts, the function stops retrying and rejects.
  *
  * @example
  *
@@ -246,22 +277,24 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  *     },
  *     {
  *         maxRetries: 3,
- *         initialDelay: 1000,
+ *         initialDelay: 1_000,
  *         signal: controller.signal,
  *     }
  * );
  * ```
  *
- * @param operation - Function to retry
- * @param options - Retry configuration
+ * @typeParam T - Resolved value produced by the operation.
  *
- * @returns Promise that resolves to the operation result
+ * @param operation - Async function to invoke on each retry attempt.
+ * @param options - Retry behavior tuning configuration.
  *
- * @throws When all retries are exhausted or operation is aborted
+ * @returns Promise that resolves with the operation result.
+ *
+ * @throws The last captured error when retries are exhausted.
+ * @throws {@link Error} When the supplied signal aborts before completion.
  *
  * @public
  */
-
 export async function retryWithAbort<T>(
     operation: () => Promise<T>,
     options: RetryWithAbortOptions = {}
@@ -310,11 +343,12 @@ export async function retryWithAbort<T>(
 }
 
 /**
- * Checks if an error is an AbortError.
+ * Determines whether an unknown value represents an abort-style error.
  *
  * @remarks
- * Utility function to identify abort-related errors consistently. Handles
- * different abort error patterns from various APIs.
+ * The check covers native {@link Error} instances, DOM `AbortError` and
+ * `TimeoutError` exceptions, and message patterns commonly emitted by Fetch and
+ * other browser APIs.
  *
  * @example
  *
@@ -330,9 +364,10 @@ export async function retryWithAbort<T>(
  * }
  * ```
  *
- * @param error - Error to check
+ * @param error - Value to inspect.
  *
- * @returns True if the error is an abort error
+ * @returns `true` when the value represents an abort scenario; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -360,11 +395,12 @@ export function isAbortError(error: unknown): boolean {
 }
 
 /**
- * Creates a race condition between an operation and an abort signal.
+ * Races a promise against an {@link AbortSignal}.
  *
  * @remarks
- * Useful for operations that don't natively support AbortSignal. The operation
- * will be raced against the abort signal.
+ * Useful for APIs without native abort support. The returned promise rejects as
+ * soon as the signal aborts, allowing callers to adopt a uniform cancellation
+ * flow.
  *
  * @example
  *
@@ -377,10 +413,14 @@ export function isAbortError(error: unknown): boolean {
  * );
  * ```
  *
- * @param operation - Promise to race
- * @param signal - AbortSignal to race against
+ * @typeParam T - Resolved value of the underlying operation.
  *
- * @returns Promise that resolves to the operation result or rejects if aborted
+ * @param operation - Promise to monitor.
+ * @param signal - Abort signal to race against.
+ *
+ * @returns The first settled result between the promise and the abort event.
+ *
+ * @throws {@link Error} When the signal aborts before the operation settles.
  *
  * @public
  */

@@ -1,58 +1,55 @@
-/**
- * Comprehensive type guard utilities for enhanced type safety.
- *
- * @remarks
- * This module provides centralized type checking logic using proper TypeScript
- * type predicates. Each utility function is a type guard that narrows the type
- * of the checked value. All TSDoc tags follow the official TSDoc standard.
- *
- * @packageDocumentation
- */
-
 import type { UnknownRecord } from "type-fest";
 
 /**
- * Determines if a value is an object (excluding `null` and arrays).
+ * Checks whether a value is a non-null object excluding arrays.
  *
- * @param value - The value to check.
+ * @remarks
+ * Arrays are explicitly rejected so the guard can be safely used for record
+ * inputs without further refinement.
  *
- * @returns True if `value` is an object and not null or an array; otherwise,
- *   false.
+ * @param value - Value to evaluate.
+ *
+ * @returns `true` when the value is a non-null object; otherwise `false`.
  */
 export function isObject(value: unknown): value is UnknownRecord {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /**
- * Determines if a value is a number (excluding `NaN`).
+ * Checks whether a value is a `number` excluding `NaN`.
  *
- * @param value - The value to check.
+ * @remarks
+ * This guard considers both positive and negative infinity as numbers. Use
+ * {@link isFiniteNumber} when infinities should be rejected.
  *
- * @returns True if `value` is a number and not `NaN`; otherwise, false.
+ * @param value - Value to evaluate.
+ *
+ * @returns `true` when the value is a number and not `NaN`.
  */
 export function isNumber(value: unknown): value is number {
     return typeof value === "number" && !Number.isNaN(value);
 }
 
 /**
- * Determines if an object contains all specified properties.
+ * Verifies that a value exposes a set of own properties.
+ *
+ * @remarks
+ * Uses {@link Object.hasOwn} to avoid prototype traversal.
  *
  * @example
  *
  * ```ts
  * if (hasProperties(obj, ["foo", "bar"])) {
- *     // obj has both 'foo' and 'bar' properties
+ *     // obj has both 'foo' and 'bar'
  * }
  * ```
  *
- * @typeParam K - The type of property keys to check for.
+ * @typeParam K - Property keys that must exist on the value.
  *
- * @param value - The value to check.
- * @param properties - An array of property keys that must be present on the
- *   value.
+ * @param value - Value to evaluate as an object.
+ * @param properties - Property names that must be present on the value.
  *
- * @returns True if `value` is an object containing all specified properties;
- *   otherwise, false.
+ * @returns `true` when the value is an object containing every property.
  */
 export function hasProperties<K extends PropertyKey>(
     value: unknown,
@@ -65,7 +62,7 @@ export function hasProperties<K extends PropertyKey>(
 }
 
 /**
- * Determines if an object contains a specific property.
+ * Checks if a value exposes a specific own property.
  *
  * @example
  *
@@ -75,13 +72,12 @@ export function hasProperties<K extends PropertyKey>(
  * }
  * ```
  *
- * @typeParam K - The property key to check for.
+ * @typeParam K - Property key that must exist on the value.
  *
- * @param value - The value to check.
- * @param property - The property key that must be present on the value.
+ * @param value - Value to evaluate as an object.
+ * @param property - Property name that must be present on the value.
  *
- * @returns True if `value` is an object containing the specified property;
- *   otherwise, false.
+ * @returns `true` when the property exists directly on the value.
  */
 export function hasProperty<K extends PropertyKey>(
     value: unknown,
@@ -91,7 +87,7 @@ export function hasProperty<K extends PropertyKey>(
 }
 
 /**
- * Determines if a value is an array, optionally validating each item.
+ * Determines whether a value is an array and optionally validates each element.
  *
  * @example
  *
@@ -101,14 +97,12 @@ export function hasProperty<K extends PropertyKey>(
  * }
  * ```
  *
- * @typeParam T - The type of array items, inferred by the optional validator.
+ * @typeParam T - Element type enforced by the optional validator.
  *
- * @param value - The value to check.
- * @param itemValidator - Optional type guard to validate each item in the
- *   array.
+ * @param value - Value to evaluate.
+ * @param itemValidator - Optional guard applied to each array element.
  *
- * @returns True if `value` is an array (and all items pass `itemValidator`, if
- *   provided); otherwise, false.
+ * @returns `true` when the value is an array and all elements pass the guard.
  */
 export function isArray<T = unknown>(
     value: unknown,
@@ -126,7 +120,7 @@ export function isArray<T = unknown>(
 }
 
 /**
- * Determines if a value is a boolean.
+ * Checks whether a value is a boolean.
  *
  * @example
  *
@@ -136,16 +130,16 @@ export function isArray<T = unknown>(
  * }
  * ```
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a boolean; otherwise, false.
+ * @returns `true` when the value is `true` or `false`.
  */
 export function isBoolean(value: unknown): value is boolean {
     return typeof value === "boolean";
 }
 
 /**
- * Determines if a value is a valid `Date` instance.
+ * Checks whether a value is a valid {@link Date} instance.
  *
  * @example
  *
@@ -155,39 +149,38 @@ export function isBoolean(value: unknown): value is boolean {
  * }
  * ```
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a valid `Date` object; otherwise, false.
+ * @returns `true` when the value is a `Date` with a finite timestamp.
  */
 export function isDate(value: unknown): value is Date {
     return value instanceof Date && !Number.isNaN(value.getTime());
 }
 
 /**
- * Determines if a value is an `Error` instance.
+ * Checks whether a value extends {@link Error}.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is an instance of `Error`; otherwise, false.
+ * @returns `true` when the value is an Error instance.
  */
 export function isError(value: unknown): value is Error {
     return value instanceof Error;
 }
 
 /**
- * Determines if a value is a finite number (excludes `Infinity` and
- * `-Infinity`).
+ * Checks whether a value is a finite number.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a finite number; otherwise, false.
+ * @returns `true` when the value is a number and not infinite.
  */
 export function isFiniteNumber(value: unknown): value is number {
     return isNumber(value) && Number.isFinite(value);
 }
 
 /**
- * Determines if a value is a function.
+ * Checks whether a value is callable.
  *
  * @example
  *
@@ -197,9 +190,9 @@ export function isFiniteNumber(value: unknown): value is number {
  * }
  * ```
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a function; otherwise, false.
+ * @returns `true` when the value is a function.
  */
 export function isFunction(
     value: unknown
@@ -208,55 +201,55 @@ export function isFunction(
 }
 
 /**
- * Determines if a value is a non-negative number (zero or positive).
+ * Checks whether a value is a non-negative number.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a non-negative number; otherwise, false.
+ * @returns `true` when the value is a number greater than or equal to zero.
  */
 export function isNonNegativeNumber(value: unknown): value is number {
     return isNumber(value) && !Number.isNaN(value) && value >= 0;
 }
 
 /**
- * Determines if a value is a non-null object.
+ * Checks whether a value is an object that is not `null`.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a non-null object; otherwise, false.
+ * @returns `true` when the value is a non-null object.
  */
 export function isNonNullObject(value: unknown): value is UnknownRecord {
     return isObject(value);
 }
 
 /**
- * Determines if a value is a positive number (greater than zero).
+ * Checks whether a value is a positive number.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a positive number; otherwise, false.
+ * @returns `true` when the value is greater than zero.
  */
 export function isPositiveNumber(value: unknown): value is number {
     return isNumber(value) && !Number.isNaN(value) && value > 0;
 }
 
 /**
- * Determines if a value is a string.
+ * Checks whether a value is a string.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a string; otherwise, false.
+ * @returns `true` when the value is of type `string`.
  */
 export function isString(value: unknown): value is string {
     return typeof value === "string";
 }
 
 /**
- * Determines if a value is a valid TCP/IP port number (1–65535).
+ * Checks whether a value falls within the valid TCP/UDP port range.
  *
- * @param value - The value to check.
+ * @param value - Value to evaluate.
  *
- * @returns True if `value` is a valid port number; otherwise, false.
+ * @returns `true` when the value is an integer between 1 and 65,535.
  */
 export function isValidPort(value: unknown): value is number {
     return (
@@ -268,12 +261,15 @@ export function isValidPort(value: unknown): value is number {
 }
 
 /**
- * Determines if a value is a valid Unix timestamp (seconds or milliseconds).
- * Allows timestamps up to 1 day in the future from the current time.
+ * Checks whether a value represents a realistic Unix timestamp.
  *
- * @param value - The value to check.
+ * @remarks
+ * Accepts timestamps expressed in either seconds or milliseconds and permits
+ * values up to 24 hours ahead of the current time.
  *
- * @returns True if `value` is a valid timestamp; otherwise, false.
+ * @param value - Value to evaluate.
+ *
+ * @returns `true` when the value is a positive number within the allowed range.
  */
 export function isValidTimestamp(value: unknown): value is number {
     if (!isNumber(value) || value <= 0) {

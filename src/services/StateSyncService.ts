@@ -33,8 +33,8 @@ const { ensureInitialized, wrap } = ((): ReturnType<
  *
  * @remarks
  * Provides guarded access to preload-managed IPC endpoints so callers do not
- * touch {@link window.electronAPI} directly. Implementations must ensure the
- * Electron bridge is ready before invoking any underlying channel.
+ * touch the `window.electronAPI` global directly. Implementations must ensure
+ * the Electron bridge is ready before invoking any underlying channel.
  */
 interface StateSyncServiceContract {
     /** Retrieves the latest synchronization status snapshot from the backend. */

@@ -219,16 +219,6 @@ export interface SiteFormData {
 export type FormMode = "existing" | "new";
 
 /**
- * Validation result interface for form validation.
- *
- * @remarks
- * Used to return validation results with success status and error details.
- * Import directly from "./validation" for FormValidationResult if needed.
- *
- * @public
- */
-
-/**
  * Union type representing all possible monitor form data types.
  *
  * @remarks
@@ -245,7 +235,8 @@ export type MonitorFormData = HttpFormData | PingFormData | PortFormData;
  *
  * @param formData - The form data to check
  *
- * @returns True if the form data is for an HTTP monitor
+ * @returns `true` when the form data targets an HTTP monitor; otherwise
+ *   `false`.
  *
  * @public
  */
@@ -275,7 +266,7 @@ export function isHttpFormData(
  *
  * @param formData - The form data to check
  *
- * @returns True if the form data is for a ping monitor
+ * @returns `true` when the form data targets a ping monitor; otherwise `false`.
  *
  * @public
  */
@@ -305,7 +296,7 @@ export function isPingFormData(
  *
  * @param formData - The form data to check
  *
- * @returns True if the form data is for a port monitor
+ * @returns `true` when the form data targets a port monitor; otherwise `false`.
  *
  * @public
  */

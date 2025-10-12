@@ -1,13 +1,20 @@
 /**
- * Specific types for monitor form data and field handling. Replaces generic
- * `Record<string, unknown>` patterns.
+ * Specific types for monitor form data and field handling.
+ *
+ * @remarks
+ * Provides strongly typed alternatives to generic `Record<string, unknown>`
+ * shapes so monitor configuration helpers can rely on explicit property names.
+ *
+ * @public
  */
 
 import type { HttpMethod, MonitorType } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 /**
- * Base monitor fields common to all monitor types
+ * Base monitor fields common to all monitor types.
+ *
+ * @public
  */
 export interface BaseMonitorFields {
     /** Check interval in milliseconds */
@@ -21,7 +28,9 @@ export interface BaseMonitorFields {
 }
 
 /**
- * HTTP monitor specific fields
+ * HTTP monitor specific fields.
+ *
+ * @public
  */
 export interface HttpMonitorFields extends BaseMonitorFields {
     /** Expected status code for primary checks */
@@ -37,7 +46,9 @@ export interface HttpMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * HTTP header monitor specific fields
+ * HTTP header monitor specific fields.
+ *
+ * @public
  */
 export interface HttpHeaderMonitorFields extends BaseMonitorFields {
     /** Expected header value to compare against */
@@ -49,7 +60,9 @@ export interface HttpHeaderMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * HTTP JSON monitor specific fields
+ * HTTP JSON monitor specific fields.
+ *
+ * @public
  */
 export interface HttpJsonMonitorFields extends BaseMonitorFields {
     /** Expected value for the JSON path */
@@ -61,7 +74,9 @@ export interface HttpJsonMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * HTTP latency monitor specific fields
+ * HTTP latency monitor specific fields.
+ *
+ * @public
  */
 export interface HttpLatencyMonitorFields extends BaseMonitorFields {
     /** Maximum acceptable response time in milliseconds */
@@ -71,7 +86,9 @@ export interface HttpLatencyMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * HTTP keyword monitor specific fields
+ * HTTP keyword monitor specific fields.
+ *
+ * @public
  */
 export interface HttpKeywordMonitorFields extends BaseMonitorFields {
     /** Keyword that must appear in the response body */
@@ -81,7 +98,9 @@ export interface HttpKeywordMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * HTTP status monitor specific fields
+ * HTTP status monitor specific fields.
+ *
+ * @public
  */
 export interface HttpStatusMonitorFields extends BaseMonitorFields {
     /** Expected HTTP status code */
@@ -91,7 +110,9 @@ export interface HttpStatusMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * Type-safe field change handlers for monitor forms
+ * Type-safe field change handlers for monitor forms.
+ *
+ * @public
  */
 export interface MonitorFieldChangeHandlers {
     /** Handler for boolean fields */
@@ -105,7 +126,9 @@ export interface MonitorFieldChangeHandlers {
 }
 
 /**
- * Monitor field values organized by type
+ * Monitor field values organized by type.
+ *
+ * @public
  */
 export interface MonitorFieldValues {
     /** Boolean field values */
@@ -119,7 +142,9 @@ export interface MonitorFieldValues {
 }
 
 /**
- * Ping monitor specific fields
+ * Ping monitor specific fields.
+ *
+ * @public
  */
 export interface PingMonitorFields extends BaseMonitorFields {
     /** Host to ping */
@@ -127,7 +152,9 @@ export interface PingMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * DNS monitor specific fields
+ * DNS monitor specific fields.
+ *
+ * @public
  */
 export interface DnsMonitorFields extends BaseMonitorFields {
     /** Expected value for the DNS response (optional) */
@@ -152,7 +179,9 @@ export interface DnsMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * Port monitor specific fields
+ * Port monitor specific fields.
+ *
+ * @public
  */
 export interface PortMonitorFields extends BaseMonitorFields {
     /** Host to monitor */
@@ -169,7 +198,9 @@ export interface PortMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * SSL monitor specific fields
+ * SSL monitor specific fields.
+ *
+ * @public
  */
 export interface SslMonitorFields extends BaseMonitorFields {
     /** Days before expiry to trigger warnings */
@@ -182,6 +213,8 @@ export interface SslMonitorFields extends BaseMonitorFields {
 
 /**
  * CDN edge consistency monitor specific fields.
+ *
+ * @public
  */
 export interface CdnEdgeConsistencyMonitorFields extends BaseMonitorFields {
     /** Origin baseline URL that edge endpoints should match */
@@ -192,6 +225,8 @@ export interface CdnEdgeConsistencyMonitorFields extends BaseMonitorFields {
 
 /**
  * Replication monitor specific fields.
+ *
+ * @public
  */
 export interface ReplicationMonitorFields extends BaseMonitorFields {
     /** Maximum allowed replication lag in seconds */
@@ -206,6 +241,8 @@ export interface ReplicationMonitorFields extends BaseMonitorFields {
 
 /**
  * Server heartbeat monitor specific fields.
+ *
+ * @public
  */
 export interface ServerHeartbeatMonitorFields extends BaseMonitorFields {
     /** Expected heartbeat status value */
@@ -222,6 +259,8 @@ export interface ServerHeartbeatMonitorFields extends BaseMonitorFields {
 
 /**
  * WebSocket keepalive monitor specific fields.
+ *
+ * @public
  */
 export interface WebsocketKeepaliveMonitorFields extends BaseMonitorFields {
     /** Maximum delay allowed before pong is considered missing */
@@ -231,7 +270,9 @@ export interface WebsocketKeepaliveMonitorFields extends BaseMonitorFields {
 }
 
 /**
- * Union type for all monitor field types
+ * Union type for all monitor field types.
+ *
+ * @public
  */
 export type MonitorFormFields =
     | CdnEdgeConsistencyMonitorFields
@@ -260,6 +301,8 @@ export type MonitorFormFields =
  * @param type - The monitor type to get defaults for
  *
  * @returns Default field values for the specified monitor type
+ *
+ * @public
  */
 export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
     const baseFields: BaseMonitorFields = {
@@ -402,7 +445,9 @@ export function getDefaultMonitorFields(type: MonitorType): MonitorFormFields {
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain HTTP monitor properties
+ * @returns `true` if fields contain HTTP monitor properties.
+ *
+ * @public
  */
 export function isHttpMonitorFields(
     fields: MonitorFormFields
@@ -419,7 +464,9 @@ export function isHttpMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid ping monitor properties
+ * @returns `true` if fields contain valid ping monitor properties.
+ *
+ * @public
  */
 export function isPingMonitorFields(
     fields: MonitorFormFields
@@ -441,7 +488,9 @@ export function isPingMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid port monitor properties
+ * @returns `true` if fields contain valid port monitor properties.
+ *
+ * @public
  */
 export function isPortMonitorFields(
     fields: MonitorFormFields
@@ -463,7 +512,9 @@ export function isPortMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid SSL monitor properties
+ * @returns `true` if fields contain valid SSL monitor properties.
+ *
+ * @public
  */
 export function isSslMonitorFields(
     fields: MonitorFormFields
@@ -488,7 +539,9 @@ export function isSslMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain CDN edge consistency monitor properties
+ * @returns `true` if fields contain CDN edge consistency monitor properties.
+ *
+ * @public
  */
 export function isCdnEdgeConsistencyMonitorFields(
     fields: MonitorFormFields
@@ -505,7 +558,9 @@ export function isCdnEdgeConsistencyMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid Replication monitor properties
+ * @returns `true` if fields contain valid replication monitor properties.
+ *
+ * @public
  */
 export function isReplicationMonitorFields(
     fields: MonitorFormFields
@@ -529,7 +584,9 @@ export function isReplicationMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid Server Heartbeat monitor properties
+ * @returns `true` if fields contain valid server heartbeat monitor properties.
+ *
+ * @public
  */
 export function isServerHeartbeatMonitorFields(
     fields: MonitorFormFields
@@ -553,7 +610,10 @@ export function isServerHeartbeatMonitorFields(
  *
  * @param fields - Monitor form fields to check
  *
- * @returns True if fields contain valid WebSocket Keepalive monitor properties
+ * @returns `true` if fields contain valid WebSocket keepalive monitor
+ *   properties.
+ *
+ * @public
  */
 export function isWebsocketKeepaliveMonitorFields(
     fields: MonitorFormFields

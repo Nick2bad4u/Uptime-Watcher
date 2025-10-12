@@ -660,7 +660,18 @@ export async function openSiteDetails(
         await navigationEntry.scrollIntoViewIfNeeded();
         await navigationEntry.click();
     } else {
-        await siteCard.click();
+        await expect(async () => {
+            const targetCard = getSiteCardLocator(page, siteName);
+            await targetCard.waitFor({
+                state: "visible",
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+            });
+            await targetCard.scrollIntoViewIfNeeded();
+            await targetCard.click({
+                timeout: WAIT_TIMEOUTS.MEDIUM,
+                noWaitAfter: true,
+            });
+        }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
     }
 
     const siteDetailsModal = page.getByTestId("site-details-modal");

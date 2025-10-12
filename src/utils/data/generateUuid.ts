@@ -2,10 +2,10 @@
  * Utility function for generating unique identifiers.
  *
  * @remarks
- * Uses crypto.randomUUID provided by modern Electron/Node.js environments.
- * Falls back to a timestamp-based ID when crypto is unavailable.
+ * Uses `crypto.randomUUID` when available and falls back to a timestamp-based
+ * identifier otherwise.
  *
- * @packageDocumentation
+ * @public
  */
 
 /**
@@ -23,7 +23,9 @@
  * // or: "site-abc123-1234567890123" (fallback)
  * ```
  *
- * @returns A UUID string in standard format or fallback format
+ * @returns A UUID string in standard format or fallback format.
+ *
+ * @public
  */
 export function generateUuid(): string {
     // Check if crypto and randomUUID are available

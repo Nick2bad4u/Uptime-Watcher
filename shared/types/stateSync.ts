@@ -12,16 +12,22 @@ import type { Site } from "@shared/types";
 
 /**
  * Valid sources that can initiate a state synchronization action.
+ *
+ * @public
  */
 export type StateSyncSource = "cache" | "database" | "frontend";
 
 /**
  * Supported state synchronization lifecycle actions.
+ *
+ * @public
  */
 export type StateSyncAction = "bulk-sync" | "delete" | "update";
 
 /**
  * Summary returned from a `getSyncStatus` request.
+ *
+ * @public
  */
 export interface StateSyncStatusSummary {
     /** Timestamp (ms since epoch) of the last successful sync, if available. */
@@ -36,6 +42,8 @@ export interface StateSyncStatusSummary {
 
 /**
  * Result returned from a `requestFullSync` invocation.
+ *
+ * @public
  */
 export interface StateSyncFullSyncResult {
     /** Timestamp (ms since epoch) when the sync completed. */

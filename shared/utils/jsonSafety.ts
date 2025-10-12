@@ -1,29 +1,28 @@
 /**
- * Type-safe JSON parsing utilities.
+ * Result envelope returned by safe JSON helpers.
  *
  * @remarks
- * Provides safe alternatives to JSON.parse with proper error handling and
- * validation. All parsing operations return a result object with success status
- * and optional error information.
- *
- * @packageDocumentation
- */
-
-/**
- * Safe JSON parsing result.
+ * Operations capture thrown errors and expose them as structured metadata so
+ * callers never deal with exceptions during normal control flow.
  */
 export interface SafeJsonResult<T> {
+    /** Parsed value when the operation succeeds. */
     data?: T;
+    /**
+     * Descriptive error message when the operation fails. Present only when
+     * {@link SafeJsonResult.success} is `false`.
+     */
     error?: string;
+    /** Indicates whether the underlying operation completed successfully. */
     success: boolean;
 }
 
 /**
- * Ensures an error object is properly typed and formatted.
+ * Normalizes an unknown value into an {@link Error} instance.
  *
- * @param error - Unknown error value to convert to Error instance
+ * @param error - Arbitrary error-like value caught during JSON operations.
  *
- * @returns Properly typed Error object
+ * @returns A proper {@link Error} instance describing the problem.
  *
  * @internal
  */
@@ -32,18 +31,22 @@ function ensureError(error: unknown): Error {
 }
 
 /**
- * Wraps any operation with consistent error handling for SafeJsonResult
- * pattern.
+ * Executes an operation and converts thrown errors into {@link SafeJsonResult}
+ * objects.
  *
- * @param operation - Function to execute safely
- * @param errorPrefix - Prefix for error messages
+ * @remarks
+ * When the operation succeeds the resolved data is returned with `success`
+ * flagged `true`. Any thrown error is converted into a formatted message,
+ * optionally prefixed, keeping control flow exception-free.
  *
- * @returns Safe result object with data or error
+ * @typeParam T - Value returned by the wrapped operation.
  *
- * @throws Never throws - all errors are captured and returned in the result
- *   object
+ * @param operation - Callback that performs the JSON work.
+ * @param errorPrefix - Prefix describing the failing operation for diagnostics.
  *
- * @internal Helper function to eliminate error handling duplication
+ * @returns Structured result describing success or failure.
+ *
+ * @internal
  */
 function safeOperation<T>(
     operation: () => T,
@@ -73,7 +76,12 @@ function safeOperation<T>(
 }
 
 /**
- * Safely parse JSON string with type validation.
+ * Parses a JSON string and validates the resulting value with a type guard.
+ *
+ * @remarks
+ * Any failure—syntactic or semantic—becomes a structured error message inside
+ * the returned {@link SafeJsonResult} object, so callers never need try/catch
+ * for parsing.
  *
  * @example
  *
@@ -82,25 +90,24 @@ function safeOperation<T>(
  *     return (
  *         typeof data === "object" &&
  *         data !== null &&
- *         typeof data.id === "string" &&
- *         typeof data.name === "string"
+ *         typeof (data as User).id === "string" &&
+ *         typeof (data as User).name === "string"
  *     );
  * });
  *
- * if (result.success) {
- *     console.log(result.data.name); // Type-safe access
+ * if (result.success && result.data) {
+ *     console.log(result.data.name);
  * } else {
  *     console.error(result.error);
  * }
  * ```
  *
- * @param json - JSON string to parse
- * @param validator - Type guard function to validate the parsed data
+ * @typeParam T - Validated shape returned on success.
  *
- * @returns Safe result object with parsed data or error
+ * @param json - Raw JSON string to parse.
+ * @param validator - Custom type guard ensuring the parsed value satisfies `T`.
  *
- * @throws Never throws - all errors are captured and returned in the result
- *   object
+ * @returns Structured result containing either the parsed value or a message.
  */
 export function safeJsonParse<T>(
     json: string,
@@ -118,7 +125,12 @@ export function safeJsonParse<T>(
 }
 
 /**
- * Parse JSON array with element validation.
+ * Parses a JSON array and validates each element.
+ *
+ * @remarks
+ * Ensures the top-level value is an array before validating each element using
+ * the supplied guard. The first failing element aborts validation and surfaces
+ * an informative error message.
  *
  * @example
  *
@@ -129,13 +141,12 @@ export function safeJsonParse<T>(
  * );
  * ```
  *
- * @param json - JSON string to parse
- * @param elementValidator - Type guard for array elements
+ * @typeParam T - Element type expected inside the array.
  *
- * @returns Safe result object with validated array or error
+ * @param json - Raw JSON string to parse.
+ * @param elementValidator - Type guard applied to each array element.
  *
- * @throws Never throws - all errors are captured and returned in the result
- *   object
+ * @returns Structured result containing a typed array or an error message.
  */
 export function safeJsonParseArray<T>(
     json: string,
@@ -164,7 +175,11 @@ export function safeJsonParseArray<T>(
 }
 
 /**
- * Safely parse JSON string with fallback value.
+ * Parses JSON with validation and returns a fallback on failure.
+ *
+ * @remarks
+ * Delegates to {@link safeJsonParse}. When parsing fails the provided fallback
+ * is returned, ensuring callers always receive a value of type `T`.
  *
  * @example
  *
@@ -176,13 +191,13 @@ export function safeJsonParseArray<T>(
  * );
  * ```
  *
- * @param json - JSON string to parse
- * @param validator - Type guard function to validate the parsed data
- * @param fallback - Fallback value if parsing fails
+ * @typeParam T - Validated shape returned on success or fallback.
  *
- * @returns Parsed data if successful, fallback if failed
+ * @param json - Raw JSON string to parse.
+ * @param validator - Type guard ensuring the parsed value satisfies `T`.
+ * @param fallback - Value returned when parsing or validation fails.
  *
- * @throws Never throws - parsing errors result in fallback value being returned
+ * @returns The validated data or the provided fallback.
  */
 export function safeJsonParseWithFallback<T>(
     json: string,
@@ -194,7 +209,12 @@ export function safeJsonParseWithFallback<T>(
 }
 
 /**
- * Safely stringify any value to JSON.
+ * Serializes a value to JSON without throwing.
+ *
+ * @remarks
+ * The helper surfaces serialization failures (for example, circular references)
+ * as structured errors. The optional `space` parameter mirrors
+ * {@link JSON.stringify} formatting behaviour.
  *
  * @example
  *
@@ -205,13 +225,10 @@ export function safeJsonParseWithFallback<T>(
  * }
  * ```
  *
- * @param value - Value to stringify
- * @param space - Space parameter for JSON.stringify (for formatting)
+ * @param value - Arbitrary value to serialize.
+ * @param space - Formatting argument passed to {@link JSON.stringify}.
  *
- * @returns Safe result object with JSON string or error
- *
- * @throws Never throws - all errors are captured and returned in the result
- *   object
+ * @returns Structured result containing the JSON string or an error message.
  */
 export function safeJsonStringify(
     value: unknown,
@@ -229,7 +246,11 @@ export function safeJsonStringify(
 }
 
 /**
- * Safely stringify value with fallback.
+ * Serializes a value to JSON and returns a fallback string on failure.
+ *
+ * @remarks
+ * Delegates to {@link safeJsonStringify}, guaranteeing a string return value
+ * without requiring consumers to inspect the intermediate result envelope.
  *
  * @example
  *
@@ -237,14 +258,11 @@ export function safeJsonStringify(
  * const jsonString = safeJsonStringifyWithFallback(data, "{}");
  * ```
  *
- * @param value - Value to stringify
- * @param fallback - Fallback string if stringification fails
- * @param space - Space parameter for JSON.stringify (for formatting)
+ * @param value - Arbitrary value to serialize.
+ * @param fallback - String returned when serialization fails.
+ * @param space - Formatting argument passed to {@link JSON.stringify}.
  *
- * @returns JSON string if successful, fallback if failed
- *
- * @throws Never throws - stringification errors result in fallback value being
- *   returned
+ * @returns The serialized JSON string or the provided fallback.
  */
 export function safeJsonStringifyWithFallback(
     value: unknown,

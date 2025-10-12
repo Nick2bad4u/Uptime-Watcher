@@ -143,9 +143,8 @@ export class PingMonitor implements IMonitorService {
      * @throws {@link Error} When monitor validation fails (wrong type or
      *   missing host)
      *
-     * @see {@link hasValidHost} - Host validation utility
-     * @see {@link getMonitorTimeout} - Timeout extraction utility
-     * @see {@link getMonitorRetryAttempts} - Retry attempts extraction utility
+     * @see {@link validateMonitorHost} - Host validation utility
+     * @see {@link extractMonitorConfig} - Timeout and retry extraction utility
      * @see {@link performPingCheckWithRetry} - Core ping functionality
      */
     public async check(

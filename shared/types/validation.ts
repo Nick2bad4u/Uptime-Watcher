@@ -116,7 +116,8 @@ export interface ValidationResult extends BaseValidationResult {
  * @param errors - Array of error messages
  * @param metadata - Optional metadata about the validation
  *
- * @returns A failed ValidationResult
+ * @returns A validation result marked as unsuccessful with empty warnings
+ *   metadata populated.
  *
  * @public
  */
@@ -138,7 +139,8 @@ export function createFailureResult(
  * @param data - Optional validated data
  * @param warnings - Optional warning messages
  *
- * @returns A successful ValidationResult
+ * @returns A validation result marked as successful with optional warnings
+ *   attached.
  *
  * @public
  */
@@ -165,7 +167,8 @@ export function createSuccessResult(
  *
  * @param result - The object to check
  *
- * @returns True if the object matches BaseValidationResult structure
+ * @returns `true` when the object matches the {@link BaseValidationResult}
+ *   contract; otherwise `false`.
  *
  * @public
  */

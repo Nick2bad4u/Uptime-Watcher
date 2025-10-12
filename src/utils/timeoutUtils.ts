@@ -32,9 +32,11 @@ import {
  * const large = clampTimeoutMs(999999); // Returns maximum valid timeout
  * ```
  *
- * @param timeoutMs - Timeout value in milliseconds
+ * @param timeoutMs - Timeout value in milliseconds.
  *
- * @returns Clamped timeout value within valid range
+ * @returns Clamped timeout value within valid range.
+ *
+ * @public
  */
 export function clampTimeoutMs(timeoutMs: number): number {
     return Math.max(
@@ -57,9 +59,11 @@ export function clampTimeoutMs(timeoutMs: number): number {
  * const reasonable = clampTimeoutSeconds(30); // Returns 30 if within bounds
  * ```
  *
- * @param timeoutSeconds - Timeout value in seconds
+ * @param timeoutSeconds - Timeout value in seconds.
  *
- * @returns Clamped timeout value within valid range
+ * @returns Clamped timeout value within valid range.
+ *
+ * @public
  */
 export function clampTimeoutSeconds(timeoutSeconds: number): number {
     return Math.max(
@@ -84,9 +88,11 @@ export function clampTimeoutSeconds(timeoutSeconds: number): number {
  * const rounded = Math.round(timeoutMsToSeconds(5500)); // Returns 6
  * ```
  *
- * @param timeoutMs - Timeout value in milliseconds
+ * @param timeoutMs - Timeout value in milliseconds.
  *
- * @returns Timeout value in seconds (may include decimal places)
+ * @returns Timeout value in seconds (may include decimal places).
+ *
+ * @public
  */
 export function timeoutMsToSeconds(timeoutMs: number): number {
     return timeoutMs / 1000;
@@ -107,9 +113,11 @@ export function timeoutMsToSeconds(timeoutMs: number): number {
  * const timeout2 = getTimeoutSeconds(5000); // Returns 5 seconds
  * ```
  *
- * @param monitorTimeout - Monitor timeout in milliseconds (optional)
+ * @param monitorTimeout - Monitor timeout in milliseconds (optional).
  *
- * @returns Timeout in seconds
+ * @returns Timeout in seconds.
+ *
+ * @public
  */
 export function getTimeoutSeconds(monitorTimeout?: number): number {
     return monitorTimeout
@@ -131,9 +139,11 @@ export function getTimeoutSeconds(monitorTimeout?: number): number {
  * const isTooShort = isValidTimeoutMs(100); // false if below minimum
  * ```
  *
- * @param timeoutMs - Timeout value in milliseconds
+ * @param timeoutMs - Timeout value in milliseconds.
  *
- * @returns True if the timeout is valid, false otherwise
+ * @returns `true` if the timeout is valid; otherwise `false`.
+ *
+ * @public
  */
 export function isValidTimeoutMs(timeoutMs: number): boolean {
     return (
@@ -156,9 +166,11 @@ export function isValidTimeoutMs(timeoutMs: number): boolean {
  * const isTooLong = isValidTimeoutSeconds(1000); // false if above maximum
  * ```
  *
- * @param timeoutSeconds - Timeout value in seconds
+ * @param timeoutSeconds - Timeout value in seconds.
  *
- * @returns True if the timeout is valid, false otherwise
+ * @returns `true` if the timeout is valid; otherwise `false`.
+ *
+ * @public
  */
 export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
     if (Number.isNaN(timeoutSeconds)) {
@@ -186,9 +198,11 @@ export function isValidTimeoutSeconds(timeoutSeconds: number): boolean {
  * const fractional = timeoutSecondsToMs(0.1); // Returns 100
  * ```
  *
- * @param timeoutSeconds - Timeout value in seconds (accepts fractional values)
+ * @param timeoutSeconds - Timeout value in seconds (accepts fractional values).
  *
- * @returns Timeout value in milliseconds (may be fractional)
+ * @returns Timeout value in milliseconds (may be fractional).
+ *
+ * @public
  */
 export function timeoutSecondsToMs(timeoutSeconds: number): number {
     return timeoutSeconds * 1000;

@@ -59,6 +59,11 @@ type DnsRecordEnum = z.ZodEnum<{
     TXT: "TXT";
 }>;
 
+/**
+ * Zod schema capturing common monitor fields shared by all monitor variants.
+ *
+ * @public
+ */
 export type BaseMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -73,6 +78,11 @@ export type BaseMonitorSchemaType = z.ZodObject<{
     type: MonitorTypeEnum;
 }>;
 
+/**
+ * Zod schema describing HTTP monitor payloads stored in persisted state.
+ *
+ * @public
+ */
 export type HttpMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -88,6 +98,11 @@ export type HttpMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing HTTP header monitor payloads.
+ *
+ * @public
+ */
 export type HttpHeaderMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -105,6 +120,11 @@ export type HttpHeaderMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing HTTP JSON monitor payloads.
+ *
+ * @public
+ */
 export type HttpJsonMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -122,6 +142,11 @@ export type HttpJsonMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing HTTP keyword monitor payloads.
+ *
+ * @public
+ */
 export type HttpKeywordMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     bodyKeyword: z.ZodString;
@@ -138,6 +163,11 @@ export type HttpKeywordMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing HTTP latency monitor payloads.
+ *
+ * @public
+ */
 export type HttpLatencyMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -154,6 +184,11 @@ export type HttpLatencyMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing HTTP status monitor payloads.
+ *
+ * @public
+ */
 export type HttpStatusMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -170,6 +205,11 @@ export type HttpStatusMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing TCP port monitor payloads.
+ *
+ * @public
+ */
 export type PortMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -186,6 +226,11 @@ export type PortMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"port">;
 }>;
 
+/**
+ * Zod schema describing replication monitor payloads.
+ *
+ * @public
+ */
 export type ReplicationMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -204,6 +249,11 @@ export type ReplicationMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"replication">;
 }>;
 
+/**
+ * Zod schema describing ICMP ping monitor payloads.
+ *
+ * @public
+ */
 export type PingMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -219,6 +269,11 @@ export type PingMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"ping">;
 }>;
 
+/**
+ * Zod schema describing DNS monitor payloads.
+ *
+ * @public
+ */
 export type DnsMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -236,6 +291,11 @@ export type DnsMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"dns">;
 }>;
 
+/**
+ * Zod schema describing SSL certificate monitor payloads.
+ *
+ * @public
+ */
 export type SslMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     certificateWarningDays: z.ZodNumber;
@@ -253,6 +313,11 @@ export type SslMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"ssl">;
 }>;
 
+/**
+ * Zod schema describing CDN edge consistency monitor payloads.
+ *
+ * @public
+ */
 export type CdnEdgeConsistencyMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     baselineUrl: z.ZodString;
@@ -269,6 +334,11 @@ export type CdnEdgeConsistencyMonitorSchemaType = z.ZodObject<{
     type: z.ZodLiteral<"cdn-edge-consistency">;
 }>;
 
+/**
+ * Zod schema describing server heartbeat monitor payloads.
+ *
+ * @public
+ */
 export type ServerHeartbeatMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -288,6 +358,11 @@ export type ServerHeartbeatMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod schema describing WebSocket keepalive monitor payloads.
+ *
+ * @public
+ */
 export type WebsocketKeepaliveMonitorSchemaType = z.ZodObject<{
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
@@ -304,6 +379,11 @@ export type WebsocketKeepaliveMonitorSchemaType = z.ZodObject<{
     url: z.ZodString;
 }>;
 
+/**
+ * Zod discriminated union covering all monitor schema variants.
+ *
+ * @public
+ */
 export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     [
         HttpMonitorSchemaType,
@@ -323,6 +403,11 @@ export type MonitorSchemaType = z.ZodDiscriminatedUnion<
     ]
 >;
 
+/**
+ * Zod schema describing persisted site payloads including nested monitors.
+ *
+ * @public
+ */
 export type SiteSchemaType = z.ZodObject<{
     identifier: z.ZodString;
     monitoring: z.ZodBoolean;
@@ -330,6 +415,11 @@ export type SiteSchemaType = z.ZodObject<{
     name: z.ZodString;
 }>;
 
+/**
+ * Mapping of monitor type identifiers to their corresponding Zod schemas.
+ *
+ * @public
+ */
 export interface MonitorSchemas {
     readonly "cdn-edge-consistency": CdnEdgeConsistencyMonitorSchemaType;
     readonly dns: DnsMonitorSchemaType;

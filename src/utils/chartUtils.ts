@@ -2,19 +2,12 @@
  * Type-safe Chart.js configuration utilities.
  *
  * @remarks
- * Provides type guards and safe access to Chart.js configuration properties
- * with proper TypeScript support using hybrid Chart.js types.
+ * Provides safe accessors and metadata helpers for Chart.js configuration
+ * structures using the project's hybrid Chart.js type system.
  *
- * This module uses the hybrid Chart.js type system to provide:
+ * @public
  *
- * - Type-safe access to scale configurations
- * - Safe nested property navigation
- * - Business logic type integration
- * - Chart.js API compatibility
- *
- * @packageDocumentation
- *
- * @see hybrid-type-system.md for hybrid type strategy
+ * @see hybrid-type-system.md for hybrid type strategy.
  */
 
 import type { ChartScalesConfig } from "@shared/types/chartConfig";
@@ -23,9 +16,11 @@ import type { Simplify } from "type-fest";
 import { hasScales as hasScalesInternal } from "@shared/types/chartConfig";
 
 /**
- * Type-safe scale configuration result.
+ * Type-safe scale configuration result describing lookup outcomes.
+ *
+ * @public
  */
-type ScaleConfigResult = Simplify<{
+export type ScaleConfigResult = Simplify<{
     /** The scale configuration object */
     config:
         | ChartScalesConfig[keyof ChartScalesConfig]
@@ -40,7 +35,9 @@ type ScaleConfigResult = Simplify<{
  * @param config - Chart configuration
  * @param axis - Axis name ("x" or "y")
  *
- * @returns Scale configuration result with existence information
+ * @returns Scale configuration result with existence information.
+ *
+ * @public
  */
 export function getScaleConfigSafe(
     config: unknown,
@@ -76,12 +73,14 @@ export function getScaleConfigSafe(
 // Make hasScales available for external use
 
 /**
- * Safely get scale configuration.
+ * Safely get scale configuration, returning `undefined` when absent.
  *
- * @param config - Chart configuration
- * @param axis - Axis name ("x" or "y")
+ * @param config - Chart configuration.
+ * @param axis - Axis name ("x" or "y").
  *
- * @returns Scale configuration or undefined
+ * @returns Scale configuration or `undefined` when the scale is missing.
+ *
+ * @public
  */
 export function getScaleConfig(
     config: unknown,
@@ -93,8 +92,10 @@ export function getScaleConfig(
 
 /**
  * Type-safe nested property access result.
+ *
+ * @public
  */
-type PropertyAccessResult = Simplify<{
+export type PropertyAccessResult = Simplify<{
     /** Whether the property path exists */
     exists: boolean;
     /** The path that was successfully traversed */
@@ -110,7 +111,9 @@ type PropertyAccessResult = Simplify<{
  * @param axis - Axis name ("x" or "y")
  * @param path - Property path (e.g., "title.text")
  *
- * @returns Detailed property access result
+ * @returns Detailed property access result.
+ *
+ * @public
  */
 export function getNestedScalePropertySafe(
     config: unknown,
@@ -158,11 +161,13 @@ export function getNestedScalePropertySafe(
 /**
  * Safely get nested property from scale configuration.
  *
- * @param config - Chart configuration
- * @param axis - Axis name ("x" or "y")
- * @param path - Property path (e.g., "title.text")
+ * @param config - Chart configuration.
+ * @param axis - Axis name ("x" or "y").
+ * @param path - Property path (e.g., "title.text").
  *
- * @returns Property value or undefined
+ * @returns Property value or `undefined` when unavailable.
+ *
+ * @public
  */
 export function getNestedScaleProperty(
     config: unknown,
@@ -176,11 +181,13 @@ export function getNestedScaleProperty(
 /**
  * Safely get a property from a scale configuration.
  *
- * @param config - Chart configuration
- * @param axis - Axis name ("x" or "y")
- * @param property - Property name to access
+ * @param config - Chart configuration.
+ * @param axis - Axis name ("x" or "y").
+ * @param property - Property name to access.
  *
- * @returns Property value or undefined
+ * @returns Property value or `undefined` when the property is missing.
+ *
+ * @public
  */
 export function getScaleProperty(
     config: unknown,

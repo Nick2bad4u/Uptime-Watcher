@@ -1,27 +1,23 @@
 /**
- * Standardized cache configuration constants for consistent caching behavior
- * across all managers and services.
+ * Immutable cache configuration entry used to build {@link CACHE_CONFIG}.
  *
- * @remarks
- * Provides centralized cache configuration to ensure consistent TTL values,
- * size limits, and naming conventions throughout the application. These
- * constants are used by StandardizedCache instances in managers and services.
- *
- * @packageDocumentation
- */
-
-/**
- * Cache configuration interface for type safety.
+ * @internal
  */
 interface CacheConfigItem {
+    /** Enables metrics collection for cache hit/miss tracking. */
     readonly enableStats: boolean;
+    /** Upper bound on cached entries. */
     readonly maxSize: number;
+    /** Human-readable cache identifier. */
     readonly name: string;
+    /** Duration in milliseconds before entries expire. */
     readonly ttl: number;
 }
 
 /**
- * Cache configuration collection type.
+ * Internal structure describing the {@link CACHE_CONFIG} constant.
+ *
+ * @internal
  */
 interface CacheConfigCollection {
     readonly MONITORS: CacheConfigItem;
@@ -32,7 +28,11 @@ interface CacheConfigCollection {
 }
 
 /**
- * Cache configuration for different data types.
+ * Centralized cache configuration used across shared managers and services.
+ *
+ * @remarks
+ * The configurations are deeply frozen to guarantee immutability when shared
+ * between Electron and renderer processes.
  *
  * @example
  *
@@ -44,6 +44,8 @@ interface CacheConfigCollection {
  *     eventEmitter: this.eventEmitter,
  * });
  * ```
+ *
+ * @public
  */
 export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
     /**
@@ -138,7 +140,9 @@ export const CACHE_CONFIG: CacheConfigCollection = Object.freeze({
 } as const);
 
 /**
- * Cache naming interface for type safety.
+ * Internal structure describing cache naming helpers.
+ *
+ * @internal
  */
 interface CacheNamesCollection {
     readonly monitors: (suffix?: string) => string;
@@ -148,11 +152,13 @@ interface CacheNamesCollection {
 }
 
 /**
- * Cache naming patterns for consistent naming across the application.
+ * Cache naming helpers for consistent cache identifiers.
  *
  * @remarks
- * Provides standardized naming functions to ensure consistent cache naming
- * conventions, especially for temporary and dynamic caches.
+ * Standardizes naming conventions for caches, especially temporary caches that
+ * append operational context to support debugging.
+ *
+ * @public
  */
 export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
     /**
@@ -208,8 +214,20 @@ export const CACHE_NAMES: CacheNamesCollection = Object.freeze({
 } as const);
 
 /**
- * Type definitions for cache configuration.
+ * Strongly typed view of the {@link CACHE_CONFIG} map.
+ *
+ * @public
  */
 export type CacheConfigType = typeof CACHE_CONFIG;
+/**
+ * Union of cache configuration keys.
+ *
+ * @public
+ */
 export type CacheConfigKey = keyof CacheConfigType;
+/**
+ * Individual cache configuration entry type.
+ *
+ * @public
+ */
 export type CacheConfig = CacheConfigType[CacheConfigKey];

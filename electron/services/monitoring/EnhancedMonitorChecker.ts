@@ -371,9 +371,10 @@ export class EnhancedMonitorChecker {
      *
      * @public
      *
-     * @see {@link MonitorOperationRegistry.registerOperation} for operation registration
-     * @see {@link OperationTimeoutManager.createTimeout} for timeout management
-     * @see {@link MonitorStatusUpdateService.updateStatus} for status update safety
+     * @see {@link MonitorOperationRegistry.initiateCheck} for operation registration
+     * @see {@link OperationTimeoutManager.scheduleTimeout} for timeout management
+     * @see {@link MonitorStatusUpdateService.updateMonitorStatus} for status update
+     *   safety
      */
     public async checkMonitor(
         site: Site,

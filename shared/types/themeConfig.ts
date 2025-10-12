@@ -499,16 +499,6 @@ export interface ThemeOverride {
 export type DeepThemeOverride = PartialDeep<ThemeConfig>;
 
 /**
- * Theme validation result interface.
- *
- * @remarks
- * Used to return validation results for theme configurations. Import directly
- * from "./validation" for ThemeValidationResult if needed.
- *
- * @public
- */
-
-/**
  * Typography configuration interface.
  *
  * @remarks
@@ -564,7 +554,8 @@ export type ThemeMode = "dark" | "light";
  *
  * @param obj - Object to check
  *
- * @returns True if the object is a valid color palette
+ * @returns `true` when the object matches the `ColorPalette` contract;
+ *   otherwise `false`.
  *
  * @public
  */
@@ -596,7 +587,8 @@ export function isColorPalette(obj: unknown): obj is ColorPalette {
  *
  * @param obj - Object to check
  *
- * @returns True if the object is a valid theme configuration
+ * @returns `true` when the object matches the `ThemeConfig` contract; otherwise
+ *   `false`.
  *
  * @public
  */

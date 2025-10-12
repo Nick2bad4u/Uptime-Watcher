@@ -1,19 +1,10 @@
 /**
- * Common error utilities shared across the application.
+ * Derives a user-friendly message from an unknown error value.
  *
  * @remarks
- * This module provides shared utilities for consistent error handling and
- * formatting across both frontend and backend code.
- *
- * @packageDocumentation
- */
-
-/**
- * Extracts a human-readable error message from an unknown error value.
- *
- * @remarks
- * This utility standardizes error message extraction across the application,
- * providing consistent fallback behavior for non-Error values.
+ * When the supplied value is an {@link Error} instance the underlying `message`
+ * property is returned. All other values yield the provided fallback string,
+ * allowing a consistent logging surface.
  *
  * @example
  *
@@ -25,10 +16,12 @@
  * }
  * ```
  *
- * @param error - Unknown error value from catch block or callback
- * @param fallback - Custom fallback message (default: "Unknown error")
+ * @defaultValue "Unknown error"
  *
- * @returns Human-readable error message
+ * @param error - Arbitrary value captured from a thrown exception or callback.
+ * @param fallback - Message used when the value is not an {@link Error}.
+ *
+ * @returns A string suitable for logging or surfacing to the user.
  */
 export function getErrorMessage(
     error: unknown,

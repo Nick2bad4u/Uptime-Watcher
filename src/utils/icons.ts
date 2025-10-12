@@ -2,11 +2,11 @@
  * Centralized icon system using react-icons.
  *
  * @remarks
- * This module provides a consistent, type-safe way to use icons throughout the
- * application. All icons are sourced from react-icons to ensure visual
- * consistency and reduce bundle size compared to using emoji.
+ * Provides a consistent, type-safe way to use icons throughout the application.
+ * All icons are sourced from `react-icons` to ensure visual consistency and
+ * reduce bundle size compared to inline SVG or emoji.
  *
- * @packageDocumentation
+ * @public
  */
 
 import type { IconType } from "react-icons";
@@ -69,6 +69,8 @@ import { VscDatabase } from "react-icons/vsc";
 
 /**
  * Icon categories for semantic organization.
+ *
+ * @public
  */
 export const AppIcons: {
     readonly actions: {
@@ -227,10 +229,12 @@ export const AppIcons: {
  * <RefreshIcon size={20} />;
  * ```
  *
- * @param category - Icon category
- * @param name - Icon name within category
+ * @param category - Icon category.
+ * @param name - Icon name within category.
  *
- * @returns Icon component from react-icons
+ * @returns Icon component from `react-icons`.
+ *
+ * @public
  */
 export function getIcon<
     TCategory extends keyof typeof AppIcons,
@@ -241,6 +245,8 @@ export function getIcon<
 
 /**
  * Common icon size presets in pixels.
+ *
+ * @public
  */
 export const IconSizes = {
     lg: 24,
@@ -253,6 +259,8 @@ export const IconSizes = {
 
 /**
  * Type for icon size keys.
+ *
+ * @public
  */
 export type IconSize = keyof typeof IconSizes;
 
@@ -265,9 +273,11 @@ export type IconSize = keyof typeof IconSizes;
  * <Icon size={getIconSize("md")} />;
  * ```
  *
- * @param size - Icon size key
+ * @param size - Icon size key.
  *
- * @returns Pixel value
+ * @returns Pixel value.
+ *
+ * @public
  */
 export function getIconSize(size: IconSize): number {
     return IconSizes[size];

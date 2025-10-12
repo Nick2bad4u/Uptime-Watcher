@@ -1,6 +1,8 @@
 /**
  * Enhanced monitor validation utilities with shared schemas. Provides both
  * client-side and server-side validation support.
+ *
+ * @public
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -38,7 +40,10 @@ import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 // @shared/types/validation
 
 /**
- * Enhanced validation result with additional type information using Simplify.
+ * Enhanced validation result with additional type information using
+ * {@link Simplify}.
+ *
+ * @internal
  */
 type EnhancedValidationResult = Simplify<
     ValidationResult & {
@@ -52,6 +57,8 @@ type EnhancedValidationResult = Simplify<
 /**
  * Required fields for monitor creation, ensuring type safety. Prevents runtime
  * errors by guaranteeing essential properties are present.
+ *
+ * @public
  */
 export interface MonitorCreationData
     extends Pick<
@@ -68,11 +75,13 @@ export interface MonitorCreationData
 /**
  * Create monitor object with proper field mapping and type safety.
  *
- * @param type - Monitor type
- * @param fields - Field values to merge with defaults
+ * @param type - Monitor type.
+ * @param fields - Field values to merge with defaults.
  *
  * @returns Monitor creation data with type-specific fields and guaranteed
- *   required fields
+ *   required fields.
+ *
+ * @public
  */
 export function createMonitorObject(
     type: MonitorType,
@@ -99,10 +108,12 @@ export function createMonitorObject(
 /**
  * Validate monitor data using backend registry.
  *
- * @param type - Monitor type
- * @param data - Monitor data to validate
+ * @param type - Monitor type.
+ * @param data - Monitor data to validate.
  *
- * @returns Promise resolving to validation result
+ * @returns Promise resolving to validation result.
+ *
+ * @public
  */
 export async function validateMonitorData(
     type: MonitorType,
@@ -128,10 +139,12 @@ export async function validateMonitorData(
  * Perform client-side validation using shared Zod schemas. Provides immediate
  * feedback without IPC round-trip.
  *
- * @param type - Monitor type
- * @param data - Monitor data to validate
+ * @param type - Monitor type.
+ * @param data - Monitor data to validate.
  *
- * @returns Promise resolving to validation result
+ * @returns Promise resolving to validation result.
+ *
+ * @public
  */
 export async function validateMonitorDataClientSide(
     type: MonitorType,
@@ -160,11 +173,13 @@ export async function validateMonitorDataClientSide(
 /**
  * Enhanced field validation with type information and better error handling.
  *
- * @param type - Monitor type
- * @param fieldName - Field name to validate
- * @param value - Field value
+ * @param type - Monitor type.
+ * @param fieldName - Field name to validate.
+ * @param value - Field value.
  *
- * @returns Promise resolving to enhanced validation result
+ * @returns Promise resolving to enhanced validation result.
+ *
+ * @public
  */
 export async function validateMonitorFieldEnhanced(
     type: MonitorType,
@@ -219,11 +234,13 @@ export async function validateMonitorFieldEnhanced(
 /**
  * Validate individual monitor field with improved error filtering.
  *
- * @param type - Monitor type
- * @param fieldName - Field name to validate
- * @param value - Field value
+ * @param type - Monitor type.
+ * @param fieldName - Field name to validate.
+ * @param value - Field value.
  *
- * @returns Promise resolving to validation errors (empty if valid)
+ * @returns Promise resolving to validation errors (empty when valid).
+ *
+ * @public
  */
 export async function validateMonitorField(
     type: MonitorType,
@@ -249,11 +266,13 @@ export async function validateMonitorField(
  * Validate a specific monitor field for real-time feedback using shared
  * schemas. Provides immediate validation without IPC round-trip.
  *
- * @param type - Monitor type
- * @param fieldName - Field name to validate
- * @param value - Field value to validate
+ * @param type - Monitor type.
+ * @param fieldName - Field name to validate.
+ * @param value - Field value to validate.
  *
- * @returns Promise resolving to validation result
+ * @returns Promise resolving to validation result.
+ *
+ * @public
  */
 export async function validateMonitorFieldClientSide(
     type: MonitorType,
@@ -827,10 +846,12 @@ const validateMonitorFormDataByType = (
  * Validate monitor form data with only the fields that are provided. Used for
  * form validation where not all monitor fields are available yet.
  *
- * @param type - Monitor type
- * @param data - Partial monitor data from form
+ * @param type - Monitor type.
+ * @param data - Partial monitor data from form.
  *
- * @returns Promise resolving to validation result
+ * @returns Promise resolving to validation result.
+ *
+ * @public
  */
 export async function validateMonitorFormData(
     type: MonitorType,
@@ -858,9 +879,11 @@ export async function validateMonitorFormData(
 /**
  * Type guard to check if form data is valid and complete.
  *
- * @param data - Form data to validate
+ * @param data - Form data to validate.
  *
- * @returns True if form data is valid and complete, false otherwise
+ * @returns `true` if form data is valid and complete; otherwise `false`.
+ *
+ * @public
  */
 export function isMonitorFormData(data: unknown): data is MonitorFormData {
     // Perform runtime validation using shared schemas

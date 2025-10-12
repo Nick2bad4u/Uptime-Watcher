@@ -19,6 +19,8 @@ import type { StateSyncAction, StateSyncSource } from "./stateSync";
  * @remarks
  * Provides common timestamp field that all events must include. All event
  * interfaces should extend this base interface to ensure consistency.
+ *
+ * @public
  */
 export interface BaseEventData {
     /**
@@ -56,6 +58,8 @@ export interface BaseEventData {
  *     timestamp: Date.now(),
  * };
  * ```
+ *
+ * @public
  */
 export interface StateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
@@ -73,12 +77,7 @@ export interface StateSyncEventData extends BaseEventData {
  *
  * @remarks
  * Used to notify listeners that a cache entry or the entire cache has been
- * invalidated for a specific reason. - `identifier`: The specific identifier
- * affected (optional for global invalidation). - `reason`: The reason for
- * invalidation.
- *
- * - `timestamp`: The time (in ms since epoch) when invalidation occurred.
- * - `type`: The type of cache invalidation.
+ * invalidated for a specific reason.
  *
  * @example // Invalidate all site caches due to manual action
  *
@@ -89,6 +88,8 @@ export interface StateSyncEventData extends BaseEventData {
  *     timestamp: Date.now(),
  * };
  * ```
+ *
+ * @public
  */
 export interface CacheInvalidatedEventData extends BaseEventData {
     /**
@@ -130,6 +131,8 @@ export interface CacheInvalidatedEventData extends BaseEventData {
  *     connectionId: "conn_123",
  * };
  * ```
+ *
+ * @public
  */
 export interface DatabaseConnectionEventData extends BaseEventData {
     /** Unique identifier for the connection */
@@ -156,6 +159,8 @@ export interface DatabaseConnectionEventData extends BaseEventData {
  *     table: "monitors",
  * };
  * ```
+ *
+ * @public
  */
 export interface DatabaseErrorEventData extends BaseEventData {
     /** The actual error that occurred */
@@ -185,6 +190,8 @@ export interface DatabaseErrorEventData extends BaseEventData {
  *     delay: 1000,
  * };
  * ```
+ *
+ * @public
  */
 export interface DatabaseRetryEventData extends BaseEventData {
     /** Current attempt number (1-based) */
@@ -214,6 +221,8 @@ export interface DatabaseRetryEventData extends BaseEventData {
  *     cacheHit: true,
  * };
  * ```
+ *
+ * @public
  */
 export interface DatabaseSuccessEventData extends BaseEventData {
     /** Whether this operation was served from cache */
@@ -247,6 +256,8 @@ export interface DatabaseSuccessEventData extends BaseEventData {
  *     timestamp: Date.now(),
  * };
  * ```
+ *
+ * @public
  */
 export interface MonitorDownEventData extends BaseEventData {
     /**
@@ -268,8 +279,7 @@ export interface MonitorDownEventData extends BaseEventData {
  *
  * @remarks
  * Used to signal global monitoring state changes, such as starting or stopping
- * all monitors. - `activeMonitors`: Number of active monitors (for stopped
- * events).
+ * all monitors.
  *
  * - `monitorCount`: Number of monitors involved in the operation.
  * - `reason`: Reason for stopping (for stopped events).
@@ -286,6 +296,8 @@ export interface MonitorDownEventData extends BaseEventData {
  *     timestamp: Date.now(),
  * };
  * ```
+ *
+ * @public
  */
 export interface MonitoringControlEventData extends BaseEventData {
     /**
@@ -330,6 +342,8 @@ export interface MonitoringControlEventData extends BaseEventData {
  *     timestamp: Date.now(),
  * };
  * ```
+ *
+ * @public
  */
 export interface MonitorUpEventData extends BaseEventData {
     /**
@@ -351,7 +365,7 @@ export interface MonitorUpEventData extends BaseEventData {
  *
  * @remarks
  * Used to communicate the current status of application updates, including
- * errors. - `error`: Error message if status is 'error'.
+ * errors.
  *
  * - `status`: The current update status.
  *
@@ -362,6 +376,8 @@ export interface MonitorUpEventData extends BaseEventData {
  *     status: "downloaded",
  * };
  * ```
+ *
+ * @public
  */
 export interface UpdateStatusEventData {
     /**
@@ -411,5 +427,7 @@ export type DatabaseOperation =
  *     count: 42,
  * };
  * ```
+ *
+ * @public
  */
 export type TestEventData = UnknownRecord;

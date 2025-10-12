@@ -1,16 +1,7 @@
 /**
- * Shared type definitions used across frontend and backend.
- *
- * @remarks
- * All core domain types (Monitor, Site, StatusUpdate, etc.) live here. Both
- * frontend and backend must import from this file for consistency. Event types
- * are separate to avoid circular dependencies.
- *
- * @packageDocumentation
- */
-
-/**
  * Canonical status kinds shared across monitors, sites, and history records.
+ *
+ * @public
  */
 export const STATUS_KIND = {
     DEGRADED: "degraded",
@@ -24,9 +15,17 @@ export const STATUS_KIND = {
 
 /**
  * Union of all recognized status kinds.
+ *
+ * @public
  */
 export type StatusKind = (typeof STATUS_KIND)[keyof typeof STATUS_KIND];
 
+/**
+ * Ordered list of monitor status literals used for comparisons and UI sort
+ * order.
+ *
+ * @internal
+ */
 type MonitorStatusTuple = readonly [
     typeof STATUS_KIND.DEGRADED,
     typeof STATUS_KIND.DOWN,
@@ -35,6 +34,11 @@ type MonitorStatusTuple = readonly [
     typeof STATUS_KIND.UP,
 ];
 
+/**
+ * Ordered list of site status literals used for comparisons and UI sort order.
+ *
+ * @internal
+ */
 type SiteStatusTuple = readonly [
     typeof STATUS_KIND.DEGRADED,
     typeof STATUS_KIND.DOWN,
@@ -45,6 +49,11 @@ type SiteStatusTuple = readonly [
     typeof STATUS_KIND.UP,
 ];
 
+/**
+ * Ordered list of status literals persisted in monitor history records.
+ *
+ * @internal
+ */
 type StatusHistoryTuple = readonly [
     typeof STATUS_KIND.UP,
     typeof STATUS_KIND.DOWN,
@@ -52,7 +61,7 @@ type StatusHistoryTuple = readonly [
 ];
 
 /**
- * Ordered list of monitor-specific status values.
+ * Status values captured in historical monitor records.
  */
 export const MONITOR_STATUS_VALUES: MonitorStatusTuple = [
     STATUS_KIND.DEGRADED,
@@ -64,6 +73,12 @@ export const MONITOR_STATUS_VALUES: MonitorStatusTuple = [
 
 /**
  * Ordered list of site status values (monitor statuses plus computed kinds).
+ *
+ * @remarks
+ * Includes derived site-only states such as {@link STATUS_KIND.MIXED} and
+ * {@link STATUS_KIND.UNKNOWN}.
+ *
+ * @public
  */
 export const SITE_STATUS_VALUES: SiteStatusTuple = [
     STATUS_KIND.DEGRADED,
@@ -77,6 +92,8 @@ export const SITE_STATUS_VALUES: SiteStatusTuple = [
 
 /**
  * Valid status values recorded in monitor history entries.
+ *
+ * @public
  */
 export const STATUS_HISTORY_VALUES: StatusHistoryTuple = [
     STATUS_KIND.UP,
@@ -86,6 +103,8 @@ export const STATUS_HISTORY_VALUES: StatusHistoryTuple = [
 
 /**
  * Status values captured in historical monitor records.
+ *
+ * @public
  */
 export type StatusHistoryStatus = StatusHistoryTuple[number];
 
@@ -94,6 +113,8 @@ export type StatusHistoryStatus = StatusHistoryTuple[number];
  *
  * @remarks
  * Used throughout the system to represent the current state of a monitor.
+ *
+ * @public
  */
 export type MonitorStatus = MonitorStatusTuple[number];
 
@@ -313,10 +334,23 @@ export interface MonitorFieldDefinition {
     type: "number" | "select" | "text" | "url";
 }
 
+/**
+ * Core site entity aggregating one or more monitors.
+ *
+ * @remarks
+ * Represents a logical monitored property such as a website or service. Each
+ * site owns a collection of monitors that produce its aggregate status.
+ *
+ * @public
+ */
 export interface Site {
+    /** Unique identifier persisted across renderer and backend. */
     identifier: string;
+    /** Indicates whether monitoring is currently active for the site. */
     monitoring: boolean;
+    /** Collection of monitors assigned to the site. */
     monitors: Monitor[];
+    /** Human-readable site name rendered throughout the UI. */
     name: string;
 }
 
@@ -336,30 +370,59 @@ export interface SiteForStatus {
     }>;
 }
 
+/**
+ * Snapshot of a monitor's status at a specific point in time.
+ *
+ * @remarks
+ * Persisted within history timelines and analytics datasets.
+ *
+ * @public
+ */
 export interface StatusHistory {
+    /** Optional diagnostic message captured during the check. */
     details?: string;
+    /** Response time measurement in milliseconds. */
     responseTime: number;
+    /** Resulting monitor status. */
     status: StatusHistoryStatus;
+    /** Unix timestamp (milliseconds) for when the check completed. */
     timestamp: number;
 }
 
+/**
+ * Real-time status update emitted when a monitor changes state.
+ *
+ * @remarks
+ * Sent across IPC boundaries to synchronize renderer views and orchestrator
+ * caches.
+ *
+ * @public
+ */
 export interface StatusUpdate {
+    /** Optional diagnostic message describing the change. */
     details?: string;
+    /** Identifier of the monitor generating the update. */
     monitorId: string;
+    /** Previous status before the update, if known. */
     previousStatus?: MonitorStatus;
+    /** Optional full site entity when context is required. */
     site?: Site;
+    /** Identifier of the site associated with the monitor. */
     siteIdentifier: string;
+    /** New monitor status after processing the check result. */
     status: MonitorStatus;
+    /** ISO-8601 timestamp representing when the update was produced. */
     timestamp: string;
 }
 
 /**
- * Helper to validate that all elements in activeOperations are valid
- * identifiers.
+ * Validates that active operation identifiers are well-formed strings.
  *
- * @param activeOperations - Array to validate
+ * @param activeOperations - Value supplied for the `activeOperations` field.
  *
- * @returns True if all elements are valid identifiers
+ * @returns `true` when every entry is a non-empty string.
+ *
+ * @internal
  */
 function isValidActiveOperations(
     activeOperations: unknown
@@ -378,23 +441,59 @@ function isValidActiveOperations(
     return true;
 }
 
+/**
+ * Determines whether a string represents a computed site-only status value.
+ *
+ * @param status - Status string to evaluate.
+ *
+ * @returns `true` when the value is either `mixed` or `unknown`.
+ *
+ * @public
+ */
 export function isComputedSiteStatus(
     status: string
 ): status is typeof STATUS_KIND.MIXED | typeof STATUS_KIND.UNKNOWN {
     return status === STATUS_KIND.MIXED || status === STATUS_KIND.UNKNOWN;
 }
 
+/**
+ * Determines whether a string matches a monitor status literal.
+ *
+ * @param status - Status string to evaluate.
+ *
+ * @returns `true` when the value is part of {@link MONITOR_STATUS_VALUES}.
+ *
+ * @public
+ */
 export function isMonitorStatus(status: string): status is MonitorStatus {
     return (MONITOR_STATUS_VALUES as readonly string[]).includes(status);
 }
 
+/**
+ * Determines whether a string matches a site status literal.
+ *
+ * @param status - Status string to evaluate.
+ *
+ * @returns `true` when the value is part of {@link SITE_STATUS_VALUES}.
+ *
+ * @public
+ */
 export function isSiteStatus(status: string): status is SiteStatus {
     return (SITE_STATUS_VALUES as readonly string[]).includes(status);
 }
 
 /**
- * Enhanced monitor validation using shared type guards. Provides consistent
- * validation across frontend and backend.
+ * Validates monitor payloads using shared runtime guards.
+ *
+ * @remarks
+ * Used by both renderer and Electron processes to ensure monitor data meets the
+ * shared {@link Monitor} contract before persisting or rendering.
+ *
+ * @param monitor - Partial monitor payload to validate.
+ *
+ * @returns `true` when the payload satisfies the {@link Monitor} interface.
+ *
+ * @public
  */
 export function validateMonitor(monitor: Partial<Monitor>): monitor is Monitor {
     // Runtime validation requires null/undefined checks despite type signature

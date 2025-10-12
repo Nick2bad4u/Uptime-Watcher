@@ -4,7 +4,6 @@
  * @remarks
  * These utilities eliminate hardcoded monitor type checks throughout the
  * frontend by providing dynamic configuration-based helpers for UI behavior.
- *
  * All utilities support caching for optimal performance and include error
  * handling.
  *
@@ -18,7 +17,7 @@
  * const defaultId = getDefaultMonitorId(["monitor-1", "monitor-2"]);
  * ```
  *
- * @packageDocumentation
+ * @public
  */
 
 import type { Monitor, MonitorType } from "@shared/types";
@@ -37,12 +36,13 @@ import {
 } from "./monitorTypeHelper";
 
 /**
- * Help text configuration for monitor types
+ * Help text configuration for monitor types.
  *
  * @remarks
- * This interface defines the structure for contextual help text displayed to
- * users when configuring monitors. The help text provides guidance on
- * monitor-specific configuration options and requirements.
+ * Defines the structure for contextual help text displayed to users when
+ * configuring monitors.
+ *
+ * @public
  */
 export interface MonitorHelpTexts {
     /**
@@ -67,7 +67,9 @@ export interface MonitorHelpTexts {
 }
 
 /**
- * Type guard to check if a cache value is a MonitorTypeConfig
+ * Type guard to check if a cache value is a {@link MonitorTypeConfig}.
+ *
+ * @internal
  */
 function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Type guard requires assertions to check object properties */
@@ -85,14 +87,16 @@ function isMonitorTypeConfig(value: unknown): value is MonitorTypeConfig {
  * Retrieves monitor type configuration with automatic caching.
  *
  * @remarks
- * This function first checks the cache for the configuration. If not found, it
- * fetches from the backend and caches the result for future use.
+ * Checks the cache before performing a backend lookup and stores successful
+ * results back into the cache.
  *
- * @param monitorType - The monitor type to get configuration for
- * @param signal - Optional AbortSignal for cancellation
+ * @param monitorType - The monitor type to get configuration for.
+ * @param signal - Optional `AbortSignal` for cancellation.
  *
- * @returns Promise resolving to the monitor type configuration or undefined if
- *   not found
+ * @returns Promise resolving to the monitor type configuration or `undefined`
+ *   when not found.
+ *
+ * @internal
  */
 async function getConfig(
     monitorType: MonitorType,
@@ -128,9 +132,10 @@ async function getConfig(
  * Clears the configuration cache.
  *
  * @remarks
- * Removes all cached monitor type configurations. This is useful for testing
- * scenarios or when monitor types change and the cache needs to be
- * invalidated.
+ * Removes all cached monitor type configurations. Useful for tests or when
+ * monitor types change and require cache invalidation.
+ *
+ * @public
  */
 export function clearConfigCache(): void {
     AppCaches.uiHelpers.clear();
@@ -140,15 +145,15 @@ export function clearConfigCache(): void {
  * Get the default monitor ID from a list of monitor IDs.
  *
  * @remarks
- * This function returns the first element of the array if it exists, otherwise
- * an empty string. It does not validate whether the IDs are actually valid
- * monitor identifiers - that should be done by the caller if needed. Empty
- * arrays return an empty string as a safe fallback.
+ * Returns the first element of the array if it exists; otherwise, an empty
+ * string.
  *
- * @param monitorIds - Array of monitor IDs
+ * @param monitorIds - Array of monitor IDs.
  *
- * @returns Default monitor ID (first valid ID in array) or empty string if
- *   array is empty or contains no valid IDs
+ * @returns First monitor identifier in the list or an empty string when the
+ *   collection is empty.
+ *
+ * @public
  */
 export function getDefaultMonitorId(monitorIds: readonly string[]): string {
     return monitorIds[0] ?? "";
@@ -157,9 +162,12 @@ export function getDefaultMonitorId(monitorIds: readonly string[]): string {
 /**
  * Check if monitor type supports advanced analytics.
  *
- * @param monitorType - Type of monitor
+ * @param monitorType - Type of monitor.
  *
- * @returns Whether monitor supports advanced analytics
+ * @returns `true` when the monitor supports advanced analytics; otherwise
+ *   `false`.
+ *
+ * @public
  */
 export async function supportsAdvancedAnalytics(
     monitorType: MonitorType
@@ -177,9 +185,11 @@ export async function supportsAdvancedAnalytics(
 /**
  * Check if monitor type supports response time analytics.
  *
- * @param monitorType - Type of monitor
+ * @param monitorType - Type of monitor.
  *
- * @returns Whether monitor supports response time analytics
+ * @returns `true` when the monitor provides response time analytics.
+ *
+ * @public
  */
 export async function supportsResponseTime(
     monitorType: MonitorType
@@ -195,12 +205,14 @@ export async function supportsResponseTime(
 }
 
 /**
- * Check if all monitor types in array support advanced analytics. Useful for
- * conditional rendering of advanced analytics components.
+ * Check if all monitor types in array support advanced analytics.
  *
- * @param monitorTypes - Array of monitor types to check
+ * @param monitorTypes - Array of monitor types to check.
  *
- * @returns Whether all types support advanced analytics
+ * @returns `true` when every monitor type in the provided array supports
+ *   advanced analytics.
+ *
+ * @public
  */
 export async function allSupportsAdvancedAnalytics(
     monitorTypes: MonitorType[]
@@ -218,12 +230,14 @@ export async function allSupportsAdvancedAnalytics(
 }
 
 /**
- * Check if all monitor types in array support response time. Useful for
- * conditional rendering of response time charts.
+ * Check if all monitor types in array support response time.
  *
- * @param monitorTypes - Array of monitor types to check
+ * @param monitorTypes - Array of monitor types to check.
  *
- * @returns Whether all types support response time
+ * @returns `true` when every monitor type in the list supports response time
+ *   analytics.
+ *
+ * @public
  */
 export async function allSupportsResponseTime(
     monitorTypes: MonitorType[]
@@ -250,10 +264,12 @@ export async function allSupportsResponseTime(
  * const label = await formatMonitorDetail("port", "80"); // "Port: 80"
  * ```
  *
- * @param monitorType - Type of monitor
- * @param details - Detail value to format
+ * @param monitorType - Type of monitor.
+ * @param details - Detail value to format.
  *
- * @returns Formatted detail string
+ * @returns Formatted detail string supplied by the monitor registry.
+ *
+ * @public
  */
 export async function formatMonitorDetail(
     monitorType: MonitorType,
@@ -286,10 +302,12 @@ export async function formatMonitorDetail(
  * }); // " (localhost:80)"
  * ```
  *
- * @param monitorType - Type of monitor
- * @param monitor - Monitor data
+ * @param monitorType - Type of monitor.
+ * @param monitor - Monitor data.
  *
- * @returns Formatted title suffix string
+ * @returns Title suffix string suitable for rendering in the UI.
+ *
+ * @public
  */
 export async function formatMonitorTitleSuffix(
     monitorType: MonitorType,
@@ -310,9 +328,11 @@ export async function formatMonitorTitleSuffix(
 /**
  * Get analytics label for monitor type.
  *
- * @param monitorType - Type of monitor
+ * @param monitorType - Type of monitor.
  *
- * @returns Analytics label or fallback
+ * @returns Analytics label from configuration or a fallback string.
+ *
+ * @public
  */
 export async function getAnalyticsLabel(
     monitorType: MonitorType
@@ -333,10 +353,12 @@ export async function getAnalyticsLabel(
 /**
  * Get help text for monitor type form fields.
  *
- * @param monitorType - Type of monitor
- * @param signal - Optional AbortSignal for cancellation
+ * @param monitorType - Type of monitor.
+ * @param signal - Optional `AbortSignal` for cancellation.
  *
- * @returns Object containing primary and secondary help texts
+ * @returns Object containing primary and secondary help texts.
+ *
+ * @public
  */
 export async function getMonitorHelpTexts(
     monitorType: MonitorType,
@@ -359,9 +381,12 @@ export async function getMonitorHelpTexts(
 /**
  * Get available monitor types that support a specific feature.
  *
- * @param feature - Feature to check for ('responseTime' | 'advancedAnalytics')
+ * @param feature - Feature to check for (`"responseTime"` or
+ *   `"advancedAnalytics"`).
  *
- * @returns Array of monitor types that support the feature
+ * @returns Array of monitor types that support the requested feature.
+ *
+ * @public
  */
 export async function getTypesWithFeature(
     feature: "advancedAnalytics" | "responseTime"
@@ -392,9 +417,11 @@ export async function getTypesWithFeature(
 /**
  * Check if monitor type should show URL in display.
  *
- * @param monitorType - Type of monitor
+ * @param monitorType - Type of monitor.
  *
- * @returns Whether to show URL
+ * @returns `true` when URLs should appear in UI for the given monitor type.
+ *
+ * @public
  */
 export async function shouldShowUrl(
     monitorType: MonitorType

@@ -4,9 +4,9 @@
  *
  * @remarks
  * These schemas and functions are used by both frontend and backend to ensure
- * data integrity. Validation constraints are synchronized with UI constants in
- * {@link constants.ts}. All validation logic is centralized here for consistency
- * and maintainability.
+ * data integrity. Validation constraints are synchronized with the UI constants
+ * defined in `@shared/constants`. All validation logic is centralized here for
+ * consistency and maintainability.
  *
  * @packageDocumentation
  */
@@ -91,7 +91,7 @@ const statusHistorySchema = z
  * Validation constraints for monitor fields.
  *
  * @remarks
- * These values must match the UI constants in {@link constants.ts}.
+ * These values must match the UI constants in `@shared/constants`.
  */
 const VALIDATION_CONSTRAINTS = {
     CHECK_INTERVAL: {
