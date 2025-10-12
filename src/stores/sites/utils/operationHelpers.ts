@@ -1,5 +1,7 @@
 /**
  * Common helper functions for site operations to eliminate code duplication.
+ *
+ * @packageDocumentation
  */
 
 import type { Site } from "@shared/types";
@@ -19,12 +21,14 @@ import { updateMonitorInSite } from "./monitorOperations";
  * Gets a site by ID and validates it exists. Common pattern used across
  * multiple site operations.
  *
- * @param siteId - The site identifier
- * @param deps - Site operation dependencies
+ * @param siteId - The site identifier.
+ * @param deps - Site operation dependencies.
  *
- * @returns The found site
+ * @returns The found site.
  *
- * @throws Error if site is not found
+ * @throws Error if site is not found.
+ *
+ * @public
  */
 export const getSiteById = (
     siteId: string,
@@ -42,10 +46,14 @@ export const getSiteById = (
  * Updates a monitor within a site and saves it. Common pattern for monitor
  * update operations.
  *
- * @param siteId - The site identifier
- * @param monitorId - The monitor identifier
- * @param updates - Monitor updates to apply
- * @param deps - Site operation dependencies
+ * @param siteId - The site identifier.
+ * @param monitorId - The monitor identifier.
+ * @param updates - Monitor updates to apply.
+ * @param deps - Site operation dependencies.
+ *
+ * @returns Promise that resolves when the monitor update completes.
+ *
+ * @public
  */
 export const updateMonitorAndSave = async (
     siteId: string,
@@ -77,13 +85,15 @@ export const updateMonitorAndSave = async (
  * sync. Eliminates duplication of the common pattern used across all site
  * operations.
  *
- * @param operationName - Name of the operation for logging and error handling
- * @param operation - The async operation to execute
- * @param params - Parameters passed to the operation for logging
- * @param deps - Site operation dependencies
- * @param syncAfter - Whether to sync from backend after the operation
+ * @param operationName - Name of the operation for logging and error handling.
+ * @param operation - The async operation to execute.
+ * @param params - Parameters passed to the operation for logging.
+ * @param deps - Site operation dependencies.
+ * @param syncAfter - Whether to sync from backend after the operation.
  *
- * @returns Promise that resolves when operation and optional sync complete
+ * @returns Promise that resolves when operation and optional sync complete.
+ *
+ * @public
  */
 export const withSiteOperation = async (
     operationName: string,
@@ -109,13 +119,15 @@ export const withSiteOperation = async (
  * Wraps a site operation with consistent logging, error handling, and optional
  * sync. This version supports operations that return a value.
  *
- * @param operationName - Name of the operation for logging and error handling
- * @param operation - The async operation to execute that returns a value
- * @param params - Parameters passed to the operation for logging
- * @param deps - Site operation dependencies
- * @param syncAfter - Whether to sync from backend after the operation
+ * @param operationName - Name of the operation for logging and error handling.
+ * @param operation - The async operation to execute that returns a value.
+ * @param params - Parameters passed to the operation for logging.
+ * @param deps - Site operation dependencies.
+ * @param syncAfter - Whether to sync from backend after the operation.
  *
- * @returns Promise that resolves to the operation result
+ * @returns Promise that resolves to the operation result.
+ *
+ * @public
  */
 export const withSiteOperationReturning = async <T>(
     operationName: string,

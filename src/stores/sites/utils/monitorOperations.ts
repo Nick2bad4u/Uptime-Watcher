@@ -4,6 +4,8 @@
  * @remarks
  * Provides utilities for working with monitor data and configurations,
  * including creation, validation, and manipulation of monitor objects.
+ *
+ * @packageDocumentation
  */
 
 import type { UnknownRecord } from "type-fest";
@@ -241,7 +243,9 @@ function validateMonitorType(type: unknown): MonitorType {
 }
 
 /**
- * Adds a monitor to a site
+ * Adds a monitor to a site.
+ *
+ * @public
  */
 export function addMonitorToSite(site: Site, monitor: Monitor): Site {
     const updatedMonitors = [...site.monitors, monitor];
@@ -249,7 +253,9 @@ export function addMonitorToSite(site: Site, monitor: Monitor): Site {
 }
 
 /**
- * Finds a monitor in a site by ID
+ * Finds a monitor in a site by ID.
+ *
+ * @public
  */
 export function findMonitorInSite(
     site: Site,
@@ -928,7 +934,7 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
 /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe monitor configuration type assertions */
 
 /**
- * Creates a default monitor for a site
+ * Creates a default monitor for a site.
  *
  * @example
  *
@@ -936,9 +942,11 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
  * const monitor = createDefaultMonitor({ url: "https://example.com" });
  * ```
  *
- * @param overrides - Partial monitor object to override defaults
+ * @param overrides - Partial monitor object to override defaults.
  *
- * @returns Complete monitor object with defaults applied
+ * @returns Complete monitor object with defaults applied.
+ *
+ * @public
  */
 export function createDefaultMonitor(
     overrides: Partial<Monitor> = {}
@@ -948,7 +956,7 @@ export function createDefaultMonitor(
 }
 
 /**
- * Removes a monitor from a site
+ * Removes a monitor from a site.
  *
  * @example
  *
@@ -956,10 +964,12 @@ export function createDefaultMonitor(
  * const updatedSite = removeMonitorFromSite(site, "monitor-123");
  * ```
  *
- * @param site - The site to remove the monitor from
- * @param monitorId - The ID of the monitor to remove
+ * @param site - The site to remove the monitor from.
+ * @param monitorId - The ID of the monitor to remove.
  *
- * @returns Updated site without the specified monitor
+ * @returns Updated site without the specified monitor.
+ *
+ * @public
  */
 export function removeMonitorFromSite(site: Site, monitorId: string): Site {
     const updatedMonitors = site.monitors.filter(
@@ -969,7 +979,7 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
 }
 
 /**
- * Updates a monitor in a site
+ * Updates a monitor in a site.
  *
  * @example
  *
@@ -979,13 +989,15 @@ export function removeMonitorFromSite(site: Site, monitorId: string): Site {
  * });
  * ```
  *
- * @param site - The site containing the monitor
- * @param monitorId - The ID of the monitor to update
- * @param updates - Partial monitor updates to apply
+ * @param site - The site containing the monitor.
+ * @param monitorId - The ID of the monitor to update.
+ * @param updates - Partial monitor updates to apply.
  *
- * @returns Updated site with modified monitor
+ * @returns Updated site with modified monitor.
  *
- * @throws Error if monitor is not found
+ * @throws Error if monitor is not found.
+ *
+ * @public
  */
 export function updateMonitorInSite(
     site: Site,
@@ -1043,10 +1055,12 @@ export function updateMonitorInSite(
  * validateMonitorExists(site, "monitor-123");
  * ```
  *
- * @param site - The site to check for the monitor
- * @param monitorId - The ID of the monitor to validate
+ * @param site - The site to check for the monitor.
+ * @param monitorId - The ID of the monitor to validate.
  *
- * @throws Error if site is not found or monitor does not exist
+ * @throws Error if site is not found or monitor does not exist.
+ *
+ * @public
  */
 export function validateMonitorExists(
     site: Site | undefined,

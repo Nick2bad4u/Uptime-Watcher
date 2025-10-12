@@ -94,9 +94,11 @@ function getMonitorDisplayText(monitor: Monitor): string {
  * - Site-level monitoring controls
  * - Quick actions for site management
  *
- * @param props - Component props
+ * @param props - Component props.
  *
- * @returns JSX element containing the site overview
+ * @returns JSX element containing the site overview.
+ *
+ * @public
  */
 export const SiteOverviewTab = ({
     avgResponseTime,

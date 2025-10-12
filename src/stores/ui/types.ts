@@ -6,6 +6,8 @@
  * This store is responsible for managing the UI state of the application,
  * including modal visibility, selected site, active tabs, and chart time
  * ranges. All state mutations must be performed via store actions.
+ *
+ * @packageDocumentation
  */
 
 import type { Site } from "@shared/types";
@@ -14,16 +16,22 @@ import type { ChartTimeRange } from "../types";
 
 /**
  * Layout modes available for the dashboard site list.
+ *
+ * @public
  */
 export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 
 /**
  * Presentation modes available for large site cards.
+ *
+ * @public
  */
 export type SiteCardPresentation = "grid" | "stacked";
 
 /**
  * Resizable column identifiers for the list layout table.
+ *
+ * @public
  */
 export type SiteTableColumnKey =
     | "controls"
@@ -36,6 +44,8 @@ export type SiteTableColumnKey =
 
 /**
  * Supported tab identifiers for the site details view.
+ *
+ * @public
  */
 export type SiteDetailsTab =
     | "analytics"
@@ -51,6 +61,8 @@ export type SiteDetailsTab =
  * @remarks
  * Provides state and actions for managing user interface interactions and modal
  * visibility.
+ *
+ * @public
  */
 export interface UIStore {
     /**

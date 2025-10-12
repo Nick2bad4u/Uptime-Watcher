@@ -68,9 +68,11 @@ export interface SiteDetailsNavigationProperties {
  * Provides tabbed navigation and monitoring controls for site details,
  * including start/stop monitoring, manual checks, and configuration options.
  *
- * @param props - Component props for navigation and control
+ * @param props - Component props for navigation and control.
  *
- * @returns JSX element containing navigation controls
+ * @returns JSX element containing navigation controls.
+ *
+ * @public
  */
 export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationProperties> =
     memo(function SiteDetailsNavigationComponent({

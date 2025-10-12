@@ -2,6 +2,8 @@
  * Factory for creating standardized error handling contexts for store
  * operations. Eliminates duplication of error handling patterns across
  * different store modules.
+ *
+ * @packageDocumentation
  */
 
 import type { ErrorHandlingFrontendStore } from "@shared/utils/errorHandling";
@@ -37,7 +39,9 @@ import { useErrorStore } from "../error/useErrorStore";
  * @param operationName - The name of the specific operation being performed
  *   (e.g., "createSite", "deleteSite")
  *
- * @returns Error handling context compatible with `withErrorHandling` function
+ * @returns Error handling context compatible with `withErrorHandling` function.
+ *
+ * @public
  */
 export function createStoreErrorHandler(
     storeKey: string,

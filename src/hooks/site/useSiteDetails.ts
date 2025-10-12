@@ -14,6 +14,8 @@
  * render instead of managing state in useEffect hooks. Changes are tracked
  * using previous value comparison and user edit state to provide responsive UI
  * feedback.
+ *
+ * @public
  */
 
 import type { Monitor, Site } from "@shared/types";
@@ -55,11 +57,6 @@ export interface UseSiteDetailsProperties {
     site: Site;
 }
 
-/**
- * Result interface for the useSiteDetails hook
- *
- * @public
- */
 /**
  * Return type for the useSiteDetails hook containing all state and handlers.
  *
@@ -177,9 +174,13 @@ export interface UseSiteDetailsResult {
  * }
  * ```
  *
- * @param props - Hook props containing the site to manage
+ * @param props - Hook props containing the site to manage.
  *
- * @returns Object containing all site details state and handlers
+ * @returns Object containing all site details state and handlers.
+ *
+ * @public
+ *
+ * @see {@link UseSiteDetailsResult} for the complete return shape.
  */
 
 // eslint-disable-next-line complexity -- Complex hook that manages multiple site detail states and operations, breaking down would reduce cohesion

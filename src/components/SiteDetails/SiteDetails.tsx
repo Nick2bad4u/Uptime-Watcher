@@ -92,9 +92,11 @@ export interface SiteDetailsProperties {
  * />;
  * ```
  *
- * @param props - Component props
+ * @param props - Component props.
  *
- * @returns JSX element containing the site details interface
+ * @returns JSX element containing the site details interface.
+ *
+ * @public
  */
 export const SiteDetails = ({
     onClose,

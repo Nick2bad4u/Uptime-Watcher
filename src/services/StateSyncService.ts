@@ -61,13 +61,30 @@ interface StateSyncServiceContract {
  * @public
  */
 export const StateSyncService: StateSyncServiceContract = {
+    /**
+     * Retrieves the latest synchronization summary from the backend.
+     *
+     * @returns {@link StateSyncStatusSummary} Describing recent sync activity.
+     */
     getSyncStatus: wrap("getSyncStatus", (api) =>
         // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
         api.stateSync.getSyncStatus()
     ),
 
+    /**
+     * Ensures the preload bridge is initialized prior to invoking IPC.
+     *
+     * @returns Promise that resolves when the bridge is ready.
+     */
     initialize: ensureInitialized,
 
+    /**
+     * Subscribes to incremental state synchronization updates.
+     *
+     * @param callback - Handler invoked with {@link StateSyncEventData}.
+     *
+     * @returns Cleanup callback that removes the subscription.
+     */
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
         (api, callback: (event: StateSyncEventData) => void) =>
@@ -75,6 +92,11 @@ export const StateSyncService: StateSyncServiceContract = {
             Promise.resolve(api.stateSync.onStateSyncEvent(callback))
     ),
 
+    /**
+     * Requests a full state synchronization cycle.
+     *
+     * @returns {@link StateSyncFullSyncResult} Emitted by the backend.
+     */
     requestFullSync: wrap("requestFullSync", (api) =>
         // eslint-disable-next-line n/no-sync -- IPC bridge exposes async method with "Sync" suffix.
         api.stateSync.requestFullSync()

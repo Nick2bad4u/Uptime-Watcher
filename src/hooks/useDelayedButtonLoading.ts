@@ -23,6 +23,7 @@
  * @returns The delayed loading state for button display
  *
  * @public
+ * @public
  */
 
 import { useCallback, useEffect, useState } from "react";
@@ -32,9 +33,11 @@ import { UI_DELAYS } from "../constants";
 /**
  * Hook that manages delayed button loading states to prevent UI flickering.
  *
- * @param isLoading - Whether the operation is currently loading
+ * @param isLoading - Whether the operation is currently loading.
  *
- * @returns Delayed loading state for button display
+ * @returns Delayed loading state for button display.
+ *
+ * @public
  */
 export function useDelayedButtonLoading(isLoading: boolean): boolean {
     const [showButtonLoading, setShowButtonLoading] = useState(false);

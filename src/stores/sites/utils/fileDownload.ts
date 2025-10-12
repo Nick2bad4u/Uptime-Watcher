@@ -1,6 +1,8 @@
 /**
  * File backup utility for handling file download operations. Provides utilities
  * for browser-based file downloads.
+ *
+ * @packageDocumentation
  */
 
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
@@ -14,6 +16,8 @@ import { isPlaywrightAutomation } from "../../../utils/environment";
  * @remarks
  * Used to specify the file buffer, filename, and optional MIME type for
  * download operations.
+ *
+ * @public
  */
 export interface FileDownloadOptions {
     /** The file buffer to download */
@@ -196,6 +200,8 @@ function handleDownloadError(
  *
  * @throws {@link Error} If the download fails due to browser API issues or DOM
  *   manipulation errors.
+ *
+ * @public
  */
 export function downloadFile(options: FileDownloadOptions): void {
     const { buffer, fileName, mimeType = "application/octet-stream" } = options;
@@ -224,6 +230,8 @@ export function downloadFile(options: FileDownloadOptions): void {
  * @param extension - The file extension (default: "sqlite").
  *
  * @returns The generated filename string.
+ *
+ * @public
  */
 export function generateBackupFileName(
     prefix = "backup",
@@ -291,8 +299,10 @@ function isSerializedDatabaseBackupResult(
  * @param downloadFunction - Async function resolving to a serialized backup
  *   payload from the Electron main process.
  *
- * @throws TypeError if the backup data fails validation
- * @throws Error if the download fails due to browser API or DOM errors
+ * @throws TypeError if the backup data fails validation.
+ * @throws Error if the download fails due to browser API or DOM errors.
+ *
+ * @public
  */
 export async function handleSQLiteBackupDownload(
     downloadFunction: () => Promise<SerializedDatabaseBackupResult>

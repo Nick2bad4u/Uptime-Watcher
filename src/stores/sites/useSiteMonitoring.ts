@@ -4,6 +4,8 @@
  * @remarks
  * Handles monitoring start/stop operations and manual checks. Uses centralized
  * error store for consistent error handling across the application.
+ *
+ * @packageDocumentation
  */
 
 import { withErrorHandling } from "@shared/utils/errorHandling";
@@ -43,6 +45,8 @@ export interface SiteMonitoringActions {
 
 /**
  * External dependencies required for monitoring actions.
+ *
+ * @public
  */
 export interface SiteMonitoringDependencies {
     /** Monitoring service abstraction */
@@ -70,7 +74,9 @@ const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
  * checking sites. All operations communicate with the backend via IPC services
  * and rely on event-driven updates for state synchronization.
  *
- * @returns Object containing all site monitoring action functions
+ * @returns Object containing all site monitoring action functions.
+ *
+ * @public
  */
 export const createSiteMonitoringActions = (
     deps: SiteMonitoringDependencies = defaultMonitoringDependencies

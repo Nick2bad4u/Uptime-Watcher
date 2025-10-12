@@ -104,9 +104,11 @@ const FILTER_OPTIONS: ReadonlyArray<{
  * - User action logging for analytics
  *
  * @param props - Component props containing formatting functions and monitor
- *   data
+ *   data.
  *
- * @returns JSX element displaying history interface
+ * @returns JSX element displaying history interface.
+ *
+ * @public
  */
 export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
     function HistoryTab({

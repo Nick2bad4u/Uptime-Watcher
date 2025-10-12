@@ -4,7 +4,8 @@
  * @remarks
  * This hook manages asynchronous loading of monitor-specific help text from the
  * backend configuration. It handles loading states, error scenarios, and
- * provides appropriate fallbacks when help text is unavailable.
+ * provides appropriate fallbacks when help text is unavailable via
+ * {@link getMonitorHelpTexts}.
  *
  * The hook automatically cancels pending requests when the component unmounts
  * or when the monitor type changes to prevent memory leaks and race
@@ -28,9 +29,13 @@
  * }
  * ```
  *
- * @param monitorType - MonitorType - The monitor type to load help text for
+ * @param monitorType - Monitor type to load help text for.
  *
- * @returns Object containing help text data and loading state
+ * @returns Object containing help text data and loading state.
+ *
+ * @public
+ *
+ * @see {@link getMonitorHelpTexts} for the underlying fetcher.
  */
 
 import type { MonitorType } from "@shared/types";
@@ -41,18 +46,18 @@ import { logger } from "../services/logger";
 import { getMonitorHelpTexts } from "../utils/monitorUiHelpers";
 
 /**
- * Result interface for useDynamicHelpText hook
+ * Result interface for the {@link useDynamicHelpText} hook.
  *
  * @public
  */
 export interface DynamicHelpTextResult {
-    /** Error message if loading failed */
+    /** Error message if loading failed. */
     error?: string | undefined;
-    /** Whether help texts are currently loading */
+    /** Whether help texts are currently loading. */
     isLoading: boolean;
-    /** Primary help text content */
+    /** Primary help text content. */
     primary?: string;
-    /** Secondary help text content */
+    /** Secondary help text content. */
     secondary?: string;
 }
 
@@ -64,11 +69,14 @@ export interface DynamicHelpTextResult {
  * Handles cancellation of pending requests on unmount or monitor type changes
  * using AbortController for proper cleanup.
  *
- * @param monitorType - The monitor type to load help text for
+ * @param monitorType - Monitor type to load help text for.
  *
- * @returns Object containing help text data and loading state
+ * @returns Object containing help text data and loading state.
  *
  * @public
+ *
+ * @see {@link getMonitorHelpTexts} for the IPC-backed helper powering this
+ *   hook.
  */
 export function useDynamicHelpText(
     monitorType: MonitorType

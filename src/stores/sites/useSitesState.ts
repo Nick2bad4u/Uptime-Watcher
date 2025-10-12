@@ -1,6 +1,8 @@
 /**
  * Sites state management module. Handles core state operations for sites,
  * selected site, and monitor selections.
+ *
+ * @packageDocumentation
  */
 
 import type { Site } from "@shared/types";
@@ -70,7 +72,9 @@ export type SitesStateStore = Simplify<SitesState & SitesStateActions>;
  * @param set - Zustand state setter function for updating store state
  * @param get - Zustand state getter function for reading current state
  *
- * @returns Object containing all state management action functions
+ * @returns Object containing all state management action functions.
+ *
+ * @public
  */
 export const createSitesStateActions = (
     set: (function_: (state: SitesState) => Partial<SitesState>) => void,
@@ -141,6 +145,8 @@ export const createSitesStateActions = (
 /**
  * Initial state for the sites store. Provides default values for all state
  * properties.
+ *
+ * @public
  */
 export const initialSitesState: SitesState = {
     selectedMonitorIds: {},

@@ -70,10 +70,10 @@ import { logger } from "../services/logger";
  * component lifecycle management. Specifically designed to handle React's
  * StrictMode development behavior where effects can run multiple times.
  *
- * @param mountCallback - Function to execute on component mount (can be async)
- * @param unmountCallback - Optional function to execute on component unmount
+ * @param mountCallback - Function to execute on component mount (can be async).
+ * @param unmountCallback - Optional function to execute on component unmount.
  *
- * @returns Void - This hook performs side effects only
+ * @returns `void` – the hook performs side effects only.
  *
  * @public
  */

@@ -1,6 +1,8 @@
 /**
  * Site statistics calculation hook. Provides utilities for computing uptime,
  * response time averages, and check counts from monitor history data.
+ *
+ * @public
  */
 
 import type { StatusHistory } from "@shared/types";
@@ -61,13 +63,14 @@ export interface SiteStats {
  * }
  * ```
  *
- * @param history - StatusHistory[] - Array of status history records for
- *   calculation
+ * @param history - Array of {@link StatusHistory} records to analyze.
  *
- * @returns Object containing calculated statistics (uptime, checkCount,
- *   averageResponseTime)
+ * @returns Object containing calculated statistics (uptime, check count, and
+ *   average response time).
  *
- * @see {@link SiteStats} for the complete interface specification
+ * @public
+ *
+ * @see {@link SiteStats} for the complete interface specification.
  */
 export function useSiteStats(history: StatusHistory[]): SiteStats {
     // Memoize the calculations to avoid recalculating on every render

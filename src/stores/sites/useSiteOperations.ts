@@ -4,6 +4,8 @@
  *
  * Uses centralized error store for consistent error handling across the
  * application.
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, MonitorType, Site } from "@shared/types";
@@ -42,6 +44,11 @@ const normalizeMonitorOrThrow = (
     }
 };
 
+/**
+ * Site operations actions exposed by the sites store.
+ *
+ * @public
+ */
 export interface SiteOperationsActions extends BaseSiteOperations {
     /** Initialize sites data from backend */
     initializeSites: () => Promise<{
@@ -64,9 +71,11 @@ export interface SiteOperationsActions extends BaseSiteOperations {
  * including creation, modification, deletion, and monitor management. All
  * operations include proper error handling and logging.
  *
- * @param deps - Dependencies required for site operations
+ * @param deps - Dependencies required for site operations.
  *
- * @returns Object containing all site operation action functions
+ * @returns Object containing all site operation action functions.
+ *
+ * @public
  */
 export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies

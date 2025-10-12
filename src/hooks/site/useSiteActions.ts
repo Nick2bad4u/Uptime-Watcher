@@ -6,6 +6,8 @@
  * Provides comprehensive site management functionality including monitor
  * control, site deletion, and monitoring state management. All actions include
  * error handling and user action logging.
+ *
+ * @public
  */
 import type { Monitor, Site } from "@shared/types";
 
@@ -80,10 +82,15 @@ export interface SiteActionsResult {
  * }
  * ```
  *
- * @param site - The site object to act upon
- * @param monitor - The specific monitor to use for individual monitor actions
+ * @param site - The site object to act upon.
+ * @param monitor - The specific monitor to use for individual monitor actions.
  *
- * @returns Object containing all available action handler functions
+ * @returns Object containing all available action handler functions.
+ *
+ * @public
+ *
+ * @see {@link useSitesStore} for data access.
+ * @see {@link useUIStore} for selection updates.
  */
 export function useSiteActions(
     site: Site,

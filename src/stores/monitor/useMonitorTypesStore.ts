@@ -253,6 +253,8 @@ export interface MonitorTypesState {
 
 /**
  * Combined interface for Monitor Types store.
+ *
+ * @public
  */
 export type MonitorTypesStore = Simplify<
     BaseStore & MonitorTypesActions & MonitorTypesState

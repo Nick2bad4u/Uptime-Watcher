@@ -30,10 +30,13 @@
  * }
  * ```
  *
- * @param isCollapsed - Boolean - Whether the component is in collapsed state
- *   (default: false)
+ * @param isCollapsed - Whether the component is in collapsed state (default:
+ *   `false`).
  *
- * @returns ThemeStyles object containing all CSS-in-JS style properties
+ * @returns {@link ThemeStyles} Containing all CSS-in-JS style properties.
+ *
+ * @public
+ * @public
  */
 
 import type { CSSProperties } from "react";
@@ -43,7 +46,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { useMount } from "./useMount";
 
 /**
- * Theme styles interface for CSS-in-JS styling
+ * Theme styles interface for CSS-in-JS styling.
  *
  * @public
  */
@@ -65,16 +68,20 @@ export interface ThemeStyles {
 }
 
 /**
- * Common transition easing for consistent animations
+ * Common transition easing for consistent animations.
+ *
+ * @internal
  */
 const TRANSITION_EASING = "0.3s cubic-bezier(0.4, 0, 0.2, 1)";
 
 /**
- * Generates collapse button styles based on theme
+ * Generates collapse button styles based on theme.
  *
- * @param isDarkMode - Whether dark mode is active
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for collapse button
+ * @returns CSS properties for collapse button.
+ *
+ * @internal
  */
 function getCollapseButtonStyle(isDarkMode: boolean): CSSProperties {
     return {
@@ -92,11 +99,13 @@ function getCollapseButtonStyle(isDarkMode: boolean): CSSProperties {
 }
 
 /**
- * Generates content area styles based on collapse state
+ * Generates content area styles based on collapse state.
  *
- * @param isCollapsed - Whether the component is collapsed
+ * @param isCollapsed - Whether the component is collapsed.
  *
- * @returns CSS properties for content area
+ * @returns CSS properties for content area.
+ *
+ * @internal
  */
 function getContentStyle(isCollapsed: boolean): CSSProperties {
     return {
@@ -108,12 +117,14 @@ function getContentStyle(isCollapsed: boolean): CSSProperties {
 }
 
 /**
- * Generates header styles based on theme and collapse state
+ * Generates header styles based on theme and collapse state.
  *
- * @param isCollapsed - Whether the component is collapsed
- * @param isDarkMode - Whether dark mode is active
+ * @param isCollapsed - Whether the component is collapsed.
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for header section
+ * @returns CSS properties for header section.
+ *
+ * @internal
  */
 function getHeaderStyle(
     isCollapsed: boolean,
@@ -157,11 +168,13 @@ function getHeaderStyle(
 }
 
 /**
- * Generates metadata text styles based on theme
+ * Generates metadata text styles based on theme.
  *
- * @param isDarkMode - Whether dark mode is active
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for metadata text
+ * @returns CSS properties for metadata text.
+ *
+ * @internal
  */
 function getMetaStyle(isDarkMode: boolean): CSSProperties {
     return {
@@ -177,11 +190,13 @@ function getMetaStyle(isDarkMode: boolean): CSSProperties {
 }
 
 /**
- * Generates overlay/backdrop styles based on theme
+ * Generates overlay/backdrop styles based on theme.
  *
- * @param isDarkMode - Whether dark mode is active
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for overlay backdrop
+ * @returns CSS properties for overlay backdrop.
+ *
+ * @internal
  */
 function getOverlayStyle(isDarkMode: boolean): CSSProperties {
     const darkGradient =
@@ -205,11 +220,13 @@ function getOverlayStyle(isDarkMode: boolean): CSSProperties {
 }
 
 /**
- * Generates title text styles based on theme
+ * Generates title text styles based on theme.
  *
- * @param isDarkMode - Whether dark mode is active
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for title text
+ * @returns CSS properties for title text.
+ *
+ * @internal
  */
 function getTitleStyle(isDarkMode: boolean): CSSProperties {
     const darkShadow =
@@ -231,11 +248,13 @@ function getTitleStyle(isDarkMode: boolean): CSSProperties {
 }
 
 /**
- * Generates URL/link text styles based on theme
+ * Generates URL/link text styles based on theme.
  *
- * @param isDarkMode - Whether dark mode is active
+ * @param isDarkMode - Whether dark mode is active.
  *
- * @returns CSS properties for URL text
+ * @returns CSS properties for URL text.
+ *
+ * @internal
  */
 function getUrlStyle(isDarkMode: boolean): CSSProperties {
     return {
@@ -262,11 +281,14 @@ function getUrlStyle(isDarkMode: boolean): CSSProperties {
  * hook listens to media query changes and updates styles accordingly.
  *
  * @param isCollapsed - Whether the component is in collapsed state (default:
- *   false)
+ *   `false`).
  *
- * @returns Complete ThemeStyles object with all CSS-in-JS style properties
+ * @returns Complete {@link ThemeStyles} object with all CSS-in-JS style
+ *   properties.
  *
  * @public
+ *
+ * @see {@link useMount} for the lifecycle helper used to manage listeners.
  */
 export function useThemeStyles(isCollapsed = false): ThemeStyles {
     // Use state to track theme changes for reactivity
@@ -290,7 +312,9 @@ export function useThemeStyles(isCollapsed = false): ThemeStyles {
     const mediaQueryRef = useRef<MediaQueryList | null>(null);
 
     /**
-     * Named event handler for media query changes
+     * Named event handler for media query changes.
+     *
+     * @internal
      */
     const handleThemeChange = useCallback((e: MediaQueryListEvent): void => {
         setIsDarkMode(e.matches);

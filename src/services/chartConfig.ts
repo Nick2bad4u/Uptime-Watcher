@@ -30,7 +30,14 @@ import type { ChartData, ChartOptions } from "chart.js";
 import type { Theme } from "../theme/types";
 
 /**
- * Interface for chart configuration return type.
+ * Bundle of chart options returned by {@link createChartConfigs}.
+ *
+ * @remarks
+ * Provides preconfigured Chart.js options scoped to the application's
+ * monitoring dashboard. Consumers typically spread these options when rendering
+ * `<Bar />`, `<Doughnut />`, or `<Line />` components.
+ *
+ * @public
  */
 export interface ChartConfigs {
     /** Configuration options for bar charts */
@@ -42,7 +49,13 @@ export interface ChartConfigs {
 }
 
 /**
- * Response time line chart data structure
+ * Response time line chart data structure.
+ *
+ * @remarks
+ * Aligns with the dataset shape produced by {@link useSiteAnalytics} for
+ * time-series response visualisations.
+ *
+ * @public
  */
 export interface ResponseTimeChartData extends ChartData<"line"> {
     /** Dataset configuration for response time line chart */
@@ -63,11 +76,14 @@ export interface ResponseTimeChartData extends ChartData<"line"> {
 }
 
 /**
- * Type definitions for chart data to avoid manual type casting
- */
-
-/**
- * Status distribution bar chart data structure
+ * Status distribution bar chart data structure.
+ *
+ * @remarks
+ * Mirrors the payload supplied to the uptime status bar chart rendered on the
+ * overview dashboard. Keeps Chart.js generics strictly typed inside the UI
+ * layer.
+ *
+ * @public
  */
 export interface StatusBarChartData extends ChartData<"bar"> {
     /** Dataset configuration for status bar chart */
@@ -88,7 +104,13 @@ export interface StatusBarChartData extends ChartData<"bar"> {
 }
 
 /**
- * Uptime status doughnut chart data structure
+ * Uptime status doughnut chart data structure.
+ *
+ * @remarks
+ * Represents the sliced status summary shown in the global monitoring widget
+ * and is consumed alongside {@link ChartConfigService.getDoughnutChartConfig}.
+ *
+ * @public
  */
 export interface UptimeChartData extends ChartData<"doughnut"> {
     /** Dataset configuration for uptime doughnut chart */
@@ -107,7 +129,9 @@ export interface UptimeChartData extends ChartData<"doughnut"> {
 }
 
 /**
- * Configuration object for chart axis titles
+ * Theme-aware configuration object for chart axis titles.
+ *
+ * @public
  */
 export interface AxisTitleConfig {
     /** Text color for the axis title */
@@ -126,7 +150,9 @@ export interface AxisTitleConfig {
 }
 
 /**
- * Configuration object for chart base scales
+ * Base scale configuration shared across chart types.
+ *
+ * @public
  */
 export interface BaseScaleConfig {
     /** Grid line configuration */
@@ -149,7 +175,9 @@ export interface BaseScaleConfig {
 }
 
 /**
- * Configuration object for chart fonts
+ * Font configuration applied to chart titles, axis labels, and legends.
+ *
+ * @public
  */
 export interface ChartFontConfig {
     /** Font family name */
@@ -161,7 +189,9 @@ export interface ChartFontConfig {
 }
 
 /**
- * Configuration object for chart titles
+ * Theme-aware configuration object for chart titles.
+ *
+ * @public
  */
 export interface ChartTitleConfig {
     /** Text color for the chart title */
@@ -190,6 +220,8 @@ export interface ChartTitleConfig {
  * theme colors, fonts, and spacing to all chart configurations.
  *
  * @public
+ *
+ * @see {@link createChartConfigs} for the functional wrapper.
  */
 export class ChartConfigService {
     /** Current theme instance for styling configuration */
@@ -207,9 +239,9 @@ export class ChartConfigService {
     }
 
     /**
-     * Status distribution bar chart configuration
+     * Status distribution bar chart configuration.
      *
-     * @returns Chart configuration options for bar charts
+     * @returns Chart configuration options for bar charts.
      *
      * @public
      */
@@ -234,11 +266,11 @@ export class ChartConfigService {
     }
 
     /**
-     * Uptime doughnut chart configuration
+     * Uptime doughnut chart configuration.
      *
-     * @param totalChecks - Total number of checks for percentage calculation
+     * @param totalChecks - Total number of checks for percentage calculation.
      *
-     * @returns Chart configuration options for doughnut charts
+     * @returns Chart configuration options for doughnut charts.
      *
      * @public
      */
@@ -280,10 +312,10 @@ export class ChartConfigService {
     }
 
     /**
-     * Response time line chart configuration
+     * Response time line chart configuration.
      *
      * @returns Chart configuration options for line charts with responsive
-     *   scaling
+     *   scaling.
      *
      * @public
      */
@@ -332,11 +364,13 @@ export class ChartConfigService {
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe Chart.js configuration type assertion */
 
     /**
-     * Get common axis title configuration
+     * Get common axis title configuration.
      *
-     * @param text - The text to display in the axis title
+     * @param text - The text to display in the axis title.
      *
-     * @returns Configured axis title object with theme-aware styling
+     * @returns Configured axis title object with theme-aware styling.
+     *
+     * @internal
      */
     private getAxisTitle(text: string): AxisTitleConfig {
         return {
@@ -351,13 +385,13 @@ export class ChartConfigService {
      * Get base configuration shared across all chart types.
      *
      * @remarks
-     * Provides consistent foundation for all charts including responsive
-     * behavior, theme-aware colors, typography, and tooltip styling. This
-     * configuration is extended by specific chart type methods.
+     * Provides a consistent foundation for all charts including responsive
+     * behavior, theme-aware colors, typography, and tooltip styling. Extended
+     * by chart-specific methods to avoid duplication.
      *
-     * This is an internal method used by other configuration methods.
+     * @returns Partial chart options with common styling and behavior.
      *
-     * @returns Partial chart options with common styling and behavior
+     * @internal
      */
     private getBaseConfig(): Partial<ChartOptions> {
         return {
@@ -387,9 +421,11 @@ export class ChartConfigService {
     }
 
     /**
-     * Get base scale configuration with theme-aware styling
+     * Get base scale configuration with theme-aware styling.
      *
-     * @returns Base scale configuration object for axes
+     * @returns Base scale configuration object for axes.
+     *
+     * @internal
      */
     private getBaseScale(): BaseScaleConfig {
         return {
@@ -407,12 +443,14 @@ export class ChartConfigService {
     }
 
     /**
-     * Get common font configuration used across charts
+     * Get common font configuration used across charts.
      *
-     * @param size - Font size in pixels (default: 12)
-     * @param weight - Font weight (default: "normal")
+     * @param size - Font size in pixels (default: 12).
+     * @param weight - Font weight (default: `"normal"`).
      *
-     * @returns Font configuration object with theme-aware family
+     * @returns Font configuration object with theme-aware family.
+     *
+     * @internal
      */
     private getChartFont(size = 12, weight = "normal"): ChartFontConfig {
         return {
@@ -423,11 +461,13 @@ export class ChartConfigService {
     }
 
     /**
-     * Get common title configuration for charts
+     * Get common title configuration for charts.
      *
-     * @param text - The text to display in the chart title
+     * @param text - The text to display in the chart title.
      *
-     * @returns Configured chart title object with theme-aware styling
+     * @returns Configured chart title object with theme-aware styling.
+     *
+     * @internal
      */
     private getChartTitle(text: string): ChartTitleConfig {
         return {
@@ -440,28 +480,33 @@ export class ChartConfigService {
 }
 
 /**
- * React hook for getting theme-aware chart configurations.
+ * Creates a set of theme-aware Chart.js configuration objects.
+ *
+ * @remarks
+ * Thin wrapper around {@link ChartConfigService} for callers that prefer a
+ * functional API. Returns memo-friendly plain objects ready to be passed to
+ * Chart.js components.
  *
  * @example
  *
  * ```typescript
- * const { barChartOptions, doughnutOptions, lineChartOptions } = createChartConfigs(theme, 100);
- * // Use with Chart.js components
+ * const { barChartOptions, doughnutOptions, lineChartOptions } =
+ *     createChartConfigs(theme, 100);
+ *
  * <Bar data={chartData} options={barChartOptions} />
  * <Doughnut data={statusData} options={doughnutOptions} />
  * <Line data={timeSeriesData} options={lineChartOptions} />
  * ```
  *
- * @param theme - Current theme object for styling charts
- * @param totalChecks - Total number of checks for pie chart configuration
+ * @param theme - Current theme object for styling charts.
+ * @param totalChecks - Total number of checks for doughnut percentage
+ *   formatting.
  *
- * @returns Object containing various chart configuration options
- * @returns BarChartOptions - Configuration for bar charts with theme-aware
- *   styling
- * @returns DoughnutOptions - Configuration for doughnut/pie charts with
- *   tooltips and legends
- * @returns LineChartOptions - Configuration for line charts with responsive
- *   scaling and interactions
+ * @returns {@link ChartConfigs} Containing theme-aware chart options.
+ *
+ * @public
+ *
+ * @see {@link ChartConfigService} for the class-based implementation.
  */
 export function createChartConfigs(
     theme: Theme,

@@ -23,16 +23,6 @@ interface DataServiceContract {
     readonly initialize: () => Promise<void>;
 }
 
-/**
- * Service for managing data operations through Electron IPC.
- *
- * @remarks
- * Provides a comprehensive interface for data management operations including
- * backup creation, data export/import, and persistence with automatic service
- * initialization and type-safe IPC communication.
- *
- * @public
- */
 const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
@@ -43,6 +33,17 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     }
 })();
 
+/**
+ * Service for managing data operations through Electron IPC.
+ *
+ * @remarks
+ * Provides backup creation, JSON import/export, and initialization helpers with
+ * consistent error handling. All methods wait for the preload bridge via
+ * {@link getIpcServiceHelpers} before invoking the underlying
+ * {@link window.electronAPI} contract.
+ *
+ * @public
+ */
 export const DataService: DataServiceContract = {
     /**
      * Downloads a complete SQLite database backup.
@@ -57,7 +58,8 @@ export const DataService: DataServiceContract = {
      * // Save blob as file with backup.fileName
      * ```
      *
-     * @returns An object containing the backup buffer and suggested filename.
+     * @returns {@link SerializedDatabaseBackupResult} Describing the backup
+     *   bundle.
      *
      * @throws If the electron API is unavailable or the backup operation fails.
      */
@@ -97,7 +99,7 @@ export const DataService: DataServiceContract = {
      *
      * @param data - JSON string containing application data to import.
      *
-     * @returns True if import was successful, false otherwise.
+     * @returns `true` if import was successful; otherwise, `false`.
      *
      * @throws If the electron API is unavailable or the import operation fails.
      */

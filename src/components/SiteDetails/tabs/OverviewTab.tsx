@@ -89,9 +89,11 @@ export interface OverviewTabProperties {
  * - Monitor status indicator
  * - Site removal action
  *
- * @param props - Component props containing metrics and handlers
+ * @param props - Component props containing metrics and handlers.
  *
- * @returns JSX element displaying overview information
+ * @returns JSX element displaying overview information.
+ *
+ * @public
  */
 export const OverviewTab = ({
     avgResponseTime,

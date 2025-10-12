@@ -95,13 +95,6 @@ export interface SettingsTabProperties {
 }
 
 /**
- * Helper function to format retry attempts text.
- *
- * @param attempts - Number of retry attempts
- *
- * @returns Formatted retry attempts description
- */
-/**
  * Generate a display identifier based on the monitor type. Uses dynamic utility
  * instead of hardcoded backward compatibility patterns.
  */
@@ -193,9 +186,11 @@ function IdentifierLabel({
  * - Unsaved changes tracking and warnings
  * - Real-time settings validation
  *
- * @param props - Component props containing site data and handlers
+ * @param props - Component props containing site data and handlers.
  *
- * @returns JSX element displaying settings interface
+ * @returns JSX element displaying settings interface.
+ *
+ * @public
  */
 export const SettingsTab = ({
     currentSite,

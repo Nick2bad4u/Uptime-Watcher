@@ -1,14 +1,18 @@
 /**
  * Base operations types shared across site management functionality. Eliminates
  * code duplication between different store modules.
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
- * Common site CRUD operations interface. Used by both SiteOperationsActions and
+ * Common site CRUD operations interface used by both SiteOperationsActions and
  * SitesActions to eliminate duplication.
+ *
+ * @public
  */
 export interface BaseSiteOperations {
     /** Add a monitor to an existing site */
@@ -49,6 +53,8 @@ export interface BaseSiteOperations {
 /**
  * Common site monitoring operations interface. Shared between different
  * monitoring-related modules.
+ *
+ * @public
  */
 export interface BaseSiteMonitoring {
     /** Check a site now */
@@ -72,6 +78,8 @@ export interface BaseSiteMonitoring {
 /**
  * Common site synchronization operations interface. Shared between different
  * sync-related modules.
+ *
+ * @public
  */
 export interface BaseSiteSync {
     /** Full resync from backend */
@@ -87,6 +95,8 @@ export interface BaseSiteSync {
 /**
  * Common site state management interface. Shared between different state
  * modules.
+ *
+ * @public
  */
 export interface BaseSiteState {
     /** Add a site to the store */
@@ -110,6 +120,8 @@ export interface BaseSiteState {
 /**
  * Common site subscription interface. Shared between different subscription
  * modules.
+ *
+ * @public
  */
 export interface BaseSiteSubscriptions {
     /** Subscribe to status updates */

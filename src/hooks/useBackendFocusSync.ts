@@ -5,8 +5,11 @@
  * Provides functionality to automatically refresh data from the backend when
  * users return to the application after being away. Uses window focus events to
  * trigger full backend synchronization when enabled. Errors are handled
- * internally by the store's error handling system through withErrorHandling, so
- * the fire-and-forget void pattern is safe here.
+ * internally by the store's error handling system through
+ * {@link useSitesStore}'s `withErrorHandling` wrapper, so the fire-and-forget
+ * void pattern is safe here.
+ *
+ * @public
  */
 
 import { useCallback, useEffect } from "react";
@@ -29,10 +32,14 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
  * }
  * ```
  *
- * @param enabled - Boolean - Set to true to enable focus-based backend sync
- *   (default: false)
+ * @param enabled - Set to `true` to enable focus-based backend synchronization
+ *   (defaults to `false`).
  *
- * @returns Void - This hook manages side effects only
+ * @returns `void` – the hook only manages side effects.
+ *
+ * @public
+ *
+ * @see {@link useSitesStore} for the backing store implementation.
  */
 export function useBackendFocusSync(enabled = false): void {
     // Use selector to avoid unnecessary re-renders when other store state

@@ -9,6 +9,8 @@
  * whenever the provided dependency list changes. ResizeObserver is used when
  * available but the hook gracefully degrades in environments where it is
  * unsupported.
+ *
+ * @public
  */
 
 import type { RefObject } from "react";
@@ -17,6 +19,8 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 
 /**
  * Return type for {@link useOverflowMarquee}.
+ *
+ * @public
  */
 export interface OverflowMarqueeReturn<ElementType extends HTMLElement> {
     /**
@@ -33,6 +37,8 @@ export interface OverflowMarqueeReturn<ElementType extends HTMLElement> {
 
 /**
  * Configuration options for {@link useOverflowMarquee}.
+ *
+ * @public
  */
 export interface OverflowMarqueeOptions<ElementType extends HTMLElement> {
     /**
@@ -49,10 +55,12 @@ export interface OverflowMarqueeOptions<ElementType extends HTMLElement> {
  * Detects horizontal overflow to support marquee animations.
  *
  * @param dependencies - Values that should trigger an overflow re-evaluation
- *   when they change (e.g. content strings, layout toggles).
+ *   when they change (e.g., content strings, layout toggles).
  *
  * @returns {@link OverflowMarqueeReturn} With the container ref and current
  *   overflow state.
+ *
+ * @public
  */
 const overflowReducer = (state: boolean, next: boolean): boolean =>
     state === next ? state : next;

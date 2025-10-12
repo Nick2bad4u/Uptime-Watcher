@@ -333,9 +333,11 @@ function useSiteDetailsHeaderModel(
  * spinner, and a screenshot thumbnail. Handles external URL opening with proper
  * fallbacks and validates URLs before processing.
  *
- * @param props - Component props containing site data and control handlers
+ * @param props - Component props containing site data and control handlers.
  *
- * @returns JSX element containing the site details header
+ * @returns JSX element containing the site details header.
+ *
+ * @public
  */
 export const SiteDetailsHeader: NamedExoticComponent<SiteDetailsHeaderProperties> =
     memo(function SiteDetailsHeader({

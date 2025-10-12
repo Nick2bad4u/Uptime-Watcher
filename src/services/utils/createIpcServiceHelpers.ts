@@ -8,11 +8,22 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { waitForElectronAPI } from "../../stores/utils";
 import * as loggerModule from "../logger";
 
+/**
+ * Minimal logging shape used by the IPC helper utilities.
+ *
+ * @internal
+ */
 interface LoggerLike {
     debug?: (message: string, ...details: unknown[]) => void;
     error: (message: string, ...details: unknown[]) => void;
 }
 
+/**
+ * Fallback logger that writes to the browser console when the shared logger
+ * cannot be resolved.
+ *
+ * @internal
+ */
 const consoleFallbackLogger: LoggerLike = {
     debug: (...details) => {
         console.debug(...details);
@@ -22,6 +33,11 @@ const consoleFallbackLogger: LoggerLike = {
     },
 };
 
+/**
+ * Type guard verifying that a candidate matches {@link LoggerLike}.
+ *
+ * @internal
+ */
 const isLoggerLike = (candidate: unknown): candidate is LoggerLike => {
     if (typeof candidate !== "object" || candidate === null) {
         return false;
@@ -30,6 +46,11 @@ const isLoggerLike = (candidate: unknown): candidate is LoggerLike => {
     return typeof Reflect.get(candidate, "error") === "function";
 };
 
+/**
+ * Safely reads a property from a module export without triggering getters.
+ *
+ * @internal
+ */
 const safeGetModuleExport = (
     module: unknown,
     property: PropertyKey
@@ -49,6 +70,11 @@ const safeGetModuleExport = (
     return undefined;
 };
 
+/**
+ * Resolves the default logger instance to use for IPC helper diagnostics.
+ *
+ * @internal
+ */
 const resolveDefaultLogger = (): LoggerLike => {
     const lowercaseCandidate = safeGetModuleExport(loggerModule, "logger");
     if (isLoggerLike(lowercaseCandidate)) {
@@ -63,10 +89,17 @@ const resolveDefaultLogger = (): LoggerLike => {
     return consoleFallbackLogger;
 };
 
+/**
+ * Logger used when no custom logger is provided.
+ *
+ * @internal
+ */
 const defaultLogger: LoggerLike = resolveDefaultLogger();
 
 /**
  * Options for configuring {@link createIpcServiceHelpers} behavior.
+ *
+ * @internal
  */
 interface CreateIpcServiceHelpersOptions {
     /** Optional logger instance. Defaults to the shared renderer logger. */
@@ -75,6 +108,13 @@ interface CreateIpcServiceHelpersOptions {
 
 /**
  * Typed wrapper utilities for building guarded IPC services.
+ *
+ * @remarks
+ * Returned by {@link createIpcServiceHelpers} and {@link getIpcServiceHelpers}.
+ * Consumers typically spread these helpers into service objects exposed from
+ * `src/services`.
+ *
+ * @public
  */
 export interface GuardedIpcServiceHelpers {
     /** Ensures the preload bridge is ready before IPC calls. */
@@ -93,12 +133,20 @@ export interface GuardedIpcServiceHelpers {
 }
 
 /**
- * Creates helper utilities that enforce guarded access to `window.electronAPI`.
+ * Creates helper utilities that enforce guarded access to
+ * {@link window.electronAPI}.
+ *
+ * @remarks
+ * Each helper waits for {@link waitForElectronAPI} before executing the wrapped
+ * handler and logs failures using the provided logger (or a console fallback).
+ * Primarily used by renderer services to standardize preload access.
  *
  * @param serviceName - Human-readable service name used for log messages.
  * @param options - Optional configuration overrides.
  *
  * @returns Helper functions for building guarded IPC service methods.
+ *
+ * @public
  */
 export function createIpcServiceHelpers(
     serviceName: string,
@@ -152,13 +200,15 @@ export function createIpcServiceHelpers(
  * Creates IPC service helpers with guarded error handling.
  *
  * @remarks
- * Ensures that unexpected failures during helper construction are surfaced with
- * a descriptive error message and attached cause to aid diagnostics.
+ * Wraps {@link createIpcServiceHelpers} with additional error reporting so
+ * callers receive contextual information when helper construction fails.
  *
  * @param serviceName - Human-readable service name used for log messages.
  * @param options - Optional configuration overrides.
  *
  * @returns Guarded IPC helper utilities.
+ *
+ * @public
  */
 export function getIpcServiceHelpers(
     serviceName: string,

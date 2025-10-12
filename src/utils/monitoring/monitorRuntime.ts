@@ -3,7 +3,7 @@
  *
  * @remarks
  * These helpers power renderer components that display aggregate runtime state,
- * such as "all monitors running" banners and quick statistics. They accept
+ * including "all monitors running" banners and quick statistics. They accept
  * lightweight monitor descriptors so callers can pass data from either shared
  * types or UI-specific projections.
  *

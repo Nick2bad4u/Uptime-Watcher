@@ -5,6 +5,8 @@
  * Provides a unified interface for site actions, monitoring, and statistics.
  * Aggregates functionality from multiple specialized hooks into a single
  * convenient interface for components.
+ *
+ * @public
  */
 import type { Site } from "@shared/types";
 
@@ -70,11 +72,16 @@ export interface UseSiteResult
  * }
  * ```
  *
- * @param site - The site to work with
+ * @param site - The site to work with.
  *
- * @returns Combined data and functionality from all site-related hooks
+ * @returns Combined data and functionality from all site-related hooks.
  *
- * @see {@link UseSiteResult} for the complete interface specification
+ * @public
+ *
+ * @see {@link UseSiteResult} for the complete interface specification.
+ * @see {@link useSiteMonitor} for monitor state.
+ * @see {@link useSiteStats} for derived analytics.
+ * @see {@link useSiteActions} for available actions.
  */
 export function useSite(site: Site): UseSiteResult {
     // Get monitor data

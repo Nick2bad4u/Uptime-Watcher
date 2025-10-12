@@ -70,9 +70,9 @@ ChartJS.register(ArcElement, Legend, Tooltip);
  * ```
  *
  * @param props - The component properties containing data and options for the
- *   chart
+ *   chart.
  *
- * @returns Memoized doughnut chart component
+ * @returns Memoized doughnut chart component.
  *
  * @public
  */

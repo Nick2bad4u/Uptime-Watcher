@@ -25,6 +25,8 @@ import { formatTitleSuffix } from "../../utils/monitorTitleFormatters";
 
 /**
  * Props for the MonitoringStatusDisplay component.
+ *
+ * @public
  */
 export interface MonitoringStatusDisplayProperties {
     /** Array of monitors to display status for */
@@ -38,9 +40,11 @@ export interface MonitoringStatusDisplayProperties {
  * Displays monitor status, type, and connection information with proper error
  * handling for URL parsing.
  *
- * @param props - Component props containing monitors array
+ * @param props - Component props containing monitors array.
  *
- * @returns JSX element with enhanced monitoring status indicators
+ * @returns JSX element with enhanced monitoring status indicators.
+ *
+ * @public
  */
 export const MonitoringStatusDisplay: NamedExoticComponent<MonitoringStatusDisplayProperties> =
     memo(function MonitoringStatusDisplay({

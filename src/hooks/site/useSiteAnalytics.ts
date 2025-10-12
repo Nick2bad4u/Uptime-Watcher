@@ -4,6 +4,8 @@
  * Provides detailed analytics for a monitor including uptime percentages,
  * response time statistics, downtime analysis, and reliability metrics. All
  * calculations are memoized for performance optimization.
+ *
+ * @public
  */
 
 import type { Monitor, StatusHistory } from "@shared/types";
@@ -15,7 +17,11 @@ import type { Theme } from "../../theme/types";
 import { CHART_TIME_PERIODS } from "../../constants";
 import { TIME_PERIOD_LABELS, type TimePeriod } from "../../utils/time";
 
-/** Chart data structure for line charts */
+/**
+ * Chart data structure for line charts.
+ *
+ * @public
+ */
 export interface ChartData {
     /** Chart.js compatible line chart data configuration */
     lineChartData: {
@@ -52,7 +58,11 @@ export interface ChartData {
     };
 }
 
-/** Represents a period of downtime with start, end, and duration */
+/**
+ * Represents a period of downtime with start, end, and duration.
+ *
+ * @public
+ */
 export interface DowntimePeriod {
     /** Duration of downtime in milliseconds */
     duration: number;
@@ -62,7 +72,11 @@ export interface DowntimePeriod {
     start: number;
 }
 
-/** Comprehensive analytics data for a site monitor */
+/**
+ * Comprehensive analytics data for a site monitor.
+ *
+ * @public
+ */
 export interface SiteAnalytics {
     /** Average response time in milliseconds */
     avgResponseTime: number;
@@ -101,7 +115,9 @@ export interface SiteAnalytics {
 }
 
 /**
- * Calculate average response time from filtered history
+ * Calculate average response time from filtered history.
+ *
+ * @internal
  */
 function calculateAverageResponseTime(
     filteredHistory: StatusHistory[]
@@ -116,7 +132,9 @@ function calculateAverageResponseTime(
 }
 
 /**
- * Calculate downtime periods from filtered history
+ * Calculate downtime periods from filtered history.
+ *
+ * @internal
  */
 function calculateDowntimePeriods(
     filteredHistory: StatusHistory[]
@@ -173,7 +191,9 @@ function calculateDowntimePeriods(
 }
 
 /**
- * Calculate response time metrics including percentiles
+ * Calculate response time metrics including percentiles.
+ *
+ * @internal
  */
 function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
     fastestResponse: number;
@@ -215,7 +235,9 @@ function calculateResponseMetrics(filteredHistory: StatusHistory[]): {
 }
 
 /**
- * Filter history records based on time range
+ * Filter history records based on time range.
+ *
+ * @internal
  */
 function filterHistoryByTimeRange(
     history: StatusHistory[],
@@ -234,8 +256,18 @@ function filterHistoryByTimeRange(
 }
 
 /**
- * Hook for generating chart data Separates data preparation from component
- * logic
+ * Generates chart-ready datasets for a site's monitor history.
+ *
+ * @remarks
+ * Separates data preparation from component logic and applies theme-aware
+ * styling to the resulting Chart.js configuration.
+ *
+ * @param monitor - Monitor whose history should populate the chart.
+ * @param theme - Theme palette used to style the datasets.
+ *
+ * @returns {@link ChartData} Suitable for Chart.js line charts.
+ *
+ * @public
  */
 export function useChartData(monitor: Monitor, theme: Theme): ChartData {
     return useMemo(() => {
@@ -299,12 +331,16 @@ export function useChartData(monitor: Monitor, theme: Theme): ChartData {
  * }
  * ```
  *
- * @param monitor - The monitor to analyze (can be undefined)
- * @param timeRange - Time period to analyze (defaults to "24h")
+ * @param monitor - Monitor to analyze (can be `undefined`).
+ * @param timeRange - Time period to analyze (defaults to `'24h'`).
  *
- * @returns Comprehensive analytics object with all calculated metrics
+ * @returns Comprehensive {@link SiteAnalytics} object with all calculated
+ *   metrics.
  *
- * @see {@link SiteAnalytics} for the complete interface specification
+ * @public
+ *
+ * @see {@link SiteAnalytics} for the complete interface specification.
+ * @see {@link useChartData} for chart-friendly transformations.
  */
 export function useSiteAnalytics(
     monitor: Monitor | undefined,
@@ -363,23 +399,29 @@ export function useSiteAnalytics(
 }
 
 /**
- * Utility functions for common calculations
+ * Utility functions for common calculations.
+ *
+ * @public
  */
 export const SiteAnalyticsUtils = {
     /**
-     * Calculate SLA compliance
+     * Calculate SLA compliance.
+     *
+     * @returns Object describing the SLA compliance evaluation.
+     *
+     * @public
      */
     calculateSLA(
         uptime: number,
         targetSLA = 99.9
     ): {
-        /** Actual downtime percentage (0-1) */
+        /** Actual downtime percentage (0-1). */
         actualDowntime: number;
-        /** Allowed downtime percentage for target SLA (0-1) */
+        /** Allowed downtime percentage for target SLA (0-1). */
         allowedDowntime: number;
-        /** Whether the uptime meets the target SLA */
+        /** Whether the uptime meets the target SLA. */
         compliant: boolean;
-        /** Percentage points below target SLA (0 if compliant) */
+        /** Percentage points below target SLA (0 if compliant). */
         deficit: number;
     } {
         const compliant = uptime >= targetSLA;
@@ -395,15 +437,17 @@ export const SiteAnalyticsUtils = {
         };
     },
     /**
-     * Get availability status based on uptime percentage
+     * Get availability status based on uptime percentage.
      *
      * @remarks
      * Thresholds: `≥99.9%` = excellent, `≥99%` = good, `≥95%` = warning, `<95%`
      * = critical
      *
-     * @param uptime - Uptime percentage (0-100)
+     * @param uptime - Uptime percentage (0-100).
      *
-     * @returns Status level based on uptime thresholds
+     * @returns Status level based on uptime thresholds.
+     *
+     * @public
      */
     getAvailabilityStatus(
         uptime: number
@@ -420,15 +464,17 @@ export const SiteAnalyticsUtils = {
         return "critical";
     },
     /**
-     * Get performance status based on response time
+     * Get performance status based on response time.
      *
      * @remarks
      * Thresholds: `≤200ms` = excellent, `≤500ms` = good, `≤1000ms` = warning,
      * `>1000ms` = critical
      *
-     * @param responseTime - Average response time in milliseconds
+     * @param responseTime - Average response time in milliseconds.
      *
-     * @returns Status level based on response time thresholds
+     * @returns Status level based on response time thresholds.
+     *
+     * @public
      */
     getPerformanceStatus(
         responseTime: number

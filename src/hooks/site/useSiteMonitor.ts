@@ -1,6 +1,8 @@
 /**
  * Custom hook for managing site monitor selection and data. Provides monitor
  * state, statistics, and selection handling for sites.
+ *
+ * @public
  */
 
 import type {
@@ -48,8 +50,8 @@ export interface SiteMonitorResult {
      * Current status of the selected monitor
      *
      * @remarks
-     * Falls back to DEFAULT_MONITOR_STATUS ("pending") when no monitor is
-     * selected
+     * Falls back to {@link DEFAULT_MONITOR_STATUS} (`"pending"`) when no monitor
+     * is selected.
      */
     status: MonitorStatus;
 }
@@ -96,11 +98,14 @@ export interface SiteMonitorResult {
  * }
  * ```
  *
- * @param site - The site object to monitor
+ * @param site - The site object to monitor.
  *
- * @returns Monitor data and helper functions
+ * @returns Monitor data and helper functions.
  *
- * @see {@link SiteMonitorResult} for the complete interface specification
+ * @public
+ *
+ * @see {@link SiteMonitorResult} for the complete interface specification.
+ * @see {@link DEFAULT_MONITOR_STATUS} for the default pending state fallback.
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
     const { getSelectedMonitorId, setSelectedMonitorId, sites } =

@@ -514,7 +514,9 @@ const validateFormFields = (
  *
  * @returns Combined form state and action handlers containing all form fields,
  *   validation state, and manipulation functions for managing the add site
- *   form
+ *   form.
+ *
+ * @public
  */
 export function useAddSiteForm(): UseAddSiteFormReturn {
     // Form field state

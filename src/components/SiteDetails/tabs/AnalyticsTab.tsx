@@ -119,9 +119,11 @@ export interface AnalyticsTabProperties {
  * - Downtime period analysis
  * - Export capabilities for chart data
  *
- * @param props - Component props containing metrics and chart configurations
+ * @param props - Component props containing metrics and chart configurations.
  *
- * @returns JSX element displaying analytics interface
+ * @returns JSX element displaying analytics interface.
+ *
+ * @public
  */
 export const AnalyticsTab = ({
     avgResponseTime,

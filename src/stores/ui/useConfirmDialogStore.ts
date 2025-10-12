@@ -6,15 +6,25 @@
  * without relying on legacy browser alert APIs. Consumers call
  * {@link requestConfirmation} to display the dialog and receive the user's
  * response as a promise.
+ *
+ * @public
  */
 
 import { useMemo } from "react";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
-/** Visual tone for the confirm action button. */
+/**
+ * Visual tone for the confirm action button.
+ *
+ * @public
+ */
 export type ConfirmDialogTone = "danger" | "default";
 
-/** Options accepted when requesting a confirmation dialog. */
+/**
+ * Options accepted when requesting a confirmation dialog.
+ *
+ * @public
+ */
 export interface ConfirmDialogOptions {
     /** Custom label for the cancel action button. */
     readonly cancelLabel?: string;
@@ -30,7 +40,11 @@ export interface ConfirmDialogOptions {
     readonly tone?: ConfirmDialogTone;
 }
 
-/** Normalized request stored in the confirm dialog store. */
+/**
+ * Normalized request stored in the confirm dialog store.
+ *
+ * @public
+ */
 export interface ConfirmDialogRequest {
     readonly cancelLabel: string;
     readonly confirmLabel: string;
@@ -68,6 +82,8 @@ const selectIsOpen = (state: ConfirmDialogState): boolean =>
 
 /**
  * Zustand store holding the active confirmation dialog state.
+ *
+ * @public
  */
 export const useConfirmDialogStore: UseBoundStore<
     StoreApi<ConfirmDialogState>
@@ -128,7 +144,11 @@ if (typeof window !== "undefined") {
     };
 }
 
-/** State shape of the confirmation dialog store. */
+/**
+ * State shape of the confirmation dialog store.
+ *
+ * @public
+ */
 export type ConfirmDialogStoreState = ReturnType<
     typeof useConfirmDialogStore.getState
 >;
@@ -136,6 +156,8 @@ export type ConfirmDialogStoreState = ReturnType<
 /**
  * Shape of the confirm dialog controls returned by
  * {@link useConfirmDialogControls}.
+ *
+ * @public
  */
 export interface ConfirmDialogControls {
     /** Close the active confirmation dialog, resolving to `false`. */
@@ -149,6 +171,8 @@ export interface ConfirmDialogControls {
 /**
  * Shape of the confirm dialog visibility helpers returned by
  * {@link useConfirmDialogVisibility}.
+ *
+ * @public
  */
 export interface ConfirmDialogVisibility {
     /** Cancel handler suitable for closing the dialog from UI integrations. */
@@ -161,6 +185,8 @@ export interface ConfirmDialogVisibility {
  * Provides memoized cancel/confirm handlers and the active request payload.
  *
  * @returns Stable confirm dialog controls for rendering components.
+ *
+ * @public
  */
 export function useConfirmDialogControls(): ConfirmDialogControls {
     const cancel = useConfirmDialogStore(selectCancel);
@@ -190,6 +216,8 @@ export function useConfirmDialogControls(): ConfirmDialogControls {
  * integrations.
  *
  * @returns Stable cancel handler and boolean flag describing dialog visibility.
+ *
+ * @public
  */
 export function useConfirmDialogVisibility(): ConfirmDialogVisibility {
     const cancel = useConfirmDialogStore(selectCancel);
@@ -207,9 +235,12 @@ export function useConfirmDialogVisibility(): ConfirmDialogVisibility {
 /**
  * Opens a confirmation dialog and resolves with the user's choice.
  *
- * @param options - Dialog configuration options
+ * @param options - Dialog configuration options.
  *
- * @returns Promise resolving to true when the user confirms, false otherwise
+ * @returns Promise resolving to `true` when the user confirms, `false`
+ *   otherwise.
+ *
+ * @public
  */
 export async function requestConfirmation(
     options: ConfirmDialogOptions
@@ -231,6 +262,8 @@ export async function requestConfirmation(
 
 /**
  * Resets the confirm dialog state. Intended for test cleanup.
+ *
+ * @public
  */
 export function resetConfirmDialogState(): void {
     useConfirmDialogStore.setState({ request: null, resolve: null });

@@ -24,8 +24,8 @@
  * }
  * ```
  *
- * @returns The currently selected site object, or undefined if no site is
- *   selected
+ * @returns The currently selected site object, or `undefined` when no site is
+ *   selected.
  *
  * @public
  */
@@ -47,7 +47,9 @@ import { useUIStore } from "../stores/ui/useUiStore";
  * The memoization ensures the hook only recalculates when the selected site ID
  * or sites array actually changes.
  *
- * @returns The selected site object or undefined if no selection exists
+ * @returns The selected site object or `undefined` when no selection exists.
+ *
+ * @public
  */
 export function useSelectedSite(): Site | undefined {
     const selectedSiteId = useUIStore(

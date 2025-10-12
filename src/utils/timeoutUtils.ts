@@ -29,7 +29,7 @@ import {
  *
  * ```typescript
  * const clamped = clampTimeoutMs(100); // Returns minimum valid timeout
- * const large = clampTimeoutMs(999999); // Returns maximum valid timeout
+ * const large = clampTimeoutMs(999_999); // Returns maximum valid timeout
  * ```
  *
  * @param timeoutMs - Timeout value in milliseconds.

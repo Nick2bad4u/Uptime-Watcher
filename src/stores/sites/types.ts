@@ -4,6 +4,8 @@
  * @remarks
  * Defines the contract for sites store including actions, state, and
  * dependencies for managing site data and operations.
+ *
+ * @packageDocumentation
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
@@ -158,6 +160,8 @@ export interface SitesState {
 /**
  * Combined interface for Sites store actions and state. Provides a complete
  * interface for site management functionality with flattened type display.
+ *
+ * @public
  */
 export type SitesStore = Simplify<SitesActions & SitesState>;
 
@@ -188,6 +192,8 @@ export interface SiteOperationsDependencies {
 
 /**
  * External services consumed by site operations.
+ *
+ * @public
  */
 export interface SiteOperationsServiceDependencies {
     /** Monitoring service operations */

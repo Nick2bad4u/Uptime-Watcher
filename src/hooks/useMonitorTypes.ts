@@ -12,7 +12,7 @@
  *
  * - Network errors: Logged and fallback options provided
  * - Parse errors: Logged with context for debugging
- * - Fallback behavior: Uses FALLBACK_MONITOR_TYPE_OPTIONS from constants
+ * - Fallback behavior: Uses {@link FALLBACK_MONITOR_TYPE_OPTIONS} from constants
  *
  * @example
  *
@@ -35,7 +35,9 @@
  * }
  * ```
  *
- * @returns Monitor type options and loading state
+ * @returns Monitor type options and loading state.
+ *
+ * @public
  */
 
 import { useCallback, useState } from "react";
@@ -69,7 +71,11 @@ export interface UseMonitorTypesResult {
 /**
  * Hook to load monitor type configurations from backend.
  *
- * @returns Monitor type options and loading state
+ * @returns Monitor type options and loading state.
+ *
+ * @public
+ *
+ * @see {@link getMonitorTypeOptions} for the IPC-backed fetcher.
  */
 export function useMonitorTypes(): UseMonitorTypesResult {
     const [options, setOptions] = useState<

@@ -36,6 +36,8 @@
  * ```
  *
  * @returns Object containing field accessor functions and loading state
+ *
+ * @public
  */
 
 import type { MonitorFieldDefinition } from "@shared/types";
@@ -70,9 +72,11 @@ export interface UseMonitorFieldsResult {
  * the monitor types store. Maintains backward compatibility with existing
  * utility functions while leveraging centralized state management.
  *
- * @returns Hook result containing field access methods and loading state
+ * @returns Hook result containing field access methods and loading state.
  *
  * @public
+ *
+ * @see {@link useMonitorTypesStore} for the underlying registry.
  */
 export function useMonitorFields(): UseMonitorFieldsResult {
     const { fieldConfigs, isLoaded, lastError, loadMonitorTypes } =

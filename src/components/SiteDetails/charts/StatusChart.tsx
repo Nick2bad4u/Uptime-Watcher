@@ -85,9 +85,9 @@ ChartJS.register(
  * ```
  *
  * @param props - The component properties containing data and options for the
- *   chart
+ *   chart.
  *
- * @returns Memoized bar chart component
+ * @returns Memoized bar chart component.
  *
  * @public
  */
