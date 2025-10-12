@@ -51,24 +51,9 @@ updates:
             versions: ["< 26.0.18"]
           - dependency-name: "electron-builder-squirrel-windows"
             versions: ["< 26.0.18"]
-            # Ignore local file dependencies - these are not external packages
-          - dependency-name: "@shared/constants"
-            versions: ["*"]
-          - dependency-name: "@shared/types"
-            versions: ["*"]
-          - dependency-name: "@shared/utils"
-            versions: ["*"]
-          - dependency-name: "@shared/validation"
-            versions: ["*"]
-            # Ignore local file dependencies - these are not external packages
-          - dependency-name: "file:./shared/constants"
-            versions: ["*"]
-          - dependency-name: "file:./shared/types"
-            versions: ["*"]
-          - dependency-name: "file:./shared/utils"
-            versions: ["*"]
-          - dependency-name: "file:./shared/validation"
-            versions: ["*"]
+            # Ignore local workspace dependencies completely
+          - dependency-name: "@shared/*"
+          - dependency-name: "file:*"
 
       labels:
           - "npm"
@@ -83,6 +68,10 @@ updates:
               applies-to: version-updates
               patterns:
                   - "*"
+                  # Exclude local packages from grouping
+              exclude-patterns:
+                  - "@shared/*"
+                  - "file:*"
 
     - package-ecosystem: npm
       directory: /docs/docusaurus
