@@ -7,14 +7,112 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[62d675f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62d675fc5cb7aee1f7aab9c4e2d40280014edb86)...
+[55a9f74](https://github.com/Nick2bad4u/Uptime-Watcher/commit/55a9f74dab20d0e73eaab32fb7b37e5f0f483836)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/62d675fc5cb7aee1f7aab9c4e2d40280014edb86...55a9f74dab20d0e73eaab32fb7b37e5f0f483836))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 16.8.0 [`(62d675f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62d675fc5cb7aee1f7aab9c4e2d40280014edb86)
+
+
+
+### 🛠️ Other Changes
+
+- Update tsconfig.typedoc.json [`(55a9f74)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/55a9f74dab20d0e73eaab32fb7b37e5f0f483836)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Refine Dependabot configuration to ignore local workspace dependencies
+ - Excluded all local packages under @shared/* and file:* from updates
+ - Updated grouping patterns to exclude local packages
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(85b39bb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/85b39bbd100ea654245138ac5a24a54990d3c841)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update greetings workflow to use correct parameter names for first interaction action
+ - Changed `repo-token` to `repo_token`
+ - Changed `issue-message` to `issue_message`
+ - Changed `pr-message` to `pr_message`
+📝 [docs] Modify TypeScript configuration to include baseUrl and additional path mappings
+ - Added `baseUrl` option
+ - Introduced path mapping for `@assets/*`
+ - Included `vite/client` in types array
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(97c6545)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/97c6545cd08b3c376c28bb790d0cba7f75e67a12)
+
+
+
+
+
+
+## [16.8.0] - 2025-10-11
+
+
 [[543b134](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)...
-[543b134](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/543b134cdb3bfdf1acd0b876f293900efc94c320...543b134cdb3bfdf1acd0b876f293900efc94c320))
+[a60227e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a60227eaba7d5418aad6e07efd83bcece93fed5a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/543b134cdb3bfdf1acd0b876f293900efc94c320...a60227eaba7d5418aad6e07efd83bcece93fed5a))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 16.7.0 [`(543b134)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/543b134cdb3bfdf1acd0b876f293900efc94c320)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v16.7.0 [skip ci] [`(5a944d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5a944d85837159b8693e0a64f1fb733c81b61278)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Enhance CI/CD workflow for releases
+
+This commit enhances the CI/CD pipeline to streamline the release process and improve build consistency.
+
+- 🔧 [build] Updates the build workflow for Electron apps:
+  -  [dependency] Updates the package.json version number automatically based on the current version.
+  -  Creates a new git tag for the new version.
+  -  Commits and pushes the version bump to the repository.
+  -  Uploads the bumped package.json as an artifact.
+  -  Downloads the bumped package.json in the build job.
+  -  Sets up the Node.js environment.
+  -  Installs build dependencies for Linux, macOS, and Windows.
+  -  Caches node modules for faster builds.
+  -  Builds the Vite frontend and Electron backend.
+  -  Builds the Electron app for various platforms and architectures.
+  -  Uploads build artifacts.
+  -  Updates the build matrix summary.
+- 📦 [release] Implements a comprehensive release process:
+  -  Downloads all build artifacts from the build job.
+  -  Generates release notes for the new version, including merge commit details.
+  -  Organizes distributables by platform and architecture.
+  -  Fixes SHA512 hashes in latest.yml files to ensure integrity.
+  -  Creates or updates the GitHub release with distributable builds, including detailed release notes and download links.
+  -  Includes a detailed table of download links for each platform and architecture.
+- 📝 [docs] Updates changelogs in multiple directories:
+  -  Sets up Node.js and installs git-cliff.
+  -  Generates CHANGELOG.md files for the root directory, src, shared, docs, config, and electron directories.
+  -  Commits and pushes the updated changelogs to the repository.
+  -  Creates and completes a check run to track the changelog update process.
+- 🧪 [test] Updates integration tests for site deletion:
+  -  Updates the `findBySiteIdentifier` mock to correctly return an empty array if no monitors are found for a given site identifier.
+- 🧹 [chore] Removes unnecessary `ignore` directive from dependabot.yml.
+- ✨ [feat] Adds Storybook build step to codecov workflow.
+- 🛠️ [fix] Improves URL validation logic:
+  -  Fixes an issue where valid URLs containing protocol-like sequences in the path were being rejected.
+  -  Removes unnecessary protocol check in the `isValidUrl` function.
+- 🎨 [style] Disables `selector-class-pattern` in stylelint configuration to allow flexibility with utility-first CSS frameworks.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a60227e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a60227eaba7d5418aad6e07efd83bcece93fed5a)
 
 
 
