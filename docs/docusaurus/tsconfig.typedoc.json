@@ -3,7 +3,6 @@
     "compilerOptions": {
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "baseUrl": "../../",
         "checkJs": false,
         "declaration": true,
         "declarationDir": ".cache/builds/docusaurus/typedoc/types",
