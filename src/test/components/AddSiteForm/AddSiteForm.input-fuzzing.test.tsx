@@ -47,7 +47,7 @@ let mockState = {
     name: "",
     port: "",
     selectedExistingSite: "",
-    siteId: "test-site-id",
+    siteIdentifier: "test-site-id",
     url: "",
 };
 
@@ -83,7 +83,7 @@ const mockResetForm = vi.fn(() => {
         name: "",
         port: "",
         selectedExistingSite: "",
-        siteId: "test-site-id",
+        siteIdentifier: "test-site-id",
         url: "",
     };
 });
@@ -94,8 +94,8 @@ const mockSetFormError = vi.fn((value: string | undefined) => {
 const mockSetSelectedExistingSite = vi.fn((value: string) => {
     mockState.selectedExistingSite = value;
 });
-const mockSetSiteId = vi.fn((value: string) => {
-    mockState.siteId = value;
+const mockSetSiteIdentifier = vi.fn((value: string) => {
+    mockState.siteIdentifier = value;
 });
 
 // Get the mocked useAddSiteForm function that returns current state
@@ -113,7 +113,7 @@ const mockUseAddSiteForm = vi.fn(() => ({
     setName: mockSetName,
     setPort: mockSetPort,
     setSelectedExistingSite: mockSetSelectedExistingSite,
-    setSiteId: mockSetSiteId,
+    setSiteIdentifier: mockSetSiteIdentifier,
     setUrl: mockSetUrl,
 }));
 
@@ -434,7 +434,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             name: "",
             port: "",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "",
         };
     });

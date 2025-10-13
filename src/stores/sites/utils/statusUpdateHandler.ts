@@ -9,12 +9,12 @@
  *
  * @public
  */
-
-import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
-import type { UnknownRecord } from "type-fest";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { MonitorStatusChangedEventData } from "@shared/types/events";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
+import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 
 import { EventsService } from "../../../services/EventsService";
 import { logger } from "../../../services/logger";
@@ -29,24 +29,12 @@ import { logger } from "../../../services/logger";
  *
  * @internal
  */
-interface MonitorStatusChangedEvent {
-    /** The complete monitor object with updated history. */
+type MonitorStatusChangedEvent = MonitorStatusChangedEventData & {
+    /** Complete monitor snapshot with refreshed history. */
     monitor: Monitor;
-    /** The ID of the monitor. */
-    monitorId: string;
-    /** The new status string. */
-    newStatus: MonitorStatus;
-    /** The previous status string. */
-    previousStatus: MonitorStatus;
-    /** Optional response time in ms. */
-    responseTime?: number;
-    /** The complete site object. */
+    /** Site context required for notification workflows. */
     site: Site;
-    /** The ID of the site. */
-    siteId: string;
-    /** Unix timestamp (ms) when the status changed. */
-    timestamp: number;
-}
+};
 
 /**
  * Configuration options for status update handler operations.
@@ -211,10 +199,10 @@ export class StatusUpdateManager {
 
             // Log if site not found in development mode
             const siteExists = currentSites.some(
-                (site) => site.identifier === event.siteId
+                (site) => site.identifier === event.siteIdentifier
             );
             if (!siteExists && isDevelopment()) {
-                logger.debug(`Site ${event.siteId} not found in store`);
+                logger.debug(`Site ${event.siteIdentifier} not found in store`);
             }
 
             // Apply the update using the complete monitor object from the event
@@ -224,21 +212,37 @@ export class StatusUpdateManager {
             );
             this.setSites(updatedSites);
 
+            const siteForCallback = event.site;
+
             // Call optional update callback
             if (this.onUpdate) {
-                this.onUpdate({
+                const statusUpdate: StatusUpdate = {
+                    monitor: event.monitor,
                     monitorId: event.monitorId,
-                    previousStatus: event.previousStatus,
-                    site: event.site, // Use the complete site from event
-                    siteIdentifier: event.siteId,
-                    status: event.newStatus,
+                    site: siteForCallback,
+                    siteIdentifier: event.siteIdentifier,
+                    status: event.status,
                     timestamp: new Date(event.timestamp).toISOString(),
-                });
+                };
+
+                if (event.details !== undefined) {
+                    statusUpdate.details = event.details;
+                }
+
+                if (event.previousStatus !== undefined) {
+                    statusUpdate.previousStatus = event.previousStatus;
+                }
+
+                if (event.responseTime !== undefined) {
+                    statusUpdate.responseTime = event.responseTime;
+                }
+
+                this.onUpdate(statusUpdate);
             }
 
             if (isDevelopment()) {
                 logger.debug(
-                    `Applied incremental status update: site=${event.siteId}, monitor=${event.monitorId}, ${event.previousStatus} → ${event.newStatus}`
+                    `Applied incremental status update: site=${event.siteIdentifier}, monitor=${event.monitorId}, ${event.previousStatus} → ${event.status}`
                 );
             }
         } catch (error) {
@@ -466,7 +470,7 @@ export class StatusUpdateManager {
     ): Site[] {
         return sites.map((site) => {
             // Only update the site that contains this monitor
-            if (site.identifier !== event.siteId) {
+            if (site.identifier !== event.siteIdentifier) {
                 return site;
             }
 
@@ -476,7 +480,7 @@ export class StatusUpdateManager {
             );
             if (!monitorExists && isDevelopment()) {
                 logger.debug(
-                    `Monitor ${event.monitorId} not found in site ${event.siteId}`
+                    `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
                 );
             }
 
@@ -527,35 +531,6 @@ export class StatusUpdateManager {
     private isMonitorStatusChangedEvent(
         data: unknown
     ): data is MonitorStatusChangedEvent {
-        if (typeof data !== "object" || data === null) {
-            return false;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard with runtime validation following
-        const record = data as UnknownRecord;
-
-        // Validate basic event fields
-        const hasBasicFields =
-            "monitorId" in data &&
-            "newStatus" in data &&
-            "previousStatus" in data &&
-            "siteId" in data &&
-            "timestamp" in data &&
-            typeof record["monitorId"] === "string" &&
-            typeof record["newStatus"] === "string" &&
-            typeof record["previousStatus"] === "string" &&
-            typeof record["siteId"] === "string" &&
-            typeof record["timestamp"] === "number";
-
-        // Validate complete monitor and site objects are present
-        const hasCompleteObjects =
-            "monitor" in data &&
-            "site" in data &&
-            typeof record["monitor"] === "object" &&
-            record["monitor"] !== null &&
-            typeof record["site"] === "object" &&
-            record["site"] !== null;
-
-        return hasBasicFields && hasCompleteObjects;
+        return isEnrichedMonitorStatusChangedEventData(data);
     }
 }

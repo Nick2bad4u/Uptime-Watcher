@@ -466,7 +466,7 @@ export class SiteManager {
             // Emit typed site removed event with accurate site name
             await this.eventEmitter.emitTyped("site:removed", {
                 cascade: true,
-                siteId: identifier,
+                siteIdentifier: identifier,
                 siteName: siteName,
                 timestamp: Date.now(),
             });
@@ -539,7 +539,7 @@ export class SiteManager {
                 /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
                 await this.eventEmitter.emitTyped("site:removed", {
                     cascade: true,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                     timestamp: Date.now(),
                 });

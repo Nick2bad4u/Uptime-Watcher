@@ -18,6 +18,7 @@ import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
+    MonitorStatusChangedEventData,
     MonitorUpEventData,
 } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
@@ -1062,33 +1063,9 @@ export interface UptimeEvents extends UnknownRecord {
     /**
      * Emitted when a monitor's status changes.
      *
-     * @param monitor - The monitor object.
-     * @param monitorId - The ID of the monitor.
-     * @param newStatus - The new status string.
-     * @param previousStatus - The previous status string.
-     * @param responseTime - Optional response time in ms.
-     * @param site - The site object.
-     * @param siteId - The ID of the site.
-     * @param timestamp - Unix timestamp (ms) when the status changed.
+     * @see {@link MonitorStatusChangedEventData} for payload details.
      */
-    "monitor:status-changed": {
-        /** The monitor object. */
-        monitor: Monitor;
-        /** The ID of the monitor. */
-        monitorId: string;
-        /** The new status string. */
-        newStatus: string;
-        /** The previous status string. */
-        previousStatus: string;
-        /** Optional response time in ms. */
-        responseTime?: number;
-        /** The site object. */
-        site: Site;
-        /** The ID of the site. */
-        siteId: string;
-        /** Unix timestamp (ms) when the status changed. */
-        timestamp: number;
-    };
+    "monitor:status-changed": MonitorStatusChangedEventData;
 
     /**
      * Emitted when a monitor goes up.
@@ -1226,15 +1203,15 @@ export interface UptimeEvents extends UnknownRecord {
      * Emitted when a site is removed.
      *
      * @param cascade - Whether the removal was cascaded.
-     * @param siteId - The ID of the site removed.
+     * @param siteIdentifier - The identifier of the site removed.
      * @param siteName - The name of the site removed.
      * @param timestamp - Unix timestamp (ms) when the site was removed.
      */
     "site:removed": {
         /** Whether the removal was cascaded. */
         cascade: boolean;
-        /** The ID of the site removed. */
-        siteId: string;
+        /** The identifier of the site removed. */
+        siteIdentifier: string;
         /** The name of the site removed. */
         siteName: string;
         /** Unix timestamp (ms) when the site was removed. */

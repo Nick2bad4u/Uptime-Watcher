@@ -23,7 +23,7 @@ export interface SitesState {
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */
-    selectedSiteId: string | undefined;
+    selectedSiteIdentifier: string | undefined;
     /** Array of monitored sites */
     sites: Site[];
 }
@@ -41,7 +41,7 @@ export interface SitesStateActions {
     /** Add a site to the store */
     addSite: (site: Site) => void;
     /** Get selected monitor ID for a site */
-    getSelectedMonitorId: (siteId: string) => string | undefined;
+    getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
     /** Remove a site from the store */
@@ -49,7 +49,7 @@ export interface SitesStateActions {
     /** Select a site for focused operations and UI display */
     selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
 }
@@ -84,17 +84,20 @@ export const createSitesStateActions = (
         logStoreAction("SitesStore", "addSite", { site });
         set((state) => ({ sites: [...state.sites, site] }));
     },
-    getSelectedMonitorId: (siteId: string): string | undefined => {
+    getSelectedMonitorId: (siteIdentifier: string): string | undefined => {
         const ids = get().selectedMonitorIds;
 
-        return ids[siteId];
+        return ids[siteIdentifier];
     },
     getSelectedSite: (): Site | undefined => {
-        const { selectedSiteId, sites } = get();
-        if (!selectedSiteId) {
+        const { selectedSiteIdentifier, sites } = get();
+        if (!selectedSiteIdentifier) {
             return undefined;
         }
-        return sites.find((s) => s.identifier === selectedSiteId) ?? undefined;
+        return (
+            sites.find((site) => site.identifier === selectedSiteIdentifier) ??
+            undefined
+        );
     },
     removeSite: (identifier: string): void => {
         logStoreAction("SitesStore", "removeSite", { identifier });
@@ -110,10 +113,10 @@ export const createSitesStateActions = (
             );
             return {
                 selectedMonitorIds: remainingMonitorIds,
-                selectedSiteId:
-                    state.selectedSiteId === identifier
+                selectedSiteIdentifier:
+                    state.selectedSiteIdentifier === identifier
                         ? undefined
-                        : state.selectedSiteId,
+                        : state.selectedSiteIdentifier,
                 sites: state.sites.filter(
                     (site) => site.identifier !== identifier
                 ),
@@ -122,17 +125,19 @@ export const createSitesStateActions = (
     },
     selectSite: (site: Site | undefined): void => {
         logStoreAction("SitesStore", "selectSite", { site });
-        set(() => ({ selectedSiteId: site ? site.identifier : undefined }));
+        set(() => ({
+            selectedSiteIdentifier: site ? site.identifier : undefined,
+        }));
     },
-    setSelectedMonitorId: (siteId: string, monitorId: string): void => {
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string): void => {
         logStoreAction("SitesStore", "setSelectedMonitorId", {
             monitorId,
-            siteId,
+            siteIdentifier,
         });
         set((state) => ({
             selectedMonitorIds: {
                 ...state.selectedMonitorIds,
-                [siteId]: monitorId,
+                [siteIdentifier]: monitorId,
             },
         }));
     },
@@ -150,6 +155,6 @@ export const createSitesStateActions = (
  */
 export const initialSitesState: SitesState = {
     selectedMonitorIds: {},
-    selectedSiteId: undefined,
+    selectedSiteIdentifier: undefined,
     sites: [],
 };

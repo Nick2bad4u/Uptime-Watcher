@@ -37,6 +37,8 @@ import type { CacheValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 
+import { logger } from "../services/logger";
+
 /**
  * Predefined application cache collection interface.
  *
@@ -175,10 +177,10 @@ export class TypedCache<K, V> {
 
         const configuredTtl = options.ttl;
         if (configuredTtl !== undefined && configuredTtl <= 0) {
-            console.warn(
-                `[Cache] Invalid TTL configuration: ${configuredTtl}. ` +
-                    "Cache will use no TTL (infinite duration)."
-            );
+            logger.warn("[Cache] Invalid TTL configuration", {
+                configuredTtl,
+                context: "cache:TypedCache",
+            });
         }
 
         this.defaultTtl =

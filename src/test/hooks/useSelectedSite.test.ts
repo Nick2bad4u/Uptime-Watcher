@@ -68,7 +68,7 @@ describe(useSelectedSite, () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should return undefined when selectedSiteId is undefined", async ({
+        it("should return undefined when selectedSiteIdentifier is undefined", async ({
             task,
             annotate,
         }) => {
@@ -85,7 +85,7 @@ describe(useSelectedSite, () => {
             expect(result.current).toBeUndefined();
         });
 
-        it("should return undefined when selectedSiteId is empty string", async ({
+        it("should return undefined when selectedSiteIdentifier is empty string", async ({
             task,
             annotate,
         }) => {
@@ -150,7 +150,7 @@ describe(useSelectedSite, () => {
             await annotate("Type: Business Logic", "type");
 
             mockUseUIStore.mockImplementation((selector: any) =>
-                selector({ selectedSiteId: "site-1" })
+                selector({ selectedSiteIdentifier: "site-1" })
             );
             mockUseSitesStore.mockReturnValue(mockSites);
 
@@ -375,7 +375,7 @@ describe(useSelectedSite, () => {
     });
 
     describe("State updates and reactivity", () => {
-        it("should update when selectedSiteId changes", async ({
+        it("should update when selectedSiteIdentifier changes", async ({
             task,
             annotate,
         }) => {
@@ -491,7 +491,7 @@ describe(useSelectedSite, () => {
             expect(firstResult).toBe(secondResult);
         });
 
-        it("should return new reference when selectedSiteId changes", async ({
+        it("should return new reference when selectedSiteIdentifier changes", async ({
             task,
             annotate,
         }) => {

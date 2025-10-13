@@ -121,10 +121,10 @@ export interface AddSiteFormActions {
     setReplicaStatusUrl: (value: string) => void;
     /** Set replication timestamp field */
     setReplicationTimestampField: (value: string) => void;
-    /** Set selected existing site */
+    /** Set selected existing site identifier */
     setSelectedExistingSite: (value: string) => void;
-    /** Set site ID */
-    setSiteId: (value: string) => void;
+    /** Set generated site identifier */
+    setSiteIdentifier: (value: string) => void;
     /** Set URL field value */
     setUrl: (value: string) => void;
 }
@@ -196,10 +196,10 @@ export interface AddSiteFormState {
     replicaStatusUrl: string;
     /** Replication timestamp field */
     replicationTimestampField: string;
-    /** Selected existing site ID when adding to existing */
+    /** Selected existing site identifier when adding to existing */
     selectedExistingSite: string;
     /** Generated site identifier */
-    siteId: string;
+    siteIdentifier: string;
     /** URL field for HTTP monitors */
     url: string;
 }
@@ -442,12 +442,12 @@ const resetFieldsForModeChange = (
     addMode: FormMode,
     setters: {
         setName: (value: string) => void;
-        setSiteId: (value: string) => void;
+        setSiteIdentifier: (value: string) => void;
     }
 ): void => {
     if (addMode === "new") {
         setters.setName("");
-        setters.setSiteId(generateUuid());
+        setters.setSiteIdentifier(generateUuid());
     } else {
         setters.setName("");
     }
@@ -553,7 +553,9 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     const [name, setName] = useState("");
     const [monitorType, setMonitorType] = useState<MonitorType>("http");
     const [checkInterval, setCheckInterval] = useState(DEFAULT_CHECK_INTERVAL);
-    const [siteId, setSiteId] = useState<string>(() => generateUuid()); // Lazy initialization
+    const [siteIdentifier, setSiteIdentifier] = useState<string>(() =>
+        generateUuid()
+    ); // Lazy initialization
 
     const monitorFieldValues = useMemo<MonitorFieldValues>(
         () => ({
@@ -685,15 +687,18 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         ]
     );
 
-    // Reset name and siteId when switching modes - using useEffect to avoid render-time setState
+    // Reset name and site identifier when switching modes - using useEffect to avoid render-time setState
     useEffect(
         function resetFieldsOnAddModeChange() {
-            resetFieldsForModeChange(addMode, { setName, setSiteId });
+            resetFieldsForModeChange(addMode, {
+                setName,
+                setSiteIdentifier,
+            });
         },
         [
             addMode,
             setName,
-            setSiteId,
+            setSiteIdentifier,
         ]
     );
 
@@ -745,7 +750,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setName("");
         setMonitorType("http");
         setCheckInterval(DEFAULT_CHECK_INTERVAL);
-        setSiteId(generateUuid());
+        setSiteIdentifier(generateUuid());
         setAddMode("new");
         setSelectedExistingSite("");
         setFormError(undefined);
@@ -779,7 +784,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setReplicaStatusUrl,
         setReplicationTimestampField,
         setSelectedExistingSite,
-        setSiteId,
+        setSiteIdentifier,
         setUrl,
     ]);
 
@@ -844,9 +849,9 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setReplicaStatusUrl,
         setReplicationTimestampField,
         setSelectedExistingSite,
-        setSiteId,
+        setSiteIdentifier,
         setUrl,
-        siteId,
+        siteIdentifier,
         url,
     };
 }

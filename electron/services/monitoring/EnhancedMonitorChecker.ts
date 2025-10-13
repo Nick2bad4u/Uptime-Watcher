@@ -32,6 +32,11 @@
  */
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    MonitorDownEventData,
+    MonitorLifecycleEventData,
+    MonitorUpEventData,
+} from "@shared/types/events";
 
 import {
     interpolateLogTemplate,
@@ -518,25 +523,34 @@ export class EnhancedMonitorChecker {
         freshMonitor: Site["monitors"][0],
         checkResult: StatusUpdateMonitorCheckResult
     ): Promise<void> {
-        const timestamp = checkResult.timestamp.getTime();
+        const isoTimestamp = checkResult.timestamp.toISOString();
+        const lifecycleBase: MonitorLifecycleEventData = {
+            details: checkResult.details ?? "",
+            monitor: freshMonitor,
+            monitorId: freshMonitor.id,
+            previousStatus: originalMonitor.status,
+            responseTime: checkResult.responseTime,
+            site,
+            siteIdentifier: site.identifier,
+            status: checkResult.status,
+            timestamp: isoTimestamp,
+        };
 
         if (checkResult.status === "up" && originalMonitor.status !== "up") {
-            await this.config.eventEmitter.emitTyped("monitor:up", {
-                monitor: freshMonitor,
-                site: site,
-                siteId: site.identifier,
-                timestamp,
-            });
+            const payload: MonitorUpEventData = {
+                ...lifecycleBase,
+                status: "up",
+            };
+            await this.config.eventEmitter.emitTyped("monitor:up", payload);
         } else if (
             checkResult.status === "down" &&
             originalMonitor.status !== "down"
         ) {
-            await this.config.eventEmitter.emitTyped("monitor:down", {
-                monitor: freshMonitor,
-                site: site,
-                siteId: site.identifier,
-                timestamp,
-            });
+            const payload: MonitorDownEventData = {
+                ...lifecycleBase,
+                status: "down",
+            };
+            await this.config.eventEmitter.emitTyped("monitor:down", payload);
         }
     }
 
@@ -629,17 +643,31 @@ export class EnhancedMonitorChecker {
             history: freshHistory,
         };
 
-        // Emit proper typed events like the traditional monitoring system
-        await this.config.eventEmitter.emitTyped("monitor:status-changed", {
+        // Determine details message based on status
+        let details = "Monitor is not responding"; // Default value
+        if (checkResult.status === "up") {
+            details = "Monitor is responding";
+        } else if (checkResult.status === "degraded") {
+            details = "Monitor is partially responding";
+        }
+
+        const statusUpdate: StatusUpdate = {
+            details,
             monitor: freshMonitorWithHistory,
-            monitorId: freshMonitorWithHistory.id,
-            newStatus: checkResult.status,
+            monitorId: checkResult.monitorId,
             previousStatus: monitor.status,
             responseTime: checkResult.responseTime,
-            site: site,
-            siteId: site.identifier,
-            timestamp: checkResult.timestamp.getTime(),
-        });
+            site,
+            siteIdentifier: site.identifier,
+            status: checkResult.status,
+            timestamp: checkResult.timestamp.toISOString(),
+        };
+
+        // Emit proper typed events like the traditional monitoring system
+        await this.config.eventEmitter.emitTyped(
+            "monitor:status-changed",
+            statusUpdate
+        );
 
         // Emit monitor up/down events for status changes
         await this.emitStatusChangeEvents(
@@ -649,23 +677,7 @@ export class EnhancedMonitorChecker {
             checkResult
         );
 
-        // Determine details message based on status
-        let details = "Monitor is not responding"; // Default value
-        if (checkResult.status === "up") {
-            details = "Monitor is responding";
-        } else if (checkResult.status === "degraded") {
-            details = "Monitor is partially responding";
-        }
-
-        // Return status update for event emission
-        return {
-            details,
-            monitorId: checkResult.monitorId,
-            previousStatus: monitor.status,
-            siteIdentifier: site.identifier,
-            status: checkResult.status, // Use actual status from check result
-            timestamp: checkResult.timestamp.toISOString(),
-        };
+        return statusUpdate;
     }
 
     /**
@@ -775,7 +787,7 @@ export class EnhancedMonitorChecker {
             // result)
             await this.saveHistoryEntry(monitor, checkResult);
 
-            const statusUpdate: StatusUpdate = {
+            const statusUpdateBase: StatusUpdate = {
                 details:
                     serviceResult.details ??
                     (serviceResult.status === "up"
@@ -810,7 +822,7 @@ export class EnhancedMonitorChecker {
                 );
             if (!freshMonitor) {
                 logger.warn(`Fresh monitor data not found for ${monitor.id}`);
-                return statusUpdate;
+                return statusUpdateBase;
             }
 
             // Fetch the monitor's updated history to include in the event
@@ -823,38 +835,49 @@ export class EnhancedMonitorChecker {
                 history: freshHistory,
             };
 
-            // Emit proper typed events like the traditional monitoring system
-            await this.config.eventEmitter.emitTyped("monitor:status-changed", {
+            const statusUpdate: StatusUpdate = {
+                ...statusUpdateBase,
                 monitor: freshMonitorWithHistory,
-                monitorId: freshMonitorWithHistory.id,
-                newStatus: finalStatus, // Use final status
-                previousStatus: monitor.status,
                 responseTime: serviceResult.responseTime,
-                site: site,
-                siteId: site.identifier,
-                timestamp: checkResult.timestamp.getTime(),
-            });
+                site,
+            };
+
+            // Emit proper typed events like the traditional monitoring system
+            await this.config.eventEmitter.emitTyped(
+                "monitor:status-changed",
+                statusUpdate
+            );
 
             // Emit monitor up/down events for status changes
             // Don't emit up/down events for manual checks on paused monitors
             if (!isManualCheck || monitor.status !== "paused") {
+                const lifecyclePayloadBase: MonitorLifecycleEventData = {
+                    ...statusUpdate,
+                    monitor: freshMonitorWithHistory,
+                    site,
+                };
+
                 if (serviceResult.status === "up" && monitor.status !== "up") {
-                    await this.config.eventEmitter.emitTyped("monitor:up", {
-                        monitor: freshMonitorWithHistory,
-                        site: site,
-                        siteId: site.identifier,
-                        timestamp: checkResult.timestamp.getTime(),
-                    });
+                    const payload: MonitorUpEventData = {
+                        ...lifecyclePayloadBase,
+                        status: "up",
+                    };
+                    await this.config.eventEmitter.emitTyped(
+                        "monitor:up",
+                        payload
+                    );
                 } else if (
                     serviceResult.status === "down" &&
                     monitor.status !== "down"
                 ) {
-                    await this.config.eventEmitter.emitTyped("monitor:down", {
-                        monitor: freshMonitorWithHistory,
-                        site: site,
-                        siteId: site.identifier,
-                        timestamp: checkResult.timestamp.getTime(),
-                    });
+                    const payload: MonitorDownEventData = {
+                        ...lifecyclePayloadBase,
+                        status: "down",
+                    };
+                    await this.config.eventEmitter.emitTyped(
+                        "monitor:down",
+                        payload
+                    );
                 }
             }
 

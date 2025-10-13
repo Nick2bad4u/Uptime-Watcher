@@ -62,18 +62,19 @@ const withSiteDetailsState: Decorator = (StoryComponent, context) => {
     useEffect(
         function syncSiteDetailsState(): () => void {
             const previous = {
-                selectedSiteId: useUIStore.getState().selectedSiteId,
+                selectedSiteIdentifier:
+                    useUIStore.getState().selectedSiteIdentifier,
                 showSiteDetails: useUIStore.getState().showSiteDetails,
             } as const;
 
             useUIStore.setState({
-                selectedSiteId: site.identifier,
+                selectedSiteIdentifier: site.identifier,
                 showSiteDetails: true,
             });
 
             return function restoreSiteDetailsState(): void {
                 useUIStore.setState({
-                    selectedSiteId: previous.selectedSiteId,
+                    selectedSiteIdentifier: previous.selectedSiteIdentifier,
                     showSiteDetails: previous.showSiteDetails,
                 });
             };

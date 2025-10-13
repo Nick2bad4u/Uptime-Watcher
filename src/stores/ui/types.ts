@@ -81,7 +81,7 @@ export interface UIStore {
     /**
      * The identifier of the currently selected site.
      */
-    selectedSiteId: string | undefined;
+    selectedSiteIdentifier: string | undefined;
 
     /**
      * Selects a site for focused operations and UI display.
@@ -145,10 +145,13 @@ export interface UIStore {
      * Persists the collapsed state of the site details header for a specific
      * site.
      *
-     * @param siteId - Identifier of the site being viewed.
+     * @param siteIdentifier - Identifier of the site being viewed.
      * @param collapsed - Whether the header should be collapsed.
      */
-    setSiteDetailsHeaderCollapsed: (siteId: string, collapsed: boolean) => void;
+    setSiteDetailsHeaderCollapsed: (
+        siteIdentifier: string,
+        collapsed: boolean
+    ) => void;
 
     /**
      * Updates the active presentation layout for the dashboard site list.
@@ -223,17 +226,17 @@ export interface UIStore {
     /**
      * Synchronizes the active tab with the last tab opened for a site.
      *
-     * @param siteId - Identifier of the site being viewed.
+     * @param siteIdentifier - Identifier of the site being viewed.
      */
-    syncActiveSiteDetailsTab: (siteId: string) => void;
+    syncActiveSiteDetailsTab: (siteIdentifier: string) => void;
 
     /**
      * Toggles the collapsed state of the site details header for the provided
      * site.
      *
-     * @param siteId - Identifier of the site being viewed.
+     * @param siteIdentifier - Identifier of the site being viewed.
      */
-    toggleSiteDetailsHeaderCollapsed: (siteId: string) => void;
+    toggleSiteDetailsHeaderCollapsed: (siteIdentifier: string) => void;
 
     // NOTE: getSelectedSite removed - use useSelectedSite hook instead
     // (src/hooks/useSelectedSite.ts)

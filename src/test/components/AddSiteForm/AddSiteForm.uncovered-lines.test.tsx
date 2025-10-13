@@ -100,7 +100,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setHost: vi.fn(),
         port: "",
         setPort: vi.fn(),
-        siteId: "",
+        siteIdentifier: "",
         description: "",
         setDescription: vi.fn(),
         timeout: 30_000,

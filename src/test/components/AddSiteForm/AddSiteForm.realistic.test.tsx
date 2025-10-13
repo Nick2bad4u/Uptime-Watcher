@@ -211,7 +211,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             setPort: vi.fn(),
             setRecordType: vi.fn(),
             setSelectedExistingSite: vi.fn(),
-            setSiteId: vi.fn(),
+            setSiteIdentifier: vi.fn(),
             setUrl: vi.fn(),
         };
 
@@ -235,7 +235,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             port: "",
             recordType: "A",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "",
 
             // Actions - use stable function references to prevent re-renders

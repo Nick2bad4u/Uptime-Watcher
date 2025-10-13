@@ -121,7 +121,7 @@ All store actions include consistent logging for debugging:
 ```typescript
 setSelectedSite: (site: Site | undefined) => {
  logStoreAction("UIStore", "setSelectedSite", { site });
- set({ selectedSiteId: site ? site.identifier : undefined });
+ set({ selectedSiteIdentifier: site ? site.identifier : undefined });
 };
 ```
 

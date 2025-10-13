@@ -26,7 +26,7 @@ const { ensureInitialized, wrap } = ((): ReturnType<
 
 interface SystemServiceContract {
     initialize: () => Promise<void>;
-    openExternal: (url: string) => Promise<void>;
+    openExternal: (url: string) => Promise<boolean>;
 }
 
 /**
@@ -63,9 +63,23 @@ export const SystemService: SystemServiceContract = {
      *
      * @param url - The URL to open in the external browser.
      *
-     * @throws If the electron API is unavailable or the operation fails.
+     * @returns `true` when Electron successfully delegates the request.
+     *
+     * @throws If the electron API is unavailable, the underlying operation
+     *   fails, or Electron declines to open the target URL.
      */
-    openExternal: wrap("openExternal", async (api, url: string) => {
-        await api.system.openExternal(url);
-    }),
+    openExternal: wrap(
+        "openExternal",
+        async (api, url: string): Promise<boolean> => {
+            const opened = await api.system.openExternal(url);
+
+            if (!opened) {
+                throw new Error(
+                    `Electron declined to open external URL: ${url}`
+                );
+            }
+
+            return opened;
+        }
+    ),
 };

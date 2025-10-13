@@ -6,11 +6,11 @@
  * event subscription API exposed through `window.electronAPI.events`.
  */
 
-import type { StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
+    MonitorStatusChangedEventData,
     MonitorUpEventData,
     TestEventData,
     UpdateStatusEventData,
@@ -35,7 +35,7 @@ export interface EventsDomainBridge {
         callback: (data: MonitoringControlEventData) => void
     ) => () => void;
     readonly onMonitorStatusChanged: (
-        callback: (data: StatusUpdate) => void
+        callback: (data: MonitorStatusChangedEventData) => void
     ) => () => void;
     readonly onMonitorUp: (
         callback: (data: MonitorUpEventData) => void

@@ -26,7 +26,7 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Performs an immediate check for a specific monitor
      *
-     * @param siteId - ID of the site containing the monitor
+     * @param siteIdentifier - Identifier of the site containing the monitor
      * @param monitorId - ID of the monitor to check
      *
      * @returns Promise resolving to the latest {@link StatusUpdate} or undefined
@@ -55,7 +55,7 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Removes a monitor from a site
      *
-     * @param siteId - ID of the site
+     * @param siteIdentifier - Identifier of the site
      * @param monitorId - ID of the monitor to remove
      *
      * @returns Promise resolving to true when the monitor is removed
@@ -72,7 +72,7 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Starts monitoring for a specific site or monitor
      *
-     * @param siteId - The site identifier
+     * @param siteIdentifier - The site identifier
      * @param monitorId - Optional monitor identifier
      *
      * @returns Promise resolving to true if monitoring started successfully
@@ -89,7 +89,7 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Stops monitoring for a specific site or monitor
      *
-     * @param siteId - The site identifier
+     * @param siteIdentifier - The site identifier
      * @param monitorId - Optional monitor identifier
      *
      * @returns Promise resolving to true if monitoring stopped successfully
@@ -139,7 +139,7 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Removes a monitor from a site
      *
-     * @param siteId - ID of the site
+     * @param siteIdentifier - Identifier of the site
      * @param monitorId - ID of the monitor to remove
      *
      * @returns Promise resolving to true when the monitor is removed
@@ -156,7 +156,7 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Starts monitoring for a specific site or monitor
      *
-     * @param siteId - The site identifier
+     * @param siteIdentifier - The site identifier
      * @param monitorId - Optional monitor identifier
      *
      * @returns Promise resolving to true if monitoring started successfully
@@ -173,7 +173,7 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Stops monitoring for a specific site or monitor
      *
-     * @param siteId - The site identifier
+     * @param siteIdentifier - The site identifier
      * @param monitorId - Optional monitor identifier
      *
      * @returns Promise resolving to true if monitoring stopped successfully

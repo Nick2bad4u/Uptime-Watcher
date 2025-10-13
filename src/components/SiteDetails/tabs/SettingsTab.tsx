@@ -245,7 +245,7 @@ export const SettingsTab = ({
         logger.user.action("Settings: Save site name initiated", {
             newName: trimmedSiteName,
             oldName: currentSite.name,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
         await handleSaveName();
     }, [
@@ -260,7 +260,7 @@ export const SettingsTab = ({
             monitorId: selectedMonitor.id,
             newInterval: localCheckInterval,
             oldInterval: selectedMonitor.checkInterval,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
         handleSaveInterval();
     }, [
@@ -273,7 +273,7 @@ export const SettingsTab = ({
 
     const loggedHandleRemoveSite = useCallback(async () => {
         logger.user.action("Settings: Remove site initiated", {
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
             siteName: currentSite.name,
         });
         await handleRemoveSite();
@@ -288,7 +288,7 @@ export const SettingsTab = ({
             monitorId: selectedMonitor.id,
             newTimeout: localTimeout,
             oldTimeout: selectedMonitor.timeout,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
         await handleSaveTimeout();
     }, [
@@ -304,7 +304,7 @@ export const SettingsTab = ({
             monitorId: selectedMonitor.id,
             newRetryAttempts: localRetryAttempts,
             oldRetryAttempts: selectedMonitor.retryAttempts,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
         await handleSaveRetryAttempts();
     }, [

@@ -31,7 +31,7 @@ import * as fc from "fast-check";
 // Mock SystemService for openExternal functionality
 vi.mock("../../../services/SystemService", () => ({
     SystemService: {
-        openExternal: vi.fn().mockResolvedValue(undefined),
+        openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
 import { SystemService } from "../../../services/SystemService";
@@ -250,7 +250,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 ...globalThis.window,
                 electronAPI: {
                     system: {
-                        openExternal: vi.fn().mockResolvedValue(undefined),
+                        openExternal: vi.fn().mockResolvedValue(true),
                     },
                 },
             };
@@ -388,7 +388,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 useUIStore.getState().selectSite(site);
 
                 // Assert
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     site.identifier
                 );
             }
@@ -400,7 +400,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             // Act & Assert - select each site in turn
             for (const site of sites) {
                 useUIStore.getState().selectSite(site);
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     site.identifier
                 );
             }
@@ -411,7 +411,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             (site) => {
                 // Arrange
                 useUIStore.getState().selectSite(site);
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     site.identifier
                 );
 
@@ -419,7 +419,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 useUIStore.getState().selectSite(undefined);
 
                 // Assert
-                expect(useUIStore.getState().selectedSiteId).toBeUndefined();
+                expect(
+                    useUIStore.getState().selectedSiteIdentifier
+                ).toBeUndefined();
             }
         );
 
@@ -431,7 +433,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
             // Assert - last selection should win
             const lastSite = sites.at(-1);
-            expect(useUIStore.getState().selectedSiteId).toBe(
+            expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                 lastSite!.identifier
             );
         });
@@ -601,7 +603,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     );
 
                 // Assert - all state should be consistent
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     site.identifier
                 );
                 expect(useUIStore.getState().showSettings).toBe(
@@ -651,7 +653,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 const lastSite = sites.at(-1);
                 const lastTabId = tabIds.at(-1);
 
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     lastSite!.identifier
                 );
                 expect(useUIStore.getState().activeSiteDetailsTab).toBe(
@@ -784,7 +786,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert - final site should be selected
                 const finalSite = sites.at(-1);
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     finalSite!.identifier
                 );
 
@@ -803,7 +805,9 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             expect(() =>
                 useUIStore.getState().selectSite(undefined)
             ).not.toThrow();
-            expect(useUIStore.getState().selectedSiteId).toBeUndefined();
+            expect(
+                useUIStore.getState().selectedSiteIdentifier
+            ).toBeUndefined();
         });
 
         fcTest.prop([arbitraries.url])(
@@ -934,15 +938,15 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                 useUIStore.getState().selectSite(site);
 
                 // Assert invariants
-                expect(useUIStore.getState().selectedSiteId).toBe(
+                expect(useUIStore.getState().selectedSiteIdentifier).toBe(
                     site.identifier
                 );
-                expect(typeof useUIStore.getState().selectedSiteId).toBe(
-                    "string"
-                );
-                if (useUIStore.getState().selectedSiteId) {
+                expect(
+                    typeof useUIStore.getState().selectedSiteIdentifier
+                ).toBe("string");
+                if (useUIStore.getState().selectedSiteIdentifier) {
                     expect(
-                        useUIStore.getState().selectedSiteId!.length
+                        useUIStore.getState().selectedSiteIdentifier!.length
                     ).toBeGreaterThan(0);
                 }
             }

@@ -123,7 +123,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             port: "80",
             recordType: "A",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "https://example.com",
 
             setFormError: vi.fn(),
@@ -575,7 +575,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     const mockEvent = { preventDefault: vi.fn() } as any;
                     const properties = createMockProperties({
                         name: `Site ${index}`,
-                        siteId: `site-${index}`,
+                        siteIdentifier: `site-${index}`,
                     });
 
                     return { mockEvent, properties };

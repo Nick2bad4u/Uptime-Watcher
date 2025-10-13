@@ -12,6 +12,7 @@
  */
 
 import type { Monitor } from "@shared/types";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { ValidationResult } from "@shared/types/validation";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -34,7 +35,7 @@ interface MonitorTypesServiceContract {
         type: string,
         monitor: Monitor
     ) => Promise<string>;
-    getMonitorTypes: () => Promise<unknown>;
+    getMonitorTypes: () => Promise<MonitorTypeConfig[]>;
     initialize: () => Promise<void>;
     validateMonitorData: (
         type: string,
@@ -120,8 +121,10 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      *
      * @throws If the electron API is unavailable or the operation fails.
      */
-    getMonitorTypes: wrap("getMonitorTypes", async (api) =>
-        api.monitorTypes.getMonitorTypes()
+    getMonitorTypes: wrap(
+        "getMonitorTypes",
+        async (api): Promise<MonitorTypeConfig[]> =>
+            api.monitorTypes.getMonitorTypes()
     ),
 
     /**

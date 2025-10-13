@@ -26,19 +26,19 @@ import { MonitoringService } from "./services/MonitoringService";
  */
 export interface SiteMonitoringActions {
     /** Check a site now */
-    checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
     /** Start monitoring for all monitors of a site */
-    startSiteMonitoring: (siteId: string) => Promise<void>;
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Start monitoring for a site monitor */
     startSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
     /** Stop monitoring for all monitors of a site */
-    stopSiteMonitoring: (siteId: string) => Promise<void>;
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Stop monitoring for a site monitor */
     stopSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
 }
@@ -81,24 +81,37 @@ const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
 export const createSiteMonitoringActions = (
     deps: SiteMonitoringDependencies = defaultMonitoringDependencies
 ): SiteMonitoringActions => ({
-    checkSiteNow: async (siteId: string, monitorId: string): Promise<void> => {
-        logStoreAction("SitesStore", "checkSiteNow", { monitorId, siteId });
+    checkSiteNow: async (
+        siteIdentifier: string,
+        monitorId: string
+    ): Promise<void> => {
+        logStoreAction("SitesStore", "checkSiteNow", {
+            monitorId,
+            siteIdentifier,
+        });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.checkSiteNow(siteId, monitorId);
+                await deps.monitoringService.checkSiteNow(
+                    siteIdentifier,
+                    monitorId
+                );
                 // Backend will emit 'monitor:status-changed', which will
                 // trigger incremental update
             },
             createStoreErrorHandler("sites-monitoring", "checkSiteNow")
         );
     },
-    startSiteMonitoring: async (siteId: string): Promise<void> => {
-        logStoreAction("SitesStore", "startSiteMonitoring", { siteId });
+    startSiteMonitoring: async (siteIdentifier: string): Promise<void> => {
+        logStoreAction("SitesStore", "startSiteMonitoring", {
+            siteIdentifier,
+        });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.startSiteMonitoring(siteId);
+                await deps.monitoringService.startSiteMonitoring(
+                    siteIdentifier
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -106,17 +119,20 @@ export const createSiteMonitoringActions = (
         );
     },
     startSiteMonitorMonitoring: async (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ): Promise<void> => {
         logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
             monitorId,
-            siteId,
+            siteIdentifier,
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.startMonitoring(siteId, monitorId);
+                await deps.monitoringService.startMonitoring(
+                    siteIdentifier,
+                    monitorId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -126,12 +142,14 @@ export const createSiteMonitoringActions = (
             )
         );
     },
-    stopSiteMonitoring: async (siteId: string): Promise<void> => {
-        logStoreAction("SitesStore", "stopSiteMonitoring", { siteId });
+    stopSiteMonitoring: async (siteIdentifier: string): Promise<void> => {
+        logStoreAction("SitesStore", "stopSiteMonitoring", {
+            siteIdentifier,
+        });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.stopSiteMonitoring(siteId);
+                await deps.monitoringService.stopSiteMonitoring(siteIdentifier);
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },
@@ -139,17 +157,20 @@ export const createSiteMonitoringActions = (
         );
     },
     stopSiteMonitorMonitoring: async (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ): Promise<void> => {
         logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
             monitorId,
-            siteId,
+            siteIdentifier,
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.stopMonitoring(siteId, monitorId);
+                await deps.monitoringService.stopMonitoring(
+                    siteIdentifier,
+                    monitorId
+                );
                 // No need for manual sync - StatusUpdateHandler will update UI
                 // via events
             },

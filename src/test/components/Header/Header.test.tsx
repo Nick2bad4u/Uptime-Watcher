@@ -30,7 +30,7 @@ const mockUseSidebarLayout = vi.mocked(useSidebarLayout);
 const createUiState = (): UIStore => ({
     activeSiteDetailsTab: "site-overview",
     openExternal: vi.fn(),
-    selectedSiteId: undefined,
+    selectedSiteIdentifier: undefined,
     selectSite: vi.fn(),
     setActiveSiteDetailsTab: vi.fn(),
     setShowAddSiteModal: vi.fn(),

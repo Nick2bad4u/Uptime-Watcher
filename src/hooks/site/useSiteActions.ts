@@ -125,7 +125,7 @@ export function useSiteActions(
             logger.user.action("Started site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
         } catch (error) {
@@ -157,7 +157,7 @@ export function useSiteActions(
             logger.user.action("Stopped site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
         } catch (error) {
@@ -177,7 +177,7 @@ export function useSiteActions(
                 await startSiteMonitoring(site.identifier);
                 logger.user.action("Started site-wide monitoring", {
                     monitorsCount: site.monitors.length,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
             } catch (error) {
@@ -198,7 +198,7 @@ export function useSiteActions(
                 await stopSiteMonitoring(site.identifier);
                 logger.user.action("Stopped site-wide monitoring", {
                     monitorsCount: site.monitors.length,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
             } catch (error) {
@@ -227,7 +227,7 @@ export function useSiteActions(
         logger.user.action("Manual site check initiated", {
             monitorId: monitor.id,
             monitorType: monitor.type,
-            siteId: site.identifier,
+            siteIdentifier: site.identifier,
             siteName: site.name,
         });
 
@@ -239,7 +239,7 @@ export function useSiteActions(
                 await checkSiteNow(site.identifier, monitor.id);
                 logger.user.action("Manual site check completed successfully", {
                     monitorId: monitor.id,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 });
             } catch (error) {
@@ -260,7 +260,7 @@ export function useSiteActions(
         logger.user.action("Site card clicked - navigating to details", {
             monitorId: monitor?.id,
             monitorType: monitor?.type,
-            siteId: site.identifier,
+            siteIdentifier: site.identifier,
             siteName: site.name,
         });
 

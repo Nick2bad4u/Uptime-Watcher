@@ -84,7 +84,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
 
         return (
             <div
-                data-site-id={siteId}
+                data-site-identifier={siteId}
                 data-status={statusValue}
                 data-testid="site-card-metrics-content"
             >

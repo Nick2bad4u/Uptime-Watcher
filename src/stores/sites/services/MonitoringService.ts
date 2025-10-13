@@ -33,8 +33,35 @@ import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
-import { logger } from "../../../services/logger";
-import { waitForElectronAPI } from "../../utils";
+import { getIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+
+const { ensureInitialized, wrap } = ((): ReturnType<
+    typeof getIpcServiceHelpers
+> => {
+    try {
+        return getIpcServiceHelpers("MonitoringService");
+    } catch (error: unknown) {
+        throw ensureError(error);
+    }
+})();
+
+interface MonitoringServiceContract {
+    checkSiteNow: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<StatusUpdate | undefined>;
+    initialize: () => Promise<void>;
+    startMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    stopMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+}
 
 /**
  * Service for managing monitoring operations through Electron IPC.
@@ -46,44 +73,30 @@ import { waitForElectronAPI } from "../../utils";
  *
  * @public
  */
-export const MonitoringService = {
+export const MonitoringService: MonitoringServiceContract = {
     /**
      * Perform an immediate manual check for a specific monitor.
      *
-     * @param siteId - The identifier of the site containing the monitor.
+     * @param siteIdentifier - The identifier of the site containing the
+     *   monitor.
      * @param monitorId - The identifier of the monitor to check.
      *
      * @returns The latest {@link StatusUpdate} when available, otherwise
      *   undefined.
      */
-    async checkSiteNow(
-        siteId: string,
-        monitorId: string
-    ): Promise<StatusUpdate | undefined> {
-        await this.initialize();
-        return window.electronAPI.monitoring.checkSiteNow(siteId, monitorId);
-    },
+    checkSiteNow: wrap(
+        "checkSiteNow",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<StatusUpdate | undefined> =>
+            api.monitoring.checkSiteNow(siteIdentifier, monitorId)
+    ),
     /**
-     * Initialize the service by ensuring electron API is available
-     *
-     * @remarks
-     * This method is automatically called by all other service methods to
-     * ensure the electron API is ready before making IPC calls.
-     *
-     * @throws Error if electron API cannot be initialized
+     * Ensures the preload bridge is ready before invoking monitoring APIs.
      */
-    async initialize(): Promise<void> {
-        try {
-            await waitForElectronAPI();
-        } catch (error) {
-            logger.error(
-                "Failed to initialize MonitoringService:",
-
-                ensureError(error)
-            );
-            throw error;
-        }
-    },
+    initialize: ensureInitialized,
     /**
      * Start monitoring for a specific monitor
      *
@@ -93,24 +106,29 @@ export const MonitoringService = {
      * await MonitoringService.startMonitoring("site-123", "monitor-456");
      * ```
      *
-     * @param siteId - The identifier of the site containing the monitor
+     * @param siteIdentifier - The identifier of the site containing the monitor
      * @param monitorId - The identifier of the specific monitor to start
      *
      * @throws Error if the electron API is unavailable or the operation fails
      */
-    async startMonitoring(siteId: string, monitorId: string): Promise<void> {
-        await this.initialize();
-        const success =
-            await window.electronAPI.monitoring.startMonitoringForSite(
-                siteId,
+    startMonitoring: wrap(
+        "startMonitoring",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<void> => {
+            const success = await api.monitoring.startMonitoringForSite(
+                siteIdentifier,
                 monitorId
             );
-        if (!success) {
-            throw new Error(
-                `Failed to start monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
-            );
+            if (!success) {
+                throw new Error(
+                    `Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    },
+    ),
     /**
      * Start monitoring for all monitors of a site
      *
@@ -126,20 +144,22 @@ export const MonitoringService = {
      * await MonitoringService.startSiteMonitoring("site-123");
      * ```
      *
-     * @param siteId - The identifier of the site to start monitoring
+     * @param siteIdentifier - The identifier of the site to start monitoring
      *
      * @throws Error if the electron API is unavailable or the operation fails
      */
-    async startSiteMonitoring(siteId: string): Promise<void> {
-        await this.initialize();
-        const success =
-            await window.electronAPI.monitoring.startMonitoringForSite(siteId);
-        if (!success) {
-            throw new Error(
-                `Failed to start monitoring for site ${siteId}: Backend operation failed`
-            );
+    startSiteMonitoring: wrap(
+        "startSiteMonitoring",
+        async (api, siteIdentifier: string): Promise<void> => {
+            const success =
+                await api.monitoring.startMonitoringForSite(siteIdentifier);
+            if (!success) {
+                throw new Error(
+                    `Failed to start monitoring for site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    },
+    ),
     /**
      * Stop monitoring for a specific monitor
      *
@@ -149,24 +169,29 @@ export const MonitoringService = {
      * await MonitoringService.stopMonitoring("site-123", "monitor-456");
      * ```
      *
-     * @param siteId - The identifier of the site containing the monitor
+     * @param siteIdentifier - The identifier of the site containing the monitor
      * @param monitorId - The identifier of the specific monitor to stop
      *
      * @throws Error if the electron API is unavailable or the operation fails
      */
-    async stopMonitoring(siteId: string, monitorId: string): Promise<void> {
-        await this.initialize();
-        const success =
-            await window.electronAPI.monitoring.stopMonitoringForSite(
-                siteId,
+    stopMonitoring: wrap(
+        "stopMonitoring",
+        async (
+            api,
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<void> => {
+            const success = await api.monitoring.stopMonitoringForSite(
+                siteIdentifier,
                 monitorId
             );
-        if (!success) {
-            throw new Error(
-                `Failed to stop monitoring for monitor ${monitorId} of site ${siteId}: Backend operation failed`
-            );
+            if (!success) {
+                throw new Error(
+                    `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    },
+    ),
     /**
      * Stop monitoring for all monitors of a site
      *
@@ -182,18 +207,20 @@ export const MonitoringService = {
      * await MonitoringService.stopSiteMonitoring("site-123");
      * ```
      *
-     * @param siteId - The identifier of the site to stop monitoring
+     * @param siteIdentifier - The identifier of the site to stop monitoring
      *
      * @throws Error if the electron API is unavailable or the operation fails
      */
-    async stopSiteMonitoring(siteId: string): Promise<void> {
-        await this.initialize();
-        const success =
-            await window.electronAPI.monitoring.stopMonitoringForSite(siteId);
-        if (!success) {
-            throw new Error(
-                `Failed to stop monitoring for site ${siteId}: Backend operation failed`
-            );
+    stopSiteMonitoring: wrap(
+        "stopSiteMonitoring",
+        async (api, siteIdentifier: string): Promise<void> => {
+            const success =
+                await api.monitoring.stopMonitoringForSite(siteIdentifier);
+            if (!success) {
+                throw new Error(
+                    `Failed to stop monitoring for site ${siteIdentifier}: Backend operation failed`
+                );
+            }
         }
-    },
+    ),
 };

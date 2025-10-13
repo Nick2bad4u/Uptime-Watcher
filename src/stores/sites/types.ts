@@ -24,11 +24,14 @@ import type { Simplify } from "type-fest";
  */
 export interface SitesActions {
     /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    addMonitorToSite: (
+        siteIdentifier: string,
+        monitor: Monitor
+    ) => Promise<void>;
     /** Add a site to the store */
     addSite: (site: Site) => void;
     /** Check a site now */
-    checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
     /** Create a new site */
     createSite: (siteData: {
         identifier: string;
@@ -51,7 +54,7 @@ export interface SitesActions {
      */
     fullResyncSites: () => Promise<void>;
     /** Get selected monitor ID for a site */
-    getSelectedMonitorId: (siteId: string) => string | undefined;
+    getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
     /** Get sync status */
@@ -68,7 +71,10 @@ export interface SitesActions {
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
     /** Remove a monitor from a site */
-    removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
+    removeMonitorFromSite: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
     /**
@@ -83,21 +89,21 @@ export interface SitesActions {
      */
     selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
     /** Start monitoring for all monitors of a site */
-    startSiteMonitoring: (siteId: string) => Promise<void>;
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Start monitoring for a site monitor */
     startSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
     /** Stop monitoring for all monitors of a site */
-    stopSiteMonitoring: (siteId: string) => Promise<void>;
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Stop monitoring for a site monitor */
     stopSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
     /** Subscribe to status updates */
@@ -121,19 +127,19 @@ export interface SitesActions {
     unsubscribeFromStatusUpdates: () => void;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         retryAttempts: number
     ) => Promise<void>;
     /** Update monitor timeout */
     updateMonitorTimeout: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         timeout: number
     ) => Promise<void>;
     /** Update site check interval */
     updateSiteCheckInterval: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         interval: number
     ) => Promise<void>;
@@ -152,7 +158,7 @@ export interface SitesState {
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */
-    selectedSiteId: string | undefined;
+    selectedSiteIdentifier: string | undefined;
     /** Array of monitored sites */
     sites: Site[];
 }
@@ -217,10 +223,16 @@ export interface SiteOperationsServiceDependencies {
 }
 
 interface SiteMonitoringService {
-    startMonitoring: (siteId: string, monitorId: string) => Promise<void>;
-    startSiteMonitoring: (siteId: string) => Promise<void>;
-    stopMonitoring: (siteId: string, monitorId: string) => Promise<void>;
-    stopSiteMonitoring: (siteId: string) => Promise<void>;
+    startMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    stopMonitoring: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
 }
 
 interface SiteDataService {

@@ -7,8 +7,8 @@
  * store (which contains site data). This hook properly handles cross-store
  * dependencies without creating tight coupling between stores.
  *
- * The hook automatically updates when either the selected site ID changes or
- * when the sites data is updated, ensuring consistent state.
+ * The hook automatically updates when either the selected site identifier
+ * changes or when the sites data is updated, ensuring consistent state.
  *
  * @example
  *
@@ -44,23 +44,23 @@ import { useUIStore } from "../stores/ui/useUiStore";
  * @remarks
  * This hook efficiently combines data from the UI store (selection state) and
  * sites store (site data) using useMemo to prevent unnecessary recalculations.
- * The memoization ensures the hook only recalculates when the selected site ID
- * or sites array actually changes.
+ * The memoization ensures the hook only recalculates when the selected site
+ * identifier or sites array actually changes.
  *
  * @returns The selected site object or `undefined` when no selection exists.
  *
  * @public
  */
 export function useSelectedSite(): Site | undefined {
-    const selectedSiteId = useUIStore(
-        useCallback((state) => state.selectedSiteId, [])
+    const selectedSiteIdentifier = useUIStore(
+        useCallback((state) => state.selectedSiteIdentifier, [])
     );
     const sites = useSitesStore(useCallback((state) => state.sites, []));
 
     return React.useMemo((): Site | undefined => {
-        if (!selectedSiteId) {
+        if (!selectedSiteIdentifier) {
             return undefined;
         }
-        return sites.find((site) => site.identifier === selectedSiteId);
-    }, [selectedSiteId, sites]);
+        return sites.find((site) => site.identifier === selectedSiteIdentifier);
+    }, [selectedSiteIdentifier, sites]);
 }

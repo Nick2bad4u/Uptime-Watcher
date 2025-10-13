@@ -321,7 +321,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             // Extract original data without _meta to prevent conflicts
             await this.emitTyped("site:removed", {
                 cascade: true,
-                siteId: data.identifier ?? data.site.identifier,
+                siteIdentifier: data.identifier ?? data.site.identifier,
                 siteName: data.site.name,
                 timestamp: data.timestamp,
             });

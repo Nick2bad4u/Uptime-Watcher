@@ -112,7 +112,7 @@ const newSite = await window.electronAPI.sites.create({
 Updates an existing site and/or its monitors.
 
 ```typescript
-const updatedSite = await window.electronAPI.sites.update(siteId, {
+const updatedSite = await window.electronAPI.sites.update(siteIdentifier, {
  name: "New Site Name",
  description: "Updated description",
  monitors: [...updatedMonitors],
@@ -124,7 +124,7 @@ const updatedSite = await window.electronAPI.sites.update(siteId, {
 Deletes a site and all its associated monitors and historical data.
 
 ```typescript
-await window.electronAPI.sites.delete(siteId);
+await window.electronAPI.sites.delete(siteIdentifier);
 // Triggers 'sites:deleted' event
 ```
 
@@ -133,7 +133,7 @@ await window.electronAPI.sites.delete(siteId);
 Starts monitoring for all monitors associated with a site.
 
 ```typescript
-await window.electronAPI.sites.startMonitoring(siteId);
+await window.electronAPI.sites.startMonitoring(siteIdentifier);
 // Triggers 'sites:monitoring-started' event
 ```
 
@@ -142,19 +142,19 @@ await window.electronAPI.sites.startMonitoring(siteId);
 Stops monitoring for all monitors associated with a site.
 
 ```typescript
-await window.electronAPI.sites.stopMonitoring(siteId);
+await window.electronAPI.sites.stopMonitoring(siteIdentifier);
 // Triggers 'sites:monitoring-stopped' event
 ```
 
 ### Monitoring API (`window.electronAPI.monitoring`)
 
-#### `checkManually(siteId: string, monitorId: string): Promise<MonitorCheckResult>`
+#### `checkManually(siteIdentifier: string, monitorId: string): Promise<MonitorCheckResult>`
 
 Performs a manual health check for a specific monitor.
 
 ```typescript
 const result = await window.electronAPI.monitoring.checkManually(
- siteId,
+ siteIdentifier,
  monitorId
 );
 // Returns: {
@@ -327,16 +327,28 @@ const cleanup1 = window.electronAPI.events.onSiteAdded((data) => {
 });
 
 const cleanup2 = window.electronAPI.events.onSiteDeleted((data) => {
- sitesStore.removeSite(data.siteId);
+sitesStore.removeSite(data.siteIdentifier);
 });
 
 // Monitor events
 const cleanup3 = window.electronAPI.events.onMonitorStatusChanged((data) => {
- sitesStore.updateMonitorStatus(data.monitorId, data.newStatus);
- if (data.newStatus === "down") {
+ sitesStore.updateMonitorStatus(data.monitorId, data.status);
+ if (data.status === "down") {
   showNotification(`Monitor ${data.monitorId} is down!`, "error");
  }
 });
+
+#### Canonical Monitor Status Payload
+
+`onMonitorStatusChanged` always delivers the shared [`StatusUpdate`](../../shared/types.ts) contract:
+
+- `siteIdentifier` (string) – stable identifier for the owning site.
+- `monitorId` (string) – unique monitor identifier.
+- `status` (MonitorStatus) – new status after processing.
+- `timestamp` (ISO string) – emission time in UTC (`new Date(...).toISOString()`).
+- Optional context: `previousStatus`, `details`, `responseTime`, `monitor`, `site`.
+
+Legacy shapes (`siteId`, `newStatus`, numeric timestamps, etc.) are rejected by the preload bridge and will not reach the renderer. Keep integrations aligned with `StatusUpdate` to avoid silent drops.
 
 // Settings events
 const cleanup4 = window.electronAPI.events.onSettingsUpdated((data) => {
@@ -406,11 +418,28 @@ Internal event communication uses a type-safe event bus with automatic metadata 
 
 ```typescript
 interface UptimeEvents {
- "sites:added": { site: Site; timestamp: number };
- "sites:updated": { site: Site; timestamp: number };
- "sites:deleted": { siteId: string; timestamp: number };
- "sites:monitoring-started": { siteId: string; timestamp: number };
- "sites:monitoring-stopped": { siteId: string; timestamp: number };
+ "site:added": {
+  site: Site;
+  source: "import" | "migration" | "user";
+  timestamp: number;
+ };
+ "site:cache-miss": {
+  backgroundLoading: boolean;
+  identifier: string;
+  operation: "cache-lookup";
+  timestamp: number;
+ };
+ "site:cache-updated": {
+  identifier: string;
+  operation: "background-load" | "cache-updated" | "manual-refresh";
+  timestamp: number;
+ };
+ "site:removed": {
+  cascade: boolean;
+  siteIdentifier: string;
+  siteName: string;
+  timestamp: number;
+ };
 }
 ```
 
@@ -420,21 +449,30 @@ interface UptimeEvents {
 interface UptimeEvents {
  "monitor:status-changed": {
   monitorId: string;
-  siteId: string;
-  newStatus: "up" | "down";
-  previousStatus: "up" | "down";
-  responseTime: number;
+  siteIdentifier: string;
+  status: MonitorStatus;
+  previousStatus?: MonitorStatus;
+  responseTime?: number;
   details?: string;
-  timestamp: number;
+  timestamp: string; // ISO-8601
+  monitor?: Monitor;
+  site?: Site;
  };
  "monitor:check-completed": {
+  checkType: "manual" | "scheduled";
   monitorId: string;
-  siteId: string;
   result: MonitorCheckResult;
+  siteId: string;
   timestamp: number;
  };
+ "monitor:down": MonitorDownEventData; // StatusUpdate payload + monitor/site context
+ "monitor:up": MonitorUpEventData; // StatusUpdate payload + monitor/site context
 }
 ```
+
+Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate`
+payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`,
+and ISO-8601 `timestamp` values alongside populated `monitor` and `site` context.
 
 #### Application Events
 
@@ -568,7 +606,7 @@ export const useSiteEventListeners = () => {
    }),
 
    window.electronAPI.events.onSiteDeleted((data) => {
-    removeSite(data.siteId);
+    removeSite(data.siteIdentifier);
    }),
 
    window.electronAPI.events.onSiteUpdated((data) => {
@@ -608,12 +646,12 @@ export const useSiteOperations = () => {
   }
  }, []);
 
- const deleteSite = useCallback(async (siteId: string) => {
+ const deleteSite = useCallback(async (siteIdentifier: string) => {
   setIsLoading(true);
   setError(null);
 
   try {
-   await window.electronAPI.sites.delete(siteId);
+   await window.electronAPI.sites.delete(siteIdentifier);
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
    setError(errorMessage);

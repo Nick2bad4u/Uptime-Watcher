@@ -6,6 +6,8 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
 
+import type { Monitor, Site, StatusHistory } from "@shared/types";
+
 // Mock electron using vi.hoisted() to ensure proper initialization order
 const mockIpcRenderer = vi.hoisted(() => ({
     invoke: vi.fn(),
@@ -20,15 +22,38 @@ vi.mock("electron", () => ({
 }));
 
 import { createEventsApi } from "../../../preload/domains/eventsApi";
-import type { StatusUpdate, Monitor, Site } from "../../../../shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
+    MonitorStatusChangedEventData,
     MonitoringControlEventData,
     MonitorUpEventData,
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+
+const createMonitorFixture = (overrides: Partial<Monitor> = {}): Monitor => ({
+    activeOperations: [],
+    checkInterval: 60000,
+    history: [] as StatusHistory[],
+    id: "monitor-123",
+    monitoring: true,
+    responseTime: 1200,
+    retryAttempts: 0,
+    status: "up",
+    timeout: 30000,
+    type: "http",
+    url: "https://example.com",
+    ...overrides,
+});
+
+const createSiteFixture = (overrides: Partial<Site> = {}): Site => ({
+    identifier: "site-abc",
+    monitoring: true,
+    monitors: [createMonitorFixture()],
+    name: "Example site",
+    ...overrides,
+});
 
 describe("Events Domain API", () => {
     let eventsApi: ReturnType<typeof createEventsApi>;
@@ -150,22 +175,24 @@ describe("Events Domain API", () => {
 
         it("should call callback with monitor down data", () => {
             const callback = vi.fn();
+            const monitor = createMonitorFixture({
+                id: "test-monitor",
+                status: "down",
+            });
+            const site = createSiteFixture({
+                identifier: "test-site",
+                monitors: [monitor],
+            });
             const mockEventData: MonitorDownEventData = {
-                siteId: "test-site",
-                monitor: {
-                    id: "test-monitor",
-                    name: "Test Monitor",
-                    type: "http",
-                    url: "https://example.com",
-                    isActive: false,
-                } as unknown as Monitor,
-                site: {
-                    id: "test-site",
-                    name: "Test Site",
-                    url: "https://example.com",
-                    isActive: true,
-                } as unknown as Site,
-                timestamp: Date.now(),
+                details: "Synthetic outage detected",
+                monitor,
+                monitorId: monitor.id,
+                previousStatus: "up",
+                responseTime: monitor.responseTime,
+                site,
+                siteIdentifier: site.identifier,
+                status: "down",
+                timestamp: new Date().toISOString(),
             };
 
             eventsApi.onMonitorDown(callback);
@@ -179,11 +206,18 @@ describe("Events Domain API", () => {
 
         it("should handle monitor down events with minimal data", () => {
             const callback = vi.fn();
+            const monitor = createMonitorFixture({ id: "minimal-monitor" });
+            const site = createSiteFixture({
+                identifier: "site",
+                monitors: [monitor],
+            });
             const mockEventData: MonitorDownEventData = {
-                siteId: "site",
-                monitor: {} as any,
-                site: {} as any,
-                timestamp: Date.now(),
+                monitor,
+                monitorId: monitor.id,
+                site,
+                siteIdentifier: site.identifier,
+                status: "down",
+                timestamp: new Date().toISOString(),
             };
 
             eventsApi.onMonitorDown(callback);
@@ -210,11 +244,23 @@ describe("Events Domain API", () => {
 
         it("should call callback with monitor up data", () => {
             const callback = vi.fn();
+            const monitor = createMonitorFixture({
+                id: "test-monitor",
+                status: "up",
+            });
+            const site = createSiteFixture({
+                identifier: "test-site",
+                monitors: [monitor],
+            });
             const mockEventData: MonitorUpEventData = {
-                siteId: "test-site",
-                monitor: {} as any,
-                site: {} as any,
-                timestamp: Date.now(),
+                monitor,
+                monitorId: monitor.id,
+                previousStatus: "down",
+                responseTime: monitor.responseTime,
+                site,
+                siteIdentifier: site.identifier,
+                status: "up",
+                timestamp: new Date().toISOString(),
             };
 
             eventsApi.onMonitorUp(callback);
@@ -280,7 +326,7 @@ describe("Events Domain API", () => {
 
         it("should call callback with status update data", () => {
             const callback = vi.fn();
-            const mockEventData: StatusUpdate = {
+            const mockEventData: MonitorStatusChangedEventData = {
                 siteIdentifier: "test-site",
                 monitorId: "test-monitor",
                 status: "up",
@@ -293,6 +339,59 @@ describe("Events Domain API", () => {
             eventHandler?.({}, mockEventData);
 
             expect(callback).toHaveBeenCalledWith(mockEventData);
+        });
+
+        it("should accept canonical payloads that include monitor and site context", () => {
+            const callback = vi.fn();
+            const canonicalPayload: MonitorStatusChangedEventData & {
+                monitor: Record<string, unknown>;
+                site: Record<string, unknown>;
+            } = {
+                details: "Recovered",
+                monitor: createMonitorFixture(),
+                monitorId: "monitor-123",
+                previousStatus: "down",
+                responseTime: 1200,
+                site: createSiteFixture(),
+                siteIdentifier: "site-abc",
+                status: "up",
+                timestamp: new Date().toISOString(),
+            };
+
+            mockIpcRenderer.on.mockClear();
+            eventsApi.onMonitorStatusChanged(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls.at(-1)?.[1];
+            eventHandler?.({}, canonicalPayload);
+
+            expect(callback).toHaveBeenCalledWith(canonicalPayload);
+        });
+
+        it("should drop legacy monitor status payloads", () => {
+            const callback = vi.fn();
+            const warnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
+            const legacyPayload = {
+                monitorId: "monitor-legacy",
+                newStatus: "down",
+                previousStatus: "up",
+                siteId: "site-legacy",
+                timestamp: Date.now(),
+            };
+
+            mockIpcRenderer.on.mockClear();
+            eventsApi.onMonitorStatusChanged(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls.at(-1)?.[1];
+            eventHandler?.({}, legacyPayload);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'monitor:status-changed'",
+                legacyPayload
+            );
+            warnSpy.mockRestore();
         });
     });
 
@@ -389,30 +488,63 @@ describe("Events Domain API", () => {
 
     describe("Property-based testing with fast-check", () => {
         it("should handle various event data structures", () => {
-            fc.assert(
-                fc.property(
-                    fc.record({
-                        siteIdentifier: fc.string(),
-                        monitorId: fc.string(),
-                        timestamp: fc.integer({ min: 0 }),
-                        status: fc.oneof(
-                            fc.constant("up"),
-                            fc.constant("down"),
-                            fc.constant("pending")
-                        ),
-                        responseTime: fc.integer({ min: 0, max: 60_000 }),
+            const statusValues = [
+                "degraded",
+                "down",
+                "paused",
+                "pending",
+                "up",
+            ] as const;
+            const siteRecordArbitrary = fc
+                .record({
+                    identifier: fc.string({ minLength: 1 }),
+                    name: fc.option(fc.string({ minLength: 1 }), {
+                        nil: undefined,
                     }),
-                    (eventData) => {
-                        const callback = vi.fn();
-                        eventsApi.onMonitorStatusChanged(callback);
+                })
+                .map((value) => ({ ...value }));
+            const monitorRecordArbitrary = fc
+                .record({
+                    id: fc.string({ minLength: 1 }),
+                    status: fc.option(fc.constantFrom(...statusValues), {
+                        nil: undefined,
+                    }),
+                })
+                .map((value) => ({ ...value }));
+            const statusUpdateArbitrary = fc
+                .record({
+                    details: fc.option(fc.string(), { nil: undefined }),
+                    monitor: fc.option(monitorRecordArbitrary, {
+                        nil: undefined,
+                    }),
+                    monitorId: fc.string({ minLength: 1 }),
+                    previousStatus: fc.option(
+                        fc.constantFrom(...statusValues),
+                        {
+                            nil: undefined,
+                        }
+                    ),
+                    responseTime: fc.option(fc.nat({ max: 10_000 }), {
+                        nil: undefined,
+                    }),
+                    site: fc.option(siteRecordArbitrary, { nil: undefined }),
+                    siteIdentifier: fc.string({ minLength: 1 }),
+                    status: fc.constantFrom(...statusValues),
+                    timestamp: fc.date().map((date) => date.toISOString()),
+                })
+                .map((eventData) => eventData as MonitorStatusChangedEventData);
 
-                        const eventHandler =
-                            mockIpcRenderer.on.mock.calls.at(-1)?.[1];
-                        eventHandler?.({}, eventData);
+            fc.assert(
+                fc.property(statusUpdateArbitrary, (eventData) => {
+                    const callback = vi.fn();
+                    eventsApi.onMonitorStatusChanged(callback);
 
-                        expect(callback).toHaveBeenCalledWith(eventData);
-                    }
-                ),
+                    const eventHandler =
+                        mockIpcRenderer.on.mock.calls.at(-1)?.[1];
+                    eventHandler?.({}, eventData);
+
+                    expect(callback).toHaveBeenCalledWith(eventData);
+                }),
                 { numRuns: 20 }
             );
         });
@@ -552,20 +684,36 @@ describe("Events Domain API", () => {
             const cleanup1 = eventsApi.onCacheInvalidated(callback1);
             const cleanup2 = eventsApi.onMonitorDown(callback2);
 
+            const monitor = createMonitorFixture({ id: "monitor" });
+            const site = createSiteFixture({
+                identifier: "site",
+                monitors: [monitor],
+            });
+
             // Trigger cache event
             const cacheHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
-            cacheHandler?.({}, { cacheType: "sites", timestamp: Date.now() });
+            cacheHandler?.(
+                {},
+                {
+                    identifier: "site-123",
+                    reason: "update",
+                    timestamp: Date.now(),
+                    type: "site",
+                }
+            );
 
             // Trigger monitor event
             const monitorHandler = mockIpcRenderer.on.mock.calls[1]?.[1];
             monitorHandler?.(
                 {},
                 {
-                    siteIdentifier: "site",
-                    monitorId: "monitor",
+                    monitor,
+                    monitorId: monitor.id,
+                    previousStatus: "up",
+                    site,
+                    siteIdentifier: site.identifier,
                     status: "down",
-                    timestamp: Date.now(),
-                    responseTime: 0,
+                    timestamp: new Date().toISOString(),
                 }
             );
 
@@ -597,28 +745,49 @@ describe("Events Domain API", () => {
 
         it("should handle undefined event data", () => {
             const callback = vi.fn();
+            const warnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             eventsApi.onTestEvent(callback);
 
             const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
             eventHandler?.({}, undefined);
 
-            expect(callback).toHaveBeenCalledWith(undefined);
+            expect(callback).not.toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'test-event'",
+                undefined
+            );
+
+            warnSpy.mockRestore();
         });
 
         it("should handle null event data", () => {
             const callback = vi.fn();
+            const warnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             eventsApi.onMonitorStatusChanged(callback);
 
             const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
             eventHandler?.({}, null);
 
-            expect(callback).toHaveBeenCalledWith(null);
+            expect(callback).not.toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'monitor:status-changed'",
+                null
+            );
+
+            warnSpy.mockRestore();
         });
 
         it("should handle malformed event data gracefully", () => {
             const callback = vi.fn();
+            const warnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {});
 
             eventsApi.onCacheInvalidated(callback);
 
@@ -626,7 +795,13 @@ describe("Events Domain API", () => {
             const malformedData = { unexpected: "structure" };
             eventHandler?.({}, malformedData);
 
-            expect(callback).toHaveBeenCalledWith(malformedData);
+            expect(callback).not.toHaveBeenCalled();
+            expect(warnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'cache:invalidated'",
+                malformedData
+            );
+
+            warnSpy.mockRestore();
         });
 
         it("should handle cleanup function called multiple times", () => {
@@ -670,14 +845,18 @@ describe("Events Domain API", () => {
                     expect(typeof data.type).toBe("string");
                 }),
                 api.onMonitorDown((data: MonitorDownEventData) => {
-                    expect(typeof data.siteId).toBe("string");
+                    expect(typeof data.siteIdentifier).toBe("string");
+                    expect(data.status).toBe("down");
                 }),
                 api.onMonitorUp((data: MonitorUpEventData) => {
-                    expect(typeof data.siteId).toBe("string");
-                }),
-                api.onMonitorStatusChanged((data: StatusUpdate) => {
                     expect(typeof data.siteIdentifier).toBe("string");
+                    expect(data.status).toBe("up");
                 }),
+                api.onMonitorStatusChanged(
+                    (data: MonitorStatusChangedEventData) => {
+                        expect(typeof data.siteIdentifier).toBe("string");
+                    }
+                ),
                 api.onTestEvent((data: TestEventData) => {
                     expect(typeof data["message"]).toBe("string");
                 }),

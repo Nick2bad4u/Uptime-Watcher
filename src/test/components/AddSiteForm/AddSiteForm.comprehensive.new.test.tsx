@@ -22,7 +22,7 @@ const mockResetForm = vi.fn();
 const mockIsFormValid = vi.fn(() => true);
 const mockSetFormError = vi.fn();
 const mockSetSelectedExistingSite = vi.fn();
-const mockSetSiteId = vi.fn();
+const mockSetSiteIdentifier = vi.fn();
 
 // Get the mocked useAddSiteForm function
 const mockUseAddSiteForm = vi.fn(() => ({
@@ -35,7 +35,7 @@ const mockUseAddSiteForm = vi.fn(() => ({
     name: "",
     port: "",
     selectedExistingSite: "",
-    siteId: "test-site-id",
+    siteIdentifier: "test-site-id",
     url: "",
     // AddSiteFormActions methods
     isFormValid: mockIsFormValid,
@@ -48,7 +48,7 @@ const mockUseAddSiteForm = vi.fn(() => ({
     setName: mockSetName,
     setPort: mockSetPort,
     setSelectedExistingSite: mockSetSelectedExistingSite,
-    setSiteId: mockSetSiteId,
+    setSiteIdentifier: mockSetSiteIdentifier,
     setUrl: mockSetUrl,
 }));
 
@@ -174,7 +174,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             name: "",
             port: "",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "",
             isFormValid: mockIsFormValid,
             resetForm: mockResetForm,
@@ -186,11 +186,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             setName: mockSetName,
             setPort: mockSetPort,
             setSelectedExistingSite: mockSetSelectedExistingSite,
-            setSiteId: mockSetSiteId,
+            setSiteIdentifier: mockSetSiteIdentifier,
             setUrl: mockSetUrl,
         });
     });
-
     describe("Basic Rendering", () => {
         it("should render without crashing", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
@@ -332,7 +331,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "Test Site",
                 port: "",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "https://example.com",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -340,19 +339,16 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setCheckInterval: mockSetCheckInterval,
                 setFormError: mockSetFormError,
                 setHost: mockSetHost,
-                setMonitorType: mockSetMonitorType,
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
         });
-
         it("should show site name field for new sites", ({
             task,
             annotate,
-        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -390,7 +386,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "",
                 port: "0",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "https://example.com",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -402,11 +398,9 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
-
-            render(<AddSiteForm />);
 
             const urlInput = screen.getByLabelText(/url/i);
             expect(urlInput).toBeInTheDocument();
@@ -449,7 +443,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "Port Monitor",
                 port: "8080",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -461,15 +455,13 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
         });
-
         it("should show host and port fields for port monitor", ({
             task,
             annotate,
-        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -481,7 +473,6 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             annotate("Type: Monitoring", "type");
 
             render(<AddSiteForm />);
-
             const hostInput = screen.getByLabelText(/host/i);
             const portInput = screen.getByLabelText(/port/i);
 
@@ -502,7 +493,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "",
                 port: "",
                 selectedExistingSite: "existing-site-id",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "https://example.com",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -514,11 +505,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
         });
-
         it("should show existing mode as selected", ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
@@ -582,7 +572,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "",
                 port: "",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -594,11 +584,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
 
-            render(<AddSiteForm />);
 
             const submitButton = screen.getByRole("button", {
                 name: /add site/i,
@@ -648,7 +637,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "",
                 port: "",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -660,11 +649,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
 
-            render(<AddSiteForm />);
 
             expect(
                 screen.getByText("Site name is required")
@@ -688,10 +676,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
             // Check that all options are present in the select element
             const monitorTypeSelect = screen.getByRole("combobox", {
-                name: /monitor type/i,
             });
             expect(monitorTypeSelect).toBeInTheDocument();
-
             // Check that all options are available
             expect(
                 screen.getByRole("option", { name: "HTTP" })
@@ -812,7 +798,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 name: "",
                 port: "",
                 selectedExistingSite: "",
-                siteId: "test-site-id",
+                siteIdentifier: "test-site-id",
                 url: "",
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
@@ -824,7 +810,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
-                setSiteId: mockSetSiteId,
+                setSiteIdentifier: mockSetSiteIdentifier,
                 setUrl: mockSetUrl,
             });
 

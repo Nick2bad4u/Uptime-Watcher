@@ -89,7 +89,7 @@ describe(useUIStore, () => {
             const { result } = renderHook(() => useUIStore());
 
             expect(result.current.activeSiteDetailsTab).toBe("site-overview");
-            expect(result.current.selectedSiteId).toBeUndefined();
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
             expect(result.current.showAdvancedMetrics).toBeFalsy();
             expect(result.current.showSettings).toBeFalsy();
             expect(result.current.showSiteDetails).toBeFalsy();
@@ -408,7 +408,9 @@ describe(useUIStore, () => {
                 result.current.selectSite(mockSite);
             });
 
-            expect(result.current.selectedSiteId).toBe(mockSite.identifier);
+            expect(result.current.selectedSiteIdentifier).toBe(
+                mockSite.identifier
+            );
         });
 
         it("should clear selected site with undefined", async ({
@@ -426,13 +428,15 @@ describe(useUIStore, () => {
             act(() => {
                 result.current.selectSite(mockSite);
             });
-            expect(result.current.selectedSiteId).toBe(mockSite.identifier);
+            expect(result.current.selectedSiteIdentifier).toBe(
+                mockSite.identifier
+            );
 
             // Then clear it
             act(() => {
                 result.current.selectSite(undefined);
             });
-            expect(result.current.selectedSiteId).toBeUndefined();
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
         });
 
         it("should handle site with different identifier", async ({
@@ -455,7 +459,9 @@ describe(useUIStore, () => {
                 result.current.selectSite(differentSite);
             });
 
-            expect(result.current.selectedSiteId).toBe("different-site-456");
+            expect(result.current.selectedSiteIdentifier).toBe(
+                "different-site-456"
+            );
         });
 
         it("should handle site with empty identifier", async ({
@@ -478,7 +484,7 @@ describe(useUIStore, () => {
                 result.current.selectSite(emptySite);
             });
 
-            expect(result.current.selectedSiteId).toBe("");
+            expect(result.current.selectedSiteIdentifier).toBe("");
         });
 
         it("should overwrite previous selection", async ({
@@ -498,12 +504,12 @@ describe(useUIStore, () => {
             act(() => {
                 result.current.selectSite(site1);
             });
-            expect(result.current.selectedSiteId).toBe("site-1");
+            expect(result.current.selectedSiteIdentifier).toBe("site-1");
 
             act(() => {
                 result.current.selectSite(site2);
             });
-            expect(result.current.selectedSiteId).toBe("site-2");
+            expect(result.current.selectedSiteIdentifier).toBe("site-2");
         });
     });
 
@@ -947,7 +953,9 @@ describe(useUIStore, () => {
             act(() => {
                 result.current.selectSite(mockSite);
             });
-            expect(result.current.selectedSiteId).toBe(mockSite.identifier);
+            expect(result.current.selectedSiteIdentifier).toBe(
+                mockSite.identifier
+            );
 
             // User opens site details
             act(() => {
@@ -1001,14 +1009,16 @@ describe(useUIStore, () => {
                 act(() => {
                     result.current.selectSite(site);
                 });
-                expect(result.current.selectedSiteId).toBe(site.identifier);
+                expect(result.current.selectedSiteIdentifier).toBe(
+                    site.identifier
+                );
             }
 
             // Clear selection
             act(() => {
                 result.current.selectSite(undefined);
             });
-            expect(result.current.selectedSiteId).toBeUndefined();
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
         });
 
         it("should handle edge case with multiple simultaneous changes", async ({
@@ -1032,7 +1042,9 @@ describe(useUIStore, () => {
                 result.current.setShowSettings(false);
             });
 
-            expect(result.current.selectedSiteId).toBe(mockSite.identifier);
+            expect(result.current.selectedSiteIdentifier).toBe(
+                mockSite.identifier
+            );
             expect(result.current.showSiteDetails).toBeTruthy();
             expect(result.current.activeSiteDetailsTab).toBe("history");
             expect(result.current.siteDetailsChartTimeRange).toBe("30d");
@@ -1121,7 +1133,9 @@ describe(useUIStore, () => {
             act(() => {
                 result.current.selectSite(mockSite);
             });
-            expect(result.current.selectedSiteId).toBe(mockSite.identifier);
+            expect(result.current.selectedSiteIdentifier).toBe(
+                mockSite.identifier
+            );
 
             // Clear with undefined multiple times
             act(() => {
@@ -1129,7 +1143,7 @@ describe(useUIStore, () => {
                 result.current.selectSite(undefined);
                 result.current.selectSite(undefined);
             });
-            expect(result.current.selectedSiteId).toBeUndefined();
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
         });
 
         it("should handle boolean state transitions correctly", async ({

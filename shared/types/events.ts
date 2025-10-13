@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import type { Monitor, Site } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import type { StateSyncAction, StateSyncSource } from "./stateSync";
@@ -53,7 +53,7 @@ export interface BaseEventData {
  * ```typescript
  * const event: StateSyncEventData = {
  *     action: "delete",
- *     siteId: "site_123",
+ *     siteIdentifier: "site_123",
  *     source: "backend",
  *     timestamp: Date.now(),
  * };
@@ -236,43 +236,64 @@ export interface DatabaseSuccessEventData extends BaseEventData {
 }
 
 /**
+ * Payload for monitor status change events.
+ *
+ * @remarks
+ * Aliases {@link StatusUpdate} to emphasize that monitor status events use the
+ * shared real-time status contract while optionally including rich monitor and
+ * site context.
+ *
+ * @public
+ */
+export type MonitorStatusChangedEventData = StatusUpdate;
+
+/**
+ * Canonical payload shared by monitor lifecycle events.
+ *
+ * @remarks
+ * Builds on {@link StatusUpdate} by guaranteeing the presence of fully hydrated
+ * `monitor` and `site` entities. The timestamp field mirrors the real-time
+ * status contract, using an ISO-8601 string for consistency across renderer,
+ * preload, and backend consumers.
+ *
+ * @public
+ */
+export type MonitorLifecycleEventData = StatusUpdate & {
+    /** Monitor entity associated with the lifecycle transition. */
+    monitor: Monitor;
+    /** Site entity associated with the lifecycle transition. */
+    site: Site;
+};
+
+/**
  * Payload for events when a monitor goes down (unavailable).
  *
  * @remarks
- * Emitted when a monitored endpoint or service is detected as down.
- *
- * - `monitor`: The monitor that went down.
- * - `site`: The site containing the monitor.
- * - `siteId`: The unique identifier of the site.
- * - `timestamp`: The time (in ms since epoch) when the event occurred.
+ * Emitted when a monitored endpoint or service is detected as down. Uses the
+ * canonical {@link StatusUpdate} schema with `status` constrained to `"down"`,
+ * `siteIdentifier` replacing legacy `siteId`, and ISO-8601 timestamps.
  *
  * @example // Example event payload for a monitor down event
  *
  * ```typescript
  * const event: MonitorDownEventData = {
+ *     details: "Service returned 500",
  *     monitor,
+ *     monitorId: monitor.id,
+ *     previousStatus: "up",
  *     site,
- *     siteId: site.id,
- *     timestamp: Date.now(),
+ *     siteIdentifier: site.identifier,
+ *     status: "down",
+ *     timestamp: new Date().toISOString(),
  * };
  * ```
  *
  * @public
  */
-export interface MonitorDownEventData extends BaseEventData {
-    /**
-     * The monitor that went down.
-     */
-    readonly monitor: Monitor;
-    /**
-     * The site containing the monitor.
-     */
-    readonly site: Site;
-    /**
-     * The unique identifier of the site.
-     */
-    readonly siteId: string;
-}
+export type MonitorDownEventData = MonitorLifecycleEventData & {
+    /** New status value (always "down" for this event). */
+    status: "down";
+};
 
 /**
  * Payload for monitoring control events (global monitoring start/stop).
@@ -325,40 +346,31 @@ export interface MonitoringControlEventData extends BaseEventData {
  * Payload for events when a monitor comes back up (becomes available).
  *
  * @remarks
- * Emitted when a previously down monitor is detected as up.
- *
- * - `monitor`: The monitor that came back up.
- * - `site`: The site containing the monitor.
- * - `siteId`: The unique identifier of the site.
- * - `timestamp`: The time (in ms since epoch) when the event occurred.
+ * Emitted when a previously down monitor is detected as up. Aligns with the
+ * canonical {@link StatusUpdate} payload while constraining the resulting status
+ * to `"up"`.
  *
  * @example // Example event payload for a monitor up event
  *
  * ```typescript
  * const event: MonitorUpEventData = {
+ *     details: "Endpoint recovered",
  *     monitor,
+ *     monitorId: monitor.id,
+ *     previousStatus: "down",
  *     site,
- *     siteId: site.id,
- *     timestamp: Date.now(),
+ *     siteIdentifier: site.identifier,
+ *     status: "up",
+ *     timestamp: new Date().toISOString(),
  * };
  * ```
  *
  * @public
  */
-export interface MonitorUpEventData extends BaseEventData {
-    /**
-     * The monitor that came back up.
-     */
-    readonly monitor: Monitor;
-    /**
-     * The site containing the monitor.
-     */
-    readonly site: Site;
-    /**
-     * The unique identifier of the site.
-     */
-    readonly siteId: string;
-}
+export type MonitorUpEventData = MonitorLifecycleEventData & {
+    /** New status value (always "up" for this event). */
+    status: "up";
+};
 
 /**
  * Payload for update status change events.

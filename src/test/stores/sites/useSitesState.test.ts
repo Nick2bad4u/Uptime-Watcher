@@ -48,7 +48,7 @@ describe("useSitesState", () => {
         // Setup initial state
         mockGet.mockReturnValue({
             selectedMonitorIds: {},
-            selectedSiteId: undefined,
+            selectedSiteIdentifier: undefined,
             sites: [mockSite],
         });
 
@@ -85,7 +85,7 @@ describe("useSitesState", () => {
 
             expect(initialSitesState).toEqual({
                 selectedMonitorIds: {},
-                selectedSiteId: undefined,
+                selectedSiteIdentifier: undefined,
                 sites: [],
             });
         });
@@ -126,7 +126,7 @@ describe("useSitesState", () => {
             if (setFunction) {
                 const result = setFunction({
                     selectedMonitorIds: {},
-                    selectedSiteId: undefined,
+                    selectedSiteIdentifier: undefined,
                     sites: [],
                 });
                 expect(result).toEqual({ sites: newSites });
@@ -241,7 +241,7 @@ describe("useSitesState", () => {
     });
 
     describe("removeSite", () => {
-        it("should clear selectedSiteId if removed site was selected", async ({
+        it("should clear selectedSiteIdentifier if removed site was selected", async ({
             annotate,
         }) => {
             await annotate("Component: useSitesState", "component");
@@ -260,13 +260,13 @@ describe("useSitesState", () => {
                 "state-consistency"
             );
             await annotate(
-                "Purpose: Ensure selectedSiteId is cleared when that site is removed",
+                "Purpose: Ensure selectedSiteIdentifier is cleared when that site is removed",
                 "purpose"
             );
 
             mockGet.mockReturnValue({
                 selectedMonitorIds: {},
-                selectedSiteId: "test-site",
+                selectedSiteIdentifier: "test-site",
                 sites: [mockSite],
             });
 
@@ -278,10 +278,10 @@ describe("useSitesState", () => {
             if (setFunction) {
                 const result = setFunction({
                     selectedMonitorIds: {},
-                    selectedSiteId: "test-site",
+                    selectedSiteIdentifier: "test-site",
                     sites: [mockSite],
                 });
-                expect(result.selectedSiteId).toBeUndefined();
+                expect(result.selectedSiteIdentifier).toBeUndefined();
             }
         });
     });
@@ -318,7 +318,7 @@ describe("useSitesState", () => {
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({});
-                expect(result).toEqual({ selectedSiteId: "test-site" });
+                expect(result).toEqual({ selectedSiteIdentifier: "test-site" });
             }
         });
 
@@ -350,7 +350,7 @@ describe("useSitesState", () => {
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
                 const result = setFunction({});
-                expect(result).toEqual({ selectedSiteId: undefined });
+                expect(result).toEqual({ selectedSiteIdentifier: undefined });
             }
         });
     });
@@ -375,7 +375,7 @@ describe("useSitesState", () => {
             );
 
             mockGet.mockReturnValue({
-                selectedSiteId: "test-site",
+                selectedSiteIdentifier: "test-site",
                 sites: [mockSite],
             });
 
@@ -411,7 +411,7 @@ describe("useSitesState", () => {
             );
 
             mockGet.mockReturnValue({
-                selectedSiteId: undefined,
+                selectedSiteIdentifier: undefined,
                 sites: [mockSite],
             });
 
@@ -444,7 +444,7 @@ describe("useSitesState", () => {
             );
 
             mockGet.mockReturnValue({
-                selectedSiteId: "non-existent",
+                selectedSiteIdentifier: "non-existent",
                 sites: [mockSite],
             });
 

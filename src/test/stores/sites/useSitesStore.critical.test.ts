@@ -211,7 +211,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             expect(Array.isArray(store.sites)).toBeTruthy();
             expect(store.sites).toHaveLength(0);
-            expect(store.selectedSiteId).toBeUndefined();
+            expect(store.selectedSiteIdentifier).toBeUndefined();
             expect(typeof store.selectedMonitorIds).toBe("object");
         });
 

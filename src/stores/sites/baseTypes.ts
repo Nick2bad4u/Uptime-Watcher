@@ -16,7 +16,10 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
  */
 export interface BaseSiteOperations {
     /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    addMonitorToSite: (
+        siteIdentifier: string,
+        monitor: Monitor
+    ) => Promise<void>;
     /** Create a new site */
     createSite: (siteData: {
         identifier: string;
@@ -29,22 +32,25 @@ export interface BaseSiteOperations {
     /** Download SQLite backup */
     downloadSqliteBackup: () => Promise<void>;
     /** Remove a monitor from a site */
-    removeMonitorFromSite: (siteId: string, monitorId: string) => Promise<void>;
+    removeMonitorFromSite: (
+        siteIdentifier: string,
+        monitorId: string
+    ) => Promise<void>;
     /** Update monitor retry attempts */
     updateMonitorRetryAttempts: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         retryAttempts: number
     ) => Promise<void>;
     /** Update monitor timeout */
     updateMonitorTimeout: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         timeout: number
     ) => Promise<void>;
     /** Update site check interval */
     updateSiteCheckInterval: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         interval: number
     ) => Promise<void>;
@@ -58,19 +64,19 @@ export interface BaseSiteOperations {
  */
 export interface BaseSiteMonitoring {
     /** Check a site now */
-    checkSiteNow: (siteId: string, monitorId: string) => Promise<void>;
+    checkSiteNow: (siteIdentifier: string, monitorId: string) => Promise<void>;
     /** Start monitoring for a site */
-    startSiteMonitoring: (siteId: string) => Promise<void>;
+    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Start monitoring for a specific site monitor */
     startSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
     /** Stop monitoring for a site */
-    stopSiteMonitoring: (siteId: string) => Promise<void>;
+    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Stop monitoring for a specific site monitor */
     stopSiteMonitorMonitoring: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
 }
@@ -102,7 +108,7 @@ export interface BaseSiteState {
     /** Add a site to the store */
     addSite: (site: Site) => void;
     /** Get selected monitor ID for a site */
-    getSelectedMonitorId: (siteId: string) => string | undefined;
+    getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
     /** Remove a site from the store */
@@ -110,7 +116,7 @@ export interface BaseSiteState {
     /** Select site */
     selectSite: (site: Site | undefined) => void;
     /** Set selected monitor ID for a site */
-    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set all sites */
     setSites: (sites: Site[]) => void;
     /** Update a site */

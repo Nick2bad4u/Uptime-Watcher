@@ -5,6 +5,8 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
+import type { StatusUpdate } from "@shared/types";
+
 describe("Electron Preload Script", () => {
     let mockContextBridge: { exposeInMainWorld: ReturnType<typeof vi.fn> };
     let mockIpcRenderer: {
@@ -1100,13 +1102,12 @@ describe("Electron Preload Script", () => {
 
                 // Simulate IPC event
                 const testData = {
-                    siteId: "test-site",
-                    monitor: { id: "test-monitor", type: "http" },
                     monitorId: "test-monitor",
-                    newStatus: "up",
+                    siteIdentifier: "test-site",
+                    status: "up",
                     previousStatus: "down",
-                    timestamp: Date.now(),
-                };
+                    timestamp: new Date().toISOString(),
+                } satisfies StatusUpdate;
                 listener(null, testData);
 
                 expect(callback).toHaveBeenCalledWith(testData);

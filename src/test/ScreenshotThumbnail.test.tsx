@@ -65,7 +65,7 @@ const mockElectronAPI = {
         getSites: vi.fn(),
     },
     system: {
-        openExternal: vi.fn(),
+        openExternal: vi.fn().mockResolvedValue(true),
     },
 };
 

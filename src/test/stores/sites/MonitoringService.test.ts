@@ -38,18 +38,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle errors when starting monitoring", async ({
@@ -61,7 +61,7 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to start monitoring");
 
@@ -70,24 +70,24 @@ describe("MonitoringService", () => {
             );
 
             await expect(
-                MonitoringService.startMonitoring(siteId, monitorId)
+                MonitoringService.startMonitoring(siteIdentifier, monitorId)
             ).rejects.toThrow("Failed to start monitoring");
         });
 
-        it("should handle empty siteId", async ({ task, annotate }) => {
+        it("should handle empty siteIdentifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "";
+            const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
@@ -100,18 +100,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, "");
+            ).toHaveBeenCalledWith(siteIdentifier, "");
         });
 
         it("should handle special characters in IDs", async ({
@@ -123,18 +123,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "test-site-id@#$%";
+            const siteIdentifier = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle Unicode characters in IDs", async ({
@@ -146,18 +146,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "test-site-id-🌟";
+            const siteIdentifier = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 
@@ -171,18 +171,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle errors when stopping monitoring", async ({
@@ -194,7 +194,7 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to stop monitoring");
 
@@ -203,24 +203,24 @@ describe("MonitoringService", () => {
             );
 
             await expect(
-                MonitoringService.stopMonitoring(siteId, monitorId)
+                MonitoringService.stopMonitoring(siteIdentifier, monitorId)
             ).rejects.toThrow("Failed to stop monitoring");
         });
 
-        it("should handle empty siteId", async ({ task, annotate }) => {
+        it("should handle empty siteIdentifier", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: MonitoringService", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "";
+            const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
@@ -233,18 +233,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "test-site-id";
+            const siteIdentifier = "test-site-id";
             const monitorId = "";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, "");
+            ).toHaveBeenCalledWith(siteIdentifier, "");
         });
 
         it("should handle special characters in IDs", async ({
@@ -256,18 +256,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "test-site-id@#$%";
+            const siteIdentifier = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle Unicode characters in IDs", async ({
@@ -279,18 +279,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "test-site-id-🌟";
+            const siteIdentifier = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 
@@ -350,18 +350,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "valid-site-id";
+            const siteIdentifier = "valid-site-id";
             const monitorId = "valid-monitor-id";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle long IDs", async ({ task, annotate }) => {
@@ -370,18 +370,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "a".repeat(1000);
+            const siteIdentifier = "a".repeat(1000);
             const monitorId = "b".repeat(1000);
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle numeric-like string IDs", async ({
@@ -393,18 +393,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "12345";
+            const siteIdentifier = "12345";
             const monitorId = "67890";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteId, monitorId);
+            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
         it("should handle UUID-like IDs", async ({ task, annotate }) => {
@@ -413,18 +413,18 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "550e8400-e29b-41d4-a716-446655440000";
+            const siteIdentifier = "550e8400-e29b-41d4-a716-446655440000";
             const monitorId = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 

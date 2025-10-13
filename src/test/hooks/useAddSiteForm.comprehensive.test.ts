@@ -86,13 +86,13 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.name).toBe("");
             expect(result.current.monitorType).toBe("http");
             expect(result.current.checkInterval).toBe(DEFAULT_CHECK_INTERVAL);
-            expect(result.current.siteId).toBe("mock-uuid-12345");
+            expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
             expect(result.current.addMode).toBe("new");
             expect(result.current.selectedExistingSite).toBe("");
             expect(result.current.formError).toBeUndefined();
         });
 
-        it("should initialize with lazy-generated UUID for siteId", async ({
+        it("should initialize with lazy-generated UUID for siteIdentifier", async ({
             task,
             annotate,
         }) => {
@@ -103,7 +103,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
 
             const { result } = renderHook(() => useAddSiteForm());
 
-            expect(result.current.siteId).toBe("mock-uuid-12345");
+            expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
         });
     });
 
@@ -206,7 +206,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.checkInterval).toBe(60_000);
         });
 
-        it("should update siteId correctly", async ({ task, annotate }) => {
+        it("should update siteIdentifier correctly", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useAddSiteForm", "component");
             await annotate("Category: Hook", "category");
@@ -215,10 +218,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             act(() => {
-                result.current.setSiteId("custom-id");
+                result.current.setSiteIdentifier("custom-id");
             });
 
-            expect(result.current.siteId).toBe("custom-id");
+            expect(result.current.siteIdentifier).toBe("custom-id");
         });
 
         it("should update selected existing site correctly", async ({
@@ -327,7 +330,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             // Set up some initial state
             act(() => {
                 result.current.setName("Test Site");
-                result.current.setSiteId("custom-id");
+                result.current.setSiteIdentifier("custom-id");
                 result.current.setAddMode("existing");
             });
 
@@ -337,7 +340,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             });
 
             expect(result.current.name).toBe("");
-            expect(result.current.siteId).toBe("mock-uuid-12345");
+            expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
             expect(result.current.formError).toBeUndefined();
         });
 
@@ -823,7 +826,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 result.current.setName("My Site");
                 result.current.setMonitorType("port");
                 result.current.setCheckInterval(60_000);
-                result.current.setSiteId("custom-id");
+                result.current.setSiteIdentifier("custom-id");
                 result.current.setAddMode("existing");
                 result.current.setSelectedExistingSite("existing-site");
                 result.current.setFormError("Some error");
@@ -840,7 +843,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             expect(result.current.name).toBe("");
             expect(result.current.monitorType).toBe("http");
             expect(result.current.checkInterval).toBe(DEFAULT_CHECK_INTERVAL);
-            expect(result.current.siteId).toBe("mock-uuid-12345");
+            expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
             expect(result.current.addMode).toBe("new");
             expect(result.current.selectedExistingSite).toBe("");
             expect(result.current.formError).toBeUndefined();
@@ -858,16 +861,16 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
             const { result } = renderHook(() => useAddSiteForm());
 
             act(() => {
-                result.current.setSiteId("custom-id");
+                result.current.setSiteIdentifier("custom-id");
             });
 
-            expect(result.current.siteId).toBe("custom-id");
+            expect(result.current.siteIdentifier).toBe("custom-id");
 
             act(() => {
                 result.current.resetForm();
             });
 
-            expect(result.current.siteId).toBe("mock-uuid-12345");
+            expect(result.current.siteIdentifier).toBe("mock-uuid-12345");
         });
     });
 
@@ -1115,7 +1118,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 "name",
                 "port",
                 "selectedExistingSite",
-                "siteId",
+                "siteIdentifier",
                 "url",
             ];
 
@@ -1146,7 +1149,7 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 "setName",
                 "setPort",
                 "setSelectedExistingSite",
-                "setSiteId",
+                "setSiteIdentifier",
                 "setUrl",
             ];
 

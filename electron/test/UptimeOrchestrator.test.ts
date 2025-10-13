@@ -886,28 +886,28 @@ describe(UptimeOrchestrator, () => {
             expect(() => {
                 orchestrator.emitTyped("monitor:status-changed", {
                     monitor: {
-                        id: "monitor-1",
-                        type: "http",
-                        status: "up",
-                        history: [],
                         checkInterval: 30_000,
+                        history: [],
+                        id: "monitor-1",
                         monitoring: true,
                         responseTime: 100,
                         retryAttempts: 3,
+                        status: "up",
                         timeout: 5000,
+                        type: "http",
                     },
                     monitorId: "monitor-1",
-                    newStatus: "up",
                     previousStatus: "down",
                     responseTime: 100,
                     site: {
                         identifier: "test-site",
-                        name: "Test Site",
                         monitors: [],
                         monitoring: true,
+                        name: "Test Site",
                     },
-                    siteId: "test-site",
-                    timestamp: Date.now(),
+                    siteIdentifier: "test-site",
+                    status: "up",
+                    timestamp: new Date().toISOString(),
                 });
             }).not.toThrow();
         });
@@ -1163,7 +1163,7 @@ describe(UptimeOrchestrator, () => {
                 "site:removed",
                 expect.objectContaining({
                     cascade: true,
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                     siteName: "Test Site",
                 })
             );
@@ -1202,7 +1202,7 @@ describe(UptimeOrchestrator, () => {
                 "site:removed",
                 expect.objectContaining({
                     cascade: true,
-                    siteId: "fallback-site", // Should use site.identifier as fallback
+                    siteIdentifier: "fallback-site", // Should use site.identifier as fallback
                     siteName: "Test Site",
                 })
             );

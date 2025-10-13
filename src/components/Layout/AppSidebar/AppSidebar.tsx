@@ -72,8 +72,8 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     const sites = useSitesStore(useCallback((state) => state.sites, []));
 
     const selectSite = useUIStore(useCallback((state) => state.selectSite, []));
-    const selectedSiteId = useUIStore(
-        useCallback((state) => state.selectedSiteId, [])
+    const selectedSiteIdentifier = useUIStore(
+        useCallback((state) => state.selectedSiteIdentifier, [])
     );
     const setShowAddSiteModal = useUIStore(
         useCallback((state) => state.setShowAddSiteModal, [])
@@ -105,13 +105,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     // first render.
     useEffect(
         function selectInitialSite(): void {
-            if (!selectedSiteId && filteredSites.length > 0) {
+            if (!selectedSiteIdentifier && filteredSites.length > 0) {
                 selectSite(filteredSites[0]);
             }
         },
         [
             filteredSites,
-            selectedSiteId,
+            selectedSiteIdentifier,
             selectSite,
         ]
     );
@@ -134,13 +134,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     const handleSelectSite = useCallback(
         (event: MouseEvent<HTMLButtonElement>) => {
             const { dataset } = event.currentTarget;
-            const { siteId } = dataset;
-            if (!siteId) {
+            const { siteIdentifier } = dataset;
+            if (!siteIdentifier) {
                 return;
             }
 
             const siteToSelect = sites.find(
-                (site) => site.identifier === siteId
+                (site) => site.identifier === siteIdentifier
             );
             if (!siteToSelect) {
                 return;
@@ -170,7 +170,7 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
             // Scroll to the site card in the main content area
             requestAnimationFrame(() => {
                 const cardElement = document.querySelector(
-                    `[data-site-id="${siteId}"]`
+                    `[data-site-identifier="${siteIdentifier}"]`
                 );
                 if (cardElement) {
                     cardElement.scrollIntoView({
@@ -312,11 +312,13 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
                                             {...triggerProps}
                                             className={`app-sidebar__item ${
                                                 site.identifier ===
-                                                selectedSiteId
+                                                selectedSiteIdentifier
                                                     ? "app-sidebar__item--active"
                                                     : ""
                                             }`}
-                                            data-site-id={site.identifier}
+                                            data-site-identifier={
+                                                site.identifier
+                                            }
                                             data-testid="sidebar-site-item"
                                             onClick={handleSelectSite}
                                             type="button"

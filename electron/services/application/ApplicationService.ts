@@ -46,6 +46,7 @@
  * @public
  */
 import { isDevelopment } from "@shared/utils/environment";
+import { ensureError } from "@shared/utils/errorHandling";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -55,51 +56,6 @@ import { app } from "electron";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
-/**
- * Main application service that orchestrates all other services and coordinates
- * application lifecycle across the Electron backend.
- *
- * @remarks
- * Uses dependency injection through {@link ServiceContainer} to manage all
- * services and their dependencies. Provides proper initialization order, event
- * handler setup, and cleanup. Handles Electron app events and orchestrates
- * service startup and shutdown.
- *
- * Key responsibilities:
- *
- * - Application lifecycle management (startup, shutdown, error handling)
- * - Service container initialization and dependency injection
- * - Event handler registration for Electron app events
- * - Graceful shutdown coordination for all services
- * - Error handling and recovery for application-level failures
- * - Development vs production environment handling
- * - Service health monitoring and status reporting
- *
- * @example Basic application service usage:
- *
- * ```typescript
- * const appService = new ApplicationService();
- *
- * // Initialize all services
- * await appService.initializeServices();
- *
- * // Start the application
- * await appService.startApplication();
- *
- * // Shutdown gracefully
- * await appService.shutdown();
- * ```
- *
- * @example Service dependency access:
- *
- * ```typescript
- * // Access services through the container
- * const databaseManager = appService.getDatabaseManager();
- * const monitorManager = appService.getMonitorManager();
- * ```
- *
- * @public
- */
 export class ApplicationService {
     /**
      * The container for all application services.
@@ -371,24 +327,26 @@ export class ApplicationService {
 
         // Handle monitor status changes with typed events
         orchestrator.onTyped("monitor:status-changed", (data) => {
+            const monitorIdentifier = data.monitor?.id ?? data.monitorId;
+            const siteIdentifier = data.site?.identifier ?? data.siteIdentifier;
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS,
                     {
-                        monitorId: data.monitor.id,
-                        newStatus: data.newStatus,
+                        monitorId: monitorIdentifier,
+                        newStatus: data.status,
                         previousStatus: data.previousStatus,
-                        siteId: data.siteId,
+                        siteIdentifier,
                     }
                 );
 
                 // Send status update to renderer
                 windowService.sendToRenderer("monitor:status-changed", data);
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
                         .APPLICATION_FORWARD_MONITOR_STATUS_ERROR,
-                    error
+                    ensureError(error)
                 );
             }
         });
@@ -400,17 +358,17 @@ export class ApplicationService {
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
                     {
                         monitorId: data.monitor.id,
-                        siteId: data.siteId,
+                        siteIdentifier: data.site.identifier,
                         siteName: data.site.name,
                     }
                 );
 
                 windowService.sendToRenderer("monitor:up", data);
                 notificationService.notifyMonitorUp(data.site, data.monitor.id);
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_UP_ERROR,
-                    error
+                    ensureError(error)
                 );
             }
         });
@@ -420,7 +378,7 @@ export class ApplicationService {
             try {
                 logger.warn(LOG_TEMPLATES.warnings.APPLICATION_MONITOR_DOWN, {
                     monitorId: data.monitor.id,
-                    siteId: data.siteId,
+                    siteIdentifier: data.site.identifier,
                     siteName: data.site.name,
                 });
 
@@ -429,10 +387,10 @@ export class ApplicationService {
                     data.site,
                     data.monitor.id
                 );
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_DOWN_ERROR,
-                    error
+                    ensureError(error)
                 );
             }
         });
@@ -457,11 +415,11 @@ export class ApplicationService {
                     data
                 );
                 windowService.sendToRenderer("monitoring:started", data);
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
                         .APPLICATION_FORWARD_MONITORING_STARTED_ERROR,
-                    error
+                    ensureError(error)
                 );
             }
         });
@@ -474,11 +432,11 @@ export class ApplicationService {
                     data
                 );
                 windowService.sendToRenderer("monitoring:stopped", data);
-            } catch (error) {
+            } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
                         .APPLICATION_FORWARD_MONITORING_STOPPED_ERROR,
-                    error
+                    ensureError(error)
                 );
             }
         });

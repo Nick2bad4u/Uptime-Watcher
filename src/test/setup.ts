@@ -336,7 +336,7 @@ const mockElectronAPI: {
         }),
     },
     system: {
-        openExternal: vi.fn().mockResolvedValue(undefined),
+        openExternal: vi.fn().mockResolvedValue(true),
         quitAndInstall: vi.fn(),
     },
 };

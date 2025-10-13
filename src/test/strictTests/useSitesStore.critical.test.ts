@@ -111,8 +111,8 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Verify core state properties exist
             expect(Array.isArray(store.sites)).toBeTruthy();
             expect(
-                store.selectedSiteId === undefined ||
-                    typeof store.selectedSiteId === "string"
+                store.selectedSiteIdentifier === undefined ||
+                    typeof store.selectedSiteIdentifier === "string"
             ).toBeTruthy();
             expect(typeof store.selectedMonitorIds).toBe("object");
 
@@ -147,7 +147,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             const store = useSitesStore.getState();
 
             expect(store.sites).toEqual([]);
-            expect(store.selectedSiteId).toBeUndefined();
+            expect(store.selectedSiteIdentifier).toBeUndefined();
             expect(store.selectedMonitorIds).toEqual({});
         });
 
@@ -180,7 +180,7 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test selectSite
             store.selectSite(testSite);
-            expect(useSitesStore.getState().selectedSiteId).toBe(
+            expect(useSitesStore.getState().selectedSiteIdentifier).toBe(
                 testSite.identifier
             );
 
@@ -203,7 +203,9 @@ describe("useSitesStore Function Coverage Tests", () => {
             // Test removeSite
             store.removeSite(testSite.identifier);
             expect(useSitesStore.getState().sites).toHaveLength(0);
-            expect(useSitesStore.getState().selectedSiteId).toBeUndefined();
+            expect(
+                useSitesStore.getState().selectedSiteIdentifier
+            ).toBeUndefined();
         });
     });
 

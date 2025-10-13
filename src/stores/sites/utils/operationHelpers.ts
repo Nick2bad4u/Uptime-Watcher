@@ -18,10 +18,10 @@ import { createStoreErrorHandler } from "../../utils/storeErrorHandling";
 import { updateMonitorInSite } from "./monitorOperations";
 
 /**
- * Gets a site by ID and validates it exists. Common pattern used across
+ * Gets a site by identifier and validates it exists. Common pattern used across
  * multiple site operations.
  *
- * @param siteId - The site identifier.
+ * @param siteIdentifier - The site identifier.
  * @param deps - Site operation dependencies.
  *
  * @returns The found site.
@@ -30,12 +30,12 @@ import { updateMonitorInSite } from "./monitorOperations";
  *
  * @public
  */
-export const getSiteById = (
-    siteId: string,
+export const getSiteByIdentifier = (
+    siteIdentifier: string,
     deps: SiteOperationsDependencies
 ): Site => {
     const sites = deps.getSites() as Array<null | Site | undefined>;
-    const site = sites.find((s) => s && s.identifier === siteId);
+    const site = sites.find((s) => s && s.identifier === siteIdentifier);
     if (!site) {
         throw new Error(ERROR_CATALOG.sites.NOT_FOUND as string);
     }
@@ -46,7 +46,7 @@ export const getSiteById = (
  * Updates a monitor within a site and saves it. Common pattern for monitor
  * update operations.
  *
- * @param siteId - The site identifier.
+ * @param siteIdentifier - The site identifier.
  * @param monitorId - The monitor identifier.
  * @param updates - Monitor updates to apply.
  * @param deps - Site operation dependencies.
@@ -56,15 +56,15 @@ export const getSiteById = (
  * @public
  */
 export const updateMonitorAndSave = async (
-    siteId: string,
+    siteIdentifier: string,
     monitorId: string,
     updates: Partial<Site["monitors"][0]>,
     deps: SiteOperationsDependencies
 ): Promise<void> => {
     try {
-        const site = getSiteById(siteId, deps);
+        const site = getSiteByIdentifier(siteIdentifier, deps);
         const updatedSite = updateMonitorInSite(site, monitorId, updates);
-        await deps.services.site.updateSite(siteId, {
+        await deps.services.site.updateSite(siteIdentifier, {
             monitors: updatedSite.monitors,
         });
     } catch (error) {
@@ -72,8 +72,13 @@ export const updateMonitorAndSave = async (
             error instanceof Error &&
             error.message.includes(ERROR_CATALOG.sites.NOT_FOUND as string)
         ) {
-            logger.error(`Failed to find site with ID ${siteId}:`, error);
-            throw new Error(`Site not found: ${siteId}`, { cause: error });
+            logger.error(
+                `Failed to find site with identifier ${siteIdentifier}:`,
+                error
+            );
+            throw new Error(`Site not found: ${siteIdentifier}`, {
+                cause: error,
+            });
         }
         // Re-throw other errors
         throw error;

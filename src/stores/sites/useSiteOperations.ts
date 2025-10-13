@@ -22,7 +22,7 @@ import { logger } from "../../services/logger";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
-    getSiteById,
+    getSiteByIdentifier,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
@@ -80,12 +80,12 @@ export interface SiteOperationsActions extends BaseSiteOperations {
 export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies
 ): SiteOperationsActions => ({
-    addMonitorToSite: async (siteId, monitor): Promise<void> => {
+    addMonitorToSite: async (siteIdentifier, monitor): Promise<void> => {
         await withSiteOperation(
             "addMonitorToSite",
             async () => {
                 // Get the current site
-                const site = getSiteById(siteId, deps);
+                const site = getSiteByIdentifier(siteIdentifier, deps);
 
                 const normalizedMonitor = normalizeMonitorOrThrow(
                     monitor,
@@ -94,11 +94,11 @@ export const createSiteOperationsActions = (
 
                 // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, normalizedMonitor];
-                await deps.services.site.updateSite(siteId, {
+                await deps.services.site.updateSite(siteIdentifier, {
                     monitors: updatedMonitors,
                 });
             },
-            { monitor, siteId },
+            { monitor, siteIdentifier },
             deps
         );
     },
@@ -242,12 +242,12 @@ export const createSiteOperationsActions = (
             deps
         );
     },
-    removeMonitorFromSite: async (siteId, monitorId): Promise<void> => {
+    removeMonitorFromSite: async (siteIdentifier, monitorId): Promise<void> => {
         await withSiteOperation(
             "removeMonitorFromSite",
             async () => {
                 // Get the current site
-                const site = getSiteById(siteId, deps);
+                const site = getSiteByIdentifier(siteIdentifier, deps);
 
                 // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
@@ -257,14 +257,14 @@ export const createSiteOperationsActions = (
                 // Stop monitoring for this specific monitor first
                 try {
                     await deps.services.monitoring.stopMonitoring(
-                        siteId,
+                        siteIdentifier,
                         monitorId
                     );
                 } catch (error) {
                     // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
                         logger.warn(
-                            `Failed to stop monitoring for monitor ${monitorId} of site ${siteId}`,
+                            `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}`,
                             error instanceof Error
                                 ? error
                                 : new Error(String(error))
@@ -273,14 +273,17 @@ export const createSiteOperationsActions = (
                 }
 
                 // Remove the monitor via backend
-                await deps.services.site.removeMonitor(siteId, monitorId);
+                await deps.services.site.removeMonitor(
+                    siteIdentifier,
+                    monitorId
+                );
             },
-            { monitorId, siteId },
+            { monitorId, siteIdentifier },
             deps
         );
     },
     updateMonitorRetryAttempts: async (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         retryAttempts: number | undefined
     ): Promise<void> => {
@@ -293,14 +296,19 @@ export const createSiteOperationsActions = (
                     updates.retryAttempts = retryAttempts;
                 }
 
-                await updateMonitorAndSave(siteId, monitorId, updates, deps);
+                await updateMonitorAndSave(
+                    siteIdentifier,
+                    monitorId,
+                    updates,
+                    deps
+                );
             },
-            { monitorId, retryAttempts, siteId },
+            { monitorId, retryAttempts, siteIdentifier },
             deps
         );
     },
     updateMonitorTimeout: async (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         timeout: number | undefined
     ): Promise<void> => {
@@ -313,14 +321,19 @@ export const createSiteOperationsActions = (
                     updates.timeout = timeout;
                 }
 
-                await updateMonitorAndSave(siteId, monitorId, updates, deps);
+                await updateMonitorAndSave(
+                    siteIdentifier,
+                    monitorId,
+                    updates,
+                    deps
+                );
             },
-            { monitorId, siteId, timeout },
+            { monitorId, siteIdentifier, timeout },
             deps
         );
     },
     updateSiteCheckInterval: async (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
         interval: number
     ): Promise<void> => {
@@ -328,7 +341,7 @@ export const createSiteOperationsActions = (
             "updateSiteCheckInterval",
             async () => {
                 await updateMonitorAndSave(
-                    siteId,
+                    siteIdentifier,
                     monitorId,
                     {
                         checkInterval: interval,
@@ -336,7 +349,7 @@ export const createSiteOperationsActions = (
                     deps
                 );
             },
-            { interval, monitorId, siteId },
+            { interval, monitorId, siteIdentifier },
             deps
         );
     },

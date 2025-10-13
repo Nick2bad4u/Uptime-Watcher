@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Site } from "../../../../../shared/types";
+import type { MonitorStatus, Site } from "../../../../../shared/types";
 
 // Mock basic dependencies first
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
@@ -98,24 +98,25 @@ describe("StatusUpdateHandler", () => {
     });
 
     const createCompleteMonitorStatusEvent = (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string,
-        newStatus: "up" | "down" = "down",
-        previousStatus: "up" | "down" = "up"
+        status: MonitorStatus = "down",
+        previousStatus: MonitorStatus = "up"
     ) => {
-        const mockSite = createMockSite(siteId, monitorId);
+        const mockSite = createMockSite(siteIdentifier, monitorId);
         const mockMonitor = {
             ...mockSite.monitors[0],
-            status: newStatus, // Set the monitor status to the new status
+            status, // Set the monitor status to the new status
         };
         return {
-            siteId,
             monitorId,
-            newStatus,
-            previousStatus,
             monitor: mockMonitor,
+            previousStatus,
+            responseTime: mockMonitor.responseTime,
             site: mockSite,
-            timestamp: Date.now(),
+            siteIdentifier,
+            status,
+            timestamp: new Date().toISOString(),
         };
     };
 
@@ -390,6 +391,33 @@ describe("StatusUpdateHandler", () => {
             expect(actualUpdate.status).toBe("down"); // Converted to status in StatusUpdate
         });
 
+        it("should ignore legacy monitor status payloads dropped by the preload guard", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: statusUpdateHandler", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Monitoring", "type");
+
+            manager.subscribe();
+            mockSetSites.mockClear();
+            mockOnUpdate.mockClear();
+
+            const legacyPayload = {
+                monitorId: "legacy-monitor",
+                newStatus: "down",
+                previousStatus: "up",
+                siteId: "legacy-site",
+                timestamp: Date.now(),
+            };
+
+            await statusChangedCallback(legacyPayload);
+
+            expect(mockSetSites).not.toHaveBeenCalled();
+            expect(mockOnUpdate).not.toHaveBeenCalled();
+        });
+
         it("should handle monitoring started events", async ({
             task,
             annotate,
@@ -401,7 +429,7 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const startEvent = { siteId: "site1" };
+            const startEvent = { siteIdentifier: "site1" };
 
             // Trigger the callback and wait for async execution
             await startedCallback(startEvent);
@@ -419,7 +447,7 @@ describe("StatusUpdateHandler", () => {
 
             manager.subscribe();
 
-            const stopEvent = { siteId: "site1" };
+            const stopEvent = { siteIdentifier: "site1" };
 
             // Trigger the callback and wait for async execution
             await stoppedCallback(stopEvent);
@@ -480,10 +508,11 @@ describe("StatusUpdateHandler", () => {
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
-                siteId: "nonexistent-site",
+                siteIdentifier: "nonexistent-site",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
+                timestamp: new Date().toISOString(),
             };
 
             await statusChangedCallback(monitorStatusEvent);
@@ -503,10 +532,11 @@ describe("StatusUpdateHandler", () => {
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "nonexistent-monitor",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
+                timestamp: new Date().toISOString(),
             };
 
             await statusChangedCallback(monitorStatusEvent);
@@ -557,9 +587,9 @@ describe("StatusUpdateHandler", () => {
                 .mockReturnValue([]);
 
             const monitorStatusEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -671,9 +701,9 @@ describe("StatusUpdateHandler", () => {
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -697,9 +727,9 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             const statusUpdate = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -868,9 +898,9 @@ describe("StatusUpdateHandler", () => {
             // Test site not found branch without development logging
             mockGetSites.mockReturnValue([]);
             const monitorStatusEvent = {
-                siteId: "nonexistent-site",
+                siteIdentifier: "nonexistent-site",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -904,9 +934,9 @@ describe("StatusUpdateHandler", () => {
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -932,9 +962,9 @@ describe("StatusUpdateHandler", () => {
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -1024,9 +1054,9 @@ describe("StatusUpdateHandler", () => {
                 false,
                 { monitorId: 123 }, // Wrong type
                 { monitorId: "test" }, // Missing other fields
-                { monitorId: "test", newStatus: null }, // Wrong type
-                { monitorId: "test", newStatus: "up", previousStatus: 123 }, // Wrong type
-                { monitorId: "test", newStatus: "up", previousStatus: "down" }, // Missing siteId
+                { monitorId: "test", status: null }, // Wrong type
+                { monitorId: "test", status: "up", previousStatus: 123 }, // Wrong type
+                { monitorId: "test", status: "up", previousStatus: "down" }, // Missing siteIdentifier
             ];
 
             for (const invalidData of invalidDataTypes) {
@@ -1092,8 +1122,8 @@ describe("StatusUpdateHandler", () => {
                 site: expect.objectContaining({
                     identifier: "site1",
                 }),
-                siteIdentifier: event.siteId,
-                status: event.newStatus,
+                siteIdentifier: event.siteIdentifier,
+                status: event.status,
                 timestamp: expect.any(String),
             });
         });
@@ -1150,9 +1180,9 @@ describe("StatusUpdateHandler", () => {
             const invalidEvent = {
                 correlationId: undefined,
                 monitorId: undefined,
-                newStatus: undefined,
+                status: undefined,
                 previousStatus: undefined,
-                siteId: undefined,
+                siteIdentifier: undefined,
                 timestamp: undefined,
             } as any;
 
@@ -1251,9 +1281,9 @@ describe("StatusUpdateHandler", () => {
             );
 
             const event = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -1318,9 +1348,9 @@ describe("StatusUpdateHandler", () => {
             // Test site not found in production mode (should not log)
             mockGetSites.mockReturnValue([]);
             const event = {
-                siteId: "nonexistent-site",
+                siteIdentifier: "nonexistent-site",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 
@@ -1431,9 +1461,9 @@ describe("StatusUpdateHandler", () => {
 
             // Create an event with empty history (as happens during stop operations)
             const eventWithEmptyHistory = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
                 monitor: {
                     id: "monitor1",
@@ -1453,7 +1483,7 @@ describe("StatusUpdateHandler", () => {
                     updatedAt: "2023-01-01T00:00:00Z",
                 },
                 site: siteWithHistory,
-                timestamp: Date.now(),
+                timestamp: new Date().toISOString(),
             };
 
             await statusChangedCallback(eventWithEmptyHistory);
@@ -1495,9 +1525,9 @@ describe("StatusUpdateHandler", () => {
             manager.subscribe();
 
             const validEvent = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
-                newStatus: "down" as const,
+                status: "down" as const,
                 previousStatus: "up" as const,
             };
 

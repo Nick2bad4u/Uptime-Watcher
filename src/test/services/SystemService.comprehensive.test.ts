@@ -117,9 +117,9 @@ describe("SystemService", () => {
         it("should open external URL successfully after initialization", async () => {
             const testUrl = "https://example.com";
 
-            await expect(
-                SystemService.openExternal(testUrl)
-            ).resolves.toBeUndefined();
+            await expect(SystemService.openExternal(testUrl)).resolves.toBeTruthy(
+                
+            );
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 testUrl
@@ -159,7 +159,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of urls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
                 expect(
                     mockElectronAPI.system.openExternal
                 ).toHaveBeenCalledWith(url);
@@ -181,7 +181,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of specialUrls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
                 expect(
                     mockElectronAPI.system.openExternal
                 ).toHaveBeenCalledWith(url);
@@ -202,7 +202,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of urls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
             }
 
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(urls.length);
@@ -225,7 +225,9 @@ describe("SystemService", () => {
             ];
 
             const promises = urls.map((url) => SystemService.openExternal(url));
-            await Promise.all(promises);
+            await expect(Promise.all(promises)).resolves.toEqual(
+                Array.from({length: urls.length}).fill(true)
+            );
 
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(urls.length);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
@@ -243,9 +245,13 @@ describe("SystemService", () => {
 
         it("should handle mixed initialization and operation calls", async () => {
             await SystemService.initialize();
-            await SystemService.openExternal("https://example.com");
+            await expect(
+                SystemService.openExternal("https://example.com")
+            ).resolves.toBeTruthy();
             await SystemService.initialize();
-            await SystemService.openExternal("https://another.com");
+            await expect(
+                SystemService.openExternal("https://another.com")
+            ).resolves.toBeTruthy();
 
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(4); // 2 explicit + 2 from openExternal
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
@@ -326,7 +332,7 @@ describe("SystemService", () => {
             const longPath = "a".repeat(2000);
             const longUrl = `https://example.com/${longPath}`;
 
-            await SystemService.openExternal(longUrl);
+            await expect(SystemService.openExternal(longUrl)).resolves.toBeTruthy();
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 longUrl
             );
@@ -342,7 +348,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of unicodeUrls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
                 expect(
                     mockElectronAPI.system.openExternal
                 ).toHaveBeenCalledWith(url);
@@ -359,7 +365,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of protocolUrls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
                 expect(
                     mockElectronAPI.system.openExternal
                 ).toHaveBeenCalledWith(url);
@@ -376,7 +382,7 @@ describe("SystemService", () => {
             ];
 
             for (const url of unusualUrls) {
-                await SystemService.openExternal(url);
+                await expect(SystemService.openExternal(url)).resolves.toBeTruthy();
                 expect(
                     mockElectronAPI.system.openExternal
                 ).toHaveBeenCalledWith(url);
@@ -390,7 +396,7 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).resolves.toBeUndefined();
+            ).resolves.toBeTruthy();
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 "https://example.com"
             );
@@ -401,7 +407,9 @@ describe("SystemService", () => {
 
             await expect(
                 SystemService.openExternal("https://example.com")
-            ).resolves.toBeUndefined();
+            ).rejects.toThrow(
+                "Electron declined to open external URL: https://example.com"
+            );
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 "https://example.com"
             );
@@ -423,7 +431,12 @@ describe("SystemService", () => {
                 );
                 await expect(
                     SystemService.openExternal("https://example.com")
-                ).resolves.toBeUndefined();
+                ).rejects.toThrow(
+                    "Electron declined to open external URL: https://example.com"
+                );
+                expect(
+                    mockElectronAPI.system.openExternal
+                ).toHaveBeenCalledWith("https://example.com");
             }
         });
     });

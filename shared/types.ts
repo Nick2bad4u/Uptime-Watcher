@@ -401,10 +401,14 @@ export interface StatusHistory {
 export interface StatusUpdate {
     /** Optional diagnostic message describing the change. */
     details?: string;
+    /** Rich monitor context when available. */
+    monitor?: Monitor;
     /** Identifier of the monitor generating the update. */
     monitorId: string;
     /** Previous status before the update, if known. */
     previousStatus?: MonitorStatus;
+    /** Latest response time measurement, when recorded. */
+    responseTime?: number;
     /** Optional full site entity when context is required. */
     site?: Site;
     /** Identifier of the site associated with the monitor. */

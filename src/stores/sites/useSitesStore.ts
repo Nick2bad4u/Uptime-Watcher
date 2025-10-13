@@ -92,22 +92,36 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
             removeSite: stateActions.removeSite,
             services: {
                 monitoring: {
-                    startMonitoring: (siteId: string, monitorId: string) =>
-                        MonitoringService.startMonitoring(siteId, monitorId),
-                    startSiteMonitoring: (siteId: string) =>
-                        MonitoringService.startSiteMonitoring(siteId),
-                    stopMonitoring: (siteId: string, monitorId: string) =>
-                        MonitoringService.stopMonitoring(siteId, monitorId),
-                    stopSiteMonitoring: (siteId: string) =>
-                        MonitoringService.stopSiteMonitoring(siteId),
+                    startMonitoring: (
+                        siteIdentifier: string,
+                        monitorId: string
+                    ) =>
+                        MonitoringService.startMonitoring(
+                            siteIdentifier,
+                            monitorId
+                        ),
+                    startSiteMonitoring: (siteIdentifier: string) =>
+                        MonitoringService.startSiteMonitoring(siteIdentifier),
+                    stopMonitoring: (
+                        siteIdentifier: string,
+                        monitorId: string
+                    ) =>
+                        MonitoringService.stopMonitoring(
+                            siteIdentifier,
+                            monitorId
+                        ),
+                    stopSiteMonitoring: (siteIdentifier: string) =>
+                        MonitoringService.stopSiteMonitoring(siteIdentifier),
                 },
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),
                     downloadSqliteBackup: () =>
                         DataService.downloadSqliteBackup(),
                     getSites: () => SiteService.getSites(),
-                    removeMonitor: (siteId: string, monitorId: string) =>
-                        SiteService.removeMonitor(siteId, monitorId),
+                    removeMonitor: (
+                        siteIdentifier: string,
+                        monitorId: string
+                    ) => SiteService.removeMonitor(siteIdentifier, monitorId),
                     removeSite: (identifier: string) =>
                         SiteService.removeSite(identifier),
                     updateSite: (identifier: string, updates: Partial<Site>) =>

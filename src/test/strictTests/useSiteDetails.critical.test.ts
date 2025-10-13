@@ -60,7 +60,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
     // Helper to create consistent mock store
     const createMockStore = (overrides: any = {}) => ({
-        getSiteById: vi.fn().mockReturnValue(mockSite),
+        getSiteByIdentifier: vi.fn().mockReturnValue(mockSite),
         removeSiteMonitor: vi.fn(),
         getSelectedMonitorId: vi.fn().mockReturnValue(null),
         setSelectedMonitorId: vi.fn(),
@@ -264,7 +264,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         };
 
         const mockStore = {
-            getSiteById: vi.fn().mockReturnValue(siteWithSpecialMonitor),
+            getSiteByIdentifier: vi
+                .fn()
+                .mockReturnValue(siteWithSpecialMonitor),
             removeSiteMonitor: vi.fn(),
             getSelectedMonitorId: vi.fn().mockReturnValue("special-monitor"),
             setSelectedMonitorId: vi.fn(),
@@ -300,7 +302,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         };
 
         const mockStore = {
-            getSiteById: vi.fn().mockReturnValue(siteWithoutMonitors),
+            getSiteByIdentifier: vi.fn().mockReturnValue(siteWithoutMonitors),
             removeSiteMonitor: vi.fn(),
             getSelectedMonitorId: vi.fn().mockReturnValue(null),
             setSelectedMonitorId: vi.fn(),
@@ -406,7 +408,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
     it("should handle monitor selection when monitor does not exist", async () => {
         const mockStore = {
-            getSiteById: vi.fn().mockReturnValue(mockSite),
+            getSiteByIdentifier: vi.fn().mockReturnValue(mockSite),
             removeSiteMonitor: vi.fn(),
             getSelectedMonitorId: vi
                 .fn()
@@ -447,7 +449,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         };
 
         const mockStore = {
-            getSiteById: vi.fn().mockReturnValue(siteWithInvalidMonitor),
+            getSiteByIdentifier: vi
+                .fn()
+                .mockReturnValue(siteWithInvalidMonitor),
             removeSiteMonitor: vi.fn(),
             getSelectedMonitorId: vi.fn().mockReturnValue("invalid-monitor"),
             setSelectedMonitorId: vi.fn(),

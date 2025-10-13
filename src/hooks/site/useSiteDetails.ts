@@ -325,13 +325,13 @@ export function useSiteDetails({
                     monitorType: currentSite.monitors.find(
                         (m) => m.id === selectedMonitorId
                     )?.type,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                     siteName: currentSite.name,
                 });
                 await checkSiteNow(currentSite.identifier, selectedMonitorId);
                 logger.user.action("Manual site check completed successfully", {
                     monitorId: selectedMonitorId,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                     siteName: currentSite.name,
                 });
             },
@@ -442,7 +442,7 @@ export function useSiteDetails({
                 logger.user.action("Monitor removed successfully", {
                     monitorId: selectedMonitor.id,
                     monitorType: selectedMonitor.type,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                 });
             },
             "Remove monitor from site",
@@ -469,7 +469,7 @@ export function useSiteDetails({
                 await startSiteMonitoring(currentSite.identifier);
                 logger.user.action("Started site monitoring", {
                     monitorCount: currentSite.monitors.length,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                 });
             },
             "Start site monitoring",
@@ -493,7 +493,7 @@ export function useSiteDetails({
                 await stopSiteMonitoring(currentSite.identifier);
                 logger.user.action("Stopped site monitoring", {
                     monitorCount: currentSite.monitors.length,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                 });
             },
             "Stop site monitoring",
@@ -518,7 +518,7 @@ export function useSiteDetails({
                 );
                 logger.user.action("Started monitoring", {
                     monitorId: selectedMonitorId,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                 });
             },
             "Start monitor monitoring",
@@ -542,7 +542,7 @@ export function useSiteDetails({
                 );
                 logger.user.action("Stopped monitoring", {
                     monitorId: selectedMonitorId,
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                 });
             },
             "Stop monitor monitoring",
@@ -596,7 +596,7 @@ export function useSiteDetails({
         logger.user.action("Updated check interval", {
             monitorId: selectedMonitorId,
             newInterval: localCheckInterval,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
     }, [
         clearError,
@@ -652,7 +652,7 @@ export function useSiteDetails({
         logger.user.action("Updated monitor timeout", {
             monitorId: selectedMonitorId,
             newTimeout: timeoutInMs,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
     }, [
         clearError,
@@ -703,7 +703,7 @@ export function useSiteDetails({
         logger.user.action("Updated monitor retry attempts", {
             monitorId: selectedMonitorId,
             newRetryAttempts: localRetryAttempts,
-            siteId: currentSite.identifier,
+            siteIdentifier: currentSite.identifier,
         });
     }, [
         clearError,

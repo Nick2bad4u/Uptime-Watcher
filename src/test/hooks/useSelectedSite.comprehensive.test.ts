@@ -32,7 +32,7 @@ const defaultChartTimeRange: ChartTimeRange = "24h";
 const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     activeSiteDetailsTab: "site-overview",
     openExternal: (_url: string, _context?: { siteName?: string }) => {},
-    selectedSiteId: undefined,
+    selectedSiteIdentifier: undefined,
     selectSite: (_site: Site | undefined) => {},
     setActiveSiteDetailsTab: (_tab: SiteDetailsTab) => {},
     setShowAddSiteModal: (_show: boolean) => {},
@@ -62,7 +62,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
         status: 12,
         uptime: 12,
     },
-    syncActiveSiteDetailsTab: (_siteId: string) => {},
+    syncActiveSiteDetailsTab: (_siteIdentifier: string) => {},
     toggleSiteDetailsHeaderCollapsed: vi.fn(),
     ...overrides,
 });
@@ -108,7 +108,7 @@ const createMockSitesStore = (
     updateMonitorTimeout: async () => {},
     updateSiteCheckInterval: async () => {},
     selectedMonitorIds: {},
-    selectedSiteId: undefined,
+    selectedSiteIdentifier: undefined,
     sites: [],
     ...overrides,
 });
@@ -204,7 +204,9 @@ describe("useSelectedSite", () => {
             expect(mockUseUIStore).toHaveBeenCalledWith(expect.any(Function));
             const selector = mockUseUIStore.mock.calls[0]?.[0];
             const selection = selector?.(
-                createMockUiStore({ selectedSiteId: "abc" })
+                createMockUiStore({
+                    selectedSiteIdentifier: "abc",
+                })
             );
             expect(selection).toBe("abc");
         });
@@ -242,7 +244,7 @@ describe("useSelectedSite", () => {
             findSpy.mockRestore();
         });
 
-        it("recomputes when selectedSiteId changes", () => {
+        it("recomputes when selectedSiteIdentifier changes", () => {
             mockUseUIStore.mockReturnValue("site-1");
             mockUseSitesStore.mockReturnValue(mockSites);
 
@@ -274,7 +276,7 @@ describe("useSelectedSite", () => {
             findSpy.mockRestore();
         });
 
-        it("skips lookup when selectedSiteId is null", () => {
+        it("skips lookup when selectedSiteIdentifier is null", () => {
             mockUseUIStore.mockReturnValue(null);
             mockUseSitesStore.mockReturnValue(mockSites);
 

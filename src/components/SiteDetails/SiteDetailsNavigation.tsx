@@ -98,7 +98,7 @@ export const SiteDetailsNavigation: NamedExoticComponent<SiteDetailsNavigationPr
         const logTabChange = useCallback(
             (tab: string, additionalData?: UnknownRecord) => {
                 logger.user.action("Site details tab changed", {
-                    siteId: currentSite.identifier,
+                    siteIdentifier: currentSite.identifier,
                     tab,
                     ...additionalData,
                 });

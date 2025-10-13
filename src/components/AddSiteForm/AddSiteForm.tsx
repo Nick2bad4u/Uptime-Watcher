@@ -187,7 +187,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             setReplicationTimestampField,
             setSelectedExistingSite,
             setUrl,
-            siteId,
+            siteIdentifier,
             url,
         } = formState;
 
@@ -436,7 +436,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         replicationTimestampField,
                         selectedExistingSite,
                         setFormError,
-                        siteId,
+                        siteIdentifier,
                         url,
                     });
                 } catch (error) {
@@ -483,7 +483,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                 replicationTimestampField,
                 selectedExistingSite,
                 setFormError,
-                siteId,
+                siteIdentifier,
                 url,
             ]
         );
@@ -597,7 +597,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                                 variant="tertiary"
                             >
                                 Site Identifier:{" "}
-                                <span className="font-mono">{siteId}</span>
+                                <span className="font-mono">
+                                    {siteIdentifier}
+                                </span>
                             </ThemedText>
                         </div>
                     )}

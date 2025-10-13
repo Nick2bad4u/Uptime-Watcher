@@ -70,7 +70,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         updateMonitorTimeout: vi.fn(async () => {}),
         updateSiteCheckInterval: vi.fn(async () => {}),
         selectedMonitorIds: {},
-        selectedSiteId: undefined,
+        selectedSiteIdentifier: undefined,
         sites,
     };
 };

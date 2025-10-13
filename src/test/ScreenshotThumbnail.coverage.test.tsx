@@ -28,7 +28,7 @@ vi.mock("../stores/utils", () => ({
 // Mock SystemService
 vi.mock("../services/SystemService", () => ({
     SystemService: {
-        openExternal: vi.fn().mockResolvedValue(undefined),
+        openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
 
@@ -92,7 +92,7 @@ const mockElectronAPI = {
         getSites: vi.fn(),
     },
     system: {
-        openExternal: vi.fn().mockResolvedValue(undefined),
+        openExternal: vi.fn().mockResolvedValue(true),
     },
 };
 

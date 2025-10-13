@@ -120,16 +120,19 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     window.open(url, "_blank", "noopener");
                 });
             },
-            selectedSiteId: undefined,
+            selectedSiteIdentifier: undefined,
             selectSite: (site: Site | undefined): void => {
                 logStoreAction("UIStore", "selectSite", { site });
-                set({ selectedSiteId: site ? site.identifier : undefined });
+                set({
+                    selectedSiteIdentifier: site ? site.identifier : undefined,
+                });
             },
             setActiveSiteDetailsTab: (tab: SiteDetailsTab): void => {
                 logStoreAction("UIStore", "setActiveSiteDetailsTab", { tab });
                 set((state) => {
-                    const { selectedSiteId, siteDetailsTabState } = state;
-                    if (!selectedSiteId) {
+                    const { selectedSiteIdentifier, siteDetailsTabState } =
+                        state;
+                    if (!selectedSiteIdentifier) {
                         return { activeSiteDetailsTab: tab };
                     }
 
@@ -137,7 +140,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         activeSiteDetailsTab: tab,
                         siteDetailsTabState: {
                             ...siteDetailsTabState,
-                            [selectedSiteId]: tab,
+                            [selectedSiteIdentifier]: tab,
                         },
                     };
                 });
@@ -173,17 +176,17 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 set({ siteDetailsChartTimeRange: range });
             },
             setSiteDetailsHeaderCollapsed: (
-                siteId: string,
+                siteIdentifier: string,
                 collapsed: boolean
             ): void => {
                 logStoreAction("UIStore", "setSiteDetailsHeaderCollapsed", {
                     collapsed,
-                    siteId,
+                    siteIdentifier,
                 });
                 set((state) => ({
                     siteDetailsHeaderCollapsedState: {
                         ...state.siteDetailsHeaderCollapsedState,
-                        [siteId]: collapsed,
+                        [siteIdentifier]: collapsed,
                     },
                 }));
             },
@@ -235,19 +238,20 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 status: 12,
                 uptime: 12,
             },
-            syncActiveSiteDetailsTab: (siteId: string): void => {
+            syncActiveSiteDetailsTab: (siteIdentifier: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
-                    siteId,
+                    siteIdentifier,
                 });
                 set((state) => {
-                    const existingTab = state.siteDetailsTabState[siteId];
+                    const existingTab =
+                        state.siteDetailsTabState[siteIdentifier];
 
                     if (existingTab === undefined) {
                         return {
                             activeSiteDetailsTab: "site-overview",
                             siteDetailsTabState: {
                                 ...state.siteDetailsTabState,
-                                [siteId]: "site-overview",
+                                [siteIdentifier]: "site-overview",
                             },
                         };
                     }
@@ -258,17 +262,20 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     };
                 });
             },
-            toggleSiteDetailsHeaderCollapsed: (siteId: string): void => {
+            toggleSiteDetailsHeaderCollapsed: (
+                siteIdentifier: string
+            ): void => {
                 logStoreAction("UIStore", "toggleSiteDetailsHeaderCollapsed", {
-                    siteId,
+                    siteIdentifier,
                 });
                 set((state) => {
                     const current =
-                        state.siteDetailsHeaderCollapsedState[siteId] ?? false;
+                        state.siteDetailsHeaderCollapsedState[siteIdentifier] ??
+                        false;
                     return {
                         siteDetailsHeaderCollapsedState: {
                             ...state.siteDetailsHeaderCollapsedState,
-                            [siteId]: !current,
+                            [siteIdentifier]: !current,
                         },
                     };
                 });
@@ -298,7 +305,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
              * Non-persisted state:
              *
              * - Modal states (showSettings, showSiteDetails): Reset on each
-             *   session - selectedSiteId: Reset on each session for
+             *   session - selectedSiteIdentifier: Reset on each session for
              *   security/privacy
              */
             partialize: (state) => ({

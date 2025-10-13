@@ -55,8 +55,9 @@ export interface SiteCardProperties {
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
-const selectSelectedSiteId = (state: UiStoreState): string | undefined =>
-    state.selectedSiteId;
+const selectSelectedSiteIdentifier = (
+    state: UiStoreState
+): string | undefined => state.selectedSiteIdentifier;
 
 const formatStatus = (value: string): string => {
     if (!value) {
@@ -144,7 +145,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
             uptime,
         } = useSite(site);
 
-        const selectedSiteId = useUIStore(selectSelectedSiteId);
+        const selectedSiteIdentifier = useUIStore(selectSelectedSiteIdentifier);
 
         const monitorRuntime = useMemo(
             () => getMonitorRuntimeSummary(latestSite.monitors),
@@ -159,7 +160,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
 
         const isStacked = presentation === "stacked";
 
-        const isActiveCard = selectedSiteId === latestSite.identifier;
+        const isActiveCard = selectedSiteIdentifier === latestSite.identifier;
 
         const cardClassName = useMemo(() => {
             const classes = [
@@ -406,7 +407,7 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
             <ThemedBox
                 aria-label={`View details for ${latestSite.name}`}
                 className={cardClassName}
-                data-site-id={latestSite.identifier}
+                data-site-identifier={latestSite.identifier}
                 data-state={isActiveCard ? "active" : "idle"}
                 data-testid="site-card"
                 onClick={handleCardClick}

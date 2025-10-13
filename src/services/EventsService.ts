@@ -10,11 +10,11 @@
  * @packageDocumentation
  */
 
-import type { StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
+    MonitorStatusChangedEventData,
     MonitorUpEventData,
     TestEventData,
     UpdateStatusEventData,
@@ -49,7 +49,7 @@ interface EventsServiceContract {
         callback: (data: MonitoringControlEventData) => void
     ) => Promise<() => void>;
     onMonitorStatusChanged: (
-        callback: (update: StatusUpdate) => void
+        callback: (update: MonitorStatusChangedEventData) => void
     ) => Promise<() => void>;
     onMonitorUp: (
         callback: (data: MonitorUpEventData) => void
@@ -116,7 +116,11 @@ export const EventsService: EventsServiceContract = {
      *
      * ```typescript
      * const cleanup = await EventsService.onMonitorDown((data) => {
-     *     console.log("Monitor down:", data.siteId, data.monitorId);
+     *     console.log(
+     *         "Monitor down:",
+     *         data.siteIdentifier,
+     *         data.monitorId
+     *     );
      * });
      * // Later: cleanup();
      * ```
@@ -140,7 +144,11 @@ export const EventsService: EventsServiceContract = {
      *
      * ```typescript
      * const cleanup = await EventsService.onMonitoringStarted((data) => {
-     *     console.log("Monitoring started for:", data.siteId);
+     *     console.log(
+     *         "Monitoring started:",
+     *         data.monitorCount,
+     *         "monitors active"
+     *     );
      * });
      * // Later: cleanup();
      * ```
@@ -164,7 +172,11 @@ export const EventsService: EventsServiceContract = {
      *
      * ```typescript
      * const cleanup = await EventsService.onMonitoringStopped((data) => {
-     *     console.log("Monitoring stopped for:", data.siteId);
+     *     console.log(
+     *         "Monitoring stopped:",
+     *         data.monitorCount,
+     *         "monitors paused"
+     *     );
      * });
      * // Later: cleanup();
      * ```
@@ -203,7 +215,7 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitorStatusChanged: wrap(
         "onMonitorStatusChanged",
-        (api, callback: (update: StatusUpdate) => void) =>
+        (api, callback: (update: MonitorStatusChangedEventData) => void) =>
             Promise.resolve(api.events.onMonitorStatusChanged(callback))
     ),
 
@@ -214,7 +226,7 @@ export const EventsService: EventsServiceContract = {
      *
      * ```typescript
      * const cleanup = await EventsService.onMonitorUp((data) => {
-     *     console.log("Monitor up:", data.siteId, data.monitorId);
+     *     console.log("Monitor up:", data.siteIdentifier, data.monitorId);
      * });
      * // Later: cleanup();
      * ```

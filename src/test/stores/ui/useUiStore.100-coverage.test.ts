@@ -57,14 +57,14 @@ describe("useUIStore - 100% Coverage Tests", () => {
                 result.current.selectSite(mockSite);
             });
 
-            expect(result.current.selectedSiteId).toBe("test-site-1");
+            expect(result.current.selectedSiteIdentifier).toBe("test-site-1");
 
             // Now set it to undefined - this targets line 130-131
             await act(async () => {
                 result.current.selectSite(undefined);
             });
 
-            expect(result.current.selectedSiteId).toBeUndefined();
+            expect(result.current.selectedSiteIdentifier).toBeUndefined();
         });
 
         test("should handle selectSite with valid site", async ({
@@ -100,7 +100,7 @@ describe("useUIStore - 100% Coverage Tests", () => {
                 result.current.selectSite(mockSite);
             });
 
-            expect(result.current.selectedSiteId).toBe("test-site-2");
+            expect(result.current.selectedSiteIdentifier).toBe("test-site-2");
         });
 
         test("should handle all UI store actions for coverage", async ({

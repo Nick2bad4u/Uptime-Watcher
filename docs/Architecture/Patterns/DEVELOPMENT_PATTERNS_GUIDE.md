@@ -190,7 +190,7 @@ interface DomainEvents extends Record<string, unknown> {
  };
  "domain:action-failed": {
   entityId: string;
-  error: string;
+  selectedSiteIdentifier?: string;
   timestamp: number;
  };
 }
@@ -201,6 +201,7 @@ interface DomainEvents extends Record<string, unknown> {
 ### Shared Utility Import Overview
 
 All consumers must import helpers from explicit module paths under `@shared/utils/*`. Barrel imports are disallowed to keep dependency graphs predictable and prevent circular references across Electron, renderer, and shared packages.
+selectedSiteIdentifier: undefined,
 
 ### Shared Utility Guidelines
 
@@ -449,7 +450,7 @@ export const useSimpleStore = create<SimpleStore>()((set, get) => ({
 // 1. Define module interfaces
 interface StateModule {
  sites: Site[];
- selectedSiteId?: string;
+ selectedSiteIdentifier?: string;
  setSites: (sites: Site[]) => void;
  setSelectedSite: (site: Site | undefined) => void;
 }
@@ -466,7 +467,7 @@ export function createStateModule(
 ): StateModule {
  return {
   sites: [],
-  selectedSiteId: undefined,
+  selectedSiteIdentifier: undefined,
 
   setSites: (sites: Site[]) => {
    logStoreAction("SitesStore", "setSites", { count: sites.length });
@@ -475,9 +476,9 @@ export function createStateModule(
 
   setSelectedSite: (site: Site | undefined) => {
    logStoreAction("SitesStore", "setSelectedSite", {
-    siteId: site?.identifier,
+    siteIdentifier: site?.identifier,
    });
-   set({ selectedSiteId: site?.identifier });
+   set({ selectedSiteIdentifier: site?.identifier });
   },
  };
 }

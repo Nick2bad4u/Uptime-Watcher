@@ -19,21 +19,6 @@ interface LoggerLike {
 }
 
 /**
- * Fallback logger that writes to the browser console when the shared logger
- * cannot be resolved.
- *
- * @internal
- */
-const consoleFallbackLogger: LoggerLike = {
-    debug: (...details) => {
-        console.debug(...details);
-    },
-    error: (...details) => {
-        console.error(...details);
-    },
-};
-
-/**
  * Type guard verifying that a candidate matches {@link LoggerLike}.
  *
  * @internal
@@ -75,7 +60,7 @@ const safeGetModuleExport = (
  *
  * @internal
  */
-const resolveDefaultLogger = (): LoggerLike => {
+const resolveDefaultLogger = (): LoggerLike | null => {
     const lowercaseCandidate = safeGetModuleExport(loggerModule, "logger");
     if (isLoggerLike(lowercaseCandidate)) {
         return lowercaseCandidate;
@@ -86,7 +71,7 @@ const resolveDefaultLogger = (): LoggerLike => {
         return uppercaseCandidate;
     }
 
-    return consoleFallbackLogger;
+    return null;
 };
 
 /**
@@ -94,7 +79,21 @@ const resolveDefaultLogger = (): LoggerLike => {
  *
  * @internal
  */
-const defaultLogger: LoggerLike = resolveDefaultLogger();
+const defaultLogger: LoggerLike | null = resolveDefaultLogger();
+
+/**
+ * Creates a console-based logger tagged with the service name as a fallback.
+ *
+ * @internal
+ */
+const createConsoleFallbackLogger = (serviceName: string): LoggerLike => ({
+    debug: (message: string, ...details: unknown[]): void => {
+        console.debug(`[${serviceName}] ${message}`, ...details);
+    },
+    error: (message: string, ...details: unknown[]): void => {
+        console.error(`[${serviceName}] ${message}`, ...details);
+    },
+});
 
 /**
  * Options for configuring {@link createIpcServiceHelpers} behavior.
@@ -103,7 +102,7 @@ const defaultLogger: LoggerLike = resolveDefaultLogger();
  */
 interface CreateIpcServiceHelpersOptions {
     /** Optional logger instance. Defaults to the shared renderer logger. */
-    logger?: typeof defaultLogger;
+    logger?: LoggerLike;
 }
 
 /**
@@ -152,7 +151,10 @@ export function createIpcServiceHelpers(
     serviceName: string,
     options: CreateIpcServiceHelpersOptions = {}
 ): GuardedIpcServiceHelpers {
-    const logger = options.logger ?? defaultLogger;
+    const logger =
+        options.logger ??
+        defaultLogger ??
+        createConsoleFallbackLogger(serviceName);
     const ensureInitialized = async (): Promise<void> => {
         try {
             await waitForElectronAPI();
@@ -218,8 +220,11 @@ export function getIpcServiceHelpers(
         return createIpcServiceHelpers(serviceName, options);
     } catch (error) {
         const ensuredError = ensureError(error);
-        const logger = options.logger ?? defaultLogger;
-        logger.error(
+        const loggerInstance =
+            options.logger ??
+            defaultLogger ??
+            createConsoleFallbackLogger(serviceName);
+        loggerInstance.error(
             `[${serviceName}] Failed to create IPC service helpers`,
             ensuredError
         );

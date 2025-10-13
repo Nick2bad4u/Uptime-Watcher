@@ -46,26 +46,34 @@ describe("useSiteMonitoring", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         const monitoringService = {
-            checkSiteNow: vi.fn(async (siteId: string, monitorId: string) =>
-                mockElectronAPI.monitoring.checkSiteNow(siteId, monitorId)
+            checkSiteNow: vi.fn(
+                async (siteIdentifier: string, monitorId: string) =>
+                    mockElectronAPI.monitoring.checkSiteNow(
+                        siteIdentifier,
+                        monitorId
+                    )
             ),
-            startMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
+            startMonitoring: vi.fn(
+                async (siteIdentifier: string, monitorId: string) =>
+                    mockElectronAPI.monitoring.startMonitoringForSite(
+                        siteIdentifier,
+                        monitorId
+                    )
+            ),
+            startSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
                 mockElectronAPI.monitoring.startMonitoringForSite(
-                    siteId,
-                    monitorId
+                    siteIdentifier
                 )
             ),
-            startSiteMonitoring: vi.fn(async (siteId: string) =>
-                mockElectronAPI.monitoring.startMonitoringForSite(siteId)
+            stopMonitoring: vi.fn(
+                async (siteIdentifier: string, monitorId: string) =>
+                    mockElectronAPI.monitoring.stopMonitoringForSite(
+                        siteIdentifier,
+                        monitorId
+                    )
             ),
-            stopMonitoring: vi.fn(async (siteId: string, monitorId: string) =>
-                mockElectronAPI.monitoring.stopMonitoringForSite(
-                    siteId,
-                    monitorId
-                )
-            ),
-            stopSiteMonitoring: vi.fn(async (siteId: string) =>
-                mockElectronAPI.monitoring.stopMonitoringForSite(siteId)
+            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
+                mockElectronAPI.monitoring.stopMonitoringForSite(siteIdentifier)
             ),
         };
 
@@ -82,14 +90,14 @@ describe("useSiteMonitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "site-1";
+            const siteIdentifier = "site-1";
             const monitorId = "monitor-1";
 
-            await actions.checkSiteNow(siteId, monitorId);
+            await actions.checkSiteNow(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.checkSiteNow
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 
@@ -103,13 +111,13 @@ describe("useSiteMonitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "site-1";
+            const siteIdentifier = "site-1";
 
-            await actions.startSiteMonitoring(siteId);
+            await actions.startSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId);
+            ).toHaveBeenCalledWith(siteIdentifier);
         });
     });
 
@@ -123,14 +131,14 @@ describe("useSiteMonitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "site-1";
+            const siteIdentifier = "site-1";
             const monitorId = "monitor-1";
 
-            await actions.startSiteMonitorMonitoring(siteId, monitorId);
+            await actions.startSiteMonitorMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 
@@ -144,13 +152,13 @@ describe("useSiteMonitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "site-1";
+            const siteIdentifier = "site-1";
 
-            await actions.stopSiteMonitoring(siteId);
+            await actions.stopSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId);
+            ).toHaveBeenCalledWith(siteIdentifier);
         });
     });
 
@@ -164,14 +172,14 @@ describe("useSiteMonitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "site-1";
+            const siteIdentifier = "site-1";
             const monitorId = "monitor-1";
 
-            await actions.stopSiteMonitorMonitoring(siteId, monitorId);
+            await actions.stopSiteMonitorMonitoring(siteIdentifier, monitorId);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 });

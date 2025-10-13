@@ -401,7 +401,7 @@ export const useUIStore = create<UIStore>()(
    showAddSiteModal: false,
    showSettings: false,
    showSiteDetails: false,
-   selectedSiteId: undefined,
+   selectedSiteIdentifier: undefined,
    activeTab: "dashboard",
 
    // Actions
@@ -415,16 +415,18 @@ export const useUIStore = create<UIStore>()(
     set({ showSettings: show });
    },
 
-   setSelectedSiteId: (siteId: string | undefined) => {
-    logStoreAction("UIStore", "setSelectedSiteId", { siteId });
-    set({ selectedSiteId: siteId });
+   setSelectedSiteIdentifier: (siteIdentifier: string | undefined) => {
+    logStoreAction("UIStore", "setSelectedSiteIdentifier", {
+     siteIdentifier,
+    });
+    set({ selectedSiteIdentifier: siteIdentifier });
    },
 
    // Compound actions
-   showSiteDetails: (siteId: string) => {
-    logStoreAction("UIStore", "showSiteDetails", { siteId });
+   showSiteDetails: (siteIdentifier: string) => {
+    logStoreAction("UIStore", "showSiteDetails", { siteIdentifier });
     set({
-     selectedSiteId: siteId,
+     selectedSiteIdentifier: siteIdentifier,
      showSiteDetails: true,
     });
    },
@@ -1171,11 +1173,11 @@ eventEmitter.emit("statusUpdate", data);
 // Right - use defined events
 await eventEmitter.emitTyped("monitor:status-changed", {
  monitor: freshMonitor,
- newStatus: "up",
+ status: "up",
  previousStatus: "down",
  site: site,
- siteId: site.identifier,
- timestamp: Date.now(),
+ siteIdentifier: site.identifier,
+ timestamp: new Date().toISOString(),
 });
 ```
 

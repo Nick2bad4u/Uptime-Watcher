@@ -55,7 +55,7 @@ const arbitraryEventPayload = fc.oneof(
         type: fc.constantFrom("all", "monitor", "site"),
     }),
     fc.record({
-        siteId: fc.uuid(),
+        siteIdentifier: fc.uuid(),
         siteName: fc.string({ minLength: 1, maxLength: 100 }),
         monitoringEnabled: fc.boolean(),
     }),

@@ -53,7 +53,7 @@ Object.defineProperty(globalThis, "electronAPI", {
 
 // Import after mocking
 import {
-    getSiteById,
+    getSiteByIdentifier,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
@@ -158,14 +158,14 @@ describe("OperationHelpers", () => {
         vi.resetAllMocks();
     });
 
-    describe(getSiteById, () => {
+    describe(getSiteByIdentifier, () => {
         it("should return site when found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: operationHelpers", "component");
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = getSiteById("site1", mockDeps);
+            const result = getSiteByIdentifier("site1", mockDeps);
 
             expect(result).toBe(mockSites[0]);
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
@@ -180,7 +180,7 @@ describe("OperationHelpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            expect(() => getSiteById("nonexistent", mockDeps)).toThrow(
+            expect(() => getSiteByIdentifier("nonexistent", mockDeps)).toThrow(
                 "Site not found"
             );
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
@@ -194,7 +194,7 @@ describe("OperationHelpers", () => {
 
             vi.mocked(mockDeps.getSites).mockReturnValue([]);
 
-            expect(() => getSiteById("site1", mockDeps)).toThrow(
+            expect(() => getSiteByIdentifier("site1", mockDeps)).toThrow(
                 "Site not found"
             );
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
@@ -673,7 +673,7 @@ describe("OperationHelpers", () => {
     });
 
     describe("Edge Cases and Error Scenarios", () => {
-        it("should handle getSiteById with sites array containing null/undefined entries", async ({
+        it("should handle getSiteByIdentifier with sites array containing null/undefined entries", async ({
             task,
             annotate,
         }) => {
@@ -691,7 +691,7 @@ describe("OperationHelpers", () => {
             ] as any;
             vi.mocked(mockDeps.getSites).mockReturnValue(sitesWithNulls);
 
-            const result = getSiteById("site1", mockDeps);
+            const result = getSiteByIdentifier("site1", mockDeps);
             expect(result).toBe(mockSites[0]);
         });
 

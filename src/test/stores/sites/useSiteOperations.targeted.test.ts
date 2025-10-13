@@ -164,13 +164,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockElectronAPI.data.downloadSqliteBackup()
             ),
             getSites: vi.fn(async () => getSitesFn()),
-            removeMonitor: vi.fn(async (siteId: string, monitorId: string) => {
-                await mockElectronAPI.monitoring.removeMonitor(
-                    siteId,
-                    monitorId
-                );
-                return true;
-            }),
+            removeMonitor: vi.fn(
+                async (siteIdentifier: string, monitorId: string) => {
+                    await mockElectronAPI.monitoring.removeMonitor(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    return true;
+                }
+            ),
             removeSite: vi.fn(async (identifier: string) =>
                 mockElectronAPI.sites.removeSite(identifier)
             ),
@@ -179,24 +181,30 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         const monitoringService = {
             startMonitoring: vi.fn(
-                async (siteId: string, monitorId: string) => {
+                async (siteIdentifier: string, monitorId: string) => {
                     await mockElectronAPI.monitoring.startMonitoringForSite(
-                        siteId,
+                        siteIdentifier,
                         monitorId
                     );
                 }
             ),
-            startSiteMonitoring: vi.fn(async (siteId: string) => {
-                await mockElectronAPI.monitoring.startMonitoringForSite(siteId);
-            }),
-            stopMonitoring: vi.fn(async (siteId: string, monitorId: string) => {
-                await mockElectronAPI.monitoring.stopMonitoringForSite(
-                    siteId,
-                    monitorId
+            startSiteMonitoring: vi.fn(async (siteIdentifier: string) => {
+                await mockElectronAPI.monitoring.startMonitoringForSite(
+                    siteIdentifier
                 );
             }),
-            stopSiteMonitoring: vi.fn(async (siteId: string) => {
-                await mockElectronAPI.monitoring.stopMonitoringForSite(siteId);
+            stopMonitoring: vi.fn(
+                async (siteIdentifier: string, monitorId: string) => {
+                    await mockElectronAPI.monitoring.stopMonitoringForSite(
+                        siteIdentifier,
+                        monitorId
+                    );
+                }
+            ),
+            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) => {
+                await mockElectronAPI.monitoring.stopMonitoringForSite(
+                    siteIdentifier
+                );
             }),
         };
 

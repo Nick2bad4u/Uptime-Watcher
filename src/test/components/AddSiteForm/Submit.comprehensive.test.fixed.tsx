@@ -42,7 +42,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             port: "80",
             recordType: "A",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "https://example.com",
 
             setFormError: vi.fn(),

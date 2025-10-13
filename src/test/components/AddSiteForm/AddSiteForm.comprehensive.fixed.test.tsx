@@ -20,7 +20,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         name: "",
         port: "",
         selectedExistingSite: "",
-        siteId: "test-site-id",
+        siteIdentifier: "test-site-id",
         url: "",
         // AddSiteFormActions methods
         isFormValid: vi.fn(() => true),
@@ -33,7 +33,7 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         setName: vi.fn(),
         setPort: vi.fn(),
         setSelectedExistingSite: vi.fn(),
-        setSiteId: vi.fn(),
+        setSiteIdentifier: vi.fn(),
         setUrl: vi.fn(),
     })),
 }));
@@ -193,7 +193,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             name: "",
             port: "0",
             selectedExistingSite: "",
-            siteId: "test-site-id",
+            siteIdentifier: "test-site-id",
             url: "",
             isFormValid: vi.fn(() => true),
             resetForm: vi.fn(),
@@ -205,7 +205,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             setName: vi.fn(),
             setPort: vi.fn(),
             setSelectedExistingSite: vi.fn(),
-            setSiteId: vi.fn(),
+            setSiteIdentifier: vi.fn(),
             setUrl: vi.fn(),
         };
         vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);

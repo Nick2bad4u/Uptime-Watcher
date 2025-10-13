@@ -100,45 +100,62 @@ export const setupSiteStoryEnvironment = (
     );
 
     useSitesStore.setState({
-        checkSiteNow: (siteId: string, monitorId: string) => {
-            action("sites/checkSiteNow")({ monitorId, siteId });
+        checkSiteNow: (siteIdentifier: string, monitorId: string) => {
+            action("sites/checkSiteNow")({ monitorId, siteIdentifier });
             return Promise.resolve();
         },
         selectedMonitorIds,
-        selectedSiteId: sites[0]?.identifier,
-        setSelectedMonitorId: (siteId: string, monitorId: string) => {
-            action("sites/setSelectedMonitorId")({ monitorId, siteId });
+        selectedSiteIdentifier: sites[0]?.identifier,
+        setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => {
+            action("sites/setSelectedMonitorId")({
+                monitorId,
+                siteIdentifier,
+            });
             useSitesStore.setState((state) => ({
                 selectedMonitorIds: {
                     ...state.selectedMonitorIds,
-                    [siteId]: monitorId,
+                    [siteIdentifier]: monitorId,
                 },
             }));
         },
         sites: Array.from(sites),
-        startSiteMonitoring: (siteId: string) => {
-            action("sites/startSiteMonitoring")(siteId);
+        startSiteMonitoring: (siteIdentifier: string) => {
+            action("sites/startSiteMonitoring")(siteIdentifier);
             return Promise.resolve();
         },
-        startSiteMonitorMonitoring: (siteId: string, monitorId: string) => {
-            action("sites/startSiteMonitorMonitoring")({ monitorId, siteId });
+        startSiteMonitorMonitoring: (
+            siteIdentifier: string,
+            monitorId: string
+        ) => {
+            action("sites/startSiteMonitorMonitoring")({
+                monitorId,
+                siteIdentifier,
+            });
             return Promise.resolve();
         },
-        stopSiteMonitoring: (siteId: string) => {
-            action("sites/stopSiteMonitoring")(siteId);
+        stopSiteMonitoring: (siteIdentifier: string) => {
+            action("sites/stopSiteMonitoring")(siteIdentifier);
             return Promise.resolve();
         },
-        stopSiteMonitorMonitoring: (siteId: string, monitorId: string) => {
-            action("sites/stopSiteMonitorMonitoring")({ monitorId, siteId });
+        stopSiteMonitorMonitoring: (
+            siteIdentifier: string,
+            monitorId: string
+        ) => {
+            action("sites/stopSiteMonitorMonitoring")({
+                monitorId,
+                siteIdentifier,
+            });
             return Promise.resolve();
         },
     });
 
     useUIStore.setState({
-        selectedSiteId: sites[0]?.identifier,
+        selectedSiteIdentifier: sites[0]?.identifier,
         selectSite: (site) => {
             action("ui/selectSite")(site?.identifier ?? null);
-            useUIStore.setState({ selectedSiteId: site?.identifier });
+            useUIStore.setState({
+                selectedSiteIdentifier: site?.identifier,
+            });
         },
         setShowSiteDetails: (show) => {
             action("ui/setShowSiteDetails")(show);

@@ -20,7 +20,7 @@ const createMockStore = (): Partial<SitesStore> => ({
     fullResyncSites: mockfullResyncSites,
     sites: [],
     selectedMonitorIds: {},
-    selectedSiteId: undefined,
+    selectedSiteIdentifier: undefined,
     // Add minimal mock implementations for other required methods
     addMonitorToSite: vi.fn(),
     addSite: vi.fn(),

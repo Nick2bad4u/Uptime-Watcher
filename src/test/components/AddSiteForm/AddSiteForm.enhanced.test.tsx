@@ -156,7 +156,7 @@ const createMockFormState = (
         port: "",
         recordType: "A",
         selectedExistingSite: "",
-        siteId: "test-id",
+        siteIdentifier: "test-id",
         url: "",
         // Actions
         isFormValid: vi.fn(() => true),
@@ -179,7 +179,7 @@ const createMockFormState = (
         setPort: vi.fn(),
         setRecordType: vi.fn(),
         setSelectedExistingSite: vi.fn(),
-        setSiteId: vi.fn(),
+        setSiteIdentifier: vi.fn(),
         setUrl: vi.fn(),
         ...overrides,
     }) as ReturnType<typeof useAddSiteForm>;
@@ -206,7 +206,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         sites: mockSites,
-        selectedSiteId: null,
+        selectedSiteIdentifier: null,
         isLoading: false,
         addSite: vi.fn(),
         updateSite: vi.fn(),

@@ -38,7 +38,10 @@ function safeTrim(value: unknown): string {
  */
 export interface StoreActions {
     /** Add a monitor to an existing site */
-    addMonitorToSite: (siteId: string, monitor: Monitor) => Promise<void>;
+    addMonitorToSite: (
+        siteIdentifier: string,
+        monitor: Monitor
+    ) => Promise<void>;
     /** Clear any existing error state */
     clearError: () => void;
     /** Create a new site with monitors */
@@ -372,11 +375,11 @@ async function submitNewSite(
     properties: FormSubmitProperties,
     monitor: Monitor
 ): Promise<void> {
-    const { createSite, logger, name, siteId } = properties;
+    const { createSite, logger, name, siteIdentifier } = properties;
 
     const trimmedName = safeTrim(name);
     const siteData = {
-        identifier: siteId,
+        identifier: siteIdentifier,
         monitors: [monitor],
         name: trimmedName || "Unnamed Site", // Provide default name
     };
@@ -384,7 +387,7 @@ async function submitNewSite(
     await createSite(siteData);
 
     logger.info("Site created successfully", {
-        identifier: siteId,
+        identifier: siteIdentifier,
         monitorId: monitor.id,
         monitorType: monitor.type,
         name: trimmedName,
@@ -406,8 +409,9 @@ async function performSubmission(
         await addToExistingSite(properties, monitor);
     }
 
-    const { selectedExistingSite, siteId } = properties;
-    const identifier = addMode === "new" ? siteId : selectedExistingSite;
+    const { selectedExistingSite, siteIdentifier } = properties;
+    const identifier =
+        addMode === "new" ? siteIdentifier : selectedExistingSite;
     logger.info(
         `Successfully ${addMode === "new" ? "created site" : "added monitor"}: ${identifier}`
     );

@@ -56,7 +56,7 @@
  * @public
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
@@ -1387,7 +1387,7 @@ export class MonitorManager {
         site: Site,
         monitor: Monitor,
         changes: Partial<Monitor>,
-        newStatus: string
+        newStatus: MonitorStatus
     ): Promise<void> {
         const previousStatus = monitor.status;
 
@@ -1423,16 +1423,21 @@ export class MonitorManager {
         );
 
         // Emit status-changed event with full payload
-        await this.eventEmitter.emitTyped("monitor:status-changed", {
-            monitor: monitor,
+        const statusUpdate: StatusUpdate = {
+            monitor,
             monitorId: monitor.id,
-            newStatus: newStatus,
-            previousStatus: previousStatus,
+            previousStatus,
             responseTime: monitor.responseTime,
-            site: site,
-            siteId: site.identifier,
-            timestamp: Date.now(),
-        });
+            site,
+            siteIdentifier: site.identifier,
+            status: newStatus,
+            timestamp: new Date().toISOString(),
+        };
+
+        await this.eventEmitter.emitTyped(
+            "monitor:status-changed",
+            statusUpdate
+        );
     }
 
     /**

@@ -46,12 +46,12 @@ const createTestSitesStore = () => {
     const clearedState = useSitesStore.getState();
     if (
         clearedState.sites.length > 0 ||
-        clearedState.selectedSiteId !== undefined
+        clearedState.selectedSiteIdentifier !== undefined
     ) {
         throw new Error(
             `Sites store not properly cleared: ${JSON.stringify({
                 sitesCount: clearedState.sites.length,
-                selectedSiteId: clearedState.selectedSiteId,
+                selectedSiteIdentifier: clearedState.selectedSiteIdentifier,
             })}`
         );
     }
@@ -197,7 +197,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 const state = useSitesStore.getState();
-                expect(state.selectedSiteId).toBe(site.identifier);
+                expect(state.selectedSiteIdentifier).toBe(site.identifier);
                 expect(useSitesStore.getState().getSelectedSite()).toEqual(
                     site
                 );
@@ -217,7 +217,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // Assert
                 const state = useSitesStore.getState();
-                expect(state.selectedSiteId).toBeUndefined();
+                expect(state.selectedSiteIdentifier).toBeUndefined();
                 expect(
                     useSitesStore.getState().getSelectedSite()
                 ).toBeUndefined();
@@ -320,7 +320,7 @@ describe("Sites Store - Property-Based Fuzzing Tests", () => {
 
                 // And the selection should be cleared (no selected site)
                 expect(selectedSite).toBeUndefined();
-                expect(state.selectedSiteId).toBeUndefined();
+                expect(state.selectedSiteIdentifier).toBeUndefined();
             }
         );
 
