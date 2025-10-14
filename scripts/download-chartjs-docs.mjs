@@ -7,12 +7,24 @@ import { exec } from "child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+/**
+ * @typedef {Object} HashRecord
+ * @property {Record<string, string>} [key] - Mapping of file names to their SHA-256 hashes
+ */
+
+/**
+ * @typedef {Record<string, string>} FileHashMap
+ */
+
 /* -------------------- CONFIGURATION -------------------- */
 
+/** @type {string} */
 const DOC_NAME = "Chartjs";
+/** @type {string} */
 const BASE_URL = "https://www.chartjs.org";
 
 // Key Chart.js documentation pages
+/** @type {string[]} */
 const PAGES = [
     "docs/latest/getting-started/installation",
     "docs/latest/getting-started/usage",
@@ -40,15 +52,21 @@ const PAGES = [
     "docs/latest/samples",
 ];
 
+/** @type {string} */
 const INPUT_FORMAT = "html";
+/** @type {string} */
 const OUTPUT_FORMAT = "gfm";
 
+/** @type {string} */
 const SUBDIR_1 = "docs";
+/** @type {string} */
 const SUBDIR_2 = "packages";
+/** @type {string} */
 const OUTPUT_EXT = "md";
 
 /* -------------------- SETUP -------------------- */
 
+/** @type {string} */
 const outputDir = path.join(
     process.env.DOCS_OUTPUT_DIR || ".",
     SUBDIR_1,
@@ -61,14 +79,24 @@ if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
 
+/** @type {string} */
 const hashFile = path.join(outputDir, `${DOC_NAME}-hashes.json`);
+/** @type {string[]} */
 const downloadedFiles = [];
 
 // Load previous hashes (if any)
+/** @type {FileHashMap} */
 let previousHashes = {};
 if (fs.existsSync(hashFile)) {
     try {
-        previousHashes = JSON.parse(fs.readFileSync(hashFile, "utf8"));
+        /** @type {unknown} */
+        const parsed = JSON.parse(fs.readFileSync(hashFile, "utf8"));
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            previousHashes = /** @type {FileHashMap} */ (parsed);
+        } else {
+            console.warn("⚠️ Invalid hashes file structure — starting fresh.");
+            previousHashes = {};
+        }
         console.log(
             `📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`
         );
@@ -77,6 +105,7 @@ if (fs.existsSync(hashFile)) {
     }
 }
 
+/** @type {FileHashMap} */
 const newHashes = {};
 
 /**
@@ -143,7 +172,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
+                    ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
                 );
                 return reject(readErr);
             }
@@ -166,7 +195,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
+                    ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
                 );
                 return reject(writeErr);
             }
@@ -178,10 +207,15 @@ function downloadFile(cmd, filePath, logMsg, name) {
     });
 }
 
+/** @type {Promise<void>[]} */
 const pagePromises = PAGES.map((page) => {
+    /** @type {string} */
     const url = `${BASE_URL}/${page}`;
+    /** @type {string} */
     const fileName = `Chartjs-${page.replace(/docs\/latest\//g, "").replace(/\//g, "-")}.${OUTPUT_EXT}`;
+    /** @type {string} */
     const filePath = path.join(outputDir, fileName);
+    /** @type {string} */
     const cmd = `pandoc "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${filePath}"`;
 
     return downloadFile(

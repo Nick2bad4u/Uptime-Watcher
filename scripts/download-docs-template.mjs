@@ -36,12 +36,25 @@ import fsSync from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
+/** @typedef {import('http')} http */
+/** @typedef {import('https')} https */
 
 const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* ==================== TYPE DEFINITIONS ==================== */
+
+/**
+ * @typedef {Object} ExecFileResult
+ * @property {string} stdout - Standard output
+ * @property {string} stderr - Standard error
+ */
+
+/**
+ * @typedef {Object} HttpModule
+ * @property {Function} get - HTTP GET method
+ */
 
 /**
  * @typedef {Object} DownloadConfig
@@ -107,6 +120,16 @@ const __dirname = path.dirname(__filename);
  * @property {Paths} paths - Path configuration
  */
 
+/**
+ * @typedef {Object} ValidationResult
+ * @property {boolean} isValid - Whether content is valid
+ * @property {string[]} [errors] - Validation errors
+ */
+
+/**
+ * @typedef {Record<string, string>} HashRecord
+ */
+
 /* ==================== ENHANCED CONFIGURATION ==================== */
 
 /**
@@ -164,11 +187,15 @@ const CONFIG = {
  * @returns {DownloadConfig} Enhanced configuration
  */
 function parseArguments() {
+    /** @type {string[]} */
     const args = process.argv.slice(2);
+    /** @type {DownloadConfig} */
     const config = { ...CONFIG };
 
     for (let i = 0; i < args.length; i++) {
+        /** @type {string} */
         const arg = args[i];
+        /** @type {string | undefined} */
         const nextArg = args[i + 1];
 
         switch (arg) {
@@ -236,8 +263,11 @@ function parseArguments() {
 
 /**
  * Display comprehensive help information
+ *
+ * @returns {void}
  */
 function showHelp() {
+    /** @type {string} */
     const msg = [
         "Universal Documentation Downloader v2.0.0",
         "",
@@ -271,6 +301,7 @@ function showHelp() {
         "",
     ].join("\n");
     try {
+        /** @type {number} */
         const fd = process.stdout.fd;
         fsSync.writeFileSync(fd, msg + "\n");
     } catch {
@@ -285,7 +316,7 @@ function showHelp() {
  */
 class Logger {
     /**
-     * @param {boolean} verbose - Enable verbose logging
+     * @param {boolean} [verbose=false] - Enable verbose logging
      */
     constructor(verbose = false) {
         /** @type {boolean} */
@@ -297,6 +328,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     * @returns {void}
      */
     info(message, ...args) {
         console.log(`ℹ️ ${message}`, ...args);
@@ -305,6 +337,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     * @returns {void}
      */
     success(message, ...args) {
         console.log(`✅ ${message}`, ...args);
@@ -313,6 +346,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     * @returns {void}
      */
     warn(message, ...args) {
         console.warn(`⚠️ ${message}`, ...args);
@@ -321,6 +355,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     * @returns {void}
      */
     error(message, ...args) {
         console.error(`❌ ${message}`, ...args);
@@ -329,6 +364,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     * @returns {void}
      */
     debug(message, ...args) {
         if (this.verbose) {
@@ -339,12 +375,17 @@ class Logger {
     /**
      * @param {number} current
      * @param {number} total
-     * @param {string} item
+     * @param {string} [item=""]
+     * @returns {void}
      */
     progress(current, total, item = "") {
+        /** @type {number} */
         const percent = Math.round((current / total) * 100);
+        /** @type {number} */
         const elapsed = Date.now() - this.startTime;
+        /** @type {number} */
         const rate = current / (elapsed / 1000);
+        /** @type {number} */
         const eta = total > current ? Math.round((total - current) / rate) : 0;
 
         console.log(
@@ -359,10 +400,13 @@ class Logger {
  * @returns {Promise<InitializationResult>}
  */
 async function initialize() {
+    /** @type {DownloadConfig} */
     const config = parseArguments();
+    /** @type {Logger} */
     const logger = new Logger(config.verbose);
 
     // Setup paths
+    /** @type {string} */
     let outputDir;
     if (process.env.DOCS_OUTPUT_DIR) {
         outputDir = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
@@ -373,6 +417,7 @@ async function initialize() {
     }
     outputDir = path.resolve(outputDir);
 
+    /** @type {Paths} */
     const paths = {
         outputDir,
         logFile: path.join(outputDir, `${config.docName}-Download-Log.md`),
@@ -446,8 +491,10 @@ function validateContent(content, config, logger) {
  * @returns {string} Processed content
  */
 function rewriteLinks(content, baseUrl, logger) {
+    /** @type {number} */
     let linkCount = 0;
 
+    /** @type {string} */
     const processed = content.replace(
         /\((\.{1,2}\/[^\)\s]+)\)/g,
         (match, relPath) => {
@@ -456,12 +503,13 @@ function rewriteLinks(content, baseUrl, logger) {
             }
 
             try {
+                /** @type {string} */
                 const absUrl = new URL(relPath, baseUrl + "/").toString();
                 linkCount++;
                 return `(${absUrl})`;
             } catch (error) {
                 logger.warn(
-                    `Failed to rewrite link: ${relPath} - ${error.message}`
+                    `Failed to rewrite link: ${relPath} - ${error instanceof Error ? error.message : String(error)}`
                 );
                 return match;
             }
@@ -485,13 +533,17 @@ function rewriteLinks(content, baseUrl, logger) {
  * @returns {string} Cleaned content
  */
 function cleanContent(content, config, logger) {
+    /** @type {string} */
     let cleaned = content;
+    /** @type {number} */
     let changesMade = 0;
 
     // Remove content from markers onward
     for (const marker of config.removeFromMarkers || []) {
+        /** @type {number} */
         const idx = cleaned.indexOf(marker);
         if (idx !== -1) {
+            /** @type {number} */
             const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
             cleaned = cleaned.slice(0, lineStart);
             changesMade++;
@@ -501,8 +553,10 @@ function cleanContent(content, config, logger) {
 
     // Remove content above markers
     for (const marker of config.removeAboveMarkers || []) {
+        /** @type {number} */
         const idx = cleaned.indexOf(marker);
         if (idx !== -1) {
+            /** @type {number} */
             const lineStart = cleaned.lastIndexOf("\n", idx) + 1;
             cleaned = cleaned.slice(lineStart);
             changesMade++;
@@ -512,9 +566,12 @@ function cleanContent(content, config, logger) {
 
     // Remove lines containing markers
     if (config.removeLineMarkers && config.removeLineMarkers.length > 0) {
+        /** @type {string[]} */
         const lines = cleaned.split("\n");
+        /** @type {number} */
         const originalLineCount = lines.length;
 
+        /** @type {string[]} */
         const filteredLines = lines.filter(
             (line) =>
                 !config.removeLineMarkers.some((marker) =>
@@ -542,39 +599,26 @@ function cleanContent(content, config, logger) {
 }
 
 /**
- * Download a single file with retry logic
+ * Download content directly via HTTP/HTTPS
  *
- * @param {DownloadTask} task - Download task
- * @param {DownloadConfig} config - Configuration
- * @param {Logger} logger - Logger instance
- * @param {Paths} paths - Path configuration
- *
- * @returns {Promise<DownloadResult>} Download result
+ * @param {string} url - URL to download
+ * @param {number} timeoutMs - Timeout in milliseconds
+ * @returns {Promise<string>}
  */
-let _pandocAvailableCache = null;
-async function isPandocAvailable(logger) {
-    if (_pandocAvailableCache !== null) return _pandocAvailableCache;
-    try {
-        await execFileAsync("pandoc", ["--version"], { timeout: 4000 });
-        _pandocAvailableCache = true;
-    } catch (e) {
-        logger.warn("Pandoc not available – using raw download fallback");
-        _pandocAvailableCache = false;
-    }
-    return _pandocAvailableCache;
-}
-
 async function rawDownload(url, timeoutMs) {
+    /** @type {HttpModule} */
     const protocol = await import(url.startsWith("https") ? "https" : "http");
     return new Promise((resolve, reject) => {
+        /** @type {import('http').ClientRequest} */
         const req = protocol.get(url, (res) => {
             if (res.statusCode && res.statusCode >= 400) {
                 reject(new Error(`HTTP ${res.statusCode} for ${url}`));
                 return;
             }
+            /** @type {string} */
             let data = "";
             res.setEncoding("utf8");
-            res.on("data", (c) => (data += c));
+            res.on("data", (/** @type {string} */ c) => (data += c));
             res.on("end", () => resolve(data));
         });
         req.on("error", reject);
@@ -584,12 +628,46 @@ async function rawDownload(url, timeoutMs) {
     });
 }
 
+/**
+ * Check if Pandoc is available on the system
+ *
+ * @param {Logger} logger - Logger instance
+ *
+ * @returns {Promise<boolean>} Whether Pandoc is available
+ */
+async function isPandocAvailable(logger) {
+    try {
+        await execFileAsync("pandoc", ["--version"], { timeout: 5000 });
+        logger.debug("Pandoc is available");
+        return true;
+    } catch (error) {
+        logger.warn(
+            `Pandoc not available: ${error instanceof Error ? error.message : String(error)}`
+        );
+        logger.warn("Falling back to raw HTTP download");
+        return false;
+    }
+}
+
+/**
+ * Download a single file with retry logic
+ *
+ * @param {DownloadTask} task - Download task
+ * @param {DownloadConfig} config - Configuration
+ * @param {Logger} logger - Logger instance
+ * @param {Paths} paths - Path configuration
+ * @param {HashRecord} previousHashes - Previous file hashes
+ *
+ * @returns {Promise<DownloadResult>} Download result
+ */
 async function downloadFile(task, config, logger, paths, previousHashes) {
     const { page, url, outputPath } = task;
 
     if (config.enableCache && !config.force && fsSync.existsSync(outputPath)) {
         try {
+            /** @type {string} */
             const existing = await fs.readFile(outputPath, "utf8");
+            /** @type {string} */
             const existingHash = crypto
                 .createHash("sha256")
                 .update(existing)
@@ -606,12 +684,15 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 };
             }
         } catch (e) {
-            logger.debug(`Cache check failed for ${page}: ${e.message}`);
+            logger.debug(`Cache check failed for ${page}: ${e instanceof Error ? e.message : String(e)}`);
         }
     }
 
+    /** @type {Error | null} */
     let lastError = null;
+    /** @type {boolean} */
     const canUsePandoc = await isPandocAvailable(logger);
+    /** @type {boolean} */
     const useRaw =
         !canUsePandoc ||
         (config.inputFormat === config.outputFormat &&
@@ -621,9 +702,10 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
         try {
             logger.debug(
                 `Downloading ${page} (attempt ${attempt}/${config.maxRetries})` +
-                    (useRaw ? " [raw]" : " [pandoc]")
+                (useRaw ? " [raw]" : " [pandoc]")
             );
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
+            /** @type {string} */
             let content;
             if (useRaw) {
                 content = await rawDownload(url, config.timeout);
@@ -632,6 +714,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 }
                 await fs.writeFile(outputPath, content, "utf8");
             } else {
+                /** @type {string[]} */
                 const cmdArgs = [
                     "--wrap=preserve",
                     url,
@@ -657,6 +740,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
             content = rewriteLinks(content, config.baseUrl, logger);
             content = cleanContent(content, config, logger);
             await fs.writeFile(outputPath, content, "utf8");
+            /** @type {string} */
             const hash = crypto
                 .createHash("sha256")
                 .update(content)
@@ -671,11 +755,12 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 attempts: attempt,
             };
         } catch (error) {
-            lastError = error;
+            lastError = error instanceof Error ? error : new Error(String(error));
             logger.warn(
-                `Attempt ${attempt} failed for ${page}: ${error.message}`
+                `Attempt ${attempt} failed for ${page}: ${lastError.message}`
             );
             if (attempt < config.maxRetries) {
+                /** @type {number} */
                 const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
                 logger.debug(`Retrying in ${delay}ms...`);
                 await new Promise((r) => setTimeout(r, delay));
@@ -701,6 +786,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Paths} paths - Path configuration
+ * @param {HashRecord} previousHashes - Previous file hashes
  *
  * @returns {Promise<DownloadResult[]>} Download results
  */
@@ -711,12 +797,15 @@ async function downloadSequential(
     paths,
     previousHashes
 ) {
+    /** @type {DownloadResult[]} */
     const results = [];
 
     for (let i = 0; i < tasks.length; i++) {
+        /** @type {DownloadTask} */
         const task = tasks[i];
         logger.progress(i + 1, tasks.length, task.page);
 
+        /** @type {DownloadResult} */
         const result = await downloadFile(
             task,
             config,
@@ -737,18 +826,24 @@ async function downloadSequential(
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Paths} paths - Path configuration
+ * @param {HashRecord} previousHashes - Previous file hashes
  *
  * @returns {Promise<DownloadResult[]>} Download results
  */
 async function downloadParallel(tasks, config, logger, paths, previousHashes) {
+    /** @type {DownloadResult[]} */
     const results = [];
+    /** @type {Set<string>} */
     const inProgress = new Set();
+    /** @type {number} */
     let completed = 0;
 
     // Process tasks in batches to control concurrency
     for (let i = 0; i < tasks.length; i += config.concurrency) {
+        /** @type {DownloadTask[]} */
         const batch = tasks.slice(i, i + config.concurrency);
 
+        /** @type {Promise<DownloadResult>[]} */
         const batchPromises = batch.map(async (task) => {
             inProgress.add(task.page);
 
@@ -767,6 +862,7 @@ async function downloadParallel(tasks, config, logger, paths, previousHashes) {
             }
         });
 
+        /** @type {DownloadResult[]} */
         const batchResults = await Promise.all(batchPromises);
         results.push(...batchResults);
     }
@@ -781,13 +877,16 @@ async function downloadParallel(tasks, config, logger, paths, previousHashes) {
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
  * @param {Paths} paths - Path configuration
- * @param {Record<string, string>} previousHashes - Previous file hashes
+ * @param {HashRecord} previousHashes - Previous file hashes
  *
  * @returns {Promise<void>}
  */
 async function generateReport(results, config, logger, paths, previousHashes) {
+    /** @type {DownloadResult[]} */
     const successful = results.filter((r) => r.success);
+    /** @type {DownloadResult[]} */
     const failed = results.filter((r) => !r.success);
+    /** @type {DownloadResult[]} */
     const changed = successful.filter((r) => previousHashes[r.page] !== r.hash);
 
     logger.info(`Download Summary:`);
@@ -802,9 +901,12 @@ async function generateReport(results, config, logger, paths, previousHashes) {
     }
 
     // Update hashes file
+    /** @type {HashRecord} */
     const newHashes = {};
     successful.forEach((r) => {
-        newHashes[r.page] = r.hash;
+        if (r.hash) {
+            newHashes[r.page] = r.hash;
+        }
     });
 
     if (Object.keys(newHashes).length > 0) {
@@ -818,7 +920,9 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
     // Generate detailed log entry
     if (changed.length > 0) {
+        /** @type {string} */
         const timestamp = new Date().toISOString();
+        /** @type {string} */
         let logEntry = `## 🕓 ${config.docName} docs sync @ ${timestamp}\n`;
         logEntry += `\n### Summary\n`;
         logEntry += `- Total files: ${results.length}\n`;
@@ -856,30 +960,37 @@ async function generateReport(results, config, logger, paths, previousHashes) {
 
 /**
  * Main application entry point
+ *
+ * @returns {Promise<void>}
  */
 async function main() {
     try {
+        /** @type {InitializationResult} */
         const { config, logger, paths } = await initialize();
 
         // Load previous hashes for change detection
+        /** @type {HashRecord} */
         let previousHashes = {};
         try {
             if (fsSync.existsSync(paths.hashesFile)) {
+                /** @type {string} */
                 const hashData = await fs.readFile(paths.hashesFile, "utf8");
+                /** @type {unknown} */
                 const parsed = JSON.parse(hashData);
                 if (
                     parsed &&
                     typeof parsed === "object" &&
                     !Array.isArray(parsed)
                 ) {
-                    previousHashes = parsed;
+                    previousHashes = /** @type {HashRecord} */ (parsed);
                 }
             }
         } catch (error) {
-            logger.warn(`Failed to load previous hashes: ${error.message}`);
+            logger.warn(`Failed to load previous hashes: ${error instanceof Error ? error.message : String(error)}`);
         }
 
         // Create download tasks
+        /** @type {DownloadTask[]} */
         const downloadTasks = config.pages.map((page) => ({
             page,
             url: `${config.baseUrl}/${page}`,
@@ -890,31 +1001,31 @@ async function main() {
         logger.info(`Starting download of ${downloadTasks.length} pages...`);
 
         // Execute downloads
+        /** @type {DownloadResult[]} */
         const results = config.enableParallel
             ? await downloadParallel(
-                  downloadTasks,
-                  config,
-                  logger,
-                  paths,
-                  previousHashes
-              )
+                downloadTasks,
+                config,
+                logger,
+                paths,
+                previousHashes
+            )
             : await downloadSequential(
-                  downloadTasks,
-                  config,
-                  logger,
-                  paths,
-                  previousHashes
-              );
+                downloadTasks,
+                config,
+                logger,
+                paths,
+                previousHashes
+            );
 
         // Process results and generate report
-        // @ts-ignore
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
     } catch (error) {
-        console.error(`❌ Application failed: ${error.message}`);
+        console.error(`❌ Application failed: ${error instanceof Error ? error.message : String(error)}`);
         if (process.env.DOC_DOWNLOADER_VERBOSE) {
-            console.error(error.stack);
+            console.error(error instanceof Error ? error.stack : error);
         }
         process.exit(1);
     }
@@ -930,7 +1041,9 @@ async function main() {
  * @returns {string} Output file path
  */
 function getOutputPath(page, config, paths) {
+    /** @type {path.ParsedPath} */
     const parsed = path.parse(page);
+    /** @type {string} */
     const fileName = path.join(
         parsed.dir,
         `${parsed.name}.${config.outputExt}`
@@ -939,7 +1052,9 @@ function getOutputPath(page, config, paths) {
 }
 
 // Execute main function if this is the main module
+/** @type {string} */
 const templateArgvPath = path.resolve(process.argv[1]);
+/** @type {string} */
 const templateMetaPath = fileURLToPath(import.meta.url);
 if (templateMetaPath === templateArgvPath) {
     main().catch(console.error);

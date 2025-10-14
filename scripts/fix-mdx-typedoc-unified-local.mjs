@@ -20,6 +20,9 @@ function fixFile(filePath) {
     let changed = false;
 
     // Find code block ranges so we don't touch content inside them
+    /**
+     * @type {number[][]}
+     */
     const codeBlocks = [];
     const codeBlockRegex = /```[\w-]*[\S\s]*?```/g;
     let match;

@@ -9,7 +9,8 @@
 import { bench, describe } from "vitest";
 
 /**
- * Utility type describing configuration schema for the configuration management benchmark.
+ * Utility type describing configuration schema for the configuration management
+ * benchmark.
  */
 type ConfigurationSchema = Record<
     string,
@@ -24,7 +25,8 @@ type ConfigurationSchema = Record<
 >;
 
 /**
- * Represents configuration value data in the configuration management benchmark.
+ * Represents configuration value data in the configuration management
+ * benchmark.
  */
 interface ConfigurationValue {
     key: string;
@@ -36,7 +38,8 @@ interface ConfigurationValue {
 }
 
 /**
- * Represents configuration group data in the configuration management benchmark.
+ * Represents configuration group data in the configuration management
+ * benchmark.
  */
 interface ConfigurationGroup {
     name: string;
@@ -46,7 +49,8 @@ interface ConfigurationGroup {
 }
 
 /**
- * Represents config change event data in the configuration management benchmark.
+ * Represents config change event data in the configuration management
+ * benchmark.
  */
 interface ConfigChangeEvent {
     key: string;
@@ -58,7 +62,8 @@ interface ConfigChangeEvent {
 }
 
 /**
- * Represents config validation result data in the configuration management benchmark.
+ * Represents config validation result data in the configuration management
+ * benchmark.
  */
 interface ConfigValidationResult {
     isValid: boolean;
@@ -81,7 +86,8 @@ interface ConfigBackup {
 }
 
 /**
- * Mock configuration repository used to drive the configuration management benchmark.
+ * Mock configuration repository used to drive the configuration management
+ * benchmark.
  */
 class MockConfigurationRepository {
     private configurations = new Map<string, ConfigurationValue>();
@@ -290,7 +296,8 @@ class MockEventEmitter {
 }
 
 /**
- * Mock configuration management service used to drive the configuration management benchmark.
+ * Mock configuration management service used to drive the configuration
+ * management benchmark.
  */
 class MockConfigurationManagementService {
     private repository: MockConfigurationRepository;

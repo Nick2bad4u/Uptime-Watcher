@@ -651,7 +651,8 @@ function generateStatusEntries(
     const now = Date.now();
 
     for (let i = 0; i < count; i++) {
-        const siteIdentifier = siteIdentifiers[Math.floor(Math.random() * siteIdentifiers.length)];
+        const siteIdentifier =
+            siteIdentifiers[Math.floor(Math.random() * siteIdentifiers.length)];
         const monitorId = `${siteIdentifier}-monitor-${Math.floor(Math.random() * monitorsPerSite)}`;
         const timestamp = now - Math.random() * timeSpan;
 
@@ -850,7 +851,11 @@ describe("Status Processing and Aggregation Benchmarks", () => {
             "Process bulk updates - 50 sites, 5,000 entries",
             async () => {
                 const siteIdentifiers = generateSiteIdentifiers(50);
-                const entries = generateStatusEntries(5000, siteIdentifiers, 10);
+                const entries = generateStatusEntries(
+                    5000,
+                    siteIdentifiers,
+                    10
+                );
                 await statusService.processBulkStatusUpdates(entries);
             },
             { iterations: 5 }
@@ -860,7 +865,11 @@ describe("Status Processing and Aggregation Benchmarks", () => {
             "Process bulk updates - 100 sites, 10,000 entries",
             async () => {
                 const siteIdentifiers = generateSiteIdentifiers(100);
-                const entries = generateStatusEntries(10_000, siteIdentifiers, 15);
+                const entries = generateStatusEntries(
+                    10_000,
+                    siteIdentifiers,
+                    15
+                );
                 await statusService.processBulkStatusUpdates(
                     entries,
                     [3_600_000, 86_400_000]
@@ -1012,7 +1021,11 @@ describe("Status Processing and Aggregation Benchmarks", () => {
             "Multi-site aggregation with trend analysis",
             async () => {
                 const siteIdentifiers = generateSiteIdentifiers(30);
-                const entries = generateStatusEntries(15_000, siteIdentifiers, 25);
+                const entries = generateStatusEntries(
+                    15_000,
+                    siteIdentifiers,
+                    25
+                );
 
                 // Process with extensive time windows
                 const aggregationWindows = [
@@ -1031,12 +1044,16 @@ describe("Status Processing and Aggregation Benchmarks", () => {
                 // Additional processing on results
                 for (const [siteIdentifier, result] of results) {
                     const outages = statusService.detectOutages(
-                        entries.filter((e) => e.siteIdentifier === siteIdentifier),
+                        entries.filter(
+                            (e) => e.siteIdentifier === siteIdentifier
+                        ),
                         60_000
                     );
 
                     const slaCompliance = statusService.calculateSLACompliance(
-                        entries.filter((e) => e.siteIdentifier === siteIdentifier),
+                        entries.filter(
+                            (e) => e.siteIdentifier === siteIdentifier
+                        ),
                         99.9
                     );
                 }

@@ -69,9 +69,11 @@ const limitOverride =
 
 // Respect --no-color by overriding color helpers to pass-through
 if (noColor) {
-    Object.keys(colors).forEach((k) => {
+    /** @type {(keyof typeof colors)[]} */
+    const colorKeys = /** @type {(keyof typeof colors)[]} */ (Object.keys(colors));
+    for (const k of colorKeys) {
         colors[k] = (/** @type {any} */ s) => s;
-    });
+    }
 }
 
 // Analyze each file
@@ -320,8 +322,8 @@ function printCoverageSection(header, files) {
                 return pct >= 90
                     ? colors.green(text)
                     : pct >= 75
-                      ? colors.yellow(text)
-                      : colors.red(text);
+                        ? colors.yellow(text)
+                        : colors.red(text);
             };
             table.push([
                 ellipsize(f.file, DEFAULTS.truncateFilePath),
@@ -367,8 +369,8 @@ function printCoverageSection(header, files) {
                 pct >= 90
                     ? colors.green(padded)
                     : pct >= 75
-                      ? colors.yellow(padded)
-                      : colors.red(padded);
+                        ? colors.yellow(padded)
+                        : colors.red(padded);
             return colored;
         };
 

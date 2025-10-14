@@ -87,9 +87,10 @@ async function buildESLintInspector() {
 
         console.log("✅ ESLint Config Inspector built successfully");
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error(
             "❌ Failed to build ESLint Config Inspector:",
-            error.message
+            errorMessage
         );
         throw error;
     }
@@ -134,7 +135,8 @@ async function copyToDocusaurus() {
         await fs.remove(ESLINT_INSPECTOR_OUTPUT_DIR);
         console.log("🧹 Cleaned up temporary build directory");
     } catch (error) {
-        console.error("❌ Failed to copy ESLint Inspector:", error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("❌ Failed to copy ESLint Inspector:", errorMessage);
         throw error;
     }
 }
@@ -212,7 +214,8 @@ async function fixAssetPaths() {
 
         console.log("✅ Asset path fixing completed");
     } catch (error) {
-        console.error("❌ Failed to fix asset paths:", error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("❌ Failed to fix asset paths:", errorMessage);
         throw error;
     }
 }
@@ -297,9 +300,10 @@ async function createLocalTestingVersion() {
         );
         console.log(`🗑️  Remember to delete ${localTestDir} when done testing`);
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error(
             "❌ Failed to create local testing version:",
-            error.message
+            errorMessage
         );
         // Errors are suppressed here because creating a local testing version is an optional feature.
         // Any issues are logged to the console for visibility, but do not interrupt the main deployment process.
@@ -382,7 +386,8 @@ async function createIndexRedirect() {
 
         console.log("✅ Index redirect page created");
     } catch (error) {
-        console.error("❌ Failed to create index redirect:", error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("❌ Failed to create index redirect:", errorMessage);
         throw error;
     }
 }
@@ -418,7 +423,8 @@ try {
         "🌐 Will be accessible at: https://nick2bad4u.github.io/Uptime-Watcher/eslint-inspector/"
     );
 } catch (error) {
-    console.error("💥 Deployment failed:", error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("💥 Deployment failed:", errorMessage);
     process.exit(1);
 }
 

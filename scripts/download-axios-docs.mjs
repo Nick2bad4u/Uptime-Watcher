@@ -9,7 +9,17 @@ import {
 import { join, resolve as _resolve } from "path";
 import { createHash } from "crypto";
 
+/**
+ * @typedef {Object} HashRecord
+ * @property {Record<string, string>} [key] - Mapping of file names to their SHA-256 hashes
+ */
+
+/**
+ * @typedef {Record<string, string>} FileHashMap
+ */
+
 // List of Axios documentation pages to download
+/** @type {string[]} */
 const axiosPages = [
     "intro",
     "example",
@@ -27,27 +37,34 @@ const axiosPages = [
     "notes",
 ];
 
+/** @type {string} */
 const baseAxiosUrl = "https://axios-http.com/docs";
+/** @type {string} */
 let outputDir =
     process.env.AXIOS_DOCS_OUTPUT_DIR ||
     join(process.cwd(), "docs", "packages", "axios");
 // Normalize and resolve the output directory for cross-platform compatibility
 outputDir = _resolve(outputDir);
+/** @type {string} */
 const logFile = join(outputDir, "Axios-Download-Log.md");
+/** @type {string} */
 const hashesPath = join(outputDir, "Axios-Hashes.json");
 
 if (!existsSync(outputDir)) {
     mkdirSync(outputDir, { recursive: true });
 }
 
+/** @type {string[]} */
 const downloadedFiles = [];
 
+/** @type {FileHashMap} */
 let previousHashes = {};
 if (existsSync(hashesPath)) {
     try {
+        /** @type {unknown} */
         const parsed = JSON.parse(readFileSync(hashesPath, "utf8"));
         if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-            previousHashes = parsed;
+            previousHashes = /** @type {FileHashMap} */ (parsed);
         } else {
             console.warn("⚠️ Invalid hashes file structure — starting fresh.");
             previousHashes = {};
@@ -57,6 +74,7 @@ if (existsSync(hashesPath)) {
     }
 }
 
+/** @type {FileHashMap} */
 const newHashes = {};
 
 /**
@@ -105,7 +123,16 @@ function rewriteLinks(content) {
     );
 }
 
-// Download a single Axios doc page as markdown
+/**
+ * Download a single Axios doc page as markdown
+ *
+ * @param {string} cmd - The pandoc command to execute
+ * @param {string} filePath - The path where the downloaded file will be saved
+ * @param {string} logMsg - The log message to display on success
+ * @param {string} name - The name of the file being downloaded
+ *
+ * @returns {Promise<void>}
+ */
 function downloadFile(cmd, filePath, logMsg, name) {
     return new Promise((resolve, reject) => {
         exec(cmd, (err) => {
@@ -125,7 +152,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
+                    ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
                 );
                 return reject(readErr);
             }
@@ -143,7 +170,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                        ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
+                    ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
                 );
                 return reject(writeErr);
             }
@@ -154,11 +181,16 @@ function downloadFile(cmd, filePath, logMsg, name) {
     });
 }
 
+/** @type {Promise<void>[]} */
 const axiosPagePromises = axiosPages.map((page) => {
     // Download the HTML page and convert to markdown using pandoc
+    /** @type {string} */
     const url = `${baseAxiosUrl}/${page}`;
+    /** @type {string} */
     const fileName = `Axios-${page.replace(/_/g, "-")}.md`;
+    /** @type {string} */
     const filePath = join(outputDir, fileName);
+    /** @type {string} */
     const cmd = `pandoc "${url}.html" -t markdown -o "${filePath}"`;
     return downloadFile(
         cmd,
@@ -168,6 +200,11 @@ const axiosPagePromises = axiosPages.map((page) => {
     );
 });
 
+/**
+ * Main execution function
+ *
+ * @returns {Promise<void>}
+ */
 (async function main() {
     try {
         await Promise.all(axiosPagePromises);
@@ -186,18 +223,27 @@ const axiosPagePromises = axiosPages.map((page) => {
  * - Only writes the log if all expected files have been downloaded.
  * - Compares file hashes to detect changes and logs updated files.
  * - Updates the hashes file for future change detection.
+ *
+ * @returns {void}
  */
 function writeLogIfComplete() {
+    /** @type {number} */
     const expectedCount = axiosPages.length;
     if (downloadedFiles.length !== expectedCount) return;
 
+    /** @type {string} */
     const timestamp = new Date().toISOString();
+    /** @type {string} */
     let logEntry = `## 🕓 Axios docs sync @ ${timestamp}\n`;
+    /** @type {number} */
     let changedCount = 0;
 
     downloadedFiles.forEach((name) => {
+        /** @type {string} */
         const filePath = join(outputDir, name);
+        /** @type {string} */
         const content = readFileSync(filePath, "utf8");
+        /** @type {string} */
         const hash = createHash("sha256").update(content).digest("hex");
         newHashes[name] = hash;
 

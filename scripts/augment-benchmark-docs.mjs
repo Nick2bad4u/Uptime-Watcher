@@ -43,6 +43,10 @@ for (const config of fileConfigs) {
     }
 }
 
+/**
+ * @param {string} text
+ * @param {{ file: string; domain: string; }} config
+ */
 function updateFile(text, config) {
     let result = updateHeader(text, config);
     result = addDocToDefinitions(result, config);
@@ -50,6 +54,10 @@ function updateFile(text, config) {
     return result;
 }
 
+/**
+ * @param {string} text
+ * @param {{ file: string; domain: any; }} config
+ */
 function updateHeader(text, config) {
     const title = buildTitle(config.file);
     const description = `Exercises ${config.domain} scenarios to measure service throughput and resilience.`;
@@ -73,12 +81,18 @@ function updateHeader(text, config) {
     return `${header}\n${text}`;
 }
 
+/**
+ * @param {string} text
+ * @param {{ domain: string; }} config
+ */
 function addDocToDefinitions(text, config) {
     const lines = text.split("\n");
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const match = line.match(/^(?<indent>\s*)(?:export\s+)?(?<kind>interface|class|type)\s+(?<name>\w+)/);
+        const match = line.match(
+            /^(?<indent>\s*)(?:export\s+)?(?<kind>interface|class|type)\s+(?<name>\w+)/
+        );
         if (!match) continue;
 
         const indent = match.groups?.indent ?? "";
@@ -90,7 +104,17 @@ function addDocToDefinitions(text, config) {
             continue;
         }
 
-        const commentLines = buildDefinitionComment(indent, kind, name, config.domain);
+        // Validate kind is one of the expected values
+        if (kind !== "interface" && kind !== "class" && kind !== "type") {
+            continue;
+        }
+
+        const commentLines = buildDefinitionComment(
+            indent,
+            kind,
+            name,
+            config.domain
+        );
         lines.splice(i, 0, ...commentLines);
         i += commentLines.length;
     }
@@ -98,6 +122,10 @@ function addDocToDefinitions(text, config) {
     return lines.join("\n");
 }
 
+/**
+ * @param {string} text
+ * @param {{ domain: string; }} config
+ */
 function addDocToFunctions(text, config) {
     const lines = text.split("\n");
 

@@ -7,12 +7,20 @@ import { exec } from "child_process";
 import fs from "node:fs";
 import path from "node:path";
 
+/**
+ * @typedef {Object} FileHashMap
+ * @property {string} [key] - SHA-256 hash for a given filename
+ */
+
 /* -------------------- CONFIGURATION -------------------- */
 
+/** @type {string} */
 const DOC_NAME = "Electron";
+/** @type {string} */
 const BASE_URL = "https://www.electronjs.org";
 
 // Key Electron documentation pages
+/** @type {string[]} */
 const PAGES = [
     "docs/latest/tutorial/quick-start",
     "docs/latest/tutorial/process-model",
@@ -42,15 +50,21 @@ const PAGES = [
     "docs/latest/api/auto-updater",
 ];
 
+/** @type {string} */
 const INPUT_FORMAT = "html";
+/** @type {string} */
 const OUTPUT_FORMAT = "gfm";
 
+/** @type {string} */
 const SUBDIR_1 = "docs";
+/** @type {string} */
 const SUBDIR_2 = "packages";
+/** @type {string} */
 const OUTPUT_EXT = "md";
 
 /* -------------------- SETUP -------------------- */
 
+/** @type {string} */
 const outputDir = path.join(
     process.env.DOCS_OUTPUT_DIR || ".",
     SUBDIR_1,
@@ -63,14 +77,21 @@ if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
 
+/** @type {string} */
 const hashFile = path.join(outputDir, `${DOC_NAME}-hashes.json`);
+/** @type {string[]} */
 const downloadedFiles = [];
 
 // Load previous hashes (if any)
+/** @type {FileHashMap} */
 let previousHashes = {};
 if (fs.existsSync(hashFile)) {
     try {
-        previousHashes = JSON.parse(fs.readFileSync(hashFile, "utf8"));
+        /** @type {unknown} */
+        const parsed = JSON.parse(fs.readFileSync(hashFile, "utf8"));
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            previousHashes = /** @type {FileHashMap} */ (parsed);
+        }
         console.log(
             `📁 Loaded ${Object.keys(previousHashes).length} previous hashes.`
         );
@@ -79,6 +100,7 @@ if (fs.existsSync(hashFile)) {
     }
 }
 
+/** @type {FileHashMap} */
 const newHashes = {};
 
 /**
@@ -185,10 +207,15 @@ function downloadFile(cmd, filePath, logMsg, name) {
     });
 }
 
+/** @type {Promise<void>[]} */
 const pagePromises = PAGES.map((page) => {
+    /** @type {string} */
     const url = `${BASE_URL}/${page}`;
+    /** @type {string} */
     const fileName = `Electron-${page.replace(/docs\/latest\//g, "").replace(/\//g, "-")}.${OUTPUT_EXT}`;
+    /** @type {string} */
     const filePath = path.join(outputDir, fileName);
+    /** @type {string} */
     const cmd = `pandoc "${url}" -f ${INPUT_FORMAT} -t ${OUTPUT_FORMAT} -o "${filePath}"`;
 
     return downloadFile(
