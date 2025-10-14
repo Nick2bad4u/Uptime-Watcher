@@ -198,17 +198,20 @@ class MockSiteListComponent {
             sortOrder,
         ]);
 
-        const selectSite = this.hookManager.useCallback((siteId: string) => {
-            setSelectedSites((prev) => {
-                const newSet = new Set(prev);
-                if (newSet.has(siteId)) {
-                    newSet.delete(siteId);
-                } else {
-                    newSet.add(siteId);
-                }
-                return newSet;
-            });
-        }, []);
+        const selectSite = this.hookManager.useCallback(
+            (siteIdentifier: string) => {
+                setSelectedSites((prev) => {
+                    const newSet = new Set(prev);
+                    if (newSet.has(siteIdentifier)) {
+                        newSet.delete(siteIdentifier);
+                    } else {
+                        newSet.add(siteIdentifier);
+                    }
+                    return newSet;
+                });
+            },
+            []
+        );
 
         const selectAllSites = this.hookManager.useCallback(() => {
             setSelectedSites(new Set(filteredSites.map((site) => site.id)));

@@ -31,7 +31,7 @@ interface SitesState {
             status: "up" | "down" | "unknown";
         }[];
     }[];
-    selectedSiteId?: string;
+    selectedSiteIdentifier?: string;
     selectedMonitorIds: Record<string, string>;
 }
 
@@ -39,15 +39,15 @@ interface SitesActions {
     addSite: (site: SitesState["sites"][0]) => void;
     removeSite: (identifier: string) => void;
     setSites: (sites: SitesState["sites"]) => void;
-    selectSite: (siteId: string | undefined) => void;
-    setSelectedMonitorId: (siteId: string, monitorId: string) => void;
+    selectSite: (siteIdentifier: string | undefined) => void;
+    setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     getSelectedSite: () => SitesState["sites"][0] | undefined;
 }
 
 function createSitesStore(): StoreApi<SitesState & SitesActions> {
     return createStore<SitesState & SitesActions>()((set, get) => ({
         sites: [],
-        selectedSiteId: undefined,
+        selectedSiteIdentifier: undefined,
         selectedMonitorIds: {},
 
         addSite: (site) =>
@@ -58,28 +58,29 @@ function createSitesStore(): StoreApi<SitesState & SitesActions> {
         removeSite: (identifier) =>
             set((state) => ({
                 sites: state.sites.filter((s) => s.identifier !== identifier),
-                selectedSiteId:
-                    state.selectedSiteId === identifier
+                selectedSiteIdentifier:
+                    state.selectedSiteIdentifier === identifier
                         ? undefined
-                        : state.selectedSiteId,
+                        : state.selectedSiteIdentifier,
             })),
 
         setSites: (sites) => set({ sites }),
 
-        selectSite: (siteId) => set({ selectedSiteId: siteId }),
+        selectSite: (siteIdentifier) =>
+            set({ selectedSiteIdentifier: siteIdentifier }),
 
-        setSelectedMonitorId: (siteId, monitorId) =>
+        setSelectedMonitorId: (siteIdentifier, monitorId) =>
             set((state) => ({
                 selectedMonitorIds: {
                     ...state.selectedMonitorIds,
-                    [siteId]: monitorId,
+                    [siteIdentifier]: monitorId,
                 },
             })),
 
         getSelectedSite: () => {
-            const { selectedSiteId, sites } = get();
-            return selectedSiteId
-                ? sites.find((s) => s.identifier === selectedSiteId)
+            const { selectedSiteIdentifier, sites } = get();
+            return selectedSiteIdentifier
+                ? sites.find((s) => s.identifier === selectedSiteIdentifier)
                 : undefined;
         },
     }));

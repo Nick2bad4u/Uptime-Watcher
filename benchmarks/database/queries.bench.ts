@@ -39,7 +39,7 @@ class MockQueryExecutor {
         // Monitors table
         const monitors = Array.from({ length: 3000 }, (_, i) => ({
             id: i + 1,
-            siteId: Math.floor(Math.random() * 1000) + 1,
+            siteIdentifier: Math.floor(Math.random() * 1000) + 1,
             type: [
                 "http",
                 "ping",
@@ -60,7 +60,7 @@ class MockQueryExecutor {
         const history = Array.from({ length: 50_000 }, (_, i) => ({
             id: i + 1,
             monitorId: Math.floor(Math.random() * 3000) + 1,
-            siteId: Math.floor(Math.random() * 1000) + 1,
+            siteIdentifier: Math.floor(Math.random() * 1000) + 1,
             status: [
                 "online",
                 "offline",
@@ -98,7 +98,9 @@ class MockQueryExecutor {
 
         return sites.map((site) => ({
             ...site,
-            monitors: monitors.filter((monitor) => monitor.siteId === site.id),
+            monitors: monitors.filter(
+                (monitor) => monitor.siteIdentifier === site.id
+            ),
         }));
     }
 
@@ -109,7 +111,7 @@ class MockQueryExecutor {
 
         return sites.map((site) => {
             const siteMonitors = monitors.filter(
-                (monitor) => monitor.siteId === site.id
+                (monitor) => monitor.siteIdentifier === site.id
             );
             return {
                 ...site,
@@ -172,7 +174,7 @@ class MockQueryExecutor {
 
         return sites.filter((site) => {
             const activeMonitors = monitors.filter(
-                (m) => m.siteId === site.id && m.isEnabled
+                (m) => m.siteIdentifier === site.id && m.isEnabled
             );
             return activeMonitors.length > 0;
         });

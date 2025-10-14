@@ -34,7 +34,7 @@ describe("Site Service Performance", () => {
         operationTime: number;
         success: boolean;
         type: string;
-        siteId: string;
+        siteIdentifier: string;
         operationId: string;
     }
     // Mock site data for testing
@@ -55,7 +55,7 @@ describe("Site Service Performance", () => {
 
     const mockMonitors = Array.from({ length: 200 }, (_, i) => ({
         id: `monitor-${i}`,
-        siteId: `site-${Math.floor(i / 2)}`,
+        siteIdentifier: `site-${Math.floor(i / 2)}`,
         type: [
             "http",
             "ping",
@@ -80,7 +80,7 @@ describe("Site Service Performance", () => {
 
     const mockHistory = Array.from({ length: 1000 }, (_, i) => ({
         id: `history-${i}`,
-        siteId: `site-${Math.floor(i / 10)}`,
+        siteIdentifier: `site-${Math.floor(i / 10)}`,
         monitorId: `monitor-${Math.floor(i / 5)}`,
         timestamp: Date.now() - i * 60_000,
         status: ["up", "down"][Math.floor(Math.random() * 2)],
@@ -96,11 +96,11 @@ describe("Site Service Performance", () => {
     // Site loading performance benchmarks
     bench("site loading simulation - individual sites", () => {
         for (let i = 0; i < 200; i++) {
-            const siteId = `site-${i % 100}`;
+            const siteIdentifier = `site-${i % 100}`;
 
             // Simulate site loading operation
             const loadOperation = {
-                siteId,
+                siteIdentifier,
                 timestamp: Date.now(),
                 loadTime: Math.random() * 50,
                 includeMonitors: true,
@@ -108,11 +108,11 @@ describe("Site Service Performance", () => {
             };
 
             // Simulate finding site
-            const site = mockSites.find((s) => s.id === siteId);
+            const site = mockSites.find((s) => s.id === siteIdentifier);
             if (site) {
                 // Simulate loading related monitors
                 const relatedMonitors = mockMonitors.filter(
-                    (m) => m.siteId === siteId
+                    (m) => m.siteIdentifier === siteIdentifier
                 );
 
                 const result = {
@@ -137,11 +137,11 @@ describe("Site Service Performance", () => {
 
     bench("site loading simulation - with full history", () => {
         for (let i = 0; i < 100; i++) {
-            const siteId = `site-${i % 50}`;
+            const siteIdentifier = `site-${i % 50}`;
 
             // Simulate comprehensive site loading
             const loadOperation = {
-                siteId,
+                siteIdentifier,
                 timestamp: Date.now(),
                 includeMonitors: true,
                 includeHistory: true,
@@ -149,12 +149,12 @@ describe("Site Service Performance", () => {
             };
 
             // Simulate finding site and related data
-            const site = mockSites.find((s) => s.id === siteId);
+            const site = mockSites.find((s) => s.id === siteIdentifier);
             const relatedMonitors = mockMonitors.filter(
-                (m) => m.siteId === siteId
+                (m) => m.siteIdentifier === siteIdentifier
             );
             const relatedHistory = mockHistory
-                .filter((h) => h.siteId === siteId)
+                .filter((h) => h.siteIdentifier === siteIdentifier)
                 .slice(0, 100);
 
             // Simulate processing time based on data volume
@@ -188,7 +188,7 @@ describe("Site Service Performance", () => {
             const batchOperation = {
                 batchSize,
                 timestamp: Date.now(),
-                siteIds: Array.from(
+                siteIdentifiers: Array.from(
                     { length: batchSize },
                     (_, i) => `site-${i}`
                 ),
@@ -197,10 +197,10 @@ describe("Site Service Performance", () => {
             const loadedSites: LoadedSiteResult[] = [];
             let totalLoadTime = 0;
 
-            for (const siteId of batchOperation.siteIds) {
-                const site = mockSites.find((s) => s.id === siteId);
+            for (const siteIdentifier of batchOperation.siteIdentifiers) {
+                const site = mockSites.find((s) => s.id === siteIdentifier);
                 const monitors = mockMonitors.filter(
-                    (m) => m.siteId === siteId
+                    (m) => m.siteIdentifier === siteIdentifier
                 );
 
                 const siteLoadTime = Math.random() * 10 + monitors.length * 0.2;
@@ -245,13 +245,13 @@ describe("Site Service Performance", () => {
             if (isValid) {
                 // Simulate creation operation
                 const creationTime = Math.random() * 15;
-                const siteId = `new-site-${i}`;
+                const siteIdentifier = `new-site-${i}`;
 
                 // Simulate default monitor creation
                 const defaultMonitorTime = Math.random() * 8;
 
                 const result = {
-                    siteId,
+                    siteIdentifier,
                     creationTime:
                         validationTime + creationTime + defaultMonitorTime,
                     validation: { isValidUrl, isValidInterval },
@@ -260,7 +260,7 @@ describe("Site Service Performance", () => {
                 };
             } else {
                 const result = {
-                    siteId: null,
+                    siteIdentifier: null,
                     creationTime: validationTime,
                     validation: { isValidUrl, isValidInterval },
                     defaultMonitorCreated: false,
@@ -339,7 +339,7 @@ describe("Site Service Performance", () => {
     // Site update performance benchmarks
     bench("site update simulation", () => {
         for (let i = 0; i < 250; i++) {
-            const siteId = `site-${i % 100}`;
+            const siteIdentifier = `site-${i % 100}`;
             const updates = {
                 name: `Updated Site ${i}`,
                 url: `https://updated${i}.example.com`,
@@ -348,7 +348,7 @@ describe("Site Service Performance", () => {
             };
 
             // Simulate finding existing site
-            const existingSite = mockSites.find((s) => s.id === siteId);
+            const existingSite = mockSites.find((s) => s.id === siteIdentifier);
 
             if (existingSite) {
                 // Simulate validation of updates
@@ -377,7 +377,7 @@ describe("Site Service Performance", () => {
                     urlChanged || intervalChanged ? Math.random() * 15 : 0;
 
                 const result = {
-                    siteId,
+                    siteIdentifier,
                     updates,
                     changeCount,
                     validationTime,
@@ -389,7 +389,7 @@ describe("Site Service Performance", () => {
                 };
             } else {
                 const result = {
-                    siteId,
+                    siteIdentifier,
                     updates,
                     changeCount: 0,
                     validationTime: Math.random() * 2,
@@ -406,15 +406,15 @@ describe("Site Service Performance", () => {
     // Site deletion performance benchmarks
     bench("site deletion simulation", () => {
         for (let i = 0; i < 200; i++) {
-            const siteId = `site-${i % 100}`;
+            const siteIdentifier = `site-${i % 100}`;
 
             // Simulate finding site and related data
-            const site = mockSites.find((s) => s.id === siteId);
+            const site = mockSites.find((s) => s.id === siteIdentifier);
             const relatedMonitors = mockMonitors.filter(
-                (m) => m.siteId === siteId
+                (m) => m.siteIdentifier === siteIdentifier
             );
             const relatedHistory = mockHistory.filter(
-                (h) => h.siteId === siteId
+                (h) => h.siteIdentifier === siteIdentifier
             );
 
             if (site) {
@@ -439,7 +439,7 @@ describe("Site Service Performance", () => {
                     transactionTime;
 
                 const result = {
-                    siteId,
+                    siteIdentifier,
                     validationTime,
                     monitorDeletionTime,
                     historyDeletionTime,
@@ -453,7 +453,7 @@ describe("Site Service Performance", () => {
                 };
             } else {
                 const result = {
-                    siteId,
+                    siteIdentifier,
                     validationTime: Math.random() * 2,
                     totalTime: Math.random() * 2,
                     success: false,
@@ -571,7 +571,7 @@ describe("Site Service Performance", () => {
                     "status_update",
                     "config_sync",
                 ][Math.floor(Math.random() * 4)],
-                siteId: `site-${i % 50}`,
+                siteIdentifier: `site-${i % 50}`,
                 timestamp: Date.now(),
             };
 
@@ -681,7 +681,7 @@ describe("Site Service Performance", () => {
                     type: operationTypes[
                         Math.floor(Math.random() * operationTypes.length)
                     ],
-                    siteId: `batch-site-${i}`,
+                    siteIdentifier: `batch-site-${i}`,
                     operationId: `op-${i}`,
                 })),
             };

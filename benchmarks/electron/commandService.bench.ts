@@ -573,7 +573,10 @@ describe("Command Service Benchmarks", () => {
 
                 switch (scenario.name) {
                     case "site-create": {
-                        result = { siteId: `site-${i}`, status: "created" };
+                        result = {
+                            siteIdentifier: `site-${i}`,
+                            status: "created",
+                        };
                         break;
                     }
                     case "status-check": {

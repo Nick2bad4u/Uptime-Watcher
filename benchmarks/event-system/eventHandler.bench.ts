@@ -94,16 +94,16 @@ class MockEventHandler {
 
     handleSiteStatusChanged(event: DomainEvent): void {
         // Simulate site status change handling
-        const { siteId, status, responseTime } = event.payload;
+        const { siteIdentifier, status, responseTime } = event.payload;
         if (status === "offline") {
-            this.triggerAlert(siteId);
+            this.triggerAlert(siteIdentifier);
         }
     }
 
     handleMonitorCreated(event: DomainEvent): void {
         // Simulate monitor creation handling
-        const { monitorId, siteId, type } = event.payload;
-        this.initializeMonitor(monitorId, siteId, type);
+        const { monitorId, siteIdentifier, type } = event.payload;
+        this.initializeMonitor(monitorId, siteIdentifier, type);
     }
 
     handleAlertTriggered(event: DomainEvent): void {
@@ -112,7 +112,7 @@ class MockEventHandler {
         this.processAlert(alertId, severity, message);
     }
 
-    private triggerAlert(siteId: string): void {
+    private triggerAlert(siteIdentifier: string): void {
         // Simulate alert triggering logic
         const alertId = `alert-${Date.now()}`;
         // Process alert...
@@ -120,7 +120,7 @@ class MockEventHandler {
 
     private initializeMonitor(
         monitorId: string,
-        siteId: string,
+        siteIdentifier: string,
         type: string
     ): void {
         // Simulate monitor initialization
@@ -222,7 +222,7 @@ describe("Event Handler Performance", () => {
                 timestamp: Date.now(),
                 correlationId: "corr-1",
                 payload: {
-                    siteId: "site-1",
+                    siteIdentifier: "site-1",
                     status: "offline",
                     responseTime: 5000,
                 },
@@ -249,7 +249,7 @@ describe("Event Handler Performance", () => {
                 correlationId: "corr-2",
                 payload: {
                     monitorId: "monitor-1",
-                    siteId: "site-1",
+                    siteIdentifier: "site-1",
                     type: "http",
                 },
             };

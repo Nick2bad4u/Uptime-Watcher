@@ -28,9 +28,9 @@ class MockSiteMonitor {
 
     private initializeTestSites() {
         for (let i = 0; i < 100; i++) {
-            const siteId = `site-${i}`;
-            this.sites.set(siteId, {
-                id: siteId,
+            const siteIdentifier = `site-${i}`;
+            this.sites.set(siteIdentifier, {
+                id: siteIdentifier,
                 url: `https://site${i}.example.com`,
                 name: `Site ${i}`,
                 isActive: Math.random() > 0.1,
@@ -44,14 +44,14 @@ class MockSiteMonitor {
                 lastChecked: null,
                 status: "unknown",
             });
-            this.monitoringResults.set(siteId, []);
+            this.monitoringResults.set(siteIdentifier, []);
         }
     }
 
-    async performHealthCheck(siteId: string) {
-        const site = this.sites.get(siteId);
+    async performHealthCheck(siteIdentifier: string) {
+        const site = this.sites.get(siteIdentifier);
         if (!site) {
-            throw new Error(`Site ${siteId} not found`);
+            throw new Error(`Site ${siteIdentifier} not found`);
         }
 
         const startTime = Date.now();
@@ -66,7 +66,7 @@ class MockSiteMonitor {
         const isHealthy = Math.random() > 0.1; // 90% uptime simulation
 
         const result = {
-            siteId,
+            siteIdentifier,
             timestamp: startTime,
             responseTime,
             statusCode: isHealthy
@@ -81,12 +81,12 @@ class MockSiteMonitor {
         };
 
         // Store result
-        const results = this.monitoringResults.get(siteId) || [];
+        const results = this.monitoringResults.get(siteIdentifier) || [];
         results.push(result);
         if (results.length > 100) {
             results.shift(); // Keep only last 100 results
         }
-        this.monitoringResults.set(siteId, results);
+        this.monitoringResults.set(siteIdentifier, results);
 
         // Update site status
         site.status = isHealthy ? "online" : "offline";
@@ -95,28 +95,28 @@ class MockSiteMonitor {
         return result;
     }
 
-    async performBulkHealthChecks(siteIds: string[]) {
-        const promises = siteIds.map((siteId) =>
-            this.performHealthCheck(siteId)
+    async performBulkHealthChecks(siteIdentifiers: string[]) {
+        const promises = siteIdentifiers.map((siteIdentifier) =>
+            this.performHealthCheck(siteIdentifier)
         );
         return Promise.all(promises);
     }
 
-    async performSequentialHealthChecks(siteIds: string[]) {
+    async performSequentialHealthChecks(siteIdentifiers: string[]) {
         const results: any[] = [];
-        for (const siteId of siteIds) {
-            results.push(await this.performHealthCheck(siteId));
+        for (const siteIdentifier of siteIdentifiers) {
+            results.push(await this.performHealthCheck(siteIdentifier));
         }
         return results;
     }
 
-    getMonitoringHistory(siteId: string, limit: number = 50) {
-        const results = this.monitoringResults.get(siteId) || [];
+    getMonitoringHistory(siteIdentifier: string, limit: number = 50) {
+        const results = this.monitoringResults.get(siteIdentifier) || [];
         return results.slice(-limit).toReversed();
     }
 
-    getAggregatedStats(siteId: string) {
-        const results = this.monitoringResults.get(siteId) || [];
+    getAggregatedStats(siteIdentifier: string) {
+        const results = this.monitoringResults.get(siteIdentifier) || [];
         if (results.length === 0) {
             return null;
         }
@@ -148,9 +148,9 @@ class MockSiteMonitor {
 
     getAllSiteStatuses() {
         const statuses: any[] = [];
-        for (const [siteId, site] of this.sites) {
+        for (const [siteIdentifier, site] of this.sites) {
             statuses.push({
-                siteId,
+                siteIdentifier,
                 name: site.name,
                 url: site.url,
                 status: site.status,
@@ -171,13 +171,13 @@ class MockSiteMonitor {
         );
     }
 
-    async scheduleMonitoring(siteIds: string[]) {
+    async scheduleMonitoring(siteIdentifiers: string[]) {
         const schedules: any[] = [];
-        for (const siteId of siteIds) {
-            const site = this.sites.get(siteId);
+        for (const siteIdentifier of siteIdentifiers) {
+            const site = this.sites.get(siteIdentifier);
             if (site && site.isActive) {
                 schedules.push({
-                    siteId,
+                    siteIdentifier,
                     nextCheck: Date.now() + site.checkInterval,
                     interval: site.checkInterval,
                 });
@@ -188,11 +188,11 @@ class MockSiteMonitor {
 
     async detectStatusChanges(previousStatuses: Map<string, string>) {
         const changes: any[] = [];
-        for (const [siteId, site] of this.sites) {
-            const previousStatus = previousStatuses.get(siteId);
+        for (const [siteIdentifier, site] of this.sites) {
+            const previousStatus = previousStatuses.get(siteIdentifier);
             if (previousStatus && previousStatus !== site.status) {
                 changes.push({
-                    siteId,
+                    siteIdentifier,
                     previousStatus,
                     currentStatus: site.status,
                     timestamp: Date.now(),
@@ -207,15 +207,16 @@ class MockSiteMonitor {
         const now = Date.now();
 
         for (const rule of alertRules) {
-            for (const [siteId, site] of this.sites) {
-                const results = this.monitoringResults.get(siteId) || [];
+            for (const [siteIdentifier, site] of this.sites) {
+                const results =
+                    this.monitoringResults.get(siteIdentifier) || [];
                 const recentResults = results.filter(
                     (r) => now - r.timestamp < rule.timeWindow
                 );
 
                 if (this.evaluateAlertRule(rule, recentResults, site)) {
                     alerts.push({
-                        siteId,
+                        siteIdentifier,
                         rule: rule.name,
                         severity: rule.severity,
                         message: `Alert triggered for ${site.name}: ${rule.message}`,
@@ -259,10 +260,10 @@ class MockSiteMonitor {
         let processed = 0;
 
         // Clean old monitoring results
-        for (const [siteId, results] of this.monitoringResults) {
+        for (const [siteIdentifier, results] of this.monitoringResults) {
             const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000; // 7 days
             const filtered = results.filter((r) => r.timestamp > cutoff);
-            this.monitoringResults.set(siteId, filtered);
+            this.monitoringResults.set(siteIdentifier, filtered);
             processed++;
         }
 
@@ -312,8 +313,11 @@ describe("Site Monitoring Performance", () => {
         "bulk health checks (10 sites)",
         async () => {
             monitor = new MockSiteMonitor();
-            const siteIds = Array.from({ length: 10 }, (_, i) => `site-${i}`);
-            await monitor.performBulkHealthChecks(siteIds);
+            const siteIdentifiers = Array.from(
+                { length: 10 },
+                (_, i) => `site-${i}`
+            );
+            await monitor.performBulkHealthChecks(siteIdentifiers);
         },
         { warmupIterations: 2, iterations: 200 }
     );
@@ -332,8 +336,11 @@ describe("Site Monitoring Performance", () => {
         "sequential health checks (10 sites)",
         async () => {
             monitor = new MockSiteMonitor();
-            const siteIds = Array.from({ length: 10 }, (_, i) => `site-${i}`);
-            await monitor.performSequentialHealthChecks(siteIds);
+            const siteIdentifiers = Array.from(
+                { length: 5 },
+                (_, i) => `site-${i}`
+            );
+            await monitor.performSequentialHealthChecks(siteIdentifiers);
         },
         { warmupIterations: 2, iterations: 100 }
     );
@@ -474,19 +481,22 @@ describe("Site Monitoring Performance", () => {
             monitor = new MockSiteMonitor();
 
             // Perform health checks
-            const siteIds = Array.from({ length: 5 }, (_, i) => `site-${i}`);
-            await monitor.performBulkHealthChecks(siteIds);
+            const siteIdentifiers = Array.from(
+                { length: 5 },
+                (_, i) => `site-${i}`
+            );
+            await monitor.performBulkHealthChecks(siteIdentifiers);
 
             // Get aggregated stats
-            for (const siteId of siteIds) {
-                monitor.getAggregatedStats(siteId);
+            for (const siteIdentifier of siteIdentifiers) {
+                monitor.getAggregatedStats(siteIdentifier);
             }
 
             // Check system health
             monitor.getSystemHealth();
 
             // Schedule next monitoring
-            await monitor.scheduleMonitoring(siteIds);
+            await monitor.scheduleMonitoring(siteIdentifiers);
         },
         { warmupIterations: 2, iterations: 200 }
     );

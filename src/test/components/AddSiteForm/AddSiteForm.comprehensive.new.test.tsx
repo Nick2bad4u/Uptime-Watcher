@@ -339,6 +339,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setCheckInterval: mockSetCheckInterval,
                 setFormError: mockSetFormError,
                 setHost: mockSetHost,
+                setMonitorType: mockSetMonitorType,
                 setName: mockSetName,
                 setPort: mockSetPort,
                 setSelectedExistingSite: mockSetSelectedExistingSite,
@@ -349,6 +350,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should show site name field for new sites", ({
             task,
             annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -462,6 +464,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
         it("should show host and port fields for port monitor", ({
             task,
             annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.comprehensive.new", "component");
             annotate("Category: Component", "category");
@@ -588,7 +591,6 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
-
             const submitButton = screen.getByRole("button", {
                 name: /add site/i,
             });
@@ -653,7 +655,6 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
-
             expect(
                 screen.getByText("Site name is required")
             ).toBeInTheDocument();
@@ -675,8 +676,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // Check that all options are present in the select element
-            const monitorTypeSelect = screen.getByRole("combobox", {
-            });
+            const monitorTypeSelect = screen.getByRole("combobox", {});
             expect(monitorTypeSelect).toBeInTheDocument();
             // Check that all options are available
             expect(

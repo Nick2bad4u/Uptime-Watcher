@@ -572,14 +572,14 @@ class MockAnalyticsService {
 
     /** Calculates uptime percentage for the specified site. */
     async calculateUptime(
-        siteId: string,
+        siteIdentifier: string,
         timeRange: { start: Date; end: Date }
     ): Promise<number> {
         const query: AnalyticsQuery = {
-            metricNames: [`site.${siteId}.status`],
+            metricNames: [`site.${siteIdentifier}.status`],
             timeRange,
             aggregation: { type: "avg" },
-            filters: { siteId },
+            filters: { siteIdentifier },
         };
 
         const result = await this.executeQuery(query);
@@ -592,7 +592,7 @@ class MockAnalyticsService {
 
     /** Derives response time statistics for a monitored site. */
     async calculateResponseTimeStats(
-        siteId: string,
+        siteIdentifier: string,
         timeRange: { start: Date; end: Date }
     ): Promise<{
         avg: number;
@@ -601,7 +601,7 @@ class MockAnalyticsService {
         p95: number;
         p99: number;
     }> {
-        const metricName = `site.${siteId}.response_time`;
+        const metricName = `site.${siteIdentifier}.response_time`;
 
         const queries = [
             { type: "avg" as const },
@@ -617,7 +617,7 @@ class MockAnalyticsService {
                     metricNames: [metricName],
                     timeRange,
                     aggregation: agg,
-                    filters: { siteId },
+                    filters: { siteIdentifier },
                 })
             )
         );
@@ -778,7 +778,7 @@ function generateMetricData(
             value: Math.random() * 1000 + 100,
             timestamp,
             metadata: {
-                siteId: `site-${Math.floor(i / 10) + 1}`,
+                siteIdentifier: `site-${Math.floor(i / 10) + 1}`,
                 region:
                     i % 3 === 0
                         ? "us-east"
@@ -903,7 +903,7 @@ describe("Analytics Service Performance", () => {
                         interval: 600_000,
                     },
                     filters: { region: "us-east" },
-                    groupBy: ["siteId"],
+                    groupBy: ["siteIdentifier"],
                 };
 
                 service.executeQuery(query);
@@ -946,7 +946,7 @@ describe("Analytics Service Performance", () => {
                 name: "site.test-site.status",
                 value: Math.random() > 0.1 ? 1 : 0, // 90% uptime
                 timestamp: new Date(Date.now() - (60 - i) * 60 * 1000),
-                metadata: { siteId: "test-site" },
+                metadata: { siteIdentifier: "test-site" },
             }));
 
             service.recordBatchMetrics(statusMetrics).then(() => {
@@ -967,7 +967,7 @@ describe("Analytics Service Performance", () => {
                 name: "site.test-site.response_time",
                 value: Math.random() * 500 + 50, // 50-550ms
                 timestamp: new Date(Date.now() - (100 - i) * 30 * 1000), // Every 30 seconds
-                metadata: { siteId: "test-site" },
+                metadata: { siteIdentifier: "test-site" },
             }));
 
             service.recordBatchMetrics(responseTimeMetrics).then(() => {
@@ -1028,13 +1028,13 @@ describe("Analytics Service Performance", () => {
                     name: "response_time.avg",
                     value: 750, // Above threshold
                     timestamp: new Date(),
-                    metadata: { siteId: "site-1" },
+                    metadata: { siteIdentifier: "site-1" },
                 },
                 {
                     name: "uptime.percentage",
                     value: 92, // Below threshold
                     timestamp: new Date(),
-                    metadata: { siteId: "site-2" },
+                    metadata: { siteIdentifier: "site-2" },
                 },
             ];
 

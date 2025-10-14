@@ -68,8 +68,8 @@ class MockDatabase {
                 if (sql.includes("WHERE monitorId =")) {
                     return this.history.filter((h) => h.monitorId === 1);
                 }
-                if (sql.includes("WHERE siteId =")) {
-                    return this.history.filter((h) => h.siteId === 1);
+                if (sql.includes("WHERE site_identifier =")) {
+                    return this.history.filter((h) => h.siteIdentifier === 1);
                 }
                 return this.history;
             },
@@ -95,7 +95,7 @@ class MockHistoryRepository {
         const now = Date.now();
         for (let i = 0; i < 10_000; i++) {
             this.logEvent({
-                siteId: (i % 100) + 1,
+                siteIdentifier: (i % 100) + 1,
                 monitorId: (i % 1000) + 1,
                 eventType: [
                     "status_change",
@@ -125,11 +125,11 @@ class MockHistoryRepository {
 
     logEvent(event: any) {
         const stmt = this.db.prepare(`
-            INSERT INTO history (siteId, monitorId, eventType, status, message, metadata, timestamp)
+            INSERT INTO history (site_identifier, monitorId, eventType, status, message, metadata, timestamp)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `);
         return stmt.run(
-            event.siteId,
+            event.siteIdentifier,
             event.monitorId,
             event.eventType,
             event.status,
@@ -158,9 +158,9 @@ class MockHistoryRepository {
         return stmt.all();
     }
 
-    findBySite(siteId: number, limit: number = 100) {
+    findBySite(siteIdentifier: number, limit: number = 100) {
         const stmt = this.db.prepare(
-            "SELECT * FROM history WHERE siteId = ? ORDER BY timestamp DESC LIMIT ?"
+            "SELECT * FROM history WHERE site_identifier = ? ORDER BY timestamp DESC LIMIT ?"
         );
         return stmt.all();
     }
@@ -181,12 +181,12 @@ class MockHistoryRepository {
 
     bulkLogEvents(events: any[]) {
         const stmt = this.db.prepare(`
-            INSERT INTO history (siteId, monitorId, eventType, status, message, metadata, timestamp)
+            INSERT INTO history (site_identifier, monitorId, eventType, status, message, metadata, timestamp)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `);
         return events.map((event) =>
             stmt.run(
-                event.siteId,
+                event.siteIdentifier,
                 event.monitorId,
                 event.eventType,
                 event.status,
@@ -275,7 +275,7 @@ describe("History Repository Performance", () => {
         () => {
             repository = new MockHistoryRepository();
             repository.logEvent({
-                siteId: 1,
+                siteIdentifier: 1,
                 monitorId: 1,
                 eventType: "status_change",
                 status: "online",
@@ -358,7 +358,7 @@ describe("History Repository Performance", () => {
         () => {
             repository = new MockHistoryRepository();
             const events = Array.from({ length: 50 }, (_, i) => ({
-                siteId: (i % 10) + 1,
+                siteIdentifier: (i % 10) + 1,
                 monitorId: (i % 50) + 1,
                 eventType: "check_result",
                 status: Math.random() > 0.5 ? "online" : "offline",

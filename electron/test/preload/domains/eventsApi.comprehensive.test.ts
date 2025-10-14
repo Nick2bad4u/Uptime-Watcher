@@ -344,18 +344,16 @@ describe("Events Domain API", () => {
         it("should accept canonical payloads that include monitor and site context", () => {
             const callback = vi.fn();
             const canonicalPayload: MonitorStatusChangedEventData & {
-                monitor: Record<string, unknown>;
-                site: Record<string, unknown>;
+                monitor: Monitor & Record<string, unknown>;
+                site: Site & Record<string, unknown>;
             } = {
                 details: "Recovered",
-                monitor: createMonitorFixture() as unknown as Record<
-                    string,
-                    unknown
-                >,
+                monitor: createMonitorFixture() as Monitor &
+                    Record<string, unknown>,
                 monitorId: "monitor-123",
                 previousStatus: "down",
                 responseTime: 1200,
-                site: createSiteFixture() as unknown as Record<string, unknown>,
+                site: createSiteFixture() as Site & Record<string, unknown>,
                 siteIdentifier: "site-abc",
                 status: "up",
                 timestamp: new Date().toISOString(),
@@ -379,7 +377,7 @@ describe("Events Domain API", () => {
                 monitorId: "monitor-legacy",
                 newStatus: "down",
                 previousStatus: "up",
-                // Legacy events still use siteId; ensure we drop them.
+                // INTENTIONAL LEGACY: verify preload guard rejects legacy siteId payloads.
                 siteId: "site-legacy",
                 timestamp: Date.now(),
             };

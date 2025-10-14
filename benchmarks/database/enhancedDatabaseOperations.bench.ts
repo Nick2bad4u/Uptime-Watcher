@@ -46,7 +46,10 @@ describe("Enhanced Database Operations Benchmarks", () => {
         };
     }
 
-    function generateMonitor(siteId: string, monitorId: number): Monitor {
+    function generateMonitor(
+        siteIdentifier: string,
+        monitorId: number
+    ): Monitor {
         const types = [
             "http",
             "ping",
@@ -147,8 +150,8 @@ describe("Enhanced Database Operations Benchmarks", () => {
         bench(
             "Query monitors by site",
             async () => {
-                const siteId = "benchmark-site-0";
-                await monitorRepository.findBySiteIdentifier(siteId);
+                const siteIdentifier = "benchmark-site-0";
+                await monitorRepository.findBySiteIdentifier(siteIdentifier);
             },
             { iterations: 50 }
         );

@@ -12,7 +12,7 @@ import { bench, describe } from "vitest";
 
 // Define comprehensive interfaces for type safety
 interface MonitorResult {
-    siteId: string;
+    siteIdentifier: string;
     monitorId: string;
     type: string;
     status: string;
@@ -42,7 +42,7 @@ interface MonitorConfig {
 }
 
 interface BulkResult {
-    siteId: string;
+    siteIdentifier: string;
     monitorId: string;
     type: string;
     enabled: boolean;
@@ -53,7 +53,7 @@ interface BulkResult {
 }
 
 interface SiteOperation {
-    siteId: string;
+    siteIdentifier: string;
     monitors: number;
     operationTime: number;
     success: boolean;
@@ -88,7 +88,7 @@ describe("Monitoring Service Benchmarks", () => {
     bench("monitor execution simulation", () => {
         for (let i = 0; i < 1000; i++) {
             const monitorExecution = {
-                siteId: `site-${i}`,
+                siteIdentifier: `site-${i}`,
                 monitorId: `monitor-${i}`,
                 type: monitorTypes[
                     Math.floor(Math.random() * monitorTypes.length)
@@ -132,7 +132,7 @@ describe("Monitoring Service Benchmarks", () => {
                 );
 
                 const result: MonitorResult = {
-                    siteId: monitorExecution.siteId,
+                    siteIdentifier: monitorExecution.siteIdentifier,
                     monitorId: monitorExecution.monitorId,
                     type: monitorExecution.type,
                     status: statusTypes[
@@ -153,7 +153,7 @@ describe("Monitoring Service Benchmarks", () => {
     bench("monitor scheduling simulation", () => {
         interface ScheduleEntry {
             monitorId: string;
-            siteId: string;
+            siteIdentifier: string;
             type: string;
             interval: number;
             nextRun: number;
@@ -165,7 +165,7 @@ describe("Monitoring Service Benchmarks", () => {
             { length: 500 },
             (_, i) => ({
                 monitorId: `sched-monitor-${i}`,
-                siteId: `sched-site-${i % 100}`,
+                siteIdentifier: `sched-site-${i % 100}`,
                 type: monitorTypes[
                     Math.floor(Math.random() * monitorTypes.length)
                 ],
@@ -216,7 +216,7 @@ describe("Monitoring Service Benchmarks", () => {
     // Status tracking and aggregation
     bench("status tracking simulation", () => {
         interface StatusEvent {
-            siteId: string;
+            siteIdentifier: string;
             monitorId: string;
             previousStatus: string;
             currentStatus: string;
@@ -228,7 +228,7 @@ describe("Monitoring Service Benchmarks", () => {
         const statusEvents: StatusEvent[] = [];
 
         for (let i = 0; i < 800; i++) {
-            const siteId = `status-site-${i % 50}`;
+            const siteIdentifier = `status-site-${i % 50}`;
             const monitorId = `status-monitor-${i}`;
 
             // Generate status change event
@@ -254,7 +254,7 @@ describe("Monitoring Service Benchmarks", () => {
                 (previousStatus === "DOWN" && currentStatus === "UP");
 
             const statusEvent: StatusEvent = {
-                siteId,
+                siteIdentifier,
                 monitorId,
                 previousStatus,
                 currentStatus,
@@ -269,9 +269,9 @@ describe("Monitoring Service Benchmarks", () => {
             const aggregationTime = Math.random() * 3;
 
             const aggregation = {
-                siteId: statusEvent.siteId,
+                siteIdentifier: statusEvent.siteIdentifier,
                 totalEvents: statusEvents.filter(
-                    (e) => e.siteId === statusEvent.siteId
+                    (e) => e.siteIdentifier === statusEvent.siteIdentifier
                 ).length,
                 uptime: Math.random() * 100,
                 downtime: Math.random() * 10,
@@ -433,7 +433,7 @@ describe("Monitoring Service Benchmarks", () => {
                 bulkSize,
                 timestamp: Date.now(),
                 monitors: Array.from({ length: bulkSize }, (_, i) => ({
-                    siteId: `bulk-site-${i}`,
+                    siteIdentifier: `bulk-site-${i}`,
                     monitorId: `bulk-monitor-${i}`,
                     type: monitorTypes[
                         Math.floor(Math.random() * monitorTypes.length)
@@ -524,7 +524,7 @@ describe("Monitoring Service Benchmarks", () => {
 
             for (let j = 0; j < coordination.affectedSites; j++) {
                 const siteOperation = {
-                    siteId: `coord-site-${j}`,
+                    siteIdentifier: `coord-site-${j}`,
                     monitors: Math.floor(Math.random() * 5) + 1,
                 };
 
@@ -612,7 +612,7 @@ describe("Monitoring Service Benchmarks", () => {
                 // Simulate batch processing
                 for (let i = 0; i < monitorsInBatch; i++) {
                     const monitorExecution = {
-                        siteId: `vol-site-${Math.floor((batch * concurrencyLimit + i) / scenario.monitorsPerSite)}`,
+                        siteIdentifier: `vol-site-${Math.floor((batch * concurrencyLimit + i) / scenario.monitorsPerSite)}`,
                         monitorId: `vol-monitor-${batch * concurrencyLimit + i}`,
                         type: monitorTypes[
                             Math.floor(Math.random() * monitorTypes.length)
@@ -685,7 +685,7 @@ describe("Monitoring Service Benchmarks", () => {
 
         for (let i = 0; i < 300; i++) {
             const monitorAttempt = {
-                siteId: `error-site-${i % 30}`,
+                siteIdentifier: `error-site-${i % 30}`,
                 monitorId: `error-monitor-${i}`,
                 type: monitorTypes[
                     Math.floor(Math.random() * monitorTypes.length)

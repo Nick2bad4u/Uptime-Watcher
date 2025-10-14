@@ -94,8 +94,8 @@ interface CustomHookState extends HookState {
     complexity: number;
 }
 
-type EffectCleanup = undefined | (() => void);
-type EffectCallback = () => EffectCleanup;
+type EffectCleanup = (() => void) | undefined;
+type EffectCallback = () => EffectCleanup | undefined;
 
 /**
  * Enumerates supported hook types tracked by the benchmark.

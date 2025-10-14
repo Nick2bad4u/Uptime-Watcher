@@ -164,14 +164,14 @@ class MockIpcService {
         };
     }
 
-    handleDeleteSite(siteId: string): boolean {
+    handleDeleteSite(siteIdentifier: string): boolean {
         return true;
     }
 
-    handleGetMonitors(siteId: string): any[] {
+    handleGetMonitors(siteIdentifier: string): any[] {
         return Array.from({ length: 10 }, (_, i) => ({
             id: `monitor-${i}`,
-            siteId,
+            siteIdentifier,
             type: "http",
             interval: 60_000,
             status: "active",
@@ -295,7 +295,7 @@ describe("IPC Communication Performance", () => {
                 ipcService.handleGetHistory.bind(ipcService)
             );
             await ipcService.invoke("get-history", {
-                siteId: "site-1",
+                siteIdentifier: "site-1",
                 timeRange: 24 * 60 * 60 * 1000,
             });
         },

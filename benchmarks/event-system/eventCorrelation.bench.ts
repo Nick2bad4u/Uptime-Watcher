@@ -263,7 +263,7 @@ describe("Event Correlation Performance", () => {
                 type: "site.check.started",
                 correlationId: "corr-1",
                 timestamp: Date.now(),
-                payload: { siteId: "site-1" },
+                payload: { siteIdentifier: "site-1" },
                 metadata: {},
             };
             correlator.startCorrelation(rootEvent);
@@ -280,7 +280,7 @@ describe("Event Correlation Performance", () => {
                 type: "site.check.started",
                 correlationId: "corr-1",
                 timestamp: Date.now(),
-                payload: { siteId: "site-1" },
+                payload: { siteIdentifier: "site-1" },
                 metadata: {},
             };
             correlator.startCorrelation(rootEvent);
@@ -291,7 +291,7 @@ describe("Event Correlation Performance", () => {
                 correlationId: "corr-1",
                 causationId: "event-1",
                 timestamp: Date.now(),
-                payload: { siteId: "site-1", status: "online" },
+                payload: { siteIdentifier: "site-1", status: "online" },
                 metadata: {},
             };
             correlator.correlateEvent(correlatedEvent);

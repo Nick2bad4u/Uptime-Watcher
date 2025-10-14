@@ -32,7 +32,7 @@ interface DnsCheckRequest {
     retryAttempts: number;
     priority: "critical" | "high" | "normal" | "low";
     metadata: {
-        siteId: string;
+        siteIdentifier: string;
         siteName: string;
         tags: string[];
     };
@@ -335,7 +335,7 @@ function generateDnsCheckRequests(
                       ? "high"
                       : "normal",
             metadata: {
-                siteId: `site-${Math.floor(i / 10)}`,
+                siteIdentifier: `site-${Math.floor(i / 10)}`,
                 siteName: `Site ${Math.floor(i / 10)}`,
                 tags: [
                     "dns",
@@ -433,7 +433,7 @@ describe("DNS Monitoring Performance Benchmarks", () => {
                     retryAttempts: 3,
                     priority: "critical",
                     metadata: {
-                        siteId: "site-1",
+                        siteIdentifier: "site-1",
                         siteName: "Site 1",
                         tags: ["timeout"],
                     },

@@ -408,7 +408,7 @@ describe("StatusUpdateHandler", () => {
                 monitorId: "legacy-monitor",
                 newStatus: "down",
                 previousStatus: "up",
-                // Intentionally using legacy siteId to ensure the guard rejects legacy payloads.
+                // INTENTIONAL LEGACY: ensure guard rejects legacy siteId payloads.
                 siteId: "legacy-site",
                 timestamp: Date.now(),
             };

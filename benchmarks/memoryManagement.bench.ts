@@ -244,14 +244,14 @@ function generateHistoryEntry(): HistoryEntry {
 /**
  * Generates synthetic monitor data with randomized configuration and history.
  *
- * @param siteId - Identifier of the site the monitor belongs to.
+ * @param siteIdentifier - Identifier of the site the monitor belongs to.
  * @param monitorIndex - Index used to diversify generated values.
  * @param historySize - Number of history entries to produce for the monitor.
  *
  * @returns Synthetic {@link MonitorData} instance.
  */
 function generateMonitorData(
-    siteId: string,
+    siteIdentifier: string,
     monitorIndex: number,
     historySize: number
 ): MonitorData {
@@ -261,8 +261,12 @@ function generateMonitorData(
     }
 
     return {
-        id: `${siteId}-monitor-${monitorIndex}`,
-        type: ["http", "ping", "port"][monitorIndex % 3],
+        id: `${siteIdentifier}-monitor-${monitorIndex}`,
+        type: [
+            "http",
+            "ping",
+            "port",
+        ][monitorIndex % 3],
         url:
             monitorIndex % 3 === 0
                 ? `https://example${monitorIndex}.com`
@@ -299,12 +303,12 @@ function generateSiteData(
     monitorCount: number,
     historySize: number
 ): SiteData {
-    const siteId = `site-${siteIndex}`;
+    const siteIdentifier = `site-${siteIndex}`;
     const monitors: MonitorData[] = [];
     const history: HistoryEntry[] = [];
 
     for (let i = 0; i < monitorCount; i++) {
-        monitors.push(generateMonitorData(siteId, i, historySize));
+        monitors.push(generateMonitorData(siteIdentifier, i, historySize));
     }
 
     for (let i = 0; i < historySize * 2; i++) {
@@ -312,7 +316,7 @@ function generateSiteData(
     }
 
     return {
-        identifier: siteId,
+        identifier: siteIdentifier,
         name: `Site ${siteIndex}`,
         monitors,
         history,
@@ -483,7 +487,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
                     );
 
                     return {
-                        siteId: site.identifier,
+                        siteIdentifier: site.identifier,
                         stats: uptimeStats,
                         processedAt: Date.now(),
                     };
@@ -616,7 +620,7 @@ describe("Memory Usage and Cache Performance Benchmarks", () => {
 
                     // Derived data in secondary cache
                     const derivedData = {
-                        siteId: siteData.identifier,
+                        siteIdentifier: siteData.identifier,
                         summary: {
                             monitorCount: siteData.monitors.length,
                             historyCount: siteData.history.length,

@@ -22,7 +22,7 @@ interface SiteCheckRequest {
 }
 
 interface CheckMetadata {
-    siteId: string;
+    siteIdentifier: string;
     siteName: string;
     tags: string[];
     category: string;
@@ -1150,7 +1150,7 @@ describe("Site Checking Algorithms Performance", () => {
                 checkType: "http",
                 priority: "normal",
                 metadata: {
-                    siteId: `site-${index}`,
+                    siteIdentifier: `site-${index}`,
                     siteName: `Site ${index}`,
                     tags: [`tag${index % 5}`],
                     category: "web",
@@ -1214,7 +1214,7 @@ describe("Site Checking Algorithms Performance", () => {
                 checkType: "http",
                 priority: index % 4 === 0 ? "high" : "normal",
                 metadata: {
-                    siteId: `batch-site-${index}`,
+                    siteIdentifier: `batch-site-${index}`,
                     siteName: `Batch Site ${index}`,
                     tags: [
                         `batch`,
@@ -1278,7 +1278,7 @@ describe("Site Checking Algorithms Performance", () => {
                 checkType: "performance",
                 priority: index % 3 === 0 ? "high" : "normal",
                 metadata: {
-                    siteId: `retry-site-${index}`,
+                    siteIdentifier: `retry-site-${index}`,
                     siteName: `Retry Site ${index}`,
                     tags: [`retry`, `performance`],
                     category: "monitoring",
@@ -1347,7 +1347,7 @@ describe("Site Checking Algorithms Performance", () => {
                     checkType: "http",
                     priority: "normal",
                     metadata: {
-                        siteId: `${domain}-${i}`,
+                        siteIdentifier: `${domain}-${i}`,
                         siteName: `${domain} Page ${i}`,
                         tags: [`optimized`, domain.split(".")[0]],
                         category: "web",
@@ -1409,7 +1409,7 @@ describe("Site Checking Algorithms Performance", () => {
                 priority:
                     index < 5 ? "critical" : index < 15 ? "high" : "normal",
                 metadata: {
-                    siteId: `monitor-service-${index}`,
+                    siteIdentifier: `monitor-service-${index}`,
                     siteName: `Monitor Service ${index}`,
                     tags: [
                         `monitoring`,
@@ -1469,7 +1469,7 @@ describe("Site Checking Algorithms Performance", () => {
                 checkType: "ssl",
                 priority: "normal",
                 metadata: {
-                    siteId: `ssl-site-${index}`,
+                    siteIdentifier: `ssl-site-${index}`,
                     siteName: `SSL Site ${index}`,
                     tags: [
                         `ssl`,
@@ -1554,7 +1554,7 @@ describe("Site Checking Algorithms Performance", () => {
                     checkType: "performance",
                     priority,
                     metadata: {
-                        siteId: `${priority}-${index}`,
+                        siteIdentifier: `${priority}-${index}`,
                         siteName: `${priority.charAt(0).toUpperCase() + priority.slice(1)} Site ${index}`,
                         tags: [
                             priority,
@@ -1656,7 +1656,7 @@ describe("Site Checking Algorithms Performance", () => {
                     checkType: "performance",
                     priority: "normal",
                     metadata: {
-                        siteId: `analysis-${checkerId}-${index}`,
+                        siteIdentifier: `analysis-${checkerId}-${index}`,
                         siteName: `Analysis Site ${index}`,
                         tags: [
                             `analysis`,

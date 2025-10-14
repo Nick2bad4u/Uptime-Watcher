@@ -235,9 +235,9 @@ class MockEventProjector {
     }
 
     private projectSiteCreated(event: SiteCreatedEvent): void {
-        const siteId = event.aggregateId;
-        this.projections.set(`site:${siteId}`, {
-            id: siteId,
+        const siteIdentifier = event.aggregateId;
+        this.projections.set(`site:${siteIdentifier}`, {
+            id: siteIdentifier,
             name: event.payload.name,
             url: event.payload.url,
             status: "unknown",
@@ -247,8 +247,8 @@ class MockEventProjector {
     }
 
     private projectSiteStatusChanged(event: SiteStatusChangedEvent): void {
-        const siteId = event.aggregateId;
-        const projection = this.projections.get(`site:${siteId}`);
+        const siteIdentifier = event.aggregateId;
+        const projection = this.projections.get(`site:${siteIdentifier}`);
         if (projection) {
             projection.status = event.payload.newStatus;
             projection.lastUpdated = event.timestamp;

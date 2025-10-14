@@ -65,27 +65,31 @@ class MockMonitorScheduler {
     private intervals = new Map<string, NodeJS.Timeout>();
     private activeMonitors = new Set<string>();
     private checkCallback?: (
-        siteId: string,
+        siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
 
     setCheckCallback(
-        callback: (siteId: string, monitorId: string) => Promise<void>
+        callback: (siteIdentifier: string, monitorId: string) => Promise<void>
     ): void {
         this.checkCallback = callback;
     }
 
-    startMonitor(siteId: string, monitorId: string, interval: number): void {
-        const key = `${siteId}:${monitorId}`;
+    startMonitor(
+        siteIdentifier: string,
+        monitorId: string,
+        interval: number
+    ): void {
+        const key = `${siteIdentifier}:${monitorId}`;
 
         if (this.intervals.has(key)) {
-            this.stopMonitor(siteId, monitorId);
+            this.stopMonitor(siteIdentifier, monitorId);
         }
 
         const timeoutId = setInterval(async () => {
             if (this.checkCallback) {
                 try {
-                    await this.checkCallback(siteId, monitorId);
+                    await this.checkCallback(siteIdentifier, monitorId);
                 } catch {
                     // Handle error
                 }
@@ -96,8 +100,8 @@ class MockMonitorScheduler {
         this.activeMonitors.add(key);
     }
 
-    stopMonitor(siteId: string, monitorId: string): void {
-        const key = `${siteId}:${monitorId}`;
+    stopMonitor(siteIdentifier: string, monitorId: string): void {
+        const key = `${siteIdentifier}:${monitorId}`;
         const interval = this.intervals.get(key);
 
         if (interval) {
@@ -274,7 +278,7 @@ describe("Monitoring System Performance Benchmarks", () => {
         const scheduler = new MockMonitorScheduler();
         let checkCallCount = 0;
 
-        scheduler.setCheckCallback(async (siteId, monitorId) => {
+        scheduler.setCheckCallback(async (siteIdentifier, monitorId) => {
             checkCallCount++;
             await simulateMonitorCheck();
         });
@@ -322,8 +326,8 @@ describe("Monitoring System Performance Benchmarks", () => {
 
             // Perform many lookups
             for (let i = 0; i < 10_000; i++) {
-                const siteId = `site-${i % 1000}`;
-                cache.get(siteId);
+                const siteIdentifier = `site-${i % 1000}`;
+                cache.get(siteIdentifier);
             }
         });
 
@@ -352,7 +356,7 @@ describe("Monitoring System Performance Benchmarks", () => {
             cache.set(site.identifier, site);
         }
 
-        scheduler.setCheckCallback(async (siteId, monitorId) => {
+        scheduler.setCheckCallback(async (siteIdentifier, monitorId) => {
             const operationId = registry.initiateCheck(monitorId);
             try {
                 await simulateMonitorCheck();

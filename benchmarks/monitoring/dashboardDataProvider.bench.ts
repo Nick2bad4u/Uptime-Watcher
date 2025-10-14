@@ -40,7 +40,7 @@ class MockDashboardDataProvider {
 
         this.monitors = Array.from({ length: 300 }, (_, i) => ({
             id: `monitor-${i}`,
-            siteId: `site-${i % 100}`,
+            siteIdentifier: `site-${i % 100}`,
             type: [
                 "http",
                 "ping",
@@ -81,7 +81,8 @@ class MockDashboardDataProvider {
     getSiteStatuses(): any[] {
         return this.sites.map((site) => ({
             ...site,
-            monitors: this.monitors.filter((m) => m.siteId === site.id).length,
+            monitors: this.monitors.filter((m) => m.siteIdentifier === site.id)
+                .length,
         }));
     }
 
@@ -102,11 +103,13 @@ class MockDashboardDataProvider {
     }
 
     getUptimeData(
-        siteId: string,
+        siteIdentifier: string,
         period: number = 7 * 24 * 60 * 60 * 1000
     ): any {
         const cutoff = Date.now() - period;
-        const siteMonitors = this.monitors.filter((m) => m.siteId === siteId);
+        const siteMonitors = this.monitors.filter(
+            (m) => m.siteIdentifier === siteIdentifier
+        );
         const relevantHistory = this.history.filter(
             (h) =>
                 siteMonitors.some((m) => m.id === h.monitorId) &&
@@ -117,14 +120,18 @@ class MockDashboardDataProvider {
             (relevantHistory.filter((h) => h.status === "online").length /
                 relevantHistory.length) *
             100;
-        return { siteId, uptime, dataPoints: relevantHistory.length };
+        return {
+            siteIdentifier,
+            uptime,
+            dataPoints: relevantHistory.length,
+        };
     }
 
     getAlertsData(): any[] {
         return this.sites
             .filter((s) => s.status === "offline")
             .map((s) => ({
-                siteId: s.id,
+                siteIdentifier: s.id,
                 siteName: s.name,
                 status: s.status,
                 duration: Date.now() - s.lastChecked,

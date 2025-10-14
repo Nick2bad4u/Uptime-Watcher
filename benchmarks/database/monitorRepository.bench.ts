@@ -81,7 +81,7 @@ class MockMonitorRepository {
         // Seed with test data
         for (let i = 0; i < 1000; i++) {
             this.create({
-                siteId: (i % 100) + 1,
+                siteIdentifier: (i % 100) + 1,
                 type: [
                     "http",
                     "ping",
@@ -106,11 +106,11 @@ class MockMonitorRepository {
 
     create(monitor: any) {
         const stmt = this.db.prepare(`
-            INSERT INTO monitors (siteId, type, name, isEnabled, interval, timeout, retries, configuration)
+            INSERT INTO monitors (site_identifier, type, name, isEnabled, interval, timeout, retries, configuration)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `);
         return stmt.run(
-            monitor.siteId,
+            monitor.siteIdentifier,
             monitor.type,
             monitor.name,
             monitor.isEnabled,
@@ -126,8 +126,10 @@ class MockMonitorRepository {
         return stmt.get(id);
     }
 
-    findBySiteId(siteId: number) {
-        const stmt = this.db.prepare("SELECT * FROM monitors WHERE siteId = ?");
+    findBySiteIdentifier(siteIdentifier: number) {
+        const stmt = this.db.prepare(
+            "SELECT * FROM monitors WHERE site_identifier = ?"
+        );
         return stmt.all();
     }
 
@@ -172,9 +174,11 @@ class MockMonitorRepository {
         return stmt.run(id);
     }
 
-    deleteBySiteId(siteId: number) {
-        const stmt = this.db.prepare("DELETE FROM monitors WHERE siteId = ?");
-        return stmt.run(siteId);
+    deleteBySiteIdentifier(siteIdentifier: number) {
+        const stmt = this.db.prepare(
+            "DELETE FROM monitors WHERE site_identifier = ?"
+        );
+        return stmt.run(siteIdentifier);
     }
 
     bulkUpdateStatus(
@@ -218,7 +222,7 @@ describe("Monitor Repository Performance", () => {
         () => {
             repository = new MockMonitorRepository();
             repository.create({
-                siteId: 1,
+                siteIdentifier: 1,
                 type: "http",
                 name: "Test Monitor",
                 isEnabled: true,
@@ -247,7 +251,9 @@ describe("Monitor Repository Performance", () => {
         "find monitors by site id",
         () => {
             repository = new MockMonitorRepository();
-            repository.findBySiteId(Math.floor(Math.random() * 100) + 1);
+            repository.findBySiteIdentifier(
+                Math.floor(Math.random() * 100) + 1
+            );
         },
         { warmupIterations: 5, iterations: 1000 }
     );
@@ -336,8 +342,8 @@ describe("Monitor Repository Performance", () => {
         "delete monitors by site id",
         () => {
             repository = new MockMonitorRepository();
-            const siteId = Math.floor(Math.random() * 100) + 1;
-            repository.deleteBySiteId(siteId);
+            const siteIdentifier = Math.floor(Math.random() * 100) + 1;
+            repository.deleteBySiteIdentifier(siteIdentifier);
         },
         { warmupIterations: 5, iterations: 500 }
     );
