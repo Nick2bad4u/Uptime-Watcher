@@ -118,7 +118,7 @@ Event contracts are defined in `@shared/types/events.ts` to ensure type safety b
 // State synchronization
 interface StateSyncEventData extends BaseEventData {
  action: "bulk-sync" | "create" | "delete" | "update";
- siteId?: string;
+ siteIdentifier?: string;
  sites?: Site[];
  source: "backend" | "cache" | "manual";
 }
@@ -133,14 +133,14 @@ interface CacheInvalidatedEventData extends BaseEventData {
 // Monitor status changes
 interface MonitorUpEventData extends BaseEventData {
  monitorId: string;
- siteId: string;
+ siteIdentifier: string;
  responseTime: number;
  statusCode: number;
 }
 
 interface MonitorDownEventData extends BaseEventData {
  monitorId: string;
- siteId: string;
+ siteIdentifier: string;
  error: string;
  statusCode?: number;
 }
@@ -205,13 +205,13 @@ cleanupFunctions.push(
     console.log(`Bulk sync: ${data.sites?.length} sites`);
     break;
    case "create":
-    console.log(`Site created: ${data.siteId}`);
+    console.log(`Site created: ${data.siteIdentifier}`);
     break;
    case "update":
-    console.log(`Site updated: ${data.siteId}`);
+    console.log(`Site updated: ${data.siteIdentifier}`);
     break;
    case "delete":
-    console.log(`Site deleted: ${data.siteId}`);
+    console.log(`Site deleted: ${data.siteIdentifier}`);
     break;
   }
  })
@@ -303,18 +303,18 @@ export const initializeEventListeners = async (): Promise<() => void> => {
      }
      break;
     case "create":
-     if (data.siteId && data.sites?.[0]) {
+     if (data.siteIdentifier && data.sites?.[0]) {
       sites.addSite(data.sites[0]);
      }
      break;
     case "update":
-     if (data.siteId && data.sites?.[0]) {
-      sites.updateSite(data.siteId, data.sites[0]);
+     if (data.siteIdentifier && data.sites?.[0]) {
+      sites.updateSite(data.siteIdentifier, data.sites[0]);
      }
      break;
     case "delete":
-     if (data.siteId) {
-      sites.removeSite(data.siteId);
+     if (data.siteIdentifier) {
+      sites.removeSite(data.siteIdentifier);
      }
      break;
    }
@@ -454,7 +454,7 @@ Design event payloads to be self-contained:
 ```typescript
 // ✅ Good: Self-contained event data
 interface SiteUpdatedEventData {
- siteId: string;
+ siteIdentifier: string;
  changes: Partial<Site>;
  updatedBy: string;
  timestamp: number;
@@ -479,13 +479,13 @@ eventBus.onTyped("site:updated", async (data) => {
  } catch (error) {
   logger.error("Failed to process site update", {
    correlationId: data._meta.correlationId,
-   siteId: data.siteId,
+   siteIdentifier: data.siteIdentifier,
    error: ensureError(error),
   });
 
   // Emit error event for monitoring
   await eventBus.emitTyped("site:update-failed", {
-   siteId: data.siteId,
+   siteIdentifier: data.siteIdentifier,
    originalCorrelationId: data._meta.correlationId,
    error: ensureError(error).message,
    timestamp: Date.now(),

@@ -60,18 +60,18 @@ describe("CacheKeys - Property-Based Tests", () => {
         );
 
         test.prop({
-            siteId: fc.string({ minLength: 1, maxLength: 50 }),
+            siteIdentifier: fc.string({ minLength: 1, maxLength: 50 }),
         })("should generate site-scoped monitor keys", (props) => {
-            const key = CacheKeys.monitor.bySite(props.siteId);
+            const key = CacheKeys.monitor.bySite(props.siteIdentifier);
 
             // Should start with monitor prefix
             expect(key).toMatch(/^monitor:site:/);
 
             // Should contain the site id
-            expect(key).toContain(props.siteId);
+            expect(key).toContain(props.siteIdentifier);
 
             // Should follow the expected pattern
-            expect(key).toBe(`monitor:site:${props.siteId}`);
+            expect(key).toBe(`monitor:site:${props.siteIdentifier}`);
         });
     });
 

@@ -415,10 +415,10 @@ describe("logTemplates function coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const template =
-                "Monitor {monitorId} on site {siteId} returned status {status} in {responseTime}ms";
+                "Monitor {monitorId} on site {siteIdentifier} returned status {status} in {responseTime}ms";
             const data = {
                 monitorId: "mon-123",
-                siteId: "site-456",
+                siteIdentifier: "site-456",
                 status: 200,
                 responseTime: 145,
             };

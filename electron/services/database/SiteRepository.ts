@@ -32,7 +32,7 @@
  * const sites = await siteRepo.getAllSites();
  *
  * // Update site
- * await siteRepo.updateSite(siteId, { name: "Updated Name" });
+ * await siteRepo.updateSite(siteIdentifier, { name: "Updated Name" });
  * ```
  *
  * @example Transaction usage:

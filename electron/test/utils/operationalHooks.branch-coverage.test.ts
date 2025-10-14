@@ -546,7 +546,7 @@ describe("operationalHooks.ts - Branch Coverage", () => {
             await annotate("Type: Business Logic", "type");
 
             const mockOperation = vi.fn().mockResolvedValue({ success: true });
-            const context = { siteId: "123", userId: "456" };
+            const context = { siteIdentifier: "123", userId: "456" };
 
             const result = await operationalHooks.withDatabaseOperation(
                 mockOperation,

@@ -27,7 +27,7 @@ interface BaseEvent {
 interface SiteStatusChangedEvent extends BaseEvent {
     type: "site-status-changed";
     payload: {
-        siteId: string;
+        siteIdentifier: string;
         previousStatus: "up" | "down" | "degraded";
         currentStatus: "up" | "down" | "degraded";
         responseTime: number;
@@ -36,13 +36,14 @@ interface SiteStatusChangedEvent extends BaseEvent {
 }
 
 /**
- * Represents monitor check completed event data in the event processing benchmark.
+ * Represents monitor check completed event data in the event processing
+ * benchmark.
  */
 interface MonitorCheckCompletedEvent extends BaseEvent {
     type: "monitor-check-completed";
     payload: {
         monitorId: string;
-        siteId: string;
+        siteIdentifier: string;
         status: "up" | "down" | "degraded";
         responseTime: number;
         details?: string;
@@ -493,7 +494,8 @@ function generateSiteStatusEvents(
     ] as const;
 
     for (let i = 0; i < count; i++) {
-        const siteId = siteIds[Math.floor(Math.random() * siteIds.length)];
+        const siteIdentifier =
+            siteIds[Math.floor(Math.random() * siteIds.length)];
         const currentStatus =
             statuses[Math.floor(Math.random() * statuses.length)];
         const previousStatus =
@@ -507,11 +509,13 @@ function generateSiteStatusEvents(
             correlationId:
                 Math.random() > 0.7 ? `corr-${Math.floor(i / 5)}` : undefined,
             payload: {
-                siteId,
+                siteIdentifier,
                 previousStatus,
                 currentStatus,
                 responseTime: Math.random() * 2000,
-                monitorId: `${siteId}-monitor-${Math.floor(Math.random() * 5)}`,
+                monitorId: `${siteIdentifier}-monitor-${Math.floor(
+                    Math.random() * 5
+                )}`,
             },
         });
     }
@@ -534,7 +538,8 @@ function generateMonitorCheckEvents(
     ] as const;
 
     for (let i = 0; i < count; i++) {
-        const siteId = siteIds[Math.floor(Math.random() * siteIds.length)];
+        const siteIdentifier =
+            siteIds[Math.floor(Math.random() * siteIds.length)];
         const status = statuses[Math.floor(Math.random() * statuses.length)];
 
         events.push({
@@ -547,8 +552,10 @@ function generateMonitorCheckEvents(
                     ? `check-corr-${Math.floor(i / 3)}`
                     : undefined,
             payload: {
-                monitorId: `${siteId}-monitor-${Math.floor(Math.random() * 10)}`,
-                siteId,
+                monitorId: `${siteIdentifier}-monitor-${Math.floor(
+                    Math.random() * 10
+                )}`,
+                siteIdentifier,
                 status,
                 responseTime: status === "down" ? 0 : Math.random() * 1500,
                 details: status === "down" ? "Connection timeout" : undefined,

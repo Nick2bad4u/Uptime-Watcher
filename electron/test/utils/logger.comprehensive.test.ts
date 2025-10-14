@@ -187,7 +187,7 @@ describe("Logger Utilities", () => {
                 ).not.toThrow();
                 expect(() =>
                     monitorLogger.info("Monitor check started", {
-                        siteId: "abc123",
+                        siteIdentifier: "abc123",
                     })
                 ).not.toThrow();
                 expect(() =>
@@ -368,7 +368,7 @@ describe("Logger Utilities", () => {
 
                 expect(() => {
                     monitorLogger.info("Starting monitor check", {
-                        siteId: "site_123",
+                        siteIdentifier: "site_123",
                         url: "https://example.com",
                     });
                     monitorLogger.debug("HTTP request sent", {
@@ -376,7 +376,7 @@ describe("Logger Utilities", () => {
                         timeout: 30_000,
                     });
                     monitorLogger.info("Monitor check completed", {
-                        siteId: "site_123",
+                        siteIdentifier: "site_123",
                         status: "up",
                         responseTime: 234,
                     });

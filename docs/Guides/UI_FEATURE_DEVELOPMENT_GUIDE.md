@@ -1000,7 +1000,7 @@ onClick={(event) => {
 sites[0].name = "New Name";
 
 // Right
-updateSiteName(siteId, "New Name");
+updateSiteName(siteIdentifier, "New Name");
 ```
 
 ### 3. Prop Drilling
@@ -1091,19 +1091,19 @@ export const useMonitorEventIntegration = () => {
      // Monitor status change events
      const statusCleanup = await EventsService.onMonitorStatusChanged(
       (data) => {
-       sitesStore.updateMonitorStatus(data.siteId, data.monitor);
+       sitesStore.updateMonitorStatus(data.siteIdentifier, data.monitor);
       }
      );
      cleanupFunctions.push(statusCleanup);
 
      // Monitor up/down events
      const upCleanup = await EventsService.onMonitorUp((data) => {
-      sitesStore.handleMonitorUp(data.siteId, data.monitorId);
+      sitesStore.handleMonitorUp(data.siteIdentifier, data.monitorId);
      });
      cleanupFunctions.push(upCleanup);
 
      const downCleanup = await EventsService.onMonitorDown((data) => {
-      sitesStore.handleMonitorDown(data.siteId, data.monitorId);
+      sitesStore.handleMonitorDown(data.siteIdentifier, data.monitorId);
      });
      cleanupFunctions.push(downCleanup);
 

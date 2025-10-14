@@ -33,10 +33,10 @@
  * });
  *
  * // Start monitoring for a site
- * const monitor = await monitorManager.startMonitoring(siteId);
+ * const monitor = await monitorManager.startMonitoring(siteIdentifier);
  *
  * // Check status manually
- * const status = await monitorManager.checkSiteStatus(siteId);
+ * const status = await monitorManager.checkSiteStatus(siteIdentifier);
  * ```
  *
  * @example Event-driven monitoring:
@@ -44,11 +44,11 @@
  * ```typescript
  * // Listen for status updates
  * eventBus.onTyped("monitor:statusUpdated", (data) => {
- *     console.log(`Site ${data.siteId} status: ${data.status}`);
+ *     console.log(`Site ${data.siteIdentifier} status: ${data.status}`);
  * });
  *
  * // Monitor will emit events automatically
- * await monitorManager.startMonitoring(siteId);
+ * await monitorManager.startMonitoring(siteIdentifier);
  * ```
  *
  * @packageDocumentation

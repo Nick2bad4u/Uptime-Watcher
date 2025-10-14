@@ -18,8 +18,8 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Error Handling", "type");
 
-            const template = "Site {siteId} failed with error {error}";
-            const variables = { siteId: "example.com", error: "404" };
+            const template = "Site {siteIdentifier} failed with error {error}";
+            const variables = { siteIdentifier: "example.com", error: "404" };
 
             const result = formatErrorMessage(template, variables);
 
@@ -35,12 +35,15 @@ describe("errorCatalog utilities", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const template = "Monitor {monitorId} on site {siteId} failed";
-            const variables = { monitorId: "mon-123" }; // Missing siteId
+            const template =
+                "Monitor {monitorId} on site {siteIdentifier} failed";
+            const variables = { monitorId: "mon-123" }; // Missing siteIdentifier
 
             const result = formatErrorMessage(template, variables);
 
-            expect(result).toBe("Monitor mon-123 on site {siteId} failed");
+            expect(result).toBe(
+                "Monitor mon-123 on site {siteIdentifier} failed"
+            );
         });
 
         it("should handle template without placeholders", async ({

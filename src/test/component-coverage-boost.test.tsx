@@ -127,14 +127,15 @@ describe("Component Coverage Boost", () => {
             // Test SiteDetails.tsx functionality (lines 88-389)
             interface SiteDetailsState {
                 currentTab: string;
-                siteId: string;
+                siteIdentifier: string;
                 data: any;
                 loading: boolean;
                 error: string | null;
             }
 
             const siteDetailsLogic = {
-                getTabKey: (tab: string, siteId: string) => `${tab}-${siteId}`,
+                getTabKey: (tab: string, siteIdentifier: string) =>
+                    `${tab}-${siteIdentifier}`,
                 isValidTab: (tab: string) =>
                     [
                         "overview",
@@ -159,7 +160,7 @@ describe("Component Coverage Boost", () => {
 
             const initialState: SiteDetailsState = {
                 currentTab: "overview",
-                siteId: "123",
+                siteIdentifier: "123",
                 data: null,
                 loading: false,
                 error: null,
@@ -262,7 +263,7 @@ describe("Component Coverage Boost", () => {
 
             const navigationLogic = {
                 getNavigationItems: (
-                    _siteId: string,
+                    _siteIdentifier: string,
                     hasData: boolean
                 ): NavigationItem[] => [
                     { key: "overview", label: "Overview", icon: "📊" },

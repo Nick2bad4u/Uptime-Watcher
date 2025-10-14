@@ -270,7 +270,7 @@ describe("DataService", () => {
                 })),
                 monitors: Array.from({ length: 5000 }, (_, i) => ({
                     id: i,
-                    siteId: i % 1000,
+                    siteIdentifier: i % 1000,
                 })),
                 settings: { theme: "dark", notifications: true },
             });
@@ -356,8 +356,18 @@ describe("DataService", () => {
                     { id: "2", name: "Site 2", url: "https://test.com" },
                 ],
                 monitors: [
-                    { id: "1", siteId: "1", type: "http", interval: 300 },
-                    { id: "2", siteId: "2", type: "ping", interval: 60 },
+                    {
+                        id: "1",
+                        siteIdentifier: "1",
+                        type: "http",
+                        interval: 300,
+                    },
+                    {
+                        id: "2",
+                        siteIdentifier: "2",
+                        type: "ping",
+                        interval: 60,
+                    },
                 ],
                 settings: {
                     theme: "light",

@@ -941,7 +941,7 @@ function createSiteDownNotification(siteData: any): NotificationRequest {
             error: siteData.error || "Connection timeout",
         },
         priority: "high",
-        metadata: { siteId: siteData.id },
+        metadata: { siteIdentifier: siteData.id },
     };
 }
 
@@ -957,7 +957,7 @@ function createMaintenanceNotification(siteData: any): NotificationRequest {
         },
         priority: "normal",
         scheduledAt: new Date(Date.now() + 1_800_000), // 30 minutes from now
-        metadata: { type: "maintenance", siteId: siteData.id },
+        metadata: { type: "maintenance", siteIdentifier: siteData.id },
     };
 }
 

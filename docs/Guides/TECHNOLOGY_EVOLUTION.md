@@ -1,16 +1,16 @@
-# 🔄 Technology Evolution Guide
+## 🔄 Technology Evolution Guide
 
 > **Migration History**: Understanding how Uptime Watcher evolved to its current sophisticated architecture.
 
-## 📋 Overview
+### 📋 Overview
 
 Uptime Watcher has undergone significant architectural evolution to become the robust, enterprise-grade monitoring application it is today. This document explains the technology migrations, their rationale, and current state.
 
 ## 🏗️ Architectural Evolution Timeline
 
-### Phase 1: Initial Prototype (Early Development)
+#### Phase 1: Initial Prototype (Early Development)
 
-**Simple Monitoring Application**
+##### **Simple Monitoring Application**
 
 ```yaml
 Frontend: Basic React + JavaScript
@@ -27,9 +27,9 @@ Architecture: Monolithic renderer process
 - Minimal error handling
 - Basic monitoring capabilities
 
-### Phase 2: Structured Application (Mid Development)
+#### Phase 2: Structured Application (Mid Development)
 
-**Introduction of TypeScript and Basic Architecture**
+##### **Introduction of TypeScript and Basic Architecture**
 
 ```yaml
 Frontend: React + TypeScript
@@ -46,9 +46,9 @@ Architecture: Separated concerns
 - ✅ Structured database approach with LowDB
 - ✅ Better error handling
 
-### Phase 3: Current Architecture (Present)
+#### Phase 3: Current Architecture (Present)
 
-**Enterprise-Grade Service-Oriented Architecture**
+##### **Enterprise-Grade Service-Oriented Architecture**
 
 ```yaml
 Frontend: React + TypeScript + Tailwind CSS + Vite
@@ -74,11 +74,11 @@ Error Handling: Centralized error store with withErrorHandling utility
 - 🛡️ **Robust error handling**: Centralized error management with domain isolation
 - 🔄 **Modular state management**: Zustand composition pattern for complex stores
 
-## 🗃️ Database Migration: LowDB → SQLite
+### 🗃️ Database Migration: LowDB → SQLite
 
-### Why the Migration?
+#### Why the Migration?
 
-#### LowDB Limitations
+##### LowDB Limitations
 
 - **Performance**: JSON file operations became slow with large datasets
 - **Concurrency**: No transaction support, prone to corruption
@@ -86,7 +86,7 @@ Error Handling: Centralized error store with withErrorHandling utility
 - **Features**: Limited querying capabilities
 - **Reliability**: No ACID compliance
 
-#### SQLite Benefits
+##### SQLite Benefits
 
 - **Performance**: Efficient indexing and querying
 - **ACID Compliance**: Transactional integrity
@@ -95,9 +95,9 @@ Error Handling: Centralized error store with withErrorHandling utility
 - **Feature Rich**: Advanced SQL querying
 - **WASM Support**: Browser-compatible via node-sqlite3-wasm
 
-### Migration Implementation
+#### Migration Implementation
 
-#### Before (LowDB)
+##### Before (LowDB)
 
 ```typescript
 // Simple JSON-based storage
@@ -112,7 +112,7 @@ db.data.sites.push(newSite);
 db.write();
 ```
 
-#### After (SQLite)
+##### After (SQLite)
 
 ```typescript
 // Sophisticated repository pattern
@@ -129,7 +129,7 @@ export class SiteRepository {
 }
 ```
 
-#### Migration Process
+##### Migration Process
 
 1. **Schema Design**: Created comprehensive SQLite schema
 2. **Repository Pattern**: Implemented data access layer
@@ -137,27 +137,27 @@ export class SiteRepository {
 4. **Data Migration**: Automated migration from JSON to SQLite
 5. **Testing**: Extensive testing of new database layer
 
-## 🎨 Frontend Evolution
+### 🎨 Frontend Evolution
 
-### State Management: React Context → Zustand
+#### State Management: React Context → Zustand
 
-#### Problems with Context
+##### Problems with Context
 
 - **Performance**: Unnecessary re-renders
 - **Complexity**: Provider hell with multiple contexts
 - **Boilerplate**: Verbose reducer patterns
 - **Type Safety**: Complex type definitions
 
-#### Zustand Advantages
+##### Zustand Advantages
 
 - **Performance**: Selective subscriptions
 - **Simplicity**: Minimal boilerplate
 - **Flexibility**: Modular store composition
 - **TypeScript**: Excellent type inference
 
-#### Migration Example
+##### Migration Example
 
-**Before (React Context)**:
+###### **Before (React Context)**:
 
 ```typescript
 // Complex provider setup
@@ -177,7 +177,7 @@ export const SitesProvider: React.FC = ({ children }) => {
 };
 ```
 
-**After (Zustand with Modular Composition)**:
+###### **After (Zustand with Modular Composition)**:
 
 ```typescript
 // Modular store composition for complex stores
@@ -190,10 +190,15 @@ export const createSitesStateActions = (
   set((state) => ({ sites: [...state.sites, newSite] }));
   return newSite;
  },
- updateSite: async (siteId: string, updates: Partial<Site>) => {
-  const updatedSite = await window.electronAPI.sites.update(siteId, updates);
+ updateSite: async (siteIdentifier: string, updates: Partial<Site>) => {
+  const updatedSite = await window.electronAPI.sites.update(
+   siteIdentifier,
+   updates
+  );
   set((state) => ({
-   sites: state.sites.map((site) => (site.id === siteId ? updatedSite : site)),
+   sites: state.sites.map((site) =>
+    site.identifier === siteIdentifier ? updatedSite : site
+   ),
   }));
  },
 });
@@ -202,10 +207,10 @@ export const createSiteOperationsActions = (
  set: SetState<SitesStore>,
  get: GetState<SitesStore>
 ) => ({
- deleteSite: async (siteId: string) => {
-  await window.electronAPI.sites.delete(siteId);
+ deleteSite: async (siteIdentifier: string) => {
+  await window.electronAPI.sites.delete(siteIdentifier);
   set((state) => ({
-   sites: state.sites.filter((site) => site.id !== siteId),
+   sites: state.sites.filter((site) => site.identifier !== siteIdentifier),
   }));
  },
 });
@@ -227,7 +232,7 @@ export const useUIStore = create<UIStore>((set) => ({
 }));
 ```
 
-### Build System: webpack → Vite
+#### Build System: webpack → Vite
 
 #### Migration Benefits
 
@@ -236,16 +241,16 @@ export const useUIStore = create<UIStore>((set) => ({
 - **Simplicity**: Less configuration
 - **Modern**: ES modules and tree shaking
 
-### Event System: Basic Events → TypedEventBus
+#### Event System: Basic Events → TypedEventBus
 
-#### Problems with Basic Event System
+##### Problems with Basic Event System
 
 - **Type Safety**: No compile-time validation of event data
 - **Debugging**: Difficult to trace event flow
 - **Metadata**: No automatic event correlation or debugging information
 - **IPC Integration**: Manual event forwarding between main and renderer processes
 
-#### TypedEventBus Benefits
+##### TypedEventBus Benefits
 
 - **Type Safety**: Compile-time validation of event names and data
 - **Automatic Metadata**: Correlation IDs, timestamps, and debugging info
@@ -253,9 +258,9 @@ export const useUIStore = create<UIStore>((set) => ({
 - **IPC Integration**: Automatic event forwarding via EventsService
 - **Debugging**: Comprehensive diagnostics and event tracing
 
-#### Event System Migration Example
+##### Event System Migration Example
 
-**Before (Basic Events)**:
+###### **Before (Basic Events)**:
 
 ```typescript
 // No type safety, manual IPC forwarding
@@ -269,35 +274,35 @@ ipcRenderer.on("site:updated", (event, data) => {
 });
 ```
 
-**After (TypedEventBus)**:
+###### **After (TypedEventBus)**:
 
 ```typescript
 // Type-safe events with automatic metadata
 interface AppEvents {
- "site:updated": { siteId: string; changes: Partial<Site> };
+ "site:updated": { siteIdentifier: string; changes: Partial<Site> };
 }
 
 const eventBus = new TypedEventBus<AppEvents>("app-events");
 
 // Backend emission with automatic metadata
 await eventBus.emitTyped("site:updated", {
- siteId: "site_123",
+ siteIdentifier: "site_123",
  changes: { name: "New Name" },
 });
 
 // Frontend handling via EventsService
 const cleanup = await EventsService.onSiteUpdated((data) => {
  // data is fully typed with automatic metadata
- console.log(`Site ${data.siteId} updated`, data._meta.correlationId);
+ console.log(`Site ${data.siteIdentifier} updated`, data._meta.correlationId);
  handleSiteUpdate(data);
 });
 ```
 
-## 🔧 Architecture Transformation
+### 🔧 Architecture Transformation
 
-### Monolithic → Service-Oriented
+#### Monolithic → Service-Oriented
 
-#### Before: Monolithic Approach
+##### Before: Monolithic Approach
 
 ```text
 src/
@@ -307,7 +312,7 @@ src/
 └── main.tsx       # Everything initialized here
 ```
 
-#### After: Service-Oriented Architecture
+##### After: Service-Oriented Architecture
 
 ```text
 electron/
@@ -326,11 +331,11 @@ src/
 └── main.tsx          # Clean initialization
 ```
 
-### Key Architectural Improvements
+#### Key Architectural Improvements
 
-#### 1. Dependency Injection
+##### 1. Dependency Injection
 
-**Before**: Manual service instantiation
+###### **Before**: Manual service instantiation
 
 ```typescript
 // Scattered service creation
@@ -338,7 +343,7 @@ const siteService = new SiteService();
 const monitorService = new MonitorService();
 ```
 
-**After**: Centralized container
+###### **After**: Centralized container
 
 ```typescript
 // ServiceContainer manages all dependencies
@@ -351,9 +356,9 @@ export class ServiceContainer {
 }
 ```
 
-#### 2. Event-Driven Communication
+##### 2. Event-Driven Communication
 
-**Before**: Direct method calls
+###### **Before**: Direct method calls
 
 ```typescript
 // Tight coupling
@@ -361,7 +366,7 @@ siteService.updateSite(site);
 uiManager.refreshSites(); // Manual coordination
 ```
 
-**After**: Event-driven
+###### **After**: Event-driven
 
 ```typescript
 // Loose coupling via events
@@ -369,9 +374,9 @@ await eventBus.emitTyped("sites:updated", { site });
 // UI automatically updates via event subscription
 ```
 
-#### 3. Type-Safe IPC
+##### 3. Type-Safe IPC
 
-**Before**: Untyped communication
+###### **Before**: Untyped communication
 
 ```typescript
 // No type safety
@@ -380,7 +385,7 @@ ipcMain.handle("create-site", async (event, data) => {
 });
 ```
 
-**After**: Fully typed with validation
+###### **After**: Fully typed with validation
 
 ```typescript
 // Complete type safety with validation
@@ -413,27 +418,27 @@ ipcService.registerStandardizedIpcHandler(
 );
 ```
 
-## 🔍 Monitoring System Evolution
+### 🔍 Monitoring System Evolution
 
-### Basic → Enhanced Monitoring
+#### Basic → Enhanced Monitoring
 
-#### Phase 1: Basic Monitoring
+##### Phase 1: Basic Monitoring
 
 - Simple HTTP requests
 - Basic status checking
 - No operation correlation
 - Race conditions possible
 
-#### Phase 2: Enhanced Monitoring
+##### Phase 2: Enhanced Monitoring
 
 - **Operation Correlation**: UUID-based operation tracking
 - **Race Condition Prevention**: Validates operations before updates
 - **Comprehensive Logging**: Structured logging with correlation IDs
 - **Error Recovery**: Sophisticated retry and fallback mechanisms
 
-### Monitor Type Architecture
+#### Monitor Type Architecture
 
-#### Extensible Monitor System
+##### Extensible Monitor System
 
 ```typescript
 // Clean interface-based design
@@ -450,17 +455,17 @@ export class CustomMonitorService implements IMonitorService {
 }
 ```
 
-## 🧪 Testing Evolution
+### 🧪 Testing Evolution
 
-### Manual → Comprehensive Automated Testing
+#### Manual → Comprehensive Automated Testing
 
-#### Before: Manual Testing
+##### Before: Manual Testing
 
 - Manual verification of features
 - No automated test coverage
 - Bugs discovered in production
 
-#### After: Comprehensive Test Suite
+##### After: Comprehensive Test Suite
 
 - **Dual Configuration**: Separate tests for frontend and backend
 - **Unit Tests**: Service and component testing
@@ -477,17 +482,17 @@ npm run test:shared           # Shared utility tests
 npm run test:all:coverage     # Coverage reports (all configurations)
 ```
 
-## 📚 Documentation Evolution
+### 📚 Documentation Evolution
 
-### Minimal → Comprehensive Documentation
+#### Minimal → Comprehensive Documentation
 
-#### Before: Basic README
+##### Before: Basic README
 
 - Simple setup instructions
 - Minimal architecture information
 - No contribution guidelines
 
-#### After: Extensive Documentation Ecosystem
+##### After: Extensive Documentation Ecosystem
 
 - **Architecture Decision Records (ADRs)**: Design decisions
 - **Implementation Guides**: Step-by-step instructions
@@ -496,9 +501,9 @@ npm run test:all:coverage     # Coverage reports (all configurations)
 - **AI Context**: Quick onboarding for AI assistants
 - **Code Templates**: Consistent patterns
 
-## 🔄 Current Migration Status
+### 🔄 Current Migration Status
 
-### ✅ Completed Migrations
+#### ✅ Completed Migrations
 
 - [x] **Database**: LowDB → SQLite (COMPLETE)
 - [x] **State Management**: React Context → Zustand with modular composition (COMPLETE)
@@ -511,59 +516,59 @@ npm run test:all:coverage     # Coverage reports (all configurations)
 - [x] **Documentation**: Minimal → Comprehensive with current patterns (COMPLETE)
 - [x] **Error Handling**: Scattered → Centralized with withErrorHandling utility (COMPLETE)
 
-### 🔧 Ongoing Improvements
+#### 🔧 Ongoing Improvements
 
 - **Performance Optimization**: Continuous monitoring and optimization
 - **Security Enhancements**: Regular security audits and updates
 - **Feature Expansion**: New monitor types and capabilities
 - **Documentation Maintenance**: Keeping documentation current
 
-## 📈 Impact of Evolution
+### 📈 Impact of Evolution
 
-### Performance Improvements
+#### Performance Improvements
 
 - **Database Operations**: 90% faster with SQLite transactions
 - **UI Responsiveness**: Eliminated unnecessary re-renders with Zustand
 - **Build Times**: 70% faster with Vite
 - **Memory Usage**: 60% reduction with proper state management
 
-### Developer Experience
+#### Developer Experience
 
 - **Type Safety**: 100% TypeScript coverage eliminates runtime errors
 - **Development Speed**: Hot reload and fast builds
 - **Code Quality**: Automated linting and formatting
 - **Documentation**: Comprehensive guides reduce onboarding time
 
-### Reliability Improvements
+#### Reliability Improvements
 
 - **Error Handling**: Centralized error management
 - **Race Conditions**: Eliminated through operation correlation
 - **Data Integrity**: ACID compliance with SQLite transactions
 - **Testing Coverage**: Automated test suite prevents regressions
 
-## 🎯 Future Evolution Plans
+### 🎯 Future Evolution Plans
 
-### Short Term (Next 3 months)
+#### Short Term (Next 3 months)
 
 - **Performance Metrics**: Add performance monitoring
 - **Enhanced Notifications**: Rich notification system
 - **Mobile Support**: PWA capabilities exploration
 
-### Medium Term (Next 6 months)
+#### Medium Term (Next 6 months)
 
 - **Plugin System**: Extensible plugin architecture
 - **Cloud Sync**: Optional cloud data synchronization
 - **Advanced Analytics**: Trend analysis and reporting
 
-### Long Term (Next year)
+#### Long Term (Next year)
 
 - **Multi-Instance**: Support for multiple monitoring instances
 - **Enterprise Features**: Advanced security and compliance
 - **Machine Learning**: Predictive failure detection
 
-## 💡 Lessons Learned
+### 💡 Lessons Learned
 
-### Migration Best Practices
+#### Migration Best Practices
 
 1. **Incremental Changes**: Migrate one system at a time
 2. **Maintain Compatibility**: Keep old systems running during transition
@@ -571,7 +576,7 @@ npm run test:all:coverage     # Coverage reports (all configurations)
 4. **Documentation**: Document decisions and rationale
 5. **User Impact**: Minimize disruption to end users
 
-### Architecture Principles
+#### Architecture Principles
 
 1. **Separation of Concerns**: Each service has a single responsibility
 2. **Type Safety**: TypeScript everywhere prevents runtime errors

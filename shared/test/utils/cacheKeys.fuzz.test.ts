@@ -476,12 +476,12 @@ describe("Cache Keys - Property-Based Tests", () => {
                     validCacheKeyPart,
                     validCacheKeyPart,
                     validCacheKeyPart,
-                    (configName, monitorId, siteId, validationType) => {
+                    (configName, monitorId, siteIdentifier, validationType) => {
                         // Test various generated keys
                         const keys = [
                             CacheKeys.config.byName(configName),
                             CacheKeys.monitor.byId(monitorId),
-                            CacheKeys.site.byIdentifier(siteId),
+                            CacheKeys.site.byIdentifier(siteIdentifier),
                             CacheKeys.validation.byType(
                                 validationType,
                                 "test-id"

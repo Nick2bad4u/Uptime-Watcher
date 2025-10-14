@@ -20,7 +20,7 @@ import { MIN_CHECK_INTERVAL } from "./constants";
  *
  * ```typescript
  * const scheduler = new MonitorScheduler();
- * scheduler.setCheckCallback(async (siteId, monitorId) => { ... });
+ * scheduler.setCheckCallback(async (siteIdentifier, monitorId) => { ... });
  * scheduler.startSite(siteObj);
  * ```
  *
@@ -184,7 +184,9 @@ export class MonitorScheduler {
      * @example
      *
      * ```typescript
-     * scheduler.setCheckCallback(async (siteId, monitorId) => { ... });
+     * scheduler.setCheckCallback(async (siteIdentifier, monitorId) => {
+     *     // Custom check implementation
+     * });
      * ```
      *
      * @param callback - Function to execute for each scheduled monitor check.

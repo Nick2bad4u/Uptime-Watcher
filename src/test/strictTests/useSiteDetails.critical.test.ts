@@ -220,7 +220,7 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             {
                 monitorId: "monitor-1",
                 monitorType: "http",
-                siteId: siteWithMonitor.identifier,
+                siteIdentifier: siteWithMonitor.identifier,
             }
         );
     });
@@ -394,14 +394,14 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             "Started site monitoring",
             {
                 monitorCount: 0,
-                siteId: siteWithoutMonitors.identifier,
+                siteIdentifier: siteWithoutMonitors.identifier,
             }
         );
         expect(logger.user.action).toHaveBeenCalledWith(
             "Stopped site monitoring",
             {
                 monitorCount: 0,
-                siteId: siteWithoutMonitors.identifier,
+                siteIdentifier: siteWithoutMonitors.identifier,
             }
         );
     });

@@ -30,7 +30,7 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("startSiteMonitoring", () => {
-        it("should call startMonitoringForSite with only siteId", async ({
+        it("should call startMonitoringForSite with only siteIdentifier", async ({
             task,
             annotate,
         }) => {
@@ -42,17 +42,17 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startSiteMonitoring(siteId);
+            await MonitoringService.startSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId);
+            ).toHaveBeenCalledWith(siteIdentifier);
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
             ).toHaveBeenCalledTimes(1);
@@ -70,7 +70,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
             const error = new Error("Failed to start site monitoring");
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
@@ -78,11 +78,11 @@ describe("MonitoringService - Site-level monitoring", () => {
             );
 
             await expect(
-                MonitoringService.startSiteMonitoring(siteId)
+                MonitoringService.startSiteMonitoring(siteIdentifier)
             ).rejects.toThrow("Failed to start site monitoring");
         });
 
-        it("should work with empty string site ID", async ({
+        it("should work with empty string site identifier", async ({
             task,
             annotate,
         }) => {
@@ -94,13 +94,13 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "";
+            const siteIdentifier = "";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startSiteMonitoring(siteId);
+            await MonitoringService.startSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
@@ -109,7 +109,7 @@ describe("MonitoringService - Site-level monitoring", () => {
     });
 
     describe("stopSiteMonitoring", () => {
-        it("should call stopMonitoringForSite with only siteId", async ({
+        it("should call stopMonitoringForSite with only siteIdentifier", async ({
             task,
             annotate,
         }) => {
@@ -121,17 +121,17 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopSiteMonitoring(siteId);
+            await MonitoringService.stopSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(siteId);
+            ).toHaveBeenCalledWith(siteIdentifier);
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).toHaveBeenCalledTimes(1);
@@ -149,7 +149,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
             const error = new Error("Failed to stop site monitoring");
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
@@ -157,11 +157,11 @@ describe("MonitoringService - Site-level monitoring", () => {
             );
 
             await expect(
-                MonitoringService.stopSiteMonitoring(siteId)
+                MonitoringService.stopSiteMonitoring(siteIdentifier)
             ).rejects.toThrow("Failed to stop site monitoring");
         });
 
-        it("should work with empty string site ID", async ({
+        it("should work with empty string site identifier", async ({
             task,
             annotate,
         }) => {
@@ -173,13 +173,13 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteId = "";
+            const siteIdentifier = "";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopSiteMonitoring(siteId);
+            await MonitoringService.stopSiteMonitoring(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
@@ -200,7 +200,7 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
             const monitorId = "monitor-1";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
@@ -208,16 +208,16 @@ describe("MonitoringService - Site-level monitoring", () => {
             );
 
             // Monitor-level call
-            await MonitoringService.startMonitoring(siteId, monitorId);
+            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId, monitorId);
+            ).toHaveBeenCalledWith(siteIdentifier, monitorId);
 
             // Site-level call
-            await MonitoringService.startSiteMonitoring(siteId);
+            await MonitoringService.startSiteMonitoring(siteIdentifier);
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
-            ).toHaveBeenCalledWith(siteId);
+            ).toHaveBeenCalledWith(siteIdentifier);
 
             expect(
                 mockElectronAPI.monitoring.startMonitoringForSite
@@ -235,14 +235,14 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
 
             mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValue(
                 new Error("Network error")
             );
 
             await expect(
-                MonitoringService.startSiteMonitoring(siteId)
+                MonitoringService.startSiteMonitoring(siteIdentifier)
             ).rejects.toThrow("Network error");
         });
 
@@ -255,14 +255,14 @@ describe("MonitoringService - Site-level monitoring", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            const siteId = "example.com";
+            const siteIdentifier = "example.com";
 
             mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValue(
                 new Error("Request timeout")
             );
 
             await expect(
-                MonitoringService.stopSiteMonitoring(siteId)
+                MonitoringService.stopSiteMonitoring(siteIdentifier)
             ).rejects.toThrow("Request timeout");
         });
     });

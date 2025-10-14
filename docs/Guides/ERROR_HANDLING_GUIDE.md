@@ -319,13 +319,13 @@ export const createSiteOperationsActions = (
   );
  },
 
- deleteSite: async (siteId: string) => {
+ deleteSite: async (siteIdentifier: string) => {
   const errorStore = useErrorStore.getState();
 
   return await withErrorHandling(
    async () => {
-    await window.electronAPI.sites.deleteSite(siteId);
-    deps.removeSite(siteId);
+    await window.electronAPI.sites.delete(siteIdentifier);
+    deps.removeSite(siteIdentifier);
    },
    {
     clearError: () => errorStore.clearStoreError("sites-operations"),
@@ -415,26 +415,26 @@ export class SiteService {
   );
  }
 
- async deleteSite(siteId: string): Promise<void> {
+ async deleteSite(siteIdentifier: string): Promise<void> {
   return await withErrorHandling(
    async () => {
     // Validation
-    if (!siteId || typeof siteId !== "string") {
+    if (!siteIdentifier || typeof siteIdentifier !== "string") {
      throw new Error("Invalid site ID provided");
     }
 
     // Database operation
     await executeTransaction(async (db) => {
-     const site = await this.siteRepository.findById(siteId, db);
+     const site = await this.siteRepository.findById(siteIdentifier, db);
      if (!site) {
-      throw new Error(`Site not found: ${siteId}`);
+      throw new Error(`Site not found: ${siteIdentifier}`);
      }
 
-     await this.siteRepository.delete(siteId, db);
+     await this.siteRepository.delete(siteIdentifier, db);
 
      // Emit event
      await this.eventBus.emitTyped("site:deleted", {
-      siteId,
+      siteIdentifier,
       timestamp: Date.now(),
      });
     });
@@ -486,9 +486,9 @@ export const setupSitesIpc = (
   async (data: unknown) => {
    return await withErrorHandling(
     async () => {
-     const { siteId } = deleteSiteSchema.parse(data);
+     const { siteIdentifier } = deleteSiteSchema.parse(data);
 
-     await siteService.deleteSite(siteId);
+     await siteService.deleteSite(siteIdentifier);
 
      return {
       success: true,
@@ -529,7 +529,7 @@ export class UptimeService {
    // Log error
    logger.error("Monitor check failed:", errorInfo, {
     monitorId: monitor.id,
-    siteId: monitor.siteId,
+    siteIdentifier: monitor.siteIdentifier,
    });
 
    // Emit error event for frontend notification
@@ -557,7 +557,7 @@ export const useMonitorEventIntegration = () => {
     // Success events
     const successCleanup = await EventsService.onMonitorCheckCompleted(
      (data) => {
-      sitesStore.updateMonitorResult(data.monitor.siteId, data.result);
+      sitesStore.updateMonitorResult(data.monitor.siteIdentifier, data.result);
      }
     );
     cleanupFunctions.push(successCleanup);
@@ -565,7 +565,7 @@ export const useMonitorEventIntegration = () => {
     // Error events
     const errorCleanup = await EventsService.onMonitorCheckFailed((data) => {
      // Update monitor state
-     sitesStore.updateMonitorError(data.monitor.siteId, data.error);
+     sitesStore.updateMonitorError(data.monitor.siteIdentifier, data.error);
 
      // Show user notification
      errorStore.setStoreError(
@@ -612,16 +612,16 @@ export const App = () => {
 };
 
 // Component-specific error boundaries
-export const SiteDetails = ({ siteId }: { siteId: string }) => {
+export const SiteDetails = ({ siteIdentifier }: { siteIdentifier: string }) => {
   return (
-    <ErrorBoundary fallback={<SiteDetailsErrorFallback siteId={siteId} />}>
-      <SiteDetailsContent siteId={siteId} />
+  <ErrorBoundary fallback={<SiteDetailsErrorFallback siteIdentifier={siteIdentifier} />}>
+    <SiteDetailsContent siteIdentifier={siteIdentifier} />
     </ErrorBoundary>
   );
 };
 
 // Error fallback components
-const SiteDetailsErrorFallback = ({ siteId }: { siteId: string }) => {
+const SiteDetailsErrorFallback = ({ siteIdentifier }: { siteIdentifier: string }) => {
   const handleRetry = () => {
     window.location.reload();
   };
@@ -629,7 +629,7 @@ const SiteDetailsErrorFallback = ({ siteId }: { siteId: string }) => {
   return (
     <div className="error-fallback">
       <h2>Unable to load site details</h2>
-      <p>An error occurred while loading details for site {siteId}</p>
+  <p>An error occurred while loading details for site {siteIdentifier}</p>
       <button onClick={handleRetry}>Retry</button>
     </div>
   );

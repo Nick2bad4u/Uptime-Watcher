@@ -1003,14 +1003,15 @@ export interface UptimeEvents extends UnknownRecord {
      * Emitted when a monitor is added.
      *
      * @param monitor - The monitor object added.
-     * @param siteId - The ID of the site the monitor belongs to.
+     * @param siteIdentifier - The identifier of the site the monitor belongs
+     *   to.
      * @param timestamp - Unix timestamp (ms) when the monitor was added.
      */
     "monitor:added": {
         /** The monitor object added. */
         monitor: Monitor;
-        /** The ID of the site the monitor belongs to. */
-        siteId: string;
+        /** The identifier of the site the monitor belongs to. */
+        siteIdentifier: string;
         /** Unix timestamp (ms) when the monitor was added. */
         timestamp: number;
     };
@@ -1021,7 +1022,8 @@ export interface UptimeEvents extends UnknownRecord {
      * @param checkType - The type of check ("manual" or "scheduled").
      * @param monitorId - The monitor ID.
      * @param result - The status update result.
-     * @param siteId - The ID of the site the monitor belongs to.
+     * @param siteIdentifier - The identifier of the site the monitor belongs
+     *   to.
      * @param timestamp - Unix timestamp (ms) when the check completed.
      */
     "monitor:check-completed": {
@@ -1031,8 +1033,8 @@ export interface UptimeEvents extends UnknownRecord {
         monitorId: string;
         /** The status update result. */
         result: StatusUpdate;
-        /** The ID of the site the monitor belongs to. */
-        siteId: string;
+        /** The identifier of the site the monitor belongs to. */
+        siteIdentifier: string;
         /** Unix timestamp (ms) when the check completed. */
         timestamp: number;
     };
@@ -1048,14 +1050,15 @@ export interface UptimeEvents extends UnknownRecord {
      * Emitted when a monitor is removed.
      *
      * @param monitorId - The monitor ID.
-     * @param siteId - The ID of the site the monitor belonged to.
+     * @param siteIdentifier - The identifier of the site the monitor belonged
+     *   to.
      * @param timestamp - Unix timestamp (ms) when the monitor was removed.
      */
     "monitor:removed": {
         /** The monitor ID. */
         monitorId: string;
-        /** The ID of the site the monitor belonged to. */
-        siteId: string;
+        /** The identifier of the site the monitor belonged to. */
+        siteIdentifier: string;
         /** Unix timestamp (ms) when the monitor was removed. */
         timestamp: number;
     };

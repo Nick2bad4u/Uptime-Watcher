@@ -48,7 +48,7 @@ export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Removes a site from monitoring
      *
-     * @param siteId - ID of the site to remove
+     * @param siteIdentifier - ID of the site to remove
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
@@ -57,7 +57,7 @@ export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Updates an existing site's configuration
      *
-     * @param siteId - ID of the site to update
+     * @param siteIdentifier - ID of the site to update
      * @param siteData - Partial site data to update
      *
      * @returns Promise resolving to the updated site
@@ -97,7 +97,7 @@ export const sitesApi: SitesApiInterface = {
     /**
      * Removes a site from monitoring
      *
-     * @param siteId - ID of the site to remove
+     * @param siteIdentifier - ID of the site to remove
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
@@ -106,7 +106,7 @@ export const sitesApi: SitesApiInterface = {
     /**
      * Updates an existing site's configuration.
      *
-     * @param siteId - ID of the site to update.
+     * @param siteIdentifier - ID of the site to update.
      * @param siteData - Partial site data to update.
      *
      * @returns Promise resolving to the updated site.

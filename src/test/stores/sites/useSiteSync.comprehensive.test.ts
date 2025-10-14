@@ -368,7 +368,7 @@ describe("useSiteSync", () => {
 
             const deleteEvent = {
                 action: "delete",
-                siteId: "site-1",
+                siteIdentifier: "site-1",
                 data: {},
             };
 
@@ -405,7 +405,7 @@ describe("useSiteSync", () => {
 
             const updateEvent = {
                 action: "update",
-                siteId: "site-1",
+                siteIdentifier: "site-1",
                 data: { name: "Updated Site" },
             };
 

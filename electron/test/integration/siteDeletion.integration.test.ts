@@ -160,19 +160,19 @@ afterEach(() => {
 
 describe("Site deletion orchestration", () => {
     it("uses a single transactional surface via SiteWriterService", async () => {
-        const siteId = "site-writer";
-        const sampleSite = createSampleSite(siteId);
+        const siteIdentifier = "site-writer";
+        const sampleSite = createSampleSite(siteIdentifier);
 
         const monitorsBySite = new Map<string, Site["monitors"]>();
-        monitorsBySite.set(siteId, Array.from(sampleSite.monitors));
+        monitorsBySite.set(siteIdentifier, Array.from(sampleSite.monitors));
 
         const sites = new Map<string, Site>();
-        sites.set(siteId, { ...sampleSite });
+        sites.set(siteIdentifier, { ...sampleSite });
 
         const sitesCache = new StandardizedCache<Site>({
             name: "integration-sites",
         });
-        sitesCache.set(siteId, { ...sampleSite });
+        sitesCache.set(siteIdentifier, { ...sampleSite });
 
         const fakeDatabaseService = new FakeDatabaseService();
         const repositories = createRepositoryBundle(monitorsBySite, sites);
@@ -192,18 +192,18 @@ describe("Site deletion orchestration", () => {
             },
         });
 
-        const result = await writer.deleteSite(sitesCache, siteId);
+        const result = await writer.deleteSite(sitesCache, siteIdentifier);
 
         expect(result).toBeTruthy();
         expect(fakeDatabaseService.nestedTransactions).toBe(0);
-        expect(sitesCache.has(siteId)).toBeFalsy();
-        expect(sites.has(siteId)).toBeFalsy();
-        expect(monitorsBySite.get(siteId)).toEqual([]);
+        expect(sitesCache.has(siteIdentifier)).toBeFalsy();
+        expect(sites.has(siteIdentifier)).toBeFalsy();
+        expect(monitorsBySite.get(siteIdentifier)).toEqual([]);
         expect(
             repositories.monitorAdapters.at(0)?.deleteBySiteIdentifier
-        ).toHaveBeenCalledWith(siteId);
+        ).toHaveBeenCalledWith(siteIdentifier);
         expect(repositories.siteAdapters.at(0)?.delete).toHaveBeenCalledWith(
-            siteId
+            siteIdentifier
         );
     });
 });

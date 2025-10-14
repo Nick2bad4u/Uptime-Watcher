@@ -98,15 +98,15 @@ function generateFileOperationTestData(): FileOperationTestData {
 
     // CSV data (monitoring history export)
     const csvHeaders =
-        "timestamp,site_id,monitor_id,status,response_time,error_message";
+        "timestamp,site_identifier,monitor_id,status,response_time,error_message";
     const csvRows = Array.from({ length: 10_000 }, (_, i) => {
         const timestamp = Date.now() - i * 60_000;
-        const siteId = `site-${i % 100}`;
+        const siteIdentifier = `site-${i % 100}`;
         const monitorId = `monitor-${i % 500}`;
         const status = Math.random() > 0.1 ? "up" : "down";
         const responseTime = status === "up" ? Math.random() * 1000 : 0;
         const errorMessage = status === "down" ? "Connection timeout" : "";
-        return `${timestamp},${siteId},${monitorId},${status},${responseTime},"${errorMessage}"`;
+        return `${timestamp},${siteIdentifier},${monitorId},${status},${responseTime},"${errorMessage}"`;
     });
     const csvData = `${csvHeaders}\n${csvRows.join("\n")}`;
 
@@ -228,7 +228,7 @@ function generateBackupData(): BackupData {
         })),
         monitors: Array.from({ length: 1500 }, (_, i) => ({
             id: `monitor-${i}`,
-            siteId: `site-${i % 500}`,
+            siteIdentifier: `site-${i % 500}`,
             type: "http",
             interval: 30_000,
         })),

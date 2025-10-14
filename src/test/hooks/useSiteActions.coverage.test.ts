@@ -181,7 +181,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             mockselectSite(site.identifier);
             mockSetShowSiteDetails(true);
             mockLogger.user.action("Opened site details", {
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -190,7 +190,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "Opened site details",
                 {
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -219,7 +219,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             mockLogger.user.action("Manually checked site status", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -229,7 +229,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -261,7 +261,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             mockLogger.user.action("Started site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -274,7 +274,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -313,7 +313,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             mockLogger.user.action("Stopped site monitoring", {
                 monitorId: monitor.id,
                 monitorType: monitor.type,
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -326,7 +326,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 {
                     monitorId: monitor.id,
                     monitorType: monitor.type,
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -355,7 +355,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             // Simulate handleStartSiteMonitoring logic
             mockStartSiteMonitoring(site.identifier);
             mockLogger.user.action("Started monitoring all site monitors", {
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -365,7 +365,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "Started monitoring all site monitors",
                 {
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -387,7 +387,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             // Simulate handleStopSiteMonitoring logic
             mockStopSiteMonitoring(site.identifier);
             mockLogger.user.action("Stopped monitoring all site monitors", {
-                siteId: site.identifier,
+                siteIdentifier: site.identifier,
                 siteName: site.name,
             });
 
@@ -397,7 +397,7 @@ describe("useSiteActions Hook Coverage Tests", () => {
             expect(mockLogger.user.action).toHaveBeenCalledWith(
                 "Stopped monitoring all site monitors",
                 {
-                    siteId: site.identifier,
+                    siteIdentifier: site.identifier,
                     siteName: site.name,
                 }
             );
@@ -496,15 +496,21 @@ describe("useSiteActions Hook Coverage Tests", () => {
             const actions = [
                 {
                     name: "Opened site details",
-                    data: { siteId: "test", siteName: "Test" },
+                    data: { siteIdentifier: "test", siteName: "Test" },
                 },
                 {
                     name: "Started site monitoring",
-                    data: { monitorId: "monitor-1", siteId: "test" },
+                    data: {
+                        monitorId: "monitor-1",
+                        siteIdentifier: "test",
+                    },
                 },
                 {
                     name: "Stopped site monitoring",
-                    data: { monitorId: "monitor-1", siteId: "test" },
+                    data: {
+                        monitorId: "monitor-1",
+                        siteIdentifier: "test",
+                    },
                 },
             ];
 
@@ -524,11 +530,14 @@ describe("useSiteActions Hook Coverage Tests", () => {
                 },
             };
 
-            const siteId = "test-site";
+            const siteIdentifier = "test-site";
             const error = new Error("Test error");
 
-            mockLogger.site.error(siteId, error);
-            expect(mockLogger.site.error).toHaveBeenCalledWith(siteId, error);
+            mockLogger.site.error(siteIdentifier, error);
+            expect(mockLogger.site.error).toHaveBeenCalledWith(
+                siteIdentifier,
+                error
+            );
         });
     });
 
@@ -600,29 +609,29 @@ describe("useSiteActions Hook Coverage Tests", () => {
             const actionData = {
                 monitorId: "monitor-1",
                 monitorType: "http",
-                siteId: "test-site",
+                siteIdentifier: "test-site",
                 siteName: "Test Site",
             };
 
             expect(actionData).toHaveProperty("monitorId");
             expect(actionData).toHaveProperty("monitorType");
-            expect(actionData).toHaveProperty("siteId");
+            expect(actionData).toHaveProperty("siteIdentifier");
             expect(actionData).toHaveProperty("siteName");
             expect(typeof actionData.monitorId).toBe("string");
             expect(typeof actionData.monitorType).toBe("string");
-            expect(typeof actionData.siteId).toBe("string");
+            expect(typeof actionData.siteIdentifier).toBe("string");
             expect(typeof actionData.siteName).toBe("string");
         });
 
         it("should format site-only action data", () => {
             const siteActionData = {
-                siteId: "test-site",
+                siteIdentifier: "test-site",
                 siteName: "Test Site",
             };
 
-            expect(siteActionData).toHaveProperty("siteId");
+            expect(siteActionData).toHaveProperty("siteIdentifier");
             expect(siteActionData).toHaveProperty("siteName");
-            expect(typeof siteActionData.siteId).toBe("string");
+            expect(typeof siteActionData.siteIdentifier).toBe("string");
             expect(typeof siteActionData.siteName).toBe("string");
         });
     });

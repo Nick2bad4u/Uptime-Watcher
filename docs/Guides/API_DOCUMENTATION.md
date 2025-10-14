@@ -348,7 +348,7 @@ const cleanup3 = window.electronAPI.events.onMonitorStatusChanged((data) => {
 - `timestamp` (ISO string) – emission time in UTC (`new Date(...).toISOString()`).
 - Optional context: `previousStatus`, `details`, `responseTime`, `monitor`, `site`.
 
-Legacy shapes (`siteId`, `newStatus`, numeric timestamps, etc.) are rejected by the preload bridge and will not reach the renderer. Keep integrations aligned with `StatusUpdate` to avoid silent drops.
+Legacy shapes (the deprecated site identifier field, `newStatus`, numeric timestamps, etc.) are rejected by the preload bridge and will not reach the renderer. Keep integrations aligned with `StatusUpdate` to avoid silent drops.
 
 // Settings events
 const cleanup4 = window.electronAPI.events.onSettingsUpdated((data) => {
@@ -462,7 +462,7 @@ interface UptimeEvents {
   checkType: "manual" | "scheduled";
   monitorId: string;
   result: MonitorCheckResult;
-  siteId: string;
+  siteIdentifier: string;
   timestamp: number;
  };
  "monitor:down": MonitorDownEventData; // StatusUpdate payload + monitor/site context
@@ -679,7 +679,7 @@ export const useSiteOperations = () => {
 
 ```typescript
 interface Site {
- id: string;
+ identifier: string;
  name: string;
  url: string;
  description?: string;
@@ -697,7 +697,7 @@ interface Site {
 interface Monitor {
  id: string;
  type: "http" | "port" | "ping";
- siteId: string;
+ siteIdentifier: string;
  checkInterval: number; // milliseconds
  retryAttempts: number;
  timeout: number; // milliseconds

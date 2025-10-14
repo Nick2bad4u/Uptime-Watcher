@@ -273,7 +273,7 @@ import { eventBus } from "@electron/events/EventBus";
 
 // Publishing events
 eventBus.publish("site:created", {
- siteId: site.id,
+ siteIdentifier: site.id,
  timestamp: new Date().toISOString(),
 });
 

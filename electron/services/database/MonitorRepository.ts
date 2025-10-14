@@ -25,14 +25,14 @@
  *
  * // Create a monitor for a site
  * const monitor = await monitorRepo.createMonitor({
- *     siteId: "site123",
+ *     siteIdentifier: "site123",
  *     checkInterval: 60000,
  *     retryAttempts: 3,
  *     timeout: 30000,
  * });
  *
  * // Get all monitors for a site
- * const monitors = await monitorRepo.getMonitorsBySiteId("site123");
+ * const monitors = await monitorRepo.findBySiteIdentifier("site123");
  * ```
  *
  * @example Transaction usage:

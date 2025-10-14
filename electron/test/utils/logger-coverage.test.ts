@@ -247,12 +247,12 @@ describe("Logger Implementation Coverage", () => {
             await annotate("Type: Monitoring", "type");
 
             monitorLogger.debug("Monitor check initiated", {
-                siteId: "abc123",
+                siteIdentifier: "abc123",
             });
 
             expect(mockElectronLog.debug).toHaveBeenCalledWith(
                 "[MONITOR] Monitor check initiated",
-                { siteId: "abc123" }
+                { siteIdentifier: "abc123" }
             );
         });
 

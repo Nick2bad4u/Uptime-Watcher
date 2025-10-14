@@ -50,14 +50,14 @@ describe("Backend Arrow Function Mutation Tests", () => {
                 );
 
             // Test the function works correctly
-            const siteId = "test-site";
+            const siteIdentifier = "test-site";
             const monitorId = "monitor-123";
 
-            await removeMonitor(siteId, monitorId);
+            await removeMonitor(siteIdentifier, monitorId);
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                 "monitor:remove",
-                siteId,
+                siteIdentifier,
                 monitorId
             );
 

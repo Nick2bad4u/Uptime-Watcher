@@ -80,7 +80,7 @@ describe("AddSiteForm Component Coverage Tests", () => {
                 name: "",
                 port: 80,
                 selectedExistingSite: "",
-                siteId: "",
+                siteIdentifier: "",
                 url: "",
             };
 

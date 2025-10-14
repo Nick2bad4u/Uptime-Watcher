@@ -34,14 +34,14 @@ import type {
 
 const createMonitorFixture = (overrides: Partial<Monitor> = {}): Monitor => ({
     activeOperations: [],
-    checkInterval: 60000,
+    checkInterval: 60_000,
     history: [] as StatusHistory[],
     id: "monitor-123",
     monitoring: true,
     responseTime: 1200,
     retryAttempts: 0,
     status: "up",
-    timeout: 30000,
+    timeout: 30_000,
     type: "http",
     url: "https://example.com",
     ...overrides,
@@ -348,11 +348,14 @@ describe("Events Domain API", () => {
                 site: Record<string, unknown>;
             } = {
                 details: "Recovered",
-                monitor: createMonitorFixture(),
+                monitor: createMonitorFixture() as unknown as Record<
+                    string,
+                    unknown
+                >,
                 monitorId: "monitor-123",
                 previousStatus: "down",
                 responseTime: 1200,
-                site: createSiteFixture(),
+                site: createSiteFixture() as unknown as Record<string, unknown>,
                 siteIdentifier: "site-abc",
                 status: "up",
                 timestamp: new Date().toISOString(),
@@ -376,6 +379,7 @@ describe("Events Domain API", () => {
                 monitorId: "monitor-legacy",
                 newStatus: "down",
                 previousStatus: "up",
+                // Legacy events still use siteId; ensure we drop them.
                 siteId: "site-legacy",
                 timestamp: Date.now(),
             };

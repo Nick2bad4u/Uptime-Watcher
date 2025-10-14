@@ -306,7 +306,7 @@ describe("Comprehensive Coverage Boost Tests", () => {
                     "history",
                     "settings",
                 ],
-                siteId: "123",
+                siteIdentifier: "123",
             };
 
             const isValidTab = (tab: string) =>

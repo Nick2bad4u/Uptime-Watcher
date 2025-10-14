@@ -72,13 +72,15 @@ export const createSitesStateActions = (set, get) => ({
  },
 
  addSite: (site: Site) => {
-  logStoreAction("SitesStore", "addSite", { siteId: site.id });
+  logStoreAction("SitesStore", "addSite", { siteIdentifier: site.id });
   set((state) => ({ sites: [...state.sites, site] }));
  },
 
- removeSite: (siteId: string) => {
-  logStoreAction("SitesStore", "removeSite", { siteId });
-  set((state) => ({ sites: state.sites.filter((s) => s.id !== siteId) }));
+ removeSite: (siteIdentifier: string) => {
+  logStoreAction("SitesStore", "removeSite", { siteIdentifier });
+  set((state) => ({
+   sites: state.sites.filter((s) => s.id !== siteIdentifier),
+  }));
  },
 });
 
@@ -98,12 +100,12 @@ export const createSiteOperationsActions = (deps) => ({
   }
  },
 
- deleteSite: async (siteId: string): Promise<void> => {
-  logStoreAction("SitesStore", "deleteSite", { siteId });
+ deleteSite: async (siteIdentifier: string): Promise<void> => {
+  logStoreAction("SitesStore", "deleteSite", { siteIdentifier });
 
   try {
-   await window.electronAPI.sites.delete(siteId);
-   deps.removeSite(siteId);
+   await window.electronAPI.sites.delete(siteIdentifier);
+   deps.removeSite(siteIdentifier);
   } catch (error) {
    console.error("Failed to delete site:", error);
    throw error;
@@ -225,7 +227,7 @@ export const useStoreEventListeners = () => {
    }),
 
    window.electronAPI.events.onSiteDeleted((data) => {
-    sitesStore.handleSiteDeleted(data.siteId);
+    sitesStore.handleSiteDeleted(data.siteIdentifier);
    }),
 
    // Settings events

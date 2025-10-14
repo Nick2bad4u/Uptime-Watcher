@@ -293,7 +293,7 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
     participant Renderer as Renderer EventsService
     participant Stores as Zustand Stores & UI
 
-    Sched->>Mgr: handleScheduledCheck(siteId, monitorId)
+    Sched->>Mgr: handleScheduledCheck(siteIdentifier, monitorId)
     Mgr->>Mgr: Lookup site in cache
     Mgr->>Checker: checkMonitor(site, monitorId, false)
 

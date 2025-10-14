@@ -93,7 +93,7 @@ const buildAddSiteFormState = (
         setSelectedExistingSite: vi.fn(),
         setSiteId: vi.fn(),
         setUrl: vi.fn(),
-        siteId: "test-site-id",
+        siteIdentifier: "test-site-id",
         url: "",
         ...overrides,
     }) as ReturnType<typeof useAddSiteForm>;

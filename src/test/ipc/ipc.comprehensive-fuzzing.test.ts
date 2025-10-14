@@ -97,7 +97,7 @@ const arbitrarySiteData = fc.record({
 });
 
 const arbitraryMonitoringData = fc.record({
-    siteId: fc.string({ minLength: 1, maxLength: 36 }),
+    siteIdentifier: fc.string({ minLength: 1, maxLength: 36 }),
     monitorId: fc.string({ minLength: 1, maxLength: 36 }),
     status: fc.constantFrom("up", "down", "warning", "unknown"),
     timestamp: fc.integer({ min: 0 }),
@@ -688,9 +688,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 ): data is typeof monitoringData =>
                     typeof data === "object" &&
                     data !== null &&
-                    "siteId" in data &&
+                    "siteIdentifier" in data &&
                     "status" in data &&
-                    typeof (data as any).siteId === "string" &&
+                    typeof (data as any).siteIdentifier === "string" &&
                     typeof (data as any).status === "string";
 
                 registerStandardizedIpcHandler(

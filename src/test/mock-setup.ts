@@ -180,9 +180,9 @@ const mockElectronAPI: ElectronAPI = {
 
     monitoring: {
         checkSiteNow: vi.fn<ElectronAPI["monitoring"]["checkSiteNow"]>(
-            async (siteId, monitorId) => {
+            async (siteIdentifier, monitorId) => {
                 const base = cloneSite(defaultSite);
-                base.identifier = siteId;
+                base.identifier = siteIdentifier;
 
                 const monitor = base.monitors.find(
                     (candidate) => candidate.id === monitorId
@@ -221,7 +221,7 @@ const mockElectronAPI: ElectronAPI = {
                     monitorId,
                     previousStatus,
                     site: updatedSite,
-                    siteIdentifier: siteId,
+                    siteIdentifier,
                     status: updatedMonitor?.status ?? previousStatus,
                     timestamp,
                 };
@@ -291,12 +291,12 @@ const mockElectronAPI: ElectronAPI = {
         ]),
         removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
         updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(
-            async (siteId, updates) => {
+            async (siteIdentifier, updates) => {
                 const base = cloneSite(defaultSite);
                 return {
                     ...base,
                     ...updates,
-                    identifier: siteId,
+                    identifier: siteIdentifier,
                     monitors: updates.monitors
                         ? updates.monitors.map((monitor: Monitor) =>
                               cloneMonitor(monitor)

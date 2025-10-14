@@ -287,7 +287,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 {
                     monitorId: "monitor-1",
                     newInterval: 30_000,
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                 }
             );
         });
@@ -335,7 +335,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 {
                     monitorId: "monitor-1",
                     newTimeout: 10_000,
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                 }
             );
         });
@@ -381,7 +381,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 {
                     monitorId: "monitor-1",
                     newRetryAttempts: 5,
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                 }
             );
         });
@@ -412,7 +412,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "Started monitoring",
                 {
                     monitorId: "monitor-1",
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                 }
             );
         });
@@ -441,7 +441,7 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
                 "Stopped monitoring",
                 {
                     monitorId: "monitor-1",
-                    siteId: "test-site",
+                    siteIdentifier: "test-site",
                 }
             );
         });

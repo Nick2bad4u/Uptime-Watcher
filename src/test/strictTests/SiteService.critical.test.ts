@@ -314,9 +314,9 @@ describe("SiteService Critical Coverage Tests", () => {
         it("should handle multiple removeMonitor calls sequentially", async () => {
             // Arrange
             const operations = [
-                { siteId: "site-1", monitorId: "monitor-1" },
-                { siteId: "site-2", monitorId: "monitor-2" },
-                { siteId: "site-3", monitorId: "monitor-3" },
+                { siteIdentifier: "site-1", monitorId: "monitor-1" },
+                { siteIdentifier: "site-2", monitorId: "monitor-2" },
+                { siteIdentifier: "site-3", monitorId: "monitor-3" },
             ];
 
             vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
@@ -327,8 +327,8 @@ describe("SiteService Critical Coverage Tests", () => {
             ).mockResolvedValue(true);
 
             // Act
-            for (const { siteId, monitorId } of operations) {
-                await SiteService.removeMonitor(siteId, monitorId);
+            for (const { siteIdentifier, monitorId } of operations) {
+                await SiteService.removeMonitor(siteIdentifier, monitorId);
             }
 
             // Assert
@@ -337,19 +337,22 @@ describe("SiteService Critical Coverage Tests", () => {
                 (globalThis as any).electronAPI.monitoring.removeMonitor
             ).toHaveBeenCalledTimes(3);
 
-            for (const [index, { siteId, monitorId }] of operations.entries()) {
+            for (const [
+                index,
+                { siteIdentifier, monitorId },
+            ] of operations.entries()) {
                 expect(
                     (globalThis as any).electronAPI.monitoring.removeMonitor
-                ).toHaveBeenNthCalledWith(index + 1, siteId, monitorId);
+                ).toHaveBeenNthCalledWith(index + 1, siteIdentifier, monitorId);
             }
         });
 
         it("should handle concurrent removeMonitor calls", async () => {
             // Arrange
             const operations = [
-                { siteId: "site-1", monitorId: "monitor-1" },
-                { siteId: "site-2", monitorId: "monitor-2" },
-                { siteId: "site-3", monitorId: "monitor-3" },
+                { siteIdentifier: "site-1", monitorId: "monitor-1" },
+                { siteIdentifier: "site-2", monitorId: "monitor-2" },
+                { siteIdentifier: "site-3", monitorId: "monitor-3" },
             ];
 
             vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
@@ -360,8 +363,8 @@ describe("SiteService Critical Coverage Tests", () => {
             ).mockResolvedValue(true);
 
             // Act
-            const promises = operations.map(({ siteId, monitorId }) =>
-                SiteService.removeMonitor(siteId, monitorId)
+            const promises = operations.map(({ siteIdentifier, monitorId }) =>
+                SiteService.removeMonitor(siteIdentifier, monitorId)
             );
 
             await Promise.all(promises);

@@ -572,7 +572,7 @@ describe("Logger Service - Basic Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const details = { siteId: "123", url: "example.com" };
+            const details = { siteIdentifier: "123", url: "example.com" };
 
             logger.user.action("site-created", details);
 

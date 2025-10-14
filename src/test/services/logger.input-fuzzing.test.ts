@@ -117,8 +117,8 @@ const arbitraries = {
             return error;
         }),
 
-    /** Generate site ID */
-    siteId: fc
+    /** Generate site identifier */
+    siteIdentifier: fc
         .string({ minLength: 1, maxLength: 50 })
         .filter((s) => s.trim().length > 0),
 
@@ -422,37 +422,37 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
     });
 
     describe("Site Domain Logging", () => {
-        fcTest.prop([arbitraries.siteId])(
+        fcTest.prop([arbitraries.siteIdentifier])(
             "should handle site added logging",
-            (siteId) => {
+            (siteIdentifier) => {
                 // Act
-                logger.site.added(siteId);
+                logger.site.added(siteIdentifier);
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site added: ${siteId}`
+                    `[UPTIME-WATCHER] Site added: ${siteIdentifier}`
                 );
             }
         );
 
-        fcTest.prop([arbitraries.siteId])(
+        fcTest.prop([arbitraries.siteIdentifier])(
             "should handle site removed logging",
-            (siteId) => {
+            (siteIdentifier) => {
                 // Act
-                logger.site.removed(siteId);
+                logger.site.removed(siteIdentifier);
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site removed: ${siteId}`
+                    `[UPTIME-WATCHER] Site removed: ${siteIdentifier}`
                 );
             }
         );
 
-        fcTest.prop([arbitraries.siteId, arbitraries.errorObject])(
+        fcTest.prop([arbitraries.siteIdentifier, arbitraries.errorObject])(
             "should handle site error logging",
-            (siteId, error) => {
+            (siteIdentifier, error) => {
                 // Act
-                logger.site.error(siteId, error);
+                logger.site.error(siteIdentifier, error);
 
                 // Assert
                 expect(mockError).toHaveBeenCalled();
@@ -460,31 +460,31 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
         );
 
         fcTest.prop([
-            arbitraries.siteId,
+            arbitraries.siteIdentifier,
             arbitraries.logMessage,
             arbitraries.logMessage,
         ])(
             "should handle site status change logging",
-            (siteId, oldStatus, newStatus) => {
+            (siteIdentifier, oldStatus, newStatus) => {
                 // Act
-                logger.site.statusChange(siteId, oldStatus, newStatus);
+                logger.site.statusChange(siteIdentifier, oldStatus, newStatus);
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Site status change: ${siteId} - ${oldStatus} -> ${newStatus}`
+                    `[UPTIME-WATCHER] Site status change: ${siteIdentifier} - ${oldStatus} -> ${newStatus}`
                 );
             }
         );
 
         fcTest.prop([
-            arbitraries.siteId,
+            arbitraries.siteIdentifier,
             arbitraries.logMessage,
             arbitraries.performanceDuration,
         ])(
             "should handle site check logging",
-            (siteId, status, responseTime) => {
+            (siteIdentifier, status, responseTime) => {
                 // Act
-                logger.site.check(siteId, status, responseTime);
+                logger.site.check(siteIdentifier, status, responseTime);
 
                 // Assert
                 expect(mockInfo).toHaveBeenCalled();
@@ -519,31 +519,19 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
             }
         );
 
-        fcTest.prop([arbitraries.actionName, arbitraries.logMessage])(
-            "should handle system window logging",
-            (action, windowName) => {
-                // Act
-                logger.system.window(action, windowName);
+        fcTest.prop([
+            arbitraries.actionName,
+            fc.option(arbitraries.logMessage),
+        ])("should handle system window logging", (action, windowName) => {
+            // Act
+            logger.system.window(action, windowName ?? undefined);
 
-                // Assert
-                expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Window ${action} (${windowName})`
-                );
-            }
-        );
-
-        fcTest.prop([arbitraries.actionName])(
-            "should handle system window logging without name",
-            (action) => {
-                // Act
-                logger.system.window(action);
-
-                // Assert
-                expect(mockDebug).toHaveBeenCalledWith(
-                    `[UPTIME-WATCHER] Window ${action}`
-                );
-            }
-        );
+            // Assert
+            const nameInfo = windowName ? ` (${windowName})` : "";
+            expect(mockDebug).toHaveBeenCalledWith(
+                `[UPTIME-WATCHER] Window ${action}${nameInfo}`
+            );
+        });
     });
 
     describe("User Domain Logging", () => {
@@ -639,25 +627,31 @@ describe("Logger Service - Property-Based Fuzzing Tests", () => {
         });
 
         fcTest.prop([
-            fc.array(arbitraries.siteId, { minLength: 1, maxLength: 5 }),
+            fc.array(arbitraries.siteIdentifier, {
+                minLength: 1,
+                maxLength: 5,
+            }),
             fc.array(arbitraries.actionName, { minLength: 1, maxLength: 5 }),
-        ])("should handle concurrent domain logging", (siteIds, actions) => {
-            // Clear mock before starting
-            mockInfo.mockClear();
+        ])(
+            "should handle concurrent domain logging",
+            (siteIdentifiers, actions) => {
+                // Clear mock before starting
+                mockInfo.mockClear();
 
-            // Act - mix site and user logging
-            for (const siteId of siteIds) {
-                logger.site.added(siteId);
-            }
-            for (const action of actions) {
-                logger.user.action(action);
-            }
+                // Act - mix site and user logging
+                for (const siteIdentifier of siteIdentifiers) {
+                    logger.site.added(siteIdentifier);
+                }
+                for (const action of actions) {
+                    logger.user.action(action);
+                }
 
-            // Assert - verify all logging calls were made
-            expect(mockInfo).toHaveBeenCalledTimes(
-                siteIds.length + actions.length
-            );
-        });
+                // Assert - verify all logging calls were made
+                expect(mockInfo).toHaveBeenCalledTimes(
+                    siteIdentifiers.length + actions.length
+                );
+            }
+        );
     });
 
     describe("Edge Cases and Error Scenarios", () => {

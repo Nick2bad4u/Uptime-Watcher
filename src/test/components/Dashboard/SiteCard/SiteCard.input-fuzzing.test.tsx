@@ -73,7 +73,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
             readonly value: string | number;
         }[];
     }) => {
-        const siteId = mockSiteData?.identifier || "default";
+        const siteIdentifier = mockSiteData?.identifier || "default";
         const statusMetric = metrics.find((metric) => metric.key === "status");
         const statusValue = String(
             statusMetric?.value ?? "unknown"
@@ -84,7 +84,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardMetrics", () => ({
 
         return (
             <div
-                data-site-identifier={siteId}
+                data-site-identifier={siteIdentifier}
                 data-status={statusValue}
                 data-testid="site-card-metrics-content"
             >
@@ -111,9 +111,9 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => {
         // Get unique site identifier from mock data
-        const siteId = mockSiteData?.identifier || "default";
+        const siteIdentifier = mockSiteData?.identifier || "default";
         return (
-            <div data-testid={`site-card-footer-${siteId}`}>
+            <div data-testid={`site-card-footer-${siteIdentifier}`}>
                 Click to view details
             </div>
         );
@@ -157,14 +157,14 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
         "aria-label"?: string;
     }) => {
         // Get unique site identifier from mock data
-        const siteId = mockSiteData?.identifier || "default";
+        const siteIdentifier = mockSiteData?.identifier || "default";
         // Extract site name from aria-label to create unique test ID
         // Handle the case where aria-label is "View details for " (empty name)
         const siteNameMatch = ariaLabel?.match(
             /View details for (?<siteName>.*)/
         );
         const siteName = siteNameMatch?.groups?.["siteName"] ?? "unknown";
-        const testId = `themed-box-${siteId}-${siteName.replaceAll(/[^\dA-Za-z]/g, "_")}`;
+        const testId = `themed-box-${siteIdentifier}-${siteName.replaceAll(/[^\dA-Za-z]/g, "_")}`;
 
         return (
             <div

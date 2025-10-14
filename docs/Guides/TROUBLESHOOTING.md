@@ -137,7 +137,7 @@ eventBus.onTyped("site:updated", (data) => {
  console.log("Event received:", data._meta.correlationId);
 });
 
-await eventBus.emitTyped("site:updated", { siteId: "123" });
+await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
 ```
 
 #### 2. IPC Events Not Crossing Boundary
@@ -402,7 +402,10 @@ import { logger } from "./utils/logger";
 
 // Use structured logging
 logger.debug("Operation started", { operationId, userId });
-logger.info("Site created", { siteId: site.id, name: site.name });
+logger.info("Site created", {
+ siteIdentifier: site.identifier,
+ name: site.name,
+});
 logger.error("Database error", { error: error.message, query });
 ```
 

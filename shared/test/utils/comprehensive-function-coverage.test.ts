@@ -566,8 +566,8 @@ describe("Shared Module - 100% Function Coverage", () => {
             // Call all exported functions
             expect(
                 errorCatalogModule.formatErrorMessage(
-                    "Site with ID '{siteId}' was not found",
-                    { siteId: "test" }
+                    "Site with ID '{siteIdentifier}' was not found",
+                    { siteIdentifier: "test" }
                 )
             ).toBeDefined();
             expect(

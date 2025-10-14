@@ -18,7 +18,7 @@ interface StatusEntry {
     responseTime: number;
     details?: string;
     monitorId: string;
-    siteId: string;
+        siteIdentifier: string;
 }
 
 /**
@@ -78,7 +78,7 @@ interface TimeWindowStats {
  * Represents status aggregation result data in the status processing benchmark.
  */
 interface StatusAggregationResult {
-    siteId: string;
+    siteIdentifier: string;
     totalMonitors: number;
     activeMonitors: number;
     overallStatus: "healthy" | "degraded" | "critical" | "unknown";
@@ -159,7 +159,7 @@ class MockStatusProcessingService {
                 }
             }
 
-            totalResponseTime += entry.responseTime;
+        for (const entry of sortedEntries) {
         }
 
         const totalChecks = sortedEntries.length;
@@ -215,8 +215,8 @@ class MockStatusProcessingService {
         const thresholds = severityThresholds ?? {
             minor: 300_000,
             major: 1_800_000,
-        };
-        const sortedEntries = entries.toSorted(
+            function generateSiteIdentifiers(count: number): string[] {
+                return Array.from({ length: count }, (_, i) => `site-${i + 1}`);
             (a, b) => a.timestamp - b.timestamp
         );
         const outages: OutageEvent[] = [];
@@ -258,7 +258,7 @@ class MockStatusProcessingService {
                         severity,
                         affectedMonitors: Array.from(currentOutage.monitors),
                         impactScope,
-                    });
+                const siteIdentifier = new Set(
                 }
 
                 currentOutage = null;
@@ -330,7 +330,7 @@ class MockStatusProcessingService {
         const siteGroups = this.groupStatusBySite(statusUpdates);
         const results = new Map<string, StatusAggregationResult>();
 
-        for (const [siteId, siteEntries] of siteGroups) {
+        for (const [siteIdentifier, siteEntries] of siteGroups) {
             const monitors = new Set(
                 siteEntries.map((entry) => entry.monitorId)
             );
@@ -344,9 +344,10 @@ class MockStatusProcessingService {
 
             // Calculate SLA compliance
             const slaCompliance = this.calculateSLACompliance(
-                siteEntries,
-                99.9
-            );
+                    const monitors = new Set(
+                        siteEntries.map((entry) => entry.monitorId)
+                    );
+                    const activeMonitors = monitors.size;
 
             // Calculate time window statistics
             const now = Date.now();
@@ -383,8 +384,8 @@ class MockStatusProcessingService {
             // Calculate trends
             const trends = this.calculateTrends(siteEntries, timeWindowStats);
 
-            results.set(siteId, {
-                siteId,
+            results.set(siteIdentifier, {
+                siteIdentifier,
                 totalMonitors: activeMonitors,
                 activeMonitors,
                 overallStatus,
@@ -395,8 +396,8 @@ class MockStatusProcessingService {
                 trends,
             });
         }
-
-        return results;
+                    results.set(siteIdentifier, {
+                        siteIdentifier,
     }
 
     /**
@@ -474,9 +475,9 @@ class MockStatusProcessingService {
         const groups = new Map<string, StatusEntry[]>();
 
         for (const entry of entries) {
-            const existing = groups.get(entry.siteId) || [];
+                const existing = groups.get(entry.siteIdentifier) || [];
             existing.push(entry);
-            groups.set(entry.siteId, existing);
+                groups.set(entry.siteIdentifier, existing);
         }
 
         return groups;
@@ -551,7 +552,7 @@ class MockStatusProcessingService {
 
     private updateRunningStatistics(entry: StatusEntry): void {
         // Update running statistics (simplified)
-        const cacheKey = `running-${entry.siteId}`;
+            const cacheKey = `running-${entry.siteIdentifier}`;
         // Implementation would update running averages, counters, etc.
     }
 
@@ -651,8 +652,11 @@ function generateStatusEntries(
     const now = Date.now();
 
     for (let i = 0; i < count; i++) {
-        const siteId = siteIds[Math.floor(Math.random() * siteIds.length)];
-        const monitorId = `${siteId}-monitor-${Math.floor(Math.random() * monitorsPerSite)}`;
+        const siteIdentifier =
+            siteIds[Math.floor(Math.random() * siteIds.length)];
+        const monitorId = `${siteIdentifier}-monitor-${Math.floor(
+            Math.random() * monitorsPerSite
+        )}`;
         const timestamp = now - Math.random() * timeSpan;
 
         // Simulate realistic failure patterns (5% down, 2% degraded)
@@ -684,7 +688,7 @@ function generateStatusEntries(
             responseTime,
             details: status === "down" ? "Connection timeout" : undefined,
             monitorId,
-            siteId,
+            siteIdentifier,
         });
     }
 
@@ -1029,14 +1033,18 @@ describe("Status Processing and Aggregation Benchmarks", () => {
                 );
 
                 // Additional processing on results
-                for (const [siteId, result] of results) {
+                for (const [siteIdentifier, result] of results) {
                     const outages = statusService.detectOutages(
-                        entries.filter((e) => e.siteId === siteId),
+                        entries.filter(
+                            (entry) => entry.siteIdentifier === siteIdentifier
+                        ),
                         60_000
                     );
 
                     const slaCompliance = statusService.calculateSLACompliance(
-                        entries.filter((e) => e.siteId === siteId),
+                        entries.filter(
+                            (entry) => entry.siteIdentifier === siteIdentifier
+                        ),
                         99.9
                     );
                 }

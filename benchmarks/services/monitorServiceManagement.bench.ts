@@ -14,7 +14,7 @@ import { bench, describe } from "vitest";
  */
 interface Monitor {
     id: string;
-    siteId: string;
+    siteIdentifier: string;
     type: "http" | "port" | "dns" | "ping";
     name: string;
     url?: string;
@@ -31,7 +31,8 @@ interface Monitor {
 }
 
 /**
- * Represents monitor check result data in the monitor service management benchmark.
+ * Represents monitor check result data in the monitor service management
+ * benchmark.
  */
 interface MonitorCheckResult {
     monitorId: string;
@@ -58,7 +59,8 @@ interface MonitorSchedule {
 }
 
 /**
- * Represents monitor service metrics data in the monitor service management benchmark.
+ * Represents monitor service metrics data in the monitor service management
+ * benchmark.
  */
 interface MonitorServiceMetrics {
     totalMonitors: number;
@@ -79,7 +81,8 @@ interface MonitorServiceMetrics {
 }
 
 /**
- * Represents health check report data in the monitor service management benchmark.
+ * Represents health check report data in the monitor service management
+ * benchmark.
  */
 interface HealthCheckReport {
     serviceId: string;
@@ -92,7 +95,8 @@ interface HealthCheckReport {
 
 // Mock Monitor Service Management implementation
 /**
- * Mock monitor service manager used to drive the monitor service management benchmark.
+ * Mock monitor service manager used to drive the monitor service management
+ * benchmark.
  */
 class MockMonitorServiceManager {
     private monitors = new Map<string, Monitor>();
@@ -486,7 +490,7 @@ class MockMonitorServiceManager {
         ] as const;
         const testMonitors = Array.from({ length: monitorCount }, (_, i) => ({
             id: `stress-test-${i}`,
-            siteId: `site-${Math.floor(i / 10)}`,
+            siteIdentifier: `site-${Math.floor(i / 10)}`,
             type: validMonitorTypes[i % 4],
             name: `Stress Test Monitor ${i}`,
             url: `https://test${i}.example.com`,
@@ -716,12 +720,12 @@ function generateMonitors(count: number, siteCount: number = 10): Monitor[] {
     ] as const;
 
     for (let i = 0; i < count; i++) {
-        const siteId = `site-${(i % siteCount) + 1}`;
+        const siteIdentifier = `site-${(i % siteCount) + 1}`;
         const type = types[i % types.length];
 
         monitors.push({
             id: `monitor-${i}`,
-            siteId,
+            siteIdentifier,
             type,
             name: `${type.toUpperCase()} Monitor ${i}`,
             url: type === "http" ? `https://example${i}.com` : undefined,

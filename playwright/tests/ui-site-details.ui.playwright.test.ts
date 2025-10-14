@@ -158,10 +158,10 @@ test.describe(
                         electronAPI?: {
                             monitoring?: {
                                 stopMonitoringForSite?: (
-                                    siteId: string
+                                    siteIdentifier: string
                                 ) => Promise<unknown>;
                                 startMonitoringForSite?: (
-                                    siteId: string
+                                    siteIdentifier: string
                                 ) => Promise<unknown>;
                             };
                             sites?: {
@@ -206,7 +206,7 @@ test.describe(
                         electronAPI?: {
                             monitoring?: {
                                 startMonitoringForSite?: (
-                                    siteId: string
+                                    siteIdentifier: string
                                 ) => Promise<unknown>;
                             };
                             sites?: {
@@ -272,7 +272,7 @@ test.describe(
                         electronAPI?: {
                             monitoring?: {
                                 stopMonitoringForSite?: (
-                                    siteId: string
+                                    siteIdentifier: string
                                 ) => Promise<unknown>;
                             };
                             sites?: {

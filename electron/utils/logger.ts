@@ -124,13 +124,15 @@ export const dbLogger: Logger = createLogger("DB");
  * ```typescript
  * import { monitorLogger } from "./logger";
  *
- * monitorLogger.info("Monitor check started", { siteId: "abc123" });
+ * monitorLogger.info("Monitor check started", {
+ *     siteIdentifier: "abc123",
+ * });
  * monitorLogger.debug("Response time recorded", {
  *     time: 245,
  *     url: "https://example.com",
  * });
  * monitorLogger.error("Monitor check failed", {
- *     siteId: "abc123",
+ *     siteIdentifier: "abc123",
  *     error: "timeout",
  * });
  * ```

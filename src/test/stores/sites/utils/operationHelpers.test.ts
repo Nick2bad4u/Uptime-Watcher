@@ -283,7 +283,7 @@ describe("OperationHelpers", () => {
             await annotate("Type: Business Logic", "type");
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             await withSiteOperation(
                 "testOperation",
@@ -324,7 +324,7 @@ describe("OperationHelpers", () => {
             await annotate("Type: Business Logic", "type");
 
             const mockOperation = vi.fn().mockResolvedValue(undefined);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             await withSiteOperation(
                 "testOperation",
@@ -363,7 +363,7 @@ describe("OperationHelpers", () => {
 
             const operationError = new Error("Operation failed");
             const mockOperation = vi.fn().mockRejectedValue(operationError);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to throw the error
             mockWithErrorHandling.mockRejectedValue(operationError);
@@ -394,7 +394,7 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const syncError = new Error("Sync failed");
             mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
             mockWithErrorHandling.mockImplementation(async (fn) => {
@@ -427,7 +427,7 @@ describe("OperationHelpers", () => {
 
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute the function and return its result
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
@@ -474,7 +474,7 @@ describe("OperationHelpers", () => {
 
             const expectedResult = { data: "test result" };
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute the function and return its result
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
@@ -518,7 +518,7 @@ describe("OperationHelpers", () => {
 
             const operationError = new Error("Operation failed");
             const mockOperation = vi.fn().mockRejectedValue(operationError);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to throw the error
             mockWithErrorHandling.mockRejectedValue(operationError);
@@ -553,7 +553,7 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(expectedResult);
             const syncError = new Error("Sync failed");
             mockDeps.syncSites = vi.fn().mockRejectedValue(syncError);
-            const params = { siteId: "site1" };
+            const params = { siteIdentifier: "site1" };
 
             // Mock withErrorHandling to execute and re-throw sync error
             mockWithErrorHandling.mockImplementation(async (fn) => {
@@ -775,7 +775,7 @@ describe("OperationHelpers", () => {
             await annotate("Type: Business Logic", "type");
 
             const complexParams = {
-                siteId: "site1",
+                siteIdentifier: "site1",
                 monitorId: "monitor1",
                 config: {
                     timeout: 5000,

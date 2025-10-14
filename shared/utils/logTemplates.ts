@@ -456,7 +456,7 @@ export function interpolateLogTemplate(
  * });
  *
  * // Use normally for dynamic content
- * logger.debug(`Processing site ${siteId} with custom logic`);
+ * logger.debug(`Processing site ${siteIdentifier} with custom logic`);
  * ```
  */
 export function createTemplateLogger(baseLogger: Logger): {

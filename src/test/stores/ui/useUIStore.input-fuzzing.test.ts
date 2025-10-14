@@ -85,7 +85,7 @@ const arbitraries = {
         .filter((s) => s.trim().length > 0),
 
     /** Generate site identifier */
-    siteId: fc
+    siteIdentifier: fc
         .string({ minLength: 1, maxLength: 50 })
         .filter((s) => s.trim().length > 0),
 

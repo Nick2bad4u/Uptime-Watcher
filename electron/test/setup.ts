@@ -204,18 +204,22 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
         setCheckCallback: vi.fn(function (this: any, callback: any) {
             this.onCheckCallback = callback;
         }),
-        startMonitor: vi.fn(function (this: any, siteId: string, monitor: any) {
+        startMonitor: vi.fn(function (
+            this: any,
+            siteIdentifier: string,
+            monitor: any
+        ) {
             if (!monitor.id) return false;
-            const key = `${siteId}|${monitor.id}`;
+            const key = `${siteIdentifier}|${monitor.id}`;
             this.intervals.set(key, 123); // Mock interval ID
             return true;
         }),
         stopMonitor: vi.fn(function (
             this: any,
-            siteId: string,
+            siteIdentifier: string,
             monitorId: string
         ) {
-            const key = `${siteId}|${monitorId}`;
+            const key = `${siteIdentifier}|${monitorId}`;
             if (this.intervals.has(key)) {
                 this.intervals.delete(key);
                 return true;
@@ -234,11 +238,15 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
             }
             return started;
         }),
-        stopSite: vi.fn(function (this: any, siteId: string, monitors?: any[]) {
+        stopSite: vi.fn(function (
+            this: any,
+            siteIdentifier: string,
+            monitors?: any[]
+        ) {
             if (monitors) {
                 for (const monitor of monitors) {
                     if (monitor.id) {
-                        this.stopMonitor(siteId, monitor.id);
+                        this.stopMonitor(siteIdentifier, monitor.id);
                     }
                 }
             } else {
@@ -247,7 +255,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
                 for (const key of this.intervals.keys()) {
                     if (
                         typeof key === "string" &&
-                        key.startsWith(`${siteId}|`)
+                        key.startsWith(`${siteIdentifier}|`)
                     ) {
                         keysToDelete.push(key);
                     }
@@ -260,19 +268,19 @@ vi.mock("../services/monitoring/MonitorScheduler", () => ({
         }),
         restartMonitor: vi.fn(function (
             this: any,
-            siteId: string,
+            siteIdentifier: string,
             monitor: any
         ) {
             if (!monitor.id) return false;
-            this.stopMonitor(siteId, monitor.id);
-            return this.startMonitor(siteId, monitor);
+            this.stopMonitor(siteIdentifier, monitor.id);
+            return this.startMonitor(siteIdentifier, monitor);
         }),
         isMonitoring: vi.fn(function (
             this: any,
-            siteId: string,
+            siteIdentifier: string,
             monitorId: string
         ) {
-            const key = `${siteId}|${monitorId}`;
+            const key = `${siteIdentifier}|${monitorId}`;
             return this.intervals.has(key);
         }),
         getActiveCount: vi.fn(function (this: any) {

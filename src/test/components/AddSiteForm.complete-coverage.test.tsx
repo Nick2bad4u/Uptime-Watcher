@@ -43,7 +43,7 @@ vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
         setPort: vi.fn(),
         setSelectedExistingSite: vi.fn(),
         setUrl: vi.fn(),
-        siteId: "test-site-id",
+        siteIdentifier: "test-site-id",
         url: "",
     }),
 }));
