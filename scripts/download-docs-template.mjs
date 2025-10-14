@@ -36,8 +36,8 @@ import fsSync from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
-/** @typedef {import('http')} http */
-/** @typedef {import('https')} https */
+/** @typedef {import("http")} http */
+/** @typedef {import("https")} https */
 
 const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
@@ -47,13 +47,31 @@ const __dirname = path.dirname(__filename);
 
 /**
  * @typedef {Object} ExecFileResult
+ *
  * @property {string} stdout - Standard output
  * @property {string} stderr - Standard error
  */
 
 /**
  * @typedef {Object} HttpModule
+ *
  * @property {Function} get - HTTP GET method
+ */
+
+/**
+ * @typedef {Object} HttpResponse
+ *
+ * @property {number} [statusCode] - HTTP status code
+ * @property {Function} setEncoding - Set response encoding
+ * @property {Function} on - Event listener
+ */
+
+/**
+ * @typedef {Object} HttpRequest
+ *
+ * @property {Function} on - Event listener
+ * @property {Function} setTimeout - Set request timeout
+ * @property {Function} destroy - Destroy request
  */
 
 /**
@@ -122,6 +140,7 @@ const __dirname = path.dirname(__filename);
 
 /**
  * @typedef {Object} ValidationResult
+ *
  * @property {boolean} isValid - Whether content is valid
  * @property {string[]} [errors] - Validation errors
  */
@@ -316,7 +335,8 @@ function showHelp() {
  */
 class Logger {
     /**
-     * @param {boolean} [verbose=false] - Enable verbose logging
+     * @param {boolean} [verbose=false] - Enable verbose logging. Default is
+     *   `false`
      */
     constructor(verbose = false) {
         /** @type {boolean} */
@@ -328,6 +348,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     info(message, ...args) {
@@ -337,6 +358,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     success(message, ...args) {
@@ -346,6 +368,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     warn(message, ...args) {
@@ -355,6 +378,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     error(message, ...args) {
@@ -364,6 +388,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     debug(message, ...args) {
@@ -375,7 +400,8 @@ class Logger {
     /**
      * @param {number} current
      * @param {number} total
-     * @param {string} [item=""]
+     * @param {string} [item=""] Default is `""`
+     *
      * @returns {void}
      */
     progress(current, total, item = "") {
@@ -603,25 +629,28 @@ function cleanContent(content, config, logger) {
  *
  * @param {string} url - URL to download
  * @param {number} timeoutMs - Timeout in milliseconds
+ *
  * @returns {Promise<string>}
  */
 async function rawDownload(url, timeoutMs) {
     /** @type {HttpModule} */
     const protocol = await import(url.startsWith("https") ? "https" : "http");
     return new Promise((resolve, reject) => {
-        /** @type {import('http').ClientRequest} */
-        const req = protocol.get(url, (res) => {
-            if (res.statusCode && res.statusCode >= 400) {
-                reject(new Error(`HTTP ${res.statusCode} for ${url}`));
-                return;
-            }
-            /** @type {string} */
-            let data = "";
-            res.setEncoding("utf8");
-            res.on("data", (/** @type {string} */ c) => (data += c));
-            res.on("end", () => resolve(data));
-        });
-        req.on("error", reject);
+        /** @type {HttpRequest} */
+        const req = /** @type {HttpRequest} */ (
+            protocol.get(url, (/** @type {HttpResponse} */ res) => {
+                if (res.statusCode && res.statusCode >= 400) {
+                    reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+                    return;
+                }
+                /** @type {string} */
+                let data = "";
+                res.setEncoding("utf8");
+                res.on("data", (/** @type {string} */ c) => (data += c));
+                res.on("end", () => resolve(data));
+            })
+        );
+        req.on("error", (/** @type {Error} */ err) => reject(err));
         req.setTimeout(timeoutMs, () =>
             req.destroy(new Error("Request timeout"))
         );
@@ -684,7 +713,9 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 };
             }
         } catch (e) {
-            logger.debug(`Cache check failed for ${page}: ${e instanceof Error ? e.message : String(e)}`);
+            logger.debug(
+                `Cache check failed for ${page}: ${e instanceof Error ? e.message : String(e)}`
+            );
         }
     }
 
@@ -702,7 +733,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
         try {
             logger.debug(
                 `Downloading ${page} (attempt ${attempt}/${config.maxRetries})` +
-                (useRaw ? " [raw]" : " [pandoc]")
+                    (useRaw ? " [raw]" : " [pandoc]")
             );
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
             /** @type {string} */
@@ -755,7 +786,8 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 attempts: attempt,
             };
         } catch (error) {
-            lastError = error instanceof Error ? error : new Error(String(error));
+            lastError =
+                error instanceof Error ? error : new Error(String(error));
             logger.warn(
                 `Attempt ${attempt} failed for ${page}: ${lastError.message}`
             );
@@ -986,7 +1018,9 @@ async function main() {
                 }
             }
         } catch (error) {
-            logger.warn(`Failed to load previous hashes: ${error instanceof Error ? error.message : String(error)}`);
+            logger.warn(
+                `Failed to load previous hashes: ${error instanceof Error ? error.message : String(error)}`
+            );
         }
 
         // Create download tasks
@@ -1004,26 +1038,28 @@ async function main() {
         /** @type {DownloadResult[]} */
         const results = config.enableParallel
             ? await downloadParallel(
-                downloadTasks,
-                config,
-                logger,
-                paths,
-                previousHashes
-            )
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              )
             : await downloadSequential(
-                downloadTasks,
-                config,
-                logger,
-                paths,
-                previousHashes
-            );
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              );
 
         // Process results and generate report
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
     } catch (error) {
-        console.error(`❌ Application failed: ${error instanceof Error ? error.message : String(error)}`);
+        console.error(
+            `❌ Application failed: ${error instanceof Error ? error.message : String(error)}`
+        );
         if (process.env.DOC_DOWNLOADER_VERBOSE) {
             console.error(error instanceof Error ? error.stack : error);
         }

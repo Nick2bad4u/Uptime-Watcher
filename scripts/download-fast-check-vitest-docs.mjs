@@ -303,6 +303,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     info(message, ...args) {
@@ -312,6 +313,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     success(message, ...args) {
@@ -321,6 +323,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     warn(message, ...args) {
@@ -330,6 +333,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     error(message, ...args) {
@@ -339,6 +343,7 @@ class Logger {
     /**
      * @param {string} message
      * @param {...any} args
+     *
      * @returns {void}
      */
     debug(message, ...args) {
@@ -351,6 +356,7 @@ class Logger {
      * @param {number} current
      * @param {number} total
      * @param {string} item
+     *
      * @returns {void}
      */
     progress(current, total, item = "") {
@@ -615,21 +621,24 @@ async function isPandocAvailable(logger) {
  * @returns {Promise<string>}
  */
 async function rawDownload(url, timeoutMs) {
-    /** @type {typeof import('http') | typeof import('https')} */
+    /** @type {typeof import("http") | typeof import("https")} */
     const protocol = await import(url.startsWith("https") ? "https" : "http");
     return new Promise((resolve, reject) => {
-        /** @type {import('http').ClientRequest} */
-        const req = protocol.get(url, (/** @type {import('http').IncomingMessage} */ res) => {
-            if (res.statusCode && res.statusCode >= 400) {
-                reject(new Error(`HTTP ${res.statusCode} for ${url}`));
-                return;
+        /** @type {import("http").ClientRequest} */
+        const req = protocol.get(
+            url,
+            (/** @type {import("http").IncomingMessage} */ res) => {
+                if (res.statusCode && res.statusCode >= 400) {
+                    reject(new Error(`HTTP ${res.statusCode} for ${url}`));
+                    return;
+                }
+                /** @type {string} */
+                let data = "";
+                res.setEncoding("utf8");
+                res.on("data", (/** @type {string} */ c) => (data += c));
+                res.on("end", () => resolve(data));
             }
-            /** @type {string} */
-            let data = "";
-            res.setEncoding("utf8");
-            res.on("data", (/** @type {string} */ c) => (data += c));
-            res.on("end", () => resolve(data));
-        });
+        );
         req.on("error", (/** @type {Error} */ err) => reject(err));
         req.setTimeout(timeoutMs, () =>
             req.destroy(new Error("Request timeout"))
@@ -643,6 +652,7 @@ async function rawDownload(url, timeoutMs) {
  * @param {Logger} logger
  * @param {Paths} paths
  * @param {Record<string, string>} previousHashes
+ *
  * @returns {Promise<DownloadResult>}
  */
 async function downloadFile(task, config, logger, paths, previousHashes) {
@@ -662,17 +672,19 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 logger.info(`♻️  Cache hit (unchanged) - skipping ${page}`);
                 /** @type {DownloadResult} */
 
-                return ({
+                return {
                     page,
                     outputPath,
                     success: true,
                     hash: existingHash,
                     size: existing.length,
                     attempts: 0,
-                });
+                };
             }
         } catch (/** @type {unknown} */ e) {
-            logger.debug(`Cache check failed for ${page}: ${e instanceof Error ? e.message : String(e)}`);
+            logger.debug(
+                `Cache check failed for ${page}: ${e instanceof Error ? e.message : String(e)}`
+            );
         }
     }
 
@@ -690,7 +702,7 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
         try {
             logger.debug(
                 `Downloading ${page} (attempt ${attempt}/${config.maxRetries})` +
-                (useRaw ? " [raw]" : " [pandoc]")
+                    (useRaw ? " [raw]" : " [pandoc]")
             );
             await fs.mkdir(path.dirname(outputPath), { recursive: true });
             /** @type {string} */
@@ -736,16 +748,17 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
             logger.success(`Downloaded: ${page}`);
             /** @type {DownloadResult} */
 
-            return ({
+            return {
                 page,
                 outputPath,
                 success: true,
                 hash,
                 size: content.length,
                 attempts: attempt,
-            });
+            };
         } catch (/** @type {unknown} */ error) {
-            lastError = error instanceof Error ? error : new Error(String(error));
+            lastError =
+                error instanceof Error ? error : new Error(String(error));
             logger.warn(
                 `Attempt ${attempt} failed for ${page}: ${lastError.message}`
             );
@@ -753,7 +766,9 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
                 /** @type {number} */
                 const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
                 logger.debug(`Retrying in ${delay}ms...`);
-                await new Promise((/** @type {(value: void) => void} */ r) => setTimeout(r, delay));
+                await new Promise((/** @type {(value: void) => void} */ r) =>
+                    setTimeout(r, delay)
+                );
             }
         }
     }
@@ -762,13 +777,13 @@ async function downloadFile(task, config, logger, paths, previousHashes) {
     );
     /** @type {DownloadResult} */
 
-    return ({
+    return {
         page,
         outputPath,
         success: false,
         error: lastError?.message || "Unknown error",
         attempts: config.maxRetries,
-    });
+    };
 }
 
 /**
@@ -973,11 +988,15 @@ async function main() {
                     typeof parsed === "object" &&
                     !Array.isArray(parsed)
                 ) {
-                    previousHashes = /** @type {Record<string, string>} */ (parsed);
+                    previousHashes = /** @type {Record<string, string>} */ (
+                        parsed
+                    );
                 }
             }
         } catch (error) {
-            logger.warn(`Failed to load previous hashes: ${error instanceof Error ? error.message : String(error)}`);
+            logger.warn(
+                `Failed to load previous hashes: ${error instanceof Error ? error.message : String(error)}`
+            );
         }
 
         // Create download tasks
@@ -995,26 +1014,28 @@ async function main() {
         /** @type {DownloadResult[]} */
         const results = config.enableParallel
             ? await downloadParallel(
-                downloadTasks,
-                config,
-                logger,
-                paths,
-                previousHashes
-            )
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              )
             : await downloadSequential(
-                downloadTasks,
-                config,
-                logger,
-                paths,
-                previousHashes
-            );
+                  downloadTasks,
+                  config,
+                  logger,
+                  paths,
+                  previousHashes
+              );
 
         // Process results and generate report
         await generateReport(results, config, logger, paths, previousHashes);
 
         logger.success(`Download completed successfully!`);
     } catch (error) {
-        console.error(`❌ Application failed: ${error instanceof Error ? error.message : String(error)}`);
+        console.error(
+            `❌ Application failed: ${error instanceof Error ? error.message : String(error)}`
+        );
         if (process.env.DOC_DOWNLOADER_VERBOSE) {
             console.error(error instanceof Error ? error.stack : error);
         }
@@ -1032,7 +1053,7 @@ async function main() {
  * @returns {string} Output file path
  */
 function getOutputPath(page, config, paths) {
-    /** @type {import('path').ParsedPath} */
+    /** @type {import("path").ParsedPath} */
     const parsed = path.parse(page);
     /** @type {string} */
     const fileName = path.join(

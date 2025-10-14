@@ -9,6 +9,7 @@ import path from "node:path";
 
 /**
  * @typedef {Object} FileHashMap
+ *
  * @property {string} [key] - SHA-256 hash for a given filename
  */
 

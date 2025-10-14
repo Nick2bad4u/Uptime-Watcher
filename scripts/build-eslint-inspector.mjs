@@ -87,7 +87,8 @@ async function buildESLintInspector() {
 
         console.log("✅ ESLint Config Inspector built successfully");
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error(
             "❌ Failed to build ESLint Config Inspector:",
             errorMessage
@@ -135,7 +136,8 @@ async function copyToDocusaurus() {
         await fs.remove(ESLINT_INSPECTOR_OUTPUT_DIR);
         console.log("🧹 Cleaned up temporary build directory");
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error("❌ Failed to copy ESLint Inspector:", errorMessage);
         throw error;
     }
@@ -214,7 +216,8 @@ async function fixAssetPaths() {
 
         console.log("✅ Asset path fixing completed");
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error("❌ Failed to fix asset paths:", errorMessage);
         throw error;
     }
@@ -300,7 +303,8 @@ async function createLocalTestingVersion() {
         );
         console.log(`🗑️  Remember to delete ${localTestDir} when done testing`);
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error(
             "❌ Failed to create local testing version:",
             errorMessage
@@ -386,7 +390,8 @@ async function createIndexRedirect() {
 
         console.log("✅ Index redirect page created");
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
         console.error("❌ Failed to create index redirect:", errorMessage);
         throw error;
     }

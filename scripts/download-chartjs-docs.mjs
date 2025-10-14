@@ -9,7 +9,9 @@ import path from "node:path";
 
 /**
  * @typedef {Object} HashRecord
- * @property {Record<string, string>} [key] - Mapping of file names to their SHA-256 hashes
+ *
+ * @property {Record<string, string>} [key] - Mapping of file names to their
+ *   SHA-256 hashes
  */
 
 /**
@@ -172,7 +174,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (readErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                    ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
+                        ` → Failed to read file: ${readErr instanceof Error ? readErr.message : String(readErr)}`
                 );
                 return reject(readErr);
             }
@@ -195,7 +197,7 @@ function downloadFile(cmd, filePath, logMsg, name) {
             } catch (writeErr) {
                 console.error(
                     logMsg.replace("✅", "❌") +
-                    ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
+                        ` → Failed to write file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`
                 );
                 return reject(writeErr);
             }
