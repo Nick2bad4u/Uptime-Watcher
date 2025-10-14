@@ -17,8 +17,37 @@ const mockIpcRenderer = vi.hoisted(() => ({
     removeAllListeners: vi.fn(),
 }));
 
+const diagnosticsWarnSpy = vi.hoisted(() => vi.fn());
+const guardFailureSpy = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+const buildPayloadPreviewMock = vi.hoisted(() =>
+    vi.fn((payload: unknown) => {
+        try {
+            return JSON.stringify(payload);
+        } catch {
+            return undefined;
+        }
+    })
+);
+
 vi.mock("electron", () => ({
     ipcRenderer: mockIpcRenderer,
+}));
+
+vi.mock("../../../preload/utils/preloadLogger", () => ({
+    buildPayloadPreview: buildPayloadPreviewMock,
+    preloadLogger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
+    preloadDiagnosticsLogger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: diagnosticsWarnSpy,
+    },
+    reportPreloadGuardFailure: guardFailureSpy,
 }));
 
 import { createEventsApi } from "../../../preload/domains/eventsApi";
@@ -60,6 +89,9 @@ describe("Events Domain API", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        diagnosticsWarnSpy.mockClear();
+        guardFailureSpy.mockClear();
+        buildPayloadPreviewMock.mockClear();
         eventsApi = createEventsApi();
     });
 
@@ -370,9 +402,6 @@ describe("Events Domain API", () => {
 
         it("should drop legacy monitor status payloads", () => {
             const callback = vi.fn();
-            const warnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
             const legacyPayload = {
                 monitorId: "monitor-legacy",
                 newStatus: "down",
@@ -389,11 +418,20 @@ describe("Events Domain API", () => {
             eventHandler?.({}, legacyPayload);
 
             expect(callback).not.toHaveBeenCalled();
-            expect(warnSpy).toHaveBeenCalledWith(
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
                 "[eventsApi] Dropped malformed payload for 'monitor:status-changed'",
-                legacyPayload
+                expect.objectContaining({
+                    guard: expect.stringContaining("isMonitor"),
+                    payloadType: "object",
+                })
             );
-            warnSpy.mockRestore();
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitor:status-changed",
+                    guard: expect.stringContaining("isMonitor"),
+                    reason: "payload-validation",
+                })
+            );
         });
     });
 
@@ -747,9 +785,6 @@ describe("Events Domain API", () => {
 
         it("should handle undefined event data", () => {
             const callback = vi.fn();
-            const warnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
 
             eventsApi.onTestEvent(callback);
 
@@ -757,19 +792,23 @@ describe("Events Domain API", () => {
             eventHandler?.({}, undefined);
 
             expect(callback).not.toHaveBeenCalled();
-            expect(warnSpy).toHaveBeenCalledWith(
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
                 "[eventsApi] Dropped malformed payload for 'test-event'",
-                undefined
+                expect.objectContaining({
+                    guard: expect.stringContaining("isTestEventDataPayload"),
+                    payloadType: "undefined",
+                })
             );
-
-            warnSpy.mockRestore();
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "test-event",
+                    guard: expect.stringContaining("isTestEventDataPayload"),
+                })
+            );
         });
 
         it("should handle null event data", () => {
             const callback = vi.fn();
-            const warnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
 
             eventsApi.onMonitorStatusChanged(callback);
 
@@ -777,19 +816,23 @@ describe("Events Domain API", () => {
             eventHandler?.({}, null);
 
             expect(callback).not.toHaveBeenCalled();
-            expect(warnSpy).toHaveBeenCalledWith(
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
                 "[eventsApi] Dropped malformed payload for 'monitor:status-changed'",
-                null
+                expect.objectContaining({
+                    guard: expect.stringContaining("isMonitorStatusChanged"),
+                    payloadType: "object",
+                })
             );
-
-            warnSpy.mockRestore();
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitor:status-changed",
+                    guard: expect.stringContaining("isMonitorStatusChanged"),
+                })
+            );
         });
 
         it("should handle malformed event data gracefully", () => {
             const callback = vi.fn();
-            const warnSpy = vi
-                .spyOn(console, "warn")
-                .mockImplementation(() => {});
 
             eventsApi.onCacheInvalidated(callback);
 
@@ -798,12 +841,23 @@ describe("Events Domain API", () => {
             eventHandler?.({}, malformedData);
 
             expect(callback).not.toHaveBeenCalled();
-            expect(warnSpy).toHaveBeenCalledWith(
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
                 "[eventsApi] Dropped malformed payload for 'cache:invalidated'",
-                malformedData
+                expect.objectContaining({
+                    guard: expect.stringContaining(
+                        "isCacheInvalidatedEventDataPayload"
+                    ),
+                    payloadType: "object",
+                })
             );
-
-            warnSpy.mockRestore();
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "cache:invalidated",
+                    guard: expect.stringContaining(
+                        "isCacheInvalidatedEventDataPayload"
+                    ),
+                })
+            );
         });
 
         it("should handle cleanup function called multiple times", () => {

@@ -8,9 +8,9 @@ Uptime Watcher has undergone significant architectural evolution to become the r
 
 ## 🏗️ Architectural Evolution Timeline
 
-#### Phase 1: Initial Prototype (Early Development)
+### Phase 1: Initial Prototype (Early Development)
 
-##### **Simple Monitoring Application**
+#### **Simple Monitoring Application**
 
 ```yaml
 Frontend: Basic React + JavaScript
@@ -27,9 +27,9 @@ Architecture: Monolithic renderer process
 - Minimal error handling
 - Basic monitoring capabilities
 
-#### Phase 2: Structured Application (Mid Development)
+### Phase 2: Structured Application (Mid Development)
 
-##### **Introduction of TypeScript and Basic Architecture**
+#### **Introduction of TypeScript and Basic Architecture**
 
 ```yaml
 Frontend: React + TypeScript
@@ -46,9 +46,9 @@ Architecture: Separated concerns
 - ✅ Structured database approach with LowDB
 - ✅ Better error handling
 
-#### Phase 3: Current Architecture (Present)
+### Phase 3: Current Architecture (Present)
 
-##### **Enterprise-Grade Service-Oriented Architecture**
+#### **Enterprise-Grade Service-Oriented Architecture**
 
 ```yaml
 Frontend: React + TypeScript + Tailwind CSS + Vite

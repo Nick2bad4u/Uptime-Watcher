@@ -33,6 +33,11 @@ import {
 } from "@shared/validation/monitorStatusEvents";
 
 import { createEventManager } from "../core/bridgeFactory";
+import {
+    buildPayloadPreview,
+    preloadDiagnosticsLogger,
+    reportPreloadGuardFailure,
+} from "../utils/preloadLogger";
 
 /**
  * Type alias describing the events domain preload bridge surface.
@@ -217,23 +222,51 @@ const isUpdateStatusEventDataPayload = (
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
     isUnknownRecord(payload);
 
-const reportInvalidPayload = (channel: string, payload: unknown): void => {
-    console.warn(
-        `[eventsApi] Dropped malformed payload for '${channel}'`,
-        payload
-    );
-};
+interface GuardSubscriptionOptions {
+    readonly domain?: string;
+    readonly guardName?: string;
+    readonly reason?: string;
+}
 
 const subscribeWithGuard = <TPayload>(
     manager: EventManager,
     channel: string,
     guard: EventGuard<TPayload>,
-    callback: (payload: TPayload) => void
+    callback: (payload: TPayload) => void,
+    options: GuardSubscriptionOptions = {}
 ): (() => void) =>
     manager.on((...args: unknown[]) => {
         const [payload] = args;
         if (!guard(payload)) {
-            reportInvalidPayload(channel, payload);
+            const guardName =
+                options.guardName ??
+                (guard.name.length > 0 ? guard.name : "anonymous");
+            const payloadPreview = buildPayloadPreview(payload);
+            const payloadType = Array.isArray(payload)
+                ? "array"
+                : typeof payload;
+            const domain = options.domain ?? "eventsApi";
+
+            preloadDiagnosticsLogger.warn(
+                `[eventsApi] Dropped malformed payload for '${channel}'`,
+                {
+                    domain,
+                    guard: guardName,
+                    payloadPreview,
+                    payloadType,
+                }
+            );
+
+            void reportPreloadGuardFailure({
+                channel,
+                guard: guardName,
+                metadata: {
+                    domain,
+                    payloadType,
+                },
+                payloadPreview,
+                reason: options.reason ?? "payload-validation",
+            });
             return;
         }
         callback(payload);

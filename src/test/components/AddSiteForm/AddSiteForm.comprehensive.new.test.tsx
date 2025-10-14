@@ -404,6 +404,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
+            render(<AddSiteForm />);
+
             const urlInput = screen.getByLabelText(/url/i);
             expect(urlInput).toBeInTheDocument();
             // Note: Field value test removed as form component may not be using mock values correctly
@@ -591,6 +593,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
+            render(<AddSiteForm />);
+
             const submitButton = screen.getByRole("button", {
                 name: /add site/i,
             });
@@ -655,6 +659,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 setUrl: mockSetUrl,
             });
 
+            render(<AddSiteForm />);
+
             expect(
                 screen.getByText("Site name is required")
             ).toBeInTheDocument();
@@ -676,7 +682,9 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             // Check that all options are present in the select element
-            const monitorTypeSelect = screen.getByRole("combobox", {});
+            const monitorTypeSelect = screen.getByRole("combobox", {
+                name: /monitor type/i,
+            });
             expect(monitorTypeSelect).toBeInTheDocument();
             // Check that all options are available
             expect(

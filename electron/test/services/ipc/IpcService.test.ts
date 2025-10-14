@@ -240,6 +240,40 @@ describe(IpcService, () => {
             expect(metrics.missingHandlerChecks).toBe(1);
             expect(metrics.lastMissingChannel).toBe("missing-channel");
         });
+        it("records preload guard diagnostics", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
+
+            const diagnosticsEntry = mockIpcMain.handle.mock.calls.find(
+                ([channel]) => channel === "diagnostics:report-preload-guard"
+            );
+
+            expect(diagnosticsEntry).toBeDefined();
+
+            const diagnosticsHandler = diagnosticsEntry?.[1];
+            expect(typeof diagnosticsHandler).toBe("function");
+
+            const timestamp = Date.now();
+            await (diagnosticsHandler as any)(undefined, {
+                channel: "monitor:status-changed",
+                guard: "isMonitorStatusChangedEventData",
+                metadata: { source: "eventsApi" },
+                payloadPreview: '{"status":42}',
+                reason: "payload-validation",
+                timestamp,
+            });
+
+            const metrics = getDiagnosticsMetrics();
+            expect(metrics.preloadGuardReports).toBe(1);
+            expect(metrics.lastPreloadGuard).toEqual({
+                channel: "monitor:status-changed",
+                guard: "isMonitorStatusChangedEventData",
+                reason: "payload-validation",
+                timestamp,
+            });
+        });
         it("should setup monitoring handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: IpcService", "component");

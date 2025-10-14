@@ -24,7 +24,7 @@
  *     return (
  *         <div>
  *             {sites.map((site) => (
- *                 <SiteCard key={site.id} site={site} />
+ *                 <SiteCard key={site.identifier} site={site} />
  *             ))}
  *         </div>
  *     );

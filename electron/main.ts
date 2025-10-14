@@ -57,41 +57,47 @@ const configureLogging = (): {
         fileLevel: ElectronLogLevel;
     } => {
         if (debugFlag) {
-            console.log(
-                "[LOGGING] Debug logging enabled via command line flag"
-            );
-            return {
+            const configuration = {
                 consoleLevel: "debug" as ElectronLogLevel,
                 fileLevel: "debug" as ElectronLogLevel,
             };
-        } else if (productionFlag) {
-            console.log(
-                "[LOGGING] Production logging level enabled via command line flag"
+            logger.debug(
+                "[Logging] Debug logging enabled via command line flag",
+                configuration
             );
-            return {
+            return configuration;
+        } else if (productionFlag) {
+            const configuration = {
                 consoleLevel: "info" as ElectronLogLevel,
                 fileLevel: "warn" as ElectronLogLevel,
             };
-        } else if (infoFlag) {
-            console.log(
-                "[LOGGING] Info logging level enabled via command line flag"
+            logger.info(
+                "[Logging] Production logging level enabled via command line flag",
+                configuration
             );
-            return {
+            return configuration;
+        } else if (infoFlag) {
+            const configuration = {
                 consoleLevel: "info" as ElectronLogLevel,
                 fileLevel: "info" as ElectronLogLevel,
             };
+            logger.info(
+                "[Logging] Info logging level enabled via command line flag",
+                configuration
+            );
+            return configuration;
         }
         // Default development behavior
         const isDevMode = !app.isPackaged;
-        const consoleLevel = isDevMode ? "debug" : "info";
-        const fileLevel = isDevMode ? "info" : "warn";
-        console.log(
-            `[LOGGING] Default logging: console=${consoleLevel}, file=${fileLevel} (isDev=${isDevMode})`
-        );
-        return {
-            consoleLevel: consoleLevel as ElectronLogLevel,
-            fileLevel: fileLevel as ElectronLogLevel,
+        const configuration = {
+            consoleLevel: (isDevMode ? "debug" : "info") as ElectronLogLevel,
+            fileLevel: (isDevMode ? "info" : "warn") as ElectronLogLevel,
         };
+        logger.debug("[Logging] Using default logging configuration", {
+            ...configuration,
+            isDevMode,
+        });
+        return configuration;
     })();
 };
 

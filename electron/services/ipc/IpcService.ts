@@ -7,6 +7,7 @@
  * and validation.
  */
 import type { Monitor, Site } from "@shared/types";
+import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
@@ -16,13 +17,14 @@ import { BrowserWindow, ipcMain, shell } from "electron";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
-import { logger } from "../../utils/logger";
+import { diagnosticsLogger, logger } from "../../utils/logger";
 import {
     getAllMonitorTypeConfigs,
     getMonitorTypeConfig,
 } from "../monitoring/MonitorTypeRegistry";
 import {
     recordMissingHandler,
+    recordPreloadGuardFailure,
     recordSuccessfulHandlerCheck,
 } from "./diagnosticsMetrics";
 import {
@@ -37,6 +39,23 @@ import {
     StateSyncHandlerValidators,
     SystemHandlerValidators,
 } from "./validators";
+
+function isPreloadGuardDiagnosticsReport(
+    value: unknown
+): value is PreloadGuardDiagnosticsReport {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+        return false;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- value verified as object without arrays
+    const record = value as Record<string, unknown>;
+
+    return (
+        typeof record["channel"] === "string" &&
+        typeof record["guard"] === "string" &&
+        typeof record["timestamp"] === "number"
+    );
+}
 
 /**
  * Serialized monitor type configuration for IPC transmission.
@@ -1112,6 +1131,35 @@ export class IpcService {
                 };
             },
             SystemHandlerValidators.verifyIpcHandler,
+            this.registeredIpcHandlers
+        );
+
+        registerStandardizedIpcHandler(
+            "diagnostics:report-preload-guard",
+            (reportCandidate: unknown) => {
+                if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
+                    throw new TypeError(
+                        "Invalid preload guard diagnostics payload"
+                    );
+                }
+
+                const report = reportCandidate;
+
+                recordPreloadGuardFailure(report);
+
+                diagnosticsLogger.warn(
+                    "[IpcDiagnostics] Preload guard rejected payload",
+                    {
+                        channel: report.channel,
+                        guard: report.guard,
+                        metadata: report.metadata,
+                        payloadPreview: report.payloadPreview,
+                        reason: report.reason,
+                        timestamp: report.timestamp,
+                    }
+                );
+            },
+            SystemHandlerValidators.reportPreloadGuard,
             this.registeredIpcHandlers
         );
     }

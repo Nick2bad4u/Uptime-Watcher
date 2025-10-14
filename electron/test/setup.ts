@@ -338,3 +338,24 @@ vi.mock("electron-log/main", () => ({
         },
     },
 }));
+
+vi.mock("electron-log/renderer", () => ({
+    default: {
+        debug: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+        error: vi.fn(),
+        transports: {
+            file: {
+                level: "info",
+                fileName: "uptime-watcher-renderer.log",
+                maxSize: 1024 * 1024 * 5,
+                format: "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}",
+            },
+            console: {
+                level: "debug",
+                format: "[{h}:{i}:{s}.{ms}] [{level}] {text}",
+            },
+        },
+    },
+}));

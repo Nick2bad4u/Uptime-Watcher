@@ -61,6 +61,28 @@ export interface IpcHandlerVerificationResult {
 }
 
 /**
+ * Structured payload emitted when a preload guard rejects an incoming event.
+ *
+ * @remarks
+ * Enables centralized diagnostics by forwarding guard failures, along with
+ * contextual metadata, to the Electron main process.
+ */
+export interface PreloadGuardDiagnosticsReport {
+    /** IPC channel associated with the rejected payload. */
+    channel: string;
+    /** Name of the guard function that rejected the payload. */
+    guard: string;
+    /** Additional metadata describing the guard context. */
+    metadata?: Record<string, unknown>;
+    /** Serialized preview of the rejected payload for debugging. */
+    payloadPreview?: string;
+    /** Optional human-readable reason supplied by the guard. */
+    reason?: string;
+    /** Timestamp (milliseconds since Unix epoch) when the guard triggered. */
+    timestamp: number;
+}
+
+/**
  * Mapping of IPC invoke channel names to their parameter tuples and result
  * payloads.
  *
@@ -78,6 +100,10 @@ export interface IpcInvokeChannelMap {
     "delete-all-sites": {
         params: readonly [];
         result: number;
+    };
+    "diagnostics:report-preload-guard": {
+        params: readonly [report: PreloadGuardDiagnosticsReport];
+        result: undefined;
     };
     "diagnostics:verify-ipc-handler": {
         params: readonly [channel: string];

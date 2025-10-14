@@ -6,25 +6,34 @@
  * can detect missing handler registrations during CI and in production logs.
  */
 
+import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import * as loggerModule from "../../utils/logger";
 
 export interface DiagnosticsMetricsSnapshot {
     lastMissingChannel?: string;
+    lastPreloadGuard?: {
+        channel: string;
+        guard: string;
+        reason?: string;
+        timestamp: number;
+    };
     lastUpdatedAt?: number;
     missingHandlerChecks: number;
+    preloadGuardReports: number;
     successfulHandlerChecks: number;
 }
 
 const metrics: DiagnosticsMetricsSnapshot = {
     missingHandlerChecks: 0,
+    preloadGuardReports: 0,
     successfulHandlerChecks: 0,
 };
 
 interface DiagnosticsSnapshotContext {
     readonly channel?: string;
-    readonly event: "missing" | "success";
+    readonly event: "guard-failure" | "missing" | "success";
 }
 
 const consoleDiagnosticsLogger: Logger = {
@@ -104,6 +113,37 @@ export function recordMissingHandler(channel: string): void {
 }
 
 /**
+ * Records a preload guard failure reported by the preload diagnostics bridge.
+ *
+ * @param report - Guard diagnostics payload emitted by preload.
+ */
+export function recordPreloadGuardFailure(
+    report: PreloadGuardDiagnosticsReport
+): void {
+    metrics.preloadGuardReports += 1;
+    metrics.lastUpdatedAt = report.timestamp;
+    metrics.lastPreloadGuard = {
+        channel: report.channel,
+        guard: report.guard,
+        timestamp: report.timestamp,
+        ...(report.reason ? { reason: report.reason } : {}),
+    };
+
+    diagnosticsLog.warn("[IpcDiagnostics] Preload guard failure", {
+        channel: report.channel,
+        guard: report.guard,
+        metadata: report.metadata,
+        payloadPreviewLength: report.payloadPreview?.length ?? 0,
+        reason: report.reason,
+    });
+
+    logDiagnosticsSnapshot({
+        channel: report.channel,
+        event: "guard-failure",
+    });
+}
+
+/**
  * Retrieves a snapshot of the current diagnostics metrics.
  *
  * @returns Diagnostics metrics snapshot with counters and metadata.
@@ -121,7 +161,9 @@ export function getDiagnosticsMetrics(): DiagnosticsMetricsSnapshot {
  */
 export function resetDiagnosticsMetrics(): void {
     delete metrics.lastMissingChannel;
+    delete metrics.lastPreloadGuard;
     delete metrics.lastUpdatedAt;
     metrics.missingHandlerChecks = 0;
+    metrics.preloadGuardReports = 0;
     metrics.successfulHandlerChecks = 0;
 }

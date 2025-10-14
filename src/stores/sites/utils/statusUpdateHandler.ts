@@ -212,14 +212,15 @@ export class StatusUpdateManager {
             );
             this.setSites(updatedSites);
 
-            const siteForCallback = event.site;
+            const updatedSite = updatedSites.find(
+                (site) => site.identifier === event.siteIdentifier
+            );
 
             // Call optional update callback
-            if (this.onUpdate) {
+            if (this.onUpdate && updatedSite) {
                 const statusUpdate: StatusUpdate = {
-                    monitor: event.monitor,
                     monitorId: event.monitorId,
-                    site: siteForCallback,
+                    site: updatedSite,
                     siteIdentifier: event.siteIdentifier,
                     status: event.status,
                     timestamp: new Date(event.timestamp).toISOString(),
@@ -231,10 +232,6 @@ export class StatusUpdateManager {
 
                 if (event.previousStatus !== undefined) {
                     statusUpdate.previousStatus = event.previousStatus;
-                }
-
-                if (event.responseTime !== undefined) {
-                    statusUpdate.responseTime = event.responseTime;
                 }
 
                 this.onUpdate(statusUpdate);

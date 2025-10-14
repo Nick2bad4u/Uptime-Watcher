@@ -73,6 +73,12 @@ export const SystemService: SystemServiceContract = {
         async (api, url: string): Promise<boolean> => {
             const opened = await api.system.openExternal(url);
 
+            if (typeof opened !== "boolean") {
+                throw new TypeError(
+                    `Electron declined to open external URL: ${url} (received ${typeof opened})`
+                );
+            }
+
             if (!opened) {
                 throw new Error(
                     `Electron declined to open external URL: ${url}`

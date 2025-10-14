@@ -7,6 +7,7 @@
  * render scheduling, memoization, and dependency tracking costs.
  */
 
+import type { EffectCallback as ReactEffectCallback } from "react";
 import { bench, describe } from "vitest";
 
 // Interface definitions for React Hooks
@@ -94,8 +95,8 @@ interface CustomHookState extends HookState {
     complexity: number;
 }
 
-type EffectCleanup = (() => void) | undefined;
-type EffectCallback = () => EffectCleanup | undefined;
+type EffectCallback = ReactEffectCallback;
+type EffectCleanup = ReturnType<EffectCallback>;
 
 /**
  * Enumerates supported hook types tracked by the benchmark.

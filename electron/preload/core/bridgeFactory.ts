@@ -21,6 +21,11 @@ import type { IpcRendererEvent } from "electron";
 
 import { ipcRenderer } from "electron";
 
+import {
+    preloadDiagnosticsLogger,
+    preloadLogger,
+} from "../utils/preloadLogger";
+
 const DIAGNOSTICS_CHANNEL = "diagnostics:verify-ipc-handler" as const;
 
 const globalProcess =
@@ -231,8 +236,9 @@ async function verifyChannelOrThrow(channel: string): Promise<void> {
                 }
 
                 if (!verificationResult.registered) {
-                    console.error(
+                    preloadDiagnosticsLogger.error(
                         `[IPC Bridge] No handler registered for channel '${channel}'.`,
+                        undefined,
                         {
                             availableChannels:
                                 verificationResult.availableChannels,
@@ -371,7 +377,10 @@ export function createEventManager(channel: string): {
                     callback(...args);
                 } catch (error) {
                     // Log callback errors but don't propagate them to prevent event system crashes
-                    console.warn("Event callback error:", error);
+                    preloadLogger.warn("Event callback error", {
+                        channel,
+                        error,
+                    });
                 }
             };
             ipcRenderer.on(channel, handleEventCallback);
@@ -390,7 +399,10 @@ export function createEventManager(channel: string): {
                     callback(...args);
                 } catch (error) {
                     // Log callback errors but don't propagate them to prevent event system crashes
-                    console.warn("Event callback error:", error);
+                    preloadLogger.warn("Event callback error", {
+                        channel,
+                        error,
+                    });
                 }
             });
         },

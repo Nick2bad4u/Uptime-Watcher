@@ -74,6 +74,7 @@ interface StateSyncHandlerValidatorsInterface {
  */
 interface SystemHandlerValidatorsInterface {
     openExternal: IpcParameterValidator;
+    reportPreloadGuard: IpcParameterValidator;
     verifyIpcHandler: IpcParameterValidator;
 }
 
@@ -173,6 +174,80 @@ function createSingleObjectValidator(paramName: string): IpcParameterValidator {
         const error = IpcValidators.requiredObject(params[0], paramName);
         if (error) {
             errors.push(error);
+        }
+
+        return errors.length > 0 ? errors : null;
+    };
+}
+
+function createPreloadGuardReportValidator(): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        const errors: string[] = [];
+
+        if (params.length !== 1) {
+            errors.push("Expected exactly 1 parameter");
+        }
+
+        const [report] = params;
+        const objectError = IpcValidators.requiredObject(report, "guardReport");
+
+        if (objectError) {
+            errors.push(objectError);
+            return errors.length > 0 ? errors : null;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
+        const record = report as Record<string, unknown>;
+
+        const channelError = IpcValidators.requiredString(
+            record["channel"],
+            "channel"
+        );
+        if (channelError) {
+            errors.push(channelError);
+        }
+
+        const guardError = IpcValidators.requiredString(
+            record["guard"],
+            "guard"
+        );
+        if (guardError) {
+            errors.push(guardError);
+        }
+
+        const reasonError = IpcValidators.optionalString(
+            record["reason"],
+            "reason"
+        );
+        if (reasonError) {
+            errors.push(reasonError);
+        }
+
+        const payloadPreviewError = IpcValidators.optionalString(
+            record["payloadPreview"],
+            "payloadPreview"
+        );
+        if (payloadPreviewError) {
+            errors.push(payloadPreviewError);
+        }
+
+        const metadataValue = record["metadata"];
+        if (metadataValue !== undefined) {
+            const metadataError = IpcValidators.requiredObject(
+                metadataValue,
+                "metadata"
+            );
+            if (metadataError) {
+                errors.push(metadataError);
+            }
+        }
+
+        const timestampError = IpcValidators.requiredNumber(
+            record["timestamp"],
+            "timestamp"
+        );
+        if (timestampError) {
+            errors.push(timestampError);
         }
 
         return errors.length > 0 ? errors : null;
@@ -584,6 +659,7 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * Expects exactly one string parameter (the URL to open).
      */
     openExternal: createSingleStringValidator("url"),
+    reportPreloadGuard: createPreloadGuardReportValidator(),
     /**
      * Validates parameters for the diagnostics handler verification channel.
      *
