@@ -12,9 +12,10 @@ import type { UnknownRecord } from "type-fest";
 
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
-import { BrowserWindow, ipcMain, shell } from "electron";
+import { ipcMain, shell } from "electron";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+import type { RendererEventBridge } from "../events/RendererEventBridge";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { diagnosticsLogger, logger } from "../../utils/logger";
@@ -411,7 +412,8 @@ const UiConfigSerializer = {
  * ```typescript
  * const ipcService = new IpcService(
  *     uptimeOrchestrator,
- *     autoUpdaterService
+ *     autoUpdaterService,
+ *     rendererEventBridge
  * );
  * ipcService.setupHandlers();
  *
@@ -427,9 +429,14 @@ const UiConfigSerializer = {
  *
  *     constructor(
  *         orchestrator: UptimeOrchestrator,
- *         updater: AutoUpdaterService
+ *         updater: AutoUpdaterService,
+ *         rendererBridge: RendererEventBridge
  *     ) {
- *         this.ipcService = new IpcService(orchestrator, updater);
+ *         this.ipcService = new IpcService(
+ *             orchestrator,
+ *             updater,
+ *             rendererBridge
+ *         );
  *     }
  *
  *     async start(): Promise<void> {
@@ -466,6 +473,9 @@ export class IpcService {
      */
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
+    /** Renderer bridge for broadcasting events to all windows. */
+    private readonly rendererEventBridge: RendererEventBridge;
+
     /**
      * Constructs a new IpcService instance.
      *
@@ -488,15 +498,19 @@ export class IpcService {
      * @param uptimeOrchestrator - The core orchestrator for monitoring
      *   operations
      * @param autoUpdaterService - The service for handling application updates
+     * @param rendererEventBridge - Bridge for broadcasting events to renderer
+     *   processes
      *
      * @public
      */
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
-        autoUpdaterService: AutoUpdaterService
+        autoUpdaterService: AutoUpdaterService,
+        rendererEventBridge: RendererEventBridge
     ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
+        this.rendererEventBridge = rendererEventBridge;
     }
 
     /**
@@ -1018,14 +1032,12 @@ export class IpcService {
                 );
 
                 // Send state sync event to all renderer processes
-                for (const window of BrowserWindow.getAllWindows()) {
-                    window.webContents.send("state-sync-event", {
-                        action: "bulk-sync",
-                        sites,
-                        source: "database",
-                        timestamp,
-                    });
-                }
+                this.rendererEventBridge.sendStateSyncEvent({
+                    action: "bulk-sync",
+                    sites,
+                    source: "database",
+                    timestamp,
+                });
 
                 logger.debug("[IpcService] Full sync completed", {
                     siteCount: sites.length,

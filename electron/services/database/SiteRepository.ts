@@ -171,9 +171,8 @@ export class SiteRepository {
 
         await withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.bulkInsertInternal(db, sites);
-                    return Promise.resolve();
                 }),
             "site-bulk-insert",
             undefined,
@@ -200,8 +199,8 @@ export class SiteRepository {
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(this.deleteInternal(db, identifier))
+                this.databaseService.executeTransaction(async (db) =>
+                    this.deleteInternal(db, identifier)
                 ),
             "site-delete",
             undefined,
@@ -229,9 +228,8 @@ export class SiteRepository {
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "site-delete-all"
         );
@@ -355,10 +353,9 @@ export class SiteRepository {
         site: Pick<SiteRow, SiteRowUpsertFields>
     ): Promise<void> {
         return withDatabaseOperation(
-            () => {
+            async () => {
                 const db = this.databaseService.getDatabase();
                 this.upsertInternal(db, site);
-                return Promise.resolve();
             },
             "site-upsert",
             undefined,
@@ -396,10 +393,9 @@ export class SiteRepository {
         metadata?: Record<string, unknown>
     ): Promise<TResult> {
         return withDatabaseOperation(
-            () => {
+            async () => {
                 const db = this.getDb();
-                const result = handler(db);
-                return Promise.resolve(result);
+                return handler(db);
             },
             operationName,
             undefined,

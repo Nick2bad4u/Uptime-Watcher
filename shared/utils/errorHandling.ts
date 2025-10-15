@@ -25,6 +25,69 @@
  * @packageDocumentation
  */
 
+/**
+ * Options for constructing an {@link ApplicationError} instance.
+ */
+/**
+ * Options for constructing an {@link ApplicationError} instance.
+ */
+export interface ApplicationErrorOptions {
+    /** Underlying error cause. */
+    cause?: unknown;
+    /** Machine-readable error code for diagnostics. */
+    code: string;
+    /** Additional structured metadata for debugging. */
+    details?: Record<string, unknown>;
+    /** Human-readable error message. */
+    message: string;
+    /** Optional identifier of the operation that failed. */
+    operation?: string;
+}
+
+/**
+ * Application-level error that decorates a cause with operation metadata.
+ *
+ * @remarks
+ * Normalizes the provided cause to ensure consistent error chaining and keeps
+ * diagnostic metadata immutable for safe logging.
+ *
+ * @public
+ */
+export class ApplicationError extends Error {
+    /** Machine-readable error code. */
+    public readonly code: string;
+
+    /** Identifier of the operation that produced the error. */
+    public readonly operation: string | undefined;
+
+    /** Structured diagnostic metadata. */
+    public readonly details: Readonly<Record<string, unknown>> | undefined;
+
+    /** Underlying cause of the error chain. */
+    public override readonly cause: unknown;
+
+    public constructor(options: ApplicationErrorOptions) {
+        const normalizedCause =
+            options.cause instanceof Error
+                ? options.cause
+                : options.cause === undefined
+                  ? undefined
+                  : new Error(String(options.cause));
+
+        super(
+            options.message,
+            normalizedCause ? { cause: normalizedCause } : undefined
+        );
+        this.name = "ApplicationError";
+        this.code = options.code;
+        this.operation = options.operation;
+        this.details = options.details
+            ? Object.freeze({ ...options.details })
+            : undefined;
+        this.cause = normalizedCause;
+    }
+}
+
 export interface ErrorHandlingBackendContext {
     logger: {
         error: (msg: string, err: unknown) => void;

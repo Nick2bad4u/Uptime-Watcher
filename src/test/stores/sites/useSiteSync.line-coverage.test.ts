@@ -197,6 +197,63 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 });
             });
 
+            describe("retryStatusSubscription success path", () => {
+                it("clears previous diagnostics before re-subscribing", async () => {
+                    const statusUpdateHandlerModule = await import(
+                        "../../../stores/sites/utils/statusUpdateHandler"
+                    );
+                    const StatusUpdateManagerMock = vi.mocked(
+                        statusUpdateHandlerModule.StatusUpdateManager
+                    );
+
+                    StatusUpdateManagerMock.mockReset();
+                    const unsubscribeSpies: ReturnType<typeof vi.fn>[] =
+                        [];
+                    StatusUpdateManagerMock.mockImplementation(() => {
+                        const unsubscribe = vi.fn();
+                        unsubscribeSpies.push(unsubscribe);
+                        return {
+                            getExpectedListenerCount: vi.fn(() => 3),
+                            subscribe: vi.fn(async () => ({
+                                errors: [],
+                                expectedListeners: 3,
+                                listenersAttached: 3,
+                                success: true,
+                            })),
+                            unsubscribe,
+                        };
+                    });
+
+                    const callback = vi.fn();
+                    await syncActions.subscribeToStatusUpdates(callback);
+
+                    mockDeps.setStatusSubscriptionSummary.mockClear();
+
+                    const retryResult =
+                        await syncActions.retryStatusSubscription();
+
+                    expect(retryResult.success).toBeTruthy();
+                    expect(retryResult.subscribed).toBeTruthy();
+                    expect(
+                        StatusUpdateManagerMock.mock.instances.length
+                    ).toBeGreaterThanOrEqual(2);
+                    expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
+                    expect(
+                        mockDeps.setStatusSubscriptionSummary
+                    ).toHaveBeenNthCalledWith(1, undefined);
+                    expect(
+                        mockDeps.setStatusSubscriptionSummary
+                    ).toHaveBeenNthCalledWith(
+                        2,
+                        expect.objectContaining({
+                            expectedListeners: 3,
+                            listenersAttached: 3,
+                            success: true,
+                        })
+                    );
+                });
+            });
+
             // Mock StatusUpdateManager to throw during subscribe
             const statusUpdateHandlerModule = await import(
                 "../../../stores/sites/utils/statusUpdateHandler"

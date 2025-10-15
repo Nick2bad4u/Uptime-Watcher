@@ -278,12 +278,27 @@ describe("useSiteSync", () => {
                 statusUpdateHandlerModule.StatusUpdateManager
             );
 
+            StatusUpdateManagerMock.mockReset();
+            const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
+            StatusUpdateManagerMock.mockImplementation(() => {
+                const unsubscribe = vi.fn();
+                unsubscribeSpies.push(unsubscribe);
+                return {
+                    getExpectedListenerCount: vi.fn(() => 3),
+                    subscribe: vi.fn(async () => ({
+                        errors: [],
+                        expectedListeners: 3,
+                        listenersAttached: 3,
+                        success: true,
+                    })),
+                    unsubscribe,
+                };
+            });
+
             const callback = vi.fn();
             await syncActions.subscribeToStatusUpdates(callback);
 
-            const initialInstance =
-                StatusUpdateManagerMock.mock.instances.at(-1);
-            expect(initialInstance).toBeDefined();
+            mockDeps.setStatusSubscriptionSummary.mockClear();
 
             const retryResult = await syncActions.retryStatusSubscription();
 
@@ -292,10 +307,14 @@ describe("useSiteSync", () => {
             expect(
                 StatusUpdateManagerMock.mock.instances.length
             ).toBeGreaterThanOrEqual(2);
-            expect(initialInstance?.unsubscribe).toHaveBeenCalledTimes(1);
+            expect(unsubscribeSpies[0]).toHaveBeenCalledTimes(1);
             expect(
                 mockDeps.setStatusSubscriptionSummary
-            ).toHaveBeenLastCalledWith(
+            ).toHaveBeenNthCalledWith(1, undefined);
+            expect(
+                mockDeps.setStatusSubscriptionSummary
+            ).toHaveBeenNthCalledWith(
+                2,
                 expect.objectContaining({
                     expectedListeners: 3,
                     listenersAttached: 3,

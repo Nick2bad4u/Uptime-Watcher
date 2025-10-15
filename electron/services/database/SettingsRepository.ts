@@ -155,9 +155,8 @@ export class SettingsRepository {
 
         await withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.bulkInsertInternal(db, settings);
-                    return Promise.resolve();
                 }),
             "settings-bulk-insert",
             undefined,
@@ -183,9 +182,8 @@ export class SettingsRepository {
     public async delete(key: string): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.deleteInternal(db, key);
-                    return Promise.resolve();
                 }),
             "settings-delete",
             undefined,
@@ -209,9 +207,8 @@ export class SettingsRepository {
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "settings-delete-all"
         );
@@ -234,13 +231,13 @@ export class SettingsRepository {
      * @throws Error if the database operation fails.
      */
     public async get(key: string): Promise<string | undefined> {
-        return withDatabaseOperation(() => {
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Database query returns known structure from controlled SQL
             const result = db.get(SETTINGS_QUERIES.SELECT_VALUE_BY_KEY, [
                 key,
             ]) as DatabaseSettingsRow | undefined;
-            return Promise.resolve(rowToSettingValue(result));
+            return rowToSettingValue(result);
         }, `get-setting-${key}`);
     }
 
@@ -264,13 +261,13 @@ export class SettingsRepository {
      * @throws Error if the database operation fails.
      */
     public async getAll(): Promise<Record<string, string>> {
-        return withDatabaseOperation(() => {
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
             const settings = db.all(
                 SETTINGS_QUERIES.SELECT_ALL
             ) as DatabaseSettingsRow[];
             const settingRows = rowsToSettings(settings);
-            return Promise.resolve(settingsToRecord(settingRows));
+            return settingsToRecord(settingRows);
         }, "settings-get-all");
     }
 
@@ -293,9 +290,8 @@ export class SettingsRepository {
     public async set(key: string, value: string): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.setInternal(db, key, value);
-                    return Promise.resolve();
                 }),
             "settings-set",
             undefined,

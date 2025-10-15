@@ -525,14 +525,25 @@ IPC handlers are tested by mocking dependencies:
 ```typescript
 describe("Sites IPC Handlers", () => {
  it("should handle add site request", async () => {
-  const mockSiteManager = {
+  const mockOrchestrator = {
    addSite: vi.fn().mockResolvedValue(mockSite),
-  };
+  } as unknown as UptimeOrchestrator;
+  const mockUpdaterService = {
+   quitAndInstall: vi.fn(),
+  } as unknown as AutoUpdaterService;
+  const mockRendererBridge = {
+   broadcast: vi.fn(),
+   sendStateSyncEvent: vi.fn(),
+  } as unknown as RendererEventBridge;
 
-  const ipcService = new IpcService();
-  ipcService.initialize({ siteManager: mockSiteManager });
+  const ipcService = new IpcService(
+   mockOrchestrator,
+   mockUpdaterService,
+   mockRendererBridge
+  );
+  ipcService.setupHandlers();
 
-  const result = await ipcRenderer.invoke("sites:add", siteData);
+  const result = await ipcRenderer.invoke("add-site", siteData);
   expect(result).toEqual(mockSite);
  });
 });

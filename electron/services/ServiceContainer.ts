@@ -34,6 +34,7 @@ import { HistoryRepository } from "./database/HistoryRepository";
 import { MonitorRepository } from "./database/MonitorRepository";
 import { SettingsRepository } from "./database/SettingsRepository";
 import { SiteRepository } from "./database/SiteRepository";
+import { RendererEventBridge } from "./events/RendererEventBridge";
 import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
 import { NotificationService } from "./notifications/NotificationService";
@@ -229,6 +230,9 @@ export class ServiceContainer {
      * @internal
      */
     private notificationService?: NotificationService;
+
+    /** Renderer event bridge singleton. */
+    private rendererEventBridge?: RendererEventBridge;
 
     /**
      * Singleton instance of {@link SettingsRepository}.
@@ -515,7 +519,11 @@ export class ServiceContainer {
         if (!this.ipcService) {
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
-            this.ipcService = new IpcService(orchestrator, updater);
+            this.ipcService = new IpcService(
+                orchestrator,
+                updater,
+                this.getRendererEventBridge()
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created IpcService with dependencies"
@@ -825,6 +833,21 @@ export class ServiceContainer {
             }
         }
         return this.windowService;
+    }
+
+    /**
+     * Gets the {@link RendererEventBridge} singleton.
+     */
+    public getRendererEventBridge(): RendererEventBridge {
+        if (!this.rendererEventBridge) {
+            this.rendererEventBridge = new RendererEventBridge(
+                this.getWindowService()
+            );
+            if (this.config.enableDebugLogging) {
+                logger.debug("[ServiceContainer] Created RendererEventBridge");
+            }
+        }
+        return this.rendererEventBridge;
     }
 
     /**

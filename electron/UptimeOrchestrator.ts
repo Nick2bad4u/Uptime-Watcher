@@ -79,6 +79,8 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+import { ApplicationError } from "@shared/utils/errorHandling";
+
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
@@ -89,7 +91,7 @@ import {
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
-import { logger } from "./utils/logger";
+import { diagnosticsLogger, logger } from "./utils/logger";
 
 /**
  * Data structure for internal monitoring status check events.
@@ -222,7 +224,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     // Manager instances
     private readonly siteManager: SiteManager;
 
-    // Named event handlers for database events
     /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
         data: UpdateSitesCacheRequestData
@@ -287,7 +288,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
-    // Named event handlers for event forwarding
     /** Event handler for site addition events */
     private readonly handleSiteAddedEvent = (
         data: SiteEventData & { _meta?: unknown }
@@ -355,7 +355,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
-    // Named event handlers for monitoring events
     /** Event handler for monitor start events */
     private readonly handleMonitorStartedEvent = (eventData: {
         identifier: string;
@@ -443,7 +442,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         })();
     };
 
-    // Named event handlers for site management events
     /** Event handler for monitoring start requests */
     private readonly handleStartMonitoringRequestedEvent = (
         data: StartMonitoringRequestData
@@ -608,17 +606,23 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     /**
-     * Gets the current history retention limit.
-     *
-     * @remarks
-     * This getter provides convenient property-style access for internal use.
-     * The corresponding getHistoryLimit() method exists for IPC compatibility
-     * since Electron IPC can only serialize method calls, not property access.
-     *
-     * @returns The current history limit from DatabaseManager
+     * Executes an operation and normalizes thrown errors via
+     * {@link ApplicationError} with contextual metadata.
      */
-    public get historyLimit(): number {
-        return this.databaseManager.getHistoryLimit();
+    private async runWithContext<T>(
+        operation: () => Promise<T>,
+        options: {
+            code: string;
+            details?: Record<string, unknown>;
+            message: string;
+            operation: string;
+        }
+    ): Promise<T> {
+        try {
+            return await operation();
+        } catch (error) {
+            this.throwWithContext({ ...options, error });
+        }
     }
 
     /**
@@ -660,11 +664,16 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 }
             }
 
-            logger.error(
-                `[UptimeOrchestrator] Failed to add site ${siteData.identifier}:`,
-                error
-            );
-            throw error;
+            this.throwWithContext({
+                code: "ORCHESTRATOR_ADD_SITE_FAILED",
+                details: {
+                    monitorCount: siteData.monitors?.length ?? 0,
+                    siteIdentifier: siteData.identifier,
+                },
+                error,
+                message: `Failed to add site ${siteData.identifier}`,
+                operation: "orchestrator.addSite",
+            });
         }
     }
 
@@ -681,7 +690,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<StatusUpdate | undefined> {
-        return this.monitorManager.checkSiteManually(identifier, monitorId);
+        return this.runWithContext(
+            () => this.monitorManager.checkSiteManually(identifier, monitorId),
+            {
+                code: "ORCHESTRATOR_MANUAL_CHECK_FAILED",
+                details: {
+                    monitorId,
+                    siteIdentifier: identifier,
+                },
+                message: `Failed to run manual check for site ${identifier}`,
+                operation: "orchestrator.checkSiteManually",
+            }
+        );
     }
 
     /**
@@ -698,7 +718,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         /** Generated filename for the backup file */
         fileName: string;
     }> {
-        return this.databaseManager.downloadBackup();
+        return this.runWithContext(
+            () => this.databaseManager.downloadBackup(),
+            {
+                code: "ORCHESTRATOR_DOWNLOAD_BACKUP_FAILED",
+                message: "Failed to download SQLite backup",
+                operation: "orchestrator.downloadBackup",
+            }
+        );
     }
 
     /**
@@ -707,16 +734,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise resolving to the exported data string.
      */
     public async exportData(): Promise<string> {
-        return this.databaseManager.exportData();
-    }
-
-    /**
-     * Retrieves all sites from the site manager.
-     *
-     * @returns Promise resolving to an array of Site objects.
-     */
-    public async getSites(): Promise<Site[]> {
-        return this.siteManager.getSites();
+        return this.runWithContext(() => this.databaseManager.exportData(), {
+            code: "ORCHESTRATOR_EXPORT_DATA_FAILED",
+            message: "Failed to export application data",
+            operation: "orchestrator.exportData",
+        });
     }
 
     /**
@@ -727,7 +749,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise resolving to true if import succeeded, false otherwise.
      */
     public async importData(data: string): Promise<boolean> {
-        return this.databaseManager.importData(data);
+        return this.runWithContext(
+            () => this.databaseManager.importData(data),
+            {
+                code: "ORCHESTRATOR_IMPORT_DATA_FAILED",
+                details: { payloadSize: data.length },
+                message: "Failed to import application data",
+                operation: "orchestrator.importData",
+            }
+        );
     }
 
     /**
@@ -762,8 +792,150 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 "[UptimeOrchestrator] Initialization completed successfully"
             );
         } catch (error) {
-            logger.error("[UptimeOrchestrator] Initialization failed:", error);
-            throw error;
+            this.throwWithContext({
+                code: "ORCHESTRATOR_INITIALIZE_FAILED",
+                error,
+                message: "Failed to initialize orchestrator",
+                operation: "orchestrator.initialize",
+            });
+        }
+    }
+
+    /**
+     * Retrieves all sites from the site manager.
+     *
+     * @returns Promise resolving to an array of Site objects.
+     */
+    public async getSites(): Promise<Site[]> {
+        return this.runWithContext(() => this.siteManager.getSites(), {
+            code: "ORCHESTRATOR_GET_SITES_FAILED",
+            message: "Failed to retrieve sites",
+            operation: "orchestrator.getSites",
+        });
+    }
+
+    /**
+     * Resets all application settings to their default values.
+     *
+     * @remarks
+     * This method delegates to the DatabaseManager to reset all settings to
+     * their default values in the database. The operation is performed within a
+     * database transaction to ensure consistency.
+     *
+     * This includes:
+     *
+     * - History limit reset to default value
+     * - Any other persisted settings reset to defaults
+     * - Backend cache invalidation
+     *
+     * @returns Promise that resolves when settings have been reset.
+     */
+    public async resetSettings(): Promise<void> {
+        await this.runWithContext(() => this.databaseManager.resetSettings(), {
+            code: "ORCHESTRATOR_RESET_SETTINGS_FAILED",
+            message: "Failed to reset application settings",
+            operation: "orchestrator.resetSettings",
+        });
+    }
+
+    /**
+     * Sets the history retention limit for monitor data.
+     *
+     * @remarks
+     * This method delegates to the DatabaseManager to update the history limit
+     * in the database and prune existing history entries if necessary.
+     *
+     * The operation is performed within a database transaction to ensure
+     * consistency between the setting update and history pruning.
+     *
+     * @param limit - The new history limit (number of entries to retain per
+     *   monitor). Values less than or equal to 0 will disable history pruning.
+     *
+     * @returns Promise that resolves when the limit is set.
+     */
+    public async setHistoryLimit(limit: number): Promise<void> {
+        await this.runWithContext(
+            () => this.databaseManager.setHistoryLimit(limit),
+            {
+                code: "ORCHESTRATOR_SET_HISTORY_LIMIT_FAILED",
+                details: { limit },
+                message: "Failed to set history limit",
+                operation: "orchestrator.setHistoryLimit",
+            }
+        );
+    }
+
+    /**
+     * Handles the update sites cache request asynchronously.
+     *
+     * @remarks
+     * Extracted from event handler to enable proper async handling and testing.
+     * Updates the site cache and sets up monitoring for all loaded sites.
+     *
+     * Uses Promise.allSettled to handle monitoring setup failures gracefully.
+     * Critical failures include both rejected promises and fulfilled promises
+     * where the operation reported failure. The logic correctly identifies
+     * failures by checking either rejected status or successful completion with
+     * failure result.
+     *
+     * @param data - The sites cache update request data
+     *
+     * @returns Promise that resolves when the cache update is complete
+     */
+    private async handleUpdateSitesCacheRequest(
+        data: UpdateSitesCacheRequestData
+    ): Promise<void> {
+        await this.siteManager.updateSitesCache(data.sites);
+
+        // CRITICAL: Set up monitoring for each loaded site
+        const setupResults = await Promise.allSettled(
+            data.sites.map(async (site) => {
+                try {
+                    await this.monitorManager.setupSiteForMonitoring(site);
+                    return { site: site.identifier, success: true };
+                } catch (error) {
+                    logger.error(
+                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
+                        error
+                    );
+                    return { error, site: site.identifier, success: false };
+                }
+            })
+        );
+
+        // Validate that critical sites were set up successfully
+        const successful = setupResults.filter(
+            (result) => result.status === "fulfilled" && result.value.success
+        ).length;
+        const failed = setupResults.length - successful;
+
+        if (failed > 0) {
+            const criticalFailures = setupResults.filter(
+                (result) =>
+                    result.status === "rejected" || !result.value.success
+            ).length;
+
+            if (criticalFailures > 0) {
+                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
+                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
+                // For critical operations, we might want to emit an error event
+                await this.emitTyped("system:error", {
+                    context: "site-monitoring-setup",
+                    error: new Error(errorMessage),
+                    recovery:
+                        "Check site configurations and restart monitoring",
+                    severity: "high",
+                    timestamp: Date.now(),
+                });
+            } else {
+                logger.warn(
+                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
+                );
+            }
+        } else {
+            logger.info(
+                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
+            );
         }
     }
 
@@ -788,8 +960,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             logger.info("[UptimeOrchestrator] Shutdown completed successfully");
         } catch (error) {
-            logger.error("[UptimeOrchestrator] Shutdown failed:", error);
-            throw error;
+            this.throwWithContext({
+                code: "ORCHESTRATOR_SHUTDOWN_FAILED",
+                error,
+                message: "Failed to shut down orchestrator",
+                operation: "orchestrator.shutdown",
+            });
         }
     }
 
@@ -809,13 +985,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
+        let monitoringStopped: boolean | undefined;
+        let databaseRemoved: boolean | undefined;
+
         try {
             // Phase 1: Stop monitoring immediately (reversible)
-            const monitoringStopped =
-                await this.monitorManager.stopMonitoringForSite(
-                    siteIdentifier,
-                    monitorId
-                );
+            monitoringStopped = await this.monitorManager.stopMonitoringForSite(
+                siteIdentifier,
+                monitorId
+            );
 
             // If stopping monitoring failed, log warning but continue with
             // database removal The monitor may not be running, but database
@@ -828,7 +1006,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             // Phase 2: Remove monitor from database using transaction
             // (irreversible)
-            const databaseRemoved = await this.siteManager.removeMonitor(
+            databaseRemoved = await this.siteManager.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
@@ -876,11 +1054,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             return false;
         } catch (error) {
-            logger.error(
-                `[UptimeOrchestrator] Failed to remove monitor ${siteIdentifier}/${monitorId}:`,
-                error
-            );
-            throw error;
+            this.throwWithContext({
+                code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
+                details: {
+                    databaseRemoved,
+                    monitorId,
+                    monitoringStopped,
+                    siteIdentifier,
+                },
+                error,
+                message: `Failed to remove monitor ${siteIdentifier}/${monitorId}`,
+                operation: "orchestrator.removeMonitor",
+            });
         }
     }
 
@@ -912,8 +1097,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
         }
 
+        let monitoringStopped: boolean | undefined;
+        let siteRemoved: boolean | undefined;
+
         try {
-            const monitoringStopped =
+            monitoringStopped =
                 await this.monitorManager.stopMonitoringForSite(identifier);
 
             if (!monitoringStopped) {
@@ -923,7 +1111,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 return false;
             }
 
-            const siteRemoved = await this.siteManager.removeSite(identifier);
+            siteRemoved = await this.siteManager.removeSite(identifier);
 
             if (siteRemoved) {
                 return true;
@@ -970,11 +1158,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             return false;
         } catch (error) {
-            logger.error(
-                `[UptimeOrchestrator] Failed to remove site ${identifier}:`,
-                error
-            );
-            throw error;
+            this.throwWithContext({
+                code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
+                details: {
+                    activeMonitorIds,
+                    monitoringStopped,
+                    siteIdentifier: identifier,
+                    siteRemoved,
+                },
+                error,
+                message: `Failed to remove site ${identifier}`,
+                operation: "orchestrator.removeSite",
+            });
         }
     }
 
@@ -997,56 +1192,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @throws If database operation fails.
      */
     public async deleteAllSites(): Promise<number> {
-        try {
-            await this.monitorManager.stopMonitoring();
-        } catch (error) {
-            logger.error(
-                "[UptimeOrchestrator] Failed to stop monitoring prior to bulk site deletion:",
-                error
-            );
-            throw error;
-        }
+        await this.runWithContext(() => this.monitorManager.stopMonitoring(), {
+            code: "ORCHESTRATOR_DELETE_ALL_SITES_STOP_MONITORING_FAILED",
+            message: "Failed to stop monitoring prior to bulk site deletion",
+            operation: "orchestrator.deleteAllSites.stopMonitoring",
+        });
 
-        return this.siteManager.deleteAllSites();
-    }
-
-    /**
-     * Resets all application settings to their default values.
-     *
-     * @remarks
-     * This method delegates to the DatabaseManager to reset all settings to
-     * their default values in the database. The operation is performed within a
-     * database transaction to ensure consistency.
-     *
-     * This includes:
-     *
-     * - History limit reset to default value
-     * - Any other persisted settings reset to defaults
-     * - Backend cache invalidation
-     *
-     * @returns Promise that resolves when settings have been reset.
-     */
-    public async resetSettings(): Promise<void> {
-        await this.databaseManager.resetSettings();
-    }
-
-    /**
-     * Sets the history retention limit for monitor data.
-     *
-     * @remarks
-     * This method delegates to the DatabaseManager to update the history limit
-     * in the database and prune existing history entries if necessary.
-     *
-     * The operation is performed within a database transaction to ensure
-     * consistency between the setting update and history pruning.
-     *
-     * @param limit - The new history limit (number of entries to retain per
-     *   monitor). Values less than or equal to 0 will disable history pruning.
-     *
-     * @returns Promise that resolves when the limit is set.
-     */
-    public async setHistoryLimit(limit: number): Promise<void> {
-        await this.databaseManager.setHistoryLimit(limit);
+        return this.runWithContext(() => this.siteManager.deleteAllSites(), {
+            code: "ORCHESTRATOR_DELETE_ALL_SITES_FAILED",
+            message: "Failed to delete all sites",
+            operation: "orchestrator.deleteAllSites",
+        });
     }
 
     /**
@@ -1055,7 +1211,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when monitoring has started.
      */
     public async startMonitoring(): Promise<void> {
-        await this.monitorManager.startMonitoring();
+        await this.runWithContext(() => this.monitorManager.startMonitoring(), {
+            code: "ORCHESTRATOR_START_MONITORING_FAILED",
+            message: "Failed to start monitoring",
+            operation: "orchestrator.startMonitoring",
+        });
     }
 
     /**
@@ -1070,9 +1230,18 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        return this.monitorManager.startMonitoringForSite(
-            identifier,
-            monitorId
+        return this.runWithContext(
+            () =>
+                this.monitorManager.startMonitoringForSite(
+                    identifier,
+                    monitorId
+                ),
+            {
+                code: "ORCHESTRATOR_START_MONITORING_FOR_SITE_FAILED",
+                details: { identifier, monitorId },
+                message: `Failed to start monitoring for site ${identifier}`,
+                operation: "orchestrator.startMonitoringForSite",
+            }
         );
     }
 
@@ -1082,7 +1251,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when monitoring has stopped.
      */
     public async stopMonitoring(): Promise<void> {
-        await this.monitorManager.stopMonitoring();
+        await this.runWithContext(() => this.monitorManager.stopMonitoring(), {
+            code: "ORCHESTRATOR_STOP_MONITORING_FAILED",
+            message: "Failed to stop monitoring",
+            operation: "orchestrator.stopMonitoring",
+        });
     }
 
     /**
@@ -1097,7 +1270,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         monitorId?: string
     ): Promise<boolean> {
-        return this.monitorManager.stopMonitoringForSite(identifier, monitorId);
+        return this.runWithContext(
+            () =>
+                this.monitorManager.stopMonitoringForSite(
+                    identifier,
+                    monitorId
+                ),
+            {
+                code: "ORCHESTRATOR_STOP_MONITORING_FOR_SITE_FAILED",
+                details: { identifier, monitorId },
+                message: `Failed to stop monitoring for site ${identifier}`,
+                operation: "orchestrator.stopMonitoringForSite",
+            }
+        );
     }
 
     /**
@@ -1112,7 +1297,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string,
         updates: Partial<Site>
     ): Promise<Site> {
-        return this.siteManager.updateSite(identifier, updates);
+        return this.runWithContext(
+            () => this.siteManager.updateSite(identifier, updates),
+            {
+                code: "ORCHESTRATOR_UPDATE_SITE_FAILED",
+                details: { identifier, updatedFields: Object.keys(updates) },
+                message: `Failed to update site ${identifier}`,
+                operation: "orchestrator.updateSite",
+            }
+        );
     }
 
     /**
@@ -1245,77 +1438,62 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Handles the update sites cache request asynchronously.
-     *
-     * @remarks
-     * Extracted from event handler to enable proper async handling and testing.
-     * Updates the site cache and sets up monitoring for all loaded sites.
-     *
-     * Uses Promise.allSettled to handle monitoring setup failures gracefully.
-     * Critical failures include both rejected promises and fulfilled promises
-     * where the operation reported failure. The logic correctly identifies
-     * failures by checking either rejected status or successful completion with
-     * failure result.
-     *
-     * @param data - The sites cache update request data
-     *
-     * @returns Promise that resolves when the cache update is complete
+     * Throw an {@link ApplicationError} with standardized logging.
      */
-    private async handleUpdateSitesCacheRequest(
-        data: UpdateSitesCacheRequestData
-    ): Promise<void> {
-        await this.siteManager.updateSitesCache(data.sites);
+    private throwWithContext(options: {
+        code: string;
+        details?: Record<string, unknown>;
+        error: unknown;
+        message: string;
+        operation: string;
+    }): never {
+        const appError = new ApplicationError({
+            cause: options.error,
+            code: options.code,
+            details: options.details,
+            message: options.message,
+            operation: options.operation,
+        });
 
-        // CRITICAL: Set up monitoring for each loaded site
-        const setupResults = await Promise.allSettled(
-            data.sites.map(async (site) => {
-                try {
-                    await this.monitorManager.setupSiteForMonitoring(site);
-                    return { site: site.identifier, success: true };
-                } catch (error) {
-                    logger.error(
-                        `[UptimeOrchestrator] Failed to setup monitoring for site ${site.identifier}:`,
-                        error
-                    );
-                    return { error, site: site.identifier, success: false };
-                }
-            })
+        logger.error(appError.message, {
+            code: options.code,
+            details: options.details,
+            error: options.error,
+            operation: options.operation,
+        });
+
+        diagnosticsLogger.error(
+            `[UptimeOrchestrator] ${options.operation} failed`,
+            {
+                code: options.code,
+                details: options.details,
+                error: appError,
+            }
         );
 
-        // Validate that critical sites were set up successfully
-        const successful = setupResults.filter(
-            (result) => result.status === "fulfilled" && result.value.success
-        ).length;
-        const failed = setupResults.length - successful;
+        throw appError;
+    }
 
-        if (failed > 0) {
-            const criticalFailures = setupResults.filter(
-                (result) =>
-                    result.status === "rejected" || !result.value.success
-            ).length;
+    // Named event handlers for database events
 
-            if (criticalFailures > 0) {
-                const errorMessage = `Critical monitoring setup failures: ${criticalFailures} of ${data.sites.length} sites failed`;
-                logger.error(`[UptimeOrchestrator] ${errorMessage}`);
-                // For critical operations, we might want to emit an error event
-                await this.emitTyped("system:error", {
-                    context: "site-monitoring-setup",
-                    error: new Error(errorMessage),
-                    recovery:
-                        "Check site configurations and restart monitoring",
-                    severity: "high",
-                    timestamp: Date.now(),
-                });
-            } else {
-                logger.warn(
-                    `[UptimeOrchestrator] Site monitoring setup completed: ${successful} successful, ${failed} failed`
-                );
-            }
-        } else {
-            logger.info(
-                `[UptimeOrchestrator] Successfully set up monitoring for all ${successful} loaded sites`
-            );
-        }
+    // Named event handlers for event forwarding
+
+    // Named event handlers for monitoring events
+
+    // Named event handlers for site management events
+
+    /**
+     * Gets the current history retention limit.
+     *
+     * @remarks
+     * This getter provides convenient property-style access for internal use.
+     * The corresponding getHistoryLimit() method exists for IPC compatibility
+     * since Electron IPC can only serialize method calls, not property access.
+     *
+     * @returns The current history limit from DatabaseManager
+     */
+    public get historyLimit(): number {
+        return this.databaseManager.getHistoryLimit();
     }
 
     /**

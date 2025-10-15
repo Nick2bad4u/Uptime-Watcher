@@ -173,7 +173,7 @@ export class MonitorRepository {
                 // Use executeTransaction for atomic bulk create operation
                 const createdMonitors: Array<Site["monitors"][0]> = [];
 
-                await this.databaseService.executeTransaction((db) => {
+                await this.databaseService.executeTransaction(async (db) => {
                     for (const monitor of monitors) {
                         const insertResult = insertWithReturning(
                             db,
@@ -198,7 +198,6 @@ export class MonitorRepository {
                         };
                         createdMonitors.push(newMonitor);
                     }
-                    return Promise.resolve();
                 });
 
                 logger.info(
@@ -230,9 +229,8 @@ export class MonitorRepository {
     public async clearActiveOperations(monitorId: string): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.clearActiveOperationsInternal(db, monitorId);
-                    return Promise.resolve();
                 }),
             "MonitorRepository.clearActiveOperations"
         );
@@ -264,10 +262,8 @@ export class MonitorRepository {
     ): Promise<string> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) =>
-                    Promise.resolve(
-                        this.createInternal(db, siteIdentifier, monitor)
-                    )
+                this.databaseService.executeTransaction(async (db) =>
+                    this.createInternal(db, siteIdentifier, monitor)
                 ),
             "monitor-create",
             undefined,
@@ -296,7 +292,7 @@ export class MonitorRepository {
     public async delete(monitorId: string): Promise<boolean> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     const result = this.deleteInternal(db, monitorId);
 
                     if (result) {
@@ -311,7 +307,7 @@ export class MonitorRepository {
                         );
                     }
 
-                    return Promise.resolve(result);
+                    return result;
                 }),
             "monitor-delete",
             undefined,
@@ -338,9 +334,8 @@ export class MonitorRepository {
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.deleteAllInternal(db);
-                    return Promise.resolve();
                 }),
             "monitor-delete-all"
         );
@@ -368,7 +363,7 @@ export class MonitorRepository {
     public async deleteBySiteIdentifier(siteIdentifier: string): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.deleteBySiteIdentifierInternal(db, siteIdentifier);
 
                     if (isDev()) {
@@ -376,7 +371,6 @@ export class MonitorRepository {
                             `[MonitorRepository] Deleted all monitors for site: ${siteIdentifier}`
                         );
                     }
-                    return Promise.resolve();
                 }),
             "monitor-delete-by-site",
             undefined,
@@ -407,7 +401,7 @@ export class MonitorRepository {
         monitorId: string
     ): Promise<Site["monitors"][0] | undefined> {
         return withDatabaseOperation(
-            () => {
+            async () => {
                 const db = this.getDb();
                 const row = queryForSingleRecord(
                     db,
@@ -415,7 +409,7 @@ export class MonitorRepository {
                     [monitorId]
                 ) as MonitorRow | undefined;
 
-                return Promise.resolve(rowToMonitorOrUndefined(row));
+                return rowToMonitorOrUndefined(row);
             },
             "monitor-lookup",
             undefined,
@@ -444,14 +438,9 @@ export class MonitorRepository {
     public async findBySiteIdentifier(
         siteIdentifier: string
     ): Promise<Site["monitors"]> {
-        return withDatabaseOperation(() => {
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
-            const monitors = this.findBySiteIdentifierInternal(
-                db,
-                siteIdentifier
-            );
-
-            return Promise.resolve(monitors);
+            return this.findBySiteIdentifierInternal(db, siteIdentifier);
         }, `find-monitors-by-site-${siteIdentifier}`);
     }
 
@@ -472,10 +461,9 @@ export class MonitorRepository {
      * @throws Error if the database operation fails.
      */
     public async getAllMonitorIds(): Promise<Array<{ id: number }>> {
-        return withDatabaseOperation(() => {
+        return withDatabaseOperation(async () => {
             const db = this.getDb();
-            const rows = queryForIds(db, MONITOR_QUERIES.SELECT_ALL_IDS);
-            return Promise.resolve(rows);
+            return queryForIds(db, MONITOR_QUERIES.SELECT_ALL_IDS);
         }, "monitor-get-all-ids");
     }
 
@@ -504,9 +492,8 @@ export class MonitorRepository {
     ): Promise<void> {
         return withDatabaseOperation(
             async () =>
-                this.databaseService.executeTransaction((db) => {
+                this.databaseService.executeTransaction(async (db) => {
                     this.updateInternal(db, monitorId, monitor);
-                    return Promise.resolve();
                 }),
             "monitor-update",
             undefined,

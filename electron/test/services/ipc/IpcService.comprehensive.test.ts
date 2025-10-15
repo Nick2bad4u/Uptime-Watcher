@@ -112,6 +112,11 @@ vi.mock("../../../../shared/validation/schemas", () => ({
     })),
 }));
 
+const mockRendererEventBridge = {
+    broadcast: vi.fn(),
+    sendStateSyncEvent: vi.fn(),
+};
+
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
@@ -198,9 +203,13 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
+        mockRendererEventBridge.broadcast.mockReset();
+        mockRendererEventBridge.sendStateSyncEvent.mockReset();
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
-            mockAutoUpdaterService
+            mockAutoUpdaterService,
+            mockRendererEventBridge as any
         );
     });
 
@@ -1107,10 +1116,19 @@ describe("IpcService - Comprehensive Coverage", () => {
                     timestamp: expect.any(Number),
                 }
             );
-
-            // Note: BrowserWindow event emission is complex to test in isolation
-            // The implementation handles state sync correctly, but testing it requires
-            // full browser window setup that we're avoiding in isolated tests
+            expect(
+                mockRendererEventBridge.sendStateSyncEvent
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    action: "bulk-sync",
+                    sites: expect.any(Array),
+                    source: "database",
+                    timestamp: expect.any(Number),
+                })
+            );
+            expect(
+                mockRendererEventBridge.sendStateSyncEvent
+            ).toHaveBeenCalledTimes(1);
 
             expect(result).toEqual({
                 success: true,

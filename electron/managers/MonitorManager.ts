@@ -1082,30 +1082,31 @@ export class MonitorManager {
 
         await withDatabaseOperation(
             async () =>
-                this.dependencies.databaseService.executeTransaction((db) => {
-                    const monitorTx =
-                        this.dependencies.repositories.monitor.createTransactionAdapter(
-                            db
-                        );
+                this.dependencies.databaseService.executeTransaction(
+                    async (db) => {
+                        const monitorTx =
+                            this.dependencies.repositories.monitor.createTransactionAdapter(
+                                db
+                            );
 
-                    for (const monitor of monitorsNeedingRemediation) {
-                        monitorTx.update(monitor.id, {
-                            checkInterval: DEFAULT_CHECK_INTERVAL,
-                        });
+                        for (const monitor of monitorsNeedingRemediation) {
+                            monitorTx.update(monitor.id, {
+                                checkInterval: DEFAULT_CHECK_INTERVAL,
+                            });
 
-                        logger.debug(
-                            interpolateLogTemplate(
-                                LOG_TEMPLATES.debug.MONITOR_INTERVALS_APPLIED,
-                                {
-                                    interval: DEFAULT_CHECK_INTERVAL / 1000,
-                                    monitorId: monitor.id,
-                                }
-                            )
-                        );
+                            logger.debug(
+                                interpolateLogTemplate(
+                                    LOG_TEMPLATES.debug
+                                        .MONITOR_INTERVALS_APPLIED,
+                                    {
+                                        interval: DEFAULT_CHECK_INTERVAL / 1000,
+                                        monitorId: monitor.id,
+                                    }
+                                )
+                            );
+                        }
                     }
-
-                    return Promise.resolve();
-                }),
+                ),
             "monitor-manager-apply-default-interval",
             undefined,
             {

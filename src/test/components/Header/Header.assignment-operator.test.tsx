@@ -15,6 +15,7 @@ import { Header } from "../../../components/Header/Header";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import type { SitesStore } from "../../../stores/sites/types";
 import { useUIStore } from "../../../stores/ui/useUiStore";
+import type { UIStore } from "../../../stores/ui/types";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import type { Site } from "../../../../shared/types";
 import type {
@@ -32,6 +33,55 @@ const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 
+/**
+ * Builds a mock UI store state matching the modular store contract.
+ *
+ * @returns Mocked UI store implementing required actions and state.
+ */
+const createMockUiStoreState = (): UIStore => ({
+    activeSiteDetailsTab: "site-overview",
+    openExternal: vi.fn(),
+    selectedSiteIdentifier: undefined,
+    selectSite: vi.fn(),
+    setActiveSiteDetailsTab: vi.fn(),
+    setShowAddSiteModal: vi.fn(),
+    setShowAdvancedMetrics: vi.fn(),
+    setShowSettings: vi.fn(),
+    setShowSiteDetails: vi.fn(),
+    setSiteCardPresentation: vi.fn(),
+    setSiteDetailsChartTimeRange: vi.fn(),
+    setSiteDetailsHeaderCollapsed: vi.fn(),
+    setSiteListLayout: vi.fn(),
+    setSiteTableColumnWidths: vi.fn(),
+    showAddSiteModal: false,
+    showAdvancedMetrics: false,
+    showSettings: false,
+    showSiteDetails: false,
+    siteCardPresentation: "stacked",
+    siteDetailsChartTimeRange: "24h",
+    siteDetailsHeaderCollapsedState: {},
+    siteDetailsTabState: {},
+    siteListLayout: "list",
+    siteTableColumnWidths: {
+        controls: 16,
+        monitor: 14,
+        response: 12,
+        running: 10,
+        site: 24,
+        status: 12,
+        uptime: 12,
+    },
+    syncActiveSiteDetailsTab: vi.fn(),
+    toggleSiteDetailsHeaderCollapsed: vi.fn(),
+});
+
+/**
+ * Creates a mock sites store snapshot wired with async stubs for store actions.
+ *
+ * @param sites - Site collection used to drive aggregate metric calculations.
+ *
+ * @returns Sites store mock implementing the complete store contract.
+ */
 const createMockSitesStoreState = (sites: Site[]): SitesStore => {
     const unsubscribe = vi.fn();
     const subscriptionSummary: StatusUpdateSubscriptionSummary = {
@@ -107,6 +157,14 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
 describe("Header Assignment Operator Mutations", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        const uiStoreState = createMockUiStoreState();
+        mockUseUIStore.mockImplementation(
+            <Result,>(selector?: (state: UIStore) => Result) =>
+                typeof selector === "function"
+                    ? selector(uiStoreState)
+                    : (uiStoreState as unknown as Result)
+        );
 
         // Mock theme hooks with proper types
         mockUseTheme.mockReturnValue({

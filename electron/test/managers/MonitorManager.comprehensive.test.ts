@@ -902,6 +902,34 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             );
         });
 
+        it("should surface remediation failures during database transactions", async () => {
+            const failingMonitor = {
+                ...mockMonitor,
+                checkInterval: 0,
+            };
+            const siteRequiringRemediation = {
+                ...mockSite,
+                monitors: [failingMonitor],
+            };
+
+            const transactionError = new Error("transaction failed");
+            mockDependencies.databaseService.executeTransaction.mockImplementationOnce(
+                async () => {
+                    throw transactionError;
+                }
+            );
+
+            await expect(
+                manager.setupSiteForMonitoring(siteRequiringRemediation)
+            ).rejects.toThrow(transactionError);
+
+            expect(
+                mockDependencies.repositories.monitor.updateInternal
+            ).not.toHaveBeenCalled();
+            expect(mockSitesCache.set).not.toHaveBeenCalled();
+            expect(siteRequiringRemediation.monitors[0]?.checkInterval).toBe(0);
+        });
+
         it("should auto-start monitoring after default interval remediation", async () => {
             const monitorWithoutInterval = {
                 ...mockMonitor,

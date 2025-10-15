@@ -333,24 +333,15 @@ export class SiteManager {
      * @throws If loading sites from database fails.
      */
     public async initialize(): Promise<void> {
-        try {
-            logger.info(LOG_TEMPLATES.services.SITE_MANAGER_LOADING_CACHE);
-            const sites =
-                await this.siteRepositoryService.getSitesFromDatabase();
-            await this.updateSitesCache(sites);
-            logger.info(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED,
-                    { count: sites.length }
-                )
-            );
-        } catch (error) {
-            logger.error(
-                LOG_TEMPLATES.errors.SITE_INITIALIZATION_FAILED,
-                error
-            );
-            throw error;
-        }
+        logger.info(LOG_TEMPLATES.services.SITE_MANAGER_LOADING_CACHE);
+        const sites = await this.siteRepositoryService.getSitesFromDatabase();
+        await this.updateSitesCache(sites);
+        logger.info(
+            interpolateLogTemplate(
+                LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED,
+                { count: sites.length }
+            )
+        );
     }
 
     /**
@@ -376,65 +367,51 @@ export class SiteManager {
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
-        try {
-            // Remove the monitor from the database using transaction
-            const success = await this.executeMonitorDeletion(monitorId);
+        // Remove the monitor from the database using transaction
+        const success = await this.executeMonitorDeletion(monitorId);
 
-            if (success) {
-                // Refresh the cache by getting all sites (to ensure proper
-                // site structure)
-                const allSites =
-                    await this.siteRepositoryService.getSitesFromDatabase();
+        if (success) {
+            // Refresh the cache by getting all sites (to ensure proper
+            // site structure)
+            const allSites =
+                await this.siteRepositoryService.getSitesFromDatabase();
 
-                // Update cache
-                await this.updateSitesCache(allSites);
+            // Update cache
+            await this.updateSitesCache(allSites);
 
-                // Find the updated site for the event
-                const updatedSite = this.sitesCache.get(siteIdentifier);
-                if (updatedSite) {
-                    // Emit internal site updated event
-                    await this.eventEmitter.emitTyped("internal:site:updated", {
-                        identifier: siteIdentifier,
-                        operation: "updated",
-                        site: updatedSite,
-                        timestamp: Date.now(),
-                        updatedFields: ["monitors"],
-                    });
+            // Find the updated site for the event
+            const updatedSite = this.sitesCache.get(siteIdentifier);
+            if (updatedSite) {
+                // Emit internal site updated event
+                await this.eventEmitter.emitTyped("internal:site:updated", {
+                    identifier: siteIdentifier,
+                    operation: "updated",
+                    site: updatedSite,
+                    timestamp: Date.now(),
+                    updatedFields: ["monitors"],
+                });
 
-                    // Emit sync event for state consistency
-                    await this.eventEmitter.emitTyped(
-                        "sites:state-synchronized",
+                // Emit sync event for state consistency
+                await this.eventEmitter.emitTyped("sites:state-synchronized", {
+                    action: "update" as const,
+                    siteIdentifier: siteIdentifier,
+                    source: "database" as const,
+                    timestamp: Date.now(),
+                });
+
+                logger.info(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
                         {
-                            action: "update" as const,
-                            siteIdentifier: siteIdentifier,
-                            source: "database" as const,
-                            timestamp: Date.now(),
+                            monitorId,
+                            siteIdentifier,
                         }
-                    );
-
-                    logger.info(
-                        interpolateLogTemplate(
-                            LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
-                            {
-                                monitorId,
-                                siteIdentifier,
-                            }
-                        )
-                    );
-                }
+                    )
+                );
             }
-
-            return success;
-        } catch (error) {
-            logger.error(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.errors.SITE_MONITOR_REMOVAL_FAILED,
-                    { monitorId, siteIdentifier }
-                ),
-                error
-            );
-            throw error;
         }
+
+        return success;
     }
 
     /**
@@ -520,48 +497,43 @@ export class SiteManager {
 
         logger.info(`[SiteManager] Deleting all ${snapshotCount} sites`);
 
-        try {
-            const { deletedCount, deletedSites } =
-                await this.siteWriterService.deleteAllSites(this.sitesCache);
+        const { deletedCount, deletedSites } =
+            await this.siteWriterService.deleteAllSites(this.sitesCache);
 
-            if (deletedCount === 0) {
-                logger.warn(
-                    `[SiteManager] Bulk delete reported zero deletions despite ${snapshotCount} cached sites`
-                );
-                return 0;
-            }
+        if (deletedCount === 0) {
+            logger.warn(
+                `[SiteManager] Bulk delete reported zero deletions despite ${snapshotCount} cached sites`
+            );
+            return 0;
+        }
 
-            const eventSites =
-                deletedSites.length > 0 ? deletedSites : sitesSnapshot;
+        const eventSites =
+            deletedSites.length > 0 ? deletedSites : sitesSnapshot;
 
-            // Emit events for each deleted site for consistency
-            for (const site of eventSites) {
-                /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
-                await this.eventEmitter.emitTyped("site:removed", {
-                    cascade: true,
-                    siteIdentifier: site.identifier,
-                    siteName: site.name,
-                    timestamp: Date.now(),
-                });
-                /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
-            }
-
-            // Emit bulk sync event for state consistency
-            await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                action: "bulk-sync" as const,
-                siteIdentifier: "all",
-                source: "database" as const,
+        // Emit events for each deleted site for consistency
+        for (const site of eventSites) {
+            /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
+            await this.eventEmitter.emitTyped("site:removed", {
+                cascade: true,
+                siteIdentifier: site.identifier,
+                siteName: site.name,
                 timestamp: Date.now(),
             });
-
-            logger.info(
-                `[SiteManager] Successfully deleted all ${deletedCount} sites`
-            );
-            return deletedCount;
-        } catch (error) {
-            logger.error("[SiteManager] Failed to delete all sites", error);
-            throw error;
+            /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
         }
+
+        // Emit bulk sync event for state consistency
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: "bulk-sync" as const,
+            siteIdentifier: "all",
+            source: "database" as const,
+            timestamp: Date.now(),
+        });
+
+        logger.info(
+            `[SiteManager] Successfully deleted all ${deletedCount} sites`
+        );
+        return deletedCount;
     }
 
     /**

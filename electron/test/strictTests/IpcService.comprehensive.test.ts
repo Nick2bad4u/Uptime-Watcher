@@ -7,7 +7,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ipcMain, BrowserWindow } from "electron";
+import { ipcMain } from "electron";
 import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 
 import { IpcService } from "../../../electron/services/ipc/IpcService";
@@ -144,6 +144,11 @@ vi.mock("@shared/validation/schemas", () => {
     };
 });
 
+const mockRendererEventBridge = {
+    broadcast: vi.fn(),
+    sendStateSyncEvent: vi.fn(),
+};
+
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
@@ -230,9 +235,13 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
+        mockRendererEventBridge.broadcast.mockReset();
+        mockRendererEventBridge.sendStateSyncEvent.mockReset();
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
-            mockAutoUpdaterService
+            mockAutoUpdaterService,
+            mockRendererEventBridge as any
         );
     });
 
@@ -1113,9 +1122,7 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             const handler = handleCall![1];
 
-            // Reset the mock to ensure clean state
-            const mockWindow = BrowserWindow.getAllWindows()[0]!;
-            vi.mocked(mockWindow.webContents.send).mockClear();
+            mockRendererEventBridge.sendStateSyncEvent.mockClear();
 
             const result = await handler(mockIpcEvent);
 
@@ -1129,19 +1136,19 @@ describe("IpcService - Comprehensive Coverage", () => {
                 }
             );
 
-            // Check BrowserWindow state sync event
-            // Note: The webContents.send call is working in implementation but has mock timing issues in tests
-            // The typed event emission above confirms the core functionality works
-            // Skipping this assertion to avoid flaky test behavior
-            // expect(mockWindow.webContents.send).toHaveBeenCalledWith(
-            //     "state-sync-event",
-            //     expect.objectContaining({
-            //         action: "bulk-sync",
-            //         sites: expect.any(Array),
-            //         source: "database",
-            //         timestamp: expect.any(Number),
-            //     })
-            // );
+            expect(
+                mockRendererEventBridge.sendStateSyncEvent
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    action: "bulk-sync",
+                    sites: expect.any(Array),
+                    source: "database",
+                    timestamp: expect.any(Number),
+                })
+            );
+            expect(
+                mockRendererEventBridge.sendStateSyncEvent
+            ).toHaveBeenCalledTimes(1);
 
             expect(result).toEqual({
                 success: true,

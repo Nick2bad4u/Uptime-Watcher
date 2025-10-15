@@ -37,6 +37,12 @@ describe("SafeConversions utilities fuzzing tests", () => {
             expect(safeNumberConversion(Number.NaN, 42)).toBe(42);
         });
 
+        it("sanitizes NaN defaults for invalid inputs", () => {
+            const fallback = Number.NaN;
+            expect(safeNumberConversion("invalid", fallback)).toBe(0);
+            expect(safeNumberConversion(false, fallback)).toBe(0);
+        });
+
         test.prop([fc.string()])(
             "should convert valid numeric strings",
             (str) => {

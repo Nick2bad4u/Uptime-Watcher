@@ -143,11 +143,11 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
  *
  * @returns Localised label string for the monitor identifier field.
  */
-function IdentifierLabel({
-    selectedMonitor,
-}: {
+interface IdentifierLabelProps {
     selectedMonitor: Monitor;
-}): string {
+}
+
+function IdentifierLabel({ selectedMonitor }: IdentifierLabelProps): string {
     const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
 
     useEffect(

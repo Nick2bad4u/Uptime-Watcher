@@ -119,6 +119,21 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
             expect(safeNumberConversion("invalid", 42)).toBe(42);
             expect(safeNumberConversion(null, -1)).toBe(-1);
         });
+
+        it("sanitizes NaN defaults before applying fallback", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: Shared Safe Conversions - Backend Coverage",
+                "component"
+            );
+
+            const fallback = Number.NaN;
+            expect(safeNumberConversion("invalid", fallback)).toBe(0);
+            expect(safeNumberConversion(undefined, fallback)).toBe(0);
+        });
     });
     describe(safeParseCheckInterval, () => {
         it("should return values >= 1000", async ({ task, annotate }) => {
