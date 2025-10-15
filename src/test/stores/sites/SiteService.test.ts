@@ -291,14 +291,22 @@ describe("SiteService", () => {
                 name: "Updated Site",
             };
 
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(undefined);
+            const updatedSite: Site = {
+                identifier,
+                monitors: [],
+                monitoring: true,
+                name: "Updated Site",
+            };
 
-            await SiteService.updateSite(identifier, updates);
+            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
+
+            const result = await SiteService.updateSite(identifier, updates);
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
                 identifier,
                 updates
             );
+            expect(result).toEqual(updatedSite);
         });
 
         it("should handle update errors", async ({ task, annotate }) => {
@@ -355,14 +363,22 @@ describe("SiteService", () => {
                 name: "Partially Updated Site",
             };
 
-            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(undefined);
+            const updatedSite: Site = {
+                identifier,
+                monitors: [],
+                monitoring: true,
+                name: "Partially Updated Site",
+            };
 
-            await SiteService.updateSite(identifier, updates);
+            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
+
+            const result = await SiteService.updateSite(identifier, updates);
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
                 identifier,
                 updates
             );
+            expect(result).toEqual(updatedSite);
         });
     });
 

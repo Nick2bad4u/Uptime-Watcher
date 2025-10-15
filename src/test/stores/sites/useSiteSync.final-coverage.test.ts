@@ -27,7 +27,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
     ),
-    withErrorHandling: vi.fn(),
+    withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
@@ -42,7 +42,12 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
-        subscribe: vi.fn(),
+        subscribe: vi.fn(async () => ({
+            errors: [],
+            expectedListeners: 3,
+            listenersAttached: 3,
+            success: true,
+        })),
         unsubscribe: vi.fn(),
     })),
 }));

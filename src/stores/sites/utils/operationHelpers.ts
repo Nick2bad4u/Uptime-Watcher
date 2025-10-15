@@ -64,9 +64,24 @@ export const updateMonitorAndSave = async (
     try {
         const site = getSiteByIdentifier(siteIdentifier, deps);
         const updatedSite = updateMonitorInSite(site, monitorId, updates);
-        await deps.services.site.updateSite(siteIdentifier, {
+        const savedSite = await deps.services.site.updateSite(siteIdentifier, {
             monitors: updatedSite.monitors,
         });
+
+        const currentSites = deps.getSites();
+        const hasExistingSite = currentSites.some(
+            (existingSite) => existingSite.identifier === savedSite.identifier
+        );
+
+        const nextSites = hasExistingSite
+            ? currentSites.map((existingSite) =>
+                  existingSite.identifier === savedSite.identifier
+                      ? savedSite
+                      : existingSite
+              )
+            : [...currentSites, savedSite];
+
+        deps.setSites(nextSites);
     } catch (error) {
         if (
             error instanceof Error &&

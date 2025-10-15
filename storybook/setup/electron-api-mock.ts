@@ -332,6 +332,29 @@ const electronAPIMockDefinition = {
         deleteAllSites: async (): Promise<number> =>
             mockState.sites.splice(0).length,
         getSites: async (): Promise<Site[]> => clone(mockState.sites),
+        removeMonitor: async (
+            siteIdentifier: string,
+            monitorId: string
+        ): Promise<boolean> => {
+            applySiteMutation(siteIdentifier, (site) => {
+                const nextMonitors = site.monitors.filter(
+                    (monitor) => monitor.id !== monitorId
+                );
+
+                if (nextMonitors.length === site.monitors.length) {
+                    throw new Error(
+                        `Storybook electron mock: monitor '${monitorId}' not found on site '${siteIdentifier}'.`
+                    );
+                }
+
+                return {
+                    ...site,
+                    monitors: nextMonitors,
+                } satisfies Site;
+            });
+
+            return true;
+        },
         removeSite: async (identifier: string): Promise<boolean> => {
             const index = findSiteIndex(identifier);
             if (index < 0) {

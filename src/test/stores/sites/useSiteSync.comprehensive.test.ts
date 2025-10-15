@@ -3,7 +3,7 @@
  * site sync functions
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
 
@@ -45,7 +45,12 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
-        subscribe: vi.fn(),
+        subscribe: vi.fn(async () => ({
+            errors: [],
+            expectedListeners: 3,
+            listenersAttached: 3,
+            success: true,
+        })),
         unsubscribe: vi.fn(),
     })),
 }));
@@ -100,6 +105,10 @@ describe("useSiteSync", () => {
         };
 
         syncActions = createSiteSyncActions(mockDeps);
+    });
+
+    afterEach(() => {
+        syncActions.unsubscribeFromStatusUpdates();
     });
 
     describe("fullResyncSites", () => {
@@ -176,33 +185,8 @@ describe("useSiteSync", () => {
             });
         });
 
-        it("should handle withErrorHandling exceptions and use fallback", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteSync", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Mock withErrorHandling to throw an error (covering the catch block in getSyncStatus)
-            const { withErrorHandling } = await import(
-                "../../../../shared/utils/errorHandling"
-            );
-            vi.mocked(withErrorHandling).mockImplementationOnce(async () => {
-                throw new Error("withErrorHandling failed");
-            });
-
-            const result = await syncActions.getSyncStatus();
-
-            // Should use fallback values when withErrorHandling throws
-            expect(result).toEqual({
-                lastSyncAt: null,
-                siteCount: 0,
-                source: "frontend",
-                synchronized: false,
-            });
-        });
+        // Removed legacy withErrorHandling-specific fallback test; getSyncStatus now
+        // relies on direct try/catch error handling (covered above).
     });
 
     describe("subscribeToStatusUpdates", () => {
@@ -216,10 +200,13 @@ describe("useSiteSync", () => {
             await annotate("Type: Data Update", "type");
 
             const mockCallback = vi.fn();
-            const result = syncActions.subscribeToStatusUpdates(mockCallback);
+            const result =
+                await syncActions.subscribeToStatusUpdates(mockCallback);
 
             expect(result).toEqual(
                 expect.objectContaining({
+                    errors: [],
+                    listenersAttached: 3,
                     success: true,
                     subscribed: true,
                     message:
@@ -244,7 +231,7 @@ describe("useSiteSync", () => {
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
-                subscribe: vi.fn(() => {
+                subscribe: vi.fn(async () => {
                     throw new Error("Subscribe failed");
                 }),
                 unsubscribe: vi.fn(),
@@ -254,15 +241,12 @@ describe("useSiteSync", () => {
                 statusUpdateHandlerModule.StatusUpdateManager
             ).mockImplementation(() => mockStatusUpdateManager);
 
-            // Should still return success even if subscribe throws (error is caught and logged)
-            const result = syncActions.subscribeToStatusUpdates(mockCallback);
+            const result =
+                await syncActions.subscribeToStatusUpdates(mockCallback);
 
-            expect(result).toEqual(
-                expect.objectContaining({
-                    success: true,
-                    subscribed: true,
-                })
-            );
+            expect(result.success).toBeFalsy();
+            expect(result.subscribed).toBeFalsy();
+            expect(result.errors).toContain("Subscribe failed");
         });
     });
 

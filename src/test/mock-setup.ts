@@ -235,9 +235,6 @@ const mockElectronAPI: ElectronAPI = {
         formatMonitorTitleSuffix: vi.fn<
             ElectronAPI["monitoring"]["formatMonitorTitleSuffix"]
         >(async (monitorType, monitor) => `${monitor.id}-${monitorType}`),
-        removeMonitor: vi.fn<ElectronAPI["monitoring"]["removeMonitor"]>(
-            async () => true
-        ),
         startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
             async () => true
         ),
@@ -289,6 +286,9 @@ const mockElectronAPI: ElectronAPI = {
         getSites: vi.fn<ElectronAPI["sites"]["getSites"]>(async () => [
             cloneSite(defaultSite),
         ]),
+        removeMonitor: vi.fn<ElectronAPI["sites"]["removeMonitor"]>(
+            async () => true
+        ),
         removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
         updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(
             async (siteIdentifier, updates) => {

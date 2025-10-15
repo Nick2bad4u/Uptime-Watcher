@@ -32,6 +32,7 @@
 
 import type { Site } from "@shared/types";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -46,6 +47,7 @@ import type {
 
 import { logger } from "../../services/logger";
 import { SystemService } from "../../services/SystemService";
+import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
 
 interface UIPersistedState {
@@ -116,8 +118,30 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 });
 
                 /* eslint-disable-next-line promise/prefer-await-to-then -- Fire-and-forget pattern for external URL opening */
-                void SystemService.openExternal(url).catch(() => {
-                    window.open(url, "_blank", "noopener");
+                void SystemService.openExternal(url).catch((error: unknown) => {
+                    const normalizedError = ensureError(error);
+
+                    logger.error(
+                        "Failed to open external URL via SystemService",
+                        {
+                            context,
+                            error: normalizedError,
+                            url,
+                        }
+                    );
+
+                    logStoreAction("UIStore", "openExternalFailed", {
+                        context,
+                        error: normalizedError.message,
+                        url,
+                    });
+
+                    useErrorStore
+                        .getState()
+                        .setStoreError(
+                            "system-open-external",
+                            `Unable to open external link (${url}): ${normalizedError.message}`
+                        );
                 });
             },
             selectedSiteIdentifier: undefined,

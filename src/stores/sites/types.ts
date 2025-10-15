@@ -13,6 +13,8 @@ import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
+import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+
 /**
  * Sites store actions interface for managing site operations.
  *
@@ -109,7 +111,7 @@ export interface SitesActions {
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (
         callback: (update: StatusUpdate) => void
-    ) => void;
+    ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
     /**
@@ -244,5 +246,5 @@ interface SiteDataService {
         monitorId: string
     ) => Promise<boolean>;
     removeSite: (identifier: string) => Promise<boolean>;
-    updateSite: (identifier: string, updates: Partial<Site>) => Promise<void>;
+    updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
 }

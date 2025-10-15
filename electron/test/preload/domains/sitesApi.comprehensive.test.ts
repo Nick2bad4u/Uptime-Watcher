@@ -61,6 +61,25 @@ describe("sitesApi", () => {
         );
     });
 
+    it("removes a monitor from a site", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
+        });
+
+        const result = await sitesApi.removeMonitor(
+            baseSite.identifier,
+            "monitor-1"
+        );
+
+        expect(result).toBeTruthy();
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "remove-monitor",
+            baseSite.identifier,
+            "monitor-1"
+        );
+    });
+
     it("updates a site", async () => {
         const updated = { ...baseSite, name: "Updated" };
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({

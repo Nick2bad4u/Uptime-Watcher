@@ -24,9 +24,35 @@
  * @ts-expect-error Complex fuzzing tests with Site object type compatibility - exact type safety deferred for test coverage
  */
 
-import { beforeEach, describe, expect, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
+
+const mockErrorStore = vi.hoisted(() => ({
+    clearStoreError: vi.fn(),
+    setOperationLoading: vi.fn(),
+    setStoreError: vi.fn(),
+}));
+
+vi.mock("../../../stores/error/useErrorStore", () => ({
+    useErrorStore: {
+        getState: vi.fn(() => mockErrorStore),
+    },
+}));
+
+const mockLogger = vi.hoisted(() => ({
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    user: {
+        action: vi.fn(),
+    },
+}));
+
+vi.mock("../../../services/logger", () => ({
+    logger: mockLogger,
+}));
 
 // Mock SystemService for openExternal functionality
 vi.mock("../../../services/SystemService", () => ({
@@ -240,6 +266,12 @@ const arbitraries = {
 describe("UI Store - Property-Based Fuzzing Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        mockErrorStore.clearStoreError.mockClear();
+        mockErrorStore.setOperationLoading.mockClear();
+        mockErrorStore.setStoreError.mockClear();
+        mockLogger.error.mockClear();
+        mockLogger.user.action.mockClear();
 
         // Reset store to initial state
         resetUIStore();
@@ -570,6 +602,30 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             for (const url of urls) {
                 expect(mockOpenExternal).toHaveBeenCalledWith(url);
             }
+        });
+
+        it("should log and surface errors when SystemService.openExternal fails", async () => {
+            const url = "https://example.com";
+            const failure = new Error("IPC failure");
+
+            mockOpenExternal.mockRejectedValueOnce(failure);
+
+            useUIStore.getState().openExternal(url);
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(mockOpenExternal).toHaveBeenCalledWith(url);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Failed to open external URL via SystemService",
+                expect.objectContaining({
+                    error: failure,
+                    url,
+                })
+            );
+            expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                "system-open-external",
+                expect.stringContaining("Unable to open external link")
+            );
         });
     });
 

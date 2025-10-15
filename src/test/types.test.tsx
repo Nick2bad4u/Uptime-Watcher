@@ -580,6 +580,7 @@ describe("Types Module", () => {
                             ...site,
                             identifier: "new-id",
                         } as Site),
+                    removeMonitor: () => Promise.resolve(true),
                     removeSite: () => Promise.resolve(true),
                     updateSite: () =>
                         Promise.resolve({
@@ -613,7 +614,6 @@ describe("Types Module", () => {
             expect(typeof mockAPI.monitoring.formatMonitorTitleSuffix).toBe(
                 "function"
             );
-            expect(typeof mockAPI.monitoring.removeMonitor).toBe("function");
             expect(typeof mockAPI.monitoring.stopMonitoring).toBe("function");
             expect(typeof mockAPI.monitoring.startMonitoringForSite).toBe(
                 "function"
@@ -631,6 +631,7 @@ describe("Types Module", () => {
 
             expect(typeof mockAPI.sites.getSites).toBe("function");
             expect(typeof mockAPI.sites.addSite).toBe("function");
+            expect(typeof mockAPI.sites.removeMonitor).toBe("function");
             expect(typeof mockAPI.sites.removeSite).toBe("function");
             expect(typeof mockAPI.sites.updateSite).toBe("function");
 

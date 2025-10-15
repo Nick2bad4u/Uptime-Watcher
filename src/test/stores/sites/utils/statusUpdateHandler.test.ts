@@ -243,7 +243,7 @@ describe("StatusUpdateHandler", () => {
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
-            manager.subscribe();
+            await manager.subscribe();
             expect(manager.isSubscribed()).toBeTruthy();
         });
 
@@ -263,7 +263,7 @@ describe("StatusUpdateHandler", () => {
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
-            manager.subscribe();
+            await manager.subscribe();
 
             expect(mockEventsService.onMonitorStatusChanged).toHaveBeenCalled();
             expect(mockEventsService.onMonitoringStarted).toHaveBeenCalled();
@@ -286,10 +286,8 @@ describe("StatusUpdateHandler", () => {
             mockEventsService.onMonitoringStarted.mockResolvedValue(cleanupFn);
             mockEventsService.onMonitoringStopped.mockResolvedValue(cleanupFn);
 
-            manager.subscribe();
-            // Wait a bit for async operations to complete
-            await new Promise((resolve) => setTimeout(resolve, 10));
-            manager.subscribe(); // Subscribe again
+            await manager.subscribe();
+            await manager.subscribe(); // Subscribe again
 
             expect(cleanupFn).toHaveBeenCalled();
         });
@@ -310,7 +308,7 @@ describe("StatusUpdateHandler", () => {
             mockEventsService.onMonitoringStarted.mockResolvedValue(cleanupFn);
             mockEventsService.onMonitoringStopped.mockResolvedValue(cleanupFn);
 
-            manager.subscribe();
+            await manager.subscribe();
             // Wait a bit for async operations to complete
             await new Promise((resolve) => setTimeout(resolve, 10));
             expect(manager.isSubscribed()).toBeTruthy();
@@ -371,7 +369,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Create proper MonitorStatusChangedEvent format (what the backend sends)
             const monitorStatusEvent = createCompleteMonitorStatusEvent(
@@ -400,7 +398,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
             mockSetSites.mockClear();
             mockOnUpdate.mockClear();
 
@@ -428,7 +426,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const startEvent = { siteIdentifier: "site1" };
 
@@ -446,7 +444,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const stopEvent = { siteIdentifier: "site1" };
 
@@ -479,7 +477,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = createCompleteMonitorStatusEvent(
@@ -505,7 +503,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             mockGetSites.mockReturnValue([]); // Empty sites array
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
@@ -529,7 +527,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
@@ -553,7 +551,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Test with invalid data structure
             const invalidData = {
@@ -574,7 +572,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Create a mock site initially
             const originalSite = createMockSite("site1", "monitor1");
@@ -631,7 +629,7 @@ describe("StatusUpdateHandler", () => {
             mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
             mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});
 
-            managerWithoutCallback.subscribe();
+            await managerWithoutCallback.subscribe();
 
             const monitorStatusEvent = createCompleteMonitorStatusEvent(
                 "site1",
@@ -698,7 +696,7 @@ describe("StatusUpdateHandler", () => {
                 }
             );
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
@@ -725,7 +723,7 @@ describe("StatusUpdateHandler", () => {
                 throw new Error("onUpdate error");
             });
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const statusUpdate = {
                 siteIdentifier: "site1",
@@ -748,7 +746,7 @@ describe("StatusUpdateHandler", () => {
 
             mockfullResyncSites.mockRejectedValue(new Error("Sync error"));
 
-            manager.subscribe();
+            await manager.subscribe();
 
             expect(() => statusChangedCallback({})).not.toThrow();
         });
@@ -780,7 +778,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Test site not found branch with development logging
             mockGetSites.mockReturnValue([]); // No sites in store
@@ -809,7 +807,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Set up a site that exists but doesn't have the monitor we're looking for
             const siteWithoutMonitor = createMockSite(
@@ -841,7 +839,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Set up a site that exists with the monitor we're updating
             const site = createMockSite("site1", "monitor1");
@@ -870,7 +868,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const invalidData = { invalid: "data" };
             await statusChangedCallback(invalidData);
@@ -894,7 +892,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Test site not found branch without development logging
             mockGetSites.mockReturnValue([]);
@@ -931,7 +929,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Business Logic", "type");
 
             mockGetSites.mockReturnValue([]);
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
@@ -959,7 +957,7 @@ describe("StatusUpdateHandler", () => {
                 monitors: [],
             };
             mockGetSites.mockReturnValue([siteWithoutMonitors]);
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const monitorStatusEvent = {
@@ -982,7 +980,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             await statusChangedCallback(null);
             await statusChangedCallback(undefined);
@@ -1000,7 +998,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use proper MonitorStatusChangedEvent format
             const site = createMockSite("site1", "monitor1");
@@ -1043,7 +1041,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const invalidDataTypes = [
                 null,
@@ -1106,7 +1104,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Setup site with monitor
             const site = createMockSite("site1", "monitor1");
@@ -1138,7 +1136,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             await monitoringStartedCallback();
 
@@ -1155,7 +1153,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             await monitoringStoppedCallback();
 
@@ -1175,7 +1173,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Create invalid event data
             const invalidEvent = {
@@ -1214,7 +1212,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const invalidEvent = {
                 incomplete: "data",
@@ -1239,7 +1237,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(true);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Setup site with monitor for successful update
             const site = createMockSite("site1", "monitor1");
@@ -1267,7 +1265,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Mock setSites to actually call the provided function to set state
             let storedSites: any[] = [createMockSite("site1", "monitor1")];
@@ -1306,7 +1304,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Monitoring", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Use the helper function to create a complete event for monitor1 (single monitor case)
             const event = createCompleteMonitorStatusEvent(
@@ -1344,7 +1342,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false); // Production mode
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Test site not found in production mode (should not log)
             mockGetSites.mockReturnValue([]);
@@ -1372,7 +1370,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Type: Data Update", "type");
 
             // Test with manager that has onUpdate callback
-            manager.subscribe();
+            await manager.subscribe();
 
             let storedSites = [createMockSite("site1", "monitor1")];
             mockGetSites.mockImplementation(() => storedSites);
@@ -1414,7 +1412,7 @@ describe("StatusUpdateHandler", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: History Preservation", "type");
 
-            manager.subscribe();
+            await manager.subscribe();
 
             // Create a site with a monitor that has existing history
             const existingHistory = [
@@ -1523,7 +1521,7 @@ describe("StatusUpdateHandler", () => {
             const logger = await import("../../../../services/logger");
             mockIsDevelopment.mockReturnValue(false);
 
-            manager.subscribe();
+            await manager.subscribe();
 
             const validEvent = {
                 siteIdentifier: "site1",

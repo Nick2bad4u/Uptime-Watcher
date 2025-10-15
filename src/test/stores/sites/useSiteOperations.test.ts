@@ -83,6 +83,8 @@ describe(createSiteOperationsActions, () => {
             true
         );
 
+        mockElectronAPI.sites.removeMonitor.mockResolvedValue(true);
+
         mockMonitor = {
             checkInterval: 60_000,
             history: [],
@@ -103,6 +105,8 @@ describe(createSiteOperationsActions, () => {
             name: "Test Site",
         };
 
+        mockElectronAPI.sites.updateSite.mockResolvedValue(mockSite);
+
         const siteService = {
             addSite: vi.fn(async (site: Site) =>
                 mockElectronAPI.sites.addSite(site)
@@ -113,7 +117,7 @@ describe(createSiteOperationsActions, () => {
             getSites: vi.fn(async () => mockElectronAPI.sites.getSites()),
             removeMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.removeMonitor(
+                    mockElectronAPI.sites.removeMonitor(
                         siteIdentifier,
                         monitorId
                     )
@@ -175,8 +179,6 @@ describe(createSiteOperationsActions, () => {
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
-
-            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
 
             await actions.addMonitorToSite("test-site", mockMonitor);
 
@@ -431,7 +433,11 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Business Logic", "type");
 
             const updates = { name: "Updated Site" };
-            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            const updatedSite: Site = {
+                ...mockSite,
+                name: "Updated Site",
+            };
+            mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
 
             await actions.modifySite("test-site", updates);
 
@@ -439,7 +445,8 @@ describe(createSiteOperationsActions, () => {
                 "test-site",
                 updates
             );
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should handle modify errors", async ({ task, annotate }) => {
@@ -454,6 +461,7 @@ describe(createSiteOperationsActions, () => {
             await expect(
                 actions.modifySite("test-site", { name: "Updated" })
             ).rejects.toThrow("Update failed");
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
     });
 
@@ -478,16 +486,17 @@ describe(createSiteOperationsActions, () => {
             mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
                 true
             );
-            mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(true);
+            mockElectronAPI.sites.removeMonitor.mockResolvedValue(true);
 
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(
-                mockElectronAPI.monitoring.removeMonitor
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+                "test-site",
+                "monitor-1"
+            );
             expect(mockDeps.syncSites).toHaveBeenCalled();
         });
     });
@@ -502,7 +511,16 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Update", "type");
 
-            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            const updatedSite: Site = {
+                ...mockSite,
+                monitors: [
+                    {
+                        ...mockMonitor,
+                        retryAttempts: 5,
+                    },
+                ],
+            };
+            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateMonitorRetryAttempts(
                 "test-site",
@@ -510,8 +528,15 @@ describe(createSiteOperationsActions, () => {
                 5
             );
 
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                "test-site",
+                {
+                    monitors: updatedSite.monitors,
+                }
+            );
+            expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should update monitor timeout", async ({ task, annotate }) => {
@@ -520,7 +545,16 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Update", "type");
 
-            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            const updatedSite: Site = {
+                ...mockSite,
+                monitors: [
+                    {
+                        ...mockMonitor,
+                        timeout: 10_000,
+                    },
+                ],
+            };
+            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateMonitorTimeout(
                 "test-site",
@@ -528,8 +562,15 @@ describe(createSiteOperationsActions, () => {
                 10_000
             );
 
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                "test-site",
+                {
+                    monitors: updatedSite.monitors,
+                }
+            );
+            expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should update site check interval", async ({ task, annotate }) => {
@@ -538,7 +579,16 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Update", "type");
 
-            mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+            const updatedSite: Site = {
+                ...mockSite,
+                monitors: [
+                    {
+                        ...mockMonitor,
+                        checkInterval: 30_000,
+                    },
+                ],
+            };
+            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
             await actions.updateSiteCheckInterval(
                 "test-site",
@@ -546,8 +596,15 @@ describe(createSiteOperationsActions, () => {
                 30_000
             );
 
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                "test-site",
+                {
+                    monitors: updatedSite.monitors,
+                }
+            );
+            expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 

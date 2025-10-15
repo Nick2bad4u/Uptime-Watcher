@@ -66,22 +66,6 @@ describe("monitoringApi", () => {
         );
     });
 
-    it("removes monitors via typed arguments", async () => {
-        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
-            success: true,
-            data: true,
-        });
-
-        const result = await monitoringApi.removeMonitor("site-1", "monitor-1");
-
-        expect(result).toBeTruthy();
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "remove-monitor",
-            "site-1",
-            "monitor-1"
-        );
-    });
-
     it("supports optional monitor identifier when starting monitoring", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,

@@ -258,15 +258,24 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
 
         if (typeof subscribeToStatusUpdates === "function") {
-            subscribeToStatusUpdates((update) => {
-                // Optional callback for additional processing if needed
-                if (isDevelopment()) {
-                    const timestamp = new Date().toLocaleTimeString();
-                    logger.debug(
-                        `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
-                    );
+            const subscriptionResult = await subscribeToStatusUpdates(
+                (update) => {
+                    // Optional callback for additional processing if needed
+                    if (isDevelopment()) {
+                        const timestamp = new Date().toLocaleTimeString();
+                        logger.debug(
+                            `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
+                        );
+                    }
                 }
-            });
+            );
+
+            if (!subscriptionResult.success) {
+                logger.warn("Status update subscription encountered issues", {
+                    errors: subscriptionResult.errors,
+                    listenersAttached: subscriptionResult.listenersAttached,
+                });
+            }
         } else if (isDevelopment()) {
             logger.warn(
                 "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"

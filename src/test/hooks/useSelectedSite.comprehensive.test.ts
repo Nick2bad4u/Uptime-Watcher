@@ -100,7 +100,15 @@ const createMockSitesStore = (
     startSiteMonitorMonitoring: async () => {},
     stopSiteMonitoring: async () => {},
     stopSiteMonitorMonitoring: async () => {},
-    subscribeToStatusUpdates: (_callback: (update: StatusUpdate) => void) => {},
+    subscribeToStatusUpdates: async (
+        _callback: (update: StatusUpdate) => void
+    ) => ({
+        errors: [],
+        listenersAttached: 0,
+        message: "",
+        subscribed: true,
+        success: true,
+    }),
     subscribeToSyncEvents: () => () => {},
     syncSites: async () => {},
     unsubscribeFromStatusUpdates: () => {},

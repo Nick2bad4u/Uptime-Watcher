@@ -26,7 +26,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     ensureError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
     ),
-    withErrorHandling: vi.fn(),
+    withErrorHandling: vi.fn(async (operation) => await operation()),
     withUtilityErrorHandling: vi.fn(),
     convertError: vi.fn((error) =>
         error instanceof Error ? error : new Error(String(error))
@@ -41,7 +41,12 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
-        subscribe: vi.fn(),
+        subscribe: vi.fn(async () => ({
+            errors: [],
+            expectedListeners: 3,
+            listenersAttached: 3,
+            success: true,
+        })),
         unsubscribe: vi.fn(),
     })),
 }));
@@ -175,7 +180,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
-                subscribe: vi.fn(() => {
+                subscribe: vi.fn(async () => {
                     throw testError;
                 }),
                 unsubscribe: vi.fn(),
@@ -185,13 +190,17 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 statusUpdateHandlerModule.StatusUpdateManager
             ).mockImplementation(() => mockStatusUpdateManager as any);
 
-            syncActions.subscribeToStatusUpdates(mockCallback);
+            const result =
+                await syncActions.subscribeToStatusUpdates(mockCallback);
 
             // Verify line 262: logger.error was called
             expect(logger.error).toHaveBeenCalledWith(
-                "Failed to subscribe to status updates:",
+                "Status update subscription threw an exception",
                 testError
             );
+
+            expect(result.success).toBeFalsy();
+            expect(result.errors).toContain("Subscribe failed");
         });
     });
 
@@ -421,7 +430,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             // First subscribe to create a manager
             const mockCallback = vi.fn();
-            syncActions.subscribeToStatusUpdates(mockCallback);
+            await syncActions.subscribeToStatusUpdates(mockCallback);
 
             // Then unsubscribe
             const result = syncActions.unsubscribeFromStatusUpdates();

@@ -90,7 +90,6 @@ interface MonitoringChannelMap {
     readonly checkSiteNow: "check-site-now";
     readonly formatMonitorDetail: "format-monitor-detail";
     readonly formatMonitorTitleSuffix: "format-monitor-title-suffix";
-    readonly removeMonitor: "remove-monitor";
     readonly startMonitoring: "start-monitoring";
     readonly startMonitoringForSite: "start-monitoring-for-site";
     readonly stopMonitoring: "stop-monitoring";
@@ -102,7 +101,6 @@ const MONITORING_CHANNELS_DEFINITION: MonitoringChannelMap = {
     checkSiteNow: "check-site-now",
     formatMonitorDetail: "format-monitor-detail",
     formatMonitorTitleSuffix: "format-monitor-title-suffix",
-    removeMonitor: "remove-monitor",
     startMonitoring: "start-monitoring",
     startMonitoringForSite: "start-monitoring-for-site",
     stopMonitoring: "stop-monitoring",
@@ -194,6 +192,7 @@ interface SitesChannelMap {
     readonly addSite: "add-site";
     readonly deleteAllSites: "delete-all-sites";
     readonly getSites: "get-sites";
+    readonly removeMonitor: "remove-monitor";
     readonly removeSite: "remove-site";
     readonly updateSite: "update-site";
 }
@@ -202,6 +201,7 @@ const SITES_CHANNELS_DEFINITION: SitesChannelMap = {
     addSite: "add-site",
     deleteAllSites: "delete-all-sites",
     getSites: "get-sites",
+    removeMonitor: "remove-monitor",
     removeSite: "remove-site",
     updateSite: "update-site",
 };

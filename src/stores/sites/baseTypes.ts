@@ -9,6 +9,22 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
+ * Summary returned after attempting to subscribe to status updates.
+ */
+export interface StatusUpdateSubscriptionSummary {
+    /** Collected errors encountered while attaching listeners. */
+    errors: string[];
+    /** Number of listeners successfully attached. */
+    listenersAttached: number;
+    /** Human-friendly message describing the outcome. */
+    message: string;
+    /** Whether the subscription succeeded and listeners are active. */
+    subscribed: boolean;
+    /** Convenience success flag mirroring overall subscription status. */
+    success: boolean;
+}
+
+/**
  * Common site CRUD operations interface used by both SiteOperationsActions and
  * SitesActions to eliminate duplication.
  *
@@ -133,7 +149,7 @@ export interface BaseSiteSubscriptions {
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (
         callback: (update: StatusUpdate) => void
-    ) => void;
+    ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Unsubscribe from status updates */
     unsubscribeFromStatusUpdates: () => void;
 }

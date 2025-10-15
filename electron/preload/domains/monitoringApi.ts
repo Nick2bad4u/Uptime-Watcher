@@ -53,16 +53,6 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     formatMonitorTitleSuffix: MonitoringDomainBridge["formatMonitorTitleSuffix"];
 
     /**
-     * Removes a monitor from a site
-     *
-     * @param siteIdentifier - Identifier of the site
-     * @param monitorId - ID of the monitor to remove
-     *
-     * @returns Promise resolving to true when the monitor is removed
-     */
-    removeMonitor: MonitoringDomainBridge["removeMonitor"];
-
-    /**
      * Starts the global monitoring system
      *
      * @returns Promise resolving to true if monitoring started successfully
@@ -135,16 +125,6 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to formatted title suffix
      */
     formatMonitorTitleSuffix: createTypedInvoker("format-monitor-title-suffix"),
-
-    /**
-     * Removes a monitor from a site
-     *
-     * @param siteIdentifier - Identifier of the site
-     * @param monitorId - ID of the monitor to remove
-     *
-     * @returns Promise resolving to true when the monitor is removed
-     */
-    removeMonitor: createTypedInvoker("remove-monitor"),
 
     /**
      * Starts the global monitoring system

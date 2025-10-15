@@ -406,6 +406,13 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
             render(<AddSiteForm />);
 
+            screen.debug();
+            const textboxes = screen.queryAllByRole("textbox");
+            console.log(
+                "textbox aria-labels",
+                textboxes.map((element) => element.getAttribute("aria-label"))
+            );
+
             const urlInput = screen.getByLabelText(/url/i);
             expect(urlInput).toBeInTheDocument();
             // Note: Field value test removed as form component may not be using mock values correctly

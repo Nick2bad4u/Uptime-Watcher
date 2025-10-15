@@ -68,7 +68,8 @@ const mockElectronAPI = {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
-    monitoring: {
+    monitoring: {},
+    sites: {
         removeMonitor: vi.fn(),
     },
     stateSync: {
@@ -107,7 +108,7 @@ describe(useSettingsStore, () => {
                 sizeBytes: 100,
             },
         });
-        mockElectronAPI.monitoring.removeMonitor.mockResolvedValue(undefined);
+        mockElectronAPI.sites.removeMonitor.mockResolvedValue(true);
         mockElectronAPI.stateSync.onStateSyncEvent.mockReturnValue(() => {});
 
         mockExtractIpcData.mockImplementation((response: any) => response.data);

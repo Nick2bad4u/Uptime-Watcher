@@ -233,14 +233,28 @@ export const createSiteOperationsActions = (
         identifier: string,
         updates: Partial<Site>
     ): Promise<void> => {
-        await withSiteOperation(
+        const updatedSite = await withSiteOperationReturning(
             "modifySite",
-            async () => {
-                await deps.services.site.updateSite(identifier, updates);
-            },
+            async () => deps.services.site.updateSite(identifier, updates),
             { identifier, updates },
-            deps
+            deps,
+            false
         );
+
+        const currentSites = deps.getSites();
+        const hasExistingSite = currentSites.some(
+            (site) => site.identifier === updatedSite.identifier
+        );
+
+        const nextSites = hasExistingSite
+            ? currentSites.map((site) =>
+                  site.identifier === updatedSite.identifier
+                      ? updatedSite
+                      : site
+              )
+            : [...currentSites, updatedSite];
+
+        deps.setSites(nextSites);
     },
     removeMonitorFromSite: async (siteIdentifier, monitorId): Promise<void> => {
         await withSiteOperation(
@@ -304,7 +318,8 @@ export const createSiteOperationsActions = (
                 );
             },
             { monitorId, retryAttempts, siteIdentifier },
-            deps
+            deps,
+            false
         );
     },
     updateMonitorTimeout: async (
@@ -329,7 +344,8 @@ export const createSiteOperationsActions = (
                 );
             },
             { monitorId, siteIdentifier, timeout },
-            deps
+            deps,
+            false
         );
     },
     updateSiteCheckInterval: async (
@@ -350,7 +366,8 @@ export const createSiteOperationsActions = (
                 );
             },
             { interval, monitorId, siteIdentifier },
-            deps
+            deps,
+            false
         );
     },
 });

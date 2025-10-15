@@ -38,7 +38,7 @@ interface SiteServiceContract {
     readonly updateSite: (
         identifier: string,
         updates: Partial<Site>
-    ) => Promise<void>;
+    ) => Promise<Site>;
 }
 
 /**
@@ -123,7 +123,7 @@ export const SiteService: SiteServiceContract = {
     removeMonitor: wrap(
         "removeMonitor",
         async (api, siteIdentifier: string, monitorId: string) => {
-            const removed = await api.monitoring.removeMonitor(
+            const removed = await api.sites.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
@@ -178,15 +178,14 @@ export const SiteService: SiteServiceContract = {
      * @param identifier - The identifier of the site to update.
      * @param updates - Partial site object containing fields to update.
      *
-     * @returns A promise that resolves when the site is updated.
+     * @returns The updated {@link Site} instance returned by the backend.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
     updateSite: wrap(
         "updateSite",
-        async (api, identifier: string, updates: Partial<Site>) => {
-            await api.sites.updateSite(identifier, updates);
-        }
+        async (api, identifier: string, updates: Partial<Site>) =>
+            api.sites.updateSite(identifier, updates)
     ),
 };

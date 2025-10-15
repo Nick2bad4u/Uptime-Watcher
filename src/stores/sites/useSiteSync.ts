@@ -14,19 +14,23 @@
  *
  * @packageDocumentation
  */
-
 import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
+import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { SiteService } from "./services/SiteService";
-import { StatusUpdateManager } from "./utils/statusUpdateHandler";
+import {
+    StatusUpdateManager,
+    type StatusUpdateSubscriptionResult,
+} from "./utils/statusUpdateHandler";
 
 /**
  * Site synchronization actions interface.
@@ -82,14 +86,9 @@ export interface SiteSyncActions {
      *
      * @returns Subscription result with success indicators
      */
-    subscribeToStatusUpdates: (callback: (update: StatusUpdate) => void) => {
-        /** Human-readable description of the operation */
-        message: string;
-        /** Whether subscription was successful */
-        subscribed: boolean;
-        /** Overall operation success status */
-        success: boolean;
-    };
+    subscribeToStatusUpdates: (
+        callback: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
 
     /**
      * Establishes subscription to backend synchronization events.
@@ -240,10 +239,9 @@ export const createSiteSyncActions = (
                 } satisfies StateSyncStatusSummary;
             }
         },
-        subscribeToStatusUpdates: (
+        subscribeToStatusUpdates: async (
             callback: (update: StatusUpdate) => void
-        ) => {
-            // Initialize status update manager if not already done
+        ): Promise<StatusUpdateSubscriptionSummary> => {
             statusUpdateManager.instance ??= new StatusUpdateManager({
                 fullResyncSites: actions.fullResyncSites,
                 getSites: deps.getSites,
@@ -251,26 +249,116 @@ export const createSiteSyncActions = (
                 setSites: deps.setSites,
             });
 
-            try {
-                // Use the new efficient StatusUpdateManager that handles
-                // incremental updates
-                statusUpdateManager.instance.subscribe();
-            } catch (error) {
-                logger.error(
-                    "Failed to subscribe to status updates:",
-                    ensureError(error)
-                );
-            }
+            const errorHandler = createStoreErrorHandler(
+                "sites-sync",
+                "subscribeToStatusUpdates"
+            );
 
-            const result = {
-                message:
-                    "Successfully subscribed to status updates with efficient incremental updates",
-                subscribed: true,
-                success: true,
-            };
-            logStoreAction("SitesStore", "subscribeToStatusUpdates", result);
+            const executeSubscription =
+                async (): Promise<StatusUpdateSubscriptionSummary> => {
+                    const managerInstance = statusUpdateManager.instance;
 
-            return result;
+                    if (!managerInstance) {
+                        const initializationMessage =
+                            "StatusUpdateManager instance is not initialized";
+                        errorHandler.setError(initializationMessage);
+                        logger.error(
+                            "Status update subscription attempted without an initialized manager",
+                            initializationMessage
+                        );
+
+                        const fallbackSummary: StatusUpdateSubscriptionSummary =
+                            {
+                                errors: [initializationMessage],
+                                listenersAttached: 0,
+                                message:
+                                    "Failed to subscribe to status updates",
+                                subscribed: false,
+                                success: false,
+                            };
+
+                        logStoreAction(
+                            "SitesStore",
+                            "subscribeToStatusUpdates",
+                            fallbackSummary
+                        );
+
+                        return fallbackSummary;
+                    }
+
+                    try {
+                        const {
+                            errors,
+                            expectedListeners,
+                            listenersAttached,
+                            success,
+                        }: StatusUpdateSubscriptionResult =
+                            await managerInstance.subscribe();
+
+                        const summary: StatusUpdateSubscriptionSummary = {
+                            errors,
+                            listenersAttached,
+                            message: success
+                                ? "Successfully subscribed to status updates with efficient incremental updates"
+                                : "Failed to subscribe to status updates",
+                            subscribed: success,
+                            success,
+                        };
+
+                        if (!success) {
+                            const detailMessage = `Status update subscription failed (${listenersAttached}/${expectedListeners} listeners attached)`;
+                            errorHandler.setError(detailMessage);
+                            logger.error(
+                                "Status update subscription encountered errors",
+                                {
+                                    detailMessage,
+                                    errors,
+                                    expectedListeners,
+                                    listenersAttached,
+                                }
+                            );
+                        }
+
+                        logStoreAction(
+                            "SitesStore",
+                            "subscribeToStatusUpdates",
+                            {
+                                ...summary,
+                                expectedListeners,
+                            }
+                        );
+
+                        return summary;
+                    } catch (error) {
+                        const normalizedError = ensureError(error);
+                        errorHandler.setError(normalizedError.message);
+
+                        logger.error(
+                            "Status update subscription threw an exception",
+                            normalizedError
+                        );
+
+                        const failureSummary: StatusUpdateSubscriptionSummary =
+                            {
+                                errors: [normalizedError.message],
+                                listenersAttached: 0,
+                                message:
+                                    "Failed to subscribe to status updates",
+                                subscribed: false,
+                                success: false,
+                            };
+
+                        logStoreAction(
+                            "SitesStore",
+                            "subscribeToStatusUpdates",
+                            failureSummary
+                        );
+
+                        return failureSummary;
+                    }
+                };
+
+            return withErrorHandling(executeSubscription, errorHandler);
         },
         subscribeToSyncEvents: (): (() => void) => {
             let cleanup: (() => void) | null = null;
@@ -372,6 +460,7 @@ export const createSiteSyncActions = (
         },
         unsubscribeFromStatusUpdates: () => {
             statusUpdateManager.instance?.unsubscribe();
+            delete statusUpdateManager.instance;
             const result = {
                 message: "Successfully unsubscribed from status updates",
                 success: true,

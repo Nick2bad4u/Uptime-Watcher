@@ -128,10 +128,10 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         mockElectronAPI = {
             sites: {
+                removeMonitor: vi.fn().mockResolvedValue(true),
                 removeSite: vi.fn().mockResolvedValue(true),
             },
             monitoring: {
-                removeMonitor: vi.fn().mockResolvedValue(true),
                 stopMonitoringForSite: vi.fn().mockResolvedValue(true),
             },
             data: {
@@ -166,7 +166,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             getSites: vi.fn(async () => getSitesFn()),
             removeMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) => {
-                    await mockElectronAPI.monitoring.removeMonitor(
+                    await mockElectronAPI.sites.removeMonitor(
                         siteIdentifier,
                         monitorId
                     );
@@ -176,7 +176,13 @@ describe("useSiteOperations - Targeted Coverage", () => {
             removeSite: vi.fn(async (identifier: string) =>
                 mockElectronAPI.sites.removeSite(identifier)
             ),
-            updateSite: vi.fn(async () => undefined),
+            updateSite: vi.fn(
+                async (identifier: string, updates: Partial<Site>) => ({
+                    ...mockSiteWithMultipleMonitors,
+                    ...updates,
+                    identifier,
+                })
+            ),
         };
 
         const monitoringService = {
@@ -352,9 +358,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(
-                mockElectronAPI.monitoring.removeMonitor
-            ).not.toHaveBeenCalled();
+            expect(mockElectronAPI.sites.removeMonitor).not.toHaveBeenCalled();
         });
     });
 
@@ -388,9 +392,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
 
             // Verify monitor removal still proceeded
-            expect(
-                mockElectronAPI.monitoring.removeMonitor
-            ).toHaveBeenCalledWith(
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
@@ -445,9 +447,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
-            expect(
-                mockElectronAPI.monitoring.removeMonitor
-            ).toHaveBeenCalledWith(
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
@@ -468,9 +468,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
-            expect(
-                mockElectronAPI.monitoring.removeMonitor
-            ).toHaveBeenCalledWith(
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );

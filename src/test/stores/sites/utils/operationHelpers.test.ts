@@ -151,7 +151,7 @@ describe("OperationHelpers", () => {
             setLoading: vi.fn(),
         });
         mockUpdateMonitorInSite.mockReturnValue(mockSites[0]!);
-        mockElectronAPI.sites.updateSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.updateSite.mockResolvedValue(mockSites[0]!);
     });
 
     afterEach(() => {
@@ -217,10 +217,11 @@ describe("OperationHelpers", () => {
                 monitors: [{ ...mockSites[0]!.monitors[0]!, ...updates }],
             };
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
             await updateMonitorAndSave("site1", "monitor1", updates, mockDeps);
 
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(mockDeps.getSites).toHaveBeenCalledTimes(2);
             expect(mockUpdateMonitorInSite).toHaveBeenCalledWith(
                 mockSites[0]!,
                 "monitor1",
@@ -230,6 +231,12 @@ describe("OperationHelpers", () => {
                 "site1",
                 { monitors: updatedSite.monitors }
             );
+            expect(mockDeps.setSites).toHaveBeenCalledWith([
+                updatedSite,
+                mockSites[1]!,
+                mockSites[2]!,
+            ]);
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
         });
 
         it("should throw error when site not found", async ({
@@ -248,6 +255,7 @@ describe("OperationHelpers", () => {
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
         it("should handle updateSite API errors", async ({
@@ -269,6 +277,7 @@ describe("OperationHelpers", () => {
             expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).toHaveBeenCalled();
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
     });
 
@@ -719,6 +728,7 @@ describe("OperationHelpers", () => {
                 ],
             };
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
+            mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
             await updateMonitorAndSave(
                 "site1",
@@ -736,6 +746,12 @@ describe("OperationHelpers", () => {
                 "site1",
                 { monitors: updatedSite.monitors }
             );
+            expect(mockDeps.setSites).toHaveBeenCalledWith([
+                updatedSite,
+                mockSites[1]!,
+                mockSites[2]!,
+            ]);
+            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operations with empty parameters object", async ({

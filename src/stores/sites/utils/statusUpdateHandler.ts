@@ -83,6 +83,22 @@ export interface StatusUpdateHandlerOptions {
 }
 
 /**
+ * Result returned when attempting to subscribe to status updates.
+ *
+ * @public
+ */
+export interface StatusUpdateSubscriptionResult {
+    /** Collected error messages encountered during subscription. */
+    errors: string[];
+    /** Expected number of listeners to attach. */
+    expectedListeners: number;
+    /** Total number of listeners that were attached. */
+    listenersAttached: number;
+    /** Whether all listeners were attached successfully without errors. */
+    success: boolean;
+}
+
+/**
  * Manages status update subscriptions and event handling with efficient
  * incremental updates.
  *
@@ -252,6 +268,155 @@ export class StatusUpdateManager {
     }
 
     /**
+     * Subscribe to status updates from the backend with efficient incremental
+     * processing.
+     *
+     * @remarks
+     * Sets up IPC event listeners for monitor status changes and monitoring
+     * lifecycle events. Automatically performs an initial full sync when
+     * subscribing. Prioritizes incremental updates over full syncs for better
+     * performance.
+     *
+     * @example
+     *
+     * ```typescript
+     * manager.subscribe();
+     * ```
+     */
+    public async subscribe(): Promise<StatusUpdateSubscriptionResult> {
+        // Cleanup existing subscriptions if any
+        this.unsubscribe();
+
+        const errors: string[] = [];
+        let listenersAttached = 0;
+        const expectedListeners = 3;
+        let encounteredListenerFailure = false;
+
+        try {
+            await this.fullResyncSites();
+        } catch (error) {
+            const normalizedError = ensureError(error);
+            errors.push(`initial-sync: ${normalizedError.message}`);
+            logger.error(
+                "Initial full sync on status update handler subscribe failed",
+                normalizedError
+            );
+        }
+
+        const listenerDescriptors: Array<{
+            register: () => Promise<() => void>;
+            scope: string;
+        }> = [
+            {
+                register: () =>
+                    EventsService.onMonitorStatusChanged((data: unknown) => {
+                        void (async (): Promise<void> => {
+                            try {
+                                if (this.isMonitorStatusChangedEvent(data)) {
+                                    logger.debug(
+                                        "Processing valid monitor status change event"
+                                    );
+                                    await this.handleIncrementalStatusUpdate(
+                                        data
+                                    );
+                                } else {
+                                    // Invalid data structure - trigger full sync as fallback
+                                    if (isDevelopment()) {
+                                        logger.warn(
+                                            "Invalid monitor status changed event data, triggering full sync",
+                                            data
+                                        );
+                                        logger.debug(
+                                            "Event failed type guard, triggering full sync"
+                                        );
+                                    }
+                                    await this.fullResyncSites();
+                                }
+                            } catch (error) {
+                                // Log error but don't throw - event handling should continue
+                                logger.error(
+                                    "Monitor status update processing failed",
+                                    ensureError(error)
+                                );
+                            }
+                        })();
+                    }),
+                scope: "monitor-status-changed",
+            },
+            {
+                register: () =>
+                    EventsService.onMonitoringStarted(() => {
+                        void (async (): Promise<void> => {
+                            try {
+                                await this.fullResyncSites();
+                            } catch (error) {
+                                // Log error but don't throw - event handling should continue
+                                logger.error(
+                                    "Full sync on monitoring started failed",
+                                    ensureError(error)
+                                );
+                            }
+                        })();
+                    }),
+                scope: "monitoring-started",
+            },
+            {
+                register: () =>
+                    EventsService.onMonitoringStopped(() => {
+                        void (async (): Promise<void> => {
+                            try {
+                                await this.fullResyncSites();
+                            } catch (error) {
+                                // Log error but don't throw - event handling should continue
+                                logger.error(
+                                    "Full sync on monitoring stopped failed",
+                                    ensureError(error)
+                                );
+                            }
+                        })();
+                    }),
+                scope: "monitoring-stopped",
+            },
+        ];
+
+        /* eslint-disable no-await-in-loop -- Event listeners must be attached sequentially to preserve registration order */
+        for (const { register, scope } of listenerDescriptors) {
+            if (encounteredListenerFailure) {
+                break;
+            }
+
+            try {
+                const cleanup = await register();
+                this.cleanupFunctions.push(cleanup);
+                listenersAttached += 1;
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                errors.push(`${scope}: ${normalizedError.message}`);
+                logger.error(
+                    `Failed to register ${scope} listener`,
+                    normalizedError
+                );
+                encounteredListenerFailure = true;
+                listenersAttached = 0;
+                this.unsubscribe();
+            }
+        }
+        /* eslint-enable no-await-in-loop -- Sequential registration complete */
+
+        this.isListenerAttached = listenersAttached === expectedListeners;
+
+        return {
+            errors,
+            expectedListeners,
+            listenersAttached,
+            success:
+                errors.length === 0 &&
+                !encounteredListenerFailure &&
+                listenersAttached === expectedListeners,
+        } satisfies StatusUpdateSubscriptionResult;
+    }
+
+    /**
      * Constructs a new StatusUpdateManager instance.
      *
      * @remarks
@@ -278,146 +443,6 @@ export class StatusUpdateManager {
      */
     public isSubscribed(): boolean {
         return this.isListenerAttached;
-    }
-
-    /**
-     * Subscribe to status updates from the backend with efficient incremental
-     * processing.
-     *
-     * @remarks
-     * Sets up IPC event listeners for monitor status changes and monitoring
-     * lifecycle events. Automatically performs an initial full sync when
-     * subscribing. Prioritizes incremental updates over full syncs for better
-     * performance.
-     *
-     * @example
-     *
-     * ```typescript
-     * manager.subscribe();
-     * ```
-     */
-    public subscribe(): void {
-        // Cleanup existing subscriptions if any
-        this.unsubscribe();
-
-        // Initial full sync
-        void (async (): Promise<void> => {
-            try {
-                await this.fullResyncSites();
-            } catch (error) {
-                // Log error but don't throw - subscription should continue
-                logger.error(
-                    "Initial full sync on status update handler subscribe failed",
-                    ensureError(error)
-                );
-            }
-        })();
-
-        // Listen to monitor status changed events for efficient incremental
-        // updates
-        void (async (): Promise<void> => {
-            try {
-                const statusUpdateCleanup =
-                    await EventsService.onMonitorStatusChanged(
-                        (data: unknown) => {
-                            void (async (): Promise<void> => {
-                                try {
-                                    if (
-                                        this.isMonitorStatusChangedEvent(data)
-                                    ) {
-                                        logger.debug(
-                                            "Processing valid monitor status change event"
-                                        );
-                                        await this.handleIncrementalStatusUpdate(
-                                            data
-                                        );
-                                    } else {
-                                        // Invalid data structure - trigger full sync
-                                        // as fallback
-                                        if (isDevelopment()) {
-                                            logger.warn(
-                                                "Invalid monitor status changed event data, triggering full sync",
-                                                data
-                                            );
-                                            logger.debug(
-                                                "Event failed type guard, triggering full sync"
-                                            );
-                                        }
-                                        await this.fullResyncSites();
-                                    }
-                                } catch (error) {
-                                    // Log error but don't throw - event handling should continue
-                                    logger.error(
-                                        "Monitor status update processing failed",
-                                        ensureError(error)
-                                    );
-                                }
-                            })();
-                        }
-                    );
-                this.cleanupFunctions.push(statusUpdateCleanup);
-            } catch (error) {
-                logger.error(
-                    "Failed to register monitor status change listener",
-                    ensureError(error)
-                );
-            }
-        })();
-
-        // Subscribe to monitoring lifecycle events for full sync triggers
-        void (async (): Promise<void> => {
-            try {
-                const monitoringStartedCleanup =
-                    await EventsService.onMonitoringStarted(() => {
-                        void (async (): Promise<void> => {
-                            try {
-                                await this.fullResyncSites();
-                            } catch (error) {
-                                // Log error but don't throw - event handling should continue
-                                logger.error(
-                                    "Full sync on monitoring started failed",
-                                    ensureError(error)
-                                );
-                            }
-                        })();
-                    });
-
-                this.cleanupFunctions.push(monitoringStartedCleanup);
-            } catch (error) {
-                logger.error(
-                    "Failed to register monitoring started listener",
-                    ensureError(error)
-                );
-            }
-        })();
-
-        void (async (): Promise<void> => {
-            try {
-                const monitoringStoppedCleanup =
-                    await EventsService.onMonitoringStopped(() => {
-                        void (async (): Promise<void> => {
-                            try {
-                                await this.fullResyncSites();
-                            } catch (error) {
-                                // Log error but don't throw - event handling should continue
-                                logger.error(
-                                    "Full sync on monitoring stopped failed",
-                                    ensureError(error)
-                                );
-                            }
-                        })();
-                    });
-
-                this.cleanupFunctions.push(monitoringStoppedCleanup);
-            } catch (error) {
-                logger.error(
-                    "Failed to register monitoring stopped listener",
-                    ensureError(error)
-                );
-            }
-        })();
-
-        this.isListenerAttached = true;
     }
 
     /**
