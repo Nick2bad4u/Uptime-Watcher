@@ -180,8 +180,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 it("returns fallback diagnostics when called without prior subscription", async () => {
                     const result = await syncActions.retryStatusSubscription();
 
-                    expect(result.success).toBe(false);
-                    expect(result.subscribed).toBe(false);
+                    expect(result.success).toBeFalsy();
+                    expect(result.subscribed).toBeFalsy();
                     expect(result.errors).toContain(
                         "Retry attempted without previously registered callback"
                     );

@@ -93,15 +93,26 @@ const createMockSitesStore = (
     modifySite: async () => {},
     removeMonitorFromSite: async () => {},
     removeSite: (_identifier: string) => {},
+    retryStatusSubscription: async (
+        _callback?: (update: StatusUpdate) => void
+    ) => ({
+        errors: [],
+        expectedListeners: 0,
+        listenersAttached: 0,
+        message: "Subscription retried",
+        subscribed: true,
+        success: true,
+    }),
     selectSite: (_site: Site | undefined) => {},
     setSelectedMonitorId: (_siteId: string, _monitorId: string) => {},
     setSites: (_sites: Site[]) => {},
+    setStatusSubscriptionSummary: (_summary) => {},
     startSiteMonitoring: async () => {},
     startSiteMonitorMonitoring: async () => {},
     stopSiteMonitoring: async () => {},
     stopSiteMonitorMonitoring: async () => {},
     subscribeToStatusUpdates: async (
-        _callback: (update: StatusUpdate) => void
+        _callback?: (update: StatusUpdate) => void
     ) => ({
         errors: [],
         expectedListeners: 0,
@@ -112,13 +123,18 @@ const createMockSitesStore = (
     }),
     subscribeToSyncEvents: () => () => {},
     syncSites: async () => {},
-    unsubscribeFromStatusUpdates: () => {},
+    unsubscribeFromStatusUpdates: () => ({
+        message: "Unsubscribed",
+        success: true,
+        unsubscribed: true,
+    }),
     updateMonitorRetryAttempts: async () => {},
     updateMonitorTimeout: async () => {},
     updateSiteCheckInterval: async () => {},
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],
+    statusSubscriptionSummary: undefined,
     ...overrides,
 });
 

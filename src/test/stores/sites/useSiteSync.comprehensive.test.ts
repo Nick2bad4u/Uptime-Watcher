@@ -287,8 +287,8 @@ describe("useSiteSync", () => {
 
             const retryResult = await syncActions.retryStatusSubscription();
 
-            expect(retryResult.success).toBe(true);
-            expect(retryResult.subscribed).toBe(true);
+            expect(retryResult.success).toBeTruthy();
+            expect(retryResult.subscribed).toBeTruthy();
             expect(
                 StatusUpdateManagerMock.mock.instances.length
             ).toBeGreaterThanOrEqual(2);
@@ -307,8 +307,8 @@ describe("useSiteSync", () => {
         it("returns fallback diagnostics when no callback was registered", async () => {
             const result = await syncActions.retryStatusSubscription();
 
-            expect(result.success).toBe(false);
-            expect(result.subscribed).toBe(false);
+            expect(result.success).toBeFalsy();
+            expect(result.subscribed).toBeFalsy();
             expect(result.errors).toContain(
                 "Retry attempted without previously registered callback"
             );

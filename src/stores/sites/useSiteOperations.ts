@@ -98,9 +98,11 @@ export const createSiteOperationsActions = (
                     monitors: updatedMonitors,
                 });
             },
-            { monitor, siteIdentifier },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { monitor, siteIdentifier },
+            }
         );
 
         applySavedSiteToStore(savedSite, deps);
@@ -141,9 +143,11 @@ export const createSiteOperationsActions = (
                 const newSite = await deps.services.site.addSite(completeSite);
                 deps.addSite(newSite);
             },
-            { siteData },
             deps,
-            false // Don't sync after as we're adding directly to deps
+            {
+                syncAfter: false,
+                telemetry: { siteData },
+            } // Don't sync after as we're adding directly to deps
         );
     },
     deleteSite: async (identifier: string): Promise<void> => {
@@ -184,9 +188,11 @@ export const createSiteOperationsActions = (
                 }
                 deps.removeSite(identifier);
             },
-            { identifier },
             deps,
-            false // Don't sync after as we're removing directly from deps
+            {
+                syncAfter: false,
+                telemetry: { identifier },
+            } // Don't sync after as we're removing directly from deps
         );
     },
     downloadSqliteBackup: async (): Promise<void> => {
@@ -206,9 +212,15 @@ export const createSiteOperationsActions = (
                     throw resolvedError;
                 }
             },
-            { message: "SQLite backup download completed", success: true },
             deps,
-            false // Don't sync for backup download
+            {
+                syncAfter: false,
+                telemetry: {
+                    success: {
+                        message: "SQLite backup download completed",
+                    },
+                },
+            } // Don't sync for backup download
         );
     },
     initializeSites: async (): Promise<{
@@ -228,9 +240,11 @@ export const createSiteOperationsActions = (
                     success: true,
                 };
             },
-            {},
             deps,
-            false // Don't sync for initialization - we're loading the data
+            {
+                syncAfter: false,
+                telemetry: {},
+            } // Don't sync for initialization - we're loading the data
         ),
     modifySite: async (
         identifier: string,
@@ -239,9 +253,11 @@ export const createSiteOperationsActions = (
         const updatedSite = await withSiteOperationReturning(
             "modifySite",
             async () => deps.services.site.updateSite(identifier, updates),
-            { identifier, updates },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { identifier, updates },
+            }
         );
 
         const currentSites = deps.getSites();
@@ -293,9 +309,11 @@ export const createSiteOperationsActions = (
                     monitors: updatedMonitors,
                 });
             },
-            { monitorId, siteIdentifier },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { monitorId, siteIdentifier },
+            }
         );
 
         applySavedSiteToStore(savedSite, deps);
@@ -321,9 +339,11 @@ export const createSiteOperationsActions = (
                     deps
                 );
             },
-            { monitorId, retryAttempts, siteIdentifier },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { monitorId, retryAttempts, siteIdentifier },
+            }
         );
     },
     updateMonitorTimeout: async (
@@ -347,9 +367,11 @@ export const createSiteOperationsActions = (
                     deps
                 );
             },
-            { monitorId, siteIdentifier, timeout },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { monitorId, siteIdentifier, timeout },
+            }
         );
     },
     updateSiteCheckInterval: async (
@@ -369,9 +391,11 @@ export const createSiteOperationsActions = (
                     deps
                 );
             },
-            { interval, monitorId, siteIdentifier },
             deps,
-            false
+            {
+                syncAfter: false,
+                telemetry: { interval, monitorId, siteIdentifier },
+            }
         );
     },
 });

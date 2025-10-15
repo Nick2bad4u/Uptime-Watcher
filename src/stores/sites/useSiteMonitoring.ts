@@ -102,6 +102,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "success",
+                        success: true,
                     });
                 } catch (error) {
                     const normalizedError = ensureError(error);
@@ -110,6 +111,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "failure",
+                        success: false,
                     });
                     throw error;
                 }
@@ -132,6 +134,7 @@ export const createSiteMonitoringActions = (
                     logStoreAction("SitesStore", "startSiteMonitoring", {
                         siteIdentifier,
                         status: "success",
+                        success: true,
                     });
                     // No need for manual sync - StatusUpdateHandler will update UI
                     // via events
@@ -141,6 +144,7 @@ export const createSiteMonitoringActions = (
                         error: normalizedError.message,
                         siteIdentifier,
                         status: "failure",
+                        success: false,
                     });
                     throw error;
                 }
@@ -169,6 +173,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "success",
+                        success: true,
                     });
                     // No need for manual sync - StatusUpdateHandler will update UI
                     // via events
@@ -179,6 +184,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "failure",
+                        success: false,
                     });
                     throw error;
                 }
@@ -204,6 +210,7 @@ export const createSiteMonitoringActions = (
                     logStoreAction("SitesStore", "stopSiteMonitoring", {
                         siteIdentifier,
                         status: "success",
+                        success: true,
                     });
                     // No need for manual sync - StatusUpdateHandler will update UI
                     // via events
@@ -213,6 +220,7 @@ export const createSiteMonitoringActions = (
                         error: normalizedError.message,
                         siteIdentifier,
                         status: "failure",
+                        success: false,
                     });
                     throw error;
                 }
@@ -241,6 +249,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "success",
+                        success: true,
                     });
                     // No need for manual sync - StatusUpdateHandler will update UI
                     // via events
@@ -251,6 +260,7 @@ export const createSiteMonitoringActions = (
                         monitorId,
                         siteIdentifier,
                         status: "failure",
+                        success: false,
                     });
                     throw error;
                 }

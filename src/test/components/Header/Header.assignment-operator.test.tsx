@@ -17,6 +17,10 @@ import type { SitesStore } from "../../../stores/sites/types";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import type { Site } from "../../../../shared/types";
+import type {
+    StatusUpdateSubscriptionSummary,
+    StatusUpdateUnsubscribeResult,
+} from "../../../stores/sites/baseTypes";
 
 // Mock all store hooks
 vi.mock("../../../stores/sites/useSitesStore");
@@ -30,6 +34,28 @@ const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 
 const createMockSitesStoreState = (sites: Site[]): SitesStore => {
     const unsubscribe = vi.fn();
+    const subscriptionSummary: StatusUpdateSubscriptionSummary = {
+        errors: [],
+        expectedListeners: 3,
+        listenersAttached: 3,
+        message: "Subscription established",
+        subscribed: true,
+        success: true,
+    };
+    const unsubscribeSummary: StatusUpdateUnsubscribeResult = {
+        message: "Unsubscribed",
+        success: true,
+        unsubscribed: true,
+    };
+    const subscribeToStatusUpdatesMock = vi
+        .fn<SitesStore["subscribeToStatusUpdates"]>()
+        .mockResolvedValue(subscriptionSummary);
+    const retryStatusSubscriptionMock = vi
+        .fn<SitesStore["retryStatusSubscription"]>()
+        .mockResolvedValue(subscriptionSummary);
+    const unsubscribeFromStatusUpdatesMock = vi
+        .fn<SitesStore["unsubscribeFromStatusUpdates"]>()
+        .mockReturnValue(unsubscribeSummary);
 
     return {
         addMonitorToSite: vi.fn(async () => {}),
@@ -55,17 +81,20 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         modifySite: vi.fn(async () => {}),
         removeMonitorFromSite: vi.fn(async () => {}),
         removeSite: vi.fn(),
+        retryStatusSubscription: retryStatusSubscriptionMock,
         selectSite: vi.fn(),
         setSelectedMonitorId: vi.fn(),
         setSites: vi.fn(),
+        setStatusSubscriptionSummary: vi.fn(),
         startSiteMonitoring: vi.fn(async () => {}),
         startSiteMonitorMonitoring: vi.fn(async () => {}),
         stopSiteMonitoring: vi.fn(async () => {}),
         stopSiteMonitorMonitoring: vi.fn(async () => {}),
-        subscribeToStatusUpdates: vi.fn(),
+        statusSubscriptionSummary: subscriptionSummary,
+        subscribeToStatusUpdates: subscribeToStatusUpdatesMock,
         subscribeToSyncEvents: vi.fn(() => unsubscribe),
         syncSites: vi.fn(async () => {}),
-        unsubscribeFromStatusUpdates: vi.fn(),
+        unsubscribeFromStatusUpdates: unsubscribeFromStatusUpdatesMock,
         updateMonitorRetryAttempts: vi.fn(async () => {}),
         updateMonitorTimeout: vi.fn(async () => {}),
         updateSiteCheckInterval: vi.fn(async () => {}),

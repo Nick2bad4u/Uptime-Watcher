@@ -20,7 +20,10 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
-import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+import type {
+    StatusUpdateSubscriptionSummary,
+    StatusUpdateUnsubscribeResult,
+} from "./baseTypes";
 
 import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
@@ -71,6 +74,11 @@ export interface SiteSyncActions {
      */
     getSyncStatus: () => Promise<StateSyncStatusSummary>;
 
+    /** Retry status update subscription using the most recent callback */
+    retryStatusSubscription: (
+        callback?: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
+
     /**
      * Establishes subscription to real-time status updates.
      *
@@ -87,11 +95,6 @@ export interface SiteSyncActions {
      * @returns Subscription result with success indicators
      */
     subscribeToStatusUpdates: (
-        callback?: (update: StatusUpdate) => void
-    ) => Promise<StatusUpdateSubscriptionSummary>;
-
-    /** Retry status update subscription using the most recent callback */
-    retryStatusSubscription: (
         callback?: (update: StatusUpdate) => void
     ) => Promise<StatusUpdateSubscriptionSummary>;
 
@@ -136,14 +139,7 @@ export interface SiteSyncActions {
      *
      * @returns Unsubscription result with success indicators
      */
-    unsubscribeFromStatusUpdates: () => {
-        /** Human-readable description of the operation */
-        message: string;
-        /** Overall operation success status */
-        success: boolean;
-        /** Whether unsubscription was successful */
-        unsubscribed: boolean;
-    };
+    unsubscribeFromStatusUpdates: () => StatusUpdateUnsubscribeResult;
 }
 
 /**
@@ -172,9 +168,23 @@ export interface SiteSyncDependencies {
 // Singleton instance management for status updates, lazily initialized to
 // avoid unnecessary object creation
 const statusUpdateManager: {
-    instance?: StatusUpdateManager;
     callback?: (update: StatusUpdate) => void;
+    instance?: StatusUpdateManager;
 } = {};
+
+const FALLBACK_EXPECTED_LISTENERS = 3;
+
+const resolveExpectedListenerCount = (): number => {
+    const candidate = (
+        StatusUpdateManager as {
+            EXPECTED_LISTENER_COUNT?: number;
+        }
+    ).EXPECTED_LISTENER_COUNT;
+
+    return typeof candidate === "number"
+        ? candidate
+        : FALLBACK_EXPECTED_LISTENERS;
+};
 
 /**
  * Creates site synchronization actions with injected dependencies.
@@ -273,6 +283,50 @@ export const createSiteSyncActions = (
                 } satisfies StateSyncStatusSummary;
             }
         },
+        retryStatusSubscription: async (
+            callback?: (update: StatusUpdate) => void
+        ): Promise<StatusUpdateSubscriptionSummary> => {
+            const errorHandler = createStoreErrorHandler(
+                "sites-sync",
+                "retryStatusSubscription"
+            );
+            const effectiveCallback = callback ?? statusUpdateManager.callback;
+
+            if (!effectiveCallback) {
+                const message =
+                    "Retry attempted without previously registered callback";
+                const fallbackSummary: StatusUpdateSubscriptionSummary = {
+                    errors: [message],
+                    expectedListeners: resolveExpectedListenerCount(),
+                    listenersAttached: 0,
+                    message:
+                        "Unable to retry status subscription without callback context",
+                    subscribed: false,
+                    success: false,
+                };
+
+                deps.setStatusSubscriptionSummary(fallbackSummary);
+                errorHandler.setError(message);
+                logger.error(
+                    "Failed to retry status subscription due to missing callback",
+                    message
+                );
+                logStoreAction("SitesStore", "retryStatusSubscription", {
+                    ...fallbackSummary,
+                    status: "failure",
+                });
+                return fallbackSummary;
+            }
+
+            if (statusUpdateManager.instance) {
+                statusUpdateManager.instance.unsubscribe();
+                delete statusUpdateManager.instance;
+            }
+
+            deps.setStatusSubscriptionSummary(undefined);
+
+            return actions.subscribeToStatusUpdates(effectiveCallback);
+        },
         subscribeToStatusUpdates: async (
             callback?: (update: StatusUpdate) => void
         ): Promise<StatusUpdateSubscriptionSummary> => {
@@ -287,8 +341,7 @@ export const createSiteSyncActions = (
                     "Status update subscription attempted without a callback";
                 const fallbackSummary: StatusUpdateSubscriptionSummary = {
                     errors: [initializationMessage],
-                    expectedListeners:
-                        StatusUpdateManager.EXPECTED_LISTENER_COUNT,
+                    expectedListeners: resolveExpectedListenerCount(),
                     listenersAttached: 0,
                     message:
                         "Failed to subscribe to status updates due to missing callback",
@@ -334,7 +387,7 @@ export const createSiteSyncActions = (
                             {
                                 errors: [initializationMessage],
                                 expectedListeners:
-                                    StatusUpdateManager.EXPECTED_LISTENER_COUNT,
+                                    resolveExpectedListenerCount(),
                                 listenersAttached: 0,
                                 message:
                                     "Failed to subscribe to status updates",
@@ -394,8 +447,8 @@ export const createSiteSyncActions = (
                             "subscribeToStatusUpdates",
                             {
                                 ...summary,
-                                status: success ? "success" : "failure",
                                 expectedListeners,
+                                status: success ? "success" : "failure",
                             }
                         );
 
@@ -414,7 +467,7 @@ export const createSiteSyncActions = (
                                 errors: [normalizedError.message],
                                 expectedListeners:
                                     statusUpdateManager.instance?.getExpectedListenerCount() ??
-                                    StatusUpdateManager.EXPECTED_LISTENER_COUNT,
+                                    resolveExpectedListenerCount(),
                                 listenersAttached: 0,
                                 message:
                                     "Failed to subscribe to status updates",
@@ -438,51 +491,6 @@ export const createSiteSyncActions = (
                 };
 
             return withErrorHandling(executeSubscription, errorHandler);
-        },
-        retryStatusSubscription: async (
-            callback?: (update: StatusUpdate) => void
-        ): Promise<StatusUpdateSubscriptionSummary> => {
-            const errorHandler = createStoreErrorHandler(
-                "sites-sync",
-                "retryStatusSubscription"
-            );
-            const effectiveCallback = callback ?? statusUpdateManager.callback;
-
-            if (!effectiveCallback) {
-                const message =
-                    "Retry attempted without previously registered callback";
-                const fallbackSummary: StatusUpdateSubscriptionSummary = {
-                    errors: [message],
-                    expectedListeners:
-                        StatusUpdateManager.EXPECTED_LISTENER_COUNT,
-                    listenersAttached: 0,
-                    message:
-                        "Unable to retry status subscription without callback context",
-                    subscribed: false,
-                    success: false,
-                };
-
-                deps.setStatusSubscriptionSummary(fallbackSummary);
-                errorHandler.setError(message);
-                logger.error(
-                    "Failed to retry status subscription due to missing callback",
-                    message
-                );
-                logStoreAction("SitesStore", "retryStatusSubscription", {
-                    ...fallbackSummary,
-                    status: "failure",
-                });
-                return fallbackSummary;
-            }
-
-            if (statusUpdateManager.instance) {
-                statusUpdateManager.instance.unsubscribe();
-                delete statusUpdateManager.instance;
-            }
-
-            deps.setStatusSubscriptionSummary(undefined);
-
-            return actions.subscribeToStatusUpdates(effectiveCallback);
         },
         subscribeToSyncEvents: (): (() => void) => {
             let cleanup: (() => void) | null = null;
@@ -606,7 +614,7 @@ export const createSiteSyncActions = (
             delete statusUpdateManager.instance;
             delete statusUpdateManager.callback;
             deps.setStatusSubscriptionSummary(undefined);
-            const result = {
+            const result: StatusUpdateUnsubscribeResult = {
                 message: "Successfully unsubscribed from status updates",
                 success: true,
                 unsubscribed: true,

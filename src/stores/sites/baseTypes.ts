@@ -27,6 +27,18 @@ export interface StatusUpdateSubscriptionSummary {
 }
 
 /**
+ * Summary returned after unsubscribing from status updates.
+ */
+export interface StatusUpdateUnsubscribeResult {
+    /** Human-readable description of the unsubscription outcome. */
+    message: string;
+    /** Whether the unsubscription request completed successfully. */
+    success: boolean;
+    /** Indicates if listeners were detached as part of the operation. */
+    unsubscribed: boolean;
+}
+
+/**
  * Common site CRUD operations interface used by both SiteOperationsActions and
  * SitesActions to eliminate duplication.
  *
@@ -152,14 +164,14 @@ export interface BaseSiteState {
  * @public
  */
 export interface BaseSiteSubscriptions {
-    /** Subscribe to status updates */
-    subscribeToStatusUpdates: (
-        callback?: (update: StatusUpdate) => void
-    ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Retry status update subscription using the last known callback */
     retryStatusSubscription: (
         callback?: (update: StatusUpdate) => void
     ) => Promise<StatusUpdateSubscriptionSummary>;
+    /** Subscribe to status updates */
+    subscribeToStatusUpdates: (
+        callback?: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Unsubscribe from status updates */
-    unsubscribeFromStatusUpdates: () => void;
+    unsubscribeFromStatusUpdates: () => StatusUpdateUnsubscribeResult;
 }

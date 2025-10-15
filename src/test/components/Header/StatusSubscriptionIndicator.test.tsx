@@ -38,7 +38,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
         typeof selector === "function" ? selector(mockStore) : mockStore,
 }));
 
-describe("StatusSubscriptionIndicator", function describeIndicatorSuite() {
+describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
     beforeEach(() => {
         mockStore.retryStatusSubscription.mockReset();
         mockStore.statusSubscriptionSummary = healthySummary;

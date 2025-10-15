@@ -9,6 +9,7 @@ import type { JSX } from "react/jsx-runtime";
 import { useCallback, useMemo, useState } from "react";
 
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
+
 import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -41,9 +42,7 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
         useState<null | StatusUpdateSubscriptionSummary>(null);
 
     const health = useMemo(
-        () =>
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Zustand store typing ensures summary shape matches helper contract
-            deriveStatusSubscriptionHealth(summary),
+        () => deriveStatusSubscriptionHealth(summary),
         [summary]
     );
 
@@ -85,9 +84,8 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
         setIsRetrying(true);
         void (async (): Promise<void> => {
             try {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call -- Zustand action typing guarantees promise result shape
                 const result = await retryStatusSubscription();
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- Store action contract guarantees summary result typing
+
                 setLastAttempt(result);
             } finally {
                 setIsRetrying(false);

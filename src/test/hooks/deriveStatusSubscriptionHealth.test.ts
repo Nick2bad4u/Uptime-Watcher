@@ -3,13 +3,13 @@ import { describe, expect, it } from "vitest";
 import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
 import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
 
-describe("deriveStatusSubscriptionHealth", () => {
+describe(deriveStatusSubscriptionHealth, () => {
     it("flags unknown health when summary is absent", () => {
         const health = deriveStatusSubscriptionHealth(undefined);
 
         expect(health.status).toBe("unknown");
-        expect(health.isHealthy).toBe(false);
-        expect(health.needsAttention).toBe(false);
+        expect(health.isHealthy).toBeFalsy();
+        expect(health.needsAttention).toBeFalsy();
         expect(health.listenersProgress).toBe("No listeners connected");
     });
 
@@ -26,8 +26,8 @@ describe("deriveStatusSubscriptionHealth", () => {
         const health = deriveStatusSubscriptionHealth(summary);
 
         expect(health.status).toBe("healthy");
-        expect(health.isHealthy).toBe(true);
-        expect(health.needsAttention).toBe(false);
+        expect(health.isHealthy).toBeTruthy();
+        expect(health.needsAttention).toBeFalsy();
         expect(health.listenersProgress).toBe("3/3 listeners");
     });
 
@@ -44,8 +44,8 @@ describe("deriveStatusSubscriptionHealth", () => {
         const health = deriveStatusSubscriptionHealth(summary);
 
         expect(health.status).toBe("degraded");
-        expect(health.isHealthy).toBe(false);
-        expect(health.needsAttention).toBe(true);
+        expect(health.isHealthy).toBeFalsy();
+        expect(health.needsAttention).toBeTruthy();
         expect(health.errors).toContain("monitoring-started: ipc failure");
     });
 
@@ -62,7 +62,7 @@ describe("deriveStatusSubscriptionHealth", () => {
         const health = deriveStatusSubscriptionHealth(summary);
 
         expect(health.status).toBe("failed");
-        expect(health.needsAttention).toBe(true);
+        expect(health.needsAttention).toBeTruthy();
         expect(health.errors).toHaveLength(1);
     });
 });

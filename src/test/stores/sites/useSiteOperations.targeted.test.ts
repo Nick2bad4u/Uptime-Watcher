@@ -402,7 +402,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
             expect(mockSiteDeps.setSites).toHaveBeenCalled();
             const updatedSites =
-                mockSiteDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+                vi.mocked(mockSiteDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = updatedSites.find(
                 (site: Site) =>
                     site.identifier === mockSiteWithMultipleMonitors.identifier

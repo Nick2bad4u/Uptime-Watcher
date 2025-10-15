@@ -147,6 +147,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             url,
                         });
 
+                        if (typeof window !== "undefined") {
+                            window.open(url, "_blank", "noopener");
+                        }
+
                         useErrorStore
                             .getState()
                             .setStoreError(

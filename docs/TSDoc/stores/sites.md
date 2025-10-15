@@ -18,9 +18,11 @@ const savedSite = await withSiteOperationReturning(
     const updatedMonitors = [...site.monitors, normalizeMonitorOrThrow(monitor)];
     return deps.services.site.updateSite(siteIdentifier, { monitors: updatedMonitors });
   },
-  { monitor, siteIdentifier },
   deps,
-  false
+  {
+    telemetry: { monitor, siteIdentifier },
+    syncAfter: false,
+  }
 );
 
 applySavedSiteToStore(savedSite, deps);
@@ -41,3 +43,15 @@ Unit tests (`useSiteOperations.test.ts` and `useSiteOperations.targeted.test.ts`
 - `updateMonitorAndSave` is layered on top of these helpers and should be used for monitor-specific updates.
 
 When introducing additional mutations, compose these helpers instead of inventing new sync flows. This keeps monitor state transitions consistent and minimizes IPC chatter.
+
+## Realtime subscription diagnostics
+
+- `useSiteSync.subscribeToStatusUpdates` captures a `StatusUpdateSubscriptionSummary` and persists it via `setStatusSubscriptionSummary`. Components render the summary through `StatusSubscriptionIndicator`.
+- `retryStatusSubscription` clears the previous snapshot before re-subscribing so the indicator reflects the latest attempt. Consumers should rely on the returned summary rather than mixing derived state.
+- The `deriveStatusSubscriptionHealth` helper converts raw listener counts into a normalized health state (`healthy`, `degraded`, `failed`, `unknown`). Use it instead of duplicating heuristics in components.
+
+## Logging conventions
+
+- Store actions log three phases: `status: "pending"`, `status: "success"` (`success: true`), and `status: "failure"` (`success: false`). Pending entries intentionally omit a `success` flag.
+- `withSiteOperation` and `withSiteOperationReturning` accept stage-specific telemetry (e.g., `{ success: { message: "completed" } }`). Success metadata appears only after the operation resolves, preventing premature success telemetry in dashboards.
+- Monitoring actions mirror the same convention so alerting pipelines can treat store logs uniformly across CRUD, monitoring, and sync flows.

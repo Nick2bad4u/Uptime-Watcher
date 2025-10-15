@@ -21,6 +21,8 @@ import {
     useState,
 } from "react";
 
+import type { StatusUpdateSubscriptionSummary } from "./stores/sites/baseTypes";
+
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
@@ -258,7 +260,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
 
         if (typeof subscribeToStatusUpdates === "function") {
-            const subscriptionResult = await subscribeToStatusUpdates(
+            const subscriptionResult = (await subscribeToStatusUpdates(
                 (update) => {
                     // Optional callback for additional processing if needed
                     if (isDevelopment()) {
@@ -268,9 +270,13 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                         );
                     }
                 }
-            );
+            )) as StatusUpdateSubscriptionSummary | undefined;
 
-            if (!subscriptionResult.success) {
+            if (!subscriptionResult) {
+                logger.warn(
+                    "Status update subscription resolved without diagnostics"
+                );
+            } else if (!subscriptionResult.success) {
                 logger.warn("Status update subscription encountered issues", {
                     errors: subscriptionResult.errors,
                     listenersAttached: subscriptionResult.listenersAttached,

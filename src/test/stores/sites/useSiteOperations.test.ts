@@ -198,7 +198,7 @@ describe(createSiteOperationsActions, () => {
             expect(updatedMonitors).toHaveLength(2);
             expect(mockDeps.setSites).toHaveBeenCalled();
             const reconciledSites =
-                mockDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+                vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
                 (site: Site) => site.identifier === "test-site"
             );
@@ -515,7 +515,7 @@ describe(createSiteOperationsActions, () => {
             expect(monitorsAfterRemoval).toHaveLength(1);
             expect(mockDeps.setSites).toHaveBeenCalled();
             const reconciledSites =
-                mockDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+                vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
             const reconciledSite = reconciledSites.find(
                 (site: Site) => site.identifier === "test-site"
             );

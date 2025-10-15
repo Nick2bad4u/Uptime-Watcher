@@ -294,12 +294,9 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const params = { siteIdentifier: "site1" };
 
-            await withSiteOperation(
-                "testOperation",
-                mockOperation,
-                params,
-                mockDeps
-            );
+            await withSiteOperation("testOperation", mockOperation, mockDeps, {
+                telemetry: params,
+            });
 
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 1,
@@ -310,12 +307,16 @@ describe("OperationHelpers", () => {
                     status: "pending",
                 })
             );
+            const firstPayload = mockLogStoreAction.mock.calls[0]?.[2];
+            expect(firstPayload).toBeDefined();
+            expect(firstPayload).not.toHaveProperty("success");
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 2,
                 "SitesStore",
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -345,12 +346,16 @@ describe("OperationHelpers", () => {
                     status: "pending",
                 })
             );
+            const wrappedFirstPayload = mockLogStoreAction.mock.calls[0]?.[2];
+            expect(wrappedFirstPayload).toBeDefined();
+            expect(wrappedFirstPayload).not.toHaveProperty("success");
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 2,
                 "SitesStore",
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -368,13 +373,10 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             const params = { siteIdentifier: "site1" };
 
-            await withSiteOperation(
-                "testOperation",
-                mockOperation,
-                params,
-                mockDeps,
-                false
-            );
+            await withSiteOperation("testOperation", mockOperation, mockDeps, {
+                telemetry: params,
+                syncAfter: false,
+            });
 
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 1,
@@ -391,6 +393,7 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -422,6 +425,7 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -444,12 +448,9 @@ describe("OperationHelpers", () => {
             mockWithErrorHandling.mockRejectedValue(operationError);
 
             await expect(
-                withSiteOperation(
-                    "testOperation",
-                    mockOperation,
-                    params,
-                    mockDeps
-                )
+                withSiteOperation("testOperation", mockOperation, mockDeps, {
+                    telemetry: params,
+                })
             ).rejects.toThrow("Operation failed");
 
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
@@ -468,6 +469,7 @@ describe("OperationHelpers", () => {
                 expect.objectContaining({
                     ...params,
                     error: "Operation failed",
+                    success: false,
                     status: "failure",
                 })
             );
@@ -491,12 +493,9 @@ describe("OperationHelpers", () => {
             });
 
             await expect(
-                withSiteOperation(
-                    "testOperation",
-                    mockOperation,
-                    params,
-                    mockDeps
-                )
+                withSiteOperation("testOperation", mockOperation, mockDeps, {
+                    telemetry: params,
+                })
             ).rejects.toThrow("Sync failed");
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
@@ -517,9 +516,96 @@ describe("OperationHelpers", () => {
                 expect.objectContaining({
                     ...params,
                     error: "Sync failed",
+                    success: false,
                     status: "failure",
                 })
             );
+        });
+
+        it("applies stage-specific telemetry metadata on success", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Telemetry", "type");
+
+            const mockOperation = vi.fn().mockResolvedValue(undefined);
+
+            await withSiteOperation("testOperation", mockOperation, mockDeps, {
+                telemetry: {
+                    base: { siteIdentifier: "site-1" },
+                    pending: { phase: "initializing" },
+                    success: { message: "completed" },
+                },
+                syncAfter: false,
+            });
+
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(2);
+
+            const [pendingCall, successCall] = mockLogStoreAction.mock.calls;
+            const pendingPayload = pendingCall?.[2];
+            const successPayload = successCall?.[2];
+
+            expect(pendingPayload).toMatchObject({
+                phase: "initializing",
+                siteIdentifier: "site-1",
+                status: "pending",
+            });
+            expect(pendingPayload).not.toHaveProperty("message");
+
+            expect(successPayload).toMatchObject({
+                message: "completed",
+                siteIdentifier: "site-1",
+                status: "success",
+                success: true,
+            });
+        });
+
+        it("applies stage-specific telemetry metadata on failure", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Telemetry", "type");
+
+            const operationError = new Error("failure");
+            const mockOperation = vi.fn().mockRejectedValue(operationError);
+
+            mockWithErrorHandling.mockRejectedValue(operationError);
+
+            await expect(
+                withSiteOperation("testOperation", mockOperation, mockDeps, {
+                    telemetry: {
+                        base: { siteIdentifier: "site-2" },
+                        failure: { reason: "ipc" },
+                    },
+                })
+            ).rejects.toThrow("failure");
+
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(2);
+
+            const [pendingCall, failureCall] = mockLogStoreAction.mock.calls;
+            const pendingPayload = pendingCall?.[2];
+            const failurePayload = failureCall?.[2];
+
+            expect(pendingPayload).toMatchObject({
+                siteIdentifier: "site-2",
+                status: "pending",
+            });
+            expect(pendingPayload).not.toHaveProperty("reason");
+
+            expect(failurePayload).toMatchObject({
+                error: "failure",
+                reason: "ipc",
+                siteIdentifier: "site-2",
+                status: "failure",
+                success: false,
+            });
         });
     });
 
@@ -543,8 +629,8 @@ describe("OperationHelpers", () => {
             const result = await withSiteOperationReturning(
                 "testOperation",
                 mockOperation,
-                params,
-                mockDeps
+                mockDeps,
+                { telemetry: params }
             );
 
             expect(result).toEqual(expectedResult);
@@ -557,12 +643,17 @@ describe("OperationHelpers", () => {
                     status: "pending",
                 })
             );
+            const returningPendingPayload =
+                mockLogStoreAction.mock.calls[0]?.[2];
+            expect(returningPendingPayload).toBeDefined();
+            expect(returningPendingPayload).not.toHaveProperty("success");
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 2,
                 "SitesStore",
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -599,6 +690,7 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -623,9 +715,8 @@ describe("OperationHelpers", () => {
             const result = await withSiteOperationReturning(
                 "testOperation",
                 mockOperation,
-                params,
                 mockDeps,
-                false
+                { telemetry: params, syncAfter: false }
             );
 
             expect(result).toEqual(expectedResult);
@@ -644,6 +735,7 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -676,6 +768,7 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
+                    success: true,
                     status: "success",
                 })
             );
@@ -701,8 +794,8 @@ describe("OperationHelpers", () => {
                 withSiteOperationReturning(
                     "testOperation",
                     mockOperation,
-                    params,
-                    mockDeps
+                    mockDeps,
+                    { telemetry: params }
                 )
             ).rejects.toThrow("Operation failed");
 
@@ -722,6 +815,7 @@ describe("OperationHelpers", () => {
                 expect.objectContaining({
                     ...params,
                     error: "Operation failed",
+                    success: false,
                     status: "failure",
                 })
             );
@@ -752,8 +846,8 @@ describe("OperationHelpers", () => {
                 withSiteOperationReturning(
                     "testOperation",
                     mockOperation,
-                    params,
-                    mockDeps
+                    mockDeps,
+                    { telemetry: params }
                 )
             ).rejects.toThrow("Sync failed");
 
@@ -775,6 +869,7 @@ describe("OperationHelpers", () => {
                 expect.objectContaining({
                     ...params,
                     error: "Sync failed",
+                    success: false,
                     status: "failure",
                 })
             );
@@ -796,9 +891,8 @@ describe("OperationHelpers", () => {
             const stringResult = await withSiteOperationReturning(
                 "stringOp",
                 stringOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(stringResult).toBe("string result");
 
@@ -807,9 +901,8 @@ describe("OperationHelpers", () => {
             const numberResult = await withSiteOperationReturning(
                 "numberOp",
                 numberOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(numberResult).toBe(42);
 
@@ -818,9 +911,8 @@ describe("OperationHelpers", () => {
             const booleanResult = await withSiteOperationReturning(
                 "booleanOp",
                 booleanOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(booleanResult).toBeTruthy();
 
@@ -833,9 +925,8 @@ describe("OperationHelpers", () => {
             const arrayResult = await withSiteOperationReturning(
                 "arrayOp",
                 arrayOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(arrayResult).toEqual([
                 1,
@@ -860,9 +951,8 @@ describe("OperationHelpers", () => {
             const nullResult = await withSiteOperationReturning(
                 "nullOp",
                 nullOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(nullResult).toBeNull();
 
@@ -871,9 +961,8 @@ describe("OperationHelpers", () => {
             const undefinedResult = await withSiteOperationReturning(
                 "undefinedOp",
                 undefinedOperation,
-                {},
                 mockDeps,
-                false
+                { syncAfter: false }
             );
             expect(undefinedResult).toBeUndefined();
         });
@@ -964,19 +1053,24 @@ describe("OperationHelpers", () => {
             const mockOperation = vi.fn().mockResolvedValue(undefined);
             mockWithErrorHandling.mockImplementation(async (fn) => fn());
 
-            await withSiteOperation(
-                "emptyParamsOp",
-                mockOperation,
-                {},
-                mockDeps
-            );
+            await withSiteOperation("emptyParamsOp", mockOperation, mockDeps);
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "emptyParamsOp",
-                {}
+                expect.objectContaining({ status: "pending" })
             );
-            expect(mockOperation).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "emptyParamsOp",
+                expect.objectContaining({
+                    status: "success",
+                    success: true,
+                })
+            );
         });
 
         it("should handle operations with complex parameters object", async ({
@@ -1010,14 +1104,28 @@ describe("OperationHelpers", () => {
             await withSiteOperation(
                 "complexParamsOp",
                 mockOperation,
-                complexParams,
-                mockDeps
+                mockDeps,
+                { telemetry: complexParams }
             );
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "complexParamsOp",
-                complexParams
+                expect.objectContaining({
+                    ...complexParams,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "complexParamsOp",
+                expect.objectContaining({
+                    ...complexParams,
+                    status: "success",
+                    success: true,
+                })
             );
         });
     });
