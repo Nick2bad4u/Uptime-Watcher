@@ -94,6 +94,10 @@ export interface SitesActions {
     setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
+    /** Persist subscription diagnostics for status updates */
+    setStatusSubscriptionSummary: (
+        summary: StatusUpdateSubscriptionSummary | undefined
+    ) => void;
     /** Start monitoring for all monitors of a site */
     startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
     /** Start monitoring for a site monitor */
@@ -110,7 +114,11 @@ export interface SitesActions {
     ) => Promise<void>;
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (
-        callback: (update: StatusUpdate) => void
+        callback?: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
+    /** Retry status update subscription */
+    retryStatusSubscription: (
+        callback?: (update: StatusUpdate) => void
     ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Subscribe to sync events */
     subscribeToSyncEvents: () => () => void;
@@ -163,6 +171,8 @@ export interface SitesState {
     selectedSiteIdentifier: string | undefined;
     /** Array of monitored sites */
     sites: Site[];
+    /** Latest subscription diagnostics for monitoring status updates */
+    statusSubscriptionSummary: StatusUpdateSubscriptionSummary | undefined;
 }
 
 /**

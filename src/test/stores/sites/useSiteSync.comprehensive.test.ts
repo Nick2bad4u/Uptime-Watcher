@@ -45,6 +45,7 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
+        getExpectedListenerCount: vi.fn(() => 3),
         subscribe: vi.fn(async () => ({
             errors: [],
             expectedListeners: 3,
@@ -102,6 +103,7 @@ describe("useSiteSync", () => {
         mockDeps = {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
+            setStatusSubscriptionSummary: vi.fn(),
         };
 
         syncActions = createSiteSyncActions(mockDeps);
@@ -206,11 +208,20 @@ describe("useSiteSync", () => {
             expect(result).toEqual(
                 expect.objectContaining({
                     errors: [],
+                    expectedListeners: 3,
                     listenersAttached: 3,
                     success: true,
                     subscribed: true,
                     message:
                         "Successfully subscribed to status updates with efficient incremental updates",
+                })
+            );
+
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    expectedListeners: 3,
+                    listenersAttached: 3,
+                    success: true,
                 })
             );
         });
@@ -231,6 +242,7 @@ describe("useSiteSync", () => {
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
+                getExpectedListenerCount: vi.fn(() => 3),
                 subscribe: vi.fn(async () => {
                     throw new Error("Subscribe failed");
                 }),
@@ -247,6 +259,66 @@ describe("useSiteSync", () => {
             expect(result.success).toBeFalsy();
             expect(result.subscribed).toBeFalsy();
             expect(result.errors).toContain("Subscribe failed");
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    expectedListeners: 3,
+                    listenersAttached: 0,
+                    success: false,
+                })
+            );
+        });
+    });
+
+    describe("retryStatusSubscription", () => {
+        it("retries subscription using the stored callback", async () => {
+            const statusUpdateHandlerModule = await import(
+                "../../../stores/sites/utils/statusUpdateHandler"
+            );
+            const StatusUpdateManagerMock = vi.mocked(
+                statusUpdateHandlerModule.StatusUpdateManager
+            );
+
+            const callback = vi.fn();
+            await syncActions.subscribeToStatusUpdates(callback);
+
+            const initialInstance =
+                StatusUpdateManagerMock.mock.instances.at(-1);
+            expect(initialInstance).toBeDefined();
+
+            const retryResult = await syncActions.retryStatusSubscription();
+
+            expect(retryResult.success).toBe(true);
+            expect(retryResult.subscribed).toBe(true);
+            expect(
+                StatusUpdateManagerMock.mock.instances.length
+            ).toBeGreaterThanOrEqual(2);
+            expect(initialInstance?.unsubscribe).toHaveBeenCalledTimes(1);
+            expect(
+                mockDeps.setStatusSubscriptionSummary
+            ).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    expectedListeners: 3,
+                    listenersAttached: 3,
+                    success: true,
+                })
+            );
+        });
+
+        it("returns fallback diagnostics when no callback was registered", async () => {
+            const result = await syncActions.retryStatusSubscription();
+
+            expect(result.success).toBe(false);
+            expect(result.subscribed).toBe(false);
+            expect(result.errors).toContain(
+                "Retry attempted without previously registered callback"
+            );
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    expectedListeners: 3,
+                    listenersAttached: 0,
+                    success: false,
+                })
+            );
         });
     });
 
@@ -503,6 +575,7 @@ describe("useSiteSync", () => {
             expect(actions).toHaveProperty("fullResyncSites");
             expect(actions).toHaveProperty("getSyncStatus");
             expect(actions).toHaveProperty("subscribeToStatusUpdates");
+            expect(actions).toHaveProperty("retryStatusSubscription");
             expect(actions).toHaveProperty("subscribeToSyncEvents");
             expect(actions).toHaveProperty("syncSites");
             expect(actions).toHaveProperty("unsubscribeFromStatusUpdates");
@@ -510,6 +583,7 @@ describe("useSiteSync", () => {
             expect(typeof actions.fullResyncSites).toBe("function");
             expect(typeof actions.getSyncStatus).toBe("function");
             expect(typeof actions.subscribeToStatusUpdates).toBe("function");
+            expect(typeof actions.retryStatusSubscription).toBe("function");
             expect(typeof actions.subscribeToSyncEvents).toBe("function");
             expect(typeof actions.syncSites).toBe("function");
             expect(typeof actions.unsubscribeFromStatusUpdates).toBe(

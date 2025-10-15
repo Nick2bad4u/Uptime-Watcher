@@ -123,6 +123,9 @@ export interface StatusUpdateSubscriptionResult {
  * @public
  */
 export class StatusUpdateManager {
+    /** Number of listeners required for a healthy subscription. */
+    public static readonly EXPECTED_LISTENER_COUNT = 3;
+
     /**
      * Array of cleanup functions for active event listeners.
      *
@@ -289,7 +292,7 @@ export class StatusUpdateManager {
 
         const errors: string[] = [];
         let listenersAttached = 0;
-        const expectedListeners = 3;
+        const expectedListeners = StatusUpdateManager.EXPECTED_LISTENER_COUNT;
         let encounteredListenerFailure = false;
 
         try {
@@ -431,6 +434,15 @@ export class StatusUpdateManager {
         this.getSites = options.getSites;
         this.setSites = options.setSites;
         this.onUpdate = options.onUpdate ?? undefined;
+    }
+
+    /**
+     * Retrieves the expected listener count for diagnostics.
+     *
+     * @returns Number of listeners the manager attempts to attach.
+     */
+    public getExpectedListenerCount(): number {
+        return StatusUpdateManager.EXPECTED_LISTENER_COUNT;
     }
 
     /**

@@ -112,37 +112,49 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             ): void => {
                 logStoreAction("UIStore", "openExternal", { context, url });
 
-                logger.user.action("External URL opened", {
-                    url,
-                    ...(context && { siteName: context.siteName }),
-                });
-
-                /* eslint-disable-next-line promise/prefer-await-to-then -- Fire-and-forget pattern for external URL opening */
-                void SystemService.openExternal(url).catch((error: unknown) => {
-                    const normalizedError = ensureError(error);
-
-                    logger.error(
-                        "Failed to open external URL via SystemService",
-                        {
-                            context,
-                            error: normalizedError,
+                void (async (): Promise<void> => {
+                    try {
+                        await SystemService.openExternal(url);
+                        logger.user.action("External URL opened", {
                             url,
-                        }
-                    );
+                            ...(context?.siteName
+                                ? { siteName: context.siteName }
+                                : {}),
+                        });
+                    } catch (error: unknown) {
+                        const normalizedError = ensureError(error);
 
-                    logStoreAction("UIStore", "openExternalFailed", {
-                        context,
-                        error: normalizedError.message,
-                        url,
-                    });
-
-                    useErrorStore
-                        .getState()
-                        .setStoreError(
-                            "system-open-external",
-                            `Unable to open external link (${url}): ${normalizedError.message}`
+                        logger.error(
+                            "Failed to open external URL via SystemService",
+                            {
+                                context,
+                                error: normalizedError,
+                                url,
+                            }
                         );
-                });
+
+                        logger.user.action("External URL failed", {
+                            error: normalizedError.message,
+                            url,
+                            ...(context?.siteName
+                                ? { siteName: context.siteName }
+                                : {}),
+                        });
+
+                        logStoreAction("UIStore", "openExternalFailed", {
+                            context,
+                            error: normalizedError.message,
+                            url,
+                        });
+
+                        useErrorStore
+                            .getState()
+                            .setStoreError(
+                                "system-open-external",
+                                `Unable to open external link (${url}): ${normalizedError.message}`
+                            );
+                    }
+                })();
             },
             selectedSiteIdentifier: undefined,
             selectSite: (site: Site | undefined): void => {

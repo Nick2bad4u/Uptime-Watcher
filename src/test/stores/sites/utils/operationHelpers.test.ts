@@ -301,10 +301,23 @@ describe("OperationHelpers", () => {
                 mockDeps
             );
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
             );
             expect(mockCreateStoreErrorHandler).toHaveBeenCalledWith(
                 "sites-operations",
@@ -316,11 +329,31 @@ describe("OperationHelpers", () => {
             const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
             const wrappedOperation = errorHandlingCall[0];
 
+            mockLogStoreAction.mockClear();
+
             // Execute the wrapped operation to test its behavior
             await wrappedOperation();
 
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(2); // Once in main call, once in test
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
+            );
         });
 
         it("should execute operation without sync when syncAfter is false", async ({
@@ -343,10 +376,23 @@ describe("OperationHelpers", () => {
                 false
             );
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
@@ -354,11 +400,31 @@ describe("OperationHelpers", () => {
             const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
             const wrappedOperation = errorHandlingCall[0];
 
+            mockLogStoreAction.mockClear();
+
             // Execute the wrapped operation to test its behavior
             await wrappedOperation();
 
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
             expect(mockDeps.syncSites).not.toHaveBeenCalled();
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
+            );
         });
 
         it("should handle operation errors through withErrorHandling", async ({
@@ -386,10 +452,24 @@ describe("OperationHelpers", () => {
                 )
             ).rejects.toThrow("Operation failed");
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    error: "Operation failed",
+                    status: "failure",
+                })
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
         });
@@ -421,6 +501,25 @@ describe("OperationHelpers", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    error: "Sync failed",
+                    status: "failure",
+                })
+            );
         });
     });
 
@@ -449,10 +548,23 @@ describe("OperationHelpers", () => {
             );
 
             expect(result).toEqual(expectedResult);
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
             );
             expect(mockCreateStoreErrorHandler).toHaveBeenCalledWith(
                 "sites-operations",
@@ -464,12 +576,32 @@ describe("OperationHelpers", () => {
             const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
             const wrappedOperation = errorHandlingCall[0];
 
+            mockLogStoreAction.mockClear();
+
             // Execute the wrapped operation to test its behavior
             const wrappedResult = await wrappedOperation();
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(2); // Once in main call, once in test
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
+            );
         });
 
         it("should execute operation without sync when syncAfter is false and return result", async ({
@@ -497,10 +629,23 @@ describe("OperationHelpers", () => {
             );
 
             expect(result).toEqual(expectedResult);
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
@@ -508,12 +653,32 @@ describe("OperationHelpers", () => {
             const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
             const wrappedOperation = errorHandlingCall[0];
 
+            mockLogStoreAction.mockClear();
+
             // Execute the wrapped operation to test its behavior
             const wrappedResult = await wrappedOperation();
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
             expect(mockDeps.syncSites).not.toHaveBeenCalled();
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "success",
+                })
+            );
         });
 
         it("should handle operation errors through withErrorHandling", async ({
@@ -541,10 +706,24 @@ describe("OperationHelpers", () => {
                 )
             ).rejects.toThrow("Operation failed");
 
-            expect(mockLogStoreAction).toHaveBeenCalledWith(
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
                 "SitesStore",
                 "testOperation",
-                params
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    error: "Operation failed",
+                    status: "failure",
+                })
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
         });
@@ -580,6 +759,25 @@ describe("OperationHelpers", () => {
 
             expect(mockOperation).toHaveBeenCalledTimes(1);
             expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                1,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    status: "pending",
+                })
+            );
+            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
+                2,
+                "SitesStore",
+                "testOperation",
+                expect.objectContaining({
+                    ...params,
+                    error: "Sync failed",
+                    status: "failure",
+                })
+            );
         });
 
         it("should return different types of results", async ({

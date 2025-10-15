@@ -105,7 +105,13 @@ describe(createSiteOperationsActions, () => {
             name: "Test Site",
         };
 
-        mockElectronAPI.sites.updateSite.mockResolvedValue(mockSite);
+        mockElectronAPI.sites.updateSite.mockImplementation(
+            async (identifier: string, updates: Partial<Site>) => ({
+                ...mockSite,
+                ...updates,
+                identifier,
+            })
+        );
 
         const siteService = {
             addSite: vi.fn(async (site: Site) =>
@@ -184,14 +190,20 @@ describe(createSiteOperationsActions, () => {
 
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
                 "test-site",
-                {
-                    monitors: expect.arrayContaining([
-                        mockMonitor,
-                        mockMonitor,
-                    ]), // Original + new
-                }
+                expect.objectContaining({ monitors: expect.any(Array) })
             );
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            const updateCall =
+                mockElectronAPI.sites.updateSite.mock.calls.at(-1);
+            const updatedMonitors = updateCall?.[1]?.monitors ?? [];
+            expect(updatedMonitors).toHaveLength(2);
+            expect(mockDeps.setSites).toHaveBeenCalled();
+            const reconciledSites =
+                mockDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+            const reconciledSite = reconciledSites.find(
+                (site: Site) => site.identifier === "test-site"
+            );
+            expect(reconciledSite?.monitors).toHaveLength(2);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should throw error when site is not found", async ({
@@ -493,11 +505,22 @@ describe(createSiteOperationsActions, () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
                 "test-site",
-                "monitor-1"
+                expect.objectContaining({ monitors: expect.any(Array) })
             );
-            expect(mockDeps.syncSites).toHaveBeenCalled();
+            const updateArgs =
+                mockElectronAPI.sites.updateSite.mock.calls.at(-1);
+            const monitorsAfterRemoval = updateArgs?.[1]?.monitors ?? [];
+            expect(monitorsAfterRemoval).toHaveLength(1);
+            expect(mockDeps.setSites).toHaveBeenCalled();
+            const reconciledSites =
+                mockDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+            const reconciledSite = reconciledSites.find(
+                (site: Site) => site.identifier === "test-site"
+            );
+            expect(reconciledSite?.monitors).toHaveLength(1);
+            expect(mockDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 

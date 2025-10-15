@@ -1,0 +1,68 @@
+import { describe, expect, it } from "vitest";
+
+import { deriveStatusSubscriptionHealth } from "../../hooks/useStatusSubscriptionHealth";
+import type { StatusUpdateSubscriptionSummary } from "../../stores/sites/baseTypes";
+
+describe("deriveStatusSubscriptionHealth", () => {
+    it("flags unknown health when summary is absent", () => {
+        const health = deriveStatusSubscriptionHealth(undefined);
+
+        expect(health.status).toBe("unknown");
+        expect(health.isHealthy).toBe(false);
+        expect(health.needsAttention).toBe(false);
+        expect(health.listenersProgress).toBe("No listeners connected");
+    });
+
+    it("returns healthy state when subscription succeeded", () => {
+        const summary: StatusUpdateSubscriptionSummary = {
+            errors: [],
+            expectedListeners: 3,
+            listenersAttached: 3,
+            message: "success",
+            subscribed: true,
+            success: true,
+        };
+
+        const health = deriveStatusSubscriptionHealth(summary);
+
+        expect(health.status).toBe("healthy");
+        expect(health.isHealthy).toBe(true);
+        expect(health.needsAttention).toBe(false);
+        expect(health.listenersProgress).toBe("3/3 listeners");
+    });
+
+    it("marks degraded when only some listeners attach", () => {
+        const summary: StatusUpdateSubscriptionSummary = {
+            errors: ["monitoring-started: ipc failure"],
+            expectedListeners: 3,
+            listenersAttached: 1,
+            message: "partial",
+            subscribed: false,
+            success: false,
+        };
+
+        const health = deriveStatusSubscriptionHealth(summary);
+
+        expect(health.status).toBe("degraded");
+        expect(health.isHealthy).toBe(false);
+        expect(health.needsAttention).toBe(true);
+        expect(health.errors).toContain("monitoring-started: ipc failure");
+    });
+
+    it("marks failed when no listeners attach and errors exist", () => {
+        const summary: StatusUpdateSubscriptionSummary = {
+            errors: ["subscribe crash"],
+            expectedListeners: 3,
+            listenersAttached: 0,
+            message: "failure",
+            subscribed: false,
+            success: false,
+        };
+
+        const health = deriveStatusSubscriptionHealth(summary);
+
+        expect(health.status).toBe("failed");
+        expect(health.needsAttention).toBe(true);
+        expect(health.errors).toHaveLength(1);
+    });
+});

@@ -8,6 +8,8 @@
 import type { Site } from "@shared/types";
 import type { Simplify } from "type-fest";
 
+import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+
 import { logStoreAction } from "../utils";
 
 /**
@@ -26,6 +28,8 @@ export interface SitesState {
     selectedSiteIdentifier: string | undefined;
     /** Array of monitored sites */
     sites: Site[];
+    /** Latest status update subscription diagnostics. */
+    statusSubscriptionSummary: StatusUpdateSubscriptionSummary | undefined;
 }
 
 /**
@@ -52,6 +56,10 @@ export interface SitesStateActions {
     setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set sites data */
     setSites: (sites: Site[]) => void;
+    /** Persist status subscription diagnostics */
+    setStatusSubscriptionSummary: (
+        summary: StatusUpdateSubscriptionSummary | undefined
+    ) => void;
 }
 
 /**
@@ -145,6 +153,16 @@ export const createSitesStateActions = (
         logStoreAction("SitesStore", "setSites", { count: sites.length });
         set(() => ({ sites }));
     },
+    setStatusSubscriptionSummary: (
+        summary: StatusUpdateSubscriptionSummary | undefined
+    ): void => {
+        logStoreAction("SitesStore", "setStatusSubscriptionSummary", {
+            expectedListeners: summary?.expectedListeners,
+            listenersAttached: summary?.listenersAttached,
+            success: summary?.success,
+        });
+        set(() => ({ statusSubscriptionSummary: summary }));
+    },
 });
 
 /**
@@ -157,4 +175,5 @@ export const initialSitesState: SitesState = {
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],
+    statusSubscriptionSummary: undefined,
 };

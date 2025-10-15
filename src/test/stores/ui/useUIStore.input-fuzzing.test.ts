@@ -604,6 +604,21 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             }
         });
 
+        it("should log user action after successful external navigation", async () => {
+            const url = "https://example.com";
+
+            mockLogger.user.action.mockClear();
+
+            useUIStore.getState().openExternal(url);
+
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "External URL opened",
+                expect.objectContaining({ url })
+            );
+        });
+
         it("should log and surface errors when SystemService.openExternal fails", async () => {
             const url = "https://example.com";
             const failure = new Error("IPC failure");
@@ -621,6 +636,17 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     error: failure,
                     url,
                 })
+            );
+            expect(mockLogger.user.action).toHaveBeenCalledWith(
+                "External URL failed",
+                expect.objectContaining({
+                    error: failure.message,
+                    url,
+                })
+            );
+            expect(mockLogger.user.action).not.toHaveBeenCalledWith(
+                "External URL opened",
+                expect.anything()
             );
             expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
                 "system-open-external",

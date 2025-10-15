@@ -277,7 +277,9 @@
     display: flex;
     align-items: stretch;
     align-self: stretch;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.85rem;
+    justify-content: flex-start;
 }
 
 .app-topbar__controls--stacked {
@@ -728,6 +730,200 @@
     .status-degraded-badge,
     .status-down-badge,
     .status-pending-badge,
+
+    .status-subscription-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 48%, transparent);
+        border-radius: 0.95rem;
+        background: color-mix(
+            in srgb,
+            var(--color-surface-elevated) 92%,
+            transparent
+        );
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 4%),
+            0 14px 30px rgb(8 12 24 / 22%);
+        padding: 0.75rem 1rem;
+        transition:
+            border-color var(--transition-fast),
+            box-shadow var(--transition-fast),
+            transform var(--transition-fast);
+    }
+
+    .status-subscription-indicator__body {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-inline-size: 0;
+    }
+
+    .status-subscription-indicator__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 32%, transparent);
+        border-radius: 0.85rem;
+        background: color-mix(
+            in srgb,
+            var(--color-surface-overlay) 88%,
+            transparent
+        );
+        block-size: 2rem;
+        inline-size: 2rem;
+        color: inherit;
+        cursor: pointer;
+        transition:
+            border-color var(--transition-fast),
+            transform var(--transition-fast);
+    }
+
+    .status-subscription-indicator__icon:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 42%,
+            transparent
+        );
+        transform: translateY(-1px);
+    }
+
+    .status-subscription-indicator__meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-inline-size: 0;
+    }
+
+    .status-subscription-indicator__retry {
+        min-inline-size: 5.75rem;
+    }
+
+    .status-subscription-indicator__tooltip {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        max-inline-size: 18rem;
+    }
+
+    .status-subscription-indicator__tooltip-errors {
+        margin: 0;
+        padding-inline-start: 1rem;
+        color: var(--color-error, rgb(239 68 68));
+        font-size: 0.8rem;
+    }
+
+    .status-subscription-indicator__tooltip-description,
+    .status-subscription-indicator__tooltip-progress,
+    .status-subscription-indicator__tooltip-attempt {
+        margin: 0;
+        font-size: 0.85rem;
+        line-height: 1.35;
+    }
+
+    .status-subscription-indicator--healthy {
+        border-color: color-mix(in srgb, var(--color-status-up) 38%, transparent);
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--color-status-up) 16%, transparent),
+            color-mix(in srgb, var(--color-surface-elevated) 88%, transparent)
+        );
+        color: color-mix(
+            in srgb,
+            var(--color-status-up) 65%,
+            rgb(255 255 255) 35%
+        );
+    }
+
+    .status-subscription-indicator--degraded {
+        border-color: color-mix(
+            in srgb,
+            var(--color-status-degraded) 38%,
+            transparent
+        );
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--color-status-degraded) 16%, transparent),
+            color-mix(in srgb, var(--color-surface-elevated) 90%, transparent)
+        );
+        color: color-mix(
+            in srgb,
+            var(--color-status-degraded) 65%,
+            rgb(255 255 255) 35%
+        );
+    }
+
+    .status-subscription-indicator--failed {
+        border-color: color-mix(
+            in srgb,
+            var(--color-status-down) 38%,
+            transparent
+        );
+        background: linear-gradient(
+            135deg,
+            color-mix(in srgb, var(--color-status-down) 18%, transparent),
+            color-mix(in srgb, var(--color-surface-elevated) 90%, transparent)
+        );
+        color: color-mix(
+            in srgb,
+            var(--color-status-down) 65%,
+            rgb(255 255 255) 35%
+        );
+    }
+
+    .status-subscription-indicator--unknown {
+        border-color: color-mix(
+            in srgb,
+            var(--color-border-secondary) 36%,
+            transparent
+        );
+        color: color-mix(
+            in srgb,
+            var(--color-text-secondary) 80%,
+            rgb(255 255 255) 20%
+        );
+    }
+
+    .status-subscription-indicator--healthy .status-subscription-indicator__icon,
+    .status-subscription-indicator--degraded .status-subscription-indicator__icon,
+    .status-subscription-indicator--failed .status-subscription-indicator__icon {
+        border-color: color-mix(in srgb, currentColor 42%, transparent);
+    }
+
+    .status-subscription-indicator__icon svg {
+        display: inline-block;
+    }
+
+    .status-subscription-indicator:hover {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 35%,
+            transparent
+        );
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 6%),
+            0 18px 34px rgb(8 12 24 / 28%);
+        transform: translateY(-1px);
+    }
+
+    @media (width <= 768px) {
+        .status-subscription-indicator {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.65rem;
+        }
+
+        .status-subscription-indicator__body {
+            justify-content: space-between;
+        }
+
+        .status-subscription-indicator__retry {
+            inline-size: 100%;
+        }
+    }
     .status-paused-badge,
     .total-sites-badge {
         animation: none;

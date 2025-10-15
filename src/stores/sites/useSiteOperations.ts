@@ -22,6 +22,7 @@ import { logger } from "../../services/logger";
 import { handleSQLiteBackupDownload } from "./utils/fileDownload";
 import { normalizeMonitor } from "./utils/monitorOperations";
 import {
+    applySavedSiteToStore,
     getSiteByIdentifier,
     updateMonitorAndSave,
     withSiteOperation,
@@ -81,10 +82,9 @@ export const createSiteOperationsActions = (
     deps: SiteOperationsDependencies
 ): SiteOperationsActions => ({
     addMonitorToSite: async (siteIdentifier, monitor): Promise<void> => {
-        await withSiteOperation(
+        const savedSite = await withSiteOperationReturning(
             "addMonitorToSite",
             async () => {
-                // Get the current site
                 const site = getSiteByIdentifier(siteIdentifier, deps);
 
                 const normalizedMonitor = normalizeMonitorOrThrow(
@@ -92,15 +92,18 @@ export const createSiteOperationsActions = (
                     "Failed to normalize monitor before adding to site"
                 );
 
-                // Allow multiple monitors of the same type
                 const updatedMonitors = [...site.monitors, normalizedMonitor];
-                await deps.services.site.updateSite(siteIdentifier, {
+
+                return deps.services.site.updateSite(siteIdentifier, {
                     monitors: updatedMonitors,
                 });
             },
             { monitor, siteIdentifier },
-            deps
+            deps,
+            false
         );
+
+        applySavedSiteToStore(savedSite, deps);
     },
     createSite: async (siteData): Promise<void> => {
         await withSiteOperation(
@@ -257,25 +260,21 @@ export const createSiteOperationsActions = (
         deps.setSites(nextSites);
     },
     removeMonitorFromSite: async (siteIdentifier, monitorId): Promise<void> => {
-        await withSiteOperation(
+        const savedSite = await withSiteOperationReturning(
             "removeMonitorFromSite",
             async () => {
-                // Get the current site
                 const site = getSiteByIdentifier(siteIdentifier, deps);
 
-                // Check if this is the only monitor - prevent removal if so
                 if (site.monitors.length <= 1) {
                     throw new Error(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
                 }
 
-                // Stop monitoring for this specific monitor first
                 try {
                     await deps.services.monitoring.stopMonitoring(
                         siteIdentifier,
                         monitorId
                     );
                 } catch (error) {
-                    // Log but do not block removal if stopping fails
                     if (isDevelopment()) {
                         logger.warn(
                             `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}`,
@@ -286,15 +285,20 @@ export const createSiteOperationsActions = (
                     }
                 }
 
-                // Remove the monitor via backend
-                await deps.services.site.removeMonitor(
-                    siteIdentifier,
-                    monitorId
+                const updatedMonitors = site.monitors.filter(
+                    (entry) => entry.id !== monitorId
                 );
+
+                return deps.services.site.updateSite(siteIdentifier, {
+                    monitors: updatedMonitors,
+                });
             },
             { monitorId, siteIdentifier },
-            deps
+            deps,
+            false
         );
+
+        applySavedSiteToStore(savedSite, deps);
     },
     updateMonitorRetryAttempts: async (
         siteIdentifier: string,

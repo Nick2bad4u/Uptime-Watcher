@@ -104,6 +104,7 @@ const createMockSitesStore = (
         _callback: (update: StatusUpdate) => void
     ) => ({
         errors: [],
+        expectedListeners: 0,
         listenersAttached: 0,
         message: "",
         subscribed: true,

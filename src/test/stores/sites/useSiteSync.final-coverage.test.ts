@@ -97,6 +97,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
         mockDeps = {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
+            setStatusSubscriptionSummary: vi.fn(),
         };
 
         syncActions = createSiteSyncActions(mockDeps);
@@ -131,6 +132,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
                 "fullResyncSites",
                 {
                     message: "Full backend resynchronization completed",
+                    status: "success",
                     success: true,
                 }
             );
@@ -176,6 +178,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
                     message: "Sync status retrieved",
                     siteCount: mockStatus.siteCount,
                     source: mockStatus.source,
+                    status: "success",
                     success: true,
                     synchronized: mockStatus.synchronized,
                 }

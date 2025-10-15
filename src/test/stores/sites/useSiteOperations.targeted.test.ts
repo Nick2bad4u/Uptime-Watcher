@@ -77,6 +77,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
     let mockElectronAPI: any;
     let mockSiteDeps: SiteOperationsDependencies;
     let actions: ReturnType<typeof createSiteOperationsActions>;
+    let siteService: any;
 
     // Test site with multiple monitors
     const mockSiteWithMultipleMonitors: Site = {
@@ -158,7 +159,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             mockSiteWithSingleMonitor,
         ]);
 
-        const siteService = {
+        siteService = {
             addSite: vi.fn(async (site: Site) => site),
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
@@ -358,7 +359,8 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(mockElectronAPI.sites.removeMonitor).not.toHaveBeenCalled();
+            expect(siteService.updateSite).not.toHaveBeenCalled();
+            expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 
@@ -392,10 +394,21 @@ describe("useSiteOperations - Targeted Coverage", () => {
             );
 
             // Verify monitor removal still proceeded
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(siteService.updateSite).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                expect.objectContaining({
+                    monitors: [mockSiteWithMultipleMonitors.monitors[1]],
+                })
             );
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            const updatedSites =
+                mockSiteDeps.setSites.mock.calls.at(-1)?.[0] ?? [];
+            const reconciledSite = updatedSites.find(
+                (site: Site) =>
+                    site.identifier === mockSiteWithMultipleMonitors.identifier
+            );
+            expect(reconciledSite?.monitors).toHaveLength(1);
+            expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should handle non-Error objects when stopping monitoring fails during monitor removal", async ({
@@ -423,6 +436,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 ),
                 expect.any(Error)
             );
+
+            expect(siteService.updateSite).toHaveBeenCalledWith(
+                mockSiteWithMultipleMonitors.identifier,
+                expect.objectContaining({
+                    monitors: [mockSiteWithMultipleMonitors.monitors[0]],
+                })
+            );
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 
@@ -447,10 +469,14 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(siteService.updateSite).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[0]!.id
+                expect.objectContaining({
+                    monitors: [mockSiteWithMultipleMonitors.monitors[1]],
+                })
             );
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
 
         it("should handle sites with exactly 2 monitors when removing one", async ({
@@ -468,10 +494,14 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
-            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
+            expect(siteService.updateSite).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[1]!.id
+                expect.objectContaining({
+                    monitors: [mockSiteWithMultipleMonitors.monitors[0]],
+                })
             );
+            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 });

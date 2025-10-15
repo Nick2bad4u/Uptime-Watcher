@@ -14,6 +14,8 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 export interface StatusUpdateSubscriptionSummary {
     /** Collected errors encountered while attaching listeners. */
     errors: string[];
+    /** Total number of listeners the subscription attempted to attach. */
+    expectedListeners: number;
     /** Number of listeners successfully attached. */
     listenersAttached: number;
     /** Human-friendly message describing the outcome. */
@@ -135,6 +137,10 @@ export interface BaseSiteState {
     setSelectedMonitorId: (siteIdentifier: string, monitorId: string) => void;
     /** Set all sites */
     setSites: (sites: Site[]) => void;
+    /** Persist subscription diagnostics */
+    setStatusSubscriptionSummary: (
+        summary: StatusUpdateSubscriptionSummary | undefined
+    ) => void;
     /** Update a site */
     updateSite: (site: Site) => void;
 }
@@ -148,7 +154,11 @@ export interface BaseSiteState {
 export interface BaseSiteSubscriptions {
     /** Subscribe to status updates */
     subscribeToStatusUpdates: (
-        callback: (update: StatusUpdate) => void
+        callback?: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
+    /** Retry status update subscription using the last known callback */
+    retryStatusSubscription: (
+        callback?: (update: StatusUpdate) => void
     ) => Promise<StatusUpdateSubscriptionSummary>;
     /** Unsubscribe from status updates */
     unsubscribeFromStatusUpdates: () => void;

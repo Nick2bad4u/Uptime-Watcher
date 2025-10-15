@@ -78,6 +78,8 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         const syncActions = createSiteSyncActions({
             getSites,
             setSites: stateActions.setSites,
+            setStatusSubscriptionSummary:
+                stateActions.setStatusSubscriptionSummary,
         });
 
         // Create monitoring actions

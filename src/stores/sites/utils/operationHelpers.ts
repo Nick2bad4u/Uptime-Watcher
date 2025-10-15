@@ -8,7 +8,7 @@ import type { Site } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -43,6 +43,32 @@ export const getSiteByIdentifier = (
 };
 
 /**
+ * Applies a backend-sourced site snapshot to the local store state.
+ *
+ * @param savedSite - Site instance returned by the backend after a mutation.
+ * @param deps - Site operation dependencies used to read and write store state.
+ */
+export const applySavedSiteToStore = (
+    savedSite: Site,
+    deps: SiteOperationsDependencies
+): void => {
+    const currentSites = deps.getSites();
+    const hasExistingSite = currentSites.some(
+        (existingSite) => existingSite.identifier === savedSite.identifier
+    );
+
+    const nextSites = hasExistingSite
+        ? currentSites.map((existingSite) =>
+              existingSite.identifier === savedSite.identifier
+                  ? savedSite
+                  : existingSite
+          )
+        : [...currentSites, savedSite];
+
+    deps.setSites(nextSites);
+};
+
+/**
  * Updates a monitor within a site and saves it. Common pattern for monitor
  * update operations.
  *
@@ -68,20 +94,7 @@ export const updateMonitorAndSave = async (
             monitors: updatedSite.monitors,
         });
 
-        const currentSites = deps.getSites();
-        const hasExistingSite = currentSites.some(
-            (existingSite) => existingSite.identifier === savedSite.identifier
-        );
-
-        const nextSites = hasExistingSite
-            ? currentSites.map((existingSite) =>
-                  existingSite.identifier === savedSite.identifier
-                      ? savedSite
-                      : existingSite
-              )
-            : [...currentSites, savedSite];
-
-        deps.setSites(nextSites);
+        applySavedSiteToStore(savedSite, deps);
     } catch (error) {
         if (
             error instanceof Error &&
@@ -122,13 +135,30 @@ export const withSiteOperation = async (
     deps: SiteOperationsDependencies,
     syncAfter = true
 ): Promise<void> => {
-    logStoreAction("SitesStore", operationName, params);
+    logStoreAction("SitesStore", operationName, {
+        ...params,
+        status: "pending",
+    });
 
     await withErrorHandling(
         async () => {
-            await operation();
-            if (syncAfter) {
-                await deps.syncSites();
+            try {
+                await operation();
+                if (syncAfter) {
+                    await deps.syncSites();
+                }
+                logStoreAction("SitesStore", operationName, {
+                    ...params,
+                    status: "success",
+                });
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                logStoreAction("SitesStore", operationName, {
+                    ...params,
+                    error: normalizedError.message,
+                    status: "failure",
+                });
+                throw error;
             }
         },
         createStoreErrorHandler("sites-operations", operationName)
@@ -156,19 +186,32 @@ export const withSiteOperationReturning = async <T>(
     deps: SiteOperationsDependencies,
     syncAfter = true
 ): Promise<T> => {
-    logStoreAction("SitesStore", operationName, params);
+    logStoreAction("SitesStore", operationName, {
+        ...params,
+        status: "pending",
+    });
 
     return withErrorHandling(
         async () => {
-            if (!syncAfter) {
-                return operation();
+            try {
+                const result = await operation();
+                if (syncAfter) {
+                    await deps.syncSites();
+                }
+                logStoreAction("SitesStore", operationName, {
+                    ...params,
+                    status: "success",
+                });
+                return result;
+            } catch (error) {
+                const normalizedError = ensureError(error);
+                logStoreAction("SitesStore", operationName, {
+                    ...params,
+                    error: normalizedError.message,
+                    status: "failure",
+                });
+                throw error;
             }
-
-            /* eslint-disable nitpick/no-redundant-vars -- Variable needed for sync operation sequencing */
-            const result = await operation();
-            await deps.syncSites();
-            return result;
-            /* eslint-enable nitpick/no-redundant-vars -- Re-enable after sync operation sequencing */
         },
         createStoreErrorHandler("sites-operations", operationName)
     );

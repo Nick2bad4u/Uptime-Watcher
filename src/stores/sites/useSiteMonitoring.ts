@@ -8,7 +8,7 @@
  * @packageDocumentation
  */
 
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
@@ -88,16 +88,31 @@ export const createSiteMonitoringActions = (
         logStoreAction("SitesStore", "checkSiteNow", {
             monitorId,
             siteIdentifier,
+            status: "pending",
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.checkSiteNow(
-                    siteIdentifier,
-                    monitorId
-                );
-                // Backend will emit 'monitor:status-changed', which will
-                // trigger incremental update
+                try {
+                    await deps.monitoringService.checkSiteNow(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    logStoreAction("SitesStore", "checkSiteNow", {
+                        monitorId,
+                        siteIdentifier,
+                        status: "success",
+                    });
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "checkSiteNow", {
+                        error: normalizedError.message,
+                        monitorId,
+                        siteIdentifier,
+                        status: "failure",
+                    });
+                    throw error;
+                }
             },
             createStoreErrorHandler("sites-monitoring", "checkSiteNow")
         );
@@ -105,15 +120,30 @@ export const createSiteMonitoringActions = (
     startSiteMonitoring: async (siteIdentifier: string): Promise<void> => {
         logStoreAction("SitesStore", "startSiteMonitoring", {
             siteIdentifier,
+            status: "pending",
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.startSiteMonitoring(
-                    siteIdentifier
-                );
-                // No need for manual sync - StatusUpdateHandler will update UI
-                // via events
+                try {
+                    await deps.monitoringService.startSiteMonitoring(
+                        siteIdentifier
+                    );
+                    logStoreAction("SitesStore", "startSiteMonitoring", {
+                        siteIdentifier,
+                        status: "success",
+                    });
+                    // No need for manual sync - StatusUpdateHandler will update UI
+                    // via events
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "startSiteMonitoring", {
+                        error: normalizedError.message,
+                        siteIdentifier,
+                        status: "failure",
+                    });
+                    throw error;
+                }
             },
             createStoreErrorHandler("sites-monitoring", "startSiteMonitoring")
         );
@@ -125,16 +155,33 @@ export const createSiteMonitoringActions = (
         logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
             monitorId,
             siteIdentifier,
+            status: "pending",
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.startMonitoring(
-                    siteIdentifier,
-                    monitorId
-                );
-                // No need for manual sync - StatusUpdateHandler will update UI
-                // via events
+                try {
+                    await deps.monitoringService.startMonitoring(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
+                        monitorId,
+                        siteIdentifier,
+                        status: "success",
+                    });
+                    // No need for manual sync - StatusUpdateHandler will update UI
+                    // via events
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "startSiteMonitorMonitoring", {
+                        error: normalizedError.message,
+                        monitorId,
+                        siteIdentifier,
+                        status: "failure",
+                    });
+                    throw error;
+                }
             },
             createStoreErrorHandler(
                 "sites-monitoring",
@@ -145,13 +192,30 @@ export const createSiteMonitoringActions = (
     stopSiteMonitoring: async (siteIdentifier: string): Promise<void> => {
         logStoreAction("SitesStore", "stopSiteMonitoring", {
             siteIdentifier,
+            status: "pending",
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.stopSiteMonitoring(siteIdentifier);
-                // No need for manual sync - StatusUpdateHandler will update UI
-                // via events
+                try {
+                    await deps.monitoringService.stopSiteMonitoring(
+                        siteIdentifier
+                    );
+                    logStoreAction("SitesStore", "stopSiteMonitoring", {
+                        siteIdentifier,
+                        status: "success",
+                    });
+                    // No need for manual sync - StatusUpdateHandler will update UI
+                    // via events
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "stopSiteMonitoring", {
+                        error: normalizedError.message,
+                        siteIdentifier,
+                        status: "failure",
+                    });
+                    throw error;
+                }
             },
             createStoreErrorHandler("sites-monitoring", "stopSiteMonitoring")
         );
@@ -163,16 +227,33 @@ export const createSiteMonitoringActions = (
         logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
             monitorId,
             siteIdentifier,
+            status: "pending",
         });
 
         await withErrorHandling(
             async () => {
-                await deps.monitoringService.stopMonitoring(
-                    siteIdentifier,
-                    monitorId
-                );
-                // No need for manual sync - StatusUpdateHandler will update UI
-                // via events
+                try {
+                    await deps.monitoringService.stopMonitoring(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
+                        monitorId,
+                        siteIdentifier,
+                        status: "success",
+                    });
+                    // No need for manual sync - StatusUpdateHandler will update UI
+                    // via events
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "stopSiteMonitorMonitoring", {
+                        error: normalizedError.message,
+                        monitorId,
+                        siteIdentifier,
+                        status: "failure",
+                    });
+                    throw error;
+                }
             },
             createStoreErrorHandler(
                 "sites-monitoring",

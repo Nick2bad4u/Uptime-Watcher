@@ -31,6 +31,7 @@ import { Tooltip } from "../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../Layout/SidebarLayoutContext";
 import "./Header.css";
 import { HeaderControls } from "./HeaderControls";
+import { StatusSubscriptionIndicator } from "./StatusSubscriptionIndicator";
 import { StatusSummary } from "./StatusSummary";
 
 /**
@@ -183,6 +184,7 @@ export const Header = (): JSX.Element => {
                     </div>
 
                     <div className="app-topbar__controls">
+                        <StatusSubscriptionIndicator />
                         <HeaderControls
                             isDark={isDark}
                             onShowAddSiteModal={handleShowAddSiteModal}

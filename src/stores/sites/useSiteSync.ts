@@ -87,7 +87,12 @@ export interface SiteSyncActions {
      * @returns Subscription result with success indicators
      */
     subscribeToStatusUpdates: (
-        callback: (update: StatusUpdate) => void
+        callback?: (update: StatusUpdate) => void
+    ) => Promise<StatusUpdateSubscriptionSummary>;
+
+    /** Retry status update subscription using the most recent callback */
+    retryStatusSubscription: (
+        callback?: (update: StatusUpdate) => void
     ) => Promise<StatusUpdateSubscriptionSummary>;
 
     /**
@@ -156,13 +161,20 @@ export interface SiteSyncDependencies {
     getSites: () => Site[];
     /** Function to update sites in the store */
     setSites: (sites: Site[]) => void;
+    /** Function to persist subscription diagnostics */
+    setStatusSubscriptionSummary: (
+        summary: StatusUpdateSubscriptionSummary | undefined
+    ) => void;
 }
 
 // Create a shared status update manager instance - will be initialized when
 // first used
 // Singleton instance management for status updates, lazily initialized to
 // avoid unnecessary object creation
-const statusUpdateManager: { instance?: StatusUpdateManager } = {};
+const statusUpdateManager: {
+    instance?: StatusUpdateManager;
+    callback?: (update: StatusUpdate) => void;
+} = {};
 
 /**
  * Creates site synchronization actions with injected dependencies.
@@ -200,12 +212,24 @@ export const createSiteSyncActions = (
 
             // Start a new sync and store the promise
             pendingSyncPromise = (async (): Promise<void> => {
+                logStoreAction("SitesStore", "fullResyncSites", {
+                    status: "pending",
+                });
                 try {
                     await actions.syncSites();
                     logStoreAction("SitesStore", "fullResyncSites", {
                         message: "Full backend resynchronization completed",
+                        status: "success",
                         success: true,
                     });
+                } catch (error) {
+                    const normalizedError = ensureError(error);
+                    logStoreAction("SitesStore", "fullResyncSites", {
+                        error: normalizedError.message,
+                        status: "failure",
+                        success: false,
+                    });
+                    throw error;
                 } finally {
                     // Clear the pending promise when done (success or failure)
                     pendingSyncPromise = null;
@@ -216,21 +240,31 @@ export const createSiteSyncActions = (
         },
         getSyncStatus: async () => {
             try {
+                logStoreAction("SitesStore", "getSyncStatus", {
+                    status: "pending",
+                });
                 const status = await StateSyncService.getSyncStatus();
                 logStoreAction("SitesStore", "getSyncStatus", {
                     lastSyncAt: status.lastSyncAt,
                     message: "Sync status retrieved",
                     siteCount: status.siteCount,
                     source: status.source,
+                    status: "success",
                     success: true,
                     synchronized: status.synchronized,
                 });
                 return status;
             } catch (error) {
+                const normalizedError = ensureError(error);
                 logger.error(
                     "Failed to retrieve sync status:",
-                    ensureError(error)
+                    normalizedError
                 );
+                logStoreAction("SitesStore", "getSyncStatus", {
+                    error: normalizedError.message,
+                    status: "failure",
+                    success: false,
+                });
                 return {
                     lastSyncAt: null,
                     siteCount: 0,
@@ -240,19 +274,48 @@ export const createSiteSyncActions = (
             }
         },
         subscribeToStatusUpdates: async (
-            callback: (update: StatusUpdate) => void
+            callback?: (update: StatusUpdate) => void
         ): Promise<StatusUpdateSubscriptionSummary> => {
-            statusUpdateManager.instance ??= new StatusUpdateManager({
-                fullResyncSites: actions.fullResyncSites,
-                getSites: deps.getSites,
-                onUpdate: callback,
-                setSites: deps.setSites,
-            });
-
             const errorHandler = createStoreErrorHandler(
                 "sites-sync",
                 "subscribeToStatusUpdates"
             );
+            const effectiveCallback = callback ?? statusUpdateManager.callback;
+
+            if (!effectiveCallback) {
+                const initializationMessage =
+                    "Status update subscription attempted without a callback";
+                const fallbackSummary: StatusUpdateSubscriptionSummary = {
+                    errors: [initializationMessage],
+                    expectedListeners:
+                        StatusUpdateManager.EXPECTED_LISTENER_COUNT,
+                    listenersAttached: 0,
+                    message:
+                        "Failed to subscribe to status updates due to missing callback",
+                    subscribed: false,
+                    success: false,
+                };
+
+                deps.setStatusSubscriptionSummary(fallbackSummary);
+                errorHandler.setError(initializationMessage);
+                logger.error(
+                    "Status update subscription requires a callback",
+                    initializationMessage
+                );
+                logStoreAction("SitesStore", "subscribeToStatusUpdates", {
+                    ...fallbackSummary,
+                    status: "failure",
+                });
+                return fallbackSummary;
+            }
+
+            statusUpdateManager.callback = effectiveCallback;
+            statusUpdateManager.instance ??= new StatusUpdateManager({
+                fullResyncSites: actions.fullResyncSites,
+                getSites: deps.getSites,
+                onUpdate: effectiveCallback,
+                setSites: deps.setSites,
+            });
 
             const executeSubscription =
                 async (): Promise<StatusUpdateSubscriptionSummary> => {
@@ -270,12 +333,16 @@ export const createSiteSyncActions = (
                         const fallbackSummary: StatusUpdateSubscriptionSummary =
                             {
                                 errors: [initializationMessage],
+                                expectedListeners:
+                                    StatusUpdateManager.EXPECTED_LISTENER_COUNT,
                                 listenersAttached: 0,
                                 message:
                                     "Failed to subscribe to status updates",
                                 subscribed: false,
                                 success: false,
                             };
+
+                        deps.setStatusSubscriptionSummary(fallbackSummary);
 
                         logStoreAction(
                             "SitesStore",
@@ -297,6 +364,7 @@ export const createSiteSyncActions = (
 
                         const summary: StatusUpdateSubscriptionSummary = {
                             errors,
+                            expectedListeners,
                             listenersAttached,
                             message: success
                                 ? "Successfully subscribed to status updates with efficient incremental updates"
@@ -304,6 +372,8 @@ export const createSiteSyncActions = (
                             subscribed: success,
                             success,
                         };
+
+                        deps.setStatusSubscriptionSummary(summary);
 
                         if (!success) {
                             const detailMessage = `Status update subscription failed (${listenersAttached}/${expectedListeners} listeners attached)`;
@@ -324,6 +394,7 @@ export const createSiteSyncActions = (
                             "subscribeToStatusUpdates",
                             {
                                 ...summary,
+                                status: success ? "success" : "failure",
                                 expectedListeners,
                             }
                         );
@@ -341,6 +412,9 @@ export const createSiteSyncActions = (
                         const failureSummary: StatusUpdateSubscriptionSummary =
                             {
                                 errors: [normalizedError.message],
+                                expectedListeners:
+                                    statusUpdateManager.instance?.getExpectedListenerCount() ??
+                                    StatusUpdateManager.EXPECTED_LISTENER_COUNT,
                                 listenersAttached: 0,
                                 message:
                                     "Failed to subscribe to status updates",
@@ -348,10 +422,15 @@ export const createSiteSyncActions = (
                                 success: false,
                             };
 
+                        deps.setStatusSubscriptionSummary(failureSummary);
+
                         logStoreAction(
                             "SitesStore",
                             "subscribeToStatusUpdates",
-                            failureSummary
+                            {
+                                ...failureSummary,
+                                status: "failure",
+                            }
                         );
 
                         return failureSummary;
@@ -359,6 +438,51 @@ export const createSiteSyncActions = (
                 };
 
             return withErrorHandling(executeSubscription, errorHandler);
+        },
+        retryStatusSubscription: async (
+            callback?: (update: StatusUpdate) => void
+        ): Promise<StatusUpdateSubscriptionSummary> => {
+            const errorHandler = createStoreErrorHandler(
+                "sites-sync",
+                "retryStatusSubscription"
+            );
+            const effectiveCallback = callback ?? statusUpdateManager.callback;
+
+            if (!effectiveCallback) {
+                const message =
+                    "Retry attempted without previously registered callback";
+                const fallbackSummary: StatusUpdateSubscriptionSummary = {
+                    errors: [message],
+                    expectedListeners:
+                        StatusUpdateManager.EXPECTED_LISTENER_COUNT,
+                    listenersAttached: 0,
+                    message:
+                        "Unable to retry status subscription without callback context",
+                    subscribed: false,
+                    success: false,
+                };
+
+                deps.setStatusSubscriptionSummary(fallbackSummary);
+                errorHandler.setError(message);
+                logger.error(
+                    "Failed to retry status subscription due to missing callback",
+                    message
+                );
+                logStoreAction("SitesStore", "retryStatusSubscription", {
+                    ...fallbackSummary,
+                    status: "failure",
+                });
+                return fallbackSummary;
+            }
+
+            if (statusUpdateManager.instance) {
+                statusUpdateManager.instance.unsubscribe();
+                delete statusUpdateManager.instance;
+            }
+
+            deps.setStatusSubscriptionSummary(undefined);
+
+            return actions.subscribeToStatusUpdates(effectiveCallback);
         },
         subscribeToSyncEvents: (): (() => void) => {
             let cleanup: (() => void) | null = null;
@@ -387,8 +511,10 @@ export const createSiteSyncActions = (
                             try {
                                 await actions.syncSites();
                             } catch (error: unknown) {
+                                const normalizedError = ensureError(error);
                                 logStoreAction("SitesStore", "error", {
-                                    error: ensureError(error),
+                                    error: normalizedError.message,
+                                    status: "failure",
                                 });
                             }
                         })();
@@ -414,6 +540,7 @@ export const createSiteSyncActions = (
                     cleanup = serviceCleanup;
                     logStoreAction("SitesStore", "subscribeToSyncEvents", {
                         message: "Sync event subscription setup completed",
+                        status: "success",
                         success: true,
                     });
                 } catch (error) {
@@ -425,6 +552,7 @@ export const createSiteSyncActions = (
                     logStoreAction("SitesStore", "subscribeToSyncEvents", {
                         error: normalizedError.message,
                         message: "Failed to subscribe to sync events",
+                        status: "failure",
                         success: false,
                     });
                 }
@@ -432,7 +560,7 @@ export const createSiteSyncActions = (
 
             logStoreAction("SitesStore", "subscribeToSyncEvents", {
                 message: "Sync event subscription setup initiated",
-                success: true,
+                status: "pending",
             });
 
             return (): void => {
@@ -446,14 +574,29 @@ export const createSiteSyncActions = (
         syncSites: async (): Promise<void> => {
             await withErrorHandling(
                 async () => {
-                    const backendSites = await SiteService.getSites();
-                    deps.setSites(backendSites);
-
                     logStoreAction("SitesStore", "syncSites", {
-                        message: "Sites synchronized from backend",
-                        sitesCount: deps.getSites().length,
-                        success: true,
+                        status: "pending",
                     });
+
+                    try {
+                        const backendSites = await SiteService.getSites();
+                        deps.setSites(backendSites);
+
+                        logStoreAction("SitesStore", "syncSites", {
+                            message: "Sites synchronized from backend",
+                            sitesCount: deps.getSites().length,
+                            status: "success",
+                            success: true,
+                        });
+                    } catch (error) {
+                        const normalizedError = ensureError(error);
+                        logStoreAction("SitesStore", "syncSites", {
+                            error: normalizedError.message,
+                            status: "failure",
+                            success: false,
+                        });
+                        throw error;
+                    }
                 },
                 createStoreErrorHandler("sites-sync", "syncSites")
             );
@@ -461,6 +604,8 @@ export const createSiteSyncActions = (
         unsubscribeFromStatusUpdates: () => {
             statusUpdateManager.instance?.unsubscribe();
             delete statusUpdateManager.instance;
+            delete statusUpdateManager.callback;
+            deps.setStatusSubscriptionSummary(undefined);
             const result = {
                 message: "Successfully unsubscribed from status updates",
                 success: true,

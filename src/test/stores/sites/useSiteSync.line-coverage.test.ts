@@ -115,6 +115,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
         mockDeps = {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
+            setStatusSubscriptionSummary: vi.fn(),
         };
 
         syncActions = createSiteSyncActions(mockDeps);
@@ -175,11 +176,33 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const mockCallback = vi.fn();
             const testError = new Error("Subscribe failed");
 
+            describe("retryStatusSubscription", () => {
+                it("returns fallback diagnostics when called without prior subscription", async () => {
+                    const result = await syncActions.retryStatusSubscription();
+
+                    expect(result.success).toBe(false);
+                    expect(result.subscribed).toBe(false);
+                    expect(result.errors).toContain(
+                        "Retry attempted without previously registered callback"
+                    );
+                    expect(
+                        mockDeps.setStatusSubscriptionSummary
+                    ).toHaveBeenCalledWith(
+                        expect.objectContaining({
+                            expectedListeners: 3,
+                            listenersAttached: 0,
+                            success: false,
+                        })
+                    );
+                });
+            });
+
             // Mock StatusUpdateManager to throw during subscribe
             const statusUpdateHandlerModule = await import(
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
+                getExpectedListenerCount: vi.fn(() => 3),
                 subscribe: vi.fn(async () => {
                     throw testError;
                 }),
@@ -201,6 +224,13 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             expect(result.success).toBeFalsy();
             expect(result.errors).toContain("Subscribe failed");
+            expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    expectedListeners: 3,
+                    listenersAttached: 0,
+                    success: false,
+                })
+            );
         });
     });
 
@@ -324,7 +354,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(syncSpy).toHaveBeenCalled();
             // Verify lines 301-304: error was logged
             expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "error", {
-                error: testError,
+                error: testError.message,
+                status: "failure",
             });
         });
     });
