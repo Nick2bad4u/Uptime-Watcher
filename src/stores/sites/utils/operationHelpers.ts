@@ -215,7 +215,7 @@ export const getSiteByIdentifier = (
     deps: SiteOperationsDependencies
 ): Site => {
     const sites = deps.getSites() as Array<null | Site | undefined>;
-    const site = sites.find((s) => s && s.identifier === siteIdentifier);
+    const site = sites.find((s) => s?.identifier === siteIdentifier);
     if (!site) {
         throw new Error(ERROR_CATALOG.sites.NOT_FOUND as string);
     }

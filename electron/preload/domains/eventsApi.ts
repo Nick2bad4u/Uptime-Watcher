@@ -28,6 +28,10 @@ import type {
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
 
 import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventChannel,
+} from "@shared/ipc/rendererEvents";
+import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
@@ -230,7 +234,7 @@ interface GuardSubscriptionOptions {
 
 const subscribeWithGuard = <TPayload>(
     manager: EventManager,
-    channel: string,
+    channel: RendererEventChannel,
     guard: EventGuard<TPayload>,
     callback: (payload: TPayload) => void,
     options: GuardSubscriptionOptions = {}
@@ -281,14 +285,22 @@ const subscribeWithGuard = <TPayload>(
  */
 export function createEventsApi(): EventsApi {
     const managers = {
-        cacheInvalidated: createEventManager("cache:invalidated"),
-        monitorDown: createEventManager("monitor:down"),
-        monitoringStarted: createEventManager("monitoring:started"),
-        monitoringStopped: createEventManager("monitoring:stopped"),
-        monitorStatusChanged: createEventManager("monitor:status-changed"),
-        monitorUp: createEventManager("monitor:up"),
-        testEvent: createEventManager("test-event"),
-        updateStatus: createEventManager("update-status"),
+        cacheInvalidated: createEventManager(
+            RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED
+        ),
+        monitorDown: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_DOWN),
+        monitoringStarted: createEventManager(
+            RENDERER_EVENT_CHANNELS.MONITORING_STARTED
+        ),
+        monitoringStopped: createEventManager(
+            RENDERER_EVENT_CHANNELS.MONITORING_STOPPED
+        ),
+        monitorStatusChanged: createEventManager(
+            RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED
+        ),
+        monitorUp: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_UP),
+        testEvent: createEventManager(RENDERER_EVENT_CHANNELS.TEST_EVENT),
+        updateStatus: createEventManager(RENDERER_EVENT_CHANNELS.UPDATE_STATUS),
     } as const;
 
     return {
@@ -297,7 +309,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.cacheInvalidated,
-                "cache:invalidated",
+                RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
                 isCacheInvalidatedEventDataPayload,
                 callback
             ),
@@ -306,7 +318,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.monitorDown,
-                "monitor:down",
+                RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
                 isMonitorDownEventDataPayload,
                 callback
             ),
@@ -315,7 +327,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.monitoringStarted,
-                "monitoring:started",
+                RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
                 isMonitoringControlEventDataPayload,
                 callback
             ),
@@ -324,7 +336,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.monitoringStopped,
-                "monitoring:stopped",
+                RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
                 isMonitoringControlEventDataPayload,
                 callback
             ),
@@ -333,7 +345,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.monitorStatusChanged,
-                "monitor:status-changed",
+                RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
                 isMonitorStatusChangedEventData,
                 callback
             ),
@@ -342,14 +354,14 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.monitorUp,
-                "monitor:up",
+                RENDERER_EVENT_CHANNELS.MONITOR_UP,
                 isMonitorUpEventDataPayload,
                 callback
             ),
         onTestEvent: (callback: (data: TestEventData) => void): (() => void) =>
             subscribeWithGuard(
                 managers.testEvent,
-                "test-event",
+                RENDERER_EVENT_CHANNELS.TEST_EVENT,
                 isTestEventDataPayload,
                 callback
             ),
@@ -358,7 +370,7 @@ export function createEventsApi(): EventsApi {
         ): (() => void) =>
             subscribeWithGuard(
                 managers.updateStatus,
-                "update-status",
+                RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
                 isUpdateStatusEventDataPayload,
                 callback
             ),

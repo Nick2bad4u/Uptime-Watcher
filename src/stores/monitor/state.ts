@@ -50,16 +50,16 @@ export const createMonitorTypesStateSlice = (
     | "setLoading"
 > => ({
     ...initialMonitorTypesState,
-    clearError: () => {
+    clearError: (): void => {
         setState({ lastError: undefined });
     },
     getFieldConfig: (
         type: MonitorType
     ): MonitorTypeConfig["fields"] | undefined => getState().fieldConfigs[type],
-    setError: (error: string | undefined) => {
+    setError: (error: string | undefined): void => {
         setState({ lastError: error });
     },
-    setLoading: (loading: boolean) => {
+    setLoading: (loading: boolean): void => {
         setState({ isLoading: loading });
     },
 });

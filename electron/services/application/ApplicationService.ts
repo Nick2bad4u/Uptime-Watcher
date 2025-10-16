@@ -45,6 +45,7 @@
  *
  * @public
  */
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import {
@@ -282,10 +283,13 @@ export class ApplicationService {
      */
     private setupAutoUpdater(): void {
         const autoUpdater = this.serviceContainer.getAutoUpdaterService();
-        const windowService = this.serviceContainer.getWindowService();
+        const rendererBridge = this.serviceContainer.getRendererEventBridge();
 
         autoUpdater.setStatusCallback((statusData) => {
-            windowService.sendToRenderer("update-status", statusData);
+            rendererBridge.sendToRenderers(
+                RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
+                statusData
+            );
         });
 
         autoUpdater.initialize();
@@ -321,7 +325,7 @@ export class ApplicationService {
      */
     private setupUptimeEventHandlers(): void {
         const orchestrator = this.serviceContainer.getUptimeOrchestrator();
-        const windowService = this.serviceContainer.getWindowService();
+        const rendererBridge = this.serviceContainer.getRendererEventBridge();
         const notificationService =
             this.serviceContainer.getNotificationService();
 
@@ -341,7 +345,10 @@ export class ApplicationService {
                 );
 
                 // Send status update to renderer
-                windowService.sendToRenderer("monitor:status-changed", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
+                    data
+                );
             } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
@@ -363,7 +370,10 @@ export class ApplicationService {
                     }
                 );
 
-                windowService.sendToRenderer("monitor:up", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITOR_UP,
+                    data
+                );
                 notificationService.notifyMonitorUp(data.site, data.monitor.id);
             } catch (error: unknown) {
                 logger.error(
@@ -382,7 +392,10 @@ export class ApplicationService {
                     siteName: data.site.name,
                 });
 
-                windowService.sendToRenderer("monitor:down", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
+                    data
+                );
                 notificationService.notifyMonitorDown(
                     data.site,
                     data.monitor.id
@@ -414,7 +427,10 @@ export class ApplicationService {
                         .APPLICATION_FORWARDING_MONITORING_STARTED,
                     data
                 );
-                windowService.sendToRenderer("monitoring:started", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
+                    data
+                );
             } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
@@ -431,7 +447,10 @@ export class ApplicationService {
                         .APPLICATION_FORWARDING_MONITORING_STOPPED,
                     data
                 );
-                windowService.sendToRenderer("monitoring:stopped", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
+                    data
+                );
             } catch (error: unknown) {
                 logger.error(
                     LOG_TEMPLATES.errors
@@ -453,7 +472,10 @@ export class ApplicationService {
                         type: data.type,
                     }
                 );
-                windowService.sendToRenderer("cache:invalidated", data);
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
+                    data
+                );
             } catch (error) {
                 logger.error(
                     LOG_TEMPLATES.errors

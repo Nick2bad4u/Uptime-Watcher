@@ -113,6 +113,7 @@ vi.mock("../../../services/ServiceContainer", () => ({
         getIpcService: vi.fn(),
         getUptimeOrchestrator: vi.fn(),
         getWindowService: vi.fn(),
+        getRendererEventBridge: vi.fn(),
         getAutoUpdaterService: vi.fn(),
         getNotificationService: vi.fn(),
     },
@@ -134,6 +135,11 @@ const mockWindowService = {
     getAllWindows: vi.fn(() => [] as any[]),
     createMainWindow: vi.fn(),
     sendToRenderer: vi.fn(),
+};
+
+const mockRendererEventBridge = {
+    sendToRenderers: vi.fn(),
+    sendStateSyncEvent: vi.fn(),
 };
 
 const mockAutoUpdaterService = {
@@ -175,6 +181,9 @@ describe(ApplicationService, () => {
         );
         mockServiceContainer.getWindowService.mockReturnValue(
             mockWindowService
+        );
+        mockServiceContainer.getRendererEventBridge.mockReturnValue(
+            mockRendererEventBridge
         );
         mockServiceContainer.getAutoUpdaterService.mockReturnValue(
             mockAutoUpdaterService
@@ -747,10 +756,9 @@ describe(ApplicationService, () => {
             statusCallback?.(statusData);
 
             // Assert
-            expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                "update-status",
-                statusData
-            );
+            expect(
+                mockRendererEventBridge.sendToRenderers
+            ).toHaveBeenCalledWith("update-status", statusData);
         });
         it("should handle auto updater check errors", async ({
             task,
@@ -884,10 +892,9 @@ describe(ApplicationService, () => {
                 monitorUpHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                    "monitor:up",
-                    eventData
-                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("monitor:up", eventData);
                 expect(
                     mockNotificationService.notifyMonitorUp
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
@@ -910,9 +917,11 @@ describe(ApplicationService, () => {
                     timestamp: "2023-01-01T00:00:00Z",
                 };
                 const error = new Error("Forward failed");
-                mockWindowService.sendToRenderer.mockImplementation(() => {
-                    throw error;
-                });
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
                 // Act
                 monitorUpHandler?.(eventData);
 
@@ -946,10 +955,9 @@ describe(ApplicationService, () => {
                 monitorDownHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                    "monitor:down",
-                    eventData
-                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("monitor:down", eventData);
                 expect(
                     mockNotificationService.notifyMonitorDown
                 ).toHaveBeenCalledWith(eventData.site, eventData.monitor.id);
@@ -972,9 +980,11 @@ describe(ApplicationService, () => {
                     timestamp: "2023-01-01T00:00:00Z",
                 };
                 const error = new Error("Forward failed");
-                mockWindowService.sendToRenderer.mockImplementation(() => {
-                    throw error;
-                });
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
                 // Act
                 monitorDownHandler?.(eventData);
 
@@ -1029,10 +1039,9 @@ describe(ApplicationService, () => {
                 monitoringStartedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                    "monitoring:started",
-                    eventData
-                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("monitoring:started", eventData);
             });
             it("should handle monitoring started forwarding errors", async ({
                 task,
@@ -1048,9 +1057,11 @@ describe(ApplicationService, () => {
                     )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
-                mockWindowService.sendToRenderer.mockImplementation(() => {
-                    throw error;
-                });
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
                 // Act
                 monitoringStartedHandler?.(eventData);
 
@@ -1080,10 +1091,9 @@ describe(ApplicationService, () => {
                 monitoringStoppedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                    "monitoring:stopped",
-                    eventData
-                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("monitoring:stopped", eventData);
             });
             it("should handle monitoring stopped forwarding errors", async ({
                 task,
@@ -1099,9 +1109,11 @@ describe(ApplicationService, () => {
                     )?.[1];
                 const eventData = { siteIdentifier: "site-1" };
                 const error = new Error("Forward failed");
-                mockWindowService.sendToRenderer.mockImplementation(() => {
-                    throw error;
-                });
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
                 // Act
                 monitoringStoppedHandler?.(eventData);
 
@@ -1135,10 +1147,9 @@ describe(ApplicationService, () => {
                 cacheInvalidatedHandler?.(eventData);
 
                 // Assert
-                expect(mockWindowService.sendToRenderer).toHaveBeenCalledWith(
-                    "cache:invalidated",
-                    eventData
-                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("cache:invalidated", eventData);
             });
             it("should handle cache invalidation forwarding errors", async ({
                 task,
@@ -1158,9 +1169,11 @@ describe(ApplicationService, () => {
                     type: "site",
                 };
                 const error = new Error("Forward failed");
-                mockWindowService.sendToRenderer.mockImplementation(() => {
-                    throw error;
-                });
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
                 // Act
                 cacheInvalidatedHandler?.(eventData);
 

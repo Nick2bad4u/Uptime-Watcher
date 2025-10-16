@@ -1,8 +1,12 @@
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventChannel,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
 import { STATUS_KIND } from "../../../../shared/types";
 import type { Mock } from "vitest";
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { RendererEventMap } from "../../../services/events/RendererEventBridge";
 import { RendererEventBridge } from "../../../services/events/RendererEventBridge";
 import type { WindowService } from "../../../services/window/WindowService";
 import { logger } from "../../../utils/logger";
@@ -13,8 +17,8 @@ interface WindowStub {
     webContents: {
         send: Mock<
             (
-                channel: string,
-                payload: RendererEventMap[keyof RendererEventMap]
+                channel: RendererEventChannel,
+                payload: RendererEventPayload<RendererEventChannel>
             ) => void
         >;
     };
@@ -27,8 +31,8 @@ describe(RendererEventBridge, () => {
         >;
         const send = vi.fn(() => undefined) as Mock<
             (
-                channel: string,
-                payload: RendererEventMap[keyof RendererEventMap]
+                channel: RendererEventChannel,
+                payload: RendererEventPayload<RendererEventChannel>
             ) => void
         >;
 
@@ -39,7 +43,9 @@ describe(RendererEventBridge, () => {
         };
     };
 
-    const createPayload = (): RendererEventMap["state-sync-event"] => ({
+    const createPayload = (): RendererEventPayload<
+        typeof RENDERER_EVENT_CHANNELS.STATE_SYNC
+    > => ({
         action: "bulk-sync",
         sites: [
             {
@@ -97,16 +103,21 @@ describe(RendererEventBridge, () => {
         bridge.sendStateSyncEvent(payload);
 
         expect(firstWindow.webContents.send).toHaveBeenCalledWith(
-            "state-sync-event",
+            RENDERER_EVENT_CHANNELS.STATE_SYNC,
             payload
         );
         expect(secondWindow.webContents.send).toHaveBeenCalledWith(
-            "state-sync-event",
+            RENDERER_EVENT_CHANNELS.STATE_SYNC,
             payload
         );
-        expect(logger.debug).toHaveBeenCalledWith(
-            expect.stringContaining("Broadcasted state-sync-event")
-        );
+        const debugCalls = vi.mocked(logger.debug).mock.calls;
+        expect(debugCalls).toHaveLength(2);
+        for (const [message, metadata] of debugCalls) {
+            expect(message).toContain(
+                `Broadcasted ${RENDERER_EVENT_CHANNELS.STATE_SYNC}`
+            );
+            expect(metadata).toMatchObject({ windowCount: 2 });
+        }
     });
 
     it("skips destroyed windows", () => {
@@ -141,7 +152,9 @@ describe(RendererEventBridge, () => {
         bridge.sendStateSyncEvent(createPayload());
 
         expect(logger.error).toHaveBeenCalledWith(
-            expect.stringContaining("Failed to broadcast state-sync-event"),
+            expect.stringContaining(
+                `Failed to broadcast ${RENDERER_EVENT_CHANNELS.STATE_SYNC}`
+            ),
             expect.any(Error)
         );
         expect(healthyWindow.webContents.send).toHaveBeenCalledTimes(1);
@@ -153,7 +166,9 @@ describe(RendererEventBridge, () => {
         bridge.sendStateSyncEvent(createPayload());
 
         expect(logger.debug).toHaveBeenCalledWith(
-            expect.stringContaining("Skipping broadcast for state-sync-event")
+            expect.stringContaining(
+                `Skipping broadcast for ${RENDERER_EVENT_CHANNELS.STATE_SYNC}`
+            )
         );
     });
 });

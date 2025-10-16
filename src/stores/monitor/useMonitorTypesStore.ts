@@ -57,9 +57,3 @@ export const useMonitorTypesStore: UseBoundStore<StoreApi<MonitorTypesStore>> =
         ...createMonitorTypesStateSlice(set, get),
         ...createMonitorTypesOperationsSlice(set, get),
     }));
-
-export type {
-    MonitorTypesActions,
-    MonitorTypesState,
-    MonitorTypesStore,
-} from "./types";

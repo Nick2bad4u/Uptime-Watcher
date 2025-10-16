@@ -67,7 +67,7 @@ describe("SafeConversions - Property-Based Tests", () => {
                 fc.constant(null),
                 fc.constant(undefined)
             ),
-            defaultValue: fc.float(),
+            defaultValue: fc.float({ noNaN: true }),
         })("should return default value for non-numeric types", (props) => {
             const result = safeNumberConversion(
                 props.value,

@@ -28,9 +28,6 @@
 /**
  * Options for constructing an {@link ApplicationError} instance.
  */
-/**
- * Options for constructing an {@link ApplicationError} instance.
- */
 export interface ApplicationErrorOptions {
     /** Underlying error cause. */
     cause?: unknown;
@@ -42,6 +39,57 @@ export interface ApplicationErrorOptions {
     message: string;
     /** Optional identifier of the operation that failed. */
     operation?: string;
+}
+
+/**
+ * Safely format an unknown error cause into a string description.
+ *
+ * @param cause - Unknown error cause value to format.
+ *
+ * @returns Descriptive string for the provided cause.
+ */
+function formatUnknownErrorCause(cause: unknown): string {
+    if (cause === null) {
+        return "null";
+    }
+
+    if (typeof cause === "string") {
+        return cause;
+    }
+
+    if (typeof cause === "number" || typeof cause === "boolean") {
+        return cause.toString();
+    }
+
+    try {
+        const serialized = JSON.stringify(cause);
+        return typeof serialized === "string"
+            ? serialized
+            : `[unserializable:${typeof cause}]`;
+    } catch {
+        return `[unserializable:${typeof cause}]`;
+    }
+}
+
+/**
+ * Normalize an unknown error cause to a proper {@link Error} instance when
+ * needed.
+ *
+ * @param cause - Unknown cause value supplied to {@link ApplicationError}.
+ *
+ * @returns Normalized Error instance or undefined when no cause provided.
+ */
+function normalizeErrorCause(cause: unknown): Error | undefined {
+    if (cause instanceof Error) {
+        return cause;
+    }
+
+    if (cause === undefined) {
+        return undefined;
+    }
+
+    const message = formatUnknownErrorCause(cause);
+    return new Error(message);
 }
 
 /**
@@ -67,12 +115,7 @@ export class ApplicationError extends Error {
     public override readonly cause: unknown;
 
     public constructor(options: ApplicationErrorOptions) {
-        const normalizedCause =
-            options.cause instanceof Error
-                ? options.cause
-                : options.cause === undefined
-                  ? undefined
-                  : new Error(String(options.cause));
+        const normalizedCause = normalizeErrorCause(options.cause);
 
         super(
             options.message,
@@ -88,25 +131,13 @@ export class ApplicationError extends Error {
     }
 }
 
-export interface ErrorHandlingBackendContext {
-    logger: {
-        error: (msg: string, err: unknown) => void;
-    };
-    operationName?: string;
-}
-
-export interface ErrorHandlingFrontendStore {
-    clearError: () => void;
-    setError: (err: string | undefined) => void;
-    setLoading: (loading: boolean) => void;
-}
-
 /**
- * Get the appropriate error message based on the operation name.
+ * Derives a default error message description from the given operation name.
  *
- * @param operationName - The operation name (should be string, but defensive)
+ * @param operationName - User-facing operation descriptor, when available.
  *
- * @returns Formatted error message
+ * @returns Human-readable error message that avoids leaking implementation
+ *   details.
  */
 function getErrorMessage(operationName: unknown): string {
     if (
@@ -117,6 +148,38 @@ function getErrorMessage(operationName: unknown): string {
         return `Failed to ${operationName}`;
     }
     return "Async operation failed";
+}
+
+/**
+ * Backend-specific context required for {@link withErrorHandling} logging.
+ *
+ * @public
+ */
+export interface ErrorHandlingBackendContext {
+    /** Structured logger used for backend error reporting. */
+    readonly logger: {
+        error: (msg: string, err: unknown) => void;
+    };
+    /** Optional identifier describing the operation being executed. */
+    readonly operationName?: string;
+}
+
+/**
+ * Frontend store contract supported by {@link withErrorHandling}.
+ *
+ * @remarks
+ * Provides the minimal surface required to manage loading and error states for
+ * UI stores.
+ *
+ * @public
+ */
+export interface ErrorHandlingFrontendStore {
+    /** Clears the current error state before starting an operation. */
+    clearError: () => void;
+    /** Persists the latest error message for user feedback. */
+    setError: (err: string | undefined) => void;
+    /** Toggles the loading indicator associated with the operation. */
+    setLoading: (loading: boolean) => void;
 }
 
 /**
@@ -233,6 +296,17 @@ export function convertError(error: unknown): ErrorConversionResult {
 }
 
 /**
+ * Ensures an error object is properly typed and formatted.
+ *
+ * @param error - Unknown error value from catch blocks.
+ *
+ * @returns Properly typed {@link Error} instance.
+ */
+export function ensureError(error: unknown): Error {
+    return convertError(error).error;
+}
+
+/**
  * Handle backend operations with logger integration.
  *
  * @remarks
@@ -259,16 +333,16 @@ async function handleBackendOperation<T>(
 
     try {
         return await operation();
-    } catch (error) {
+    } catch (error: unknown) {
         const errorMessage = getErrorMessage(operationName);
 
         // Safely handle logging - fallback to console.error if logger fails
         try {
             logger.error(errorMessage, error);
-        } catch (logError) {
-            // Fallback to console.error if logger.error throws
+        } catch (error_) {
+            const loggingError = ensureError(error_);
             console.error(errorMessage, error);
-            console.warn("Logger error during error handling:", logError);
+            console.warn("Logger error during error handling:", loggingError);
         }
 
         throw error;
@@ -390,18 +464,6 @@ export async function withErrorHandling<T>(
 /**
  * Type-safe error conversion result with enhanced type information.
  */
-/**
- * Ensures an error object is properly typed and formatted. Converts unknown
- * error types to proper Error instances.
- *
- * @param error - Unknown error value from catch blocks
- *
- * @returns Properly typed Error instance
- */
-export function ensureError(error: unknown): Error {
-    return convertError(error).error;
-}
-
 /**
  * Simple error handling wrapper for utility functions. Provides consistent
  * error logging and error response formatting.

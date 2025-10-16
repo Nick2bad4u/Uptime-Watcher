@@ -14,6 +14,31 @@ import type { SiteForStatus, SiteStatus } from "@shared/types";
 import { isMonitorStatus, STATUS_KIND } from "@shared/types";
 
 /**
+ * Normalizes a site monitors collection by removing nullish entries and
+ * ensuring an array is always returned.
+ *
+ * @param monitors - Raw monitors payload from a {@link SiteForStatus} entity.
+ *
+ * @returns A sanitized monitors array safe for downstream calculations.
+ */
+const normalizeMonitors = (
+    monitors: null | SiteForStatus["monitors"] | undefined
+): SiteForStatus["monitors"] => {
+    if (!Array.isArray(monitors)) {
+        return [];
+    }
+
+    const nullableMonitors = monitors as Array<
+        null | SiteForStatus["monitors"][number] | undefined
+    >;
+
+    return nullableMonitors.filter(
+        (monitor): monitor is SiteForStatus["monitors"][number] =>
+            monitor !== null && monitor !== undefined
+    );
+};
+
+/**
  * Calculates the overall monitoring state for a site based on its monitors.
  *
  * @remarks
@@ -40,10 +65,9 @@ import { isMonitorStatus, STATUS_KIND } from "@shared/types";
 export function calculateSiteMonitoringStatus(
     site: SiteForStatus
 ): "partial" | "running" | "stopped" {
-    const { monitors } = site;
+    const monitors = normalizeMonitors(site.monitors);
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- monitors may be undefined from input parameters
-    if (!monitors || monitors.length === 0) {
+    if (monitors.length === 0) {
         return "stopped";
     }
 
@@ -88,7 +112,7 @@ export function calculateSiteMonitoringStatus(
  * @returns The operational status as a {@link SiteStatus} value.
  */
 export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
-    const { monitors } = site;
+    const monitors = normalizeMonitors(site.monitors);
 
     if (monitors.length === 0) {
         return STATUS_KIND.UNKNOWN;
@@ -147,11 +171,17 @@ export function calculateSiteStatus(site: SiteForStatus): SiteStatus {
  * @returns The display status as a {@link SiteStatus} value.
  */
 export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
-    const monitoringStatus = calculateSiteMonitoringStatus(site);
-    const operationalStatus = calculateSiteStatus(site);
+    const monitors = normalizeMonitors(site.monitors);
+    const normalizedSite: SiteForStatus = {
+        ...site,
+        monitors,
+    };
+
+    const monitoringStatus = calculateSiteMonitoringStatus(normalizedSite);
+    const operationalStatus = calculateSiteStatus(normalizedSite);
 
     // If no monitors exist, show as unknown
-    if (site.monitors.length === 0) {
+    if (monitors.length === 0) {
         return STATUS_KIND.UNKNOWN;
     }
 
@@ -190,9 +220,15 @@ export function getSiteDisplayStatus(site: SiteForStatus): SiteStatus {
  * @returns A human-readable string describing the site's status.
  */
 export function getSiteStatusDescription(site: SiteForStatus): string {
-    const status = getSiteDisplayStatus(site);
-    const monitorCount = site.monitors.length;
-    const runningCount = site.monitors.filter((m) => m.monitoring).length;
+    const monitors = normalizeMonitors(site.monitors);
+    const normalizedSite: SiteForStatus = {
+        ...site,
+        monitors,
+    };
+
+    const status = getSiteDisplayStatus(normalizedSite);
+    const monitorCount = monitors.length;
+    const runningCount = monitors.filter((m) => m.monitoring).length;
 
     switch (status) {
         case STATUS_KIND.DEGRADED: {

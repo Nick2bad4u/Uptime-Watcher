@@ -172,9 +172,10 @@ export class HistoryRepository {
         details?: string
     ): Promise<void> {
         return withDatabaseOperation(
-            async () =>
-                this.databaseService.executeTransaction(async (db) => {
+            () =>
+                this.databaseService.executeTransaction((db) => {
                     this.addEntryInternal(db, monitorId, entry, details);
+                    return Promise.resolve();
                 }),
             "history-add-entry",
             undefined,
@@ -210,9 +211,9 @@ export class HistoryRepository {
         }
 
         await withDatabaseOperation(
-            async () => {
+            () =>
                 // Use executeTransaction for atomic bulk insert operation
-                await this.databaseService.executeTransaction(async (db) => {
+                this.databaseService.executeTransaction((db) => {
                     // Prepare the statement once for better performance
                     const stmt = db.prepare(HISTORY_QUERIES.INSERT_ENTRY);
 
@@ -233,8 +234,9 @@ export class HistoryRepository {
                     } finally {
                         stmt.finalize();
                     }
-                });
-            },
+
+                    return Promise.resolve();
+                }),
             "history-bulk-insert",
             undefined,
             { count: historyEntries.length, monitorId }
@@ -261,9 +263,10 @@ export class HistoryRepository {
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
-            async () =>
-                this.databaseService.executeTransaction(async (db) => {
+            () =>
+                this.databaseService.executeTransaction((db) => {
                     this.deleteAllInternal(db);
+                    return Promise.resolve();
                 }),
             "history-delete-all"
         );
@@ -287,9 +290,10 @@ export class HistoryRepository {
      */
     public async deleteByMonitorId(monitorId: string): Promise<void> {
         return withDatabaseOperation(
-            async () =>
-                this.databaseService.executeTransaction(async (db) => {
+            () =>
+                this.databaseService.executeTransaction((db) => {
                     this.deleteByMonitorIdInternal(db, monitorId);
+                    return Promise.resolve();
                 }),
             "history-delete-by-monitor",
             undefined,
@@ -314,10 +318,13 @@ export class HistoryRepository {
      * @throws Error if the database operation fails.
      */
     public async findByMonitorId(monitorId: string): Promise<StatusHistory[]> {
-        return withDatabaseOperation(async () => {
-            const db = this.getDb();
-            return findHistoryByMonitorId(db, monitorId);
-        }, `find-history-by-monitor-${monitorId}`);
+        return withDatabaseOperation(
+            () =>
+                Promise.resolve(
+                    findHistoryByMonitorId(this.getDb(), monitorId)
+                ),
+            `find-history-by-monitor-${monitorId}`
+        );
     }
 
     /**
@@ -341,10 +348,7 @@ export class HistoryRepository {
      */
     public async getHistoryCount(monitorId: string): Promise<number> {
         return withDatabaseOperation(
-            async () => {
-                const db = this.getDb();
-                return getHistoryCount(db, monitorId);
-            },
+            () => Promise.resolve(getHistoryCount(this.getDb(), monitorId)),
             "history-count",
             undefined,
             { monitorId }
@@ -375,10 +379,8 @@ export class HistoryRepository {
         monitorId: string
     ): Promise<StatusHistory | undefined> {
         return withDatabaseOperation(
-            async () => {
-                const db = this.getDb();
-                return getLatestHistoryEntry(db, monitorId);
-            },
+            () =>
+                Promise.resolve(getLatestHistoryEntry(this.getDb(), monitorId)),
             "history-latest-entry",
             undefined,
             { monitorId }
@@ -406,9 +408,9 @@ export class HistoryRepository {
         if (limit <= 0) return;
 
         await withDatabaseOperation(
-            async () => {
+            () =>
                 // Use executeTransaction for atomic multi-monitor operation
-                await this.databaseService.executeTransaction(async (db) => {
+                this.databaseService.executeTransaction((db) => {
                     // Type assertion is safe: SQL query "SELECT id FROM
                     // monitors" guarantees { id: number } structure
                     /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Database queries return known structures from controlled SQL */
@@ -442,8 +444,8 @@ export class HistoryRepository {
                             }
                         }
                     }
-                });
-            },
+                    return Promise.resolve();
+                }),
             "history-prune-all",
             undefined,
             { limit }
@@ -471,9 +473,9 @@ export class HistoryRepository {
      */
     public async pruneHistory(monitorId: string, limit: number): Promise<void> {
         return withDatabaseOperation(
-            async () => {
-                const db = this.getDb();
-                pruneHistoryForMonitor(db, monitorId, limit);
+            () => {
+                pruneHistoryForMonitor(this.getDb(), monitorId, limit);
+                return Promise.resolve();
             },
             "history-prune",
             undefined,

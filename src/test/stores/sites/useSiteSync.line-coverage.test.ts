@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
+import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -40,15 +41,18 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
-    StatusUpdateManager: vi.fn().mockImplementation(() => ({
-        subscribe: vi.fn(async () => ({
-            errors: [],
-            expectedListeners: 3,
-            listenersAttached: 3,
-            success: true,
-        })),
-        unsubscribe: vi.fn(),
-    })),
+    StatusUpdateManager: vi.fn().mockImplementation(
+        () =>
+            ({
+                subscribe: vi.fn(async () => ({
+                    errors: [],
+                    expectedListeners: 3,
+                    listenersAttached: 3,
+                    success: true,
+                })),
+                unsubscribe: vi.fn(),
+            }) as unknown as StatusUpdateManager
+    ),
 }));
 
 vi.mock("../../../types/ipc", () => ({
@@ -207,8 +211,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                     );
 
                     StatusUpdateManagerMock.mockReset();
-                    const unsubscribeSpies: ReturnType<typeof vi.fn>[] =
-                        [];
+                    const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
                     StatusUpdateManagerMock.mockImplementation(() => {
                         const unsubscribe = vi.fn();
                         unsubscribeSpies.push(unsubscribe);
@@ -221,7 +224,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                                 success: true,
                             })),
                             unsubscribe,
-                        };
+                        } as unknown as StatusUpdateManager;
                     });
 
                     const callback = vi.fn();
@@ -264,11 +267,11 @@ describe("useSiteSync - Line Coverage Completion", () => {
                     throw testError;
                 }),
                 unsubscribe: vi.fn(),
-            };
+            } as unknown as StatusUpdateManager;
 
             vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(() => mockStatusUpdateManager as any);
+            ).mockImplementation(() => mockStatusUpdateManager);
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

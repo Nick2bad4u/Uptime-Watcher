@@ -13,12 +13,14 @@ import type { SettingsStore } from "./types";
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { logStoreAction } from "../utils";
 
+const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
+
 /**
  * Default application settings applied during initialization.
  */
 export const defaultSettings: AppSettings = {
     autoStart: false,
-    historyLimit: DEFAULT_HISTORY_LIMIT,
+    historyLimit: DEFAULT_SETTINGS_HISTORY_LIMIT,
     minimizeToTray: true,
     notifications: true,
     soundAlerts: false,
@@ -42,7 +44,7 @@ export const createSettingsStateSlice = (
     setState: SettingsStoreSetter
 ): Pick<SettingsStore, "settings" | "updateSettings"> => ({
     settings: { ...defaultSettings },
-    updateSettings: (newSettings) => {
+    updateSettings: (newSettings): void => {
         logStoreAction("SettingsStore", "updateSettings", {
             newSettings,
         });

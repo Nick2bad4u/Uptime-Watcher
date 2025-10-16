@@ -454,7 +454,7 @@ function isMonitorConfigOfType<T extends MonitorConfig>(
     config: MonitorConfig | null | undefined,
     type: T["type"]
 ): config is T {
-    return config !== null && config !== undefined && config.type === type;
+    return config?.type === type;
 }
 
 /**
@@ -470,7 +470,7 @@ function isMonitorConfigOfType<T extends MonitorConfig>(
 export function isHttpMonitorConfig(
     config: MonitorConfig | null | undefined
 ): config is HttpMonitorConfig {
-    return config !== null && config !== undefined && config.type === "http";
+    return config?.type === "http";
 }
 
 /**
@@ -486,7 +486,7 @@ export function isHttpMonitorConfig(
 export function isPingMonitorConfig(
     config: MonitorConfig | null | undefined
 ): config is PingMonitorConfig {
-    return config !== null && config !== undefined && config.type === "ping";
+    return config?.type === "ping";
 }
 
 /**
@@ -502,7 +502,7 @@ export function isPingMonitorConfig(
 export function isPortMonitorConfig(
     config: MonitorConfig | null | undefined
 ): config is PortMonitorConfig {
-    return config !== null && config !== undefined && config.type === "port";
+    return config?.type === "port";
 }
 
 /**
@@ -518,7 +518,7 @@ export function isPortMonitorConfig(
 export function isSslMonitorConfig(
     config: MonitorConfig | null | undefined
 ): config is SslMonitorConfig {
-    return config !== null && config !== undefined && config.type === "ssl";
+    return config?.type === "ssl";
 }
 
 /**

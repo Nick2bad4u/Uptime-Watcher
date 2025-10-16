@@ -3,7 +3,7 @@
  * component behavior and interface structure
  */
 
-import { render, screen, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
     describe,
@@ -354,9 +354,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const existingModeRadio = screen.getByRole("radio", {
                 name: /add to existing site/i,
             });
-            await act(async () => {
-                await user.click(existingModeRadio);
-            });
+            await user.click(existingModeRadio);
 
             expect(mockFormHook.setAddMode).toHaveBeenCalledWith("existing");
         });
@@ -414,9 +412,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const nameInput = screen.getByRole("textbox", {
                 name: /site name/i,
             });
-            await act(async () => {
-                await user.type(nameInput, "Test");
-            });
+            await user.type(nameInput, "Test");
 
             // UserEvent.type calls the setter for each character
             expect(mockFormHook.setName).toHaveBeenCalledTimes(4);
@@ -447,9 +443,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const monitorTypeSelect = screen.getByRole("combobox", {
                 name: /monitor type/i,
             });
-            await act(async () => {
-                await user.selectOptions(monitorTypeSelect, "port");
-            });
+            await user.selectOptions(monitorTypeSelect, "port");
 
             expect(mockFormHook.setMonitorType).toHaveBeenCalledWith("port");
         });
@@ -475,9 +469,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const checkIntervalSelect = screen.getByRole("combobox", {
                 name: /check interval/i,
             });
-            await act(async () => {
-                await user.selectOptions(checkIntervalSelect, "300000");
-            });
+            await user.selectOptions(checkIntervalSelect, "300000");
 
             expect(mockFormHook.setCheckInterval).toHaveBeenCalledWith(300_000);
         });
@@ -623,9 +615,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             });
             const specialText = "Test & Special";
 
-            await act(async () => {
-                await user.type(nameInput, specialText);
-            });
+            await user.type(nameInput, specialText);
 
             // Verify character-by-character calls (userEvent.type behavior)
             expect(mockFormHook.setName).toHaveBeenCalledTimes(
@@ -684,15 +674,11 @@ describe("AddSiteForm Comprehensive Tests", () => {
             });
 
             // Focus on name input and verify
-            await act(async () => {
-                nameInput.focus();
-            });
+            nameInput.focus();
             expect(nameInput).toHaveFocus();
 
             // Tab to monitor type select
-            await act(async () => {
-                await user.tab();
-            });
+            await user.tab();
             expect(monitorTypeSelect).toHaveFocus();
         });
     });

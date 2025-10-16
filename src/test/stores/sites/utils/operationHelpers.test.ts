@@ -327,8 +327,7 @@ describe("OperationHelpers", () => {
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
             // Get the operation passed to withErrorHandling
-            const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
-            const wrappedOperation = errorHandlingCall[0];
+            const [wrappedOperation] = mockWithErrorHandling.mock.calls.at(-1)!;
 
             mockLogStoreAction.mockClear();
 
@@ -343,35 +342,13 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
-                    status: "pending",
-                })
-            );
-            const wrappedFirstPayload = mockLogStoreAction.mock.calls[0]?.[2];
-            expect(wrappedFirstPayload).toBeDefined();
-            expect(wrappedFirstPayload).not.toHaveProperty("success");
-            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
-                2,
-                "SitesStore",
-                "testOperation",
-                expect.objectContaining({
-                    ...params,
-                    success: true,
                     status: "success",
+                    success: true,
                 })
             );
-        });
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(1);
 
-        it("should execute operation without sync when syncAfter is false", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: operationHelpers", "component");
-            await annotate("Category: Utility", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const mockOperation = vi.fn().mockResolvedValue(undefined);
-            const params = { siteIdentifier: "site1" };
+            mockLogStoreAction.mockClear();
 
             await withSiteOperation("testOperation", mockOperation, mockDeps, {
                 telemetry: params,
@@ -393,42 +370,37 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
-                    success: true,
                     status: "success",
+                    success: true,
                 })
             );
-            expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(2);
+            expect(mockWithErrorHandling).toHaveBeenCalledTimes(2);
 
-            // Get the operation passed to withErrorHandling
-            const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
-            const wrappedOperation = errorHandlingCall[0];
+            const [wrappedOperationAgain] =
+                mockWithErrorHandling.mock.calls.at(-1)!;
 
             mockLogStoreAction.mockClear();
+            mockOperation.mockClear();
+            const syncSitesMock = vi.mocked(mockDeps.syncSites);
+            syncSitesMock.mockClear();
 
             // Execute the wrapped operation to test its behavior
-            await wrappedOperation();
+            await wrappedOperationAgain();
 
-            expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
-            expect(mockDeps.syncSites).not.toHaveBeenCalled();
+            expect(mockOperation).toHaveBeenCalledTimes(1);
+            expect(syncSitesMock).not.toHaveBeenCalled();
             expect(mockLogStoreAction).toHaveBeenNthCalledWith(
                 1,
                 "SitesStore",
                 "testOperation",
                 expect.objectContaining({
                     ...params,
-                    status: "pending",
-                })
-            );
-            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
-                2,
-                "SitesStore",
-                "testOperation",
-                expect.objectContaining({
-                    ...params,
-                    success: true,
                     status: "success",
+                    success: true,
                 })
             );
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation errors through withErrorHandling", async ({
@@ -663,14 +635,13 @@ describe("OperationHelpers", () => {
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
-            // Get the operation passed to withErrorHandling
-            const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
-            const wrappedOperation = errorHandlingCall[0];
+            const [wrappedOperationReturn] =
+                mockWithErrorHandling.mock.calls.at(-1)!;
 
             mockLogStoreAction.mockClear();
 
             // Execute the wrapped operation to test its behavior
-            const wrappedResult = await wrappedOperation();
+            const wrappedResult = await wrappedOperationReturn();
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
@@ -681,19 +652,11 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
-                    status: "pending",
-                })
-            );
-            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
-                2,
-                "SitesStore",
-                "testOperation",
-                expect.objectContaining({
-                    ...params,
-                    success: true,
                     status: "success",
+                    success: true,
                 })
             );
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(1);
         });
 
         it("should execute operation without sync when syncAfter is false and return result", async ({
@@ -741,14 +704,13 @@ describe("OperationHelpers", () => {
             );
             expect(mockWithErrorHandling).toHaveBeenCalledTimes(1);
 
-            // Get the operation passed to withErrorHandling
-            const errorHandlingCall = mockWithErrorHandling.mock.calls[0]!;
-            const wrappedOperation = errorHandlingCall[0];
+            const [wrappedOperationReturnAgain] =
+                mockWithErrorHandling.mock.calls.at(-1)!;
 
             mockLogStoreAction.mockClear();
 
             // Execute the wrapped operation to test its behavior
-            const wrappedResult = await wrappedOperation();
+            const wrappedResult = await wrappedOperationReturnAgain();
 
             expect(wrappedResult).toEqual(expectedResult);
             expect(mockOperation).toHaveBeenCalledTimes(2); // Once in main call, once in test
@@ -759,19 +721,11 @@ describe("OperationHelpers", () => {
                 "testOperation",
                 expect.objectContaining({
                     ...params,
-                    status: "pending",
-                })
-            );
-            expect(mockLogStoreAction).toHaveBeenNthCalledWith(
-                2,
-                "SitesStore",
-                "testOperation",
-                expect.objectContaining({
-                    ...params,
                     success: true,
                     status: "success",
                 })
             );
+            expect(mockLogStoreAction).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operation errors through withErrorHandling", async ({

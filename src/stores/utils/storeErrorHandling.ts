@@ -53,10 +53,10 @@ export function createStoreErrorHandler(
         clearError: (): void => {
             errorStore.clearStoreError(storeKey);
         },
-        setError: (error): void => {
+        setError: (error: string | undefined): void => {
             errorStore.setStoreError(storeKey, error);
         },
-        setLoading: (loading): void => {
+        setLoading: (loading: boolean): void => {
             errorStore.setOperationLoading(operationName, loading);
         },
     };

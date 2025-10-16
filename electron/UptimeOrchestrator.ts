@@ -79,7 +79,10 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
-import { ApplicationError } from "@shared/utils/errorHandling";
+import {
+    ApplicationError,
+    type ApplicationErrorOptions,
+} from "@shared/utils/errorHandling";
 
 import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
@@ -621,7 +624,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         try {
             return await operation();
         } catch (error) {
-            this.throwWithContext({ ...options, error });
+            throw this.createContextualError({
+                ...options,
+                cause: error,
+            });
         }
     }
 
@@ -664,13 +670,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 }
             }
 
-            this.throwWithContext({
+            throw this.createContextualError({
+                cause: error,
                 code: "ORCHESTRATOR_ADD_SITE_FAILED",
                 details: {
-                    monitorCount: siteData.monitors?.length ?? 0,
+                    monitorCount: siteData.monitors.length,
                     siteIdentifier: siteData.identifier,
                 },
-                error,
                 message: `Failed to add site ${siteData.identifier}`,
                 operation: "orchestrator.addSite",
             });
@@ -792,9 +798,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 "[UptimeOrchestrator] Initialization completed successfully"
             );
         } catch (error) {
-            this.throwWithContext({
+            throw this.createContextualError({
+                cause: error,
                 code: "ORCHESTRATOR_INITIALIZE_FAILED",
-                error,
                 message: "Failed to initialize orchestrator",
                 operation: "orchestrator.initialize",
             });
@@ -960,9 +966,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             logger.info("[UptimeOrchestrator] Shutdown completed successfully");
         } catch (error) {
-            this.throwWithContext({
+            throw this.createContextualError({
+                cause: error,
                 code: "ORCHESTRATOR_SHUTDOWN_FAILED",
-                error,
                 message: "Failed to shut down orchestrator",
                 operation: "orchestrator.shutdown",
             });
@@ -985,8 +991,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         siteIdentifier: string,
         monitorId: string
     ): Promise<boolean> {
-        let monitoringStopped: boolean | undefined;
-        let databaseRemoved: boolean | undefined;
+        let monitoringStopped = false;
+        let databaseRemoved = false;
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
@@ -1054,7 +1060,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             return false;
         } catch (error) {
-            this.throwWithContext({
+            throw this.createContextualError({
+                cause: error,
                 code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
                 details: {
                     databaseRemoved,
@@ -1062,7 +1069,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitoringStopped,
                     siteIdentifier,
                 },
-                error,
                 message: `Failed to remove monitor ${siteIdentifier}/${monitorId}`,
                 operation: "orchestrator.removeMonitor",
             });
@@ -1097,8 +1103,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
         }
 
-        let monitoringStopped: boolean | undefined;
-        let siteRemoved: boolean | undefined;
+        let monitoringStopped = false;
+        let siteRemoved = false;
 
         try {
             monitoringStopped =
@@ -1158,7 +1164,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
             return false;
         } catch (error) {
-            this.throwWithContext({
+            throw this.createContextualError({
+                cause: error,
                 code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
                 details: {
                     activeMonitorIds,
@@ -1166,7 +1173,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     siteIdentifier: identifier,
                     siteRemoved,
                 },
-                error,
                 message: `Failed to remove site ${identifier}`,
                 operation: "orchestrator.removeSite",
             });
@@ -1438,40 +1444,41 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
-     * Throw an {@link ApplicationError} with standardized logging.
+     * Build an {@link ApplicationError} with standardized logging context.
      */
-    private throwWithContext(options: {
+    private createContextualError(options: {
+        cause: unknown;
         code: string;
         details?: Record<string, unknown>;
-        error: unknown;
         message: string;
         operation: string;
-    }): never {
-        const appError = new ApplicationError({
-            cause: options.error,
-            code: options.code,
-            details: options.details,
-            message: options.message,
-            operation: options.operation,
-        });
+    }): ApplicationError {
+        const { cause, code, details, message, operation } = options;
+
+        const errorOptions: ApplicationErrorOptions = {
+            cause,
+            code,
+            message,
+            operation,
+            ...(details ? { details } : {}),
+        };
+
+        const appError = new ApplicationError(errorOptions);
 
         logger.error(appError.message, {
-            code: options.code,
-            details: options.details,
-            error: options.error,
-            operation: options.operation,
+            code,
+            details,
+            error: cause,
+            operation,
         });
 
-        diagnosticsLogger.error(
-            `[UptimeOrchestrator] ${options.operation} failed`,
-            {
-                code: options.code,
-                details: options.details,
-                error: appError,
-            }
-        );
+        diagnosticsLogger.error(`[UptimeOrchestrator] ${operation} failed`, {
+            code,
+            details,
+            error: appError,
+        });
 
-        throw appError;
+        return appError;
     }
 
     // Named event handlers for database events

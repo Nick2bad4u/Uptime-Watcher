@@ -1,25 +1,13 @@
-import type { Site } from "@shared/types";
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventChannel,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
+import { ensureError } from "@shared/utils/errorHandling";
 
-import type { UptimeEvents } from "../../events/eventTypes";
 import type { WindowService } from "../window/WindowService";
 
 import { logger } from "../../utils/logger";
-
-/**
- * Map of renderer IPC channels to their payload contracts.
- *
- * @public
- */
-export interface RendererEventMap {
-    /**
-     * Global state synchronization payload emitted to keep renderer stores in
-     * sync.
-     */
-    "state-sync-event": UptimeEvents["sites:state-synchronized"] & {
-        /** Snapshot of all sites included in the synchronization. */
-        sites: Site[];
-    };
-}
 
 /**
  * Bridges typed backend events to renderer processes via IPC.
@@ -43,41 +31,48 @@ export class RendererEventBridge {
      * @param channel - Renderer IPC channel to target.
      * @param payload - Channel payload to dispatch.
      */
-    public sendToRenderers<Channel extends keyof RendererEventMap>(
+    public sendToRenderers<Channel extends RendererEventChannel>(
         channel: Channel,
-        payload: RendererEventMap[Channel]
+        payload: RendererEventPayload<Channel>
     ): void {
         const windows = this.windowService.getAllWindows();
+        const windowCount = windows.length;
 
-        if (windows.length === 0) {
+        if (windowCount === 0) {
             logger.debug(
                 `[RendererEventBridge] Skipping broadcast for ${channel} (no active windows)`
             );
             return;
         }
 
-        for (const window of windows) {
+        windows.forEach((window, index) => {
             if (window.isDestroyed()) {
                 logger.debug(
                     `[RendererEventBridge] Skipping destroyed window for channel ${channel}`
                 );
-            } else {
-                try {
-                    window.webContents.send(channel, payload);
-                } catch (error) {
-                    logger.error(
-                        `[RendererEventBridge] Failed to broadcast ${channel} to renderer`,
-                        error
-                    );
-                }
+                return;
             }
-        }
 
-        const dispatchProgress = Math.round((index / windowCount) * 100);
-        logger.debug(`[RendererEventBridge] Broadcasted ${channel} to window`, {
-            index: index + 1,
-            progressPercentage: dispatchProgress,
-            windowCount,
+            try {
+                window.webContents.send(channel, payload);
+                const progressPercentage = Math.round(
+                    ((index + 1) / windowCount) * 100
+                );
+                logger.debug(
+                    `[RendererEventBridge] Broadcasted ${channel} to window`,
+                    {
+                        index: index + 1,
+                        progressPercentage,
+                        windowCount,
+                    }
+                );
+            } catch (rawError) {
+                const error = ensureError(rawError);
+                logger.error(
+                    `[RendererEventBridge] Failed to broadcast ${channel} to renderer`,
+                    error
+                );
+            }
         });
     }
 
@@ -87,8 +82,8 @@ export class RendererEventBridge {
      * @param payload - State synchronization payload to broadcast.
      */
     public sendStateSyncEvent(
-        payload: RendererEventMap["state-sync-event"]
+        payload: RendererEventPayload<typeof RENDERER_EVENT_CHANNELS.STATE_SYNC>
     ): void {
-        this.sendToRenderers("state-sync-event", payload);
+        this.sendToRenderers(RENDERER_EVENT_CHANNELS.STATE_SYNC, payload);
     }
 }

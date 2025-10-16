@@ -4,7 +4,7 @@
  * Targets uncovered line 72 in the openExternal call
  */
 
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -155,9 +155,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
 
             const link = screen.getByRole("link");
-            await act(async () => {
-                await user.click(link);
-            });
+            await user.click(link);
 
             // Verify openExternal was called with correct URL (targeting line 72)
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
@@ -283,9 +281,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
 
             const link = screen.getByRole("link");
-            await act(async () => {
-                await user.click(link);
-            });
+            await user.click(link);
 
             // Verify openExternal was called with correct URL (targeting line 72)
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
@@ -327,9 +323,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
             );
 
             const link = screen.getByRole("link");
-            await act(async () => {
-                await user.click(link);
-            });
+            await user.click(link);
 
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
             expect(mockOpenExternal).toHaveBeenCalledWith(
@@ -400,9 +394,7 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
                 name: /collapse header/i,
             });
 
-            await act(async () => {
-                await user.click(collapseButton);
-            });
+            await user.click(collapseButton);
 
             expect(mockToggleHeaderCollapsed).toHaveBeenCalledTimes(1);
             expect(mockToggleHeaderCollapsed).toHaveBeenCalledWith(

@@ -11,6 +11,7 @@ import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import type { Site, Monitor, StatusUpdate } from "../../shared/types.js";
+import { ApplicationError } from "../../shared/utils/errorHandling.js";
 
 // Mock all dependencies with proper typing
 const mockDatabaseManager = {
@@ -182,9 +183,17 @@ describe(UptimeOrchestrator, () => {
                 new Error("Init failed")
             );
 
-            await expect(orchestrator.initialize()).rejects.toThrow(
-                "Init failed"
-            );
+            const error = (await orchestrator
+                .initialize()
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_INITIALIZE_FAILED",
+                message: "Failed to initialize orchestrator",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Init failed");
         });
 
         it("should validate initialization and throw for missing database manager method", async ({
@@ -346,9 +355,17 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.setupSiteForMonitoring
             ).mockRejectedValueOnce(new Error("Setup failed"));
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
-                "Setup failed"
-            );
+            const error = (await orchestrator
+                .addSite(testSite)
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_ADD_SITE_FAILED",
+                message: "Failed to add site test-site",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Setup failed");
 
             expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
                 testSite.identifier
@@ -371,9 +388,17 @@ describe(UptimeOrchestrator, () => {
                 new Error("Cleanup failed")
             );
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
-                "Setup failed"
-            );
+            const error = (await orchestrator
+                .addSite(testSite)
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_ADD_SITE_FAILED",
+                message: "Failed to add site test-site",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Setup failed");
 
             expect(mockSiteManager.removeSite).toHaveBeenCalledWith(
                 testSite.identifier
@@ -466,7 +491,17 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.startMonitoringForSite
             ).mockResolvedValueOnce(false);
 
-            await expect(orchestrator.removeSite("test-site")).rejects.toThrow(
+            const error = (await orchestrator
+                .removeSite("test-site")
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_REMOVE_SITE_FAILED",
+                message: "Failed to remove site test-site",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toMatch(
                 /Critical state inconsistency/
             );
         });
@@ -723,10 +758,17 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.startMonitoringForSite
             ).mockRejectedValueOnce(new Error("Restart failed"));
 
-            // This should throw a critical state inconsistency error
-            await expect(
-                orchestrator.removeMonitor("test-site", "monitor-1")
-            ).rejects.toThrow(
+            const error = (await orchestrator
+                .removeMonitor("test-site", "monitor-1")
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
+                message: "Failed to remove monitor test-site/monitor-1",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe(
                 "Critical state inconsistency: Monitor test-site/monitor-1 stopped but database removal failed and restart failed"
             );
         });
@@ -744,9 +786,17 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.stopMonitoringForSite
             ).mockRejectedValueOnce(new Error("Stop failed"));
 
-            await expect(
-                orchestrator.removeMonitor("test-site", "monitor-1")
-            ).rejects.toThrow("Stop failed");
+            const error = (await orchestrator
+                .removeMonitor("test-site", "monitor-1")
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
+                message: "Failed to remove monitor test-site/monitor-1",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Stop failed");
         });
     });
 
@@ -1791,9 +1841,17 @@ describe(UptimeOrchestrator, () => {
                 new Error("Database error")
             );
 
-            await expect(orchestrator.exportData()).rejects.toThrow(
-                "Database error"
-            );
+            const error = (await orchestrator
+                .exportData()
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_EXPORT_DATA_FAILED",
+                message: "Failed to export application data",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Database error");
         });
 
         it("should handle monitor manager errors", async ({
@@ -1809,9 +1867,17 @@ describe(UptimeOrchestrator, () => {
                 mockMonitorManager.checkSiteManually
             ).mockRejectedValueOnce(new Error("Monitor error"));
 
-            await expect(
-                orchestrator.checkSiteManually("test-site")
-            ).rejects.toThrow("Monitor error");
+            const error = (await orchestrator
+                .checkSiteManually("test-site")
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_MANUAL_CHECK_FAILED",
+                message: "Failed to run manual check for site test-site",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Monitor error");
         });
 
         it("should handle site manager errors", async ({ task, annotate }) => {
@@ -1831,9 +1897,17 @@ describe(UptimeOrchestrator, () => {
                 monitoring: true,
             };
 
-            await expect(orchestrator.addSite(testSite)).rejects.toThrow(
-                "Site error"
-            );
+            const error = (await orchestrator
+                .addSite(testSite)
+                .catch((error_) => error_)) as ApplicationError;
+
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_ADD_SITE_FAILED",
+                message: "Failed to add site test-site",
+            });
+            expect(error.cause).toBeInstanceOf(Error);
+            expect((error.cause as Error).message).toBe("Site error");
         });
     });
 });

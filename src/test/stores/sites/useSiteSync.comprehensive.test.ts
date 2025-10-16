@@ -6,6 +6,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
+import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 // Mock all the dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
@@ -44,16 +45,19 @@ vi.mock("../../../stores/sites/services/SiteService", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
-    StatusUpdateManager: vi.fn().mockImplementation(() => ({
-        getExpectedListenerCount: vi.fn(() => 3),
-        subscribe: vi.fn(async () => ({
-            errors: [],
-            expectedListeners: 3,
-            listenersAttached: 3,
-            success: true,
-        })),
-        unsubscribe: vi.fn(),
-    })),
+    StatusUpdateManager: vi.fn().mockImplementation(
+        () =>
+            ({
+                getExpectedListenerCount: vi.fn(() => 3),
+                subscribe: vi.fn(async () => ({
+                    errors: [],
+                    expectedListeners: 3,
+                    listenersAttached: 3,
+                    success: true,
+                })),
+                unsubscribe: vi.fn(),
+            }) as unknown as StatusUpdateManager
+    ),
 }));
 
 const mockStateSyncService = vi.hoisted(() => ({
@@ -247,7 +251,7 @@ describe("useSiteSync", () => {
                     throw new Error("Subscribe failed");
                 }),
                 unsubscribe: vi.fn(),
-            } as any; // Use any to bypass type checking for test mock
+            } as unknown as StatusUpdateManager;
 
             vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
@@ -292,7 +296,7 @@ describe("useSiteSync", () => {
                         success: true,
                     })),
                     unsubscribe,
-                };
+                } as unknown as StatusUpdateManager;
             });
 
             const callback = vi.fn();

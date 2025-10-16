@@ -25,13 +25,7 @@
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import {
-    render,
-    screen,
-    fireEvent,
-    waitFor,
-    act,
-} from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import type { MonitorType, Site } from "../../../../shared/types";
@@ -927,23 +921,22 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 // Should not crash during form interaction
                 expect(async () => {
                     // Set mode - use query to handle missing elements
-                    const modeRadio = screen.queryByDisplayValue(formData.mode);
+                    const modeRadios = screen.queryAllByDisplayValue(
+                        formData.mode
+                    );
+                    const modeRadio = modeRadios[0];
                     if (modeRadio) {
-                        await act(async () => {
-                            await user.click(modeRadio);
-                        });
+                        await user.click(modeRadio);
                     }
 
                     // Set monitor type - use query to handle missing elements
                     const monitorTypeSelect =
                         screen.queryByLabelText(/monitor type/i);
                     if (monitorTypeSelect) {
-                        await act(async () => {
-                            await user.selectOptions(
-                                monitorTypeSelect,
-                                formData.monitorType
-                            );
-                        });
+                        await user.selectOptions(
+                            monitorTypeSelect,
+                            formData.monitorType
+                        );
                     }
 
                     // Fill in fields based on monitor type and mode

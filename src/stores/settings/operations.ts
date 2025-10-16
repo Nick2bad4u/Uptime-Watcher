@@ -113,14 +113,14 @@ export const createSettingsOperationsSlice = (
                 clearError: () => {
                     useErrorStore.getState().clearStoreError("settings");
                 },
-                setError: (error) => {
+                setError: (error: string | undefined) => {
                     const errorStore = useErrorStore.getState();
                     errorStore.setStoreError("settings", error);
                     getState().updateSettings({
                         historyLimit: currentSettings.historyLimit,
                     });
                 },
-                setLoading: (loading) => {
+                setLoading: (loading: boolean) => {
                     useErrorStore
                         .getState()
                         .setOperationLoading("updateHistoryLimit", loading);
