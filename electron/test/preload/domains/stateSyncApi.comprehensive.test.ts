@@ -55,11 +55,21 @@ const buildStateSyncEventData = (
     timestamp: number,
     siteIdentifier: string | null
 ): StateSyncEventData => {
+    const baseEvent: StateSyncEventData = {
+        action,
+        sites: [],
+        source,
+        timestamp,
+    };
+
     if (siteIdentifier === null) {
-        return { action, source, timestamp };
+        return baseEvent;
     }
 
-    return { action, source, timestamp, siteIdentifier };
+    return {
+        ...baseEvent,
+        siteIdentifier,
+    };
 };
 
 describe("State Sync Domain API", () => {
@@ -278,6 +288,7 @@ describe("State Sync Domain API", () => {
 
             const validEventData: StateSyncEventData = {
                 action: "update",
+                sites: [],
                 source: "database",
                 timestamp: Date.now(),
                 siteIdentifier: "test-site",
@@ -333,6 +344,7 @@ describe("State Sync Domain API", () => {
             for (const action of actions) {
                 const eventData: StateSyncEventData = {
                     action,
+                    sites: [],
                     source: "database",
                     timestamp: Date.now(),
                 };
@@ -365,6 +377,7 @@ describe("State Sync Domain API", () => {
             for (const source of sources) {
                 const eventData: StateSyncEventData = {
                     action: "update",
+                    sites: [],
                     source,
                     timestamp: Date.now(),
                 };
@@ -636,6 +649,7 @@ describe("State Sync Domain API", () => {
 
             const syncEvent: StateSyncEventData = {
                 action: "bulk-sync",
+                sites: [],
                 source: "database",
                 timestamp: Date.now(),
                 siteIdentifier: "new-site",
@@ -784,6 +798,7 @@ describe("State Sync Domain API", () => {
 
             const validEventData: StateSyncEventData = {
                 action: "update",
+                sites: [],
                 source: "database",
                 timestamp: Date.now(),
             };
@@ -811,6 +826,7 @@ describe("State Sync Domain API", () => {
                 { length: 100 },
                 (_, i) => ({
                     action: "update",
+                    sites: [],
                     source: "database",
                     timestamp: Date.now() + i,
                     siteIdentifier: `rapid-${i}`,

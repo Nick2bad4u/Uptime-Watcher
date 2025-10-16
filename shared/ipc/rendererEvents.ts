@@ -9,7 +9,6 @@
  * mutations.
  */
 
-import type { Site } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -74,7 +73,7 @@ export interface RendererEventPayloadMap {
         reason: "error" | "shutdown" | "user";
     };
     /** Payload for full state synchronisation broadcasts. */
-    "state-sync-event": StateSyncEventData & { sites: Site[] };
+    "state-sync-event": StateSyncEventData;
     /** Payload for development/test events. */
     "test-event": TestEventData;
     /** Payload for auto-updater status notifications. */

@@ -307,7 +307,7 @@ export default function SystemArchitecture() {
     end
 
     subgraph FrontendSync["Renderer Sync"]
-        WindowSvc[WindowService.sendToRenderer]
+        RendererBridge[RendererEventBridge.sendToRenderers]
         EventsAPI[electronAPI.events.on...]
         SiteStore[useSiteSync & sites store]
     end
@@ -326,7 +326,7 @@ export default function SystemArchitecture() {
     CheckerStart -->|start monitoring events| EventBus
     EventBus --> AppSvc
     AppSvc --> Notify
-    AppSvc --> WindowSvc
+    AppSvc --> RendererBridge
     SitesCache -->|cache-updated| EventBus
     WindowSvc -->|ipcRenderer.send| EventsAPI
     EventsAPI -->|dispatch cache/monitor events| SiteStore

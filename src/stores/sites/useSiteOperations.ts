@@ -8,6 +8,7 @@
  * @packageDocumentation
  */
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, MonitorType, Site } from "@shared/types";
 
 import { isDevelopment } from "@shared/utils/environment";
@@ -136,7 +137,7 @@ export const createSiteOperationsActions = (
                     identifier: siteData.identifier,
                     monitoring: siteData.monitoring ?? true, // Default to monitoring enabled
                     monitors,
-                    name: siteData.name ?? "Unnamed Site", // Provide default name
+                    name: siteData.name ?? DEFAULT_SITE_NAME,
                 };
 
                 // Preload now returns extracted data directly
@@ -201,7 +202,7 @@ export const createSiteOperationsActions = (
             async () => {
                 try {
                     await handleSQLiteBackupDownload(() =>
-                        deps.services.site.downloadSqliteBackup()
+                        deps.services.data.downloadSqliteBackup()
                     );
                 } catch (error) {
                     const resolvedError = ensureError(error);

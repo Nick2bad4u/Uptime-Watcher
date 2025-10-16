@@ -333,83 +333,6 @@ describe(WindowService, () => {
         });
     });
 
-    describe("sendToRenderer", () => {
-        it("should send message to renderer when window exists", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const window = windowService.createMainWindow();
-            vi.mocked(window.isDestroyed).mockReturnValue(false);
-
-            windowService.sendToRenderer("test-channel", { data: "test" });
-
-            expect(logger.debug).toHaveBeenCalledWith(
-                "[WindowService] Sending to renderer: test-channel"
-            );
-            expect(window.webContents.send).toHaveBeenCalledWith(
-                "test-channel",
-                { data: "test" }
-            );
-        });
-
-        it("should send message without data", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const window = windowService.createMainWindow();
-            vi.mocked(window.isDestroyed).mockReturnValue(false);
-
-            windowService.sendToRenderer("test-channel");
-
-            expect(window.webContents.send).toHaveBeenCalledWith(
-                "test-channel",
-                undefined
-            );
-        });
-
-        it("should log warning when no window exists", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            windowService.sendToRenderer("test-channel", { data: "test" });
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                "[WindowService] Cannot send to renderer (no main window): test-channel"
-            );
-        });
-
-        it("should log warning when window is destroyed", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const window = windowService.createMainWindow();
-            vi.mocked(window.isDestroyed).mockReturnValue(true);
-
-            windowService.sendToRenderer("test-channel");
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                "[WindowService] Cannot send to renderer (no main window): test-channel"
-            );
-        });
-    });
-
     describe("getAllWindows", () => {
         it("should return all browser windows", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -849,25 +772,6 @@ describe(WindowService, () => {
     });
 
     describe("edge cases", () => {
-        it("should handle null window in sendToRenderer safety check", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: WindowService", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            windowService.createMainWindow();
-            (windowService as any).mainWindow = null;
-
-            windowService.sendToRenderer("test");
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                "[WindowService] Cannot send to renderer (no main window): test"
-            );
-        });
-
         it("should handle destroyed window in ready-to-show event", async ({
             task,
             annotate,

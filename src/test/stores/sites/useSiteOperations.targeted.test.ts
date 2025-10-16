@@ -159,11 +159,14 @@ describe("useSiteOperations - Targeted Coverage", () => {
             mockSiteWithSingleMonitor,
         ]);
 
-        siteService = {
-            addSite: vi.fn(async (site: Site) => site),
+        const dataService = {
             downloadSqliteBackup: vi.fn(async () =>
                 mockElectronAPI.data.downloadSqliteBackup()
             ),
+        };
+
+        siteService = {
+            addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => getSitesFn()),
             removeMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) => {
@@ -222,6 +225,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
+                data: dataService,
                 monitoring: monitoringService,
                 site: siteService,
             },

@@ -986,7 +986,7 @@
     "stylelint-codeframe-formatter": "^1.2.0",
     "stylelint-config-alphabetical-order": "^1.0.0",
     "stylelint-config-idiomatic-order": "^10.0.0",
-    "stylelint-config-recess-order": "^7.3.0",
+    "stylelint-config-recess-order": "^7.4.0",
     "stylelint-config-recommended": "^17.0.0",
     "stylelint-config-sass-guidelines": "^12.1.0",
     "stylelint-config-standard": "^39.0.1",

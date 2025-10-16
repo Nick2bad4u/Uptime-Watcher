@@ -10,12 +10,26 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
-
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
 import { logger } from "../logger";
+
+type CacheEventName =
+    | "internal:cache:all-invalidated"
+    | "internal:cache:bulk-updated"
+    | "internal:cache:cleanup-completed"
+    | "internal:cache:cleared"
+    | "internal:cache:item-cached"
+    | "internal:cache:item-deleted"
+    | "internal:cache:item-evicted"
+    | "internal:cache:item-expired"
+    | "internal:cache:item-invalidated";
+
+type CacheEventPayload<EventName extends CacheEventName> = Omit<
+    UptimeEvents[EventName],
+    "cacheName" | "timestamp"
+>;
 
 /**
  * Cache configuration.
@@ -394,14 +408,19 @@ export class StandardizedCache<T> {
     /**
      * Emit cache event if event emitter is configured.
      */
-    private emitEvent(eventType: string, data: UnknownRecord): void {
-        if (this.config.eventEmitter) {
-            this.config.eventEmitter.emit(eventType, {
-                cacheName: this.config.name,
-                timestamp: Date.now(),
-                ...data,
-            });
+    private emitEvent<EventName extends CacheEventName>(
+        eventType: EventName,
+        data: CacheEventPayload<EventName>
+    ): void {
+        if (!this.config.eventEmitter) {
+            return;
         }
+
+        this.config.eventEmitter.emitTyped(eventType, {
+            cacheName: this.config.name,
+            timestamp: Date.now(),
+            ...data,
+        });
     }
 
     /**

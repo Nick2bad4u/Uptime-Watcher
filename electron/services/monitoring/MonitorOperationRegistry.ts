@@ -235,11 +235,3 @@ export class MonitorOperationRegistry {
         return Boolean(operation && !operation.signal.aborted);
     }
 }
-
-/**
- * Singleton instance of the operation registry.
- *
- * @public
- */
-export const operationRegistry: MonitorOperationRegistry =
-    new MonitorOperationRegistry();

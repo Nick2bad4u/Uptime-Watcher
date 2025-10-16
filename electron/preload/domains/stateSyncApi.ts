@@ -74,7 +74,7 @@ const isStateSyncEventData = (data: unknown): data is StateSyncEventData => {
         return false;
     }
 
-    if (sites !== undefined && !Array.isArray(sites)) {
+    if (!Array.isArray(sites)) {
         return false;
     }
 

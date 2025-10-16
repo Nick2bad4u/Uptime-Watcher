@@ -328,9 +328,8 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
 
     Bus->>AppSvc: typed event handler invoked
     AppSvc->>Notify: notifyMonitorDown/Up(site, monitorId)
-    AppSvc->>WinSvc: sendToRenderer(channel, payload)
-
-    WinSvc->>Renderer: ipcRenderer.emit(channel, payload)
+    AppSvc->>RendererBridge: sendToRenderers(channel, payload)
+    RendererBridge->>Renderer: ipcRenderer.emit(channel, payload)
     Renderer->>Stores: apply status update & append history
     Stores->>UI: Re-render dashboards
 `} />

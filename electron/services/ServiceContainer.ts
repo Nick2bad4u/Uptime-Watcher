@@ -37,6 +37,7 @@ import { SiteRepository } from "./database/SiteRepository";
 import { RendererEventBridge } from "./events/RendererEventBridge";
 import { IpcService } from "./ipc/IpcService";
 import { EnhancedMonitoringServiceFactory } from "./monitoring/EnhancedMonitoringServiceFactory";
+import { MonitorOperationRegistry } from "./monitoring/MonitorOperationRegistry";
 import { NotificationService } from "./notifications/NotificationService";
 import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
@@ -218,6 +219,11 @@ export class ServiceContainer {
     private monitorManager?: MonitorManager;
 
     /**
+     * Singleton instance of {@link MonitorOperationRegistry}.
+     */
+    private monitorOperationRegistry?: MonitorOperationRegistry;
+
+    /**
      * Singleton instance of {@link MonitorRepository}.
      *
      * @internal
@@ -280,6 +286,18 @@ export class ServiceContainer {
      *
      * @returns The singleton {@link ServiceContainer} instance.
      */
+    private getMonitorOperationRegistry(): MonitorOperationRegistry {
+        if (!this.monitorOperationRegistry) {
+            this.monitorOperationRegistry = new MonitorOperationRegistry();
+            if (this.config.enableDebugLogging) {
+                logger.debug(
+                    "[ServiceContainer] Created MonitorOperationRegistry"
+                );
+            }
+        }
+        return this.monitorOperationRegistry;
+    }
+
     public static getInstance(
         config?: ServiceContainerConfig
     ): ServiceContainer {
@@ -573,6 +591,7 @@ export class ServiceContainer {
                         this.getDatabaseManager().getHistoryLimit(),
                     historyRepository: this.getHistoryRepository(),
                     monitorRepository: this.getMonitorRepository(),
+                    operationRegistry: this.getMonitorOperationRegistry(),
                     siteRepository: this.getSiteRepository(),
                     sites: getSitesCache(),
                 });

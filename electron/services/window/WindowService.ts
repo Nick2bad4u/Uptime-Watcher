@@ -25,8 +25,6 @@
  * const windowService = new WindowService();
  * const mainWindow = windowService.createMainWindow();
  *
- * windowService.sendToRenderer("status-update", { status: "up" });
- *
  * if (windowService.hasMainWindow()) {
  *     // Window operations...
  * }
@@ -422,23 +420,6 @@ export class WindowService {
      */
     public hasMainWindow(): boolean {
         return this.mainWindow !== null && !this.mainWindow.isDestroyed();
-    }
-
-    /**
-     * Send a message to the main window's renderer process.
-     *
-     * @param channel - IPC channel name
-     * @param data - Optional data to send
-     */
-    public sendToRenderer(channel: string, data?: unknown): void {
-        if (this.hasMainWindow()) {
-            logger.debug(`[WindowService] Sending to renderer: ${channel}`);
-            this.mainWindow?.webContents.send(channel, data);
-        } else {
-            logger.warn(
-                `[WindowService] Cannot send to renderer (no main window): ${channel}`
-            );
-        }
     }
 
     /**

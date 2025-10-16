@@ -387,45 +387,13 @@ describe("useSiteSync", () => {
             const bulkSyncEvent = {
                 action: "bulk-sync",
                 sites: mockSites,
-                source: "backend",
+                source: "database",
                 timestamp: Date.now(),
             };
 
             eventHandler(bulkSyncEvent);
 
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
-        });
-
-        it("should handle bulk-sync events without sites", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: useSiteSync", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Event Processing", "type");
-
-            let eventHandler: any;
-            mockStateSyncService.onStateSyncEvent.mockImplementation(
-                async (handler) => {
-                    eventHandler = handler;
-                    return vi.fn();
-                }
-            );
-
-            syncActions.subscribeToSyncEvents();
-
-            const bulkSyncEvent = {
-                action: "bulk-sync",
-                sites: undefined, // Test case where sites is undefined
-                source: "backend",
-                timestamp: Date.now(),
-            };
-
-            eventHandler(bulkSyncEvent);
-
-            // SetSites should not be called when sites is undefined
-            expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
 
         it("should handle delete events", async ({ task, annotate }) => {
@@ -446,18 +414,19 @@ describe("useSiteSync", () => {
             syncActions.subscribeToSyncEvents();
 
             const deleteEvent = {
-                action: "delete",
+                action: "delete" as const,
                 siteIdentifier: "site-1",
-                data: {},
+                sites: mockSites,
+                source: "database" as const,
+                timestamp: Date.now(),
             };
 
             eventHandler(deleteEvent);
 
-            // Verify that the event was handled (no specific action expected for delete events)
-            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle update events with syncSites error", async ({
+        it("should handle update events without triggering full sync", async ({
             task,
             annotate,
         }) => {
@@ -466,7 +435,6 @@ describe("useSiteSync", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Test error handling during update events by simulating sync subscription
             let eventHandler: any;
             mockStateSyncService.onStateSyncEvent.mockImplementation(
                 async (handler) => {
@@ -475,23 +443,20 @@ describe("useSiteSync", () => {
                 }
             );
 
-            // Mock SiteService to throw an error
-            vi.mocked(SiteService.getSites).mockRejectedValue(
-                new Error("Sync error")
-            );
-
             syncActions.subscribeToSyncEvents();
 
             const updateEvent = {
-                action: "update",
+                action: "update" as const,
                 siteIdentifier: "site-1",
-                data: { name: "Updated Site" },
+                sites: mockSites,
+                source: "database" as const,
+                timestamp: Date.now(),
             };
 
-            await eventHandler(updateEvent);
+            eventHandler(updateEvent);
 
-            // Verify sync subscription was established
-            expect(mockStateSyncService.onStateSyncEvent).toHaveBeenCalled();
+            expect(SiteService.getSites).not.toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
     });
 

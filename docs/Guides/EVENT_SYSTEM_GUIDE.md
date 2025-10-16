@@ -117,10 +117,10 @@ Event contracts are defined in `@shared/types/events.ts` to ensure type safety b
 ```typescript
 // State synchronization
 interface StateSyncEventData extends BaseEventData {
- action: "bulk-sync" | "create" | "delete" | "update";
+ action: "bulk-sync" | "delete" | "update";
  siteIdentifier?: string;
- sites?: Site[];
- source: "backend" | "cache" | "manual";
+ sites: Site[];
+ source: "cache" | "database" | "frontend";
 }
 
 // Cache invalidation
@@ -202,7 +202,7 @@ cleanupFunctions.push(
  await EventsService.onStateSync((data) => {
   switch (data.action) {
    case "bulk-sync":
-    console.log(`Bulk sync: ${data.sites?.length} sites`);
+    console.log(`Bulk sync: ${data.sites.length} sites`);
     break;
    case "create":
     console.log(`Site created: ${data.siteIdentifier}`);
@@ -298,24 +298,13 @@ export const initializeEventListeners = async (): Promise<() => void> => {
 
    switch (data.action) {
     case "bulk-sync":
-     if (data.sites) {
-      sites.bulkSync(data.sites);
-     }
-     break;
-    case "create":
-     if (data.siteIdentifier && data.sites?.[0]) {
-      sites.addSite(data.sites[0]);
-     }
+     sites.bulkSync(data.sites);
      break;
     case "update":
-     if (data.siteIdentifier && data.sites?.[0]) {
-      sites.updateSite(data.siteIdentifier, data.sites[0]);
-     }
+     sites.bulkSync(data.sites);
      break;
     case "delete":
-     if (data.siteIdentifier) {
-      sites.removeSite(data.siteIdentifier);
-     }
+     sites.bulkSync(data.sites);
      break;
    }
   })

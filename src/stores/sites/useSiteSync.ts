@@ -497,35 +497,30 @@ export const createSiteSyncActions = (
             let disposed = false;
 
             const handleEvent = (event: StateSyncEventData): void => {
+                const hasSnapshot = Array.isArray(event.sites);
+
                 logStoreAction("SitesStore", "syncEventReceived", {
                     action: event.action,
                     message: `Received sync event: ${event.action}`,
                     siteIdentifier: event.siteIdentifier,
-                    sitesCount: event.sites?.length,
                     source: event.source,
                     timestamp: event.timestamp,
+                    ...(hasSnapshot && { sitesCount: event.sites.length }),
                 });
 
+                if (!hasSnapshot) {
+                    logger.error(
+                        "State sync event missing sites payload",
+                        event
+                    );
+                    return;
+                }
+
                 switch (event.action) {
-                    case "bulk-sync": {
-                        if (event.sites) {
-                            deps.setSites(event.sites);
-                        }
-                        break;
-                    }
+                    case "bulk-sync":
                     case "delete":
                     case "update": {
-                        void (async (): Promise<void> => {
-                            try {
-                                await actions.syncSites();
-                            } catch (error: unknown) {
-                                const normalizedError = ensureError(error);
-                                logStoreAction("SitesStore", "error", {
-                                    error: normalizedError.message,
-                                    status: "failure",
-                                });
-                            }
-                        })();
+                        deps.setSites(event.sites);
                         break;
                     }
                     default: {

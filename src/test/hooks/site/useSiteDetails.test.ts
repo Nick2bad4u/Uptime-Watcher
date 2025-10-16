@@ -4,6 +4,7 @@
  * @file Src/test/hooks/site/useSiteDetails.test.ts
  */
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { renderHook, act } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import React from "react";
@@ -273,7 +274,7 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             const { result } = renderHook(() =>
                 useSiteDetails({ site: mockSite })
             );
-
+            expect(result.current.currentSite.name).toBe(DEFAULT_SITE_NAME);
             expect(result.current.currentSite.name).toBe("Unnamed Site");
             expect(result.current.currentSite.monitoring).toBeTruthy();
             expect(result.current.currentSite.monitors).toEqual([]);

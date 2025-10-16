@@ -105,8 +105,7 @@ describe("OperationHelpers", () => {
             createMockSite("site3", "monitor3"),
         ];
 
-        const siteService = {
-            addSite: vi.fn(async (site: Site) => site),
+        const dataService = {
             downloadSqliteBackup: vi.fn(async () => ({
                 buffer: new ArrayBuffer(0),
                 fileName: "backup.db",
@@ -116,6 +115,10 @@ describe("OperationHelpers", () => {
                     sizeBytes: 0,
                 },
             })),
+        };
+
+        const siteService = {
+            addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => mockSites),
             removeMonitor: vi.fn(async () => true),
             removeSite: vi.fn(async () => true),
@@ -138,6 +141,7 @@ describe("OperationHelpers", () => {
             removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
             services: {
+                data: dataService,
                 monitoring: monitoringService,
                 site: siteService,
             },

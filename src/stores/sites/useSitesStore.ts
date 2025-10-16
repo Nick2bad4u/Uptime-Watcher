@@ -93,6 +93,10 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
             getSites,
             removeSite: stateActions.removeSite,
             services: {
+                data: {
+                    downloadSqliteBackup: () =>
+                        DataService.downloadSqliteBackup(),
+                },
                 monitoring: {
                     startMonitoring: (
                         siteIdentifier: string,
@@ -117,8 +121,6 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
                 },
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),
-                    downloadSqliteBackup: () =>
-                        DataService.downloadSqliteBackup(),
                     getSites: () => SiteService.getSites(),
                     removeMonitor: (
                         siteIdentifier: string,

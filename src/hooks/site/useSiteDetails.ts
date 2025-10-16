@@ -18,6 +18,7 @@
  * @public
  */
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, Site } from "@shared/types";
 
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
@@ -41,11 +42,6 @@ import {
 } from "../../utils/timeoutUtils";
 import { useConfirmDialog } from "../ui/useConfirmDialog";
 import { type SiteAnalytics, useSiteAnalytics } from "./useSiteAnalytics";
-
-/**
- * Default fallback site name when site is not found
- */
-const DEFAULT_SITE_NAME = "Unnamed Site";
 
 /**
  * Props for the useSiteDetails hook

@@ -2,6 +2,7 @@
  * Form submission handling utilities for the AddSiteForm component.
  */
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, MonitorType } from "@shared/types";
 import type { FormEvent } from "react";
 import type { Simplify, UnknownRecord } from "type-fest";
@@ -381,7 +382,7 @@ async function submitNewSite(
     const siteData = {
         identifier: siteIdentifier,
         monitors: [monitor],
-        name: trimmedName || "Unnamed Site", // Provide default name
+        name: trimmedName || DEFAULT_SITE_NAME,
     };
 
     await createSite(siteData);

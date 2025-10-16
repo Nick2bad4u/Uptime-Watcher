@@ -9,7 +9,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
     MonitorOperationRegistry,
-    operationRegistry,
     type MonitorCheckOperation,
     type MonitorCheckResult,
 } from "../../../services/monitoring/MonitorOperationRegistry";
@@ -742,36 +741,6 @@ describe(MonitorOperationRegistry, () => {
             expect(operation!.id).toBe(originalId);
             expect(operation!.initiatedAt).toBe(originalInitiatedAt);
             expect(operation!.monitorId).toBe(mockMonitorId);
-        });
-    });
-
-    describe("Singleton operationRegistry", () => {
-        it("should export a singleton instance", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorOperationRegistry", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            expect(operationRegistry).toBeInstanceOf(MonitorOperationRegistry);
-        });
-
-        it("should be the same instance across imports", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: MonitorOperationRegistry", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Test that the singleton pattern works
-            expect(operationRegistry).toBe(operationRegistry);
-
-            // Test that multiple calls return the same instance
-            operationRegistry.initiateCheck("test-1");
-            operationRegistry.initiateCheck("test-2");
-
-            expect(operationRegistry.getActiveOperations().size).toBe(2);
         });
     });
 

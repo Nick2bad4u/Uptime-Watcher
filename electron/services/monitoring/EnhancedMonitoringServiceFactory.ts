@@ -58,7 +58,6 @@ import type { EnhancedMonitorCheckConfig } from "./EnhancedMonitorChecker";
 import type { MonitorOperationRegistry } from "./MonitorOperationRegistry";
 
 import { EnhancedMonitorChecker } from "./EnhancedMonitorChecker";
-import { operationRegistry } from "./MonitorOperationRegistry";
 import { MonitorStatusUpdateService } from "./MonitorStatusUpdateService";
 import { OperationTimeoutManager } from "./OperationTimeoutManager";
 
@@ -138,6 +137,12 @@ export interface EnhancedMonitoringDependencies {
      * monitor state management.
      */
     monitorRepository: MonitorRepository;
+
+    /**
+     * Registry coordinating active monitor operations to prevent race
+     * conditions.
+     */
+    operationRegistry: MonitorOperationRegistry;
 
     /**
      * Repository for site entity operations and site-monitor relationship
@@ -345,8 +350,7 @@ export const EnhancedMonitoringServiceFactory = {
     createServices(
         dependencies: EnhancedMonitoringDependencies
     ): EnhancedMonitoringServices {
-        // Use singleton operation registry
-        const operationRegistryInstance = operationRegistry;
+        const operationRegistryInstance = dependencies.operationRegistry;
 
         // Create timeout manager
         const timeoutManager = new OperationTimeoutManager(

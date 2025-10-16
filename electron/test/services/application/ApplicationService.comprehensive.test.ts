@@ -134,7 +134,6 @@ const mockWindowService = {
     closeMainWindow: vi.fn(),
     getAllWindows: vi.fn(() => [] as any[]),
     createMainWindow: vi.fn(),
-    sendToRenderer: vi.fn(),
 };
 
 const mockRendererEventBridge = {

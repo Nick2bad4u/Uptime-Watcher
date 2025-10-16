@@ -1026,6 +1026,7 @@ export class IpcService {
                     "sites:state-synchronized",
                     {
                         action: "bulk-sync",
+                        sites,
                         source: "database",
                         timestamp,
                     }

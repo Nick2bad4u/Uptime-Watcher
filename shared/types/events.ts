@@ -43,7 +43,7 @@ export interface BaseEventData {
  * const event: StateSyncEventData = {
  *     action: "bulk-sync",
  *     sites: updatedSites,
- *     source: "backend",
+ *     source: "database",
  *     timestamp: Date.now(),
  * };
  * ```
@@ -54,7 +54,8 @@ export interface BaseEventData {
  * const event: StateSyncEventData = {
  *     action: "delete",
  *     siteIdentifier: "site_123",
- *     source: "backend",
+ *     sites: [],
+ *     source: "database",
  *     timestamp: Date.now(),
  * };
  * ```
@@ -66,8 +67,8 @@ export interface StateSyncEventData extends BaseEventData {
     readonly action: StateSyncAction;
     /** Site identifier for targeted operations (delete, update) */
     readonly siteIdentifier?: string;
-    /** Site data for bulk sync operations */
-    readonly sites?: Site[];
+    /** Complete site dataset after the sync operation */
+    readonly sites: Site[];
     /** Source system that triggered the sync */
     readonly source: StateSyncSource;
 }

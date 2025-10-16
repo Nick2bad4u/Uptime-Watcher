@@ -1,3 +1,5 @@
+import { DEFAULT_SITE_NAME as SHARED_DEFAULT_SITE_NAME } from "@shared/constants/sites";
+
 /**
  * Backend constants for the Uptime Watcher application.
  *
@@ -97,11 +99,10 @@ export const DB_FILE_NAME = "uptime-watcher.sqlite";
  * Default site name when no name is provided.
  *
  * @remarks
- * Used as a fallback label for sites created without a user-specified name.
- *
- * @defaultValue "Unnamed Site"
+ * Re-exported from the shared constants module to keep frontend and backend
+ * defaults in lockstep.
  */
-export const DEFAULT_SITE_NAME = "Unnamed Site";
+export const DEFAULT_SITE_NAME = SHARED_DEFAULT_SITE_NAME;
 
 /**
  * Backup database file name for data export/import operations.

@@ -225,15 +225,12 @@ export interface SiteOperationsServiceDependencies {
         | "stopMonitoring"
         | "stopSiteMonitoring"
     >;
+    /** Data export operations */
+    data: Pick<DataBackupService, "downloadSqliteBackup">;
     /** Site service operations */
     site: Pick<
         SiteDataService,
-        | "addSite"
-        | "downloadSqliteBackup"
-        | "getSites"
-        | "removeMonitor"
-        | "removeSite"
-        | "updateSite"
+        "addSite" | "getSites" | "removeMonitor" | "removeSite" | "updateSite"
     >;
 }
 
@@ -252,7 +249,6 @@ interface SiteMonitoringService {
 
 interface SiteDataService {
     addSite: (site: Site) => Promise<Site>;
-    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
     getSites: () => Promise<Site[]>;
     removeMonitor: (
         siteIdentifier: string,
@@ -260,4 +256,8 @@ interface SiteDataService {
     ) => Promise<boolean>;
     removeSite: (identifier: string) => Promise<boolean>;
     updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
+}
+
+interface DataBackupService {
+    downloadSqliteBackup: () => Promise<SerializedDatabaseBackupResult>;
 }

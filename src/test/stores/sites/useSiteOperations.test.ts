@@ -113,12 +113,15 @@ describe(createSiteOperationsActions, () => {
             })
         );
 
+        const dataService = {
+            downloadSqliteBackup: vi.fn(async () =>
+                mockElectronAPI.data.downloadSqliteBackup()
+            ),
+        };
+
         const siteService = {
             addSite: vi.fn(async (site: Site) =>
                 mockElectronAPI.sites.addSite(site)
-            ),
-            downloadSqliteBackup: vi.fn(async () =>
-                mockElectronAPI.data.downloadSqliteBackup()
             ),
             getSites: vi.fn(async () => mockElectronAPI.sites.getSites()),
             removeMonitor: vi.fn(
@@ -168,6 +171,7 @@ describe(createSiteOperationsActions, () => {
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
+                data: dataService,
                 monitoring: monitoringService,
                 site: siteService,
             },

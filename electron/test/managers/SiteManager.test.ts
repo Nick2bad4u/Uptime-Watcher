@@ -460,6 +460,7 @@ describe(SiteManager, () => {
                     .fn()
                     .mockReturnValueOnce(existingSite) // First call returns existing site
                     .mockReturnValueOnce(updatedSite), // Second call (after refresh) returns updated site
+                getAll: vi.fn(() => [updatedSite]),
                 set: vi.fn(),
                 delete: vi.fn(),
                 has: vi.fn().mockReturnValue(true),

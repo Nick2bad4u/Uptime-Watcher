@@ -312,31 +312,23 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 }
             );
 
-            // Spy on syncSites
-            const syncSpy = vi
-                .spyOn(syncActions, "syncSites")
-                .mockResolvedValue(undefined);
-
             syncActions.subscribeToSyncEvents();
 
             const deleteEvent = {
-                action: "delete",
+                action: "delete" as const,
                 siteIdentifier: "site-1",
-                source: "database",
+                sites: mockSites,
+                source: "database" as const,
                 timestamp: Date.now(),
             };
 
             // Trigger delete event (line 296-297)
             eventHandler(deleteEvent);
 
-            // Wait for async operation
-            await new Promise((resolve) => setTimeout(resolve, 0));
-
-            // Verify line 300: syncSites was called
-            expect(syncSpy).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
 
-        it("should handle update event and call syncSites (line 300)", async ({
+        it("should handle update event and apply provided snapshot", async ({
             task,
             annotate,
         }) => {
@@ -353,29 +345,24 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 }
             );
 
-            const syncSpy = vi
-                .spyOn(syncActions, "syncSites")
-                .mockResolvedValue(undefined);
-
             syncActions.subscribeToSyncEvents();
 
             const updateEvent = {
-                action: "update",
+                action: "update" as const,
                 siteIdentifier: "site-1",
-                source: "database",
+                sites: mockSites,
+                source: "database" as const,
                 timestamp: Date.now(),
             };
 
             // Trigger update event (line 296-297)
             eventHandler(updateEvent);
 
-            await new Promise((resolve) => setTimeout(resolve, 0));
-
-            // Verify line 300: syncSites was called
-            expect(syncSpy).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(SiteService.getSites).not.toHaveBeenCalled();
         });
 
-        it("should log error when syncSites fails (lines 301-304)", async ({
+        it("should log error when event snapshot missing", async ({
             task,
             annotate,
         }) => {
@@ -392,31 +379,21 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 }
             );
 
-            const testError = new Error("Sync failed");
-            const syncSpy = vi
-                .spyOn(syncActions, "syncSites")
-                .mockRejectedValue(testError);
-
             syncActions.subscribeToSyncEvents();
 
             const deleteEvent = {
-                action: "delete",
+                action: "delete" as const,
                 siteIdentifier: "site-1",
-                source: "database",
+                // @ts-expect-error -- intentionally malformed event for guard coverage
+                sites: undefined,
+                source: "database" as const,
                 timestamp: Date.now(),
             };
 
             eventHandler(deleteEvent);
 
-            // Wait for async operation and error handling
-            await new Promise((resolve) => setTimeout(resolve, 10));
-
-            expect(syncSpy).toHaveBeenCalled();
-            // Verify lines 301-304: error was logged
-            expect(logStoreAction).toHaveBeenCalledWith("SitesStore", "error", {
-                error: testError.message,
-                status: "failure",
-            });
+            expect(logger.error).toHaveBeenCalled();
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
         });
     });
 

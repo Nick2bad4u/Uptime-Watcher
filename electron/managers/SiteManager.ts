@@ -240,6 +240,7 @@ export class SiteManager {
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action: "update" as const,
             siteIdentifier: site.identifier,
+            sites: this.getSitesSnapshot(),
             source: "database" as const,
             timestamp: Date.now(),
         });
@@ -395,6 +396,7 @@ export class SiteManager {
                 await this.eventEmitter.emitTyped("sites:state-synchronized", {
                     action: "update" as const,
                     siteIdentifier: siteIdentifier,
+                    sites: this.getSitesSnapshot(),
                     source: "database" as const,
                     timestamp: Date.now(),
                 });
@@ -452,6 +454,7 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("sites:state-synchronized", {
                 action: "delete" as const,
                 siteIdentifier: identifier,
+                sites: this.getSitesSnapshot(),
                 source: "database" as const,
                 timestamp: Date.now(),
             });
@@ -526,6 +529,7 @@ export class SiteManager {
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action: "bulk-sync" as const,
             siteIdentifier: "all",
+            sites: this.getSitesSnapshot(),
             source: "database" as const,
             timestamp: Date.now(),
         });
@@ -632,6 +636,7 @@ export class SiteManager {
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action: "update" as const,
             siteIdentifier: identifier,
+            sites: this.getSitesSnapshot(),
             source: "database" as const,
             timestamp: Date.now(),
         });
@@ -964,6 +969,10 @@ export class SiteManager {
      */
     public getSitesFromCache(): Site[] {
         return this.sitesCache.getAll();
+    }
+
+    private getSitesSnapshot(): Site[] {
+        return this.getSitesFromCache().map((site) => structuredClone(site));
     }
 
     /**

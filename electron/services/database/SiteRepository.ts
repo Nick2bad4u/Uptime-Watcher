@@ -47,13 +47,13 @@
  *
  * @packageDocumentation
  */
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
-import type { DatabaseService } from "./DatabaseService";
-
 import { logger } from "../../utils/logger";
 import { withDatabaseOperation } from "../../utils/operationalHooks";
+import type { DatabaseService } from "./DatabaseService";
 import { rowsToSites, rowToSite, type SiteRow } from "./utils/siteMapper";
 
 /**
@@ -106,7 +106,7 @@ export interface SiteRepositoryTransactionAdapter {
  */
 const SITE_DEFAULTS = {
     MONITORING: true,
-    NAME: "Unnamed Site",
+    NAME: DEFAULT_SITE_NAME,
 } as const;
 
 /**
