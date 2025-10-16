@@ -8,6 +8,8 @@
  * @packageDocumentation
  */
 
+import type { UpdateStatus as SharedUpdateStatus } from "@shared/types/events";
+
 import type { ThemeName } from "../theme/types";
 
 /**
@@ -124,13 +126,7 @@ export type StoreState<T> = {
  * store to track update progress and display appropriate UI states to the
  * user.
  */
-export type UpdateStatus =
-    | "available"
-    | "checking"
-    | "downloaded"
-    | "downloading"
-    | "error"
-    | "idle";
+export type UpdateStatus = SharedUpdateStatus;
 
 /**
  * Re-exported core types from shared module for convenience.

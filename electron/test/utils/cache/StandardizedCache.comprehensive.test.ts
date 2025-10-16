@@ -3,6 +3,11 @@ import { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import { TypedEventBus } from "../../../events/TypedEventBus";
 import type { UptimeEvents } from "../../../events/eventTypes.js";
 
+const flushMicrotasks = async (): Promise<void> => {
+    await Promise.resolve();
+    await Promise.resolve();
+};
+
 /**
  * Comprehensive test suite for StandardizedCache
  *
@@ -180,12 +185,16 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1");
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-                ttl: 300_000, // Default TTL
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                    ttl: 300_000, // Default TTL
+                })
+            );
         });
 
         it("should emit undefined TTL when cache TTL is disabled", async ({
@@ -208,12 +217,16 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1");
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                key: "key1",
-                timestamp: expect.any(Number),
-                ttl: undefined,
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    key: "key1",
+                    timestamp: expect.any(Number),
+                    ttl: undefined,
+                })
+            );
         });
 
         it("should work without event emitter", async ({ task, annotate }) => {
@@ -315,11 +328,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             vi.advanceTimersByTime(600);
             cache.get("key1"); // Should trigger expiration check
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                })
+            );
         });
 
         it("should handle expired items in has() method", async ({
@@ -430,18 +447,22 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             vi.advanceTimersByTime(1);
             cache.set("key4", "value4");
 
+            await flushMicrotasks();
+
             expect(cache.size).toBe(3);
             expect(cache.has("key1")).toBeFalsy(); // Should be evicted (oldest)
             expect(cache.has("key2")).toBeTruthy();
             expect(cache.has("key3")).toBeTruthy();
             expect(cache.has("key4")).toBeTruthy();
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-                reason: "lru",
-            });
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                    reason: "lru",
+                })
+            );
         });
 
         it("should not evict when updating existing key", async ({
@@ -638,12 +659,16 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             cache.set("key1", "value1", 2000);
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-                ttl: 2000,
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                    ttl: 2000,
+                })
+            );
         });
 
         it("should emit item-deleted event on delete", async ({
@@ -661,11 +686,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             cache.delete("key1");
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                })
+            );
         });
 
         it("should emit cleared event on clear", async ({ task, annotate }) => {
@@ -681,11 +710,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key2", "value2");
             cache.clear();
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                itemCount: 2,
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    itemCount: 2,
+                })
+            );
         });
 
         it("should emit bulk-updated event on bulkUpdate", async ({
@@ -706,11 +739,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                 { key: "key3", data: "value3" },
             ]);
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                itemCount: 3,
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    itemCount: 3,
+                })
+            );
         });
 
         it("should emit item-invalidated event on invalidate", async ({
@@ -728,11 +765,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key1", "value1");
             cache.invalidate("key1");
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                key: "key1",
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    key: "key1",
+                })
+            );
         });
 
         it("should emit all-invalidated event on invalidateAll", async ({
@@ -751,11 +792,15 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             cache.set("key2", "value2");
             cache.invalidateAll();
 
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                itemCount: 2,
-            });
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    itemCount: 2,
+                })
+            );
         });
 
         it("should emit cleanup-completed event on cleanup", async ({
@@ -777,11 +822,16 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             const cleaned = cache.cleanup();
 
             expect(cleaned).toBe(1);
-            expect(eventSpy).toHaveBeenCalledWith({
-                cacheName: "test-cache",
-                timestamp: expect.any(Number),
-                itemCount: 1,
-            });
+
+            await flushMicrotasks();
+
+            expect(eventSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    timestamp: expect.any(Number),
+                    itemCount: 1,
+                })
+            );
         });
     });
 
@@ -1400,6 +1450,8 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             expect(cache.size).toBe(0);
 
             // Verify events were emitted
+            await flushMicrotasks();
+
             expect(eventSpy).toHaveBeenCalled();
             expect(invalidationSpy).toHaveBeenCalled();
         });

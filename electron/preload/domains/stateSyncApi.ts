@@ -16,34 +16,27 @@ import type {
     StateSyncApiSurface,
     StateSyncDomainBridge,
 } from "@shared/types/preload";
+import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
+
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
+import {
+    STATE_SYNC_ACTIONS,
+    STATE_SYNC_SOURCES,
+} from "@shared/types/stateSync";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
 
-const VALID_STATE_SYNC_ACTIONS = [
-    "bulk-sync",
-    "delete",
-    "update",
-] as const;
-const VALID_STATE_SYNC_SOURCES = [
-    "cache",
-    "database",
-    "frontend",
-] as const;
-
-type ValidStateSyncAction = (typeof VALID_STATE_SYNC_ACTIONS)[number];
-type ValidStateSyncSource = (typeof VALID_STATE_SYNC_SOURCES)[number];
-
-const isValidStateSyncAction = (
-    value: unknown
-): value is ValidStateSyncAction =>
+const isValidStateSyncAction = (value: unknown): value is StateSyncAction =>
     typeof value === "string" &&
-    (VALID_STATE_SYNC_ACTIONS as readonly string[]).includes(value);
+    STATE_SYNC_ACTIONS.some(
+        (action): action is StateSyncAction => action === value
+    );
 
-const isValidStateSyncSource = (
-    value: unknown
-): value is ValidStateSyncSource =>
+const isValidStateSyncSource = (value: unknown): value is StateSyncSource =>
     typeof value === "string" &&
-    (VALID_STATE_SYNC_SOURCES as readonly string[]).includes(value);
+    STATE_SYNC_SOURCES.some(
+        (source): source is StateSyncSource => source === value
+    );
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
@@ -136,12 +129,14 @@ export const stateSyncApi: StateSyncApiInterface = {
     onStateSyncEvent: (
         callback: (data: StateSyncEventData) => void
     ): (() => void) =>
-        createEventManager("state-sync-event").on((data: unknown) => {
-            if (isStateSyncEventData(data)) {
-                // eslint-disable-next-line n/callback-return -- Callback Return not required here as we just invoke the callback
-                callback(data);
+        createEventManager(RENDERER_EVENT_CHANNELS.STATE_SYNC).on(
+            (data: unknown) => {
+                if (isStateSyncEventData(data)) {
+                    // eslint-disable-next-line n/callback-return -- Callback Return not required here as we just invoke the callback
+                    callback(data);
+                }
             }
-        }),
+        ),
 
     /**
      * Requests a full synchronization of all data

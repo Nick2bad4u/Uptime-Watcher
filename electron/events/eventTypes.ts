@@ -56,118 +56,6 @@ export interface UptimeEvents extends UnknownRecord {
     "cache:invalidated": CacheInvalidatedEventData;
 
     /**
-     * Emitted when multiple cache entries are updated in a batch operation.
-     */
-    "internal:cache:bulk-updated": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Number of items affected by the bulk update. */
-        itemCount: number;
-        /** Unix timestamp (ms) when the bulk update completed. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted after expired cache entries have been cleaned up.
-     */
-    "internal:cache:cleanup-completed": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Number of entries removed during cleanup. */
-        itemCount: number;
-        /** Unix timestamp (ms) when cleanup finished. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when the entire cache is cleared.
-     */
-    "internal:cache:cleared": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Number of entries removed. */
-        itemCount: number;
-        /** Unix timestamp (ms) when the clear action occurred. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when every cache entry is invalidated.
-     */
-    "internal:cache:all-invalidated": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Number of entries invalidated. */
-        itemCount: number;
-        /** Unix timestamp (ms) when invalidation occurred. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when a cache entry is cached or updated.
-     */
-    "internal:cache:item-cached": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Cache key that was stored. */
-        key: string;
-        /** Optional TTL for the cached entry in milliseconds. */
-        ttl?: number;
-        /** Unix timestamp (ms) when the item was cached. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when a cache entry is explicitly deleted.
-     */
-    "internal:cache:item-deleted": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Cache key that was deleted. */
-        key: string;
-        /** Unix timestamp (ms) when the item was deleted. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when a cache entry expires.
-     */
-    "internal:cache:item-expired": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Cache key that expired. */
-        key: string;
-        /** Unix timestamp (ms) when the item expired. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when a cache entry is invalidated.
-     */
-    "internal:cache:item-invalidated": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Cache key that was invalidated. */
-        key: string;
-        /** Unix timestamp (ms) when the item was invalidated. */
-        timestamp: number;
-    };
-
-    /**
-     * Emitted when a cache entry is evicted, typically due to LRU strategy.
-     */
-    "internal:cache:item-evicted": {
-        /** Name of the cache instance emitting the event. */
-        cacheName: string;
-        /** Cache key that was evicted. */
-        key: string;
-        /** Reason the entry was evicted ("lru" for least-recently-used). */
-        reason: "lru" | "manual";
-        /** Unix timestamp (ms) when the eviction occurred. */
-        timestamp: number;
-    };
-
-    /**
      * Emitted when a configuration setting is changed.
      *
      * @remarks
@@ -181,50 +69,15 @@ export interface UptimeEvents extends UnknownRecord {
      * @param timestamp - Unix timestamp (ms) when the change occurred.
      */
     "config:changed": {
-        /**
-         * The new value of the setting.
-         *
-         * @remarks
-         * Contains the updated value after the configuration change. Type is
-         * unknown to support any configuration value type.
-         */
+        /** The new value of the setting. */
         newValue: unknown;
-
-        /**
-         * The previous value of the setting.
-         *
-         * @remarks
-         * Contains the value before the configuration change for comparison and
-         * potential rollback scenarios.
-         */
+        /** The previous value of the setting. */
         oldValue: unknown;
-
-        /**
-         * The name of the setting that changed.
-         *
-         * @remarks
-         * Identifies which specific configuration setting was modified. Used
-         * for targeted event handling and change tracking.
-         */
+        /** The configuration key that changed. */
         setting: string;
-
-        /**
-         * The origin of the change.
-         *
-         * @remarks
-         * Indicates what initiated the configuration change: "migration" for
-         * database migrations, "system" for automatic updates, or "user" for
-         * manual changes.
-         */
+        /** Origin of the change (user, system, migration). */
         source: "migration" | "system" | "user";
-
-        /**
-         * Unix timestamp (ms) when the change occurred.
-         *
-         * @remarks
-         * Provides precise timing for configuration changes to support
-         * debugging and audit trails.
-         */
+        /** Unix timestamp (ms) when the change occurred. */
         timestamp: number;
     };
 
@@ -278,8 +131,6 @@ export interface UptimeEvents extends UnknownRecord {
          */
         triggerType: "manual" | "scheduled" | "shutdown";
     };
-
-    // Monitor events
 
     /**
      * Emitted when a database error occurs.
@@ -458,6 +309,120 @@ export interface UptimeEvents extends UnknownRecord {
          * Provides precise timing of when the transaction finished, regardless
          * of success or failure status.
          */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when every cache entry is invalidated.
+     */
+    "internal:cache:all-invalidated": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Number of entries invalidated. */
+        itemCount: number;
+        /** Unix timestamp (ms) when invalidation occurred. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when multiple cache entries are updated in a batch operation.
+     */
+    "internal:cache:bulk-updated": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Number of items affected by the bulk update. */
+        itemCount: number;
+        /** Unix timestamp (ms) when the bulk update completed. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted after expired cache entries have been cleaned up.
+     */
+    "internal:cache:cleanup-completed": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Number of entries removed during cleanup. */
+        itemCount: number;
+        /** Unix timestamp (ms) when cleanup finished. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when the entire cache is cleared.
+     */
+    "internal:cache:cleared": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Number of entries removed. */
+        itemCount: number;
+        /** Unix timestamp (ms) when the clear action occurred. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a cache entry is cached or updated.
+     */
+    "internal:cache:item-cached": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Cache key that was stored. */
+        key: string;
+        /** Unix timestamp (ms) when the item was cached. */
+        timestamp: number;
+        /** Optional TTL for the cached entry in milliseconds. */
+        ttl?: number;
+    };
+
+    // Monitor events
+
+    /**
+     * Emitted when a cache entry is explicitly deleted.
+     */
+    "internal:cache:item-deleted": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Cache key that was deleted. */
+        key: string;
+        /** Unix timestamp (ms) when the item was deleted. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a cache entry is evicted, typically due to LRU strategy.
+     */
+    "internal:cache:item-evicted": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Cache key that was evicted. */
+        key: string;
+        /** Reason the entry was evicted ("lru" for least-recently-used). */
+        reason: "lru" | "manual";
+        /** Unix timestamp (ms) when the eviction occurred. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a cache entry expires.
+     */
+    "internal:cache:item-expired": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Cache key that expired. */
+        key: string;
+        /** Unix timestamp (ms) when the item expired. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a cache entry is invalidated.
+     */
+    "internal:cache:item-invalidated": {
+        /** Name of the cache instance emitting the event. */
+        cacheName: string;
+        /** Cache key that was invalidated. */
+        key: string;
+        /** Unix timestamp (ms) when the item was invalidated. */
         timestamp: number;
     };
 
@@ -1604,6 +1569,21 @@ export const EVENT_CATEGORIES = {
     ] as const,
 
     /**
+     * Internal cache management events.
+     */
+    INTERNAL_CACHE: [
+        "internal:cache:all-invalidated",
+        "internal:cache:bulk-updated",
+        "internal:cache:cleanup-completed",
+        "internal:cache:cleared",
+        "internal:cache:item-cached",
+        "internal:cache:item-deleted",
+        "internal:cache:item-evicted",
+        "internal:cache:item-expired",
+        "internal:cache:item-invalidated",
+    ] as const,
+
+    /**
      * Internal database management events.
      *
      * @remarks
@@ -1621,21 +1601,6 @@ export const EVENT_CATEGORIES = {
         "internal:database:initialized",
         "internal:database:sites-refreshed",
         "internal:database:update-sites-cache-requested",
-    ] as const,
-
-    /**
-     * Internal cache management events.
-     */
-    INTERNAL_CACHE: [
-        "internal:cache:all-invalidated",
-        "internal:cache:bulk-updated",
-        "internal:cache:cleanup-completed",
-        "internal:cache:cleared",
-        "internal:cache:item-cached",
-        "internal:cache:item-deleted",
-        "internal:cache:item-evicted",
-        "internal:cache:item-expired",
-        "internal:cache:item-invalidated",
     ] as const,
 
     /**
@@ -1920,6 +1885,11 @@ export function isEventOfCategory(
             return (EVENT_CATEGORIES.DATABASE as readonly string[]).includes(
                 eventNameStr
             );
+        }
+        case "INTERNAL_CACHE": {
+            return (
+                EVENT_CATEGORIES.INTERNAL_CACHE as readonly string[]
+            ).includes(eventNameStr);
         }
         case "INTERNAL_DATABASE": {
             return (

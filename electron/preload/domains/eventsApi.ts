@@ -17,12 +17,16 @@
 
 import type {
     CacheInvalidatedEventData,
+    CacheInvalidationReason,
+    CacheInvalidationType,
     MonitorDownEventData,
     MonitoringControlEventData,
+    MonitoringControlReason,
     MonitorLifecycleEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     TestEventData,
+    UpdateStatus,
     UpdateStatusEventData,
 } from "@shared/types/events";
 import type { EventsDomainBridge } from "@shared/types/eventsBridge";
@@ -31,6 +35,12 @@ import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
 } from "@shared/ipc/rendererEvents";
+import {
+    CACHE_INVALIDATION_REASON_VALUES,
+    CACHE_INVALIDATION_TYPE_VALUES,
+    MONITORING_CONTROL_REASON_VALUES,
+    UPDATE_STATUS_VALUES,
+} from "@shared/types/events";
 import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
@@ -53,62 +63,35 @@ export type EventsApi = EventsDomainBridge;
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
 
-const CACHE_INVALIDATION_REASON_VALUES = [
-    "delete",
-    "expiry",
-    "manual",
-    "update",
-] as const satisfies ReadonlyArray<CacheInvalidatedEventData["reason"]>;
-const CACHE_INVALIDATION_TYPE_VALUES = [
-    "all",
-    "monitor",
-    "site",
-] as const satisfies ReadonlyArray<CacheInvalidatedEventData["type"]>;
-const MONITORING_CONTROL_REASON_VALUES = [
-    "error",
-    "shutdown",
-    "user",
-] as const satisfies ReadonlyArray<
-    NonNullable<MonitoringControlEventData["reason"]>
->;
-const UPDATE_STATUS_VALUES = [
-    "available",
-    "checking",
-    "downloaded",
-    "downloading",
-    "error",
-    "idle",
-] as const satisfies ReadonlyArray<UpdateStatusEventData["status"]>;
-
-const CACHE_INVALIDATION_REASONS = new Set<string>(
-    CACHE_INVALIDATION_REASON_VALUES
-);
-const CACHE_INVALIDATION_TYPES = new Set<string>(
-    CACHE_INVALIDATION_TYPE_VALUES
-);
-const MONITORING_CONTROL_REASONS = new Set<string>(
-    MONITORING_CONTROL_REASON_VALUES
-);
-const UPDATE_STATUS_SET = new Set<string>(UPDATE_STATUS_VALUES);
 const isCacheInvalidationReason = (
     value: unknown
-): value is CacheInvalidatedEventData["reason"] =>
-    typeof value === "string" && CACHE_INVALIDATION_REASONS.has(value);
+): value is CacheInvalidationReason =>
+    typeof value === "string" &&
+    CACHE_INVALIDATION_REASON_VALUES.some(
+        (reason): reason is CacheInvalidationReason => reason === value
+    );
 
 const isCacheInvalidationType = (
     value: unknown
-): value is CacheInvalidatedEventData["type"] =>
-    typeof value === "string" && CACHE_INVALIDATION_TYPES.has(value);
+): value is CacheInvalidationType =>
+    typeof value === "string" &&
+    CACHE_INVALIDATION_TYPE_VALUES.some(
+        (type): type is CacheInvalidationType => type === value
+    );
 
 const isMonitoringControlReason = (
     value: unknown
-): value is NonNullable<MonitoringControlEventData["reason"]> =>
-    typeof value === "string" && MONITORING_CONTROL_REASONS.has(value);
+): value is MonitoringControlReason =>
+    typeof value === "string" &&
+    MONITORING_CONTROL_REASON_VALUES.some(
+        (reason): reason is MonitoringControlReason => reason === value
+    );
 
-const isUpdateStatus = (
-    value: unknown
-): value is UpdateStatusEventData["status"] =>
-    typeof value === "string" && UPDATE_STATUS_SET.has(value);
+const isUpdateStatus = (value: unknown): value is UpdateStatus =>
+    typeof value === "string" &&
+    UPDATE_STATUS_VALUES.some(
+        (status): status is UpdateStatus => status === value
+    );
 
 const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;

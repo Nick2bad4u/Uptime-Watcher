@@ -52,6 +52,7 @@
 import type { Site } from "@shared/types";
 
 import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -238,10 +239,10 @@ export class SiteManager {
 
         // Emit sync event for state consistency
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
-            action: "update" as const,
+            action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: site.identifier,
             sites: this.getSitesSnapshot(),
-            source: "database" as const,
+            source: STATE_SYNC_SOURCE.DATABASE,
             timestamp: Date.now(),
         });
 
@@ -394,10 +395,10 @@ export class SiteManager {
 
                 // Emit sync event for state consistency
                 await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                    action: "update" as const,
+                    action: STATE_SYNC_ACTION.UPDATE,
                     siteIdentifier: siteIdentifier,
                     sites: this.getSitesSnapshot(),
-                    source: "database" as const,
+                    source: STATE_SYNC_SOURCE.DATABASE,
                     timestamp: Date.now(),
                 });
 
@@ -452,10 +453,10 @@ export class SiteManager {
 
             // Emit sync event for state consistency
             await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                action: "delete" as const,
+                action: STATE_SYNC_ACTION.DELETE,
                 siteIdentifier: identifier,
                 sites: this.getSitesSnapshot(),
-                source: "database" as const,
+                source: STATE_SYNC_SOURCE.DATABASE,
                 timestamp: Date.now(),
             });
         }
@@ -527,10 +528,10 @@ export class SiteManager {
 
         // Emit bulk sync event for state consistency
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
-            action: "bulk-sync" as const,
+            action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             sites: this.getSitesSnapshot(),
-            source: "database" as const,
+            source: STATE_SYNC_SOURCE.DATABASE,
             timestamp: Date.now(),
         });
 
@@ -634,10 +635,10 @@ export class SiteManager {
 
         // Emit sync event for state consistency
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
-            action: "update" as const,
+            action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: identifier,
             sites: this.getSitesSnapshot(),
-            source: "database" as const,
+            source: STATE_SYNC_SOURCE.DATABASE,
             timestamp: Date.now(),
         });
 

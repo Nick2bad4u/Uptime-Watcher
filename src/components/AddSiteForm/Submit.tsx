@@ -2,11 +2,11 @@
  * Form submission handling utilities for the AddSiteForm component.
  */
 
-import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, MonitorType } from "@shared/types";
 import type { FormEvent } from "react";
 import type { Simplify, UnknownRecord } from "type-fest";
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 
 import type { Logger } from "../../services/logger";

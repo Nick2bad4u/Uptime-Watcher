@@ -11,18 +11,60 @@
 import type { Site } from "@shared/types";
 
 /**
- * Valid sources that can initiate a state synchronization action.
+ * Enumerated state synchronization sources for cross-layer consistency.
  *
  * @public
  */
-export type StateSyncSource = "cache" | "database" | "frontend";
+export const STATE_SYNC_SOURCE = {
+    CACHE: "cache",
+    DATABASE: "database",
+    FRONTEND: "frontend",
+} as const;
 
 /**
- * Supported state synchronization lifecycle actions.
+ * Union of all valid state synchronization sources.
  *
  * @public
  */
-export type StateSyncAction = "bulk-sync" | "delete" | "update";
+export type StateSyncSource =
+    (typeof STATE_SYNC_SOURCE)[keyof typeof STATE_SYNC_SOURCE];
+
+/**
+ * Enumerated state synchronization lifecycle actions.
+ *
+ * @public
+ */
+export const STATE_SYNC_ACTION = {
+    BULK_SYNC: "bulk-sync",
+    DELETE: "delete",
+    UPDATE: "update",
+} as const;
+
+/**
+ * Union of all supported state synchronization lifecycle actions.
+ *
+ * @public
+ */
+export type StateSyncAction =
+    (typeof STATE_SYNC_ACTION)[keyof typeof STATE_SYNC_ACTION];
+
+/**
+ * Ordered list of valid synchronization sources.
+ *
+ * @public
+ */
+export const STATE_SYNC_SOURCES: readonly StateSyncSource[] = Object.freeze(
+    Object.values(STATE_SYNC_SOURCE) as StateSyncSource[]
+);
+
+/**
+ * Ordered list of valid synchronization actions.
+ *
+ * @public
+ */
+export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] = Object.freeze(
+    Object.values(STATE_SYNC_ACTION) as StateSyncAction[]
+);
 
 /**
  * Summary returned from a `getSyncStatus` request.

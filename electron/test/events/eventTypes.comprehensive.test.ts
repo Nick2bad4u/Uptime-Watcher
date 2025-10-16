@@ -28,6 +28,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 "CACHE",
                 "CONFIG",
                 "DATABASE",
+                "INTERNAL_CACHE",
                 "INTERNAL_DATABASE",
                 "INTERNAL_MONITOR",
                 "INTERNAL_SITE",
@@ -62,6 +63,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
             );
             expect(EVENT_CATEGORIES.INTERNAL_DATABASE).toContain(
                 "internal:database:initialized"
+            );
+            expect(EVENT_CATEGORIES.INTERNAL_CACHE).toContain(
+                "internal:cache:item-cached"
             );
             expect(EVENT_CATEGORIES.INTERNAL_MONITOR).toContain(
                 "internal:monitor:started"

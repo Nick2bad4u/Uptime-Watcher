@@ -18,9 +18,9 @@
  * @public
  */
 
-import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, Site } from "@shared/types";
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
 import { type ChangeEvent, useCallback, useEffect, useState } from "react";

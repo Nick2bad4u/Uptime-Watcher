@@ -18,6 +18,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
+import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type {
@@ -517,9 +518,9 @@ export const createSiteSyncActions = (
                 }
 
                 switch (event.action) {
-                    case "bulk-sync":
-                    case "delete":
-                    case "update": {
+                    case STATE_SYNC_ACTION.BULK_SYNC:
+                    case STATE_SYNC_ACTION.DELETE:
+                    case STATE_SYNC_ACTION.UPDATE: {
                         deps.setSites(event.sites);
                         break;
                     }

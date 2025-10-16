@@ -74,6 +74,65 @@ export interface StateSyncEventData extends BaseEventData {
 }
 
 /**
+ * Enumerated cache invalidation reasons shared across renderer and main.
+ *
+ * @public
+ */
+export const CACHE_INVALIDATION_REASON = {
+    DELETE: "delete",
+    EXPIRY: "expiry",
+    MANUAL: "manual",
+    UPDATE: "update",
+} as const;
+
+/**
+ * Enumerated cache invalidation types shared across renderer and main.
+ *
+ * @public
+ */
+export const CACHE_INVALIDATION_TYPE = {
+    ALL: "all",
+    MONITOR: "monitor",
+    SITE: "site",
+} as const;
+
+/**
+ * Union of cache invalidation reasons.
+ *
+ * @public
+ */
+export type CacheInvalidationReason =
+    (typeof CACHE_INVALIDATION_REASON)[keyof typeof CACHE_INVALIDATION_REASON];
+
+/**
+ * Union of cache invalidation types.
+ *
+ * @public
+ */
+export type CacheInvalidationType =
+    (typeof CACHE_INVALIDATION_TYPE)[keyof typeof CACHE_INVALIDATION_TYPE];
+
+/**
+ * Canonical list of cache invalidation reasons.
+ *
+ * @public
+ */
+export const CACHE_INVALIDATION_REASON_VALUES: readonly CacheInvalidationReason[] =
+    Object.freeze(
+        Object.values(CACHE_INVALIDATION_REASON) as CacheInvalidationReason[]
+    );
+
+/**
+ * Canonical list of cache invalidation types.
+ *
+ * @public
+ */
+export const CACHE_INVALIDATION_TYPE_VALUES: readonly CacheInvalidationType[] =
+    Object.freeze(
+        Object.values(CACHE_INVALIDATION_TYPE) as CacheInvalidationType[]
+    );
+
+/**
  * Payload for cache invalidation events.
  *
  * @remarks
@@ -104,17 +163,16 @@ export interface CacheInvalidatedEventData extends BaseEventData {
      * The reason for invalidation.
      *
      * @remarks
-     * Can be 'delete', 'expiry', 'manual', or 'update'.
+     * See {@link CACHE_INVALIDATION_REASON} for the complete list.
      */
-    readonly reason: "delete" | "expiry" | "manual" | "update";
+    readonly reason: CacheInvalidationReason;
     /**
      * The type of cache invalidation.
      *
      * @remarks
-     * 'all' for global, 'monitor' for a specific monitor, 'site' for a specific
-     * site.
+     * See {@link CACHE_INVALIDATION_TYPE} for the complete list.
      */
-    readonly type: "all" | "monitor" | "site";
+    readonly type: CacheInvalidationType;
 }
 
 /**
@@ -297,6 +355,35 @@ export type MonitorDownEventData = MonitorLifecycleEventData & {
 };
 
 /**
+ * Enumerated monitoring control stop reasons shared across layers.
+ *
+ * @public
+ */
+export const MONITORING_CONTROL_REASON = {
+    ERROR: "error",
+    SHUTDOWN: "shutdown",
+    USER: "user",
+} as const;
+
+/**
+ * Union of monitoring control reasons.
+ *
+ * @public
+ */
+export type MonitoringControlReason =
+    (typeof MONITORING_CONTROL_REASON)[keyof typeof MONITORING_CONTROL_REASON];
+
+/**
+ * Canonical list of monitoring control reasons.
+ *
+ * @public
+ */
+export const MONITORING_CONTROL_REASON_VALUES: readonly MonitoringControlReason[] =
+    Object.freeze(
+        Object.values(MONITORING_CONTROL_REASON) as MonitoringControlReason[]
+    );
+
+/**
  * Payload for monitoring control events (global monitoring start/stop).
  *
  * @remarks
@@ -334,9 +421,9 @@ export interface MonitoringControlEventData extends BaseEventData {
      * Reason for stopping (for stopped events).
      *
      * @remarks
-     * Can be 'error', 'shutdown', or 'user'.
+     * Refer to {@link MONITORING_CONTROL_REASON} for the complete list.
      */
-    readonly reason?: "error" | "shutdown" | "user";
+    readonly reason?: MonitoringControlReason;
     /**
      * Number of sites involved in the operation.
      */
@@ -374,6 +461,34 @@ export type MonitorUpEventData = MonitorLifecycleEventData & {
 };
 
 /**
+ * Enumerated auto-update statuses shared across layers.
+ *
+ * @public
+ */
+export const UPDATE_STATUS = {
+    AVAILABLE: "available",
+    CHECKING: "checking",
+    DOWNLOADED: "downloaded",
+    DOWNLOADING: "downloading",
+    ERROR: "error",
+    IDLE: "idle",
+} as const;
+
+/**
+ * Union of auto-update statuses.
+ *
+ * @public
+ */
+export type UpdateStatus = (typeof UPDATE_STATUS)[keyof typeof UPDATE_STATUS];
+/**
+ * Canonical list of auto-update statuses.
+ *
+ * @public
+ */
+export const UPDATE_STATUS_VALUES: readonly UpdateStatus[] = Object.freeze(
+    Object.values(UPDATE_STATUS) as UpdateStatus[]
+);
+/**
  * Payload for update status change events.
  *
  * @remarks
@@ -401,16 +516,9 @@ export interface UpdateStatusEventData {
      * The current update status.
      *
      * @remarks
-     * Can be 'available', 'checking', 'downloaded', 'downloading', 'error', or
-     * 'idle'.
+     * See {@link UPDATE_STATUS} for the complete list.
      */
-    readonly status:
-        | "available"
-        | "checking"
-        | "downloaded"
-        | "downloading"
-        | "error"
-        | "idle";
+    readonly status: UpdateStatus;
 }
 
 /**

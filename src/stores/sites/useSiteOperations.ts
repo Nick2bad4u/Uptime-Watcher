@@ -8,9 +8,9 @@
  * @packageDocumentation
  */
 
-import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import type { Monitor, MonitorType, Site } from "@shared/types";
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { isDevelopment } from "@shared/utils/environment";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";

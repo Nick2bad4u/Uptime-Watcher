@@ -3,6 +3,7 @@
  * application updates using electron-updater.
  */
 
+import { UPDATE_STATUS, type UpdateStatus } from "@shared/types/events";
 import { autoUpdater } from "electron-updater";
 
 import { logger } from "../../utils/logger";
@@ -14,17 +15,6 @@ export interface UpdateStatusData {
     error?: string;
     status: UpdateStatus;
 }
-
-/**
- * Status of the application update process.
- */
-export type UpdateStatus =
-    | "available"
-    | "checking"
-    | "downloaded"
-    | "downloading"
-    | "error"
-    | "idle";
 
 /**
  * Service responsible for handling application auto-updates. Manages update
@@ -69,7 +59,7 @@ export class AutoUpdaterService {
      */
     private readonly handleCheckingForUpdate = (): void => {
         logger.debug("[AutoUpdaterService] Checking for updates");
-        this.notifyStatusChange({ status: "checking" });
+        this.notifyStatusChange({ status: UPDATE_STATUS.CHECKING });
     };
 
     /**
@@ -77,7 +67,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateAvailable = (info: unknown): void => {
         logger.info("[AutoUpdaterService] Update available", info);
-        this.notifyStatusChange({ status: "available" });
+        this.notifyStatusChange({ status: UPDATE_STATUS.AVAILABLE });
     };
 
     /**
@@ -85,7 +75,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateNotAvailable = (info: unknown): void => {
         logger.debug("[AutoUpdaterService] No update available", info);
-        this.notifyStatusChange({ status: "idle" });
+        this.notifyStatusChange({ status: UPDATE_STATUS.IDLE });
     };
 
     /**
@@ -103,7 +93,7 @@ export class AutoUpdaterService {
             total: progressObj.total,
             transferred: progressObj.transferred,
         });
-        this.notifyStatusChange({ status: "downloading" });
+        this.notifyStatusChange({ status: UPDATE_STATUS.DOWNLOADING });
     };
 
     /**
@@ -111,7 +101,7 @@ export class AutoUpdaterService {
      */
     private readonly handleUpdateDownloaded = (info: unknown): void => {
         logger.info("[AutoUpdaterService] Update downloaded", info);
-        this.notifyStatusChange({ status: "downloaded" });
+        this.notifyStatusChange({ status: UPDATE_STATUS.DOWNLOADED });
     };
 
     /**
@@ -121,7 +111,7 @@ export class AutoUpdaterService {
         logger.error("[AutoUpdaterService] Auto-updater error", error);
         this.notifyStatusChange({
             error: error.message || String(error),
-            status: "error",
+            status: UPDATE_STATUS.ERROR,
         });
     };
 
@@ -154,7 +144,7 @@ export class AutoUpdaterService {
             );
             this.notifyStatusChange({
                 error: error instanceof Error ? error.message : String(error),
-                status: "error",
+                status: UPDATE_STATUS.ERROR,
             });
         }
     }

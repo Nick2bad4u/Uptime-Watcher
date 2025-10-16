@@ -217,6 +217,8 @@ export interface SiteOperationsDependencies {
  * @public
  */
 export interface SiteOperationsServiceDependencies {
+    /** Data export operations */
+    data: Pick<DataBackupService, "downloadSqliteBackup">;
     /** Monitoring service operations */
     monitoring: Pick<
         SiteMonitoringService,
@@ -225,8 +227,6 @@ export interface SiteOperationsServiceDependencies {
         | "stopMonitoring"
         | "stopSiteMonitoring"
     >;
-    /** Data export operations */
-    data: Pick<DataBackupService, "downloadSqliteBackup">;
     /** Site service operations */
     site: Pick<
         SiteDataService,

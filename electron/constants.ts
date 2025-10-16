@@ -102,7 +102,7 @@ export const DB_FILE_NAME = "uptime-watcher.sqlite";
  * Re-exported from the shared constants module to keep frontend and backend
  * defaults in lockstep.
  */
-export const DEFAULT_SITE_NAME = SHARED_DEFAULT_SITE_NAME;
+export const DEFAULT_SITE_NAME: string = SHARED_DEFAULT_SITE_NAME.slice(0);
 
 /**
  * Backup database file name for data export/import operations.

@@ -96,7 +96,6 @@ import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { withErrorHandling } from "../../../../shared/utils/errorHandling";
-import { logStoreAction } from "../../../stores/utils";
 import { logger } from "../../../services/logger";
 
 describe("useSiteSync - Line Coverage Completion", () => {
@@ -384,7 +383,6 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
-                // @ts-expect-error -- intentionally malformed event for guard coverage
                 sites: undefined,
                 source: "database" as const,
                 timestamp: Date.now(),

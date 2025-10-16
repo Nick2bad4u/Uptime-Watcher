@@ -275,29 +275,6 @@ export class ServiceContainer {
      */
     private windowService?: WindowService;
 
-    /**
-     * Gets the singleton {@link ServiceContainer} instance.
-     *
-     * @remarks
-     * If the instance does not exist, it is created with the provided
-     * configuration.
-     *
-     * @param config - Optional configuration for the container.
-     *
-     * @returns The singleton {@link ServiceContainer} instance.
-     */
-    private getMonitorOperationRegistry(): MonitorOperationRegistry {
-        if (!this.monitorOperationRegistry) {
-            this.monitorOperationRegistry = new MonitorOperationRegistry();
-            if (this.config.enableDebugLogging) {
-                logger.debug(
-                    "[ServiceContainer] Created MonitorOperationRegistry"
-                );
-            }
-        }
-        return this.monitorOperationRegistry;
-    }
-
     public static getInstance(
         config?: ServiceContainerConfig
     ): ServiceContainer {
@@ -352,6 +329,29 @@ export class ServiceContainer {
         await this.getUptimeOrchestrator().initialize();
         this.getIpcService().setupHandlers();
         logger.info("[ServiceContainer] All services initialized successfully");
+    }
+
+    /**
+     * Gets the singleton {@link ServiceContainer} instance.
+     *
+     * @remarks
+     * If the instance does not exist, it is created with the provided
+     * configuration.
+     *
+     * @param config - Optional configuration for the container.
+     *
+     * @returns The singleton {@link ServiceContainer} instance.
+     */
+    private getMonitorOperationRegistry(): MonitorOperationRegistry {
+        if (!this.monitorOperationRegistry) {
+            this.monitorOperationRegistry = new MonitorOperationRegistry();
+            if (this.config.enableDebugLogging) {
+                logger.debug(
+                    "[ServiceContainer] Created MonitorOperationRegistry"
+                );
+            }
+        }
+        return this.monitorOperationRegistry;
     }
 
     /**

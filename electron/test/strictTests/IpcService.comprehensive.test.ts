@@ -1131,6 +1131,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 "sites:state-synchronized",
                 {
                     action: "bulk-sync",
+                    sites: expect.any(Array),
                     source: "database",
                     timestamp: expect.any(Number),
                 }

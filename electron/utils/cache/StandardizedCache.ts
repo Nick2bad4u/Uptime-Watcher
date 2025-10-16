@@ -26,10 +26,82 @@ type CacheEventName =
     | "internal:cache:item-expired"
     | "internal:cache:item-invalidated";
 
-type CacheEventPayload<EventName extends CacheEventName> = Omit<
-    UptimeEvents[EventName],
-    "cacheName" | "timestamp"
->;
+type CacheEventPayloadMap = {
+    [Event in CacheEventName]: Omit<
+        UptimeEvents[Event],
+        "cacheName" | "timestamp"
+    >;
+};
+
+type CacheEventPayload<EventName extends CacheEventName> =
+    CacheEventPayloadMap[EventName];
+
+interface CacheEventContext {
+    cacheName: string;
+    timestamp: number;
+}
+
+const createItemCountPayload = (
+    context: CacheEventContext,
+    data: { itemCount: number }
+): { cacheName: string; itemCount: number; timestamp: number } => ({
+    cacheName: context.cacheName,
+    itemCount: data.itemCount,
+    timestamp: context.timestamp,
+});
+
+const createKeyPayload = (
+    context: CacheEventContext,
+    data: { key: string }
+): { cacheName: string; key: string; timestamp: number } => ({
+    cacheName: context.cacheName,
+    key: data.key,
+    timestamp: context.timestamp,
+});
+
+const createKeyWithOptionalTtlPayload = (
+    context: CacheEventContext,
+    data: { key: string; ttl?: number }
+): { cacheName: string; key: string; timestamp: number; ttl?: number } => {
+    return {
+        cacheName: context.cacheName,
+        key: data.key,
+        timestamp: context.timestamp,
+        ttl: data.ttl ?? undefined,
+    };
+};
+
+const createKeyWithReasonPayload = (
+    context: CacheEventContext,
+    data: { key: string; reason: "lru" | "manual" }
+): {
+    cacheName: string;
+    key: string;
+    reason: "lru" | "manual";
+    timestamp: number;
+} => ({
+    cacheName: context.cacheName,
+    key: data.key,
+    reason: data.reason,
+    timestamp: context.timestamp,
+});
+
+const CACHE_EVENT_PAYLOAD_BUILDERS: {
+    [Event in CacheEventName]: (
+        context: CacheEventContext,
+        data: CacheEventPayload<Event>
+    ) => UptimeEvents[Event];
+} = {
+    "internal:cache:all-invalidated": createItemCountPayload,
+    "internal:cache:bulk-updated": createItemCountPayload,
+    "internal:cache:cleanup-completed": createItemCountPayload,
+    "internal:cache:cleared": createItemCountPayload,
+    "internal:cache:item-cached": createKeyWithOptionalTtlPayload,
+    "internal:cache:item-deleted": createKeyPayload,
+    "internal:cache:item-evicted": createKeyWithReasonPayload,
+    "internal:cache:item-expired": createKeyPayload,
+    "internal:cache:item-invalidated": createKeyPayload,
+};
 
 /**
  * Cache configuration.
@@ -401,7 +473,7 @@ export class StandardizedCache<T> {
         );
         this.emitEvent("internal:cache:item-cached", {
             key,
-            ttl: requestedTTL > 0 ? requestedTTL : undefined,
+            ...(requestedTTL > 0 ? { ttl: requestedTTL } : {}),
         });
     }
 
@@ -416,11 +488,23 @@ export class StandardizedCache<T> {
             return;
         }
 
-        this.config.eventEmitter.emitTyped(eventType, {
+        const payload = this.buildCacheEventPayload(eventType, data);
+        void this.config.eventEmitter.emitTyped(eventType, payload);
+    }
+
+    /**
+     * Construct a cache event payload with metadata for a specific event.
+     */
+    private buildCacheEventPayload<EventName extends CacheEventName>(
+        eventType: EventName,
+        data: CacheEventPayload<EventName>
+    ): UptimeEvents[EventName] {
+        const context: CacheEventContext = {
             cacheName: this.config.name,
             timestamp: Date.now(),
-            ...data,
-        });
+        };
+
+        return CACHE_EVENT_PAYLOAD_BUILDERS[eventType](context, data);
     }
 
     /**

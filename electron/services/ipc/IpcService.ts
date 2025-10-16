@@ -10,6 +10,7 @@ import type { Monitor, Site } from "@shared/types";
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
@@ -1025,18 +1026,18 @@ export class IpcService {
                 await this.uptimeOrchestrator.emitTyped(
                     "sites:state-synchronized",
                     {
-                        action: "bulk-sync",
+                        action: STATE_SYNC_ACTION.BULK_SYNC,
                         sites,
-                        source: "database",
+                        source: STATE_SYNC_SOURCE.DATABASE,
                         timestamp,
                     }
                 );
 
                 // Send state sync event to all renderer processes
                 this.rendererEventBridge.sendStateSyncEvent({
-                    action: "bulk-sync",
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
                     sites,
-                    source: "database",
+                    source: STATE_SYNC_SOURCE.DATABASE,
                     timestamp,
                 });
 
@@ -1047,7 +1048,7 @@ export class IpcService {
                     completedAt: timestamp,
                     siteCount: sites.length,
                     sites,
-                    source: "database" as const,
+                    source: STATE_SYNC_SOURCE.DATABASE,
                     synchronized: true,
                 };
             },
@@ -1064,7 +1065,7 @@ export class IpcService {
                 return {
                     lastSyncAt: timestamp,
                     siteCount: sites.length,
-                    source: "database" as const,
+                    source: STATE_SYNC_SOURCE.DATABASE,
                     synchronized: true,
                 };
             },

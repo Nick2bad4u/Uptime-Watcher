@@ -13,6 +13,7 @@ import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
+    MonitoringControlReason,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
     StateSyncEventData,
@@ -70,7 +71,7 @@ export interface RendererEventPayloadMap {
     /** Payload for monitoring stopped events. */
     "monitoring:stopped": MonitoringControlEventData & {
         activeMonitors: number;
-        reason: "error" | "shutdown" | "user";
+        reason: MonitoringControlReason;
     };
     /** Payload for full state synchronisation broadcasts. */
     "state-sync-event": StateSyncEventData;
