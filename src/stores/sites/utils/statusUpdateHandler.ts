@@ -390,11 +390,12 @@ export class StatusUpdateManager {
             },
         ];
 
-        const listenerStates: ListenerAttachmentState[] =
-            listenerDescriptors.map(({ label }) => ({
+        let listenerStates: ListenerAttachmentState[] = listenerDescriptors.map(
+            ({ label }) => ({
                 attached: false,
                 name: label,
-            }));
+            })
+        );
 
         /* eslint-disable no-await-in-loop -- Event listeners must be attached sequentially to preserve registration order */
         for (const [
@@ -409,7 +410,15 @@ export class StatusUpdateManager {
                 const cleanup = await register();
                 this.cleanupFunctions.push(cleanup);
                 listenersAttached += 1;
-                listenerStates[index]!.attached = true;
+                const state = listenerStates[index];
+                if (state) {
+                    listenerStates = listenerStates.map(
+                        (listenerState, listenerIndex) =>
+                            listenerIndex === index
+                                ? { ...listenerState, attached: true }
+                                : listenerState
+                    );
+                }
             } catch (error) {
                 const normalizedError = ensureError(error);
                 errors.push(`${scope}: ${normalizedError.message}`);

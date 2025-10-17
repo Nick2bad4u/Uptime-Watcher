@@ -53,6 +53,7 @@ import { logStoreAction } from "../utils";
 interface UIPersistedState {
     activeSiteDetailsTab: SiteDetailsTab;
     showAdvancedMetrics: boolean;
+    sidebarCollapsedPreference: boolean;
     siteCardPresentation: SiteCardPresentation;
     siteDetailsChartTimeRange: ChartTimeRange;
     siteDetailsHeaderCollapsedState: Record<string, boolean>;
@@ -70,6 +71,22 @@ const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
     "running",
     "controls",
 ] as const;
+
+/**
+ * Default width allocation (percentages) for list mode columns.
+ */
+export const DEFAULT_SITE_TABLE_COLUMN_WIDTHS: Record<
+    SiteTableColumnKey,
+    number
+> = Object.freeze({
+    controls: 16,
+    monitor: 14,
+    response: 12,
+    running: 10,
+    site: 24,
+    status: 12,
+    uptime: 12,
+});
 
 /**
  * Interface for the UI store with persistence capabilities.
@@ -201,6 +218,12 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 logStoreAction("UIStore", "setShowSiteDetails", { show });
                 set({ showSiteDetails: show });
             },
+            setSidebarCollapsedPreference: (collapsed: boolean): void => {
+                logStoreAction("UIStore", "setSidebarCollapsedPreference", {
+                    collapsed,
+                });
+                set({ sidebarCollapsedPreference: collapsed });
+            },
             setSiteCardPresentation: (
                 presentation: SiteCardPresentation
             ): void => {
@@ -261,23 +284,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             showAdvancedMetrics: false,
             showSettings: false,
             showSiteDetails: false,
+            sidebarCollapsedPreference: false,
             siteCardPresentation: "stacked",
             siteDetailsChartTimeRange: "24h",
             siteDetailsHeaderCollapsedState: {},
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
-            /**
-             * Default width allocation (percentages) for list mode columns.
-             */
-            siteTableColumnWidths: {
-                controls: 16,
-                monitor: 14,
-                response: 12,
-                running: 10,
-                site: 24,
-                status: 12,
-                uptime: 12,
-            },
+            siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
             syncActiveSiteDetailsTab: (siteIdentifier: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteIdentifier,
@@ -351,6 +364,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             partialize: (state) => ({
                 activeSiteDetailsTab: state.activeSiteDetailsTab,
                 showAdvancedMetrics: state.showAdvancedMetrics,
+                sidebarCollapsedPreference: state.sidebarCollapsedPreference,
                 siteCardPresentation: state.siteCardPresentation,
                 siteDetailsChartTimeRange: state.siteDetailsChartTimeRange,
                 siteDetailsHeaderCollapsedState:

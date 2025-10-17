@@ -11,6 +11,7 @@ import { type ChangeEvent, memo, type NamedExoticComponent } from "react";
 import { ThemedText } from "../../../theme/components/ThemedText";
 import { ActionButtonGroup } from "./components/ActionButtonGroup";
 import { MonitorSelector } from "./components/MonitorSelector";
+import { SiteCardFooter } from "./SiteCardFooter";
 
 /**
  * Display and UI state options
@@ -140,18 +141,21 @@ export const SiteCardHeader: NamedExoticComponent<SiteCardHeaderProperties> =
                         selectedMonitorId={monitoring.selectedMonitorId}
                     />
 
-                    <ActionButtonGroup
-                        allMonitorsRunning={monitoring.allMonitorsRunning}
-                        buttonSize="xs"
-                        disabled={!monitoring.hasMonitor}
-                        isLoading={display.isLoading}
-                        isMonitoring={monitoring.isMonitoring}
-                        onCheckNow={handleCheckNow}
-                        onStartMonitoring={handleStartMonitoring}
-                        onStartSiteMonitoring={handleStartSiteMonitoring}
-                        onStopMonitoring={handleStopMonitoring}
-                        onStopSiteMonitoring={handleStopSiteMonitoring}
-                    />
+                    <div className="site-card__control-actions">
+                        <ActionButtonGroup
+                            allMonitorsRunning={monitoring.allMonitorsRunning}
+                            buttonSize="xs"
+                            disabled={!monitoring.hasMonitor}
+                            isLoading={display.isLoading}
+                            isMonitoring={monitoring.isMonitoring}
+                            onCheckNow={handleCheckNow}
+                            onStartMonitoring={handleStartMonitoring}
+                            onStartSiteMonitoring={handleStartSiteMonitoring}
+                            onStopMonitoring={handleStopMonitoring}
+                            onStopSiteMonitoring={handleStopSiteMonitoring}
+                        />
+                        <SiteCardFooter />
+                    </div>
                 </div>
             </div>
         );

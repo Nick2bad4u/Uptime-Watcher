@@ -151,7 +151,10 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
         [summary]
     );
 
-    const listenerStates = summary?.listenerStates ?? [];
+    const listenerStates = useMemo(
+        () => summary?.listenerStates ?? [],
+        [summary]
+    );
 
     const shouldShowRetryAction = health.needsAttention;
 

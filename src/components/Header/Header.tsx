@@ -27,8 +27,6 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
-import { Tooltip } from "../common/Tooltip/Tooltip";
-import { useSidebarLayout } from "../Layout/SidebarLayoutContext";
 import "./Header.css";
 import { HeaderControls } from "./HeaderControls";
 import { StatusSubscriptionIndicator } from "./StatusSubscriptionIndicator";
@@ -52,7 +50,6 @@ export const Header = (): JSX.Element => {
         useUIStore();
     const { isDark, toggleTheme } = useTheme();
     const { getAvailabilityColor } = useAvailabilityColors();
-    const { toggleSidebar } = useSidebarLayout();
     const metrics = useGlobalMonitoringMetrics();
 
     const {
@@ -80,9 +77,9 @@ export const Header = (): JSX.Element => {
         setShowSettings(true);
     }, [setShowSettings]);
 
-    const SidebarToggleIcon = AppIcons.layout.viewColumns;
     const ActiveIcon = AppIcons.metrics.monitor;
     const GlobalUptimeIcon = AppIcons.metrics.uptime;
+    const shouldShowSummary = siteListLayout !== "card-large";
 
     return (
         <header className="app-topbar" data-testid="app-header" role="banner">
@@ -94,25 +91,12 @@ export const Header = (): JSX.Element => {
                 shadow="md"
                 surface="elevated"
             >
+                <div className="app-topbar__status-indicator">
+                    <StatusSubscriptionIndicator />
+                </div>
+
                 <div className="app-topbar__grid">
                     <div className="app-topbar__identity">
-                        <Tooltip
-                            content="Toggle navigation sidebar"
-                            position="bottom"
-                        >
-                            {(triggerProps) => (
-                                <button
-                                    {...triggerProps}
-                                    aria-label="Toggle navigation sidebar"
-                                    className="app-topbar__sidebar-toggle"
-                                    data-testid="header-sidebar-toggle"
-                                    onClick={toggleSidebar}
-                                    type="button"
-                                >
-                                    <SidebarToggleIcon size={20} />
-                                </button>
-                            )}
-                        </Tooltip>
                         <div className="app-topbar__identity-text">
                             <ThemedText
                                 className="app-topbar__title"
@@ -166,25 +150,9 @@ export const Header = (): JSX.Element => {
                                 </div>
                             </div>
                         </div>
-
-                        {siteListLayout === "card-large" ? null : (
-                            <div className="app-topbar__summary">
-                                <StatusSummary
-                                    degradedMonitors={degradedMonitors}
-                                    downMonitors={downMonitors}
-                                    getAvailabilityColor={getAvailabilityColor}
-                                    pausedMonitors={pausedMonitors}
-                                    pendingMonitors={pendingMonitors}
-                                    totalMonitors={totalStatusMonitors}
-                                    upMonitors={upMonitors}
-                                    uptimePercentage={uptimePercentage}
-                                />
-                            </div>
-                        )}
                     </div>
 
                     <div className="app-topbar__controls">
-                        <StatusSubscriptionIndicator />
                         <HeaderControls
                             isDark={isDark}
                             onShowAddSiteModal={handleShowAddSiteModal}
@@ -194,6 +162,21 @@ export const Header = (): JSX.Element => {
                         />
                     </div>
                 </div>
+
+                {shouldShowSummary ? (
+                    <div className="app-topbar__summary-bar">
+                        <StatusSummary
+                            degradedMonitors={degradedMonitors}
+                            downMonitors={downMonitors}
+                            getAvailabilityColor={getAvailabilityColor}
+                            pausedMonitors={pausedMonitors}
+                            pendingMonitors={pendingMonitors}
+                            totalMonitors={totalStatusMonitors}
+                            upMonitors={upMonitors}
+                            uptimePercentage={uptimePercentage}
+                        />
+                    </div>
+                ) : null}
             </ThemedBox>
         </header>
     );

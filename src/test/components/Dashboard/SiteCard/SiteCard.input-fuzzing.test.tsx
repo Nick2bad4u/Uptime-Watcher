@@ -45,6 +45,10 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: ({ site }: { site: { site: Site } }) => (
         <div data-testid={`site-card-header-${site.site.identifier}`}>
             Header: {site.site.name}
+            {" "}
+            <div data-testid={`site-card-footer-${site.site.identifier}`}>
+                Click to view details
+            </div>
         </div>
     ),
 }));
@@ -108,17 +112,6 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
     ),
 }));
 
-vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
-    SiteCardFooter: () => {
-        // Get unique site identifier from mock data
-        const siteIdentifier = mockSiteData?.identifier || "default";
-        return (
-            <div data-testid={`site-card-footer-${siteIdentifier}`}>
-                Click to view details
-            </div>
-        );
-    },
-}));
 
 // Mock the useSite hook with comprehensive return data
 vi.mock("../../../../hooks/site/useSite", () => ({
@@ -476,7 +469,7 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
                 const normalizeWhitespace = (text: string) =>
                     text.split(/\s+/).join(" ").trim();
                 const expectedHeaderText = normalizeWhitespace(
-                    `Header: ${site.name}`
+                    `Header: ${site.name} Click to view details`
                 );
                 const headerElement = screen.getByTestId(
                     `site-card-header-${site.identifier}`

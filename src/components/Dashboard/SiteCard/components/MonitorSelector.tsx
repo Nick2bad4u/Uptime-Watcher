@@ -278,6 +278,7 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 aria-haspopup="listbox"
                 className={wrapperClassName}
                 data-disabled={isDisabled}
+                data-prevent-row-activation="true"
                 onClick={handleWrapperClick}
                 onKeyDown={handleWrapperKeyDown}
                 role="button"

@@ -79,6 +79,24 @@
         minmax(0, 1.2fr)
         minmax(0, 1.5fr)
         minmax(200px, 0.65fr);
+    padding-inline-end: clamp(1rem, 0.9rem + 1vi, 1.5rem);
+}
+
+.app-topbar__status-indicator {
+    position: absolute;
+    z-index: 2;
+    inset-block-start: clamp(1rem, 0.85rem + 0.6vi, 1.45rem);
+    inset-inline-end: clamp(1.4rem, 1.15rem + 1.1vi, 2.1rem);
+}
+
+.app-topbar__summary-bar {
+    display: flex;
+    justify-content: center;
+    margin-block-start: clamp(1.15rem, 0.85rem + 0.9vi, 1.75rem);
+}
+
+.app-topbar__summary-bar .header-status-summary {
+    inline-size: 100%;
 }
 
 .app-topbar__identity {
@@ -393,17 +411,6 @@
         var(--color-status-degraded) 40%,
         var(--color-primary-500) 60%
     );
-}
-
-.app-topbar__summary {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 1.1rem;
-    inline-size: 100%;
-    min-inline-size: 0;
 }
 
 .header-status-summary {

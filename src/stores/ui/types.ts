@@ -128,6 +128,14 @@ export interface UIStore {
     setShowSiteDetails: (show: boolean) => void;
 
     /**
+     * Persists the preferred collapsed state for the navigation sidebar.
+     *
+     * @param collapsed - Whether the sidebar should default to the collapsed
+     *   state.
+     */
+    setSidebarCollapsedPreference: (collapsed: boolean) => void;
+
+    /**
      * Updates the presentation style for large site cards.
      *
      * @param presentation - The presentation mode to activate.
@@ -191,6 +199,11 @@ export interface UIStore {
      * Whether the site details modal is currently open.
      */
     showSiteDetails: boolean;
+
+    /**
+     * Whether the navigation sidebar should default to the collapsed state.
+     */
+    sidebarCollapsedPreference: boolean;
 
     /**
      * Presentation style for large site cards (grid or stacked).

@@ -14,7 +14,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Header } from "../../../components/Header/Header";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import type { SitesStore } from "../../../stores/sites/types";
-import { useUIStore } from "../../../stores/ui/useUiStore";
+import {
+    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+    useUIStore,
+} from "../../../stores/ui/useUiStore";
 import type { UIStore } from "../../../stores/ui/types";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
 import type { Site } from "../../../../shared/types";
@@ -25,7 +28,15 @@ import type {
 
 // Mock all store hooks
 vi.mock("../../../stores/sites/useSitesStore");
-vi.mock("../../../stores/ui/useUiStore");
+vi.mock("../../../stores/ui/useUiStore", async () => {
+    const actual = await vi.importActual<
+        typeof import("../../../stores/ui/useUiStore")
+    >("../../../stores/ui/useUiStore");
+    return {
+        ...actual,
+        useUIStore: vi.fn(),
+    };
+});
 vi.mock("../../../theme/useTheme");
 
 const mockUseSitesStore = vi.mocked(useSitesStore);
@@ -48,6 +59,7 @@ const createMockUiStoreState = (): UIStore => ({
     setShowAdvancedMetrics: vi.fn(),
     setShowSettings: vi.fn(),
     setShowSiteDetails: vi.fn(),
+    setSidebarCollapsedPreference: vi.fn(),
     setSiteCardPresentation: vi.fn(),
     setSiteDetailsChartTimeRange: vi.fn(),
     setSiteDetailsHeaderCollapsed: vi.fn(),
@@ -62,15 +74,8 @@ const createMockUiStoreState = (): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "list",
-    siteTableColumnWidths: {
-        controls: 16,
-        monitor: 14,
-        response: 12,
-        running: 10,
-        site: 24,
-        status: 12,
-        uptime: 12,
-    },
+    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: vi.fn(),
     toggleSiteDetailsHeaderCollapsed: vi.fn(),
 });

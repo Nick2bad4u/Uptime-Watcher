@@ -11,7 +11,7 @@ import { AppIcons } from "../../../utils/icons";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { useSidebarLayout } from "../SidebarLayoutContext";
 
-const RevealIcon = AppIcons.layout.viewColumns;
+const RevealIcon = AppIcons.ui.sidebarExpand;
 
 /**
  * Floating sidebar toggle rendered when the navigation is collapsed.
@@ -43,7 +43,15 @@ export const SidebarRevealButton: NamedExoticComponent = memo(
                         onClick={toggleSidebar}
                         type="button"
                     >
-                        <RevealIcon aria-hidden="true" size={18} />
+                        <span
+                            aria-hidden="true"
+                            className="sidebar-reveal-button__icon"
+                        >
+                            <RevealIcon size={18} />
+                        </span>
+                        <span className="sidebar-reveal-button__label">
+                            Open Sidebar
+                        </span>
                     </button>
                 )}
             </Tooltip>

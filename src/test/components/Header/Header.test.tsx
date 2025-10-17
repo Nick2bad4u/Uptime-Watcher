@@ -5,11 +5,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Header } from "../../../components/Header/Header";
 import { useSidebarLayout } from "../../../components/Layout/SidebarLayoutContext";
 import { useGlobalMonitoringMetrics } from "../../../hooks/useGlobalMonitoringMetrics";
-import { useUIStore } from "../../../stores/ui/useUiStore";
+import {
+    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+    useUIStore,
+} from "../../../stores/ui/useUiStore";
 import type { UIStore } from "../../../stores/ui/types";
 import { useAvailabilityColors, useTheme } from "../../../theme/useTheme";
 
-vi.mock("../../../stores/ui/useUiStore", () => ({ useUIStore: vi.fn() }));
+vi.mock("../../../stores/ui/useUiStore", async () => {
+    const actual = await vi.importActual<
+        typeof import("../../../stores/ui/useUiStore")
+    >("../../../stores/ui/useUiStore");
+    return {
+        ...actual,
+        useUIStore: vi.fn(),
+    };
+});
 vi.mock("../../../theme/useTheme", () => ({
     useAvailabilityColors: vi.fn(),
     useTheme: vi.fn(),
@@ -37,6 +48,7 @@ const createUiState = (): UIStore => ({
     setShowAdvancedMetrics: vi.fn(),
     setShowSettings: vi.fn(),
     setShowSiteDetails: vi.fn(),
+    setSidebarCollapsedPreference: vi.fn(),
     setSiteCardPresentation: vi.fn(),
     setSiteDetailsChartTimeRange: vi.fn(),
     setSiteDetailsHeaderCollapsed: vi.fn(),
@@ -51,15 +63,8 @@ const createUiState = (): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
-    siteTableColumnWidths: {
-        controls: 16,
-        monitor: 14,
-        response: 12,
-        running: 10,
-        site: 24,
-        status: 12,
-        uptime: 12,
-    },
+    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: vi.fn(),
     toggleSiteDetailsHeaderCollapsed: vi.fn(),
 });

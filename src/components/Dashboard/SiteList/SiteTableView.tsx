@@ -9,13 +9,17 @@ import {
     type CSSProperties,
     memo,
     type NamedExoticComponent,
+    type MouseEvent as ReactMouseEvent,
     type PointerEvent as ReactPointerEvent,
     useMemo,
 } from "react";
 
 import type { SiteTableColumnKey } from "../../../stores/ui/types";
 
-import { useUIStore } from "../../../stores/ui/useUiStore";
+import {
+    DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
+    useUIStore,
+} from "../../../stores/ui/useUiStore";
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { SiteTableRow } from "./SiteTableRow";
 import "./SiteTableView.css";
@@ -164,6 +168,50 @@ function createPointerDownHandler({
     };
 }
 
+function createDoubleClickHandler({
+    adjacentColumnKey,
+    columnKey,
+    columnWidths,
+    resizable,
+    setColumnWidths,
+}: ColumnResizeContext): (event: ReactMouseEvent<HTMLButtonElement>) => void {
+    if (!resizable) {
+        return (event: ReactMouseEvent<HTMLButtonElement>): void => {
+            event.preventDefault();
+        };
+    }
+
+    return (event: ReactMouseEvent<HTMLButtonElement>): void => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const defaultPrimary = DEFAULT_SITE_TABLE_COLUMN_WIDTHS[columnKey];
+        const defaultAdjacent =
+            DEFAULT_SITE_TABLE_COLUMN_WIDTHS[adjacentColumnKey];
+
+        const defaultTotal = defaultPrimary + defaultAdjacent;
+        if (defaultTotal <= 0) {
+            return;
+        }
+
+        const currentTotal =
+            columnWidths[columnKey] + columnWidths[adjacentColumnKey];
+        const workingTotal = currentTotal > 0 ? currentTotal : defaultTotal;
+
+        const normalizedPrimary = Number(
+            ((defaultPrimary / defaultTotal) * workingTotal).toFixed(2)
+        );
+        const normalizedAdjacent = Number(
+            ((defaultAdjacent / defaultTotal) * workingTotal).toFixed(2)
+        );
+
+        setColumnWidths({
+            [adjacentColumnKey]: normalizedAdjacent,
+            [columnKey]: normalizedPrimary,
+        });
+    };
+}
+
 /**
  * Builds a memoizable style map for the current column widths.
  *
@@ -242,6 +290,14 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                         resizable,
                                         setColumnWidths,
                                     });
+                                const doubleClickHandler =
+                                    createDoubleClickHandler({
+                                        adjacentColumnKey,
+                                        columnKey: column.key,
+                                        columnWidths,
+                                        resizable,
+                                        setColumnWidths,
+                                    });
                                 const resizeHandleClass = isLastColumn
                                     ? "site-table__resize-handle site-table__resize-handle--last"
                                     : "site-table__resize-handle";
@@ -251,6 +307,7 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                         className={headingClass}
                                         key={column.key}
                                         scope="col"
+                                        title={column.label}
                                     >
                                         <div className="site-table__heading-content">
                                             <span>{column.label}</span>
@@ -259,6 +316,9 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                                                     aria-label={`Resize ${column.label} column`}
                                                     className={
                                                         resizeHandleClass
+                                                    }
+                                                    onDoubleClick={
+                                                        doubleClickHandler
                                                     }
                                                     onPointerDown={
                                                         pointerDownHandler

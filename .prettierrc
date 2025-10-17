@@ -140,7 +140,6 @@
     "singleAttributePerLine": false,
     "singleQuote": false,
     "tabWidth": 4,
-    "tailwindConfig": "./tailwind.config.mjs",
     "tailwindFunctions": [
         "clsx",
         "cva"

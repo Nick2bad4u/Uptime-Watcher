@@ -34,7 +34,6 @@ import {
     formatIntervalDuration,
     formatRelativeTimestamp,
 } from "../../../utils/time";
-import { SiteCardFooter } from "./SiteCardFooter";
 import { SiteCardHeader } from "./SiteCardHeader";
 import { SiteCardHistory } from "./SiteCardHistory";
 import { SiteCardMetrics } from "./SiteCardMetrics";
@@ -443,8 +442,6 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
                         {historySection}
                     </>
                 )}
-
-                <SiteCardFooter />
             </ThemedBox>
         );
     }

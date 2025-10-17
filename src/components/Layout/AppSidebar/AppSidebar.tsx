@@ -191,8 +191,8 @@ export const AppSidebar: NamedExoticComponent = memo(function AppSidebar() {
     );
 
     const SidebarToggleIcon = isSidebarOpen
-        ? AppIcons.ui.collapse
-        : AppIcons.ui.expand;
+        ? AppIcons.ui.sidebarCollapse
+        : AppIcons.ui.sidebarExpand;
     const AddIcon = AppIcons.actions.add;
     const SettingsIcon = AppIcons.settings.gear;
     const ThemeIcon = isDark ? AppIcons.theme.light : AppIcons.theme.dark;

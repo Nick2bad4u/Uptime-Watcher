@@ -4,7 +4,14 @@
 
 import type { MonitorStatus, Site } from "@shared/types";
 
-import { memo, type NamedExoticComponent, useCallback, useMemo } from "react";
+import {
+    type KeyboardEvent,
+    memo,
+    type MouseEvent,
+    type NamedExoticComponent,
+    useCallback,
+    useMemo,
+} from "react";
 
 import { useSite } from "../../../hooks/site/useSite";
 import { ThemedText } from "../../../theme/components/ThemedText";
@@ -79,8 +86,60 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             []
         );
 
+        const handleRowActivation = useCallback(
+            (event: MouseEvent<HTMLTableRowElement>) => {
+                const { target } = event;
+                if (!(target instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (
+                    target.closest(
+                        "button, a, input, select, textarea, [data-prevent-row-activation]"
+                    )
+                ) {
+                    return;
+                }
+
+                handleCardClick();
+            },
+            [handleCardClick]
+        );
+
+        const handleRowKeyDown = useCallback(
+            (event: KeyboardEvent<HTMLTableRowElement>) => {
+                if (event.key !== "Enter" && event.key !== " ") {
+                    return;
+                }
+
+                const { target } = event;
+                if (!(target instanceof HTMLElement)) {
+                    return;
+                }
+
+                if (
+                    target.closest(
+                        "button, a, input, select, textarea, [data-prevent-row-activation]"
+                    )
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+                handleCardClick();
+            },
+            [handleCardClick]
+        );
+
         return (
-            <tr className="site-table__row">
+            <tr
+                aria-label={`Open details for ${latestSite.name}`}
+                className="site-table__row"
+                data-site-identifier={latestSite.identifier}
+                onClick={handleRowActivation}
+                onKeyDown={handleRowKeyDown}
+                tabIndex={0}
+            >
                 <th className="site-table__site" scope="row">
                     <button
                         className="site-table__site-trigger"
@@ -100,6 +159,12 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         <ThemedText size="xs" variant="tertiary">
                             {site.identifier}
                         </ThemedText>
+                        <span
+                            aria-hidden="true"
+                            className="site-table__row-hint"
+                        >
+                            View details
+                        </span>
                     </button>
                 </th>
                 <td>

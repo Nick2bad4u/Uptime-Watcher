@@ -8,6 +8,7 @@ import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../shared/types/stateSync";
 import type { SitesStore } from "../../stores/sites/types";
 import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
+import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";
 import type { ChartTimeRange } from "../../stores/types";
 
 let useSelectedSite: typeof import("../../hooks/useSelectedSite").useSelectedSite;
@@ -17,9 +18,15 @@ vi.mock("../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(),
 }));
 
-vi.mock("../../stores/ui/useUiStore", () => ({
-    useUIStore: vi.fn(),
-}));
+vi.mock("../../stores/ui/useUiStore", async () => {
+    const actual = await vi.importActual<
+        typeof import("../../stores/ui/useUiStore")
+    >("../../stores/ui/useUiStore");
+    return {
+        ...actual,
+        useUIStore: vi.fn(),
+    };
+});
 
 type SitesModule = typeof import("../../stores/sites/useSitesStore");
 type UiModule = typeof import("../../stores/ui/useUiStore");
@@ -39,6 +46,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     setShowAdvancedMetrics: (_show: boolean) => {},
     setShowSettings: (_show: boolean) => {},
     setShowSiteDetails: (_show: boolean) => {},
+    setSidebarCollapsedPreference: vi.fn(),
     setSiteCardPresentation: (_presentation) => {},
     setSiteDetailsChartTimeRange: (_range: ChartTimeRange) => {},
     setSiteDetailsHeaderCollapsed: vi.fn(),
@@ -53,15 +61,8 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     siteDetailsHeaderCollapsedState: {},
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
-    siteTableColumnWidths: {
-        controls: 16,
-        monitor: 14,
-        response: 12,
-        running: 10,
-        site: 24,
-        status: 12,
-        uptime: 12,
-    },
+    siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: (_siteIdentifier: string) => {},
     toggleSiteDetailsHeaderCollapsed: vi.fn(),
     ...overrides,

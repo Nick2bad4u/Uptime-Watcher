@@ -36,6 +36,8 @@ import {
 } from "react-icons/fi";
 import {
     HiMiniChevronDown,
+    HiMiniChevronLeft,
+    HiMiniChevronRight,
     HiMiniChevronUp,
     HiMiniPause,
     HiMiniPlay,
@@ -137,6 +139,8 @@ export const AppIcons: {
         readonly home: IconType;
         readonly info: IconType;
         readonly link: IconType;
+        readonly sidebarCollapse: IconType;
+        readonly sidebarExpand: IconType;
     };
 } = {
     /** Action icons */
@@ -216,6 +220,8 @@ export const AppIcons: {
         home: HiOutlineHome,
         info: HiOutlineInformationCircle,
         link: FiExternalLink,
+        sidebarCollapse: HiMiniChevronLeft,
+        sidebarExpand: HiMiniChevronRight,
     },
 } as const;
 

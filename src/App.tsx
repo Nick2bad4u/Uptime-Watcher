@@ -118,9 +118,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         setShowAddSiteModal,
         setShowSettings,
         setShowSiteDetails,
+        setSidebarCollapsedPreference,
         showAddSiteModal,
         showSettings,
         showSiteDetails,
+        sidebarCollapsedPreference,
         siteListLayout,
     } = useUIStore();
 
@@ -146,11 +148,26 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
     // Sidebar responsive state management
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(true);
+    const [compactSidebarOpen, setCompactSidebarOpen] =
+        useState<boolean>(false);
+    const [isCompactViewport, setIsCompactViewport] = useState<boolean>(false);
+
+    const isSidebarOpen = isCompactViewport
+        ? compactSidebarOpen
+        : !sidebarCollapsedPreference;
 
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
+
+    const persistSidebarPreference = useCallback(
+        (nextOpen: boolean): void => {
+            if (!isCompactViewport) {
+                setSidebarCollapsedPreference(!nextOpen);
+            }
+        },
+        [isCompactViewport, setSidebarCollapsedPreference]
+    );
 
     // Create stable callbacks to avoid direct setState in useEffect
     const clearLoadingOverlay = useCallback(() => {
@@ -331,7 +348,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     const handleSidebarBreakpointChange = useCallback(
         (event: MediaQueryListEvent): void => {
-            setIsSidebarOpen(!event.matches);
+            setIsCompactViewport(event.matches);
+            if (event.matches) {
+                setCompactSidebarOpen(false);
+            }
         },
         []
     );
@@ -364,7 +384,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             sidebarMediaQueryRef.current = mediaQuery;
             const { matches } = mediaQuery;
             if (typeof matches === "boolean") {
-                setIsSidebarOpen(!matches);
+                setIsCompactViewport(matches);
+                if (matches) {
+                    setCompactSidebarOpen(false);
+                }
             }
 
             if (typeof mediaQuery.addEventListener === "function") {
@@ -413,7 +436,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     return;
                 }
 
-                setIsSidebarOpen(false);
+                if (isCompactViewport) {
+                    setCompactSidebarOpen(false);
+                } else {
+                    persistSidebarPreference(false);
+                }
             };
 
             document.addEventListener("pointerdown", handlePointerDown, true);
@@ -426,12 +453,26 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 );
             };
         },
-        [isSidebarOpen, setIsSidebarOpen]
+        [
+            isCompactViewport,
+            isSidebarOpen,
+            persistSidebarPreference,
+        ]
     );
 
     const toggleSidebar = useCallback(() => {
-        setIsSidebarOpen((previous) => !previous);
-    }, []);
+        if (isCompactViewport) {
+            setCompactSidebarOpen((previous) => !previous);
+            return;
+        }
+
+        const next = !isSidebarOpen;
+        persistSidebarPreference(next);
+    }, [
+        isCompactViewport,
+        isSidebarOpen,
+        persistSidebarPreference,
+    ]);
 
     const globalMetrics = useGlobalMonitoringMetrics();
 

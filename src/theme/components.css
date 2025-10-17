@@ -256,13 +256,17 @@
 
 .sidebar-reveal-button {
     position: fixed;
-    z-index: var(--z-elevated-fixed);
+    z-index: 1200;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.3rem;
+    padding: clamp(0.45rem, 0.35rem + 0.25vi, 0.65rem)
+        clamp(0.4rem, 0.3rem + 0.2vi, 0.6rem);
     border: 1px solid
         color-mix(in srgb, var(--color-primary-500) 32%, transparent);
-    border-radius: 1rem;
+    border-radius: 9999px;
     backdrop-filter: blur(12px) saturate(1.08);
     background: linear-gradient(
         135deg,
@@ -277,7 +281,6 @@
             var(--color-surface-overlay) 90%
         )
     );
-    block-size: 2.75rem;
     box-shadow: 0 18px 48px
         color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
     color: color-mix(
@@ -285,16 +288,27 @@
         var(--color-primary-500) 72%,
         var(--color-surface-base, rgb(226 232 240)) 28%
     );
-    grid-column: 1 / -1;
-    grid-row: 1;
-    inline-size: 2.75rem;
-    inset-block-end: clamp(1rem, 0.75rem + 1.4vi, 2.3rem);
-    inset-inline-start: clamp(1rem, 0.75rem + 1.4vi, 2.3rem);
-    line-height: 1;
+    inline-size: clamp(2.1rem, 1.85rem + 0.45vi, 2.6rem);
+    min-block-size: clamp(2.2rem, 2rem + 0.35vi, 2.6rem);
+    inset-block-start: 35%;
+    inset-inline-start: calc(env(safe-area-inset-left, 0rem) + 0.25rem);
+    transform: translateY(-50%);
     transition:
         transform var(--transition-fast),
         box-shadow var(--transition-fast),
-        color var(--transition-fast);
+        color var(--transition-fast),
+        opacity var(--transition-fast);
+    pointer-events: auto;
+
+    .app-shell--sidebar-open & {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .app-shell--sidebar-closed & {
+        opacity: 1;
+        pointer-events: auto;
+    }
 
     &:hover {
         box-shadow: 0 24px 56px
@@ -303,8 +317,30 @@
                 var(--accent-primary-strong-color) 36%,
                 transparent
             );
-        transform: translateY(-0.125rem);
+        transform: translateY(-50%) scale(1.03);
     }
+}
+
+.sidebar-reveal-button__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 1.25rem;
+    inline-size: 1.25rem;
+}
+
+.sidebar-reveal-button__label {
+    font-size: 0.5625rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: color-mix(
+        in srgb,
+        var(--color-text-secondary) 75%,
+        transparent
+    );
 }
 
 .sidebar-reveal-button--dark {
@@ -325,12 +361,6 @@
     &:hover {
         box-shadow: 0 20px 48px
             color-mix(in srgb, var(--shadow-base-color) 56%, transparent);
-    }
-}
-
-@media (width >= 64rem) {
-    .sidebar-reveal-button {
-        display: none;
     }
 }
 
@@ -2518,6 +2548,37 @@
     .site-grid--compact & {
         justify-content: space-between;
     }
+}
+
+.site-card__control-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(0.45rem, 0.4rem + 0.25vi, 0.75rem);
+}
+
+.site-card__inline-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-inline: 0.35rem;
+    color: color-mix(
+        in srgb,
+        var(--color-text-tertiary) 82%,
+        transparent
+    );
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.site-card:hover .site-card__inline-hint,
+.site-card:focus-within .site-card__inline-hint {
+    opacity: 0.85;
 }
 
 .monitor-selector__wrapper {

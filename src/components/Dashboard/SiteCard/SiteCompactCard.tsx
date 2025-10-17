@@ -167,6 +167,18 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             variant="secondary"
                         >
                             <span
+                                className="site-card__compact-subtitle-url"
+                                title={site.identifier}
+                            >
+                                {site.identifier}
+                            </span>
+                            <span
+                                aria-hidden="true"
+                                className="site-card__compact-subtitle-separator"
+                            >
+                                •
+                            </span>
+                            <span
                                 className="site-card__compact-subtitle-text"
                                 title={monitorSummary}
                             >
@@ -242,24 +254,28 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                         selectedMonitorId={selectedMonitorId}
                     />
 
-                    <ActionButtonGroup
-                        allMonitorsRunning={allMonitorsRunning}
-                        buttonSize="xs"
-                        disabled={!monitor}
-                        isLoading={isLoading}
-                        isMonitoring={isMonitoring}
-                        onCheckNow={handleCheckNow}
-                        onStartMonitoring={handleStartMonitoring}
-                        onStartSiteMonitoring={handleStartSiteMonitoring}
-                        onStopMonitoring={handleStopMonitoring}
-                        onStopSiteMonitoring={handleStopSiteMonitoring}
-                    />
-                </div>
-
-                <div className="site-card__compact-footer">
-                    <ThemedText size="xs" variant="tertiary">
-                        Tap for detailed analytics • {toSentenceCase(status)}
-                    </ThemedText>
+                    <div className="site-card__compact-actions">
+                        <ActionButtonGroup
+                            allMonitorsRunning={allMonitorsRunning}
+                            buttonSize="xs"
+                            disabled={!monitor}
+                            isLoading={isLoading}
+                            isMonitoring={isMonitoring}
+                            onCheckNow={handleCheckNow}
+                            onStartMonitoring={handleStartMonitoring}
+                            onStartSiteMonitoring={handleStartSiteMonitoring}
+                            onStopMonitoring={handleStopMonitoring}
+                            onStopSiteMonitoring={handleStopSiteMonitoring}
+                        />
+                        <ThemedText
+                            className="site-card__compact-hint"
+                            size="xs"
+                            variant="tertiary"
+                        >
+                            Tap for detailed analytics •{" "}
+                            {toSentenceCase(status)}
+                        </ThemedText>
+                    </div>
                 </div>
             </ThemedBox>
         );
