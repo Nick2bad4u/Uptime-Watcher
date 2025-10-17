@@ -7,12 +7,249 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[62d675f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62d675fc5cb7aee1f7aab9c4e2d40280014edb86)...
-[55a9f74](https://github.com/Nick2bad4u/Uptime-Watcher/commit/55a9f74dab20d0e73eaab32fb7b37e5f0f483836)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/62d675fc5cb7aee1f7aab9c4e2d40280014edb86...55a9f74dab20d0e73eaab32fb7b37e5f0f483836))
+[[fcb65e8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)...
+[fcb65e8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/fcb65e861f130f7593601afde00152874c5153e8...fcb65e861f130f7593601afde00152874c5153e8))
 
 
 ### 📦 Dependencies
+
+- [dependency] Update version 16.9.0 [`(fcb65e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)
+
+
+
+
+
+
+## [16.9.0] - 2025-10-17
+
+
+[[62d675f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62d675fc5cb7aee1f7aab9c4e2d40280014edb86)...
+[465af28](https://github.com/Nick2bad4u/Uptime-Watcher/commit/465af28833f78940bdf648c100236dc13c1aa41a)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/62d675fc5cb7aee1f7aab9c4e2d40280014edb86...465af28833f78940bdf648c100236dc13c1aa41a))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance error handling and validation
+
+This commit introduces layered validation, structured error handling, and architectural documentation to improve data quality, consistency, and maintainability.
+
+- 🧱 Implements layered validation strategy with IPC schema, manager business rules, and repository persistence checks to ensure data quality at each layer.
+ - Guarantees a single responsibility per layer, early failure with actionable messages, structured errors using `ApplicationError`, immutable inputs, and unit tests at the source.
+- 🐛 Introduces `ApplicationError` for consistent error propagation with contextual metadata, aiding in debugging and user feedback.
+ - Normalizes error causes, includes machine-readable codes, operation identifiers, and structured diagnostic metadata.
+- 🔄 Refactors `UptimeOrchestrator` to use `runWithContext` for standardized error handling across operations.
+ - Wraps operations in a try/catch block, normalizes errors into `ApplicationError` instances, and includes contextual information like code, details, message, and operation.
+- 📝 Adds architectural diagrams and documentation for validation layers, error propagation, and event bus flow to improve understanding and maintainability.
+ - Documents IPC boundary, event bus coupling, transaction adapters, validation layers, error propagation, service container, and repositories.
+- 🧪 Updates tests to reflect changes in `IpcService` constructor and `MonitorManager` to account for new error handling and validation logic.
+- 🧹 Introduces `RendererEventBridge` to manage renderer process communication via IPC, centralizing window iteration and error handling.
+ - Adds `sendToRenderers` for sending payloads to all active renderer windows and `sendStateSyncEvent` for emitting state synchronization events with metadata.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fb77fcc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fb77fcc5311cae4429c3cea6d754753c19a106fe)
+
+
+- ✨ [feat] Expose realtime status subscription health
+
+This commit introduces a new UI component and associated logic to display the health of the realtime status subscription.
+
+- Adds a `StatusSubscriptionIndicator` component to the header, providing a summary of the subscription's health and retry controls.
+ - The component visualizes the status using icons and text, and provides a tooltip with detailed diagnostics.
+ - Exposes a button to retry the subscription if it's degraded or failed.
+ - Styles the indicator to reflect different health states (healthy, degraded, failed, unknown) using color-coding and icons.
+- Creates a `useStatusSubscriptionHealth` hook to derive a normalized health representation from the latest subscription summary.
+ - Aggregates `StatusUpdateSubscriptionSummary` data into a format suitable for UI rendering.
+ - Defines discrete health states (degraded, failed, healthy, unknown).
+- Modifies the sites store to persist subscription diagnostics.
+ - Adds `setStatusSubscriptionSummary` action to store the latest `StatusUpdateSubscriptionSummary`.
+ - Updates `subscribeToStatusUpdates` and `retryStatusSubscription` actions to persist subscription diagnostics and handle cases where no callback is registered.
+ - Updates `unsubscribeFromStatusUpdates` to clear the persisted subscription diagnostics.
+- Updates site operations to handle backend-sourced snapshots, and ensure that the Zustand store always holds the enriched `Site`, including backend-side defaults.
+ - Updates site operations to only call `applySavedSiteToStore` as the only supported post-mutation path.
+- Adds logging to site monitoring actions for pending, success, and failure states.
+- Adds dedicated tests for the new component and hook:
+ - `StatusSubscriptionIndicator.test.tsx` tests the rendering and functionality of the `StatusSubscriptionIndicator` component.
+ - `deriveStatusSubscriptionHealth.test.ts` tests the logic of the `deriveStatusSubscriptionHealth` hook.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca83cbd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca83cbddce24b39d00af1e488eebbfe48d833468)
+
+
+- ✨ [feat] Enhance preload diagnostics and logging
+
+This commit introduces enhanced diagnostics and logging capabilities, focusing on improving the reliability and debuggability of preload scripts.
+
+- 🔧 Extends logging capabilities in the Electron main process and preload scripts.
+ - Adds structured diagnostics forwarding for preload guard violations to the main process.
+ - Implements detailed logging for IPC handler verifications and preload guard failures.
+ - Provides more context and clarity in log messages, facilitating easier debugging and issue resolution.
+- 🛠️ Introduces a new `preloadLogger` utility for enhanced logging within preload scripts.
+ - Creates dedicated logger instances for standard and diagnostic logging.
+ - Implements structured payload previews to provide context for debugging.
+ - Adds functionality to report preload guard failures to the main process for centralized diagnostics.
+- 🧪 Adds comprehensive tests for the `eventsApi` to ensure proper handling of malformed payloads.
+ - Verifies that invalid payloads are correctly dropped and reported via diagnostics.
+ - Includes tests for undefined, null, and malformed event data.
+- 📝 Updates documentation to reflect architectural evolution.
+- 🚜 Refactors code to improve readability and maintainability.
+ - Replaces `console.warn` with the new `preloadDiagnosticsLogger` for reporting malformed payloads.
+ - Simplifies logging configuration in `electron/main.ts`.
+- 🎨 Improves type safety and code clarity.
+ - Corrects type definitions for `EffectCallback` and `EffectCleanup` in `hookPerformance.bench.ts`.
+ - Updates parameter descriptions in `sitesApi.ts` for clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(baad87b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/baad87b9ac5ca1d11278ed79b66c1400499e8810)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Improve site management and event handling
+
+This commit refactors site management and event handling to improve data consistency and streamline inter-process communication.
+
+- 🛠️ **Site Management Improvements**:
+ - Normalizes cache updates through a shared utility to guarantee event emission when a site is added.
+  - This ensures that the cache is consistent and that all relevant events are triggered.
+ - Sanitizes site data before emitting events to prevent unintended data exposure.
+  - This enhances data integrity by ensuring that only safe data is shared.
+ - Emits internal site events ("internal:site:added", "internal:site:removed") to provide more granular control over site lifecycle events.
+  - These events allow internal components to react specifically to site addition or removal.
+ - ⚡ Updates site removal logic to ensure cache and event consistency.
+  - Ensures sites are properly removed from the cache before removal events are fired.
+- 📝 **IPC Service**:
+ - Removes the `RendererEventBridge` dependency from the `IpcService`.
+  - This simplifies the `IpcService` by removing an unnecessary dependency.
+ - ♻️ **Event Handling**:
+  - Forwards `sites:state-synchronized` events from the orchestrator to the renderer, ensuring that all renderer processes are kept in sync with the latest site state.
+  - This maintains UI consistency across all application windows.
+- 🧪 **Testing**:
+ - Updates comprehensive tests for `SiteManager` to accurately mock cache operations.
+  - Ensures cache operations are reliably mocked to mimic real-world behavior.
+- 🧹 **Other Changes**:
+ - Registers database event bus for event forwarding.
+  - Enables the forwarding of events from the database event bus to other parts of the application.
+ - Adds new events to the list of forwarded events in `ServiceContainer`.
+  - Ensures that new events are properly forwarded to the appropriate listeners.
+ - Removes unnecessary `sendStateSyncEvent` calls from `IpcService`.
+  - This reduces redundancy and potential inconsistencies in state synchronization.
+- 🎨 **UI**:
+ - Adds a status subscription indicator to the header, providing real-time feedback on the health of the app's event listeners.
+  - Includes logic for retrying subscriptions and displaying detailed listener states.
+- 📝 **Documentation**:
+ - Updates ADR_005_IPC_COMMUNICATION_PROTOCOL.md to reflect changes to IpcService.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(465af28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/465af28833f78940bdf648c100236dc13c1aa41a)
+
+
+- 🛠️ [fix] Improve cache update atomicity
+
+This commit refactors cache update operations to ensure atomicity and consistency, and includes various related improvements:
+
+- 🔄 Updates the `StandardizedCache` class to include a `replaceAll` method that atomically replaces all cache entries.
+ -  This method first clears the cache and then bulk updates it with new items, ensuring a consistent state.
+ -  Emits `internal:cache:bulk-updated` event with a zero count when `replaceAll` is called with an empty array.
+- ⚡ Improves the performance of cache updates by using the new `replaceAll` method in `DatabaseManager` and `SiteManager`.
+ -  Removes the temporary cache implementation in `updateSitesCache` in `SiteManager`.
+ -  Updates the site cache update process in `DatabaseManager` to use `replaceAll`.
+- 🧪 Updates tests to reflect the new `replaceAll` method and ensure proper cache behavior.
+ -  Improves test coverage and adds comprehensive tests for `replaceAll` in `StandardizedCache`.
+ -  Updates mocks and test implementations to align with the new `replaceAll` method.
+- 📝 Updates documentation and comments to reflect the changes in cache update operations.
+- 🛠️ Addresses potential issues with URL validation and sanitization in the `AddSiteForm`.
+ - Ensures URLs are properly trimmed and sanitized before being used, preventing validation issues.
+- 🛠️ Normalizes timestamp generation in event data to prevent potential issues with invalid date strings.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e6719a8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6719a8d98fb904a263a71fafd1ab64c040c7f4b)
+
+
+- 🛠️ [fix] Improve state synchronization reliability
+
+This commit enhances the reliability and efficiency of state synchronization across the application.
+
+- ♻️ Refactors the state synchronization mechanism to ensure data consistency and prevent potential race conditions.
+   - 🗑️ Removes the `create` action from the `StateSyncEventData` interface as it's no longer needed.
+   - 🚚 Renames `WindowService.sendToRenderer` to `RendererEventBridge.sendToRenderers` to clarify its purpose and scope.
+   - 📝 Updates documentation to reflect the changes in the event system and architecture.
+   - ⚡️ Improves performance by streamlining the state synchronization process.
+   - 🔑 Replaces optional `sites` with a mandatory `sites` array in `StateSyncEventData` to guarantee data availability.
+   - 🩹 Fixes the state sync event to always provide a full state snapshot after an event to prevent inconsistencies.
+   - 🌐 Updates the `stateSyncApi.ts` to check if the sites array exists and is indeed an array.
+   - 🎨 Updates the default site name to be located in `@shared/constants/sites` to ensure both the frontend and backend use the same default and stay in lockstep.
+- 🧪 Adds comprehensive test coverage for state synchronization to ensure its reliability and correctness.
+   - ✅ Adds comprehensive tests for the state sync domain API.
+   - ✅ Adds tests for the `SiteManager` to ensure the cache is properly updated.
+   - ✅ Adds tests for the `ApplicationService`.
+- 🗑️ Removes the singleton `operationRegistry` as it's no longer needed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c6be6ba)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c6be6bab8e8fff2317f6b8e08ae8fa33a3b43f6a)
+
+
+- 🛠️ [fix] Enhance error handling and event dispatch
+
+This commit improves error handling and event dispatch within the application.
+
+- 🛠️ Updates error handling in `UptimeOrchestrator` to use `createContextualError` for standardized error reporting and logging, enhancing error context and diagnostics.
+ - 📝 This change replaces `this.throwWithContext` with `this.createContextualError` to ensure consistent error formatting and logging across the orchestrator.
+ - 🐛 It corrects error details and cause handling for initialization, shutdown, site/monitor removal, and data export operations.
+- ✨ The commit refactors event dispatch in `ApplicationService` to use `RendererEventBridge` for sending updates to renderers, decoupling the service from direct window management.
++ ✨ Refactors event dispatch in `ApplicationService` to use `RendererEventBridge` for sending updates to renderers.
+  - ⚙️ It replaces direct calls to `windowService.sendToRenderer` with `rendererBridge.sendToRenderers`, improving modularity and maintainability.
+  - 📢 It ensures auto-updater status and monitoring events are dispatched via the event bridge.
+- ⚡ This commit improves database transaction handling by removing unnecessary async wrappers, streamlining repository operations, and enhancing performance.
++ ⚡ Improves database transaction handling by removing unnecessary async wrappers, streamlining repository operations, and enhancing performance.
+  - 🔄 It simplifies transaction execution in `MonitorManager`, `HistoryRepository`, `MonitorRepository`, and `SettingsRepository` by directly returning the promise from `executeTransaction`.
+- 🧪 Updates tests to reflect changes in error handling and event dispatch, ensuring test suite accuracy and reliability.
++ 🧪 Updates tests to reflect changes in error handling and event dispatch.
+   - ✅ It adjusts assertions to validate the new error structure and event dispatch mechanism.
+   - 📝 It adds comprehensive testing for forwarding errors in the `ApplicationService`.
+- 🎨 Updates events API to use renderer event channels for event management, improving code maintainability and readability.
++ 🎨 Updates events API to use renderer event channels for event management.
+  - 🏷️ It introduces `RENDERER_EVENT_CHANNELS` constant for defining event channels.
+  - ✨ It migrates event subscriptions to use the new event channel constants.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(af06cea)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/af06ceabcfe2fb1edba9a2bfae5f7769f6a7da09)
+
+
+- 🛠️ [fix] Improve site monitoring and operation flows
+
+This commit enhances site monitoring and operation flows by improving logging, error handling, and subscription management.
+
+- 🛠️ **Enhances telemetry for store operations**:
+   - Updates `withSiteOperation` and `withSiteOperationReturning` to use a new telemetry system.
+   - Adds support for stage-specific metadata (pending, success, failure) to provide more granular logging.
+   - Centralizes logging logic to ensure consistency across different operations.
+- 🧪 **Fixes potential NaN value in safe number conversions**:
+   - Modifies `safeNumberConversion` to handle potential NaN default values, ensuring a fallback to 0.
+- ⚡ **Improves status update subscription**:
+   - Modifies the status update subscription process to handle cases where a callback is not initially provided.
+   - Implements retry logic for status update subscriptions, ensuring proper cleanup and re-subscription.
+   - Adds unsubscribe functionality to cleanly disconnect from status updates.
+- 📝 **Updates documentation**:
+   - Adds documentation for real-time subscription diagnostics, logging conventions, and shared helpers.
+   - Clarifies the usage of `updateMonitorAndSave` and the importance of composing helpers for consistent state transitions.
+- 🧹 **Updates dependencies**:
+   - Adds new dependencies to `knip.config.ts` to align with project requirements, including `@storybook/test-runner`, `istanbul-lib-coverage`, `istanbul-lib-report`, `istanbul-reports`, and `node-abi`.
+- 🎨 **Updates UI components**:
+   - Refactors `StatusSubscriptionIndicator` to improve error handling and display subscription status more accurately.
+   - Updates CSS styles for `Header.css` to enhance the visual presentation of status indicators and controls.
+- 📝 **Excludes build artifacts from remark linting**:
+   - Adds new entries to `.remarkignore` to exclude build artifacts and generated documentation from remark linting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0377b44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0377b444319a0399a5ceb2f626d86823814813a7)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update katex (#86) [`(b22ca5c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b22ca5caa5fb986e9e827e01ebf50420a20c7373)
+
+
+- *(deps)* [dependency] Update dependency group (#84) [`(e19db7d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e19db7dd97a94eb29c108aa296d8abfcf1fd74d6)
+
+
+- *(deps)* [dependency] Update the npm-all group (#85) [`(d38a27e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d38a27ebd8ebd90e7abc73b9104bef0c045d2373)
+
 
 - [dependency] Update version 16.8.0 [`(62d675f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62d675fc5cb7aee1f7aab9c4e2d40280014edb86)
 
@@ -24,7 +261,298 @@ All notable changes to this project will be documented in this file.
 
 
 
+### 🚜 Refactor
+
+- 🚜 [refactor] Improves event handling and state sync
+
+This commit refactors event handling and state synchronization within the application to improve maintainability and reduce potential errors.
+
+- 🚚 Moves cache-related event definitions in `eventTypes.ts` to improve organization and readability.
+- ♻️ Refactors state synchronization logic in `SiteManager.ts` and `IpcService.ts` to use constants for actions and sources, ensuring consistency and reducing the risk of typos.
+ - 📝 This change replaces inline string literals with references to `STATE_SYNC_ACTION` and `STATE_SYNC_SOURCE`
+ - 🔤 Adds and utilizes `STATE_SYNC_ACTION` and `STATE_SYNC_SOURCE` constants in `shared/types/stateSync.ts`
+- ✅ Enhances type safety and code clarity in `eventsApi.ts` and `stateSyncApi.ts` by using `some()` with type predicates to validate event data.
+ - 🔍 This ensures that event payloads are correctly typed before being processed, preventing runtime errors.
+ - ➕ Introduces canonical lists (`CACHE_INVALIDATION_REASON_VALUES`, `CACHE_INVALIDATION_TYPE_VALUES`, `MONITORING_CONTROL_REASON_VALUES`, `UPDATE_STATUS_VALUES`) to define allowed values for event properties.
+- 🔨 Modifies `AutoUpdaterService.ts` to use `UPDATE_STATUS` constants for update status changes, promoting consistency.
+- 🧪 Adds comprehensive tests for event types to ensure all cases are covered.
+- 🧪 Improves test descriptions for clarity.
+- ⏱️ Adds `flushMicrotasks` to cache tests to ensure events are emitted before assertions are made.
+- ✨ These changes make the codebase more robust and easier to maintain.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(df77379)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/df7737912a46f46cb4ae58ebae0edeba776337a6)
+
+
+- 🚜 [refactor] Improve error handling
+
+This commit improves error handling and renderer event management.
+
+- 🛠️ Refactors `UptimeOrchestrator` to use `createContextualError` for standardized error creation and logging, enhancing error context.
+ - Removes the `throwWithContext` method.
+ - Updates error handling in methods like `initialize`, `shutdown`, `removeMonitor`, and `removeSite`, ensuring consistent error reporting.
+- 🛠️ Modifies `MonitorManager` to streamline database transaction execution, simplifying the `applyDefaultInterval` method.
+- 🛠️ Updates `HistoryRepository` and `SiteRepository` to use arrow functions and promises for database transactions.
+- ✨ Introduces `RENDERER_EVENT_CHANNELS` to manage renderer IPC channels, providing a centralized definition for event names.
+- 🔄 Updates `ApplicationService` to use `RendererEventBridge` for sending events to renderers, decoupling the service from direct window management.
+- 🧹 Cleans up and standardizes event emission in `ApplicationService`, improving code readability and maintainability.
+- 🧪 Adds comprehensive tests for `ApplicationService` to ensure proper event handling and error forwarding.
+- 🧪 Updates `UptimeOrchestrator.test.ts` to check for `ApplicationError` instances for initialization and setup failures.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cd43a7c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd43a7c56ca19dd4da60d4858ea5c39ad3c25537)
+
+
+- 🚜 [refactor] Move monitor removal to sites API
+
+This commit refactors the monitor removal functionality by moving it from the monitoring API to the sites API.
+
+- 🧩 **API Restructuring**:
+ - 🚚 Moves the `removeMonitor` function from `monitoringApi.ts` to `sitesApi.ts`.
+  - This change aligns the API structure more logically, as monitor management is more closely associated with site management.
+ - 📝 Updates the corresponding interface definitions in `shared/types/preload.ts` to reflect this move.
+  - Removes `removeMonitor` from `MonitoringChannelMap` and `MONITORING_CHANNELS_DEFINITION`.
+  - Adds `removeMonitor` to `SitesChannelMap` and `SITES_CHANNELS_DEFINITION`.
+- 🛠️ **Service Layer Modification**:
+ - 🔄 Modifies `SiteService.ts` to use the `sites.removeMonitor` API instead of `monitoring.removeMonitor`.
+  - This ensures that the service layer correctly calls the new API endpoint for removing monitors.
+- 🔄 Updates the `updateSite` function in `SiteService.ts` to return the updated `Site` instance from the backend.
+  -  Ensures the frontend receives the complete, updated site data after a modification.
+- 🔄 Updates `useSiteOperations.ts` to set the sites after updating a site via `updateSite`.
+ - Ensures the frontend receives and applies site changes.
+- 🧪 **Comprehensive Testing Updates**:
+ - 🧪 Updates `useSiteOperations.targeted.test.ts` to reflect the change in API usage.
+  - Removes the mock for `monitoring.removeMonitor` and adds a mock for `sites.removeMonitor`.
+ - 🧪 Modifies `useSiteOperations.test.ts` to align with the refactored API structure.
+ - 🧪 Updates `src/test/stores/sites/utils/operationHelpers.test.ts` to ensure tests are up to date with changes.
+ - ✅ Adds a new test case to `src/test/stores/sites/SiteService.test.ts` to cover the `updateSite` function.
+- 🧪 **UI Store Error handling**:
+ - ✅ Adds error handling and logging to `useUIStore.ts` when opening external URLs fails.
+  - Improves the reliability of the UI by gracefully handling errors when opening external links.
+- 🐛 **Bug Fix**:
+ - 🐛 Fixes an issue in `App.tsx` where the `subscribeToStatusUpdates` function could encounter issues.
+  - Adds a check for the `success` property in the subscription result and logs a warning if the subscription fails.
+- ⚡ **Performance**:
+ - ⚡ Improves the efficiency of status updates by using incremental updates.
+- 🧪 **Comprehensive Testing**:
+ - 🧪 Adds tests to `useSiteSync.comprehensive.test.ts` to cover the new status update subscription logic.
+- 🔄 Updates the `subscribeToStatusUpdates` function in `useSiteSync.ts` to return a promise that resolves with a `StatusUpdateSubscriptionSummary` object.
+- 📝 Adds a new type `StatusUpdateSubscriptionSummary` to `src/stores/sites/baseTypes.ts` to represent the summary of a status update subscription.
+- 🔄 Updates the `StatusUpdateManager` class in `src/stores/sites/utils/statusUpdateHandler.ts` to return a `StatusUpdateSubscriptionResult` object when subscribing to status updates.
+- 🗑️ **Code Cleanup**:
+ - 🗑️ Removes unused code from `electron/test/preload/domains/monitoringApi.comprehensive.test.ts` and `electron/test/preload.missing-branches.test.ts`.
+  - This removes the test case for `monitoringApi.removeMonitor` and the corresponding expectation in `preload.missing-branches.test.ts`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9391f45)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9391f4592d754df3942bd09d37ee8166f78be26c)
+
+
+- 🚜 [refactor] Rename `siteId` to `siteIdentifier`
+
+Refactors code to consistently use `siteIdentifier` instead of `siteId`.
+
+- 🛠️ Updates codebase to replace instances of `siteId` with `siteIdentifier` across multiple files.
+ - This change ensures consistency and clarity in identifying sites throughout the application.
+ -  🧼 Cleans up naming inconsistencies to improve code readability and maintainability.
+- ⚡️ Improves code efficiency by aligning naming conventions with the intended purpose of site identification.
+- 🧪 Updates benchmarks and tests to reflect the change from `siteId` to `siteIdentifier`.
+ -  Ensures that the test suite remains accurate and reliable after the refactoring.
+ -  Includes modifications to mock data and test assertions to align with the new naming convention.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(64f3527)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/64f35276da2549e3f2d72669d8690c02ca343490)
+
+
+- 🚜 [refactor] Rename `siteId` to `siteIdentifier`
+
+This commit refactors the codebase to rename the `siteId` property to `siteIdentifier` for improved clarity and consistency.
+
+- 🛠️ Updates the codebase to consistently use `siteIdentifier` instead of `siteId`.
+ - This change ensures that the code accurately reflects the intended purpose of the identifier.
+ - 💡 The renaming enhances code readability and reduces potential confusion.
+- 📝 Updates documentation and guides to reflect the change from `siteId` to `siteIdentifier`.
+ - This ensures that the documentation remains accurate and up-to-date.
+- 🧪 Updates benchmarks and tests to use `siteIdentifier` for consistency.
+ - This ensures that the tests remain relevant and accurate.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(34a2e8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/34a2e8afbdd35f2164c4686210c0d97190b866f4)
+
+
+- 🚜 [refactor] Standardize site identifier usage
+
+This commit refactors the application to consistently use `siteIdentifier` instead of `siteId` for identifying sites across the codebase.
+
+- 🔑 Replaces instances of `siteId` with `siteIdentifier` in documentation, code, and event payloads to ensure consistent naming and prevent confusion.
+ - This change improves code readability and maintainability by establishing a single, clear identifier for sites.
+- 🔄 Updates the UI store, add site form, site details, and other relevant components to reflect the change from `selectedSiteId` to `selectedSiteIdentifier`.
+- 🚦 Modifies event payloads and their corresponding type definitions to consistently use `siteIdentifier`.
+ - This ensures that events are correctly processed and that the correct site is targeted.
+- 🚚 Adapts the electron backend to emit and listen for events using the new `siteIdentifier`.
+ - This includes changes to the uptime orchestrator, monitor manager, and site manager, ensuring that site removals and other operations are correctly handled.
+- 🛡️ Adds runtime type guards to validate monitor status events, ensuring data integrity and preventing errors due to malformed payloads.
+- 🧪 Updates tests to reflect the identifier change and to ensure that events are correctly processed.
+ - Includes comprehensive fuzzing tests to handle a wide range of inputs and edge cases.
+- 📝 Updates documentation to reflect the new naming convention and to provide clear guidance on using the `siteIdentifier`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2bac699)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2bac699c24708bfd0acdf57153c205d628090245)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Revise Consistency-Check prompt to clarify scope, checks, and remediation guidance
+
+ - 📝 [docs] Update .github/prompts/Consistency-Check.prompt.md: reword Objective to focus on layered Electron + React architecture and broaden review targets (utilities, services, platform glue, renderer-facing modules).
+ - 📝 [docs] Replace and standardize analysis headings (Structural Alignment, Data Flow Health, Logic Uniformity, Interface Cohesion, Inconsistency Sweep) and expand checklist items for each area.
+ - 📝 [docs] Flesh out Output Requirements and Prioritization sections with clearer deliverables and ranking criteria.
+ - 📝 [docs] Add explicit remediation guidance ("Fixing Inconsistencies") with step-by-step refactor/testing/documentation rules and a strict no-backwards-compatibility directive.
+ - 📝 [docs] Emphasize excluding tests/Playwright/Storybook, prioritizing cross-layer boundaries, and leveraging existing docs and tooling for inspections.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a03417b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a03417b611a78765210180a15b6da7081a477e28)
+
+
+- 📝 [docs] Augment benchmark files with documentation
+
+This commit enhances the benchmark suite by adding comprehensive documentation to several files.
+
+- ✨ [feat] Introduces JSDoc comments to classes, interfaces, types, and functions across multiple benchmark files.
+   - This improves code understanding and maintainability by providing clear explanations of each component's purpose and usage.
+- 📝 [docs] Updates file headers in benchmark files to include descriptions and package documentation tags.
+   - This offers a high-level overview of each benchmark's goal and scope.
+- 🔧 [build] Adds a script to automate the documentation augmentation process.
+   - This ensures consistency and reduces manual effort when updating documentation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1740b43)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1740b435af453124cbe19b5142f69932a4734b7e)
+
+
+- 📝 [docs] Add jsdoc `@public` tag for public APIs
+
+Adds the `@public` JSDoc tag to mark React components, hooks, types, interfaces, and functions intended for public use in the codebase.
+
+ - 📝 [docs] Adds `@public` tag to:
+   -  `MonitoringStatusDisplayProperties` interface
+   -  `MonitoringStatusDisplay` component
+   -  `SiteDetails` component
+   -  `SiteDetailsHeader` component
+   -  `SiteDetailsNavigation` component
+   -  `ResponseTimeChart` component
+   -  `StatusChart` component
+   -  `UptimeChart` component
+   -  `AnalyticsTab` component
+   -  `HistoryTab` component
+   -  `OverviewTab` component
+   -  `SettingsTab` component
+   -  `SiteOverviewTab` component
+   -  `useAddSiteForm` hook
+   -  `useSite` hook and dependent interfaces
+   -  `useSiteActions` hook and dependent interfaces
+   -  `useSiteAnalytics` hook and dependent interfaces
+     -  📈 - Includes `ChartData`, `DowntimePeriod`, and `SiteAnalytics` interfaces
+   -  `useSiteDetails` hook and dependent interfaces
+   -  `useSiteMonitor` hook and dependent interfaces
+   -  `useSiteStats` hook and dependent interfaces
+   -  `useConfirmDialog` hook
+   -  `useOverflowMarquee` hook and dependent interfaces
+   -  `useBackendFocusSync` hook
+   -  `useDelayedButtonLoading` hook
+   -  `useDynamicHelpText` hook and dependent interfaces
+   -  `useGlobalMonitoringMetrics` hook
+   -  `useMonitorFields` hook
+   -  `useMonitorTypes` hook
+   -  `useMount` hook
+   -  `useSelectedSite` hook
+   -  `useThemeStyles` hook and dependent interfaces
+   -  `DataService`
+   -  `StateSyncService`
+   -  `ChartConfigService` and dependent interfaces
+   -  `createIpcServiceHelpers` and `getIpcServiceHelpers`
+   -  `MonitorTypesStore`
+   -  Base types and interfaces related to:
+     -  Site CRUD operations
+     -  Site monitoring operations
+     -  Site synchronization operations
+     -  Site state management
+     -  Site subscriptions
+   -  `SitesStore`
+   -  Site monitoring actions
+   -  Site operations actions
+   -  Site state actions
+   -  File download utilities
+   -  Monitor operations utilities
+   -  Site operations helpers
+   -  UI store interfaces
+   -  Confirm dialog store interfaces
+   -  Updates store interfaces
+   -  Store error handling utilities
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6435887)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6435887177ecd5dfd680c72574c8d95c97d8b2ab)
+
+
+- 📝 [docs] Improve code documentation and types
+
+Improves code documentation and type definitions across multiple modules to enhance clarity and maintainability.
+
+- 🌐 **Shared Types**:
+ -  Refines JSDoc comments for shared types in `shared/types.ts`, `shared/types/chartConfig.ts`, `shared/types/componentProps.ts`, `shared/types/database.ts`, `shared/types/events.ts`, `shared/types/eventsBridge.ts`, `shared/types/formData.ts`, `shared/types/ipc.ts`, `shared/types/monitorConfig.ts`, `shared/types/monitorTypes.ts`, `shared/types/preload.ts`, `shared/types/schemaTypes.ts`, `shared/types/stateSync.ts`, `shared/types/themeConfig.ts`, and `shared/types/validation.ts` to provide better context and usage examples.
+ -  Adds descriptions and `@public` tags for public interfaces and types.
+ -  Clarifies the purpose and usage of various types, interfaces, and functions.
+ -  Ensures all shared types are well-documented for both frontend and backend use.
+ -  Replaces some uses of backticks around `Monitor` with a KaTeX equation and removes some unnecessary `@see` links.
+- 🔧 **Enhanced Monitor Checker**:
+ -  Updates `@see` links in `EnhancedMonitorChecker.ts` to reflect renamed methods in `MonitorOperationRegistry`, `OperationTimeoutManager`, and `MonitorStatusUpdateService`.
+- 🛠️ **Ping Monitor**:
+ -  Updates `@see` links in `PingMonitor.ts` to reflect renamed methods: `hasValidHost` is now `validateMonitorHost` and `getMonitorTimeout` + `getMonitorRetryAttempts` are now `extractMonitorConfig`.
+- 🧪 **Playwright UI Helper**:
+ -  Adds retry logic with increased timeouts to `openSiteDetails` in `playwright/utils/ui-helpers.ts` to improve test stability.
+ -  Adds scrolling and visibility checks before clicking the target card.
+- 🧹 **Cache Configuration**:
+ -  Updates JSDoc in `shared/constants/cacheConfig.ts` to better explain cache configuration and usage.
+ -  Marks internal interfaces to clarify the structure of the `CACHE_CONFIG` constant.
+- ⏱️ **Monitoring Constants**:
+ -  Adds JSDoc to `shared/constants/monitoring.ts` to clarify the purpose of `DEFAULT_MONITOR_CHECK_INTERVAL_MS` and `MIN_MONITOR_CHECK_INTERVAL_MS`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(afe2335)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/afe2335549a9a11f228440393ca6f915786c410a)
+
+
+
 ### 🧹 Chores
+
+- 🧹 [chore] Enhance script codebase consistency
+
+Refactors and improves the consistency of various scripts.
+
+- 📝 Updates JSDoc types across multiple files for better clarity and maintainability.
+- 🛠️ Improves error handling in `build-eslint-inspector.mjs` by ensuring consistent error message extraction.
+- 🎨 Improves code formatting in `analyze-coverage.mjs` for better readability.
+- ♻️ Enhances the `download-docs-template.mjs` script:
+ - ⬆️ Updates type imports from http and https.
+ - ➕ Adds/clarifies JSDoc comments for better documentation.
+ - 🐛 Fixes/improves the cache check logic in `downloadFile` to prevent potential issues.
+- ⬆️ Updates the `download-fast-check-vitest-docs.mjs` script:
+ - ⬆️ Updates type imports from http and https.
+ - ➕ Adds/clarifies JSDoc comments for better documentation.
+ - 🐛 Fixes/improves the cache check logic in `downloadFile` to prevent potential issues.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(05e4da1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/05e4da1f781f64860cf1a45ed4de9acb76b5083a)
+
+
+- 🧹 [chore] Enhance code readability and maintainability
+
+Improves code quality and consistency across multiple files.
+
+- 🔧 Configuration Management Benchmarks:
+ - Refactors the code to enhance readability by adding line breaks in the documentation for configuration schema, value data, group data, change event data, validation result data, config backup, mock configuration repository and mock configuration management service.
+- ⚡ Status Processing Benchmarks:
+ - Improves code formatting in the status processing benchmark by adding line breaks for better readability.
+- 🎨 Script Updates:
+ - Updates code in `analyze-coverage.mjs` to improve code readability and maintainability by using a `for...of` loop instead of `Object.keys().forEach()` for iterating over color keys, and adjusts ternary operator formatting for better readability.
+ - Modifies `augment-benchmark-docs.mjs` to enhance documentation generation by adding JSDoc type annotations and input validation in documentation scripts.
+ - Enhances error handling in `build-eslint-inspector.mjs` by including the error message in console output.
+ - Improves documentation download scripts (`download-axios-docs.mjs`, `download-chartjs-docs.mjs`, `download-docs-template.mjs`, `download-electron-docs.mjs`, `download-fast-check-vitest-docs.mjs`) by standardizing JSDoc types, enhancing file hash validation, improving error logging, and adding more comments to improve code clarity and maintainability.
+- 🧪 System Service Tests:
+ - Refactors the `SystemService.comprehensive.test.ts` to improve test readability and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(38058eb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/38058eb3eefc61a9e864472d33d152a1e321df71)
+
+
+- Update changelogs for v16.8.0 [skip ci] [`(5f33894)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5f338946e16aeb244db8f748f35408a986ac1291)
+
 
 - 🧹 [chore] Refine Dependabot configuration to ignore local workspace dependencies
  - Excluded all local packages under @shared/* and file:* from updates
