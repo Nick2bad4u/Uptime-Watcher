@@ -26,7 +26,9 @@ export function createMockStandardizedCache<T>(): Partial<
         has: vi.fn((key: string) => cache.has(key)),
         delete: vi.fn((key: string) => cache.delete(key)),
         clear: vi.fn(() => cache.clear()),
-        size: cache.size,
+        get size() {
+            return cache.size;
+        },
         keys: vi.fn(() => Array.from(cache.keys())),
         entries: vi.fn(() => Array.from(cache.entries())[Symbol.iterator]()),
 
@@ -41,6 +43,12 @@ export function createMockStandardizedCache<T>(): Partial<
         // Bulk operations
         getAll: vi.fn(() => Array.from(cache.values())),
         bulkUpdate: vi.fn(),
+        replaceAll: vi.fn((items: { key: string; data: T }[]) => {
+            cache.clear();
+            for (const { key, data } of items) {
+                cache.set(key, data);
+            }
+        }),
         cleanup: vi.fn(() => 0),
         invalidate: vi.fn(),
         invalidateAll: vi.fn(),

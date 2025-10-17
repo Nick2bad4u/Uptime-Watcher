@@ -85,6 +85,7 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
         // Mock site cache
         mockSiteCache = {
             clear: vi.fn(),
+            replaceAll: vi.fn(),
             set: vi.fn(),
             get: vi.fn(),
             size: 0,
@@ -624,9 +625,12 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await siteRepositoryService.loadSitesIntoCache(mockSiteCache);
 
-            expect(mockSiteCache.clear).toHaveBeenCalled();
-            expect(mockSiteCache.set).toHaveBeenCalledWith("site1", sites[0]);
-            expect(mockSiteCache.set).toHaveBeenCalledWith("site2", sites[1]);
+            expect(mockSiteCache.replaceAll).toHaveBeenCalledWith([
+                { key: "site1", data: sites[0] },
+                { key: "site2", data: sites[1] },
+            ]);
+            expect(mockSiteCache.clear).not.toHaveBeenCalled();
+            expect(mockSiteCache.set).not.toHaveBeenCalled();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Loaded 2 sites into cache"
             );
@@ -646,7 +650,8 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
 
             await siteRepositoryService.loadSitesIntoCache(mockSiteCache);
 
-            expect(mockSiteCache.clear).toHaveBeenCalled();
+            expect(mockSiteCache.replaceAll).toHaveBeenCalledWith([]);
+            expect(mockSiteCache.clear).not.toHaveBeenCalled();
             expect(mockSiteCache.set).not.toHaveBeenCalled();
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "Loaded 0 sites into cache"
@@ -1031,16 +1036,21 @@ describe("SiteRepositoryService and SiteLoadingOrchestrator - Comprehensive Cove
             // Verify complete workflow
             expect(result.success).toBeTruthy();
             expect(result.sitesLoaded).toBe(1);
-            expect(mockSiteCache.set).toHaveBeenCalledWith("complex-site", {
-                identifier: "complex-site",
-                name: "Complex Site",
-                monitoring: true,
-                monitors: [
-                    { ...monitors[0], history: history1 },
-                    { ...monitors[1], history: history2 },
-                    monitors[2], // Monitor without ID has no history
-                ],
-            });
+            expect(mockSiteCache.replaceAll).toHaveBeenCalledWith([
+                {
+                    key: "complex-site",
+                    data: {
+                        identifier: "complex-site",
+                        name: "Complex Site",
+                        monitoring: true,
+                        monitors: [
+                            { ...monitors[0], history: history1 },
+                            { ...monitors[1], history: history2 },
+                            monitors[2],
+                        ],
+                    },
+                },
+            ]);
             expect(mockMonitoringConfig.setHistoryLimit).toHaveBeenCalledWith(
                 25
             );

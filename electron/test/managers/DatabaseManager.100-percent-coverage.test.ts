@@ -250,6 +250,7 @@ describe("DatabaseManager - 100% Coverage", () => {
                 has: vi.fn(),
                 delete: vi.fn(),
                 clear: vi.fn(),
+                replaceAll: vi.fn(),
                 size: 0,
                 entries: vi.fn().mockReturnValue([]),
                 keys: vi.fn().mockReturnValue([]),

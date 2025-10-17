@@ -13,7 +13,7 @@
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 
-import { logger } from "../logger";
+import { diagnosticsLogger, logger } from "../logger";
 
 type CacheEventName =
     | "internal:cache:all-invalidated"
@@ -62,14 +62,12 @@ const createKeyPayload = (
 const createKeyWithOptionalTtlPayload = (
     context: CacheEventContext,
     data: { key: string; ttl?: number }
-): { cacheName: string; key: string; timestamp: number; ttl?: number } => {
-    return {
-        cacheName: context.cacheName,
-        key: data.key,
-        timestamp: context.timestamp,
-        ttl: data.ttl ?? undefined,
-    };
-};
+): { cacheName: string; key: string; timestamp: number; ttl?: number } => ({
+    cacheName: context.cacheName,
+    key: data.key,
+    timestamp: context.timestamp,
+    ...(data.ttl === undefined ? {} : { ttl: data.ttl }),
+});
 
 const createKeyWithReasonPayload = (
     context: CacheEventContext,
@@ -220,17 +218,50 @@ export class StandardizedCache<T> {
     public bulkUpdate(
         items: Array<{ data: T; key: string; ttl?: number }>
     ): void {
+        if (items.length === 0) {
+            logger.debug(
+                `[Cache:${this.config.name}] Bulk update skipped (no items)`
+            );
+            return;
+        }
+
         logger.debug(
             `[Cache:${this.config.name}] Bulk updating ${items.length} items`
         );
 
         for (const item of items) {
-            this.set(item.key, item.data, item.ttl);
+            this.setEntry(item.key, item.data, item.ttl, {
+                emitEvent: false,
+                logAction: false,
+            });
         }
 
         this.emitEvent("internal:cache:bulk-updated", {
             itemCount: items.length,
         });
+    }
+
+    /**
+     * Replace all cache entries atomically.
+     *
+     * @remarks
+     * Clears existing entries before applying the supplied items via
+     * {@link bulkUpdate}. When the incoming items array is empty the cache emits
+     * both the standard `internal:cache:cleared` event and an
+     * `internal:cache:bulk-updated` event (with `itemCount: 0`) to keep
+     * downstream telemetry consistent with the refresh contract.
+     */
+    public replaceAll(
+        items: Array<{ data: T; key: string; ttl?: number }>
+    ): void {
+        this.clear();
+
+        if (items.length === 0) {
+            this.emitEvent("internal:cache:bulk-updated", { itemCount: 0 });
+            return;
+        }
+
+        this.bulkUpdate(items);
     }
 
     /**
@@ -431,7 +462,7 @@ export class StandardizedCache<T> {
         );
 
         // Return cleanup function
-        return () => {
+        return (): void => {
             this.invalidationCallbacks.delete(callback);
             logger.debug(
                 `[Cache:${this.config.name}] Invalidation callback removed`
@@ -448,33 +479,7 @@ export class StandardizedCache<T> {
      *   will not expire.
      */
     public set(key: string, data: T, ttl?: number): void {
-        // Evict if at capacity and this is a new key
-        if (this.config.maxSize <= this.cache.size && !this.cache.has(key)) {
-            this.evictLRU();
-        }
-
-        const now = Date.now();
-        const requestedTTL = ttl ?? this.config.ttl;
-
-        const entry: CacheEntry<T> = {
-            data,
-            hits: 0,
-            timestamp: now,
-            ...(requestedTTL > 0 && { expiresAt: now + requestedTTL }),
-        };
-
-        this.cache.set(key, entry);
-        this.updateSize();
-
-        logger.debug(
-            `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${
-                requestedTTL > 0 ? `${requestedTTL}ms` : "disabled"
-            })`
-        );
-        this.emitEvent("internal:cache:item-cached", {
-            key,
-            ...(requestedTTL > 0 ? { ttl: requestedTTL } : {}),
-        });
+        this.setEntry(key, data, ttl, { emitEvent: true, logAction: true });
     }
 
     /**
@@ -484,12 +489,31 @@ export class StandardizedCache<T> {
         eventType: EventName,
         data: CacheEventPayload<EventName>
     ): void {
-        if (!this.config.eventEmitter) {
+        const { eventEmitter, name } = this.config;
+
+        if (!eventEmitter) {
             return;
         }
 
         const payload = this.buildCacheEventPayload(eventType, data);
-        void this.config.eventEmitter.emitTyped(eventType, payload);
+        void (async (): Promise<void> => {
+            try {
+                await eventEmitter.emitTyped(eventType, payload);
+            } catch (error) {
+                logger.error(
+                    `[Cache:${name}] Failed to emit cache event '${eventType}'`,
+                    error
+                );
+                diagnosticsLogger.error(
+                    `[Cache:${name}] Event emission failure`,
+                    error,
+                    {
+                        eventType,
+                        payload,
+                    }
+                );
+            }
+        })();
     }
 
     /**
@@ -531,12 +555,15 @@ export class StandardizedCache<T> {
             }
         }
 
-        // Notify callbacks for expired items
-        for (const key of expiredKeys) {
-            this.notifyInvalidation(key);
+        if (expiredKeys.length > 0) {
+            this.updateSize();
+            for (const key of expiredKeys) {
+                this.emitEvent("internal:cache:item-expired", { key });
+                this.notifyInvalidation(key);
+            }
+        } else {
+            this.updateSize();
         }
-
-        this.updateSize();
         return results;
     }
 
@@ -618,11 +645,52 @@ export class StandardizedCache<T> {
     private updateHitRatio(): void {
         const total = this.stats.hits + this.stats.misses;
         this.stats.hitRatio = total > 0 ? this.stats.hits / total : 0;
-    } /**
+    }
+
+    /**
      * Update size statistic.
      */
-
     private updateSize(): void {
         this.stats.size = this.cache.size;
+    }
+
+    private setEntry(
+        key: string,
+        data: T,
+        ttl: number | undefined,
+        options?: { emitEvent?: boolean; logAction?: boolean }
+    ): void {
+        // Evict if at capacity and this is a new key
+        if (this.config.maxSize <= this.cache.size && !this.cache.has(key)) {
+            this.evictLRU();
+        }
+
+        const now = Date.now();
+        const requestedTTL = ttl ?? this.config.ttl;
+
+        const entry: CacheEntry<T> = {
+            data,
+            hits: 0,
+            timestamp: now,
+            ...(requestedTTL > 0 && { expiresAt: now + requestedTTL }),
+        };
+
+        this.cache.set(key, entry);
+        this.updateSize();
+
+        if (options?.logAction ?? true) {
+            logger.debug(
+                `[Cache:${this.config.name}] Cached item: ${key} (TTL: ${
+                    requestedTTL > 0 ? `${requestedTTL}ms` : "disabled"
+                })`
+            );
+        }
+
+        if (options?.emitEvent ?? true) {
+            this.emitEvent("internal:cache:item-cached", {
+                key,
+                ...(requestedTTL > 0 ? { ttl: requestedTTL } : {}),
+            });
+        }
     }
 }

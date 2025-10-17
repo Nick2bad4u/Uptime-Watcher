@@ -545,15 +545,19 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                     const containsDisallowedCharacters =
                         validUrl.includes("'") || validUrl.includes("`");
                     const schemeSeparatorIndex = validUrl.indexOf("://");
-                    const hasAdditionalSchemeSeparator =
-                        schemeSeparatorIndex !== -1 &&
-                        validUrl
+                    let hasDisallowedAdditionalScheme = false;
+                    if (schemeSeparatorIndex !== -1) {
+                        const remainder = validUrl
                             .slice(schemeSeparatorIndex + 3)
-                            .includes("://");
+                            .toLowerCase();
+                        if (/https?:\/\//u.test(remainder)) {
+                            hasDisallowedAdditionalScheme = true;
+                        }
+                    }
 
                     if (
                         containsDisallowedCharacters ||
-                        hasAdditionalSchemeSeparator
+                        hasDisallowedAdditionalScheme
                     ) {
                         expect(result).toBeFalsy();
                     } else {

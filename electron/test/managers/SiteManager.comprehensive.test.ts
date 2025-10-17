@@ -66,6 +66,7 @@ const mockCache = {
     getAll: vi.fn().mockReturnValue([]),
     entries: vi.fn().mockReturnValue(new Map().entries()), // Return proper iterable
     bulkUpdate: vi.fn(),
+    replaceAll: vi.fn(),
     cleanup: vi.fn(),
     invalidate: vi.fn(),
     invalidateAll: vi.fn(),
@@ -879,8 +880,14 @@ describe("SiteManager - Comprehensive", () => {
 
             await siteManager.updateSitesCache(sites);
 
-            expect(mockCache.clear).toHaveBeenCalled();
-            expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
+            expect(mockCache.replaceAll).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        data: mockSite,
+                        key: "site-1",
+                    }),
+                ])
+            );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:cache-updated",
                 expect.any(Object)

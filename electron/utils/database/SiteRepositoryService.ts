@@ -254,11 +254,12 @@ export class SiteRepositoryService {
     ): Promise<void> {
         try {
             const sites = await this.getSitesFromDatabase();
-            siteCache.clear();
-
-            for (const site of sites) {
-                siteCache.set(site.identifier, site);
-            }
+            siteCache.replaceAll(
+                sites.map((site) => ({
+                    data: site,
+                    key: site.identifier,
+                }))
+            );
 
             this.logger.info(`Loaded ${sites.length} sites into cache`);
         } catch (error) {

@@ -722,6 +722,187 @@
         color-mix(in srgb, var(--color-primary-500) 18%, transparent);
 }
 
+.status-subscription-indicator {
+    background: none;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-flex;
+    padding: 0.4rem;
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.status-subscription-indicator:hover,
+.status-subscription-indicator:focus-visible {
+    box-shadow: 0 6px 18px 0
+        color-mix(in srgb, var(--color-primary-500) 16%, transparent);
+    transform: translateY(-1px);
+}
+
+.status-subscription-indicator:focus-visible {
+    outline: 2px solid color-mix(
+        in srgb,
+        var(--color-primary-500) 75%,
+        transparent
+    );
+    outline-offset: 2px;
+}
+
+.status-subscription-indicator--requires-action {
+    box-shadow: 0 0 0 2px
+        color-mix(in srgb, var(--color-status-down) 32%, transparent);
+}
+
+.status-subscription-indicator__dot {
+    background: var(--color-status-up);
+    border-radius: 9999px;
+    block-size: 0.75rem;
+    color: var(--color-status-up);
+    inline-size: 0.75rem;
+    position: relative;
+}
+
+.status-subscription-indicator__dot::after {
+    animation: status-subscription-indicator-pulse 2.4s ease-in-out infinite;
+    border: 1px solid color-mix(in srgb, currentcolor 55%, transparent);
+    border-radius: inherit;
+    content: "";
+    inset: -0.35rem;
+    opacity: 0.6;
+    position: absolute;
+}
+
+.status-subscription-indicator__dot--healthy {
+    background: var(--color-status-up);
+    color: var(--color-status-up);
+}
+
+.status-subscription-indicator__dot--degraded {
+    background: var(--color-status-degraded);
+    color: var(--color-status-degraded);
+}
+
+.status-subscription-indicator__dot--failed {
+    background: var(--color-status-down);
+    color: var(--color-status-down);
+}
+
+.status-subscription-indicator__dot--unknown {
+    background: color-mix(
+        in srgb,
+        var(--color-border-secondary) 60%,
+        transparent
+    );
+    color: color-mix(
+        in srgb,
+        var(--color-border-secondary) 60%,
+        transparent
+    );
+}
+
+.status-subscription-indicator--degraded
+    .status-subscription-indicator__dot::after,
+.status-subscription-indicator--failed
+    .status-subscription-indicator__dot::after,
+.status-subscription-indicator--unknown
+    .status-subscription-indicator__dot::after {
+    animation: none;
+    opacity: 0.35;
+}
+
+@keyframes status-subscription-indicator-pulse {
+    0% {
+        opacity: 0.45;
+        transform: scale(0.6);
+    }
+
+    60% {
+        opacity: 0;
+        transform: scale(1.6);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.6);
+    }
+}
+
+.status-subscription-indicator__tooltip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    max-inline-size: 22rem;
+}
+
+.status-subscription-indicator__tooltip-header {
+    align-items: center;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.status-subscription-indicator__tooltip-dot {
+    background: var(--color-status-up);
+    border-radius: 9999px;
+    block-size: 0.5rem;
+    inline-size: 0.5rem;
+}
+
+.status-subscription-indicator__tooltip-dot--healthy {
+    background: var(--color-status-up);
+}
+
+.status-subscription-indicator__tooltip-dot--degraded {
+    background: var(--color-status-degraded);
+}
+
+.status-subscription-indicator__tooltip-dot--failed {
+    background: var(--color-status-down);
+}
+
+.status-subscription-indicator__tooltip-dot--unknown {
+    background: color-mix(
+        in srgb,
+        var(--color-border-secondary) 60%,
+        transparent
+    );
+}
+
+.status-subscription-indicator__tooltip-description,
+.status-subscription-indicator__tooltip-progress,
+.status-subscription-indicator__tooltip-summary,
+.status-subscription-indicator__tooltip-attempt {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.status-subscription-indicator__tooltip-summary {
+    color: var(--color-text-secondary);
+}
+
+.status-subscription-indicator__tooltip-context {
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.status-subscription-indicator__tooltip-errors {
+    color: var(--color-error, rgb(239 68 68));
+    font-size: 0.8rem;
+    margin: 0;
+    padding-inline-start: 1rem;
+}
+
+.status-subscription-indicator__tooltip-retry {
+    align-items: center;
+    align-self: flex-start;
+    column-gap: 0.35rem;
+    display: inline-flex;
+}
+
 /* Accessibility: reduce motion */
 @media (prefers-reduced-motion: reduce) {
     .header-status-summary,
@@ -730,7 +911,8 @@
     .status-degraded-badge,
     .status-down-badge,
     .status-pending-badge,
-    .status-subscription-indicator {
+    .status-paused-badge,
+    .total-sites-badge {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -753,181 +935,8 @@
             transform var(--transition-fast);
     }
 
-    .status-subscription-indicator__body {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        min-inline-size: 0;
-    }
-
-    .status-subscription-indicator__icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid
-            color-mix(in srgb, var(--color-border-secondary) 32%, transparent);
-        border-radius: 0.85rem;
-        background: color-mix(
-            in srgb,
-            var(--color-surface-overlay) 88%,
-            transparent
-        );
-        block-size: 2rem;
-        color: inherit;
-        cursor: pointer;
-        inline-size: 2rem;
-        transition:
-            border-color var(--transition-fast),
-            transform var(--transition-fast);
-
-        &:hover {
-            border-color: color-mix(
-                in srgb,
-                var(--color-primary-500) 42%,
-                transparent
-            );
-            transform: translateY(-1px);
-        }
-    }
-
-    .status-subscription-indicator__meta {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        min-inline-size: 0;
-    }
-
-    .status-subscription-indicator__retry {
-        min-inline-size: 5.75rem;
-    }
-
-    .status-subscription-indicator__tooltip {
-        display: flex;
-        flex-direction: column;
-        gap: 0.35rem;
-        max-inline-size: 18rem;
-    }
-
-    .status-subscription-indicator__tooltip-errors {
-        margin: 0;
-        color: var(--color-error, rgb(239 68 68));
-        font-size: 0.75rem;
-        padding-inline-start: 1rem;
-    }
-
-    .status-subscription-indicator__tooltip-description,
-    .status-subscription-indicator__tooltip-progress,
-    .status-subscription-indicator__tooltip-attempt {
-        margin: 0;
-        font-size: 0.875rem;
-        line-height: 1.375;
-    }
-
-    .status-subscription-indicator--healthy {
-        border-color: color-mix(
-            in srgb,
-            var(--color-status-up) 38%,
-            transparent
-        );
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--color-status-up) 16%, transparent),
-            color-mix(in srgb, var(--color-surface-elevated) 88%, transparent)
-        );
-        color: color-mix(
-            in srgb,
-            var(--color-status-up) 65%,
-            rgb(255 255 255) 35%
-        );
-    }
-
-    .status-subscription-indicator--degraded {
-        border-color: color-mix(
-            in srgb,
-            var(--color-status-degraded) 38%,
-            transparent
-        );
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--color-status-degraded) 16%, transparent),
-            color-mix(in srgb, var(--color-surface-elevated) 90%, transparent)
-        );
-        color: color-mix(
-            in srgb,
-            var(--color-status-degraded) 65%,
-            rgb(255 255 255) 35%
-        );
-    }
-
-    .status-subscription-indicator--failed {
-        border-color: color-mix(
-            in srgb,
-            var(--color-status-down) 38%,
-            transparent
-        );
-        background: linear-gradient(
-            135deg,
-            color-mix(in srgb, var(--color-status-down) 18%, transparent),
-            color-mix(in srgb, var(--color-surface-elevated) 90%, transparent)
-        );
-        color: color-mix(
-            in srgb,
-            var(--color-status-down) 65%,
-            rgb(255 255 255) 35%
-        );
-    }
-
-    .status-subscription-indicator--unknown {
-        border-color: color-mix(
-            in srgb,
-            var(--color-border-secondary) 36%,
-            transparent
-        );
-        color: color-mix(
-            in srgb,
-            var(--color-text-secondary) 80%,
-            rgb(255 255 255) 20%
-        );
-    }
-
-    .status-subscription-indicator--healthy,
-    .status-subscription-indicator--degraded,
-    .status-subscription-indicator--failed {
-        & .status-subscription-indicator__icon {
-            border-color: color-mix(in srgb, currentcolor 42%, transparent);
-        }
-    }
-
-    .status-subscription-indicator__icon svg {
-        display: inline-block;
-    }
-
-    .status-subscription-indicator:hover {
-        border-color: color-mix(
-            in srgb,
-            var(--color-primary-500) 35%,
-            transparent
-        );
-        box-shadow:
-            inset 0 0 0 1px rgb(255 255 255 / 6%),
-            0 18px 34px rgb(8 12 24 / 28%);
-        transform: translateY(-1px);
-    }
-
-    @media (width <= 768px) {
-        .status-subscription-indicator {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.65rem;
-        }
-
-        .status-subscription-indicator__body {
-            justify-content: space-between;
-        }
-
-        .status-subscription-indicator__retry {
-            inline-size: 100%;
-        }
+    .status-subscription-indicator__dot::after {
+        animation: none;
     }
 
     .status-paused-badge,

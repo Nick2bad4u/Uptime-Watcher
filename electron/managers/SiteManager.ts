@@ -51,7 +51,7 @@
 
 import type { Site } from "@shared/types";
 
-import { CACHE_CONFIG, CACHE_NAMES } from "@shared/constants/cacheConfig";
+import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     interpolateLogTemplate,
@@ -237,7 +237,6 @@ export class SiteManager {
             timestamp: Date.now(),
         });
 
-        // Emit sync event for state consistency
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: site.identifier,
@@ -650,8 +649,9 @@ export class SiteManager {
      * atomically.
      *
      * @remarks
-     * Uses a temporary cache for atomic replacement to ensure consistency and
-     * avoid partial updates. Emits a cache-updated event after completion.
+     * Performs atomic replacement by clearing the primary cache and applying a
+     * bulk update in a single operation. Emits a cache-updated event after
+     * completion.
      *
      * @example
      *
@@ -666,23 +666,12 @@ export class SiteManager {
      * @public
      */
     public async updateSitesCache(sites: Site[]): Promise<void> {
-        // Create temporary cache for atomic replacement
-        const tempCache = new StandardizedCache<Site>({
-            ...CACHE_CONFIG.SITES,
-            eventEmitter: this.eventEmitter,
-            name: CACHE_NAMES.sites("temp"),
-        });
-
-        // Populate temporary cache
-        for (const site of sites) {
-            tempCache.set(site.identifier, site);
-        }
-
-        // Atomic replacement: clear and copy from temp cache
-        this.sitesCache.clear();
-        for (const [key, site] of tempCache.entries()) {
-            this.sitesCache.set(key, site);
-        }
+        this.sitesCache.replaceAll(
+            sites.map((site) => ({
+                data: site,
+                key: site.identifier,
+            }))
+        );
 
         // Emit cache updated event
         await this.eventEmitter.emitTyped("internal:site:cache-updated", {

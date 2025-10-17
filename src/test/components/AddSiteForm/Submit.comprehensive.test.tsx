@@ -156,8 +156,11 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             const properties = createMockProperties();
 
             // Mock successful validation
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
+            const {
+                createMonitorObject,
+                validateMonitorFormData,
+                validateMonitorFieldClientSide,
+            } = await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -176,6 +179,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(properties.createSite).toHaveBeenCalled();
             expect(properties.onSuccess).toHaveBeenCalled();
+            expect(createMonitorObject).toHaveBeenCalledWith(
+                properties.monitorType,
+                expect.objectContaining({ url: properties.url })
+            );
         });
 
         it("should handle validation errors", async ({ task, annotate }) => {
@@ -193,9 +200,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             const properties = createMockProperties();
 
             // Mock validation failure
-            const { validateMonitorFormData } = await import(
-                "../../../utils/monitorValidation"
-            );
+            const { createMonitorObject, validateMonitorFormData } =
+                await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: false,
                 errors: ["Invalid URL format"],
@@ -210,6 +216,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             );
             expect(properties.createSite).not.toHaveBeenCalled();
             expect(properties.onSuccess).not.toHaveBeenCalled();
+            expect(createMonitorObject).not.toHaveBeenCalled();
         });
     });
 
@@ -235,8 +242,11 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             });
 
             // Mock successful validation
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
+            const {
+                createMonitorObject,
+                validateMonitorFormData,
+                validateMonitorFieldClientSide,
+            } = await import("../../../utils/monitorValidation");
             vi.mocked(validateMonitorFormData).mockResolvedValue({
                 success: true,
                 errors: [],
@@ -254,6 +264,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             expect(mockEvent.preventDefault).toHaveBeenCalled();
             expect(properties.addMonitorToSite).toHaveBeenCalled();
             expect(properties.onSuccess).toHaveBeenCalled();
+            expect(createMonitorObject).toHaveBeenCalledWith(
+                properties.monitorType,
+                expect.objectContaining({ url: properties.url })
+            );
         });
     });
 
@@ -285,6 +299,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
                 // Mock successful validation
                 const {
+                    createMonitorObject,
                     validateMonitorFormData,
                     validateMonitorFieldClientSide,
                 } = await import("../../../utils/monitorValidation");
@@ -305,6 +320,10 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(mockEvent.preventDefault).toHaveBeenCalled();
                 expect(properties.createSite).toHaveBeenCalled();
                 expect(properties.onSuccess).toHaveBeenCalled();
+                expect(createMonitorObject).toHaveBeenCalledWith(
+                    properties.monitorType,
+                    expect.objectContaining({ url: properties.url })
+                );
 
                 // Verify form data characteristics
                 expect(formData.siteName.trim().length).toBeGreaterThan(0);
@@ -332,9 +351,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 const properties = createMockProperties();
 
                 // Mock validation failure
-                const { validateMonitorFormData } = await import(
-                    "../../../utils/monitorValidation"
-                );
+                const { createMonitorObject, validateMonitorFormData } =
+                    await import("../../../utils/monitorValidation");
                 vi.mocked(validateMonitorFormData).mockResolvedValue({
                     success: false,
                     errors: errorMessages,
@@ -346,6 +364,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(mockEvent.preventDefault).toHaveBeenCalled();
                 expect(properties.setFormError).toHaveBeenCalled();
                 expect(properties.createSite).not.toHaveBeenCalled();
+                expect(createMonitorObject).not.toHaveBeenCalled();
 
                 // Verify error characteristics
                 expect(Array.isArray(errorMessages)).toBeTruthy();

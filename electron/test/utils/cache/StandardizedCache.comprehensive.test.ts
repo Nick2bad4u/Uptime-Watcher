@@ -219,14 +219,17 @@ describe("StandardizedCache - Comprehensive Tests", () => {
 
             await flushMicrotasks();
 
-            expect(eventSpy).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    cacheName: "test-cache",
-                    key: "key1",
-                    timestamp: expect.any(Number),
-                    ttl: undefined,
-                })
-            );
+            const eventPayload = eventSpy.mock.calls.at(-1)?.[0] as
+                | Record<string, unknown>
+                | undefined;
+
+            expect(eventPayload).toBeDefined();
+            expect(eventPayload).toMatchObject({
+                cacheName: "test-cache",
+                key: "key1",
+                timestamp: expect.any(Number),
+            });
+            expect(eventPayload ?? {}).not.toHaveProperty("ttl");
         });
 
         it("should work without event emitter", async ({ task, annotate }) => {
@@ -748,6 +751,76 @@ describe("StandardizedCache - Comprehensive Tests", () => {
                     itemCount: 3,
                 })
             );
+        });
+
+        it("should replace entries atomically via replaceAll", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
+            cache.set("old-key", "legacy");
+
+            const clearedSpy = vi.fn();
+            const bulkSpy = vi.fn();
+            eventBus.on("internal:cache:cleared", clearedSpy);
+            eventBus.on("internal:cache:bulk-updated", bulkSpy);
+
+            cache.replaceAll([
+                { key: "key1", data: "value1" },
+                { key: "key2", data: "value2" },
+            ]);
+
+            await flushMicrotasks();
+
+            expect(clearedSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    itemCount: 1,
+                    timestamp: expect.any(Number),
+                })
+            );
+            expect(bulkSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    itemCount: 2,
+                    timestamp: expect.any(Number),
+                })
+            );
+            expect(cache.get("old-key")).toBeUndefined();
+            expect(cache.get("key1")).toBe("value1");
+            expect(cache.get("key2")).toBe("value2");
+        });
+
+        it("should emit bulk-updated event with zero count on empty replaceAll", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: StandardizedCache", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Update", "type");
+
+            cache.set("old-key", "legacy");
+
+            const bulkSpy = vi.fn();
+            eventBus.on("internal:cache:bulk-updated", bulkSpy);
+
+            cache.replaceAll([]);
+
+            await flushMicrotasks();
+
+            expect(bulkSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cacheName: "test-cache",
+                    itemCount: 0,
+                    timestamp: expect.any(Number),
+                })
+            );
+            expect(cache.size).toBe(0);
         });
 
         it("should emit item-invalidated event on invalidate", async ({

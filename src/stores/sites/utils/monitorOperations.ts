@@ -28,7 +28,6 @@ import { ensureError } from "@shared/utils/errorHandling";
 import {
     isNonEmptyString,
     isValidPort,
-    isValidUrl,
     safeInteger,
 } from "@shared/validation/validatorUtils";
 
@@ -445,9 +444,8 @@ function applyHttpMonitorDefaults(
     monitor: Monitor,
     filteredData: UnknownRecord
 ): void {
-    // HTTP monitors require a URL - provide default if missing or invalid
     const urlValue = filteredData["url"];
-    monitor.url = isValidUrl(urlValue) ? urlValue : "https://example.com";
+    monitor.url = typeof urlValue === "string" ? urlValue.trim() : "";
 }
 
 function applyHttpKeywordMonitorDefaults(

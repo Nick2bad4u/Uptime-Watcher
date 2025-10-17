@@ -552,13 +552,18 @@ describe(SiteManager, () => {
             ];
 
             // Spy on the actual cache methods that will be called
-            const clearSpy = vi.spyOn(manager["sitesCache"], "clear");
-            const setSpy = vi.spyOn(manager["sitesCache"], "set");
+            const replaceAllSpy = vi.spyOn(manager["sitesCache"], "replaceAll");
 
             await manager.updateSitesCache(sites);
 
-            expect(clearSpy).toHaveBeenCalled();
-            expect(setSpy).toHaveBeenCalledWith("site1", sites[0]);
+            expect(replaceAllSpy).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        data: sites[0],
+                        key: "site1",
+                    }),
+                ])
+            );
         });
     });
     describe("initialize", () => {
@@ -894,17 +899,18 @@ describe(SiteManager, () => {
                 monitors: [],
             }));
 
-            vi.spyOn(manager["sitesCache"], "clear").mockImplementation(
-                () => {}
-            );
-            vi.spyOn(manager["sitesCache"], "set").mockImplementation(() => {});
+            const replaceAllSpy = vi
+                .spyOn(manager["sitesCache"], "replaceAll")
+                .mockImplementation(() => {});
 
             await expect(
                 manager.updateSitesCache(largeSiteDataset)
             ).resolves.not.toThrow();
 
-            // The cache has maxSize: 500, so it will only store up to 500 items
-            expect(manager["sitesCache"].set).toHaveBeenCalledTimes(500);
+            expect(replaceAllSpy).toHaveBeenCalledTimes(1);
+            expect(replaceAllSpy.mock.calls[0]?.[0]).toHaveLength(
+                largeSiteDataset.length
+            );
         });
         it("should handle malformed site data gracefully", async () => {
             const malformedSite = {

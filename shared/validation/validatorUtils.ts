@@ -293,6 +293,14 @@ export function isValidUrl(
         return false;
     }
 
+    const firstSchemeSeparator = value.indexOf("://");
+    if (firstSchemeSeparator !== -1) {
+        const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
+        if (/^https?:\/\//v.test(remainder)) {
+            return false;
+        }
+    }
+
     // Default options to allow localhost and restrict to HTTP/HTTPS
     const urlOptions = {
         allow_protocol_relative_urls: false,

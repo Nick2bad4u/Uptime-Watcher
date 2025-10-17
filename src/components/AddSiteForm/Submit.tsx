@@ -300,6 +300,11 @@ const buildMonitorFormData = (
         ),
     };
 
+    const sanitizedUrl = toOptionalString(properties.url);
+    if (sanitizedUrl !== undefined) {
+        formData["url"] = sanitizedUrl;
+    }
+
     if (formData["expectedValue"] === undefined) {
         delete formData["expectedValue"];
     }

@@ -471,6 +471,21 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             expect(() => normalizeMonitor([] as any)).toThrow();
         });
 
+        it("should not inject placeholder URLs for legacy HTTP monitors", () => {
+            const normalized = normalizeMonitor({ type: "http" });
+
+            expect(normalized.url).toBe("");
+        });
+
+        it("should trim preserved HTTP monitor URLs", () => {
+            const normalized = normalizeMonitor({
+                type: "http",
+                url: "   https://uptime.example.com/health   ",
+            });
+
+            expect(normalized.url).toBe("https://uptime.example.com/health");
+        });
+
         it("should filter out inappropriate fields for monitor types", () => {
             const httpMonitor = normalizeMonitor({
                 type: "http",

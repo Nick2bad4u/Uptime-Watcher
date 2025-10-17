@@ -68,7 +68,10 @@ describe("SafeConversions utilities fuzzing tests", () => {
                 );
 
                 const result = safeNumberConversion(value, defaultValue);
-                expect(result).toBe(defaultValue);
+                const sanitizedDefault = Number.isNaN(defaultValue)
+                    ? 0
+                    : defaultValue;
+                expect(result).toBe(sanitizedDefault);
             }
         );
 

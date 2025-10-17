@@ -49,7 +49,7 @@ Take the time needed for careful design, testing, and review rather than rushing
 Only implement backwards-compatibility layers or wrappers with explicit approval
 Follow current, supported patterns and best practices; propose migrations when legacy or deprecated approaches are encountered.
 Prioritize code quality, maintainability, readability.
-Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root.
+Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root. Always write detailed descriptions of each TODO item so that anyone can understand the task and its context.
 Integrate new features or changes into the existing architecture and patterns.
 Tedious, systematic work is often the correct solution. Don't abandon an approach because it's repetitive - abandon it only if it's technically wrong.
 Write tests only after the source code is in a working state without lint or type errors.

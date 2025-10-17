@@ -535,6 +535,8 @@ describe("Events Domain API", () => {
                 "pending",
                 "up",
             ] as const;
+            const MIN_ISO_TIMESTAMP_MS = -8_640_000_000_000_000 + 1;
+            const MAX_ISO_TIMESTAMP_MS = 8_640_000_000_000_000 - 1;
             const siteRecordArbitrary = fc
                 .record({
                     identifier: fc.string({ minLength: 1 }),
@@ -570,7 +572,16 @@ describe("Events Domain API", () => {
                     site: fc.option(siteRecordArbitrary, { nil: undefined }),
                     siteIdentifier: fc.string({ minLength: 1 }),
                     status: fc.constantFrom(...statusValues),
-                    timestamp: fc.date().map((date) => date.toISOString()),
+                    timestamp: fc.date().map((date) => {
+                        const time = date.getTime();
+                        const normalizedTime = Number.isNaN(time)
+                            ? 0
+                            : Math.max(
+                                  MIN_ISO_TIMESTAMP_MS,
+                                  Math.min(MAX_ISO_TIMESTAMP_MS, time)
+                              );
+                        return new Date(normalizedTime).toISOString();
+                    }),
                 })
                 .map((eventData) => eventData as MonitorStatusChangedEventData);
 

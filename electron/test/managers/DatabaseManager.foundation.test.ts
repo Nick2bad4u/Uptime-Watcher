@@ -197,6 +197,7 @@ describe("DatabaseManager Foundation Tests", () => {
             siteCache.set = vi.fn();
             siteCache.get = vi.fn();
             siteCache.getAll = vi.fn(() => []);
+            siteCache.replaceAll = vi.fn();
             siteCache.entries = vi.fn(() => [][Symbol.iterator]()) as any;
         }
     });

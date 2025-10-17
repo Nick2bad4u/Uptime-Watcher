@@ -87,10 +87,12 @@ describe("DatabaseManager - Coverage Tests", () => {
         const testSites = [createTestSite("test1"), createTestSite("test2")];
         mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
             async (siteCache: any) => {
-                // Populate the cache with test sites (simulate the real behavior)
-                for (const site of testSites) {
-                    siteCache.set(site.identifier, site);
-                }
+                siteCache.replaceAll(
+                    testSites.map((site) => ({
+                        key: site.identifier,
+                        data: site,
+                    }))
+                );
 
                 return {
                     success: true,
@@ -439,11 +441,12 @@ describe("DatabaseManager - Coverage Tests", () => {
             // The orchestrator should populate the cache when called
             mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
                 async (siteCache: any) => {
-                    // Clear and populate the cache with test sites
-                    siteCache.clear();
-                    for (const site of testSites) {
-                        siteCache.set(site.identifier, site);
-                    }
+                    siteCache.replaceAll(
+                        testSites.map((site) => ({
+                            key: site.identifier,
+                            data: site,
+                        }))
+                    );
 
                     return {
                         success: true,
@@ -609,11 +612,12 @@ describe("DatabaseManager - Coverage Tests", () => {
             // The orchestrator should populate the cache when called
             mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
                 async (siteCache: any) => {
-                    // Clear and populate the cache with test sites
-                    siteCache.clear();
-                    for (const site of testSites) {
-                        siteCache.set(site.identifier, site);
-                    }
+                    siteCache.replaceAll(
+                        testSites.map((site) => ({
+                            key: site.identifier,
+                            data: site,
+                        }))
+                    );
 
                     return {
                         success: true,
@@ -669,11 +673,12 @@ describe("DatabaseManager - Coverage Tests", () => {
             // The orchestrator should populate the cache when called
             mockSiteLoadingOrchestrator.loadSitesFromDatabase.mockImplementation(
                 async (siteCache: any) => {
-                    // Clear and populate the cache with test sites
-                    siteCache.clear();
-                    for (const site of testSites) {
-                        siteCache.set(site.identifier, site);
-                    }
+                    siteCache.replaceAll(
+                        testSites.map((site) => ({
+                            key: site.identifier,
+                            data: site,
+                        }))
+                    );
 
                     return {
                         success: true,

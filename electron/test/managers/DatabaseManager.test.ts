@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import type { Site } from "../../../shared/types";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
@@ -98,27 +99,43 @@ vi.mock("../../utils/database/historyLimitManager", () => ({
 }));
 
 vi.mock("../../utils/database/serviceFactory", () => ({
-    createSiteCache: vi.fn(() => ({
-        get: vi.fn(),
-        set: vi.fn(),
-        has: vi.fn(),
-        delete: vi.fn(),
-        clear: vi.fn(),
-        keys: vi.fn(() => []),
-        values: vi.fn(() => []),
-        entries: vi.fn(() => []),
-        size: 0,
-        getStats: vi.fn(() => ({
-            hits: 0,
-            misses: 0,
-            hitRate: 0,
-            size: 0,
-            maxSize: 100,
-        })),
-        invalidate: vi.fn(),
-        resetStats: vi.fn(),
-        bulkUpdate: vi.fn(),
-    })),
+    createSiteCache: vi.fn(() => {
+        const store = new Map<string, Site>();
+
+        return {
+            get: vi.fn((key: string) => store.get(key)),
+            set: vi.fn((key: string, value: Site) => {
+                store.set(key, value);
+            }),
+            has: vi.fn((key: string) => store.has(key)),
+            delete: vi.fn((key: string) => store.delete(key)),
+            clear: vi.fn(() => {
+                store.clear();
+            }),
+            replaceAll: vi.fn((items: { key: string; data: Site }[]) => {
+                store.clear();
+                for (const { key, data } of items) {
+                    store.set(key, data);
+                }
+            }),
+            keys: vi.fn(() => Array.from(store.keys())),
+            values: vi.fn(() => Array.from(store.values())),
+            entries: vi.fn(() => store.entries()),
+            get size() {
+                return store.size;
+            },
+            getStats: vi.fn(() => ({
+                hits: 0,
+                misses: 0,
+                hitRate: 0,
+                size: store.size,
+                maxSize: 100,
+            })),
+            invalidate: vi.fn(),
+            resetStats: vi.fn(),
+            bulkUpdate: vi.fn(),
+        };
+    }),
     LoggerAdapter: vi.fn().mockImplementation(() => ({
         debug: vi.fn(),
         info: vi.fn(),

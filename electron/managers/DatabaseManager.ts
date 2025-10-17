@@ -708,10 +708,11 @@ export class DatabaseManager {
         }
 
         // Atomically replace the main cache (prevents race conditions)
-        this.siteCache.clear();
-        for (const [key, site] of tempCache.entries()) {
-            this.siteCache.set(key, site);
-        }
+        const serializedEntries = Array.from(
+            tempCache.entries(),
+            ([key, site]) => ({ data: site, key })
+        );
+        this.siteCache.replaceAll(serializedEntries);
 
         // Update the cache with loaded sites (final update to ensure
         // consistency)
