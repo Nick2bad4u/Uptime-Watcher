@@ -261,7 +261,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
     padding: clamp(0.45rem, 0.35rem + 0.25vi, 0.65rem)
         clamp(0.4rem, 0.3rem + 0.2vi, 0.6rem);
     border: 1px solid
@@ -288,17 +287,18 @@
         var(--color-primary-500) 72%,
         var(--color-surface-base, rgb(226 232 240)) 28%
     );
+    gap: 0.3rem;
     inline-size: clamp(2.1rem, 1.85rem + 0.45vi, 2.6rem);
-    min-block-size: clamp(2.2rem, 2rem + 0.35vi, 2.6rem);
     inset-block-start: 35%;
     inset-inline-start: calc(env(safe-area-inset-left, 0rem) + 0.25rem);
+    min-block-size: clamp(2.2rem, 2rem + 0.35vi, 2.6rem);
+    pointer-events: auto;
     transform: translateY(-50%);
     transition:
         transform var(--transition-fast),
         box-shadow var(--transition-fast),
         color var(--transition-fast),
         opacity var(--transition-fast);
-    pointer-events: auto;
 
     .app-shell--sidebar-open & {
         opacity: 0;
@@ -330,17 +330,13 @@
 }
 
 .sidebar-reveal-button__label {
-    font-size: 0.5625rem;
+    color: color-mix(in srgb, var(--color-text-secondary) 75%, transparent);
+    font-size: 0.625rem;
     font-weight: var(--font-weight-semibold);
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    writing-mode: vertical-rl;
     transform: rotate(180deg);
-    color: color-mix(
-        in srgb,
-        var(--color-text-secondary) 75%,
-        transparent
-    );
+    writing-mode: vertical-rl;
 }
 
 .sidebar-reveal-button--dark {
@@ -2561,24 +2557,20 @@
 .site-card__inline-hint {
     display: inline-flex;
     align-items: center;
+    color: color-mix(in srgb, var(--color-text-tertiary) 82%, transparent);
     gap: 0.35rem;
-    padding-inline: 0.35rem;
-    color: color-mix(
-        in srgb,
-        var(--color-text-tertiary) 82%,
-        transparent
-    );
     letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
     opacity: 0;
+    padding-inline: 0.35rem;
     pointer-events: none;
+    text-transform: uppercase;
     transition: opacity var(--transition-normal);
-}
+    white-space: nowrap;
 
-.site-card:hover .site-card__inline-hint,
-.site-card:focus-within .site-card__inline-hint {
-    opacity: 0.85;
+    .site-card:hover &,
+    .site-card:focus-within & {
+        opacity: 0.85;
+    }
 }
 
 .monitor-selector__wrapper {

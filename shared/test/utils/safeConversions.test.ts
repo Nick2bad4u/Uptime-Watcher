@@ -662,7 +662,11 @@ describe("Shared Safe Conversions - Backend Coverage", () => {
                         expect(Number.isNaN(result)).toBeFalsy();
 
                         if (typeof input === "number" && !Number.isNaN(input)) {
-                            expect(result).toBe(Math.floor(input));
+                            if (Number.isFinite(input)) {
+                                expect(result).toBe(Math.floor(input));
+                            } else {
+                                expect(result).toBe(defaultVal);
+                            }
                         } else if (typeof input === "string") {
                             const parsed = Number.parseInt(input, 10);
                             if (Number.isNaN(parsed)) {

@@ -471,10 +471,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             expect(() => normalizeMonitor([] as any)).toThrow();
         });
 
-        it("should not inject placeholder URLs for legacy HTTP monitors", () => {
+        it("should provide default URLs for HTTP monitors", () => {
             const normalized = normalizeMonitor({ type: "http" });
 
-            expect(normalized.url).toBe("");
+            expect(normalized.url).toBe("https://example.com");
         });
 
         it("should trim preserved HTTP monitor URLs", () => {

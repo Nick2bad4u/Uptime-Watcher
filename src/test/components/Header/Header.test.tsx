@@ -3,7 +3,6 @@ import "@testing-library/jest-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Header } from "../../../components/Header/Header";
-import { useSidebarLayout } from "../../../components/Layout/SidebarLayoutContext";
 import { useGlobalMonitoringMetrics } from "../../../hooks/useGlobalMonitoringMetrics";
 import {
     DEFAULT_SITE_TABLE_COLUMN_WIDTHS,
@@ -28,15 +27,11 @@ vi.mock("../../../theme/useTheme", () => ({
 vi.mock("../../../hooks/useGlobalMonitoringMetrics", () => ({
     useGlobalMonitoringMetrics: vi.fn(),
 }));
-vi.mock("../../../components/Layout/SidebarLayoutContext", () => ({
-    useSidebarLayout: vi.fn(),
-}));
 
 const mockUseUIStore = vi.mocked(useUIStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
 const mockUseGlobalMonitoringMetrics = vi.mocked(useGlobalMonitoringMetrics);
-const mockUseSidebarLayout = vi.mocked(useSidebarLayout);
 
 const createUiState = (): UIStore => ({
     activeSiteDetailsTab: "site-overview",
@@ -239,11 +234,6 @@ beforeEach(() => {
     });
 
     mockUseGlobalMonitoringMetrics.mockReturnValue(metricsFixture);
-
-    mockUseSidebarLayout.mockReturnValue({
-        isSidebarOpen: true,
-        toggleSidebar: vi.fn(),
-    });
 });
 
 describe(Header, () => {
@@ -270,16 +260,6 @@ describe(Header, () => {
                 metricsFixture.monitorStatusCounts.total.toString()
             )
         ).toBeInTheDocument();
-    });
-
-    it("toggles sidebar when nav button clicked", () => {
-        const layout = { isSidebarOpen: true, toggleSidebar: vi.fn() };
-        mockUseSidebarLayout.mockReturnValue(layout);
-
-        render(<Header />);
-        fireEvent.click(screen.getByLabelText("Toggle navigation sidebar"));
-
-        expect(layout.toggleSidebar).toHaveBeenCalledTimes(1);
     });
 
     it("opens add site modal", () => {

@@ -56,6 +56,23 @@ export interface MonitorTypeConfig {
 }
 
 /**
+ * Option tuple for selecting monitor types in UI elements.
+ *
+ * @remarks
+ * Shared between renderer dropdowns and backend generated fallback lists to
+ * guarantee consistent labeling and identifier usage. Re-exported from renderer
+ * constants to maintain backwards compatibility with existing imports.
+ *
+ * @public
+ */
+export interface MonitorTypeOption {
+    /** Human-readable display label presented to users. */
+    label: string;
+    /** Stable monitor type identifier used across IPC boundaries. */
+    value: string;
+}
+
+/**
  * Common display configuration for monitor types.
  *
  * @remarks

@@ -326,6 +326,12 @@ interface MonitorServiceDependencies {
 constructor(config?: MonitorConfig, logger?: Logger, client?: AxiosInstance)
 ```
 
+### 3. Shared Contract Interfaces
+
+- Canonical DTOs live in the `shared` package. Do **not** redeclare interfaces such as `MonitorTypeOption`; import them from `@shared/types/monitorTypes`.
+- Favor re-exporting shared contracts from feature modules (e.g. `src/constants.ts`) instead of introducing renderer-only clones.
+- When introducing a new shared interface, add it to `shared/types/*` and extend the ESLint guard (`config/linting/rules/shared-contract-interfaces.mjs`) so duplicates are caught automatically.
+
 ## Testing Conventions
 
 ### 1. Test Structure

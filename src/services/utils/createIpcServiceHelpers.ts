@@ -4,6 +4,7 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import log from "electron-log/renderer";
 
 import { waitForElectronAPI } from "../../stores/utils";
 import * as loggerModule from "../logger";
@@ -82,16 +83,17 @@ const resolveDefaultLogger = (): LoggerLike | null => {
 const defaultLogger: LoggerLike | null = resolveDefaultLogger();
 
 /**
- * Creates a console-based logger tagged with the service name as a fallback.
+ * Creates an electron-log based logger tagged with the service name as a
+ * fallback.
  *
  * @internal
  */
-const createConsoleFallbackLogger = (serviceName: string): LoggerLike => ({
+const createStructuredFallbackLogger = (serviceName: string): LoggerLike => ({
     debug: (message: string, ...details: unknown[]): void => {
-        console.debug(`[${serviceName}] ${message}`, ...details);
+        log.debug(`[${serviceName}] ${message}`, ...details);
     },
     error: (message: string, ...details: unknown[]): void => {
-        console.error(`[${serviceName}] ${message}`, ...details);
+        log.error(`[${serviceName}] ${message}`, ...details);
     },
 });
 
@@ -154,7 +156,7 @@ export function createIpcServiceHelpers(
     const logger =
         options.logger ??
         defaultLogger ??
-        createConsoleFallbackLogger(serviceName);
+        createStructuredFallbackLogger(serviceName);
     const ensureInitialized = async (): Promise<void> => {
         try {
             await waitForElectronAPI();
@@ -223,7 +225,7 @@ export function getIpcServiceHelpers(
         const loggerInstance =
             options.logger ??
             defaultLogger ??
-            createConsoleFallbackLogger(serviceName);
+            createStructuredFallbackLogger(serviceName);
         loggerInstance.error(
             `[${serviceName}] Failed to create IPC service helpers`,
             ensuredError

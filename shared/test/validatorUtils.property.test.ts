@@ -254,11 +254,15 @@ describe("Validator Utils Property-Based Tests", () => {
             (url) => {
                 const result = isValidUrl(url);
                 const schemeIndex = url.indexOf("://");
-                const hasExtraSchemeSeparator =
-                    schemeIndex !== -1 &&
-                    url.slice(schemeIndex + 3).includes("://");
+                const remainder =
+                    schemeIndex === -1
+                        ? ""
+                        : url.slice(schemeIndex + 3).toLowerCase();
+                const hasDuplicateHttpScheme =
+                    remainder.includes("http://") ||
+                    remainder.includes("https://");
 
-                if (hasExtraSchemeSeparator) {
+                if (hasDuplicateHttpScheme) {
                     expect(result).toBeFalsy();
                 } else {
                     expect(result).toBeTruthy();

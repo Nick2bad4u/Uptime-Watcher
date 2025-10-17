@@ -93,10 +93,10 @@
     display: flex;
     justify-content: center;
     margin-block-start: clamp(1.15rem, 0.85rem + 0.9vi, 1.75rem);
-}
 
-.app-topbar__summary-bar .header-status-summary {
-    inline-size: 100%;
+    & .header-status-summary {
+        inline-size: 100%;
+    }
 }
 
 .app-topbar__identity {
@@ -730,14 +730,14 @@
 }
 
 .status-subscription-indicator__container {
+    display: inline-flex;
     align-items: center;
     column-gap: 0.75rem;
-    display: inline-flex;
 }
 
 .status-subscription-indicator__retry {
-    column-gap: 0.35rem;
     display: inline-flex;
+    column-gap: 0.35rem;
     padding-inline: 0.6rem;
 }
 
@@ -748,25 +748,25 @@
 }
 
 .status-subscription-indicator__tooltip-listeners-title {
-    text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
 .status-subscription-indicator__tooltip-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: column;
+    padding: 0;
+    margin: 0;
     gap: 0.2rem;
+    list-style: none;
 }
 
 .status-subscription-indicator__tooltip-list-item {
-    align-items: center;
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
     justify-content: space-between;
     font-size: 0.75rem;
+    gap: 0.5rem;
 }
 
 .status-subscription-indicator__tooltip-list-item--attached span:last-child {
@@ -778,31 +778,28 @@
 }
 
 .status-subscription-indicator {
-    background: none;
-    border: none;
-    border-radius: 9999px;
-    cursor: pointer;
     display: inline-flex;
     padding: 0.4rem;
+    border: none;
+    border-radius: 9999px;
+    background: none;
+    cursor: pointer;
     transition:
         transform var(--transition-fast),
         box-shadow var(--transition-fast);
-}
 
-.status-subscription-indicator:hover,
-.status-subscription-indicator:focus-visible {
-    box-shadow: 0 6px 18px 0
-        color-mix(in srgb, var(--color-primary-500) 16%, transparent);
-    transform: translateY(-1px);
-}
+    &:hover,
+    &:focus-visible {
+        box-shadow: 0 6px 18px 0
+            color-mix(in srgb, var(--color-primary-500) 16%, transparent);
+        transform: translateY(-1px);
+    }
 
-.status-subscription-indicator:focus-visible {
-    outline: 2px solid color-mix(
-        in srgb,
-        var(--color-primary-500) 75%,
-        transparent
-    );
-    outline-offset: 2px;
+    &:focus-visible {
+        outline: 2px solid
+            color-mix(in srgb, var(--color-primary-500) 75%, transparent);
+        outline-offset: 2px;
+    }
 }
 
 .status-subscription-indicator--requires-action {
@@ -811,22 +808,22 @@
 }
 
 .status-subscription-indicator__dot {
-    background: var(--color-status-up);
+    position: relative;
     border-radius: 9999px;
+    background: var(--color-status-up);
     block-size: 0.9rem;
     color: var(--color-status-up);
     inline-size: 0.9rem;
-    position: relative;
-}
 
-.status-subscription-indicator__dot::after {
-    animation: status-subscription-indicator-pulse 2.4s ease-in-out infinite;
-    border: 1px solid color-mix(in srgb, currentcolor 55%, transparent);
-    border-radius: inherit;
-    content: "";
-    inset: -0.42rem;
-    opacity: 0.6;
-    position: absolute;
+    &::after {
+        position: absolute;
+        border: 1px solid color-mix(in srgb, currentcolor 55%, transparent);
+        border-radius: inherit;
+        animation: status-subscription-indicator-pulse 2.4s ease-in-out infinite;
+        content: "";
+        inset: -0.42rem;
+        opacity: 0.6;
+    }
 }
 
 .status-subscription-indicator__dot--healthy {
@@ -850,11 +847,7 @@
         var(--color-border-secondary) 60%,
         transparent
     );
-    color: color-mix(
-        in srgb,
-        var(--color-border-secondary) 60%,
-        transparent
-    );
+    color: color-mix(in srgb, var(--color-border-secondary) 60%, transparent);
 }
 
 .status-subscription-indicator--degraded
@@ -892,14 +885,14 @@
 }
 
 .status-subscription-indicator__tooltip-header {
-    align-items: center;
     display: flex;
+    align-items: center;
     gap: 0.4rem;
 }
 
 .status-subscription-indicator__tooltip-dot {
-    background: var(--color-status-up);
     border-radius: 9999px;
+    background: var(--color-status-up);
     block-size: 0.5rem;
     inline-size: 0.5rem;
 }
@@ -928,9 +921,9 @@
 .status-subscription-indicator__tooltip-progress,
 .status-subscription-indicator__tooltip-summary,
 .status-subscription-indicator__tooltip-attempt {
-    font-size: 0.85rem;
-    line-height: 1.4;
     margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.375;
 }
 
 .status-subscription-indicator__tooltip-summary {
@@ -938,24 +931,24 @@
 }
 
 .status-subscription-indicator__tooltip-context {
-    color: var(--color-text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.4;
     margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.375;
 }
 
 .status-subscription-indicator__tooltip-errors {
-    color: var(--color-error, rgb(239 68 68));
-    font-size: 0.8rem;
     margin: 0;
+    color: var(--color-error, rgb(239 68 68));
+    font-size: 0.75rem;
     padding-inline-start: 1rem;
 }
 
 .status-subscription-indicator__tooltip-retry {
+    display: inline-flex;
     align-items: center;
     align-self: flex-start;
     column-gap: 0.35rem;
-    display: inline-flex;
 }
 
 /* Accessibility: reduce motion */

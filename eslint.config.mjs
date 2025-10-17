@@ -148,6 +148,8 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
+
+import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
 // import pluginPii from "eslint-plugin-pii"; - broken
@@ -186,6 +188,7 @@ export default [
         name: "Global .gitignore Rules",
         root: true,
     }), // MARK: Global Configs and Rules
+    sharedContractInterfaceGuard,
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
