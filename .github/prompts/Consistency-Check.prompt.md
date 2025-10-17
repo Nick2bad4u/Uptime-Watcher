@@ -8,74 +8,85 @@ description: "Run a consistency audit tailored for the Uptime Watcher Electron +
 
 ## Objective
 
-Execute a repository-wide consistency review across all **implementation** files (ignore tests). Begin with foundational utilities and domain repositories before moving through the Electron main process, shared modules, and finally the renderer (`app.tsx`, routing, Zustand stores, UI components). Ensure alignment with the established Electron + React + SQLite architecture.
+Review implementation code across the stack to confirm the project continues to follow its layered Electron + React architecture. Cover foundational utilities, services, platform glue, and renderer-facing modules without dwelling on test-only files.
+
+Go in detail to identify inconsistencies in structure, data flow, logic, and interfaces that could lead to maintenance challenges or bugs. Provide a prioritized report of findings with actionable recommendations for alignment.
+
+Be super thorough and precise, as this will guide future refactoring and standardization efforts.
+
+We want architectural perfection before adding new features.
+
+If you find documentation gaps add them. If you find out-of-date documentation add a task to update it to the todo list.
 
 ## Analysis Requirements
 
-### 1. Structural Consistency Check
+### 1. Structural Alignment
 
-- [ ] Confirm uniform usage of the repository pattern, TypedEventBus, and contextBridge IPC wrappers.
-- [ ] Flag any divergence from the layered separation: Electron main (infrastructure), shared/domain modules, renderer (presentation + state).
-- [ ] Validate consistent application of dependency injection, factory helpers, and transaction wrappers.
+- Ensure common architectural patterns for data access, eventing, and IPC are applied uniformly and respect the boundaries between infrastructure, shared logic, and presentation layers.
+- Call out notable deviations from the expected layering or from the helper abstractions that already exist in the codebase.
 
-### 2. Data Flow Audit
+### 2. Data Flow Health
 
-- [ ] Trace data paths end-to-end: database repositories → service/domain layer → IPC → renderer stores/components.
-- [ ] Highlight inconsistent validation, sanitization, or transformation logic for comparable entities (e.g., monitors, heartbeats).
-- [ ] Verify error propagation and logging follow the standardized structured logging approach across layers.
+- Trace representative flows from persistence through services and IPC into renderer state and UI to confirm validations, transformations, and error handling behave consistently.
+- Note any mismatched logging or observability approaches that could hinder troubleshooting.
 
-### 3. Logic Uniformity Review
+### 3. Logic Uniformity
 
-- [ ] Detect duplicated domain logic implemented differently across repositories, services, or Zustand stores.
-- [ ] Ensure Zustand slices share consistent patterns for selectors, actions, and async flows.
-- [ ] Review side-effect management (async tasks, timers, Electron background work) for adherence to existing abstractions.
+- Look for domain rules or business logic implemented in multiple places with conflicting behaviour.
+- Check that state stores and side-effect handlers follow the established conventions for naming, selectors, async control, and cleanup.
 
-### 4. Interface Consistency
+### 4. Interface Cohesion
 
-- [ ] Check IPC channel naming, payload schemas, and TypeScript contracts against current conventions.
-- [ ] Confirm shared DTOs/types are reused instead of ad-hoc interfaces in renderer or main process code.
-- [ ] Audit component props and service method signatures for alignment with documented types in `docs/TSDoc/`.
+- Compare IPC channels, shared contracts, and component/service signatures to the canonical types already published in shared modules or documentation.
+- Highlight ad-hoc interfaces that should instead reuse the shared definitions.
 
-### 5. Inconsistency Detection
+### 5. Inconsistency Sweep
 
-- [ ] Surface areas where similar operations (e.g., monitor CRUD, notification dispatching) diverge in implementation strategy.
-- [ ] Identify anti-patterns (direct DB access in renderer, bypassing transaction helpers, untyped IPC calls).
-- [ ] Flag “special case” code paths that should be generalized or expressed via shared utilities/hooks.
+- Identify special-case paths or shortcuts that bypass shared utilities, transaction helpers, or event buses.
+- Surface direct cross-layer calls or other anti-patterns that erode maintainability.
 
 ## Output Requirements
 
 ### 1. Categorized Report
 
 For each inconsistency provide:
-- File path(s) and focused code excerpts.
-- Description of the inconsistency, referencing affected layer or pattern.
-- Recommended alignment strategy referencing current best practice within the codebase.
+- Relevant file path(s) with concise excerpts.
+- A short description of the issue, including the layer or pattern it affects.
+- A recommended alignment approach grounded in an existing best practice within the repository.
 
 ### 2. Prioritization
 
-Rank findings by:
-- Risk to application stability or correctness.
-- Likelihood of introducing bugs during upcoming feature development.
-- Impact on maintainability and developer onboarding.
+Rank findings by their risk to stability, potential to introduce bugs, and overall impact on maintainability or onboarding.
 
 ### 3. Improvement Suggestions
 
-For each inconsistency category supply:
-- The unified approach to adopt (cite specific files or patterns as exemplars).
-- Concrete refactoring steps (ordered list).
-- Impact analysis covering affected modules, IPC contracts, data schemas, and documentation.
+Group related findings and outline:
+- The preferred approach or exemplar to follow.
+- Ordered steps to realign the affected code.
+- Expected impact across modules, IPC contracts, schemas, or docs.
 
 ### 4. Roadmap
 
-Deliver a staged remediation plan:
-- **Quick Wins** – low-effort standardizations (naming, shared utility adoption) with high payoff.
-- **Medium-Term** – coordinated refactors (store consolidation, IPC contract normalization).
-- **Long-Term** – architectural alignments (event bus middleware, shared validation layer).
+Suggest a staged plan:
+- **Quick Wins** – light standardisations with meaningful payoff.
+- **Medium-Term** – coordinated refactors requiring moderate coordination.
+- **Long-Term** – deeper architectural work worth tracking separately.
 
 ## Additional Guidance
 
-- Focus solely on implementation files; exclude `*.test.*`, Playwright specs, and storybook examples.
-- Pay special attention to boundaries: repository ↔ service, main ↔ renderer IPC, renderer state ↔ components.
-- Defer formatting concerns; structural consistency takes precedence (run `npm run lint:fix` after code changes).
-- Reference existing documentation in `docs/TSDoc/` for canonical definitions before suggesting schema changes.
-- Use the Electron MCP server to inspect runtime behavior or UI state if deeper context is required.
+- Focus on implementation files; tests, Playwright specs, and Storybook content are out of scope.
+- Prioritise cross-layer boundaries (repositories ↔ services, main ↔ renderer IPC, renderer state ↔ components).
+- Treat formatting as secondary; address consistency first and run automated formatting afterwards if needed.
+- Refer to existing documentation (e.g., `docs/TSDoc/`, architecture notes) before proposing schema or contract adjustments.
+- Leverage available tooling (diagnostics, runtime inspection, etc.) when additional context is required.
+
+# Fixing Inconsistencies
+
+When addressing identified inconsistencies, follow these steps:
+1. **Understand the Context**: Review the relevant code sections to fully grasp the intended functionality and how it fits within the overall architecture.
+2. **Consult Documentation**: Refer to any existing documentation or architectural guidelines to ensure your changes align with established best practices.
+3. **Refactor Thoughtfully**: Make changes that enhance consistency without introducing new issues. Ensure that your refactoring maintains the original functionality.
+4. **Test Thoroughly**: After making changes, run existing tests and add new ones if necessary to verify that the changes do not break any functionality.
+5. **Document Changes**: Update any relevant documentation to reflect the changes made, ensuring that future developers can understand the rationale behind the adjustments.
+6. **No Backwards Compatibility**: Do NOT create backwards compatibility layers; instead, refactor all affected code to use the updated patterns or interfaces directly.
+7. **Add to Todo List**: Add all identified inconsistencies to a detailed todo list with descriptions and work through the entire list.
