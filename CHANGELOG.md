@@ -7,14 +7,55 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[48fd19b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)...
+[48fd19b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/48fd19bdf53c9619d965f73c4004ba3fe852841c...48fd19bdf53c9619d965f73c4004ba3fe852841c))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.0.0 [`(48fd19b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)
+
+
+
+
+
+
+## [17.0.0] - 2025-10-17
+
+
 [[fcb65e8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)...
-[fcb65e8](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/fcb65e861f130f7593601afde00152874c5153e8...fcb65e861f130f7593601afde00152874c5153e8))
+[01ae52f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/01ae52ff174f5042b4e44856693544b9e21ee48b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/fcb65e861f130f7593601afde00152874c5153e8...01ae52ff174f5042b4e44856693544b9e21ee48b))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 16.9.0 [`(fcb65e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fcb65e861f130f7593601afde00152874c5153e8)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Refactor SiteCard and header layout
+
+This commit refactors the SiteCard and header components to improve UI responsiveness and maintainability.
+
+- 🎨 Move the SiteCardFooter into the SiteCardHeader to provide an inline interaction hint and improve visual consistency.
+- 📱 Implement responsive sidebar behavior using media queries and UI store preferences.
+ - Adds logic to manage sidebar collapse state based on viewport size.
+ - Introduces a `compactSidebarOpen` state for smaller viewports and persists the collapsed preference for larger screens.
+- 📝 Update the package.json to include echo statements to indicate when type checking, linting, and formatting are complete within the scripts.
+ - Adds messages to the console to confirm the completion of various checks.
+- 🔧 Remove `tailwindConfig` from `.prettierrc` as it's no longer needed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(01ae52f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/01ae52ff174f5042b4e44856693544b9e21ee48b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v16.9.0 [skip ci] [`(1ba9901)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1ba990193b33f0c694a51252fd21ad7021fc9350)
 
 
 
