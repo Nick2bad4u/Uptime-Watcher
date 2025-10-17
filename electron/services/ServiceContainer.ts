@@ -424,6 +424,7 @@ export class ServiceContainer {
                     site: this.getSiteRepository(),
                 },
             });
+            this.setupEventForwarding(databaseEventBus, "DatabaseManager");
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created DatabaseManager with dependencies"
@@ -537,11 +538,7 @@ export class ServiceContainer {
         if (!this.ipcService) {
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
-            this.ipcService = new IpcService(
-                orchestrator,
-                updater,
-                this.getRendererEventBridge()
-            );
+            this.ipcService = new IpcService(orchestrator, updater);
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created IpcService with dependencies"
@@ -909,14 +906,21 @@ export class ServiceContainer {
             "internal:monitor:stopped",
             "internal:monitor:manual-check-completed",
             "internal:monitor:site-setup-completed",
+            "internal:site:added",
             "site:added",
             "site:updated",
             "site:removed",
+            "internal:site:removed",
             "internal:site:updated",
             "site:cache-updated",
             "internal:site:cache-updated",
             "sites:state-synchronized",
             "site:cache-miss",
+            "internal:database:data-imported",
+            "internal:database:history-limit-updated",
+            "internal:database:sites-refreshed",
+            "internal:database:update-sites-cache-requested",
+            "database:transaction-completed",
             "system:error",
         ] as const satisfies ReadonlyArray<keyof UptimeEvents>;
 

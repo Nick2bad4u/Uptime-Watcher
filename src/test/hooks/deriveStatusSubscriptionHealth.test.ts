@@ -21,6 +21,11 @@ describe(deriveStatusSubscriptionHealth, () => {
             message: "success",
             subscribed: true,
             success: true,
+            listenerStates: [
+                { attached: true, name: "monitor-status-changed" },
+                { attached: true, name: "monitoring-started" },
+                { attached: true, name: "monitoring-stopped" },
+            ],
         };
 
         const health = deriveStatusSubscriptionHealth(summary);
@@ -39,6 +44,11 @@ describe(deriveStatusSubscriptionHealth, () => {
             message: "partial",
             subscribed: false,
             success: false,
+            listenerStates: [
+                { attached: true, name: "monitor-status-changed" },
+                { attached: false, name: "monitoring-started" },
+                { attached: false, name: "monitoring-stopped" },
+            ],
         };
 
         const health = deriveStatusSubscriptionHealth(summary);
@@ -57,6 +67,11 @@ describe(deriveStatusSubscriptionHealth, () => {
             message: "failure",
             subscribed: false,
             success: false,
+            listenerStates: [
+                { attached: false, name: "monitor-status-changed" },
+                { attached: false, name: "monitoring-started" },
+                { attached: false, name: "monitoring-stopped" },
+            ],
         };
 
         const health = deriveStatusSubscriptionHealth(summary);

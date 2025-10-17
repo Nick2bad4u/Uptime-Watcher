@@ -5,6 +5,10 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ApplicationService } from "../../../services/application/ApplicationService";
+import {
+    STATE_SYNC_ACTION,
+    STATE_SYNC_SOURCE,
+} from "../../../../shared/types/stateSync";
 
 // Mock Electron app
 vi.mock("electron", () => ({
@@ -78,6 +82,8 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_INITIALIZATION_ERROR",
             APPLICATION_FORWARD_MONITOR_STATUS_ERROR:
                 "APPLICATION_FORWARD_MONITOR_STATUS_ERROR",
+            APPLICATION_FORWARD_STATE_SYNC_ERROR:
+                "APPLICATION_FORWARD_STATE_SYNC_ERROR",
         },
         debug: {
             APPLICATION_CLEANUP_SERVICE: "APPLICATION_CLEANUP_SERVICE",
@@ -93,6 +99,8 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_FORWARDING_CACHE_INVALIDATION",
             APPLICATION_FORWARDING_MONITOR_STATUS:
                 "APPLICATION_FORWARDING_MONITOR_STATUS",
+            APPLICATION_FORWARDING_STATE_SYNC:
+                "APPLICATION_FORWARDING_STATE_SYNC",
         },
         warnings: {
             APPLICATION_MONITOR_DOWN: "APPLICATION_MONITOR_DOWN",
@@ -1119,6 +1127,80 @@ describe(ApplicationService, () => {
                 // Assert
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "APPLICATION_FORWARD_MONITORING_STOPPED_ERROR",
+                    error
+                );
+            });
+        });
+        describe("sites:state-synchronized event", () => {
+            it("should forward state sync event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const stateSyncHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "sites:state-synchronized"
+                    )?.[1];
+                const eventData = {
+                    action: STATE_SYNC_ACTION.UPDATE,
+                    siteIdentifier: "site-1",
+                    sites: [
+                        {
+                            identifier: "site-1",
+                            monitoring: true,
+                            monitors: [],
+                            name: "Site 1",
+                        },
+                    ],
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                    timestamp: Date.now(),
+                };
+
+                stateSyncHandler?.(eventData);
+
+                expect(
+                    mockRendererEventBridge.sendStateSyncEvent
+                ).toHaveBeenCalledWith(eventData);
+            });
+
+            it("should handle state sync forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const stateSyncHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "sites:state-synchronized"
+                    )?.[1];
+                const eventData = {
+                    action: STATE_SYNC_ACTION.UPDATE,
+                    siteIdentifier: "site-1",
+                    sites: [
+                        {
+                            identifier: "site-1",
+                            monitoring: true,
+                            monitors: [],
+                            name: "Site 1",
+                        },
+                    ],
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                    timestamp: Date.now(),
+                };
+                const error = new Error("Forward failed");
+                mockRendererEventBridge.sendStateSyncEvent.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
+
+                stateSyncHandler?.(eventData);
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_STATE_SYNC_ERROR",
                     error
                 );
             });

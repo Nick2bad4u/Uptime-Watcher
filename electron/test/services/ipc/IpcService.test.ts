@@ -143,23 +143,15 @@ vi.mock("./", () => ({
     StateSyncHandlerValidators: {},
 }));
 
-const mockRendererEventBridge = {
-    broadcast: vi.fn(),
-    sendStateSyncEvent: vi.fn(),
-};
-
 describe(IpcService, () => {
     let ipcService: IpcService;
 
     beforeEach(() => {
         vi.clearAllMocks();
         resetDiagnosticsMetrics();
-        mockRendererEventBridge.broadcast.mockReset();
-        mockRendererEventBridge.sendStateSyncEvent.mockReset();
         ipcService = new IpcService(
             mockUptimeOrchestrator as any,
-            mockAutoUpdaterService as any,
-            mockRendererEventBridge as any
+            mockAutoUpdaterService as any
         );
     });
     afterEach(() => {

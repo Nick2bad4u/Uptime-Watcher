@@ -9,6 +9,16 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 /**
+ * Attachment state metadata for a realtime listener channel.
+ */
+export interface ListenerAttachmentState {
+    /** Whether the listener attached successfully. */
+    readonly attached: boolean;
+    /** Unique listener identifier or scope. */
+    readonly name: string;
+}
+
+/**
  * Summary returned after attempting to subscribe to status updates.
  */
 export interface StatusUpdateSubscriptionSummary {
@@ -18,6 +28,8 @@ export interface StatusUpdateSubscriptionSummary {
     expectedListeners: number;
     /** Number of listeners successfully attached. */
     listenersAttached: number;
+    /** Attachment diagnostics for each listener scope. */
+    listenerStates: ListenerAttachmentState[];
     /** Human-friendly message describing the outcome. */
     message: string;
     /** Whether the subscription succeeded and listeners are active. */

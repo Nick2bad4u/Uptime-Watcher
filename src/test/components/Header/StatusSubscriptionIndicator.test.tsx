@@ -9,6 +9,11 @@ const healthySummary: StatusUpdateSubscriptionSummary = {
     errors: [],
     expectedListeners: 3,
     listenersAttached: 3,
+    listenerStates: [
+        { attached: true, name: "monitor-status-changed" },
+        { attached: true, name: "monitoring-started" },
+        { attached: true, name: "monitoring-stopped" },
+    ],
     message: "ok",
     subscribed: true,
     success: true,
@@ -18,6 +23,11 @@ const fallbackSummary: StatusUpdateSubscriptionSummary = {
     errors: ["retry failed"],
     expectedListeners: 3,
     listenersAttached: 0,
+    listenerStates: [
+        { attached: false, name: "monitor-status-changed" },
+        { attached: false, name: "monitoring-started" },
+        { attached: false, name: "monitoring-stopped" },
+    ],
     message: "retry failed",
     subscribed: false,
     success: false,
@@ -47,9 +57,23 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
     it("displays healthy metadata", () => {
         render(<StatusSubscriptionIndicator />);
 
-        expect(screen.getByText("Realtime Updates")).toBeInTheDocument();
-        expect(screen.getByText("Realtime Healthy")).toBeInTheDocument();
-        expect(screen.getByRole("button", { name: /retry/i })).toBeEnabled();
+        const trigger = screen.getByRole("button", {
+            name: /realtime updates/i,
+        });
+
+        expect(trigger).toHaveAttribute(
+            "aria-label",
+            expect.stringContaining("Realtime Healthy")
+        );
+        expect(trigger).toHaveAttribute(
+            "aria-label",
+            expect.stringContaining("3 channels active")
+        );
+        expect(
+            screen.queryByRole("button", {
+                name: /retry realtime listeners/i,
+            })
+        ).not.toBeInTheDocument();
     });
 
     it("displays unknown state when summary is missing", () => {
@@ -57,18 +81,33 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
 
         render(<StatusSubscriptionIndicator />);
 
-        expect(screen.getByText("Not Connected")).toBeInTheDocument();
-        expect(screen.getByText("No listeners connected")).toBeInTheDocument();
+        const trigger = screen.getByRole("button", {
+            name: /realtime updates/i,
+        });
+
+        expect(trigger).toHaveAttribute(
+            "aria-label",
+            expect.stringContaining("Not Connected")
+        );
+        expect(trigger).toHaveAttribute(
+            "aria-label",
+            expect.stringContaining("Connection pending")
+        );
     });
 
     it("invokes retry action when retry button is clicked", async () => {
+        mockStore.statusSubscriptionSummary = fallbackSummary;
         mockStore.retryStatusSubscription.mockResolvedValueOnce(
             fallbackSummary
         );
 
         render(<StatusSubscriptionIndicator />);
 
-        fireEvent.click(screen.getByRole("button", { name: /retry/i }));
+        fireEvent.click(
+            screen.getByRole("button", {
+                name: /retry realtime listeners/i,
+            })
+        );
 
         await waitFor(() => {
             expect(mockStore.retryStatusSubscription).toHaveBeenCalledTimes(1);

@@ -16,6 +16,8 @@ import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
 import { isEnrichedMonitorStatusChangedEventData } from "@shared/validation/monitorStatusEvents";
 
+import type { ListenerAttachmentState } from "../baseTypes";
+
 import { EventsService } from "../../../services/EventsService";
 import { logger } from "../../../services/logger";
 
@@ -94,6 +96,8 @@ export interface StatusUpdateSubscriptionResult {
     expectedListeners: number;
     /** Total number of listeners that were attached. */
     listenersAttached: number;
+    /** Detailed attachment state for each listener scope. */
+    listenerStates: ListenerAttachmentState[];
     /** Whether all listeners were attached successfully without errors. */
     success: boolean;
 }
@@ -307,10 +311,12 @@ export class StatusUpdateManager {
         }
 
         const listenerDescriptors: Array<{
+            label: string;
             register: () => Promise<() => void>;
             scope: string;
         }> = [
             {
+                label: "monitor-status-changed",
                 register: () =>
                     EventsService.onMonitorStatusChanged((data: unknown) => {
                         void (async (): Promise<void> => {
@@ -347,6 +353,7 @@ export class StatusUpdateManager {
                 scope: "monitor-status-changed",
             },
             {
+                label: "monitoring-started",
                 register: () =>
                     EventsService.onMonitoringStarted(() => {
                         void (async (): Promise<void> => {
@@ -364,6 +371,7 @@ export class StatusUpdateManager {
                 scope: "monitoring-started",
             },
             {
+                label: "monitoring-stopped",
                 register: () =>
                     EventsService.onMonitoringStopped(() => {
                         void (async (): Promise<void> => {
@@ -382,8 +390,17 @@ export class StatusUpdateManager {
             },
         ];
 
+        const listenerStates: ListenerAttachmentState[] =
+            listenerDescriptors.map(({ label }) => ({
+                attached: false,
+                name: label,
+            }));
+
         /* eslint-disable no-await-in-loop -- Event listeners must be attached sequentially to preserve registration order */
-        for (const { register, scope } of listenerDescriptors) {
+        for (const [
+            index,
+            { register, scope },
+        ] of listenerDescriptors.entries()) {
             if (encounteredListenerFailure) {
                 break;
             }
@@ -392,6 +409,7 @@ export class StatusUpdateManager {
                 const cleanup = await register();
                 this.cleanupFunctions.push(cleanup);
                 listenersAttached += 1;
+                listenerStates[index]!.attached = true;
             } catch (error) {
                 const normalizedError = ensureError(error);
                 errors.push(`${scope}: ${normalizedError.message}`);
@@ -412,6 +430,7 @@ export class StatusUpdateManager {
             errors,
             expectedListeners,
             listenersAttached,
+            listenerStates,
             success:
                 errors.length === 0 &&
                 !encounteredListenerFailure &&

@@ -112,11 +112,6 @@ vi.mock("../../../../shared/validation/schemas", () => ({
     })),
 }));
 
-const mockRendererEventBridge = {
-    broadcast: vi.fn(),
-    sendStateSyncEvent: vi.fn(),
-};
-
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
@@ -203,13 +198,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
-        mockRendererEventBridge.broadcast.mockReset();
-        mockRendererEventBridge.sendStateSyncEvent.mockReset();
-
         ipcService = new IpcService(
             mockUptimeOrchestrator,
-            mockAutoUpdaterService,
-            mockRendererEventBridge as any
+            mockAutoUpdaterService
         );
     });
 
@@ -1117,19 +1108,6 @@ describe("IpcService - Comprehensive Coverage", () => {
                     timestamp: expect.any(Number),
                 }
             );
-            expect(
-                mockRendererEventBridge.sendStateSyncEvent
-            ).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    action: "bulk-sync",
-                    sites: expect.any(Array),
-                    source: "database",
-                    timestamp: expect.any(Number),
-                })
-            );
-            expect(
-                mockRendererEventBridge.sendStateSyncEvent
-            ).toHaveBeenCalledTimes(1);
 
             expect(result).toEqual({
                 success: true,

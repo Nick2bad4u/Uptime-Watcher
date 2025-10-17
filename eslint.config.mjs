@@ -1177,7 +1177,6 @@ export default [
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
-            // @ts-expect-error -- react-hooks plugin doesn't expose typed configs
             ...reactHooks.configs["recommended-latest"].rules,
             ...jsxA11y.flatConfigs.strict.rules,
             ...pluginSonarjs.configs.recommended.rules,

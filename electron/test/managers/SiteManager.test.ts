@@ -192,6 +192,15 @@ describe(SiteManager, () => {
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
+                "internal:site:cache-updated",
+                expect.any(Object)
+            );
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith("internal:site:added", expect.any(Object));
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
                 "site:added",
                 expect.objectContaining({
                     site: expect.objectContaining({
@@ -199,6 +208,12 @@ describe(SiteManager, () => {
                         name: "Test Site",
                     }),
                 })
+            );
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.any(Object)
             );
             expect(result).toEqual(newSite);
 

@@ -181,6 +181,8 @@ export const DEBUG_LOGS = {
         "[ApplicationService] Forwarding monitoring started to renderer",
     APPLICATION_FORWARDING_MONITORING_STOPPED:
         "[ApplicationService] Forwarding monitoring stopped to renderer",
+    APPLICATION_FORWARDING_STATE_SYNC:
+        "[ApplicationService] Forwarding state sync event to renderer",
 
     /** Background operations */
     BACKGROUND_LOAD_COMPLETE:
@@ -269,6 +271,8 @@ export const ERROR_LOGS = {
         "[ApplicationService] Failed to forward monitoring started to renderer",
     APPLICATION_FORWARD_MONITORING_STOPPED_ERROR:
         "[ApplicationService] Failed to forward monitoring stopped to renderer",
+    APPLICATION_FORWARD_STATE_SYNC_ERROR:
+        "[ApplicationService] Failed to forward state sync event to renderer",
     APPLICATION_INITIALIZATION_ERROR:
         "[ApplicationService] Error during app initialization",
     APPLICATION_SYSTEM_ERROR: "[ApplicationService] System error: {context}",

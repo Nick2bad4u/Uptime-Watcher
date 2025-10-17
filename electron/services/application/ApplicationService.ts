@@ -460,6 +460,26 @@ export class ApplicationService {
             }
         });
 
+        orchestrator.onTyped("sites:state-synchronized", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,
+                    {
+                        action: data.action,
+                        siteIdentifier: data.siteIdentifier,
+                        sitesCount: data.sites.length,
+                        source: data.source,
+                    }
+                );
+                rendererBridge.sendStateSyncEvent(data);
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_STATE_SYNC_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
         // Handle cache invalidation events
         orchestrator.onTyped("cache:invalidated", (data) => {
             try {

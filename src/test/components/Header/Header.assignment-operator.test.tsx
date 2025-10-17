@@ -88,6 +88,11 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         errors: [],
         expectedListeners: 3,
         listenersAttached: 3,
+        listenerStates: [
+            { attached: true, name: "monitor-status-changed" },
+            { attached: true, name: "monitoring-started" },
+            { attached: true, name: "monitoring-stopped" },
+        ],
         message: "Subscription established",
         subscribed: true,
         success: true,

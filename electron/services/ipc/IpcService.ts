@@ -16,7 +16,6 @@ import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
 
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
-import type { RendererEventBridge } from "../events/RendererEventBridge";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { diagnosticsLogger, logger } from "../../utils/logger";
@@ -433,11 +432,7 @@ const UiConfigSerializer = {
  *         updater: AutoUpdaterService,
  *         rendererBridge: RendererEventBridge
  *     ) {
- *         this.ipcService = new IpcService(
- *             orchestrator,
- *             updater,
- *             rendererBridge
- *         );
+ *         this.ipcService = new IpcService(orchestrator, updater);
  *     }
  *
  *     async start(): Promise<void> {
@@ -474,9 +469,6 @@ export class IpcService {
      */
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
-    /** Renderer bridge for broadcasting events to all windows. */
-    private readonly rendererEventBridge: RendererEventBridge;
-
     /**
      * Constructs a new IpcService instance.
      *
@@ -499,19 +491,15 @@ export class IpcService {
      * @param uptimeOrchestrator - The core orchestrator for monitoring
      *   operations
      * @param autoUpdaterService - The service for handling application updates
-     * @param rendererEventBridge - Bridge for broadcasting events to renderer
-     *   processes
      *
      * @public
      */
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
-        autoUpdaterService: AutoUpdaterService,
-        rendererEventBridge: RendererEventBridge
+        autoUpdaterService: AutoUpdaterService
     ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
-        this.rendererEventBridge = rendererEventBridge;
     }
 
     /**
@@ -1032,14 +1020,6 @@ export class IpcService {
                         timestamp,
                     }
                 );
-
-                // Send state sync event to all renderer processes
-                this.rendererEventBridge.sendStateSyncEvent({
-                    action: STATE_SYNC_ACTION.BULK_SYNC,
-                    sites,
-                    source: STATE_SYNC_SOURCE.DATABASE,
-                    timestamp,
-                });
 
                 logger.debug("[IpcService] Full sync completed", {
                     siteCount: sites.length,

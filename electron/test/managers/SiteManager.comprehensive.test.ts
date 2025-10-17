@@ -54,27 +54,50 @@ vi.mock("../../utils/database/serviceFactory", () => ({
     })),
 }));
 
-// Mock StandardizedCache - Create shared mock instance first
+// Mock StandardizedCache - Create shared mock instance backed by Map storage
+const cacheStore = new Map<string, Site>();
+
 const mockCache = {
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-    has: vi.fn(),
-    clear: vi.fn(),
-    size: 0,
-    keys: vi.fn().mockReturnValue([]),
-    getAll: vi.fn().mockReturnValue([]),
-    entries: vi.fn().mockReturnValue(new Map().entries()), // Return proper iterable
-    bulkUpdate: vi.fn(),
-    replaceAll: vi.fn(),
-    cleanup: vi.fn(),
+    get: vi.fn((key: string) => cacheStore.get(key)),
+    set: vi.fn((key: string, value: Site) => {
+        cacheStore.set(key, value);
+    }),
+    delete: vi.fn((key: string) => cacheStore.delete(key)),
+    has: vi.fn((key: string) => cacheStore.has(key)),
+    clear: vi.fn(() => {
+        cacheStore.clear();
+    }),
+    keys: vi.fn(() => cacheStore.keys()),
+    getAll: vi.fn(() => Array.from(cacheStore.values())),
+    entries: vi.fn(() => cacheStore.entries()),
+    bulkUpdate: vi.fn((items: { key: string; data: Site; ttl?: number }[]) => {
+        for (const item of items) {
+            cacheStore.set(item.key, item.data);
+        }
+    }),
+    replaceAll: vi.fn((items: { key: string; data: Site; ttl?: number }[]) => {
+        cacheStore.clear();
+        for (const item of items) {
+            cacheStore.set(item.key, item.data);
+        }
+    }),
+    cleanup: vi.fn(() => 0),
     invalidate: vi.fn(),
     invalidateAll: vi.fn(),
-    getStats: vi
-        .fn()
-        .mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
+    getStats: vi.fn(() => ({
+        hits: 0,
+        misses: 0,
+        hitRatio: 0,
+        size: cacheStore.size,
+    })),
     onInvalidation: vi.fn().mockReturnValue(() => {}),
 };
+
+Object.defineProperty(mockCache, "size", {
+    configurable: true,
+    enumerable: false,
+    get: () => cacheStore.size,
+});
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
     StandardizedCache: vi.fn(() => mockCache),
@@ -120,6 +143,26 @@ describe("SiteManager - Comprehensive", () => {
     let mockMonitoringOperations: IMonitoringOperations;
 
     beforeEach(() => {
+        cacheStore.clear();
+        mockCache.get.mockClear();
+        mockCache.set.mockClear();
+        mockCache.delete.mockClear();
+        mockCache.has.mockClear();
+        mockCache.clear.mockClear();
+        mockCache.keys.mockClear();
+        mockCache.getAll.mockClear();
+        mockCache.entries.mockClear();
+        mockCache.bulkUpdate.mockClear();
+        mockCache.replaceAll.mockClear();
+        mockCache.cleanup.mockClear();
+        mockCache.invalidate.mockClear();
+        mockCache.invalidateAll.mockClear();
+        mockCache.getStats.mockClear();
+        mockCache.onInvalidation.mockClear();
+        mockCache.onInvalidation.mockReturnValue(() => {});
+    });
+
+    beforeEach(() => {
         vi.clearAllMocks();
 
         // Reset the shared mock instance
@@ -131,18 +174,10 @@ describe("SiteManager - Comprehensive", () => {
         );
         mockSiteWriterServiceInstance.detectNewMonitors.mockReturnValue([]);
 
-        // Reset cache mock
-        vi.mocked(mockCache.get).mockReturnValue(undefined);
-
         // Reset service mocks
         mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue(
             []
         );
-        vi.mocked(mockCache.has).mockReturnValue(false);
-        vi.mocked(mockCache.getAll).mockReturnValue([]);
-        mockCache.keys.mockReturnValue([]);
-        mockCache.entries.mockReturnValue([]);
-        Object.defineProperty(mockCache, "size", { value: 0, writable: true });
 
         mockSite = {
             identifier: "site-1",
@@ -266,6 +301,16 @@ describe("SiteManager - Comprehensive", () => {
             expect(
                 mockSiteWriterServiceInstance.createSite
             ).toHaveBeenCalledWith(mockSite);
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:cache-updated",
+                expect.any(Object)
+            );
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:added",
+                expect.objectContaining({
+                    identifier: mockSite.identifier,
+                })
+            );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "site:added",
                 expect.any(Object)

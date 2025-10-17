@@ -7,6 +7,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "../../../../shared/types";
 import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
 
+const LISTENER_NAMES = [
+    "monitor-status-changed",
+    "monitoring-started",
+    "monitoring-stopped",
+];
+
+const buildListenerStates = (attachedCount: number) =>
+    LISTENER_NAMES.map((name, index) => ({
+        attached: index < attachedCount,
+        name,
+    }));
+
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
@@ -46,6 +58,7 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
             errors: [],
             expectedListeners: 3,
             listenersAttached: 3,
+            listenerStates: buildListenerStates(3),
             success: true,
         })),
         unsubscribe: vi.fn(),

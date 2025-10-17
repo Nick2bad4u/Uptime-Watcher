@@ -151,6 +151,10 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
         [summary]
     );
 
+    const listenerStates = summary?.listenerStates ?? [];
+
+    const shouldShowRetryAction = health.needsAttention;
+
     const retryAttemptSummary = formatRetryAttemptSummary(lastAttempt);
 
     const handleRetry = useCallback(() => {
@@ -186,6 +190,32 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
                 <p className="status-subscription-indicator__tooltip-summary">
                     {listenerSummary}
                 </p>
+                {listenerStates.length > 0 ? (
+                    <div className="status-subscription-indicator__tooltip-listeners">
+                        <ThemedText
+                            className="status-subscription-indicator__tooltip-listeners-title"
+                            size="xs"
+                            weight="semibold"
+                        >
+                            Listener Channels
+                        </ThemedText>
+                        <ul className="status-subscription-indicator__tooltip-list">
+                            {listenerStates.map((state) => (
+                                <li
+                                    className={`status-subscription-indicator__tooltip-list-item status-subscription-indicator__tooltip-list-item--${state.attached ? "attached" : "detached"}`}
+                                    key={state.name}
+                                >
+                                    <span>{state.name}</span>
+                                    <span>
+                                        {state.attached
+                                            ? "attached"
+                                            : "not attached"}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : null}
                 <p className="status-subscription-indicator__tooltip-context">
                     Realtime channels stream site, monitor, and history events
                     from the background engine. Their count is independent of
@@ -203,7 +233,7 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
                         {retryAttemptSummary}
                     </p>
                 ) : null}
-                {health.needsAttention ? (
+                {shouldShowRetryAction ? (
                     <ThemedButton
                         aria-label="Retry realtime listeners"
                         className="status-subscription-indicator__tooltip-retry"
@@ -223,27 +253,45 @@ export const StatusSubscriptionIndicator = (): JSX.Element => {
             health.description,
             health.errors,
             health.label,
-            health.needsAttention,
             health.status,
             isRetrying,
             listenerDetail,
+            listenerStates,
             listenerSummary,
             retryAttemptSummary,
+            shouldShowRetryAction,
         ]
     );
 
     return (
-        <Tooltip content={tooltipContent} position="bottom">
-            {(triggerProps) => (
-                <button
-                    {...triggerProps}
-                    aria-label={`Realtime updates: ${health.label}. ${listenerSummary}.`}
-                    className={triggerClassName}
+        <div className="status-subscription-indicator__container">
+            <Tooltip content={tooltipContent} position="bottom">
+                {(triggerProps) => (
+                    <button
+                        {...triggerProps}
+                        aria-label={`Realtime updates: ${health.label}. ${listenerSummary}.`}
+                        className={triggerClassName}
+                        type="button"
+                    >
+                        <span aria-hidden="true" className={dotClassName} />
+                    </button>
+                )}
+            </Tooltip>
+            {shouldShowRetryAction ? (
+                <ThemedButton
+                    aria-label="Retry realtime listeners"
+                    className="status-subscription-indicator__retry"
+                    disabled={isRetrying}
+                    loading={isRetrying}
+                    onClick={handleRetry}
+                    size="sm"
                     type="button"
+                    variant="ghost"
                 >
-                    <span aria-hidden="true" className={dotClassName} />
-                </button>
-            )}
-        </Tooltip>
+                    <RefreshIconComponent size={14} />
+                    <span>Retry</span>
+                </ThemedButton>
+            ) : null}
+        </div>
     );
 };

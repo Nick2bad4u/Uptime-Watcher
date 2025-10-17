@@ -300,6 +300,7 @@ export const createSiteSyncActions = (
                     errors: [message],
                     expectedListeners: resolveExpectedListenerCount(),
                     listenersAttached: 0,
+                    listenerStates: [],
                     message:
                         "Unable to retry status subscription without callback context",
                     subscribed: false,
@@ -344,6 +345,7 @@ export const createSiteSyncActions = (
                     errors: [initializationMessage],
                     expectedListeners: resolveExpectedListenerCount(),
                     listenersAttached: 0,
+                    listenerStates: [],
                     message:
                         "Failed to subscribe to status updates due to missing callback",
                     subscribed: false,
@@ -390,6 +392,7 @@ export const createSiteSyncActions = (
                                 expectedListeners:
                                     resolveExpectedListenerCount(),
                                 listenersAttached: 0,
+                                listenerStates: [],
                                 message:
                                     "Failed to subscribe to status updates",
                                 subscribed: false,
@@ -412,6 +415,7 @@ export const createSiteSyncActions = (
                             errors,
                             expectedListeners,
                             listenersAttached,
+                            listenerStates,
                             success,
                         }: StatusUpdateSubscriptionResult =
                             await managerInstance.subscribe();
@@ -420,6 +424,7 @@ export const createSiteSyncActions = (
                             errors,
                             expectedListeners,
                             listenersAttached,
+                            listenerStates,
                             message: success
                                 ? "Successfully subscribed to status updates with efficient incremental updates"
                                 : "Failed to subscribe to status updates",
@@ -470,6 +475,7 @@ export const createSiteSyncActions = (
                                     statusUpdateManager.instance?.getExpectedListenerCount() ??
                                     resolveExpectedListenerCount(),
                                 listenersAttached: 0,
+                                listenerStates: [],
                                 message:
                                     "Failed to subscribe to status updates",
                                 subscribed: false,

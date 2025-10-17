@@ -45,8 +45,6 @@ const BASE_MONITOR_DEFAULTS = {
     status: DEFAULT_MONITOR_STATUS,
 } as const;
 
-const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
-
 function ensureNumberOrFallback(value: unknown, fallback: number): number {
     return typeof value === "number" && Number.isFinite(value)
         ? value
@@ -69,6 +67,12 @@ function ensureTrimmedStringOrFallback(
     }
     return fallback;
 }
+
+const HTTP_SHARED_DEFAULTS = SHARED_MONITOR_CONFIG.http;
+const HTTP_DEFAULT_URL = ensureTrimmedStringOrFallback(
+    HTTP_SHARED_DEFAULTS.url ?? "",
+    "https://example.com"
+);
 
 function hasSharedMonitorDefaults(
     type: MonitorType
@@ -445,7 +449,7 @@ function applyHttpMonitorDefaults(
     filteredData: UnknownRecord
 ): void {
     const urlValue = filteredData["url"];
-    monitor.url = typeof urlValue === "string" ? urlValue.trim() : "";
+    monitor.url = ensureTrimmedStringOrFallback(urlValue, HTTP_DEFAULT_URL);
 }
 
 function applyHttpKeywordMonitorDefaults(

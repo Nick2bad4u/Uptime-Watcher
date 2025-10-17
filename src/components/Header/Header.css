@@ -722,6 +722,54 @@
         color-mix(in srgb, var(--color-primary-500) 18%, transparent);
 }
 
+.status-subscription-indicator__container {
+    align-items: center;
+    column-gap: 0.75rem;
+    display: inline-flex;
+}
+
+.status-subscription-indicator__retry {
+    column-gap: 0.35rem;
+    display: inline-flex;
+    padding-inline: 0.6rem;
+}
+
+.status-subscription-indicator__tooltip-listeners {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.status-subscription-indicator__tooltip-listeners-title {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-subscription-indicator__tooltip-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.status-subscription-indicator__tooltip-list-item {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+    font-size: 0.75rem;
+}
+
+.status-subscription-indicator__tooltip-list-item--attached span:last-child {
+    color: var(--color-status-up);
+}
+
+.status-subscription-indicator__tooltip-list-item--detached span:last-child {
+    color: var(--color-status-down);
+}
+
 .status-subscription-indicator {
     background: none;
     border: none;
@@ -758,9 +806,9 @@
 .status-subscription-indicator__dot {
     background: var(--color-status-up);
     border-radius: 9999px;
-    block-size: 0.75rem;
+    block-size: 0.9rem;
     color: var(--color-status-up);
-    inline-size: 0.75rem;
+    inline-size: 0.9rem;
     position: relative;
 }
 
@@ -769,7 +817,7 @@
     border: 1px solid color-mix(in srgb, currentcolor 55%, transparent);
     border-radius: inherit;
     content: "";
-    inset: -0.35rem;
+    inset: -0.42rem;
     opacity: 0.6;
     position: absolute;
 }
