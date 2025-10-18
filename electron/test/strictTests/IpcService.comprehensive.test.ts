@@ -1117,7 +1117,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                 {
                     action: "bulk-sync",
                     sites: expect.any(Array),
-                    source: "frontend",
+                    source: "database",
                     timestamp: expect.any(Number),
                 }
             );
@@ -1128,7 +1128,7 @@ describe("IpcService - Comprehensive Coverage", () => {
                     completedAt: expect.any(Number),
                     siteCount: 1,
                     sites: expect.any(Array),
-                    source: "frontend",
+                    source: "database",
                     synchronized: true,
                 }),
                 metadata: {

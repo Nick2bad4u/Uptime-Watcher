@@ -7860,6 +7860,7 @@ export default [
                         "playwright.config.ts",
                         "vite.playwright-coverage.config.ts",
                         "vitest.stryker.config.ts",
+                        "config/testing/vitest.zero-coverage.config.ts",
                         "config/tools/knip.config.ts",
                         "config/tools/createPlaywrightCoveragePlugin.ts",
                     ],

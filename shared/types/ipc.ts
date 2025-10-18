@@ -8,7 +8,6 @@
  * Electron main process (for handler registration) and the renderer (for typed
  * invokers), satisfying ADR-005's strict typing requirements.
  */
-
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
@@ -16,6 +15,33 @@ import type {
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
 import type { ValidationResult } from "@shared/types/validation";
+import type { UnknownRecord } from "type-fest";
+
+/**
+ * Standardized IPC response envelope shared across renderer, preload, and main.
+ */
+export interface IpcResponse<T = unknown> {
+    /** Response data returned on success. */
+    data?: T;
+    /** Error message when the handler fails. */
+    error?: string;
+    /** Optional metadata emitted by the handler. */
+    metadata?: UnknownRecord;
+    /** Indicates whether the IPC call succeeded. */
+    success: boolean;
+    /** Optional non-fatal warnings emitted alongside the result. */
+    warnings?: readonly string[];
+}
+
+/**
+ * Specialized response contract for validation handlers.
+ */
+export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
+    /** Validation error messages, when present. */
+    errors: readonly string[];
+    /** Whether the validation succeeded. */
+    success: boolean;
+}
 
 /**
  * Serialized database backup result returned to the renderer process.

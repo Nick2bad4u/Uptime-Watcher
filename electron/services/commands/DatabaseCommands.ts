@@ -12,6 +12,7 @@
  */
 
 import type { Site } from "@shared/types";
+
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 
 import type { UptimeEvents } from "../../events/eventTypes";

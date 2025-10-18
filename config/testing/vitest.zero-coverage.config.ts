@@ -22,24 +22,20 @@ import baseViteConfig from "../../vite.config";
 // Use isolated caches so zero-coverage probes do not contend with the primary Vite/Vitest pipeline.
 const zeroCoverageViteCacheDir = "./.cache/vite-zero-coverage/";
 
-export default defineConfig((env) =>
+const zeroCoverageConfig: UserConfigFnObject = defineConfig((env) =>
     mergeConfig(
         baseViteConfig(env),
         defineConfig({
             cacheDir: zeroCoverageViteCacheDir,
             test: {
-                name: {
-                    color: "magenta",
-                    label: "ZeroCoverage",
-                },
                 coverage: {
                     all: false,
                     allowExternal: true,
                     clean: true,
                     cleanOnRerun: true,
                     provider: "v8",
-                    reportOnFailure: false,
                     reporter: ["json"],
+                    reportOnFailure: false,
                     reportsDirectory: "./coverage/zero-coverage",
                     skipFull: false,
                     thresholds: {
@@ -50,7 +46,13 @@ export default defineConfig((env) =>
                         statements: 0,
                     },
                 },
+                name: {
+                    color: "magenta",
+                    label: "ZeroCoverage",
+                },
             },
         })
     )
-) satisfies UserConfigFnObject;
+) as UserConfigFnObject;
+
+export default zeroCoverageConfig;

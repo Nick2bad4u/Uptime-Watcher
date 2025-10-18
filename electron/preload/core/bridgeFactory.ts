@@ -15,6 +15,7 @@ import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
     IpcInvokeChannelResult,
+    IpcResponse as SharedIpcResponse,
     VoidIpcInvokeChannel,
 } from "@shared/types/ipc";
 import type { IpcRendererEvent } from "electron";
@@ -25,6 +26,8 @@ import {
     preloadDiagnosticsLogger,
     preloadLogger,
 } from "../utils/preloadLogger";
+
+export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
 
 const DIAGNOSTICS_CHANNEL = "diagnostics:verify-ipc-handler" as const;
 
@@ -68,16 +71,6 @@ export function resetDiagnosticsVerificationStateForTesting(): void {
     verifiedChannels.clear();
     verifiedChannels.add(DIAGNOSTICS_CHANNEL);
     pendingVerifications.clear();
-}
-
-/**
- * Standard IPC response interface matching backend implementation
- */
-export interface IpcResponse<T = unknown> {
-    data?: T;
-    error?: string;
-    metadata?: Record<string, unknown>;
-    success: boolean;
 }
 
 /**
