@@ -1179,13 +1179,15 @@ versionManager.setVersion("websocket-keepalive", "1.0.0");
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../utils/logger";
+ *
  * const result = createMonitorWithTypeGuards("http", {
  *     url: "https://example.com",
  * });
  * if (result.success) {
- *     console.log("Created monitor:", result.monitor);
+ *     monitorLogger.info("Created monitor", result.monitor);
  * } else {
- *     console.error("Validation errors:", result.errors);
+ *     monitorLogger.error("Monitor validation failed", result.errors);
  * }
  * ```
  *
@@ -1261,6 +1263,8 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../utils/logger";
+ *
  * const result = await migrateMonitorType(
  *     "http",
  *     "1.0.0",
@@ -1268,10 +1272,12 @@ export function isValidMonitorTypeGuard(type: unknown): type is string {
  *     monitorData
  * );
  * if (result.success) {
- *     console.log("Applied migrations:", result.appliedMigrations);
+ *     monitorLogger.info("Applied monitor migrations", {
+ *         migrations: result.appliedMigrations,
+ *     });
  *     return result.data;
  * } else {
- *     console.error("Migration failed:", result.errors);
+ *     monitorLogger.error("Monitor migration failed", result.errors);
  * }
  * ```
  *

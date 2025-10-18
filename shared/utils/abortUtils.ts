@@ -156,6 +156,8 @@ export function createCombinedAbortSignal(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const result = await createAbortableOperation(
  *     async (signal) => {
  *         const response = await fetch(url, { signal });
@@ -163,7 +165,7 @@ export function createCombinedAbortSignal(
  *     },
  *     {
  *         timeoutMs: 10_000,
- *         cleanup: () => console.log("Operation cleaned up"),
+ *         cleanup: () => logger.info("Operation cleaned up"),
  *     }
  * );
  * ```
@@ -207,14 +209,16 @@ export async function createAbortableOperation<T>(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const controller = new AbortController();
  *
  * try {
  *     await sleep(5_000, controller.signal);
- *     console.log("Delay completed");
+ *     logger.info("Delay completed");
  * } catch (error) {
  *     if (isAbortError(error)) {
- *         console.log("Delay was aborted");
+ *         logger.warn("Delay was aborted");
  *     }
  * }
  * ```
@@ -353,13 +357,15 @@ export async function retryWithAbort<T>(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * try {
  *     await fetch(url, { signal });
  * } catch (error) {
  *     if (isAbortError(error)) {
- *         console.log("Request was cancelled");
+ *         logger.warn("Request was cancelled");
  *     } else {
- *         console.error("Request failed:", error);
+ *         logger.error("Request failed", error);
  *     }
  * }
  * ```

@@ -26,14 +26,16 @@
  * @example
  *
  * ```tsx
+ * import { logger } from "@app/services/logger";
+ *
  * // Basic usage with sync operations
  * useMount(
  *     () => {
- *         console.log("Component mounted");
+ *         logger.info("Component mounted");
  *         setupEventListeners();
  *     },
  *     () => {
- *         console.log("Component unmounting");
+ *         logger.info("Component unmounting");
  *         cleanupEventListeners();
  *     }
  * );

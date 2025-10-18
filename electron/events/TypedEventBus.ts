@@ -9,6 +9,8 @@
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * interface MyEvents {
  *     "user:login": { userId: string; timestamp: number };
  *     "data:updated": { table: string; records: number };
@@ -16,7 +18,7 @@
  *
  * const bus = new TypedEventBus<MyEvents>("app-events");
  * bus.onTyped("user:login", (data) => {
- *     console.log(`User ${data.userId} logged in at ${data.timestamp}`);
+ *     logger.info("User login", data);
  * });
  * await bus.emitTyped("user:login", {
  *     userId: "123",
@@ -98,10 +100,12 @@ export interface EventMetadata {
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const loggingMiddleware: EventMiddleware = async (event, data, next) => {
- *     console.log(`Processing event: ${event}`);
+ *     logger.debug("Processing event", { event, data });
  *     await next(); // Continue to next middleware
- *     console.log(`Completed event: ${event}`);
+ *     logger.debug("Completed event", { event });
  * };
  * ```
  *
@@ -470,8 +474,10 @@ export class TypedEventBus<
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * bus.onceTyped("user:login", (data) => {
-     *     console.log("User logged in:", data.userId);
+     *     logger.info("User logged in", data);
      * });
      * ```
      *

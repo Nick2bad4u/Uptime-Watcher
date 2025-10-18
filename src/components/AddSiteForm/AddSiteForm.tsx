@@ -106,7 +106,9 @@ function isValidMonitorType(value: string): value is MonitorType {
  * @example
  *
  * ```tsx
- * <AddSiteForm onSuccess={() => console.log("Site added!")} />;
+ * import { logger } from "@app/services/logger";
+ *
+ * <AddSiteForm onSuccess={() => logger.info("Site added")} />;
  * ```
  *
  * @param props - AddSiteForm component props

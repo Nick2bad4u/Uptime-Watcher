@@ -163,9 +163,14 @@ export function getAvailableMonitorTypes(): readonly string[] {
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../utils/logger";
+ *
  * const result = getMonitorWithResult("http", { timeout: 5000 });
  * if (!result.configurationApplied && result.configurationError) {
- *     console.warn("Config failed:", result.configurationError);
+ *     monitorLogger.warn("Monitor configuration failed", {
+ *         error: result.configurationError,
+ *         monitorType: "http",
+ *     });
  * }
  * ```
  *

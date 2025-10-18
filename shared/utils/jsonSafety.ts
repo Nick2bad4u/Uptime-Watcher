@@ -86,6 +86,8 @@ function safeOperation<T>(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const result = safeJsonParse(jsonString, (data): data is User => {
  *     return (
  *         typeof data === "object" &&
@@ -96,9 +98,9 @@ function safeOperation<T>(
  * });
  *
  * if (result.success && result.data) {
- *     console.log(result.data.name);
+ *     logger.info("Parsed user", { name: result.data.name });
  * } else {
- *     console.error(result.error);
+ *     logger.error("Failed to parse user", result.error);
  * }
  * ```
  *
@@ -135,10 +137,16 @@ export function safeJsonParse<T>(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const result = safeJsonParseArray(
  *     jsonString,
  *     (item): item is User => typeof item === "object" && item !== null
  * );
+ *
+ * if (result.success) {
+ *     logger.info("Parsed users", { count: result.data.length });
+ * }
  * ```
  *
  * @typeParam T - Element type expected inside the array.
@@ -219,9 +227,11 @@ export function safeJsonParseWithFallback<T>(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const result = safeJsonStringify({ name: "John", age: 30 });
  * if (result.success) {
- *     console.log(result.data); // {"name":"John","age":30}
+ *     logger.info("Serialized JSON", { payload: result.data });
  * }
  * ```
  *

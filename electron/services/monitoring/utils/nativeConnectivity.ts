@@ -239,11 +239,16 @@ async function checkTcpPorts(
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../../utils/logger";
+ *
  * const result = await checkHttpConnectivity(
  *     "https://api.example.com/health"
  * );
  * if (result.status === "up") {
- *     console.log(`Server responded in ${result.responseTime}ms`);
+ *     monitorLogger.info("Server responded", {
+ *         responseTime: result.responseTime,
+ *         status: result.status,
+ *     });
  * }
  * ```
  *

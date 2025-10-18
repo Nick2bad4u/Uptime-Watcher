@@ -287,8 +287,10 @@ export class SiteManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * const allSites = await siteManager.getSites();
-     * console.log(`Found ${allSites.length} sites`);
+     * logger.info("Loaded sites", { count: allSites.length });
      * ```
      *
      * @returns Promise resolving to array of complete site objects.
@@ -510,8 +512,10 @@ export class SiteManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * const deletedCount = await siteManager.deleteAllSites();
-     * console.log(`Deleted ${deletedCount} sites`);
+     * logger.info("Deleted sites", { count: deletedCount });
      * ```
      *
      * @returns Promise resolving to the number of sites deleted.

@@ -205,10 +205,14 @@ export interface IntervalOption {
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const selectedInterval = CHECK_INTERVALS.find(
  *     (interval) => interval.value === 300000
  * );
- * console.log(selectedInterval?.label); // "5 minutes"
+ * logger.info("Selected interval", {
+ *     label: selectedInterval?.label ?? "unknown",
+ * });
  * ```
  *
  * @public

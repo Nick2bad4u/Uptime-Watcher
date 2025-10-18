@@ -57,14 +57,16 @@ import { PORT_NOT_REACHABLE, PortCheckError } from "./portErrorHandling";
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../../utils/logger";
+ *
  * try {
  *     const result = await performSinglePortCheck("example.com", 80, 5000);
- *     console.log(
- *         `Port check result: ${result.status} in ${result.responseTime}ms`
- *     );
+ *     monitorLogger.info("Port check result", result);
  * } catch (error) {
  *     if (error instanceof PortCheckError) {
- *         console.log(`Port unreachable after ${error.responseTime}ms`);
+ *         monitorLogger.warn("Port unreachable", {
+ *             responseTime: error.responseTime,
+ *         });
  *     }
  * }
  * ```

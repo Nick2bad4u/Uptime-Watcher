@@ -16,10 +16,12 @@
  * @example
  *
  * ```typescript
+ * import { logger } from "../../utils/logger";
+ *
  * const validator = new SiteValidator();
  * const result = validator.validateSiteConfiguration(site);
  * if (!result.isValid) {
- *     console.error("Validation errors:", result.errors);
+ *     logger.error("Site validation failed", result.errors);
  * }
  * ```
  */
@@ -43,10 +45,12 @@ import { MonitorValidator } from "./MonitorValidator";
  * @example
  *
  * ```typescript
+ * import { logger } from "../../utils/logger";
+ *
  * const validator = new SiteValidator();
  * const result = validator.validateSiteConfiguration(site);
  * if (!result.isValid) {
- *     console.error("Validation errors:", result.errors);
+ *     logger.error("Site validation failed", result.errors);
  * }
  * ```
  *
@@ -109,9 +113,11 @@ export class SiteValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * const result = validator.validateSiteConfiguration(site);
      * if (!result.isValid) {
-     *     console.error("Validation errors:", result.errors);
+     *     logger.error("Site validation failed", result.errors);
      * }
      * ```
      *
@@ -146,9 +152,11 @@ export class SiteValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * const errors = validator["validateSiteIdentifier"](site);
      * if (errors.length > 0) {
-     *     console.error(errors);
+     *     logger.error("Site identifier validation errors", errors);
      * }
      * ```
      *
@@ -178,9 +186,11 @@ export class SiteValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * const errors = validator["validateSiteMonitors"](site);
      * if (errors.length > 0) {
-     *     console.error(errors);
+     *     logger.error("Site monitor validation errors", errors);
      * }
      * ```
      *

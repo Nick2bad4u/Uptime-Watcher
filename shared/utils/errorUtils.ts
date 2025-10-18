@@ -9,10 +9,12 @@
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * try {
  *     await riskyOperation();
  * } catch (error) {
- *     console.error(`Operation failed: ${getErrorMessage(error)}`);
+ *     logger.error("Operation failed", getErrorMessage(error));
  * }
  * ```
  *

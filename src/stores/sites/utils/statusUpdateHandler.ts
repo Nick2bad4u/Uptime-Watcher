@@ -495,8 +495,12 @@ export class StatusUpdateManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * manager.unsubscribe();
-     * console.log(manager.isSubscribed()); // false
+     * logger.info("Subscription active?", {
+     *     isSubscribed: manager.isSubscribed(),
+     * }); // false
      * ```
      */
     public unsubscribe(): void {

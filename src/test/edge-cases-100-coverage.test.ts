@@ -3,26 +3,8 @@
  * functions.
  *
  * @remarks
- * This test suite focuses on edge cases and error paths that might be mi
- * it("should handle async operation failure with fallback", async () => { const
- * operation = vi .fn() .mockRejectedValue(new Error("test error")); const {
- * logger } = await import("../services/logger");
- *
- * ```
- *         const result = await withUtilityErrorHandling(
- *             operation,
- *             "test-operation",
- *             "fallback",
- *             false
- *         );
- *
- *         expect(result).toBe("fallback");
- *         expect(console.error).toHaveBeenCalledWith(
- *             "test-operation failed",
- *             expect.any(Error)
- *         );
- *     }); unit tests to achieve complete code coverage.
- * ```
+ * Focuses on error handling branches, ensuring the shared logger integration
+ * behaves as expected when failures occur.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";

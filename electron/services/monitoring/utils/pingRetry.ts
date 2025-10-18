@@ -132,15 +132,19 @@ export async function performSinglePingCheck(
  * @example
  *
  * ```typescript
+ * import { monitorLogger } from "../../../utils/logger";
+ *
  * // Try once, no retries
  * const result = await performPingCheckWithRetry("example.com", 5000, 0);
  *
  * // Try 4 times total (1 initial + 3 retries) with 3-second timeout
  * const result = await performPingCheckWithRetry("google.com", 3000, 3);
  * if (result.status === "up") {
- *     console.log(`Connectivity successful: ${result.responseTime}ms`);
+ *     monitorLogger.info("Connectivity successful", result);
  * } else {
- *     console.log(`Connectivity failed: ${result.error}`);
+ *     monitorLogger.warn("Connectivity failed", {
+ *         error: result.error,
+ *     });
  * }
  * ```
  *
