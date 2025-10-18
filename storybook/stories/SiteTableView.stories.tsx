@@ -2,6 +2,7 @@ import type { Site } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteTableView } from "@app/components/Dashboard/SiteList/SiteTableView";
+
 import {
     createMockMonitor,
     createMockSite,

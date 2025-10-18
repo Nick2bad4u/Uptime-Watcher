@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX, ReactNode } from "react";
 
-import type { ElectronAPI } from "../types/electron-api";
-
 import { DetailLabel } from "@app/components/common/MonitorUiComponents";
 import { useMount } from "@app/hooks/useMount";
 import { useRef } from "react";
+
+import type { ElectronAPI } from "../types/electron-api";
+
 import { prepareMonitorTypeMocks } from "./setup/monitorTypeMocks";
 
 prepareMonitorTypeMocks();

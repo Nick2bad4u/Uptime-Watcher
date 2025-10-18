@@ -7,7 +7,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { OverviewTab } from "../../../../components/SiteDetails/tabs/OverviewTab";
-import type { Monitor } from "../../../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({

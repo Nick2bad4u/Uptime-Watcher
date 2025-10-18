@@ -4,8 +4,8 @@
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mocked } from "vitest";
-import type { Monitor, Site, StatusUpdate } from "../../../shared/types";
-import type { StateSyncStatusSummary } from "../../../shared/types/stateSync";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { SitesStore } from "../../stores/sites/types";
 import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
 import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";

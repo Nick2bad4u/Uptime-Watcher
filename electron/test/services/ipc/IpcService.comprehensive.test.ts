@@ -12,7 +12,7 @@ import { ipcMain, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
 import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
-import type { Site, Monitor } from "../../../../shared/types.js";
+import type { Site, Monitor } from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({

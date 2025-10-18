@@ -11,7 +11,7 @@
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import type { MonitorFieldDefinition } from "../../../../../shared/types";
+import type { MonitorFieldDefinition } from "@shared/types";
 
 // Mock monitor type configurations that use camelCase field names
 const mockMonitorConfigs = [

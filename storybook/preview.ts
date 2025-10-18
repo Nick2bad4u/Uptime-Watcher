@@ -1,14 +1,15 @@
 import "@app/index.css";
 import type { ThemeName } from "@app/theme/types";
+import type { Decorator, Preview, ReactRenderer } from "@storybook/react";
 
 import { useMount } from "@app/hooks/useMount";
 import { themeManager } from "@app/theme/ThemeManager";
-import type { Decorator, Preview, ReactRenderer } from "@storybook/react";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import { initialize, mswLoader } from "msw-storybook-addon";
 import { useEffect } from "react";
 import { themes } from "storybook/theming";
 import { INITIAL_VIEWPORTS } from "storybook/viewport";
+
 import { installElectronAPIMock } from "./setup/electron-api-mock";
 
 type StoryThemeName = Extract<ThemeName, "dark" | "high-contrast" | "light">;

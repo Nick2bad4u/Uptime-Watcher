@@ -11,7 +11,7 @@ import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
 import { useTheme } from "../../../../theme/useTheme";
-import type { Monitor } from "../../../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Mock dependencies
 vi.mock("../../../../stores/settings/useSettingsStore");

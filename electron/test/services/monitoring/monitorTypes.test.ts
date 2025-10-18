@@ -8,7 +8,7 @@ import {
     getBaseMonitorTypes,
     isBaseMonitorType,
 } from "../../../services/monitoring/monitorTypes";
-import type { MonitorType } from "../../../../shared/types.js";
+import type { MonitorType } from "@shared/types";
 
 const EXPECTED_BASE_TYPES: MonitorType[] = [
     "http",

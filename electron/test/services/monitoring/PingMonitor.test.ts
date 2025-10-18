@@ -14,8 +14,8 @@ import type {
     MonitorConfig,
     MonitorCheckResult,
 } from "../../../services/monitoring/types.js";
-import type { Site } from "../../../../shared/types.js";
-import { isNonEmptyString } from "../../../../shared/validation/validatorUtils";
+import type { Site } from "@shared/types";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 import * as pingRetryModule from "../../../services/monitoring/utils/pingRetry";
 
 // Mock the ping retry utility

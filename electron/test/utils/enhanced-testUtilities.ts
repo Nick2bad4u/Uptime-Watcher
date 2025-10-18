@@ -4,7 +4,7 @@
  */
 
 import { vi } from "vitest";
-import type { Site, Monitor } from "../../../shared/types.js";
+import type { Site, Monitor } from "@shared/types";
 import type { TypedEventBus } from "../../events/TypedEventBus";
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";

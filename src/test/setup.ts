@@ -151,7 +151,7 @@ type StorageKey = "localStorage" | "sessionStorage";
 /**
  * Storage methods that must exist on a usable Web Storage implementation.
  */
-const STORAGE_METHODS: ReadonlyArray<keyof StorageShim> = [
+const STORAGE_METHODS: readonly (keyof StorageShim)[] = [
     "clear",
     "getItem",
     "key",

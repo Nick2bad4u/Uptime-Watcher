@@ -10,7 +10,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { describe, expect, it, vi } from "vitest";
 import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
-import type { Monitor, Site } from "../../../../../shared/types";
+import type { Monitor, Site } from "@shared/types";
 import { calculateMaxDuration } from "../../../../utils/duration";
 
 // Mock all external dependencies

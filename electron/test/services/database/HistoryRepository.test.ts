@@ -24,7 +24,7 @@ import {
     type HistoryRepositoryDependencies,
 } from "../../../services/database/HistoryRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { StatusHistory } from "../../../../shared/types.js";
+import type { StatusHistory } from "@shared/types";
 
 // Import mocked modules
 import * as historyManipulation from "../../../services/database/utils/historyManipulation";

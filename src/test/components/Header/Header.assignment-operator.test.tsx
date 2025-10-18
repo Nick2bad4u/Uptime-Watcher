@@ -20,7 +20,7 @@ import {
 } from "../../../stores/ui/useUiStore";
 import type { UIStore } from "../../../stores/ui/types";
 import { useTheme, useAvailabilityColors } from "../../../theme/useTheme";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,

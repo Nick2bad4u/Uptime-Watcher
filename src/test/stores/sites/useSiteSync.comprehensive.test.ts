@@ -4,8 +4,8 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../../shared/types";
-import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
+import type { Site } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 const LISTENER_NAMES = [

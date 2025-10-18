@@ -7,7 +7,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 import { useSelectedSite } from "../../hooks/useSelectedSite";
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 
 // Mock the store hooks
 vi.mock("../../stores/ui/useUiStore", () => ({

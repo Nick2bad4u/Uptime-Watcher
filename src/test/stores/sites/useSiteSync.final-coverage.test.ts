@@ -4,8 +4,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../../shared/types";
-import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
+import type { Site } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
@@ -87,7 +87,7 @@ Object.defineProperty(globalThis, "window", {
 // Import after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
-import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../../../stores/utils";
 
 describe("useSiteSync - Final 100% Coverage", () => {

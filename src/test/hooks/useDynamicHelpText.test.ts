@@ -8,7 +8,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 import { useDynamicHelpText } from "../../hooks/useDynamicHelpText";
 import { getMonitorHelpTexts } from "../../utils/monitorUiHelpers";

@@ -4,7 +4,7 @@
  * @file Src/test/types/monitor-forms.comprehensive.test.ts
  */
 
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 import {
     getDefaultMonitorFields,

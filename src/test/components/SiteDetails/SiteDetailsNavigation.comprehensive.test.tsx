@@ -8,8 +8,8 @@ import "@testing-library/jest-dom";
 import React from "react";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
 import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
-import type { Site } from "../../../../shared/types";
-import type { Monitor } from "../../../../shared/types";
+import type { Site } from "@shared/types";
+import type { Monitor } from "@shared/types";
 import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
 
 // Mock BrowserRouter to avoid react-router-dom dependency

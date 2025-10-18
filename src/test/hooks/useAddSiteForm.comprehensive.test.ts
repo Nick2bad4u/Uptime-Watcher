@@ -12,7 +12,7 @@ import { test, fc } from "@fast-check/vitest";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { useAddSiteForm } from "../../components/SiteDetails/useAddSiteForm";
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 // Mock the useMonitorFields hook
 const mockGetFields = vi.fn();

@@ -11,7 +11,7 @@ import type {
     Site,
     StatusHistory,
     StatusUpdate,
-} from "../../shared/types.js";
+} from "@shared/types";
 
 describe("Electron Types", () => {
     describe("MonitorType", () => {

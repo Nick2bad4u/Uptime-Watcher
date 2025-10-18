@@ -9,8 +9,9 @@
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
-import * as loggerModule from "../../utils/logger";
 import log from "electron-log/main";
+
+import * as loggerModule from "../../utils/logger";
 
 export interface DiagnosticsMetricsSnapshot {
     lastMissingChannel?: string;

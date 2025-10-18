@@ -6,7 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
 import { SiteService } from "../../stores/sites/services/SiteService";

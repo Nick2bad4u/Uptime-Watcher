@@ -13,7 +13,7 @@
 import { describe, expect, beforeEach } from "vitest";
 import { test } from "@fast-check/vitest";
 import fc from "fast-check";
-import type { Monitor } from "../../../shared/types.js";
+import type { Monitor } from "@shared/types";
 
 import {
     formatTitleSuffix,

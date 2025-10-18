@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Monitor } from "../../../shared/types";
-import type { ValidationResult } from "../../../shared/types/validation";
-import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
-import { CacheKeys } from "../../../shared/utils/cacheKeys";
+import type { Monitor } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { CacheKeys } from "@shared/utils/cacheKeys";
 
 const cacheMocks = vi.hoisted(() => ({
     get: vi.fn(),

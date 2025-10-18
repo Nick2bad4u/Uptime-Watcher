@@ -9,6 +9,14 @@
         "./**/*.ts",
         "./**/*.tsx",
         "./**/*.mts",
-        "./**/*.cts"
+        "./**/*.cts",
+        "../../electron/**/*.ts",
+        "../../electron/**/*.tsx",
+        "../../electron/**/*.mts",
+        "../../electron/**/*.cts",
+        "../../shared/**/*.ts",
+        "../../shared/**/*.tsx",
+        "../../shared/**/*.mts",
+        "../../shared/**/*.cts"
     ]
 }

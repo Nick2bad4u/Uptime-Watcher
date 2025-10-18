@@ -12,7 +12,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorManager } from "../../managers/MonitorManager";
-import type { Site, Monitor } from "../../../shared/types.js";
+import type { Site, Monitor } from "@shared/types";
 
 // Hoist the mock function to avoid initialization issues
 const mockInterpolateLogTemplate = vi.hoisted(() =>

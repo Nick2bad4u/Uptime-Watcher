@@ -35,12 +35,12 @@ import {
     hasValidTimeout,
     hasValidUrl,
 } from "../../../../services/monitoring/utils/monitorTypeGuards";
-import type { Site } from "../../../../../shared/types.js";
+import type { Site } from "@shared/types";
 import {
     isNonEmptyString,
     isValidFQDN,
     isValidUrl,
-} from "../../../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
 
 describe("Monitor Type Guards", () => {
     beforeEach(() => {

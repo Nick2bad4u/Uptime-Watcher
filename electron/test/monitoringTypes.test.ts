@@ -9,7 +9,7 @@ import type {
     IMonitorService,
     MonitorConfig,
 } from "../services/monitoring/types";
-import type { Site } from "../../shared/types.js";
+import type { Site } from "@shared/types";
 
 describe("Monitoring Types", () => {
     describe("MonitorCheckResult interface", () => {

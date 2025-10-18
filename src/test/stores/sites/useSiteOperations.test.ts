@@ -5,8 +5,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type Monitor, type Site } from "../../../../shared/types";
-import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
+import { type Monitor, type Site } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";

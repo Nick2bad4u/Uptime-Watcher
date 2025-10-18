@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AxiosResponse } from "axios";
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import type {
     MonitorCheckResult,
     MonitorConfig,

@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { HistoryChart } from "../../components/common/HistoryChart";
-import type { StatusHistory } from "../../../shared/types";
+import type { StatusHistory } from "@shared/types";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";
 
 // Mock MiniChartBar component

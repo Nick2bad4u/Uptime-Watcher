@@ -2,8 +2,9 @@ import type { Monitor } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { MonitorSelector } from "@app/components/Dashboard/SiteCard/components/MonitorSelector";
-import { createMockMonitor } from "../helpers/siteStoryHelpers";
 import { action } from "storybook/actions";
+
+import { createMockMonitor } from "../helpers/siteStoryHelpers";
 
 const baseMonitors: Monitor[] = [
     createMockMonitor({

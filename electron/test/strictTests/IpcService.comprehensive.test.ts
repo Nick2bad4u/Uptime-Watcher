@@ -17,7 +17,7 @@ import {
     type Site,
     type Monitor,
     BASE_MONITOR_TYPES,
-} from "../../../shared/types";
+} from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({

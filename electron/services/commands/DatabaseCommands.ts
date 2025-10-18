@@ -15,9 +15,10 @@ import type { Site } from "@shared/types";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
-import { logger as backendLogger } from "../../utils/logger";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
+
+import { logger as backendLogger } from "../../utils/logger";
 
 /**
  * Base interface for all database commands.

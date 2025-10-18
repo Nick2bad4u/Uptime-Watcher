@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Monitor } from "../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Use a simpler mock approach
 vi.mock("node:dns/promises", () => ({

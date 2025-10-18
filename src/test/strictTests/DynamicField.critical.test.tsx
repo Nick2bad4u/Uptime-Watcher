@@ -18,7 +18,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import React from "react";
 
-import type { MonitorFieldDefinition } from "../../../shared/types";
+import type { MonitorFieldDefinition } from "@shared/types";
 
 import { logger } from "../../services/logger";
 import { ThemeProvider } from "../../theme/components/ThemeProvider";

@@ -2,15 +2,15 @@
  * Storybook coverage for the application Header component.
  */
 
+import type { SiteListLayoutMode } from "@app/stores/ui/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
-
-import type { SiteListLayoutMode } from "@app/stores/ui/types";
 
 import { Header } from "@app/components/Header/Header";
 import { SidebarLayoutProvider } from "@app/components/Layout/SidebarLayoutProvider";
 import { useUIStore } from "@app/stores/ui/useUiStore";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import {
     createMockMonitor,
     createMockSite,

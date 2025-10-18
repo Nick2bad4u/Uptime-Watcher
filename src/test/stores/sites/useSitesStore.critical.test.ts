@@ -9,8 +9,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../../shared/types";
-import type { StateSyncStatusSummary } from "../../../../shared/types/stateSync";
+import type { Site } from "@shared/types";
+import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 
 const mockStateSyncService = vi.hoisted(() => ({

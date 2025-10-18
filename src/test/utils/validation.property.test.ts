@@ -36,14 +36,14 @@ import {
     isValidPort,
     isValidUrl,
     safeInteger,
-} from "../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
 
 import {
     validateMonitorType,
     getMonitorValidationErrors,
-} from "../../../shared/utils/validation";
+} from "@shared/utils/validation";
 
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 describe("Validation Utils Property-Based Tests", () => {
     describe("isNonEmptyString function", () => {

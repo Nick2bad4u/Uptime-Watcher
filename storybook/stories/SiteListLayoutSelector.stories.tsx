@@ -3,12 +3,11 @@
  * switching behaviour.
  */
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
-
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
 } from "@app/stores/ui/types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteListLayoutSelector } from "@app/components/Dashboard/SiteList/SiteListLayoutSelector";
 import { type JSX, useState } from "react";

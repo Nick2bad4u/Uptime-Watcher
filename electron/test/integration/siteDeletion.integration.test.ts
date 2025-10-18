@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi, afterEach } from "vitest";
 
-import type { Site } from "../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type {

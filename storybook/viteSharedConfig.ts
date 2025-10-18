@@ -15,7 +15,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 // eslint-disable-next-line import-x/no-nodejs-modules -- URL helpers are required to compute project-relative paths.
 import { fileURLToPath } from "node:url";
-/* eslint-disable-next-line @jcoreio/implicit-dependencies/no-implicit, import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
+/* eslint-disable-next-line import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
 import tsconfigPaths from "vite-tsconfig-paths";
 
 /**
@@ -187,7 +187,6 @@ const isBabelPlugin = (value: unknown): value is BabelPlugin =>
  */
 export const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
     try {
-        // eslint-disable-next-line @jcoreio/implicit-dependencies/no-implicit -- Optional dependency is loaded only when available.
         const pluginModule: unknown = require("babel-plugin-react-compiler");
 
         if (isBabelPlugin(pluginModule)) {

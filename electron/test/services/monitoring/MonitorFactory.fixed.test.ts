@@ -14,7 +14,7 @@ import {
 import * as MonitorTypeRegistry from "../../../services/monitoring/MonitorTypeRegistry";
 import type { IMonitorService } from "../../../services/monitoring/types.js";
 import type { MonitorConfig } from "../../../services/monitoring/types.js";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 describe("MonitorFactory - Fixed", () => {
     let mockMonitorConfig: MonitorConfig;

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
 import type { EnhancedMonitorCheckConfig } from "../services/monitoring/EnhancedMonitorChecker";
-import type { Site, Monitor } from "../../shared/types";
+import type { Site, Monitor } from "@shared/types";
 
 describe("EnhancedMonitorChecker Targeted Coverage", () => {
     let mockConfig: EnhancedMonitorCheckConfig;

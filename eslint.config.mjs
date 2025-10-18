@@ -8956,7 +8956,6 @@ export default [
         files: ["storybook/**/*.stories.tsx"],
         name: "Storybook Stories - storybook/**/*.stories.tsx",
         rules: {
-            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@arthurgeron/react-usememo/require-usememo": "off",
             "@eslint-react/jsx-no-iife": "off",
             "@eslint-react/jsx-shorthand-fragment": "off",
@@ -8965,6 +8964,7 @@ export default [
             // Storybook stories are demo code, loosen the grip for now
             "@eslint-react/prefer-read-only-props": "off",
             "@eslint-react/prefer-shorthand-fragment": "off",
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/array-type": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
             "@typescript-eslint/no-confusing-void-expression": "off",

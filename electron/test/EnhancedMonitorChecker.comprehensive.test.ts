@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import type { Site, Monitor } from "../../shared/types";
+import type { Site, Monitor } from "@shared/types";
 import { EnhancedMonitorChecker } from "../services/monitoring/EnhancedMonitorChecker";
 
 function createTestMonitor(overrides: Partial<Monitor> = {}): Monitor {

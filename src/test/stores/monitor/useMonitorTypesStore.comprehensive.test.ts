@@ -11,9 +11,9 @@ import type {
     Monitor,
     MonitorType,
     MonitorFieldDefinition,
-} from "../../../../shared/types";
-import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
-import type { ValidationResult } from "../../../../shared/types/validation";
+} from "@shared/types";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Mock dependencies

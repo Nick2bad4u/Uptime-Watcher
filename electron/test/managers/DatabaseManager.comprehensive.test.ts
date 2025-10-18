@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 
 // Mock database commands FIRST using vi.hoisted
 const { DatabaseCommandExecutor } = vi.hoisted(() => {

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { MonitorStatus, Site } from "../../../../../shared/types";
+import type { MonitorStatus, Site } from "@shared/types";
 
 // Mock basic dependencies first
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
@@ -60,8 +60,8 @@ vi.mock("../../../../services/EventsService", () => ({
 
 // Import after mocking
 import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdateHandler";
-import { withUtilityErrorHandling } from "../../../../../shared/utils/errorHandling";
-import { isDevelopment } from "../../../../../shared/utils/environment";
+import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
+import { isDevelopment } from "@shared/utils/environment";
 import { EventsService } from "../../../../services/EventsService";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);

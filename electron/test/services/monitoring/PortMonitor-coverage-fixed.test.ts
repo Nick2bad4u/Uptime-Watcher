@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 // Mock the modules before importing

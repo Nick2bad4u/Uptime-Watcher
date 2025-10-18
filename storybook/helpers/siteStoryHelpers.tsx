@@ -1,11 +1,10 @@
 import type { Monitor, Site } from "@shared/types";
 import type { Decorator } from "@storybook/react";
 
-import { useEffect, useMemo, useRef } from "react";
-import { action } from "storybook/actions";
-
 import { useSitesStore } from "@app/stores/sites/useSitesStore";
 import { useUIStore } from "@app/stores/ui/useUiStore";
+import { useEffect, useMemo, useRef } from "react";
+import { action } from "storybook/actions";
 
 const DEFAULT_HISTORY_LENGTH = 6;
 const RESPONSE_INCREMENT = 25;

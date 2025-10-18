@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
-import type { Monitor } from "../../../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Mock all external dependencies
 vi.mock("../../../../stores/settings/useSettingsStore", () => ({

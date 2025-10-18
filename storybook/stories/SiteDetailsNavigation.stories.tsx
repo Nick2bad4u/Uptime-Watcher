@@ -3,14 +3,14 @@
  * monitor interactions remain consistent across UI states.
  */
 
+import type { SiteDetailsTab } from "@app/stores/ui/types";
 import type { Monitor, Site } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import type { SiteDetailsTab } from "@app/stores/ui/types";
-
 import { SiteDetailsNavigation } from "@app/components/SiteDetails/SiteDetailsNavigation";
-import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
 import { action } from "storybook/actions";
+
+import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
 
 interface NavigationScenario {
     readonly heartbeatMonitor: Monitor;

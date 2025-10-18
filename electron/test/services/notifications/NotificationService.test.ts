@@ -8,7 +8,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { NotificationService } from "../../../services/notifications/NotificationService";
 import type { NotificationConfig } from "../../../services/notifications/NotificationService";
-import type { Site } from "../../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({

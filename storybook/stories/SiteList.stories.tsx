@@ -3,22 +3,22 @@
  * layouts and presentations available in the refreshed UI.
  */
 
-import type { Site } from "@shared/types";
-import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
-
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
 } from "@app/stores/ui/types";
+import type { Site } from "@shared/types";
+import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteList } from "@app/components/Dashboard/SiteList/SiteList";
 import { useUIStore } from "@app/stores/ui/useUiStore";
+import { useEffect } from "react";
+
 import {
     createMockMonitor,
     createMockSite,
     createSiteDecorator,
 } from "../helpers/siteStoryHelpers";
-import { useEffect } from "react";
 
 interface SiteListStoryArgs {
     layout: SiteListLayoutMode;

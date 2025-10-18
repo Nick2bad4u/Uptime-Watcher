@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 const LISTENER_NAMES = [
@@ -108,7 +108,7 @@ Object.defineProperty(globalThis, "window", {
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { SiteService } from "../../../stores/sites/services/SiteService";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
-import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logger } from "../../../services/logger";
 
 describe("useSiteSync - Line Coverage Completion", () => {

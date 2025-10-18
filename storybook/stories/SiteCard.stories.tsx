@@ -6,6 +6,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteCard } from "@app/components/Dashboard/SiteCard/SiteCard";
+
 import {
     createMockMonitor,
     createMockSite,

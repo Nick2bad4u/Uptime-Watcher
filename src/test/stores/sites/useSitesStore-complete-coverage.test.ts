@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 // Mock the electron API
 const mockElectronAPI = {

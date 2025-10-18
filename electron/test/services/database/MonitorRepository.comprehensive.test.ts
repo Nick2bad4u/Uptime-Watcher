@@ -16,7 +16,7 @@ import {
 
 import { MonitorRepository } from "../../../services/database/MonitorRepository";
 import type { DatabaseService } from "../../../services/database/DatabaseService";
-import type { Site } from "../../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 describe("MonitorRepository - Comprehensive Coverage", () => {
     let repository: MonitorRepository;

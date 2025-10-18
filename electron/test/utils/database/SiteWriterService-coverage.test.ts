@@ -11,8 +11,8 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
-import type { Site } from "../../../../shared/types";
-import type { MonitorRow } from "../../../../shared/types/database";
+import type { Site } from "@shared/types";
+import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
 import { SiteWriterService } from "../../../utils/database/SiteWriterService";

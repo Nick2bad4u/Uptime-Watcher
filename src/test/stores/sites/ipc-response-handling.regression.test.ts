@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import { extractIpcData } from "../../../types/ipc";
 
 // Mock the electron API

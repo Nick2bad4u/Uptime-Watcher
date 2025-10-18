@@ -7,7 +7,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import type { Database } from "node-sqlite3-wasm";
-import type { StatusHistory } from "../../../../../shared/types.js";
+import type { StatusHistory } from "@shared/types";
 
 // Import functions to test
 import {

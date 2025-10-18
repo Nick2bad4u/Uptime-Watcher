@@ -19,7 +19,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
-import type { Site } from "../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 describe(SiteManager, () => {
     let manager: SiteManager;

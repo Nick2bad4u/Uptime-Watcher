@@ -8,13 +8,14 @@ import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteDetails } from "@app/components/SiteDetails/SiteDetails";
 import { useUIStore } from "@app/stores/ui/useUiStore";
+import { useEffect } from "react";
+import { action } from "storybook/actions";
+
 import {
     createMockMonitor,
     createMockSite,
     createSiteDecorator,
 } from "../helpers/siteStoryHelpers";
-import { useEffect } from "react";
-import { action } from "storybook/actions";
 
 const baseSite = createMockSite({
     identifier: "site-storyboard",

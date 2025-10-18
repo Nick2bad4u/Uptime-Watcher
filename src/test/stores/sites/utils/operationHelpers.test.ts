@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Site } from "../../../../../shared/types";
+import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
 
 // Mock the error catalog
@@ -58,7 +58,7 @@ import {
     withSiteOperation,
     withSiteOperationReturning,
 } from "../../../../stores/sites/utils/operationHelpers";
-import { withErrorHandling } from "../../../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../../../../stores/utils";
 import { createStoreErrorHandler } from "../../../../stores/utils/storeErrorHandling";
 import { updateMonitorInSite } from "../../../../stores/sites/utils/monitorOperations";

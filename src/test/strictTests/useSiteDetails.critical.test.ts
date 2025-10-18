@@ -11,7 +11,7 @@ import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { logger } from "../../services/logger";
 import { useUIStore } from "../../stores/ui/useUiStore";
-import type { Monitor, Site } from "../../../shared/types";
+import type { Monitor, Site } from "@shared/types";
 // import type { ChangeEvent } from "react";
 
 // Mock modules

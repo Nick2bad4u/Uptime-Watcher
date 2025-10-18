@@ -6,7 +6,7 @@
 import type { EventEmitter as NodeEventEmitter } from "node:events";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 const socketReadyState = {
     CONNECTING: 0,

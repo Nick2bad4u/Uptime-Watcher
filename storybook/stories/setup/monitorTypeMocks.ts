@@ -3,6 +3,7 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import { useMonitorTypesStore } from "@app/stores/monitor/useMonitorTypesStore";
 import { clearMonitorTypeCache } from "@app/utils/monitorTypeHelper";
 import { clearConfigCache } from "@app/utils/monitorUiHelpers";
+
 import { setMockMonitorTypes } from "../../setup/electron-api-mock";
 
 /**

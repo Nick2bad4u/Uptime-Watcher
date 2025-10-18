@@ -4,7 +4,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 const httpGetMock = vi.fn();
 
