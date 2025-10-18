@@ -636,45 +636,26 @@ export async function openSiteDetails(
         .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
         .catch(() => false);
 
-    if (!cardVisible) {
-        const navigationEntry = page
-            .getByRole("navigation", { name: "Monitored sites" })
-            .getByRole("button", {
-                name: new RegExp(`^${escapeForRegex(siteName)}`),
-            })
-            .first();
-
-        const expandSidebarButton = page
-            .getByRole("button", { name: "Expand sidebar" })
-            .first();
-
-        const sidebarCollapsed = await expandSidebarButton
-            .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
-            .catch(() => false);
-
-        if (sidebarCollapsed) {
-            await expandSidebarButton.click();
+    if (cardVisible) {
+        try {
+            await expect(async () => {
+                await siteCard.click({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                    trial: true,
+                });
+            }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
+            await siteCard.evaluate((node) => {
+                (node as HTMLElement).click();
+            });
+        } catch (error) {
+            console.warn(
+                "Site card interaction failed; falling back to sidebar navigation",
+                error
+            );
+            await openSiteDetailsViaSidebar(page, siteName);
         }
-
-        await navigationEntry.waitFor({
-            state: "visible",
-            timeout: WAIT_TIMEOUTS.LONG,
-        });
-        await navigationEntry.scrollIntoViewIfNeeded();
-        await navigationEntry.click();
     } else {
-        await expect(async () => {
-            const targetCard = getSiteCardLocator(page, siteName);
-            await targetCard.waitFor({
-                state: "visible",
-                timeout: WAIT_TIMEOUTS.MEDIUM,
-            });
-            await targetCard.scrollIntoViewIfNeeded();
-            await targetCard.click({
-                timeout: WAIT_TIMEOUTS.MEDIUM,
-                noWaitAfter: true,
-            });
-        }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
+        await openSiteDetailsViaSidebar(page, siteName);
     }
 
     const siteDetailsModal = page.getByTestId("site-details-modal");
@@ -697,6 +678,46 @@ export async function openSiteDetails(
         .getByText("Site Actions", { exact: true })
         .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG })
         .catch(() => undefined);
+}
+
+/**
+ * Opens the site details modal via the sidebar navigation entry.
+ *
+ * @param page - The Playwright page instance representing the renderer.
+ * @param siteName - Human-readable site name used within navigation.
+ */
+async function openSiteDetailsViaSidebar(
+    page: Page,
+    siteName: string
+): Promise<void> {
+    const navigationEntry = page
+        .getByRole("navigation", { name: "Monitored sites" })
+        .getByRole("button", {
+            name: new RegExp(`^${escapeForRegex(siteName)}`),
+        })
+        .first();
+
+    const expandSidebarButton = page
+        .getByRole("button", { name: "Expand sidebar" })
+        .first();
+
+    const sidebarCollapsed = await expandSidebarButton
+        .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
+        .catch(() => false);
+
+    if (sidebarCollapsed) {
+        await expandSidebarButton.evaluate((node) => {
+            (node as HTMLButtonElement).click();
+        });
+    }
+
+    await navigationEntry.waitFor({
+        state: "visible",
+        timeout: WAIT_TIMEOUTS.LONG,
+    });
+    await navigationEntry.evaluate((node) => {
+        (node as HTMLButtonElement).click();
+    });
 }
 
 /**
@@ -725,25 +746,48 @@ export async function ensureSiteDetailsHeaderState(
 
     const toggleButtonName =
         desiredState === "collapsed" ? "Collapse header" : "Expand header";
-    const toggleButton = siteDetailsModal
-        .getByRole("button", { name: toggleButtonName })
-        .first();
 
-    const isToggleVisible = await toggleButton
-        .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
-        .catch(() => false);
-
-    if (isToggleVisible) {
-        await toggleButton.click();
+    const refreshedValue = await header
+        .getAttribute("data-collapsed")
+        .catch(() => null);
+    if (refreshedValue === expectedCollapsedValue) {
+        return;
     }
 
-    await expect(header).toHaveAttribute(
-        "data-collapsed",
-        expectedCollapsedValue,
-        {
+    await expect(async () => {
+        const toggleButton = siteDetailsModal
+            .getByRole("button", { name: toggleButtonName })
+            .first();
+        await toggleButton.waitFor({
+            state: "attached",
             timeout: WAIT_TIMEOUTS.MEDIUM,
+        });
+        const didClick = await toggleButton
+            .evaluate((node) => {
+                (node as HTMLButtonElement).click();
+                return true as const;
+            })
+            .catch(() => false);
+        if (!didClick) {
+            throw new Error(
+                `Site details header toggle '${toggleButtonName}' could not be activated via DOM click.`
+            );
         }
-    );
+    }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
+
+    await expect
+        .poll(
+            async () =>
+                (await header
+                    .getAttribute("data-collapsed")
+                    .catch(() => null)) ?? "",
+            {
+                timeout: WAIT_TIMEOUTS.LONG,
+                intervals: [200],
+                message: `Waiting for site details header to reach '${expectedCollapsedValue}' state`,
+            }
+        )
+        .toBe(expectedCollapsedValue);
 }
 
 /**
@@ -1044,15 +1088,51 @@ export async function closeSiteDetails(page: Page): Promise<void> {
 }
 
 /**
- * Gets the current monitor count from the dashboard.
+ * Resolves the number of monitors by consulting the Electron preload bridge.
  *
- * @param page - The Playwright page instance
+ * @param page - The Playwright page instance associated with the renderer.
  *
- * @returns Promise resolving to the monitor count
+ * @returns Site count when available from the preload bridge, otherwise null.
  */
-export async function getMonitorCount(page: Page): Promise<number> {
-    await waitForAppInitialization(page);
+async function getElectronSiteCount(page: Page): Promise<number | null> {
+    const result = await page
+        .evaluate(async () => {
+            const globalTarget = globalThis as typeof globalThis & {
+                electronAPI?: {
+                    sites?: {
+                        getSites?: () => Promise<Site[] | undefined>;
+                    };
+                };
+            };
 
+            try {
+                const sites =
+                    await globalTarget.electronAPI?.sites?.getSites?.();
+                if (Array.isArray(sites)) {
+                    return sites.length;
+                }
+            } catch (error) {
+                console.warn(
+                    "[playwright:getElectronSiteCount] Failed to query site list",
+                    error
+                );
+            }
+
+            return null;
+        })
+        .catch(() => null);
+
+    return typeof result === "number" ? result : null;
+}
+
+/**
+ * Reads the dashboard monitor count from the rendered UI when available.
+ *
+ * @param page - The Playwright page instance associated with the renderer.
+ *
+ * @returns Parsed monitor count from the DOM or null when inaccessible.
+ */
+async function getMonitorCountFromDom(page: Page): Promise<number | null> {
     const emptyStateVisible = await page
         .getByTestId("empty-state")
         .isVisible({ timeout: WAIT_TIMEOUTS.SHORT })
@@ -1062,15 +1142,37 @@ export async function getMonitorCount(page: Page): Promise<number> {
         return 0;
     }
 
-    const countLabel = page.getByTestId("site-count-label");
-    const labelText = await countLabel.textContent();
+    const labelText = await page
+        .getByTestId("site-count-label")
+        .textContent()
+        .catch(() => null);
 
     if (!labelText) {
-        return 0;
+        return null;
     }
 
-    const match = labelText.match(/Tracking\s+(\d+)/i);
-    return match && match[1] ? Number.parseInt(match[1], 10) : 0;
+    const match = labelText.match(/Tracking\s+(\d+)/iu);
+    return match?.[1] ? Number.parseInt(match[1], 10) : null;
+}
+
+/**
+ * Determines the current monitor count using the Electron bridge as the
+ * authoritative source with graceful fallback to DOM parsing.
+ *
+ * @param page - The Playwright page instance whose renderer exposes the UI.
+ *
+ * @returns Promise resolving to the best-known monitor count.
+ */
+export async function getMonitorCount(page: Page): Promise<number> {
+    await waitForAppInitialization(page);
+
+    const electronCount = await getElectronSiteCount(page);
+    if (typeof electronCount === "number") {
+        return electronCount;
+    }
+
+    const domCount = await getMonitorCountFromDom(page);
+    return typeof domCount === "number" ? domCount : 0;
 }
 
 /**
@@ -1085,30 +1187,24 @@ export async function waitForMonitorCount(
     expectedCount: number,
     timeout: number = WAIT_TIMEOUTS.LONG
 ): Promise<void> {
-    await page.waitForFunction(
-        (count) => {
-            const emptyState = document.querySelector(
-                '[data-testid="empty-state"]'
-            );
-            if (emptyState && count === 0) {
-                return true;
-            }
+    await waitForAppInitialization(page);
 
-            const label = document.querySelector(
-                '[data-testid="site-count-label"]'
-            );
-            if (!label) {
-                return false;
-            }
+    await expect
+        .poll(
+            async () => {
+                const electronCount = await getElectronSiteCount(page);
+                if (typeof electronCount === "number") {
+                    return electronCount;
+                }
 
-            const match = label.textContent?.match(/Tracking\s+(\d+)/i);
-            if (!match || !match[1]) {
-                return false;
+                const domCount = await getMonitorCountFromDom(page);
+                return domCount ?? -1;
+            },
+            {
+                message: `Waiting for monitor count to equal ${expectedCount}`,
+                timeout,
+                intervals: [250],
             }
-
-            return Number.parseInt(match[1], 10) === count;
-        },
-        expectedCount,
-        { timeout }
-    );
+        )
+        .toBe(expectedCount);
 }

@@ -11,18 +11,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
-import { SiteService } from "../../../stores/sites/services/SiteService";
-
-const mockStateSyncService = vi.hoisted(() => ({
-    getSyncStatus: vi.fn(),
-    initialize: vi.fn(),
-    onStateSyncEvent: vi.fn(),
-    requestFullSync: vi.fn(),
-}));
-
-vi.mock("../../../services/StateSyncService", () => ({
-    StateSyncService: mockStateSyncService,
-}));
 
 // Mock services first - these need to be hoisted above imports
 vi.mock("../../../services/DataService", () => ({
@@ -107,7 +95,13 @@ const mockElectronAPI = {
     stateSync: {
         getSyncStatus: vi.fn(),
         onStateSyncEvent: vi.fn(),
-        requestFullSync: vi.fn(),
+        requestFullSync: vi.fn().mockResolvedValue({
+            completedAt: Date.now(),
+            siteCount: 0,
+            sites: [],
+            source: "cache",
+            synchronized: true,
+        }),
     },
     notifications: {
         subscribeToStatusUpdates: vi.fn(),
@@ -143,17 +137,17 @@ describe("useSitesStore Function Coverage Tests", () => {
             name: "Default Site",
         });
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
-        mockStateSyncService.getSyncStatus.mockResolvedValue({
+        mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,
             source: "cache",
             synchronized: true,
         });
-        mockStateSyncService.onStateSyncEvent.mockResolvedValue(vi.fn());
-        mockStateSyncService.requestFullSync.mockResolvedValue({
+        mockElectronAPI.stateSync.onStateSyncEvent.mockResolvedValue(vi.fn());
+        mockElectronAPI.stateSync.requestFullSync.mockResolvedValue({
             completedAt: Date.now(),
-            sites: [],
             siteCount: 0,
+            sites: [],
             source: "cache",
             synchronized: true,
         });
@@ -304,26 +298,32 @@ describe("useSitesStore Function Coverage Tests", () => {
                 synchronized: true,
             };
 
-            mockStateSyncService.getSyncStatus.mockResolvedValueOnce(
+            mockElectronAPI.stateSync.getSyncStatus.mockResolvedValueOnce(
                 mockSyncStatus
             );
 
-            const getSitesSpy = vi.spyOn(SiteService, "getSites");
-            try {
-                getSitesSpy.mockResolvedValueOnce([]);
-                getSitesSpy.mockResolvedValueOnce([]);
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: 0,
+                sites: [],
+                source: "frontend" as const,
+                synchronized: true,
+            };
 
-                const syncStatus = await store.getSyncStatus();
-                expect(syncStatus).toEqual(mockSyncStatus);
-                expect(mockStateSyncService.getSyncStatus).toHaveBeenCalled();
+            mockElectronAPI.stateSync.requestFullSync.mockResolvedValue(
+                fullSyncResult
+            );
 
-                await store.syncSites();
-                await store.fullResyncSites();
+            const syncStatus = await store.getSyncStatus();
+            expect(syncStatus).toEqual(mockSyncStatus);
+            expect(mockElectronAPI.stateSync.getSyncStatus).toHaveBeenCalled();
 
-                expect(getSitesSpy).toHaveBeenCalledTimes(2);
-            } finally {
-                getSitesSpy.mockRestore();
-            }
+            await store.syncSites();
+            await store.fullResyncSites();
+
+            expect(
+                mockElectronAPI.stateSync.requestFullSync
+            ).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -443,7 +443,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             const store = useSitesStore.getState();
 
             // Mock error for sync
-            mockStateSyncService.getSyncStatus.mockRejectedValueOnce(
+            mockElectronAPI.stateSync.getSyncStatus.mockRejectedValueOnce(
                 new Error("Sync error")
             );
 

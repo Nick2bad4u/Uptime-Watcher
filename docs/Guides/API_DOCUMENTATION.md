@@ -274,13 +274,36 @@ const updated = await window.electronAPI.settings.update({
 
 ### State Sync API (`window.electronAPI.stateSync`)
 
-#### `invalidateCache(keys: string[]): Promise<void>`
+#### `getSyncStatus(): Promise<StateSyncStatusSummary>`
 
-Invalidates specific cache keys to force data refresh.
+Retrieves the latest synchronization status snapshot, including last sync time, site count, and origin.
 
 ```typescript
-await window.electronAPI.stateSync.invalidateCache(["sites", "settings"]);
-// Triggers cache refresh for specified domains
+const status = await window.electronAPI.stateSync.getSyncStatus();
+console.log(`Last sync: ${status.lastSyncAt}`);
+```
+
+#### `requestFullSync(): Promise<StateSyncFullSyncResult>`
+
+Performs a full synchronization round-trip and returns the authoritative site snapshot. The call also emits a `sites:state-synchronized` event to all renderers.
+
+```typescript
+const { sites } = await window.electronAPI.stateSync.requestFullSync();
+useSitesStore.getState().setSites(sites);
+```
+
+#### `onStateSyncEvent(callback: (event: StateSyncEventData) => void): () => void`
+
+Registers a listener for incremental state sync events (bulk-sync, update, delete). Returns a cleanup function to unsubscribe.
+
+```typescript
+const cleanup = await window.electronAPI.stateSync.onStateSyncEvent((event) => {
+ if (event.action === "bulk-sync") {
+  useSitesStore.getState().setSites(event.sites);
+ }
+});
+
+// Later: cleanup();
 ```
 
 ### System API (`window.electronAPI.system`)
@@ -317,53 +340,65 @@ The application uses a sophisticated event system for real-time communication:
 
 ### Event Listener Registration
 
-All event listeners are accessed through `window.electronAPI.events`:
+Realtime listeners exposed via `window.electronAPI.events` focus on monitoring, cache invalidation, update status, and diagnostic test events:
 
 ```typescript
-// Site events
-const cleanup1 = window.electronAPI.events.onSiteAdded((data) => {
- sitesStore.addSite(data.site);
- showNotification(`Site ${data.site.name} added`);
-});
+const cleanupFunctions: Array<() => void> = [];
 
-const cleanup2 = window.electronAPI.events.onSiteDeleted((data) => {
-sitesStore.removeSite(data.siteIdentifier);
-});
+cleanupFunctions.push(
+ await window.electronAPI.events.onCacheInvalidated((data) => {
+  console.log(`Cache invalidated: ${data.type} → ${data.reason}`);
+ })
+);
 
-// Monitor events
-const cleanup3 = window.electronAPI.events.onMonitorStatusChanged((data) => {
- sitesStore.updateMonitorStatus(data.monitorId, data.status);
- if (data.status === "down") {
-  showNotification(`Monitor ${data.monitorId} is down!`, "error");
+cleanupFunctions.push(
+ await window.electronAPI.events.onMonitorStatusChanged((update) => {
+  sitesStore.updateMonitorStatus(update.monitorId, update.status);
+ })
+);
+
+// `update` adheres to the shared StatusUpdate contract (see shared/types.ts)
+
+cleanupFunctions.push(
+ await window.electronAPI.events.onMonitoringStarted((info) => {
+  console.log(`Monitoring resumed for ${info.monitorCount} monitors`);
+ })
+);
+
+cleanupFunctions.push(
+ await window.electronAPI.events.onUpdateStatus((event) => {
+  console.log(`Updater status: ${event.status}`);
+ })
+);
+
+// Remember to clean up listeners
+const cleanup = () => {
+ for (const unsubscribe of cleanupFunctions) {
+  unsubscribe();
  }
-});
+};
+```
 
-#### Canonical Monitor Status Payload
+State synchronization events are delivered via the dedicated `stateSync` domain:
 
-`onMonitorStatusChanged` always delivers the shared [`StatusUpdate`](../../shared/types.ts) contract:
+```typescript
+const cleanupSync = await window.electronAPI.stateSync.onStateSyncEvent(
+ (event) => {
+  switch (event.action) {
+   case "bulk-sync":
+    sitesStore.setSites(event.sites);
+    break;
+   case "update":
+   case "delete":
+    sitesStore.setSites(event.sites);
+    break;
+  }
+ }
+);
 
-- `siteIdentifier` (string) – stable identifier for the owning site.
-- `monitorId` (string) – unique monitor identifier.
-- `status` (MonitorStatus) – new status after processing.
-- `timestamp` (ISO string) – emission time in UTC (`new Date(...).toISOString()`).
-- Optional context: `previousStatus`, `details`, `responseTime`, `monitor`, `site`.
-
-Legacy shapes (the deprecated site identifier field, `newStatus`, numeric timestamps, etc.) are rejected by the preload bridge and will not reach the renderer. Keep integrations aligned with `StatusUpdate` to avoid silent drops.
-
-// Settings events
-const cleanup4 = window.electronAPI.events.onSettingsUpdated((data) => {
- settingsStore.updateSettings(data.settings);
-});
-
-// Clean up listeners (important for preventing memory leaks)
-useEffect(() => {
- return () => {
-  cleanup1();
-  cleanup2();
-  cleanup3();
-  cleanup4();
- };
-}, []);
+// Later
+cleanup();
+cleanupSync();
 ```
 
 ### Event Types with Metadata
@@ -588,7 +623,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
 
  // Event-driven sync (called by event listeners)
  syncFromBackend: async () => {
-  const sites = await window.electronAPI.sites.getAll();
+  const { sites } = await window.electronAPI.stateSync.requestFullSync();
   set({ sites, lastSyncTime: Date.now() });
  },
 }));
@@ -596,29 +631,39 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
 // Setup event listeners (typically in root component or hook)
 export const useSiteEventListeners = () => {
  const syncFromBackend = useSitesStore((state) => state.syncFromBackend);
- const addSite = useSitesStore((state) => state.addSite);
- const removeSite = useSitesStore((state) => state.removeSite);
 
  useEffect(() => {
-  const cleanupFunctions = [
-   window.electronAPI.events.onSiteAdded((data) => {
-    addSite(data.site);
-   }),
+  let disposed = false;
 
-   window.electronAPI.events.onSiteDeleted((data) => {
-    removeSite(data.siteIdentifier);
-   }),
+  const setup = async () => {
+   const cleanup = await window.electronAPI.stateSync.onStateSyncEvent(
+    (event) => {
+     if (disposed) {
+      return;
+     }
 
-   window.electronAPI.events.onSiteUpdated((data) => {
-    // Full sync to ensure consistency
-    syncFromBackend();
-   }),
-  ];
+     switch (event.action) {
+      case "bulk-sync":
+       syncFromBackend();
+       break;
+      case "update":
+      case "delete":
+       useSitesStore.getState().setSites(event.sites);
+       break;
+     }
+    }
+   );
+
+   return cleanup;
+  };
+
+  const subscriptionPromise = setup();
 
   return () => {
-   cleanupFunctions.forEach((cleanup) => cleanup());
+   disposed = true;
+   subscriptionPromise.then((cleanup) => cleanup?.()).catch(console.error);
   };
- }, [syncFromBackend, addSite, removeSite]);
+ }, [syncFromBackend]);
 };
 ```
 

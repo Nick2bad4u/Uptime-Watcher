@@ -79,6 +79,13 @@ describe("useSitesStore Function Coverage Tests", () => {
             source: "cache",
             synchronized: true,
         });
+        mockStateSyncService.requestFullSync.mockResolvedValue({
+            completedAt: Date.now(),
+            siteCount: 0,
+            sites: [],
+            source: "cache",
+            synchronized: true,
+        });
 
         // Set up SiteService mocks
         vi.mocked(SiteService.addSite).mockResolvedValue({
@@ -366,19 +373,18 @@ describe("useSitesStore Function Coverage Tests", () => {
         });
 
         it("should exercise sync operations", async () => {
-            // Mock sync responses
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
-
             const store = useSitesStore.getState();
 
             // Test syncSites
             await store.syncSites();
-            expect(SiteService.getSites).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
 
             // Test fullResyncSites
             await store.fullResyncSites();
-            // Should call getSites again for full sync
-            expect(SiteService.getSites).toHaveBeenCalledTimes(2);
+            // Should call requestFullSync again for full sync
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledTimes(
+                2
+            );
         });
     });
 

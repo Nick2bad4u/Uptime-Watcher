@@ -18,7 +18,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
-import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type {
@@ -30,7 +30,6 @@ import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { SiteService } from "./services/SiteService";
 import {
     StatusUpdateManager,
     type StatusUpdateSubscriptionResult,
@@ -589,14 +588,35 @@ export const createSiteSyncActions = (
                     });
 
                     try {
-                        const backendSites = await SiteService.getSites();
-                        deps.setSites(backendSites);
+                        const fullSyncResult =
+                            await StateSyncService.requestFullSync();
+                        const synchronizedSites = Array.isArray(
+                            fullSyncResult?.sites
+                        )
+                            ? fullSyncResult.sites
+                            : [];
+
+                        if (!Array.isArray(fullSyncResult?.sites)) {
+                            logger.warn(
+                                "Full sync payload missing sites array; defaulting to empty set",
+                                fullSyncResult
+                            );
+                        }
+
+                        deps.setSites(synchronizedSites);
 
                         logStoreAction("SitesStore", "syncSites", {
+                            completedAt:
+                                fullSyncResult?.completedAt ?? Date.now(),
                             message: "Sites synchronized from backend",
-                            sitesCount: deps.getSites().length,
+                            sitesCount:
+                                fullSyncResult?.siteCount ??
+                                synchronizedSites.length,
+                            source:
+                                fullSyncResult?.source ??
+                                STATE_SYNC_SOURCE.CACHE,
                             status: "success",
-                            success: true,
+                            success: fullSyncResult?.synchronized ?? true,
                         });
                     } catch (error) {
                         const normalizedError = ensureError(error);

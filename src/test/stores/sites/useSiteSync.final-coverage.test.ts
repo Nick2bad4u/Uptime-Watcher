@@ -46,12 +46,6 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     ),
 }));
 
-vi.mock("../../../stores/sites/services/SiteService", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-    },
-}));
-
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(() => ({
         subscribe: vi.fn(async () => ({
@@ -86,7 +80,6 @@ Object.defineProperty(globalThis, "window", {
 
 // Import after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import { SiteService } from "../../../stores/sites/services/SiteService";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../../../stores/utils";
 
@@ -129,8 +122,17 @@ describe("useSiteSync - Final 100% Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Mock syncSites to succeed
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "frontend" as const,
+                synchronized: true,
+            };
+
+            mockStateSyncService.requestFullSync.mockResolvedValue(
+                fullSyncResult
+            );
 
             // Mock withErrorHandling to execute normally
             vi.mocked(withErrorHandling).mockImplementation(

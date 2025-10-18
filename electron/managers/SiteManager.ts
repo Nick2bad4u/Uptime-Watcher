@@ -262,7 +262,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: sanitizedSite.identifier,
             sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp,
         });
 
@@ -420,7 +420,7 @@ export class SiteManager {
                     action: STATE_SYNC_ACTION.UPDATE,
                     siteIdentifier: siteIdentifier,
                     sites: this.getSitesSnapshot(),
-                    source: STATE_SYNC_SOURCE.DATABASE,
+                    source: STATE_SYNC_SOURCE.FRONTEND,
                     timestamp: Date.now(),
                 });
 
@@ -488,7 +488,7 @@ export class SiteManager {
                 action: STATE_SYNC_ACTION.DELETE,
                 siteIdentifier: identifier,
                 sites: sitesAfterRemoval,
-                source: STATE_SYNC_SOURCE.DATABASE,
+                source: STATE_SYNC_SOURCE.FRONTEND,
                 timestamp,
             });
         }
@@ -572,7 +572,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             sites: [],
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp: Date.now(),
         });
 
@@ -679,7 +679,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: identifier,
             sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp: Date.now(),
         });
 

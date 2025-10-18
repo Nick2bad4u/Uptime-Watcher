@@ -786,6 +786,15 @@ describe("DatabaseCommands", () => {
             );
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
                 2,
+                "sites:state-synchronized",
+                expect.objectContaining({
+                    action: "bulk-sync",
+                    source: "database",
+                    sites: expect.any(Array),
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                3,
                 "cache:invalidated",
                 expect.objectContaining({
                     reason: "update",

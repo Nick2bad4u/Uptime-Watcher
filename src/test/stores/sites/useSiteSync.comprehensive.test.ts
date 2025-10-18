@@ -50,12 +50,6 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     }),
 }));
 
-vi.mock("../../../stores/sites/services/SiteService", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-    },
-}));
-
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(
         () =>
@@ -98,7 +92,6 @@ Object.defineProperty(globalThis, "window", {
 
 // Import the modules after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import { SiteService } from "../../../stores/sites/services/SiteService";
 
 describe("useSiteSync", () => {
     let mockDeps: any;
@@ -140,12 +133,24 @@ describe("useSiteSync", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "frontend" as const,
+                synchronized: true,
+            };
+
+            mockStateSyncService.requestFullSync.mockResolvedValue(
+                fullSyncResult
+            );
 
             await syncActions.fullResyncSites();
 
-            expect(SiteService.getSites).toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                fullSyncResult.sites
+            );
         });
     });
 
@@ -431,7 +436,7 @@ describe("useSiteSync", () => {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
                 sites: mockSites,
-                source: "database" as const,
+                source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
@@ -463,13 +468,13 @@ describe("useSiteSync", () => {
                 action: "update" as const,
                 siteIdentifier: "site-1",
                 sites: mockSites,
-                source: "database" as const,
+                source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
             eventHandler(updateEvent);
 
-            expect(SiteService.getSites).not.toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).not.toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
     });
@@ -491,18 +496,28 @@ describe("useSiteSync", () => {
             await annotate("Type: Business Logic", "type");
 
             // Test successful sync from backend
-            const mockSites = [
-                { id: "site-1", name: "Site 1" },
-                { id: "site-2", name: "Site 2" },
-            ];
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: 2,
+                sites: [
+                    { id: "site-1", name: "Site 1" },
+                    { id: "site-2", name: "Site 2" },
+                ],
+                source: "frontend" as const,
+                synchronized: true,
+            };
 
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites as any);
+            mockStateSyncService.requestFullSync.mockResolvedValue(
+                fullSyncResult as any
+            );
 
             await syncActions.syncSites();
 
             // Verify sync was called and completed
-            expect(SiteService.getSites).toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                fullSyncResult.sites
+            );
         });
 
         it("should handle sync errors", async ({ task, annotate }) => {
@@ -512,7 +527,7 @@ describe("useSiteSync", () => {
             await annotate("Type: Error Handling", "type");
 
             const error = new Error("Sync failed");
-            vi.mocked(SiteService.getSites).mockRejectedValue(error);
+            mockStateSyncService.requestFullSync.mockRejectedValue(error);
 
             // Test that the function handles errors gracefully
             try {

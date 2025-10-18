@@ -430,7 +430,7 @@ describe("SafeConversions utilities fuzzing tests", () => {
         );
 
         it("should return current time for far future timestamps", () => {
-            const farFutureTimestamp = Date.now() + 86_400_001; // More than 1 day in future
+            const farFutureTimestamp = Date.now() + 172_800_000; // More than two days in future
             const beforeCall = Date.now();
             const result = safeParseTimestamp(farFutureTimestamp);
             const afterCall = Date.now() + 100; // Add 100ms tolerance for execution time

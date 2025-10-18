@@ -1016,7 +1016,7 @@ export class IpcService {
                     {
                         action: STATE_SYNC_ACTION.BULK_SYNC,
                         sites,
-                        source: STATE_SYNC_SOURCE.DATABASE,
+                        source: STATE_SYNC_SOURCE.FRONTEND,
                         timestamp,
                     }
                 );
@@ -1028,7 +1028,7 @@ export class IpcService {
                     completedAt: timestamp,
                     siteCount: sites.length,
                     sites,
-                    source: STATE_SYNC_SOURCE.DATABASE,
+                    source: STATE_SYNC_SOURCE.FRONTEND,
                     synchronized: true,
                 };
             },

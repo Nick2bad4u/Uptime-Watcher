@@ -65,6 +65,23 @@ vi.mock("../../../shared/utils/errorHandling", () => ({
     ),
 }));
 
+const mockStateSyncService = {
+    getSyncStatus: vi.fn(),
+    initialize: vi.fn(),
+    onStateSyncEvent: vi.fn(),
+    requestFullSync: vi.fn().mockResolvedValue({
+        completedAt: Date.now(),
+        siteCount: 0,
+        sites: [],
+        source: "frontend" as const,
+        synchronized: true,
+    }),
+};
+
+vi.mock("../../services/StateSyncService", () => ({
+    StateSyncService: mockStateSyncService,
+}));
+
 // Mock electron API
 const mockElectronAPI = {
     settings: {
@@ -94,6 +111,13 @@ Object.defineProperty(window, "electronAPI", {
 describe("Store Alias Methods", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockStateSyncService.requestFullSync.mockResolvedValue({
+            completedAt: Date.now(),
+            siteCount: 0,
+            sites: [],
+            source: "frontend" as const,
+            synchronized: true,
+        });
     });
 
     describe("Settings Store Aliases", () => {

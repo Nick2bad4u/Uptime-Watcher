@@ -46,12 +46,6 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
     ),
 }));
 
-vi.mock("../../../stores/sites/services/SiteService", () => ({
-    SiteService: {
-        getSites: vi.fn(),
-    },
-}));
-
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn().mockImplementation(
         () =>
@@ -106,7 +100,6 @@ Object.defineProperty(globalThis, "window", {
 
 // Import after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
-import { SiteService } from "../../../stores/sites/services/SiteService";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logger } from "../../../services/logger";
@@ -331,7 +324,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
                 sites: mockSites,
-                source: "database" as const,
+                source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
@@ -364,7 +357,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 action: "update" as const,
                 siteIdentifier: "site-1",
                 sites: mockSites,
-                source: "database" as const,
+                source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
@@ -372,7 +365,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             eventHandler(updateEvent);
 
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
-            expect(SiteService.getSites).not.toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).not.toHaveBeenCalled();
         });
 
         it("should log error when event snapshot missing", async ({
@@ -398,7 +391,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
                 sites: undefined,
-                source: "database" as const,
+                source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
@@ -447,7 +440,17 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 }
             );
 
-            vi.mocked(SiteService.getSites).mockResolvedValue(mockSites);
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "frontend" as const,
+                synchronized: true,
+            };
+
+            mockStateSyncService.requestFullSync.mockResolvedValue(
+                fullSyncResult
+            );
 
             await syncActions.syncSites();
 

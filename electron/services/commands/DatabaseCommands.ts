@@ -12,6 +12,7 @@
  */
 
 import type { Site } from "@shared/types";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
@@ -454,6 +455,14 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
         await this.emitSuccessEvent("internal:database:data-imported", {
             operation: "data-imported",
+        });
+
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: STATE_SYNC_ACTION.BULK_SYNC,
+            siteIdentifier: "all",
+            sites: reloadedSites.map((site) => structuredClone(site)),
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: Date.now(),
         });
 
         await this.eventEmitter.emitTyped("cache:invalidated", {

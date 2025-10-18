@@ -28,24 +28,31 @@ async function globalSetup(_config: FullConfig): Promise<void> {
     console.log("🔇 Set HEADLESS=true for Electron headless testing");
 
     // Ensure the Electron app is built
-    try {
-        const buildCommand = process.env["PLAYWRIGHT_COVERAGE"]
-            ? "npm run build:playwright-coverage"
-            : "npm run build:electron-main";
-
-        console.log(`📦 Building Electron app via: ${buildCommand}`);
-        execSync(buildCommand, {
-            stdio: "inherit",
-            cwd: path.resolve(__dirname, "../.."),
-            env: { ...process.env, HEADLESS: "true" },
-        });
-        console.log("✅ Electron app built successfully");
-    } catch (error) {
-        console.error(
-            "❌ Failed to build Electron app:",
-            (error as Error).message
+    const skipBuild = process.env["PLAYWRIGHT_SKIP_BUILD"] === "true";
+    if (skipBuild) {
+        console.log(
+            "⏭️  PLAYWRIGHT_SKIP_BUILD=true — reusing existing Electron build output"
         );
-        throw error;
+    } else {
+        try {
+            const buildCommand = process.env["PLAYWRIGHT_COVERAGE"]
+                ? "npm run build:playwright-coverage"
+                : "npm run build:electron-main";
+
+            console.log(`📦 Building Electron app via: ${buildCommand}`);
+            execSync(buildCommand, {
+                stdio: "inherit",
+                cwd: path.resolve(__dirname, "../.."),
+                env: { ...process.env, HEADLESS: "true" },
+            });
+            console.log("✅ Electron app built successfully");
+        } catch (error) {
+            console.error(
+                "❌ Failed to build Electron app:",
+                (error as Error).message
+            );
+            throw error;
+        }
     }
 
     // Verify that the main process file exists

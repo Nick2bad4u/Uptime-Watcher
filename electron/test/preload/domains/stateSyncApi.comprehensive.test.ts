@@ -192,7 +192,7 @@ describe("State Sync Domain API", () => {
                 completedAt: Date.now(),
                 siteCount: mockSyncedSites.length,
                 sites: mockSyncedSites,
-                source: "database",
+                source: "frontend",
                 synchronized: true,
             };
 

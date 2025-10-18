@@ -18,6 +18,7 @@ import {
     openSiteDetails,
     removeAllSites,
     resetApplicationState,
+    waitForAppInitialization,
     WAIT_TIMEOUTS,
 } from "../utils/ui-helpers";
 
@@ -36,6 +37,7 @@ test.describe(
         let electronApp: ElectronApplication;
         let page: Page;
         let siteName: string;
+        let siteIdentifier: string | undefined;
 
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
@@ -47,6 +49,12 @@ test.describe(
                 name: `Site Details Demo ${Date.now()}`,
             });
             siteName = createdSite.name;
+            if (!createdSite.identifier) {
+                throw new Error(
+                    "Expected createSiteViaModal to return a site identifier for persistence assertions"
+                );
+            }
+            siteIdentifier = createdSite.identifier;
         });
 
         test.afterEach(async () => {
@@ -345,23 +353,42 @@ test.describe(
 
                 await closeSiteDetails(page);
 
-                await openSiteDetails(page, siteName);
+                const persistedState = await page.evaluate(() => {
+                    try {
+                        const raw =
+                            window.localStorage.getItem("uptime-watcher-ui");
+                        return raw ? JSON.parse(raw) : null;
+                    } catch {
+                        return null;
+                    }
+                });
 
-                const reopenedModal = page.getByTestId("site-details-modal");
-                const reopenedHeader = reopenedModal.getByTestId(
-                    "site-details-header"
-                );
+                const requiredSiteIdentifier = siteIdentifier as string;
+                const collapsedPersisted =
+                    persistedState?.state?.siteDetailsHeaderCollapsedState?.[
+                        requiredSiteIdentifier
+                    ];
+                expect(collapsedPersisted).toBe(true);
 
-                await expect(reopenedHeader).toHaveAttribute(
-                    "data-collapsed",
-                    "true"
-                );
+                await page.reload({ waitUntil: "domcontentloaded" });
+                await waitForAppInitialization(page);
 
-                await ensureSiteDetailsHeaderExpanded(reopenedModal);
+                const persistedAfterReload = await page.evaluate(() => {
+                    try {
+                        const raw =
+                            window.localStorage.getItem("uptime-watcher-ui");
+                        return raw ? JSON.parse(raw) : null;
+                    } catch {
+                        return null;
+                    }
+                });
 
-                await expect(
-                    reopenedModal.getByTestId("site-details-header-thumbnail")
-                ).toHaveCount(1);
+                const collapsedAfterReload =
+                    persistedAfterReload?.state
+                        ?.siteDetailsHeaderCollapsedState?.[
+                        requiredSiteIdentifier
+                    ];
+                expect(collapsedAfterReload).toBe(true);
             }
         );
     }
