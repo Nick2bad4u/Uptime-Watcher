@@ -5,10 +5,9 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { SurfaceContainer } from "@app/components/shared/SurfaceContainer";
+import { ThemedText } from "@app/theme/components/ThemedText";
 import { action } from "storybook/actions";
-
-import { SurfaceContainer } from "../../src/components/shared/SurfaceContainer";
-import { ThemedText } from "../../src/theme/components/ThemedText";
 
 const meta: Meta<typeof SurfaceContainer> = {
     args: {

@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { ActionButtonGroup } from "@app/components/Dashboard/SiteCard/components/ActionButtonGroup";
 import { action } from "storybook/actions";
-
-import { ActionButtonGroup } from "../../src/components/Dashboard/SiteCard/components/ActionButtonGroup";
 
 const meta: Meta<typeof ActionButtonGroup> = {
     args: {

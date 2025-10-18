@@ -6,7 +6,7 @@
 import type { Monitor } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { MonitoringStatusDisplay } from "../../src/components/SiteDetails/MonitoringStatusDisplay";
+import { MonitoringStatusDisplay } from "@app/components/SiteDetails/MonitoringStatusDisplay";
 import { createMockMonitor } from "../helpers/siteStoryHelpers";
 
 const meta: Meta<typeof MonitoringStatusDisplay> = {

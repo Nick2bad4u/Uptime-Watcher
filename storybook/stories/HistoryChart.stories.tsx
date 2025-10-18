@@ -1,7 +1,7 @@
 import type { StatusHistory } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { HistoryChart } from "../../src/components/common/HistoryChart";
+import { HistoryChart } from "@app/components/common/HistoryChart";
 
 const STATUS_SEQUENCE: StatusHistory["status"][] = [
     "up",

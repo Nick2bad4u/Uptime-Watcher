@@ -4,12 +4,11 @@
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
+import type { ConfirmDialogTone } from "@app/stores/ui/useConfirmDialogStore";
+
+import { ConfirmDialog } from "@app/components/common/ConfirmDialog/ConfirmDialog";
+import { useConfirmDialogStore } from "@app/stores/ui/useConfirmDialogStore";
 import { useEffect } from "react";
-
-import type { ConfirmDialogTone } from "../../src/stores/ui/useConfirmDialogStore";
-
-import { ConfirmDialog } from "../../src/components/common/ConfirmDialog/ConfirmDialog";
-import { useConfirmDialogStore } from "../../src/stores/ui/useConfirmDialogStore";
 
 interface ConfirmDialogStoryArgs {
     tone: ConfirmDialogTone;

@@ -26,6 +26,15 @@ const SHARED_DIR = path.resolve(REPO_ROOT, "shared");
 const NORMALIZED_SHARED_DIR = normalizePath(SHARED_DIR);
 const SHARED_TYPES_PATH = path.resolve(SHARED_DIR, "types.ts");
 
+const SRC_DIR = path.resolve(REPO_ROOT, "src");
+const NORMALIZED_SRC_DIR = normalizePath(SRC_DIR);
+
+/**
+ * Absolute path to the Electron runtime source directory.
+ */
+const ELECTRON_DIR = path.resolve(REPO_ROOT, "electron");
+const NORMALIZED_ELECTRON_DIR = normalizePath(ELECTRON_DIR);
+
 /**
  * Lazily cached canonical monitor type identifiers for rule evaluations.
  *
@@ -374,6 +383,134 @@ const electronNoConsoleRule = {
 };
 
 /**
+ * ESLint rule preventing renderer bundles from importing the Electron runtime directly.
+ */
+const rendererNoElectronImportRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow renderer code from importing Electron packages or backend modules directly.",
+            recommended: false,
+        },
+        messages: {
+            forbiddenElectronImport:
+                'Renderer modules must not import from "{{module}}". Use preload bridges or shared contracts instead.',
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        const importerDirectory = path.dirname(rawFilename);
+
+        /**
+         * Determines whether the provided module specifier references Electron directly.
+         *
+         * @param {string} moduleName - Module specifier under evaluation.
+         * @returns {boolean} True when the specifier targets the Electron runtime package.
+         */
+        function isDirectElectronModule(moduleName) {
+            if (moduleName === "electron" || moduleName === "node:electron") {
+                return true;
+            }
+
+            return (
+                moduleName.startsWith("electron/") ||
+                moduleName.startsWith("node:electron/") ||
+                moduleName.startsWith("@electron/")
+            );
+        }
+
+        /**
+         * Checks if a relative specifier resolves into the Electron backend directory.
+         *
+         * @param {string} moduleName - Module specifier from an import or require call.
+         * @returns {boolean} True when the resolved path lives inside the electron source tree.
+         */
+        function resolvesToElectronDirectory(moduleName) {
+            if (!moduleName.startsWith(".")) {
+                return false;
+            }
+
+            const resolved = normalizePath(path.resolve(importerDirectory, moduleName));
+            return (
+                resolved === NORMALIZED_ELECTRON_DIR ||
+                resolved.startsWith(`${NORMALIZED_ELECTRON_DIR}/`)
+            );
+        }
+
+        /**
+         * Reports an invalid Electron dependency usage.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST node to highlight.
+         * @param {string} moduleName - Name of the offending module specifier.
+         * @returns {void}
+         */
+        function reportViolation(node, moduleName) {
+            context.report({
+                data: { module: moduleName },
+                messageId: "forbiddenElectronImport",
+                node,
+            });
+        }
+
+        /**
+         * Evaluates a static module specifier and raises a lint violation when it references Electron.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node owning the literal specifier.
+         * @param {string} moduleName - Literal module specifier value.
+         * @returns {void}
+         */
+        function handleStaticSpecifier(node, moduleName) {
+            if (
+                isDirectElectronModule(moduleName) ||
+                resolvesToElectronDirectory(moduleName)
+            ) {
+                reportViolation(node, moduleName);
+            }
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                    handleStaticSpecifier(node.source, node.source.value);
+                }
+            },
+            ImportExpression(node) {
+                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                    handleStaticSpecifier(node.source, node.source.value);
+                }
+            },
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleStaticSpecifier(firstArgument, firstArgument.value);
+                    }
+                }
+            },
+        };
+    },
+};
+
+/**
  * ESLint rule detecting console usage within TSDoc example code blocks.
  */
 const tsdocNoConsoleExampleRule = {
@@ -500,12 +637,96 @@ const preferSharedAliasRule = {
     },
 };
 
+/**
+ * ESLint rule ensuring files outside of src reference renderer modules via the @app alias.
+ */
+const preferAppAliasRule = {
+    meta: {
+        docs: {
+            description: "Use the @app alias instead of relative paths into src from external packages",
+            recommended: false,
+        },
+        fixable: "code",
+        messages: {
+            useAlias: "Import from src via the @app alias instead of relative paths.",
+        },
+        schema: [],
+        type: "suggestion",
+    },
+    create(context) {
+        const filename = context.getFilename();
+        const normalizedFilename = normalizePath(filename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`)
+        ) {
+            return {};
+        }
+
+        const importerDirectory = path.dirname(filename);
+
+        return {
+            ImportDeclaration(node) {
+                if (node.source.type !== "Literal" || typeof node.source.value !== "string") {
+                    return;
+                }
+
+                const importPath = String(node.source.value);
+                if (!importPath.startsWith(".")) {
+                    return;
+                }
+
+                const importAbsolutePath = path.resolve(importerDirectory, importPath);
+                const normalizedImportAbsolute = normalizePath(importAbsolutePath);
+
+                if (
+                    normalizedImportAbsolute !== NORMALIZED_SRC_DIR &&
+                    !normalizedImportAbsolute.startsWith(`${NORMALIZED_SRC_DIR}/`)
+                ) {
+                    return;
+                }
+
+                const relativeToSrc = normalizePath(
+                    path.relative(SRC_DIR, importAbsolutePath)
+                );
+
+                if (!relativeToSrc || relativeToSrc.startsWith("..")) {
+                    return;
+                }
+
+                const aliasSuffix = relativeToSrc.replace(
+                    /\.(?:[cm]?[jt]sx?|d\.ts)$/u,
+                    ""
+                );
+                const cleanedSuffix = aliasSuffix.replace(/^\.\/?/u, "");
+                const aliasPath = cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app";
+                const rawSource = node.source.raw ?? node.source.extra?.raw;
+                const quote = rawSource?.startsWith("'") ? "'" : '"';
+
+                context.report({
+                    fix(fixer) {
+                        return fixer.replaceText(
+                            node.source,
+                            `${quote}${aliasPath}${quote}`
+                        );
+                    },
+                    messageId: "useAlias",
+                    node: node.source,
+                });
+            },
+        };
+    },
+};
+
 const uptimeWatcherPlugin = {
     rules: {
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "electron-no-console": electronNoConsoleRule,
+        "renderer-no-electron-import": rendererNoElectronImportRule,
         "tsdoc-no-console-example": tsdocNoConsoleExampleRule,
         "prefer-shared-alias": preferSharedAliasRule,
+        "prefer-app-alias": preferAppAliasRule,
     },
 };
 

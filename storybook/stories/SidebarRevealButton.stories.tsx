@@ -5,13 +5,12 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { SidebarLayoutProvider } from "@app/components/Layout/SidebarLayoutProvider";
+import { SidebarRevealButton } from "@app/components/Layout/SidebarRevealButton/SidebarRevealButton";
+import { ThemedButton } from "@app/theme/components/ThemedButton";
+import { ThemedText } from "@app/theme/components/ThemedText";
 import { type JSX, useState } from "react";
 import { action } from "storybook/actions";
-
-import { SidebarLayoutProvider } from "../../src/components/Layout/SidebarLayoutProvider";
-import { SidebarRevealButton } from "../../src/components/Layout/SidebarRevealButton/SidebarRevealButton";
-import { ThemedButton } from "../../src/theme/components/ThemedButton";
-import { ThemedText } from "../../src/theme/components/ThemedText";
 
 interface SidebarRevealButtonStoryArgs {
     /** Whether the navigation sidebar is currently open. */

@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX, ReactNode } from "react";
 
+import { DefaultErrorFallback } from "@app/components/error/DefaultErrorFallback";
+import { useMount } from "@app/hooks/useMount";
 import { useRef } from "react";
 import { action } from "storybook/actions";
-
-import { DefaultErrorFallback } from "../../src/components/error/DefaultErrorFallback";
-import { useMount } from "../../src/hooks/useMount";
 
 const meta: Meta<typeof DefaultErrorFallback> = {
     args: {

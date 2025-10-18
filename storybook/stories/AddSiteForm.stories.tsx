@@ -5,15 +5,14 @@
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
-import { type JSX, useEffect } from "react";
-import { action } from "storybook/actions";
-
 import {
     AddSiteForm,
     type AddSiteFormProperties,
-} from "../../src/components/AddSiteForm/AddSiteForm";
-import { useAddSiteForm } from "../../src/components/SiteDetails/useAddSiteForm";
-import { useMount } from "../../src/hooks/useMount";
+} from "@app/components/AddSiteForm/AddSiteForm";
+import { useAddSiteForm } from "@app/components/SiteDetails/useAddSiteForm";
+import { useMount } from "@app/hooks/useMount";
+import { type JSX, useEffect } from "react";
+import { action } from "storybook/actions";
 import {
     createMockSite,
     createSiteDecorator,

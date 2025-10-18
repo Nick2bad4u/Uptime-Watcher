@@ -6,20 +6,19 @@
 import type { Site } from "@shared/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
-import { useEffect } from "react";
-
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
-} from "../../src/stores/ui/types";
+} from "@app/stores/ui/types";
 
-import { SiteList } from "../../src/components/Dashboard/SiteList/SiteList";
-import { useUIStore } from "../../src/stores/ui/useUiStore";
+import { SiteList } from "@app/components/Dashboard/SiteList/SiteList";
+import { useUIStore } from "@app/stores/ui/useUiStore";
 import {
     createMockMonitor,
     createMockSite,
     createSiteDecorator,
 } from "../helpers/siteStoryHelpers";
+import { useEffect } from "react";
 
 interface SiteListStoryArgs {
     layout: SiteListLayoutMode;

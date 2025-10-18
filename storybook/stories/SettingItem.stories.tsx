@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, ReactElement } from "react";
 
+import { SettingItem } from "@app/components/shared/SettingItem";
+import { ThemedCheckbox } from "@app/theme/components/ThemedCheckbox";
+import { ThemedSelect } from "@app/theme/components/ThemedSelect";
 import { useState } from "react";
-
-import { SettingItem } from "../../src/components/shared/SettingItem";
-import { ThemedCheckbox } from "../../src/theme/components/ThemedCheckbox";
-import { ThemedSelect } from "../../src/theme/components/ThemedSelect";
 
 const meta: Meta<typeof SettingItem> = {
     args: {

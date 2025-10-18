@@ -237,6 +237,19 @@ export default [
             "uptime-watcher/prefer-shared-alias": "error",
         },
     },
+    {
+        files: [
+            "src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
+        ],
+        ignores: ["src/test/**/*"],
+        name: "Renderer Electron Isolation",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/renderer-no-electron-import": "error",
+        },
+    },
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
@@ -7021,6 +7034,7 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7244,6 +7258,7 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
@@ -7468,6 +7483,7 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -8775,6 +8791,7 @@ export default [
         rules: {
             ...playwright.configs["flat/recommended"].rules,
             ...pluginTestingLibrary.configs["flat/dom"].rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             // TypeScript and testing-specific overrides for Playwright
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -8888,6 +8905,7 @@ export default [
         },
         rules: {
             ...vitest.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "testing-library/consistent-data-testid": [
                 "warn",
                 {

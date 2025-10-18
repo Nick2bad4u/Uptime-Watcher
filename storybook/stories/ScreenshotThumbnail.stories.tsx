@@ -5,7 +5,7 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { ScreenshotThumbnail } from "../../src/components/SiteDetails/ScreenshotThumbnail";
+import { ScreenshotThumbnail } from "@app/components/SiteDetails/ScreenshotThumbnail";
 
 const meta: Meta<typeof ScreenshotThumbnail> = {
     args: {

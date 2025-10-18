@@ -7,12 +7,11 @@ import type { Monitor, Site } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, JSX } from "react";
 
+import { SiteDetailsHeader } from "@app/components/SiteDetails/SiteDetailsHeader";
+import { useUIStore } from "@app/stores/ui/useUiStore";
+import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
-
-import { SiteDetailsHeader } from "../../src/components/SiteDetails/SiteDetailsHeader";
-import { useUIStore } from "../../src/stores/ui/useUiStore";
-import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
 
 const meta: Meta<typeof SiteDetailsHeader> = {
     args: {

@@ -1,7 +1,7 @@
 import type { MonitorStatus } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { StatusBadge } from "../../src/components/common/StatusBadge";
+import { StatusBadge } from "@app/components/common/StatusBadge";
 
 const STATUS_OPTIONS: MonitorStatus[] = [
     "up",

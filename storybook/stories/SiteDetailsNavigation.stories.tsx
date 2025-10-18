@@ -6,12 +6,11 @@
 import type { Monitor, Site } from "@shared/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { action } from "storybook/actions";
+import type { SiteDetailsTab } from "@app/stores/ui/types";
 
-import type { SiteDetailsTab } from "../../src/stores/ui/types";
-
-import { SiteDetailsNavigation } from "../../src/components/SiteDetails/SiteDetailsNavigation";
+import { SiteDetailsNavigation } from "@app/components/SiteDetails/SiteDetailsNavigation";
 import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
+import { action } from "storybook/actions";
 
 interface NavigationScenario {
     readonly heartbeatMonitor: Monitor;

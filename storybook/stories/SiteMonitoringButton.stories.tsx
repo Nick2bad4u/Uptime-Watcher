@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { SiteMonitoringButton } from "@app/components/common/SiteMonitoringButton/SiteMonitoringButton";
 import { action } from "storybook/actions";
-
-import { SiteMonitoringButton } from "../../src/components/common/SiteMonitoringButton/SiteMonitoringButton";
 
 const meta: Meta<typeof SiteMonitoringButton> = {
     args: {

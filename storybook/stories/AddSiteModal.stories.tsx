@@ -4,11 +4,10 @@
 
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
+import { AddSiteModal } from "@app/components/AddSiteForm/AddSiteModal";
+import { useMount } from "@app/hooks/useMount";
+import { useUIStore } from "@app/stores/ui/useUiStore";
 import { action } from "storybook/actions";
-
-import { AddSiteModal } from "../../src/components/AddSiteForm/AddSiteModal";
-import { useMount } from "../../src/hooks/useMount";
-import { useUIStore } from "../../src/stores/ui/useUiStore";
 import {
     createMockSite,
     createSiteDecorator,

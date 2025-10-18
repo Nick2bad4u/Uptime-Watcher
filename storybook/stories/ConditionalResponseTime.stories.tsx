@@ -1,9 +1,8 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
+import { ConditionalResponseTime } from "@app/components/common/MonitorUiComponents";
+import { ThemedText } from "@app/theme/components/ThemedText";
 import { Fragment, type ReactElement } from "react";
-
-import { ConditionalResponseTime } from "../../src/components/common/MonitorUiComponents";
-import { ThemedText } from "../../src/theme/components/ThemedText";
 import { prepareMonitorTypeMocks } from "./setup/monitorTypeMocks";
 
 prepareMonitorTypeMocks();

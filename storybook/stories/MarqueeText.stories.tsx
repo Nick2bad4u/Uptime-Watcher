@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, JSX } from "react";
 
-import type { TextSize, TextWeight } from "../../src/theme/components/types";
+import type { TextSize, TextWeight } from "@app/theme/components/types";
 
-import { MarqueeText } from "../../src/components/common/MarqueeText/MarqueeText";
+import { MarqueeText } from "@app/components/common/MarqueeText/MarqueeText";
 
 /**
  * Story arguments for the marquee presenter.

@@ -331,6 +331,7 @@ constructor(config?: MonitorConfig, logger?: Logger, client?: AxiosInstance)
 - Canonical DTOs live in the `shared` package. Do **not** redeclare interfaces such as `MonitorTypeOption`; import them from `@shared/types/monitorTypes`.
 - Favor re-exporting shared contracts from feature modules (e.g. `src/constants.ts`) instead of introducing renderer-only clones.
 - When introducing a new shared interface, add it to `shared/types/*` and extend the ESLint guard (`config/linting/rules/shared-contract-interfaces.mjs`) so duplicates are caught automatically.
+- Use the `@app` path alias whenever referencing renderer code from outside `src` (Storybook, benchmarks, tests, scripts). Relative deep imports such as `../../src/components/...` are disallowed by ESLint and should be rewritten to `@app/components/...`.
 
 ## Testing Conventions
 

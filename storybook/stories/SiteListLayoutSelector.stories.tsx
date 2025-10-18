@@ -5,15 +5,14 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { type JSX, useState } from "react";
-import { action } from "storybook/actions";
-
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
-} from "../../src/stores/ui/types";
+} from "@app/stores/ui/types";
 
-import { SiteListLayoutSelector } from "../../src/components/Dashboard/SiteList/SiteListLayoutSelector";
+import { SiteListLayoutSelector } from "@app/components/Dashboard/SiteList/SiteListLayoutSelector";
+import { type JSX, useState } from "react";
+import { action } from "storybook/actions";
 
 type SiteListLayoutSelectorMeta = Meta<typeof SiteListLayoutSelector>;
 
