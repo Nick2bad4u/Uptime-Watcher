@@ -7,8 +7,6 @@ import { action } from "storybook/actions";
 import { useSitesStore } from "@app/stores/sites/useSitesStore";
 import { useUIStore } from "@app/stores/ui/useUiStore";
 
-import { useSitesStore } from "@app/stores/sites/useSitesStore";
-import { useUIStore } from "@app/stores/ui/useUiStore";
 const DEFAULT_HISTORY_LENGTH = 6;
 const RESPONSE_INCREMENT = 25;
 const CHECK_INTERVAL_MS = 60_000;

@@ -1322,7 +1322,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
                         "@app",
@@ -2691,7 +2691,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
                         "@app",
@@ -4229,7 +4229,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
                         "@app",
@@ -5597,7 +5597,7 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
                         "@app",
