@@ -13,6 +13,7 @@ docs/Testing/
 ├── HEADLESS_TESTING.md                   # Headless test execution strategies
 ├── PLAYWRIGHT_CODEGEN_GUIDE.md          # Playwright test generation workflows
 ├── PLAYWRIGHT_TESTING_GUIDE.md          # Comprehensive Playwright testing guide
+├── ZERO_COVERAGE_AUDIT.md               # Workflow for spotting orphaned tests
 └── TEST_VERBOSITY_GUIDE.md               # Test output configuration and debugging
 ```
 
@@ -77,6 +78,7 @@ For new developers getting started with testing:
 | Guide                                                        | Description                                   | Use case                           |
 | ------------------------------------------------------------ | --------------------------------------------- | ---------------------------------- |
 | [Fast-check fuzzing coverage](./FAST-CHECK-FUZZING-GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs        |
+| [Zero coverage audit](./ZERO_COVERAGE_AUDIT.md)              | Isolate tests that no longer execute code     | Pruning stale specs safely         |
 | [Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)            | Configuring test output and debugging         | Test debugging and CI optimization |
 
 ## 🏃‍♂️ Running tests

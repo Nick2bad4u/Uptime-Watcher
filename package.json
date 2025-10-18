@@ -478,6 +478,7 @@
     "test:run:quiet": "npm run test:quiet",
     "test:run:verbose": "npm run test:verbose",
     "test:run:watch": "vitest run --watch --reporter=default",
+    "test:zero-coverage": "tsx scripts/detect-zero-coverage-tests.ts",
     "test:shared": "vitest run --config vitest.shared.config.ts --reporter=dot --silent",
     "test:shared:coverage": "vitest run --config vitest.shared.config.ts --coverage",
     "test:shared:detailed": "vitest run --config vitest.shared.config.ts --reporter=verbose --no-truncate",
