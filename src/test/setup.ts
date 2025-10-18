@@ -6,8 +6,8 @@
 import { vi, type Mock } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
-import type { StatusUpdate } from "../../shared/types";
-import type { ValidationResult } from "../../shared/types/validation";
+import type { StatusUpdate } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
 
 import EventEmitter from "node:events";
 

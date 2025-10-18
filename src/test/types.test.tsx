@@ -11,7 +11,7 @@ import type {
     Site,
     StatusHistory,
     StatusUpdate,
-} from "../../shared/types";
+} from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
 
 describe("Types Module", () => {

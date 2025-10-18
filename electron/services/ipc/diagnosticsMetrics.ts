@@ -10,6 +10,7 @@ import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 import * as loggerModule from "../../utils/logger";
+import log from "electron-log/main";
 
 export interface DiagnosticsMetricsSnapshot {
     lastMissingChannel?: string;
@@ -36,18 +37,18 @@ interface DiagnosticsSnapshotContext {
     readonly event: "guard-failure" | "missing" | "success";
 }
 
-const consoleDiagnosticsLogger: Logger = {
-    debug: (...messages: unknown[]) => {
-        console.debug(...messages);
+const fallbackDiagnosticsLogger: Logger = {
+    debug: (message: string, ...details: unknown[]): void => {
+        log.debug(message, ...details);
     },
-    error: (...messages: unknown[]) => {
-        console.error(...messages);
+    error: (message: string, error?: unknown, ...details: unknown[]): void => {
+        log.error(message, error, ...details);
     },
-    info: (...messages: unknown[]) => {
-        console.info(...messages);
+    info: (message: string, ...details: unknown[]): void => {
+        log.info(message, ...details);
     },
-    warn: (...messages: unknown[]) => {
-        console.warn(...messages);
+    warn: (message: string, ...details: unknown[]): void => {
+        log.warn(message, ...details);
     },
 };
 
@@ -65,7 +66,7 @@ function resolveDiagnosticsLogger(): Logger {
         return moduleWithDiagnostics.logger;
     }
 
-    return consoleDiagnosticsLogger;
+    return fallbackDiagnosticsLogger;
 }
 
 const diagnosticsLog: Logger = resolveDiagnosticsLogger();

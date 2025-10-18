@@ -27,7 +27,7 @@ import {
     safeJsonParseWithFallback,
     safeJsonStringify,
     safeJsonStringifyWithFallback,
-} from "../../../shared/utils/jsonSafety";
+} from "@shared/utils/jsonSafety";
 
 /**
  * Normalizes data to match JSON serialization behavior. This handles the same

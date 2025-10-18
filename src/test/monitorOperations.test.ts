@@ -5,13 +5,13 @@ import {
     type Monitor,
     type MonitorType,
     type Site,
-} from "../../shared/types";
+} from "@shared/types";
 
 import {
     DEFAULT_MONITOR_CHECK_INTERVAL_MS,
     MIN_MONITOR_CHECK_INTERVAL_MS,
-} from "../../shared/constants/monitoring";
-import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "../../shared/types/monitorConfig";
+} from "@shared/constants/monitoring";
+import { DEFAULT_MONITOR_CONFIG as SHARED_MONITOR_CONFIG } from "@shared/types/monitorConfig";
 
 import {
     createDefaultMonitor,
@@ -23,8 +23,8 @@ import {
     validateMonitorExists,
     monitorOperations,
 } from "../stores/sites/utils/monitorOperations";
-import { validateMonitor } from "../../shared/types";
-import { ERROR_CATALOG } from "../../shared/utils/errorCatalog";
+import { validateMonitor } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 // Mock crypto.randomUUID
 const mockUUID = "mock-uuid-123";

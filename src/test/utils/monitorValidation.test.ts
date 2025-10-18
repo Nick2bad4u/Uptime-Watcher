@@ -7,7 +7,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 // Mock dependencies
 vi.mock("@shared/utils/errorHandling", () => ({

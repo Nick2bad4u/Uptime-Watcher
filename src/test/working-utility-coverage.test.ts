@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { standardTestAnnotation } from "../../shared/test/testUtils";
+import { standardTestAnnotation } from "@shared/test/testUtils";
 
 // Import utility functions from shared modules with low function coverage
 import {
@@ -15,7 +15,7 @@ import {
     isProduction,
     isTest,
     isDevelopment,
-} from "../../shared/utils/environment";
+} from "@shared/utils/environment";
 import {
     hasProperties,
     hasProperty,
@@ -30,23 +30,23 @@ import {
     isPositiveNumber,
     isValidPort,
     isValidTimestamp,
-} from "../../shared/utils/typeGuards";
+} from "@shared/utils/typeGuards";
 import {
     safeJsonParse,
     safeJsonParseArray,
     safeJsonParseWithFallback,
     safeJsonStringify,
     safeJsonStringifyWithFallback,
-} from "../../shared/utils/jsonSafety";
-import { validateMonitorType } from "../../shared/utils/validation";
-import { withErrorHandling } from "../../shared/utils/errorHandling";
-import { safeStringify } from "../../shared/utils/stringConversion";
+} from "@shared/utils/jsonSafety";
+import { validateMonitorType } from "@shared/utils/validation";
+import { withErrorHandling } from "@shared/utils/errorHandling";
+import { safeStringify } from "@shared/utils/stringConversion";
 import {
     calculateSiteStatus,
     calculateSiteMonitoringStatus,
     getSiteDisplayStatus,
     getSiteStatusDescription,
-} from "../../shared/utils/siteStatus";
+} from "@shared/utils/siteStatus";
 
 describe("Working Utility Coverage Tests", () => {
     describe("Environment Utilities", () => {

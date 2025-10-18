@@ -19,11 +19,8 @@ import {
 } from "../../../../stores/sites/utils/monitorOperations";
 
 // Import types
-import type { Monitor, Site, MonitorType } from "../../../../../shared/types";
-import {
-    BASE_MONITOR_TYPES,
-    DEFAULT_MONITOR_STATUS,
-} from "../../../../../shared/types";
+import type { Monitor, Site, MonitorType } from "@shared/types";
+import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
 
 describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () => {
     // Helper generators for fast-check

@@ -7,7 +7,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { useSiteStats } from "../hooks/site/useSiteStats";
-import type { StatusHistory } from "../../shared/types";
+import type { StatusHistory } from "@shared/types";
 
 describe(useSiteStats, () => {
     describe("Basic Functionality", () => {

@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { getEnvironment, getNodeEnv } from "../../shared/utils/environment";
+import { getEnvironment, getNodeEnv } from "@shared/utils/environment";
 
 describe("Environment Utility Coverage Test", () => {
     it("should test environment functions", ({ task, annotate }) => {

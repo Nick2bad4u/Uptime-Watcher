@@ -20,7 +20,7 @@ import {
     MonitorDefaults,
     SiteDefaults,
 } from "../../utils/fallbacks";
-import type { Monitor } from "../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Mock the logger module
 vi.mock("../../services/logger", () => ({

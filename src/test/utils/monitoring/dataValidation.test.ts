@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { isValidUrl } from "../../../../shared/validation/validatorUtils";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     parseUptimeValue,
     safeGetHostname,

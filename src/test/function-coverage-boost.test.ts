@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
-import type { MonitorTypeConfig } from "../../shared/types/monitorTypes";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 describe("Function Coverage Boost Tests", () => {
     describe("Uncovered validation functions", () => {

@@ -14,7 +14,7 @@ import {
     type MonitorRow,
     type SettingsRow,
     type SiteRow,
-} from "../../shared/types/database";
+} from "@shared/types/database";
 
 describe("Shared Database Types - Complete Coverage", () => {
     describe(isValidHistoryRow, () => {

@@ -149,6 +149,7 @@ import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
 
+import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
 import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
@@ -189,6 +190,53 @@ export default [
         root: true,
     }), // MARK: Global Configs and Rules
     sharedContractInterfaceGuard,
+    {
+        files: ["src/constants.ts"],
+        name: "Monitor Fallback Consistency",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/monitor-fallback-consistency": "error",
+        },
+    },
+    {
+        files: ["electron/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "Electron Logger Enforcement",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/electron-no-console": "error",
+        },
+    },
+    {
+        files: ["**/*.{ts,tsx}"],
+        name: "TSDoc Logger Examples",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/tsdoc-no-console-example": "error",
+        },
+    },
+    {
+        files: [
+            "docs/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+        ],
+        ignores: ["shared/**/*"],
+        name: "Shared Alias Imports",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/prefer-shared-alias": "error",
+        },
+    },
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
@@ -1264,6 +1312,8 @@ export default [
                 "error",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -2631,6 +2681,8 @@ export default [
                 "error",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -4167,6 +4219,8 @@ export default [
                 "error",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -5533,6 +5587,8 @@ export default [
                 "error",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -8882,6 +8938,7 @@ export default [
         files: ["storybook/**/*.stories.tsx"],
         name: "Storybook Stories - storybook/**/*.stories.tsx",
         rules: {
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@arthurgeron/react-usememo/require-usememo": "off",
             "@eslint-react/jsx-no-iife": "off",
             "@eslint-react/jsx-shorthand-fragment": "off",
