@@ -3,29 +3,15 @@ import type { ValidationResult } from "@shared/types/validation";
 /**
  * Operational slice containing async monitor type actions.
  */
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
 import type { MonitorTypesStore } from "./types";
 
 import { MonitorTypesService } from "../../services/MonitorTypesService";
+import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
-
-const isValidMonitorTypeConfig = (
-    candidate: unknown
-): candidate is MonitorTypesStore["monitorTypes"][0] => {
-    if (typeof candidate !== "object" || candidate === null) {
-        return false;
-    }
-
-    if (!("type" in candidate)) {
-        return false;
-    }
-
-    const typed = candidate as { type: unknown };
-
-    return typeof typed.type === "string" && typed.type.length > 0;
-};
 
 /**
  * Creates the operational slice wiring monitor type service calls.
@@ -132,22 +118,53 @@ export const createMonitorTypesOperationsSlice = (
                     ? (rawConfigs as unknown[])
                     : [];
 
-                const configs = configsArray.filter(isValidMonitorTypeConfig);
+                const validConfigs: MonitorTypesStore["monitorTypes"] = [];
+                const invalidConfigs: Array<{
+                    index: number;
+                    kind: string;
+                }> = [];
+
+                configsArray.forEach((candidate, index) => {
+                    if (isMonitorTypeConfig(candidate)) {
+                        validConfigs.push(candidate);
+                    } else {
+                        const kind =
+                            typeof candidate === "object" && candidate !== null
+                                ? `keys:${Object.keys(
+                                      candidate as Record<string, unknown>
+                                  ).join(",")}`
+                                : `type:${typeof candidate}`;
+
+                        invalidConfigs.push({ index, kind });
+                    }
+                });
+
+                if (invalidConfigs.length > 0) {
+                    logger.error(
+                        "MonitorTypesStore dropped invalid monitor type configs",
+                        undefined,
+                        {
+                            invalidCount: invalidConfigs.length,
+                            samples: invalidConfigs.slice(0, 3),
+                        }
+                    );
+                }
 
                 const fieldMap: MonitorTypesStore["fieldConfigs"] = {};
-                for (const config of configs) {
+                for (const config of validConfigs) {
                     fieldMap[config.type] = config.fields;
                 }
 
                 setState({
                     fieldConfigs: fieldMap,
                     isLoaded: true,
-                    monitorTypes: configs,
+                    monitorTypes: validConfigs,
                 });
 
                 logStoreAction("MonitorTypesStore", "loadMonitorTypes", {
+                    invalidCount: invalidConfigs.length,
                     success: true,
-                    typesCount: configs.length,
+                    typesCount: validConfigs.length,
                 });
             },
             {

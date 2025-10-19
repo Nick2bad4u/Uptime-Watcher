@@ -7,10 +7,15 @@
  * and validation.
  */
 import type { Monitor, Site } from "@shared/types";
+import type {
+    MonitorFieldDefinition,
+    MonitorTypeConfig,
+} from "@shared/types/monitorTypes";
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { UnknownRecord } from "type-fest";
 
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
@@ -41,6 +46,10 @@ import {
     SystemHandlerValidators,
 } from "./validators";
 
+type BaseMonitorUiConfig = ReturnType<
+    typeof getAllMonitorTypeConfigs
+>[0]["uiConfig"];
+
 function isPreloadGuardDiagnosticsReport(
     value: unknown
 ): value is PreloadGuardDiagnosticsReport {
@@ -48,7 +57,6 @@ function isPreloadGuardDiagnosticsReport(
         return false;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- value verified as object without arrays
     const record = value as Record<string, unknown>;
 
     return (
@@ -58,78 +66,13 @@ function isPreloadGuardDiagnosticsReport(
     );
 }
 
-/**
- * Serialized monitor type configuration for IPC transmission.
- *
- * @remarks
- * Contains only serializable properties from monitor type configurations,
- * excluding functions and Zod schemas that cannot be transmitted via IPC. This
- * interface ensures type safety when transmitting monitor configuration data
- * between the main process and renderer processes.
- *
- * @example
- *
- * ```typescript
- * const serializedConfig: SerializedMonitorTypeConfig = {
- *     description: "HTTP endpoint monitoring",
- *     displayName: "HTTP Monitor",
- *     fields: [{ name: "url", required: true }],
- *     type: "http",
- *     uiConfig: {
- *         supportsAdvancedAnalytics: true,
- *         supportsResponseTime: true,
- *     },
- *     version: "1.0.0",
- * };
- * ```
- *
- * @public
- */
-interface SerializedMonitorTypeConfig {
-    description: string;
-    displayName: string;
-    fields: unknown[];
-    type: string;
-    uiConfig:
-        | undefined
-        | {
-              detailFormats?: undefined | { analyticsLabel?: string };
-              display?:
-                  | undefined
-                  | { showAdvancedMetrics?: boolean; showUrl?: boolean };
-              helpTexts?: undefined | { primary?: string; secondary?: string };
-              supportsAdvancedAnalytics: boolean;
-              supportsResponseTime: boolean;
-          };
-    version: string;
-}
-
-/**
- * Utility functions for validating and processing monitor configuration
- * properties.
- *
- * @remarks
- * Provides methods to extract and validate monitor configuration properties,
- * ensuring only expected properties are present and logging any unexpected
- * ones. Used during the serialization process to maintain data integrity.
- *
- * @internal
- */
 const ConfigPropertyValidator = {
     /**
-     * Extracts and validates base properties from monitor configuration.
+     * Extracts IPC-safe monitor configuration properties.
      *
      * @remarks
-     * Separates known base properties from unexpected properties to maintain
-     * clean serialization and provide debugging information for unknown
-     * properties.
-     *
-     * @param config - The monitor configuration object to process
-     *
-     * @returns Object containing validated base properties and any unexpected
-     *   properties found
-     *
-     * @internal
+     * Returns the serializable subset of a monitor configuration while
+     * capturing any unexpected keys for diagnostics.
      */
     extractAndValidateBaseProperties(
         config: ReturnType<typeof getAllMonitorTypeConfigs>[0]
@@ -137,31 +80,38 @@ const ConfigPropertyValidator = {
         baseProperties: {
             description: string;
             displayName: string;
-            fields: unknown[];
+            fields: MonitorFieldDefinition[];
             type: string;
-            uiConfig: unknown;
+            uiConfig: ReturnType<
+                typeof getAllMonitorTypeConfigs
+            >[0]["uiConfig"];
             version: string;
         };
         unexpectedProperties: UnknownRecord;
     } {
-        // Extract serializable properties, excluding non-serializable ones
-        const { description, displayName, fields, type, uiConfig, version } =
-            config;
+        const {
+            description,
+            displayName,
+            fields,
+            type,
+            uiConfig,
+            version,
+            ...rest
+        } = config;
 
-        // Get unexpected properties by filtering out known properties
         const knownProperties = new Set([
             "description",
             "displayName",
             "fields",
-            "serviceFactory", // Not serializable - functions
+            "serviceFactory",
             "type",
             "uiConfig",
-            "validationSchema", // Not serializable - Zod schemas
+            "validationSchema",
             "version",
         ]);
 
         const unexpectedProperties = Object.fromEntries(
-            Object.entries(config).filter(([key]) => !knownProperties.has(key))
+            Object.entries(rest).filter(([key]) => !knownProperties.has(key))
         );
 
         return {
@@ -178,35 +128,37 @@ const ConfigPropertyValidator = {
     },
 
     /**
-     * Validates and logs unexpected properties in monitor configuration.
+     * Throws when unexpected monitor configuration properties are detected.
      *
      * @remarks
-     * Checks for properties that are not part of the expected monitor
-     * configuration schema and logs warnings for debugging purposes. This helps
-     * identify when monitor configurations contain unexpected data that might
-     * not be serialized.
-     *
-     * @param unexpectedProperties - Record of unexpected properties found
-     *   during validation
-     * @param monitorType - The monitor type identifier for logging context
-     *
-     * @internal
+     * Fails fast whenever a registry entry contains keys the renderer is not
+     * prepared to consume, preventing silent drift between processes.
      */
-    validateAndLogUnexpectedProperties(
+    assertNoUnexpectedProperties(
         unexpectedProperties: UnknownRecord,
         monitorType: string
     ): void {
-        if (Object.keys(unexpectedProperties).length > 0) {
-            logger.warn(
-                "[IpcService] Unexpected properties in monitor config",
-                {
-                    type: monitorType,
-                    unexpectedProperties: Object.keys(unexpectedProperties),
-                }
-            );
+        const unexpectedEntries = Object.entries(unexpectedProperties);
+
+        if (unexpectedEntries.length === 0) {
+            return;
         }
+
+        const errorMessage = `Monitor config '${monitorType}' contains unexpected properties`;
+        const diagnosticError = new Error(errorMessage);
+
+        logger.error(
+            "[IpcService] Unexpected properties detected in monitor config",
+            diagnosticError,
+            {
+                monitorType,
+                unexpectedProperties: unexpectedEntries,
+            }
+        );
+
+        throw diagnosticError;
     },
-};
+} as const;
 
 /**
  * Utility functions for serializing UI configuration objects.
@@ -234,9 +186,9 @@ const UiConfigSerializer = {
      *
      * @internal
      */
-    serializeDetailFormats(detailFormats?: {
-        analyticsLabel?: string;
-    }): undefined | { analyticsLabel?: string } {
+    serializeDetailFormats(
+        detailFormats?: BaseMonitorUiConfig["detailFormats"]
+    ): undefined | { analyticsLabel?: string } {
         if (!detailFormats) {
             return undefined;
         }
@@ -266,10 +218,9 @@ const UiConfigSerializer = {
      *
      * @internal
      */
-    serializeDisplayPreferences(display?: {
-        showAdvancedMetrics?: boolean;
-        showUrl?: boolean;
-    }): undefined | { showAdvancedMetrics: boolean; showUrl: boolean } {
+    serializeDisplayPreferences(
+        display?: BaseMonitorUiConfig["display"]
+    ): undefined | { showAdvancedMetrics: boolean; showUrl: boolean } {
         return display
             ? {
                   showAdvancedMetrics: display.showAdvancedMetrics ?? false,
@@ -292,10 +243,9 @@ const UiConfigSerializer = {
      *
      * @internal
      */
-    serializeHelpTexts(helpTexts?: {
-        primary?: string;
-        secondary?: string;
-    }): undefined | { primary?: string; secondary?: string } {
+    serializeHelpTexts(
+        helpTexts?: BaseMonitorUiConfig["helpTexts"]
+    ): undefined | { primary?: string; secondary?: string } {
         if (!helpTexts) {
             return undefined;
         }
@@ -329,36 +279,14 @@ const UiConfigSerializer = {
      *
      * @internal
      */
-    serializeUiConfig(uiConfig?: {
-        detailFormats?: { analyticsLabel?: string };
-        display?: { showAdvancedMetrics?: boolean; showUrl?: boolean };
-        helpTexts?: { primary?: string; secondary?: string };
-        supportsAdvancedAnalytics?: boolean;
-        supportsResponseTime?: boolean;
-    }):
-        | undefined
-        | {
-              detailFormats?: undefined | { analyticsLabel?: string };
-              display?:
-                  | undefined
-                  | { showAdvancedMetrics?: boolean; showUrl?: boolean };
-              helpTexts?: undefined | { primary?: string; secondary?: string };
-              supportsAdvancedAnalytics: boolean;
-              supportsResponseTime: boolean;
-          } {
+    serializeUiConfig(
+        uiConfig?: BaseMonitorUiConfig
+    ): MonitorTypeConfig["uiConfig"] {
         if (!uiConfig) {
             return undefined;
         }
 
-        const result: {
-            detailFormats?: undefined | { analyticsLabel?: string };
-            display?:
-                | undefined
-                | { showAdvancedMetrics?: boolean; showUrl?: boolean };
-            helpTexts?: undefined | { primary?: string; secondary?: string };
-            supportsAdvancedAnalytics: boolean;
-            supportsResponseTime: boolean;
-        } = {
+        const result: NonNullable<MonitorTypeConfig["uiConfig"]> = {
             supportsAdvancedAnalytics:
                 uiConfig.supportsAdvancedAnalytics ?? false,
             supportsResponseTime: uiConfig.supportsResponseTime ?? false,
@@ -588,42 +516,46 @@ export class IpcService {
      */
     private serializeMonitorTypeConfig(
         config: ReturnType<typeof getAllMonitorTypeConfigs>[0]
-    ): SerializedMonitorTypeConfig {
-        // Extract and validate properties using utility
+    ): MonitorTypeConfig {
         const { baseProperties, unexpectedProperties } =
             ConfigPropertyValidator.extractAndValidateBaseProperties(config);
 
-        // Validate and log any unexpected properties
-        ConfigPropertyValidator.validateAndLogUnexpectedProperties(
+        ConfigPropertyValidator.assertNoUnexpectedProperties(
             unexpectedProperties,
             baseProperties.type
         );
 
-        // Serialize UI configuration using utility
         const serializedUiConfig = UiConfigSerializer.serializeUiConfig(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- uiConfig is validated by the serializer and type-checked at runtime
-            baseProperties.uiConfig as
-                | undefined
-                | {
-                      detailFormats?: { analyticsLabel?: string };
-                      display?: {
-                          showAdvancedMetrics?: boolean;
-                          showUrl?: boolean;
-                      };
-                      helpTexts?: { primary?: string; secondary?: string };
-                      supportsAdvancedAnalytics?: boolean;
-                      supportsResponseTime?: boolean;
-                  }
+            baseProperties.uiConfig
         );
 
-        return {
+        const sanitizedConfig: MonitorTypeConfig = {
             description: baseProperties.description,
             displayName: baseProperties.displayName,
-            fields: baseProperties.fields, // Fields are always present in BaseMonitorConfig
+            fields: baseProperties.fields,
             type: baseProperties.type,
             uiConfig: serializedUiConfig,
             version: baseProperties.version,
         };
+
+        if (!isMonitorTypeConfig(sanitizedConfig)) {
+            logger.error(
+                "[IpcService] Sanitized monitor type config failed validation",
+                undefined,
+                {
+                    monitorType: baseProperties.type,
+                    sanitizedConfig,
+                }
+            );
+
+            throw new Error(
+                `[IpcService] Invalid monitor type config produced for '${baseProperties.type}': ${JSON.stringify(
+                    sanitizedConfig
+                )}`
+            );
+        }
+
+        return sanitizedConfig;
     }
 
     /**

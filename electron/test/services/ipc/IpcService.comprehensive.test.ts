@@ -55,7 +55,14 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
             displayName: "HTTP Monitor",
             description: "HTTP endpoint monitoring",
             version: "1.0.0",
-            fields: [{ name: "url", required: true }],
+            fields: [
+                {
+                    name: "url",
+                    required: true,
+                    label: "URL",
+                    type: "url",
+                },
+            ],
             uiConfig: {
                 supportsAdvancedAnalytics: true,
                 supportsResponseTime: true,
@@ -74,7 +81,14 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
             displayName: "Ping Monitor",
             description: "Network ping monitoring",
             version: "1.0.0",
-            fields: [{ name: "host", required: true }],
+            fields: [
+                {
+                    name: "host",
+                    required: true,
+                    label: "Host",
+                    type: "text",
+                },
+            ],
             uiConfig: {
                 supportsAdvancedAnalytics: false,
                 supportsResponseTime: true,

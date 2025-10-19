@@ -60,6 +60,36 @@ vi.mock("../../hooks/useMonitorTypes", () => ({
     }),
 }));
 
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    useMonitorTypesStore: () => ({
+        isLoaded: true,
+        lastError: null,
+        loadMonitorTypes: vi.fn(),
+        monitorTypes: [
+            {
+                description: "Monitor HTTP endpoints",
+                displayName: "HTTP Monitor",
+                fields: [
+                    {
+                        helpText: "Enter the full URL including http://",
+                        label: "Website URL",
+                        name: "url",
+                        placeholder: "https://status.example.com",
+                        required: true,
+                        type: "url",
+                    },
+                ],
+                type: "http",
+                uiConfig: {
+                    supportsAdvancedAnalytics: true,
+                    supportsResponseTime: true,
+                },
+                version: "1.0.0",
+            },
+        ],
+    }),
+}));
+
 vi.mock("../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: () => false,
 }));

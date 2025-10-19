@@ -21,6 +21,25 @@ const buildListenerStates = (attachedCount: number) =>
         name,
     }));
 
+const buildSite = (identifier: string): Site => ({
+    identifier,
+    monitoring: true,
+    monitors: [
+        {
+            checkInterval: 60_000,
+            history: [],
+            id: `${identifier}-monitor`,
+            monitoring: true,
+            responseTime: 0,
+            retryAttempts: 0,
+            status: "up",
+            timeout: 5_000,
+            type: "http",
+        },
+    ],
+    name: `Site ${identifier}`,
+});
+
 // Mock all the dependencies
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: {
@@ -587,10 +606,7 @@ describe("useSiteSync", () => {
             const fullSyncResult = {
                 completedAt: Date.now(),
                 siteCount: 2,
-                sites: [
-                    { id: "site-1", name: "Site 1" },
-                    { id: "site-2", name: "Site 2" },
-                ],
+                sites: [buildSite("site-1"), buildSite("site-2")],
                 source: "frontend" as const,
                 synchronized: true,
             };

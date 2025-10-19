@@ -85,6 +85,28 @@ vi.stubGlobal("window", {
     electronAPI: mockElectronAPI,
 });
 
+const createMonitorTypeConfig = (
+    overrides: Partial<MonitorTypeConfig> = {}
+): MonitorTypeConfig => ({
+    type: overrides.type ?? "http",
+    displayName: overrides.displayName ?? "HTTP",
+    description: overrides.description ?? "HTTP monitoring",
+    version: overrides.version ?? "1.0",
+    fields:
+        overrides.fields ??
+        ([
+            {
+                helpText: "Provide a valid endpoint",
+                label: "URL",
+                name: "url",
+                placeholder: "https://example.com",
+                required: true,
+                type: "url",
+            },
+        ] satisfies MonitorTypeConfig["fields"]),
+    uiConfig: overrides.uiConfig,
+});
+
 describe("useMonitorTypesStore - 100% Coverage", () => {
     beforeEach(() => {
         // Reset all mocks
@@ -346,13 +368,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                         },
                     ],
                 },
-                {
+                createMonitorTypeConfig({
                     type: "minimal-monitor",
                     displayName: "Minimal",
                     description: "Minimal config",
-                    version: "1.0",
-                    fields: [],
-                },
+                }),
             ];
 
             originalSafeExtractIpcData.mockReturnValueOnce(complexConfigs);
@@ -529,13 +549,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                     lastError: "Direct mutation error",
                     isLoaded: true,
                     monitorTypes: [
-                        {
+                        createMonitorTypeConfig({
                             type: "direct",
                             displayName: "Direct",
                             description: "Direct mutation",
-                            version: "1.0",
-                            fields: [],
-                        } as MonitorTypeConfig,
+                        }),
                     ],
                     fieldConfigs: {
                         direct: [],
@@ -797,6 +815,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 "MonitorTypesStore",
                 "loadMonitorTypes",
                 {
+                    invalidCount: 0,
                     success: true,
                     typesCount: 0,
                 }
@@ -974,13 +993,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                             resolve({
                                 success: true,
                                 data: [
-                                    {
+                                    createMonitorTypeConfig({
                                         type: `type-${++resolveCount}`,
                                         displayName: `Type ${resolveCount}`,
                                         description: "Test type",
-                                        version: "1.0",
-                                        fields: [],
-                                    },
+                                    }),
                                 ],
                             });
                         }, 10);
@@ -1256,13 +1273,11 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             const testState = {
                 monitorTypes: [
-                    {
+                    createMonitorTypeConfig({
                         type: "test",
                         displayName: "Test",
                         description: "Test type",
-                        version: "1.0",
-                        fields: [],
-                    } as MonitorTypeConfig,
+                    }),
                 ],
                 fieldConfigs: { test: [] },
                 isLoaded: true,

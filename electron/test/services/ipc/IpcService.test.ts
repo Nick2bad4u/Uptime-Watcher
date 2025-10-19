@@ -73,7 +73,14 @@ const {
             description: "Monitor HTTP endpoints",
             version: "1.0.0",
             fields: [
-                { name: "url", type: "string", label: "URL", required: true },
+                {
+                    name: "url",
+                    type: "url",
+                    label: "URL",
+                    required: true,
+                    helpText: "Enter the endpoint URL",
+                    placeholder: "https://status.example.com",
+                },
             ],
             uiConfig: {
                 display: { showUrl: true, showAdvancedMetrics: false },
@@ -122,7 +129,7 @@ vi.mock("../../utils/logger", () => ({
     diagnosticsLogger: mockLogger,
 }));
 
-vi.mock("../monitoring/MonitorTypeRegistry", () => ({
+vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
     getAllMonitorTypeConfigs: mockGetAllMonitorTypeConfigs,
     getMonitorTypeConfig: mockGetMonitorTypeConfig,
     validateMonitorData: mockValidateMonitorData,
@@ -403,7 +410,7 @@ describe(IpcService, () => {
                 expect.fail("Handler not found for get-monitor-types");
             }
         });
-        it("should warn about unexpected properties", async () => {
+        it("should fail when monitor configs include unexpected properties", async () => {
             mockGetAllMonitorTypeConfigs.mockReturnValueOnce([
                 {
                     type: "http",
@@ -424,10 +431,9 @@ describe(IpcService, () => {
             )?.[1];
 
             if (getAllHandler) {
-                // This test verifies that the handler doesn't throw on complex configurations
                 const result = await getAllHandler();
-                expect(result.success).toBeTruthy();
-                expect(Array.isArray(result.data)).toBeTruthy();
+                expect(result.success).toBeFalsy();
+                expect(result.error).toContain("unexpected properties");
             } else {
                 expect.fail("Handler not found for get-monitor-types");
             }

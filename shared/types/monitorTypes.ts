@@ -150,3 +150,222 @@ export interface MonitorTypeUICommons {
      */
     supportsResponseTime?: boolean;
 }
+
+const ALLOWED_FIELD_TYPES = new Set<MonitorFieldDefinition["type"]>([
+    "number",
+    "select",
+    "text",
+    "url",
+]);
+
+/**
+ * Runtime type guard verifying a monitor field definition structure.
+ *
+ * @remarks
+ * Ensures IPC payloads or cached values match the {@link MonitorFieldDefinition}
+ * contract before they reach renderer logic. This guard is shared across main
+ * and renderer processes to keep cross-layer validation consistent.
+ *
+ * @param candidate - Arbitrary value to validate.
+ *
+ * @returns `true` when the candidate satisfies {@link MonitorFieldDefinition}.
+ */
+export function isMonitorFieldDefinition(
+    candidate: unknown
+): candidate is MonitorFieldDefinition {
+    if (typeof candidate !== "object" || candidate === null) {
+        return false;
+    }
+
+    const record = candidate as Partial<MonitorFieldDefinition> &
+        Record<string, unknown>;
+
+    if (typeof record.label !== "string" || record.label.length === 0) {
+        return false;
+    }
+
+    if (typeof record.name !== "string" || record.name.length === 0) {
+        return false;
+    }
+
+    if (typeof record.required !== "boolean") {
+        return false;
+    }
+
+    if (!ALLOWED_FIELD_TYPES.has(record.type)) {
+        return false;
+    }
+
+    if (record.helpText !== undefined && typeof record.helpText !== "string") {
+        return false;
+    }
+
+    if (
+        record.placeholder !== undefined &&
+        typeof record.placeholder !== "string"
+    ) {
+        return false;
+    }
+
+    if (record.max !== undefined && typeof record.max !== "number") {
+        return false;
+    }
+
+    if (record.min !== undefined && typeof record.min !== "number") {
+        return false;
+    }
+
+    if (record.options !== undefined) {
+        if (!Array.isArray(record.options)) {
+            return false;
+        }
+
+        for (const option of record.options) {
+            if (
+                typeof option !== "object" ||
+                option === null ||
+                typeof option.label !== "string" ||
+                typeof option.value !== "string"
+            ) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Runtime type guard validating serialized monitor type configurations.
+ *
+ * @remarks
+ * Used when accepting IPC payloads or cache entries to ensure they match the
+ * canonical {@link MonitorTypeConfig} contract before mutating application
+ * state. The guard intentionally checks only JSON-serializable properties to
+ * mirror what crosses the process boundary.
+ *
+ * @param candidate - Value to validate.
+ *
+ * @returns `true` when the candidate is a {@link MonitorTypeConfig}.
+ */
+export function isMonitorTypeConfig(
+    candidate: unknown
+): candidate is MonitorTypeConfig {
+    if (typeof candidate !== "object" || candidate === null) {
+        return false;
+    }
+
+    const record = candidate as Partial<MonitorTypeConfig> &
+        Record<string, unknown>;
+
+    if (typeof record.type !== "string" || record.type.length === 0) {
+        return false;
+    }
+
+    if (
+        typeof record.displayName !== "string" ||
+        record.displayName.length === 0
+    ) {
+        return false;
+    }
+
+    if (
+        typeof record.description !== "string" ||
+        record.description.length === 0
+    ) {
+        return false;
+    }
+
+    if (typeof record.version !== "string" || record.version.length === 0) {
+        return false;
+    }
+
+    if (!Array.isArray(record.fields)) {
+        return false;
+    }
+
+    if (
+        record.fields.length === 0 ||
+        !record.fields.every(isMonitorFieldDefinition)
+    ) {
+        return false;
+    }
+
+    if (record.uiConfig !== undefined) {
+        if (typeof record.uiConfig !== "object" || record.uiConfig === null) {
+            return false;
+        }
+
+        const uiConfig = record.uiConfig as MonitorTypeConfig["uiConfig"] &
+            Record<string, unknown>;
+
+        const { detailFormats, display, helpTexts } = uiConfig;
+
+        if (detailFormats !== undefined) {
+            if (typeof detailFormats !== "object" || detailFormats === null) {
+                return false;
+            }
+
+            if (
+                detailFormats.analyticsLabel !== undefined &&
+                typeof detailFormats.analyticsLabel !== "string"
+            ) {
+                return false;
+            }
+        }
+
+        if (display !== undefined) {
+            if (typeof display !== "object" || display === null) {
+                return false;
+            }
+
+            const { showAdvancedMetrics, showUrl } = display as Record<
+                string,
+                unknown
+            >;
+
+            if (
+                showAdvancedMetrics !== undefined &&
+                typeof showAdvancedMetrics !== "boolean"
+            ) {
+                return false;
+            }
+
+            if (showUrl !== undefined && typeof showUrl !== "boolean") {
+                return false;
+            }
+        }
+
+        if (helpTexts !== undefined) {
+            if (typeof helpTexts !== "object" || helpTexts === null) {
+                return false;
+            }
+
+            const { primary, secondary } = helpTexts as Record<string, unknown>;
+
+            if (primary !== undefined && typeof primary !== "string") {
+                return false;
+            }
+
+            if (secondary !== undefined && typeof secondary !== "string") {
+                return false;
+            }
+        }
+
+        if (
+            uiConfig.supportsAdvancedAnalytics !== undefined &&
+            typeof uiConfig.supportsAdvancedAnalytics !== "boolean"
+        ) {
+            return false;
+        }
+
+        if (
+            uiConfig.supportsResponseTime !== undefined &&
+            typeof uiConfig.supportsResponseTime !== "boolean"
+        ) {
+            return false;
+        }
+    }
+
+    return true;
+}

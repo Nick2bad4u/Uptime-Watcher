@@ -56,6 +56,28 @@ vi.stubGlobal("window", {
     electronAPI: mockElectronAPI,
 });
 
+const createMonitorTypeConfig = (
+    overrides: Partial<MonitorTypeConfig> = {}
+): MonitorTypeConfig => ({
+    type: overrides.type ?? "http",
+    displayName: overrides.displayName ?? "HTTP Monitor",
+    description: overrides.description ?? "HTTP endpoint monitoring",
+    version: overrides.version ?? "1.0",
+    fields:
+        overrides.fields ??
+        ([
+            {
+                helpText: "Enter the target URL",
+                label: "URL",
+                name: "url",
+                placeholder: "https://example.com",
+                required: true,
+                type: "url",
+            },
+        ] satisfies MonitorTypeConfig["fields"]),
+    uiConfig: overrides.uiConfig,
+});
+
 describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -169,13 +191,11 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 { type: "" },
                 { notType: "invalid" },
                 // Valid config that should remain
-                {
+                createMonitorTypeConfig({
                     type: "valid",
                     displayName: "Valid",
                     description: "Valid config",
-                    version: "1.0",
-                    fields: [],
-                },
+                }),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
@@ -433,13 +453,11 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle refreshMonitorTypes", async () => {
             const mockConfigs: MonitorTypeConfig[] = [
-                {
+                createMonitorTypeConfig({
                     type: "http",
                     displayName: "HTTP",
                     description: "HTTP monitoring",
-                    version: "1.0",
-                    fields: [],
-                },
+                }),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
@@ -526,6 +544,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 "MonitorTypesStore",
                 "loadMonitorTypes",
                 {
+                    invalidCount: 0,
                     success: true,
                     typesCount: 0,
                 }

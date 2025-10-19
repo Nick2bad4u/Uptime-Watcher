@@ -121,7 +121,18 @@ const createConfig = (
         displayName:
             overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
         description: overrides.description ?? "Monitor configuration",
-        fields: overrides.fields ?? [],
+        fields:
+            overrides.fields ??
+            ([
+                {
+                    helpText: "Provide a valid endpoint",
+                    label: "Endpoint",
+                    name: "endpoint",
+                    placeholder: "https://status.example.com",
+                    required: true,
+                    type: "url",
+                },
+            ] satisfies MonitorTypeConfig["fields"]),
         version: overrides.version ?? "1.0.0",
     } satisfies Omit<MonitorTypeConfig, "uiConfig">;
 
