@@ -18,7 +18,7 @@ import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
-import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type {
@@ -589,34 +589,25 @@ export const createSiteSyncActions = (
 
                     try {
                         const fullSyncResult =
+                            // eslint-disable-next-line n/no-sync -- Backend API name uses "Sync" suffix but returns a Promise
                             await StateSyncService.requestFullSync();
-                        const synchronizedSites = Array.isArray(
-                            fullSyncResult?.sites
-                        )
-                            ? fullSyncResult.sites
-                            : [];
+                        const {
+                            completedAt,
+                            siteCount,
+                            sites,
+                            source,
+                            synchronized,
+                        } = fullSyncResult;
 
-                        if (!Array.isArray(fullSyncResult?.sites)) {
-                            logger.warn(
-                                "Full sync payload missing sites array; defaulting to empty set",
-                                fullSyncResult
-                            );
-                        }
-
-                        deps.setSites(synchronizedSites);
+                        deps.setSites(sites);
 
                         logStoreAction("SitesStore", "syncSites", {
-                            completedAt:
-                                fullSyncResult?.completedAt ?? Date.now(),
+                            completedAt,
                             message: "Sites synchronized from backend",
-                            sitesCount:
-                                fullSyncResult?.siteCount ??
-                                synchronizedSites.length,
-                            source:
-                                fullSyncResult?.source ??
-                                STATE_SYNC_SOURCE.CACHE,
+                            sitesCount: siteCount,
+                            source,
                             status: "success",
-                            success: fullSyncResult?.synchronized ?? true,
+                            success: synchronized,
                         });
                     } catch (error) {
                         const normalizedError = ensureError(error);

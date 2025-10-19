@@ -532,7 +532,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             () =>
                 CHECK_INTERVALS.map((interval) => ({
                     label: interval.label,
-                    value: interval.value,
+                    value: String(interval.value),
                 })),
             []
         );
@@ -630,7 +630,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         label="Check Interval"
                         onChange={handleCheckIntervalChange}
                         options={checkIntervalOptions}
-                        value={checkInterval}
+                        value={String(checkInterval)}
                     />
 
                     <ThemedButton

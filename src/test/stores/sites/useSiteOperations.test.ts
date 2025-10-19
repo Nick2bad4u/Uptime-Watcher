@@ -275,22 +275,28 @@ describe(createSiteOperationsActions, () => {
                     ]),
                 })
             );
-            expect(mockDeps.addSite).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    identifier: "new-site",
-                    name: "New Site",
-                    monitoring: true,
-                    monitors: expect.arrayContaining([
-                        expect.objectContaining({
-                            id: expect.any(String),
-                            type: "http",
-                            status: "pending",
-                            monitoring: true,
-                            history: [],
-                        }),
-                    ]),
-                })
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        identifier: "test-site",
+                    }),
+                    expect.objectContaining({
+                        identifier: "new-site",
+                        name: "New Site",
+                        monitoring: true,
+                        monitors: expect.arrayContaining([
+                            expect.objectContaining({
+                                id: expect.any(String),
+                                type: "http",
+                                status: "pending",
+                                monitoring: true,
+                                history: [],
+                            }),
+                        ]),
+                    }),
+                ])
             );
+            expect(mockDeps.addSite).not.toHaveBeenCalled();
         });
 
         it("should create a new site with full data", async ({
@@ -316,6 +322,68 @@ describe(createSiteOperationsActions, () => {
 
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
                 expect.objectContaining(siteData)
+            );
+        });
+
+        it("should merge backend site snapshot when identifier already exists", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: State Management", "type");
+
+            const existingSite: Site = {
+                identifier: "existing-site",
+                monitoring: true,
+                monitors: [
+                    {
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-existing",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 3,
+                        status: "pending",
+                        timeout: 5_000,
+                        type: "http",
+                        url: "https://example.com",
+                    },
+                ],
+                name: "Existing Site",
+            };
+
+            let currentSites: Site[] = [existingSite];
+            vi.mocked(mockDeps.getSites).mockImplementation(() => currentSites);
+            vi.mocked(mockDeps.setSites).mockImplementation((sites: Site[]) => {
+                currentSites = sites;
+            });
+
+            const backendSite: Site = {
+                ...existingSite,
+                name: "Existing Site Updated",
+                monitors: existingSite.monitors.map((monitor) => ({
+                    ...monitor,
+                    id: "monitor-backend",
+                    status: "up",
+                })),
+            };
+
+            mockElectronAPI.sites.addSite.mockResolvedValueOnce(backendSite);
+
+            await actions.createSite({
+                identifier: "existing-site",
+                name: "Existing Site Updated",
+            });
+
+            expect(mockDeps.addSite).not.toHaveBeenCalled();
+            expect(currentSites).toHaveLength(1);
+            expect(currentSites[0]).toEqual(
+                expect.objectContaining({
+                    identifier: "existing-site",
+                    name: "Existing Site Updated",
+                })
             );
         });
     });

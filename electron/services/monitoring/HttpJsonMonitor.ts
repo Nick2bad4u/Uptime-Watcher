@@ -1,38 +1,21 @@
 /**
- * HTTP JSON monitor service that validates JSON responses against expected
- * values using dot-notation paths.
+ * HTTP JSON monitor service built on the shared HTTP core.
  */
 
-import type { Site } from "@shared/types";
-import type { AxiosInstance, AxiosResponse } from "axios";
+/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "@shared/utils/logTemplates";
+import type { Monitor } from "@shared/types";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorConfig,
-} from "./types";
+import type { MonitorConfig } from "./types";
 
-import {
-    DEFAULT_REQUEST_TIMEOUT,
-    RETRY_BACKOFF,
-    USER_AGENT,
-} from "../../constants";
-import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import { withOperationalHooks } from "../../utils/operationalHooks";
 import {
-    createMonitorErrorResult,
-    extractMonitorConfig,
-    validateMonitorUrl,
-} from "./shared/monitorServiceHelpers";
-import { handleCheckError, isCancellationError } from "./utils/errorHandling";
-import { createHttpClient } from "./utils/httpClient";
-import { getSharedHttpRateLimiter } from "./utils/httpRateLimiter";
+    createHttpMonitorService,
+    type HttpMonitorBehavior,
+    type HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
+import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
 function getTrimmedString(value: unknown): null | string {
     if (typeof value !== "string") {
@@ -122,245 +105,135 @@ function stringifyValue(value: unknown): string {
     }
 }
 
-export class HttpJsonMonitor implements IMonitorService {
-    private static readonly rateLimiter = getSharedHttpRateLimiter();
-
-    private axiosInstance: AxiosInstance;
-
-    private config: MonitorConfig;
-
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "http-json") {
-            throw new Error(
-                `HttpJsonMonitor cannot handle monitor type: ${monitor.type}`
-            );
-        }
-
-        const jsonPath = getTrimmedString(monitor.jsonPath);
-        const expectedValue = getTrimmedString(monitor.expectedJsonValue);
-
-        if (!jsonPath) {
-            return createMonitorErrorResult(
-                "Monitor missing or invalid JSON path",
-                0
-            );
-        }
-
-        if (!expectedValue) {
-            return createMonitorErrorResult(
-                "Monitor missing or invalid expected JSON value",
-                0
-            );
-        }
-
-        const validationError = validateMonitorUrl(monitor);
-        if (validationError) {
-            return createMonitorErrorResult(validationError, 0);
-        }
-
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-
-        const url = monitor.url ?? "";
-        return HttpJsonMonitor.rateLimiter.schedule(url, () =>
-            this.performJsonCheckWithRetry(
-                url,
-                jsonPath,
-                expectedValue,
-                timeout,
-                retryAttempts,
-                signal
-            )
-        );
-    }
-
-    private async performJsonCheckWithRetry(
-        url: string,
-        jsonPath: string,
-        expectedValue: string,
-        timeout: number,
-        maxRetries: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
+function parsePayload(
+    data: unknown
+): { error: Error; ok: false } | { ok: true; payload: unknown } {
+    if (typeof data === "string") {
         try {
-            if (signal?.aborted) {
-                throw new Error("Operation was aborted");
-            }
-
-            const totalAttempts = maxRetries + 1;
-
-            return await withOperationalHooks(
-                () =>
-                    this.performSingleJsonCheck(
-                        url,
-                        jsonPath,
-                        expectedValue,
-                        timeout,
-                        signal
-                    ),
-                {
-                    failureLogLevel: (encounteredError) =>
-                        isCancellationError(encounteredError)
-                            ? "warn"
-                            : "error",
-                    initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                    maxRetries: totalAttempts,
-                    operationName: `HTTP JSON check for ${url}`,
-                    ...(isDev() && {
-                        onRetry: (attempt: number, error: Error): void => {
-                            const errorMessage =
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error);
-                            logger.debug(
-                                `[HttpJsonMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                            );
-                        },
-                    }),
-                }
-            );
+            return {
+                ok: true,
+                payload: JSON.parse(data),
+            };
         } catch (error) {
-            return handleCheckError(error, url);
+            logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
+                error,
+            });
+            return {
+                error: toError(error),
+                ok: false,
+            };
         }
     }
 
-    private async performSingleJsonCheck(
-        url: string,
-        jsonPath: string,
-        expectedValue: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        const response = await this.makeRequest(url, timeout, signal);
-        const responseTime = response.responseTime ?? 0;
-        const parseResult = this.parsePayload(response.data);
+    return { ok: true, payload: data };
+}
 
-        if (!parseResult.ok) {
-            const parseError =
-                "error" in parseResult
-                    ? parseResult.error
-                    : new Error("Unknown JSON parse error");
+function isParseError(
+    result: ReturnType<typeof parsePayload>
+): result is { error: Error; ok: false } {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare -- Literal comparison keeps type guard exhaustive
+    return result.ok === false;
+}
+
+type HttpJsonMonitorConfig = Monitor & { type: "http-json" };
+
+const behavior: HttpMonitorBehavior<
+    "http-json",
+    HttpJsonMonitorConfig,
+    { expectedValue: string; jsonPath: string }
+> = {
+    evaluateResponse: ({ context, response, responseTime }) => {
+        const parseResult = parsePayload(response.data);
+
+        if (isParseError(parseResult)) {
+            const { error } = parseResult;
             return {
-                details: `JSON parsing failed: ${parseError.message}`,
+                details: `JSON parsing failed: ${error.message}`,
                 responseTime,
                 status: "degraded",
             };
         }
 
-        const { payload } = parseResult;
-        const actualValue = extractValueAtPath(payload, jsonPath);
-
-        if (isDev()) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
-                    {
-                        responseTime,
-                        status: response.status,
-                        url,
-                    }
-                )
-            );
-        }
+        const actualValue = extractValueAtPath(
+            parseResult.payload,
+            context.jsonPath
+        );
 
         if (actualValue === undefined) {
             return {
-                details: `JSON path "${jsonPath}" not found`,
+                details: `JSON path "${context.jsonPath}" not found`,
                 responseTime,
                 status: "degraded",
             };
         }
 
         const actualAsString = stringifyValue(actualValue);
-        if (actualAsString === expectedValue) {
+        if (actualAsString === context.expectedValue) {
             return {
-                details: `JSON path "${jsonPath}" matched expected value`,
+                details: `JSON path "${context.jsonPath}" matched expected value`,
                 responseTime,
                 status: "up",
             };
         }
 
         return {
-            details: `JSON path "${jsonPath}" mismatch (expected "${expectedValue}", received "${actualAsString}")`,
+            details: `JSON path "${context.jsonPath}" mismatch (expected "${context.expectedValue}", received "${actualAsString}")`,
             responseTime,
             status: "degraded",
         };
-    }
+    },
+    operationLabel: "HTTP JSON check",
+    scope: "HttpJsonMonitor",
+    type: "http-json",
+    validateMonitorSpecifics: (monitor: HttpJsonMonitorConfig) => {
+        const jsonPath = getTrimmedString(monitor.jsonPath);
+        const expectedValue = getTrimmedString(monitor.expectedJsonValue);
 
-    private async makeRequest(
-        url: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<AxiosResponse> {
-        const signals = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
+        if (!jsonPath) {
+            return {
+                kind: "error",
+                result: createMonitorErrorResult(
+                    "Monitor missing or invalid JSON path",
+                    0
+                ),
+            };
         }
 
-        return this.axiosInstance.get(url, {
-            signal: AbortSignal.any(signals),
-            timeout,
-        });
-    }
-
-    private parsePayload(
-        data: AxiosResponse["data"]
-    ): { error: Error; ok: false } | { ok: true; payload: unknown } {
-        if (typeof data === "string") {
-            try {
-                return {
-                    ok: true,
-                    payload: JSON.parse(data),
-                };
-            } catch (error) {
-                logger.warn("[HttpJsonMonitor] Failed to parse JSON payload", {
-                    error,
-                });
-                return {
-                    error: toError(error),
-                    ok: false,
-                };
-            }
+        if (!expectedValue) {
+            return {
+                kind: "error",
+                result: createMonitorErrorResult(
+                    "Monitor missing or invalid expected JSON value",
+                    0
+                ),
+            };
         }
 
         return {
-            ok: true,
-            payload: data,
+            context: {
+                expectedValue,
+                jsonPath,
+            },
+            kind: "context",
         };
-    }
+    },
+};
 
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        };
+const HttpJsonMonitorBase: new (
+    config?: MonitorConfig
+) => HttpMonitorServiceInstance = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<
+            "http-json",
+            HttpJsonMonitorConfig,
+            { expectedValue: string; jsonPath: string }
+        >(behavior),
+    "HttpJsonMonitor"
+);
 
-        this.axiosInstance = createHttpClient({
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        });
-    }
+/**
+ * HTTP JSON monitor service driven by the shared HTTP core.
+ */
+export class HttpJsonMonitor extends HttpJsonMonitorBase {}
 
-    public getType(): Site["monitors"][0]["type"] {
-        return "http-json";
-    }
-
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-
-        this.axiosInstance = createHttpClient({
-            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-            userAgent: this.config.userAgent ?? USER_AGENT,
-        });
-    }
-}
+/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

@@ -54,38 +54,28 @@
  * @public
  */
 
-import type { FormFieldBaseProperties } from "@shared/types/componentProps";
-
-import {
-    type ChangeEvent,
-    memo,
-    type NamedExoticComponent,
-    useCallback,
-} from "react";
+import type { NamedExoticComponent } from "react";
 
 import { ThemedInput } from "../../theme/components/ThemedInput";
-import { BaseFormField } from "./BaseFormField";
+import {
+    createStringField,
+    type StringFieldPropsBase,
+} from "./fields/fieldFactories";
 
 /**
  * Properties for the TextField component.
  *
  * @public
  */
-export interface TextFieldProperties extends FormFieldBaseProperties {
-    /** Whether the field is disabled */
-    readonly disabled?: boolean;
+export interface TextFieldProperties extends StringFieldPropsBase {
     /** Maximum value for number inputs (ignored for text/url types) */
     readonly max?: number;
     /** Minimum value for number inputs (ignored for text/url types) */
     readonly min?: number;
-    /** Callback function triggered when value changes */
-    readonly onChange: (value: string) => void;
     /** Placeholder text displayed when input is empty */
     readonly placeholder?: string;
     /** Input type - text, url, or number */
     readonly type?: "number" | "text" | "url";
-    /** Current field value */
-    readonly value: string;
 }
 
 /**
@@ -117,51 +107,36 @@ export interface TextFieldProperties extends FormFieldBaseProperties {
  *
  * @public
  */
-export const TextField: NamedExoticComponent<TextFieldProperties> = memo(
-    function TextField({
-        disabled = false,
-        error,
-        helpText,
-        id,
-        label,
-        max,
-        min,
-        onChange,
-        placeholder,
-        required = false,
-        type = "text",
-        value,
-    }: TextFieldProperties) {
-        const handleChange = useCallback(
-            (event: ChangeEvent<HTMLInputElement>) => {
-                onChange(event.target.value);
-            },
-            [onChange]
-        );
+const TextFieldBase = createStringField<TextFieldProperties, HTMLInputElement>({
+    displayName: "TextField",
+    renderControl: ({ ariaProps, handleChange, props }) => {
+        const {
+            disabled = false,
+            id,
+            max,
+            min,
+            placeholder,
+            required = false,
+            type = "text",
+            value,
+        } = props;
 
         return (
-            <BaseFormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
+            <ThemedInput
+                {...ariaProps}
+                disabled={disabled}
                 id={id}
-                label={label}
+                {...(max !== undefined && { max })}
+                {...(min !== undefined && { min })}
+                onChange={handleChange}
+                {...(placeholder !== undefined && { placeholder })}
                 required={required}
-            >
-                {(ariaProps) => (
-                    <ThemedInput
-                        {...ariaProps}
-                        disabled={disabled}
-                        id={id}
-                        {...(max !== undefined && { max })}
-                        {...(min !== undefined && { min })}
-                        onChange={handleChange}
-                        {...(placeholder !== undefined && { placeholder })}
-                        required={required}
-                        type={type}
-                        value={value}
-                    />
-                )}
-            </BaseFormField>
+                type={type}
+                value={value}
+            />
         );
-    }
-);
+    },
+});
+
+export const TextField: NamedExoticComponent<TextFieldProperties> =
+    TextFieldBase;

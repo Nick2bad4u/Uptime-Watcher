@@ -3262,7 +3262,7 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
             "max-lines-per-function": [
                 "error",
                 {
@@ -4874,7 +4874,7 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",
@@ -6198,7 +6198,7 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",

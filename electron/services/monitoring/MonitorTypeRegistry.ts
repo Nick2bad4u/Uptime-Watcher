@@ -7,6 +7,8 @@
  * multiple files.
  */
 
+/* eslint max-lines: ["error", { "max": 2000 }] -- Registry aggregates monitor definitions in one module */
+
 import type {
     Monitor,
     MonitorFieldDefinition,

@@ -1,38 +1,21 @@
 /**
- * HTTP header monitor service that validates the presence and value of a
- * specific HTTP response header.
+ * HTTP header monitor service built on the shared HTTP core.
  */
 
-import type { Site } from "@shared/types";
-import type { AxiosInstance, AxiosResponse } from "axios";
+/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
-import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "@shared/utils/logTemplates";
+import type { Monitor } from "@shared/types";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorConfig,
-} from "./types";
+import type { MonitorConfig } from "./types";
 
-import {
-    DEFAULT_REQUEST_TIMEOUT,
-    RETRY_BACKOFF,
-    USER_AGENT,
-} from "../../constants";
-import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
-import { withOperationalHooks } from "../../utils/operationalHooks";
 import {
-    createMonitorErrorResult,
-    extractMonitorConfig,
-    validateMonitorUrl,
-} from "./shared/monitorServiceHelpers";
-import { handleCheckError, isCancellationError } from "./utils/errorHandling";
-import { createHttpClient } from "./utils/httpClient";
-import { getSharedHttpRateLimiter } from "./utils/httpRateLimiter";
+    createHttpMonitorService,
+    type HttpMonitorBehavior,
+    type HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
+import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
 const TRIMMED_HEADER_VALUE_MAX_LENGTH = 2048;
 
@@ -58,12 +41,17 @@ function normalizeHeaderValue(value: string): string {
     return trimmed;
 }
 
-function resolveHeaderValue(
-    headers: AxiosResponse["headers"],
-    name: string
-): null | string {
+function isHeaderRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function resolveHeaderValue(headers: unknown, name: string): null | string {
     const normalizedName = normalizeHeaderName(name);
-    const rawValue = (headers as Record<string, unknown>)[normalizedName];
+    if (!isHeaderRecord(headers)) {
+        return null;
+    }
+
+    const rawValue = headers[normalizedName];
 
     if (rawValue === undefined || rawValue === null) {
         return null;
@@ -95,205 +83,96 @@ function resolveHeaderValue(
     }
 }
 
-export class HttpHeaderMonitor implements IMonitorService {
-    private static readonly rateLimiter = getSharedHttpRateLimiter();
+type HttpHeaderMonitorConfig = Monitor & { type: "http-header" };
 
-    private axiosInstance: AxiosInstance;
-
-    private config: MonitorConfig;
-
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "http-header") {
-            throw new Error(
-                `HttpHeaderMonitor cannot handle monitor type: ${monitor.type}`
-            );
-        }
-
-        const headerName = getTrimmedString(monitor.headerName);
-        const expectedValue = getTrimmedString(monitor.expectedHeaderValue);
-
-        if (!headerName) {
-            return createMonitorErrorResult(
-                "Monitor missing or invalid header name",
-                0
-            );
-        }
-
-        if (!expectedValue) {
-            return createMonitorErrorResult(
-                "Monitor missing or invalid expected header value",
-                0
-            );
-        }
-
-        const validationError = validateMonitorUrl(monitor);
-        if (validationError) {
-            return createMonitorErrorResult(validationError, 0);
-        }
-
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+const behavior: HttpMonitorBehavior<
+    "http-header",
+    HttpHeaderMonitorConfig,
+    { expectedValue: string; headerName: string }
+> = {
+    evaluateResponse: ({ context, response, responseTime }) => {
+        const resolvedValue = resolveHeaderValue(
+            response.headers,
+            context.headerName
         );
-
-        const url = monitor.url ?? "";
-        return HttpHeaderMonitor.rateLimiter.schedule(url, () =>
-            this.performHeaderCheckWithRetry(
-                url,
-                headerName,
-                expectedValue,
-                timeout,
-                retryAttempts,
-                signal
-            )
-        );
-    }
-
-    private async performHeaderCheckWithRetry(
-        url: string,
-        headerName: string,
-        expectedValue: string,
-        timeout: number,
-        maxRetries: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        try {
-            if (signal?.aborted) {
-                throw new Error("Operation was aborted");
-            }
-
-            const totalAttempts = maxRetries + 1;
-
-            return await withOperationalHooks(
-                () =>
-                    this.performSingleHeaderCheck(
-                        url,
-                        headerName,
-                        expectedValue,
-                        timeout,
-                        signal
-                    ),
-                {
-                    failureLogLevel: (encounteredError) =>
-                        isCancellationError(encounteredError)
-                            ? "warn"
-                            : "error",
-                    initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                    maxRetries: totalAttempts,
-                    operationName: `HTTP header check for ${url}`,
-                    ...(isDev() && {
-                        onRetry: (attempt: number, error: Error): void => {
-                            const errorMessage =
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error);
-                            logger.debug(
-                                `[HttpHeaderMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                            );
-                        },
-                    }),
-                }
-            );
-        } catch (error) {
-            return handleCheckError(error, url);
-        }
-    }
-
-    private async performSingleHeaderCheck(
-        url: string,
-        headerName: string,
-        expectedValue: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        const response = await this.makeRequest(url, timeout, signal);
-        const responseTime = response.responseTime ?? 0;
-        const resolvedValue = resolveHeaderValue(response.headers, headerName);
-        const normalizedExpected = normalizeHeaderValue(expectedValue);
-
-        if (isDev()) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
-                    {
-                        responseTime,
-                        status: response.status,
-                        url,
-                    }
-                )
-            );
-        }
 
         if (resolvedValue === null) {
             return {
-                details: `Header "${headerName}" not found`,
+                details: `Header "${context.headerName}" not found`,
                 responseTime,
                 status: "degraded",
             };
         }
 
         const normalizedActual = normalizeHeaderValue(resolvedValue);
+        const normalizedExpected = normalizeHeaderValue(context.expectedValue);
+
         if (normalizedActual === normalizedExpected) {
             return {
-                details: `Header "${headerName}" matched expected value`,
+                details: `Header "${context.headerName}" matched expected value`,
                 responseTime,
                 status: "up",
             };
         }
 
         return {
-            details: `Header "${headerName}" mismatch (expected "${normalizedExpected}", received "${normalizedActual}")`,
+            details: `Header "${context.headerName}" mismatch (expected "${normalizedExpected}", received "${normalizedActual}")`,
             responseTime,
             status: "degraded",
         };
-    }
+    },
+    operationLabel: "HTTP header check",
+    scope: "HttpHeaderMonitor",
+    type: "http-header",
+    validateMonitorSpecifics: (monitor: HttpHeaderMonitorConfig) => {
+        const headerName = getTrimmedString(monitor.headerName);
+        const expectedValue = getTrimmedString(monitor.expectedHeaderValue);
 
-    private async makeRequest(
-        url: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<AxiosResponse> {
-        const signals = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
+        if (!headerName) {
+            return {
+                kind: "error",
+                result: createMonitorErrorResult(
+                    "Monitor missing or invalid header name",
+                    0
+                ),
+            };
         }
 
-        return this.axiosInstance.get(url, {
-            signal: AbortSignal.any(signals),
-            timeout,
-        });
-    }
+        if (!expectedValue) {
+            return {
+                kind: "error",
+                result: createMonitorErrorResult(
+                    "Monitor missing or invalid expected header value",
+                    0
+                ),
+            };
+        }
 
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
+        return {
+            context: {
+                expectedValue,
+                headerName,
+            },
+            kind: "context",
         };
+    },
+};
 
-        this.axiosInstance = createHttpClient({
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        });
-    }
+const HttpHeaderMonitorBase: new (
+    config?: MonitorConfig
+) => HttpMonitorServiceInstance = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<
+            "http-header",
+            HttpHeaderMonitorConfig,
+            { expectedValue: string; headerName: string }
+        >(behavior),
+    "HttpHeaderMonitor"
+);
 
-    public getType(): Site["monitors"][0]["type"] {
-        return "http-header";
-    }
+/**
+ * HTTP header monitor service powered by the shared HTTP core.
+ */
+export class HttpHeaderMonitor extends HttpHeaderMonitorBase {}
 
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-
-        this.axiosInstance = createHttpClient({
-            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-            userAgent: this.config.userAgent ?? USER_AGENT,
-        });
-    }
-}
+/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

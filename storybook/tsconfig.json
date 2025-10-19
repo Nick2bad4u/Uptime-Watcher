@@ -32,13 +32,9 @@
     "include": [
         "./**/*.ts",
         "./**/*.tsx",
-        "../.storybook/**/*.ts",
-        "../.storybook/**/*.tsx",
         "../src/**/*.ts",
         "../src/**/*.tsx",
         "../shared/**/*.ts",
-        "../shared/**/*.tsx",
-        "../electron/**/*.ts",
-        "../electron/**/*.tsx"
+        "../shared/**/*.tsx"
     ]
 }
