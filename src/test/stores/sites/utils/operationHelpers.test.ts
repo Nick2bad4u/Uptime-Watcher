@@ -92,8 +92,8 @@ const mockLogger = vi.mocked(logger);
 describe("OperationHelpers", () => {
     let mockDeps: SiteOperationsDependencies;
     let mockSites: Site[];
-    let getSitesSpy: Mock<[], Site[]>;
-    let setSitesSpy: Mock<[Site[]], void>;
+    let getSitesSpy: Mock<() => Site[]>;
+    let setSitesSpy: Mock<(sites: Site[]) => void>;
 
     const createMockSite = (id: string, monitorId: string): Site => ({
         identifier: id,
@@ -157,8 +157,8 @@ describe("OperationHelpers", () => {
             stopSiteMonitoring: vi.fn(async () => {}),
         };
 
-        getSitesSpy = vi.fn<[], Site[]>(() => mockSites);
-        setSitesSpy = vi.fn<[Site[]], void>();
+        getSitesSpy = vi.fn<() => Site[]>(() => mockSites);
+        setSitesSpy = vi.fn<(sites: Site[]) => void>();
 
         mockDeps = {
             getSites: getSitesSpy,
@@ -239,7 +239,7 @@ describe("OperationHelpers", () => {
                 setSitesArg?.some(
                     (site: Site) => site.identifier === "site-new"
                 )
-            ).toBe(true);
+            ).toBeTruthy();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 

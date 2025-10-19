@@ -346,7 +346,7 @@ describe(createSiteOperationsActions, () => {
                         responseTime: 0,
                         retryAttempts: 3,
                         status: "pending",
-                        timeout: 5_000,
+                        timeout: 5000,
                         type: "http",
                         url: "https://example.com",
                     },

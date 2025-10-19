@@ -523,21 +523,17 @@ export const createSiteSyncActions = (
                     return;
                 }
 
-                if (hasSnapshot) {
-                    const duplicates = collectDuplicateSiteIdentifiers(
-                        event.sites
+                const duplicates = collectDuplicateSiteIdentifiers(event.sites);
+                if (duplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected in state sync event",
+                        {
+                            action: event.action,
+                            duplicates,
+                            siteCount: event.sites.length,
+                            source: event.source,
+                        }
                     );
-                    if (duplicates.length > 0) {
-                        logger.error(
-                            "Duplicate site identifiers detected in state sync event",
-                            {
-                                action: event.action,
-                                duplicates,
-                                siteCount: event.sites.length,
-                                source: event.source,
-                            }
-                        );
-                    }
                 }
 
                 switch (event.action) {

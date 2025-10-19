@@ -2,10 +2,11 @@
  * Stories for the HistoryTab component.
  */
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { Monitor } from "@shared/types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { HistoryTab } from "@app/components/SiteDetails/tabs/HistoryTab";
+
 import { createMockMonitor } from "../helpers/siteStoryHelpers";
 
 const formatFullTimestamp = (timestamp: number): string =>
@@ -59,7 +60,6 @@ const meta: Meta<typeof HistoryTab> = {
         layout: "fullscreen",
     },
     tags: ["autodocs"],
-    title: "Site Details/Tabs/HistoryTab",
 } satisfies Meta<typeof HistoryTab>;
 
 export default meta;

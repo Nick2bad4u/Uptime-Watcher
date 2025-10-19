@@ -555,7 +555,7 @@ describe(SiteManager, () => {
             expect(result).toBeTruthy();
         });
     });
-    describe("updateSitesCache", () => {
+    describe("updateSitesCache diagnostics", () => {
         it("should update the sites cache", async () => {
             const sites = [
                 {

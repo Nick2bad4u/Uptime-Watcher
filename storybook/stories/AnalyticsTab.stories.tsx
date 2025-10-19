@@ -2,22 +2,22 @@
  * Stories for the AnalyticsTab component.
  */
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { action } from "storybook/actions";
-import type { ChartOptions } from "chart.js";
-import type { ReactElement } from "react";
-import { useState } from "react";
-
-import { AnalyticsTab } from "@app/components/SiteDetails/tabs/AnalyticsTab";
-import { CHART_TIME_RANGES } from "@app/constants";
-import type { ChartTimeRange } from "@app/constants";
 import type { AnalyticsTabProperties } from "@app/components/SiteDetails/tabs/AnalyticsTab";
+import type { ChartTimeRange } from "@app/constants";
 import type {
     ResponseTimeChartData,
     StatusBarChartData,
     UptimeChartData,
 } from "@app/services/chartConfig";
 import type { MonitorType } from "@shared/types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { ChartOptions } from "chart.js";
+import type { ReactElement } from "react";
+
+import { AnalyticsTab } from "@app/components/SiteDetails/tabs/AnalyticsTab";
+import { CHART_TIME_RANGES } from "@app/constants";
+import { useCallback, useState } from "react";
+import { action } from "storybook/actions";
 
 const MONITOR_TYPE: MonitorType = "http";
 
@@ -169,30 +169,70 @@ const describeAvailability = (percentage: number): string => {
     return "Needs attention";
 };
 
-const AnalyticsTabStory = (args: AnalyticsTabProperties): ReactElement => {
+const createBarDatasetOverride = (
+    data: number[]
+): StatusBarChartData["datasets"][number] => {
+    const backgroundColor = data.map(() => "#2563eb");
+    const borderColor = data.map(() => "#1d4ed8");
+
+    return {
+        backgroundColor,
+        borderColor,
+        borderWidth: 1,
+        data,
+        label: barChartData.datasets.at(0)?.label ?? "Status Counts",
+    };
+};
+
+const createUptimeDatasetOverride = (
+    data: number[]
+): UptimeChartData["datasets"][number] => {
+    const backgroundColor = data.map(() => "#22c55e");
+    const borderColor = data.map(() => "#15803d");
+
+    return {
+        backgroundColor,
+        borderColor,
+        borderWidth: 1,
+        data,
+    };
+};
+
+const AnalyticsTabStory = ({
+    setShowAdvancedMetrics,
+    setSiteDetailsChartTimeRange,
+    showAdvancedMetrics,
+    siteDetailsChartTimeRange,
+    ...rest
+}: AnalyticsTabProperties): ReactElement => {
     const [timeRange, setTimeRange] = useState<ChartTimeRange>(
-        args.siteDetailsChartTimeRange
+        siteDetailsChartTimeRange
     );
-    const [showAdvancedMetrics, setShowAdvanced] = useState<boolean>(
-        args.showAdvancedMetrics
+    const [showAdvancedMetricsState, setShowAdvancedMetricsState] =
+        useState<boolean>(showAdvancedMetrics);
+
+    const handleToggleAdvanced = useCallback(
+        (next: boolean): void => {
+            setShowAdvancedMetricsState(next);
+            setShowAdvancedMetrics?.(next);
+        },
+        [setShowAdvancedMetrics]
     );
 
-    const handleToggleAdvanced = (next: boolean): void => {
-        setShowAdvanced(next);
-        args.setShowAdvancedMetrics?.(next);
-    };
-
-    const handleRangeChange = (range: ChartTimeRange): void => {
-        setTimeRange(range);
-        args.setSiteDetailsChartTimeRange?.(range);
-    };
+    const handleRangeChange = useCallback(
+        (range: ChartTimeRange): void => {
+            setTimeRange(range);
+            setSiteDetailsChartTimeRange?.(range);
+        },
+        [setSiteDetailsChartTimeRange]
+    );
 
     return (
         <AnalyticsTab
-            {...args}
+            {...rest}
             setShowAdvancedMetrics={handleToggleAdvanced}
             setSiteDetailsChartTimeRange={handleRangeChange}
-            showAdvancedMetrics={showAdvancedMetrics}
+            showAdvancedMetrics={showAdvancedMetricsState}
             siteDetailsChartTimeRange={timeRange}
         />
     );
@@ -230,9 +270,8 @@ const meta: Meta<typeof AnalyticsTab> = {
     parameters: {
         layout: "fullscreen",
     },
-    render: (props) => <AnalyticsTabStory {...props} />,
+    render: (storyArgs) => <AnalyticsTabStory {...storyArgs} />,
     tags: ["autodocs"],
-    title: "Site Details/Tabs/AnalyticsTab",
 } satisfies Meta<typeof AnalyticsTab>;
 
 export default meta;
@@ -251,14 +290,11 @@ export const HighIncidentVolume: Story = {
     args: {
         barChartData: {
             datasets: [
-                {
-                    ...barChartData.datasets[0]!,
-                    data: [
-                        280,
-                        60,
-                        128,
-                    ],
-                },
+                createBarDatasetOverride([
+                    280,
+                    60,
+                    128,
+                ]),
             ],
             labels: barChartData.labels,
         },
@@ -271,14 +307,11 @@ export const HighIncidentVolume: Story = {
         uptime: "93.2",
         uptimeChartData: {
             datasets: [
-                {
-                    ...uptimeChartData.datasets[0]!,
-                    data: [
-                        70,
-                        12,
-                        18,
-                    ],
-                },
+                createUptimeDatasetOverride([
+                    70,
+                    12,
+                    18,
+                ]),
             ],
             labels: uptimeChartData.labels,
         },

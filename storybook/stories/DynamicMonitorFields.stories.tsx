@@ -3,29 +3,64 @@
  * rendering.
  */
 
+import type { DynamicMonitorFieldsProperties } from "@app/components/AddSiteForm/DynamicMonitorFields";
+import type { MonitorType } from "@shared/types";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { ReactElement } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { action } from "storybook/actions";
+import type {
+    type Dispatch,
+    ReactElement,
+    type SetStateAction,
+    useCallback,
+    useMemo,
+    useState,
+} from "react";
 
 import { DynamicMonitorFields } from "@app/components/AddSiteForm/DynamicMonitorFields";
-import type { DynamicMonitorFieldsProperties } from "@app/components/AddSiteForm/DynamicMonitorFields";
 import { useMonitorTypesStore } from "@app/stores/monitor/useMonitorTypesStore";
-import type { MonitorType } from "@shared/types";
+import { action } from "storybook/actions";
 
-import { primeMonitorTypesStore } from "../helpers/monitorTypeStoryHelpers";
+import { prepareMonitorTypesStore } from "../helpers/monitorTypeStoryHelpers";
 
-primeMonitorTypesStore();
+prepareMonitorTypesStore();
+
+type FieldValue = number | string;
+type FieldConfig = MonitorTypeConfig["fields"][number];
+type FieldChangeHandlers = Record<string, (value: FieldValue) => void>;
 
 const getFieldDefaults = (
     monitorType: MonitorType
-): Record<string, number | string> => {
+): Record<string, FieldValue> => {
     const store = useMonitorTypesStore.getState();
     const fields = store.getFieldConfig(monitorType) ?? [];
 
-    return Object.fromEntries(
-        fields.map((field) => [field.name, field.type === "number" ? 0 : ""])
-    );
+    const defaults: Record<string, FieldValue> = {};
+
+    for (const field of fields) {
+        defaults[field.name] = field.type === "number" ? 0 : "";
+    }
+
+    return defaults;
+};
+
+const buildFieldChangeHandlers = (
+    fields: readonly FieldConfig[],
+    updateValues: Dispatch<SetStateAction<Record<string, FieldValue>>>
+): FieldChangeHandlers => {
+    const handlers: FieldChangeHandlers = {};
+
+    for (const field of fields) {
+        const emitChange = action(`dynamic-fields/${field.name}`);
+        handlers[field.name] = (value: FieldValue) => {
+            emitChange(value);
+            updateValues((previous) => ({
+                ...previous,
+                [field.name]: value,
+            }));
+        };
+    }
+
+    return handlers;
 };
 
 type DynamicMonitorFieldsStoryArgs = Pick<
@@ -33,44 +68,28 @@ type DynamicMonitorFieldsStoryArgs = Pick<
     "monitorType"
 >;
 
-const DynamicMonitorFieldsStory = (
-    args: DynamicMonitorFieldsStoryArgs
-): ReactElement => {
-    const monitorType = args.monitorType as MonitorType;
-
-    const [values, setValues] = useState<Record<string, number | string>>(() =>
-        getFieldDefaults(monitorType)
+const DynamicMonitorFieldsStoryContent = ({
+    monitorType,
+}: DynamicMonitorFieldsStoryArgs): ReactElement => {
+    const resolvedMonitorType = monitorType as MonitorType;
+    const [values, setValues] = useState<Record<string, FieldValue>>(() =>
+        getFieldDefaults(resolvedMonitorType)
     );
     const [isLoading, setIsLoading] = useState(false);
 
     const fields = useMonitorTypesStore((state) =>
-        state.getFieldConfig(monitorType)
+        state.getFieldConfig(resolvedMonitorType)
     );
-
-    useEffect(() => {
-        setValues(getFieldDefaults(monitorType));
-    }, [monitorType]);
 
     const handleChangeMap = useMemo(() => {
         if (!fields) {
             return {};
         }
 
-        return Object.fromEntries(
-            fields.map((field) => [
-                field.name,
-                (value: number | string) => {
-                    action(`dynamic-fields/${field.name}`)(value);
-                    setValues((previous) => ({
-                        ...previous,
-                        [field.name]: value,
-                    }));
-                },
-            ])
-        );
+        return buildFieldChangeHandlers(fields, setValues);
     }, [fields]);
 
-    const simulateLoading = useCallback(() => {
+    const simulateLoading = useCallback((): void => {
         setIsLoading(true);
         setTimeout(() => {
             setIsLoading(false);
@@ -79,9 +98,9 @@ const DynamicMonitorFieldsStory = (
 
     if (!fields || fields.length === 0) {
         return (
-            <div className="rounded border border-dashed border-slate-400 p-6 text-center text-sm text-slate-400">
-                Monitor type "{args.monitorType}" has no field configuration
-                registered.
+            <div className="rounded-xs border border-dashed border-slate-400 p-6 text-center text-sm text-slate-400">
+                Monitor type &quot;{monitorType}&quot; has no field
+                configuration registered.
             </div>
         );
     }
@@ -90,12 +109,12 @@ const DynamicMonitorFieldsStory = (
         <div className="flex flex-col gap-4">
             <DynamicMonitorFields
                 isLoading={isLoading}
-                monitorType={args.monitorType}
+                monitorType={monitorType}
                 onChange={handleChangeMap}
                 values={values}
             />
             <button
-                className="self-start rounded border border-slate-300 px-3 py-1 text-sm"
+                className="self-start rounded-xs border border-slate-300 px-3 py-1 text-sm"
                 onClick={simulateLoading}
                 type="button"
             >
@@ -104,6 +123,15 @@ const DynamicMonitorFieldsStory = (
         </div>
     );
 };
+
+const DynamicMonitorFieldsStory = ({
+    monitorType,
+}: DynamicMonitorFieldsStoryArgs): ReactElement => (
+    <DynamicMonitorFieldsStoryContent
+        key={monitorType}
+        monitorType={monitorType}
+    />
+);
 
 const meta: Meta<typeof DynamicMonitorFieldsStory> = {
     args: {
@@ -114,7 +142,6 @@ const meta: Meta<typeof DynamicMonitorFieldsStory> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Add Site/Form Fields/DynamicMonitorFields",
 } satisfies Meta<typeof DynamicMonitorFieldsStory>;
 
 export default meta;
@@ -127,9 +154,7 @@ export const DnsWithAnyRecord: Story = {
     args: {
         monitorType: "dns",
     },
-    render: (args) => {
-        return <DynamicMonitorFieldsStory {...args} />;
-    },
+    render: (storyArgs) => <DynamicMonitorFieldsStory {...storyArgs} />,
 };
 
 export const UnknownMonitorType: Story = {

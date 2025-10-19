@@ -2,12 +2,16 @@
  * Stories for SiteTableRow component displaying monitoring summary rows.
  */
 
-import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { Site } from "@shared/types";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { SiteTableRow } from "@app/components/Dashboard/SiteList/SiteTableRow";
-import { createMockMonitor, createMockSite } from "../helpers/siteStoryHelpers";
-import { createSiteDecorator } from "../helpers/siteStoryHelpers";
+
+import {
+    createMockMonitor,
+    createMockSite,
+    createSiteDecorator,
+} from "../helpers/siteStoryHelpers";
 
 const baseSite: Site = createMockSite({
     identifier: "site-uptime",
@@ -68,7 +72,6 @@ const meta: Meta<typeof SiteTableRow> = {
         layout: "padded",
     },
     tags: ["autodocs"],
-    title: "Dashboard/SiteList/SiteTableRow",
 } satisfies Meta<typeof SiteTableRow>;
 
 export default meta;

@@ -2,11 +2,11 @@
  * Stories for the StatusChart component.
  */
 
+import type { StatusBarChartData } from "@app/services/chartConfig";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChartOptions } from "chart.js";
 
 import { StatusChart } from "@app/components/SiteDetails/charts/StatusChart";
-import type { StatusBarChartData } from "@app/services/chartConfig";
 
 const baseOptions: ChartOptions<"bar"> = {
     maintainAspectRatio: false,
@@ -78,7 +78,6 @@ const meta: Meta<typeof StatusChart> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Site Details/Charts/StatusChart",
 } satisfies Meta<typeof StatusChart>;
 
 export default meta;

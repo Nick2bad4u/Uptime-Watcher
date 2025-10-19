@@ -5,9 +5,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import {
+    type AriaProperties,
     BaseFormField,
     type BaseFormFieldProperties,
-    type AriaProperties,
 } from "@app/components/AddSiteForm/BaseFormField";
 
 const baseChildren: BaseFormFieldProperties["children"] = (
@@ -15,7 +15,7 @@ const baseChildren: BaseFormFieldProperties["children"] = (
 ) => (
     <input
         {...ariaProps}
-        className="w-64 rounded border border-slate-400 px-3 py-2"
+        className="w-64 rounded-xs border border-slate-400 px-3 py-2"
         defaultValue=""
         placeholder="Enter a descriptive name"
         type="text"
@@ -45,7 +45,6 @@ const meta: Meta<BaseFormFieldProperties> = {
         },
     },
     tags: ["autodocs"],
-    title: "Add Site/Form Fields/BaseFormField",
 } satisfies Meta<BaseFormFieldProperties>;
 
 export default meta;

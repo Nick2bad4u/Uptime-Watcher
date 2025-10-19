@@ -2,10 +2,10 @@
  * Stories showcasing the DashboardOverview metric cards.
  */
 
+import type { GlobalMonitoringMetrics } from "@app/utils/monitoring/globalMetrics";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { DashboardOverview } from "@app/components/Dashboard/Overview/DashboardOverview";
-import type { GlobalMonitoringMetrics } from "@app/utils/monitoring/globalMetrics";
 
 const baseMetrics: GlobalMonitoringMetrics = {
     activeMonitors: 18,
@@ -65,7 +65,6 @@ const meta: Meta<typeof DashboardOverview> = {
         layout: "fullscreen",
     },
     tags: ["autodocs"],
-    title: "Dashboard/Overview/DashboardOverview",
 } satisfies Meta<typeof DashboardOverview>;
 
 export default meta;

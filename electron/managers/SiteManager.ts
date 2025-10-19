@@ -53,11 +53,11 @@ import type { Site } from "@shared/types";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";

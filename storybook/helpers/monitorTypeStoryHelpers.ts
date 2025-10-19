@@ -6,15 +6,19 @@ import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 import { useMonitorTypesStore } from "@app/stores/monitor/useMonitorTypesStore";
 
-import { SAMPLE_MONITOR_TYPES } from "../stories/setup/monitorTypeMocks";
 import { setMockMonitorTypes } from "../setup/electron-api-mock";
+import { SAMPLE_MONITOR_TYPES } from "../stories/setup/monitorTypeMocks";
 
 const createFieldConfigMap = (
     configs: readonly MonitorTypeConfig[]
 ): Record<string, MonitorTypeConfig["fields"]> => {
-    const fieldEntries = configs.map((config) => [config.type, config.fields]);
+    const fieldConfigs: Record<string, MonitorTypeConfig["fields"]> = {};
 
-    return Object.fromEntries(fieldEntries);
+    for (const config of configs) {
+        fieldConfigs[config.type] = config.fields;
+    }
+
+    return fieldConfigs;
 };
 
 /**
@@ -23,17 +27,19 @@ const createFieldConfigMap = (
  * @param configs - Monitor type configurations to seed. Defaults to
  *   {@link SAMPLE_MONITOR_TYPES}.
  */
-export const primeMonitorTypesStore = (
+export const prepareMonitorTypesStore = (
     configs: readonly MonitorTypeConfig[] = SAMPLE_MONITOR_TYPES
 ): void => {
-    const monitorTypes = configs.map((config) => ({ ...config }));
-    setMockMonitorTypes(monitorTypes as MonitorTypeConfig[]);
+    const monitorTypes = configs.map(
+        (config): MonitorTypeConfig => ({ ...config })
+    );
+    setMockMonitorTypes(monitorTypes);
 
     useMonitorTypesStore.setState({
         fieldConfigs: createFieldConfigMap(monitorTypes),
         isLoaded: true,
         isLoading: false,
         lastError: undefined,
-        monitorTypes: monitorTypes as MonitorTypeConfig[],
+        monitorTypes,
     });
 };

@@ -4,10 +4,11 @@
 
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChangeEvent, ComponentProps, ReactElement } from "react";
-import { useMemo, useState } from "react";
-import { action } from "storybook/actions";
 
 import { OverviewTab } from "@app/components/SiteDetails/tabs/OverviewTab";
+import { useCallback, useMemo, useState } from "react";
+import { action } from "storybook/actions";
+
 import { createMockMonitor } from "../helpers/siteStoryHelpers";
 
 const formatResponseTime = (time: number): string => `${time} ms`;
@@ -26,45 +27,63 @@ const baseMonitor = createMockMonitor({
     url: "https://status.example.com/health",
 });
 
-const OverviewTabStory = (
-    args: ComponentProps<typeof OverviewTab>
-): ReactElement => {
-    const [checkInterval, setCheckInterval] = useState(args.localCheckInterval);
-    const [timeout, setTimeoutValue] = useState(args.localTimeout);
-    const [intervalDirty, setIntervalDirty] = useState(args.intervalChanged);
-    const [timeoutDirty, setTimeoutDirty] = useState(args.timeoutChanged);
+const OverviewTabStory = ({
+    handleIntervalChange,
+    handleTimeoutChange,
+    intervalChanged,
+    localCheckInterval,
+    localTimeout,
+    timeoutChanged,
+    ...rest
+}: ComponentProps<typeof OverviewTab>): ReactElement => {
+    const [checkInterval, setCheckInterval] = useState(localCheckInterval);
+    const [timeoutValue, setTimeoutValue] = useState(localTimeout);
+    const [intervalDirty, setIntervalDirty] = useState(intervalChanged);
+    const [timeoutDirty, setTimeoutDirty] = useState(timeoutChanged);
 
-    const callbacks = useMemo(
+    const handleIntervalChangeWrapper = useCallback(
+        (event: ChangeEvent<HTMLSelectElement>): void => {
+            const nextValue = Number(event.target.value);
+            setCheckInterval(nextValue);
+            setIntervalDirty(true);
+            action("overview/changeInterval")(event.target.value);
+            handleIntervalChange?.(event);
+        },
+        [handleIntervalChange]
+    );
+
+    const handleTimeoutChangeWrapper = useCallback(
+        (event: ChangeEvent<HTMLInputElement>): void => {
+            const nextValue = Number(event.target.value);
+            setTimeoutValue(nextValue);
+            setTimeoutDirty(true);
+            action("overview/changeTimeout")(event.target.value);
+            handleTimeoutChange?.(event);
+        },
+        [handleTimeoutChange]
+    );
+
+    const memoizedProps = useMemo(
         () => ({
-            handleIntervalChange: (
-                event: ChangeEvent<HTMLSelectElement>
-            ): void => {
-                setCheckInterval(Number(event.target.value));
-                setIntervalDirty(true);
-                action("overview/changeInterval")(event.target.value);
-                args.handleIntervalChange(event);
-            },
-            handleTimeoutChange: (
-                event: ChangeEvent<HTMLInputElement>
-            ): void => {
-                setTimeoutValue(Number(event.target.value));
-                setTimeoutDirty(true);
-                action("overview/changeTimeout")(event.target.value);
-                args.handleTimeoutChange(event);
-            },
+            intervalChanged: intervalDirty,
+            localCheckInterval: checkInterval,
+            localTimeout: timeoutValue,
+            timeoutChanged: timeoutDirty,
         }),
-        [args]
+        [
+            checkInterval,
+            intervalDirty,
+            timeoutDirty,
+            timeoutValue,
+        ]
     );
 
     return (
         <OverviewTab
-            {...args}
-            handleIntervalChange={callbacks.handleIntervalChange}
-            handleTimeoutChange={callbacks.handleTimeoutChange}
-            intervalChanged={intervalDirty}
-            localCheckInterval={checkInterval}
-            localTimeout={timeout}
-            timeoutChanged={timeoutDirty}
+            {...rest}
+            handleIntervalChange={handleIntervalChangeWrapper}
+            handleTimeoutChange={handleTimeoutChangeWrapper}
+            {...memoizedProps}
         />
     );
 };
@@ -74,22 +93,22 @@ const meta: Meta<typeof OverviewTab> = {
         avgResponseTime: 180,
         fastestResponse: 95,
         formatResponseTime,
-        handleIntervalChange: () => {},
-        handleRemoveMonitor: async () => {
+        handleIntervalChange: (): void => {},
+        handleRemoveMonitor: async (): Promise<void> => {
             action("overview/removeMonitor")();
         },
-        handleSaveInterval: async () => {
+        handleSaveInterval: async (): Promise<void> => {
             action("overview/saveInterval")();
         },
-        handleSaveTimeout: async () => {
+        handleSaveTimeout: async (): Promise<void> => {
             action("overview/saveTimeout")();
         },
-        handleTimeoutChange: () => {},
+        handleTimeoutChange: (): void => {},
         intervalChanged: false,
         isLoading: false,
         localCheckInterval: baseMonitor.checkInterval,
         localTimeout: baseMonitor.timeout,
-        onCheckNow: () => {
+        onCheckNow: (): void => {
             action("overview/checkNow")();
         },
         selectedMonitor: baseMonitor,
@@ -99,9 +118,8 @@ const meta: Meta<typeof OverviewTab> = {
         uptime: "99.1",
     },
     component: OverviewTab,
-    render: (props) => <OverviewTabStory {...props} />,
+    render: (storyArgs) => <OverviewTabStory {...storyArgs} />,
     tags: ["autodocs"],
-    title: "Site Details/Tabs/OverviewTab",
 } satisfies Meta<typeof OverviewTab>;
 
 export default meta;

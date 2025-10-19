@@ -2,11 +2,11 @@
  * Stories for the ResponseTimeChart component.
  */
 
+import type { ResponseTimeChartData } from "@app/services/chartConfig";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ChartOptions } from "chart.js";
 
 import { ResponseTimeChart } from "@app/components/SiteDetails/charts/ResponseTimeChart";
-import type { ResponseTimeChartData } from "@app/services/chartConfig";
 
 const baseOptions: ChartOptions<"line"> = {
     maintainAspectRatio: false,
@@ -93,7 +93,6 @@ const meta: Meta<typeof ResponseTimeChart> = {
         layout: "centered",
     },
     tags: ["autodocs"],
-    title: "Site Details/Charts/ResponseTimeChart",
 } satisfies Meta<typeof ResponseTimeChart>;
 
 export default meta;

@@ -25,13 +25,8 @@ const ALLOWED_INCLUDE_GLOBS = [
  *
  * @returns {string[]} Sorted values.
  */
-const sortByLocale = (values) => [...values].sort((left, right) => {
-    if (left === right) {
-        return 0;
-    }
-
-    return left.localeCompare(right);
-});
+const sortByLocale = (values) =>
+    Array.from(values).toSorted((left, right) => left.localeCompare(right));
 
 /**
  * Creates a newline-separated bullet list.
@@ -50,7 +45,7 @@ const stringifyList = (values) =>
  *
  * @returns {string[]} Normalized strings.
  */
-const toStringArray = (values) => values.map((value) => String(value));
+const toStringArray = (values) => values.map(String);
 
 const main = async () => {
     const tsconfigRaw = await readFile(STORYBOOK_TSCONFIG_PATH, "utf8");
@@ -59,10 +54,18 @@ const main = async () => {
     try {
         tsconfig = JSON.parse(tsconfigRaw);
     } catch (error) {
-        const message =
-            error instanceof Error ? error.message : String(error);
+        const cause = error instanceof Error ? error : undefined;
+        const normalizedMessage = (() => {
+            if (cause && cause.message.trim()) {
+                return cause.message;
+            }
+
+            const fallback = String(error).trim();
+            return fallback || "Unknown Storybook tsconfig parsing error.";
+        })();
         throw new Error(
-            `Failed to parse Storybook tsconfig at ${STORYBOOK_TSCONFIG_PATH}: ${message}`
+            `Failed to parse Storybook tsconfig at ${STORYBOOK_TSCONFIG_PATH}: ${normalizedMessage}`,
+            cause ? { cause } : undefined
         );
     }
 
@@ -103,7 +106,12 @@ const main = async () => {
             `Allowed include globs:\n${stringifyList(ALLOWED_INCLUDE_GLOBS)}`
         );
 
-        throw new Error(parts.join("\n\n"));
+        throw new Error(parts.join("\n\n"), {
+            cause: {
+                missing,
+                unexpected,
+            },
+        });
     }
 
     console.log("Storybook tsconfig include globs verified.");
@@ -112,6 +120,15 @@ const main = async () => {
 try {
     await main();
 } catch (error) {
-    console.error(error instanceof Error ? error.message : error);
+    if (error instanceof Error) {
+        const message = error.message.trim() || error.toString();
+        console.error(message || "Unknown Storybook tsconfig verification error.");
+        if (error.cause) {
+            console.error("Cause:", error.cause);
+        }
+    } else {
+        const fallback = String(error).trim();
+        console.error(fallback || "Unknown Storybook tsconfig verification error.");
+    }
     process.exitCode = 1;
 }
