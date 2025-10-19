@@ -20,6 +20,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -522,6 +523,23 @@ export const createSiteSyncActions = (
                     return;
                 }
 
+                if (hasSnapshot) {
+                    const duplicates = collectDuplicateSiteIdentifiers(
+                        event.sites
+                    );
+                    if (duplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected in state sync event",
+                            {
+                                action: event.action,
+                                duplicates,
+                                siteCount: event.sites.length,
+                                source: event.source,
+                            }
+                        );
+                    }
+                }
+
                 switch (event.action) {
                     case STATE_SYNC_ACTION.BULK_SYNC:
                     case STATE_SYNC_ACTION.DELETE:
@@ -598,6 +616,19 @@ export const createSiteSyncActions = (
                             source,
                             synchronized,
                         } = fullSyncResult;
+
+                        const duplicates =
+                            collectDuplicateSiteIdentifiers(sites);
+                        if (duplicates.length > 0) {
+                            logger.error(
+                                "Duplicate site identifiers detected in full sync response",
+                                {
+                                    duplicates,
+                                    siteCount,
+                                    source,
+                                }
+                            );
+                        }
 
                         deps.setSites(sites);
 

@@ -520,9 +520,9 @@ export const createSiteOperationsActions = (
   await withErrorHandling(
    async () => {
     // Perform operation
-    const site = await window.electronAPI.sites.addSite(siteData);
-    await deps.syncSitesFromBackend();
-    return site;
+  const savedSite = await window.electronAPI.sites.addSite(siteData);
+  applySavedSiteToStore(savedSite, deps);
+  return savedSite;
    },
    {
     clearError: () => errorStore.clearStoreError("sites-operations"),
@@ -531,6 +531,11 @@ export const createSiteOperationsActions = (
      errorStore.setOperationLoading("createSite", loading),
    }
   );
+
+  > **Tip:** `applySavedSiteToStore` guards against duplicate identifiers by
+  > validating the merged snapshot before it hits the store. If the backend ever
+  > returns inconsistent data, the helper surfaces detailed diagnostics instead of
+  > silently masking the issue.
  },
 });
 ```

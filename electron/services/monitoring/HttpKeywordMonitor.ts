@@ -25,6 +25,11 @@ function getTrimmedKeyword(value: unknown): null | string {
     return trimmed.length === 0 ? null : trimmed;
 }
 
+/**
+ * Runtime configuration contract for HTTP keyword monitor instances.
+ *
+ * @internal
+ */
 type HttpKeywordMonitorConfig = Monitor & { type: "http-keyword" };
 
 const behavior: HttpMonitorBehavior<

@@ -8966,6 +8966,7 @@ export default [
             "@eslint-react/prefer-read-only-props": "off",
             "@eslint-react/prefer-shorthand-fragment": "off",
             "@jcoreio/implicit-dependencies/no-implicit": "off",
+            "@metamask/design-tokens/color-no-hex": "off",
             "@typescript-eslint/array-type": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
             "@typescript-eslint/no-confusing-void-expression": "off",

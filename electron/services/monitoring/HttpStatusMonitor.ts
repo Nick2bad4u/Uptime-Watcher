@@ -16,6 +16,11 @@ import {
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
+/**
+ * Runtime configuration contract for HTTP status monitor instances.
+ *
+ * @internal
+ */
 type HttpStatusMonitorConfig = Monitor & { type: "http-status" };
 
 const behavior: HttpMonitorBehavior<

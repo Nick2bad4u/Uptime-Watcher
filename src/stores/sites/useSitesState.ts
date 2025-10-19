@@ -8,8 +8,14 @@
 import type { Site } from "@shared/types";
 import type { Simplify } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
+import {
+    DuplicateSiteIdentifierError,
+    ensureUniqueSiteIdentifiers,
+} from "@shared/validation/siteIntegrity";
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
 
+import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
 
 /**
@@ -150,6 +156,28 @@ export const createSitesStateActions = (
         }));
     },
     setSites: (sites: Site[]): void => {
+        try {
+            ensureUniqueSiteIdentifiers(sites, "SitesStore.setSites");
+        } catch (error: unknown) {
+            if (error instanceof DuplicateSiteIdentifierError) {
+                logger.error(
+                    "Duplicate site identifiers detected while replacing sites state",
+                    {
+                        duplicates: error.duplicates,
+                        siteCount: sites.length,
+                    }
+                );
+                throw error;
+            }
+
+            const normalizedError = ensureError(error);
+            logger.error(
+                "Unexpected error while validating sites before state replacement",
+                normalizedError
+            );
+            throw normalizedError;
+        }
+
         logStoreAction("SitesStore", "setSites", { count: sites.length });
         set(() => ({ sites }));
     },

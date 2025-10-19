@@ -135,6 +135,11 @@ function isParseError(
     return result.ok === false;
 }
 
+/**
+ * Runtime configuration contract for HTTP JSON monitor instances.
+ *
+ * @internal
+ */
 type HttpJsonMonitorConfig = Monitor & { type: "http-json" };
 
 const behavior: HttpMonitorBehavior<

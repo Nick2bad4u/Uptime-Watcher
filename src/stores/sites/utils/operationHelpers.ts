@@ -9,6 +9,10 @@ import type { UnknownRecord } from "type-fest";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import {
+    DuplicateSiteIdentifierError,
+    ensureUniqueSiteIdentifiers,
+} from "@shared/validation/siteIntegrity";
 
 import type { SiteOperationsDependencies } from "../types";
 
@@ -225,6 +229,11 @@ export const getSiteByIdentifier = (
 /**
  * Applies a backend-sourced site snapshot to the local store state.
  *
+ * @remarks
+ * Validates identifier uniqueness before committing changes so mutations can
+ * never introduce duplicate site entries. Any integrity breach surfaces via a
+ * {@link DuplicateSiteIdentifierError} to avoid masking backend regressions.
+ *
  * @param savedSite - Site instance returned by the backend after a mutation.
  * @param deps - Site operation dependencies used to read and write store state.
  */
@@ -244,6 +253,32 @@ export const applySavedSiteToStore = (
                   : existingSite
           )
         : [...currentSites, savedSite];
+
+    try {
+        ensureUniqueSiteIdentifiers(
+            nextSites,
+            "SitesStore.applySavedSiteToStore"
+        );
+    } catch (error: unknown) {
+        if (error instanceof DuplicateSiteIdentifierError) {
+            logger.error(
+                "Duplicate site identifiers detected while persisting backend snapshot",
+                {
+                    duplicates: error.duplicates,
+                    operation: "applySavedSiteToStore",
+                    siteIdentifier: savedSite.identifier,
+                }
+            );
+            throw error;
+        }
+
+        const normalizedError = ensureError(error);
+        logger.error(
+            "Unexpected error while validating site identifiers",
+            normalizedError
+        );
+        throw normalizedError;
+    }
 
     deps.setSites(nextSites);
 };

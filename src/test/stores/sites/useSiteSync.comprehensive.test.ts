@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
@@ -33,6 +34,15 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
+}));
+
+vi.mock("../../../services/logger", () => ({
+    logger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 vi.mock("../../../../shared/utils/errorHandling", () => ({
@@ -92,6 +102,7 @@ Object.defineProperty(globalThis, "window", {
 
 // Import the modules after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import { logger } from "../../../services/logger";
 
 describe("useSiteSync", () => {
     let mockDeps: any;
@@ -477,12 +488,89 @@ describe("useSiteSync", () => {
             expect(mockStateSyncService.requestFullSync).not.toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
         });
+
+        it("logs and propagates duplicate identifiers received via sync events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Data Integrity", "category");
+            await annotate("Type: Regression", "type");
+
+            let eventHandler: any;
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
+
+            const duplicateSites: Site[] = [
+                {
+                    identifier: "duplicate",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Duplicate A",
+                },
+                {
+                    identifier: "duplicate",
+                    monitoring: false,
+                    monitors: [],
+                    name: "Duplicate B",
+                },
+            ];
+
+            const duplicateError = new DuplicateSiteIdentifierError(
+                [
+                    {
+                        identifier: "duplicate",
+                        occurrences: 2,
+                    },
+                ],
+                "SitesStore.setSites"
+            );
+
+            mockDeps.setSites.mockImplementation(() => {
+                throw duplicateError;
+            });
+
+            syncActions.subscribeToSyncEvents();
+
+            const duplicateEvent = {
+                action: "update" as const,
+                siteIdentifier: "duplicate",
+                sites: duplicateSites,
+                source: "database" as const,
+                timestamp: Date.now(),
+            };
+
+            expect(() => eventHandler(duplicateEvent)).toThrow(
+                DuplicateSiteIdentifierError
+            );
+            expect(logger.error).toHaveBeenCalledWith(
+                "Duplicate site identifiers detected in state sync event",
+                expect.objectContaining({
+                    action: "update",
+                    duplicates: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: "duplicate",
+                            occurrences: 2,
+                        }),
+                    ]),
+                    siteCount: duplicateSites.length,
+                    source: "database",
+                })
+            );
+            expect(mockDeps.setSites).toHaveBeenCalledWith(duplicateSites);
+        });
     });
 
     describe("syncSites", () => {
         beforeEach(() => {
             // Reset mocks specifically for this describe block
             vi.clearAllMocks();
+            mockDeps.setSites = vi.fn();
             syncActions = createSiteSyncActions(mockDeps);
         });
 
@@ -518,6 +606,71 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );
+        });
+
+        it("logs duplicate identifiers from backend full sync responses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Data Integrity", "category");
+            await annotate("Type: Regression", "type");
+
+            const duplicateSites: Site[] = [
+                {
+                    identifier: "duplicate",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Duplicate A",
+                },
+                {
+                    identifier: "duplicate",
+                    monitoring: false,
+                    monitors: [],
+                    name: "Duplicate B",
+                },
+            ];
+
+            const duplicateError = new DuplicateSiteIdentifierError(
+                [
+                    {
+                        identifier: "duplicate",
+                        occurrences: 2,
+                    },
+                ],
+                "SitesStore.setSites"
+            );
+
+            mockStateSyncService.requestFullSync.mockResolvedValue({
+                completedAt: Date.now(),
+                siteCount: duplicateSites.length,
+                sites: duplicateSites,
+                source: "database" as const,
+                synchronized: true,
+            });
+
+            mockDeps.setSites.mockImplementation(() => {
+                throw duplicateError;
+            });
+
+            await expect(syncActions.syncSites()).rejects.toThrow(
+                DuplicateSiteIdentifierError
+            );
+            expect(logger.error).toHaveBeenCalledWith(
+                "Duplicate site identifiers detected in full sync response",
+                expect.objectContaining({
+                    duplicates: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: "duplicate",
+                            occurrences: 2,
+                        }),
+                    ]),
+                    siteCount: duplicateSites.length,
+                    source: "database",
+                })
+            );
+            expect(mockDeps.setSites).toHaveBeenCalledWith(duplicateSites);
         });
 
         it("should handle sync errors", async ({ task, annotate }) => {

@@ -28,6 +28,11 @@ function getThreshold(value: unknown): null | number {
     return value;
 }
 
+/**
+ * Runtime configuration contract for HTTP latency monitor instances.
+ *
+ * @internal
+ */
 type HttpLatencyMonitorConfig = Monitor & { type: "http-latency" };
 
 const behavior: HttpMonitorBehavior<

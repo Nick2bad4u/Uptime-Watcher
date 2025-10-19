@@ -83,6 +83,11 @@ function resolveHeaderValue(headers: unknown, name: string): null | string {
     }
 }
 
+/**
+ * Runtime configuration contract for HTTP header monitor instances.
+ *
+ * @internal
+ */
 type HttpHeaderMonitorConfig = Monitor & { type: "http-header" };
 
 const behavior: HttpMonitorBehavior<
