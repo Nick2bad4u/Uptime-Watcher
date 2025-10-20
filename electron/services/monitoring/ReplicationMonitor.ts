@@ -147,10 +147,7 @@ const behavior: RemoteMonitorBehavior<
     failureLogLevel: "warn",
     getOperationName: (context) =>
         `Replication lag check for ${context.primaryUrl}`,
-    resolveConfiguration: (
-        monitor: ReplicationMonitorInstance,
-        serviceConfig: MonitorConfig
-    ) => {
+    resolveConfiguration: (monitor, serviceConfig) => {
         const primaryCandidate = Reflect.get(
             monitor,
             "primaryStatusUrl"

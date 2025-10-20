@@ -13,6 +13,94 @@ import { INITIAL_VIEWPORTS } from "storybook/viewport";
 
 import { installElectronAPIMock } from "./setup/electron-api-mock";
 
+type AccessibilityTestMode = "error" | "warn";
+
+const storybookAccessibilityModeEnvKeys = [
+    "VITE_STORYBOOK_A11Y_ASSERT_MODE",
+    "STORYBOOK_A11Y_ASSERT_MODE",
+] as const;
+
+const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
+
+const toRecord = (value: unknown): Record<string, unknown> | undefined => {
+    if (!isObjectRecord(value)) {
+        return undefined;
+    }
+
+    return value;
+};
+
+const normalizeAccessibilityTestMode = (
+    value: unknown
+): AccessibilityTestMode | undefined => {
+    if (typeof value !== "string") {
+        return undefined;
+    }
+
+    const trimmed = value.trim().toLowerCase();
+
+    if (trimmed === "error" || trimmed === "warn") {
+        return trimmed;
+    }
+
+    return undefined;
+};
+
+const readEnvVariable = (
+    envRecord: Record<string, unknown> | undefined
+): AccessibilityTestMode | undefined => {
+    if (!envRecord) {
+        return undefined;
+    }
+
+    for (const key of storybookAccessibilityModeEnvKeys) {
+        const candidate = normalizeAccessibilityTestMode(envRecord[key]);
+
+        if (candidate) {
+            return candidate;
+        }
+    }
+
+    return undefined;
+};
+
+const getProcessEnvRecord = (): Record<string, unknown> | undefined => {
+    const processCandidate = (
+        globalThis as {
+            process?: undefined | { env?: unknown };
+        }
+    ).process;
+
+    if (!isObjectRecord(processCandidate)) {
+        return undefined;
+    }
+
+    return toRecord(processCandidate.env);
+};
+
+const resolveStorybookAccessibilityMode = (): AccessibilityTestMode => {
+    const importMetaEnv = toRecord((import.meta as { env?: unknown }).env);
+
+    const importMetaCandidate = readEnvVariable(importMetaEnv);
+
+    if (importMetaCandidate) {
+        return importMetaCandidate;
+    }
+
+    const processEnv = getProcessEnvRecord();
+
+    const processCandidate = readEnvVariable(processEnv);
+
+    if (processCandidate) {
+        return processCandidate;
+    }
+
+    return "warn";
+};
+
+const storybookAccessibilityTestMode = resolveStorybookAccessibilityMode();
+
 type StoryThemeName = Extract<ThemeName, "dark" | "high-contrast" | "light">;
 
 type StoryGlobals = Parameters<Decorator>[1]["globals"];
@@ -147,6 +235,7 @@ const preview: Preview = {
                     ],
                 },
             },
+            test: storybookAccessibilityTestMode,
         },
         controls: {
             matchers: {

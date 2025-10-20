@@ -2475,7 +2475,9 @@ export default [
                 jsDocParsingMode: "all",
                 project: [
                     "tsconfig.json",
+                    ".storybook/tsconfig.json",
                     "storybook/tsconfig.json",
+                    "storybook/tsconfig.eslint.json",
                 ],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),

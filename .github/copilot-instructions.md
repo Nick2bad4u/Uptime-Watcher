@@ -48,6 +48,7 @@ description: "Instructions for the extremely capable TypeScript AI coding assist
 - Only implement backwards-compatibility layers or wrappers with explicit approval
 - Follow current, supported patterns and best practices; propose migrations when legacy or deprecated approaches are encountered.
 - Prioritize code quality, maintainability, readability.
+- Redirect terminal output to files only when running linting, testing, or type-checking commands; all other commands can stream output directly to the terminal.
 - Track multi-step tasks in a to-do list, using the todo tool or the `TODO.md` file in the repo root. Always write detailed descriptions of each TODO item so that anyone can understand the task and its context.
 - Integrate new features or changes into the existing architecture and patterns.
 - Tedious, systematic work is often the correct solution. Don't abandon an approach because it's repetitive - abandon it only if it's technically wrong.

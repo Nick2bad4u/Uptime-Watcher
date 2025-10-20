@@ -147,10 +147,7 @@ const behavior: RemoteMonitorBehavior<
     },
     failureLogLevel: "warn",
     getOperationName: (context) => `Server heartbeat check for ${context.url}`,
-    resolveConfiguration: (
-        monitor: ServerHeartbeatMonitorInstance,
-        serviceConfig: MonitorConfig
-    ) => {
+    resolveConfiguration: (monitor, serviceConfig) => {
         const urlCandidate = Reflect.get(monitor, "url") as unknown;
         if (typeof urlCandidate !== "string") {
             return {

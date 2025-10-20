@@ -1,3 +1,4 @@
+// eslint-disable-next-line import-x/no-unassigned-import -- ensure web storage shim registers before Storybook config executes
 import "./shims/nodeWebStorage";
 
 import type { AddonOptionsVite } from "@storybook/addon-coverage";

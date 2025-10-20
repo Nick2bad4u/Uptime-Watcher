@@ -104,6 +104,7 @@ Use the `get_errors` tool to check for any problems in the code
 Use the terminal command `npm run lint` to check for linting errors.
 Use the terminal command `npm test` to run the test suite.
 Use the terminal command `npm run type-check` and `npm run type-check:test` to check for TypeScript type or compile errors.
+When running commands outside linting, testing, or type-checking, you may stream output directly to the terminal; only those three categories should be redirected to log files for later review.
 Make code changes only if you have high confidence they can solve the problem
 When debugging, try to determine the root cause rather than addressing symptoms
 Debug for as long as needed to identify the root cause and identify a fix

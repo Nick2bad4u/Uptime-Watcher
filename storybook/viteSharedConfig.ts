@@ -301,8 +301,6 @@ export const createStorybookBaseViteConfig = (
             },
         },
         optimizeDeps: {
-            exclude: Array.from(optimizeDepsExclude),
-            include: Array.from(optimizeDepsInclude),
             esbuildOptions: {
                 conditions: [
                     "module",
@@ -310,6 +308,8 @@ export const createStorybookBaseViteConfig = (
                     "node",
                 ],
             },
+            exclude: Array.from(optimizeDepsExclude),
+            include: Array.from(optimizeDepsInclude),
         },
         resolve: {
             alias,
