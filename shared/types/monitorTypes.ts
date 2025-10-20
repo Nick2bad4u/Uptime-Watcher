@@ -151,12 +151,218 @@ export interface MonitorTypeUICommons {
     supportsResponseTime?: boolean;
 }
 
-const ALLOWED_FIELD_TYPES = new Set<MonitorFieldDefinition["type"]>([
-    "number",
-    "select",
-    "text",
-    "url",
-]);
+const MONITOR_FIELD_TYPE_VALUES: ReadonlyArray<MonitorFieldDefinition["type"]> =
+    [
+        "number",
+        "select",
+        "text",
+        "url",
+    ];
+
+const ALLOWED_FIELD_TYPES = new Set<string>(MONITOR_FIELD_TYPE_VALUES);
+
+const isAllowedFieldType = (
+    candidate: unknown
+): candidate is MonitorFieldDefinition["type"] =>
+    typeof candidate === "string" && ALLOWED_FIELD_TYPES.has(candidate);
+
+/**
+ * Determines whether a candidate is a plain object with string keys.
+ *
+ * @param candidate - Value to evaluate.
+ *
+ * @returns `true` when the candidate is a non-null object without an array tag.
+ */
+const isPlainObject = (
+    candidate: unknown
+): candidate is Record<string, unknown> =>
+    typeof candidate === "object" &&
+    candidate !== null &&
+    !Array.isArray(candidate);
+
+/**
+ * Checks whether a value is an optional string.
+ *
+ * @param value - Value to check.
+ *
+ * @returns `true` when the value is either undefined or a string.
+ */
+const isOptionalString = (value: unknown): value is string | undefined =>
+    value === undefined || typeof value === "string";
+
+/**
+ * Checks whether a value is an optional number.
+ *
+ * @param value - Value to check.
+ *
+ * @returns `true` when the value is either undefined or a number.
+ */
+const isOptionalNumber = (value: unknown): value is number | undefined =>
+    value === undefined || typeof value === "number";
+
+/**
+ * Checks whether a value is an optional boolean.
+ *
+ * @param value - Value to check.
+ *
+ * @returns `true` when the value is either undefined or a boolean.
+ */
+const isOptionalBoolean = (value: unknown): value is boolean | undefined =>
+    value === undefined || typeof value === "boolean";
+
+/**
+ * Determines whether a value is a non-empty string.
+ *
+ * @param value - Value to check.
+ *
+ * @returns `true` when the value is a string with a positive length.
+ */
+const isNonEmptyString = (value: unknown): value is string =>
+    typeof value === "string" && value.length > 0;
+
+/**
+ * Determines whether a value represents a valid monitor field option.
+ *
+ * @param value - Value to inspect.
+ *
+ * @returns `true` when the value includes non-empty label and value strings.
+ */
+const isValidMonitorFieldOption = (
+    value: unknown
+): value is { label: string; value: string } => {
+    if (!isPlainObject(value)) {
+        return false;
+    }
+
+    const { label, value: optionValue } = value;
+
+    return isNonEmptyString(label) && isNonEmptyString(optionValue);
+};
+
+/**
+ * Validates the optional list of select field options.
+ *
+ * @param options - Value supplied for the `options` property.
+ *
+ * @returns `true` when the options are either absent or a well-formed array.
+ */
+const hasValidFieldOptions = (
+    options: unknown
+): options is MonitorFieldDefinition["options"] => {
+    if (options === undefined) {
+        return true;
+    }
+
+    if (!Array.isArray(options)) {
+        return false;
+    }
+
+    return options.every(isValidMonitorFieldOption);
+};
+
+/**
+ * Determines whether a value is a valid monitor UI detail formats object.
+ *
+ * @param candidate - Value to examine.
+ *
+ * @returns `true` when the detail formats structure is valid.
+ */
+const isValidDetailFormats = (
+    candidate: unknown
+): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["detailFormats"] => {
+    if (candidate === undefined) {
+        return true;
+    }
+
+    if (!isPlainObject(candidate)) {
+        return false;
+    }
+
+    const { analyticsLabel } = candidate;
+
+    return isOptionalString(analyticsLabel);
+};
+
+/**
+ * Determines whether a value is a valid monitor display configuration.
+ *
+ * @param candidate - Value to examine.
+ *
+ * @returns `true` when the display configuration is valid.
+ */
+const isValidDisplayConfig = (
+    candidate: unknown
+): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["display"] => {
+    if (candidate === undefined) {
+        return true;
+    }
+
+    if (!isPlainObject(candidate)) {
+        return false;
+    }
+
+    const { showAdvancedMetrics, showUrl } = candidate;
+
+    return isOptionalBoolean(showAdvancedMetrics) && isOptionalBoolean(showUrl);
+};
+
+/**
+ * Determines whether a value is a valid monitor help text configuration.
+ *
+ * @param candidate - Value to examine.
+ *
+ * @returns `true` when the help text configuration is valid.
+ */
+const isValidHelpTexts = (
+    candidate: unknown
+): candidate is NonNullable<MonitorTypeConfig["uiConfig"]>["helpTexts"] => {
+    if (candidate === undefined) {
+        return true;
+    }
+
+    if (!isPlainObject(candidate)) {
+        return false;
+    }
+
+    const { primary, secondary } = candidate;
+
+    return isOptionalString(primary) && isOptionalString(secondary);
+};
+
+/**
+ * Determines whether a value is a valid monitor type UI configuration.
+ *
+ * @param candidate - Value to examine.
+ *
+ * @returns `true` when the UI configuration satisfies structural requirements.
+ */
+const isValidMonitorTypeUiConfig = (
+    candidate: unknown
+): candidate is NonNullable<MonitorTypeConfig["uiConfig"]> => {
+    if (candidate === undefined) {
+        return true;
+    }
+
+    if (!isPlainObject(candidate)) {
+        return false;
+    }
+
+    const {
+        detailFormats,
+        display,
+        helpTexts,
+        supportsAdvancedAnalytics,
+        supportsResponseTime,
+    } = candidate;
+
+    return (
+        isValidDetailFormats(detailFormats) &&
+        isValidDisplayConfig(display) &&
+        isValidHelpTexts(helpTexts) &&
+        isOptionalBoolean(supportsAdvancedAnalytics) &&
+        isOptionalBoolean(supportsResponseTime)
+    );
+};
 
 /**
  * Runtime type guard verifying a monitor field definition structure.
@@ -173,66 +379,47 @@ const ALLOWED_FIELD_TYPES = new Set<MonitorFieldDefinition["type"]>([
 export function isMonitorFieldDefinition(
     candidate: unknown
 ): candidate is MonitorFieldDefinition {
-    if (typeof candidate !== "object" || candidate === null) {
+    if (!isPlainObject(candidate)) {
         return false;
     }
 
-    const record = candidate as Partial<MonitorFieldDefinition> &
-        Record<string, unknown>;
+    const {
+        helpText,
+        label,
+        max,
+        min,
+        name,
+        options,
+        placeholder,
+        required,
+        type,
+    } = candidate;
 
-    if (typeof record.label !== "string" || record.label.length === 0) {
+    if (!isNonEmptyString(label) || !isNonEmptyString(name)) {
         return false;
     }
 
-    if (typeof record.name !== "string" || record.name.length === 0) {
+    if (typeof required !== "boolean") {
         return false;
     }
 
-    if (typeof record.required !== "boolean") {
+    if (typeof type !== "string") {
         return false;
     }
 
-    if (!ALLOWED_FIELD_TYPES.has(record.type)) {
+    if (!isAllowedFieldType(type)) {
         return false;
     }
 
-    if (record.helpText !== undefined && typeof record.helpText !== "string") {
+    if (!isOptionalString(helpText) || !isOptionalString(placeholder)) {
         return false;
     }
 
-    if (
-        record.placeholder !== undefined &&
-        typeof record.placeholder !== "string"
-    ) {
+    if (!isOptionalNumber(max) || !isOptionalNumber(min)) {
         return false;
     }
 
-    if (record.max !== undefined && typeof record.max !== "number") {
-        return false;
-    }
-
-    if (record.min !== undefined && typeof record.min !== "number") {
-        return false;
-    }
-
-    if (record.options !== undefined) {
-        if (!Array.isArray(record.options)) {
-            return false;
-        }
-
-        for (const option of record.options) {
-            if (
-                typeof option !== "object" ||
-                option === null ||
-                typeof option.label !== "string" ||
-                typeof option.value !== "string"
-            ) {
-                return false;
-            }
-        }
-    }
-
-    return true;
+    return hasValidFieldOptions(options);
 }
 
 /**
@@ -251,121 +438,29 @@ export function isMonitorFieldDefinition(
 export function isMonitorTypeConfig(
     candidate: unknown
 ): candidate is MonitorTypeConfig {
-    if (typeof candidate !== "object" || candidate === null) {
+    if (!isPlainObject(candidate)) {
         return false;
     }
 
-    const record = candidate as Partial<MonitorTypeConfig> &
-        Record<string, unknown>;
-
-    if (typeof record.type !== "string" || record.type.length === 0) {
-        return false;
-    }
+    const { description, displayName, fields, type, uiConfig, version } =
+        candidate;
 
     if (
-        typeof record.displayName !== "string" ||
-        record.displayName.length === 0
+        !isNonEmptyString(type) ||
+        !isNonEmptyString(displayName) ||
+        !isNonEmptyString(description) ||
+        !isNonEmptyString(version)
     ) {
         return false;
     }
 
-    if (
-        typeof record.description !== "string" ||
-        record.description.length === 0
-    ) {
+    if (!Array.isArray(fields) || fields.length === 0) {
         return false;
     }
 
-    if (typeof record.version !== "string" || record.version.length === 0) {
+    if (!fields.every(isMonitorFieldDefinition)) {
         return false;
     }
 
-    if (!Array.isArray(record.fields)) {
-        return false;
-    }
-
-    if (
-        record.fields.length === 0 ||
-        !record.fields.every(isMonitorFieldDefinition)
-    ) {
-        return false;
-    }
-
-    if (record.uiConfig !== undefined) {
-        if (typeof record.uiConfig !== "object" || record.uiConfig === null) {
-            return false;
-        }
-
-        const uiConfig = record.uiConfig as MonitorTypeConfig["uiConfig"] &
-            Record<string, unknown>;
-
-        const { detailFormats, display, helpTexts } = uiConfig;
-
-        if (detailFormats !== undefined) {
-            if (typeof detailFormats !== "object" || detailFormats === null) {
-                return false;
-            }
-
-            if (
-                detailFormats.analyticsLabel !== undefined &&
-                typeof detailFormats.analyticsLabel !== "string"
-            ) {
-                return false;
-            }
-        }
-
-        if (display !== undefined) {
-            if (typeof display !== "object" || display === null) {
-                return false;
-            }
-
-            const { showAdvancedMetrics, showUrl } = display as Record<
-                string,
-                unknown
-            >;
-
-            if (
-                showAdvancedMetrics !== undefined &&
-                typeof showAdvancedMetrics !== "boolean"
-            ) {
-                return false;
-            }
-
-            if (showUrl !== undefined && typeof showUrl !== "boolean") {
-                return false;
-            }
-        }
-
-        if (helpTexts !== undefined) {
-            if (typeof helpTexts !== "object" || helpTexts === null) {
-                return false;
-            }
-
-            const { primary, secondary } = helpTexts as Record<string, unknown>;
-
-            if (primary !== undefined && typeof primary !== "string") {
-                return false;
-            }
-
-            if (secondary !== undefined && typeof secondary !== "string") {
-                return false;
-            }
-        }
-
-        if (
-            uiConfig.supportsAdvancedAnalytics !== undefined &&
-            typeof uiConfig.supportsAdvancedAnalytics !== "boolean"
-        ) {
-            return false;
-        }
-
-        if (
-            uiConfig.supportsResponseTime !== undefined &&
-            typeof uiConfig.supportsResponseTime !== "boolean"
-        ) {
-            return false;
-        }
-    }
-
-    return true;
+    return isValidMonitorTypeUiConfig(uiConfig);
 }

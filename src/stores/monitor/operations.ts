@@ -9,9 +9,16 @@ import { withErrorHandling } from "@shared/utils/errorHandling";
 import type { MonitorTypesStoreGetter, MonitorTypesStoreSetter } from "./state";
 import type { MonitorTypesStore } from "./types";
 
-import { MonitorTypesService } from "../../services/MonitorTypesService";
 import { logger } from "../../services/logger";
+import { MonitorTypesService } from "../../services/MonitorTypesService";
 import { logStoreAction } from "../utils";
+
+const isUnknownRecord = (
+    candidate: unknown
+): candidate is Record<string, unknown> =>
+    typeof candidate === "object" &&
+    candidate !== null &&
+    !Array.isArray(candidate);
 
 /**
  * Creates the operational slice wiring monitor type service calls.
@@ -128,12 +135,9 @@ export const createMonitorTypesOperationsSlice = (
                     if (isMonitorTypeConfig(candidate)) {
                         validConfigs.push(candidate);
                     } else {
-                        const kind =
-                            typeof candidate === "object" && candidate !== null
-                                ? `keys:${Object.keys(
-                                      candidate as Record<string, unknown>
-                                  ).join(",")}`
-                                : `type:${typeof candidate}`;
+                        const kind = isUnknownRecord(candidate)
+                            ? `keys:${Object.keys(candidate).join(",")}`
+                            : `type:${typeof candidate}`;
 
                         invalidConfigs.push({ index, kind });
                     }

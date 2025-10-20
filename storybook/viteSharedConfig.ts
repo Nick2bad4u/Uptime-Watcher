@@ -140,12 +140,20 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "react-chartjs-2",
     "react-dom",
     "react-dom/client",
+    "react-icons/bi",
+    "react-icons/bs",
     "react-icons/fa",
     "react-icons/fi",
+    "react-icons/hi2",
+    "react-icons/io5",
     "react-icons/md",
+    "react-icons/ri",
+    "react-icons/tb",
+    "react-icons/vsc",
     "react/compiler-runtime",
     "storybook/actions",
     "storybook/internal/channels",
+    "storybook/theming",
     "storybook/viewport",
     "validator",
     "zustand",
@@ -153,9 +161,6 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "zod",
 ]);
 
-/**
- * Default module resolution extensions shared between Storybook build targets.
- */
 export const storybookResolveExtensions: readonly string[] = Object.freeze([
     ".mjs",
     ".js",
@@ -268,6 +273,9 @@ export const createStorybookBaseViteConfig = (
         "@shared/types",
         "@shared/utils",
         "@shared/validation",
+        "lightningcss",
+        "playwright",
+        "playwright-core",
         ...(options?.additionalOptimizeDepsExclude ?? []),
     ]);
 
@@ -295,6 +303,13 @@ export const createStorybookBaseViteConfig = (
         optimizeDeps: {
             exclude: Array.from(optimizeDepsExclude),
             include: Array.from(optimizeDepsInclude),
+            esbuildOptions: {
+                conditions: [
+                    "module",
+                    "browser",
+                    "node",
+                ],
+            },
         },
         resolve: {
             alias,

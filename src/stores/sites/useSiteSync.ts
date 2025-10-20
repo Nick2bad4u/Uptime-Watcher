@@ -20,7 +20,6 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { validateSite } from "@shared/utils/validation";
 import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type {
@@ -537,17 +536,16 @@ export const createSiteSyncActions = (
                     );
                 }
 
-                switch (event.action) {
-                    case STATE_SYNC_ACTION.BULK_SYNC:
-                    case STATE_SYNC_ACTION.DELETE:
-                    case STATE_SYNC_ACTION.UPDATE: {
-                        deps.setSites(event.sites);
-                        break;
-                    }
-                    default: {
-                        logger.warn("Unknown sync event action:", event.action);
-                    }
+                if (
+                    event.action === STATE_SYNC_ACTION.BULK_SYNC ||
+                    event.action === STATE_SYNC_ACTION.DELETE ||
+                    event.action === STATE_SYNC_ACTION.UPDATE
+                ) {
+                    deps.setSites(event.sites);
+                    return;
                 }
+
+                logger.warn("Unknown sync event action:", event.action);
             };
 
             void (async (): Promise<void> => {
@@ -624,40 +622,6 @@ export const createSiteSyncActions = (
                                     siteCount,
                                     source,
                                 }
-                            );
-                        }
-
-                        const invalidSites = sites
-                            .map((site, index) => ({ index, site }))
-                            .filter(({ site }) => !validateSite(site));
-
-                        if (invalidSites.length > 0) {
-                            logger.error(
-                                "Invalid site payload received during full sync",
-                                undefined,
-                                {
-                                    invalidCount: invalidSites.length,
-                                    samples: invalidSites
-                                        .slice(0, 3)
-                                        .map(({ index, site }) => ({
-                                            index,
-                                            identifier:
-                                                typeof site === "object" &&
-                                                site !== null &&
-                                                "identifier" in site
-                                                    ? (
-                                                          site as Record<
-                                                              string,
-                                                              unknown
-                                                          >
-                                                      ).identifier
-                                                    : null,
-                                        })),
-                                }
-                            );
-
-                            throw new Error(
-                                "Received invalid site payloads from backend sync"
                             );
                         }
 

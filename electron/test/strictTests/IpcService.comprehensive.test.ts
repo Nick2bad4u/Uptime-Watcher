@@ -106,17 +106,20 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("@shared/validation/schemas", () => {
+vi.mock("@shared/validation/schemas", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/validation/schemas")>();
+
     const createSchemaMock = () => ({
-        parse: vi.fn((data: unknown) => data),
-        safeParse: vi.fn((data: unknown) => ({ success: true, data })),
+        parse: vi.fn((data) => data),
+        safeParse: vi.fn((data) => ({ success: true, data })),
+        describe: vi.fn(() => "MockSchema"),
+        optional: vi.fn(() => createSchemaMock()),
+        array: vi.fn(() => createSchemaMock()),
     });
 
     return {
-        httpHeaderMonitorSchema: createSchemaMock(),
-        httpJsonMonitorSchema: createSchemaMock(),
-        httpKeywordMonitorSchema: createSchemaMock(),
-        httpLatencyMonitorSchema: createSchemaMock(),
+        ...actual,
         httpStatusMonitorSchema: createSchemaMock(),
         validateMonitorData: vi.fn((type: string, _data: unknown) => ({
             success: type !== "invalid",

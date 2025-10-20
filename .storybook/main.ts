@@ -7,9 +7,14 @@ const addons = Array.from(
     new Set([...(config.addons ?? []), "@storybook/addon-vitest"])
 );
 
+const stories = config.stories?.map((pattern) =>
+    pattern.startsWith("./") ? `../storybook/${pattern.slice(2)}` : pattern
+);
+
 const storybookConfig: StorybookConfig = {
     ...config,
     addons,
+    stories,
 };
 
 export default storybookConfig;

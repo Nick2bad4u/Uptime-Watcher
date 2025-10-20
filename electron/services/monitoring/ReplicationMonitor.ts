@@ -37,16 +37,10 @@ interface ReplicationMonitorContext {
     timestampField: string;
 }
 
-interface ReplicationMonitorConfig extends Monitor {
-    maxReplicationLagSeconds?: number;
-    primaryStatusUrl?: string;
-    replicaStatusUrl?: string;
-    replicationTimestampField?: string;
-    type: "replication";
-}
+type ReplicationMonitorInstance = Monitor & { type: "replication" };
 
 function resolveLagThreshold(
-    monitor: ReplicationMonitorConfig,
+    monitor: ReplicationMonitorInstance,
     serviceConfig: MonitorConfig
 ): number {
     const monitorValue = Reflect.get(
@@ -154,10 +148,13 @@ const behavior: RemoteMonitorBehavior<
     getOperationName: (context) =>
         `Replication lag check for ${context.primaryUrl}`,
     resolveConfiguration: (
-        monitor: ReplicationMonitorConfig,
+        monitor: ReplicationMonitorInstance,
         serviceConfig: MonitorConfig
     ) => {
-        const primaryCandidate = Reflect.get(monitor, "primaryStatusUrl");
+        const primaryCandidate = Reflect.get(
+            monitor,
+            "primaryStatusUrl"
+        ) as unknown;
         if (typeof primaryCandidate !== "string") {
             return {
                 kind: "error",
@@ -174,7 +171,10 @@ const behavior: RemoteMonitorBehavior<
             };
         }
 
-        const replicaCandidate = Reflect.get(monitor, "replicaStatusUrl");
+        const replicaCandidate = Reflect.get(
+            monitor,
+            "replicaStatusUrl"
+        ) as unknown;
         if (typeof replicaCandidate !== "string") {
             return {
                 kind: "error",
@@ -194,7 +194,7 @@ const behavior: RemoteMonitorBehavior<
         const timestampCandidate = Reflect.get(
             monitor,
             "replicationTimestampField"
-        );
+        ) as unknown;
         if (typeof timestampCandidate !== "string") {
             return {
                 kind: "error",

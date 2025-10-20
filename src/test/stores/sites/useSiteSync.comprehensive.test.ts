@@ -33,7 +33,7 @@ const buildSite = (identifier: string): Site => ({
             responseTime: 0,
             retryAttempts: 0,
             status: "up",
-            timeout: 5_000,
+            timeout: 5000,
             type: "http",
         },
     ],

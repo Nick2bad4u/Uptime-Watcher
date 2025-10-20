@@ -27,14 +27,9 @@ import {
 
 const DEFAULT_MAX_DRIFT_SECONDS = 60;
 
-interface ServerHeartbeatMonitorConfig extends Monitor {
-    heartbeatExpectedStatus?: string;
-    heartbeatMaxDriftSeconds?: number;
-    heartbeatStatusField?: string;
-    heartbeatTimestampField?: string;
+type ServerHeartbeatMonitorInstance = Monitor & {
     type: "server-heartbeat";
-    url?: string;
-}
+};
 
 interface ServerHeartbeatContext {
     expectedStatus: string;
@@ -45,7 +40,7 @@ interface ServerHeartbeatContext {
 }
 
 function resolveMaxDriftSeconds(
-    monitor: ServerHeartbeatMonitorConfig,
+    monitor: ServerHeartbeatMonitorInstance,
     serviceConfig: MonitorConfig
 ): number {
     const monitorValue = Reflect.get(
@@ -153,10 +148,10 @@ const behavior: RemoteMonitorBehavior<
     failureLogLevel: "warn",
     getOperationName: (context) => `Server heartbeat check for ${context.url}`,
     resolveConfiguration: (
-        monitor: ServerHeartbeatMonitorConfig,
+        monitor: ServerHeartbeatMonitorInstance,
         serviceConfig: MonitorConfig
     ) => {
-        const urlCandidate = Reflect.get(monitor, "url");
+        const urlCandidate = Reflect.get(monitor, "url") as unknown;
         if (typeof urlCandidate !== "string") {
             return {
                 kind: "error",
@@ -174,7 +169,7 @@ const behavior: RemoteMonitorBehavior<
         const statusFieldCandidate = Reflect.get(
             monitor,
             "heartbeatStatusField"
-        );
+        ) as unknown;
         if (typeof statusFieldCandidate !== "string") {
             return {
                 kind: "error",
@@ -192,7 +187,7 @@ const behavior: RemoteMonitorBehavior<
         const timestampFieldCandidate = Reflect.get(
             monitor,
             "heartbeatTimestampField"
-        );
+        ) as unknown;
         if (typeof timestampFieldCandidate !== "string") {
             return {
                 kind: "error",
@@ -210,7 +205,7 @@ const behavior: RemoteMonitorBehavior<
         const expectedStatusCandidate = Reflect.get(
             monitor,
             "heartbeatExpectedStatus"
-        );
+        ) as unknown;
         if (typeof expectedStatusCandidate !== "string") {
             return {
                 kind: "error",

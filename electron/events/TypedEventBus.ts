@@ -29,6 +29,7 @@
  * @packageDocumentation
  */
 
+import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import {
@@ -64,26 +65,6 @@ export interface EventBusDiagnostics {
     middlewareCount: number;
     /** Percentage of middleware slots used (0-100). */
     middlewareUtilization: number;
-}
-
-/**
- * Metadata automatically added to all emitted events.
- *
- * @remarks
- * Provides debugging and tracking information for each event emission. This
- * metadata is available in all event listeners under the `_meta` property.
- *
- * @public
- */
-export interface EventMetadata {
-    /** Identifier of the event bus that emitted this event. */
-    busId: string;
-    /** Unique identifier for tracking this specific event emission. */
-    correlationId: string;
-    /** Name of the event that was emitted. */
-    eventName: string;
-    /** Unix timestamp when the event was emitted. */
-    timestamp: number;
 }
 
 /**

@@ -7,17 +7,11 @@ import type { DynamicMonitorFieldsProperties } from "@app/components/AddSiteForm
 import type { MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type {
-    type Dispatch,
-    ReactElement,
-    type SetStateAction,
-    useCallback,
-    useMemo,
-    useState,
-} from "react";
+import type { Dispatch, ReactElement, SetStateAction } from "react";
 
 import { DynamicMonitorFields } from "@app/components/AddSiteForm/DynamicMonitorFields";
 import { useMonitorTypesStore } from "@app/stores/monitor/useMonitorTypesStore";
+import { useCallback, useMemo, useState } from "react";
 import { action } from "storybook/actions";
 
 import { prepareMonitorTypesStore } from "../helpers/monitorTypeStoryHelpers";
@@ -51,7 +45,7 @@ const buildFieldChangeHandlers = (
 
     for (const field of fields) {
         const emitChange = action(`dynamic-fields/${field.name}`);
-        handlers[field.name] = (value: FieldValue) => {
+        handlers[field.name] = (value: FieldValue): void => {
             emitChange(value);
             updateValues((previous) => ({
                 ...previous,
@@ -68,7 +62,7 @@ type DynamicMonitorFieldsStoryArgs = Pick<
     "monitorType"
 >;
 
-const DynamicMonitorFieldsStoryContent = ({
+const DynamicMonitorFieldsStory = ({
     monitorType,
 }: DynamicMonitorFieldsStoryArgs): ReactElement => {
     const resolvedMonitorType = monitorType as MonitorType;
@@ -81,13 +75,13 @@ const DynamicMonitorFieldsStoryContent = ({
         state.getFieldConfig(resolvedMonitorType)
     );
 
-    const handleChangeMap = useMemo(() => {
+    const handleChangeMap = useMemo<FieldChangeHandlers>(() => {
         if (!fields) {
-            return {};
+            return {} as FieldChangeHandlers;
         }
 
         return buildFieldChangeHandlers(fields, setValues);
-    }, [fields]);
+    }, [fields, setValues]);
 
     const simulateLoading = useCallback((): void => {
         setIsLoading(true);
@@ -124,15 +118,6 @@ const DynamicMonitorFieldsStoryContent = ({
     );
 };
 
-const DynamicMonitorFieldsStory = ({
-    monitorType,
-}: DynamicMonitorFieldsStoryArgs): ReactElement => (
-    <DynamicMonitorFieldsStoryContent
-        key={monitorType}
-        monitorType={monitorType}
-    />
-);
-
 const meta: Meta<typeof DynamicMonitorFieldsStory> = {
     args: {
         monitorType: "http",
@@ -154,7 +139,9 @@ export const DnsWithAnyRecord: Story = {
     args: {
         monitorType: "dns",
     },
-    render: (storyArgs) => <DynamicMonitorFieldsStory {...storyArgs} />,
+    render: (storyArgs): ReactElement => (
+        <DynamicMonitorFieldsStory {...storyArgs} />
+    ),
 };
 
 export const UnknownMonitorType: Story = {

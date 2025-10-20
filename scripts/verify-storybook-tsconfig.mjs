@@ -2,8 +2,11 @@
 // @ts-check
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const PROJECT_ROOT = path.resolve(new URL("..", import.meta.url).pathname);
+const PROJECT_ROOT = path.resolve(
+    fileURLToPath(new URL("..", import.meta.url))
+);
 const STORYBOOK_TSCONFIG_PATH = path.resolve(
     PROJECT_ROOT,
     "storybook/tsconfig.json"
@@ -106,12 +109,17 @@ const main = async () => {
             `Allowed include globs:\n${stringifyList(ALLOWED_INCLUDE_GLOBS)}`
         );
 
-        throw new Error(parts.join("\n\n"), {
-            cause: {
-                missing,
-                unexpected,
-            },
-        });
+        const details = parts.join("\n\n").trim();
+
+        throw new Error(
+            details || "Storybook tsconfig include glob mismatch detected.",
+            {
+                cause: {
+                    missing,
+                    unexpected,
+                },
+            }
+        );
     }
 
     console.log("Storybook tsconfig include globs verified.");
@@ -121,14 +129,21 @@ try {
     await main();
 } catch (error) {
     if (error instanceof Error) {
-        const message = error.message.trim() || error.toString();
-        console.error(message || "Unknown Storybook tsconfig verification error.");
+        const message = error.message.trim();
+        const fallback = error.toString().trim();
+        const finalMessage = message || fallback;
+
+        console.error(
+            finalMessage || "Unknown Storybook tsconfig verification error."
+        );
         if (error.cause) {
             console.error("Cause:", error.cause);
         }
     } else {
         const fallback = String(error).trim();
-        console.error(fallback || "Unknown Storybook tsconfig verification error.");
+        const finalMessage =
+            fallback || "Unknown Storybook tsconfig verification error.";
+        console.error(finalMessage);
     }
     process.exitCode = 1;
 }

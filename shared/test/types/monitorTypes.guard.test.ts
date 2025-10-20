@@ -14,11 +14,11 @@ describe("monitor type runtime guards", () => {
             type: "url" as const,
         };
 
-        expect(isMonitorFieldDefinition(field)).toBe(true);
+        expect(isMonitorFieldDefinition(field)).toBeTruthy();
     });
 
     it("rejects invalid field definitions", () => {
-        expect(isMonitorFieldDefinition({})).toBe(false);
+        expect(isMonitorFieldDefinition({})).toBeFalsy();
         expect(
             isMonitorFieldDefinition({
                 label: "URL",
@@ -26,7 +26,7 @@ describe("monitor type runtime guards", () => {
                 required: "yes",
                 type: "url",
             })
-        ).toBe(false);
+        ).toBeFalsy();
     });
 
     it("accepts valid monitor type configurations", () => {
@@ -49,11 +49,11 @@ describe("monitor type runtime guards", () => {
             version: "1.0.0",
         };
 
-        expect(isMonitorTypeConfig(config)).toBe(true);
+        expect(isMonitorTypeConfig(config)).toBeTruthy();
     });
 
     it("rejects monitor type configs missing required data", () => {
-        expect(isMonitorTypeConfig({})).toBe(false);
+        expect(isMonitorTypeConfig({})).toBeFalsy();
         expect(
             isMonitorTypeConfig({
                 description: "missing fields",
@@ -62,7 +62,7 @@ describe("monitor type runtime guards", () => {
                 type: "broken",
                 version: "1.0.0",
             })
-        ).toBe(false);
+        ).toBeFalsy();
         expect(
             isMonitorTypeConfig({
                 description: "invalid field",
@@ -71,6 +71,6 @@ describe("monitor type runtime guards", () => {
                 type: "broken",
                 version: "1.0.0",
             })
-        ).toBe(false);
+        ).toBeFalsy();
     });
 });

@@ -231,63 +231,63 @@ export const DEFAULT_SITE_STATUS: SiteStatus = STATUS_KIND.UNKNOWN;
  */
 export interface Monitor {
     /** Array of currently active operations for this monitor */
-    activeOperations?: string[];
+    activeOperations?: string[] | undefined;
     /** Baseline origin URL when comparing CDN edge consistency */
-    baselineUrl?: string;
+    baselineUrl?: string | undefined;
     /** Keyword that must be present in HTTP response bodies */
-    bodyKeyword?: string;
+    bodyKeyword?: string | undefined;
     /** Certificate expiry warning threshold in days for SSL monitoring */
-    certificateWarningDays?: number;
+    certificateWarningDays?: number | undefined;
     /** Interval between checks in milliseconds */
     checkInterval: number;
     /** Optional list of encoded CDN edge endpoints (comma or newline separated) */
-    edgeLocations?: string;
+    edgeLocations?: string | undefined;
     /** Expected value for HTTP header verification */
-    expectedHeaderValue?: string;
+    expectedHeaderValue?: string | undefined;
     /** Expected value within a JSON payload */
-    expectedJsonValue?: string;
+    expectedJsonValue?: string | undefined;
     /** Expected HTTP status code for status-based HTTP monitors */
-    expectedStatusCode?: number;
+    expectedStatusCode?: number | undefined;
     /** Expected value for DNS record verification */
-    expectedValue?: string; // Added for DNS monitoring
+    expectedValue?: string | undefined; // Added for DNS monitoring
     /** HTTP header name to inspect */
-    headerName?: string;
+    headerName?: string | undefined;
     /** Expected status string returned by heartbeat endpoints */
-    heartbeatExpectedStatus?: string;
+    heartbeatExpectedStatus?: string | undefined;
     /** Maximum tolerated heartbeat staleness in seconds */
-    heartbeatMaxDriftSeconds?: number;
+    heartbeatMaxDriftSeconds?: number | undefined;
     /** Field name (dot notation supported) that exposes heartbeat status */
-    heartbeatStatusField?: string;
+    heartbeatStatusField?: string | undefined;
     /** Field name (dot notation supported) that exposes heartbeat timestamp */
-    heartbeatTimestampField?: string;
+    heartbeatTimestampField?: string | undefined;
     /** Historical status data for analytics and trends */
     history: StatusHistory[];
     /** Hostname or IP address to monitor */
-    host?: string;
+    host?: string | undefined;
     /** Unique identifier for the monitor */
     id: string;
     /** JSON path expression used for HTTP JSON monitors */
-    jsonPath?: string;
+    jsonPath?: string | undefined;
     /** Timestamp of the last check performed */
-    lastChecked?: Date;
+    lastChecked?: Date | undefined;
     /** Maximum acceptable delay before a WebSocket pong response (milliseconds) */
-    maxPongDelayMs?: number;
+    maxPongDelayMs?: number | undefined;
     /** Maximum allowable replication lag in seconds */
-    maxReplicationLagSeconds?: number;
+    maxReplicationLagSeconds?: number | undefined;
     /** Maximum allowed response time for latency monitors */
-    maxResponseTime?: number;
+    maxResponseTime?: number | undefined;
     /** Whether monitoring is currently active for this monitor */
     monitoring: boolean;
     /** Port number for port-based monitoring */
-    port?: number;
+    port?: number | undefined;
     /** Primary node status endpoint used for replication comparisons */
-    primaryStatusUrl?: string;
+    primaryStatusUrl?: string | undefined;
     /** DNS record type to query (A, AAAA, CNAME, etc.) */
-    recordType?: string; // Added for DNS monitoring
+    recordType?: string | undefined; // Added for DNS monitoring
     /** Replica node status endpoint used for replication comparisons */
-    replicaStatusUrl?: string;
+    replicaStatusUrl?: string | undefined;
     /** JSON field (dot notation supported) containing replication timestamps */
-    replicationTimestampField?: string;
+    replicationTimestampField?: string | undefined;
     /** Latest response time measurement in milliseconds */
     responseTime: number;
     /** Number of retry attempts when a check fails */
@@ -301,7 +301,7 @@ export interface Monitor {
      */
     type: MonitorType;
     /** URL to monitor for HTTP-based checks */
-    url?: string;
+    url?: string | undefined;
 }
 
 /**
@@ -380,7 +380,7 @@ export interface SiteForStatus {
  */
 export interface StatusHistory {
     /** Optional diagnostic message captured during the check. */
-    details?: string;
+    details?: string | undefined;
     /** Response time measurement in milliseconds. */
     responseTime: number;
     /** Resulting monitor status. */

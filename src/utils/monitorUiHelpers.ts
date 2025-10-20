@@ -22,8 +22,8 @@
 
 import type { Monitor, MonitorType } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
-import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { validateMonitorType } from "@shared/utils/validation";

@@ -1,3 +1,5 @@
+import "./shims/nodeWebStorage";
+
 import type { AddonOptionsVite } from "@storybook/addon-coverage";
 import type { StorybookConfig } from "@storybook/react-vite";
 import type { PluginOption } from "vite";
@@ -59,10 +61,7 @@ const config: StorybookConfig = {
         name: "@storybook/react-vite",
         options: {},
     },
-    stories: [
-        "../storybook/stories/**/*.mdx",
-        "../storybook/stories/**/*.stories.@(ts|tsx)",
-    ],
+    stories: ["./stories/**/*.mdx", "./stories/**/*.stories.@(ts|tsx)"],
     viteFinal: (existingConfig) => {
         const toArray = (
             plugins: PluginOption | PluginOption[] | undefined

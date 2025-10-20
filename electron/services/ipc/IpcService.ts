@@ -6,16 +6,13 @@
  * system functions. Provides type-safe communication with proper error handling
  * and validation.
  */
-import type { Monitor, Site } from "@shared/types";
-import type {
-    MonitorFieldDefinition,
-    MonitorTypeConfig,
-} from "@shared/types/monitorTypes";
+import type { Monitor, MonitorFieldDefinition, Site } from "@shared/types";
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type { UnknownRecord } from "type-fest";
 
-import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
@@ -50,23 +47,89 @@ type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs
 >[0]["uiConfig"];
 
-function isPreloadGuardDiagnosticsReport(
-    value: unknown
-): value is PreloadGuardDiagnosticsReport {
-    if (typeof value !== "object" || value === null || Array.isArray(value)) {
-        return false;
-    }
-
-    const record = value as Record<string, unknown>;
-
+/**
+ * Determines whether a candidate is a plain object with string keys.
+ *
+ * @param candidate - Value to evaluate.
+ *
+ * @returns `true` when the candidate can be treated as {@link UnknownRecord}.
+ */
+function isUnknownRecord(candidate: unknown): candidate is UnknownRecord {
     return (
-        typeof record["channel"] === "string" &&
-        typeof record["guard"] === "string" &&
-        typeof record["timestamp"] === "number"
+        typeof candidate === "object" &&
+        candidate !== null &&
+        !Array.isArray(candidate)
     );
 }
 
+function isPreloadGuardDiagnosticsReport(
+    value: unknown
+): value is PreloadGuardDiagnosticsReport {
+    if (!isUnknownRecord(value)) {
+        return false;
+    }
+
+    return (
+        typeof value["channel"] === "string" &&
+        typeof value["guard"] === "string" &&
+        typeof value["timestamp"] === "number"
+    );
+}
+
+/**
+ * Extracts a string when present, otherwise returns `undefined`.
+ *
+ * @param value - Value to normalize.
+ *
+ * @returns The input when it is a string, otherwise `undefined`.
+ */
+const pickOptionalString = (value: unknown): string | undefined =>
+    typeof value === "string" ? value : undefined;
+
+/**
+ * Extracts a boolean when present, otherwise returns the provided fallback.
+ *
+ * @param value - Value to normalize.
+ * @param fallback - Boolean to use when the value is not a boolean.
+ *
+ * @returns A boolean suitable for serialization.
+ */
+const pickBooleanWithFallback = (value: unknown, fallback: boolean): boolean =>
+    typeof value === "boolean" ? value : fallback;
+
 const ConfigPropertyValidator = {
+    /**
+     * Throws when unexpected monitor configuration properties are detected.
+     *
+     * @remarks
+     * Fails fast whenever a registry entry contains keys the renderer is not
+     * prepared to consume, preventing silent drift between processes.
+     */
+    assertNoUnexpectedProperties(
+        unexpectedProperties: UnknownRecord,
+        monitorType: string
+    ): void {
+        const unexpectedEntries = Object.entries(unexpectedProperties);
+
+        if (unexpectedEntries.length === 0) {
+            return;
+        }
+
+        const errorMessage = `Monitor config '${monitorType}' contains unexpected properties`;
+        const diagnosticError = new Error(errorMessage);
+
+        logger.error(
+            "[IpcService] Unexpected properties detected in monitor config",
+            diagnosticError,
+            {
+                monitorType,
+                unexpectedProperties: unexpectedEntries,
+            }
+        );
+
+        throw diagnosticError;
+    },
+
     /**
      * Extracts IPC-safe monitor configuration properties.
      *
@@ -126,38 +189,6 @@ const ConfigPropertyValidator = {
             unexpectedProperties,
         };
     },
-
-    /**
-     * Throws when unexpected monitor configuration properties are detected.
-     *
-     * @remarks
-     * Fails fast whenever a registry entry contains keys the renderer is not
-     * prepared to consume, preventing silent drift between processes.
-     */
-    assertNoUnexpectedProperties(
-        unexpectedProperties: UnknownRecord,
-        monitorType: string
-    ): void {
-        const unexpectedEntries = Object.entries(unexpectedProperties);
-
-        if (unexpectedEntries.length === 0) {
-            return;
-        }
-
-        const errorMessage = `Monitor config '${monitorType}' contains unexpected properties`;
-        const diagnosticError = new Error(errorMessage);
-
-        logger.error(
-            "[IpcService] Unexpected properties detected in monitor config",
-            diagnosticError,
-            {
-                monitorType,
-                unexpectedProperties: unexpectedEntries,
-            }
-        );
-
-        throw diagnosticError;
-    },
 } as const;
 
 /**
@@ -187,20 +218,21 @@ const UiConfigSerializer = {
      * @internal
      */
     serializeDetailFormats(
-        detailFormats?: BaseMonitorUiConfig["detailFormats"]
+        detailFormats?: unknown
     ): undefined | { analyticsLabel?: string } {
-        if (!detailFormats) {
+        if (!isUnknownRecord(detailFormats)) {
             return undefined;
         }
 
-        const result: { analyticsLabel?: string } = {};
+        const analyticsLabel = pickOptionalString(
+            detailFormats["analyticsLabel"]
+        );
 
-        if (detailFormats.analyticsLabel !== undefined) {
-            result.analyticsLabel = detailFormats.analyticsLabel;
+        if (analyticsLabel === undefined) {
+            return undefined;
         }
 
-        // Return undefined if no properties were added (empty object)
-        return Object.keys(result).length > 0 ? result : undefined;
+        return { analyticsLabel };
     },
 
     /**
@@ -219,14 +251,19 @@ const UiConfigSerializer = {
      * @internal
      */
     serializeDisplayPreferences(
-        display?: BaseMonitorUiConfig["display"]
+        display?: unknown
     ): undefined | { showAdvancedMetrics: boolean; showUrl: boolean } {
-        return display
-            ? {
-                  showAdvancedMetrics: display.showAdvancedMetrics ?? false,
-                  showUrl: display.showUrl ?? false,
-              }
-            : undefined;
+        if (!isUnknownRecord(display)) {
+            return undefined;
+        }
+
+        return {
+            showAdvancedMetrics: pickBooleanWithFallback(
+                display["showAdvancedMetrics"],
+                false
+            ),
+            showUrl: pickBooleanWithFallback(display["showUrl"], false),
+        };
     },
 
     /**
@@ -244,20 +281,23 @@ const UiConfigSerializer = {
      * @internal
      */
     serializeHelpTexts(
-        helpTexts?: BaseMonitorUiConfig["helpTexts"]
+        helpTexts?: unknown
     ): undefined | { primary?: string; secondary?: string } {
-        if (!helpTexts) {
+        if (!isUnknownRecord(helpTexts)) {
             return undefined;
         }
 
         const result: { primary?: string; secondary?: string } = {};
 
-        if (helpTexts.primary !== undefined) {
-            result.primary = helpTexts.primary;
+        const primary = pickOptionalString(helpTexts["primary"]);
+        const secondary = pickOptionalString(helpTexts["secondary"]);
+
+        if (primary !== undefined) {
+            result.primary = primary;
         }
 
-        if (helpTexts.secondary !== undefined) {
-            result.secondary = helpTexts.secondary;
+        if (secondary !== undefined) {
+            result.secondary = secondary;
         }
 
         // Return undefined if no properties were added (empty object)
@@ -534,8 +574,8 @@ export class IpcService {
             displayName: baseProperties.displayName,
             fields: baseProperties.fields,
             type: baseProperties.type,
-            uiConfig: serializedUiConfig,
             version: baseProperties.version,
+            ...(serializedUiConfig ? { uiConfig: serializedUiConfig } : {}),
         };
 
         if (!isMonitorTypeConfig(sanitizedConfig)) {

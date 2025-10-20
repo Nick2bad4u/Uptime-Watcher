@@ -104,7 +104,9 @@ const createMonitorTypeConfig = (
                 type: "url",
             },
         ] satisfies MonitorTypeConfig["fields"]),
-    uiConfig: overrides.uiConfig,
+    ...(overrides.uiConfig === undefined
+        ? {}
+        : { uiConfig: overrides.uiConfig }),
 });
 
 describe("useMonitorTypesStore - 100% Coverage", () => {
