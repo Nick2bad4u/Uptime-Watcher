@@ -238,9 +238,7 @@ export default [
         },
     },
     {
-        files: [
-            "src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}",
-        ],
+        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["src/test/**/*"],
         name: "Renderer Electron Isolation",
         plugins: {
@@ -1160,7 +1158,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1268,7 +1265,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -2513,7 +2510,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2638,7 +2634,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -3264,7 +3260,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             "max-lines-per-function": [
                 "error",
                 {
@@ -4072,7 +4071,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4182,7 +4180,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -4876,7 +4874,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",
@@ -5422,7 +5423,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5546,7 +5546,6 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -6200,7 +6199,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": ["warn", { max: 1000, skipBlankLines: true, skipComments: true }],
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",
