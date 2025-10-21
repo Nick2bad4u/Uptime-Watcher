@@ -1,6 +1,6 @@
 ---
 mode: "BeastMode"
-tools: ['executePrompt', 'usages', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/runInTerminal', 'runCommands/getTerminalOutput', 'runTasks/runTask', 'runTasks/getTaskOutput', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'deepwiki/ask_question']
+tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/runInTerminal', 'runCommands/getTerminalOutput', 'runTasks/runTask', 'runTasks/getTaskOutput', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'runSubagent', 'usages', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos']
 description: "Run a consistency audit tailored for the Uptime Watcher Electron + React stack."
 ---
 
@@ -90,3 +90,43 @@ When addressing identified inconsistencies, follow these steps:
 5. **Document Changes**: Update any relevant documentation to reflect the changes made, ensuring that future developers can understand the rationale behind the adjustments.
 6. **No Backwards Compatibility**: Do NOT create backwards compatibility layers; instead, refactor all affected code to use the updated patterns or interfaces directly.
 7. **Add to Todo List**: Add all identified inconsistencies to a detailed todo list with descriptions and work through the entire list.
+
+# Examples of Inconsistencies to Look For
+Examples of inconsistencies include:
+- Different naming conventions for similar functions or variables across layers.
+- Varied approaches to error handling in services versus UI components.
+- Divergent data transformation logic for the same data structure in different modules.
+- Inconsistent use of shared utilities or helper functions across the codebase.
+- Mismatched IPC channel definitions between main and renderer processes.
+- Ad-hoc implementations of features that should leverage existing abstractions or patterns.
+- Uneven application of state management practices in different parts of the renderer layer.
+- Discrepancies in logging formats or levels used in different services or components.
+- Direct cross-layer calls that bypass established interfaces or contracts.
+- Lack of uniformity in async handling patterns (e.g., callbacks vs. promises vs. async/await) across similar operations.
+- Inconsistent structuring of files and directories that do not align with the defined architecture.
+- Varied approaches to input validation and sanitization in different layers or modules.
+- Different strategies for managing side effects in state stores or services.
+- Inconsistent documentation styles or levels of detail in code comments and external docs.
+- Special-case code paths that deviate from standard processing flows without clear justification.
+- Divergent implementations of similar features that lead to confusion or redundancy.
+- Inconsistent use of TypeScript types and interfaces across modules that should share definitions.
+- Varied approaches to configuration management and environment variable usage across layers.
+- Different testing strategies or coverage levels for similar functionalities in different parts of the codebase.
+- Inconsistent handling of user preferences or settings across the application.
+- Varied approaches to internationalization and localization in UI components versus backend services.
+- Discrepancies in performance optimization techniques applied in different layers or modules.
+- Inconsistent use of third-party libraries or frameworks across different parts of the codebase.
+- Divergent strategies for caching and data persistence in services versus UI components.
+- Inconsistent approaches to security practices, such as data encryption or access control, across layers.
+- Varied methods for logging and monitoring application health across different services and components.
+- Different patterns for managing dependencies and imports across modules.
+- Inconsistent use of design patterns (e.g., Singleton, Factory) in service implementations.
+- Varied approaches to handling user authentication and authorization across layers.
+- Inconsistent strategies for managing application state across different parts of the renderer layer.
+- Divergent implementations of event handling and propagation in different modules.
+- Inconsistent use of build and deployment scripts across different parts of the project.
+
+# Final Note and Summary
+The goal is to achieve a consistent, maintainable codebase that adheres to the established Electron + React architecture. Address all inconsistencies methodically, prioritize impactful changes, and ensure thorough testing and documentation throughout the process. Consistency means fewer bugs and easier maintenance in the long run. Add all identified inconsistencies to a detailed todo list with descriptions and work through the entire list.
+
+# Remember: Do NOT create backwards compatibility layers; instead, refactor all affected code to use the updated patterns or interfaces directly.
