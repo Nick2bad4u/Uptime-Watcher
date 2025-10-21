@@ -63,6 +63,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
         getSiteByIdentifier: vi.fn().mockReturnValue(mockSite),
         removeSiteMonitor: vi.fn(),
         getSelectedMonitorId: vi.fn().mockReturnValue(null),
+        selectedMonitorIds: {
+            [mockSite.identifier]: undefined,
+        },
         setSelectedMonitorId: vi.fn(),
         sites: [mockSite],
         removeMonitorFromSite: vi.fn(),
@@ -135,6 +138,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
             getSelectedMonitorId: vi
                 .fn()
                 .mockReturnValue("non-existent-monitor"),
+            selectedMonitorIds: {
+                [mockSite.identifier]: "non-existent-monitor",
+            },
         });
 
         (useSitesStore as any).mockReturnValue(mockStore);
@@ -161,6 +167,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         const mockStore = createMockStore({
             getSelectedMonitorId: vi.fn().mockReturnValue("monitor-1"),
+            selectedMonitorIds: {
+                [mockSite.identifier]: "monitor-1",
+            },
             sites: [siteWithMonitor],
         });
 
@@ -195,6 +204,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
 
         const mockStore = createMockStore({
             getSelectedMonitorId: vi.fn().mockReturnValue("monitor-1"),
+            selectedMonitorIds: {
+                [mockSite.identifier]: "monitor-1",
+            },
             sites: [siteWithMonitor],
         });
 
@@ -454,6 +466,9 @@ describe("useSiteDetails - Critical Coverage Tests", () => {
                 .mockReturnValue(siteWithInvalidMonitor),
             removeSiteMonitor: vi.fn(),
             getSelectedMonitorId: vi.fn().mockReturnValue("invalid-monitor"),
+            selectedMonitorIds: {
+                [siteWithInvalidMonitor.identifier]: "invalid-monitor",
+            },
             setSelectedMonitorId: vi.fn(),
             sites: [siteWithInvalidMonitor],
             removeMonitorFromSite: vi.fn(),

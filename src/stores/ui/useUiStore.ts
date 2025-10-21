@@ -33,6 +33,7 @@
 import type { Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
@@ -129,11 +130,34 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             ): void => {
                 logStoreAction("UIStore", "openExternal", { context, url });
 
+                const requestedUrl = url;
+                const urlForMessage: string = url;
+                const isSafeUrl = isValidUrl(requestedUrl);
+
+                if (!isSafeUrl) {
+                    logger.warn(
+                        "Blocked attempt to open invalid external URL",
+                        {
+                            context,
+                            url: urlForMessage,
+                        }
+                    );
+
+                    useErrorStore
+                        .getState()
+                        .setStoreError(
+                            "system-open-external",
+                            `Unable to open external link (${urlForMessage}): URL must start with http(s)://`
+                        );
+
+                    return;
+                }
+
                 void (async (): Promise<void> => {
                     try {
-                        await SystemService.openExternal(url);
+                        await SystemService.openExternal(requestedUrl);
                         logger.user.action("External URL opened", {
-                            url,
+                            url: urlForMessage,
                             ...(context?.siteName
                                 ? { siteName: context.siteName }
                                 : {}),
@@ -146,13 +170,13 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                             {
                                 context,
                                 error: normalizedError,
-                                url,
+                                url: urlForMessage,
                             }
                         );
 
                         logger.user.action("External URL failed", {
                             error: normalizedError.message,
-                            url,
+                            url: urlForMessage,
                             ...(context?.siteName
                                 ? { siteName: context.siteName }
                                 : {}),
@@ -161,18 +185,22 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                         logStoreAction("UIStore", "openExternalFailed", {
                             context,
                             error: normalizedError.message,
-                            url,
+                            url: urlForMessage,
                         });
 
                         if (typeof window !== "undefined") {
-                            window.open(url, "_blank", "noopener");
+                            window.open(
+                                requestedUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                            );
                         }
 
                         useErrorStore
                             .getState()
                             .setStoreError(
                                 "system-open-external",
-                                `Unable to open external link (${url}): ${normalizedError.message}`
+                                `Unable to open external link (${urlForMessage}): ${normalizedError.message}`
                             );
                     }
                 })();

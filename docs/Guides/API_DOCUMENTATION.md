@@ -308,13 +308,25 @@ const cleanup = await window.electronAPI.stateSync.onStateSyncEvent((event) => {
 
 ### System API (`window.electronAPI.system`)
 
-#### `openExternal(url: string): Promise<void>`
+#### `openExternal(url: string): Promise<boolean>`
 
-Opens URLs in the default external browser.
+Opens HTTP(S) URLs in the user's default external browser. The call resolves
+to `true` when Electron successfully delegates the navigation request.
+
+> **Recommendation:** Access this capability through the renderer
+> `SystemService` (`@app/services/SystemService`) rather than using the raw
+> preload bridge. The service enforces URL validation, logging, and consistent
+> error reporting.
 
 ```typescript
-await window.electronAPI.system.openExternal("https://example.com");
+import { SystemService } from "@app/services/SystemService";
+
+await SystemService.openExternal("https://example.com/docs");
 ```
+
+Only `http://` and `https://` URLs are permitted. Supplying another scheme
+(`ftp://`, `file://`, `javascript:`, etc.) results in a synchronous `TypeError`
+and the navigation request is blocked before reaching the main process.
 
 ## 🎭 Event System & Real-time Updates
 

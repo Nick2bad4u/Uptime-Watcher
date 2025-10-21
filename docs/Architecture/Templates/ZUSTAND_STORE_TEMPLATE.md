@@ -39,8 +39,13 @@ For stores with straightforward state that don't require modular composition:
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; // Remove if no persistence needed
 
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
 import type { ExampleItem } from "../types"; // Import relevant types
+import { SystemService } from "../../services/SystemService";
 import logger from "../../services/logger";
+import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
 
 /**
@@ -112,6 +117,8 @@ const initialState: ExampleState = {
  selectedItemId: undefined,
  userPreference: false,
 };
+
+const errorStore = useErrorStore.getState();
 
 /**
  * Example store for managing [DOMAIN] state and interactions.
@@ -208,14 +215,30 @@ export const useExampleStore = create<ExampleStore>()(
    openExternal: (url: string, context?: { itemName?: string }) => {
     logStoreAction("ExampleStore", "openExternal", { url, context });
 
-    // Log user action for analytics
-    logger.user.action("External URL opened", {
-     url,
-     ...(context && { itemName: context.itemName }),
-    });
+    if (!isValidUrl(url)) {
+     logger.warn("Blocked invalid external URL", { url, context });
+     errorStore.setStoreError(
+      "example-open-external",
+      `Unable to open external link (${url}): URL must start with http(s)://`
+     );
+     return;
+    }
 
-    // Use electronAPI to open external URL
-    window.electronAPI.system.openExternal(url);
+    void (async () => {
+     try {
+      await SystemService.openExternal(url);
+      logger.user.action("External URL opened", {
+       url,
+       ...(context && { itemName: context.itemName }),
+      });
+     } catch (error) {
+      logger.error("External URL navigation failed", { error, url, context });
+      errorStore.setStoreError(
+       "example-open-external",
+       `Unable to open external link (${url}): ${ensureError(error).message}`
+      );
+     }
+    })();
    },
   }),
   {

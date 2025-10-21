@@ -2341,26 +2341,26 @@
         color-mix(in srgb, var(--color-border-secondary) 58%, transparent);
     background:
         radial-gradient(
-            115% 120% at 12% -24%,
-            color-mix(in srgb, var(--color-primary-500) 32%, transparent) 0%,
-            transparent 64%
-        ),
-        radial-gradient(
-            150% 160% at 88% 10%,
-            color-mix(in srgb, var(--color-status-up) 22%, transparent) 0%,
+            120% 124% at 12% -24%,
+            color-mix(in srgb, var(--color-primary-500) 40%, transparent) 0%,
             transparent 68%
         ),
+        radial-gradient(
+            160% 170% at 88% 8%,
+            color-mix(in srgb, var(--color-status-up) 28%, transparent) 0%,
+            transparent 72%
+        ),
         linear-gradient(
-            162deg,
-            color-mix(in srgb, var(--color-surface-elevated) 88%, transparent)
+            160deg,
+            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent)
                 0%,
             color-mix(
                     in srgb,
-                    var(--color-primary-500) 12%,
-                    var(--color-surface-overlay) 88%
+                    var(--color-primary-500) 20%,
+                    var(--color-surface-overlay) 82%
                 )
-                52%,
-            color-mix(in srgb, var(--color-surface-base) 68%, transparent) 100%
+                48%,
+            color-mix(in srgb, var(--color-surface-base) 76%, transparent) 100%
         );
     box-shadow:
         inset 0 0 0 1px
@@ -2389,11 +2389,11 @@
         backdrop-filter var(--transition-normal);
 
     &::before {
-        opacity: 0.74;
+        opacity: 0.52;
     }
 
     &::after {
-        opacity: 0.64;
+        opacity: 0.48;
     }
 }
 
@@ -2438,20 +2438,20 @@
     background:
         radial-gradient(
             circle at 24% 22%,
-            color-mix(in srgb, var(--color-primary-500) 34%, transparent),
-            transparent 70%
+            color-mix(in srgb, var(--color-primary-500) 44%, transparent),
+            transparent 72%
         ),
         radial-gradient(
             circle at 56% 84%,
-            color-mix(in srgb, var(--color-status-up) 24%, transparent),
-            transparent 74%
+            color-mix(in srgb, var(--color-status-up) 30%, transparent),
+            transparent 76%
         );
     block-size: 68%;
     content: "";
     inline-size: 68%;
     inset-block-start: -30%;
     inset-inline-end: -24%;
-    opacity: 0.65;
+    opacity: 0.45;
     pointer-events: none;
 }
 
@@ -2472,7 +2472,7 @@
         );
     content: "";
     inset: 0;
-    opacity: 0.58;
+    opacity: 0.36;
     pointer-events: none;
     transition: opacity var(--transition-normal);
 }
@@ -2493,7 +2493,7 @@
 }
 
 .site-card--modern:hover::after {
-    opacity: 0.58;
+    opacity: 0.42;
 }
 
 .site-card__header-row {
@@ -2664,9 +2664,15 @@
     flex: 1 1 auto;
     border: none;
     background-color: transparent;
+    background-image: none;
     color: inherit;
     min-inline-size: 0;
+    padding-inline-end: 0;
     padding-inline: 0;
+
+    &::-ms-expand {
+        display: none;
+    }
 
     & option {
         background-color: var(--color-surface-overlay);
@@ -3373,6 +3379,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--spacing-lg);
+    padding-block: var(--spacing-sm);
 }
 
 .setting-info {

@@ -280,6 +280,31 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
 }
 
 /**
+ * Helper function to create validators for handlers expecting a single URL
+ * parameter.
+ *
+ * @param paramName - Name of the parameter for error messages
+ *
+ * @returns A validator function that validates a single URL parameter
+ */
+function createSingleUrlValidator(paramName: string): IpcParameterValidator {
+    return (params: unknown[]): null | string[] => {
+        const errors: string[] = [];
+
+        if (params.length !== 1) {
+            errors.push("Expected exactly 1 parameter");
+        }
+
+        const error = IpcValidators.requiredUrl(params[0], paramName);
+        if (error) {
+            errors.push(error);
+        }
+
+        return errors.length > 0 ? errors : null;
+    };
+}
+
+/**
  * Helper function to create validators for string and object parameter pairs.
  *
  * @param stringParamName - Name of the string parameter for error messages
@@ -656,9 +681,9 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * Validates parameters for the "open-external" IPC handler.
      *
      * @remarks
-     * Expects exactly one string parameter (the URL to open).
+     * Expects exactly one http(s) URL parameter (the destination to open).
      */
-    openExternal: createSingleStringValidator("url"),
+    openExternal: createSingleUrlValidator("url"),
     reportPreloadGuard: createPreloadGuardReportValidator(),
     /**
      * Validates parameters for the diagnostics handler verification channel.

@@ -24,7 +24,7 @@
 
 .site-table__table {
     border-collapse: separate;
-    border-spacing: 0;
+    border-spacing: 0 0.85rem;
     inline-size: 100%;
     table-layout: fixed;
 
@@ -32,7 +32,17 @@
         position: sticky;
         z-index: 1;
         backdrop-filter: blur(8px);
-        background: var(--site-table-header-surface);
+        background: linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent)
+                0%,
+            color-mix(
+                    in srgb,
+                    var(--color-surface-overlay) 84%,
+                    var(--color-primary-500) 8%
+                )
+                100%
+        );
         inset-block-start: 0;
     }
 
@@ -40,18 +50,82 @@
     & td {
         overflow: clip;
         padding: 0.6rem 0.85rem;
-        border-block-end: 1px solid var(--site-table-border);
         text-align: start;
+        position: relative;
+        z-index: 1;
+    }
+
+    & thead th {
+        border-block-end: 1px solid var(--site-table-border);
+    }
+
+    & tbody th,
+    & tbody td {
+        border: none;
     }
 }
 
 .site-table__row {
+    position: relative;
+    overflow: hidden;
     cursor: pointer;
+    border-radius: 1.15rem;
+    transition: transform var(--transition-normal);
+
+    &::before {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 46%, transparent);
+        background:
+            linear-gradient(
+                155deg,
+                color-mix(
+                        in srgb,
+                        var(--color-surface-elevated) 96%,
+                        transparent
+                    )
+                    0%,
+                color-mix(
+                        in srgb,
+                        var(--color-primary-500) 14%,
+                        var(--color-surface-overlay) 86%
+                    )
+                    48%,
+                color-mix(
+                        in srgb,
+                        var(--color-surface-base) 78%,
+                        transparent
+                    )
+                    100%
+            );
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 4%),
+            0 22px 48px rgb(8 12 24 / 24%);
+        content: "";
+        pointer-events: none;
+        transition:
+            border-color var(--transition-fast),
+            box-shadow var(--transition-fast),
+            opacity var(--transition-fast);
+    }
 
     &:hover,
     &:focus,
     &:focus-within {
-        background: var(--site-table-hover);
+        &::before {
+            border-color: color-mix(
+                in srgb,
+                var(--color-primary-500) 34%,
+                transparent
+            );
+            box-shadow:
+                inset 0 0 0 1px rgb(255 255 255 / 6%),
+                0 28px 60px
+                    color-mix(in srgb, var(--color-primary-500) 28%, transparent);
+        }
+        transform: translateY(-2px);
     }
 }
 

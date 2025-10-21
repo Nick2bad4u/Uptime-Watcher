@@ -897,6 +897,106 @@ body:has(.site-details-modal-overlay) {
     );
 }
 
+.history-tab__row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(0.75rem, 0.6rem + 0.35vi, 1.35rem);
+    padding: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem)
+        clamp(0.85rem, 0.7rem + 0.5vi, 1.4rem);
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 42%, transparent);
+    border-radius: 1.1rem;
+    background: linear-gradient(
+        150deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(
+                in srgb,
+                var(--color-primary-500) 14%,
+                var(--color-surface-overlay) 86%
+            )
+            52%,
+        color-mix(in srgb, var(--color-surface-base) 80%, transparent) 100%
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 4%),
+        0 18px 36px rgb(8 12 24 / 20%);
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-normal);
+}
+
+.history-tab__row:hover,
+.history-tab__row:focus-within {
+    border-color: color-mix(
+        in srgb,
+        var(--color-primary-500) 32%,
+        transparent
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 6%),
+        0 24px 48px
+            color-mix(in srgb, var(--color-primary-500) 26%, transparent);
+    transform: translateY(-2px);
+}
+
+.history-tab__row-content {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(0.65rem, 0.5rem + 0.4vi, 1.05rem);
+}
+
+.history-tab__row-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-inline-size: 0;
+}
+
+.history-tab__row-meta > * {
+    margin: 0;
+}
+
+.history-tab__row-sequence {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.history-tab__row-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+    text-align: end;
+}
+
+.history-tab__row-response {
+    letter-spacing: 0.01em;
+}
+
+.history-tab__row-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 0.75rem;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-overlay) 78%,
+        transparent
+    );
+    padding: 0.2rem 0.55rem;
+}
+
+.history-tab__row-status-icon {
+    color: color-mix(
+        in srgb,
+        var(--color-primary-400) 70%,
+        rgb(255 255 255) 30%
+    );
+}
+
 /* Keyframe animations */
 @keyframes pulse {
     0%,

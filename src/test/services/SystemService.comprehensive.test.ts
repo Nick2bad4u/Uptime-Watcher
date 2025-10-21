@@ -149,13 +149,13 @@ describe("SystemService", () => {
             );
         });
 
-        it("should handle different URL formats", async () => {
+        it("should handle varied but valid URL formats", async () => {
             const urls = [
                 "https://example.com",
-                "http://localhost:3000",
-                "file:///path/to/file.html",
-                "mailto:test@example.com",
-                "ftp://ftp.example.com/file.txt",
+                "http://localhost:3000/status",
+                "https://example.com/path?query=value&other=test",
+                "https://example.com/path#fragment",
+                "https://user:pass@example.com:8080/path",
             ];
 
             for (const url of urls) {
@@ -172,17 +172,42 @@ describe("SystemService", () => {
             );
         });
 
-        it("should handle empty and special character URLs", async () => {
-            const specialUrls = [
+        it("should reject invalid or unsupported URLs before invoking IPC", async () => {
+            const invalidUrls = [
                 "",
                 " ",
+                "ftp://example.com",
+                // eslint-disable-next-line no-script-url -- intentionally verifying script protocol rejection
+                "javascript:alert('xss')",
                 "https://example.com/path with spaces",
-                "https://example.com/path?query=value&other=test",
-                "https://example.com/path#fragment",
-                "https://user:pass@example.com:8080/path",
             ];
 
-            for (const url of specialUrls) {
+            for (const url of invalidUrls) {
+                await expect(
+                    SystemService.openExternal(url)
+                ).rejects.toBeInstanceOf(TypeError);
+            }
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(
+                invalidUrls.length
+            );
+            expect(mockElectronAPI.system.openExternal).not.toHaveBeenCalled();
+            const unsafeLogs = mockLogger.error.mock.calls.filter(
+                ([message]) =>
+                    message === "Rejected unsafe URL for external navigation"
+            );
+            expect(unsafeLogs).toHaveLength(invalidUrls.length);
+        });
+
+        it("should handle URLs with encoded special characters", async () => {
+            const urls = [
+                "https://example.com/path%20with%20spaces",
+                "https://example.com/path%3Fwith%26encoded",
+                "https://example.com/%C3%A9clair",
+                "http://localhost:8080/%E2%9C%93",
+            ];
+
+            for (const url of urls) {
                 await expect(
                     SystemService.openExternal(url)
                 ).resolves.toBeTruthy();
@@ -192,7 +217,7 @@ describe("SystemService", () => {
             }
 
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
-                specialUrls.length
+                urls.length
             );
         });
     });
@@ -365,7 +390,7 @@ describe("SystemService", () => {
             }
         });
 
-        it("should handle special protocol URLs", async () => {
+        it("should reject navigation for unsupported browser protocols", async () => {
             const protocolUrls = [
                 "data:text/html,<h1>Test</h1>",
                 "blob:https://example.com/test",
@@ -377,20 +402,19 @@ describe("SystemService", () => {
             for (const url of protocolUrls) {
                 await expect(
                     SystemService.openExternal(url)
-                ).resolves.toBeTruthy();
-                expect(
-                    mockElectronAPI.system.openExternal
-                ).toHaveBeenCalledWith(url);
+                ).rejects.toBeInstanceOf(TypeError);
             }
+
+            expect(mockElectronAPI.system.openExternal).not.toHaveBeenCalled();
         });
 
-        it("should handle URLs with unusual characters", async () => {
+        it("should support encoded URLs with unusual characters", async () => {
             const unusualUrls = [
-                "https://example.com/path<>|",
-                'https://example.com/path"quotes"',
-                "https://example.com/path`backticks`",
-                "https://example.com/path{braces}",
-                "https://example.com/path[brackets]",
+                "https://example.com/path%20with%20spaces",
+                "https://example.com/path%22quotes%22",
+                "https://example.com/path%60backticks%60",
+                "https://example.com/path%7Bbraces%7D",
+                "https://example.com/path%5Bbrackets%5D",
             ];
 
             for (const url of unusualUrls) {

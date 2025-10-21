@@ -1,3 +1,90 @@
+/* Compact card surface matches modern site card styling */
+.site-card.site-card--compact {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
+    background:
+        radial-gradient(
+            120% 124% at 16% -28%,
+            color-mix(in srgb, var(--color-primary-500) 34%, transparent) 0%,
+            transparent 72%
+        ),
+        radial-gradient(
+            160% 170% at 92% 12%,
+            color-mix(in srgb, var(--color-status-up) 22%, transparent) 0%,
+            transparent 74%
+        ),
+        linear-gradient(
+            162deg,
+            color-mix(in srgb, var(--color-surface-elevated) 96%, transparent)
+                0%,
+            color-mix(
+                    in srgb,
+                    var(--color-primary-500) 16%,
+                    var(--color-surface-overlay) 84%
+                )
+                48%,
+            color-mix(in srgb, var(--color-surface-base) 76%, transparent) 100%
+        );
+    box-shadow:
+        inset 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+        0 24px 56px
+            color-mix(in srgb, var(--shadow-deep-color) 38%, transparent);
+    isolation: isolate;
+}
+
+.site-card.site-card--compact::before {
+    position: absolute;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle at 18% 22%,
+            color-mix(in srgb, var(--color-primary-500) 32%, transparent),
+            transparent 72%
+        ),
+        radial-gradient(
+            circle at 62% 86%,
+            color-mix(in srgb, var(--color-status-up) 24%, transparent),
+            transparent 74%
+        );
+    block-size: 64%;
+    content: "";
+    inline-size: 64%;
+    inset-block-start: -28%;
+    inset-inline-end: -20%;
+    opacity: 0.38;
+    pointer-events: none;
+}
+
+.site-card.site-card--compact::after {
+    position: absolute;
+    border-radius: inherit;
+    background:
+        linear-gradient(
+            184deg,
+            color-mix(in srgb, var(--shadow-inverse-color) 12%, transparent)
+                0%,
+            transparent 62%
+        ),
+        radial-gradient(
+            120% 120% at 12% 0%,
+            color-mix(in srgb, var(--overlay-highlight-color) 14%, transparent),
+            transparent 70%
+        );
+    content: "";
+    inset: 0;
+    opacity: 0.32;
+    pointer-events: none;
+    transition: opacity var(--transition-normal);
+}
+
+.site-card.site-card--compact:hover::after,
+.site-card.site-card--compact:focus-within::after {
+    opacity: 0.4;
+}
+
 /* Compact site card layout styling */
 
 .site-card__compact-header,
@@ -22,10 +109,10 @@
     padding: clamp(0.35rem, 0.25rem + 0.35vi, 0.55rem)
         clamp(0.45rem, 0.35rem + 0.4vi, 0.75rem);
     border-radius: 0.9rem;
-    background: color-mix(
-        in srgb,
-        var(--color-surface-overlay) 28%,
-        transparent
+    background: linear-gradient(
+        140deg,
+        color-mix(in srgb, var(--color-surface-overlay) 88%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 10%, transparent) 100%
     );
     gap: 0.5rem;
     inline-size: 100%;
@@ -67,11 +154,11 @@
     flex: 0 0 auto;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
-    gap: clamp(0.55rem, 0.45rem + 0.35vi, 0.95rem);
+    justify-content: center;
+    gap: clamp(0.75rem, 0.6rem + 0.35vi, 1.25rem);
     max-inline-size: 100%;
     min-inline-size: 0;
-    padding-block: clamp(0.35rem, 0.25rem + 0.3vi, 0.6rem);
+    padding-block: clamp(0.45rem, 0.3rem + 0.4vi, 0.75rem);
 
     @media (width <= 768px) {
         justify-content: flex-start;
@@ -81,9 +168,9 @@
 
 .site-card__compact-status-item {
     display: inline-flex;
-    flex: 1 1 clamp(10rem, 8rem + 6vi, 14rem);
+    flex: 0 1 clamp(10rem, 9rem + 4vi, 14rem);
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 0.55rem;
 }
 
@@ -91,8 +178,9 @@
     display: flex;
     overflow: hidden;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.2rem;
     min-inline-size: 0;
+    text-align: center;
 }
 
 .site-card__compact-status-label {
@@ -154,13 +242,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.65rem 0.5rem;
-    border-radius: 0.75rem;
-    background: color-mix(
-        in srgb,
-        var(--color-surface-elevated) 82%,
-        transparent
+    padding: 0.75rem 0.6rem;
+    border-radius: 0.85rem;
+    background: linear-gradient(
+        140deg,
+        color-mix(in srgb, var(--color-surface-overlay) 92%, transparent) 0%,
+        color-mix(in srgb, var(--color-primary-500) 12%, transparent) 100%
     );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 6%),
+        0 14px 28px rgb(8 12 24 / 22%);
     gap: 0.2rem;
 }
 
@@ -181,12 +272,26 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: clamp(0.55rem, 0.45rem + 0.35vi, 0.85rem);
+    gap: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem);
 }
 
-.site-card__compact-selector {
-    inline-size: clamp(12rem, 30vi, 15rem);
-    max-inline-size: 100%;
+.monitor-selector__wrapper.site-card__compact-selector {
+    inline-size: clamp(14rem, 32vi, 18rem);
+    margin-inline: auto;
+}
+
+.monitor-selector__wrapper.site-card__compact-selector::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--color-primary-500) 22%, transparent),
+        color-mix(in srgb, var(--color-primary-400) 12%, transparent)
+    );
+    opacity: 0.18;
+    pointer-events: none;
 }
 
 .site-card__compact-actions {

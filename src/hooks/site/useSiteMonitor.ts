@@ -108,8 +108,12 @@ export interface SiteMonitorResult {
  * @see {@link DEFAULT_MONITOR_STATUS} for the default pending state fallback.
  */
 export function useSiteMonitor(site: Site): SiteMonitorResult {
-    const { getSelectedMonitorId, setSelectedMonitorId, sites } =
-        useSitesStore();
+    const {
+        getSelectedMonitorId,
+        selectedMonitorIds,
+        setSelectedMonitorId,
+        sites,
+    } = useSitesStore();
 
     // Always select the latest site from the store by id to ensure we have the
     // most updated data
@@ -126,7 +130,9 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
-        getSelectedMonitorId(latestSite.identifier) ?? defaultMonitorId;
+        selectedMonitorIds?.[latestSite.identifier] ??
+        getSelectedMonitorId(latestSite.identifier) ??
+        defaultMonitorId;
 
     // Get the currently selected monitor
     const monitor = useMemo(

@@ -189,6 +189,7 @@ export function useSiteDetails({
         getSelectedMonitorId,
         modifySite,
         removeMonitorFromSite,
+        selectedMonitorIds,
         setSelectedMonitorId,
         sites,
         startSiteMonitoring,
@@ -225,7 +226,9 @@ export function useSiteDetails({
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
-        getSelectedMonitorId(currentSite.identifier) ?? defaultMonitorId;
+        selectedMonitorIds?.[currentSite.identifier] ??
+        getSelectedMonitorId(currentSite.identifier) ??
+        defaultMonitorId;
 
     useEffect(
         function synchronizeSiteDetailsTab(): void {

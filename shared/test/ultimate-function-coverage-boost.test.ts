@@ -174,8 +174,10 @@ describe("Ultimate Function Coverage Boost", () => {
                         FUNCTION_ARGUMENT_OVERRIDES[overrideKey] ??
                         FUNCTION_ARGUMENT_OVERRIDES[key];
 
-                    if (overrideCandidates?.length) {
-                        invokeForCoverage(exportedValue, overrideCandidates[0]);
+                    const firstOverride = overrideCandidates?.[0];
+
+                    if (Array.isArray(firstOverride)) {
+                        invokeForCoverage(exportedValue, firstOverride);
                         functionCalled = true;
                     } else if (testArgs.length > 0) {
                         const [defaultArgSet] = testArgs;

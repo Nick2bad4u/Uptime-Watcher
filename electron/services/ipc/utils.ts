@@ -6,7 +6,10 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import { isNonEmptyString } from "@shared/validation/validatorUtils";
+import {
+    isNonEmptyString,
+    isValidUrl,
+} from "@shared/validation/validatorUtils";
 import { ipcMain } from "electron";
 
 import type {
@@ -161,6 +164,21 @@ export const IpcValidators = {
         if (!isNonEmptyString(value)) {
             return `${paramName} must be a non-empty string`;
         }
+        return null;
+    },
+    /**
+     * Validates a required URL parameter restricted to safe protocols.
+     *
+     * @param value - Value to validate
+     * @param paramName - Parameter name for error messages
+     *
+     * @returns Error message or null if valid
+     */
+    requiredUrl: (value: unknown, paramName: string): null | string => {
+        if (!isValidUrl(value)) {
+            return `${paramName} must be a valid http(s) URL`;
+        }
+
         return null;
     },
 } as const;
