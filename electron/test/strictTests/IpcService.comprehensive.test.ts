@@ -13,11 +13,7 @@ import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
-import {
-    type Site,
-    type Monitor,
-    BASE_MONITOR_TYPES,
-} from "../../../shared/types";
+import { type Site, type Monitor, BASE_MONITOR_TYPES } from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -110,17 +106,20 @@ vi.mock("../../electron/services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("@shared/validation/schemas", () => {
+vi.mock("@shared/validation/schemas", async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import("@shared/validation/schemas")>();
+
     const createSchemaMock = () => ({
-        parse: vi.fn((data: unknown) => data),
-        safeParse: vi.fn((data: unknown) => ({ success: true, data })),
+        parse: vi.fn((data) => data),
+        safeParse: vi.fn((data) => ({ success: true, data })),
+        describe: vi.fn(() => "MockSchema"),
+        optional: vi.fn(() => createSchemaMock()),
+        array: vi.fn(() => createSchemaMock()),
     });
 
     return {
-        httpHeaderMonitorSchema: createSchemaMock(),
-        httpJsonMonitorSchema: createSchemaMock(),
-        httpKeywordMonitorSchema: createSchemaMock(),
-        httpLatencyMonitorSchema: createSchemaMock(),
+        ...actual,
         httpStatusMonitorSchema: createSchemaMock(),
         validateMonitorData: vi.fn((type: string, _data: unknown) => ({
             success: type !== "invalid",

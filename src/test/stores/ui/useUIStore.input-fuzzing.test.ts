@@ -60,6 +60,8 @@ vi.mock("../../../services/SystemService", () => ({
         openExternal: vi.fn().mockResolvedValue(true),
     },
 }));
+import { isValidUrl } from "@shared/validation/validatorUtils";
+
 import { SystemService } from "../../../services/SystemService";
 import { useUIStore } from "../../../stores/ui/useUiStore";
 // Removed unused Site type import
@@ -562,12 +564,25 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             (url) => {
                 // Clear any previous calls
                 mockOpenExternal.mockClear();
+                mockErrorStore.setStoreError.mockClear();
 
                 // Act
                 useUIStore.getState().openExternal(url);
 
-                // Assert
-                expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                const allowed = isValidUrl(url);
+
+                if (allowed) {
+                    expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                    expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+                } else {
+                    expect(mockOpenExternal).not.toHaveBeenCalled();
+                    expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                        "system-open-external",
+                        expect.stringContaining(
+                            "URL must start with http(s)://"
+                        )
+                    );
+                }
             }
         );
 
@@ -576,15 +591,25 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             (url, siteName) => {
                 // Clear any previous calls
                 mockOpenExternal.mockClear();
+                mockErrorStore.setStoreError.mockClear();
 
                 // Act
                 useUIStore.getState().openExternal(url, { siteName });
 
-                // Assert
-                expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                const allowed = isValidUrl(url);
 
-                // Verify URL is valid
-                expect(url).toMatch(/^https?:\/\//);
+                if (allowed) {
+                    expect(mockOpenExternal).toHaveBeenCalledWith(url);
+                    expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+                } else {
+                    expect(mockOpenExternal).not.toHaveBeenCalled();
+                    expect(mockErrorStore.setStoreError).toHaveBeenCalledWith(
+                        "system-open-external",
+                        expect.stringContaining(
+                            "URL must start with http(s)://"
+                        )
+                    );
+                }
             }
         );
 
@@ -593,14 +618,25 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
         ])("should handle multiple external URL operations", (urls) => {
             // Clear any previous calls
             mockOpenExternal.mockClear();
+            mockErrorStore.setStoreError.mockClear();
 
             // Act
             for (const url of urls) useUIStore.getState().openExternal(url);
 
-            // Assert
-            expect(mockOpenExternal).toHaveBeenCalledTimes(urls.length);
-            for (const url of urls) {
+            const validUrls = urls.filter((url) => isValidUrl(url));
+            const invalidUrls = urls.length - validUrls.length;
+
+            expect(mockOpenExternal).toHaveBeenCalledTimes(validUrls.length);
+            for (const url of validUrls) {
                 expect(mockOpenExternal).toHaveBeenCalledWith(url);
+            }
+
+            if (invalidUrls > 0) {
+                expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
+                    invalidUrls
+                );
+            } else {
+                expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
             }
         });
 
@@ -855,6 +891,7 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
             (sites, urls) => {
                 // Clear any previous calls
                 mockOpenExternal.mockClear();
+                mockErrorStore.setStoreError.mockClear();
 
                 // Act - interleave site selection and URL operations
                 for (let i = 0; i < Math.max(sites.length, urls.length); i++) {
@@ -872,8 +909,20 @@ describe("UI Store - Property-Based Fuzzing Tests", () => {
                     finalSite!.identifier
                 );
 
-                // All URLs should have been opened
-                expect(mockOpenExternal).toHaveBeenCalledTimes(urls.length);
+                const validUrls = urls.filter((url) => isValidUrl(url));
+                const invalidCount = urls.length - validUrls.length;
+
+                expect(mockOpenExternal).toHaveBeenCalledTimes(
+                    validUrls.length
+                );
+
+                if (invalidCount > 0) {
+                    expect(mockErrorStore.setStoreError).toHaveBeenCalledTimes(
+                        invalidCount
+                    );
+                } else {
+                    expect(mockErrorStore.setStoreError).not.toHaveBeenCalled();
+                }
             }
         );
     });

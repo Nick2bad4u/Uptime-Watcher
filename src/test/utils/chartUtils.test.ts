@@ -13,7 +13,7 @@ import {
     getScaleConfig,
     getScaleProperty,
 } from "../../utils/chartUtils";
-import { hasScales } from "../../../shared/types/chartConfig";
+import { hasScales } from "@shared/types/chartConfig";
 
 describe("Chart Utilities", () => {
     describe(hasScales, () => {

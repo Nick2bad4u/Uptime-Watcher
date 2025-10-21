@@ -16,7 +16,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
-import type { Site } from "../../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 // Use vi.hoisted to properly initialize mocks before they're used
 const mockLogger = vi.hoisted(() => ({
@@ -40,7 +40,7 @@ vi.mock("../../utils/logger", () => ({
 
 // Import after mocking
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
-import type { Monitor } from "../../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Helper function to create complete Monitor objects
 function createValidMonitor(overrides: Partial<Monitor> = {}): Monitor {

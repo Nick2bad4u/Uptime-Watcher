@@ -45,7 +45,7 @@ import {
     SiteDefaults,
 } from "../../utils/fallbacks";
 
-import type { Monitor } from "../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 describe("Fallback Utils Property-Based Tests", () => {
     // =============================================================================

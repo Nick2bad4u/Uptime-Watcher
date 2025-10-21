@@ -14,7 +14,7 @@ import {
     useChartData,
     SiteAnalyticsUtils,
 } from "../hooks/site/useSiteAnalytics";
-import type { Monitor, StatusHistory } from "../../shared/types";
+import type { Monitor, StatusHistory } from "@shared/types";
 
 // Mock constants to avoid dependency issues
 vi.mock("../constants", () => ({

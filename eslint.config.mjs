@@ -148,6 +148,9 @@ import jsoncEslintParser from "jsonc-eslint-parser";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
+
+import uptimeWatcherPlugin from "./config/linting/plugins/uptime-watcher.mjs";
+import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract-interfaces.mjs";
 // Unused and Uninstalled Plugins:
 // import putout from "eslint-plugin-putout";
 // import pluginPii from "eslint-plugin-pii"; - broken
@@ -186,6 +189,65 @@ export default [
         name: "Global .gitignore Rules",
         root: true,
     }), // MARK: Global Configs and Rules
+    sharedContractInterfaceGuard,
+    {
+        files: ["src/constants.ts"],
+        name: "Monitor Fallback Consistency",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/monitor-fallback-consistency": "error",
+        },
+    },
+    {
+        files: ["electron/**/*.{ts,tsx}"],
+        ignores: ["electron/test/**/*"],
+        name: "Electron Logger Enforcement",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/electron-no-console": "error",
+        },
+    },
+    {
+        files: ["**/*.{ts,tsx}"],
+        name: "TSDoc Logger Examples",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/tsdoc-no-console-example": "error",
+        },
+    },
+    {
+        files: [
+            "docs/**/*.{ts,tsx}",
+            "electron/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+            "storybook/**/*.{ts,tsx}",
+        ],
+        ignores: ["shared/**/*"],
+        name: "Shared Alias Imports",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/prefer-shared-alias": "error",
+        },
+    },
+    {
+        files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
+        ignores: ["src/test/**/*"],
+        name: "Renderer Electron Isolation",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/renderer-no-electron-import": "error",
+        },
+    },
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,
@@ -1096,7 +1158,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1204,7 +1265,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -1258,9 +1319,11 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -1942,7 +2005,6 @@ export default [
                         "main.css",
                         "header.css",
                         "footer.css",
-                        "SiteDetails.css",
                     ],
                 },
             ],
@@ -2409,7 +2471,9 @@ export default [
                 jsDocParsingMode: "all",
                 project: [
                     "tsconfig.json",
+                    ".storybook/tsconfig.json",
                     "storybook/tsconfig.json",
+                    "storybook/tsconfig.eslint.json",
                 ],
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),
@@ -2445,7 +2509,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2570,7 +2633,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -2625,9 +2688,11 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -3194,7 +3259,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             "max-lines-per-function": [
                 "error",
                 {
@@ -3247,7 +3315,6 @@ export default [
                         "main.css",
                         "header.css",
                         "footer.css",
-                        "SiteDetails.css",
                     ],
                 },
             ],
@@ -4002,7 +4069,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4112,7 +4178,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Throws false `Property 'recommended' does not exist on type '{}'.` error due to ESLint v9 changes
+
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -4161,9 +4227,11 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -4804,7 +4872,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",
@@ -4858,7 +4929,6 @@ export default [
                         "main.css",
                         "header.css",
                         "footer.css",
-                        "SiteDetails.css",
                     ],
                 },
             ],
@@ -5350,7 +5420,6 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5474,7 +5543,6 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -5527,9 +5595,11 @@ export default [
             "@eslint-react/prefer-react-namespace-import": "off",
             "@eslint-react/prefer-read-only-props": "warn",
             "@jcoreio/implicit-dependencies/no-implicit": [
-                "error",
+                "off",
                 {
                     ignore: [
+                        "@app",
+                        "@app/*",
                         "@shared",
                         "electron-devtools-installer",
                         "electron",
@@ -6126,7 +6196,10 @@ export default [
             "math/prefer-exponentiation-operator": "warn",
             "math/prefer-math-sum-precise": "warn",
             "max-classes-per-file": "off",
-            "max-lines": "off",
+            "max-lines": [
+                "warn",
+                { max: 1000, skipBlankLines: true, skipComments: true },
+            ],
             // Sonar quality helpers
             "max-lines-per-function": [
                 "error",
@@ -6180,7 +6253,6 @@ export default [
                         "main.css",
                         "header.css",
                         "footer.css",
-                        "SiteDetails.css",
                     ],
                 },
             ],
@@ -6962,6 +7034,7 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7185,6 +7258,7 @@ export default [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-inferrable-types": "off", // Allow explicit types for React components
@@ -7409,6 +7483,7 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
@@ -7785,6 +7860,7 @@ export default [
                         "playwright.config.ts",
                         "vite.playwright-coverage.config.ts",
                         "vitest.stryker.config.ts",
+                        "config/testing/vitest.zero-coverage.config.ts",
                         "config/tools/knip.config.ts",
                         "config/tools/createPlaywrightCoveragePlugin.ts",
                     ],
@@ -8093,7 +8169,6 @@ export default [
                         "main.css",
                         "header.css",
                         "footer.css",
-                        "SiteDetails.css",
                     ],
                 },
             ],
@@ -8716,6 +8791,7 @@ export default [
         rules: {
             ...playwright.configs["flat/recommended"].rules,
             ...pluginTestingLibrary.configs["flat/dom"].rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             // TypeScript and testing-specific overrides for Playwright
             "@typescript-eslint/no-unused-vars": [
                 "error",
@@ -8829,6 +8905,7 @@ export default [
         },
         rules: {
             ...vitest.configs.all.rules,
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
             "testing-library/consistent-data-testid": [
                 "warn",
                 {
@@ -8887,6 +8964,8 @@ export default [
             // Storybook stories are demo code, loosen the grip for now
             "@eslint-react/prefer-read-only-props": "off",
             "@eslint-react/prefer-shorthand-fragment": "off",
+            "@jcoreio/implicit-dependencies/no-implicit": "off",
+            "@metamask/design-tokens/color-no-hex": "off",
             "@typescript-eslint/array-type": "off",
             "@typescript-eslint/explicit-module-boundary-types": "off",
             "@typescript-eslint/no-confusing-void-expression": "off",

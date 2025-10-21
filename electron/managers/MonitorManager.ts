@@ -42,9 +42,11 @@
  * @example Event-driven monitoring:
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * // Listen for status updates
  * eventBus.onTyped("monitor:statusUpdated", (data) => {
- *     console.log(`Site ${data.siteIdentifier} status: ${data.status}`);
+ *     logger.info("Monitor status update", data);
  * });
  *
  * // Monitor will emit events automatically

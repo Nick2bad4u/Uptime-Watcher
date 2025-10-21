@@ -1,16 +1,12 @@
 /**
- * Replication monitor service.
- *
- * @remarks
- * Validates replication lag between a primary and replica status endpoint by
- * comparing timestamp fields. Reports degraded status when lag exceeds the
- * configured threshold and down status when required data is unavailable.
+ * Replication monitor service leveraging the shared remote monitor core for
+ * request orchestration and retry handling.
  */
 
-import type { MonitorType, Site } from "@shared/types";
-import type { AxiosInstance } from "axios";
+/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
-import { ensureError } from "@shared/utils/errorHandling";
+import type { Monitor } from "@shared/types";
+
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
@@ -20,276 +16,225 @@ import type {
     MonitorConfig,
 } from "./types";
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { logger } from "../../utils/logger";
-import { withOperationalHooks } from "../../utils/operationalHooks";
+import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
-    extractMonitorConfig,
     extractNestedFieldValue,
     normalizeTimestampValue,
 } from "./shared/monitorServiceHelpers";
-import { createHttpClient } from "./utils/httpClient";
-
-interface EndpointPayload {
-    data: unknown;
-    responseTime: number;
-}
-
-interface ResolvedReplicationConfig {
-    primaryUrl: string;
-    replicaUrl: string;
-    timestampField: string;
-}
+import {
+    createRemoteMonitorService,
+    type RemoteEndpointPayload,
+    type RemoteMonitorBehavior,
+} from "./shared/remoteMonitorCore";
 
 const MINIMUM_LAG_THRESHOLD_SECONDS = 0;
 
-export class ReplicationMonitor implements IMonitorService {
-    private axiosInstance: AxiosInstance;
+interface ReplicationMonitorContext {
+    primaryUrl: string;
+    replicaUrl: string;
+    thresholdSeconds: number;
+    timestampField: string;
+}
 
-    private config: MonitorConfig;
+type ReplicationMonitorInstance = Monitor & { type: "replication" };
 
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "replication") {
-            throw new Error(
-                `ReplicationMonitor cannot handle monitor type: ${monitor.type}`
-            );
-        }
+function resolveLagThreshold(
+    monitor: ReplicationMonitorInstance,
+    serviceConfig: MonitorConfig
+): number {
+    const monitorValue = Reflect.get(
+        monitor,
+        "maxReplicationLagSeconds"
+    ) as unknown;
+    if (
+        typeof monitorValue === "number" &&
+        Number.isFinite(monitorValue) &&
+        monitorValue >= MINIMUM_LAG_THRESHOLD_SECONDS
+    ) {
+        return monitorValue;
+    }
 
-        const resolvedConfiguration = this.resolveConfiguration(monitor);
-        if ("error" in resolvedConfiguration) {
-            return createMonitorErrorResult(resolvedConfiguration.error, 0);
-        }
-
-        const { primaryUrl, replicaUrl, timestampField } =
-            resolvedConfiguration;
-        const thresholdSeconds = this.resolveLagThreshold(monitor);
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-
-        try {
-            return await withOperationalHooks(
-                () =>
-                    this.performReplicationCheck(
-                        primaryUrl,
-                        replicaUrl,
-                        timestampField,
-                        thresholdSeconds,
-                        timeout,
-                        signal
-                    ),
-                {
-                    failureLogLevel: "warn",
-                    maxRetries: retryAttempts + 1,
-                    operationName: `Replication lag check for ${primaryUrl}`,
-                }
-            );
-        } catch (error) {
-            const normalized = ensureError(error);
-            logger.warn(
-                `[ReplicationMonitor] Replication check failed for ${primaryUrl}`,
-                normalized
-            );
-            return {
-                ...createMonitorErrorResult(normalized.message, 0),
-                details: normalized.message,
-            };
+    if (Object.hasOwn(serviceConfig, "maxReplicationLagSeconds")) {
+        const candidate = Reflect.get(
+            serviceConfig,
+            "maxReplicationLagSeconds"
+        ) as unknown;
+        if (
+            typeof candidate === "number" &&
+            Number.isFinite(candidate) &&
+            candidate >= MINIMUM_LAG_THRESHOLD_SECONDS
+        ) {
+            return candidate;
         }
     }
 
-    private async performReplicationCheck(
-        primaryUrl: string,
-        replicaUrl: string,
-        timestampField: string,
-        thresholdSeconds: number,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        const started = performance.now();
+    return MINIMUM_LAG_THRESHOLD_SECONDS;
+}
 
+function evaluateTimestamp(
+    payload: RemoteEndpointPayload,
+    field: string,
+    responseTime: number,
+    role: "Primary" | "Replica"
+): MonitorCheckResult | { kind: "ok"; timestamp: number } {
+    const timestamp = normalizeTimestampValue(
+        extractNestedFieldValue(payload.data, field)
+    );
+
+    if (timestamp === undefined) {
+        return createMonitorErrorResult(
+            `${role} timestamp field '${field}' missing or invalid`,
+            responseTime
+        );
+    }
+
+    return { kind: "ok", timestamp };
+}
+
+const behavior: RemoteMonitorBehavior<
+    "replication",
+    ReplicationMonitorContext
+> = {
+    executeCheck: async ({ context, fetchEndpoint, signal, timeout }) => {
+        const started = performance.now();
         const [primary, replica] = await Promise.all([
-            this.fetchStatusPayload(primaryUrl, timeout, signal),
-            this.fetchStatusPayload(replicaUrl, timeout, signal),
+            fetchEndpoint(context.primaryUrl, timeout, signal),
+            fetchEndpoint(context.replicaUrl, timeout, signal),
         ]);
 
-        const primaryTimestamp = normalizeTimestampValue(
-            extractNestedFieldValue(primary.data, timestampField)
+        const primaryEvaluation = evaluateTimestamp(
+            primary,
+            context.timestampField,
+            Math.round(performance.now() - started),
+            "Primary"
         );
-        if (primaryTimestamp === undefined) {
-            return createMonitorErrorResult(
-                `Primary timestamp field '${timestampField}' missing or invalid`,
-                Math.round(performance.now() - started)
-            );
+        if ("status" in primaryEvaluation) {
+            return primaryEvaluation;
         }
 
-        const replicaTimestamp = normalizeTimestampValue(
-            extractNestedFieldValue(replica.data, timestampField)
+        const replicaEvaluation = evaluateTimestamp(
+            replica,
+            context.timestampField,
+            Math.round(performance.now() - started),
+            "Replica"
         );
-        if (replicaTimestamp === undefined) {
-            return createMonitorErrorResult(
-                `Replica timestamp field '${timestampField}' missing or invalid`,
-                Math.round(performance.now() - started)
-            );
+        if ("status" in replicaEvaluation) {
+            return replicaEvaluation;
         }
+
+        const primaryTimestamp = primaryEvaluation.timestamp;
+        const replicaTimestamp = replicaEvaluation.timestamp;
 
         const lagMilliseconds = Math.abs(primaryTimestamp - replicaTimestamp);
         const lagSeconds = lagMilliseconds / 1000;
         const responseTime = Math.round(performance.now() - started);
 
-        if (lagSeconds <= thresholdSeconds) {
+        if (lagSeconds <= context.thresholdSeconds) {
             return {
-                details: `Replication lag ${lagSeconds.toFixed(2)}s within threshold ${thresholdSeconds}s`,
+                details: `Replication lag ${lagSeconds.toFixed(2)}s within threshold ${context.thresholdSeconds}s`,
                 responseTime,
                 status: "up",
             };
         }
 
         return {
-            details: `Replication lag ${lagSeconds.toFixed(2)}s exceeds threshold ${thresholdSeconds}s`,
+            details: `Replication lag ${lagSeconds.toFixed(2)}s exceeds threshold ${context.thresholdSeconds}s`,
             responseTime,
             status: "degraded",
         };
-    }
-
-    private async fetchStatusPayload(
-        url: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<EndpointPayload> {
-        const signals: AbortSignal[] = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
-        }
-
-        const combinedSignal = AbortSignal.any(signals);
-
-        try {
-            const response = await this.axiosInstance.get<unknown>(url, {
-                signal: combinedSignal,
-                timeout,
-            });
-
-            const rawData: unknown = response.data;
-            let parsed: unknown = rawData;
-
-            if (typeof rawData === "string") {
-                if (rawData.length === 0) {
-                    parsed = {};
-                } else {
-                    try {
-                        parsed = JSON.parse(rawData);
-                    } catch (parseError) {
-                        const normalizedParseError = ensureError(parseError);
-                        normalizedParseError.message = `Invalid JSON response from ${url}: ${normalizedParseError.message}`;
-                        throw normalizedParseError;
-                    }
-                }
-            }
-
+    },
+    failureLogLevel: "warn",
+    getOperationName: (context) =>
+        `Replication lag check for ${context.primaryUrl}`,
+    resolveConfiguration: (monitor, serviceConfig) => {
+        const primaryCandidate = Reflect.get(
+            monitor,
+            "primaryStatusUrl"
+        ) as unknown;
+        if (typeof primaryCandidate !== "string") {
             return {
-                data: parsed,
-                responseTime: response.responseTime ?? timeout,
+                kind: "error",
+                message:
+                    "Primary status URL is required for replication monitors",
             };
-        } catch (fetchError) {
-            const normalizedFetchError = ensureError(fetchError);
-            normalizedFetchError.message = `Failed to fetch ${url}: ${normalizedFetchError.message}`;
-            throw normalizedFetchError;
         }
-    }
-
-    private resolveConfiguration(
-        monitor: Site["monitors"][0]
-    ): ResolvedReplicationConfig | { error: string } {
-        const primaryCandidate = Reflect.get(monitor, "primaryStatusUrl");
-        if (
-            typeof primaryCandidate !== "string" ||
-            !isValidUrl(primaryCandidate)
-        ) {
+        const primaryUrl = primaryCandidate.trim();
+        if (!isValidUrl(primaryUrl)) {
             return {
-                error: "Primary status URL is required for replication monitors",
+                kind: "error",
+                message:
+                    "Primary status URL is required for replication monitors",
             };
         }
 
-        const replicaCandidate = Reflect.get(monitor, "replicaStatusUrl");
-        if (
-            typeof replicaCandidate !== "string" ||
-            !isValidUrl(replicaCandidate)
-        ) {
+        const replicaCandidate = Reflect.get(
+            monitor,
+            "replicaStatusUrl"
+        ) as unknown;
+        if (typeof replicaCandidate !== "string") {
             return {
-                error: "Replica status URL is required for replication monitors",
+                kind: "error",
+                message:
+                    "Replica status URL is required for replication monitors",
+            };
+        }
+        const replicaUrl = replicaCandidate.trim();
+        if (!isValidUrl(replicaUrl)) {
+            return {
+                kind: "error",
+                message:
+                    "Replica status URL is required for replication monitors",
             };
         }
 
         const timestampCandidate = Reflect.get(
             monitor,
             "replicationTimestampField"
-        );
-        if (
-            typeof timestampCandidate !== "string" ||
-            timestampCandidate.trim().length === 0
-        ) {
-            return { error: "Replication timestamp field is required" };
+        ) as unknown;
+        if (typeof timestampCandidate !== "string") {
+            return {
+                kind: "error",
+                message: "Replication timestamp field is required",
+            };
         }
+        const timestampField = timestampCandidate.trim();
+        if (timestampField.length === 0) {
+            return {
+                kind: "error",
+                message: "Replication timestamp field is required",
+            };
+        }
+
+        const thresholdSeconds = resolveLagThreshold(monitor, serviceConfig);
 
         return {
-            primaryUrl: primaryCandidate.trim(),
-            replicaUrl: replicaCandidate.trim(),
-            timestampField: timestampCandidate.trim(),
+            context: {
+                primaryUrl,
+                replicaUrl,
+                thresholdSeconds,
+                timestampField,
+            },
+            kind: "context",
         };
-    }
+    },
+    scope: "ReplicationMonitor",
+    type: "replication",
+};
 
-    private resolveLagThreshold(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(
-            monitor,
-            "maxReplicationLagSeconds"
-        ) as unknown;
-        if (
-            typeof monitorValue === "number" &&
-            Number.isFinite(monitorValue) &&
-            monitorValue >= MINIMUM_LAG_THRESHOLD_SECONDS
-        ) {
-            return monitorValue;
-        }
+const ReplicationMonitorBase: new (config?: MonitorConfig) => IMonitorService =
+    buildMonitorFactory(
+        () =>
+            createRemoteMonitorService<
+                "replication",
+                ReplicationMonitorContext
+            >(behavior),
+        "ReplicationMonitor"
+    );
 
-        if (Object.hasOwn(this.config, "maxReplicationLagSeconds")) {
-            const candidate = Reflect.get(
-                this.config,
-                "maxReplicationLagSeconds"
-            ) as unknown;
-            if (
-                typeof candidate === "number" &&
-                Number.isFinite(candidate) &&
-                candidate >= MINIMUM_LAG_THRESHOLD_SECONDS
-            ) {
-                return candidate;
-            }
-        }
+/**
+ * Replication monitor service built atop the shared remote monitor core.
+ */
+export class ReplicationMonitor extends ReplicationMonitorBase {}
 
-        return MINIMUM_LAG_THRESHOLD_SECONDS;
-    }
-
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
-        this.axiosInstance = createHttpClient(this.config);
-    }
-
-    public getType(): MonitorType {
-        return "replication";
-    }
-
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-        this.axiosInstance = createHttpClient(this.config);
-    }
-}
+/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

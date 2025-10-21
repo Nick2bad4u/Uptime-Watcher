@@ -33,22 +33,61 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
 
 // Helper function to create complete MonitorTypeConfig objects
 function createMockConfig(overrides: Partial<MonitorTypeConfig> = {}) {
-    return {
-        type: "http",
-        displayName: "HTTP Monitor",
-        description: "HTTP monitoring",
-        version: "1.0.0",
-        fields: [],
-        uiConfig: {
-            supportsAdvancedAnalytics: false,
-            supportsResponseTime: false,
-            display: { showUrl: false },
-            helpTexts: {},
-            detailFormats: {},
-            ...overrides.uiConfig,
+    const defaultFields: MonitorTypeConfig["fields"] = [
+        {
+            helpText: "Enter the endpoint to monitor",
+            label: "Endpoint",
+            name: "endpoint",
+            placeholder: "https://status.example.com",
+            required: true,
+            type: "url",
         },
-        ...overrides,
-    };
+    ];
+
+    const defaultUiConfig = {
+        supportsAdvancedAnalytics: false,
+        supportsResponseTime: false,
+        display: { showUrl: true },
+        helpTexts: {
+            primary: "Primary help text",
+            secondary: "Secondary help text",
+        },
+        detailFormats: {
+            analyticsLabel: "HTTP Response Time",
+        },
+    } satisfies NonNullable<MonitorTypeConfig["uiConfig"]>;
+
+    const mergedUiConfig = overrides.uiConfig
+        ? {
+              supportsAdvancedAnalytics:
+                  overrides.uiConfig.supportsAdvancedAnalytics ??
+                  defaultUiConfig.supportsAdvancedAnalytics,
+              supportsResponseTime:
+                  overrides.uiConfig.supportsResponseTime ??
+                  defaultUiConfig.supportsResponseTime,
+              display: {
+                  ...defaultUiConfig.display,
+                  ...overrides.uiConfig.display,
+              },
+              helpTexts: {
+                  ...defaultUiConfig.helpTexts,
+                  ...overrides.uiConfig.helpTexts,
+              },
+              detailFormats: {
+                  ...defaultUiConfig.detailFormats,
+                  ...overrides.uiConfig.detailFormats,
+              },
+          }
+        : defaultUiConfig;
+
+    return {
+        type: overrides.type ?? "http",
+        displayName: overrides.displayName ?? "HTTP Monitor",
+        description: overrides.description ?? "HTTP monitoring",
+        version: overrides.version ?? "1.0.0",
+        fields: overrides.fields ?? defaultFields,
+        uiConfig: mergedUiConfig,
+    } satisfies MonitorTypeConfig;
 }
 
 // Mock window.electronAPI

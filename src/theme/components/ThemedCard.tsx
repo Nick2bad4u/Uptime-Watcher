@@ -54,6 +54,8 @@
  * @public
  */
 
+/* eslint-disable complexity -- UI component requires conditional layout handling */
+
 import type {
     ClickHandler,
     CoreComponentProperties,
@@ -140,7 +142,6 @@ export interface ThemedCardProperties extends CoreComponentProperties {
  *
  * @public
  */
-// eslint-disable-next-line complexity -- UI component with many optional props requires conditional logic for flexibility
 const ThemedCardComponent = ({
     children,
     className = "",
@@ -258,3 +259,5 @@ const ThemedCardComponent = ({
  */
 export const ThemedCard: NamedExoticComponent<ThemedCardProperties> =
     memo(ThemedCardComponent);
+
+/* eslint-enable complexity -- Restore default complexity checks */

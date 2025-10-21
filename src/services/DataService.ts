@@ -73,8 +73,10 @@ export const DataService: DataServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const jsonData = await DataService.exportData();
-     * console.log("Exported data size:", jsonData.length);
+     * logger.info("Exported data", { bytes: jsonData.length });
      * ```
      *
      * @returns A JSON string containing all sites, monitors, and settings.
@@ -89,11 +91,13 @@ export const DataService: DataServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const success = await DataService.importData(jsonString);
      * if (success) {
-     *     console.log("Data imported successfully");
+     *     logger.info("Data imported successfully");
      * } else {
-     *     console.error("Import failed");
+     *     logger.error("Data import failed");
      * }
      * ```
      *

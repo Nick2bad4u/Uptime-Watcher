@@ -11,7 +11,7 @@ import {
     registerTitleSuffixFormatter,
     type TitleSuffixFormatter,
 } from "../../utils/monitorTitleFormatters";
-import type { Monitor } from "../../../shared/types.js";
+import type { Monitor } from "@shared/types";
 
 /**
  * Mock monitor factory for testing

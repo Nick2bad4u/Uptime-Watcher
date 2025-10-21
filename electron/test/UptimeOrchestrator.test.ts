@@ -10,8 +10,8 @@ import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
-import type { Site, Monitor, StatusUpdate } from "../../shared/types.js";
-import { ApplicationError } from "../../shared/utils/errorHandling.js";
+import type { Site, Monitor, StatusUpdate } from "@shared/types";
+import { ApplicationError } from "@shared/utils/errorHandling";
 
 // Mock all dependencies with proper typing
 const mockDatabaseManager = {

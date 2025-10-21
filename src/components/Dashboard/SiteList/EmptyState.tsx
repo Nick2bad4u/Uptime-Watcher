@@ -62,7 +62,7 @@ export const EmptyState = (): JSX.Element => {
             data-testid="empty-state"
             padding="xl"
         >
-            {/* empty-state-icon class provides styling from src/theme/components.css */}
+            {/* empty-state-icon class styling loads via src/index.css fragment imports */}
             <div className="empty-state-icon">
                 <MonitorIcon className="empty-state-icon__symbol" size={56} />
             </div>

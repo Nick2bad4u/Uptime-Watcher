@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Monitor, Site } from "../../../../shared/types";
+import type { Monitor, Site } from "@shared/types";
 import {
     MonitorStatusUpdateService,
     type StatusUpdateMonitorCheckResult,

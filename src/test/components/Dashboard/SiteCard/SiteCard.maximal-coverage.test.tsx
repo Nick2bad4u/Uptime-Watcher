@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
-import type { Site } from "../../../../../shared/types";
+import type { Site } from "@shared/types";
 
 // Mock all dependencies
 vi.mock("../../../../hooks/site/useSite", () => ({

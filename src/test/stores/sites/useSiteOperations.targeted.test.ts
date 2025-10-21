@@ -5,13 +5,13 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type Site } from "../../../../shared/types";
-import { ERROR_CATALOG } from "../../../../shared/utils/errorCatalog";
+import { type Site } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 import { logger } from "../../../services/logger";
-import { isDevelopment } from "../../../../shared/utils/environment";
+import { isDevelopment } from "@shared/utils/environment";
 
 // Get mock reference after import
 const mockIsDevelopment = vi.mocked(isDevelopment);

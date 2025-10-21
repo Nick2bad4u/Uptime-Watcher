@@ -201,6 +201,12 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+
+    & > div {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
 }
 
 .settings-section__icon {
@@ -218,14 +224,22 @@
 }
 
 .settings-section__description {
-    margin-block-start: 2px;
+    display: block;
+    line-height: 1.5;
+    margin-block-start: var(--spacing-xs);
 }
 
 .settings-section__content,
 .settings-actions {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+}
+
+.settings-field,
+.settings-toggle-stack,
+.settings-actions {
+    padding-block: 0.25rem;
 }
 
 .settings-field,

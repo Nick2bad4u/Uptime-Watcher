@@ -8,10 +8,10 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { MonitorFieldDefinition } from "../../../shared/types";
+import type { MonitorFieldDefinition } from "@shared/types";
 
 import { useMonitorFields } from "../../hooks/useMonitorFields";
-import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {

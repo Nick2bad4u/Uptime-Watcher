@@ -68,18 +68,58 @@ test.describe(
 
                 await openSiteDetails(page, siteName);
 
-                const removeButton = page
-                    .getByTestId("site-details-modal")
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                await siteDetailsModal
+                    .getByRole("button", { name: "Settings" })
+                    .click({ timeout: WAIT_TIMEOUTS.MEDIUM });
+
+                const removeButton = siteDetailsModal
                     .getByRole("button", { name: "Remove Site" })
                     .first();
-                await removeButton.scrollIntoViewIfNeeded();
                 await expect(removeButton).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
-                // eslint-disable-next-line playwright/no-force-option -- The Remove Site control sits inside an animated modal header; forcing the click avoids perpetual "element is not stable" errors in automation.
-                await removeButton.click({ force: true });
+                await expect
+                    .poll(
+                        async () =>
+                            page.evaluate(() => {
+                                const modal = document.querySelector(
+                                    '[data-testid="site-details-modal"]'
+                                );
+                                if (!modal) {
+                                    return "missing-modal";
+                                }
 
-                await waitForConfirmDialogRequest(page);
+                                const buttons = Array.from(
+                                    modal.querySelectorAll("button")
+                                ) as HTMLButtonElement[];
+                                const target = buttons.find((button) =>
+                                    button.textContent
+                                        ?.trim()
+                                        .toLowerCase()
+                                        .startsWith("remove site")
+                                );
+
+                                if (!target || target.disabled) {
+                                    return "pending";
+                                }
+
+                                target.click();
+                                return "clicked";
+                            }),
+                        {
+                            timeout: WAIT_TIMEOUTS.APP_INITIALIZATION,
+                            intervals: [250, 500],
+                        }
+                    )
+                    .toBe("clicked");
+
+                const confirmRequest = await waitForConfirmDialogRequest(
+                    page,
+                    WAIT_TIMEOUTS.LONG
+                );
+                expect(confirmRequest).not.toBeNull();
+                expect(confirmRequest?.title).toBe("Remove Site");
 
                 const confirmationDialog = page.getByTestId("confirm-dialog");
 
@@ -125,15 +165,52 @@ test.describe(
 
                 await openSiteDetails(page, siteName);
 
-                const removeButton = page
-                    .getByTestId("site-details-modal")
-                    .getByRole("button", { name: "Remove Site" })
-                    .first();
-                await removeButton.scrollIntoViewIfNeeded();
-                // eslint-disable-next-line playwright/no-force-option -- The Remove Site control sits inside an animated modal header; forcing the click avoids perpetual "element is not stable" errors in automation.
-                await removeButton.click({ force: true });
+                const siteDetailsModal = page.getByTestId("site-details-modal");
+                await siteDetailsModal
+                    .getByRole("button", { name: "Settings" })
+                    .click({ timeout: WAIT_TIMEOUTS.MEDIUM });
 
-                await waitForConfirmDialogRequest(page);
+                await expect
+                    .poll(
+                        async () =>
+                            page.evaluate(() => {
+                                const modal = document.querySelector(
+                                    '[data-testid="site-details-modal"]'
+                                );
+                                if (!modal) {
+                                    return "missing-modal";
+                                }
+
+                                const buttons = Array.from(
+                                    modal.querySelectorAll("button")
+                                ) as HTMLButtonElement[];
+                                const target = buttons.find((button) =>
+                                    button.textContent
+                                        ?.trim()
+                                        .toLowerCase()
+                                        .startsWith("remove site")
+                                );
+
+                                if (!target || target.disabled) {
+                                    return "pending";
+                                }
+
+                                target.click();
+                                return "clicked";
+                            }),
+                        {
+                            timeout: WAIT_TIMEOUTS.APP_INITIALIZATION,
+                            intervals: [250, 500],
+                        }
+                    )
+                    .toBe("clicked");
+
+                const confirmRequest = await waitForConfirmDialogRequest(
+                    page,
+                    WAIT_TIMEOUTS.LONG
+                );
+                expect(confirmRequest).not.toBeNull();
+                expect(confirmRequest?.title).toBe("Remove Site");
 
                 const confirmationDialog = page.getByTestId("confirm-dialog");
 

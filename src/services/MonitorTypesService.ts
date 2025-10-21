@@ -113,8 +113,10 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const types = await MonitorTypesService.getMonitorTypes();
-     * console.log("Available monitor types:", types.length);
+     * logger.info("Loaded monitor types", { count: types.length });
      * ```
      *
      * @returns Array of monitor type configurations.
@@ -145,6 +147,8 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const result = await MonitorTypesService.validateMonitorData(
      *     "http",
      *     {
@@ -152,9 +156,9 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
      *     }
      * );
      * if (result.success) {
-     *     console.log("Validation passed");
+     *     logger.info("Monitor validation passed");
      * } else {
-     *     console.error("Validation errors:", result.errors);
+     *     logger.error("Monitor validation failed", result.errors);
      * }
      * ```
      *

@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from "vitest";
 import { getMonitorDisplayIdentifier } from "../../utils/fallbacks";
-import type { Monitor } from "../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 describe("fallbacks.ts - Targeted Coverage for Lines 121,142", (): void => {
     describe("Line 121: Ping Monitor Generator Coverage", (): void => {

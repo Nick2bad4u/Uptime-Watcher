@@ -43,19 +43,26 @@
  * @public
  */
 
-import type { FormFieldBaseProperties } from "@shared/types/componentProps";
-
-import { memo, type NamedExoticComponent, useCallback } from "react";
+import {
+    type ChangeEvent,
+    memo,
+    type NamedExoticComponent,
+    type ReactElement,
+    useCallback,
+} from "react";
 
 import { ThemedText } from "../../theme/components/ThemedText";
-import { BaseFormField } from "./BaseFormField";
+import {
+    createFieldWrapper,
+    type FieldWrapperPropsBase,
+} from "./fields/fieldFactories";
 
 /**
  * Properties for the RadioGroup component.
  *
  * @public
  */
-export interface RadioGroupProperties extends FormFieldBaseProperties {
+export interface RadioGroupProperties extends FieldWrapperPropsBase {
     /** Whether the radio group is disabled */
     readonly disabled?: boolean;
     /** Name attribute for radio inputs (should be unique within the form) */
@@ -79,6 +86,44 @@ export interface RadioOption {
     /** Value to be selected when this option is chosen */
     value: string;
 }
+
+interface RadioOptionItemProps {
+    readonly disabled: boolean;
+    readonly handleChange: (value: string) => void;
+    readonly name: string;
+    readonly option: RadioOption;
+    readonly required: boolean;
+    readonly selectedValue: string;
+}
+
+const RadioOptionItem = memo((props: RadioOptionItemProps): ReactElement => {
+    const { disabled, handleChange, name, option, required, selectedValue } =
+        props;
+
+    const handleOptionChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            handleChange(event.target.value);
+        },
+        [handleChange]
+    );
+
+    return (
+        <label className="flex items-center gap-1" key={option.value}>
+            <input
+                checked={selectedValue === option.value}
+                disabled={disabled}
+                name={name}
+                onChange={handleOptionChange}
+                required={required}
+                type="radio"
+                value={option.value}
+            />
+            <ThemedText size="sm">{option.label}</ThemedText>
+        </label>
+    );
+});
+
+RadioOptionItem.displayName = "RadioOptionItem";
 
 /**
  * RadioGroup component for selecting one option from multiple choices with
@@ -115,59 +160,39 @@ export interface RadioOption {
  *
  * @public
  */
-export const RadioGroup: NamedExoticComponent<RadioGroupProperties> = memo(
-    function RadioGroup({
-        disabled = false,
-        error,
-        helpText,
-        id,
-        label,
-        name,
-        onChange,
-        options,
-        required = false,
-        value,
-    }: RadioGroupProperties) {
-        const createChangeHandler = useCallback(
-            (optionValue: string): (() => void) =>
-                (): void => {
-                    onChange(optionValue);
-                },
-            [onChange]
-        );
+const RadioGroupBase = createFieldWrapper<RadioGroupProperties>({
+    displayName: "RadioGroup",
+    renderControl: ({ props }) => {
+        const {
+            disabled = false,
+            name,
+            onChange,
+            options,
+            required = false,
+            value,
+        } = props;
+
+        function renderOption(option: RadioOption): ReactElement {
+            return (
+                <RadioOptionItem
+                    disabled={disabled}
+                    handleChange={onChange}
+                    key={option.value}
+                    name={name}
+                    option={option}
+                    required={required}
+                    selectedValue={value}
+                />
+            );
+        }
 
         return (
-            <BaseFormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
-                id={id}
-                label={label}
-                required={required}
-            >
-                {() => (
-                    <div className="flex items-center gap-4" role="radiogroup">
-                        {options.map((option) => (
-                            <label
-                                className="flex items-center gap-1"
-                                key={option.value}
-                            >
-                                <input
-                                    checked={value === option.value}
-                                    disabled={disabled}
-                                    name={name}
-                                    onChange={createChangeHandler(option.value)}
-                                    required={required}
-                                    type="radio"
-                                    value={option.value}
-                                />
-                                <ThemedText size="sm">
-                                    {option.label}
-                                </ThemedText>
-                            </label>
-                        ))}
-                    </div>
-                )}
-            </BaseFormField>
+            <div className="flex items-center gap-4" role="radiogroup">
+                {options.map(renderOption)}
+            </div>
         );
-    }
-);
+    },
+});
+
+export const RadioGroup: NamedExoticComponent<RadioGroupProperties> =
+    RadioGroupBase;

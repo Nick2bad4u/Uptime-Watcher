@@ -5,13 +5,13 @@
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
 
+import { AppSidebar } from "@app/components/Layout/AppSidebar/AppSidebar";
+import { useSidebarLayout } from "@app/components/Layout/SidebarLayoutContext";
+import { SidebarLayoutProvider } from "@app/components/Layout/SidebarLayoutProvider";
+import { SidebarRevealButton } from "@app/components/Layout/SidebarRevealButton/SidebarRevealButton";
+import { useTheme } from "@app/theme/useTheme";
 import { useCallback, useEffect, useMemo, useReducer } from "react";
 
-import { AppSidebar } from "../../src/components/Layout/AppSidebar/AppSidebar";
-import { useSidebarLayout } from "../../src/components/Layout/SidebarLayoutContext";
-import { SidebarLayoutProvider } from "../../src/components/Layout/SidebarLayoutProvider";
-import { SidebarRevealButton } from "../../src/components/Layout/SidebarRevealButton/SidebarRevealButton";
-import { useTheme } from "../../src/theme/useTheme";
 import {
     createMockMonitor,
     createMockSite,

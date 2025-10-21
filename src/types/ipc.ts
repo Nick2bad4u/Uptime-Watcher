@@ -36,29 +36,9 @@
  * @packageDocumentation
  */
 
-import type { UnknownRecord } from "type-fest";
+import type { IpcResponse } from "@shared/types/ipc";
 
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
-
-/**
- * Standardized IPC response format.
- *
- * @typeParam T - The type of data returned on success
- *
- * @public
- */
-export interface IpcResponse<T> {
-    /** Response data when successful */
-    data?: T;
-    /** Error message when operation fails */
-    error?: string;
-    /** Additional operation metadata */
-    metadata?: UnknownRecord;
-    /** Indicates whether the operation was successful */
-    success: boolean;
-    /** Non-critical warnings */
-    warnings?: readonly string[];
-}
 
 /**
  * Type guard to check if a value is an IPC response.

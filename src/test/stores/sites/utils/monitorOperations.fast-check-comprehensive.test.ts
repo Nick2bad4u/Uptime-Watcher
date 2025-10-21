@@ -19,11 +19,8 @@ import {
 } from "../../../../stores/sites/utils/monitorOperations";
 
 // Import types
-import type { Monitor, Site, MonitorType } from "../../../../../shared/types";
-import {
-    BASE_MONITOR_TYPES,
-    DEFAULT_MONITOR_STATUS,
-} from "../../../../../shared/types";
+import type { Monitor, Site, MonitorType } from "@shared/types";
+import { BASE_MONITOR_TYPES, DEFAULT_MONITOR_STATUS } from "@shared/types";
 
 describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () => {
     // Helper generators for fast-check
@@ -471,10 +468,10 @@ describe("monitorOperations utilities - Comprehensive Fast-Check Coverage", () =
             expect(() => normalizeMonitor([] as any)).toThrow();
         });
 
-        it("should not inject placeholder URLs for legacy HTTP monitors", () => {
+        it("should provide default URLs for HTTP monitors", () => {
             const normalized = normalizeMonitor({ type: "http" });
 
-            expect(normalized.url).toBe("");
+            expect(normalized.url).toBe("https://example.com");
         });
 
         it("should trim preserved HTTP monitor URLs", () => {

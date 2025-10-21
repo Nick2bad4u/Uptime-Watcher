@@ -2,8 +2,16 @@
  * Tests for operationHelpers.ts - covering all branches and scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Site } from "../../../../../shared/types";
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+    type Mock,
+} from "vitest";
+import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
 
 // Mock the error catalog
@@ -27,6 +35,15 @@ vi.mock("../../../../../shared/utils/errorHandling", () => ({
 vi.mock("../../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
     waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock("../../../../services/logger", () => ({
+    logger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
 }));
 
 // Mock the store error handling
@@ -53,24 +70,30 @@ Object.defineProperty(globalThis, "electronAPI", {
 
 // Import after mocking
 import {
+    applySavedSiteToStore,
     getSiteByIdentifier,
     updateMonitorAndSave,
     withSiteOperation,
     withSiteOperationReturning,
 } from "../../../../stores/sites/utils/operationHelpers";
-import { withErrorHandling } from "../../../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../../../../stores/utils";
 import { createStoreErrorHandler } from "../../../../stores/utils/storeErrorHandling";
 import { updateMonitorInSite } from "../../../../stores/sites/utils/monitorOperations";
+import { logger } from "../../../../services/logger";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 const mockLogStoreAction = vi.mocked(logStoreAction);
 const mockCreateStoreErrorHandler = vi.mocked(createStoreErrorHandler);
 const mockUpdateMonitorInSite = vi.mocked(updateMonitorInSite);
+const mockLogger = vi.mocked(logger);
 
 describe("OperationHelpers", () => {
     let mockDeps: SiteOperationsDependencies;
     let mockSites: Site[];
+    let getSitesSpy: Mock<() => Site[]>;
+    let setSitesSpy: Mock<(sites: Site[]) => void>;
 
     const createMockSite = (id: string, monitorId: string): Site => ({
         identifier: id,
@@ -134,9 +157,12 @@ describe("OperationHelpers", () => {
             stopSiteMonitoring: vi.fn(async () => {}),
         };
 
+        getSitesSpy = vi.fn<() => Site[]>(() => mockSites);
+        setSitesSpy = vi.fn<(sites: Site[]) => void>();
+
         mockDeps = {
-            getSites: vi.fn(() => mockSites),
-            setSites: vi.fn(),
+            getSites: getSitesSpy,
+            setSites: setSitesSpy,
             addSite: vi.fn(),
             removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
@@ -162,6 +188,114 @@ describe("OperationHelpers", () => {
         vi.resetAllMocks();
     });
 
+    describe(applySavedSiteToStore, () => {
+        it("replaces an existing site snapshot and enforces uniqueness", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Data Sync", "category");
+            await annotate("Type: Regression", "type");
+
+            const updatedSite: Site = {
+                ...mockSites[0]!,
+                name: "Updated Site Name",
+            };
+
+            applySavedSiteToStore(updatedSite, mockDeps);
+
+            expect(setSitesSpy).toHaveBeenCalledTimes(1);
+            const setSitesArg = setSitesSpy.mock.calls[0]?.[0];
+            expect(setSitesArg).toBeDefined();
+            expect(setSitesArg).toHaveLength(mockSites.length);
+            expect(setSitesArg?.[0]).toBe(updatedSite);
+            expect(mockLogger.error).not.toHaveBeenCalled();
+        });
+
+        it("appends a new site snapshot when identifier is unknown", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Data Sync", "category");
+            await annotate("Type: Mutation", "type");
+
+            const newSite: Site = {
+                identifier: "site-new",
+                monitoring: false,
+                monitors: [],
+                name: "Brand New",
+            };
+
+            applySavedSiteToStore(newSite, mockDeps);
+
+            expect(setSitesSpy).toHaveBeenCalledTimes(1);
+            const setSitesArg = setSitesSpy.mock.calls[0]?.[0];
+            expect(setSitesArg).toBeDefined();
+            expect(setSitesArg).toHaveLength(mockSites.length + 1);
+            expect(
+                setSitesArg?.some(
+                    (site: Site) => site.identifier === "site-new"
+                )
+            ).toBeTruthy();
+            expect(mockLogger.error).not.toHaveBeenCalled();
+        });
+
+        it("throws and logs when duplicate identifiers persist after merge", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: operationHelpers", "component");
+            await annotate("Category: Data Integrity", "category");
+            await annotate("Type: Failure", "type");
+
+            const duplicateSites: Site[] = [
+                {
+                    identifier: "duplicate",
+                    monitoring: true,
+                    monitors: [],
+                    name: "First Duplicate",
+                },
+                {
+                    identifier: "duplicate",
+                    monitoring: false,
+                    monitors: [],
+                    name: "Second Duplicate",
+                },
+            ];
+
+            getSitesSpy.mockReturnValue(duplicateSites);
+
+            const savedSite: Site = {
+                identifier: "duplicate",
+                monitoring: true,
+                monitors: [],
+                name: "Updated Duplicate",
+            };
+
+            expect(() => applySavedSiteToStore(savedSite, mockDeps)).toThrow(
+                DuplicateSiteIdentifierError
+            );
+            expect(setSitesSpy).not.toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "Duplicate site identifiers detected while persisting backend snapshot",
+                expect.objectContaining({
+                    duplicates: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: "duplicate",
+                            occurrences: 2,
+                        }),
+                    ]),
+                    operation: "applySavedSiteToStore",
+                    siteIdentifier: "duplicate",
+                })
+            );
+        });
+    });
+
     describe(getSiteByIdentifier, () => {
         it("should return site when found", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -172,7 +306,7 @@ describe("OperationHelpers", () => {
             const result = getSiteByIdentifier("site1", mockDeps);
 
             expect(result).toBe(mockSites[0]);
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should throw error when site not found", async ({
@@ -187,7 +321,7 @@ describe("OperationHelpers", () => {
             expect(() => getSiteByIdentifier("nonexistent", mockDeps)).toThrow(
                 "Site not found"
             );
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should handle empty sites array", async ({ task, annotate }) => {
@@ -196,12 +330,12 @@ describe("OperationHelpers", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            vi.mocked(mockDeps.getSites).mockReturnValue([]);
+            getSitesSpy.mockReturnValue([]);
 
             expect(() => getSiteByIdentifier("site1", mockDeps)).toThrow(
                 "Site not found"
             );
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(getSitesSpy).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -225,7 +359,7 @@ describe("OperationHelpers", () => {
 
             await updateMonitorAndSave("site1", "monitor1", updates, mockDeps);
 
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(2);
+            expect(getSitesSpy).toHaveBeenCalledTimes(2);
             expect(mockUpdateMonitorInSite).toHaveBeenCalledWith(
                 mockSites[0]!,
                 "monitor1",
@@ -235,12 +369,12 @@ describe("OperationHelpers", () => {
                 "site1",
                 { monitors: updatedSite.monitors }
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith([
+            expect(setSitesSpy).toHaveBeenCalledWith([
                 updatedSite,
                 mockSites[1]!,
                 mockSites[2]!,
             ]);
-            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            expect(setSitesSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should throw error when site not found", async ({
@@ -256,10 +390,10 @@ describe("OperationHelpers", () => {
                 updateMonitorAndSave("nonexistent", "monitor1", {}, mockDeps)
             ).rejects.toThrow("Site not found");
 
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(getSitesSpy).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
-            expect(mockDeps.setSites).not.toHaveBeenCalled();
+            expect(setSitesSpy).not.toHaveBeenCalled();
         });
 
         it("should handle updateSite API errors", async ({
@@ -278,10 +412,10 @@ describe("OperationHelpers", () => {
                 updateMonitorAndSave("site1", "monitor1", {}, mockDeps)
             ).rejects.toThrow("API Error");
 
-            expect(mockDeps.getSites).toHaveBeenCalledTimes(1);
+            expect(getSitesSpy).toHaveBeenCalledTimes(1);
             expect(mockUpdateMonitorInSite).toHaveBeenCalled();
             expect(mockElectronAPI.sites.updateSite).toHaveBeenCalled();
-            expect(mockDeps.setSites).not.toHaveBeenCalled();
+            expect(setSitesSpy).not.toHaveBeenCalled();
         });
     });
 
@@ -943,7 +1077,7 @@ describe("OperationHelpers", () => {
                 null,
                 mockSites[1],
             ] as any;
-            vi.mocked(mockDeps.getSites).mockReturnValue(sitesWithNulls);
+            getSitesSpy.mockReturnValue(sitesWithNulls);
 
             const result = getSiteByIdentifier("site1", mockDeps);
             expect(result).toBe(mockSites[0]);
@@ -991,12 +1125,12 @@ describe("OperationHelpers", () => {
                 "site1",
                 { monitors: updatedSite.monitors }
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith([
+            expect(setSitesSpy).toHaveBeenCalledWith([
                 updatedSite,
                 mockSites[1]!,
                 mockSites[2]!,
             ]);
-            expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+            expect(setSitesSpy).toHaveBeenCalledTimes(1);
         });
 
         it("should handle operations with empty parameters object", async ({

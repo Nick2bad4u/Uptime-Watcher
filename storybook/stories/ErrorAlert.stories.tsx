@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, ReactElement } from "react";
 
+import { ErrorAlert } from "@app/components/common/ErrorAlert/ErrorAlert";
+import { ThemedText } from "@app/theme/components/ThemedText";
 import { useState } from "react";
 import { action } from "storybook/actions";
-
-import { ErrorAlert } from "../../src/components/common/ErrorAlert/ErrorAlert";
-import { ThemedText } from "../../src/theme/components/ThemedText";
 
 const meta: Meta<typeof ErrorAlert> = {
     args: {

@@ -14,7 +14,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import type { SiteStatus } from "../../../shared/types";
+import type { SiteStatus } from "@shared/types";
 
 describe("Frontend siteStatus re-exports", () => {
     describe("Function re-exports", () => {

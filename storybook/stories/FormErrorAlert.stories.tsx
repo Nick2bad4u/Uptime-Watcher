@@ -1,11 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ComponentProps, ReactElement } from "react";
 
+import { FormErrorAlert } from "@app/components/shared/FormErrorAlert";
+import { ThemedButton } from "@app/theme/components/ThemedButton";
 import { useState } from "react";
 import { action } from "storybook/actions";
-
-import { FormErrorAlert } from "../../src/components/shared/FormErrorAlert";
-import { ThemedButton } from "../../src/theme/components/ThemedButton";
 
 const meta: Meta<typeof FormErrorAlert> = {
     args: {

@@ -8,14 +8,19 @@
  * subscriptions.
  */
 
-import type { StateSyncEventData } from "@shared/types/events";
-import type {
-    StateSyncFullSyncResult,
-    StateSyncStatusSummary,
+import {
+    safeParseStateSyncEventData,
+    type StateSyncEventData,
+} from "@shared/types/events";
+import {
+    parseStateSyncFullSyncResult,
+    parseStateSyncStatusSummary,
+    type StateSyncFullSyncResult,
+    type StateSyncStatusSummary,
 } from "@shared/types/stateSync";
-
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -66,10 +71,11 @@ export const StateSyncService: StateSyncServiceContract = {
      *
      * @returns {@link StateSyncStatusSummary} Describing recent sync activity.
      */
-    getSyncStatus: wrap("getSyncStatus", (api) =>
+    getSyncStatus: wrap("getSyncStatus", async (api) => {
         // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
-        api.stateSync.getSyncStatus()
-    ),
+        const rawSummary = await api.stateSync.getSyncStatus();
+        return parseStateSyncStatusSummary(rawSummary);
+    }),
 
     /**
      * Ensures the preload bridge is initialized prior to invoking IPC.
@@ -87,9 +93,55 @@ export const StateSyncService: StateSyncServiceContract = {
      */
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
-        (api, callback: (event: StateSyncEventData) => void) =>
-            // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
-            Promise.resolve(api.stateSync.onStateSyncEvent(callback))
+        async (api, callback: (event: StateSyncEventData) => void) => {
+            const unsubscribeCandidate = await Promise.resolve(
+                // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
+                api.stateSync.onStateSyncEvent((rawEvent) => {
+                    const parsedEvent = safeParseStateSyncEventData(rawEvent);
+
+                    if (!parsedEvent.success) {
+                        logger.error(
+                            "[StateSyncService] Ignoring invalid state sync event payload",
+                            parsedEvent.error,
+                            {
+                                rawEvent,
+                            }
+                        );
+                        return;
+                    }
+
+                    callback(parsedEvent.data);
+                })
+            );
+
+            if (typeof unsubscribeCandidate !== "function") {
+                logger.error(
+                    "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
+                    {
+                        actualType: typeof unsubscribeCandidate,
+                    }
+                );
+
+                return (): void => {
+                    logger.error(
+                        "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
+                    );
+                };
+            }
+
+            const unsubscribe = unsubscribeCandidate;
+
+            return (): void => {
+                try {
+                    unsubscribe();
+                } catch (error) {
+                    logger.error(
+                        "[StateSyncService] Failed to cleanup state sync subscription:",
+                        ensureError(error)
+                    );
+                }
+            };
+        }
     ),
 
     /**
@@ -97,8 +149,9 @@ export const StateSyncService: StateSyncServiceContract = {
      *
      * @returns {@link StateSyncFullSyncResult} Emitted by the backend.
      */
-    requestFullSync: wrap("requestFullSync", (api) =>
+    requestFullSync: wrap("requestFullSync", async (api) => {
         // eslint-disable-next-line n/no-sync -- IPC bridge exposes async method with "Sync" suffix.
-        api.stateSync.requestFullSync()
-    ),
+        const rawResult = await api.stateSync.requestFullSync();
+        return parseStateSyncFullSyncResult(rawResult);
+    }),
 };

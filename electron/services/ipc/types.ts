@@ -3,8 +3,13 @@
  * handlers should return responses following this structure.
  */
 
-import type { ValidationResult } from "@shared/types/validation";
-import type { UnknownRecord } from "type-fest";
+import type {
+    IpcResponse as SharedIpcResponse,
+    IpcValidationResponse as SharedIpcValidationResponse,
+} from "@shared/types/ipc";
+
+export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
+export type IpcValidationResponse = SharedIpcValidationResponse;
 
 /**
  * Parameters for IPC handler wrapper configuration.
@@ -18,62 +23,6 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
     handler: (...args: TParams[]) => Promise<TResult> | TResult;
     /** Optional parameter validation function */
     validateParams?: (params: unknown[]) => null | string[];
-}
-
-/**
- * Base IPC response interface for consistent communication between main and
- * renderer processes.
- *
- * @remarks
- * Provides a standardized structure for all IPC handler responses, ensuring
- * consistent error handling and data format across the application. All IPC
- * handlers should use this response format.
- *
- * @example
- *
- * ```typescript
- * // Success response
- * const response: IpcResponse<Site[]> = {
- *     success: true,
- *     data: sites,
- * };
- *
- * // Error response
- * const response: IpcResponse<void> = {
- *     success: false,
- *     error: "Failed to retrieve sites",
- * };
- * ```
- *
- * @public
- */
-export interface IpcResponse<T = unknown> {
-    /** The response data when operation succeeds */
-    data?: T;
-    /** Error message when operation fails */
-    error?: string;
-    /** Additional metadata about the operation */
-    metadata?: UnknownRecord;
-    /** Indicates if the operation was successful */
-    success: boolean;
-    /** Non-critical warnings about the operation */
-    warnings?: readonly string[];
-}
-
-/**
- * Validation result interface specifically for monitor validation operations.
- *
- * @remarks
- * Extends the base IpcResponse pattern for monitor validation-specific
- * operations.
- *
- * @public
- */
-export interface IpcValidationResponse extends IpcResponse<ValidationResult> {
-    /** List of validation errors (required for validation responses) */
-    errors: readonly string[];
-    /** Whether validation passed (required for validation responses) */
-    success: boolean;
 }
 
 /**

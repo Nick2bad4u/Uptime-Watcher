@@ -142,7 +142,8 @@ export const createSiteOperationsActions = (
 
                 // Preload now returns extracted data directly
                 const newSite = await deps.services.site.addSite(completeSite);
-                deps.addSite(newSite);
+
+                applySavedSiteToStore(newSite, deps);
             },
             deps,
             {

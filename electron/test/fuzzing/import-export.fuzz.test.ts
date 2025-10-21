@@ -20,7 +20,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import fc from "fast-check";
 import { DataImportExportService } from "../../utils/database/DataImportExportService";
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 
 describe("Data Import/Export Service Fuzzing Tests", () => {
     let service: DataImportExportService;

@@ -1,0 +1,245 @@
+/* Application Shell and Layout Utilities */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
+
+.app-container {
+    background-color: var(--color-background-primary);
+    min-block-size: 100vb;
+}
+
+.modal-container {
+    margin: 0 1rem;
+    inline-size: 100%;
+    max-block-size: 90vb;
+    max-inline-size: 42rem;
+    overflow-block: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.main-container {
+    padding: 2rem 1rem;
+    margin: 0 auto;
+    max-inline-size: 80rem;
+
+    @media (width >= 640px) {
+        padding: 2rem 1.5rem;
+    }
+
+    @media (width >= 1024px) {
+        padding: 2rem;
+    }
+}
+
+.app-shell {
+    display: grid;
+    background: linear-gradient(180deg, rgb(15 23 42) 0%, rgb(8 11 19) 100%);
+    grid-template-columns: minmax(18rem, 20rem) minmax(0, 1fr);
+    inline-size: 100%;
+    min-block-size: 100vb;
+    transition:
+        background var(--transition-normal),
+        grid-template-columns var(--transition-normal);
+
+    & > .app-sidebar {
+        grid-column: 1;
+        grid-row: 1 / -1;
+    }
+}
+
+.app-shell--sidebar-closed {
+    grid-template-columns: 0 minmax(0, 1fr);
+}
+
+@media (width <= 1024px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .app-shell--sidebar-closed {
+        grid-template-columns: 1fr;
+    }
+}
+
+.app-shell--light {
+    background: linear-gradient(
+        180deg,
+        rgb(248 250 252) 0%,
+        rgb(226 232 240) 100%
+    );
+}
+
+.app-shell__main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(16px);
+    background: color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
+    grid-column: 2 / -1;
+    grid-row: 1;
+    min-block-size: 100vb;
+    min-inline-size: 0;
+    overflow-block: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+
+    .app-shell--light & {
+        background: color-mix(
+            in srgb,
+            var(--surface-light-color) 90%,
+            transparent
+        );
+    }
+}
+
+.app-shell__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: clamp(1.75rem, 1.35rem + 0.65vi, 2.5rem)
+        clamp(0.75rem, 2.5vi, 2rem) clamp(2.25rem, 1.8rem + 1.75vi, 3rem);
+    gap: 1.5rem;
+    min-block-size: 0;
+}
+
+.app-shell__panel {
+    padding: clamp(1rem, 0.8rem + 0.6vi, 1.5rem);
+    border: 1px solid
+        color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent);
+    border-radius: 1.25rem;
+    background: color-mix(in srgb, var(--shadow-base-color) 40%, transparent);
+    box-shadow: 0 18px 48px
+        color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
+    inline-size: 100%;
+    margin-inline: auto;
+    max-inline-size: min(120rem, 100%);
+
+    .app-shell--light & {
+        border-color: color-mix(
+            in srgb,
+            var(--shadow-base-color) 6%,
+            transparent
+        );
+        background: color-mix(
+            in srgb,
+            var(--shadow-inverse-color) 80%,
+            transparent
+        );
+        box-shadow: 0 12px 32px
+            color-mix(in srgb, var(--shadow-base-color) 12%, transparent);
+    }
+}
+
+@media (width <= 1024px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .app-shell__main {
+        padding-inline-start: 0;
+    }
+
+    .app-shell__content {
+        padding: 2rem clamp(1rem, 6vi, 2rem) 2.5rem;
+    }
+
+    .app-shell__panel {
+        padding: 1rem;
+        border-radius: 1rem;
+    }
+}
+
+@media (width <= 640px) {
+    .app-shell__content {
+        padding: 1.5rem clamp(0.75rem, 5vi, 1.5rem) 2rem;
+        gap: 1rem;
+    }
+
+    .site-grid {
+        --site-grid-column-min: clamp(18rem, 86vi, 20rem);
+        --site-grid-gap: clamp(0.75rem, 0.65rem + 0.5vi, 1rem);
+    }
+}
+
+.header-container {
+    padding: 0 1rem;
+    margin: 0 auto;
+    max-inline-size: 80rem;
+
+    @media (width >= 640px) {
+        padding: 0 1.5rem;
+    }
+
+    @media (width >= 1024px) {
+        padding: 0 2rem;
+    }
+}
+
+.grid-layout {
+    display: grid;
+    margin: 0 auto;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+    max-inline-size: 100%;
+
+    @media (width >= 768px) {
+        max-inline-size: 48rem;
+    }
+
+    @media (width >= 1024px) {
+        grid-template-columns: 2fr 1fr;
+        max-inline-size: 64rem;
+    }
+
+    @media (width >= 1280px) {
+        max-inline-size: 80rem;
+    }
+
+    @media (width >= 1536px) {
+        max-inline-size: 96rem;
+    }
+
+    @media (width >= 1920px) {
+        max-inline-size: 120rem;
+    }
+
+    @media (width >= 2560px) {
+        max-inline-size: 160rem;
+    }
+
+    @media (width >= 3840px) {
+        max-inline-size: 240rem;
+    }
+}
+
+.loading-overlay {
+    position: fixed;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(
+        in srgb,
+        var(--shadow-neutral-color) 50%,
+        transparent
+    );
+    inset: 0;
+}
+
+.loading-spinner {
+    border: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    block-size: 1.5rem;
+    border-block-end: 2px solid var(--color-primary-600);
+    inline-size: 1.5rem;
+}
+
+.bg-surface-elevated {
+    background-color: var(--color-surface-elevated);
+}
+
+.h-64 {
+    position: relative;
+    block-size: 16rem;
+}

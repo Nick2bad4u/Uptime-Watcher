@@ -28,7 +28,7 @@
 
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 // Import all validation functions to fuzz
 import {
@@ -42,12 +42,12 @@ import {
     isValidPort,
     isValidUrl,
     safeInteger,
-} from "../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
 
 import {
     validateMonitorType,
     getMonitorValidationErrors,
-} from "../../../shared/utils/validation";
+} from "@shared/utils/validation";
 
 import {
     parseUptimeValue,

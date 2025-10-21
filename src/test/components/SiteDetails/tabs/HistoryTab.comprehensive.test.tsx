@@ -11,7 +11,7 @@ import { HistoryTab } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import type { HistoryTabProperties } from "../../../../components/SiteDetails/tabs/HistoryTab";
 import { useSettingsStore } from "../../../../stores/settings/useSettingsStore";
 import { useTheme } from "../../../../theme/useTheme";
-import type { Monitor } from "../../../../../shared/types";
+import type { Monitor } from "@shared/types";
 
 // Mock dependencies
 vi.mock("../../../../stores/settings/useSettingsStore");
@@ -552,13 +552,13 @@ describe(HistoryTab, () => {
             render(<HistoryTab {...defaultProps} selectedMonitor={monitor} />);
 
             const statusLabel = screen.getByText("Up", {
-                selector: ".history-status-label span",
+                selector: ".history-tab__row-status span",
             });
             expect(statusLabel).toBeInTheDocument();
             const statusIcon = statusLabel
-                .closest(".history-status-label")
+                .closest(".history-tab__row-status")
                 ?.querySelector(
-                    ".history-status-label__icon"
+                    ".history-tab__row-status-icon"
                 ) as SVGElement | null;
             expect(statusIcon).not.toBeNull();
         });

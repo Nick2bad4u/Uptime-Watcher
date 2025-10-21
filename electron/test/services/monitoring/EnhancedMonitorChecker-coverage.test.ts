@@ -8,7 +8,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { EnhancedMonitorChecker } from "../../../services/monitoring/EnhancedMonitorChecker";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 describe("EnhancedMonitorChecker Coverage Tests", () => {
     let enhancedChecker: EnhancedMonitorChecker;

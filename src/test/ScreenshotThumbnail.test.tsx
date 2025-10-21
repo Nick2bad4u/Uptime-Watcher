@@ -334,7 +334,7 @@ describe(ScreenshotThumbnail, () => {
             expect(mockWindowOpen).toHaveBeenCalledWith(
                 "https://example.com",
                 "_blank",
-                "noopener"
+                "noopener,noreferrer"
             );
         });
     });
@@ -1091,7 +1091,7 @@ describe(ScreenshotThumbnail, () => {
             expect(mockWindowOpen).toHaveBeenCalledWith(
                 "https://example.com",
                 "_blank",
-                "noopener"
+                "noopener,noreferrer"
             );
         });
     });

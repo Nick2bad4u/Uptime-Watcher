@@ -6,10 +6,40 @@
 import { vi, type Mock } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
-import type { StatusUpdate } from "../../shared/types";
-import type { ValidationResult } from "../../shared/types/validation";
+import type { StatusUpdate } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
 
 import EventEmitter from "node:events";
+
+type GenericEmitWarning = (...emitArgs: unknown[]) => unknown;
+
+const SUPPRESSED_WARNING_SIGNATURES = [
+    "`--localstorage-file` was provided without a valid path",
+] as const;
+
+const originalEmitWarning = process.emitWarning.bind(
+    process
+) as GenericEmitWarning;
+
+process.emitWarning = ((warning: unknown, ...args: unknown[]) => {
+    const message =
+        typeof warning === "string"
+            ? warning
+            : warning instanceof Error
+              ? warning.message
+              : "";
+
+    if (
+        message !== "" &&
+        SUPPRESSED_WARNING_SIGNATURES.some((fragment) =>
+            message.includes(fragment)
+        )
+    ) {
+        return;
+    }
+
+    originalEmitWarning(warning, ...args);
+}) as typeof process.emitWarning;
 
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
@@ -99,6 +129,112 @@ globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
     unobserve: vi.fn(),
     disconnect: vi.fn(),
 }));
+
+/**
+ * Minimal Web Storage implementation used when Node.js exposes an incomplete
+ * `localStorage` or `sessionStorage` shim via experimental flags.
+ */
+interface StorageShim {
+    readonly length: number;
+    clear: () => void;
+    getItem: (key: string) => string | null;
+    key: (index: number) => string | null;
+    removeItem: (key: string) => void;
+    setItem: (key: string, value: string) => void;
+}
+
+/**
+ * Supported storage keys that require reliable mocks during tests.
+ */
+type StorageKey = "localStorage" | "sessionStorage";
+
+/**
+ * Storage methods that must exist on a usable Web Storage implementation.
+ */
+const STORAGE_METHODS: readonly (keyof StorageShim)[] = [
+    "clear",
+    "getItem",
+    "key",
+    "removeItem",
+    "setItem",
+];
+
+/**
+ * Creates an in-memory Map-backed storage implementation matching the Web
+ * Storage API used by browsers.
+ */
+const createStorageShim = (): StorageShim => {
+    const storage = new Map<string, string>();
+
+    return {
+        get length(): number {
+            return storage.size;
+        },
+        clear(): void {
+            storage.clear();
+        },
+        getItem(key: string): string | null {
+            return storage.has(key) ? (storage.get(key) ?? null) : null;
+        },
+        key(index: number): string | null {
+            return Array.from(storage.keys())[index] ?? null;
+        },
+        removeItem(key: string): void {
+            storage.delete(key);
+        },
+        setItem(key: string, value: string): void {
+            storage.set(key, String(value));
+        },
+    } satisfies StorageShim;
+};
+
+/**
+ * Determines whether the provided value already implements the Web Storage API
+ * surface that our tests rely on.
+ */
+const hasValidStorage = (candidate: unknown): candidate is StorageShim => {
+    if (candidate === null || typeof candidate !== "object") {
+        return false;
+    }
+
+    const descriptor = Reflect.getOwnPropertyDescriptor(candidate, "length");
+    const lengthValue = (candidate as { length?: unknown }).length;
+    const hasLength =
+        typeof lengthValue === "number" ||
+        (typeof descriptor?.get === "function" &&
+            typeof descriptor.get.call(candidate) === "number");
+
+    if (!hasLength) {
+        return false;
+    }
+
+    return STORAGE_METHODS.every(
+        (method) =>
+            typeof (candidate as Record<string, unknown>)[method] === "function"
+    );
+};
+
+/**
+ * Ensures `globalThis` exposes a fully functional storage implementation under
+ * the given key, overriding Node's placeholder when necessary.
+ */
+const ensureStorage = (storageKey: StorageKey): void => {
+    const existing = Reflect.get(globalThis, storageKey) as unknown;
+
+    if (hasValidStorage(existing)) {
+        return;
+    }
+
+    Object.defineProperty(globalThis, storageKey, {
+        configurable: true,
+        enumerable: true,
+        value: createStorageShim(),
+        writable: true,
+    });
+};
+
+ensureStorage("localStorage");
+ensureStorage("sessionStorage");
 
 // Global test configuration and mocks
 const mockElectronAPI: {

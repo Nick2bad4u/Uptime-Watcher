@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import type { Site, Monitor } from "../../shared/types";
+import type { Site, Monitor } from "@shared/types";
 
 // Mock all dependencies
 vi.mock("../stores", () => ({

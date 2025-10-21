@@ -5,6 +5,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 import {
     createSitesStateActions,
@@ -15,6 +16,17 @@ import {
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
 }));
+
+vi.mock("../../../services/logger", () => ({
+    logger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
+}));
+
+import { logger } from "../../../services/logger";
 
 describe("useSitesState", () => {
     let mockSet: ReturnType<typeof vi.fn>;
@@ -162,6 +174,46 @@ describe("useSitesState", () => {
             stateActions.setSites([]);
 
             expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
+        });
+
+        it("should throw and log when duplicate identifiers are supplied", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Test Type: Regression", "test-type");
+            await annotate("Category: Data Integrity", "category");
+
+            const duplicateSites: Site[] = [
+                {
+                    identifier: "duplicate",
+                    monitors: [],
+                    monitoring: true,
+                    name: "Duplicate A",
+                },
+                {
+                    identifier: "duplicate",
+                    monitors: [],
+                    monitoring: false,
+                    name: "Duplicate B",
+                },
+            ];
+
+            expect(() => stateActions.setSites(duplicateSites)).toThrow(
+                DuplicateSiteIdentifierError
+            );
+            expect(logger.error).toHaveBeenCalledWith(
+                "Duplicate site identifiers detected while replacing sites state",
+                expect.objectContaining({
+                    duplicates: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: "duplicate",
+                            occurrences: 2,
+                        }),
+                    ]),
+                    siteCount: duplicateSites.length,
+                })
+            );
+            expect(mockSet).not.toHaveBeenCalled();
         });
     });
 

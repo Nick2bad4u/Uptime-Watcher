@@ -11,7 +11,7 @@ import type { StoreApi } from "zustand";
 import { vi } from "vitest";
 
 // Mock electron API
-vi.mock("../../src/services/SettingsService", () => ({
+vi.mock("@app/services/SettingsService", () => ({
     SettingsService: {
         getHistoryLimit: vi.fn().mockResolvedValue(500),
         setHistoryLimit: vi.fn().mockResolvedValue(undefined),

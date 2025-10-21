@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { sitesApi } from "../../../preload/domains/sitesApi";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 vi.mock("electron", () => ({
     ipcRenderer: {

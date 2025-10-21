@@ -119,26 +119,10 @@ export class DataImportExportService {
 
             return safeJsonStringifyWithFallback(exportData, "{}", 2);
         } catch (error) {
-            const message = `Failed to export data: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-
-            await this.eventEmitter.emitTyped(
-                DataImportExportService.DATABASE_ERROR_EVENT,
-                {
-                    details: message,
-                    error:
-                        error instanceof Error
-                            ? error
-                            : new Error(String(error)),
-                    operation: "export-data",
-                    timestamp: Date.now(),
-                }
-            );
-
-            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
-            throw new SiteLoadingError(
-                `Failed to export data: ${message}`,
-                error instanceof Error ? error : undefined
+            return this.handleDataOperationFailure(
+                "export-data",
+                error,
+                "Failed to export data"
             );
         }
     }
@@ -166,26 +150,10 @@ export class DataImportExportService {
                 sites: validatedData.sites,
             };
         } catch (error) {
-            const message = `Failed to parse import data: ${error instanceof Error ? error.message : String(error)}`;
-            this.logger.error(message, error);
-
-            await this.eventEmitter.emitTyped(
-                DataImportExportService.DATABASE_ERROR_EVENT,
-                {
-                    details: message,
-                    error:
-                        error instanceof Error
-                            ? error
-                            : new Error(String(error)),
-                    operation: "import-data-parse",
-                    timestamp: Date.now(),
-                }
-            );
-
-            // eslint-disable-next-line ex/use-error-cause -- SiteLoadingError has specific constructor signature
-            throw new SiteLoadingError(
-                `Failed to parse import data: ${message}`,
-                error instanceof Error ? error : undefined
+            return this.handleDataOperationFailure(
+                "import-data-parse",
+                error,
+                "Failed to parse import data"
             );
         }
     }
@@ -312,6 +280,30 @@ export class DataImportExportService {
                 `[DataImportExportService] ${failures} out of ${importPromises.length} site monitor imports failed`
             );
         }
+    }
+
+    private async handleDataOperationFailure(
+        operation: string,
+        error: unknown,
+        context: string
+    ): Promise<never> {
+        const normalizedError =
+            error instanceof Error ? error : new Error(String(error));
+        const message = `${context}: ${normalizedError.message}`;
+
+        this.logger.error(message, error);
+
+        await this.eventEmitter.emitTyped(
+            DataImportExportService.DATABASE_ERROR_EVENT,
+            {
+                details: message,
+                error: normalizedError,
+                operation,
+                timestamp: Date.now(),
+            }
+        );
+
+        throw new SiteLoadingError(message, normalizedError);
     }
 
     public constructor(config: DataImportExportConfig) {

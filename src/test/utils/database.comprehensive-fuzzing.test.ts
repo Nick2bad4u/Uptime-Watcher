@@ -19,7 +19,7 @@
 
 import { describe, expect, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 // =============================================================================
 // Custom Fast-Check Arbitraries for Database Operations

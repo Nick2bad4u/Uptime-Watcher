@@ -15,7 +15,7 @@ import type {
     SiteStatus,
     MonitorStatus,
     SiteForStatus,
-} from "../../../shared/types";
+} from "@shared/types";
 /**
  * Site Status Utility Tests
  *

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { safeStringify } from "../../shared/utils/stringConversion";
-import { validateMonitorField } from "../../shared/validation/schemas";
+import { safeStringify } from "@shared/utils/stringConversion";
+import { validateMonitorField } from "@shared/validation/schemas";
 
 describe("Final Coverage - Targeting Remaining Lines", () => {
     describe("stringConversion.ts - Lines 86-89 (undefined/default switch cases)", () => {

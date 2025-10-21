@@ -6,6 +6,11 @@ This guide helps developers choose the appropriate Zustand store pattern based o
 
 ```text
 Is your store managing multiple domains/entities?
+
+ > **Why the helper?** `applySavedSiteToStore` enforces identifier uniqueness before
+ > committing state changes. Combined with sync-side duplicate detection, this
+ > prevents backend race conditions from silently introducing duplicated sites
+ > while still surfacing anomalies through structured logging.
 ├── YES: Does it have >200 lines, multiple concerns, or complex interdependencies?
 │   ├── YES → Use Modular Composition Pattern (RECOMMENDED)
 │   └── NO → Consider Direct Create Pattern (evaluate below)
@@ -90,10 +95,9 @@ export const createSiteOperationsActions = (deps) => ({
   logStoreAction("SitesStore", "createSite", { name: siteData.name });
 
   try {
-   const newSite = await window.electronAPI.sites.create(siteData);
-   deps.addSite(newSite);
-   await deps.syncSites(); // Ensure backend consistency
-   return newSite;
+   const savedSite = await window.electronAPI.sites.create(siteData);
+   applySavedSiteToStore(savedSite, deps); // Replaces existing snapshot safely
+   return savedSite;
   } catch (error) {
    console.error("Failed to create site:", error);
    throw error;
@@ -127,9 +131,10 @@ export const createSiteSyncActions = (deps) => ({
   }
  },
 
- handleSiteAdded: (site: Site) => {
-  // Called by event listeners
-  deps.addSite(site);
+ handleStateSyncEvent: (event: StateSyncEventData) => {
+  if (event.action === "bulk-sync" || event.action === "update") {
+   deps.setSites(event.sites);
+  }
  },
 });
 ```

@@ -57,7 +57,7 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 
 // Import mocked modules
 import { safeExtractIpcData } from "../../../types/ipc";
-import { withErrorHandling } from "../../../../shared/utils/errorHandling";
+import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
 const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);

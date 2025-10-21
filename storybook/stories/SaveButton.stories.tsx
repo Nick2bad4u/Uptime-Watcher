@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
+import { SaveButton } from "@app/components/shared/SaveButton";
 import { action } from "storybook/actions";
-
-import { SaveButton } from "../../src/components/shared/SaveButton";
 
 const meta: Meta<typeof SaveButton> = {
     args: {

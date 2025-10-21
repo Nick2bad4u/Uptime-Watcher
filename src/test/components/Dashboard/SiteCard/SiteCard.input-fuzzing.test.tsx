@@ -33,7 +33,7 @@ import type {
     Monitor,
     MonitorStatus,
     MonitorType,
-} from "../../../../../shared/types";
+} from "@shared/types";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 

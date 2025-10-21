@@ -29,10 +29,11 @@ graph LR
 ### Key Components
 
 1. **TypedEventBus**: Core event emission and listening with type safety
-2. **EventsService**: Frontend abstraction for event handling via IPC
-3. **Event Contracts**: Shared type definitions in `@shared/types/events`
-4. **Automatic Metadata**: Correlation IDs, timestamps, and debugging info
-5. **Middleware System**: Cross-cutting concerns like logging and validation
+2. **EventsService**: Frontend abstraction for monitor/cache/update events via IPC
+3. **StateSyncService**: Dedicated state synchronization surface (status, full-sync, event stream)
+4. **Event Contracts**: Shared type definitions in `@shared/types/events`
+5. **Automatic Metadata**: Correlation IDs, timestamps, and debugging info
+6. **Middleware System**: Cross-cutting concerns like logging and validation
 
 ## TypedEventBus Implementation
 
@@ -164,9 +165,10 @@ The EventsService provides a clean abstraction for frontend event handling:
 
 ```typescript
 import { EventsService } from "@/services/EventsService";
+import { StateSyncService } from "@/services/StateSyncService";
 
-// Initialize service (ensures electron API is available)
-await EventsService.initialize();
+// Initialize services (ensures electron API is available for each surface)
+await Promise.all([EventsService.initialize(), StateSyncService.initialize()]);
 ```
 
 ### Event Registration
@@ -197,27 +199,24 @@ cleanupFunctions.push(
  })
 );
 
-// State synchronization events
+// Cleanup on component unmount
+// State synchronization lives in the dedicated StateSyncService
 cleanupFunctions.push(
- await EventsService.onStateSync((data) => {
-  switch (data.action) {
+ await StateSyncService.onStateSyncEvent((event) => {
+  switch (event.action) {
    case "bulk-sync":
-    console.log(`Bulk sync: ${data.sites.length} sites`);
-    break;
-   case "create":
-    console.log(`Site created: ${data.siteIdentifier}`);
+    console.log(`Bulk sync: ${event.sites.length} sites`);
     break;
    case "update":
-    console.log(`Site updated: ${data.siteIdentifier}`);
+    console.log(`Site updated: ${event.siteIdentifier}`);
     break;
    case "delete":
-    console.log(`Site deleted: ${data.siteIdentifier}`);
+    console.log(`Site deleted: ${event.siteIdentifier}`);
     break;
   }
  })
 );
 
-// Cleanup on component unmount
 const cleanup = () => {
  cleanupFunctions.forEach((fn) => fn());
 };
@@ -284,7 +283,7 @@ export const MonitorStatus: React.FC<MonitorStatusProps> = ({ monitorId }) => {
 ### Zustand Store Integration
 
 ```typescript
-import { EventsService } from "@/services/EventsService";
+import { StateSyncService } from "@/services/StateSyncService";
 import type { StateSyncEventData } from "@shared/types/events";
 
 // In your store initialization
@@ -293,19 +292,19 @@ export const initializeEventListeners = async (): Promise<() => void> => {
 
  // State sync events
  cleanupFunctions.push(
-  await EventsService.onStateSync((data: StateSyncEventData) => {
-   const { sites } = useSitesStore.getState();
+  await StateSyncService.onStateSyncEvent((data: StateSyncEventData) => {
+   const { fullResyncSites, setSites } = useSitesStore.getState();
 
    switch (data.action) {
     case "bulk-sync":
-     sites.bulkSync(data.sites);
+     setSites(data.sites);
      break;
     case "update":
-     sites.bulkSync(data.sites);
-     break;
     case "delete":
-     sites.bulkSync(data.sites);
+     setSites(data.sites);
      break;
+    default:
+     void fullResyncSites();
    }
   })
  );
@@ -314,6 +313,10 @@ export const initializeEventListeners = async (): Promise<() => void> => {
   cleanupFunctions.forEach((fn) => fn());
  };
 };
+
+// When a full refresh is needed outside the event stream, request it directly:
+const { sites } = await StateSyncService.requestFullSync();
+useSitesStore.getState().setSites(sites);
 ```
 
 ## Middleware System
@@ -512,7 +515,7 @@ class MyService {
 
  async initialize() {
   this.cleanupFunctions.push(
-   await EventsService.onStateSync(this.handleStateSync.bind(this))
+   await StateSyncService.onStateSyncEvent(this.handleStateSync.bind(this))
   );
  }
 

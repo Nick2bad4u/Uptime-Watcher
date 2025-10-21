@@ -9,7 +9,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { SiteDetailsHeader } from "../../../components/SiteDetails/SiteDetailsHeader";
-import type { Monitor, Site } from "../../../../shared/types";
+import type { Monitor, Site } from "@shared/types";
 
 // Mock the UI store
 const mockOpenExternal = vi.fn();

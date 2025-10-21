@@ -91,8 +91,10 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onCacheInvalidated((data) => {
-     *     console.log("Cache invalidated:", data);
+     *     logger.info("Cache invalidated", data);
      * });
      * // Later: cleanup();
      * ```
@@ -115,12 +117,13 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onMonitorDown((data) => {
-     *     console.log(
-     *         "Monitor down:",
-     *         data.siteIdentifier,
-     *         data.monitorId
-     *     );
+     *     logger.warn("Monitor down", {
+     *         monitorId: data.monitorId,
+     *         site: data.siteIdentifier,
+     *     });
      * });
      * // Later: cleanup();
      * ```
@@ -143,12 +146,12 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onMonitoringStarted((data) => {
-     *     console.log(
-     *         "Monitoring started:",
-     *         data.monitorCount,
-     *         "monitors active"
-     *     );
+     *     logger.info("Monitoring started", {
+     *         activeMonitors: data.monitorCount,
+     *     });
      * });
      * // Later: cleanup();
      * ```
@@ -171,12 +174,12 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onMonitoringStopped((data) => {
-     *     console.log(
-     *         "Monitoring stopped:",
-     *         data.monitorCount,
-     *         "monitors paused"
-     *     );
+     *     logger.info("Monitoring stopped", {
+     *         pausedMonitors: data.monitorCount,
+     *     });
      * });
      * // Later: cleanup();
      * ```
@@ -199,9 +202,11 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onMonitorStatusChanged(
      *     (update) => {
-     *         console.log("Status changed:", update.status);
+     *         logger.info("Monitor status changed", update);
      *     }
      * );
      * // Later: cleanup();
@@ -225,8 +230,13 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onMonitorUp((data) => {
-     *     console.log("Monitor up:", data.siteIdentifier, data.monitorId);
+     *     logger.info("Monitor up", {
+     *         monitorId: data.monitorId,
+     *         site: data.siteIdentifier,
+     *     });
      * });
      * // Later: cleanup();
      * ```
@@ -249,8 +259,10 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onTestEvent((data) => {
-     *     console.log("Test event:", data);
+     *     logger.debug("Test event", data);
      * });
      * // Later: cleanup();
      * ```
@@ -273,8 +285,10 @@ export const EventsService: EventsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const cleanup = await EventsService.onUpdateStatus((data) => {
-     *     console.log("Update status:", data.status);
+     *     logger.info("Update status", data);
      * });
      * // Later: cleanup();
      * ```

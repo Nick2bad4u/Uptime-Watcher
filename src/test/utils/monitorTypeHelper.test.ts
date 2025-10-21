@@ -15,7 +15,7 @@ import {
     getMonitorTypeConfig,
     getMonitorTypeOptions,
 } from "../../utils/monitorTypeHelper";
-import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
 // Mock the monitor types store
 const mockMonitorTypesStore = {
@@ -871,8 +871,11 @@ describe("monitorTypeHelper", () => {
                     );
 
                     const result = await getMonitorTypeConfig(targetType.type);
+                    const firstMatch = mockTypes.find(
+                        (type) => type.type === targetType.type
+                    );
 
-                    expect(result).toEqual(targetType);
+                    expect(result).toEqual(firstMatch);
                 }
             );
 

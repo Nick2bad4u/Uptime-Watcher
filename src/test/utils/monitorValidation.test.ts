@@ -7,7 +7,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-import type { MonitorType } from "../../../shared/types";
+import type { MonitorType } from "@shared/types";
 
 // Mock dependencies
 vi.mock("@shared/utils/errorHandling", () => ({
@@ -50,14 +50,14 @@ import {
     validateMonitorFormData,
     type MonitorCreationData,
 } from "../../utils/monitorValidation";
-import type { ValidationResult } from "../../../shared/types/validation";
+import type { ValidationResult } from "@shared/types/validation";
 
 // Import mocked functions
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import {
     validateMonitorData as sharedValidateMonitorData,
     validateMonitorField as sharedValidateMonitorField,
-} from "../../../shared/validation/schemas";
+} from "@shared/validation/schemas";
 import { useMonitorTypesStore } from "../../stores/monitor/useMonitorTypesStore";
 
 // Helper function to create a complete mock store

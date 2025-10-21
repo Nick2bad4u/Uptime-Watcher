@@ -15,7 +15,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 // eslint-disable-next-line import-x/no-nodejs-modules -- URL helpers are required to compute project-relative paths.
 import { fileURLToPath } from "node:url";
-/* eslint-disable-next-line @jcoreio/implicit-dependencies/no-implicit, import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
+/* eslint-disable-next-line import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
 import tsconfigPaths from "vite-tsconfig-paths";
 
 /**
@@ -140,12 +140,20 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "react-chartjs-2",
     "react-dom",
     "react-dom/client",
+    "react-icons/bi",
+    "react-icons/bs",
     "react-icons/fa",
     "react-icons/fi",
+    "react-icons/hi2",
+    "react-icons/io5",
     "react-icons/md",
+    "react-icons/ri",
+    "react-icons/tb",
+    "react-icons/vsc",
     "react/compiler-runtime",
     "storybook/actions",
     "storybook/internal/channels",
+    "storybook/theming",
     "storybook/viewport",
     "validator",
     "zustand",
@@ -153,9 +161,6 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "zod",
 ]);
 
-/**
- * Default module resolution extensions shared between Storybook build targets.
- */
 export const storybookResolveExtensions: readonly string[] = Object.freeze([
     ".mjs",
     ".js",
@@ -187,7 +192,6 @@ const isBabelPlugin = (value: unknown): value is BabelPlugin =>
  */
 export const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
     try {
-        // eslint-disable-next-line @jcoreio/implicit-dependencies/no-implicit -- Optional dependency is loaded only when available.
         const pluginModule: unknown = require("babel-plugin-react-compiler");
 
         if (isBabelPlugin(pluginModule)) {
@@ -269,6 +273,9 @@ export const createStorybookBaseViteConfig = (
         "@shared/types",
         "@shared/utils",
         "@shared/validation",
+        "lightningcss",
+        "playwright",
+        "playwright-core",
         ...(options?.additionalOptimizeDepsExclude ?? []),
     ]);
 
@@ -294,6 +301,13 @@ export const createStorybookBaseViteConfig = (
             },
         },
         optimizeDeps: {
+            esbuildOptions: {
+                conditions: [
+                    "module",
+                    "browser",
+                    "node",
+                ],
+            },
             exclude: Array.from(optimizeDepsExclude),
             include: Array.from(optimizeDepsInclude),
         },

@@ -18,8 +18,8 @@ import type {
     MonitorType,
     MonitorStatus,
     Site,
-} from "../../../shared/types";
-import { BASE_MONITOR_TYPES } from "../../../shared/types";
+} from "@shared/types";
+import { BASE_MONITOR_TYPES } from "@shared/types";
 import {
     createDefaultMonitor,
     normalizeMonitor,
@@ -29,7 +29,7 @@ import {
     findMonitorInSite,
     validateMonitorExists,
 } from "../../stores/sites/utils/monitorOperations";
-import { isNonEmptyString } from "../../../shared/validation/validatorUtils";
+import { isNonEmptyString } from "@shared/validation/validatorUtils";
 
 // Test data generators using fast-check
 const arbitraryMonitorType = (): fc.Arbitrary<MonitorType> =>

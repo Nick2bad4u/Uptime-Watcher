@@ -50,8 +50,10 @@ export const SettingsService: SettingsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * const limit = await SettingsService.getHistoryLimit();
-     * console.log(`Current limit: ${limit} records`);
+     * logger.info("Current history limit", { records: limit });
      * ```
      *
      * @returns The current history retention limit as a number.
@@ -81,8 +83,10 @@ export const SettingsService: SettingsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * await SettingsService.resetSettings();
-     * console.log("Settings reset to defaults");
+     * logger.info("Settings reset to defaults");
      * ```
      *
      * @returns A promise that resolves when all settings have been reset.
@@ -100,8 +104,10 @@ export const SettingsService: SettingsServiceContract = {
      * @example
      *
      * ```typescript
+     * import { logger } from "@app/services/logger";
+     *
      * await SettingsService.updateHistoryLimit(1000);
-     * console.log("History limit updated to 1000 records");
+     * logger.info("History limit updated", { records: 1000 });
      * ```
      *
      * @param limit - The new maximum number of history records to keep per

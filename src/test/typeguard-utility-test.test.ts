@@ -3,11 +3,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import {
-    hasProperties,
-    hasProperty,
-    isArray,
-} from "../../shared/utils/typeGuards";
+import { hasProperties, hasProperty, isArray } from "@shared/utils/typeGuards";
 
 describe("TypeGuard Utility Coverage Test", () => {
     it("should test typeguard functions", ({ task, annotate }) => {

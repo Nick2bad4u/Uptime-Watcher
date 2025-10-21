@@ -19,7 +19,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { SiteManager } from "../../managers/SiteManager";
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
-import type { Site } from "../../../shared/types.js";
+import type { Site } from "@shared/types";
 
 describe(SiteManager, () => {
     let manager: SiteManager;
@@ -555,7 +555,7 @@ describe(SiteManager, () => {
             expect(result).toBeTruthy();
         });
     });
-    describe("updateSitesCache", () => {
+    describe("updateSitesCache diagnostics", () => {
         it("should update the sites cache", async () => {
             const sites = [
                 {
@@ -946,6 +946,56 @@ describe(SiteManager, () => {
             await expect(
                 manager["validateSite"](malformedSite)
             ).rejects.toThrow();
+        });
+    });
+
+    describe("updateSitesCache", () => {
+        it("logs duplicate identifiers while keeping cache consistent", async ({
+            annotate,
+        }) => {
+            await annotate("Component: SiteManager", "component");
+            await annotate("Type: Regression", "type");
+            await annotate("Category: Data Integrity", "category");
+
+            const { logger } = await import("../../utils/logger");
+            const errorSpy = vi.spyOn(logger, "error");
+            const replaceAllSpy = vi.spyOn(manager["sitesCache"], "replaceAll");
+
+            const duplicateSites: Site[] = [
+                {
+                    identifier: "duplicate",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Duplicate A",
+                },
+                {
+                    identifier: "duplicate",
+                    monitoring: false,
+                    monitors: [],
+                    name: "Duplicate B",
+                },
+            ];
+
+            await expect(
+                manager.updateSitesCache(duplicateSites, "SiteManager.test")
+            ).resolves.toBeUndefined();
+
+            expect(errorSpy).toHaveBeenCalledWith(
+                "[SiteManager] Duplicate site identifiers detected while updating cache",
+                expect.objectContaining({
+                    context: "SiteManager.test",
+                    duplicates: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: "duplicate",
+                            occurrences: 2,
+                        }),
+                    ]),
+                })
+            );
+            expect(replaceAllSpy).toHaveBeenCalledTimes(1);
+
+            errorSpy.mockRestore();
+            replaceAllSpy.mockRestore();
         });
     });
 });

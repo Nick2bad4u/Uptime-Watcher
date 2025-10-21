@@ -31,7 +31,7 @@ vi.mock("../../shared/utils/environment", () => ({
 // Import the module under test
 import { isDev } from "../electronUtils.js";
 import { app } from "electron";
-import { isDevelopment } from "../../shared/utils/environment";
+import { isDevelopment } from "@shared/utils/environment";
 
 describe("ElectronUtils", () => {
     beforeEach(() => {

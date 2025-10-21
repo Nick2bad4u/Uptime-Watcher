@@ -18,7 +18,7 @@ import {
     type MonitorTypeOption,
     type IntervalOption,
 } from "../constants";
-import { BASE_MONITOR_TYPES } from "../../shared/types";
+import { BASE_MONITOR_TYPES } from "@shared/types";
 
 // Mock any external dependencies
 vi.mock("../services/logger", () => ({

@@ -12,7 +12,7 @@ import { describe, expect, beforeEach, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
-import type { Site, Monitor, MonitorStatus } from "../../../../shared/types";
+import type { Site, Monitor, MonitorStatus } from "@shared/types";
 
 // Mock window.electronAPI for testing
 const mockElectronAPI = {

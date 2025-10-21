@@ -6,7 +6,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "../../../shared/types";
+import type { Site } from "@shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
 import { SiteService } from "../../stores/sites/services/SiteService";
@@ -76,6 +76,13 @@ describe("useSitesStore Function Coverage Tests", () => {
         mockStateSyncService.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
             siteCount: 0,
+            source: "cache",
+            synchronized: true,
+        });
+        mockStateSyncService.requestFullSync.mockResolvedValue({
+            completedAt: Date.now(),
+            siteCount: 0,
+            sites: [],
             source: "cache",
             synchronized: true,
         });
@@ -366,19 +373,18 @@ describe("useSitesStore Function Coverage Tests", () => {
         });
 
         it("should exercise sync operations", async () => {
-            // Mock sync responses
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
-
             const store = useSitesStore.getState();
 
             // Test syncSites
             await store.syncSites();
-            expect(SiteService.getSites).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
 
             // Test fullResyncSites
             await store.fullResyncSites();
-            // Should call getSites again for full sync
-            expect(SiteService.getSites).toHaveBeenCalledTimes(2);
+            // Should call requestFullSync again for full sync
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledTimes(
+                2
+            );
         });
     });
 

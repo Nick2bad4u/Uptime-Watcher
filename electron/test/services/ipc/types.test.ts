@@ -22,7 +22,7 @@ import type {
     IpcValidationResponse,
     IpcParameterValidator,
 } from "../../../services/ipc/types.js";
-import type { ValidationResult } from "../../../../shared/types/validation";
+import type { ValidationResult } from "@shared/types/validation";
 
 describe("IPC Types", () => {
     describe("IpcHandlerConfig", () => {

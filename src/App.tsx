@@ -158,6 +158,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     // Ref to store cache sync cleanup function
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
+    const syncEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
 
     const persistSidebarPreference = useCallback(
@@ -273,6 +274,17 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         const cacheSyncCleanup = setupCacheSync();
         cacheSyncCleanupRef.current = cacheSyncCleanup;
 
+        // Subscribe to state sync events
+        const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
+
+        if (typeof subscribeToSyncEvents === "function") {
+            syncEventsCleanupRef.current = subscribeToSyncEvents();
+        } else if (isDevelopment()) {
+            logger.warn(
+                "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
+            );
+        }
+
         // Subscribe to status updates
         const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
 
@@ -337,6 +349,11 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         if (cacheSyncCleanupRef.current) {
             cacheSyncCleanupRef.current();
             cacheSyncCleanupRef.current = null;
+        }
+
+        if (syncEventsCleanupRef.current) {
+            syncEventsCleanupRef.current();
+            syncEventsCleanupRef.current = null;
         }
     }, []);
 

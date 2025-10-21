@@ -6,8 +6,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react";
 
-import { StatusSummary } from "../../src/components/Header/StatusSummary";
-import { useAvailabilityColors } from "../../src/theme/useTheme";
+import { StatusSummary } from "@app/components/Header/StatusSummary";
+import { useAvailabilityColors } from "@app/theme/useTheme";
 
 const meta: Meta<typeof StatusSummary> = {
     args: {

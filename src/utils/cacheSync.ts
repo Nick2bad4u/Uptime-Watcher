@@ -7,6 +7,7 @@
  *
  * @public
  */
+import type { CacheInvalidatedEventData } from "@shared/types/events";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -15,21 +16,6 @@ import { logger } from "../services/logger";
 import { useMonitorTypesStore } from "../stores/monitor/useMonitorTypesStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { clearMonitorTypeCache } from "./monitorTypeHelper";
-
-/**
- * Cache invalidation data emitted by the backend.
- *
- * @remarks
- * Captures the invalidation scope (`type`), optional target identifier, and a
- * descriptive reason.
- *
- * @internal
- */
-interface CacheInvalidationData {
-    identifier?: string;
-    reason: string;
-    type: "all" | "monitor" | "site";
-}
 
 /**
  * Registry of cache clearing functions grouped by cache type.
@@ -151,7 +137,7 @@ export function setupCacheSync(): () => void {
     let cleanupHandler: (() => void) | null = null;
     let disposed = false;
 
-    const handleInvalidation = (data: CacheInvalidationData): void => {
+    const handleInvalidation = (data: CacheInvalidatedEventData): void => {
         try {
             logger.debug("Received cache invalidation event", data);
 

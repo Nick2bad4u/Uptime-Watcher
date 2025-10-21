@@ -8,9 +8,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import type { UptimeEvents } from "../../../events/eventTypes";
 import type { TypedEventBus } from "../../../events/TypedEventBus";
-import type { Site } from "../../../../shared/types.js";
+import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
+import { logger as backendLogger } from "../../../utils/logger";
 
 import {
     DatabaseCommand,
@@ -374,9 +375,9 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const consoleSpy = vi
-                .spyOn(console, "error")
-                .mockImplementation(() => {});
+            const loggerSpy = vi
+                .spyOn(backendLogger, "error")
+                .mockImplementation(() => undefined);
             mockCommand.execute = vi
                 .fn()
                 .mockRejectedValue(new Error("Execution failed"));
@@ -388,13 +389,13 @@ describe("DatabaseCommands", () => {
                 "Execution failed"
             );
 
-            expect(consoleSpy).toHaveBeenCalledWith(
-                "Rollback failed for command:",
-                "Mock command",
-                expect.any(Error)
+            expect(loggerSpy).toHaveBeenCalledWith(
+                "Rollback failed for database command",
+                expect.any(Error),
+                { command: "Mock command" }
             );
 
-            consoleSpy.mockRestore();
+            loggerSpy.mockRestore();
         });
 
         it("should rollback all commands in reverse order", async ({
@@ -785,6 +786,15 @@ describe("DatabaseCommands", () => {
             );
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
                 2,
+                "sites:state-synchronized",
+                expect.objectContaining({
+                    action: "bulk-sync",
+                    source: "database",
+                    sites: expect.any(Array),
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                3,
                 "cache:invalidated",
                 expect.objectContaining({
                     reason: "update",

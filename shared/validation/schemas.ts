@@ -913,14 +913,16 @@ function validateFieldWithSchema(
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const result = validateMonitorData("http", {
  *     url: "https://example.com",
  *     timeout: 5000,
  * });
  * if (result.success) {
- *     console.log("Valid monitor:", result.data);
+ *     logger.info("Monitor validation succeeded", result.data);
  * } else {
- *     console.error("Validation errors:", result.errors);
+ *     logger.error("Monitor validation failed", result.errors);
  * }
  * ```
  *

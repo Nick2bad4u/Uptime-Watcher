@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { monitoringApi } from "../../../preload/domains/monitoringApi";
-import type { Monitor, StatusUpdate } from "../../../../shared/types";
+import type { Monitor, StatusUpdate } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 vi.mock("electron", () => ({

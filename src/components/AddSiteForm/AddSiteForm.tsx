@@ -106,7 +106,9 @@ function isValidMonitorType(value: string): value is MonitorType {
  * @example
  *
  * ```tsx
- * <AddSiteForm onSuccess={() => console.log("Site added!")} />;
+ * import { logger } from "@app/services/logger";
+ *
+ * <AddSiteForm onSuccess={() => logger.info("Site added")} />;
  * ```
  *
  * @param props - AddSiteForm component props
@@ -530,7 +532,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             () =>
                 CHECK_INTERVALS.map((interval) => ({
                     label: interval.label,
-                    value: interval.value,
+                    value: String(interval.value),
                 })),
             []
         );
@@ -628,7 +630,7 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                         label="Check Interval"
                         onChange={handleCheckIntervalChange}
                         options={checkIntervalOptions}
-                        value={checkInterval}
+                        value={String(checkInterval)}
                     />
 
                     <ThemedButton

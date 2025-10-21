@@ -25,6 +25,8 @@
  * @packageDocumentation
  */
 
+import type { MonitorTypeOption as SharedMonitorTypeOption } from "@shared/types/monitorTypes";
+
 /**
  * CSS transition timing for consistent animations.
  *
@@ -38,22 +40,6 @@
  * @public
  */
 export const TRANSITION_ALL = "all 0.2s ease-in-out";
-
-/**
- * Interface for monitor type option objects.
- *
- * @remarks
- * Defines the structure for monitor type selection options used in dropdowns
- * and forms.
- *
- * @public
- */
-export interface MonitorTypeOption {
-    /** Human-readable display name for the monitor type */
-    label: string;
-    /** Unique identifier value for the monitor type */
-    value: string;
-}
 
 /**
  * Fallback monitor type options when backend loading fails.
@@ -76,22 +62,65 @@ export interface MonitorTypeOption {
  *
  * @public
  */
-export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly MonitorTypeOption[] = [
-    { label: "HTTP (Website/API)", value: "http" },
-    { label: "HTTP Keyword Match", value: "http-keyword" },
-    { label: "HTTP Status Code", value: "http-status" },
-    { label: "HTTP Header Value", value: "http-header" },
-    { label: "HTTP JSON Path", value: "http-json" },
-    { label: "HTTP Latency", value: "http-latency" },
-    { label: "Port (Host/Port)", value: "port" },
-    { label: "Ping (Host)", value: "ping" },
-    { label: "DNS (Domain Lookup)", value: "dns" },
-    { label: "SSL Certificate", value: "ssl" },
-    { label: "WebSocket Keepalive", value: "websocket-keepalive" },
-    { label: "Server Heartbeat", value: "server-heartbeat" },
-    { label: "Replication Lag", value: "replication" },
-    { label: "CDN Edge Consistency", value: "cdn-edge-consistency" },
-] as const;
+export const FALLBACK_MONITOR_TYPE_OPTIONS: readonly SharedMonitorTypeOption[] =
+    [
+        {
+            label: "HTTP (Website/API)",
+            value: "http",
+        },
+        {
+            label: "HTTP Keyword Match",
+            value: "http-keyword",
+        },
+        {
+            label: "HTTP Status Code",
+            value: "http-status",
+        },
+        {
+            label: "HTTP Header Value",
+            value: "http-header",
+        },
+        {
+            label: "HTTP JSON Path",
+            value: "http-json",
+        },
+        {
+            label: "HTTP Latency",
+            value: "http-latency",
+        },
+        {
+            label: "Port (Host/Port)",
+            value: "port",
+        },
+        {
+            label: "Ping (Host)",
+            value: "ping",
+        },
+        {
+            label: "DNS (Domain Lookup)",
+            value: "dns",
+        },
+        {
+            label: "SSL Certificate",
+            value: "ssl",
+        },
+        {
+            label: "WebSocket Keepalive",
+            value: "websocket-keepalive",
+        },
+        {
+            label: "Server Heartbeat",
+            value: "server-heartbeat",
+        },
+        {
+            label: "Replication Lag",
+            value: "replication",
+        },
+        {
+            label: "CDN Edge Consistency",
+            value: "cdn-edge-consistency",
+        },
+    ] as const;
 
 /**
  * Font family constants for monospace text display.
@@ -176,10 +205,14 @@ export interface IntervalOption {
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * const selectedInterval = CHECK_INTERVALS.find(
  *     (interval) => interval.value === 300000
  * );
- * console.log(selectedInterval?.label); // "5 minutes"
+ * logger.info("Selected interval", {
+ *     label: selectedInterval?.label ?? "unknown",
+ * });
  * ```
  *
  * @public
@@ -423,3 +456,8 @@ export type ChartTimeRange = (typeof CHART_TIME_RANGES)[number];
  * accessibility implementation across components.
  */
 export const ARIA_LABEL = "aria-label";
+
+/**
+ * Renderer type alias for the shared monitor type descriptor contract.
+ */
+export type MonitorTypeOption = SharedMonitorTypeOption;

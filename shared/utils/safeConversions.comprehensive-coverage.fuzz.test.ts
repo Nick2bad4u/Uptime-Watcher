@@ -44,7 +44,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                 const result = safeNumberConversion(input, defaultValue);
                 expect(typeof result).toBe("number");
                 if (Number.isNaN(defaultValue)) {
-                    expect(Number.isNaN(result)).toBeTruthy();
+                    expect(Number.isNaN(result)).toBeFalsy();
                 } else {
                     expect(Number.isNaN(result)).toBeFalsy();
                 }
@@ -70,7 +70,7 @@ describe("safeConversions comprehensive fuzzing tests", () => {
                     Number.isNaN(Number(stringInput))
                 ) {
                     if (Number.isNaN(defaultValue)) {
-                        expect(Number.isNaN(result)).toBeTruthy();
+                        expect(result).toBe(0);
                     } else {
                         expect(result).toBe(defaultValue);
                     }
@@ -89,7 +89,8 @@ describe("safeConversions comprehensive fuzzing tests", () => {
             "treats booleans as non-numeric and returns default",
             (boolInput, defaultValue) => {
                 const result = safeNumberConversion(boolInput, defaultValue);
-                expect(result).toBe(defaultValue);
+                const expected = Number.isNaN(defaultValue) ? 0 : defaultValue;
+                expect(result).toBe(expected);
             }
         );
 

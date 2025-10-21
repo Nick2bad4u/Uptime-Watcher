@@ -535,6 +535,7 @@ export class ThemeManager {
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
  * import { themeManager } from "./ThemeManager";
  *
  * // Apply a theme
@@ -543,7 +544,9 @@ export class ThemeManager {
  *
  * // Listen for system theme changes
  * const cleanup = themeManager.onSystemThemeChange((isDark) => {
- *     console.log("System theme changed:", isDark ? "dark" : "light");
+ *     logger.info("System theme changed", {
+ *         theme: isDark ? "dark" : "light",
+ *     });
  * });
  * ```
  *

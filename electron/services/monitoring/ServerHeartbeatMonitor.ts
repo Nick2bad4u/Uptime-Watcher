@@ -1,135 +1,114 @@
 /**
- * Server heartbeat monitor service.
- *
- * @remarks
- * Validates that a heartbeat endpoint reports an expected status value and that
- * the reported timestamp is within an acceptable drift threshold.
+ * Server heartbeat monitor service leveraging the shared remote monitor core
+ * for request orchestration and retry handling.
  */
 
-import type { MonitorType, Site } from "@shared/types";
-import type { AxiosInstance } from "axios";
+/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
+
+import type { Monitor } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import { performance } from "node:perf_hooks";
 
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorConfig,
-} from "./types";
+import type { IMonitorService, MonitorConfig } from "./types";
 
-import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
-import { logger } from "../../utils/logger";
-import { withOperationalHooks } from "../../utils/operationalHooks";
+import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import {
     createMonitorErrorResult,
-    extractMonitorConfig,
     extractNestedFieldValue,
     normalizeTimestampValue,
 } from "./shared/monitorServiceHelpers";
-import { createHttpClient } from "./utils/httpClient";
+import {
+    createRemoteMonitorService,
+    type RemoteEndpointPayload,
+    type RemoteMonitorBehavior,
+} from "./shared/remoteMonitorCore";
 
-interface HeartbeatPayload {
-    data: unknown;
-    responseTime: number;
-}
+const DEFAULT_MAX_DRIFT_SECONDS = 60;
 
-interface ResolvedHeartbeatConfig {
+type ServerHeartbeatMonitorInstance = Monitor & {
+    type: "server-heartbeat";
+};
+
+interface ServerHeartbeatContext {
     expectedStatus: string;
+    maxDriftSeconds: number;
     statusField: string;
     timestampField: string;
     url: string;
 }
 
-const DEFAULT_MAX_DRIFT_SECONDS = 60;
+function resolveMaxDriftSeconds(
+    monitor: ServerHeartbeatMonitorInstance,
+    serviceConfig: MonitorConfig
+): number {
+    const monitorValue = Reflect.get(
+        monitor,
+        "heartbeatMaxDriftSeconds"
+    ) as unknown;
+    if (
+        typeof monitorValue === "number" &&
+        Number.isFinite(monitorValue) &&
+        monitorValue >= 0
+    ) {
+        return monitorValue;
+    }
 
-export class ServerHeartbeatMonitor implements IMonitorService {
-    private axiosInstance: AxiosInstance;
-
-    private config: MonitorConfig;
-
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "server-heartbeat") {
-            throw new Error(
-                `ServerHeartbeatMonitor cannot handle monitor type: ${monitor.type}`
-            );
-        }
-
-        const resolvedConfig = this.resolveConfiguration(monitor);
-        if ("error" in resolvedConfig) {
-            return createMonitorErrorResult(resolvedConfig.error, 0);
-        }
-
-        const { expectedStatus, statusField, timestampField, url } =
-            resolvedConfig;
-        const maxDriftSeconds = this.resolveMaxDriftSeconds(monitor);
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-
-        try {
-            return await withOperationalHooks(
-                () =>
-                    this.performHeartbeatCheck(
-                        url,
-                        statusField,
-                        timestampField,
-                        expectedStatus,
-                        maxDriftSeconds,
-                        timeout,
-                        signal
-                    ),
-                {
-                    failureLogLevel: "warn",
-                    maxRetries: retryAttempts + 1,
-                    operationName: `Server heartbeat check for ${url}`,
-                }
-            );
-        } catch (error) {
-            const normalized = ensureError(error);
-            logger.warn(
-                `[ServerHeartbeatMonitor] Heartbeat check failed for ${url}`,
-                normalized
-            );
-            return {
-                ...createMonitorErrorResult(normalized.message, 0),
-                details: normalized.message,
-            };
+    if (Object.hasOwn(serviceConfig, "heartbeatMaxDriftSeconds")) {
+        const candidate = Reflect.get(
+            serviceConfig,
+            "heartbeatMaxDriftSeconds"
+        ) as unknown;
+        if (
+            typeof candidate === "number" &&
+            Number.isFinite(candidate) &&
+            candidate >= 0
+        ) {
+            return candidate;
         }
     }
 
-    private async performHeartbeatCheck(
-        url: string,
-        statusField: string,
-        timestampField: string,
-        expectedStatus: string,
-        maxDriftSeconds: number,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
+    return DEFAULT_MAX_DRIFT_SECONDS;
+}
+
+const behavior: RemoteMonitorBehavior<
+    "server-heartbeat",
+    ServerHeartbeatContext
+> = {
+    executeCheck: async ({ context, fetchEndpoint, signal, timeout }) => {
         const started = performance.now();
+        const payload = await (async (): Promise<RemoteEndpointPayload> => {
+            try {
+                return await fetchEndpoint(context.url, timeout, signal);
+            } catch (fetchError) {
+                const normalized = ensureError(fetchError);
+                throw new Error(
+                    `Failed to fetch heartbeat: ${normalized.message}`,
+                    {
+                        cause: fetchError,
+                    }
+                );
+            }
+        })();
 
-        const payload = await this.fetchHeartbeatPayload(url, timeout, signal);
-
-        const statusValue = extractNestedFieldValue(payload.data, statusField);
+        const statusValue = extractNestedFieldValue(
+            payload.data,
+            context.statusField
+        );
         if (typeof statusValue !== "string") {
             return createMonitorErrorResult(
-                `Heartbeat status field '${statusField}' missing or invalid`,
+                `Heartbeat status field '${context.statusField}' missing or invalid`,
                 payload.responseTime
             );
         }
 
         const timestampValue = normalizeTimestampValue(
-            extractNestedFieldValue(payload.data, timestampField)
+            extractNestedFieldValue(payload.data, context.timestampField)
         );
         if (timestampValue === undefined) {
             return createMonitorErrorResult(
-                `Heartbeat timestamp field '${timestampField}' missing or invalid`,
+                `Heartbeat timestamp field '${context.timestampField}' missing or invalid`,
                 payload.responseTime
             );
         }
@@ -137,12 +116,15 @@ export class ServerHeartbeatMonitor implements IMonitorService {
         const driftSeconds = Math.abs(Date.now() - timestampValue) / 1000;
         const responseTime = Math.round(performance.now() - started);
 
-        const detailSegments: string[] = [
+        const detailSegments = [
             `Status: ${statusValue}`,
-            `Drift: ${driftSeconds.toFixed(2)}s (max ${maxDriftSeconds}s)`,
+            `Drift: ${driftSeconds.toFixed(2)}s (max ${context.maxDriftSeconds}s)`,
         ];
 
-        if (statusValue === expectedStatus && driftSeconds <= maxDriftSeconds) {
+        if (
+            statusValue === context.expectedStatus &&
+            driftSeconds <= context.maxDriftSeconds
+        ) {
             return {
                 details: detailSegments.join("; "),
                 responseTime,
@@ -150,163 +132,121 @@ export class ServerHeartbeatMonitor implements IMonitorService {
             };
         }
 
-        const isStatusMismatch = statusValue !== expectedStatus;
-        const isDriftExceeded = driftSeconds > maxDriftSeconds;
-
+        const isStatusMismatch = statusValue !== context.expectedStatus;
+        const isDriftExceeded = driftSeconds > context.maxDriftSeconds;
         const details = detailSegments.join("; ");
 
         return {
+            ...(isStatusMismatch && {
+                error: `Expected heartbeat status '${context.expectedStatus}' but received '${statusValue}'`,
+            }),
             details,
             responseTime,
             status: isStatusMismatch || isDriftExceeded ? "degraded" : "up",
-            ...(isStatusMismatch && {
-                error: `Expected heartbeat status '${expectedStatus}' but received '${statusValue}'`,
-            }),
         };
-    }
-
-    private async fetchHeartbeatPayload(
-        url: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<HeartbeatPayload> {
-        const signals: AbortSignal[] = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
-        }
-
-        const combinedSignal = AbortSignal.any(signals);
-
-        try {
-            const response = await this.axiosInstance.get<unknown>(url, {
-                signal: combinedSignal,
-                timeout,
-            });
-
-            const rawData: unknown = response.data;
-            let parsed: unknown = rawData;
-
-            if (typeof rawData === "string") {
-                if (rawData.length === 0) {
-                    parsed = {};
-                } else {
-                    try {
-                        parsed = JSON.parse(rawData);
-                    } catch (parseError) {
-                        const normalizedParseError = ensureError(parseError);
-                        normalizedParseError.message = `Invalid JSON response from ${url}: ${normalizedParseError.message}`;
-                        throw normalizedParseError;
-                    }
-                }
-            }
-
+    },
+    failureLogLevel: "warn",
+    getOperationName: (context) => `Server heartbeat check for ${context.url}`,
+    resolveConfiguration: (monitor, serviceConfig) => {
+        const urlCandidate = Reflect.get(monitor, "url") as unknown;
+        if (typeof urlCandidate !== "string") {
             return {
-                data: parsed,
-                responseTime: response.responseTime ?? timeout,
+                kind: "error",
+                message: "Heartbeat monitor requires a valid URL",
             };
-        } catch (fetchError) {
-            const normalizedFetchError = ensureError(fetchError);
-            normalizedFetchError.message = `Failed to fetch heartbeat from ${url}: ${normalizedFetchError.message}`;
-            throw normalizedFetchError;
         }
-    }
-
-    private resolveConfiguration(
-        monitor: Site["monitors"][0]
-    ): ResolvedHeartbeatConfig | { error: string } {
-        const urlCandidate = Reflect.get(monitor, "url");
-        if (typeof urlCandidate !== "string" || !isValidUrl(urlCandidate)) {
-            return { error: "Heartbeat monitor requires a valid URL" };
+        const url = urlCandidate.trim();
+        if (!isValidUrl(url)) {
+            return {
+                kind: "error",
+                message: "Heartbeat monitor requires a valid URL",
+            };
         }
 
         const statusFieldCandidate = Reflect.get(
             monitor,
             "heartbeatStatusField"
-        );
-        if (
-            typeof statusFieldCandidate !== "string" ||
-            statusFieldCandidate.trim().length === 0
-        ) {
-            return { error: "Heartbeat status field is required" };
+        ) as unknown;
+        if (typeof statusFieldCandidate !== "string") {
+            return {
+                kind: "error",
+                message: "Heartbeat status field is required",
+            };
+        }
+        const statusField = statusFieldCandidate.trim();
+        if (statusField.length === 0) {
+            return {
+                kind: "error",
+                message: "Heartbeat status field is required",
+            };
         }
 
         const timestampFieldCandidate = Reflect.get(
             monitor,
             "heartbeatTimestampField"
-        );
-        if (
-            typeof timestampFieldCandidate !== "string" ||
-            timestampFieldCandidate.trim().length === 0
-        ) {
-            return { error: "Heartbeat timestamp field is required" };
+        ) as unknown;
+        if (typeof timestampFieldCandidate !== "string") {
+            return {
+                kind: "error",
+                message: "Heartbeat timestamp field is required",
+            };
+        }
+        const timestampField = timestampFieldCandidate.trim();
+        if (timestampField.length === 0) {
+            return {
+                kind: "error",
+                message: "Heartbeat timestamp field is required",
+            };
         }
 
         const expectedStatusCandidate = Reflect.get(
             monitor,
             "heartbeatExpectedStatus"
-        );
-        if (
-            typeof expectedStatusCandidate !== "string" ||
-            expectedStatusCandidate.trim().length === 0
-        ) {
-            return { error: "Heartbeat expected status is required" };
+        ) as unknown;
+        if (typeof expectedStatusCandidate !== "string") {
+            return {
+                kind: "error",
+                message: "Heartbeat expected status is required",
+            };
         }
+        const expectedStatus = expectedStatusCandidate.trim();
+        if (expectedStatus.length === 0) {
+            return {
+                kind: "error",
+                message: "Heartbeat expected status is required",
+            };
+        }
+
+        const maxDriftSeconds = resolveMaxDriftSeconds(monitor, serviceConfig);
 
         return {
-            expectedStatus: expectedStatusCandidate.trim(),
-            statusField: statusFieldCandidate.trim(),
-            timestampField: timestampFieldCandidate.trim(),
-            url: urlCandidate.trim(),
+            context: {
+                expectedStatus,
+                maxDriftSeconds,
+                statusField,
+                timestampField,
+                url,
+            },
+            kind: "context",
         };
-    }
+    },
+    scope: "ServerHeartbeatMonitor",
+    type: "server-heartbeat",
+};
 
-    private resolveMaxDriftSeconds(monitor: Site["monitors"][0]): number {
-        const monitorValue = Reflect.get(
-            monitor,
-            "heartbeatMaxDriftSeconds"
-        ) as unknown;
-        if (
-            typeof monitorValue === "number" &&
-            Number.isFinite(monitorValue) &&
-            monitorValue >= 0
-        ) {
-            return monitorValue;
-        }
+const ServerHeartbeatMonitorBase: new (
+    config?: MonitorConfig
+) => IMonitorService = buildMonitorFactory(
+    () =>
+        createRemoteMonitorService<"server-heartbeat", ServerHeartbeatContext>(
+            behavior
+        ),
+    "ServerHeartbeatMonitor"
+);
 
-        if (Object.hasOwn(this.config, "heartbeatMaxDriftSeconds")) {
-            const candidate = Reflect.get(
-                this.config,
-                "heartbeatMaxDriftSeconds"
-            ) as unknown;
-            if (
-                typeof candidate === "number" &&
-                Number.isFinite(candidate) &&
-                candidate >= 0
-            ) {
-                return candidate;
-            }
-        }
+/**
+ * Server heartbeat monitor service built atop the shared remote monitor core.
+ */
+export class ServerHeartbeatMonitor extends ServerHeartbeatMonitorBase {}
 
-        return DEFAULT_MAX_DRIFT_SECONDS;
-    }
-
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            ...config,
-        };
-        this.axiosInstance = createHttpClient(this.config);
-    }
-
-    public getType(): MonitorType {
-        return "server-heartbeat";
-    }
-
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-        this.axiosInstance = createHttpClient(this.config);
-    }
-}
+/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

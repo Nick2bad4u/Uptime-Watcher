@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ConfigurationManager } from "../../managers/ConfigurationManager";
-import type { Site, Monitor } from "../../../shared/types.js";
+import type { Site, Monitor } from "@shared/types";
 import { MonitorValidator } from "../../managers/validators/MonitorValidator";
 import { SiteValidator } from "../../managers/validators/SiteValidator";
 import type { ValidationResult } from "../../managers/validators/interfaces";

@@ -346,10 +346,12 @@ export function createDebugMiddleware(options: {
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const errorMiddleware = createErrorHandlingMiddleware({
  *     continueOnError: false,
  *     onError: (error, event, data) => {
- *         console.error(`Failed processing ${event}:`, error);
+ *         logger.error("Failed processing event", { data, error, event });
  *     },
  * });
  * eventBus.use(errorMiddleware);
@@ -548,11 +550,13 @@ export function createLoggingMiddleware(options: {
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const metricsMiddleware = createMetricsMiddleware({
  *     trackCounts: true,
  *     trackTiming: true,
  *     metricsCallback: (metric) => {
- *         console.log(`Metric: ${metric.name} = ${metric.value}`);
+ *         logger.debug("Metric update", metric);
  *     },
  * });
  * eventBus.use(metricsMiddleware);
@@ -611,11 +615,13 @@ export function createMetricsMiddleware(options: {
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const rateLimitMiddleware = createRateLimitMiddleware({
  *     burstLimit: 5,
  *     maxEventsPerSecond: 50,
  *     onRateLimit: (event, data) => {
- *         console.warn(`Rate limit hit for event: ${event}`);
+ *         logger.warn("Rate limit hit", { data, event });
  *     },
  * });
  * eventBus.use(rateLimitMiddleware);

@@ -15,7 +15,7 @@ import {
     safeParseRetryAttempts,
     safeParseTimeout,
     safeParseTimestamp,
-} from "../../../shared/utils/safeConversions";
+} from "@shared/utils/safeConversions";
 
 describe("Shared Safe Conversions - Backend Coverage", () => {
     describe(safeNumberConversion, () => {

@@ -9,6 +9,8 @@
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * interface MyEvents {
  *     "user:login": { userId: string; timestamp: number };
  *     "data:updated": { table: string; records: number };
@@ -16,7 +18,7 @@
  *
  * const bus = new TypedEventBus<MyEvents>("app-events");
  * bus.onTyped("user:login", (data) => {
- *     console.log(`User ${data.userId} logged in at ${data.timestamp}`);
+ *     logger.info("User login", data);
  * });
  * await bus.emitTyped("user:login", {
  *     userId: "123",
@@ -27,6 +29,7 @@
  * @packageDocumentation
  */
 
+import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import {
@@ -65,26 +68,6 @@ export interface EventBusDiagnostics {
 }
 
 /**
- * Metadata automatically added to all emitted events.
- *
- * @remarks
- * Provides debugging and tracking information for each event emission. This
- * metadata is available in all event listeners under the `_meta` property.
- *
- * @public
- */
-export interface EventMetadata {
-    /** Identifier of the event bus that emitted this event. */
-    busId: string;
-    /** Unique identifier for tracking this specific event emission. */
-    correlationId: string;
-    /** Name of the event that was emitted. */
-    eventName: string;
-    /** Unix timestamp when the event was emitted. */
-    timestamp: number;
-}
-
-/**
  * Middleware function for event processing.
  *
  * @remarks
@@ -98,10 +81,12 @@ export interface EventMetadata {
  * @example
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const loggingMiddleware: EventMiddleware = async (event, data, next) => {
- *     console.log(`Processing event: ${event}`);
+ *     logger.debug("Processing event", { event, data });
  *     await next(); // Continue to next middleware
- *     console.log(`Completed event: ${event}`);
+ *     logger.debug("Completed event", { event });
  * };
  * ```
  *
@@ -470,8 +455,10 @@ export class TypedEventBus<
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * bus.onceTyped("user:login", (data) => {
-     *     console.log("User logged in:", data.userId);
+     *     logger.info("User logged in", data);
      * });
      * ```
      *

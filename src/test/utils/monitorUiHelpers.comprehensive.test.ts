@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Monitor } from "../../../shared/types";
-import type { ValidationResult } from "../../../shared/types/validation";
-import type { MonitorTypeConfig } from "../../../shared/types/monitorTypes";
-import { CacheKeys } from "../../../shared/utils/cacheKeys";
+import type { Monitor } from "@shared/types";
+import type { ValidationResult } from "@shared/types/validation";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import { CacheKeys } from "@shared/utils/cacheKeys";
 
 const cacheMocks = vi.hoisted(() => ({
     get: vi.fn(),
@@ -121,7 +121,18 @@ const createConfig = (
         displayName:
             overrides.displayName ?? `${String(type).toUpperCase()} Monitor`,
         description: overrides.description ?? "Monitor configuration",
-        fields: overrides.fields ?? [],
+        fields:
+            overrides.fields ??
+            ([
+                {
+                    helpText: "Provide a valid endpoint",
+                    label: "Endpoint",
+                    name: "endpoint",
+                    placeholder: "https://status.example.com",
+                    required: true,
+                    type: "url",
+                },
+            ] satisfies MonitorTypeConfig["fields"]),
         version: overrides.version ?? "1.0.0",
     } satisfies Omit<MonitorTypeConfig, "uiConfig">;
 

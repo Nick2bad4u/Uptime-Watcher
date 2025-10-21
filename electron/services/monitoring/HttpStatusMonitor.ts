@@ -1,164 +1,35 @@
 /**
- * HTTP status monitor service that verifies the response status code of an
- * HTTP/HTTPS endpoint.
+ * HTTP status monitor service built on the shared HTTP core.
  */
 
-import type { Site } from "@shared/types";
-import type { AxiosInstance, AxiosResponse } from "axios";
+/* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
+
+import type { Monitor } from "@shared/types";
+
+import type { MonitorConfig } from "./types";
 
 import {
-    interpolateLogTemplate,
-    LOG_TEMPLATES,
-} from "@shared/utils/logTemplates";
-
-import type {
-    IMonitorService,
-    MonitorCheckResult,
-    MonitorConfig,
-} from "./types";
-
-import {
-    DEFAULT_REQUEST_TIMEOUT,
-    RETRY_BACKOFF,
-    USER_AGENT,
-} from "../../constants";
-import { isDev } from "../../electronUtils";
-import { logger } from "../../utils/logger";
-import { withOperationalHooks } from "../../utils/operationalHooks";
-import {
-    createMonitorErrorResult,
-    extractMonitorConfig,
-    validateMonitorUrl,
-} from "./shared/monitorServiceHelpers";
-import { handleCheckError, isCancellationError } from "./utils/errorHandling";
-import { createHttpClient } from "./utils/httpClient";
-import { getSharedHttpRateLimiter } from "./utils/httpRateLimiter";
+    createHttpMonitorService,
+    type HttpMonitorBehavior,
+    type HttpMonitorServiceInstance,
+} from "./shared/httpMonitorCore";
+import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
+import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
 
 /**
- * Monitor service ensuring HTTP status codes match expectations.
+ * Runtime configuration contract for HTTP status monitor instances.
+ *
+ * @internal
  */
-export class HttpStatusMonitor implements IMonitorService {
-    private static readonly rateLimiter = getSharedHttpRateLimiter();
+type HttpStatusMonitorConfig = Monitor & { type: "http-status" };
 
-    private axiosInstance: AxiosInstance;
-
-    private config: MonitorConfig;
-
-    public async check(
-        monitor: Site["monitors"][0],
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        if (monitor.type !== "http-status") {
-            throw new Error(
-                `HttpStatusMonitor cannot handle monitor type: ${monitor.type}`
-            );
-        }
-
-        const expectedStatus = Number(monitor.expectedStatusCode);
-        if (
-            !Number.isInteger(expectedStatus) ||
-            expectedStatus < 100 ||
-            expectedStatus > 599
-        ) {
-            return createMonitorErrorResult(
-                "Monitor missing or invalid expected status code",
-                0
-            );
-        }
-
-        const validationError = validateMonitorUrl(monitor);
-        if (validationError) {
-            return createMonitorErrorResult(validationError, 0);
-        }
-
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
-
-        const url = monitor.url ?? "";
-        return HttpStatusMonitor.rateLimiter.schedule(url, () =>
-            this.performStatusCheckWithRetry(
-                url,
-                expectedStatus,
-                timeout,
-                retryAttempts,
-                signal
-            )
-        );
-    }
-
-    private async performStatusCheckWithRetry(
-        url: string,
-        expectedStatus: number,
-        timeout: number,
-        maxRetries: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        try {
-            if (signal?.aborted) {
-                throw new Error("Operation was aborted");
-            }
-
-            const totalAttempts = maxRetries + 1;
-
-            return await withOperationalHooks(
-                () =>
-                    this.performSingleStatusCheck(
-                        url,
-                        expectedStatus,
-                        timeout,
-                        signal
-                    ),
-                {
-                    failureLogLevel: (encounteredError) =>
-                        isCancellationError(encounteredError)
-                            ? "warn"
-                            : "error",
-                    initialDelay: RETRY_BACKOFF.INITIAL_DELAY,
-                    maxRetries: totalAttempts,
-                    operationName: `HTTP status check for ${url}`,
-                    ...(isDev() && {
-                        onRetry: (attempt: number, error: Error): void => {
-                            const errorMessage =
-                                error instanceof Error
-                                    ? error.message
-                                    : String(error);
-                            logger.debug(
-                                `[HttpStatusMonitor] URL ${url} failed attempt ${attempt}/${totalAttempts}: ${errorMessage}`
-                            );
-                        },
-                    }),
-                }
-            );
-        } catch (error) {
-            return handleCheckError(error, url);
-        }
-    }
-
-    private async performSingleStatusCheck(
-        url: string,
-        expectedStatus: number,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<MonitorCheckResult> {
-        const response = await this.makeRequest(url, timeout, signal);
-        const responseTime = response.responseTime ?? 0;
-
-        if (isDev()) {
-            logger.debug(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.debug.MONITOR_RESPONSE_TIME,
-                    {
-                        responseTime,
-                        status: response.status,
-                        url,
-                    }
-                )
-            );
-        }
-
-        if (response.status === expectedStatus) {
+const behavior: HttpMonitorBehavior<
+    "http-status",
+    HttpStatusMonitorConfig,
+    { expectedStatus: number }
+> = {
+    evaluateResponse: ({ context, response, responseTime }) => {
+        if (response.status === context.expectedStatus) {
             return {
                 details: `HTTP ${response.status}`,
                 responseTime,
@@ -167,59 +38,54 @@ export class HttpStatusMonitor implements IMonitorService {
         }
 
         return {
-            details: `Expected ${expectedStatus}, received ${response.status}`,
+            details: `Expected ${context.expectedStatus}, received ${response.status}`,
             responseTime,
             status: "degraded",
         };
-    }
+    },
+    operationLabel: "HTTP status check",
+    scope: "HttpStatusMonitor",
+    type: "http-status",
+    validateMonitorSpecifics: (monitor: HttpStatusMonitorConfig) => {
+        const expectedStatus = Number(monitor.expectedStatusCode);
 
-    private async makeRequest(
-        url: string,
-        timeout: number,
-        signal?: AbortSignal
-    ): Promise<AxiosResponse> {
-        const signals = [AbortSignal.timeout(timeout)];
-        if (signal) {
-            signals.push(signal);
+        if (
+            !Number.isInteger(expectedStatus) ||
+            expectedStatus < 100 ||
+            expectedStatus > 599
+        ) {
+            return {
+                kind: "error",
+                result: createMonitorErrorResult(
+                    "Monitor missing or invalid expected status code",
+                    0
+                ),
+            };
         }
 
-        return this.axiosInstance.get(url, {
-            signal: AbortSignal.any(signals),
-            timeout,
-        });
-    }
-
-    public constructor(config: MonitorConfig = {}) {
-        this.config = {
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
+        return {
+            context: { expectedStatus },
+            kind: "context",
         };
+    },
+};
 
-        this.axiosInstance = createHttpClient({
-            timeout: DEFAULT_REQUEST_TIMEOUT,
-            userAgent: USER_AGENT,
-            ...config,
-        });
-    }
+const HttpStatusMonitorBase: new (
+    config?: MonitorConfig
+) => HttpMonitorServiceInstance = buildMonitorFactory(
+    () =>
+        createHttpMonitorService<
+            "http-status",
+            HttpStatusMonitorConfig,
+            { expectedStatus: number }
+        >(behavior),
+    "HttpStatusMonitor"
+);
 
-    public getConfig(): MonitorConfig {
-        return { ...this.config };
-    }
+/**
+ * HTTP status monitor service that validates response codes via the shared
+ * core.
+ */
+export class HttpStatusMonitor extends HttpStatusMonitorBase {}
 
-    public getType(): Site["monitors"][0]["type"] {
-        return "http-status";
-    }
-
-    public updateConfig(config: Partial<MonitorConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
-
-        this.axiosInstance = createHttpClient({
-            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-            userAgent: this.config.userAgent ?? USER_AGENT,
-        });
-    }
-}
+/* eslint-enable ex/no-unhandled -- Re-enable global exception handling linting */

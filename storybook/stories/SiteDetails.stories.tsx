@@ -6,11 +6,11 @@
 import type { Site } from "@shared/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
+import { SiteDetails } from "@app/components/SiteDetails/SiteDetails";
+import { useUIStore } from "@app/stores/ui/useUiStore";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
 
-import { SiteDetails } from "../../src/components/SiteDetails/SiteDetails";
-import { useUIStore } from "../../src/stores/ui/useUiStore";
 import {
     createMockMonitor,
     createMockSite,

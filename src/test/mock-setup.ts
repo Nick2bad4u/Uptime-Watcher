@@ -16,12 +16,12 @@ process.setMaxListeners(MAX_LISTENERS);
 
 import { vi } from "vitest";
 import fc from "fast-check";
-import type { Monitor, Site, StatusUpdate } from "../../shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
-} from "../../shared/types/stateSync";
-import type { ValidationResult } from "../../shared/types/validation";
+} from "@shared/types/stateSync";
+import type { ValidationResult } from "@shared/types/validation";
 import type { ElectronAPI } from "../types";
 
 // Configure fast-check for property-based testing

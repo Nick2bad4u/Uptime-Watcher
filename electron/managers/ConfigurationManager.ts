@@ -20,12 +20,14 @@
  * @example Basic configuration operations:
  *
  * ```typescript
+ * import { logger } from "../utils/logger";
+ *
  * const configManager = new ConfigurationManager();
  *
  * // Validate site configuration
  * const validation = await configManager.validateSiteConfig(siteData);
  * if (!validation.isValid) {
- *     console.error("Site validation failed:", validation.errors);
+ *     logger.error("Site validation failed", validation.errors);
  * }
  *
  * // Get default values
@@ -301,8 +303,10 @@ export class ConfigurationManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * const stats = configManager.getCacheStats();
-     * console.log(stats);
+     * logger.debug("Configuration cache stats", stats);
      * ```
      *
      * @returns An object containing statistics for both configuration and

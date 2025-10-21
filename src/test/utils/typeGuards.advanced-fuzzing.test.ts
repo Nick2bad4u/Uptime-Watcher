@@ -38,12 +38,12 @@ import {
     isValidTimestamp,
     hasProperty,
     hasProperties,
-} from "../../../shared/utils/typeGuards";
+} from "@shared/utils/typeGuards";
 import {
     validateMonitorType,
     validateSite,
     getMonitorValidationErrors,
-} from "../../../shared/utils/validation";
+} from "@shared/utils/validation";
 
 describe("Type Guards Advanced Fuzzing Tests", () => {
     describe("Basic Type Guards - Comprehensive Input Coverage", () => {

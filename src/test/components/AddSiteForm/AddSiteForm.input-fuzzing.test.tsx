@@ -28,7 +28,7 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import type { MonitorType, Site } from "../../../../shared/types";
+import type { MonitorType, Site } from "@shared/types";
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
 
 // Mock state for the form

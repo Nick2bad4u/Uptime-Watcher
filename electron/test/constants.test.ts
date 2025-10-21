@@ -15,7 +15,7 @@ import {
     RETRY_BACKOFF,
     USER_AGENT,
 } from "../constants";
-import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "../../shared/constants/monitoring";
+import { DEFAULT_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Electron Constants", () => {
     describe("Timeout Constants", () => {

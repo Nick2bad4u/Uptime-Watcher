@@ -2,20 +2,19 @@
  * Storybook coverage for the Settings modal component.
  */
 
+import type { SettingsProperties } from "@app/components/Settings/Settings";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 import type { JSX } from "react/jsx-runtime";
 
+import { Settings } from "@app/components/Settings/Settings";
+import { DEFAULT_HISTORY_LIMIT } from "@app/constants";
+import { useErrorStore } from "@app/stores/error/useErrorStore";
+import { useSettingsStore } from "@app/stores/settings/useSettingsStore";
+import { useSitesStore } from "@app/stores/sites/useSitesStore";
+import { useUIStore } from "@app/stores/ui/useUiStore";
 import { useEffect } from "react";
 import { action } from "storybook/actions";
 
-import type { SettingsProperties } from "../../src/components/Settings/Settings";
-
-import { Settings } from "../../src/components/Settings/Settings";
-import { DEFAULT_HISTORY_LIMIT } from "../../src/constants";
-import { useErrorStore } from "../../src/stores/error/useErrorStore";
-import { useSettingsStore } from "../../src/stores/settings/useSettingsStore";
-import { useSitesStore } from "../../src/stores/sites/useSitesStore";
-import { useUIStore } from "../../src/stores/ui/useUiStore";
 import {
     createMockMonitor,
     createMockSite,

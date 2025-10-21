@@ -8,6 +8,22 @@
 
 import { test, expect, _electron as electron } from "@playwright/test";
 
+function buildRendererTestEnv(
+    overrides: Record<string, string> = {}
+): Record<string, string> {
+    const baseEnv = Object.entries(process.env).reduce<Record<string, string>>(
+        (accumulator, [key, value]) => {
+            if (typeof value === "string") {
+                accumulator[key] = value;
+            }
+            return accumulator;
+        },
+        {}
+    );
+
+    return { ...baseEnv, ...overrides };
+}
+
 test.describe(
     "electron renderer process",
     {
@@ -41,10 +57,7 @@ test.describe(
             async () => {
                 const electronApp = await electron.launch({
                     args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
+                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
                 });
 
                 // Get the main window
@@ -91,10 +104,7 @@ test.describe(
             async () => {
                 const electronApp = await electron.launch({
                     args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
+                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
                 });
 
                 const window = await electronApp.firstWindow();
@@ -136,10 +146,7 @@ test.describe(
             async () => {
                 const electronApp = await electron.launch({
                     args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
+                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
                 });
 
                 const window = await electronApp.firstWindow();
@@ -179,10 +186,7 @@ test.describe(
             async () => {
                 const electronApp = await electron.launch({
                     args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
+                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
                 });
 
                 const window = await electronApp.firstWindow();
@@ -240,10 +244,7 @@ test.describe(
             async () => {
                 const electronApp = await electron.launch({
                     args: ["."],
-                    env: {
-                        ...process.env,
-                        NODE_ENV: "test",
-                    },
+                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
                 });
 
                 const window = await electronApp.firstWindow();

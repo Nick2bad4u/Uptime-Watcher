@@ -11,7 +11,9 @@
  */
 
 import { ensureError } from "@shared/utils/errorHandling";
+import { isValidUrl } from "@shared/validation/validatorUtils";
 
+import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -71,17 +73,37 @@ export const SystemService: SystemServiceContract = {
     openExternal: wrap(
         "openExternal",
         async (api, url: string): Promise<boolean> => {
-            const opened = await api.system.openExternal(url);
+            const requestedUrl = url;
+            const urlForMessage: string = url;
+            const isSafeUrl = isValidUrl(requestedUrl);
+
+            if (!isSafeUrl) {
+                const error = new TypeError(
+                    `Invalid URL provided to SystemService.openExternal: ${urlForMessage}`
+                );
+
+                logger.error(
+                    "Rejected unsafe URL for external navigation",
+                    error,
+                    {
+                        url: urlForMessage,
+                    }
+                );
+
+                throw error;
+            }
+
+            const opened = await api.system.openExternal(requestedUrl);
 
             if (typeof opened !== "boolean") {
                 throw new TypeError(
-                    `Electron declined to open external URL: ${url} (received ${typeof opened})`
+                    `Electron declined to open external URL: ${urlForMessage} (received ${typeof opened})`
                 );
             }
 
             if (!opened) {
                 throw new Error(
-                    `Electron declined to open external URL: ${url}`
+                    `Electron declined to open external URL: ${urlForMessage}`
                 );
             }
 

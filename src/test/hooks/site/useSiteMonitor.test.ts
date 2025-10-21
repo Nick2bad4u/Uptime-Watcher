@@ -22,6 +22,7 @@ interface Site {
 vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         getSelectedMonitorId: vi.fn(() => "monitor-1"),
+        selectedMonitorIds: {},
         setSelectedMonitorId: vi.fn(),
         sites: [],
     })),
@@ -74,6 +75,9 @@ describe("useSiteMonitor Hook", () => {
         // Default mock setup
         (useSitesStore as any).mockReturnValue({
             getSelectedMonitorId: vi.fn(() => "monitor-1"),
+            selectedMonitorIds: {
+                "site-1": "monitor-1",
+            },
             setSelectedMonitorId: vi.fn(),
             sites: [mockSite],
         });
@@ -117,6 +121,9 @@ describe("useSiteMonitor Hook", () => {
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => null),
+                selectedMonitorIds: {
+                    "site-1": undefined,
+                },
                 setSelectedMonitorId: vi.fn(),
                 sites: [emptyMonitorsSite],
             });
@@ -147,6 +154,9 @@ describe("useSiteMonitor Hook", () => {
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                selectedMonitorIds: {
+                    "site-1": "monitor-1",
+                },
                 setSelectedMonitorId: vi.fn(),
                 sites: [updatedSite],
             });
@@ -167,6 +177,7 @@ describe("useSiteMonitor Hook", () => {
 
             (useSitesStore as any).mockReturnValue({
                 getSelectedMonitorId: vi.fn(() => "monitor-1"),
+                selectedMonitorIds: {},
                 setSelectedMonitorId: vi.fn(),
                 sites: [], // Empty sites array
             });

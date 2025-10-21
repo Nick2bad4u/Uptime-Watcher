@@ -19,7 +19,7 @@ import {
     isValidUrl,
     isValidHost,
     isValidPort,
-} from "../../../shared/validation/validatorUtils";
+} from "@shared/validation/validatorUtils";
 
 describe("Validation Fuzzing Tests", () => {
     describe("URL Validation Fuzzing", () => {

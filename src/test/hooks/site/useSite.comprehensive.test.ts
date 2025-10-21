@@ -7,7 +7,7 @@ import { renderHook } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { useSite } from "../../../hooks/site/useSite";
-import type { Site, Monitor } from "../../../../shared/types";
+import type { Site, Monitor } from "@shared/types";
 
 // Mock all the sub-hooks
 vi.mock("../../../hooks/site/useSiteMonitor", () => ({

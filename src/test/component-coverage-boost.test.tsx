@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
+import type { MonitorTypeOption } from "@shared/types/monitorTypes";
 
 // Mock React components for testing uncovered component paths
 // Removed unused MockComponent to fix TS6133
@@ -539,11 +540,6 @@ describe("Component Coverage Boost", () => {
                 url?: string;
                 port?: number;
                 host?: string;
-            }
-
-            interface MonitorTypeOption {
-                value: string;
-                label: string;
             }
 
             const historyTitleLogic = {

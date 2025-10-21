@@ -42,34 +42,27 @@
  * @public
  */
 
-import type { FormFieldBaseProperties } from "@shared/types/componentProps";
-
-import {
-    type ChangeEvent,
-    memo,
-    type NamedExoticComponent,
-    useCallback,
-} from "react";
+import type { NamedExoticComponent } from "react";
 
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
-import { BaseFormField } from "./BaseFormField";
+import {
+    createStringField,
+    type StringFieldPropsBase,
+} from "./fields/fieldFactories";
 
 /**
  * Properties for the SelectField component.
  *
  * @public
  */
-export interface SelectFieldProperties extends FormFieldBaseProperties {
-    /** Whether the field is disabled */
-    readonly disabled?: boolean;
-    /** Callback function triggered when selection changes */
-    readonly onChange: (value: string) => void;
+export interface SelectFieldProperties
+    extends Omit<StringFieldPropsBase, "value"> {
     /** Array of options to display in the dropdown */
     readonly options: SelectOption[];
     /** Placeholder text shown when no option is selected */
     readonly placeholder?: string;
-    /** Current selected value (string or number) */
-    readonly value: number | string;
+    /** Current selected value */
+    readonly value: string;
 }
 
 /**
@@ -81,7 +74,7 @@ export interface SelectOption {
     /** Display text for the option */
     label: string;
     /** Value to be selected when this option is chosen */
-    value: number | string;
+    value: string;
 }
 
 /**
@@ -116,55 +109,41 @@ export interface SelectOption {
  *
  * @public
  */
-export const SelectField: NamedExoticComponent<SelectFieldProperties> = memo(
-    function SelectField({
-        disabled = false,
-        error,
-        helpText,
-        id,
-        label,
-        onChange,
-        options,
-        placeholder,
-        required = false,
-        value,
-    }: SelectFieldProperties) {
-        const handleChange = useCallback(
-            (event: ChangeEvent<HTMLSelectElement>) => {
-                onChange(event.target.value);
-            },
-            [onChange]
-        );
+const SelectFieldBase = createStringField<
+    SelectFieldProperties,
+    HTMLSelectElement
+>({
+    displayName: "SelectField",
+    renderControl: ({ ariaProps, handleChange, props }) => {
+        const {
+            disabled = false,
+            id,
+            options,
+            placeholder,
+            required = false,
+            value,
+        } = props;
 
         return (
-            <BaseFormField
-                {...(error !== undefined && { error })}
-                {...(helpText !== undefined && { helpText })}
+            <ThemedSelect
+                {...ariaProps}
+                disabled={disabled}
                 id={id}
-                label={label}
+                onChange={handleChange}
                 required={required}
+                title={ariaProps["aria-label"]}
+                value={value}
             >
-                {(ariaProps) => (
-                    <ThemedSelect
-                        {...ariaProps}
-                        disabled={disabled}
-                        id={id}
-                        onChange={handleChange}
-                        required={required}
-                        title={ariaProps["aria-label"]}
-                        value={value}
-                    >
-                        {placeholder ? (
-                            <option value="">{placeholder}</option>
-                        ) : null}
-                        {options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                        ))}
-                    </ThemedSelect>
-                )}
-            </BaseFormField>
+                {placeholder ? <option value="">{placeholder}</option> : null}
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </ThemedSelect>
         );
-    }
-);
+    },
+});
+
+export const SelectField: NamedExoticComponent<SelectFieldProperties> =
+    SelectFieldBase;

@@ -117,8 +117,10 @@ export function isBrowserEnvironment(): boolean {
  * @example
  *
  * ```typescript
+ * import { logger } from "@app/services/logger";
+ *
  * if (isDevelopment()) {
- *     console.log("Debug information");
+ *     logger.debug("Debug information");
  * }
  * ```
  *

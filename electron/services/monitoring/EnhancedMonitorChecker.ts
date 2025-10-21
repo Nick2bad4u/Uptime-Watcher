@@ -251,13 +251,15 @@ export interface EnhancedMonitorCheckConfig {
  * @example Error Handling
  *
  * ```typescript
+ * import { monitorLogger } from "../../utils/logger";
+ *
  * try {
  *     const result = await checker.checkMonitor(site, monitorId);
  *     if (result) {
- *         console.log("Monitor check successful:", result.status);
+ *         monitorLogger.info("Monitor check successful", result);
  *     }
  * } catch (error) {
- *     console.error("Monitor check failed:", error);
+ *     monitorLogger.error("Monitor check failed", error);
  * }
  * ```
  *
@@ -343,15 +345,18 @@ export class EnhancedMonitorChecker {
      * @example Scheduled Monitor Check
      *
      * ```typescript
+     * import { monitorLogger } from "../../utils/logger";
+     *
      * const result = await checker.checkMonitor(
      *     site,
      *     "monitor-123",
      *     false
      * );
      * if (result) {
-     *     console.log(
-     *         `Monitor ${result.monitorId} status: ${result.status}`
-     *     );
+     *     monitorLogger.info("Monitor status", {
+     *         monitorId: result.monitorId,
+     *         status: result.status,
+     *     });
      * }
      * ```
      *

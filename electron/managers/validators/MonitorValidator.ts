@@ -54,6 +54,8 @@ export class MonitorValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * if (validator.shouldApplyDefaultInterval(monitor)) {
      *     monitor.checkInterval = DEFAULT_INTERVAL;
      * }
@@ -80,9 +82,11 @@ export class MonitorValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * const result = validator.validateMonitorConfiguration(monitor);
      * if (!result.isValid) {
-     *     console.error(result.errors);
+     *     logger.error("Monitor validation errors", result.errors);
      * }
      * ```
      *
@@ -119,9 +123,11 @@ export class MonitorValidator {
      * @example
      *
      * ```typescript
+     * import { logger } from "../../utils/logger";
+     *
      * const errors = validator["validateMonitorTypeSpecific"](monitor);
      * if (errors.length > 0) {
-     *     console.error(errors);
+     *     logger.error("Monitor type validation errors", errors);
      * }
      * ```
      *

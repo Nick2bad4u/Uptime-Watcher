@@ -2,6 +2,22 @@ import { expect, _electron as electron } from "@playwright/test";
 import type { ElectronApplication, Page } from "@playwright/test";
 import type { MonitorType } from "../../../shared/types";
 
+function buildPlaywrightEnv(
+    overrides: Record<string, string> = {}
+): Record<string, string> {
+    const baseEnv = Object.entries(process.env).reduce<Record<string, string>>(
+        (accumulator, [key, value]) => {
+            if (typeof value === "string") {
+                accumulator[key] = value;
+            }
+            return accumulator;
+        },
+        {}
+    );
+
+    return { ...baseEnv, ...overrides };
+}
+
 export const createUniqueName = (prefix: string): string => {
     const randomSegment = Math.random().toString(36).slice(2, 8);
     return `${prefix} ${Date.now()}-${randomSegment}`;
@@ -13,11 +29,10 @@ export async function launchAppForMonitorTesting(): Promise<{
 }> {
     const electronApp = await electron.launch({
         args: ["."],
-        env: {
-            ...process.env,
+        env: buildPlaywrightEnv({
             NODE_ENV: "test",
             SKIP_AUTO_UPDATES: "true",
-        },
+        }),
     });
 
     const window = await electronApp.firstWindow();

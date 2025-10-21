@@ -57,6 +57,7 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
+import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -232,7 +233,7 @@ export class SiteManager {
             ...this.getSitesSnapshot(),
             structuredClone(createdSite),
         ];
-        await this.updateSitesCache(updatedSites);
+        await this.updateSitesCache(updatedSites, "SiteManager.addSite");
 
         const cachedSite = this.sitesCache.get(createdSite.identifier);
         if (!cachedSite) {
@@ -262,7 +263,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: sanitizedSite.identifier,
             sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp,
         });
 
@@ -287,8 +288,10 @@ export class SiteManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * const allSites = await siteManager.getSites();
-     * console.log(`Found ${allSites.length} sites`);
+     * logger.info("Loaded sites", { count: allSites.length });
      * ```
      *
      * @returns Promise resolving to array of complete site objects.
@@ -298,7 +301,7 @@ export class SiteManager {
     public async getSites(): Promise<Site[]> {
         const sites = await this.siteRepositoryService.getSitesFromDatabase();
         // Keep cache synchronized with database
-        await this.updateSitesCache(sites);
+        await this.updateSitesCache(sites, "SiteManager.getSites");
         return sites;
     }
 
@@ -357,7 +360,7 @@ export class SiteManager {
     public async initialize(): Promise<void> {
         logger.info(LOG_TEMPLATES.services.SITE_MANAGER_LOADING_CACHE);
         const sites = await this.siteRepositoryService.getSitesFromDatabase();
-        await this.updateSitesCache(sites);
+        await this.updateSitesCache(sites, "SiteManager.loadSitesFromCache");
         logger.info(
             interpolateLogTemplate(
                 LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED,
@@ -399,7 +402,10 @@ export class SiteManager {
                 await this.siteRepositoryService.getSitesFromDatabase();
 
             // Update cache
-            await this.updateSitesCache(allSites);
+            await this.updateSitesCache(
+                allSites,
+                "SiteManager.refreshSitesFromDatabase"
+            );
 
             // Find the updated site for the event
             const updatedSite = this.sitesCache.get(siteIdentifier);
@@ -418,7 +424,7 @@ export class SiteManager {
                     action: STATE_SYNC_ACTION.UPDATE,
                     siteIdentifier: siteIdentifier,
                     sites: this.getSitesSnapshot(),
-                    source: STATE_SYNC_SOURCE.DATABASE,
+                    source: STATE_SYNC_SOURCE.FRONTEND,
                     timestamp: Date.now(),
                 });
 
@@ -464,7 +470,10 @@ export class SiteManager {
 
         if (result) {
             const sitesAfterRemoval = this.getSitesSnapshot();
-            await this.updateSitesCache(sitesAfterRemoval);
+            await this.updateSitesCache(
+                sitesAfterRemoval,
+                "SiteManager.removeSite"
+            );
             const timestamp = Date.now();
 
             await this.eventEmitter.emitTyped("internal:site:removed", {
@@ -486,7 +495,7 @@ export class SiteManager {
                 action: STATE_SYNC_ACTION.DELETE,
                 siteIdentifier: identifier,
                 sites: sitesAfterRemoval,
-                source: STATE_SYNC_SOURCE.DATABASE,
+                source: STATE_SYNC_SOURCE.FRONTEND,
                 timestamp,
             });
         }
@@ -510,8 +519,10 @@ export class SiteManager {
      * @example
      *
      * ```typescript
+     * import { logger } from "../utils/logger";
+     *
      * const deletedCount = await siteManager.deleteAllSites();
-     * console.log(`Deleted ${deletedCount} sites`);
+     * logger.info("Deleted sites", { count: deletedCount });
      * ```
      *
      * @returns Promise resolving to the number of sites deleted.
@@ -544,7 +555,7 @@ export class SiteManager {
         const eventSites =
             deletedSites.length > 0 ? deletedSites : sitesSnapshot;
 
-        await this.updateSitesCache([]);
+        await this.updateSitesCache([], "SiteManager.clearSites");
 
         // Emit events for each deleted site for consistency
         for (const site of eventSites) {
@@ -568,7 +579,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             sites: [],
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp: Date.now(),
         });
 
@@ -652,7 +663,10 @@ export class SiteManager {
         // added/updated
         const freshSites =
             await this.siteRepositoryService.getSitesFromDatabase();
-        await this.updateSitesCache(freshSites);
+        await this.updateSitesCache(
+            freshSites,
+            "SiteManager.reloadSitesFromDatabase"
+        );
 
         // Get the refreshed site for the event
         const refreshedSite = this.sitesCache.get(identifier);
@@ -675,7 +689,7 @@ export class SiteManager {
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: identifier,
             sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.DATABASE,
+            source: STATE_SYNC_SOURCE.FRONTEND,
             timestamp: Date.now(),
         });
 
@@ -698,12 +712,27 @@ export class SiteManager {
      * ```
      *
      * @param sites - Array of {@link Site} objects to update the cache with.
+     * @param context - Optional operation context for diagnostics.
      *
      * @returns A promise that resolves when cache update is complete.
      *
      * @public
      */
-    public async updateSitesCache(sites: Site[]): Promise<void> {
+    public async updateSitesCache(
+        sites: Site[],
+        context?: string
+    ): Promise<void> {
+        const duplicates = collectDuplicateSiteIdentifiers(sites);
+        if (duplicates.length > 0) {
+            logger.error(
+                "[SiteManager] Duplicate site identifiers detected while updating cache",
+                {
+                    context: context ?? "SiteManager.updateSitesCache",
+                    duplicates,
+                }
+            );
+        }
+
         this.sitesCache.replaceAll(
             sites.map((site) => ({
                 data: site,

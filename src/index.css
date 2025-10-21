@@ -7,8 +7,25 @@
 /* https://github.com/Wombosvideo/tw-animate-css */
 @import "tw-animate-css";
 
-/* Import theme components CSS for styled components */
-@import "./theme/components.css";
+/* Theme component fragments */
+@import "./theme/styles/components/foundation.css";
+@import "./theme/styles/components/animations.css";
+@import "./theme/styles/components/buttons.css";
+@import "./theme/styles/components/status.css";
+@import "./theme/styles/components/forms.css";
+@import "./theme/styles/components/overlays.css";
+@import "./theme/styles/components/cards.css";
+@import "./theme/styles/components/layout.css";
+@import "./theme/styles/components/utilities.css";
+@import "./theme/styles/components/icons.css";
+
+/* Site Details view fragments */
+@import "./components/SiteDetails/styles/layout.css";
+@import "./components/SiteDetails/styles/navigation.css";
+@import "./components/SiteDetails/styles/settings.css";
+@import "./components/SiteDetails/styles/header.css";
+@import "./components/SiteDetails/styles/history.css";
+@import "./components/SiteDetails/styles/animations.css";
 
 /* https://github.com/tailwindlabs/tailwindcss-typography */
 @plugin "@tailwindcss/typography";

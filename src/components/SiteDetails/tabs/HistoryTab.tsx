@@ -369,7 +369,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
                 {/* History List */}
                 <ThemedCard icon={historyIcon} title="Check History">
-                    <div className="history-tab__list space-y-2">
+                    <div className="history-tab__list">
                         {filteredHistoryRecords.map((record) => {
                             const rawStatus = record.status as
                                 | SiteStatus
@@ -383,15 +383,15 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
 
                             return (
                                 <div
-                                    className="hover:bg-surface-elevated flex items-center justify-between rounded-lg p-3 transition-colors"
+                                    className="history-tab__row"
                                     key={record.timestamp}
                                 >
-                                    <div className="flex items-center space-x-3">
+                                    <div className="history-tab__row-content">
                                         <StatusIndicator
                                             size="sm"
                                             status={resolvedStatus}
                                         />
-                                        <div>
+                                        <div className="history-tab__row-meta">
                                             <ThemedText
                                                 size="sm"
                                                 weight="medium"
@@ -401,7 +401,7 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                                 )}
                                             </ThemedText>
                                             <ThemedText
-                                                className="ml-4"
+                                                className="history-tab__row-sequence"
                                                 size="xs"
                                                 variant="secondary"
                                             >
@@ -416,23 +416,28 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                             {renderDetails(record)}
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <ThemedText size="sm" weight="medium">
+                                    <div className="history-tab__row-stats">
+                                        <ThemedText
+                                            className="history-tab__row-response"
+                                            size="sm"
+                                            weight="medium"
+                                        >
                                             {formatResponseTime(
                                                 record.responseTime
                                             )}
                                         </ThemedText>
-                                        <ThemedText
-                                            className="history-status-label"
-                                            size="xs"
-                                            variant="secondary"
-                                        >
+                                        <div className="history-tab__row-status">
                                             <StatusIconComponent
-                                                className="history-status-label__icon"
+                                                className="history-tab__row-status-icon"
                                                 size={14}
                                             />
-                                            <span>{statusLabel}</span>
-                                        </ThemedText>
+                                            <ThemedText
+                                                size="xs"
+                                                variant="secondary"
+                                            >
+                                                {statusLabel}
+                                            </ThemedText>
+                                        </div>
                                     </div>
                                 </div>
                             );

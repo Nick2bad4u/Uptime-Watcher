@@ -11,23 +11,74 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
-import type { StateSyncAction, StateSyncSource } from "./stateSync";
+import { siteSchema } from "@shared/validation/schemas";
+import * as z from "zod";
+
+import {
+    type StateSyncAction,
+    stateSyncActionSchema,
+    type StateSyncSource,
+    stateSyncSourceSchema,
+} from "./stateSync";
+
+/**
+ * Metadata automatically attached to events emitted by the typed event bus.
+ *
+ * @remarks
+ * Enables correlation of renderer and main process events for logging and
+ * diagnostics. The metadata is appended at runtime and should be treated as
+ * read-only.
+ *
+ * @public
+ */
+export interface EventMetadata {
+    /** Identifier of the event bus that emitted the event. */
+    readonly busId: string;
+    /** Correlation identifier for pairing related emissions. */
+    readonly correlationId: string;
+    /** Fully-qualified event name. */
+    readonly eventName: string;
+    /** Millisecond timestamp captured at emission time. */
+    readonly timestamp: number;
+}
+
+export const eventMetadataSchema: z.ZodType<EventMetadata> = z
+    .object({
+        busId: z.string().min(1),
+        correlationId: z.string().min(1),
+        eventName: z.string().min(1),
+        timestamp: z.number().int().nonnegative(),
+    })
+    .strict();
 
 /**
  * Base interface for all event data payloads.
  *
  * @remarks
- * Provides common timestamp field that all events must include. All event
- * interfaces should extend this base interface to ensure consistency.
+ * Provides common timestamp and metadata fields that all events include. The
+ * metadata is optional when authoring events but will be present once emitted
+ * through the typed event bus.
  *
  * @public
  */
+/* eslint-disable perfectionist/sort-interfaces -- Maintain timestamp-first ordering to satisfy sort-class-members. */
 export interface BaseEventData {
-    /**
-     * The time (in ms since epoch) when the event occurred.
-     */
-    timestamp: number;
+    /** The time (in milliseconds since epoch) when the event occurred. */
+    readonly timestamp: number;
+    /** Runtime metadata describing the emission context. */
+    readonly _meta?: EventMetadata | undefined;
+    /** Preserves previously attached metadata when re-emitting events. */
+    readonly _originalMeta?: EventMetadata | undefined;
 }
+/* eslint-enable perfectionist/sort-interfaces -- Restore interface sorting rules. */
+
+const baseEventDataSchema = z
+    .object({
+        _meta: eventMetadataSchema.optional(),
+        _originalMeta: eventMetadataSchema.optional(),
+        timestamp: z.number().int().nonnegative(),
+    })
+    .strict();
 
 /**
  * Payload for state synchronization events.
@@ -66,11 +117,74 @@ export interface StateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
     readonly action: StateSyncAction;
     /** Site identifier for targeted operations (delete, update) */
-    readonly siteIdentifier?: string;
+    readonly siteIdentifier?: string | undefined;
     /** Complete site dataset after the sync operation */
     readonly sites: Site[];
     /** Source system that triggered the sync */
     readonly source: StateSyncSource;
+}
+
+const stateSyncSitesArraySchema = siteSchema.array();
+
+/**
+ * Zod schema describing valid {@link StateSyncEventData} payloads.
+ */
+export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
+    baseEventDataSchema
+        .extend({
+            action: stateSyncActionSchema,
+            siteIdentifier: z.string().min(1).optional(),
+            sites: stateSyncSitesArraySchema,
+            source: stateSyncSourceSchema,
+        })
+        .strict();
+
+/**
+ * Safe parse result for {@link StateSyncEventData}.
+ */
+export type StateSyncEventDataParseResult = ReturnType<
+    typeof stateSyncEventDataSchema.safeParse
+>;
+
+/**
+ * Type guard ensuring a candidate is {@link StateSyncEventData}.
+ *
+ * @param candidate - Value to evaluate.
+ *
+ * @returns `true` when the candidate conforms to the schema.
+ */
+export function isStateSyncEventData(
+    candidate: unknown
+): candidate is StateSyncEventData {
+    return stateSyncEventDataSchema.safeParse(candidate).success;
+}
+
+/**
+ * Parses a candidate into {@link StateSyncEventData}.
+ *
+ * @param candidate - Value to parse.
+ *
+ * @returns Parsed event data when successful.
+ *
+ * @throws {@link z.ZodError} When validation fails.
+ */
+export function parseStateSyncEventData(
+    candidate: unknown
+): StateSyncEventData {
+    return stateSyncEventDataSchema.parse(candidate);
+}
+
+/**
+ * Safely parses state sync event data.
+ *
+ * @param candidate - Value to validate.
+ *
+ * @returns Safe parse result describing success or failure.
+ */
+export function safeParseStateSyncEventData(
+    candidate: unknown
+): StateSyncEventDataParseResult {
+    return stateSyncEventDataSchema.safeParse(candidate);
 }
 
 /**

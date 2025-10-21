@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
-import { standardTestAnnotationAsync } from "../../../shared/test/testUtils";
+import { standardTestAnnotationAsync } from "@shared/test/testUtils";
 
 import {
     DEFAULT_REQUEST_TIMEOUT_SECONDS,

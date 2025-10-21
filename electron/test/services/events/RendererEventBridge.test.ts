@@ -3,7 +3,7 @@ import {
     type RendererEventChannel,
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
-import { STATUS_KIND } from "../../../../shared/types";
+import { STATUS_KIND } from "@shared/types";
 import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

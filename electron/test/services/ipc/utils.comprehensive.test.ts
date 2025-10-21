@@ -49,6 +49,10 @@ vi.mock("@shared/validation/validatorUtils", () => ({
     isNonEmptyString: vi.fn(
         (value) => typeof value === "string" && value.trim().length > 0
     ),
+    isValidUrl: vi.fn(
+        (value) =>
+            typeof value === "string" && /^(?:https?:\/\/)[^\s]+$/u.test(value)
+    ),
 }));
 
 describe("IPC Utils - Comprehensive Coverage", () => {
@@ -316,6 +320,69 @@ describe("IPC Utils - Comprehensive Coverage", () => {
 
                 const result = IpcValidators.requiredNumber([], "testParam");
                 expect(result).toBe("testParam must be a valid number");
+            });
+        });
+
+        describe("requiredUrl validator", () => {
+            it("should return null for valid http URL", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = IpcValidators.requiredUrl(
+                    "https://example.com",
+                    "url"
+                );
+                expect(result).toBeNull();
+            });
+
+            it("should return null for valid https URL", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = IpcValidators.requiredUrl(
+                    "http://localhost:3000/status",
+                    "url"
+                );
+                expect(result).toBeNull();
+            });
+
+            it("should report error for unsupported protocol", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = IpcValidators.requiredUrl(
+                    "ftp://example.com",
+                    "url"
+                );
+                expect(result).toBe("url must be a valid http(s) URL");
+            });
+
+            it("should report error for non-string input", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = IpcValidators.requiredUrl(123, "url");
+                expect(result).toBe("url must be a valid http(s) URL");
             });
         });
 

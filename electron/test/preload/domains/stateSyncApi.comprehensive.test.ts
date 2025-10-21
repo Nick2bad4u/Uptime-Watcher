@@ -22,12 +22,12 @@ import {
     stateSyncApi,
     type StateSyncApiInterface,
 } from "../../../preload/domains/stateSyncApi";
-import type { Site } from "../../../../shared/types";
-import type { StateSyncEventData } from "../../../../shared/types/events";
+import type { Site } from "@shared/types";
+import type { StateSyncEventData } from "@shared/types/events";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
-} from "../../../../shared/types/stateSync";
+} from "@shared/types/stateSync";
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 
 // Helper functions for creating properly formatted IPC responses
@@ -192,7 +192,7 @@ describe("State Sync Domain API", () => {
                 completedAt: Date.now(),
                 siteCount: mockSyncedSites.length,
                 sites: mockSyncedSites,
-                source: "database",
+                source: "frontend",
                 synchronized: true,
             };
 

@@ -1,0 +1,59 @@
+/* Site Icon Utilities */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+
+.site-icon-container {
+    position: relative;
+    flex-shrink: 0;
+    block-size: 2rem;
+    inline-size: 2rem;
+}
+
+.site-icon {
+    border-radius: var(--radius-md);
+    block-size: 2rem;
+    inline-size: 2rem;
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+}
+
+.site-icon-fallback {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background-color: var(--color-background-secondary);
+    block-size: 2rem;
+    font-size: 1.125rem;
+    inline-size: 2rem;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    line-height: 1;
+    transition:
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
+}
+
+.site-icon-fallback-hidden,
+.hidden {
+    display: none;
+}
+
+.themed-icon--primary,
+.themed-badge .themed-icon--primary,
+.themed-card .themed-icon--primary {
+    color: var(--color-primary-500);
+}
+
+.themed-icon--secondary {
+    color: var(--color-secondary-500, var(--color-text-secondary));
+}
+
+.themed-icon--success {
+    color: var(--color-success, var(--color-status-up));
+}
+
+.themed-icon--info {
+    color: var(--color-info, var(--color-primary-400));
+}

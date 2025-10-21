@@ -23,7 +23,7 @@ import { z } from "zod";
 import type {
     MonitorFieldDefinition,
     MonitorType,
-} from "../../../shared/types";
+} from "@shared/types";
 import type { IMonitorService } from "../../services/monitoring/types";
 import {
     getMonitorTypeConfig,

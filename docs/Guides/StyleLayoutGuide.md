@@ -4,7 +4,7 @@ This guide documents the shared styling primitives that keep the renderer consis
 
 ## Design Tokens & Surfaces
 
-- Use `src/theme/components.css` utilities first; they expose the gradient surfaces, border radii, and spacing scales expected across the app.
+- Use the theme component utilities defined in `src/theme/styles/components/` (imported via `src/index.css`) first; they expose the gradient surfaces, border radii, and spacing scales expected across the app.
 - Reference color tokens such as `--modal-accent`, `--color-surface-overlay`, and `--color-status-up` instead of hard-coded hex values.
 - Prefer `color-mix` with existing tokens to derive subtle overlays rather than introducing new palette entries.
 
@@ -36,5 +36,12 @@ This guide documents the shared styling primitives that keep the renderer consis
 - Keep component-level CSS files focused on structural rules; global palettes live under `src/theme`.
 - When introducing new structures, factor sharable rules into the theme layer, then consume them via semantic class names.
 - Avoid duplicating gradient definitions—inherit from the modal or section helpers and override with tokens only when necessary.
+
+## Modular Stylesheet Structure
+
+- `src/index.css` imports the focused partials in `src/theme/styles/components/`. Group primitives by domain (foundation, buttons, forms, overlays, cards, layout, utilities, icons, and animations) before adding new selectors so styling ownership remains clear.
+- Feature-specific surfaces such as the Site Details modal live in `src/components/SiteDetails/styles/`. Each tab or structural region owns its own stylesheet and `src/index.css` pulls them in, keeping the load order centralised. Extend existing partials (for example `history.css` or `header.css`) instead of growing a single monolithic file.
+- When adding entirely new domains, prefer creating a new partial rather than bolting selectors onto an unrelated file. Update `src/index.css` with the new `@import` so the fragment participates in the global stack and keep the list alphabetised within its grouping.
+- If you introduce additional lint overrides, isolate them within the new partial instead of broadening repository-wide disable comments.
 
 Following these conventions keeps new UI aligned with the existing visual language and makes it simple to evolve palettes in one place.

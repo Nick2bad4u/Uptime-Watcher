@@ -7,7 +7,7 @@ import { render, screen } from "@testing-library/react";
 
 import { describe, expect, it, vi } from "vitest";
 
-import type { Monitor, StatusHistory } from "../../../shared/types";
+import type { Monitor, StatusHistory } from "@shared/types";
 
 import { SiteCardHistory } from "../../components/Dashboard/SiteCard/SiteCardHistory";
 

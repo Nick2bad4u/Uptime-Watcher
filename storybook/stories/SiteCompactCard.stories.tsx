@@ -1,11 +1,11 @@
 import type { Site } from "@shared/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
 
+import { SiteCompactCard } from "@app/components/Dashboard/SiteCard/SiteCompactCard";
+import { useMount } from "@app/hooks/useMount";
+import { useErrorStore } from "@app/stores/error/useErrorStore";
 import { useRef } from "react";
 
-import { SiteCompactCard } from "../../src/components/Dashboard/SiteCard/SiteCompactCard";
-import { useMount } from "../../src/hooks/useMount";
-import { useErrorStore } from "../../src/stores/error/useErrorStore";
 import {
     createMockMonitor,
     createMockSite,

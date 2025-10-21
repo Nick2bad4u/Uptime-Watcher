@@ -20,6 +20,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -30,7 +31,6 @@ import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { SiteService } from "./services/SiteService";
 import {
     StatusUpdateManager,
     type StatusUpdateSubscriptionResult,
@@ -523,17 +523,29 @@ export const createSiteSyncActions = (
                     return;
                 }
 
-                switch (event.action) {
-                    case STATE_SYNC_ACTION.BULK_SYNC:
-                    case STATE_SYNC_ACTION.DELETE:
-                    case STATE_SYNC_ACTION.UPDATE: {
-                        deps.setSites(event.sites);
-                        break;
-                    }
-                    default: {
-                        logger.warn("Unknown sync event action:", event.action);
-                    }
+                const duplicates = collectDuplicateSiteIdentifiers(event.sites);
+                if (duplicates.length > 0) {
+                    logger.error(
+                        "Duplicate site identifiers detected in state sync event",
+                        {
+                            action: event.action,
+                            duplicates,
+                            siteCount: event.sites.length,
+                            source: event.source,
+                        }
+                    );
                 }
+
+                if (
+                    event.action === STATE_SYNC_ACTION.BULK_SYNC ||
+                    event.action === STATE_SYNC_ACTION.DELETE ||
+                    event.action === STATE_SYNC_ACTION.UPDATE
+                ) {
+                    deps.setSites(event.sites);
+                    return;
+                }
+
+                logger.warn("Unknown sync event action:", event.action);
             };
 
             void (async (): Promise<void> => {
@@ -589,14 +601,39 @@ export const createSiteSyncActions = (
                     });
 
                     try {
-                        const backendSites = await SiteService.getSites();
-                        deps.setSites(backendSites);
+                        const fullSyncResult =
+                            // eslint-disable-next-line n/no-sync -- Backend API name uses "Sync" suffix but returns a Promise
+                            await StateSyncService.requestFullSync();
+                        const {
+                            completedAt,
+                            siteCount,
+                            sites,
+                            source,
+                            synchronized,
+                        } = fullSyncResult;
+
+                        const duplicates =
+                            collectDuplicateSiteIdentifiers(sites);
+                        if (duplicates.length > 0) {
+                            logger.error(
+                                "Duplicate site identifiers detected in full sync response",
+                                {
+                                    duplicates,
+                                    siteCount,
+                                    source,
+                                }
+                            );
+                        }
+
+                        deps.setSites(sites);
 
                         logStoreAction("SitesStore", "syncSites", {
+                            completedAt,
                             message: "Sites synchronized from backend",
-                            sitesCount: deps.getSites().length,
+                            sitesCount: siteCount,
+                            source,
                             status: "success",
-                            success: true,
+                            success: synchronized,
                         });
                     } catch (error) {
                         const normalizedError = ensureError(error);

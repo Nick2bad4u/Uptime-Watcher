@@ -8,7 +8,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 import type { MonitorCheckResult } from "../../../services/monitoring/types";
 
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";

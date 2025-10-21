@@ -8,7 +8,7 @@ import { ApplicationService } from "../../../services/application/ApplicationSer
 import {
     STATE_SYNC_ACTION,
     STATE_SYNC_SOURCE,
-} from "../../../../shared/types/stateSync";
+} from "@shared/types/stateSync";
 
 // Mock Electron app
 vi.mock("electron", () => ({

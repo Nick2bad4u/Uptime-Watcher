@@ -1,0 +1,119 @@
+/* Site Details Modal Layout */
+
+.site-details-modal-overlay {
+    position: fixed;
+    z-index: calc(var(--z-index-modal, 90) + 4);
+    display: flex;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 0.6rem + 1.2vi, 2.5rem);
+    backdrop-filter: blur(8px);
+    background: rgb(0 0 0 / 60%);
+    inset: 0;
+}
+
+/* Prevent body scroll when modal is open */
+body:has(.site-details-modal-overlay) {
+    overflow: hidden;
+}
+
+.site-details-modal {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.2rem, 0.9rem + 1vi, 2rem);
+    inline-size: 100%;
+    min-block-size: 0;
+}
+
+.site-details-modal__actions {
+    align-self: flex-end;
+}
+
+.site-details-modal__close {
+    border-color: color-mix(in srgb, var(--color-primary-500) 32%, transparent);
+}
+
+.site-details-modal__body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.1rem, 0.9rem + 0.9vi, 1.8rem);
+    inline-size: 100%;
+    min-block-size: 0;
+}
+
+.site-details-modal__content-wrapper {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-block-size: 0;
+    overflow-block: auto;
+    overflow-inline: hidden;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+}
+
+.site-details-modal__sentinel {
+    block-size: 1px;
+    inline-size: 100%;
+    pointer-events: none;
+}
+
+.site-details-modal__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 48%, transparent);
+    background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(
+                in srgb,
+                var(--color-surface-overlay) 82%,
+                var(--color-primary-500) 6%
+            )
+            100%
+    );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 3%),
+        0 18px 40px rgb(8 12 24 / 28%);
+    gap: clamp(1rem, 0.8rem + 0.8vi, 1.6rem);
+    min-block-size: auto;
+
+    &.dark {
+        border-color: color-mix(
+            in srgb,
+            var(--color-border-secondary) 58%,
+            transparent
+        );
+        background: linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-surface-overlay) 96%, transparent) 0%,
+            color-mix(
+                    in srgb,
+                    var(--color-surface-overlay) 78%,
+                    var(--color-primary-500) 10%
+                )
+                100%
+        );
+    }
+}
+
+@media (width <= 1024px) {
+    .site-details-modal__body {
+        gap: clamp(1rem, 0.85rem + 0.7vi, 1.6rem);
+    }
+}
+
+@media (width <= 640px) {
+    .site-details-modal-overlay {
+        padding: clamp(0.75rem, 0.4rem + 1vi, 1.5rem);
+    }
+
+    .site-details-modal {
+        gap: 1rem;
+    }
+}

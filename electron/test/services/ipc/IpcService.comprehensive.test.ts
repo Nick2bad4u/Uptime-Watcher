@@ -12,7 +12,7 @@ import { ipcMain, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
 import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
-import type { Site, Monitor } from "../../../../shared/types.js";
+import type { Site, Monitor } from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -55,7 +55,14 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
             displayName: "HTTP Monitor",
             description: "HTTP endpoint monitoring",
             version: "1.0.0",
-            fields: [{ name: "url", required: true }],
+            fields: [
+                {
+                    name: "url",
+                    required: true,
+                    label: "URL",
+                    type: "url",
+                },
+            ],
             uiConfig: {
                 supportsAdvancedAnalytics: true,
                 supportsResponseTime: true,
@@ -74,7 +81,14 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
             displayName: "Ping Monitor",
             description: "Network ping monitoring",
             version: "1.0.0",
-            fields: [{ name: "host", required: true }],
+            fields: [
+                {
+                    name: "host",
+                    required: true,
+                    label: "Host",
+                    type: "text",
+                },
+            ],
             uiConfig: {
                 supportsAdvancedAnalytics: false,
                 supportsResponseTime: true,
@@ -103,14 +117,22 @@ vi.mock("../../../services/monitoring/MonitorTypeRegistry", () => ({
 }));
 
 // Mock shared validation
-vi.mock("../../../../shared/validation/schemas", () => ({
-    validateMonitorData: vi.fn((type: string, _data: unknown) => ({
-        success: type !== "invalid",
-        errors: type === "invalid" ? ["Invalid monitor type"] : [],
-        warnings: type === "warning" ? ["Warning message"] : [],
-        metadata: { validated: true },
-    })),
-}));
+vi.mock("../../../../shared/validation/schemas", async (importOriginal) => {
+    const actual =
+        await importOriginal<
+            typeof import("../../../../shared/validation/schemas")
+        >();
+
+    return {
+        ...actual,
+        validateMonitorData: vi.fn((type: string, _data: unknown) => ({
+            success: type !== "invalid",
+            errors: type === "invalid" ? ["Invalid monitor type"] : [],
+            warnings: type === "warning" ? ["Warning message"] : [],
+            metadata: { validated: true },
+        })),
+    };
+});
 
 describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;

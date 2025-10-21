@@ -12,7 +12,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { HttpMonitor } from "../../../services/monitoring/HttpMonitor";
-import type { Site } from "../../../../shared/types";
+import type { Site } from "@shared/types";
 
 const HTTPBIN_PROBE_URL = "https://httpbin.org/status/204";
 const HTTPBIN_PROBE_TIMEOUT_MS = 4000;

@@ -11,9 +11,9 @@ import type {
     Monitor,
     MonitorType,
     MonitorFieldDefinition,
-} from "../../../../shared/types";
-import type { MonitorTypeConfig } from "../../../../shared/types/monitorTypes";
-import type { ValidationResult } from "../../../../shared/types/validation";
+} from "@shared/types";
+import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";
 
 // Mock dependencies
@@ -65,6 +65,30 @@ Object.defineProperty(globalThis, "window", {
         electronAPI: mockElectronAPI,
     },
     writable: true,
+});
+
+const createMonitorTypeConfig = (
+    overrides: Partial<MonitorTypeConfig> = {}
+): MonitorTypeConfig => ({
+    type: overrides.type ?? "http",
+    displayName: overrides.displayName ?? "HTTP",
+    description: overrides.description ?? "HTTP monitoring",
+    version: overrides.version ?? "1.0",
+    fields:
+        overrides.fields ??
+        ([
+            {
+                helpText: "Provide a valid endpoint",
+                label: "URL",
+                name: "url",
+                placeholder: "https://example.com",
+                required: true,
+                type: "url",
+            },
+        ] satisfies MonitorTypeConfig["fields"]),
+    ...(overrides.uiConfig === undefined
+        ? {}
+        : { uiConfig: overrides.uiConfig }),
 });
 
 describe(useMonitorTypesStore, () => {
@@ -318,13 +342,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Data Loading", "type");
 
             const mockMonitorTypes: MonitorTypeConfig[] = [
-                {
-                    type: "http",
-                    displayName: "HTTP",
-                    description: "HTTP monitoring",
-                    version: "1.0",
-                    fields: [],
-                },
+                createMonitorTypeConfig(),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
@@ -911,13 +929,7 @@ describe(useMonitorTypesStore, () => {
 
             // Then recover with successful call
             const mockMonitorTypes: MonitorTypeConfig[] = [
-                {
-                    type: "http" as MonitorType,
-                    displayName: "HTTP",
-                    description: "HTTP monitoring",
-                    version: "1.0",
-                    fields: [],
-                },
+                createMonitorTypeConfig({ type: "http" as MonitorType }),
             ];
 
             mockElectronAPI.monitorTypes.getMonitorTypes.mockResolvedValue(
@@ -945,13 +957,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: Data Loading", "type");
 
             const mockMonitorTypes: MonitorTypeConfig[] = [
-                {
-                    type: "http" as MonitorType,
-                    displayName: "HTTP",
-                    description: "HTTP monitoring",
-                    version: "1.0",
-                    fields: [],
-                },
+                createMonitorTypeConfig({ type: "http" as MonitorType }),
             ];
 
             // Delay the first call

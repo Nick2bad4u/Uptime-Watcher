@@ -15,11 +15,13 @@
  * @example
  *
  * ```tsx
+ * import { logger } from "@app/services/logger";
+ *
  * <SiteMonitoringButton
  *     allMonitorsRunning={false}
  *     isLoading={false}
- *     onStartSiteMonitoring={() => console.log("Starting...")}
- *     onStopSiteMonitoring={() => console.log("Stopping...")}
+ *     onStartSiteMonitoring={() => logger.info("Starting site monitors")}
+ *     onStopSiteMonitoring={() => logger.info("Stopping site monitors")}
  * />;
  * ```
  *

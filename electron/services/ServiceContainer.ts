@@ -15,10 +15,10 @@
  * @public
  */
 import type { Site } from "@shared/types";
+import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
 import type { UptimeEvents } from "../events/eventTypes";
-import type { EventMetadata } from "../events/TypedEventBus";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
@@ -1048,21 +1048,26 @@ export class ServiceContainer {
         }
 
         const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
-        const {
-            _meta: metadata,
-            _originalMeta: originalMetadata,
-            ...sanitizedPayload
-        }: ForwardablePayloadWithMeta<EventName> = payloadWithMeta;
 
         if (this.config.enableDebugLogging) {
             const eventLabel = String(eventName);
+            const metadataForLog = Reflect.get(payloadWithMeta, "_meta") as
+                | EventMetadata
+                | undefined;
+            const originalMetadataForLog = Reflect.get(
+                payloadWithMeta,
+                "_originalMeta"
+            );
             logger.debug(
                 `[ServiceContainer] Stripped metadata from ${eventLabel} payload before forwarding`,
-                { metadata, originalMetadata }
+                {
+                    metadata: metadataForLog,
+                    originalMetadata: originalMetadataForLog,
+                }
             );
         }
 
-        return sanitizedPayload as UptimeEvents[EventName];
+        return this.omitEventMetadata(payloadWithMeta);
     }
 
     /**
@@ -1082,5 +1087,23 @@ export class ServiceContainer {
             payload !== null &&
             "_meta" in payload
         );
+    }
+
+    /**
+     * Produces a shallow clone of the payload without event bus metadata props.
+     *
+     * @remarks
+     * The orchestrator expects pristine payloads that mirror the original event
+     * data contracts. Manager event buses append `_meta` and `_originalMeta`
+     * fields for diagnostics; this helper strips those fields while leaving the
+     * rest of the structure untouched.
+     */
+    private omitEventMetadata<EventName extends keyof UptimeEvents>(
+        payload: ForwardablePayloadWithMeta<EventName>
+    ): UptimeEvents[EventName] {
+        const clone: Record<string, unknown> = { ...payload };
+        Reflect.deleteProperty(clone, "_meta");
+        Reflect.deleteProperty(clone, "_originalMeta");
+        return clone as UptimeEvents[EventName];
     }
 }
