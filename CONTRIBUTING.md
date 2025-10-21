@@ -230,7 +230,7 @@ Use the feature request template and include:
 
 - Follow the layered validation contract when adding features. Shape validation belongs in preload/IPC schemas, business rules in managers, and persistence checks in repositories.
 - Emit structured `ApplicationError` instances when validation fails so renderer error handling stays consistent.
-- Review the [Validation Strategy](docs/Guides/ValidationStrategy.md) guide before introducing new input flows or modifying existing schemas.
+- Review the [Validation Strategy](docs/Guides/validation-strategy.md) guide before introducing new input flows or modifying existing schemas.
 
 ## � Priority Contribution Areas
 
