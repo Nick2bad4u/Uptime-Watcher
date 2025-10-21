@@ -143,7 +143,7 @@ describe("OperationHelpers", () => {
         const siteService = {
             addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => mockSites),
-            removeMonitor: vi.fn(async () => true),
+            removeMonitor: vi.fn(async () => mockSites[0]!),
             removeSite: vi.fn(async () => true),
             updateSite: vi.fn(async (identifier: string, updates: unknown) =>
                 mockElectronAPI.sites.updateSite(identifier, updates)

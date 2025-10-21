@@ -10,7 +10,10 @@
  * @public
  */
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { MonitorStatusChangedEventData } from "@shared/types/events";
+import type {
+    MonitoringControlEventData,
+    MonitorStatusChangedEventData,
+} from "@shared/types/events";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -355,37 +358,41 @@ export class StatusUpdateManager {
             {
                 label: "monitoring-started",
                 register: () =>
-                    EventsService.onMonitoringStarted(() => {
-                        void (async (): Promise<void> => {
+                    EventsService.onMonitoringStarted(
+                        (event: MonitoringControlEventData) => {
                             try {
-                                await this.fullResyncSites();
+                                this.handleMonitoringLifecycleEvent(
+                                    "started",
+                                    event
+                                );
                             } catch (error) {
-                                // Log error but don't throw - event handling should continue
                                 logger.error(
-                                    "Full sync on monitoring started failed",
+                                    "Error while processing monitoring started lifecycle event",
                                     ensureError(error)
                                 );
                             }
-                        })();
-                    }),
+                        }
+                    ),
                 scope: "monitoring-started",
             },
             {
                 label: "monitoring-stopped",
                 register: () =>
-                    EventsService.onMonitoringStopped(() => {
-                        void (async (): Promise<void> => {
+                    EventsService.onMonitoringStopped(
+                        (event: MonitoringControlEventData) => {
                             try {
-                                await this.fullResyncSites();
+                                this.handleMonitoringLifecycleEvent(
+                                    "stopped",
+                                    event
+                                );
                             } catch (error) {
-                                // Log error but don't throw - event handling should continue
                                 logger.error(
-                                    "Full sync on monitoring stopped failed",
+                                    "Error while processing monitoring stopped lifecycle event",
                                     ensureError(error)
                                 );
                             }
-                        })();
-                    }),
+                        }
+                    ),
                 scope: "monitoring-stopped",
             },
         ];
@@ -512,6 +519,22 @@ export class StatusUpdateManager {
 
         // Reset state
         this.isListenerAttached = false;
+    }
+
+    private handleMonitoringLifecycleEvent(
+        phase: "started" | "stopped",
+        event: MonitoringControlEventData
+    ): void {
+        logger.debug("Received monitoring lifecycle event", {
+            ...(event.activeMonitors !== undefined && {
+                activeMonitors: event.activeMonitors,
+            }),
+            monitorCount: event.monitorCount,
+            phase,
+            ...(event.reason !== undefined && { reason: event.reason }),
+            siteCount: event.siteCount,
+            timestamp: event.timestamp,
+        });
     }
 
     /**

@@ -335,7 +335,7 @@ const electronAPIMockDefinition = {
         removeMonitor: async (
             siteIdentifier: string,
             monitorId: string
-        ): Promise<boolean> => {
+        ): Promise<Site> =>
             applySiteMutation(siteIdentifier, (site) => {
                 const nextMonitors = site.monitors.filter(
                     (monitor) => monitor.id !== monitorId
@@ -351,10 +351,7 @@ const electronAPIMockDefinition = {
                     ...site,
                     monitors: nextMonitors,
                 } satisfies Site;
-            });
-
-            return true;
-        },
+            }),
         removeSite: async (identifier: string): Promise<boolean> => {
             const index = findSiteIndex(identifier);
             if (index < 0) {

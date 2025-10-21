@@ -250,10 +250,7 @@ interface SiteMonitoringService {
 interface SiteDataService {
     addSite: (site: Site) => Promise<Site>;
     getSites: () => Promise<Site[]>;
-    removeMonitor: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<boolean>;
+    removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<Site>;
     removeSite: (identifier: string) => Promise<boolean>;
     updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
 }

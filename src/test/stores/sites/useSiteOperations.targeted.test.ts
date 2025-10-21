@@ -9,6 +9,7 @@ import { type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
+import { applySavedSiteToStore } from "../../../stores/sites/utils/operationHelpers";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 import { logger } from "../../../services/logger";
 import { isDevelopment } from "@shared/utils/environment";
@@ -129,7 +130,15 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
         mockElectronAPI = {
             sites: {
-                removeMonitor: vi.fn().mockResolvedValue(true),
+                removeMonitor: vi.fn(
+                    async (siteIdentifier: string, monitorId: string) => ({
+                        ...mockSiteWithMultipleMonitors,
+                        identifier: siteIdentifier,
+                        monitors: mockSiteWithMultipleMonitors.monitors.filter(
+                            (monitor) => monitor.id !== monitorId
+                        ),
+                    })
+                ),
                 removeSite: vi.fn().mockResolvedValue(true),
             },
             monitoring: {
@@ -169,13 +178,11 @@ describe("useSiteOperations - Targeted Coverage", () => {
             addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => getSitesFn()),
             removeMonitor: vi.fn(
-                async (siteIdentifier: string, monitorId: string) => {
-                    await mockElectronAPI.sites.removeMonitor(
+                async (siteIdentifier: string, monitorId: string) =>
+                    mockElectronAPI.sites.removeMonitor(
                         siteIdentifier,
                         monitorId
-                    );
-                    return true;
-                }
+                    )
             ),
             removeSite: vi.fn(async (identifier: string) =>
                 mockElectronAPI.sites.removeSite(identifier)
@@ -363,47 +370,35 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
             ).not.toHaveBeenCalled();
-            expect(siteService.updateSite).not.toHaveBeenCalled();
+            expect(siteService.removeMonitor).not.toHaveBeenCalled();
+            expect(mockSiteDeps.setSites).not.toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 
-    describe("removeMonitorFromSite Error Handling (Lines 214-215)", () => {
-        it("should handle and log errors when stopping monitoring fails but continue with monitor removal", async ({
+    describe("removeMonitorFromSite execution", () => {
+        it("should call SiteService.removeMonitor and update the local store", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
+            await annotate("Type: Monitoring", "type");
 
-            const stopError = new Error("Stop monitoring failed");
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
-                stopError
-            );
-
-            // Monitor removal should still succeed despite stop monitoring failure
             await actions.removeMonitorFromSite(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
 
-            // Verify logger.warn was called for the failed stop operation (lines 214-215)
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Failed to stop monitoring for monitor"
-                ),
-                stopError
-            );
-
-            // Verify monitor removal still proceeded
-            expect(siteService.updateSite).toHaveBeenCalledWith(
+            expect(siteService.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                expect.objectContaining({
-                    monitors: [mockSiteWithMultipleMonitors.monitors[1]],
-                })
+                mockSiteWithMultipleMonitors.monitors[0]!.id
             );
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
+
             expect(mockSiteDeps.setSites).toHaveBeenCalled();
             const updatedSites =
                 vi.mocked(mockSiteDeps.setSites).mock.calls.at(-1)?.[0] ?? [];
@@ -415,7 +410,7 @@ describe("useSiteOperations - Targeted Coverage", () => {
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
 
-        it("should handle non-Error objects when stopping monitoring fails during monitor removal", async ({
+        it("should propagate errors when SiteService.removeMonitor fails", async ({
             task,
             annotate,
         }) => {
@@ -424,31 +419,98 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
-                "Non-error object"
-            );
+            const removalError = new Error("Monitor removal failed");
+            siteService.removeMonitor.mockRejectedValueOnce(removalError);
 
-            await actions.removeMonitorFromSite(
-                mockSiteWithMultipleMonitors.identifier,
-                mockSiteWithMultipleMonitors.monitors[1]!.id
-            );
+            await expect(
+                actions.removeMonitorFromSite(
+                    mockSiteWithMultipleMonitors.identifier,
+                    mockSiteWithMultipleMonitors.monitors[0]!.id
+                )
+            ).rejects.toThrow("Monitor removal failed");
 
-            // Verify logger.warn was called with Error wrapper (lines 216-219)
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Failed to stop monitoring for monitor"
-                ),
-                expect.any(Error)
-            );
-
-            expect(siteService.updateSite).toHaveBeenCalledWith(
-                mockSiteWithMultipleMonitors.identifier,
-                expect.objectContaining({
-                    monitors: [mockSiteWithMultipleMonitors.monitors[0]],
-                })
-            );
-            expect(mockSiteDeps.setSites).toHaveBeenCalled();
+            expect(mockSiteDeps.setSites).not.toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
+        });
+
+        it("should remain consistent when a backend sync event overwrites the optimistic state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const baseSite: Site = {
+                ...mockSiteWithMultipleMonitors,
+                monitors: mockSiteWithMultipleMonitors.monitors.map(
+                    (monitor) => ({
+                        ...monitor,
+                        history: Array.from(monitor.history),
+                    })
+                ),
+            };
+
+            const sitesState: Site[] = [baseSite];
+
+            const statefulDeps: SiteOperationsDependencies = {
+                addSite: vi.fn(),
+                getSites: vi.fn(() => sitesState),
+                removeSite: vi.fn(),
+                setSites: vi.fn((sites: Site[]) => {
+                    sitesState.length = 0;
+                    for (const site of sites) {
+                        sitesState.push(site);
+                    }
+                }),
+                syncSites: vi.fn(),
+                services: {
+                    data: mockSiteDeps.services.data,
+                    monitoring: mockSiteDeps.services.monitoring,
+                    site: {
+                        ...mockSiteDeps.services.site,
+                        removeMonitor: vi.fn(
+                            async (_identifier, removedMonitorId) => ({
+                                ...baseSite,
+                                monitors: baseSite.monitors.filter(
+                                    (monitor) => monitor.id !== removedMonitorId
+                                ),
+                            })
+                        ),
+                    },
+                },
+            } satisfies SiteOperationsDependencies;
+
+            const statefulActions = createSiteOperationsActions(statefulDeps);
+
+            await statefulActions.removeMonitorFromSite(
+                baseSite.identifier,
+                baseSite.monitors[0]!.id
+            );
+
+            expect(
+                statefulDeps.services.site.removeMonitor
+            ).toHaveBeenCalledWith(
+                baseSite.identifier,
+                baseSite.monitors[0]!.id
+            );
+            expect(sitesState[0]?.monitors).toHaveLength(
+                mockSiteWithMultipleMonitors.monitors.length - 1
+            );
+
+            const syncSnapshot: Site = {
+                ...baseSite,
+                monitors: baseSite.monitors.slice(1).map((monitor) => ({
+                    ...monitor,
+                    status: "up",
+                })),
+            };
+
+            applySavedSiteToStore(syncSnapshot, statefulDeps);
+
+            expect(sitesState[0]?.monitors).toEqual(syncSnapshot.monitors);
+            expect(statefulDeps.syncSites).not.toHaveBeenCalled();
         });
     });
 
@@ -467,18 +529,13 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
 
-            expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith(
+            expect(siteService.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
                 mockSiteWithMultipleMonitors.monitors[0]!.id
             );
-            expect(siteService.updateSite).toHaveBeenCalledWith(
-                mockSiteWithMultipleMonitors.identifier,
-                expect.objectContaining({
-                    monitors: [mockSiteWithMultipleMonitors.monitors[1]],
-                })
-            );
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
             expect(mockSiteDeps.setSites).toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });
@@ -498,12 +555,13 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 mockSiteWithMultipleMonitors.monitors[1]!.id
             );
 
-            expect(siteService.updateSite).toHaveBeenCalledWith(
+            expect(siteService.removeMonitor).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier,
-                expect.objectContaining({
-                    monitors: [mockSiteWithMultipleMonitors.monitors[0]],
-                })
+                mockSiteWithMultipleMonitors.monitors[1]!.id
             );
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
             expect(mockSiteDeps.setSites).toHaveBeenCalled();
             expect(mockSiteDeps.syncSites).not.toHaveBeenCalled();
         });

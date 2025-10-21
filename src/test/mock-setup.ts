@@ -286,8 +286,8 @@ const mockElectronAPI: ElectronAPI = {
         getSites: vi.fn<ElectronAPI["sites"]["getSites"]>(async () => [
             cloneSite(defaultSite),
         ]),
-        removeMonitor: vi.fn<ElectronAPI["sites"]["removeMonitor"]>(
-            async () => true
+        removeMonitor: vi.fn<ElectronAPI["sites"]["removeMonitor"]>(async () =>
+            cloneSite(defaultSite)
         ),
         removeSite: vi.fn<ElectronAPI["sites"]["removeSite"]>(async () => true),
         updateSite: vi.fn<ElectronAPI["sites"]["updateSite"]>(

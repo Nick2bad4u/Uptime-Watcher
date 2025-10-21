@@ -252,7 +252,7 @@ export const createSiteOperationsActions = (
         identifier: string,
         updates: Partial<Site>
     ): Promise<void> => {
-        const updatedSite = await withSiteOperationReturning(
+        const savedSite = await withSiteOperationReturning(
             "modifySite",
             async () => deps.services.site.updateSite(identifier, updates),
             deps,
@@ -262,23 +262,13 @@ export const createSiteOperationsActions = (
             }
         );
 
-        const currentSites = deps.getSites();
-        const hasExistingSite = currentSites.some(
-            (site) => site.identifier === updatedSite.identifier
-        );
-
-        const nextSites = hasExistingSite
-            ? currentSites.map((site) =>
-                  site.identifier === updatedSite.identifier
-                      ? updatedSite
-                      : site
-              )
-            : [...currentSites, updatedSite];
-
-        deps.setSites(nextSites);
+        // Persist the backend snapshot via the canonical helper so duplicate
+        // identifier detection, logging, and future invariants remain
+        // centralized in a single place.
+        applySavedSiteToStore(savedSite, deps);
     },
     removeMonitorFromSite: async (siteIdentifier, monitorId): Promise<void> => {
-        const savedSite = await withSiteOperationReturning(
+        await withSiteOperation(
             "removeMonitorFromSite",
             async () => {
                 const site = getSiteByIdentifier(siteIdentifier, deps);
@@ -287,29 +277,12 @@ export const createSiteOperationsActions = (
                     throw new Error(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
                 }
 
-                try {
-                    await deps.services.monitoring.stopMonitoring(
-                        siteIdentifier,
-                        monitorId
-                    );
-                } catch (error) {
-                    if (isDevelopment()) {
-                        logger.warn(
-                            `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}`,
-                            error instanceof Error
-                                ? error
-                                : new Error(String(error))
-                        );
-                    }
-                }
-
-                const updatedMonitors = site.monitors.filter(
-                    (entry) => entry.id !== monitorId
+                const savedSite = await deps.services.site.removeMonitor(
+                    siteIdentifier,
+                    monitorId
                 );
 
-                return deps.services.site.updateSite(siteIdentifier, {
-                    monitors: updatedMonitors,
-                });
+                applySavedSiteToStore(savedSite, deps);
             },
             deps,
             {
@@ -317,8 +290,6 @@ export const createSiteOperationsActions = (
                 telemetry: { monitorId, siteIdentifier },
             }
         );
-
-        applySavedSiteToStore(savedSite, deps);
     },
     updateMonitorRetryAttempts: async (
         siteIdentifier: string,

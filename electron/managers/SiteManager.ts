@@ -375,72 +375,91 @@ export class SiteManager {
      * @example
      *
      * ```typescript
-     * const success = await siteManager.removeMonitor(
+     * const updatedSite = await siteManager.removeMonitor(
      *     "site_123",
      *     "monitor_456"
      * );
+     *
+     * logger.info({ monitorCount: updatedSite.monitors.length });
      * ```
      *
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The monitor ID to remove.
      *
-     * @returns True if the monitor was removed, false otherwise.
+     * @returns The updated {@link Site} snapshot after monitor removal.
      *
      * @throws If database or cache update fails.
      */
     public async removeMonitor(
         siteIdentifier: string,
         monitorId: string
-    ): Promise<boolean> {
-        // Remove the monitor from the database using transaction
-        const success = await this.executeMonitorDeletion(monitorId);
+    ): Promise<Site> {
+        const deletionSucceeded = await this.executeMonitorDeletion(monitorId);
 
-        if (success) {
-            // Refresh the cache by getting all sites (to ensure proper
-            // site structure)
-            const allSites =
-                await this.siteRepositoryService.getSitesFromDatabase();
-
-            // Update cache
-            await this.updateSitesCache(
-                allSites,
-                "SiteManager.refreshSitesFromDatabase"
+        if (!deletionSucceeded) {
+            throw new Error(
+                `Failed to delete monitor ${monitorId} for site ${siteIdentifier}`
             );
-
-            // Find the updated site for the event
-            const updatedSite = this.sitesCache.get(siteIdentifier);
-            if (updatedSite) {
-                // Emit internal site updated event
-                await this.eventEmitter.emitTyped("internal:site:updated", {
-                    identifier: siteIdentifier,
-                    operation: "updated",
-                    site: updatedSite,
-                    timestamp: Date.now(),
-                    updatedFields: ["monitors"],
-                });
-
-                // Emit sync event for state consistency
-                await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                    action: STATE_SYNC_ACTION.UPDATE,
-                    siteIdentifier: siteIdentifier,
-                    sites: this.getSitesSnapshot(),
-                    source: STATE_SYNC_SOURCE.FRONTEND,
-                    timestamp: Date.now(),
-                });
-
-                logger.info(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
-                        {
-                            monitorId,
-                            siteIdentifier,
-                        }
-                    )
-                );
-            }
         }
 
-        return success;
+        // Refresh the cache by getting all sites (to ensure proper
+        // site structure)
+        const allSites =
+            await this.siteRepositoryService.getSitesFromDatabase();
+
+        // Update cache
+        await this.updateSitesCache(
+            allSites,
+            "SiteManager.refreshSitesFromDatabase"
+        );
+
+        // Find the updated site for the event
+        const updatedSite = this.sitesCache.get(siteIdentifier);
+
+        if (!updatedSite) {
+            const error = new Error(
+                `Updated site ${siteIdentifier} not found after monitor removal`
+            );
+            logger.error(
+                "[SiteManager] Missing site snapshot after monitor removal",
+                error,
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
+            );
+            throw error;
+        }
+
+        // Emit internal site updated event
+        await this.eventEmitter.emitTyped("internal:site:updated", {
+            identifier: siteIdentifier,
+            operation: "updated",
+            site: updatedSite,
+            timestamp: Date.now(),
+            updatedFields: ["monitors"],
+        });
+
+        // Emit sync event for state consistency
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action: STATE_SYNC_ACTION.UPDATE,
+            siteIdentifier: siteIdentifier,
+            sites: this.getSitesSnapshot(),
+            source: STATE_SYNC_SOURCE.FRONTEND,
+            timestamp: Date.now(),
+        });
+
+        logger.info(
+            interpolateLogTemplate(
+                LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
+            )
+        );
+
+        return updatedSite;
     }
 
     /**

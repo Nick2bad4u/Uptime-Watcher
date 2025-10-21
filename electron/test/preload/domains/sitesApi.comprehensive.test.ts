@@ -49,12 +49,12 @@ describe("sitesApi", () => {
     it("removes a site by identifier", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
-            data: true,
+            data: baseSite,
         });
 
         const result = await sitesApi.removeSite(baseSite.identifier);
 
-        expect(result).toBeTruthy();
+        expect(result).toEqual(baseSite);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             "remove-site",
             baseSite.identifier

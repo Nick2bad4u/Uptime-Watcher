@@ -982,7 +982,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @param siteIdentifier - The site identifier.
      * @param monitorId - The monitor identifier.
      *
-     * @returns Promise resolving to true if removed, false otherwise.
+     * @returns Promise resolving to the updated {@link Site} snapshot after the
+     *   monitor has been removed.
      *
      * @throws When the removal operation fails critically
      * @throws When database inconsistency occurs and cannot be resolved
@@ -990,9 +991,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async removeMonitor(
         siteIdentifier: string,
         monitorId: string
-    ): Promise<boolean> {
+    ): Promise<Site> {
         let monitoringStopped = false;
-        let databaseRemoved = false;
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
@@ -1002,8 +1002,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
 
             // If stopping monitoring failed, log warning but continue with
-            // database removal The monitor may not be running, but database
-            // record should still be removed
+            // database removal. The monitor may not be running, but the database
+            // record should still be removed.
             if (!monitoringStopped) {
                 logger.warn(
                     `[UptimeOrchestrator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
@@ -1011,18 +1011,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
 
             // Phase 2: Remove monitor from database using transaction
-            // (irreversible)
-            databaseRemoved = await this.siteManager.removeMonitor(
+            // (irreversible) and return the persisted snapshot.
+            return await this.siteManager.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
-
-            // If both phases succeeded, we're done
-            if (databaseRemoved) {
-                return true;
-            }
-
-            // If database removal failed, attempt compensation
+        } catch (error) {
+            let failureCause: unknown = error;
+            // If database removal failed after monitoring was stopped, attempt compensation
             if (monitoringStopped) {
                 logger.warn(
                     `[UptimeOrchestrator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
@@ -1054,17 +1050,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         severity: "critical",
                         timestamp: Date.now(),
                     });
-                    throw criticalError;
+                    failureCause = criticalError;
                 }
             }
 
-            return false;
-        } catch (error) {
             throw this.createContextualError({
-                cause: error,
+                cause: failureCause,
                 code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
                 details: {
-                    databaseRemoved,
                     monitorId,
                     monitoringStopped,
                     siteIdentifier,

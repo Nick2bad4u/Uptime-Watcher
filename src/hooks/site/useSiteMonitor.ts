@@ -130,7 +130,7 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
-        selectedMonitorIds?.[latestSite.identifier] ??
+        selectedMonitorIds[latestSite.identifier] ??
         getSelectedMonitorId(latestSite.identifier) ??
         defaultMonitorId;
 

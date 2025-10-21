@@ -366,7 +366,12 @@ const mockElectronAPI: {
             status: "up",
             timestamp: new Date().toISOString(),
         } satisfies StatusUpdate),
-        removeMonitor: vi.fn().mockResolvedValue(true),
+        removeMonitor: vi.fn().mockResolvedValue({
+            identifier: "test-site",
+            monitoring: true,
+            monitors: [],
+            name: "Test Site",
+        }),
         startMonitor: vi.fn().mockResolvedValue(true),
         startMonitoring: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
@@ -444,7 +449,12 @@ const mockElectronAPI: {
             name: "Test Site",
         }),
         getSites: vi.fn().mockResolvedValue([]),
-        removeMonitor: vi.fn().mockResolvedValue(true),
+        removeMonitor: vi.fn().mockResolvedValue({
+            identifier: "test-site",
+            monitoring: true,
+            monitors: [],
+            name: "Test Site",
+        }),
         removeSite: vi.fn().mockResolvedValue(true),
         updateSite: vi.fn().mockResolvedValue({
             identifier: "test-site",

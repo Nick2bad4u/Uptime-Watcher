@@ -33,13 +33,41 @@ interface SiteServiceContract {
     readonly removeMonitor: (
         siteIdentifier: string,
         monitorId: string
-    ) => Promise<boolean>;
+    ) => Promise<Site>;
     readonly removeSite: (identifier: string) => Promise<boolean>;
     readonly updateSite: (
         identifier: string,
         updates: Partial<Site>
     ) => Promise<Site>;
 }
+
+const isRecordOfUnknown = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
+
+const isSiteSnapshot = (value: unknown): value is Site => {
+    if (!isRecordOfUnknown(value)) {
+        return false;
+    }
+
+    const candidate: Record<string, unknown> = value;
+    const { identifier, monitors } = candidate;
+
+    if (typeof identifier !== "string") {
+        return false;
+    }
+
+    if (!Array.isArray(monitors)) {
+        return false;
+    }
+
+    return monitors.every((monitorCandidate) => {
+        if (!isRecordOfUnknown(monitorCandidate)) {
+            return false;
+        }
+
+        return typeof monitorCandidate["id"] === "string";
+    });
+};
 
 /**
  * Service for managing site operations through Electron IPC.
@@ -109,13 +137,19 @@ export const SiteService: SiteServiceContract = {
      * @example
      *
      * ```typescript
-     * await SiteService.removeMonitor("site123", "monitor456");
+     * const updatedSite = await SiteService.removeMonitor(
+     *     "site123",
+     *     "monitor456"
+     * );
+     *
+     * logger.info({ monitorCount: updatedSite.monitors.length });
      * ```
      *
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The identifier of the monitor to remove.
      *
-     * @returns A promise resolving to true when the monitor is removed.
+     * @returns A promise resolving to the updated {@link Site} record for the
+     *   specified site.
      *
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
@@ -123,18 +157,18 @@ export const SiteService: SiteServiceContract = {
     removeMonitor: wrap(
         "removeMonitor",
         async (api, siteIdentifier: string, monitorId: string) => {
-            const removed = await api.sites.removeMonitor(
+            const savedSite = await api.sites.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
 
-            if (!removed) {
+            if (!isSiteSnapshot(savedSite)) {
                 throw new Error(
-                    `Monitor removal failed for monitor ${monitorId} on site ${siteIdentifier}`
+                    `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
                 );
             }
 
-            return true;
+            return savedSite;
         }
     ),
 

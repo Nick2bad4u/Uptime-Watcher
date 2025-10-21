@@ -474,6 +474,63 @@ describe("cacheSync", () => {
                 expect(monitorRefreshSpy).not.toHaveBeenCalled();
             });
 
+            it("should debounce duplicate site update invalidations", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const nowSpy = vi.spyOn(Date, "now");
+                let currentTime = 1000;
+                nowSpy.mockImplementation(() => currentTime);
+
+                setupCacheSync();
+                const invalidationHandler =
+                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+
+                const invalidationData = {
+                    identifier: "site-1",
+                    reason: "update" as const,
+                    type: "site" as const,
+                };
+
+                mockFullResyncSites.mockClear();
+                mockLogger.debug.mockClear();
+
+                invalidationHandler(invalidationData);
+                await flushAsyncOperations();
+
+                expect(mockFullResyncSites).toHaveBeenCalledTimes(1);
+
+                mockFullResyncSites.mockClear();
+
+                currentTime += 100;
+                invalidationHandler(invalidationData);
+                await flushAsyncOperations();
+
+                expect(mockFullResyncSites).not.toHaveBeenCalled();
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "[CacheSync] Skipping duplicate site update resync",
+                    expect.objectContaining({
+                        identifier: "site-1",
+                        reason: "update",
+                    })
+                );
+
+                mockLogger.debug.mockClear();
+
+                currentTime += 500;
+                invalidationHandler(invalidationData);
+                await flushAsyncOperations();
+
+                expect(mockFullResyncSites).toHaveBeenCalledTimes(1);
+
+                nowSpy.mockRestore();
+            });
+
             it("should handle unknown cache invalidation type", async ({
                 task,
                 annotate,

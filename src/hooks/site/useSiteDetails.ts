@@ -226,7 +226,7 @@ export function useSiteDetails({
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
     const selectedMonitorId =
-        selectedMonitorIds?.[currentSite.identifier] ??
+        selectedMonitorIds[currentSite.identifier] ??
         getSelectedMonitorId(currentSite.identifier) ??
         defaultMonitorId;
 

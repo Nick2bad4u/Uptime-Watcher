@@ -36,6 +36,16 @@ applySavedSiteToStore(savedSite, deps);
 
 Unit tests (`useSiteOperations.test.ts` and `useSiteOperations.targeted.test.ts`) assert that `addMonitorToSite` and `removeMonitorFromSite` no longer invoke `syncSites`. Any new mutation should add comparable coverage before merging.
 
+## Monitor removal workflow
+
+Monitor deletion is orchestrator-owned. The renderer must:
+
+1. Call `SiteService.removeMonitor` (IPC to `sites.removeMonitor`) with the site identifier and monitor id.
+2. Await the backend snapshot returned by that call.
+3. Persist the snapshot with `applySavedSiteToStore` **without** issuing `syncSites`.
+
+The helper guarantees duplicate identifier validation and keeps the in-memory store aligned with the orchestrator while the formal sync event is in-flight. Tests in `useSiteOperations.targeted.test.ts` simulate the subsequent `applySavedSiteToStore` invocation to ensure the optimistic state is reconciled correctly once the orchestrator broadcasts the authoritative payload.
+
 ## Shared helpers
 
 - `getSiteByIdentifier` retrieves the current `Site` from state and raises a friendly error when missing.
@@ -49,6 +59,21 @@ When introducing additional mutations, compose these helpers instead of inventin
 - `useSiteSync.subscribeToStatusUpdates` captures a `StatusUpdateSubscriptionSummary` and persists it via `setStatusSubscriptionSummary`. Components render the summary through `StatusSubscriptionIndicator`.
 - `retryStatusSubscription` clears the previous snapshot before re-subscribing so the indicator reflects the latest attempt. Consumers should rely on the returned summary rather than mixing derived state.
 - The `deriveStatusSubscriptionHealth` helper converts raw listener counts into a normalized health state (`healthy`, `degraded`, `failed`, `unknown`). Use it instead of duplicating heuristics in components.
+
+## Monitoring lifecycle resync policy
+
+The orchestrator emits two event families when monitoring starts or stops:
+
+- `monitoring:started` / `monitoring:stopped` telemetry events for dashboards.
+- A follow-up `cache:invalidated` event with `{ type: "site", reason: "update" }` that carries the authoritative signal to refresh site data.
+
+The renderer treats the cache invalidation as the single source of truth:
+
+- `StatusUpdateManager` now logs the lifecycle telemetry but deliberately avoids calling `fullResyncSites()`.
+- `setupCacheSync` listens for the site-scoped invalidation and schedules `fullResyncSites()` with a 200 ms debounce (`SITE_UPDATE_DEBOUNCE_MS`) so quick successive emissions collapse into one fetch.
+- `createSiteSyncActions.fullResyncSites` coalesces concurrent callers by reusing the pending promise and logging the event for diagnostics.
+
+When wiring new lifecycle hooks (e.g., automatic retries) prefer emitting/consuming cache invalidations over ad-hoc sync calls to keep the dedupe guarantees intact.
 
 ## Logging conventions
 
