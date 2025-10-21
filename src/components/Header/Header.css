@@ -93,10 +93,6 @@
     display: flex;
     justify-content: center;
     margin-block-start: clamp(1.15rem, 0.85rem + 0.9vi, 1.75rem);
-
-    & .header-status-summary {
-        inline-size: 100%;
-    }
 }
 
 .app-topbar__identity {
@@ -425,6 +421,10 @@
     );
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 2%);
     min-inline-size: 0;
+
+    .app-topbar__summary-bar & {
+        inline-size: 100%;
+    }
 }
 
 .header-status-summary__container {

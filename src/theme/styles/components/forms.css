@@ -1,0 +1,257 @@
+/* Form Controls and Structured Inputs */
+/* stylelint-disable no-descending-specificity -- selector order encodes focus/hover precedence */
+/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable plugin/no-low-performance-animation-properties -- intentional rich shadows/transforms rely on transitions and remain performant in benchmarks. */
+/* stylelint-disable no-unknown-animations -- animation keyframes live in shared animations.css */
+
+.themed-input {
+    position: relative;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid;
+    border-radius: var(--border-radius-md);
+    background: transparent;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+
+    &:focus {
+        box-shadow: 0 0 0 3px var(--color-primary-200);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    &:hover:not(:focus) {
+        box-shadow: var(--shadow-elevation-1);
+        transform: translateY(-0.5px);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.themed-select {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid;
+    border-radius: var(--border-radius-md);
+    appearance: none;
+    background: transparent;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding-inline-end: 2.5rem;
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+
+    &:focus {
+        box-shadow: 0 0 0 3px var(--color-primary-200);
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    &:hover:not(:focus) {
+        box-shadow: var(--shadow-elevation-1);
+        transform: translateY(-0.5px);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.themed-input:focus,
+.themed-select:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-200);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.themed-input:hover,
+.themed-select:hover {
+    transform: translateY(-1px);
+}
+
+.themed-checkbox {
+    position: relative;
+    border: 2px solid var(--color-border-primary);
+    border-radius: var(--border-radius-sm);
+    appearance: none;
+    background: transparent;
+    block-size: 1.25rem;
+    color: var(--color-primary-600);
+    cursor: pointer;
+    inline-size: 1.25rem;
+    transition:
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+
+    &:focus {
+        box-shadow: 0 0 0 3px var(--color-primary-200);
+        outline: none;
+    }
+
+    &:hover {
+        box-shadow: var(--shadow-elevation-1);
+        transform: scale(1.05);
+    }
+
+    &:checked {
+        border-color: currentcolor;
+        background: var(--color-primary-500);
+        background-color: currentcolor;
+
+        &::after {
+            position: absolute;
+            color: var(--color-text-inverse);
+            content: "✓";
+            font-size: 0.875rem;
+            font-weight: 700;
+            inset-block-start: 50%;
+            inset-inline-start: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.form-group {
+    position: relative;
+    margin-block-end: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    margin-block-end: 0.5rem;
+    transition: color var(--transition-normal);
+}
+
+.form-control-wrapper,
+.themed-card__content {
+    position: relative;
+
+    &::after {
+        position: absolute;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--color-primary-600) 50%,
+            transparent 100%
+        );
+        block-size: 2px;
+        content: "";
+        inset-block-end: 0;
+        inset-inline: 0;
+        transform: scaleX(0);
+        transition: transform var(--transition-normal);
+    }
+
+    &:focus-within::after {
+        transform: scaleX(1);
+    }
+}
+
+.themed-progress {
+    inline-size: 100%;
+}
+
+.themed-progress__container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 9999px;
+    inline-size: 100%;
+    transition:
+        background-color var(--transition-normal),
+        box-shadow var(--transition-normal),
+        transform var(--transition-normal);
+}
+
+.themed-progress__bar {
+    position: relative;
+    overflow: hidden;
+    border-radius: 9999px;
+    block-size: 100%;
+    transition: inline-size 0.3s ease-in-out;
+
+    &::after {
+        position: absolute;
+        animation: shimmer 2s infinite;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--shadow-inverse-color) 30%, transparent),
+            transparent
+        );
+        block-size: 100%;
+        content: "";
+        inline-size: 100%;
+        inset-block-start: 0;
+        inset-inline-start: -100%;
+    }
+}
+
+.themed-tooltip {
+    &::before,
+    &::after {
+        position: absolute;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            opacity var(--transition-normal),
+            transform var(--transition-normal);
+        visibility: hidden;
+    }
+
+    &::before {
+        padding: 0.5rem 0.75rem;
+        border-radius: var(--border-radius-sm);
+        background: color-mix(
+            in srgb,
+            var(--color-background-primary, rgb(15 23 42)) 90%,
+            transparent
+        );
+        color: var(--color-text-inverse);
+        content: attr(title);
+        font-size: 0.875rem;
+        inset-block-end: 100%;
+        inset-inline-start: 50%;
+        transform: translateX(-50%) translateY(-0.25rem);
+        white-space: nowrap;
+    }
+
+    &::after {
+        border: 4px solid transparent;
+        border-block-start-color: color-mix(
+            in srgb,
+            var(--color-background-primary, rgb(15 23 42)) 90%,
+            transparent
+        );
+        content: "";
+        inset-block-end: 100%;
+        inset-inline-start: 50%;
+        transform: translateX(-50%);
+    }
+
+    &:hover::before,
+    &:hover::after {
+        opacity: 1;
+        transform: translateX(-50%);
+        visibility: visible;
+    }
+}

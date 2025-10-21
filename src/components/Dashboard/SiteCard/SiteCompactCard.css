@@ -33,56 +33,90 @@
         0 24px 56px
             color-mix(in srgb, var(--shadow-deep-color) 38%, transparent);
     isolation: isolate;
-}
 
-.site-card.site-card--compact::before {
-    position: absolute;
-    border-radius: 50%;
-    background:
-        radial-gradient(
-            circle at 18% 22%,
-            color-mix(in srgb, var(--color-primary-500) 32%, transparent),
-            transparent 72%
-        ),
-        radial-gradient(
-            circle at 62% 86%,
-            color-mix(in srgb, var(--color-status-up) 24%, transparent),
-            transparent 74%
-        );
-    block-size: 64%;
-    content: "";
-    inline-size: 64%;
-    inset-block-start: -28%;
-    inset-inline-end: -20%;
-    opacity: 0.38;
-    pointer-events: none;
-}
+    &::before {
+        position: absolute;
+        border-radius: 50%;
+        background:
+            radial-gradient(
+                circle at 18% 22%,
+                color-mix(in srgb, var(--color-primary-500) 32%, transparent),
+                transparent 72%
+            ),
+            radial-gradient(
+                circle at 62% 86%,
+                color-mix(in srgb, var(--color-status-up) 24%, transparent),
+                transparent 74%
+            );
+        block-size: 64%;
+        content: "";
+        inline-size: 64%;
+        inset-block-start: -28%;
+        inset-inline-end: -20%;
+        opacity: 0.38;
+        pointer-events: none;
+    }
 
-.site-card.site-card--compact::after {
-    position: absolute;
-    border-radius: inherit;
-    background:
-        linear-gradient(
-            184deg,
-            color-mix(in srgb, var(--shadow-inverse-color) 12%, transparent)
-                0%,
-            transparent 62%
-        ),
-        radial-gradient(
-            120% 120% at 12% 0%,
-            color-mix(in srgb, var(--overlay-highlight-color) 14%, transparent),
-            transparent 70%
-        );
-    content: "";
-    inset: 0;
-    opacity: 0.32;
-    pointer-events: none;
-    transition: opacity var(--transition-normal);
-}
+    &::after {
+        position: absolute;
+        border-radius: inherit;
+        background:
+            linear-gradient(
+                184deg,
+                color-mix(in srgb, var(--shadow-inverse-color) 12%, transparent)
+                    0%,
+                transparent 62%
+            ),
+            radial-gradient(
+                120% 120% at 12% 0%,
+                color-mix(
+                    in srgb,
+                    var(--overlay-highlight-color) 14%,
+                    transparent
+                ),
+                transparent 70%
+            );
+        content: "";
+        inset: 0;
+        opacity: 0.32;
+        pointer-events: none;
+        transition: opacity var(--transition-normal);
 
-.site-card.site-card--compact:hover::after,
-.site-card.site-card--compact:focus-within::after {
-    opacity: 0.4;
+        @media screen and (prefers-reduced-motion: reduce) {
+            position: absolute;
+            border-radius: inherit;
+            background:
+                linear-gradient(
+                    184deg,
+                    color-mix(
+                            in srgb,
+                            var(--shadow-inverse-color) 12%,
+                            transparent
+                        )
+                        0%,
+                    transparent 62%
+                ),
+                radial-gradient(
+                    120% 120% at 12% 0%,
+                    color-mix(
+                        in srgb,
+                        var(--overlay-highlight-color) 14%,
+                        transparent
+                    ),
+                    transparent 70%
+                );
+            content: "";
+            inset: 0;
+            opacity: 0.32;
+            pointer-events: none;
+            transition: none;
+        }
+    }
+
+    &:hover::after,
+    &:focus-within::after {
+        opacity: 0.4;
+    }
 }
 
 /* Compact site card layout styling */
@@ -278,20 +312,20 @@
 .monitor-selector__wrapper.site-card__compact-selector {
     inline-size: clamp(14rem, 32vi, 18rem);
     margin-inline: auto;
-}
 
-.monitor-selector__wrapper.site-card__compact-selector::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: linear-gradient(
-        145deg,
-        color-mix(in srgb, var(--color-primary-500) 22%, transparent),
-        color-mix(in srgb, var(--color-primary-400) 12%, transparent)
-    );
-    opacity: 0.18;
-    pointer-events: none;
+    &::before {
+        position: absolute;
+        border-radius: inherit;
+        background: linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-primary-500) 22%, transparent),
+            color-mix(in srgb, var(--color-primary-400) 12%, transparent)
+        );
+        content: "";
+        inset: -1px;
+        opacity: 0.18;
+        pointer-events: none;
+    }
 }
 
 .site-card__compact-actions {

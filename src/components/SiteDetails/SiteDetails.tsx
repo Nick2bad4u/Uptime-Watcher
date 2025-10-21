@@ -48,7 +48,6 @@ import { ChartConfigService } from "../../services/chartConfig";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { parseUptimeValue } from "../../utils/monitoring/dataValidation";
-import "./SiteDetails.css";
 import {
     formatDuration,
     formatFullTimestamp,

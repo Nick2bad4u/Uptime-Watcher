@@ -1,0 +1,409 @@
+/* Theme Components CSS - Professional UI Enhancement */
+
+/* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable plugin/no-low-performance-animation-properties -- intentional rich shadows/transforms rely on transitions and remain performant in benchmarks. */
+/* stylelint-disable scss/function-color-relative -- native color-mix works with CSS custom properties; Sass color helpers cannot express these blends. */
+
+/* CSS Custom Properties for animations */
+:root {
+    --transition-fast: 0.15s ease-out;
+    --transition-normal: 0.25s ease-out;
+    --transition-slow: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --shadow-elevation-1:
+        0 2px 4px
+            color-mix(in srgb, var(--shadow-neutral-color) 6%, transparent),
+        0 1px 2px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent);
+    --shadow-elevation-2:
+        0 4px 6px
+            color-mix(in srgb, var(--shadow-neutral-color) 7%, transparent),
+        0 2px 4px
+            color-mix(in srgb, var(--shadow-neutral-color) 6%, transparent);
+    --shadow-elevation-3:
+        0 10px 15px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent),
+        0 4px 6px
+            color-mix(in srgb, var(--shadow-neutral-color) 5%, transparent);
+    --shadow-elevation-4:
+        0 20px 25px
+            color-mix(in srgb, var(--shadow-neutral-color) 10%, transparent),
+        0 10px 10px
+            color-mix(in srgb, var(--shadow-neutral-color) 4%, transparent);
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    --border-radius-xl: 1rem;
+    --shadow-neutral-color: var(--color-shadow-neutral, rgb(0 0 0));
+    --shadow-base-color: var(--color-shadow-base, rgb(15 23 42));
+    --shadow-deep-color: var(--color-shadow-deep, rgb(6 11 24));
+    --shadow-overlay-color: var(--color-shadow-overlay, rgb(8 12 24));
+    --shadow-inverse-color: var(--color-text-inverse, rgb(255 255 255));
+    --accent-primary-strong-color: var(--color-primary-strong, rgb(37 99 235));
+    --accent-primary-color: var(--color-primary-500, rgb(59 130 246));
+    --accent-success-color: var(--color-success-500, rgb(34 197 94));
+    --accent-muted-color: var(--color-text-muted, rgb(148 163 184));
+    --surface-light-color: var(--color-surface-light, rgb(248 250 252));
+    --overlay-highlight-color: var(--color-overlay-highlight, rgb(148 163 255));
+    --overlay-deep-color: var(--color-overlay-deep, rgb(21 30 46));
+    --overlay-mid-color: var(--color-overlay-mid, rgb(30 41 67));
+}
+
+/* Themed Box Classes */
+.themed-box--border {
+    border: 1px solid var(--color-border-primary);
+}
+
+@layer components {
+    .themed-box {
+        @apply relative;
+
+        background-clip: padding-box;
+        transition:
+            background-color var(--transition-normal),
+            border-color var(--transition-normal),
+            transform var(--transition-normal);
+    }
+
+    .themed-box--padding-xs {
+        padding-block: clamp(
+            calc(var(--spacing-xs, 0.25rem) * 1.5),
+            0.5rem + 0.2vi,
+            calc(var(--spacing-sm, 0.5rem) * 1.4)
+        );
+        padding-inline: clamp(
+            calc(var(--spacing-sm, 0.5rem) * 1.3),
+            0.75rem + 0.4vi,
+            calc(var(--spacing-md, 1rem) * 1.15)
+        );
+    }
+
+    .themed-box--padding-sm {
+        padding-block: clamp(
+            calc(var(--spacing-sm, 0.5rem) * 1.3),
+            0.9rem + 0.25vi,
+            calc(var(--spacing-md, 1rem) * 1.1)
+        );
+        padding-inline: clamp(
+            calc(var(--spacing-md, 1rem) * 1.1),
+            1.1rem + 0.45vi,
+            calc(var(--spacing-lg, 1.5rem) * 0.95)
+        );
+    }
+
+    .themed-box--padding-md {
+        padding-block: clamp(
+            calc(var(--spacing-md, 1rem) * 1.05),
+            1.25rem + 0.45vi,
+            calc(var(--spacing-lg, 1.5rem) * 0.95)
+        );
+        padding-inline: clamp(
+            calc(var(--spacing-lg, 1.5rem) * 0.9),
+            1.4rem + 0.6vi,
+            calc(var(--spacing-lg, 1.5rem) * 1.1)
+        );
+    }
+
+    .themed-box--padding-lg {
+        padding-block: clamp(1.5rem, 1.25rem + 0.75vi, 2rem);
+        padding-inline: clamp(1.75rem, 1.5rem + 1vi, 2.5rem);
+    }
+
+    .themed-box--padding-xl {
+        padding-block: clamp(2rem, 1.75rem + 1vi, 2.75rem);
+        padding-inline: clamp(2.25rem, 2rem + 1.2vi, 3.25rem);
+    }
+
+    .themed-box--rounded-none {
+        border-radius: 0;
+    }
+
+    .themed-box--rounded-sm {
+        border-radius: var(--radius-sm, 0.375rem);
+    }
+
+    .themed-box--rounded-md {
+        border-radius: var(--radius-md, 0.5rem);
+    }
+
+    .themed-box--rounded-lg {
+        border-radius: var(--radius-lg, 0.75rem);
+    }
+
+    .themed-box--rounded-xl {
+        border-radius: var(--radius-xl, 1rem);
+    }
+
+    .themed-box--rounded-full {
+        border-radius: var(--radius-full, 9999px);
+    }
+
+    .themed-box--shadow-sm {
+        box-shadow: var(
+            --shadow-sm,
+            0 1px 2px
+                color-mix(in srgb, var(--shadow-base-color) 12%, transparent)
+        );
+    }
+
+    .themed-box--shadow-md {
+        box-shadow: var(
+            --shadow-md,
+            0 10px 25px
+                color-mix(in srgb, var(--shadow-base-color) 18%, transparent)
+        );
+    }
+
+    .themed-box--shadow-lg {
+        box-shadow: var(
+            --shadow-lg,
+            0 18px 40px
+                color-mix(in srgb, var(--shadow-base-color) 32%, transparent)
+        );
+    }
+
+    .themed-box--shadow-xl {
+        box-shadow: var(
+            --shadow-xl,
+            0 28px 60px
+                color-mix(in srgb, var(--shadow-overlay-color) 42%, transparent)
+        );
+    }
+
+    .themed-box--shadow-inner {
+        box-shadow: var(
+            --shadow-inner,
+            inset 0 2px 8px
+                color-mix(in srgb, var(--shadow-overlay-color) 35%, transparent)
+        );
+    }
+
+    .themed-box--surface-base {
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 38%, transparent);
+        background: color-mix(
+            in srgb,
+            var(--color-surface-base) 96%,
+            transparent
+        );
+    }
+
+    .themed-box--surface-elevated {
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 44%, transparent);
+        background: linear-gradient(
+            140deg,
+            color-mix(in srgb, var(--color-surface-elevated) 94%, transparent)
+                0%,
+            color-mix(in srgb, var(--color-surface-overlay) 82%, transparent)
+                100%
+        );
+        box-shadow:
+            inset 0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 4%, transparent),
+            0 24px 60px
+                color-mix(in srgb, var(--shadow-overlay-color) 32%, transparent);
+    }
+
+    .themed-box--surface-overlay {
+        border: 1px solid
+            color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
+        backdrop-filter: blur(18px) saturate(1.08);
+        background: linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-surface-overlay) 95%, transparent) 0%,
+            color-mix(
+                    in srgb,
+                    var(--color-primary-500) 8%,
+                    var(--color-surface-elevated) 92%
+                )
+                55%,
+            color-mix(in srgb, var(--color-surface-base) 90%, transparent) 100%
+        );
+        box-shadow:
+            inset 0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
+            0 32px 70px
+                color-mix(in srgb, var(--shadow-deep-color) 45%, transparent);
+    }
+
+    .themed-box--background-primary {
+        color: var(--color-text-primary);
+    }
+
+    .themed-box--background-secondary {
+        color: var(--color-text-secondary);
+    }
+
+    .themed-box--background-tertiary {
+        color: var(--color-text-tertiary);
+    }
+
+    .themed-card__content {
+        display: flex;
+        flex-direction: column;
+        gap: clamp(
+            var(--spacing-sm, 0.5rem),
+            0.85rem + 0.45vi,
+            var(--spacing-lg, 1.5rem)
+        );
+    }
+}
+
+.sidebar-reveal-button {
+    position: fixed;
+    z-index: 1200;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.45rem, 0.35rem + 0.25vi, 0.65rem)
+        clamp(0.4rem, 0.3rem + 0.2vi, 0.6rem);
+    border: 1px solid
+        color-mix(in srgb, var(--color-primary-500) 32%, transparent);
+    border-radius: 9999px;
+    backdrop-filter: blur(12px) saturate(1.08);
+    background: linear-gradient(
+        135deg,
+        color-mix(
+            in srgb,
+            var(--color-primary-500) 18%,
+            var(--color-surface-elevated) 82%
+        ),
+        color-mix(
+            in srgb,
+            var(--color-primary-500) 10%,
+            var(--color-surface-overlay) 90%
+        )
+    );
+    box-shadow: 0 18px 48px
+        color-mix(in srgb, var(--shadow-base-color) 35%, transparent);
+    color: color-mix(
+        in srgb,
+        var(--color-primary-500) 72%,
+        var(--color-surface-base, rgb(226 232 240)) 28%
+    );
+    gap: 0.3rem;
+    inline-size: clamp(2.1rem, 1.85rem + 0.45vi, 2.6rem);
+    inset-block-start: 35%;
+    inset-inline-start: calc(env(safe-area-inset-left, 0rem) + 0.25rem);
+    min-block-size: clamp(2.2rem, 2rem + 0.35vi, 2.6rem);
+    pointer-events: auto;
+    transform: translateY(-50%);
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        color var(--transition-fast),
+        opacity var(--transition-fast);
+
+    .app-shell--sidebar-open & {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .app-shell--sidebar-closed & {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    &:hover {
+        box-shadow: 0 24px 56px
+            color-mix(
+                in srgb,
+                var(--accent-primary-strong-color) 36%,
+                transparent
+            );
+        transform: translateY(-50%) scale(1.03);
+    }
+}
+
+.sidebar-reveal-button__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    block-size: 1.25rem;
+    inline-size: 1.25rem;
+}
+
+.sidebar-reveal-button__label {
+    color: color-mix(in srgb, var(--color-text-secondary) 75%, transparent);
+    font-size: 0.625rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transform: rotate(180deg);
+    writing-mode: vertical-rl;
+}
+
+.sidebar-reveal-button--dark {
+    border-color: color-mix(
+        in srgb,
+        var(--color-border-secondary) 60%,
+        transparent
+    );
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--color-surface-overlay) 78%, transparent),
+        color-mix(in srgb, var(--color-surface-elevated) 88%, transparent)
+    );
+    box-shadow: 0 16px 42px
+        color-mix(in srgb, var(--shadow-base-color) 50%, transparent);
+    color: var(--color-primary-200, rgb(224 231 255));
+
+    &:hover {
+        box-shadow: 0 20px 48px
+            color-mix(in srgb, var(--shadow-base-color) 56%, transparent);
+    }
+}
+
+/* Themed Text Classes */
+.themed-text {
+    line-height: var(--line-height-normal);
+    transition: color var(--transition-normal);
+}
+
+.themed-text--size-xl {
+    font-size: var(--font-size-xl);
+}
+
+.themed-text--size-2xl {
+    font-size: var(--font-size-2xl);
+}
+
+.themed-text--size-3xl {
+    font-size: var(--font-size-3xl);
+}
+
+.themed-text--size-4xl {
+    font-size: var(--font-size-4xl);
+}
+
+.themed-text--weight-normal {
+    font-weight: var(--font-weight-normal);
+}
+
+.themed-text--weight-medium {
+    font-weight: var(--font-weight-medium);
+}
+
+.themed-text--weight-semibold {
+    font-weight: var(--font-weight-semibold);
+}
+
+.themed-text--weight-bold {
+    font-weight: var(--font-weight-bold);
+}
+
+.themed-text--align-left {
+    text-align: start;
+}
+
+.themed-text--align-center,
+.text-center {
+    text-align: center;
+}
+
+.themed-text--align-right {
+    text-align: end;
+}
