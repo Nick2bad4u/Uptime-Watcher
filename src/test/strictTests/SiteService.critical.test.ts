@@ -38,14 +38,35 @@ vi.mock("../../services/logger", () => ({
 const createMockSiteSnapshot = (identifier: string): Site => ({
     identifier,
     monitoring: true,
-    monitors: [],
-    name: `Site ${identifier}`,
+    monitors: [
+        {
+            checkInterval: 60_000,
+            history: [],
+            id: `${identifier}-monitor`,
+            lastChecked: new Date(),
+            monitoring: true,
+            responseTime: 120,
+            retryAttempts: 3,
+            status: "up",
+            timeout: 30_000,
+            type: "http",
+            url: "https://example.com/status",
+        },
+    ],
+    name: "Site",
 });
 
 // Set up global electronAPI mock before tests
 (globalThis as any).electronAPI = {
     monitoring: {
         removeMonitor: vi.fn(),
+    },
+    sites: {
+        addSite: vi.fn(),
+        getSites: vi.fn(),
+        removeMonitor: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 };
 
@@ -54,7 +75,11 @@ const createMockSiteSnapshot = (identifier: string): Site => ({
 (globalThis.window as any).electronAPI = {
     monitoring: {},
     sites: {
+        addSite: vi.fn(),
+        getSites: vi.fn(),
         removeMonitor: vi.fn(),
+        removeSite: vi.fn(),
+        updateSite: vi.fn(),
     },
 };
 
@@ -66,6 +91,10 @@ describe("SiteService Critical Coverage Tests", () => {
         vi.mocked(
             (globalThis as any).electronAPI.sites.removeMonitor
         ).mockReset();
+        vi.mocked((globalThis as any).electronAPI.sites.addSite).mockReset();
+        vi.mocked((globalThis as any).electronAPI.sites.getSites).mockReset();
+        vi.mocked((globalThis as any).electronAPI.sites.updateSite).mockReset();
+        vi.mocked((globalThis as any).electronAPI.sites.removeSite).mockReset();
         vi.mocked(storeUtils.waitForElectronAPI).mockReset();
 
         // Set default resolved values
@@ -73,6 +102,18 @@ describe("SiteService Critical Coverage Tests", () => {
         vi.mocked(
             (globalThis as any).electronAPI.sites.removeMonitor
         ).mockResolvedValue(createMockSiteSnapshot("site-123"));
+        vi.mocked(
+            (globalThis as any).electronAPI.sites.addSite
+        ).mockResolvedValue(createMockSiteSnapshot("site-123"));
+        vi.mocked(
+            (globalThis as any).electronAPI.sites.getSites
+        ).mockResolvedValue([createMockSiteSnapshot("site-123")]);
+        vi.mocked(
+            (globalThis as any).electronAPI.sites.updateSite
+        ).mockResolvedValue(createMockSiteSnapshot("site-123"));
+        vi.mocked(
+            (globalThis as any).electronAPI.sites.removeSite
+        ).mockResolvedValue(true);
     });
 
     describe("removeMonitor method - Lines 157-162 Coverage", () => {
@@ -84,12 +125,7 @@ describe("SiteService Critical Coverage Tests", () => {
             vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
                 undefined
             );
-            const persistedSite: Site = {
-                identifier: siteIdentifier,
-                monitoring: true,
-                monitors: [],
-                name: "Site",
-            };
+            const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockResolvedValue(persistedSite);
@@ -164,28 +200,30 @@ describe("SiteService Critical Coverage Tests", () => {
             vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
                 undefined
             );
-            const persistedSite: Site = {
-                identifier: siteIdentifier,
-                monitoring: true,
-                monitors: [],
-                name: "Site",
-            };
+            const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockResolvedValue(persistedSite);
 
-            // Act
-            const result = await SiteService.removeMonitor(
-                siteIdentifier,
-                monitorId
+            // Act & Assert
+            await expect(
+                SiteService.removeMonitor(siteIdentifier, monitorId)
+            ).rejects.toThrow(
+                "Monitor removal returned an invalid site snapshot for /"
             );
 
-            // Assert
             expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith("", "");
-            expect(result).toEqual(persistedSite);
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot returned after monitor removal",
+                expect.any(Error),
+                expect.objectContaining({
+                    monitorId,
+                    siteIdentifier,
+                })
+            );
         });
 
         it("should handle special characters in identifiers", async () => {
@@ -196,12 +234,7 @@ describe("SiteService Critical Coverage Tests", () => {
             vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
                 undefined
             );
-            const persistedSite: Site = {
-                identifier: siteIdentifier,
-                monitoring: true,
-                monitors: [],
-                name: "Site",
-            };
+            const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockResolvedValue(persistedSite);
@@ -314,6 +347,134 @@ describe("SiteService Critical Coverage Tests", () => {
                 SiteService.removeMonitor(siteIdentifier, monitorId)
             ).rejects.toThrow(
                 `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
+            );
+
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot returned after monitor removal",
+                expect.any(Error),
+                expect.objectContaining({
+                    monitorId,
+                    siteIdentifier,
+                })
+            );
+        });
+    });
+
+    describe("addSite validation", () => {
+        it("should validate and return the persisted site snapshot", async () => {
+            const inputSite = createMockSiteSnapshot("site-new");
+
+            const result = await SiteService.addSite(inputSite);
+
+            expect(
+                (globalThis as any).electronAPI.sites.addSite
+            ).toHaveBeenCalledWith(inputSite);
+            expect(result.identifier).toBe("site-123");
+        });
+
+        it("should throw when backend returns invalid site snapshot", async () => {
+            const invalidSite = {
+                identifier: "invalid-site",
+                monitoring: true,
+                monitors: [],
+                name: "Broken",
+            } as unknown as Site;
+
+            vi.mocked(
+                (globalThis as any).electronAPI.sites.addSite
+            ).mockResolvedValueOnce(invalidSite);
+
+            await expect(
+                SiteService.addSite(createMockSiteSnapshot("invalid-site"))
+            ).rejects.toThrow(
+                "Site creation returned an invalid site snapshot for invalid-site"
+            );
+
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot returned after addSite",
+                expect.any(Error),
+                expect.objectContaining({
+                    operation: "addSite",
+                    siteIdentifier: "invalid-site",
+                })
+            );
+        });
+    });
+
+    describe("getSites validation", () => {
+        it("should return validated site snapshots", async () => {
+            const sites = await SiteService.getSites();
+
+            expect(
+                (globalThis as any).electronAPI.sites.getSites
+            ).toHaveBeenCalledTimes(1);
+            expect(Array.isArray(sites)).toBeTruthy();
+            expect(sites[0]?.identifier).toBe("site-123");
+        });
+
+        it("should throw when any site snapshot is invalid", async () => {
+            const invalidSnapshot = {
+                identifier: "invalid",
+                monitoring: true,
+                monitors: [],
+                name: "Invalid",
+            } as unknown as Site;
+
+            vi.mocked(
+                (globalThis as any).electronAPI.sites.getSites
+            ).mockResolvedValueOnce([invalidSnapshot]);
+
+            await expect(SiteService.getSites()).rejects.toThrow(
+                "getSites returned invalid site snapshot data (indices: 0)"
+            );
+
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot(s) returned during getSites",
+                expect.any(Error),
+                expect.objectContaining({
+                    invalidIndices: [0],
+                })
+            );
+        });
+    });
+
+    describe("updateSite validation", () => {
+        it("should return validated updated snapshot", async () => {
+            const updates: Partial<Site> = { name: "Updated" };
+
+            const result = await SiteService.updateSite("site-123", updates);
+
+            expect(
+                (globalThis as any).electronAPI.sites.updateSite
+            ).toHaveBeenCalledWith("site-123", updates);
+            expect(result.identifier).toBe("site-123");
+        });
+
+        it("should throw when update returns an invalid site snapshot", async () => {
+            const invalidSnapshot = {
+                identifier: "site-123",
+                monitoring: true,
+                monitors: [],
+                name: "Invalid",
+            } as unknown as Site;
+
+            vi.mocked(
+                (globalThis as any).electronAPI.sites.updateSite
+            ).mockResolvedValueOnce(invalidSnapshot);
+
+            await expect(
+                SiteService.updateSite("site-123", { name: "Broken" })
+            ).rejects.toThrow(
+                "Site update returned an invalid site snapshot for site-123"
+            );
+
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot returned after updateSite",
+                expect.any(Error),
+                expect.objectContaining({
+                    operation: "updateSite",
+                    siteIdentifier: "site-123",
+                })
             );
         });
     });
@@ -429,17 +590,27 @@ describe("SiteService Critical Coverage Tests", () => {
             );
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
-            ).mockImplementation(async (identifier: string) =>
-                createMockSiteSnapshot(identifier)
+            ).mockResolvedValue(createMockSiteSnapshot(longSiteId));
+
+            // Act & Assert
+            await expect(
+                SiteService.removeMonitor(longSiteId, longMonitorId)
+            ).rejects.toThrow(
+                `Monitor removal returned an invalid site snapshot for ${longSiteId}/${longMonitorId}`
             );
 
-            // Act
-            await SiteService.removeMonitor(longSiteId, longMonitorId);
-
-            // Assert
+            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(longSiteId, longMonitorId);
+            expect(logger.error).toHaveBeenCalledWith(
+                "[SiteService] Invalid site snapshot returned after monitor removal",
+                expect.any(Error),
+                expect.objectContaining({
+                    monitorId: longMonitorId,
+                    siteIdentifier: longSiteId,
+                })
+            );
         });
     });
 });

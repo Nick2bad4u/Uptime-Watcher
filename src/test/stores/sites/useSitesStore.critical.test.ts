@@ -117,6 +117,36 @@ Object.defineProperty(global, "window", {
     writable: true,
 });
 
+const createValidMonitor = (
+    id: string,
+    overrides: Partial<Site["monitors"][number]> = {}
+): Site["monitors"][number] => ({
+    checkInterval: 60_000,
+    history: [],
+    id,
+    lastChecked: new Date(),
+    monitoring: true,
+    responseTime: 0,
+    retryAttempts: 3,
+    status: "pending",
+    timeout: 10_000,
+    type: "http",
+    url: `https://example-${id}.com`,
+    ...overrides,
+});
+
+const createValidSite = (
+    identifier: string,
+    overrides: Partial<Site> = {}
+): Site => ({
+    identifier,
+    monitors: overrides.monitors ?? [
+        createValidMonitor(`${identifier}-monitor`),
+    ],
+    monitoring: overrides.monitoring ?? true,
+    name: overrides.name ?? `Site ${identifier}`,
+});
+
 describe("useSitesStore Function Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
@@ -124,18 +154,12 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         // Set up default mock responses to prevent hanging
         mockElectronAPI.sites.getSites.mockResolvedValue([]);
-        mockElectronAPI.sites.addSite.mockResolvedValue({
-            identifier: "default-site",
-            monitoring: true,
-            monitors: [],
-            name: "Default Site",
-        });
-        mockElectronAPI.sites.updateSite.mockResolvedValue({
-            identifier: "default-site",
-            monitoring: true,
-            monitors: [],
-            name: "Default Site",
-        });
+        mockElectronAPI.sites.addSite.mockResolvedValue(
+            createValidSite("default-site")
+        );
+        mockElectronAPI.sites.updateSite.mockResolvedValue(
+            createValidSite("default-site")
+        );
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
         mockElectronAPI.stateSync.getSyncStatus.mockResolvedValue({
             lastSyncAt: Date.now(),
@@ -213,12 +237,10 @@ describe("useSitesStore Function Coverage Tests", () => {
             const store = useSitesStore.getState();
 
             // Test that getSites function works
-            const testSite: Site = {
-                identifier: "test-site",
-                name: "Test Site",
-                monitors: [],
+            const testSite = createValidSite("test-site", {
                 monitoring: false,
-            };
+                name: "Test Site",
+            });
 
             store.addSite(testSite);
             // Read fresh state after mutation to avoid stale snapshot
@@ -232,19 +254,20 @@ describe("useSitesStore Function Coverage Tests", () => {
         it("should properly integrate state and operations", async () => {
             const store = useSitesStore.getState();
 
-            const createdSite: Site = {
-                identifier: "test-site",
-                monitoring: true,
-                monitors: [],
+            const createdSite = createValidSite("test-site", {
                 name: "Test Site",
-            };
+            });
 
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
 
             await store.createSite({
                 identifier: "test-site",
                 name: "Test Site",
-                monitors: [],
+                monitors: [
+                    createValidMonitor("test-site-monitor", {
+                        url: "https://test-site.com",
+                    }),
+                ],
             });
 
             expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
@@ -252,6 +275,7 @@ describe("useSitesStore Function Coverage Tests", () => {
                     identifier: "test-site",
                     monitoring: true,
                     name: "Test Site",
+                    monitors: expect.any(Array),
                 })
             );
         });
@@ -331,12 +355,10 @@ describe("useSitesStore Function Coverage Tests", () => {
         it("should manage selected site state correctly", () => {
             const store = useSitesStore.getState();
 
-            const testSite: Site = {
-                identifier: "test-site",
-                name: "Test Site",
-                monitors: [],
+            const testSite = createValidSite("test-site", {
                 monitoring: false,
-            };
+                name: "Test Site",
+            });
 
             // First add the site to the sites array so it can be found
             store.setSites([testSite]);

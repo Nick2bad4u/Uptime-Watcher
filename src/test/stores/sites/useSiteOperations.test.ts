@@ -406,7 +406,7 @@ describe(createSiteOperationsActions, () => {
     });
 
     describe("deleteSite", () => {
-        it("should delete a site and stop monitoring", async ({
+        it("should delete a site via orchestrator-managed removal", async ({
             task,
             annotate,
         }) => {
@@ -415,16 +415,13 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Deletion", "type");
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                true
-            );
             mockElectronAPI.sites.removeSite.mockResolvedValue(true);
 
             await actions.deleteSite("test-site");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            ).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
                 "test-site"
             );

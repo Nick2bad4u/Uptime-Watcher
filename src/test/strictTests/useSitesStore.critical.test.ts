@@ -19,6 +19,30 @@ const mockStateSyncService = vi.hoisted(() => ({
     requestFullSync: vi.fn(),
 }));
 
+const createValidSite = (
+    identifier: string,
+    overrides: Partial<Site> = {}
+): Site => ({
+    identifier,
+    name: overrides.name ?? "Site",
+    monitoring: overrides.monitoring ?? true,
+    monitors: overrides.monitors ?? [
+        {
+            id: `${identifier}-monitor`,
+            type: "http",
+            url: "https://example.com",
+            monitoring: true,
+            checkInterval: 60_000,
+            timeout: 15_000,
+            retryAttempts: 3,
+            responseTime: 0,
+            status: "pending",
+            history: [],
+            lastChecked: new Date(),
+        },
+    ],
+});
+
 vi.mock("../../services/StateSyncService", () => ({
     StateSyncService: mockStateSyncService,
 }));
@@ -60,17 +84,18 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         // Set up default mock responses to prevent hanging
         mockElectronAPI.sites.getSites.mockResolvedValue([]);
-        mockElectronAPI.sites.addSite.mockResolvedValue(undefined);
+        mockElectronAPI.sites.addSite.mockResolvedValue(
+            createValidSite("new-site")
+        );
         mockElectronAPI.sites.updateSite.mockImplementation(
-            async (identifier: string, updates: Partial<Site>) => ({
-                identifier,
-                monitors: [],
-                monitoring: true,
-                name:
-                    typeof updates?.name === "string"
-                        ? updates.name
-                        : "Updated Site",
-            })
+            async (identifier: string, updates: Partial<Site>) =>
+                createValidSite(identifier, {
+                    ...updates,
+                    name:
+                        typeof updates?.name === "string"
+                            ? updates.name
+                            : "Updated Site",
+                })
         );
         mockElectronAPI.sites.removeSite.mockResolvedValue(true);
         mockStateSyncService.getSyncStatus.mockResolvedValue({
@@ -88,23 +113,19 @@ describe("useSitesStore Function Coverage Tests", () => {
         });
 
         // Set up SiteService mocks
-        vi.mocked(SiteService.addSite).mockResolvedValue({
-            identifier: "new-site",
-            name: "New Site",
-            monitoring: true,
-            monitors: [],
-        } as Site);
+        vi.mocked(SiteService.addSite).mockResolvedValue(
+            createValidSite("new-site", { name: "New Site" })
+        );
         vi.mocked(SiteService.getSites).mockResolvedValue([]);
         vi.mocked(SiteService.updateSite).mockImplementation(
-            async (identifier: string, updates: Partial<Site>) => ({
-                identifier,
-                monitors: [],
-                monitoring: true,
-                name:
-                    typeof updates?.name === "string"
-                        ? updates.name
-                        : "Updated Site",
-            })
+            async (identifier: string, updates: Partial<Site>) =>
+                createValidSite(identifier, {
+                    ...updates,
+                    name:
+                        typeof updates?.name === "string"
+                            ? updates.name
+                            : "Updated Site",
+                })
         );
         vi.mocked(SiteService.removeSite).mockResolvedValue(true);
         vi.mocked(SiteService.initialize).mockResolvedValue(undefined);
@@ -195,6 +216,8 @@ describe("useSitesStore Function Coverage Tests", () => {
                         responseTime: 0,
                         retryAttempts: 3,
                         timeout: 5000,
+                        url: "https://example.com",
+                        lastChecked: new Date(),
                     },
                 ],
                 monitoring: true,
@@ -318,12 +341,9 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         it("should exercise site modification operations", async () => {
             // Mock site modification response
-            const updatedSite: Site = {
-                identifier: "site-id",
-                monitors: [],
-                monitoring: true,
+            const updatedSite = createValidSite("site-id", {
                 name: "Updated Name",
-            };
+            });
             mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
             mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
 
@@ -352,6 +372,8 @@ describe("useSitesStore Function Coverage Tests", () => {
                         responseTime: 0,
                         retryAttempts: 3,
                         timeout: 5000,
+                        url: "https://example.com",
+                        lastChecked: new Date(),
                     },
                 ],
                 monitoring: true,

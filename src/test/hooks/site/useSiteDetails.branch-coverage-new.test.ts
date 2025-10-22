@@ -49,6 +49,9 @@ describe("useSiteDetails - Branch Coverage Tests", () => {
 
     const mockSitesStore = {
         sites: [mockSite],
+        selectedMonitorIds: {
+            [mockSite.identifier]: mockSite.monitors[0]!.id,
+        },
         getSelectedMonitorId: vi.fn(() => "monitor-1"),
         setSelectedMonitorId: vi.fn(),
         checkSiteNow: vi.fn(),

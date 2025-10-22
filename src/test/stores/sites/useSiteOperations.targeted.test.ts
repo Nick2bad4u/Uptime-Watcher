@@ -12,10 +12,6 @@ import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperat
 import { applySavedSiteToStore } from "../../../stores/sites/utils/operationHelpers";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
 import { logger } from "../../../services/logger";
-import { isDevelopment } from "@shared/utils/environment";
-
-// Get mock reference after import
-const mockIsDevelopment = vi.mocked(isDevelopment);
 
 // Mock logger to control development mode checks
 vi.mock("../../../services/logger", () => ({
@@ -25,11 +21,6 @@ vi.mock("../../../services/logger", () => ({
         info: vi.fn(),
         debug: vi.fn(),
     },
-}));
-
-// Mock isDevelopment to control development mode
-vi.mock("../../../../shared/utils/environment", () => ({
-    isDevelopment: vi.fn(() => true), // Set to true to trigger logger.warn calls
 }));
 
 const mockErrorStore = {
@@ -124,9 +115,6 @@ describe("useSiteOperations - Targeted Coverage", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-
-        // Ensure isDevelopment returns true for our tests
-        mockIsDevelopment.mockReturnValue(true);
 
         mockElectronAPI = {
             sites: {
@@ -241,42 +229,33 @@ describe("useSiteOperations - Targeted Coverage", () => {
         actions = createSiteOperationsActions(mockSiteDeps);
     });
 
-    describe("deleteSite Error Handling (Lines 115-116)", () => {
-        it("should handle and log errors when stopping monitoring fails but continue with site deletion", async ({
+    describe("deleteSite orchestrator alignment", () => {
+        it("should avoid monitoring stop calls while removing a site", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: useSiteOperations", "component");
             await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
+            await annotate("Type: Data Deletion", "type");
 
-            // Make stopMonitoringForSite throw an error for the second monitor
-            mockElectronAPI.monitoring.stopMonitoringForSite
-                .mockResolvedValueOnce(true) // First monitor succeeds
-                .mockRejectedValueOnce(new Error("Monitor stop failed")); // Second monitor fails
+            mockElectronAPI.sites.removeSite.mockResolvedValue(true);
 
-            // Delete site should still succeed despite monitor stop failure
             await actions.deleteSite(mockSiteWithMultipleMonitors.identifier);
 
-            // Verify logger.warn was called for the failed monitor (line 115-116)
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Failed to stop monitoring for monitor"
-                ),
-                expect.any(Error)
-            );
-
-            // Verify site deletion still proceeded
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier
             );
             expect(mockSiteDeps.removeSite).toHaveBeenCalledWith(
                 mockSiteWithMultipleMonitors.identifier
             );
+            expect(logger.warn).not.toHaveBeenCalled();
         });
 
-        it("should handle non-Error objects when stopping monitoring fails", async ({
+        it("should continue to avoid monitoring stop calls when deletion fails", async ({
             task,
             annotate,
         }) => {
@@ -285,20 +264,18 @@ describe("useSiteOperations - Targeted Coverage", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            // Make stopMonitoringForSite throw a non-Error object
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
-                "String error"
-            );
+            const error = new Error("Delete failed");
+            mockElectronAPI.sites.removeSite.mockRejectedValueOnce(error);
 
-            await actions.deleteSite(mockSiteWithSingleMonitor.identifier);
+            await expect(
+                actions.deleteSite(mockSiteWithSingleMonitor.identifier)
+            ).rejects.toThrow("Delete failed");
 
-            // Verify logger.warn was called with Error wrapper for non-Error (line 118-120)
-            expect(logger.warn).toHaveBeenCalledWith(
-                expect.stringContaining(
-                    "Failed to stop monitoring for monitor"
-                ),
-                expect.any(Error)
-            );
+            expect(
+                mockElectronAPI.monitoring.stopMonitoringForSite
+            ).not.toHaveBeenCalled();
+            expect(mockSiteDeps.removeSite).not.toHaveBeenCalled();
+            expect(logger.warn).not.toHaveBeenCalled();
         });
     });
 

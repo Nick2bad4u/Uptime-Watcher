@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site, Monitor } from "@shared/types";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     SiteManager,
     type IMonitoringOperations,
@@ -317,7 +318,10 @@ describe("SiteManager - Comprehensive", () => {
             );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "sites:state-synchronized",
-                expect.any(Object)
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.UPDATE,
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                })
             );
             expect(result).toEqual(mockSite);
         });
@@ -648,12 +652,11 @@ describe("SiteManager - Comprehensive", () => {
                 false
             );
 
-            const result = await siteManager.removeMonitor(
-                "site-1",
-                "monitor-1"
+            await expect(
+                siteManager.removeMonitor("site-1", "monitor-1")
+            ).rejects.toThrow(
+                "Failed to delete monitor monitor-1 for site site-1"
             );
-
-            expect(result).toBeFalsy();
         });
 
         it("should handle deletion errors", async ({ task, annotate }) => {
@@ -698,10 +701,27 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Deletion", "type");
 
-            // This test requires complex mock setup that creates circular dependencies
-            // Note: Simplify SiteManager to improve testability
-            expect.hasAssertions();
-            expect(true).toBeTruthy(); // Placeholder assertion
+            siteManager = new SiteManager(mockDeps);
+            cacheStore.set("site-1", mockSite);
+
+            vi.mocked(
+                mockSiteWriterServiceInstance.deleteSite
+            ).mockImplementation(async (cache, identifier) => {
+                cache.delete(identifier);
+                return true;
+            });
+
+            const result = await siteManager.removeSite("site-1");
+
+            expect(result).toBeTruthy();
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.DELETE,
+                    siteIdentifier: "site-1",
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                })
+            );
         });
 
         it("should handle site not found in cache", async ({
@@ -784,6 +804,13 @@ describe("SiteManager - Comprehensive", () => {
                 updates
             );
             expect(result).toEqual(updatedSite);
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.UPDATE,
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                })
+            );
         });
 
         it("should handle site not found", async ({ task, annotate }) => {
@@ -936,6 +963,51 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:cache-updated",
                 expect.any(Object)
+            );
+            expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.anything()
+            );
+        });
+
+        it("should emit state sync event when explicitly requested", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Update", "type");
+
+            const sites = [mockSite];
+            const timestamp = 1_725_000_000_000;
+
+            await siteManager.updateSitesCache(sites, "test", {
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                emitSyncEvent: true,
+                siteIdentifier: "all",
+                source: STATE_SYNC_SOURCE.CACHE,
+                timestamp,
+                sites,
+            });
+
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:cache-updated",
+                expect.any(Object)
+            );
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.CACHE,
+                    timestamp,
+                    sites: expect.arrayContaining([
+                        expect.objectContaining({
+                            identifier: mockSite.identifier,
+                        }),
+                    ]),
+                })
             );
         });
     });

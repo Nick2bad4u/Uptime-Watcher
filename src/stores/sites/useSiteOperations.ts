@@ -11,7 +11,6 @@
 import type { Monitor, MonitorType, Site } from "@shared/types";
 
 import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
-import { isDevelopment } from "@shared/utils/environment";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { ensureError } from "@shared/utils/errorHandling";
 import { getErrorMessage } from "@shared/utils/errorUtils";
@@ -156,32 +155,6 @@ export const createSiteOperationsActions = (
         await withSiteOperation(
             "deleteSite",
             async () => {
-                // Stop monitoring for all monitors of this site before deleting
-                // Filter out null/undefined values to handle corrupted data
-                const site = deps
-                    .getSites()
-                    .find((s) => s.identifier === identifier);
-                if (site?.monitors) {
-                    for (const monitor of site.monitors) {
-                        try {
-                            // eslint-disable-next-line no-await-in-loop -- Sequential monitor stop operations required
-                            await deps.services.monitoring.stopMonitoring(
-                                identifier,
-                                monitor.id
-                            );
-                        } catch (error) {
-                            // Log but do not block deletion if stopping fails
-                            if (isDevelopment()) {
-                                logger.warn(
-                                    `Failed to stop monitoring for monitor ${monitor.id} of site ${identifier}`,
-                                    error instanceof Error
-                                        ? error
-                                        : new Error(String(error))
-                                );
-                            }
-                        }
-                    }
-                }
                 const removed = await deps.services.site.removeSite(identifier);
                 if (!removed) {
                     throw new Error(

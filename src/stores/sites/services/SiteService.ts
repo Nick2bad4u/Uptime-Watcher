@@ -8,9 +8,15 @@
  */
 
 import type { Site } from "@shared/types";
+import type { ZodError } from "zod";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    validateSiteSnapshot,
+    validateSiteSnapshots,
+} from "@shared/validation/guards";
 
+import { logger } from "../../../services/logger";
 import { getIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -22,6 +28,20 @@ const { ensureInitialized, wrap } = ((): ReturnType<
         throw ensureError(error);
     }
 })();
+
+const logInvalidSnapshotAndThrow = (
+    logMessage: string,
+    error: ZodError<Site>,
+    metadata: Record<string, unknown>,
+    thrownMessage: string
+): never => {
+    logger.error(`[SiteService] ${logMessage}`, error, {
+        ...metadata,
+        issues: error.issues,
+    });
+
+    throw new Error(thrownMessage, { cause: error });
+};
 
 /**
  * Renderer-side contract for site operations routed through the preload bridge.
@@ -40,34 +60,6 @@ interface SiteServiceContract {
         updates: Partial<Site>
     ) => Promise<Site>;
 }
-
-const isRecordOfUnknown = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
-
-const isSiteSnapshot = (value: unknown): value is Site => {
-    if (!isRecordOfUnknown(value)) {
-        return false;
-    }
-
-    const candidate: Record<string, unknown> = value;
-    const { identifier, monitors } = candidate;
-
-    if (typeof identifier !== "string") {
-        return false;
-    }
-
-    if (!Array.isArray(monitors)) {
-        return false;
-    }
-
-    return monitors.every((monitorCandidate) => {
-        if (!isRecordOfUnknown(monitorCandidate)) {
-            return false;
-        }
-
-        return typeof monitorCandidate["id"] === "string";
-    });
-};
 
 /**
  * Service for managing site operations through Electron IPC.
@@ -99,9 +91,24 @@ export const SiteService: SiteServiceContract = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    addSite: wrap("addSite", async (api, site: Site) =>
-        api.sites.addSite(site)
-    ),
+    addSite: wrap("addSite", async (api, site: Site) => {
+        const savedSite = await api.sites.addSite(site);
+        const parseResult = validateSiteSnapshot(savedSite);
+
+        if (parseResult.success) {
+            return parseResult.data;
+        }
+
+        return logInvalidSnapshotAndThrow(
+            "Invalid site snapshot returned after addSite",
+            parseResult.error,
+            {
+                operation: "addSite",
+                siteIdentifier: site.identifier,
+            },
+            `Site creation returned an invalid site snapshot for ${site.identifier}`
+        );
+    }),
 
     /**
      * Retrieves all sites from the backend.
@@ -117,7 +124,43 @@ export const SiteService: SiteServiceContract = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    getSites: wrap("getSites", (api) => api.sites.getSites()),
+    getSites: wrap("getSites", async (api) => {
+        const rawSites = await api.sites.getSites();
+        const validationResult = validateSiteSnapshots(rawSites);
+
+        if (validationResult.success) {
+            return validationResult.data;
+        }
+
+        const [firstIssue] = validationResult.errors;
+
+        if (!firstIssue) {
+            throw new Error(
+                "getSites returned invalid site snapshot data (validation errors were empty)"
+            );
+        }
+
+        const invalidIndices = validationResult.errors.map(
+            ({ index }) => index
+        );
+
+        logger.error(
+            "[SiteService] Invalid site snapshot(s) returned during getSites",
+            firstIssue.error,
+            {
+                invalidIndices,
+                issues: validationResult.errors.map(({ error, index }) => ({
+                    index,
+                    issues: error.issues,
+                })),
+            }
+        );
+
+        throw new Error(
+            `getSites returned invalid site snapshot data (indices: ${invalidIndices.join(", ")})`,
+            { cause: firstIssue.error }
+        );
+    }),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -141,8 +184,6 @@ export const SiteService: SiteServiceContract = {
      *     "site123",
      *     "monitor456"
      * );
-     *
-     * logger.info({ monitorCount: updatedSite.monitors.length });
      * ```
      *
      * @param siteIdentifier - The identifier of the site.
@@ -161,14 +202,22 @@ export const SiteService: SiteServiceContract = {
                 siteIdentifier,
                 monitorId
             );
+            const parseResult = validateSiteSnapshot(savedSite);
 
-            if (!isSiteSnapshot(savedSite)) {
-                throw new Error(
-                    `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
-                );
+            if (parseResult.success) {
+                return parseResult.data;
             }
 
-            return savedSite;
+            return logInvalidSnapshotAndThrow(
+                "Invalid site snapshot returned after monitor removal",
+                parseResult.error,
+                {
+                    monitorId,
+                    operation: "removeMonitor",
+                    siteIdentifier,
+                },
+                `Monitor removal returned an invalid site snapshot for ${siteIdentifier}/${monitorId}`
+            );
         }
     ),
 
@@ -219,7 +268,24 @@ export const SiteService: SiteServiceContract = {
      */
     updateSite: wrap(
         "updateSite",
-        async (api, identifier: string, updates: Partial<Site>) =>
-            api.sites.updateSite(identifier, updates)
+        async (api, identifier: string, updates: Partial<Site>) => {
+            const updatedSite = await api.sites.updateSite(identifier, updates);
+            const parseResult = validateSiteSnapshot(updatedSite);
+
+            if (parseResult.success) {
+                return parseResult.data;
+            }
+
+            return logInvalidSnapshotAndThrow(
+                "Invalid site snapshot returned after updateSite",
+                parseResult.error,
+                {
+                    operation: "updateSite",
+                    siteIdentifier: identifier,
+                    updates,
+                },
+                `Site update returned an invalid site snapshot for ${identifier}`
+            );
+        }
     ),
 };

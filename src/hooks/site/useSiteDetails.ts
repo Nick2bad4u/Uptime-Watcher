@@ -225,8 +225,10 @@ export function useSiteDetails({
 
     const monitorIds = currentSite.monitors.map((m) => m.id);
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Store may not yet have monitor selections keyed.
+    const selectedMonitorIdsBySite = selectedMonitorIds ?? {};
     const selectedMonitorId =
-        selectedMonitorIds[currentSite.identifier] ??
+        selectedMonitorIdsBySite[currentSite.identifier] ??
         getSelectedMonitorId(currentSite.identifier) ??
         defaultMonitorId;
 

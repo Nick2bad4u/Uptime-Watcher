@@ -11,6 +11,7 @@ import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import type { Site, Monitor, StatusUpdate } from "@shared/types";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
 
 // Mock all dependencies with proper typing
@@ -1010,7 +1011,16 @@ describe(UptimeOrchestrator, () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
-                sites
+                sites,
+                "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    emitSyncEvent: true,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.CACHE,
+                    timestamp: expect.any(Number),
+                    sites,
+                })
             );
             expect(
                 mockMonitorManager.setupSiteForMonitoring
@@ -1053,7 +1063,16 @@ describe(UptimeOrchestrator, () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
-                sites
+                sites,
+                "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    emitSyncEvent: true,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.CACHE,
+                    timestamp: expect.any(Number),
+                    sites,
+                })
             );
             expect(
                 mockMonitorManager.setupSiteForMonitoring

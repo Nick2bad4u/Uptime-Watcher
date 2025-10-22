@@ -79,6 +79,7 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     ApplicationError,
     type ApplicationErrorOptions,
@@ -891,7 +892,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private async handleUpdateSitesCacheRequest(
         data: UpdateSitesCacheRequestData
     ): Promise<void> {
-        await this.siteManager.updateSitesCache(data.sites);
+        const timestamp = Date.now();
+
+        await this.siteManager.updateSitesCache(
+            data.sites,
+            "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+            {
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                emitSyncEvent: true,
+                siteIdentifier: "all",
+                sites: data.sites,
+                source: STATE_SYNC_SOURCE.CACHE,
+                timestamp,
+            }
+        );
 
         // CRITICAL: Set up monitoring for each loaded site
         const setupResults = await Promise.allSettled(
