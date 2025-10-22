@@ -7,9 +7,114 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)...
+[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3f75e09f75ce37b5ac3d498ca3894b6973db5449...3f75e09f75ce37b5ac3d498ca3894b6973db5449))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.2.0 [`(3f75e09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)
+
+
+
+
+
+
+## [17.2.0] - 2025-10-22
+
+
 [[436f6e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/436f6e20e6975e1ff5c5b737cbca8bb3603258e9)...
-[ea84d3f](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea84d3f7db18dd3993f0b5fcf6fa43d425dd967f)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/436f6e20e6975e1ff5c5b737cbca8bb3603258e9...ea84d3f7db18dd3993f0b5fcf6fa43d425dd967f))
+[4d6fcd7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d6fcd70c016b1c76a9192544b5111c1bb5f8524)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/436f6e20e6975e1ff5c5b737cbca8bb3603258e9...4d6fcd70c016b1c76a9192544b5111c1bb5f8524))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce Beast Mode agent configuration
+
+ - Adds a new agent configuration file for "Beast Mode 3.1 [Custom]".
+ - Defines tools, rules, planning, code edit guidelines, tool use instructions, command output handling, debugging strategies, and override constraints for the agent.
+ - This new agent is designed to iterate and refine solutions until tasks are perfectly completed, with a strong emphasis on planning, thoroughness, and leveraging available tools effectively.
+ - The agent is configured with access to a wide array of tools, including file and text search, code editing, terminal commands, task execution, web search, and more.
+ - It also includes specific instructions for handling command output, debugging, and overriding constraints for unlimited time and resources.
+
+🧹 [chore] Remove deprecated chat mode configurations
+
+ - Removes several deprecated chat mode configuration files (Debugging, Docs, Explore, Migration, Performance, Questions, Refactor, Review, Security, Tests).
+ - These files are no longer in use and their removal cleans up the repository.
+
+🚜 [refactor] Update CONTRIBUTING.md to reflect current validation strategy
+
+ - Updates the link to the Validation Strategy guide in `CONTRIBUTING.md`.
+ - This ensures that contributors are directed to the correct documentation when introducing new input flows or modifying existing schemas.
+
+🛠️ [fix] Add missing dependency to knip config
+
+ - Adds "winget" and "utf-8-validate" to the list of allowed dependencies in the `knip` configuration.
+ - This prevents `knip` from incorrectly reporting these dependencies as unused.
+
+🧹 [chore] Remove unused file from .gitignore
+
+ - Removes `.github/chatmodes/BeastMode.chatmode.md` from `.gitignore` as it is no longer needed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2ac871b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ac871b71e549d1e939b3bdb07acf3d74faed345)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Enhance site state management and validation
+
+This commit improves site state management and data validation throughout the application.
+
+- 🛠️ **Improves data validation for site snapshots**:
+ - Introduces shared runtime validation guards using Zod schemas to ensure data consistency between renderer and main processes.
+ -  This prevents accidental data corruption and ensures adherence to shared type definitions.
+ -  Adds validation to `addSite`, `getSites`, and `updateSite` operations in `SiteService` to validate site snapshots returned from the backend, throwing errors and logging details for invalid snapshots.
+- 🛠️ **Refactors site state synchronization**:
+ -  Enhances state synchronization events by including more comprehensive information, such as the action type, site identifier, and source of the event (e.g., database, cache).
+ -  Adds `emitSitesStateSynchronized` to consolidate emitting state sync events.
+ - Ensures state synchronization events are emitted after site modifications, such as adding, updating, or deleting sites, to maintain consistency across the application.
+- 🛠️ **Streamlines site deletion process**:
+ - Removes monitor stop calls while removing sites, relying on orchestrator-managed removal.
+ - This simplifies the deletion process and reduces potential errors.
+- 🧹 **Updates linter configurations**:
+ - Adds a new Remark plugin (`require-snippets.mjs`) to enforce the presence of specific code snippets in documentation files, ensuring critical references are maintained.
+ - Adds `.remarkignore` and `.stylelintignore` to exclude generated files and directories from linting, improving linting performance and reducing noise.
+- 🧪 **Enhances test coverage**:
+ - Adds property-based testing for URL validation to improve the robustness of URL validation logic.
+ - Adds comprehensive tests for SiteManager to verify state synchronization and data consistency.
+ - Updates mock implementations and test cases to align with the new validation and state management logic, ensuring thorough test coverage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(08e57db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08e57dbf2c268ca2970a03c63ed1259f9ea30e72)
+
+
+- 🛠️ [fix] Refactor monitor removal workflow for reliability
+
+This commit refactors the monitor removal process to improve reliability and data consistency.
+
+- ♻️ **Orchestrator-Owned Monitor Deletion**: Changes the monitor deletion process to be orchestrated by the backend, ensuring data consistency and reliability.
+   - 🔄 The `removeMonitor` function in `UptimeOrchestrator` now returns the updated `Site` snapshot after the monitor has been removed, instead of a boolean.
+   - 🛠️ The `SiteManager.removeMonitor` method now returns the updated `Site` snapshot after monitor removal, throwing an error if the updated site is not found.
+   - 🗑️ Removes the compensation logic in `UptimeOrchestrator` as the operation is now considered complete when the database update succeeds.
+   - 🧪 Updates tests in `UptimeOrchestrator.test.ts` to reflect the change in return type and error handling.
+- 💾 **State Management**: Updates the frontend state management to align with the backend changes.
+   - ⚛️ The `SiteService.removeMonitor` now returns a Promise resolving to the updated `Site` record.
+   - ⚛️ Updates `useSiteOperations.ts` to use `applySavedSiteToStore` to persist the backend snapshot, ensuring duplicate identifier detection, logging, and future invariants remain centralized.
+   - 📝 Updates TSDoc in `stores/sites.md` to reflect the new monitor removal workflow and the use of `applySavedSiteToStore`.
+- 🛡️ **Validation**: Enhances data validation and error handling.
+   - 📝 Adds a new guide, `validation-strategy.md`, detailing the application's layered validation pipeline and principles.
+   - 🚨 Adds validation checks in `SiteService` to ensure the returned site snapshot is valid.
+- 🧪 **Testing**: Updates tests to ensure correct behavior with the new workflow.
+   - 🧪 Updates `electron/test/preload/core/bridgeFactory.comprehensive.test.ts` and `electron/test/preload/domains/sitesApi.comprehensive.test.ts` to check for the correct return value.
+   - 🧪 Updates `src/test/mock-setup.ts` and `src/test/setup.ts` to return a mock site snapshot.
+   - 🧪 Updates `src/test/stores/sites/useSiteOperations.targeted.test.ts` to test the new workflow and error handling.
+- ⚡ **Performance**: Improves performance by debouncing duplicate site update invalidations.
+   - ⏱️ Adds a debounce mechanism to `src/utils/cacheSync.ts` to prevent multiple full resyncs for site updates within a short period.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca8f2a4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca8f2a4c6a167fba2d15595ac4730811cb081cea)
+
 
 
 ### 📦 Dependencies
@@ -18,6 +123,94 @@ All notable changes to this project will be documented in this file.
 
 
 - [dependency] Update version 17.1.0 [`(436f6e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/436f6e20e6975e1ff5c5b737cbca8bb3603258e9)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Refactor event emission for site/monitor updates
+
+This commit refactors the event emission process for site and monitor updates to improve consistency and streamline data flow.
+
+- 🔄 **Managers Emit Internal Lifecycle Topics**:
+  - `SiteManager` and `MonitorManager` now emit `internal:site:*` and `internal:monitor:*` events for CRUD and monitoring lifecycle operations instead of public events.
+  - High-frequency telemetry like `monitor:status-changed` continues to originate directly from `MonitorManager`.
+- ➡️ **`UptimeOrchestrator` as Public Source of Truth**:
+  - The orchestrator consumes internal lifecycle events, sanitizes metadata, and emits public events (`site:*`, `monitoring:*`, `monitor:*`) plus `cache:invalidated` notifications.
+  - Global monitoring transitions now use `{ type: "all" }` for cache invalidation, enabling renderers to perform a full resync.
+- 👂 **Frontend Listens Only to Orchestrator Output**:
+  - `ApplicationService` subscribes to the orchestrator and uses `RendererEventBridge` to fan out events to windows, ensuring consistent payloads across renderers.
+- 🐛 **Fixes**:
+  - Ensures that site data is available when `internal:site:removed` is emitted by including the site snapshot in the event data.
+  - Handles cases where site data might be missing by providing fallback values and logging warnings.
+- 🧪 **Tests**:
+  - Updates tests to reflect the new event emission patterns and ensure proper cache invalidation.
+  - Adds tests to verify global cache invalidation for bulk monitor start/stop events.
+- 📝 **Documentation**:
+  - Updates documentation to reflect the layered emission strategy and the role of the `UptimeOrchestrator` as the single source of truth for public events.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dce38b6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dce38b685b3edcc92bb5a39772a5d6010eb15974)
+
+
+- 🚜 [refactor] Remove site monitoring
+
+Removes site monitoring functionality from the application.
+
+- 🗑️ Removes the `addSite` function from `SiteOperationsDependencies` and `useSitesStore`.
+ - 🚚 Moves the `addSite` function to `SiteDataService` to consolidate site data operations.
+- ⚙️ Updates `SiteOperationsServiceDependencies` to remove `monitoring` operations.
+ - 💡 This simplifies the dependencies and clarifies the responsibilities of each service.
+- 🧪 Removes monitoring-related mocks and assertions from tests.
+ - 🚧 This ensures the test suite remains relevant and focused on the remaining functionality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b25cb94)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b25cb94ef8e916ac703a126ae64e0f26ab8948d0)
+
+
+- 🚜 [refactor] Replace executePrompt with runSubagent
+
+Updates chat mode and prompt configurations to enhance AI agent task orchestration.
+
+- 🔄 Replaces the `executePrompt` tool with `runSubagent` in multiple chat mode configurations (`Debugging`, `Docs`, `Explore`, `Migration`, `Performance`, `Questions`, `Refactor`, `Review`, `Security`, `Tests`).
+   -  This change streamlines the process of executing sub-prompts within the AI agent, improving modularity and reusability of prompts.
+- ⚙️ Updates prompt configurations (`BeastMode`, `Consistency-Check`, `Document-Review`, `E2E-Tests-Playwright`, `Error-Handling-Tests`, `Fix-Eslint-Errors`, `Generate-100%-Fast-Check-Fuzzing-Test-Coverage.2`, `Generate-100%-Fast-Check-Fuzzing-Test-Coverage`, `Generate-100%-Playwright-Test-Coverage.2`, `Generate-100%-Playwright-Test-Coverage`, `Generate-100%-Test-Coverage.2`, `Generate-100%-Test-Coverage`, `Generate-Test-Metadata`, `Low-Confidence-AI-Review`, `My-Custom-Prompts`, `PR-Review`, `Performance-Tests`, `Remove-Eslint-Disable`, `Review-Code-Base`, `Stryker-Generate-Stryke-Mutator-Fixes`, `TSDoc-Improvements-Checklist`, `Types-Double-Check`) to utilize the `runSubagent` tool where applicable.
+   -  This ensures consistent task orchestration across different modes and prompts, leveraging the improved sub-prompt execution mechanism.
+- 📝 Adds a detailed section to the `Consistency-Check.prompt.md` file outlining various types of inconsistencies to check for.
+   -  This enhances the prompt's ability to identify and address inconsistencies within the codebase, promoting code quality and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2a3ca82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a3ca825c85cd7ac3cde1ffa0b6c70dff349e493)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Simplify context7.json exclude patterns and clear folders
+
+ - Consolidate locale-specific i18n and zh-* excludes into a single "^i18n(/.*)?$" pattern
+ - Replace docs/old with a generic "^docs(/.*)?$" exclusion
+ - Normalize and add common excludes (node_modules, dist, build, .vite, .git, .github, coverage, test(s), scripts, public, config, dotfiles)
+ - Remove explicit project folder globs ("^src/.*", "^shared/.*", "^electron/.*") and set "folders" to an empty array
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4d6fcd7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d6fcd70c016b1c76a9192544b5111c1bb5f8524)
+
+
+- Update changelogs for v17.1.0 [skip ci] [`(b91a283)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b91a283803c819b9c036f371efaaa76e8f9cab49)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Standardize agent tool lists in prompts
+
+Updates agent prompts to include a consistent tool list.
+
+- 🧩 Replaces `mode: "BeastMode"` with `agent: "BeastMode"` in prompt files for clarity and consistency.
+ - This change improves the readability and maintainability of the prompt configurations.
+- 🛠️ Updates the tool lists in `.github/prompts/*.prompt.md` files to include a standardized set of tools for the "BeastMode" agent.
+ -  Includes tools like `Tavily-Remote-MCP/*`, `electron-mcp-server/*`, and `vscode-mcp/rename_symbol` to ensure feature parity across prompts.
+- 🚚 Renames `.github/agents/BeastMode.vscode-agent.md` to `.github/agents/BeastMode.agent.md`
+ - This change aligns the naming convention for agent configuration files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c66132)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6c6613272dd30add6b0ea7a686b3558f53ac3bba)
 
 
 
