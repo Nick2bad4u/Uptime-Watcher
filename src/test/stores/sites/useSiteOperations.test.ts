@@ -156,40 +156,13 @@ describe(createSiteOperationsActions, () => {
             ),
         };
 
-        const monitoringService = {
-            startMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.startMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
-            startSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
-                mockElectronAPI.monitoring.startMonitoringForSite(
-                    siteIdentifier
-                )
-            ),
-            stopMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.stopMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
-            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
-                mockElectronAPI.monitoring.stopMonitoringForSite(siteIdentifier)
-            ),
-        };
-
         mockDeps = {
-            addSite: vi.fn(),
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
                 data: dataService,
-                monitoring: monitoringService,
                 site: siteService,
             },
         } satisfies SiteOperationsDependencies;
@@ -313,7 +286,6 @@ describe(createSiteOperationsActions, () => {
                     }),
                 ])
             );
-            expect(mockDeps.addSite).not.toHaveBeenCalled();
         });
 
         it("should create a new site with full data", async ({
@@ -394,7 +366,6 @@ describe(createSiteOperationsActions, () => {
                 name: "Existing Site Updated",
             });
 
-            expect(mockDeps.addSite).not.toHaveBeenCalled();
             expect(currentSites).toHaveLength(1);
             expect(currentSites[0]).toEqual(
                 expect.objectContaining({

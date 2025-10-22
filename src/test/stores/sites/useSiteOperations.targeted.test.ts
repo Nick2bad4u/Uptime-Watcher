@@ -184,44 +184,13 @@ describe("useSiteOperations - Targeted Coverage", () => {
             ),
         };
 
-        const monitoringService = {
-            startMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) => {
-                    await mockElectronAPI.monitoring.startMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    );
-                }
-            ),
-            startSiteMonitoring: vi.fn(async (siteIdentifier: string) => {
-                await mockElectronAPI.monitoring.startMonitoringForSite(
-                    siteIdentifier
-                );
-            }),
-            stopMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) => {
-                    await mockElectronAPI.monitoring.stopMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    );
-                }
-            ),
-            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) => {
-                await mockElectronAPI.monitoring.stopMonitoringForSite(
-                    siteIdentifier
-                );
-            }),
-        };
-
         mockSiteDeps = {
             getSites: getSitesFn,
             removeSite: vi.fn(),
-            addSite: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
                 data: dataService,
-                monitoring: monitoringService,
                 site: siteService,
             },
         } satisfies SiteOperationsDependencies;
@@ -432,7 +401,6 @@ describe("useSiteOperations - Targeted Coverage", () => {
             const sitesState: Site[] = [baseSite];
 
             const statefulDeps: SiteOperationsDependencies = {
-                addSite: vi.fn(),
                 getSites: vi.fn(() => sitesState),
                 removeSite: vi.fn(),
                 setSites: vi.fn((sites: Site[]) => {
@@ -444,7 +412,6 @@ describe("useSiteOperations - Targeted Coverage", () => {
                 syncSites: vi.fn(),
                 services: {
                     data: mockSiteDeps.services.data,
-                    monitoring: mockSiteDeps.services.monitoring,
                     site: {
                         ...mockSiteDeps.services.site,
                         removeMonitor: vi.fn(

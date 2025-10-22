@@ -150,25 +150,16 @@ describe("OperationHelpers", () => {
             ),
         };
 
-        const monitoringService = {
-            startMonitoring: vi.fn(async () => {}),
-            startSiteMonitoring: vi.fn(async () => {}),
-            stopMonitoring: vi.fn(async () => {}),
-            stopSiteMonitoring: vi.fn(async () => {}),
-        };
-
         getSitesSpy = vi.fn<() => Site[]>(() => mockSites);
         setSitesSpy = vi.fn<(sites: Site[]) => void>();
 
         mockDeps = {
             getSites: getSitesSpy,
             setSites: setSitesSpy,
-            addSite: vi.fn(),
             removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
             services: {
                 data: dataService,
-                monitoring: monitoringService,
                 site: siteService,
             },
         } satisfies SiteOperationsDependencies;
