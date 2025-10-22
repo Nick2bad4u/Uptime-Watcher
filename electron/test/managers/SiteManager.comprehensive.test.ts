@@ -312,9 +312,9 @@ describe("SiteManager - Comprehensive", () => {
                     identifier: mockSite.identifier,
                 })
             );
-            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+            expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalledWith(
                 "site:added",
-                expect.any(Object)
+                expect.anything()
             );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "sites:state-synchronized",
@@ -715,6 +715,13 @@ describe("SiteManager - Comprehensive", () => {
 
             expect(result).toBeTruthy();
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:removed",
+                expect.objectContaining({
+                    identifier: "site-1",
+                    operation: "removed",
+                })
+            );
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "sites:state-synchronized",
                 expect.objectContaining({
                     action: STATE_SYNC_ACTION.DELETE,
@@ -804,6 +811,22 @@ describe("SiteManager - Comprehensive", () => {
                 updates
             );
             expect(result).toEqual(updatedSite);
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:updated",
+                expect.objectContaining({
+                    identifier: "site-1",
+                    operation: "updated",
+                    site: expect.objectContaining({
+                        identifier: "site-1",
+                        name: "Updated Site",
+                    }),
+                    previousSite: expect.objectContaining({
+                        identifier: "site-1",
+                        name: mockSite.name,
+                    }),
+                    updatedFields: ["name"],
+                })
+            );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "sites:state-synchronized",
                 expect.objectContaining({

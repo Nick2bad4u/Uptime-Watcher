@@ -200,15 +200,7 @@ describe(SiteManager, () => {
             ).toHaveBeenCalledWith("internal:site:added", expect.any(Object));
             expect(
                 mockDependencies.eventEmitter.emitTyped
-            ).toHaveBeenCalledWith(
-                "site:added",
-                expect.objectContaining({
-                    site: expect.objectContaining({
-                        identifier: "test-site-1",
-                        name: "Test Site",
-                    }),
-                })
-            );
+            ).not.toHaveBeenCalledWith("site:added", expect.anything());
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -393,6 +385,18 @@ describe(SiteManager, () => {
                 "site1"
             );
             expect(result).toBeTruthy();
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
+                "internal:site:removed",
+                expect.objectContaining({
+                    identifier: "site1",
+                    operation: "removed",
+                })
+            );
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalledWith("site:removed", expect.anything());
         });
 
         it("should return false when site not found", async ({ annotate }) => {
@@ -519,6 +523,22 @@ describe(SiteManager, () => {
             );
             expect(mockGetSitesFromDatabase).toHaveBeenCalled();
             expect(result).toEqual(updatedSite);
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
+                "internal:site:updated",
+                expect.objectContaining({
+                    identifier: "site1",
+                    operation: "updated",
+                    updatedFields: expect.arrayContaining([
+                        "name",
+                        "monitoring",
+                    ]),
+                })
+            );
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).not.toHaveBeenCalledWith("site:updated", expect.anything());
         });
     });
     describe("removeMonitor", () => {

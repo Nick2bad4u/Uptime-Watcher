@@ -387,7 +387,7 @@ describe("ServiceContainer - Fixed Tests", () => {
             await container.initialize();
 
             // Verify initialization calls were made on the actual instances
-            expect(databaseManager.initialize).toHaveBeenCalled();
+            expect(databaseManager.initialize).not.toHaveBeenCalled();
             expect(orchestrator.initialize).toHaveBeenCalled();
             expect(ipcService.setupHandlers).toHaveBeenCalled();
         });

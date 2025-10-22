@@ -62,18 +62,35 @@ When introducing additional mutations, compose these helpers instead of inventin
 
 ## Monitoring lifecycle resync policy
 
-The orchestrator emits two event families when monitoring starts or stops:
+Main-process managers now emit the **internal lifecycle** topics for monitoring
+start and stop (`internal:monitor:started` and `internal:monitor:stopped`).
+Real-time telemetry such as `monitor:status-changed` continues to originate
+from `MonitorManager` directly because the orchestrator does not perform any
+additional enrichment on those payloads. The `UptimeOrchestrator` consumes the
+internal lifecycle events, recomputes the aggregate monitor metrics, and then
+rebroadcasts two sanitized payloads per lifecycle change:
 
 - `monitoring:started` / `monitoring:stopped` telemetry events for dashboards.
-- A follow-up `cache:invalidated` event with `{ type: "site", reason: "update" }` that carries the authoritative signal to refresh site data.
+- A follow-up `cache:invalidated` event that carries the authoritative signal
+  to refresh site data. The orchestrator emits `{ type: "site", reason:
+  "update" }` for scoped changes and `{ type: "all", reason: "update" }`
+  when monitoring is toggled globally so the renderer can short-circuit to a
+  full resync.
 
-The renderer treats the cache invalidation as the single source of truth:
+The renderer continues to treat cache invalidations as the single source of
+truth:
 
-- `StatusUpdateManager` now logs the lifecycle telemetry but deliberately avoids calling `fullResyncSites()`.
-- `setupCacheSync` listens for the site-scoped invalidation and schedules `fullResyncSites()` with a 200 ms debounce (`SITE_UPDATE_DEBOUNCE_MS`) so quick successive emissions collapse into one fetch.
-- `createSiteSyncActions.fullResyncSites` coalesces concurrent callers by reusing the pending promise and logging the event for diagnostics.
+- `StatusUpdateManager` logs lifecycle telemetry but deliberately avoids
+  calling `fullResyncSites()`.
+- `setupCacheSync` listens for cache invalidations and schedules
+  `fullResyncSites()` with a 200 ms debounce (`SITE_UPDATE_DEBOUNCE_MS`) so
+  quick successive emissions collapse into one fetch.
+- `createSiteSyncActions.fullResyncSites` coalesces concurrent callers by
+  reusing the pending promise and logging the event for diagnostics.
 
-When wiring new lifecycle hooks (e.g., automatic retries) prefer emitting/consuming cache invalidations over ad-hoc sync calls to keep the dedupe guarantees intact.
+When wiring new lifecycle hooks (e.g., automatic retries) prefer
+emitting/consuming cache invalidations over ad-hoc sync calls to keep the
+dedupe guarantees intact.
 
 ## Logging conventions
 

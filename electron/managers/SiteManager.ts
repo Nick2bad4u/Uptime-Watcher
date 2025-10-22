@@ -289,13 +289,6 @@ export class SiteManager {
             timestamp,
         });
 
-        // Emit typed site added event
-        await this.eventEmitter.emitTyped("site:added", {
-            site: sanitizedSite,
-            source: "user" as const,
-            timestamp,
-        });
-
         await this.emitSitesStateSynchronized({
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: sanitizedSite.identifier,
@@ -517,7 +510,9 @@ export class SiteManager {
     public async removeSite(identifier: string): Promise<boolean> {
         // Get site information BEFORE deletion for accurate event data
         const siteToRemove = this.sitesCache.get(identifier);
-        const siteName = siteToRemove?.name ?? "Unknown";
+        const sanitizedRemovedSite = siteToRemove
+            ? structuredClone(siteToRemove)
+            : undefined;
 
         const result = await this.siteWriterService.deleteSite(
             this.sitesCache,
@@ -535,14 +530,7 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("internal:site:removed", {
                 identifier,
                 operation: "removed",
-                timestamp,
-            });
-
-            // Emit typed site removed event with accurate site name
-            await this.eventEmitter.emitTyped("site:removed", {
-                cascade: true,
-                siteIdentifier: identifier,
-                siteName: siteName,
+                ...(sanitizedRemovedSite ? { site: sanitizedRemovedSite } : {}),
                 timestamp,
             });
 
@@ -619,12 +607,7 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("internal:site:removed", {
                 identifier: site.identifier,
                 operation: "removed",
-                timestamp: Date.now(),
-            });
-            await this.eventEmitter.emitTyped("site:removed", {
-                cascade: true,
-                siteIdentifier: site.identifier,
-                siteName: site.name,
+                site: structuredClone(site),
                 timestamp: Date.now(),
             });
             /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
@@ -735,11 +718,14 @@ export class SiteManager {
         }
 
         const timestamp = Date.now();
+        const sanitizedUpdatedSite = structuredClone(refreshedSite);
+        const sanitizedPreviousSite = structuredClone(originalSite);
 
-        // Emit typed site updated event
-        await this.eventEmitter.emitTyped("site:updated", {
-            previousSite: originalSite,
-            site: refreshedSite,
+        await this.eventEmitter.emitTyped("internal:site:updated", {
+            identifier,
+            operation: "updated",
+            previousSite: sanitizedPreviousSite,
+            site: sanitizedUpdatedSite,
             timestamp,
             updatedFields: Object.keys(updates),
         });

@@ -629,10 +629,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
-                "monitoring:started",
+                "internal:monitor:started",
                 expect.objectContaining({
-                    monitorCount: 1,
-                    siteCount: 1,
+                    identifier: "all",
+                    operation: "started",
                 })
             );
         });
@@ -713,9 +713,10 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
-                "monitoring:stopped",
+                "internal:monitor:stopped",
                 expect.objectContaining({
-                    activeMonitors: 0,
+                    identifier: "all",
+                    operation: "stopped",
                     reason: "user",
                 })
             );

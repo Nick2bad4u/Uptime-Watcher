@@ -1412,6 +1412,34 @@ describe(UptimeOrchestrator, () => {
             );
         });
 
+        it("should emit global cache invalidation for bulk monitor start", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:monitor:started", {
+                identifier: "all",
+                operation: "started",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.objectContaining({
+                    reason: "update",
+                    type: "all",
+                })
+            );
+        });
+
         it("should handle monitor started events with errors", async ({
             task,
             annotate,
@@ -1469,6 +1497,35 @@ describe(UptimeOrchestrator, () => {
                 expect.objectContaining({
                     activeMonitors: 5,
                     reason: "user",
+                })
+            );
+        });
+
+        it("should emit global cache invalidation for bulk monitor stop", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "all",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.objectContaining({
+                    reason: "update",
+                    type: "all",
                 })
             );
         });
