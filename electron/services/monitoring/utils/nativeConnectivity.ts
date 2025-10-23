@@ -157,21 +157,19 @@ async function checkDnsResolution(
     timeout: number
 ): Promise<DnsCheckResult> {
     const startTime = performance.now();
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     try {
-        // Create timeout promise that rejects after specified time
         const timeoutPromise = new Promise<never>((_resolve, reject) => {
-            // eslint-disable-next-line clean-timer/assign-timer-id -- Timer cleanup not needed for rejection promise
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
                 reject(new Error(`DNS resolution timeout after ${timeout}ms`));
             }, timeout);
         });
 
-        // Race between DNS resolution and timeout
-        const addresses = await Promise.race([
+        const addresses = (await Promise.race([
             dns.resolve4(host),
             timeoutPromise,
-        ]);
+        ])) as string[];
 
         return {
             addresses,
@@ -179,11 +177,14 @@ async function checkDnsResolution(
             responseTime: performance.now() - startTime,
         };
     } catch {
-        // DNS resolution failed or timed out
         return {
             alive: false,
             responseTime: performance.now() - startTime,
         };
+    } finally {
+        if (timeoutId !== undefined) {
+            clearTimeout(timeoutId);
+        }
     }
 }
 
@@ -347,57 +348,51 @@ export async function checkConnectivity(
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const startTime = performance.now();
+    const cleanHost = host.replace(/^https?:\/\//iu, "");
 
-    try {
-        // Remove protocol if present for non-HTTP checks
-        const cleanHost = host.replace(/^https?:\/\//v, "");
+    if (/^https?:\/\//iu.test(host)) {
+        return checkHttpConnectivity(host, opts.timeout);
+    }
 
-        // Handle HTTP/HTTPS URLs directly
-        if (/^https?:\/\//v.test(host)) {
-            return await checkHttpConnectivity(host, opts.timeout);
-        }
-
-        // Try TCP connectivity on multiple ports
-        if (opts.method === "tcp" || opts.method === "http") {
+    if (opts.method === "tcp" || opts.method === "http") {
+        try {
             const tcpResult = await checkTcpPorts(
                 cleanHost,
                 opts.ports,
                 opts.timeout
             );
+
             if (tcpResult) {
                 return tcpResult;
             }
+        } catch (error) {
+            return {
+                details: `Connectivity check failed for ${host}`,
+                error: error instanceof Error ? error.message : String(error),
+                responseTime: Math.round(performance.now() - startTime),
+                status: "down",
+            };
         }
-
-        // If TCP fails or method is DNS, try DNS resolution as fallback
-        if (opts.method === "dns" || opts.method === "tcp") {
-            const dnsResult = await checkDnsResolution(cleanHost, opts.timeout);
-            if (dnsResult.alive) {
-                // DNS resolution works but no TCP ports are accessible - degraded state
-                return {
-                    details:
-                        "DNS resolution successful, but no open ports found",
-                    responseTime: Math.round(dnsResult.responseTime),
-                    status: "degraded",
-                };
-            }
-        }
-
-        // All checks failed
-        return {
-            details: `Failed to connect to ${host}`,
-            error: "Host unreachable - all connectivity checks failed",
-            responseTime: Math.round(performance.now() - startTime),
-            status: "down",
-        };
-    } catch (error) {
-        return {
-            details: `Connectivity check failed for ${host}`,
-            error: error instanceof Error ? error.message : String(error),
-            responseTime: Math.round(performance.now() - startTime),
-            status: "down",
-        };
     }
+
+    if (opts.method === "dns" || opts.method === "tcp") {
+        const dnsResult = await checkDnsResolution(cleanHost, opts.timeout);
+
+        if (dnsResult.alive) {
+            return {
+                details: "DNS resolution successful, but no open ports found",
+                responseTime: Math.round(dnsResult.responseTime),
+                status: "degraded",
+            };
+        }
+    }
+
+    return {
+        details: `Failed to connect to ${host}`,
+        error: "Host unreachable - all connectivity checks failed",
+        responseTime: Math.round(performance.now() - startTime),
+        status: "down",
+    };
 }
 
 /**

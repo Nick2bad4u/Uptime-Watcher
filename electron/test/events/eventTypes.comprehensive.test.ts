@@ -137,11 +137,8 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     isEventOfCategory("cache:invalidated", "CACHE")
                 ).toBeTruthy();
                 expect(
-                    isEventOfCategory("site:cache-miss", "CACHE")
-                ).toBeTruthy();
-                expect(
-                    isEventOfCategory("site:cache-updated", "CACHE")
-                ).toBeTruthy();
+                    isEventOfCategory("internal:site:cache-miss", "CACHE")
+                ).toBeFalsy();
             });
             it("should return false for non-cache events", async ({
                 task,
@@ -378,6 +375,12 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 expect(
                     isEventOfCategory(
                         "internal:site:cache-updated",
+                        "INTERNAL_SITE"
+                    )
+                ).toBeTruthy();
+                expect(
+                    isEventOfCategory(
+                        "internal:site:cache-miss",
                         "INTERNAL_SITE"
                     )
                 ).toBeTruthy();
@@ -807,7 +810,6 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 const testEvents: (keyof UptimeEvents)[] = [
                     // CACHE
                     "cache:invalidated",
-                    "site:cache-miss",
                     // CONFIG
                     "config:changed",
                     // DATABASE
@@ -822,6 +824,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                     // INTERNAL_SITE
                     "internal:site:added",
                     "internal:site:updated",
+                    "internal:site:cache-miss",
                     // MONITOR (some already tested in priority tests)
                     "monitor:added",
                     "monitor:check-completed",

@@ -11,11 +11,19 @@ import type { NotificationConfig } from "../../../services/notifications/Notific
 import type { Site } from "@shared/types";
 
 // Mock Electron modules
-vi.mock("electron", () => ({
-    Notification: vi.fn().mockImplementation(() => ({
-        show: vi.fn(),
-    })),
-}));
+vi.mock("electron", () => {
+    const Notification = vi.fn(function NotificationMock() {
+        return {
+            show: vi.fn(),
+        };
+    });
+
+    Notification.isSupported = vi.fn(() => true);
+
+    return {
+        Notification,
+    };
+});
 
 vi.mock("../../../utils/logger", () => {
     const createLoggerMock = () => ({
@@ -44,7 +52,9 @@ describe(NotificationService, () => {
             show: vi.fn(),
         };
 
-        (Notification as any).mockImplementation(() => mockNotification);
+        (Notification as any).mockImplementation(function () {
+            return mockNotification;
+        });
         (Notification as any).isSupported = vi.fn(() => true);
 
         notificationService = new NotificationService();

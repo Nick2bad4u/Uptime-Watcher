@@ -43,9 +43,11 @@ async function setupMonitorTypesMock(
     configs: MonitorTypeConfig[]
 ): Promise<MonitorMockContext> {
     const monitorModule = await import("../../utils/monitorTypeHelper");
-    const spy = vi
-        .spyOn(monitorModule, "getAvailableMonitorTypes")
-        .mockResolvedValue(configs);
+    const spy = vi.spyOn(
+        monitorModule,
+        "getAvailableMonitorTypes"
+    );
+    spy.mockResolvedValue(configs);
 
     const { getTypesWithFeature } = await import(
         "../../utils/monitorUiHelpers"
@@ -188,8 +190,8 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             expect(responseTimeResult).toEqual(["http", "ping"]);
 
             spy.mockResolvedValue([
-                baseConfigs[0],
-                baseConfigs[1],
+                baseConfigs[0]!,
+                baseConfigs[1]!,
                 createMonitorConfig("ssl", {
                     description: "SSL monitor",
                     displayName: "SSL",

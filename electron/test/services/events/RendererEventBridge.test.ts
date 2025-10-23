@@ -4,7 +4,6 @@ import {
     type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
 import { STATUS_KIND } from "@shared/types";
-import type { Mock } from "vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RendererEventBridge } from "../../../services/events/RendererEventBridge";
@@ -13,28 +12,21 @@ import { logger } from "../../../utils/logger";
 
 interface WindowStub {
     id: number;
-    isDestroyed: Mock<() => boolean>;
+    isDestroyed: ReturnType<typeof vi.fn>;
     webContents: {
-        send: Mock<
-            (
-                channel: RendererEventChannel,
-                payload: RendererEventPayload<RendererEventChannel>
-            ) => void
-        >;
+        send: ReturnType<typeof vi.fn>;
     };
 }
 
 describe(RendererEventBridge, () => {
     const createWindow = (): WindowStub => {
-        const isDestroyed = vi.fn(() => false).mockReturnValue(false) as Mock<
-            () => boolean
-        >;
-        const send = vi.fn(() => undefined) as Mock<
+        const isDestroyed = vi.fn(() => false);
+        const send = vi.fn(
             (
-                channel: RendererEventChannel,
-                payload: RendererEventPayload<RendererEventChannel>
-            ) => void
-        >;
+                _channel: RendererEventChannel,
+                _payload: RendererEventPayload<RendererEventChannel>
+            ) => undefined
+        );
 
         return {
             id: Date.now(),
@@ -73,14 +65,14 @@ describe(RendererEventBridge, () => {
 
     let bridge: RendererEventBridge;
     let mockWindowService: {
-        getAllWindows: Mock<() => WindowStub[]>;
+        getAllWindows: ReturnType<typeof vi.fn>;
     };
 
     beforeEach(() => {
         vi.restoreAllMocks();
 
         mockWindowService = {
-            getAllWindows: vi.fn(() => []) as Mock<() => WindowStub[]>,
+            getAllWindows: vi.fn(() => []),
         };
 
         vi.spyOn(logger, "debug").mockImplementation(() => undefined);

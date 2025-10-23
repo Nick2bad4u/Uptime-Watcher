@@ -90,7 +90,9 @@ const mockSiteLoadingOrchestrator = {
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
     SiteRepositoryService: vi.fn(() => mockSiteRepositoryService),
-    SiteLoadingOrchestrator: vi.fn(() => mockSiteLoadingOrchestrator),
+    SiteLoadingOrchestrator: vi.fn(function SiteLoadingOrchestratorMock() {
+        return mockSiteLoadingOrchestrator;
+    }),
 }));
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
@@ -136,12 +138,14 @@ vi.mock("../../utils/database/serviceFactory", () => ({
             bulkUpdate: vi.fn(),
         };
     }),
-    LoggerAdapter: vi.fn().mockImplementation(() => ({
-        debug: vi.fn(),
-        info: vi.fn(),
-        warn: vi.fn(),
-        error: vi.fn(),
-    })),
+    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
+        return {
+            debug: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+            error: vi.fn(),
+        };
+    }),
 }));
 
 // Mock DatabaseServiceFactory completely to return all needed services

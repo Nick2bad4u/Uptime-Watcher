@@ -442,8 +442,9 @@ export class SiteManager {
  async createSite(data: SiteCreationData): Promise<Site> {
   const site = await this.siteRepository.create(data);
 
-  // Emit typed event with automatic metadata injection
-  await this.eventBus.emitTyped("sites:added", {
+  await this.eventEmitter.emitTyped("internal:site:added", {
+   identifier: site.identifier,
+   operation: "added",
    site,
    timestamp: Date.now(),
   });
@@ -452,6 +453,11 @@ export class SiteManager {
  }
 }
 ```
+
+The `UptimeOrchestrator` listens for these internal events and re-broadcasts
+sanitized `site:*` topics (for example, `site:added`, `site:updated`) after
+stripping metadata. This keeps managers isolated from renderer-facing payloads
+while preserving a clear layering contract.
 
 ## 🎭 Event System
 
@@ -470,25 +476,33 @@ interface UptimeEvents {
   source: "import" | "migration" | "user";
   timestamp: number;
  };
- "site:cache-miss": {
-  backgroundLoading: boolean;
-  identifier: string;
-  operation: "cache-lookup";
-  timestamp: number;
- };
- "site:cache-updated": {
-  identifier: string;
-  operation: "background-load" | "cache-updated" | "manual-refresh";
-  timestamp: number;
- };
  "site:removed": {
   cascade: boolean;
   siteIdentifier: string;
   siteName: string;
   timestamp: number;
  };
+ "site:updated": {
+  previousSite: Site;
+  site: Site;
+  timestamp: number;
+  updatedFields: string[];
+ };
+ "sites:state-synchronized": {
+  action: "bulk-sync" | "delete" | "update";
+  siteIdentifier?: string;
+  sites: Site[];
+  source: "cache" | "database" | "frontend";
+  timestamp: number;
+ };
 }
 ```
+
+> **Legacy note:** Historical topics `site:cache-miss` and `site:cache-updated`
+> are no longer emitted by managers. Cache telemetry now flows through the
+> internal equivalents (`internal:site:cache-miss` /
+> `internal:site:cache-updated`) and the orchestrator decides whether a
+> renderer-facing `cache:invalidated` needs to be broadcast.
 
 #### Monitor Events
 
@@ -600,7 +614,7 @@ function SiteManager() {
 
 ### Store Integration with Event Listeners
 
-```typescript
+````typescript
 // Zustand store with comprehensive IPC and event integration
 export const useSitesStore = create<SitesStore>()((set, get) => ({
  sites: [],
@@ -655,6 +669,63 @@ export const useSiteEventListeners = () => {
      }
 
      switch (event.action) {
+
+    ### Site lifecycle subscriptions via `EventsService`
+
+    The renderer now exposes dedicated helpers for site lifecycle events. Using the
+    service keeps cleanup logic consistent with other IPC subscriptions and avoids
+    directly referencing `window.electronAPI` throughout the UI layer.
+
+    ```typescript
+    import { useEffect } from "react";
+
+    import { EventsService } from "../services/EventsService";
+    import { useSitesStore } from "../stores/useSitesStore";
+
+    export function useSiteLifecycleEvents(): void {
+      const addSite = useSitesStore((state) => state.addSite);
+      const updateSite = useSitesStore((state) => state.updateSite);
+      const removeSite = useSitesStore((state) => state.removeSite);
+
+      useEffect(() => {
+        const disposers: Array<() => void> = [];
+        let cancelled = false;
+
+        void EventsService.initialize()
+          .then(async () => {
+            if (cancelled) {
+              return;
+            }
+
+            disposers.push(
+              await EventsService.onSiteAdded(({ site }) => {
+                addSite(site);
+              }),
+              await EventsService.onSiteUpdated(({ site }) => {
+                updateSite(site.identifier, site);
+              }),
+              await EventsService.onSiteRemoved(({ siteIdentifier }) => {
+                removeSite(siteIdentifier);
+              })
+            );
+          })
+          .catch((error) => {
+            console.error("Failed to subscribe to site events", error);
+          });
+
+        return () => {
+          cancelled = true;
+          disposers.splice(0).forEach((dispose) => {
+            try {
+              dispose();
+            } catch (error) {
+              console.error("Failed to dispose site event handler", error);
+            }
+          });
+        };
+      }, [addSite, updateSite, removeSite]);
+    }
+    ```
       case "bulk-sync":
        syncFromBackend();
        break;
@@ -677,7 +748,7 @@ export const useSiteEventListeners = () => {
   };
  }, [syncFromBackend]);
 };
-```
+````
 
 ### Custom Hooks for IPC Operations
 

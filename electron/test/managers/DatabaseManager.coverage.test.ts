@@ -19,25 +19,35 @@ import {
 
 // Mock external dependencies
 vi.mock("../../services/commands/DatabaseCommands", () => ({
-    DatabaseCommandExecutor: vi.fn().mockImplementation(() => ({
-        execute: vi.fn().mockResolvedValue("mock-result"),
-        rollbackAll: vi.fn().mockResolvedValue(undefined),
-        clear: vi.fn(),
-    })),
-    DownloadBackupCommand: vi.fn(),
-    ExportDataCommand: vi.fn(),
-    ImportDataCommand: vi.fn(),
+    DatabaseCommandExecutor: vi.fn(function DatabaseCommandExecutorMock() {
+        return {
+            execute: vi.fn().mockResolvedValue("mock-result"),
+            rollbackAll: vi.fn().mockResolvedValue(undefined),
+            clear: vi.fn(),
+        };
+    }),
+    DownloadBackupCommand: vi.fn(function DownloadBackupCommandMock() {}),
+    ExportDataCommand: vi.fn(function ExportDataCommandMock() {}),
+    ImportDataCommand: vi.fn(function ImportDataCommandMock() {}),
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => ({
-    createSiteCache: vi.fn(() => createMockStandardizedCache()),
-    LoggerAdapter: vi.fn().mockImplementation(() => ({
+vi.mock("../../utils/database/serviceFactory", () => {
+    const createLoggerAdapterMock = () => ({
         debug: vi.fn(),
         info: vi.fn(),
         warn: vi.fn(),
         error: vi.fn(),
-    })),
-}));
+    });
+
+    const LoggerAdapter = vi.fn(function LoggerAdapterMock() {
+        return createLoggerAdapterMock();
+    });
+
+    return {
+        createSiteCache: vi.fn(() => createMockStandardizedCache()),
+        LoggerAdapter,
+    };
+});
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(),

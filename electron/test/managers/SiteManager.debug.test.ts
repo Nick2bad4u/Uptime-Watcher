@@ -58,7 +58,9 @@ const mockLoggerAdapterInstance = {
 };
 
 vi.mock("../../utils/database/serviceFactory", () => ({
-    LoggerAdapter: vi.fn(() => mockLoggerAdapterInstance),
+    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
+        return mockLoggerAdapterInstance;
+    }),
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({

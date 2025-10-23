@@ -29,7 +29,9 @@ vi.mock("electron", () => {
         },
     };
 
-    const MockBrowserWindow = vi.fn(() => mockWindow) as any;
+    const MockBrowserWindow = vi.fn(function MockBrowserWindowMock() {
+        return mockWindow;
+    }) as any;
     MockBrowserWindow.getAllWindows = vi.fn();
 
     return {
@@ -569,7 +571,7 @@ describe(WindowService, () => {
 
                 const window = windowService.createMainWindow();
 
-                // Wait for the async operations
+                // Wait for the async operation
                 await new Promise((resolve) => setTimeout(resolve, 0));
 
                 expect(window.loadURL).toHaveBeenCalledWith(

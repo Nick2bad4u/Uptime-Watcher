@@ -435,6 +435,164 @@ describe("Events Domain API", () => {
         });
     });
 
+    describe("onSiteAdded", () => {
+        it("should register listener for site added events", () => {
+            const callback = vi.fn();
+            const site = createSiteFixture();
+            const payload = {
+                site,
+                source: "user" as const,
+                timestamp: Date.now(),
+            };
+
+            const cleanup = eventsApi.onSiteAdded(callback);
+
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "site:added",
+                expect.any(Function)
+            );
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            expect(callback).toHaveBeenCalledWith(payload);
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should reject malformed site added payloads", () => {
+            const callback = vi.fn();
+
+            eventsApi.onSiteAdded(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.(
+                {},
+                { site: {}, source: "invalid", timestamp: "bad" }
+            );
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'site:added'",
+                expect.objectContaining({
+                    guard: "isSiteAddedEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "site:added",
+                    guard: "isSiteAddedEventDataPayload",
+                    reason: "site-added",
+                })
+            );
+        });
+    });
+
+    describe("onSiteRemoved", () => {
+        it("should register listener for site removed events", () => {
+            const callback = vi.fn();
+            const payload = {
+                cascade: false,
+                siteIdentifier: "site-abc",
+                siteName: "Example",
+                timestamp: Date.now(),
+            };
+
+            const cleanup = eventsApi.onSiteRemoved(callback);
+
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "site:removed",
+                expect.any(Function)
+            );
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            expect(callback).toHaveBeenCalledWith(payload);
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should reject malformed site removed payloads", () => {
+            const callback = vi.fn();
+
+            eventsApi.onSiteRemoved(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, { cascade: "nope", timestamp: "invalid" });
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'site:removed'",
+                expect.objectContaining({
+                    guard: "isSiteRemovedEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "site:removed",
+                    guard: "isSiteRemovedEventDataPayload",
+                    reason: "site-removed",
+                })
+            );
+        });
+    });
+
+    describe("onSiteUpdated", () => {
+        it("should register listener for site updated events", () => {
+            const callback = vi.fn();
+            const previousSite = createSiteFixture({ name: "Old" });
+            const site = createSiteFixture({ name: "New" });
+            const payload = {
+                previousSite,
+                site,
+                timestamp: Date.now(),
+                updatedFields: ["name"],
+            };
+
+            const cleanup = eventsApi.onSiteUpdated(callback);
+
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "site:updated",
+                expect.any(Function)
+            );
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            expect(callback).toHaveBeenCalledWith(payload);
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should reject malformed site updated payloads", () => {
+            const callback = vi.fn();
+
+            eventsApi.onSiteUpdated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.(
+                {},
+                { previousSite: {}, site: {}, updatedFields: "oops" }
+            );
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'site:updated'",
+                expect.objectContaining({
+                    guard: "isSiteUpdatedEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "site:updated",
+                    guard: "isSiteUpdatedEventDataPayload",
+                    reason: "site-updated",
+                })
+            );
+        });
+    });
+
     describe("onTestEvent", () => {
         it("should register listener for test events", () => {
             const callback = vi.fn();

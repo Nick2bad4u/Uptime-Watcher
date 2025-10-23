@@ -34,6 +34,7 @@ import type { EventsDomainBridge } from "@shared/types/eventsBridge";
 import {
     RENDERER_EVENT_CHANNELS,
     type RendererEventChannel,
+    type RendererEventPayload,
 } from "@shared/ipc/rendererEvents";
 import {
     CACHE_INVALIDATION_REASON_VALUES,
@@ -62,6 +63,16 @@ export type EventsApi = EventsDomainBridge;
 
 type EventManager = ReturnType<typeof createEventManager>;
 type EventGuard<TPayload> = (payload: unknown) => payload is TPayload;
+
+type SiteAddedEventDataPayload = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
+>;
+type SiteRemovedEventDataPayload = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
+>;
+type SiteUpdatedEventDataPayload = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
+>;
 
 const isCacheInvalidationReason = (
     value: unknown
@@ -95,6 +106,28 @@ const isUpdateStatus = (value: unknown): value is UpdateStatus =>
 
 const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
+
+const isSiteCandidate = (value: unknown): value is Record<string, unknown> => {
+    if (!isUnknownRecord(value)) {
+        return false;
+    }
+
+    const { identifier, monitoring, monitors, name } = value;
+
+    if (typeof identifier !== "string" || typeof name !== "string") {
+        return false;
+    }
+
+    if (typeof monitoring !== "boolean") {
+        return false;
+    }
+
+    if (!Array.isArray(monitors)) {
+        return false;
+    }
+
+    return true;
+};
 
 const hasFiniteTimestamp = (value: unknown): value is number =>
     typeof value === "number" && Number.isFinite(value);
@@ -209,6 +242,92 @@ const isUpdateStatusEventDataPayload = (
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
     isUnknownRecord(payload);
 
+const SITE_ADDED_SOURCES = [
+    "import",
+    "migration",
+    "user",
+] as const;
+
+type SiteAddedSource = (typeof SITE_ADDED_SOURCES)[number];
+
+const isSiteAddedSource = (value: unknown): value is SiteAddedSource =>
+    typeof value === "string" &&
+    SITE_ADDED_SOURCES.some(
+        (source): source is SiteAddedSource => source === value
+    );
+
+const isSiteAddedEventDataPayload = (
+    payload: unknown
+): payload is SiteAddedEventDataPayload => {
+    if (!isUnknownRecord(payload)) {
+        return false;
+    }
+
+    const { site, source, timestamp } = payload;
+
+    if (!isSiteCandidate(site)) {
+        return false;
+    }
+
+    if (!isSiteAddedSource(source)) {
+        return false;
+    }
+
+    if (!hasFiniteTimestamp(timestamp)) {
+        return false;
+    }
+
+    return true;
+};
+
+const isSiteRemovedEventDataPayload = (
+    payload: unknown
+): payload is SiteRemovedEventDataPayload => {
+    if (!isUnknownRecord(payload)) {
+        return false;
+    }
+
+    const { cascade, siteIdentifier, siteName, timestamp } = payload;
+
+    if (typeof cascade !== "boolean") {
+        return false;
+    }
+
+    if (typeof siteIdentifier !== "string" || typeof siteName !== "string") {
+        return false;
+    }
+
+    if (!hasFiniteTimestamp(timestamp)) {
+        return false;
+    }
+
+    return true;
+};
+
+const isSiteUpdatedEventDataPayload = (
+    payload: unknown
+): payload is SiteUpdatedEventDataPayload => {
+    if (!isUnknownRecord(payload)) {
+        return false;
+    }
+
+    const { previousSite, site, timestamp, updatedFields } = payload;
+
+    if (!isSiteCandidate(previousSite) || !isSiteCandidate(site)) {
+        return false;
+    }
+
+    if (!hasFiniteTimestamp(timestamp)) {
+        return false;
+    }
+
+    if (!Array.isArray(updatedFields)) {
+        return false;
+    }
+
+    return updatedFields.every((field) => typeof field === "string");
+};
+
 interface GuardSubscriptionOptions {
     readonly domain?: string;
     readonly guardName?: string;
@@ -282,6 +401,9 @@ export function createEventsApi(): EventsApi {
             RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED
         ),
         monitorUp: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_UP),
+        siteAdded: createEventManager(RENDERER_EVENT_CHANNELS.SITE_ADDED),
+        siteRemoved: createEventManager(RENDERER_EVENT_CHANNELS.SITE_REMOVED),
+        siteUpdated: createEventManager(RENDERER_EVENT_CHANNELS.SITE_UPDATED),
         testEvent: createEventManager(RENDERER_EVENT_CHANNELS.TEST_EVENT),
         updateStatus: createEventManager(RENDERER_EVENT_CHANNELS.UPDATE_STATUS),
     } as const;
@@ -340,6 +462,45 @@ export function createEventsApi(): EventsApi {
                 RENDERER_EVENT_CHANNELS.MONITOR_UP,
                 isMonitorUpEventDataPayload,
                 callback
+            ),
+        onSiteAdded: (
+            callback: (data: SiteAddedEventDataPayload) => void
+        ): (() => void) =>
+            subscribeWithGuard(
+                managers.siteAdded,
+                RENDERER_EVENT_CHANNELS.SITE_ADDED,
+                isSiteAddedEventDataPayload,
+                callback,
+                {
+                    guardName: "isSiteAddedEventDataPayload",
+                    reason: "site-added",
+                }
+            ),
+        onSiteRemoved: (
+            callback: (data: SiteRemovedEventDataPayload) => void
+        ): (() => void) =>
+            subscribeWithGuard(
+                managers.siteRemoved,
+                RENDERER_EVENT_CHANNELS.SITE_REMOVED,
+                isSiteRemovedEventDataPayload,
+                callback,
+                {
+                    guardName: "isSiteRemovedEventDataPayload",
+                    reason: "site-removed",
+                }
+            ),
+        onSiteUpdated: (
+            callback: (data: SiteUpdatedEventDataPayload) => void
+        ): (() => void) =>
+            subscribeWithGuard(
+                managers.siteUpdated,
+                RENDERER_EVENT_CHANNELS.SITE_UPDATED,
+                isSiteUpdatedEventDataPayload,
+                callback,
+                {
+                    guardName: "isSiteUpdatedEventDataPayload",
+                    reason: "site-updated",
+                }
             ),
         onTestEvent: (callback: (data: TestEventData) => void): (() => void) =>
             subscribeWithGuard(

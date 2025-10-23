@@ -866,11 +866,14 @@ export class SiteManager {
             if (site) {
                 this.sitesCache.set(identifier, site);
 
-                await this.eventEmitter.emitTyped("site:cache-updated", {
-                    identifier,
-                    operation: "background-load",
-                    timestamp: Date.now(),
-                });
+                await this.eventEmitter.emitTyped(
+                    "internal:site:cache-updated",
+                    {
+                        identifier,
+                        operation: "background-load",
+                        timestamp: Date.now(),
+                    }
+                );
 
                 logger.debug(
                     interpolateLogTemplate(
@@ -887,7 +890,7 @@ export class SiteManager {
                 );
 
                 // Emit not found event for observability
-                await this.eventEmitter.emitTyped("site:cache-miss", {
+                await this.eventEmitter.emitTyped("internal:site:cache-miss", {
                     backgroundLoading: false,
                     identifier,
                     operation: "cache-lookup",
@@ -906,7 +909,7 @@ export class SiteManager {
             );
 
             try {
-                await this.eventEmitter.emitTyped("site:cache-miss", {
+                await this.eventEmitter.emitTyped("internal:site:cache-miss", {
                     backgroundLoading: false,
                     identifier,
                     operation: "cache-lookup",
@@ -1034,12 +1037,15 @@ export class SiteManager {
             // Emit cache miss event
             void (async (): Promise<void> => {
                 try {
-                    await this.eventEmitter.emitTyped("site:cache-miss", {
-                        backgroundLoading: true,
-                        identifier,
-                        operation: "cache-lookup",
-                        timestamp: Date.now(),
-                    });
+                    await this.eventEmitter.emitTyped(
+                        "internal:site:cache-miss",
+                        {
+                            backgroundLoading: true,
+                            identifier,
+                            operation: "cache-lookup",
+                            timestamp: Date.now(),
+                        }
+                    );
                 } catch (error) {
                     logger.debug(
                         LOG_TEMPLATES.debug.SITE_CACHE_MISS_ERROR,

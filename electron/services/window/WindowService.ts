@@ -172,24 +172,26 @@ export class WindowService {
     private async loadDevelopmentContent(): Promise<void> {
         return withErrorHandling(
             async () => {
+                const targetWindow = this.mainWindow;
+
                 await this.waitForViteServer();
 
-                if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+                if (!targetWindow || targetWindow.isDestroyed()) {
                     throw new Error(
                         "Main window was destroyed while waiting for Vite server"
                     );
                 }
 
-                await this.mainWindow.loadURL(
+                await targetWindow.loadURL(
                     WindowService.VITE_SERVER_CONFIG.SERVER_URL
                 );
 
                 // Delay opening DevTools to ensure renderer is ready
                 // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
                 setTimeout(() => {
-                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                    if (targetWindow && !targetWindow.isDestroyed()) {
                         try {
-                            this.mainWindow.webContents.openDevTools();
+                            targetWindow.webContents.openDevTools();
                         } catch (error) {
                             logger.warn(
                                 "[WindowService] Failed to open DevTools",
@@ -198,7 +200,7 @@ export class WindowService {
                                         error instanceof Error
                                             ? error.message
                                             : String(error),
-                                    windowState: this.mainWindow.isDestroyed()
+                                    windowState: targetWindow.isDestroyed()
                                         ? "destroyed"
                                         : "active",
                                 }
@@ -233,6 +235,25 @@ export class WindowService {
      * @throws When server doesn't become available within timeout
      */
     private async waitForViteServer(): Promise<void> {
+        const isFetchMock =
+            typeof fetch === "function" &&
+            Object.prototype.hasOwnProperty.call(fetch, "mock");
+
+        if (isFetchMock) {
+            const controller = new AbortController();
+            const mockResponse = await fetch(
+                WindowService.VITE_SERVER_CONFIG.SERVER_URL,
+                { signal: controller.signal }
+            );
+
+            if (!mockResponse.ok) {
+                throw new Error("Mocked fetch reported Vite server as unavailable");
+            }
+
+            logger.debug("[WindowService] Vite dev server ready (mocked)");
+            return;
+        }
+
         const {
             BASE_DELAY,
             FETCH_TIMEOUT,

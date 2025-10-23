@@ -15,9 +15,31 @@ vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-// Mock the validators
-vi.mock("../../managers/validators/MonitorValidator");
-vi.mock("../../managers/validators/SiteValidator");
+const {
+    monitorValidatorMockInstance,
+    siteValidatorMockInstance,
+} = vi.hoisted(() => ({
+    monitorValidatorMockInstance: {
+        shouldApplyDefaultInterval: vi.fn(),
+        validateMonitorConfiguration: vi.fn(),
+    },
+    siteValidatorMockInstance: {
+        shouldIncludeInExport: vi.fn(),
+        validateSiteConfiguration: vi.fn(),
+    },
+}));
+
+vi.mock("../../managers/validators/MonitorValidator", () => ({
+    MonitorValidator: vi.fn(function MonitorValidatorMock() {
+        return monitorValidatorMockInstance;
+    }),
+}));
+
+vi.mock("../../managers/validators/SiteValidator", () => ({
+    SiteValidator: vi.fn(function SiteValidatorMock() {
+        return siteValidatorMockInstance;
+    }),
+}));
 
 /**
  * Helper function to create a mock monitor
@@ -59,28 +81,27 @@ describe(ConfigurationManager, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
-        // Create mock instances
-        mockMonitorValidator = {
-            shouldApplyDefaultInterval: vi.fn(() => true),
-            validateMonitorConfiguration: vi.fn(() => ({
-                success: true,
-                errors: [],
-            })),
-        };
+        // Reset mock instances
+        mockMonitorValidator = monitorValidatorMockInstance;
+        mockSiteValidator = siteValidatorMockInstance;
 
-        mockSiteValidator = {
-            shouldIncludeInExport: vi.fn(() => true),
-            validateSiteConfiguration: vi.fn(() => ({
-                success: true,
-                errors: [],
-            })),
-        };
+        vi.mocked(electronUtils.isDev).mockReturnValue(false);
 
-        // Mock the constructor calls
-        (MonitorValidator as any).mockImplementation(
-            () => mockMonitorValidator
-        );
-        (SiteValidator as any).mockImplementation(() => mockSiteValidator);
+        mockMonitorValidator.shouldApplyDefaultInterval.mockReset();
+        mockMonitorValidator.validateMonitorConfiguration.mockReset();
+        mockMonitorValidator.shouldApplyDefaultInterval.mockReturnValue(true);
+        mockMonitorValidator.validateMonitorConfiguration.mockReturnValue({
+            success: true,
+            errors: [],
+        });
+
+        mockSiteValidator.shouldIncludeInExport.mockReset();
+        mockSiteValidator.validateSiteConfiguration.mockReset();
+        mockSiteValidator.shouldIncludeInExport.mockReturnValue(true);
+        mockSiteValidator.validateSiteConfiguration.mockReturnValue({
+            success: true,
+            errors: [],
+        });
 
         configManager = new ConfigurationManager();
     });

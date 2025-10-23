@@ -15,6 +15,7 @@ import {
 import { fc, test } from "@fast-check/vitest";
 import { logger } from "../../services/logger";
 import { ensureError } from "@shared/utils/errorHandling";
+import type { CacheInvalidatedEventData } from "@shared/types/events";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
@@ -29,8 +30,26 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
 }));
 
+const noopCleanup = (): void => {};
+
+const createSubscriptionMock = () =>
+    vi.fn(async (_callback: unknown) => {
+        return noopCleanup;
+    });
+
 const mockEventsService = {
-    onCacheInvalidated: vi.fn(),
+    initialize: vi.fn(async () => undefined),
+    onCacheInvalidated: createSubscriptionMock(),
+    onMonitorDown: createSubscriptionMock(),
+    onMonitoringStarted: createSubscriptionMock(),
+    onMonitoringStopped: createSubscriptionMock(),
+    onMonitorStatusChanged: createSubscriptionMock(),
+    onMonitorUp: createSubscriptionMock(),
+    onSiteAdded: createSubscriptionMock(),
+    onSiteRemoved: createSubscriptionMock(),
+    onSiteUpdated: createSubscriptionMock(),
+    onTestEvent: createSubscriptionMock(),
+    onUpdateStatus: createSubscriptionMock(),
 };
 
 vi.mock("../../services/EventsService", () => ({
@@ -62,15 +81,18 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     },
     events: {
         onCacheInvalidated: hasEvents
-            ? vi.fn()
-            : vi.fn().mockReturnValue(() => {}),
-        onMonitorDown: vi.fn(),
-        onMonitoringStarted: vi.fn(),
-        onMonitoringStopped: vi.fn(),
-        onMonitorStatusChanged: vi.fn(),
-        onMonitorUp: vi.fn(),
-        onTestEvent: vi.fn(),
-        onUpdateStatus: vi.fn(),
+            ? vi.fn((_callback: unknown) => noopCleanup)
+            : vi.fn().mockReturnValue(noopCleanup),
+        onMonitorDown: vi.fn((_callback: unknown) => noopCleanup),
+        onMonitoringStarted: vi.fn((_callback: unknown) => noopCleanup),
+        onMonitoringStopped: vi.fn((_callback: unknown) => noopCleanup),
+        onMonitorStatusChanged: vi.fn((_callback: unknown) => noopCleanup),
+        onMonitorUp: vi.fn((_callback: unknown) => noopCleanup),
+        onSiteAdded: vi.fn((_callback: unknown) => noopCleanup),
+        onSiteRemoved: vi.fn((_callback: unknown) => noopCleanup),
+        onSiteUpdated: vi.fn((_callback: unknown) => noopCleanup),
+        onTestEvent: vi.fn((_callback: unknown) => noopCleanup),
+        onUpdateStatus: vi.fn((_callback: unknown) => noopCleanup),
         removeAllListeners: vi.fn(),
     },
     monitoring: {
@@ -114,15 +136,18 @@ type MockElectronAPI = ReturnType<typeof createMockElectronAPI>;
 const setOnCacheInvalidatedHandler = (
     handler: ReturnType<typeof vi.fn>
 ): void => {
-    mockEventsService.onCacheInvalidated.mockImplementation(async (callback) =>
-        handler(callback)
+    mockEventsService.onCacheInvalidated.mockImplementation(
+        async (callback: unknown) => {
+            return handler(callback);
+        }
     );
 
     const electronWindow = globalThis.window as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
     };
 
-    electronWindow.electronAPI.events.onCacheInvalidated = handler;
+    electronWindow.electronAPI.events.onCacheInvalidated = handler as unknown as
+        typeof electronWindow.electronAPI.events.onCacheInvalidated;
 };
 
 const flushAsyncOperations = async (): Promise<void> => {
@@ -144,13 +169,18 @@ beforeAll(async () => {
     );
     sitesStoreModule = await import("../../stores/sites/useSitesStore");
     const monitorState = monitorStoreModule.useMonitorTypesStore.getState();
-    monitorRefreshSpy = vi
-        .spyOn(monitorState, "refreshMonitorTypes")
-        .mockImplementation(mockRefreshMonitorTypes);
+    monitorRefreshSpy = vi.spyOn(
+        monitorState,
+        "refreshMonitorTypes"
+    );
+    monitorRefreshSpy.mockImplementation(async () => {
+        await mockRefreshMonitorTypes();
+    });
     const sitesState = sitesStoreModule.useSitesStore.getState();
-    sitesResyncSpy = vi
-        .spyOn(sitesState, "fullResyncSites")
-        .mockImplementation(mockFullResyncSites);
+    sitesResyncSpy = vi.spyOn(sitesState, "fullResyncSites");
+    sitesResyncSpy.mockImplementation(async () => {
+        await mockFullResyncSites();
+    });
 });
 
 afterAll(() => {
@@ -168,8 +198,12 @@ describe("cacheSync", () => {
         mockEnsureError.mockImplementation((error) =>
             error instanceof Error ? error : new Error(String(error))
         );
-        monitorRefreshSpy.mockImplementation(mockRefreshMonitorTypes);
-        sitesResyncSpy.mockImplementation(mockFullResyncSites);
+        monitorRefreshSpy.mockImplementation(async () => {
+            await mockRefreshMonitorTypes();
+        });
+        sitesResyncSpy.mockImplementation(async () => {
+            await mockFullResyncSites();
+        });
         mockRefreshMonitorTypes.mockImplementation(async () => {
             // No-op default implementation
         });
@@ -1161,7 +1195,7 @@ describe("cacheSync", () => {
                 }
 
                 mockEventsService.onCacheInvalidated.mockImplementation(
-                    async (callback) => {
+                    async (callback: unknown) => {
                         if (
                             !normalizedEnvironment.hasElectronAPI ||
                             !normalizedEnvironment.hasEvents
@@ -1169,7 +1203,9 @@ describe("cacheSync", () => {
                             throw new Error("Cache events unavailable");
                         }
 
-                        return mockOnCacheInvalidated(callback);
+                        return mockOnCacheInvalidated(
+                            callback as CacheInvalidatedEventData
+                        );
                     }
                 );
 

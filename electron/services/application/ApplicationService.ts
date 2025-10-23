@@ -460,6 +460,69 @@ export class ApplicationService {
             }
         });
 
+        orchestrator.onTyped("site:added", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_ADDED,
+                    {
+                        identifier: data.site.identifier,
+                        source: data.source,
+                    }
+                );
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.SITE_ADDED,
+                    data
+                );
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_ADDED_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
+        orchestrator.onTyped("site:removed", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_REMOVED,
+                    {
+                        cascade: data.cascade,
+                        siteIdentifier: data.siteIdentifier,
+                    }
+                );
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.SITE_REMOVED,
+                    data
+                );
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_REMOVED_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
+        orchestrator.onTyped("site:updated", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
+                    {
+                        identifier: data.site.identifier,
+                        updatedFields: data.updatedFields?.join(", ") ?? "",
+                    }
+                );
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.SITE_UPDATED,
+                    data
+                );
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_UPDATED_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
         orchestrator.onTyped("sites:state-synchronized", (data) => {
             try {
                 logger.debug(

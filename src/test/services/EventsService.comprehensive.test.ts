@@ -47,6 +47,9 @@ function createMockEventApi() {
         onMonitoringStopped: vi.fn(() => createEventCleanupFunction()),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
         onMonitorUp: vi.fn(() => createEventCleanupFunction()),
+        onSiteAdded: vi.fn(() => createEventCleanupFunction()),
+        onSiteRemoved: vi.fn(() => createEventCleanupFunction()),
+        onSiteUpdated: vi.fn(() => createEventCleanupFunction()),
         onTestEvent: vi.fn(() => createEventCleanupFunction()),
         onUpdateStatus: vi.fn(() => createEventCleanupFunction()),
     };
@@ -87,6 +90,9 @@ describe("EventsService", () => {
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
                 "onMonitorUp",
+                "onSiteAdded",
+                "onSiteRemoved",
+                "onSiteUpdated",
                 "onTestEvent",
                 "onUpdateStatus",
             ] as const;
@@ -295,6 +301,84 @@ describe("EventsService", () => {
             );
 
             expect(mockElectronAPI.events.onMonitorUp).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onSiteAdded", () => {
+        it("should register event listener after initialization", async () => {
+            const callback = vi.fn();
+
+            const cleanup = await EventsService.onSiteAdded(callback);
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockElectronAPI.events.onSiteAdded).toHaveBeenCalledWith(
+                callback
+            );
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should fail if initialization fails", async () => {
+            const initError = new Error("Init failed");
+            mockWaitForElectronAPI.mockRejectedValue(initError);
+            const callback = vi.fn();
+
+            await expect(EventsService.onSiteAdded(callback)).rejects.toThrow(
+                "Init failed"
+            );
+
+            expect(mockElectronAPI.events.onSiteAdded).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onSiteRemoved", () => {
+        it("should register event listener after initialization", async () => {
+            const callback = vi.fn();
+
+            const cleanup = await EventsService.onSiteRemoved(callback);
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockElectronAPI.events.onSiteRemoved).toHaveBeenCalledWith(
+                callback
+            );
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should fail if initialization fails", async () => {
+            const initError = new Error("Init failed");
+            mockWaitForElectronAPI.mockRejectedValue(initError);
+            const callback = vi.fn();
+
+            await expect(EventsService.onSiteRemoved(callback)).rejects.toThrow(
+                "Init failed"
+            );
+
+            expect(mockElectronAPI.events.onSiteRemoved).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onSiteUpdated", () => {
+        it("should register event listener after initialization", async () => {
+            const callback = vi.fn();
+
+            const cleanup = await EventsService.onSiteUpdated(callback);
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockElectronAPI.events.onSiteUpdated).toHaveBeenCalledWith(
+                callback
+            );
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should fail if initialization fails", async () => {
+            const initError = new Error("Init failed");
+            mockWaitForElectronAPI.mockRejectedValue(initError);
+            const callback = vi.fn();
+
+            await expect(EventsService.onSiteUpdated(callback)).rejects.toThrow(
+                "Init failed"
+            );
+
+            expect(mockElectronAPI.events.onSiteUpdated).not.toHaveBeenCalled();
         });
     });
 

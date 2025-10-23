@@ -47,19 +47,18 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
-    StatusUpdateManager: vi.fn().mockImplementation(
-        () =>
-            ({
-                subscribe: vi.fn(async () => ({
-                    errors: [],
-                    expectedListeners: 3,
-                    listenersAttached: 3,
-                    listenerStates: buildListenerStates(3),
-                    success: true,
-                })),
-                unsubscribe: vi.fn(),
-            }) as unknown as StatusUpdateManager
-    ),
+    StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
+        return {
+            subscribe: vi.fn(async () => ({
+                errors: [],
+                expectedListeners: 3,
+                listenersAttached: 3,
+                listenerStates: buildListenerStates(3),
+                success: true,
+            })),
+            unsubscribe: vi.fn(),
+        } as unknown as StatusUpdateManager;
+    }),
 }));
 
 vi.mock("../../../types/ipc", () => ({

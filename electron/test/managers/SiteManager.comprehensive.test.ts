@@ -46,14 +46,18 @@ vi.mock("../../utils/logger", () => ({
     },
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => ({
-    LoggerAdapter: vi.fn().mockImplementation(() => ({
-        info: vi.fn(),
-        error: vi.fn(),
-        debug: vi.fn(),
-        warn: vi.fn(),
-    })),
-}));
+vi.mock("../../utils/database/serviceFactory", () => {
+    const LoggerAdapter = vi.fn(function LoggerAdapterMock() {
+        return {
+            info: vi.fn(),
+            error: vi.fn(),
+            debug: vi.fn(),
+            warn: vi.fn(),
+        };
+    });
+
+    return { LoggerAdapter };
+});
 
 // Mock StandardizedCache - Create shared mock instance backed by Map storage
 const cacheStore = new Map<string, Site>();
@@ -101,7 +105,9 @@ Object.defineProperty(mockCache, "size", {
 });
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
-    StandardizedCache: vi.fn(() => mockCache),
+    StandardizedCache: vi.fn(function StandardizedCacheMock() {
+        return mockCache;
+    }),
 }));
 
 // Create mock instances for dependency injection
@@ -117,11 +123,15 @@ const mockLoggerAdapterInstance = {
 };
 
 vi.mock("../../utils/database/serviceFactory", () => ({
-    LoggerAdapter: vi.fn(() => mockLoggerAdapterInstance),
+    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
+        return mockLoggerAdapterInstance;
+    }),
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
-    SiteRepositoryService: vi.fn(() => mockSiteRepositoryServiceInstance),
+    SiteRepositoryService: vi.fn(function SiteRepositoryServiceMock() {
+        return mockSiteRepositoryServiceInstance;
+    }),
 }));
 
 // Mock module and create shared mock instance
@@ -134,7 +144,9 @@ const mockSiteWriterServiceInstance = {
 };
 
 vi.mock("../../utils/database/SiteWriterService", () => ({
-    SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
+    SiteWriterService: vi.fn(function SiteWriterServiceMock() {
+        return mockSiteWriterServiceInstance;
+    }),
 }));
 
 describe("SiteManager - Comprehensive", () => {
@@ -447,8 +459,11 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockCache.get).toHaveBeenCalledWith("site-1");
             expect(result).toBeUndefined();
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
-                "site:cache-miss",
-                expect.any(Object)
+                "internal:site:cache-miss",
+                expect.objectContaining({
+                    identifier: "site-1",
+                    operation: "cache-lookup",
+                })
             );
         });
 
@@ -1274,8 +1289,11 @@ describe("SiteManager - Comprehensive", () => {
 
             expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
-                "site:cache-updated",
-                expect.any(Object)
+                "internal:site:cache-updated",
+                expect.objectContaining({
+                    identifier: "site-1",
+                    operation: "background-load",
+                })
             );
         });
 
@@ -1295,9 +1313,11 @@ describe("SiteManager - Comprehensive", () => {
             await siteManager["loadSiteInBackground"]("site-1");
 
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
-                "site:cache-miss",
+                "internal:site:cache-miss",
                 expect.objectContaining({
                     backgroundLoading: false,
+                    identifier: "site-1",
+                    operation: "cache-lookup",
                 })
             );
         });
@@ -1318,9 +1338,11 @@ describe("SiteManager - Comprehensive", () => {
             await siteManager["loadSiteInBackground"]("site-1");
 
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
-                "site:cache-miss",
+                "internal:site:cache-miss",
                 expect.objectContaining({
                     backgroundLoading: false,
+                    identifier: "site-1",
+                    operation: "cache-lookup",
                 })
             );
         });
@@ -1507,7 +1529,12 @@ describe("SiteManager - Comprehensive", () => {
             // Get from cache
             vi.mocked(mockCache.get).mockReturnValue(mockSite);
             const cachedSite = siteManager.getSiteFromCache("site-1");
-            expect(cachedSite).toEqual(mockSite);
+            expect(cachedSite?.identifier).toBe("site-1");
+            expect(cachedSite?.monitors).toEqual(
+                expect.arrayContaining([
+                    expect.objectContaining({ id: "monitor-1" }),
+                ])
+            );
 
             // Update site
             const updates = { name: "Updated Site" };

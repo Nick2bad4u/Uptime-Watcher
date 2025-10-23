@@ -21,6 +21,10 @@ vi.mock("../../../services/logger", () => ({
     },
 }));
 
+const originalBlob = globalThis.Blob;
+const originalDocument = globalThis.document;
+const originalUrl = globalThis.URL;
+
 describe("File Download Utility - Fixed Coverage Tests", () => {
     let mockAnchor: any;
 
@@ -53,17 +57,42 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
             },
         } as any;
 
-        // Mock Blob constructor
-        globalThis.Blob = vi.fn().mockImplementation((parts, options) => ({
-            parts,
-            options,
-            type: options?.type ?? "",
-            size: 100,
-        })) as any;
+        // Mock Blob constructor with a newable factory to satisfy `new Blob()` usage
+        globalThis.Blob = vi
+            .fn(function MockBlob(parts: unknown[], options?: BlobPropertyBag) {
+                return {
+                    parts,
+                    options,
+                    type: options?.type ?? "",
+                    size: 100,
+                } satisfies {
+                    parts: unknown[];
+                    options: BlobPropertyBag | undefined;
+                    type: string;
+                    size: number;
+                };
+            }) as unknown as typeof Blob;
     });
 
     afterEach(() => {
         vi.clearAllMocks();
+        if (originalBlob) {
+            globalThis.Blob = originalBlob;
+        } else {
+            delete (globalThis as { Blob?: typeof Blob }).Blob;
+        }
+
+        if (originalDocument) {
+            globalThis.document = originalDocument;
+        } else {
+            delete (globalThis as { document?: Document }).document;
+        }
+
+        if (originalUrl) {
+            globalThis.URL = originalUrl;
+        } else {
+            delete (globalThis as { URL?: typeof URL }).URL;
+        }
     });
 
     describe("downloadFile Function", () => {

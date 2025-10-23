@@ -154,7 +154,14 @@ vi.mock("../../utils/database/serviceFactory", () => ({
             })),
         };
     }),
-    LoggerAdapter: vi.fn(),
+    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
+        return {
+            debug: vi.fn(),
+            info: vi.fn(),
+            warn: vi.fn(),
+            error: vi.fn(),
+        };
+    }),
 }));
 
 // Mock all dependencies

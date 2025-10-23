@@ -24,7 +24,6 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Mock } from "vitest";
 import {
     setHistoryLimit,
     getHistoryLimit,
@@ -38,11 +37,7 @@ import type { Database } from "node-sqlite3-wasm";
 // Mock database
 const mockDatabase = {} as Database;
 
-const mockHistoryRepositoryBase: {
-    pruneAllHistory: Mock;
-    pruneAllHistoryInternal: Mock;
-    createTransactionAdapter: Mock;
-} = {
+const mockHistoryRepositoryBase = {
     pruneAllHistory: vi.fn(),
     pruneAllHistoryInternal: vi.fn(),
     createTransactionAdapter: vi.fn(),
@@ -59,11 +54,7 @@ mockHistoryRepositoryBase.createTransactionAdapter.mockImplementation(
 const mockHistoryRepository =
     mockHistoryRepositoryBase as unknown as HistoryRepository;
 
-const mockSettingsRepositoryBase: {
-    set: Mock;
-    setInternal: Mock;
-    createTransactionAdapter: Mock;
-} = {
+const mockSettingsRepositoryBase = {
     set: vi.fn(),
     setInternal: vi.fn(),
     createTransactionAdapter: vi.fn(),

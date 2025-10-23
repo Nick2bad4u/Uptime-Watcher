@@ -10,6 +10,10 @@
  * @packageDocumentation
  */
 
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -34,6 +38,16 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     }
 })();
 
+type SiteAddedEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
+>;
+type SiteRemovedEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
+>;
+type SiteUpdatedEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
+>;
+
 interface EventsServiceContract {
     initialize: () => Promise<void>;
     onCacheInvalidated: (
@@ -53,6 +67,15 @@ interface EventsServiceContract {
     ) => Promise<() => void>;
     onMonitorUp: (
         callback: (data: MonitorUpEventData) => void
+    ) => Promise<() => void>;
+    onSiteAdded: (
+        callback: (data: SiteAddedEventData) => void
+    ) => Promise<() => void>;
+    onSiteRemoved: (
+        callback: (data: SiteRemovedEventData) => void
+    ) => Promise<() => void>;
+    onSiteUpdated: (
+        callback: (data: SiteUpdatedEventData) => void
     ) => Promise<() => void>;
     onTestEvent: (
         callback: (data: TestEventData) => void
@@ -251,6 +274,80 @@ export const EventsService: EventsServiceContract = {
         "onMonitorUp",
         (api, callback: (data: MonitorUpEventData) => void) =>
             Promise.resolve(api.events.onMonitorUp(callback))
+    ),
+
+    /**
+     * Register a callback for site added events.
+     *
+     * @example
+     *
+     * ```typescript
+     * const cleanup = await EventsService.onSiteAdded(({ site }) => {
+     *     console.info("New site registered", site.identifier);
+     * });
+     * // Later: cleanup();
+     * ```
+     *
+     * @param callback - Function invoked whenever a sanitized site addition
+     *   event reaches the renderer.
+     *
+     * @returns A cleanup function that removes the listener.
+     */
+    onSiteAdded: wrap(
+        "onSiteAdded",
+        (api, callback: (data: SiteAddedEventData) => void) =>
+            Promise.resolve(api.events.onSiteAdded(callback))
+    ),
+
+    /**
+     * Register a callback for site removal events.
+     *
+     * @example
+     *
+     * ```typescript
+     * const cleanup = await EventsService.onSiteRemoved((data) => {
+     *     console.warn("Site removed", data.siteIdentifier);
+     * });
+     * // Later: cleanup();
+     * ```
+     *
+     * @param callback - Function invoked with the removal payload whenever a
+     *   site is deleted.
+     *
+     * @returns A cleanup function that removes the listener.
+     */
+    onSiteRemoved: wrap(
+        "onSiteRemoved",
+        (api, callback: (data: SiteRemovedEventData) => void) =>
+            Promise.resolve(api.events.onSiteRemoved(callback))
+    ),
+
+    /**
+     * Register a callback for site updated events.
+     *
+     * @example
+     *
+     * ```typescript
+     * const cleanup = await EventsService.onSiteUpdated(
+     *     ({ site, updatedFields }) => {
+     *         console.debug("Site updated", {
+     *             id: site.identifier,
+     *             updatedFields,
+     *         });
+     *     }
+     * );
+     * // Later: cleanup();
+     * ```
+     *
+     * @param callback - Function invoked when a site mutation is broadcast to
+     *   the renderer.
+     *
+     * @returns A cleanup function that removes the listener.
+     */
+    onSiteUpdated: wrap(
+        "onSiteUpdated",
+        (api, callback: (data: SiteUpdatedEventData) => void) =>
+            Promise.resolve(api.events.onSiteUpdated(callback))
     ),
 
     /**

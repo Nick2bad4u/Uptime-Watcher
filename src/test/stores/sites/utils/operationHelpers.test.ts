@@ -2,15 +2,7 @@
  * Tests for operationHelpers.ts - covering all branches and scenarios.
  */
 
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    afterEach,
-    type Mock,
-} from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
 
@@ -92,8 +84,8 @@ const mockLogger = vi.mocked(logger);
 describe("OperationHelpers", () => {
     let mockDeps: SiteOperationsDependencies;
     let mockSites: Site[];
-    let getSitesSpy: Mock<() => Site[]>;
-    let setSitesSpy: Mock<(sites: Site[]) => void>;
+    let getSitesSpy: ReturnType<typeof vi.fn>;
+    let setSitesSpy: ReturnType<typeof vi.fn>;
 
     const createMockSite = (id: string, monitorId: string): Site => ({
         identifier: id,

@@ -15,6 +15,20 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
+
+type SiteAddedRendererEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
+>;
+type SiteRemovedRendererEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
+>;
+type SiteUpdatedRendererEventData = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
+>;
 
 /**
  * Contract for the preload events bridge exposed to the renderer.
@@ -39,6 +53,15 @@ export interface EventsDomainBridge {
     ) => () => void;
     readonly onMonitorUp: (
         callback: (data: MonitorUpEventData) => void
+    ) => () => void;
+    readonly onSiteAdded: (
+        callback: (data: SiteAddedRendererEventData) => void
+    ) => () => void;
+    readonly onSiteRemoved: (
+        callback: (data: SiteRemovedRendererEventData) => void
+    ) => () => void;
+    readonly onSiteUpdated: (
+        callback: (data: SiteUpdatedRendererEventData) => void
     ) => () => void;
     readonly onTestEvent: (
         callback: (data: TestEventData) => void

@@ -80,20 +80,19 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 }));
 
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
-    StatusUpdateManager: vi.fn().mockImplementation(
-        () =>
-            ({
-                getExpectedListenerCount: vi.fn(() => 3),
-                subscribe: vi.fn(async () => ({
-                    errors: [],
-                    expectedListeners: 3,
-                    listenersAttached: 3,
-                    listenerStates: buildListenerStates(3),
-                    success: true,
-                })),
-                unsubscribe: vi.fn(),
-            }) as unknown as StatusUpdateManager
-    ),
+    StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
+        return {
+            getExpectedListenerCount: vi.fn(() => 3),
+            subscribe: vi.fn(async () => ({
+                errors: [],
+                expectedListeners: 3,
+                listenersAttached: 3,
+                listenerStates: buildListenerStates(3),
+                success: true,
+            })),
+            unsubscribe: vi.fn(),
+        } as unknown as StatusUpdateManager;
+    }),
 }));
 
 const mockStateSyncService = vi.hoisted(() => ({
@@ -343,7 +342,9 @@ describe("useSiteSync", () => {
 
             vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(() => mockStatusUpdateManager);
+            ).mockImplementation(function StatusUpdateManagerErrorMock() {
+                return mockStatusUpdateManager;
+            });
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);
@@ -372,7 +373,7 @@ describe("useSiteSync", () => {
 
             StatusUpdateManagerMock.mockReset();
             const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
-            StatusUpdateManagerMock.mockImplementation(() => {
+            StatusUpdateManagerMock.mockImplementation(function StatusUpdateManagerRetryMock() {
                 const unsubscribe = vi.fn();
                 unsubscribeSpies.push(unsubscribe);
                 return {

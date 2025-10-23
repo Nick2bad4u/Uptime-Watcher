@@ -71,9 +71,11 @@ vi.mock("../../services/monitoring/MonitorTypeRegistry", () => ({
     ]),
 }));
 
-vi.mock("../../services/database/utils/dynamicSchema", () => ({
-    generateMonitorTableSchema: vi.fn(
-        () => `
+const {
+    DEFAULT_MONITOR_TABLE_SCHEMA,
+    createDefaultMonitorTableSchema,
+} = vi.hoisted(() => {
+    const DEFAULT_MONITOR_TABLE_SCHEMA = `
         CREATE TABLE IF NOT EXISTS monitors (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             site_identifier TEXT NOT NULL,
@@ -89,8 +91,18 @@ vi.mock("../../services/database/utils/dynamicSchema", () => ({
             monitoring INTEGER DEFAULT 1,
             history TEXT DEFAULT '[]'
         )
-    `
-    ),
+    `;
+
+    const createDefaultMonitorTableSchema = () => DEFAULT_MONITOR_TABLE_SCHEMA;
+
+    return {
+        DEFAULT_MONITOR_TABLE_SCHEMA,
+        createDefaultMonitorTableSchema,
+    };
+});
+
+vi.mock("../../services/database/utils/dynamicSchema", () => ({
+    generateMonitorTableSchema: vi.fn(createDefaultMonitorTableSchema),
 }));
 
 const containsStandaloneSegment = (text: string, value: string): boolean => {
@@ -784,16 +796,23 @@ describe("DatabaseSchema Comprehensive Fuzzing Tests", () => {
                         const runSpy = vi.fn();
                         const testDb = { run: runSpy } as unknown as Database;
 
-                        for (let i = 0; i < executionCount; i++) {
-                            if (schemaVariant === "valid") {
-                                expect(() =>
-                                    createDatabaseTables(testDb)
-                                ).not.toThrow();
-                            } else {
-                                expect(() =>
-                                    createDatabaseTables(testDb)
-                                ).toThrow();
+                        try {
+                            for (let i = 0; i < executionCount; i++) {
+                                if (schemaVariant === "valid") {
+                                    expect(() =>
+                                        createDatabaseTables(testDb)
+                                    ).not.toThrow();
+                                } else {
+                                    expect(() =>
+                                        createDatabaseTables(testDb)
+                                    ).toThrow();
+                                }
                             }
+                        } finally {
+                            generateMonitorTableSchema.mockImplementation(
+                                createDefaultMonitorTableSchema
+                            );
+                            generateMonitorTableSchema.mockClear();
                         }
                     }
                 )

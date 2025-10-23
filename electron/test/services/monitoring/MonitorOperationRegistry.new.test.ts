@@ -34,14 +34,11 @@ vi.mock("../../../utils/logger", () => {
 
 // Mock crypto.randomUUID for predictable test results
 const mockUUIDCounter = { value: 0 };
-const mockRandomUUID = vi.fn(() => {
+const defaultRandomUUIDImplementation = (): string => {
     mockUUIDCounter.value++;
     return `test-uuid-${mockUUIDCounter.value}`;
-});
-
-vi.stubGlobal("crypto", {
-    randomUUID: mockRandomUUID,
-});
+};
+const mockRandomUUID = vi.fn(defaultRandomUUIDImplementation);
 
 describe(MonitorOperationRegistry, () => {
     let registry: MonitorOperationRegistry;
@@ -50,6 +47,11 @@ describe(MonitorOperationRegistry, () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockUUIDCounter.value = 0; // Reset counter for each test
+        mockRandomUUID.mockReset();
+        mockRandomUUID.mockImplementation(defaultRandomUUIDImplementation);
+        vi.stubGlobal("crypto", {
+            randomUUID: mockRandomUUID,
+        });
         registry = new MonitorOperationRegistry();
     });
 

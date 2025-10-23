@@ -9,6 +9,7 @@
  * mutations.
  */
 
+import type { Site } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -37,6 +38,12 @@ export const RENDERER_EVENT_CHANNELS = {
     MONITORING_STARTED: "monitoring:started",
     /** Broadcast monitoring lifecycle stop events. */
     MONITORING_STOPPED: "monitoring:stopped",
+    /** Broadcast site added events. */
+    SITE_ADDED: "site:added",
+    /** Broadcast site removed events. */
+    SITE_REMOVED: "site:removed",
+    /** Broadcast site updated events. */
+    SITE_UPDATED: "site:updated",
     /** Broadcast incremental state synchronisation snapshots. */
     STATE_SYNC: "state-sync-event",
     /** Broadcast development/test events. */
@@ -72,6 +79,26 @@ export interface RendererEventPayloadMap {
     "monitoring:stopped": MonitoringControlEventData & {
         activeMonitors: number;
         reason: MonitoringControlReason;
+    };
+    /** Payload for site added events. */
+    "site:added": {
+        site: Site;
+        source: "import" | "migration" | "user";
+        timestamp: number;
+    };
+    /** Payload for site removed events. */
+    "site:removed": {
+        cascade: boolean;
+        siteIdentifier: string;
+        siteName: string;
+        timestamp: number;
+    };
+    /** Payload for site updated events. */
+    "site:updated": {
+        previousSite: Site;
+        site: Site;
+        timestamp: number;
+        updatedFields: string[];
     };
     /** Payload for full state synchronisation broadcasts. */
     "state-sync-event": StateSyncEventData;

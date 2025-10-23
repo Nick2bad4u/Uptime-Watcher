@@ -74,10 +74,12 @@ vi.mock("electron", () => {
 
 // Mock the application service to prevent actual initialization
 vi.mock("../services/application/ApplicationService", () => ({
-    ApplicationService: vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        cleanup: vi.fn().mockResolvedValue(undefined),
-    })),
+    ApplicationService: vi.fn(function ApplicationServiceMock() {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            cleanup: vi.fn().mockResolvedValue(undefined),
+        };
+    }),
 }));
 
 describe("main.ts - Missing Branch Coverage", () => {

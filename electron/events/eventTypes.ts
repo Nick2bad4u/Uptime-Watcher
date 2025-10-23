@@ -910,7 +910,22 @@ export interface UptimeEvents extends UnknownRecord {
      */
     "internal:site:cache-updated": {
         identifier: string;
-        operation: "cache-updated";
+        operation: "background-load" | "cache-updated" | "manual-refresh";
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a site lookup misses the cache internally.
+     *
+     * @param backgroundLoading - Whether a background refresh was triggered.
+     * @param identifier - The unique identifier for the site.
+     * @param operation - The operation type (always "cache-lookup").
+     * @param timestamp - Unix timestamp (ms) when the cache miss occurred.
+     */
+    "internal:site:cache-miss": {
+        backgroundLoading: boolean;
+        identifier: string;
+        operation: "cache-lookup";
         timestamp: number;
     };
 
@@ -1247,7 +1262,8 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
-     * Emitted when a site cache miss occurs.
+     * @deprecated Legacy public cache miss event. No longer emitted by
+     *   managers; use `internal:site:cache-miss` instead.
      *
      * @param backgroundLoading - Whether background loading is in progress.
      * @param identifier - The unique identifier for the site.
@@ -1266,7 +1282,8 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
-     * Emitted when a site's cache is updated.
+     * @deprecated Legacy public cache update event. No longer emitted by
+     *   managers; use `internal:site:cache-updated` instead.
      *
      * @param identifier - The unique identifier for the site.
      * @param operation - The operation type ("background-load",
@@ -1635,6 +1652,7 @@ export const EVENT_CATEGORIES = {
      */
     INTERNAL_SITE: [
         "internal:site:added",
+        "internal:site:cache-miss",
         "internal:site:cache-updated",
         "internal:site:is-monitoring-active-requested",
         "internal:site:is-monitoring-active-response",

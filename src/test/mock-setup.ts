@@ -24,6 +24,45 @@ import type {
 import type { ValidationResult } from "@shared/types/validation";
 import type { ElectronAPI } from "../types";
 
+vi.mock("electron", () => ({
+    app: {
+        getPath: vi.fn(() => ""),
+        isPackaged: false,
+        whenReady: vi.fn(async () => undefined),
+        on: vi.fn(),
+    },
+    ipcRenderer: {
+        invoke: vi.fn(),
+        on: vi.fn(),
+        once: vi.fn(),
+        removeAllListeners: vi.fn(),
+        removeListener: vi.fn(),
+        send: vi.fn(),
+    },
+    nativeTheme: {
+        on: vi.fn(),
+        off: vi.fn(),
+        shouldUseDarkColors: false,
+        themeSource: "light",
+    },
+    shell: {
+        openExternal: vi.fn(),
+    },
+    BrowserWindow: vi.fn(),
+}));
+
+Object.defineProperty(URL, "createObjectURL", {
+    configurable: true,
+    value: undefined,
+    writable: true,
+});
+
+Object.defineProperty(URL, "revokeObjectURL", {
+    configurable: true,
+    value: vi.fn(),
+    writable: true,
+});
+
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
 
@@ -165,6 +204,15 @@ const mockElectronAPI: ElectronAPI = {
             ElectronAPI["events"]["onMonitorStatusChanged"]
         >((_callback) => () => undefined),
         onMonitorUp: vi.fn<ElectronAPI["events"]["onMonitorUp"]>(
+            (_callback) => () => undefined
+        ),
+        onSiteAdded: vi.fn<ElectronAPI["events"]["onSiteAdded"]>(
+            (_callback) => () => undefined
+        ),
+        onSiteRemoved: vi.fn<ElectronAPI["events"]["onSiteRemoved"]>(
+            (_callback) => () => undefined
+        ),
+        onSiteUpdated: vi.fn<ElectronAPI["events"]["onSiteUpdated"]>(
             (_callback) => () => undefined
         ),
         onTestEvent: vi.fn<ElectronAPI["events"]["onTestEvent"]>(
@@ -349,11 +397,16 @@ Object.defineProperty(window, "electronAPI", {
 });
 
 // Mock Chart.js for component testing
-vi.mock("chart.js", () => ({
-    Chart: vi.fn(),
-    registerables: [],
+vi.mock("chart.js", () => {
+    const Chart = vi.fn();
+    Chart.register = vi.fn();
+
+    return {
+        Chart,
+        registerables: [],
     CategoryScale: vi.fn(),
     LinearScale: vi.fn(),
+    TimeScale: vi.fn(),
     BarElement: vi.fn(),
     LineElement: vi.fn(),
     PointElement: vi.fn(),
@@ -361,7 +414,12 @@ vi.mock("chart.js", () => ({
     Title: vi.fn(),
     Tooltip: vi.fn(),
     Legend: vi.fn(),
-}));
+    Filler: vi.fn(),
+    Zoom: vi.fn(),
+    };
+});
+
+vi.mock("chartjs-adapter-date-fns", () => ({}));
 
 // Mock react-chartjs-2
 vi.mock("react-chartjs-2", () => ({

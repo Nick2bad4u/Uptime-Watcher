@@ -95,28 +95,35 @@ export function createCombinedAbortSignal(
 
     const signals: AbortSignal[] = [];
 
+    const createTimeoutSignal = (
+        timeout: number,
+        timeoutReason?: string
+    ): AbortSignal => {
+        const controller = new AbortController();
+        const resolvedReason =
+            timeoutReason ??
+            (typeof DOMException === "function"
+                ? new DOMException("Signal timed out", "TimeoutError")
+                : new Error("Signal timed out"));
+
+        const timeoutId = setTimeout(() => {
+            controller.abort(resolvedReason);
+        }, timeout);
+
+        controller.signal.addEventListener(
+            "abort",
+            () => {
+                clearTimeout(timeoutId);
+            },
+            { once: true }
+        );
+
+        return controller.signal;
+    };
+
     // Add timeout signal if specified
     if (timeoutMs !== undefined && timeoutMs > 0) {
-        if (reason) {
-            // Create custom timeout signal with reason
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => {
-                controller.abort(reason);
-            }, timeoutMs);
-
-            // Clean up timeout if signal is aborted by other means
-            controller.signal.addEventListener(
-                "abort",
-                () => {
-                    clearTimeout(timeoutId);
-                },
-                { once: true }
-            );
-
-            signals.push(controller.signal);
-        } else {
-            signals.push(AbortSignal.timeout(timeoutMs));
-        }
+        signals.push(createTimeoutSignal(timeoutMs, reason));
     }
 
     // Add additional signals (handle null/undefined additionalSignals)

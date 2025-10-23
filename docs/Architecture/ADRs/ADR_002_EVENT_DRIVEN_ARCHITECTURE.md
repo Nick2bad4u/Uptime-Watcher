@@ -165,8 +165,11 @@ Other Backend Services (via event listeners)
 - `site:updated` - When site properties are modified
 - `site:removed` - When a site is deleted
 - `sites:state-synchronized` - When frontend and backend state are synchronized
-- `site:cache-updated` - When site cache is refreshed
-- `site:cache-miss` - When cache lookup fails
+
+_Legacy notice_: the historical `site:cache-updated` and `site:cache-miss`
+topics are no longer emitted directly. Cache telemetry now flows through the
+internal namespace and the orchestrator converts it into `cache:invalidated`
+when the renderer must react.
 
 **Internal Events:**
 
@@ -174,6 +177,7 @@ Other Backend Services (via event listeners)
 - `internal:site:updated` - Internal site modification events
 - `internal:site:removed` - Internal site deletion events
 - `internal:site:cache-updated` - Internal cache management
+- `internal:site:cache-miss` - Internal cache lookup miss telemetry
 - `internal:site:start-monitoring-requested` - Internal monitoring control
 - `internal:site:stop-monitoring-requested` - Internal monitoring control
 - `internal:site:restart-monitoring-requested` - Internal monitoring control
@@ -181,10 +185,10 @@ Other Backend Services (via event listeners)
 - `internal:site:is-monitoring-active-requested` - Internal status queries
 - `internal:site:is-monitoring-active-response` - Internal status responses
 
-> **Emission flow:** `SiteManager` emits the `internal:site:*` topics for
-> lifecycle mutations while the `UptimeOrchestrator` sanitizes and re-emits the
-> public `site:*` events. Auxiliary telemetry (e.g. background cache refreshes)
-> may still originate from the manager when no additional enrichment is needed.
+> **Emission flow:** `SiteManager` emits only `internal:site:*` topics. The
+> `UptimeOrchestrator` enriches those payloads and rebroadcasts any
+> renderer-facing `site:*` events, translating cache telemetry into the
+> canonical `cache:invalidated` pipeline when appropriate.
 
 ### 2. Monitor Events
 

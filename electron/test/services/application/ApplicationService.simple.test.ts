@@ -50,6 +50,14 @@ vi.mock("../../../electronUtils", () => ({
     isDev: vi.fn(() => true),
 }));
 
+vi.mock("node:path", () => ({
+    join: vi.fn((...segments: string[]) => segments.join("/")),
+    resolve: vi.fn((...segments: string[]) => segments.join("/")),
+    dirname: vi.fn((target: string) =>
+        target.replace(/\\/gu, "/").split("/").slice(0, -1).join("/") || "."
+    ),
+}));
+
 vi.mock("../../ServiceContainer", () => ({
     ServiceContainer: {
         getInstance: vi.fn(() => ({
