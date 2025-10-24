@@ -3,15 +3,7 @@
  * invalidation event handling and frontend cache clearing.
  */
 
-import {
-    afterAll,
-    beforeAll,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi,
-} from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { MockInstance } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { logger } from "../../services/logger";
@@ -29,6 +21,30 @@ vi.mock("@shared/utils/errorHandling", () => ({
 }));
 vi.mock("../../utils/monitorTypeHelper", () => ({
     clearMonitorTypeCache: vi.fn(), // <-- ensure this is a real mock function that records arguments
+}));
+
+type AsyncStoreOperation = () => Promise<void>;
+
+const monitorStoreState: { refreshMonitorTypes: AsyncStoreOperation } = {
+    refreshMonitorTypes: async () => undefined,
+};
+
+const sitesStoreState: { fullResyncSites: AsyncStoreOperation } = {
+    fullResyncSites: async () => undefined,
+};
+
+vi.mock("../../stores/monitor/useMonitorTypesStore", () => ({
+    __esModule: true,
+    useMonitorTypesStore: {
+        getState: () => monitorStoreState,
+    },
+}));
+
+vi.mock("../../stores/sites/useSitesStore", () => ({
+    __esModule: true,
+    useSitesStore: {
+        getState: () => sitesStoreState,
+    },
 }));
 
 const noopCleanup = (): void => {};
@@ -154,35 +170,11 @@ const flushAsyncOperations = async (): Promise<void> => {
 };
 
 let setupCacheSync: (typeof import("../../utils/cacheSync"))["setupCacheSync"];
-let monitorStoreModule: typeof import("../../stores/monitor/useMonitorTypesStore");
-let sitesStoreModule: typeof import("../../stores/sites/useSitesStore");
 let monitorRefreshSpy!: MockInstance<() => Promise<void>>;
 let sitesResyncSpy!: MockInstance<() => Promise<void>>;
 
 beforeAll(async () => {
     ({ setupCacheSync } = await import("../../utils/cacheSync"));
-    monitorStoreModule = await import(
-        "../../stores/monitor/useMonitorTypesStore"
-    );
-    sitesStoreModule = await import("../../stores/sites/useSitesStore");
-    const monitorState = monitorStoreModule.useMonitorTypesStore.getState();
-    monitorRefreshSpy = vi.spyOn(
-        monitorState,
-        "refreshMonitorTypes"
-    ) as unknown as MockInstance<() => Promise<void>>;
-    monitorRefreshSpy.mockImplementation(async () => {
-        await mockRefreshMonitorTypes();
-    });
-    const sitesState = sitesStoreModule.useSitesStore.getState();
-    sitesResyncSpy = vi.spyOn(sitesState, "fullResyncSites") as unknown as MockInstance<() => Promise<void>>;
-    sitesResyncSpy.mockImplementation(async () => {
-        await mockFullResyncSites();
-    });
-});
-
-afterAll(() => {
-    monitorRefreshSpy.mockRestore();
-    sitesResyncSpy.mockRestore();
 });
 
 describe("cacheSync", () => {
@@ -192,15 +184,21 @@ describe("cacheSync", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        monitorRefreshSpy = vi.fn(async () => {
+            await mockRefreshMonitorTypes();
+        }) as unknown as MockInstance<() => Promise<void>>;
+        monitorStoreState.refreshMonitorTypes =
+            monitorRefreshSpy as unknown as AsyncStoreOperation;
+
+        sitesResyncSpy = vi.fn(async () => {
+            await mockFullResyncSites();
+        }) as unknown as MockInstance<() => Promise<void>>;
+        sitesStoreState.fullResyncSites =
+            sitesResyncSpy as unknown as AsyncStoreOperation;
+
         mockEnsureError.mockImplementation((error) =>
             error instanceof Error ? error : new Error(String(error))
         );
-        monitorRefreshSpy.mockImplementation(async () => {
-            await mockRefreshMonitorTypes();
-        });
-        sitesResyncSpy.mockImplementation(async () => {
-            await mockFullResyncSites();
-        });
         mockRefreshMonitorTypes.mockImplementation(async () => {
             // No-op default implementation
         });
@@ -683,10 +681,9 @@ describe("cacheSync", () => {
                     identifier: "test-monitor-789",
                 };
 
-                expect(
-                    monitorStoreModule.useMonitorTypesStore.getState()
-                        .refreshMonitorTypes
-                ).toBe(monitorRefreshSpy);
+                expect(monitorStoreState.refreshMonitorTypes).toBe(
+                    monitorRefreshSpy
+                );
 
                 const refreshCall = new Promise<void>((resolve) => {
                     monitorRefreshSpy.mockImplementationOnce(async () => {

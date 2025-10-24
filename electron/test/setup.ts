@@ -161,44 +161,39 @@ const createFsMock = async (
         moduleSpecifier
     );
 
-    const readFileSyncMock = vi.fn(
-        (
-            ...args: Parameters<typeof actual.readFileSync>
-        ): ReturnType<typeof actual.readFileSync> =>
+    const readFileSyncMock = (
+        vi.fn((...args: Parameters<typeof actual.readFileSync>) =>
             actual.readFileSync(...args)
-    );
+        )
+    ) as unknown as typeof actual.readFileSync;
 
-    const readFilePromiseMock = vi.fn(
-        (
-            ...args: Parameters<typeof actual.promises.readFile>
-        ): ReturnType<typeof actual.promises.readFile> =>
+    const readFilePromiseMock = (
+        vi.fn((...args: Parameters<typeof actual.promises.readFile>) =>
             actual.promises.readFile(...args)
-    );
+        )
+    ) as unknown as typeof actual.promises.readFile;
 
-    const accessPromiseMock = vi.fn(
-        (
-            ...args: Parameters<typeof actual.promises.access>
-        ): ReturnType<typeof actual.promises.access> =>
+    const accessPromiseMock = (
+        vi.fn((...args: Parameters<typeof actual.promises.access>) =>
             actual.promises.access(...args)
-    );
+        )
+    ) as unknown as typeof actual.promises.access;
 
-    const writeFilePromiseMock = vi.fn(
-        async (
-            ...args: Parameters<typeof actual.promises.writeFile>
-        ): Promise<void> => {
+    const writeFilePromiseMock = (
+        vi.fn(async (...args: Parameters<typeof actual.promises.writeFile>) => {
             // No-op to avoid mutating the real filesystem during tests
             void args;
-        }
-    );
+            return undefined;
+        })
+    ) as unknown as typeof actual.promises.writeFile;
 
-    const mkdirPromiseMock = vi.fn(
-        async (
-            ...args: Parameters<typeof actual.promises.mkdir>
-        ): Promise<void> => {
+    const mkdirPromiseMock = (
+        vi.fn(async (...args: Parameters<typeof actual.promises.mkdir>) => {
             // No-op to avoid mutating the real filesystem during tests
             void args;
-        }
-    );
+            return undefined;
+        })
+    ) as unknown as typeof actual.promises.mkdir;
 
     return {
         ...actual,

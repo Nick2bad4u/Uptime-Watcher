@@ -471,7 +471,7 @@ describe("MonitorRepository Coverage Tests", () => {
                     }
                 ),
                 {
-                    timeout: 5_000,
+                    timeout: 5000,
                 }
             );
         });
@@ -531,7 +531,7 @@ describe("MonitorRepository Coverage Tests", () => {
                     }
                 ),
                 {
-                    timeout: 5_000,
+                    timeout: 5000,
                 }
             );
         });
@@ -594,7 +594,7 @@ describe("MonitorRepository Coverage Tests", () => {
                     }
                 ),
                 {
-                    timeout: 5_000,
+                    timeout: 5000,
                 }
             );
         });

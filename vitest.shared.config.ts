@@ -1,4 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- needed for standalone config*/
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
 /**
  * Vitest configuration for shared utility tests. Standalone config file that
@@ -40,6 +41,7 @@ const vitestConfig = defineConfig({
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
     },
+    // Cast: Vitest inline config typings currently omit several options we rely on.
     test: {
         attachmentsDir: "./.cache/vitest/.vitest-attachments-shared",
         bail: 100,
@@ -124,7 +126,7 @@ const vitestConfig = defineConfig({
                 lines: 95, // Very high line coverage for shared code
                 statements: 95, // Very high statement coverage for shared code
             },
-        },
+        } as any, // Cast: @vitest/coverage-v8 typings omit several runtime-supported options.
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
             optimizer: {
@@ -238,7 +240,7 @@ const vitestConfig = defineConfig({
             spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.shared.test.json",
         },
-    },
+    } as any,
 }) satisfies UserConfig as UserConfig;
 
 export default vitestConfig as UserConfig;

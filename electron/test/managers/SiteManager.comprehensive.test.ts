@@ -179,14 +179,8 @@ vi.mock("../../utils/database/SiteWriterService", () => ({
 }));
 
 const { cacheStore, mockCache } = cacheMocks;
-const {
-    MockLoggerAdapter,
-    MockSiteRepositoryService,
-    mockLoggerAdapterInstance,
-    mockSiteRepositoryServiceInstance,
-} = repositoryMocks;
-const { MockSiteWriterService, mockSiteWriterServiceInstance } =
-    siteWriterMocks;
+const { mockSiteRepositoryServiceInstance } = repositoryMocks;
+const { mockSiteWriterServiceInstance } = siteWriterMocks;
 
 describe("SiteManager - Comprehensive", () => {
     let siteManager: SiteManager;

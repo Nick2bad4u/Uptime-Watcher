@@ -1,3 +1,5 @@
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 /**
  * Comprehensive Vitest configuration for Stryker mutation testing. Tests all
  * three main source directories: src (frontend), electron (backend), and shared
@@ -32,6 +34,7 @@ const config: UserConfig = defineConfig({
             "@shared": normalizePath(path.resolve(dirname, "shared")),
         },
     },
+    // Cast: Vitest inline config typings omit several options needed for Stryker.
     test: {
         attachmentsDir: "./.cache/vitest/.vitest-attachments-stryker",
         bail: 100, // Stop after 100 failures to avoid excessive output
@@ -181,7 +184,7 @@ const config: UserConfig = defineConfig({
             spawnTimeout: 10_000,
             tsconfig: "./config/testing/tsconfig.shared.test.json",
         },
-    },
+    } as any,
 });
 
 export default config;

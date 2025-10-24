@@ -1,3 +1,5 @@
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 /**
  * Specialized Vitest configuration optimized for zero-coverage detection runs.
  *
@@ -14,7 +16,7 @@
 import {
     defineConfig,
     mergeConfig,
-    type UserConfigFnObject,
+    type ViteUserConfigFnObject,
 } from "vitest/config";
 
 import baseViteConfig from "../../vite.config";
@@ -22,7 +24,7 @@ import baseViteConfig from "../../vite.config";
 // Use isolated caches so zero-coverage probes do not contend with the primary Vite/Vitest pipeline.
 const zeroCoverageViteCacheDir = "./.cache/vite-zero-coverage/";
 
-const zeroCoverageConfig: UserConfigFnObject = defineConfig((env) =>
+const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
     mergeConfig(
         baseViteConfig(env),
         defineConfig({
@@ -45,14 +47,14 @@ const zeroCoverageConfig: UserConfigFnObject = defineConfig((env) =>
                         lines: 0,
                         statements: 0,
                     },
-                },
+                } as any,
                 name: {
                     color: "magenta",
                     label: "ZeroCoverage",
                 },
-            },
+            } as any,
         })
     )
-) as UserConfigFnObject;
+);
 
 export default zeroCoverageConfig;

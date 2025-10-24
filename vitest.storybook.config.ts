@@ -1,3 +1,5 @@
+/* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- single-file overrides for config typings */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 /**
  * Vitest configuration for Storybook component tests executed via the
  * `@storybook/addon-vitest` plugin.
@@ -7,8 +9,8 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import path from "node:path";
 import {
     defineConfig,
-    type UserConfigExport,
     type ViteUserConfig,
+    type ViteUserConfigExport,
 } from "vitest/config";
 
 import {
@@ -60,8 +62,9 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                         browser: "chromium",
                     },
                 ],
-                provider: "playwright",
+                provider: "playwright" as any, // Cast: Vitest browser provider typings lag behind Storybook plugin support.
             },
+            // Cast: Coverage V8 typings omit several runtime-supported flags used by Storybook.
             coverage: {
                 enabled: false,
                 exclude: [
@@ -82,7 +85,7 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                     "lcov",
                 ],
                 reportsDirectory: storybookCoverageDirectory,
-            },
+            } as any,
             css: {
                 modules: {
                     classNameStrategy: "stable",
@@ -118,7 +121,7 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
     };
 };
 
-const storybookVitestConfig: UserConfigExport = defineConfig(
+const storybookVitestConfig: ViteUserConfigExport = defineConfig(
     createStorybookVitestConfig
 );
 

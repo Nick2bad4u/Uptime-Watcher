@@ -7,19 +7,22 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import type { MonitorValidator as MonitorValidatorType } from "../../../managers/validators/MonitorValidator";
 
 const monitorValidatorCtor = vi.hoisted(() => {
-    const wrapper = vi.fn(function MockMonitorValidator() {
-        const instance: Partial<MonitorValidatorType> = {
-            validateMonitorConfiguration: vi.fn(),
-        };
+    const wrapper = vi
+        .fn(function MockMonitorValidator() {
+            const instance: Partial<MonitorValidatorType> = {
+                validateMonitorConfiguration: vi.fn(),
+            };
 
-        wrapper.latestInstance = instance;
+            wrapper.latestInstance = instance;
 
-        return instance;
-    }) as unknown as typeof vi.fn & {
+            return instance;
+        }) as unknown as {
+        new (): Partial<MonitorValidatorType>;
+        (): Partial<MonitorValidatorType>;
         latestInstance?: Partial<MonitorValidatorType>;
     };
 
-    wrapper.latestInstance = undefined;
+    delete wrapper.latestInstance;
 
     return wrapper;
 });

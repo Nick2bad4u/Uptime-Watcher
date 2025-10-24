@@ -47,7 +47,7 @@ import { WindowService } from "./window/WindowService";
  */
 interface PossiblyInitializableService {
     /** Optional initializer invoked during container bootstrap. */
-    initialize?: (() => void) | (() => Promise<void>) | (() => unknown);
+    initialize?: (() => Promise<void>) | (() => unknown);
 }
 
 /**
@@ -69,6 +69,18 @@ function hasInitializeMethod(
 
     const candidate = value as PossiblyInitializableService;
     return typeof candidate.initialize === "function";
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+    if (
+        (typeof value !== "object" && typeof value !== "function") ||
+        value === null
+    ) {
+        return false;
+    }
+
+    const { then } = value as { then?: unknown };
+    return typeof then === "function";
 }
 
 /**
@@ -345,7 +357,7 @@ export class ServiceContainer {
      */
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
-        await this.getDatabaseService().initialize();
+        this.getDatabaseService().initialize();
         await this.tryInitializeService(
             this.getConfigurationManager(),
             "ConfigurationManager"
@@ -355,10 +367,7 @@ export class ServiceContainer {
         this.getSettingsRepository();
         this.getSiteRepository();
         await this.getDatabaseManager().initialize();
-        await this.tryInitializeService(
-            this.getSiteManager(),
-            "SiteManager"
-        );
+        await this.tryInitializeService(this.getSiteManager(), "SiteManager");
         await this.tryInitializeService(
             this.getMonitorManager(),
             "MonitorManager"
@@ -369,7 +378,7 @@ export class ServiceContainer {
     }
 
     /**
-     * Attempts to call an optional {@code initialize} method on a service instance.
+     * Attempts to call an optional `initialize` method on a service instance.
      *
      * @param service - Service instance that may expose an initialize method.
      * @param serviceName - Human-readable name for diagnostics while debug logging is enabled.
@@ -379,8 +388,10 @@ export class ServiceContainer {
         serviceName: string
     ): Promise<void> {
         if (hasInitializeMethod(service)) {
-            const initializationResult = service.initialize.call(service);
-            await Promise.resolve(initializationResult);
+            const initializationResult = service.initialize();
+            if (isPromiseLike(initializationResult)) {
+                await initializationResult;
+            }
             return;
         }
 

@@ -185,7 +185,7 @@ describe("EmptyState Component - Comprehensive Coverage", () => {
         expect(emptyState).toContainElement(iconContainer as HTMLElement);
 
         const themedTexts = document.querySelectorAll(".themed-text");
-        for (const element of themedTexts) {
+        for (const element of Array.from(themedTexts)) {
             expect(container).toContainElement(element as HTMLElement);
         }
     });

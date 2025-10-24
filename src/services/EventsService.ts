@@ -20,9 +20,10 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
-import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
-
+import {
+    RENDERER_EVENT_CHANNELS,
+    type RendererEventPayload,
+} from "@shared/ipc/rendererEvents";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -279,13 +280,12 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site added events.
      *
      * @example
+     * ```typescript
+     * import { logger } from "@app/services/logger";
      *
-    * ```typescript
-    * import { logger } from "@app/services/logger";
-    *
-    * const cleanup = await EventsService.onSiteAdded(({ site }) => {
-    *     logger.info("New site registered", site.identifier);
-    * });
+     * const cleanup = await EventsService.onSiteAdded(({ site }) => {
+     *     logger.info("New site registered", site.identifier);
+     * });
      * // Later: cleanup();
      * ```
      *
@@ -304,13 +304,12 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site removal events.
      *
      * @example
+     * ```typescript
+     * import { logger } from "@app/services/logger";
      *
-    * ```typescript
-    * import { logger } from "@app/services/logger";
-    *
-    * const cleanup = await EventsService.onSiteRemoved((data) => {
-    *     logger.warn("Site removed", data.siteIdentifier);
-    * });
+     * const cleanup = await EventsService.onSiteRemoved((data) => {
+     *     logger.warn("Site removed", data.siteIdentifier);
+     * });
      * // Later: cleanup();
      * ```
      *
@@ -329,18 +328,17 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site updated events.
      *
      * @example
+     * ```typescript
+     * import { logger } from "@app/services/logger";
      *
-    * ```typescript
-    * import { logger } from "@app/services/logger";
-    *
-    * const cleanup = await EventsService.onSiteUpdated(
-    *     ({ site, updatedFields }) => {
-    *         logger.debug("Site updated", {
-    *             id: site.identifier,
-    *             updatedFields,
-    *         });
-    *     }
-    * );
+     * const cleanup = await EventsService.onSiteUpdated(
+     *     ({ site, updatedFields }) => {
+     *         logger.debug("Site updated", {
+     *             id: site.identifier,
+     *             updatedFields,
+     *         });
+     *     }
+     * );
      * // Later: cleanup();
      * ```
      *

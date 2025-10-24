@@ -209,16 +209,6 @@ vi.mock("../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: serviceMocks.MockUptimeOrchestrator,
 }));
 
-const {
-    MockConfigurationManager,
-    MockHistoryRepository,
-    MockMonitorRepository,
-    MockSettingsRepository,
-    MockSiteManager,
-    MockSiteRepository,
-    MockUptimeOrchestrator,
-} = serviceMocks;
-
 describe("ServiceContainer - Targeted SiteManager Test", () => {
     beforeEach(() => {
         ServiceContainer.resetForTesting();

@@ -564,7 +564,7 @@ describe("SettingsRepository Coverage Tests", () => {
                     }
                 ),
                 {
-                    timeout: 5_000,
+                    timeout: 5000,
                 }
             );
         });
@@ -621,7 +621,7 @@ describe("SettingsRepository Coverage Tests", () => {
                     }
                 ),
                 {
-                    timeout: 5_000,
+                    timeout: 5000,
                 }
             );
         });

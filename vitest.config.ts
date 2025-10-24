@@ -7,7 +7,7 @@
 import {
     defineConfig,
     mergeConfig,
-    type UserConfigFnObject,
+    type ViteUserConfigFnObject,
 } from "vitest/config";
 
 import viteConfig from "./vite.config";
@@ -25,4 +25,4 @@ export default defineConfig((configEnv) =>
             },
         })
     )
-) satisfies UserConfigFnObject as UserConfigFnObject;
+) satisfies ViteUserConfigFnObject as ViteUserConfigFnObject;

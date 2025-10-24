@@ -124,15 +124,6 @@ vi.mock("../../utils/database/SiteWriterService", () => ({
     SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
 
-const { mockCache } = cacheMocks;
-const {
-    MockLoggerAdapter,
-    MockSiteRepositoryService,
-    mockLoggerAdapterInstance,
-    mockSiteRepositoryServiceInstance,
-} = repositoryMocks;
-const { MockSiteWriterService, mockSiteWriterServiceInstance } =
-    siteWriterMocks;
 
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {

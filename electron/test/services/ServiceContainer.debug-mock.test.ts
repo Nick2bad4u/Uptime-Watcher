@@ -168,16 +168,6 @@ vi.mock("../../UptimeOrchestrator", () => ({
     UptimeOrchestrator: managerMocks.MockUptimeOrchestrator,
 }));
 
-const {
-    MockConfigurationManager,
-    MockHistoryRepository,
-    MockMonitorRepository,
-    MockSettingsRepository,
-    MockSiteManager,
-    MockSiteRepository,
-    MockUptimeOrchestrator,
-} = managerMocks;
-
 // Import after mocks
 import { ServiceContainer } from "../../services/ServiceContainer";
 
@@ -195,7 +185,6 @@ describe("ServiceContainer - Debug Mock Test", () => {
     });
 
     it("should create ServiceContainer and test SiteManager creation", async ({
-        task,
         annotate,
     }) => {
         await annotate("Component: ServiceContainer.debug-mock", "component");
