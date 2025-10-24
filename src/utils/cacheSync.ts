@@ -7,8 +7,10 @@
  *
  * @public
  */
-import type { CacheInvalidatedEventData } from "@shared/types/events";
-
+import {
+    CACHE_INVALIDATION_REASON,
+    type CacheInvalidatedEventData,
+} from "@shared/types/events";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { EventsService } from "../services/EventsService";
@@ -35,6 +37,8 @@ const CACHE_CLEARERS = new Map<string, (identifier?: string) => void>([
     // ["analytics", (id) => clearAnalyticsCache(id)],
     // ["settings", () => clearSettingsCache()],
 ]);
+
+const SITE_UPDATE_DEBOUNCE_MS = 200;
 
 /**
  * Clear all registered frontend caches.
@@ -136,6 +140,7 @@ export function setupCacheSync(): () => void {
 
     let cleanupHandler: (() => void) | null = null;
     let disposed = false;
+    let lastSiteUpdateResyncAt = 0;
 
     const handleInvalidation = (data: CacheInvalidatedEventData): void => {
         try {
@@ -193,6 +198,26 @@ export function setupCacheSync(): () => void {
                 }
                 case "site": {
                     clearSiteRelatedCaches(data.identifier);
+                    if (data.reason === CACHE_INVALIDATION_REASON.UPDATE) {
+                        const now = Date.now();
+                        if (
+                            now - lastSiteUpdateResyncAt <
+                            SITE_UPDATE_DEBOUNCE_MS
+                        ) {
+                            logger.debug(
+                                "[CacheSync] Skipping duplicate site update resync",
+                                {
+                                    identifier: data.identifier,
+                                    lastSiteUpdateResyncAt,
+                                    reason: data.reason,
+                                    timestamp: now,
+                                }
+                            );
+                            break;
+                        }
+
+                        lastSiteUpdateResyncAt = now;
+                    }
                     void syncSitesFromBackend("site");
                     break;
                 }

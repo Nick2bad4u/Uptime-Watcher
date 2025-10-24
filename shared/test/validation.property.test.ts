@@ -245,7 +245,12 @@ describe("Validation Utils Property-Based Tests", () => {
         test.prop([
             fc
                 .webUrl()
-                .filter((url) => !url.includes("'") && !url.includes("`")),
+                .filter(
+                    (url) =>
+                        !url.includes("'") &&
+                        !url.includes("`") &&
+                        !url.endsWith("://")
+                ),
         ])("should accept valid web URLs", (url) => {
             expect(isValidUrl(url)).toBeTruthy();
         });

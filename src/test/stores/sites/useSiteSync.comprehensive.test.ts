@@ -182,6 +182,46 @@ describe("useSiteSync", () => {
                 fullSyncResult.sites
             );
         });
+
+        it("should coalesce concurrent resync requests", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: mockSites.length,
+                sites: mockSites,
+                source: "frontend" as const,
+                synchronized: true,
+            };
+
+            let resolveSync: (() => void) | undefined;
+            mockStateSyncService.requestFullSync.mockImplementation(
+                () =>
+                    new Promise((resolve) => {
+                        resolveSync = () => resolve(fullSyncResult);
+                    })
+            );
+
+            const firstCall = syncActions.fullResyncSites();
+            const secondCall = syncActions.fullResyncSites();
+
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalledTimes(
+                1
+            );
+
+            resolveSync?.();
+            await Promise.all([firstCall, secondCall]);
+
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                fullSyncResult.sites
+            );
+        });
     });
 
     describe("getSyncStatus", () => {

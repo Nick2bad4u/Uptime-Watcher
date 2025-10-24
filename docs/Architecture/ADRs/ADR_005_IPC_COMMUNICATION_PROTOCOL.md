@@ -182,6 +182,20 @@ const electronAPI = {
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 ```
 
+#### 2025-10-21 Contract Update
+
+The `remove-monitor` invoke channel now returns the persisted `Site` snapshot
+emitted by the main process. The generated preload bridge mirrors this
+contract (`sitesApi.removeMonitor(): Promise<Site>`), allowing the renderer to
+reconcile state without performing ad-hoc reconstruction. Always apply the
+returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and
+avoid synthesizing partial results locally. This keeps optimistic updates
+aligned with the authoritative orchestrator payload and matches the guidance in
+`docs/TSDoc/stores/sites.md`. For a canonical implementation, reference
+[`SiteService.removeMonitor`](../../src/stores/sites/services/SiteService.ts),
+which validates the persisted snapshot with the shared guards before updating
+renderer state.
+
 ### 4. Event Forwarding Protocol
 
 Backend events are automatically forwarded to the frontend:

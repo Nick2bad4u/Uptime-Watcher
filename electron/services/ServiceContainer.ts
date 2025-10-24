@@ -321,11 +321,10 @@ export class ServiceContainer {
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
+        this.getConfigurationManager();
+        this.getDatabaseManager();
         this.getSiteManager();
         this.getMonitorManager();
-        const databaseManager = this.getDatabaseManager();
-        await databaseManager.initialize();
-        this.getConfigurationManager();
         await this.getUptimeOrchestrator().initialize();
         this.getIpcService().setupHandlers();
         logger.info("[ServiceContainer] All services initialized successfully");
@@ -900,16 +899,11 @@ export class ServiceContainer {
             "monitor:status-changed",
             "monitor:up",
             "monitor:down",
-            "monitoring:started",
-            "monitoring:stopped",
             "internal:monitor:started",
             "internal:monitor:stopped",
             "internal:monitor:manual-check-completed",
             "internal:monitor:site-setup-completed",
             "internal:site:added",
-            "site:added",
-            "site:updated",
-            "site:removed",
             "internal:site:removed",
             "internal:site:updated",
             "site:cache-updated",

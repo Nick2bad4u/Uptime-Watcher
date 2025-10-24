@@ -7,14 +7,649 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)...
+[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3f75e09f75ce37b5ac3d498ca3894b6973db5449...3f75e09f75ce37b5ac3d498ca3894b6973db5449))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.2.0 [`(3f75e09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)
+
+
+
+
+
+
+## [17.2.0] - 2025-10-22
+
+
+[[436f6e2](https://github.com/Nick2bad4u/Uptime-Watcher/commit/436f6e20e6975e1ff5c5b737cbca8bb3603258e9)...
+[4d6fcd7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d6fcd70c016b1c76a9192544b5111c1bb5f8524)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/436f6e20e6975e1ff5c5b737cbca8bb3603258e9...4d6fcd70c016b1c76a9192544b5111c1bb5f8524))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce Beast Mode agent configuration
+
+ - Adds a new agent configuration file for "Beast Mode 3.1 [Custom]".
+ - Defines tools, rules, planning, code edit guidelines, tool use instructions, command output handling, debugging strategies, and override constraints for the agent.
+ - This new agent is designed to iterate and refine solutions until tasks are perfectly completed, with a strong emphasis on planning, thoroughness, and leveraging available tools effectively.
+ - The agent is configured with access to a wide array of tools, including file and text search, code editing, terminal commands, task execution, web search, and more.
+ - It also includes specific instructions for handling command output, debugging, and overriding constraints for unlimited time and resources.
+
+🧹 [chore] Remove deprecated chat mode configurations
+
+ - Removes several deprecated chat mode configuration files (Debugging, Docs, Explore, Migration, Performance, Questions, Refactor, Review, Security, Tests).
+ - These files are no longer in use and their removal cleans up the repository.
+
+🚜 [refactor] Update CONTRIBUTING.md to reflect current validation strategy
+
+ - Updates the link to the Validation Strategy guide in `CONTRIBUTING.md`.
+ - This ensures that contributors are directed to the correct documentation when introducing new input flows or modifying existing schemas.
+
+🛠️ [fix] Add missing dependency to knip config
+
+ - Adds "winget" and "utf-8-validate" to the list of allowed dependencies in the `knip` configuration.
+ - This prevents `knip` from incorrectly reporting these dependencies as unused.
+
+🧹 [chore] Remove unused file from .gitignore
+
+ - Removes `.github/chatmodes/BeastMode.chatmode.md` from `.gitignore` as it is no longer needed.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2ac871b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ac871b71e549d1e939b3bdb07acf3d74faed345)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Enhance site state management and validation
+
+This commit improves site state management and data validation throughout the application.
+
+- 🛠️ **Improves data validation for site snapshots**:
+ - Introduces shared runtime validation guards using Zod schemas to ensure data consistency between renderer and main processes.
+ -  This prevents accidental data corruption and ensures adherence to shared type definitions.
+ -  Adds validation to `addSite`, `getSites`, and `updateSite` operations in `SiteService` to validate site snapshots returned from the backend, throwing errors and logging details for invalid snapshots.
+- 🛠️ **Refactors site state synchronization**:
+ -  Enhances state synchronization events by including more comprehensive information, such as the action type, site identifier, and source of the event (e.g., database, cache).
+ -  Adds `emitSitesStateSynchronized` to consolidate emitting state sync events.
+ - Ensures state synchronization events are emitted after site modifications, such as adding, updating, or deleting sites, to maintain consistency across the application.
+- 🛠️ **Streamlines site deletion process**:
+ - Removes monitor stop calls while removing sites, relying on orchestrator-managed removal.
+ - This simplifies the deletion process and reduces potential errors.
+- 🧹 **Updates linter configurations**:
+ - Adds a new Remark plugin (`require-snippets.mjs`) to enforce the presence of specific code snippets in documentation files, ensuring critical references are maintained.
+ - Adds `.remarkignore` and `.stylelintignore` to exclude generated files and directories from linting, improving linting performance and reducing noise.
+- 🧪 **Enhances test coverage**:
+ - Adds property-based testing for URL validation to improve the robustness of URL validation logic.
+ - Adds comprehensive tests for SiteManager to verify state synchronization and data consistency.
+ - Updates mock implementations and test cases to align with the new validation and state management logic, ensuring thorough test coverage.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(08e57db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/08e57dbf2c268ca2970a03c63ed1259f9ea30e72)
+
+
+- 🛠️ [fix] Refactor monitor removal workflow for reliability
+
+This commit refactors the monitor removal process to improve reliability and data consistency.
+
+- ♻️ **Orchestrator-Owned Monitor Deletion**: Changes the monitor deletion process to be orchestrated by the backend, ensuring data consistency and reliability.
+   - 🔄 The `removeMonitor` function in `UptimeOrchestrator` now returns the updated `Site` snapshot after the monitor has been removed, instead of a boolean.
+   - 🛠️ The `SiteManager.removeMonitor` method now returns the updated `Site` snapshot after monitor removal, throwing an error if the updated site is not found.
+   - 🗑️ Removes the compensation logic in `UptimeOrchestrator` as the operation is now considered complete when the database update succeeds.
+   - 🧪 Updates tests in `UptimeOrchestrator.test.ts` to reflect the change in return type and error handling.
+- 💾 **State Management**: Updates the frontend state management to align with the backend changes.
+   - ⚛️ The `SiteService.removeMonitor` now returns a Promise resolving to the updated `Site` record.
+   - ⚛️ Updates `useSiteOperations.ts` to use `applySavedSiteToStore` to persist the backend snapshot, ensuring duplicate identifier detection, logging, and future invariants remain centralized.
+   - 📝 Updates TSDoc in `stores/sites.md` to reflect the new monitor removal workflow and the use of `applySavedSiteToStore`.
+- 🛡️ **Validation**: Enhances data validation and error handling.
+   - 📝 Adds a new guide, `validation-strategy.md`, detailing the application's layered validation pipeline and principles.
+   - 🚨 Adds validation checks in `SiteService` to ensure the returned site snapshot is valid.
+- 🧪 **Testing**: Updates tests to ensure correct behavior with the new workflow.
+   - 🧪 Updates `electron/test/preload/core/bridgeFactory.comprehensive.test.ts` and `electron/test/preload/domains/sitesApi.comprehensive.test.ts` to check for the correct return value.
+   - 🧪 Updates `src/test/mock-setup.ts` and `src/test/setup.ts` to return a mock site snapshot.
+   - 🧪 Updates `src/test/stores/sites/useSiteOperations.targeted.test.ts` to test the new workflow and error handling.
+- ⚡ **Performance**: Improves performance by debouncing duplicate site update invalidations.
+   - ⏱️ Adds a debounce mechanism to `src/utils/cacheSync.ts` to prevent multiple full resyncs for site updates within a short period.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca8f2a4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ca8f2a4c6a167fba2d15595ac4730811cb081cea)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update dependency group (#88) [`(ea84d3f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ea84d3f7db18dd3993f0b5fcf6fa43d425dd967f)
+
+
+- [dependency] Update version 17.1.0 [`(436f6e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/436f6e20e6975e1ff5c5b737cbca8bb3603258e9)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Refactor event emission for site/monitor updates
+
+This commit refactors the event emission process for site and monitor updates to improve consistency and streamline data flow.
+
+- 🔄 **Managers Emit Internal Lifecycle Topics**:
+  - `SiteManager` and `MonitorManager` now emit `internal:site:*` and `internal:monitor:*` events for CRUD and monitoring lifecycle operations instead of public events.
+  - High-frequency telemetry like `monitor:status-changed` continues to originate directly from `MonitorManager`.
+- ➡️ **`UptimeOrchestrator` as Public Source of Truth**:
+  - The orchestrator consumes internal lifecycle events, sanitizes metadata, and emits public events (`site:*`, `monitoring:*`, `monitor:*`) plus `cache:invalidated` notifications.
+  - Global monitoring transitions now use `{ type: "all" }` for cache invalidation, enabling renderers to perform a full resync.
+- 👂 **Frontend Listens Only to Orchestrator Output**:
+  - `ApplicationService` subscribes to the orchestrator and uses `RendererEventBridge` to fan out events to windows, ensuring consistent payloads across renderers.
+- 🐛 **Fixes**:
+  - Ensures that site data is available when `internal:site:removed` is emitted by including the site snapshot in the event data.
+  - Handles cases where site data might be missing by providing fallback values and logging warnings.
+- 🧪 **Tests**:
+  - Updates tests to reflect the new event emission patterns and ensure proper cache invalidation.
+  - Adds tests to verify global cache invalidation for bulk monitor start/stop events.
+- 📝 **Documentation**:
+  - Updates documentation to reflect the layered emission strategy and the role of the `UptimeOrchestrator` as the single source of truth for public events.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(dce38b6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/dce38b685b3edcc92bb5a39772a5d6010eb15974)
+
+
+- 🚜 [refactor] Remove site monitoring
+
+Removes site monitoring functionality from the application.
+
+- 🗑️ Removes the `addSite` function from `SiteOperationsDependencies` and `useSitesStore`.
+ - 🚚 Moves the `addSite` function to `SiteDataService` to consolidate site data operations.
+- ⚙️ Updates `SiteOperationsServiceDependencies` to remove `monitoring` operations.
+ - 💡 This simplifies the dependencies and clarifies the responsibilities of each service.
+- 🧪 Removes monitoring-related mocks and assertions from tests.
+ - 🚧 This ensures the test suite remains relevant and focused on the remaining functionality.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b25cb94)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b25cb94ef8e916ac703a126ae64e0f26ab8948d0)
+
+
+- 🚜 [refactor] Replace executePrompt with runSubagent
+
+Updates chat mode and prompt configurations to enhance AI agent task orchestration.
+
+- 🔄 Replaces the `executePrompt` tool with `runSubagent` in multiple chat mode configurations (`Debugging`, `Docs`, `Explore`, `Migration`, `Performance`, `Questions`, `Refactor`, `Review`, `Security`, `Tests`).
+   -  This change streamlines the process of executing sub-prompts within the AI agent, improving modularity and reusability of prompts.
+- ⚙️ Updates prompt configurations (`BeastMode`, `Consistency-Check`, `Document-Review`, `E2E-Tests-Playwright`, `Error-Handling-Tests`, `Fix-Eslint-Errors`, `Generate-100%-Fast-Check-Fuzzing-Test-Coverage.2`, `Generate-100%-Fast-Check-Fuzzing-Test-Coverage`, `Generate-100%-Playwright-Test-Coverage.2`, `Generate-100%-Playwright-Test-Coverage`, `Generate-100%-Test-Coverage.2`, `Generate-100%-Test-Coverage`, `Generate-Test-Metadata`, `Low-Confidence-AI-Review`, `My-Custom-Prompts`, `PR-Review`, `Performance-Tests`, `Remove-Eslint-Disable`, `Review-Code-Base`, `Stryker-Generate-Stryke-Mutator-Fixes`, `TSDoc-Improvements-Checklist`, `Types-Double-Check`) to utilize the `runSubagent` tool where applicable.
+   -  This ensures consistent task orchestration across different modes and prompts, leveraging the improved sub-prompt execution mechanism.
+- 📝 Adds a detailed section to the `Consistency-Check.prompt.md` file outlining various types of inconsistencies to check for.
+   -  This enhances the prompt's ability to identify and address inconsistencies within the codebase, promoting code quality and maintainability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2a3ca82)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a3ca825c85cd7ac3cde1ffa0b6c70dff349e493)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Simplify context7.json exclude patterns and clear folders
+
+ - Consolidate locale-specific i18n and zh-* excludes into a single "^i18n(/.*)?$" pattern
+ - Replace docs/old with a generic "^docs(/.*)?$" exclusion
+ - Normalize and add common excludes (node_modules, dist, build, .vite, .git, .github, coverage, test(s), scripts, public, config, dotfiles)
+ - Remove explicit project folder globs ("^src/.*", "^shared/.*", "^electron/.*") and set "folders" to an empty array
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4d6fcd7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4d6fcd70c016b1c76a9192544b5111c1bb5f8524)
+
+
+- Update changelogs for v17.1.0 [skip ci] [`(b91a283)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b91a283803c819b9c036f371efaaa76e8f9cab49)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Standardize agent tool lists in prompts
+
+Updates agent prompts to include a consistent tool list.
+
+- 🧩 Replaces `mode: "BeastMode"` with `agent: "BeastMode"` in prompt files for clarity and consistency.
+ - This change improves the readability and maintainability of the prompt configurations.
+- 🛠️ Updates the tool lists in `.github/prompts/*.prompt.md` files to include a standardized set of tools for the "BeastMode" agent.
+ -  Includes tools like `Tavily-Remote-MCP/*`, `electron-mcp-server/*`, and `vscode-mcp/rename_symbol` to ensure feature parity across prompts.
+- 🚚 Renames `.github/agents/BeastMode.vscode-agent.md` to `.github/agents/BeastMode.agent.md`
+ - This change aligns the naming convention for agent configuration files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c66132)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6c6613272dd30add6b0ea7a686b3558f53ac3bba)
+
+
+
+
+
+
+## [17.1.0] - 2025-10-21
+
+
 [[48fd19b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)...
-[48fd19b](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/48fd19bdf53c9619d965f73c4004ba3fe852841c...48fd19bdf53c9619d965f73c4004ba3fe852841c))
+[10d3f4e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/10d3f4e69cf53d0bf04537ce88d357c64713fa29)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/48fd19bdf53c9619d965f73c4004ba3fe852841c...10d3f4e69cf53d0bf04537ce88d357c64713fa29))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance Storybook and code coverage
+
+This commit introduces several enhancements and fixes across the Storybook configuration, code quality checks, and test suites.
+
+- 🧪 [test] Adds a function coverage boost to call every exported function from low-coverage modules
+ - Maximizes coverage by invoking functions with different argument combinations and tolerating exceptions
+ - Prevents noisy console output during coverage boosting by overriding function-specific arguments
+ - Registers low-coverage modules for coverage boosting
+- 📝 [docs] Updates Copilot instructions to clarify terminal output handling
+ - Redirects terminal output to files only for linting, testing, or type-checking commands
+- 🛠️ [fix] Normalizes Storybook story paths for broader compatibility
+ - Resolves issues with relative paths in Storybook configurations
+ - Ensures correct story loading by normalizing story paths
+- 👷 [ci] Adds a new test command to verify accessibility of storybook components
+- 🛠️ [fix] Addresses TypeScript errors in monitor services
+ - Simplifies configuration resolvers in `ReplicationMonitor` and `ServerHeartbeatMonitor` to address TypeScript issues
+- 🧹 [chore] Updates dependencies, including `@tailwindcss/postcss` and `vite`, in `package-lock.json` and `package.json`
+- 📝 [docs] Adds tsconfig files for storybook to prevent eslint errors
+- 🛠️ [fix] Fixes storybook test glob pattern
+ - Avoids issues caused by extglob tokens on Windows systems
+- 🛠️ [fix] Ensures node web storage shims are registered before Storybook config loads
+- ✨ [feat] Adds accessibility test mode to storybook
+ - Allows setting of accessibility test mode
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eb24cda)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eb24cdafb80ba9543548c4f8dbec05cbe4d2434f)
+
+
+- ✨ [feat] Enhance state synchronization
+
+This commit introduces a dedicated state synchronization service and improves event handling for real-time updates.
+
+- 🔄 [refactor] Migrates state synchronization logic to `StateSyncService`
+ - Centralizes state management and simplifies event handling.
+ - Improves code organization and maintainability.
+- 📡 [feat] Introduces `requestFullSync` for authoritative site snapshots.
+ - Enables complete data refresh, ensuring consistency across renderers.
+ - Emits `sites:state-synchronized` event for renderer updates.
+- 👂 [feat] Adds `onStateSyncEvent` for incremental state sync events.
+ - Supports bulk-sync, update, and delete actions.
+ - Provides a cleanup function for unsubscribing listeners.
+- 🪵 [chore] Updates event listeners and store integrations
+ - Modifies `window.electronAPI.events` to focus on monitoring, cache invalidation, update status, and diagnostic test events.
+ - Simplifies event listener registration and cleanup.
+- 🎨 [style] Aligns source of state sync events to frontend
+- 🧪 [test] Updates tests to reflect changes in state synchronization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e8f4e5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e8f4e525c9e4316a7bea56bdd4c4cfe0f25c437)
+
+
+- ✨ [feat] Add zero-coverage audit tooling (Vitest config, detector script, docs)
+
+🧪 [test] Add config/testing/vitest.zero-coverage.config.ts
+ - Provides an isolated Vitest config for zero-coverage probes (separate cacheDir)
+ - Limits coverage collection to touched files, emits JSON reports, uses v8 provider
+ - Disables global coverage thresholds and writes reports to ./coverage/zero-coverage
+
+✨ [feat] Add scripts/detect-zero-coverage-tests.ts
+ - Implements a serial detector that enumerates tests (vitest list) and runs each file with --coverage --reporter=json
+ - Parses coverageMap via istanbul-lib-coverage to detect files with zero executable coverage
+ - Retries Vitest invocations on transient Windows filesystem errors, with exponential backoff and cleanup attempts
+ - Supports CLI flags: --config, --pattern, --max-files, --dry-run, --keep-reports and persistent/transient report directories
+ - Produces human-readable summary and a ranked list of top coverage-producing specs
+
+📝 [docs] Add docs/Testing/ZERO_COVERAGE_AUDIT.md
+ - Documents workflow, usage examples, output format, triage guidance, and when to rerun the audit
+ - Notes cache isolation and options for persisting JSON reports for inspection
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8279526)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8279526b7dcc6827fd80639293004a4ade2e3700)
+
+
+- ✨ [feat] Enforce shared contract interface consistency
+
+Adds an ESLint rule to prevent duplicate interface declarations.
+
+ - 💡 Introduces a new ESLint rule to enforce the usage of shared contract interfaces from the `@shared` package, preventing local redeclarations.
+ - 📝 Updates the consistency guide to reflect the new linting rule and best practices for shared contract interfaces.
+ - 🧪 Adds a test to ensure that all typed invoke channels have a registered handler, increasing contract consistency.
+ - 🛠️ Refactors the `MonitorTypeOption` interface to be shared between the renderer and backend, ensuring consistent labeling and identification.
+ - 🎨 Updates CSS to improve UI consistency and responsiveness across different screen sizes.
+ - 🐛 Fixes an issue with safe number conversions where boolean inputs were not handled correctly, resulting in incorrect default values.
+ - 🐛 Fixes an issue where `normalizeMonitor` was not providing a default URL for HTTP monitors.
+ - ⚡️ Improves the fallback logger by switching to `electron-log` for structured logging in renderer processes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6de39e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6de39e86c86fb54e87df6a366275912f1c9d7ad8)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Enhance external URL handling and validation
+
+This commit improves the application's handling of external URLs, focusing on security, user experience, and maintainability.
+
+- ✨ Enhances URL validation and error handling for `openExternal` functionality.
+ - Validates URLs before navigation to prevent opening unsafe links.
+ - Improves error reporting by providing more descriptive error messages to the user.
+ - Adds logging for invalid URL attempts to aid debugging and security monitoring.
+- 🛠️ Updates `SystemService` to enforce URL validation before attempting to open external links.
+ -  Ensures that only `http://` and `https://` URLs are allowed, blocking other schemes.
+ -  Throws a `TypeError` synchronously if an invalid scheme is detected, preventing further processing.
+ -  Logs errors when unsafe URLs are rejected.
+- 📝 Updates documentation to reflect changes in `openExternal` behavior and recommendations.
+ -  Clarifies that `openExternal` in the System API now returns a boolean.
+ -  Recommends using the `SystemService` for accessing `openExternal` due to its added safety features.
+- 🎨 Refactors UI components to improve aesthetics and user experience.
+ - Updates the appearance of site cards, tables, and history tabs with new styling and visual enhancements.
+ - Improves the layout and spacing in settings sections for better readability.
+- 🧪 Adds comprehensive test coverage for URL validation and handling in `SystemService`.
+ -  Ensures that valid URLs are correctly opened and invalid URLs are blocked.
+ -  Verifies that appropriate errors are thrown and logged for invalid URLs.
+- ⚡ Improves the UI Store's `openExternal` function to prevent opening invalid external URLs.
+ - Adds a check to ensure that the URL starts with `http(s)://`.
+ - If the URL is invalid, logs a warning and sets an error in the error store.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(29b85d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/29b85d83fc9aa6752e8d896083dd597a1848fb87)
+
+
+- 🛠️ [fix] Enhance code quality and validation
+
+This commit improves code quality, enhances validation, and refactors various parts of the application.
+
+- 🛠️ Ensure payloads mirror original event data contracts by omitting event bus metadata during forwarding.
+   - The orchestrator expects pristine payloads that mirror the original event data contracts.
+   - Manager event buses append `_meta` and `_originalMeta` fields for diagnostics; this change strips those fields while leaving the rest of the structure untouched.
+- 🛠️ Enhance monitor configuration property validation to prevent silent drift between processes.
+   - Throws when unexpected monitor configuration properties are detected.
+   - Fails fast whenever a registry entry contains keys the renderer is not prepared to consume.
+- 🛠️ Refactor UI config serialization for monitor types, improving type safety and data handling.
+   - Normalizes optional string and boolean properties with fallback values.
+   - Streamlines serialization logic for detail formats, display preferences, and help texts.
+ - 🛠️ Improve type safety and validation for monitor type configurations.
+   - Adds runtime type guards for `MonitorFieldDefinition` and `MonitorTypeConfig`.
+   - Implements comprehensive validation checks for field types, options, and UI configurations.
+- 🛠️ Update Storybook configuration to correctly map stories and ensure proper initialization in Node environments.
+   - Adds a shim to provide a minimal Web Storage API in Node-based Storybook environments.
+   - Updates story mapping to handle relative paths correctly.
+- 🛠️ [dependency] Update eslint-plugin-exception-handling 1.5.5
+- 🛠️ [dependency] Update eslint-plugin-fsecond 1.4.0
+- 🛠️ [dependency] Update eslint-plugin-node-dependencies 1.2.0
+- 🛠️ [dependency] Update eslint-plugin-unused-imports 4.3.0
+- 🛠️ [dependency] Update msw 2.11.6
+- 🛠️ Remove extraneous shared dependencies.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(63c707a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/63c707a0549460198ac992efd8d3da205d5f2380)
+
+
+- 🛠️ [fix] Refactor and improve code quality
+
+This commit refactors and improves code quality across several files, focusing on enhanced error handling, code modernization, and improved data processing.
+
+- ♻️  Modernizes array sorting and string conversion in `verify-storybook-tsconfig.mjs`:
+ - Uses `Array.from(values).toSorted()` for locale-based sorting, enhancing performance and readability.
+ - Simplifies string conversion with `values.map(String)`, streamlining the code.
+ - 🐛 Improves error handling in Storybook tsconfig verification:
+ - Adds more descriptive error messages with a cause, aiding in debugging.
+ - 🤔 This change makes it easier to identify and address issues in the tsconfig file.
+- 🐛 Fixes duplicate site identifier detection in `useSiteSync.ts`:
+ - Removes a conditional check that prevented duplicate site identifier errors from being logged when a snapshot was present.
+ - 📝 This ensures that duplicate identifiers are always reported, improving data integrity.
+- ⚡️ Simplifies test assertions in `SiteManager.test.ts`:
+ - Renames `updateSitesCache` to `updateSitesCache diagnostics` to better reflect the tests purpose.
+ - ✅ This clarifies the test's intent and improves maintainability.
+- 🎨 Updates styling in `BaseFormField.stories.tsx`:
+ - Adjusts the classname for the input field to `rounded-xs`, streamlining the user interface.
+- 🧪 Updates mock functions in `operationHelpers.test.ts` to better reflect their types.
+- 🛠️ Improves component prop handling in `AnalyticsTab.stories.tsx` and `OverviewTab.stories.tsx`:
+- Uses `useCallback` to memoize event handlers, preventing unnecessary re-renders and improving performance.
+- 💡 This optimization ensures that the components only re-render when their dependencies change, leading to smoother user interactions.
+- ✨ Improves monitor type handling in `DynamicMonitorFields.stories.tsx`:
+ - Uses `prepareMonitorTypesStore` to initialize the monitor types store, ensuring consistent state.
+- 🐛 Fixes type definitions and simplifies data mapping in `storybook/helpers/monitorTypeStoryHelpers.ts`:
+  - Replaces `.map` with a `for...of` loop to build the `fieldConfigs` object, improving readability and maintainability.
+  - 🧩 This change streamlines the data transformation process, making the code easier to understand and modify.
+- 🛠️ Standardizes timeout value in `useSiteOperations.test.ts`:
+ - Changes `timeout: 5_000` to `timeout: 5000` for consistency.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(89cf652)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89cf652d9bf05c5ad696daae9d433bf9a8f5a255)
+
+
+- 🛠️ [fix] Enforce site identifier uniqueness
+
+This commit addresses potential data integrity issues by ensuring the uniqueness of site identifiers across the application.
+
+- 🛠️ **Introduces validation for site identifier uniqueness:**
+  - Implements `collectDuplicateSiteIdentifiers` and `ensureUniqueSiteIdentifiers` in `shared/validation/siteIntegrity.ts` to detect duplicate identifiers.
+  - Integrates these utilities into the `SitesStore` and `SiteManager` to validate site data before state updates.
+  - This prevents the introduction of duplicate site entries, surfacing any integrity breaches through `DuplicateSiteIdentifierError` to avoid masking backend regressions.
+ - 📝 **Updates documentation:**
+  - Adds notes to the architecture guides to explain the helper functions.
+- 🧪 **Adds comprehensive tests:**
+  - Adds new tests to verify the correct behavior of the new data validation logic.
+- 🧹 **Refactors existing functions:**
+  - Removes unused handleSiteAdded, replaces it with handleStateSyncEvent, which now uses setSites on bulk sync or update.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a9319e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a9319e836b1cee56ce108d8b313b380452f76404)
+
+
+- 🛠️ [fix] Improves IPC handler and cache invalidation
+
+This commit enhances the robustness and efficiency of IPC communication and cache management.
+
+- ♻️ Refactors IPC response handling to use a shared type from `@shared/types/ipc`, promoting consistency across the application layers and reducing code duplication.
+- ⚡ Implements a new `executeIpcHandler` utility to streamline IPC handler execution, including detailed logging and error handling, improving maintainability and debugging.
+   - ➖ This utility also reduces logging spam for high-frequency operations.
+- 💾 Updates state synchronization to use `DATABASE` as the source of truth instead of `FRONTEND`, ensuring data consistency and preventing potential conflicts.
+- 🧹 Simplifies data export/import error handling by introducing a central `handleDataOperationFailure` method, reducing redundancy and improving error reporting.
+- 🧪 Updates tests to reflect changes in state synchronization source, ensuring continued correctness.
+- 🧪 Updates and standardizes environment variable handling for Playwright tests to ensure consistency and prevent unexpected behavior.
+- 🔧 Updates the zero-coverage Vitest configuration to properly export the configuration.
+- 📝 Adds the zero-coverage Vitest config file to eslint.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ccdd5d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ccdd5d8278f252561a7377c317b0ceb171a41d46)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.0.0 [`(48fd19b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/48fd19bdf53c9619d965f73c4004ba3fe852841c)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Streamlines Storybook and ESLint config
+
+This commit refactors the Storybook configuration and updates the ESLint configuration to improve code maintainability and reduce potential errors.
+
+- 🛠️ Refactors Storybook's stories array normalization:
+ - Replaces the `normalizeStoryPaths` function with an inline transformation using a for...of loop for better readability and maintainability.
+ - Directly modifies the `normalizedStories` array to update paths, avoiding unnecessary type assertions.
+ - 🧹 Updates ESLint configuration:
+ - Removes unnecessary comments and cleans up file formatting for better readability.
+ - 🧪 Removes `@ts-expect-error` comments that are no longer needed due to ESLint updates, ensuring cleaner code.
+ - ⚡ Improves ESLint rule configurations:
+ - Adjusts the `max-lines` rule to include an array format, enhancing configuration clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(34f3636)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/34f3636030b82367eee46b04c46b18b238fe6920)
+
+
+- 🚜 [refactor] Refine monitor config serialization
+
+Refactors the monitor configuration serialization process for improved type safety and error handling.
+
+- ⚙️  Enhances the monitor type configuration serialization within the IPC service to ensure safer data transmission between processes.
+   -  Replaces the `SerializedMonitorTypeConfig` interface with direct usage of `MonitorTypeConfig`, leveraging runtime type guards (`isMonitorTypeConfig`, `isMonitorFieldDefinition`) for validation.
+   -  This approach ensures that only valid configurations are processed, preventing runtime errors due to unexpected or malformed data.
+ - 🚨 Implements strict validation of monitor configurations to fail fast on unexpected properties.
+   - Introduces `assertNoUnexpectedProperties` to immediately throw an error if a configuration contains properties not explicitly defined in the `MonitorTypeConfig`.
+   -  This prevents silent data drift and ensures that configurations adhere to the expected schema.
+ - 🔍 Improves error logging and diagnostics for invalid monitor configurations.
+   -  Adds detailed error messages and logging when invalid configurations are detected, including the type of monitor and the unexpected properties found.
+   -  This aids in debugging and maintaining configuration integrity.
+- 🧪 Adds comprehensive unit tests for monitor type guards.
+   - Introduces new tests to validate the runtime type guards for `MonitorFieldDefinition` and `MonitorTypeConfig`.
+   -  These tests ensure that the guards correctly identify valid and invalid configurations, providing confidence in the validation process.
+- ♻️ Updates the monitor types store to filter and log invalid monitor configurations.
+   - Modifies the store to filter out invalid configurations using `isMonitorTypeConfig` before updating the state.
+   - Logs detailed information about the invalid configurations, including their index and type, to aid in debugging.
+- 🧱 Modifies site store synchronization to validate sites.
+   - Adds validation of sites to the site store synchronization.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7687412)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7687412a1a757204d2548e5a5d2bd83a2ef93d6a)
+
+
+- 🚜 [refactor] Refactors monitor services to use shared core
+
+This commit refactors the HTTP monitor services to use a shared HTTP core, and updates Storybook configuration.
+
+- ♻️ [Refactor] Migrates `HttpHeaderMonitor`, `HttpJsonMonitor`, `HttpKeywordMonitor`, `HttpLatencyMonitor`, `HttpStatusMonitor`, `ReplicationMonitor`, and `ServerHeartbeatMonitor` to use the shared HTTP monitor core for consistent request handling and retry logic.
+   - This involves creating `HttpMonitorBehavior` implementations for each monitor type, defining the monitor-specific logic for validating configurations and evaluating responses.
+   - This greatly reduces code duplication and provides a single place to update request lifecycle logic.
+- 🧱 [Build] Introduces `httpMonitorCore.ts` and `monitorFactoryUtils.ts`
+   - `httpMonitorCore.ts`: This centralizes request handling, retry logic, and response logging for HTTP-derived monitor services.
+   - `monitorFactoryUtils.ts`: This provides utilities for wrapping monitor factory construction with hardened exception handling.
+- 🔨 [Refactor] Removes the rate limiter from each of the monitor implementations and places it in the shared http core.
+- 📝 [Docs] Updates documentation to reflect the new shared core architecture.
+- 🧹 [Chore] Adds `verify-storybook-tsconfig.mjs` and updates `eslint.config.mjs`
+   - Enforces stricter type checking and linting rules.
+   - Sorts and deduplicates Storybook tsconfig includes to avoid typecheck errors.
+- 🧪 [Test] No changes to existing tests as functionality remains the same.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(88256ad)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88256ad9f639483217fc6e4396bc37f8debff78f)
+
+
+- 🚜 [refactor] Refactor shared type imports
+
+Refactors imports to use the `@shared` alias for shared types.
+
+- 🚜 [refactor] Updates imports to use the `@shared` alias
+ -  Refactors multiple files to import shared types from the `@shared` alias instead of relative paths.
+ -  This change improves code maintainability and reduces the risk of import errors when moving files.
+- 🧪 [test] Updates test files to use the `@shared` alias
+ -  Updates test files to use `@shared` imports.
+- 📝 [test] Updates tsconfig to include shared directory
+ -  Updates tsconfig to include all shared directories.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(30b1afb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/30b1afb7ee4ba4ec87e223684d6194714fef816d)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Enhance logging in documentation
+
+This commit improves the documentation by replacing `console.log` statements with calls to the logger.
+
+- 📝 [docs] Updates code examples to use centralized logger
+
+ -  Replaces `console.log` with `logger.info`, `logger.warn`, `logger.error` and `logger.debug` calls throughout the documentation examples in various files
+ -  Adds imports for the logger in the documentation examples
+ -  This change provides more structured and manageable logging across the application.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3bd04f6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3bd04f69c241a9cd13fb5831ec659e472395d97e)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Refactor CSS structure and update docs
+
+Updates CSS architecture for improved modularity and maintainability.
+
+- 🧱 [structure]: Moves SiteDetails CSS into focused partials within `src/components/SiteDetails/styles/` to promote better organization and easier maintenance.
+- 🧩 [structure]: Updates `src/index.css` to import these partials, centralizing load order and improving global stylesheet management.
+- ✅ [structure]: Removes now-redundant `SiteDetails.css` import from eslint config.
+- 📝 [docs]: Updates `StyleLayoutGuide.md` to reference the new theme component utilities import path and to document the modular stylesheet structure, improving developer understanding and consistency.
+- 🚀 [enhancement]: Adds `@media (prefers-reduced-motion: reduce)` blocks to reduce motion, improving accessibility.
+- 🐛 [fix]: Corrects minor CSS styling issues and enhances visual consistency of several components.
+- ⬆️ [deps]: Updates `@eslint/markdown` and typescript-related dependencies in `package-lock.json` and `package.json` to their latest versions.
+- ⚙️ [config]: Adds powershell script to package.json to update node using winget.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(10d3f4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/10d3f4e69cf53d0bf04537ce88d357c64713fa29)
+
+
+- 🎨 [style] Enforce `@app` alias and restrict Electron imports
+
+Updates ESLint rules to enforce the use of the `@app` alias for imports within the `src` directory and restricts direct imports from Electron in renderer modules.
+
+- 🎨 [style] Adds new ESLint rules:
+  -  `renderer-no-electron-import`: Disallows renderer code from directly importing Electron packages or backend modules, encouraging the use of preload bridges or shared contracts instead. 🚫
+   -  This rule checks `ImportDeclaration`, `ImportExpression`, and `CallExpression` nodes for invalid Electron dependencies.
+  - `prefer-app-alias`: Enforces the use of the `@app` alias for referencing renderer code from outside the `src` directory, preventing relative deep imports. 🚀
+   -  The rule provides a fix to automatically replace relative paths with the `@app` alias.
+- 📝 [docs] Updates the consistency guide to reflect the new `@app` alias rule. 📚
+- 🧹 [chore] Updates benchmark import path for SettingsService. ✅
+- 🧪 [test] Adds new `tsconfig.json` files for electron and shared test directories. 🧪
+- 🧹 [chore] Disables `@jcoreio/implicit-dependencies/no-implicit` rule in test files. 🛠️
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3eeb312)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3eeb312bbba99ca399dcc0b9a9d79a2cc7f28792)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Enhance testing and fix eslint issues
+
+- 🧪 [test] Improves test setup by:
+  - 🔇 Suppresses specific console warnings during tests to reduce noise and focus on relevant issues.
+  - 💾 Mocks `localStorage` and `sessionStorage` when Node.js shims are incomplete, providing a consistent testing environment:
+   - ⚙️ Creates an in-memory `Map`-backed storage implementation.
+   - ✅ Ensures `globalThis` exposes a fully functional storage implementation.
+- 🛠️ [fix] Fixes a bug in `DatabaseCommands.test.ts` where console.error was spied on instead of the logger, and improves the error message:
+   - 🐛 Replaces `consoleSpy` with `loggerSpy` to correctly capture logger errors.
+   - 📝 Updates the error message to provide more context, including the command name.
+- 🧹 [chore] Disables the `@jcoreio/implicit-dependencies/no-implicit` ESLint rule:
+  - 🚫 Disables the rule in multiple ESLint configurations.
+- 🎨 [style] Removes duplicate imports in `storybook/helpers/siteStoryHelpers.tsx`
+- ✨ [feat] Adds stories for Header components:
+  - ✨ Adds `HeaderControls.stories.tsx` for action cluster coverage.
+  - ✨ Adds `HealthIndicator.stories.tsx` for uptime badge.
+  - ✨ Adds `StatusCounter.stories.tsx` for badge variants.
+  - ✨ Adds `StatusDivider.stories.tsx` for utility element.
+  - ✨ Adds `StatusSubscriptionIndicator.stories.tsx` for realtime status subscription diagnostics.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(315d5e8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/315d5e82d986a46984063f9e559ea2b81c24bb04)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Upgrade project dependencies and devDependencies
+ - [dependency] Update multiple devDependencies to pick up minor/patch fixes (eslint, @eslint/js, @vitest/eslint-plugin, @playwright/test, playwright, putout, storybook and related addons/plugins, prettier-plugin-tailwindcss, rollup-plugin-visualizer, knip, @stylistic/eslint-plugin, @types/node, etc.)
+ - Update various lint/test/tooling packages (eslint-plugin-package-json, eslint-plugin-storybook, eslint-plugin-css, @docusaurus/eslint-plugin, @vitest/eslint-plugin) to compatible newer versions
+ - Misc maintenance bumps to reduce transitive vulnerabilities and align peer dep ranges
+
+🔧 [build] Replace npm-run-all with npm-run-all2 and adjust workspace/shared deps
+ - Add npm-run-all2 ^8.0.4 to dependencies and replace prior npm-run-all usage in package metadata
+ - Reorder/move @shared/ipc entry in package.json to ensure correct bundling / workspace resolution
+
+🧹 [chore] Refresh lockfiles & docs docusaurus version bumps
+ - [dependency] Update Docusaurus packages in docs to 3.9.2 (package.json + package-lock.json) and regenerate lockfile entries
+ - Update many lockfile-resolved packages (notable: @ai-sdk/gateway -> 2.0.0, ai -> 5.0.76, @ai-sdk/react -> 2.0.76; Algolia client packages -> 5.40.1; @vercel/oidc -> 3.0.3; @swc/core and platform binaries -> 1.13.5; std-env, tslib, and other transitive packages)
+ - Add/adjust peer flags and internal lockfile tweaks (new cacheable/keyv-related nodes, qified/hookified updates, file-entry-cache/flat-cache upgrades) as generated by npm install / lockfile regeneration
+ - Result: lockfiles reflect the above dependency upgrades and package replacements to keep installs reproducible
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6ad8914)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6ad8914709b6f95c3b67a71f3ba840a6fb355241)
+
+
+- 🧹 [chore] Enforce linting rules and update dependencies
+
+This commit introduces custom ESLint rules to enforce architectural conventions and improve code quality. It also updates dependencies to ensure compatibility and access to the latest features.
+
+- 🔧 Introduces a new ESLint plugin (`uptime-watcher.mjs`) with custom rules:
+  - 🛡️ `monitor-fallback-consistency`: Ensures `FALLBACK_MONITOR_TYPE_OPTIONS` aligns with shared `BASE_MONITOR_TYPES`, preventing inconsistencies.
+  - 🚫 `electron-no-console`: Enforces the use of structured logging instead of `console.*` in Electron runtime code, improving maintainability and debugging.
+  - ✍️ `tsdoc-no-console-example`: Disallows `console.*` usage within TSDoc example code blocks, promoting consistent logging practices.
+  - 🔗 `prefer-shared-alias`: Enforces the use of `@shared/*` import aliases instead of relative paths for shared modules, enhancing code clarity and maintainability.
+- 📝 Integrates the new ESLint plugin into the main ESLint configuration (`eslint.config.mjs`) and applies the custom rules to relevant files.
+  - 📁 Applies "Monitor Fallback Consistency" rule to `src/constants.ts`.
+  - 🖥️ Applies "Electron Logger Enforcement" rule to `electron/**/*.{ts,tsx}` (excluding `electron/test/**/*`).
+  - ✍️ Applies "TSDoc Logger Examples" rule to all `**/*.{ts,tsx}`.
+  - 🔗 Applies "Shared Alias Imports" rule to `docs/**/*.{ts,tsx}`, `electron/**/*.{ts,tsx}`, `src/**/*.{ts,tsx}`, and `storybook/**/*.{ts,tsx}` (excluding `shared/**/*`).
+- 🚚 Refactors database command rollback logging in `DatabaseCommands.ts` to use the `backendLogger` instead of `console.error`, aligning with the new linting rules.
+  - 🪵 Improves logging clarity by including the command description in the log message.
+- 🩹 Updates `diagnosticsMetrics.ts` to use a `fallbackDiagnosticsLogger` based on `electron-log/main` instead of `console`, ensuring consistent logging even when the primary logger is unavailable.
+- ⬆️ Updates import paths in various test files to use the `@shared` alias, aligning with the new linting rules and improving code readability.
+- 🧪 Adds a new `tsconfig.json` file in the `src/test` directory to extend the base testing configuration.
+- 🧹 Disables `@jcoreio/implicit-dependencies/no-implicit` rule for storybook stories.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f623f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f623f4614ca0343af2467f5b477031847bbed54)
+
+
+- Update changelogs for v17.0.0 [skip ci] [`(d62ffc3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d62ffc3e3b1e520dda594c77dda0b50b434195c0)
 
 
 

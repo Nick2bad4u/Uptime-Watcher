@@ -11,6 +11,7 @@ import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import type { Site, Monitor, StatusUpdate } from "@shared/types";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
 
 // Mock all dependencies with proper typing
@@ -93,7 +94,16 @@ const mockSiteManager = {
         } as Site,
     ]),
     updateSitesCache: vi.fn(() => Promise.resolve()),
-    removeMonitor: vi.fn(() => Promise.resolve(true)),
+    removeMonitor: vi.fn(() =>
+        Promise.resolve({
+            identifier: "test-site",
+            name: "Test Site",
+            monitors: [
+                { id: "monitor-2", monitoring: false },
+            ] as unknown as Monitor[],
+            monitoring: true,
+        } as Site)
+    ),
     initialize: vi.fn(() => Promise.resolve()),
 } as unknown as SiteManager;
 
@@ -690,7 +700,9 @@ describe(UptimeOrchestrator, () => {
                 "test-site",
                 "monitor-1"
             );
-            expect(result).toBeTruthy();
+            expect(result).toEqual(
+                expect.objectContaining({ identifier: "test-site" })
+            );
         });
 
         it("should handle monitor removal with failed stop monitoring", async ({
@@ -727,19 +739,24 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
-                false
+            const removalError = new Error("Database removal failed");
+            vi.mocked(mockSiteManager.removeMonitor).mockRejectedValueOnce(
+                removalError
             );
 
-            const result = await orchestrator.removeMonitor(
-                "test-site",
-                "monitor-1"
-            );
+            const error = (await orchestrator
+                .removeMonitor("test-site", "monitor-1")
+                .catch((error_) => error_)) as ApplicationError;
 
             expect(
                 mockMonitorManager.startMonitoringForSite
             ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(result).toBeFalsy();
+            expect(error).toBeInstanceOf(ApplicationError);
+            expect(error).toMatchObject({
+                code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
+                message: "Failed to remove monitor test-site/monitor-1",
+            });
+            expect(error.cause).toBe(removalError);
         });
 
         it("should handle monitor removal with failed restart after failed removal", async ({
@@ -751,8 +768,8 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.mocked(mockSiteManager.removeMonitor).mockResolvedValueOnce(
-                false
+            vi.mocked(mockSiteManager.removeMonitor).mockRejectedValueOnce(
+                new Error("Database removal failed")
             );
             vi.mocked(
                 mockMonitorManager.startMonitoringForSite
@@ -994,7 +1011,16 @@ describe(UptimeOrchestrator, () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
-                sites
+                sites,
+                "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    emitSyncEvent: true,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.CACHE,
+                    timestamp: expect.any(Number),
+                    sites,
+                })
             );
             expect(
                 mockMonitorManager.setupSiteForMonitoring
@@ -1037,7 +1063,16 @@ describe(UptimeOrchestrator, () => {
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             expect(mockSiteManager.updateSitesCache).toHaveBeenCalledWith(
-                sites
+                sites,
+                "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    emitSyncEvent: true,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.CACHE,
+                    timestamp: expect.any(Number),
+                    sites,
+                })
             );
             expect(
                 mockMonitorManager.setupSiteForMonitoring
@@ -1377,6 +1412,34 @@ describe(UptimeOrchestrator, () => {
             );
         });
 
+        it("should emit global cache invalidation for bulk monitor start", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:monitor:started", {
+                identifier: "all",
+                operation: "started",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.objectContaining({
+                    reason: "update",
+                    type: "all",
+                })
+            );
+        });
+
         it("should handle monitor started events with errors", async ({
             task,
             annotate,
@@ -1434,6 +1497,35 @@ describe(UptimeOrchestrator, () => {
                 expect.objectContaining({
                     activeMonitors: 5,
                     reason: "user",
+                })
+            );
+        });
+
+        it("should emit global cache invalidation for bulk monitor stop", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "all",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.objectContaining({
+                    reason: "update",
+                    type: "all",
                 })
             );
         });

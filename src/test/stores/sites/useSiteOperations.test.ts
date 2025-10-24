@@ -7,9 +7,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { type Monitor, type Site } from "@shared/types";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
+import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 import { createSiteOperationsActions } from "../../../stores/sites/useSiteOperations";
 import type { SiteOperationsDependencies } from "../../../stores/sites/types";
+import * as siteOperationHelpers from "../../../stores/sites/utils/operationHelpers";
 
 // Mock external dependencies
 vi.mock("../../../services/logger");
@@ -83,7 +85,22 @@ describe(createSiteOperationsActions, () => {
             true
         );
 
-        mockElectronAPI.sites.removeMonitor.mockResolvedValue(true);
+        mockElectronAPI.sites.removeMonitor.mockImplementation(
+            async (siteIdentifier: string, monitorId: string) => {
+                const sitesSnapshot = mockDeps?.getSites?.() ?? [mockSite];
+                const targetSite =
+                    sitesSnapshot.find(
+                        (site) => site.identifier === siteIdentifier
+                    ) ?? mockSite;
+
+                return {
+                    ...targetSite,
+                    monitors: targetSite.monitors.filter(
+                        (monitor) => monitor.id !== monitorId
+                    ),
+                } satisfies Site;
+            }
+        );
 
         mockMonitor = {
             checkInterval: 60_000,
@@ -139,40 +156,13 @@ describe(createSiteOperationsActions, () => {
             ),
         };
 
-        const monitoringService = {
-            startMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.startMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
-            startSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
-                mockElectronAPI.monitoring.startMonitoringForSite(
-                    siteIdentifier
-                )
-            ),
-            stopMonitoring: vi.fn(
-                async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.stopMonitoringForSite(
-                        siteIdentifier,
-                        monitorId
-                    )
-            ),
-            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
-                mockElectronAPI.monitoring.stopMonitoringForSite(siteIdentifier)
-            ),
-        };
-
         mockDeps = {
-            addSite: vi.fn(),
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
             syncSites: vi.fn(),
             services: {
                 data: dataService,
-                monitoring: monitoringService,
                 site: siteService,
             },
         } satisfies SiteOperationsDependencies;
@@ -296,7 +286,6 @@ describe(createSiteOperationsActions, () => {
                     }),
                 ])
             );
-            expect(mockDeps.addSite).not.toHaveBeenCalled();
         });
 
         it("should create a new site with full data", async ({
@@ -377,7 +366,6 @@ describe(createSiteOperationsActions, () => {
                 name: "Existing Site Updated",
             });
 
-            expect(mockDeps.addSite).not.toHaveBeenCalled();
             expect(currentSites).toHaveLength(1);
             expect(currentSites[0]).toEqual(
                 expect.objectContaining({
@@ -389,7 +377,7 @@ describe(createSiteOperationsActions, () => {
     });
 
     describe("deleteSite", () => {
-        it("should delete a site and stop monitoring", async ({
+        it("should delete a site via orchestrator-managed removal", async ({
             task,
             annotate,
         }) => {
@@ -398,16 +386,13 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Data Deletion", "type");
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                true
-            );
             mockElectronAPI.sites.removeSite.mockResolvedValue(true);
 
             await actions.deleteSite("test-site");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
+            ).not.toHaveBeenCalled();
             expect(mockElectronAPI.sites.removeSite).toHaveBeenCalledWith(
                 "test-site"
             );
@@ -523,14 +508,28 @@ describe(createSiteOperationsActions, () => {
             };
             mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
 
-            await actions.modifySite("test-site", updates);
-
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
-                "test-site",
-                updates
+            const applySavedSiteSpy = vi.spyOn(
+                siteOperationHelpers,
+                "applySavedSiteToStore"
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
-            expect(mockDeps.syncSites).not.toHaveBeenCalled();
+
+            try {
+                await actions.modifySite("test-site", updates);
+
+                expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+                    "test-site",
+                    updates
+                );
+                expect(applySavedSiteSpy).toHaveBeenCalledTimes(1);
+                expect(applySavedSiteSpy).toHaveBeenCalledWith(
+                    expect.objectContaining({ identifier: "test-site" }),
+                    mockDeps
+                );
+                expect(mockDeps.setSites).toHaveBeenCalledWith([updatedSite]);
+                expect(mockDeps.syncSites).not.toHaveBeenCalled();
+            } finally {
+                applySavedSiteSpy.mockRestore();
+            }
         });
 
         it("should handle modify errors", async ({ task, annotate }) => {
@@ -546,6 +545,48 @@ describe(createSiteOperationsActions, () => {
                 actions.modifySite("test-site", { name: "Updated" })
             ).rejects.toThrow("Update failed");
             expect(mockDeps.setSites).not.toHaveBeenCalled();
+        });
+
+        it("should surface duplicate identifier errors from the helper", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteOperations", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const duplicateError = new DuplicateSiteIdentifierError(
+                [
+                    {
+                        identifier: mockSite.identifier,
+                        occurrences: 2,
+                    },
+                ],
+                "SitesStore.applySavedSiteToStore"
+            );
+
+            const applySavedSiteSpy = vi
+                .spyOn(siteOperationHelpers, "applySavedSiteToStore")
+                .mockImplementation(() => {
+                    throw duplicateError;
+                });
+
+            mockElectronAPI.sites.updateSite.mockResolvedValueOnce({
+                ...mockSite,
+                name: "Conflicting",
+            });
+
+            try {
+                await expect(
+                    actions.modifySite("test-site", { name: "Conflicting" })
+                ).rejects.toBe(duplicateError);
+
+                expect(mockDeps.setSites).not.toHaveBeenCalled();
+                expect(applySavedSiteSpy).toHaveBeenCalledTimes(1);
+            } finally {
+                applySavedSiteSpy.mockRestore();
+            }
         });
     });
 
@@ -567,24 +608,16 @@ describe(createSiteOperationsActions, () => {
             };
             mockDeps.getSites = vi.fn(() => [siteWithMultipleMonitors]);
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
-                true
-            );
-            mockElectronAPI.sites.removeMonitor.mockResolvedValue(true);
-
             await actions.removeMonitorFromSite("test-site", "monitor-1");
 
             expect(
                 mockElectronAPI.monitoring.stopMonitoringForSite
-            ).toHaveBeenCalledWith("test-site", "monitor-1");
-            expect(mockElectronAPI.sites.updateSite).toHaveBeenCalledWith(
+            ).not.toHaveBeenCalled();
+            expect(mockElectronAPI.sites.removeMonitor).toHaveBeenCalledWith(
                 "test-site",
-                expect.objectContaining({ monitors: expect.any(Array) })
+                "monitor-1"
             );
-            const updateArgs =
-                mockElectronAPI.sites.updateSite.mock.calls.at(-1);
-            const monitorsAfterRemoval = updateArgs?.[1]?.monitors ?? [];
-            expect(monitorsAfterRemoval).toHaveLength(1);
+            expect(mockElectronAPI.sites.updateSite).not.toHaveBeenCalled();
             expect(mockDeps.setSites).toHaveBeenCalled();
             const reconciledSites =
                 vi.mocked(mockDeps.setSites).mock.calls.at(-1)?.[0] ?? [];

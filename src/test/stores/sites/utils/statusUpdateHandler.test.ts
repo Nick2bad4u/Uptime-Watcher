@@ -63,10 +63,12 @@ import { StatusUpdateManager } from "../../../../stores/sites/utils/statusUpdate
 import { withUtilityErrorHandling } from "@shared/utils/errorHandling";
 import { isDevelopment } from "@shared/utils/environment";
 import { EventsService } from "../../../../services/EventsService";
+import { logger } from "../../../../services/logger";
 
 const mockWithUtilityErrorHandling = vi.mocked(withUtilityErrorHandling);
 const mockIsDevelopment = vi.mocked(isDevelopment);
 const mockEventsService = vi.mocked(EventsService);
+const mockLogger = vi.mocked(logger);
 
 describe("StatusUpdateHandler", () => {
     let mockOptions: any;
@@ -428,11 +430,27 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            const startEvent = { siteIdentifier: "site1" };
+            mockfullResyncSites.mockClear();
+            mockLogger.debug.mockClear();
+
+            const startEvent = {
+                monitorCount: 2,
+                siteCount: 1,
+                timestamp: Date.now(),
+            };
 
             // Trigger the callback and wait for async execution
             await startedCallback(startEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+
+            expect(mockfullResyncSites).not.toHaveBeenCalled();
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "Received monitoring lifecycle event",
+                expect.objectContaining({
+                    monitorCount: 2,
+                    phase: "started",
+                    siteCount: 1,
+                })
+            );
         });
 
         it("should handle monitoring stopped events", async ({
@@ -446,11 +464,28 @@ describe("StatusUpdateHandler", () => {
 
             await manager.subscribe();
 
-            const stopEvent = { siteIdentifier: "site1" };
+            mockfullResyncSites.mockClear();
+            mockLogger.debug.mockClear();
+
+            const stopEvent = {
+                activeMonitors: 1,
+                monitorCount: 1,
+                siteCount: 1,
+                timestamp: Date.now(),
+            };
 
             // Trigger the callback and wait for async execution
             await stoppedCallback(stopEvent);
-            expect(mockfullResyncSites).toHaveBeenCalled();
+            expect(mockfullResyncSites).not.toHaveBeenCalled();
+            expect(mockLogger.debug).toHaveBeenCalledWith(
+                "Received monitoring lifecycle event",
+                expect.objectContaining({
+                    activeMonitors: 1,
+                    monitorCount: 1,
+                    phase: "stopped",
+                    siteCount: 1,
+                })
+            );
         });
     });
 

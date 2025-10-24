@@ -181,6 +181,11 @@ Other Backend Services (via event listeners)
 - `internal:site:is-monitoring-active-requested` - Internal status queries
 - `internal:site:is-monitoring-active-response` - Internal status responses
 
+> **Emission flow:** `SiteManager` emits the `internal:site:*` topics for
+> lifecycle mutations while the `UptimeOrchestrator` sanitizes and re-emits the
+> public `site:*` events. Auxiliary telemetry (e.g. background cache refreshes)
+> may still originate from the manager when no additional enrichment is needed.
+
 ### 2. Monitor Events
 
 **Public Events:**
@@ -199,6 +204,13 @@ Other Backend Services (via event listeners)
 - `internal:monitor:all-started` - When all monitors are activated
 - `internal:monitor:all-stopped` - When all monitors are deactivated
 - `internal:monitor:manual-check-completed` - Manual check results
+
+> **Emission flow:** `MonitorManager` raises `internal:monitor:*` events for
+> lifecycle transitions and continues to emit high-frequency telemetry such as
+> `monitor:status-changed` directly. The `UptimeOrchestrator` translates the
+> lifecycle events into `monitoring:*` plus the canonical `cache:invalidated`
+> broadcasts (using `{ type: "all" }` for global transitions).
+
 - `internal:monitor:site-setup-completed` - Site monitor setup completion
 
 ### 3. Database Events

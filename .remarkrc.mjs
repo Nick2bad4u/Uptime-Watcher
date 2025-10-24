@@ -12,11 +12,15 @@
  * @see {@link https://github.com/remarkjs/remark-gfm} for GitHub Flavored Markdown
  */
 
+import requireSnippets from "./config/linting/remark/require-snippets.mjs";
+
 // Type definitions for remark configuration
 /** @typedef {import("unified").Preset} Preset */
 /** @typedef {import("unified").Plugin} Plugin */
-/** @typedef {string | [string, ...unknown[]]} PluginTuple */
-/** @typedef {string | Plugin | Preset | PluginTuple} PluginEntry */
+/** @typedef {string
+    | Plugin
+    | Preset
+    | [string | Plugin | Preset, ...unknown[]]} PluginEntry */
 
 /**
  * Remark settings for markdown processing
@@ -106,6 +110,30 @@ const remarkConfig = {
                 schemas: {
                     /* Add schema validation for frontmatter if needed */
                 },
+            },
+        ],
+
+        [
+            requireSnippets,
+            {
+                entries: [
+                    {
+                        pattern:
+                            "docs/Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md",
+                        snippets: [
+                            "sitesApi.removeMonitor",
+                            "SiteService.removeMonitor",
+                        ],
+                    },
+                    {
+                        pattern:
+                            "docs/Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md",
+                        snippets: [
+                            "SiteService.removeMonitor",
+                            "validateSiteSnapshot",
+                        ],
+                    },
+                ],
             },
         ],
 

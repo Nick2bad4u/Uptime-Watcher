@@ -961,13 +961,16 @@ export interface UptimeEvents extends UnknownRecord {
     /**
      * Emitted when a site is removed internally.
      *
-     * @param identifier - The unique identifier for the site.
+     * @param identifier - The unique identifier for the site (optional when
+     *   unavailable).
      * @param operation - The operation type (always "removed").
+     * @param site - Optional site snapshot captured prior to removal.
      * @param timestamp - Unix timestamp (ms) when the site was removed.
      */
     "internal:site:removed": {
-        identifier: string;
+        identifier?: string;
         operation: "removed";
+        site?: Site;
         timestamp: number;
     };
 
@@ -1060,6 +1063,7 @@ export interface UptimeEvents extends UnknownRecord {
      * @param identifier - The unique identifier for the site.
      * @param operation - The operation type (always "updated").
      * @param site - The updated site object.
+     * @param previousSite - Optional snapshot of the site before the update.
      * @param timestamp - Unix timestamp (ms) when the update occurred.
      * @param updatedFields - Optional list of updated field names.
      */
@@ -1070,6 +1074,8 @@ export interface UptimeEvents extends UnknownRecord {
         operation: "updated";
         /** The updated site object. */
         site: Site;
+        /** Previous site snapshot before the update (optional). */
+        previousSite?: Site;
         /** Unix timestamp (ms) when the update occurred. */
         timestamp: number;
         /** Optional list of updated field names. */

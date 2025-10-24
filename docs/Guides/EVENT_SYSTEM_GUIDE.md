@@ -437,6 +437,28 @@ Follow consistent naming patterns:
 
 "change"; // ❌ Too vague
 "monitor:down"; // ✅ Specific state
+
+### Layered Emission Strategy
+
+- **Managers emit internal lifecycle topics.** `SiteManager` and
+  `MonitorManager` raise `internal:site:*` and `internal:monitor:*` events for
+  CRUD and monitoring lifecycle operations. High-frequency telemetry such as
+  `monitor:status-changed` continues to originate directly from
+  `MonitorManager`, which remains the single source of truth for real-time
+  status transitions.
+- **`ServiceContainer` forwards internal events (plus selected telemetry).**
+  The container bridges manager buses to the `UptimeOrchestrator` for
+  lifecycle events and a curated set of telemetry events that still originate
+  from managers. This prevents duplicate public emissions while preserving the
+  low-latency paths needed for status updates.
+- **`UptimeOrchestrator` is the public source of truth.** It hydrates payloads,
+  sanitizes metadata, and emits public events (`site:*`, `monitoring:*`,
+  `monitor:*`) plus the canonical `cache:invalidated` notifications. Global
+  monitoring transitions now use `{ type: "all" }` so renderer caches can
+  short-circuit to a full resync.
+- **Frontend listens only to orchestrator output.** `ApplicationService`
+  subscribes to the orchestrator and uses `RendererEventBridge` to fan out to
+  windows, guaranteeing every renderer sees the same sanitized payloads.
 ```
 
 ### Event Data Design

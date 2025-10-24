@@ -39,6 +39,55 @@ Object.defineProperty(globalThis, "electronAPI", {
     writable: true,
 });
 
+const createValidHttpMonitor = (
+    id: string,
+    overrides: Partial<Site["monitors"][number]> = {}
+): Site["monitors"][number] => ({
+    checkInterval: 60_000,
+    history: [],
+    id,
+    lastChecked: new Date(),
+    monitoring: true,
+    responseTime: 120,
+    retryAttempts: 2,
+    status: "up",
+    timeout: 10_000,
+    url: `https://example-${id}.com`,
+    ...overrides,
+    type: "http",
+});
+
+const createValidPortMonitor = (
+    id: string,
+    overrides: Partial<Site["monitors"][number]> = {}
+): Site["monitors"][number] => ({
+    checkInterval: 60_000,
+    history: [],
+    host: "example.com",
+    id,
+    lastChecked: new Date(),
+    monitoring: true,
+    port: 443,
+    responseTime: 120,
+    retryAttempts: 2,
+    status: "up",
+    timeout: 10_000,
+    ...overrides,
+    type: "port",
+});
+
+const createValidSite = (
+    identifier: string,
+    overrides: Partial<Site> = {}
+): Site => ({
+    identifier,
+    monitors: overrides.monitors ?? [
+        createValidHttpMonitor(`${identifier}-monitor`),
+    ],
+    monitoring: overrides.monitoring ?? true,
+    name: overrides.name ?? `Site ${identifier}`,
+});
+
 describe("SiteService", () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -55,45 +104,14 @@ describe("SiteService", () => {
             await annotate("Type: Data Retrieval", "type");
 
             const mockSites: Site[] = [
-                {
-                    identifier: "site1",
-                    monitors: [
-                        {
-                            history: [],
-                            id: "monitor1",
-                            status: "up",
-                            type: "http",
-                            url: "https://test1.com",
-                            responseTime: 0,
-                            monitoring: false,
-                            checkInterval: 0,
-                            timeout: 0,
-                            retryAttempts: 0,
-                        },
-                    ],
+                createValidSite("site1", {
+                    monitoring: false,
                     name: "Test Site 1",
+                }),
+                createValidSite("site2", {
                     monitoring: false,
-                },
-                {
-                    identifier: "site2",
-                    monitors: [
-                        {
-                            history: [],
-                            host: "test2.com",
-                            id: "monitor2",
-                            port: 80,
-                            status: "down",
-                            type: "port",
-                            responseTime: 0,
-                            monitoring: false,
-                            checkInterval: 0,
-                            timeout: 0,
-                            retryAttempts: 0,
-                        },
-                    ],
                     name: "Test Site 2",
-                    monitoring: false,
-                },
+                }),
             ];
 
             // Mock electronAPI to return extracted data directly (no IPC wrapper)
@@ -158,45 +176,15 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const newSite: Omit<Site, "id"> = {
-                identifier: "new-site",
-                monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "pending",
-                        type: "http",
-                        url: "https://newsite.com",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "New Site",
+            const newSite = createValidSite("new-site", {
                 monitoring: false,
-            };
+                name: "New Site",
+            });
 
-            const createdSite: Site = {
-                identifier: "new-site",
-                monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "pending",
-                        type: "http",
-                        url: "https://newsite.com",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "New Site",
+            const createdSite = createValidSite("new-site", {
                 monitoring: false,
-            };
+                name: "New Site",
+            });
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(createdSite);
@@ -291,12 +279,9 @@ describe("SiteService", () => {
                 name: "Updated Site",
             };
 
-            const updatedSite: Site = {
-                identifier,
-                monitors: [],
-                monitoring: true,
+            const updatedSite = createValidSite(identifier, {
                 name: "Updated Site",
-            };
+            });
 
             mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
 
@@ -363,12 +348,9 @@ describe("SiteService", () => {
                 name: "Partially Updated Site",
             };
 
-            const updatedSite: Site = {
-                identifier,
-                monitors: [],
-                monitoring: true,
+            const updatedSite = createValidSite(identifier, {
                 name: "Partially Updated Site",
-            };
+            });
 
             mockElectronAPI.sites.updateSite.mockResolvedValueOnce(updatedSite);
 
@@ -531,25 +513,10 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const validSite: Omit<Site, "id"> = {
-                identifier: "valid-site",
-                monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "pending",
-                        type: "http",
-                        url: "https://valid.com",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "Valid Site",
+            const validSite = createValidSite("valid-site", {
                 monitoring: false,
-            };
+                name: "Valid Site",
+            });
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
@@ -572,38 +539,17 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
-            const siteWithMonitors: Omit<Site, "id"> = {
-                identifier: "site-with-monitors",
+            const siteWithMonitors = createValidSite("site-with-monitors", {
                 monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "up",
-                        type: "http",
-                        url: "https://monitored.com",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                    {
-                        history: [],
+                    createValidHttpMonitor("monitor1"),
+                    createValidPortMonitor("monitor2", {
                         host: "monitored.com",
-                        id: "monitor2",
                         port: 443,
-                        status: "down",
-                        type: "port",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
+                    }),
                 ],
-                name: "Site with Multiple Monitors",
                 monitoring: false,
-            };
+                name: "Site with Multiple Monitors",
+            });
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
@@ -624,25 +570,18 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteWithSpecialChars: Omit<Site, "id"> = {
-                identifier: "site-with-special-chars",
-                monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "pending",
-                        type: "http",
-                        url: "https://special-chars.com/path?param=value&other=test",
-                        responseTime: 0,
-                        monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
-                ],
-                name: "Site with Special Characters: @#$%",
-                monitoring: false,
-            };
+            const siteWithSpecialChars = createValidSite(
+                "site-with-special-chars",
+                {
+                    monitors: [
+                        createValidHttpMonitor("monitor1", {
+                            url: "https://special-chars.com/path?param=value&other=test",
+                        }),
+                    ],
+                    monitoring: false,
+                    name: "Site with Special Characters",
+                }
+            );
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(
@@ -663,25 +602,16 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            const siteWithUnicode: Omit<Site, "id"> = {
-                identifier: "site-with-unicode",
+            const siteWithUnicode = createValidSite("site-with-unicode", {
                 monitors: [
-                    {
-                        history: [],
-                        id: "monitor1",
-                        status: "pending",
-                        type: "http",
-                        url: "https://unicode-site.com",
-                        responseTime: 0,
+                    createValidHttpMonitor("monitor1", {
                         monitoring: false,
-                        checkInterval: 0,
-                        timeout: 0,
-                        retryAttempts: 0,
-                    },
+                        url: "https://unicode-site.com/🌟💻🚀",
+                    }),
                 ],
-                name: "Site with Unicode: 🌟💻🚀",
                 monitoring: false,
-            };
+                name: "Site with Unicode: 🌟💻🚀",
+            });
 
             // Mock electronAPI to return extracted Site directly (no IPC wrapper)
             mockElectronAPI.sites.addSite.mockResolvedValueOnce(

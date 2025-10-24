@@ -20,6 +20,7 @@ import type {
     IpcInvokeChannel,
     IpcInvokeChannelParams,
 } from "@shared/types/ipc";
+import type { Site } from "@shared/types";
 
 vi.mock("electron", () => ({
     ipcRenderer: {
@@ -238,14 +239,21 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
                 "monitor-1",
             ];
 
+            const persistedSite = {
+                identifier: "site-1",
+                monitoring: true,
+                monitors: [],
+                name: "Site",
+            } satisfies Site;
+
             vi.mocked(ipcRenderer.invoke)
                 .mockResolvedValueOnce(createHandshakeSuccess("remove-monitor"))
                 .mockResolvedValueOnce({
-                    data: true,
+                    data: persistedSite,
                     success: true,
                 });
 
-            await expect(invoke(...args)).resolves.toBeTruthy();
+            await expect(invoke(...args)).resolves.toEqual(persistedSite);
             expect(typeof invoke).toBe("function");
         });
 

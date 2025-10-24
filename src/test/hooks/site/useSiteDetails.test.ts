@@ -186,6 +186,9 @@ describe("useSiteDetails Hook - Basic Coverage", () => {
             updateMonitorRetryAttempts: vi.fn(),
             updateMonitorTimeout: vi.fn(),
             updateSiteCheckInterval: vi.fn(),
+            selectedMonitorIds: {
+                [mockSite.identifier]: mockSite.monitors[0]!.id,
+            },
         });
     });
 

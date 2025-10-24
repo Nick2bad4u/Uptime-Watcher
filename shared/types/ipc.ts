@@ -177,7 +177,7 @@ export interface IpcInvokeChannelMap {
     };
     "remove-monitor": {
         params: readonly [siteIdentifier: string, monitorId: string];
-        result: boolean;
+        result: Site;
     };
     "remove-site": {
         params: readonly [identifier: string];
