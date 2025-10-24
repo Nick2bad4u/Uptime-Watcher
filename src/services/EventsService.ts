@@ -10,6 +10,7 @@
  * @packageDocumentation
  */
 
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -20,10 +21,6 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import {
-    RENDERER_EVENT_CHANNELS,
-    type RendererEventPayload,
-} from "@shared/ipc/rendererEvents";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -38,15 +35,9 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     }
 })();
 
-type SiteAddedEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
->;
-type SiteRemovedEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
->;
-type SiteUpdatedEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
->;
+type SiteAddedEventData = RendererEventPayloadMap["site:added"];
+type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
+type SiteUpdatedEventData = RendererEventPayloadMap["site:updated"];
 
 interface EventsServiceContract {
     initialize: () => Promise<void>;

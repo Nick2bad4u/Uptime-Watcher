@@ -6,6 +6,7 @@
  * event subscription API exposed through `window.electronAPI.events`.
  */
 
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
     MonitorDownEventData,
@@ -16,20 +17,9 @@ import type {
     UpdateStatusEventData,
 } from "@shared/types/events";
 
-import {
-    RENDERER_EVENT_CHANNELS,
-    type RendererEventPayload,
-} from "@shared/ipc/rendererEvents";
-
-type SiteAddedRendererEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_ADDED
->;
-type SiteRemovedRendererEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_REMOVED
->;
-type SiteUpdatedRendererEventData = RendererEventPayload<
-    typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
->;
+type SiteAddedRendererEventData = RendererEventPayloadMap["site:added"];
+type SiteRemovedRendererEventData = RendererEventPayloadMap["site:removed"];
+type SiteUpdatedRendererEventData = RendererEventPayloadMap["site:updated"];
 
 /**
  * Contract for the preload events bridge exposed to the renderer.
