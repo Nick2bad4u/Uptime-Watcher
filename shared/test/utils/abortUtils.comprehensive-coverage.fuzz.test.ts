@@ -62,7 +62,7 @@ import {
     raceWithAbort,
     retryWithAbort,
     sleep,
-} from "./abortUtils.js";
+} from "../../utils/abortUtils.js";
 
 describe("abortUtils comprehensive fuzzing tests", () => {
     describe(createCombinedAbortSignal, () => {

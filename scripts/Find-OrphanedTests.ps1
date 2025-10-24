@@ -73,7 +73,8 @@ $ErrorActionPreference = "Stop"
 $MainTestDirs = @(
     "src/test",
     "electron/test",
-    "shared/test"
+    "shared/test",
+    "playwright/tests"
 )
 
 # Define common test file patterns
@@ -85,7 +86,15 @@ $TestFilePatterns = @(
     "*.spec.ts",
     "*.spec.js",
     "*.spec.tsx",
-    "*.spec.jsx"
+    "*.spec.jsx",
+    "*.test.mts",
+    "*.spec.mts",
+    "*.playwright.ts",
+    "*.playwright.js",
+    "*.e2e.ts",
+    "*.e2e.js",
+    "*.cy.ts",
+    "*.cy.js"
 )
 
 # Default directories to exclude from search
@@ -99,7 +108,12 @@ $DefaultExcludePaths = @(
     "build",
     ".vscode",
     "docs/docusaurus/node_modules",
-    "docs/*/node_modules"
+    "docs/*/node_modules",
+    ".cache",
+    ".tmp",
+    "temp",
+    "out",
+    "scripts/Find-OrphanedTests.ps1"
 )
 
 # Combine default and user-specified exclusions

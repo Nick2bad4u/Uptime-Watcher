@@ -33,7 +33,7 @@ import {
     typedObjectEntries,
     typedObjectKeys,
     typedObjectValues,
-} from "./objectSafety.js";
+} from "../../utils/objectSafety.js";
 
 describe("objectSafety comprehensive fuzzing tests", () => {
     describe(safeObjectAccess, () => {

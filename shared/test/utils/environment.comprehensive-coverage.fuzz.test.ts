@@ -34,7 +34,7 @@ import {
     isNodeEnvironment,
     isProduction,
     isTest,
-} from "./environment.js";
+} from "../../utils/environment.js";
 
 describe("environment comprehensive fuzzing tests", () => {
     let originalProcess: typeof globalThis.process = globalThis.process;

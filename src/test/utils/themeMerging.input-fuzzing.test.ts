@@ -22,9 +22,9 @@ import { describe, it, expect } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-import { deepMergeTheme } from "./themeMerging";
-import type { Theme } from "../types";
-import { themes } from "../themes";
+import { deepMergeTheme } from "../../theme/utils/themeMerging";
+import type { Theme } from "../../theme/types";
+import { themes } from "../../theme/themes";
 
 // Arbitraries for theme generation (reuse from ThemeManager tests but simplified)
 const colorArbitrary = fc

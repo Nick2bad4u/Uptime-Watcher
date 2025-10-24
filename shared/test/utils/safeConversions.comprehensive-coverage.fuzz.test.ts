@@ -34,7 +34,7 @@ import {
     safeParseRetryAttempts,
     safeParseTimeout,
     safeParseTimestamp,
-} from "./safeConversions.js";
+} from "../../utils/safeConversions.js";
 
 describe("safeConversions comprehensive fuzzing tests", () => {
     describe(safeNumberConversion, () => {

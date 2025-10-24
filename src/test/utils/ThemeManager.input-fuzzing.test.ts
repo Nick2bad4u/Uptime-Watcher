@@ -23,7 +23,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { test as fcTest } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-import { ThemeManager } from "./ThemeManager";
+import { ThemeManager } from "../../theme/ThemeManager";
 import type {
     Theme,
     ThemeName,
@@ -32,8 +32,8 @@ import type {
     ThemeSpacing,
     ThemeShadows,
     ThemeBorderRadius,
-} from "./types";
-import { themes } from "./themes";
+} from "../../theme/types";
+import { themes } from "../../theme/themes";
 
 // Mock DOM environment for testing
 const mockDocument = {
