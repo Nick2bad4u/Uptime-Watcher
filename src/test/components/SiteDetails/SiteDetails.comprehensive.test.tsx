@@ -127,14 +127,18 @@ vi.mock("../../../theme/useTheme", () => ({
     ),
 }));
 
-vi.mock("../../../services/chartConfig", () => ({
-    ChartConfigService: vi.fn().mockImplementation((_theme) => ({
-        getLineChartConfig: vi.fn(() => ({})),
-        getBarChartConfig: vi.fn(() => ({})),
-        getDoughnutChartConfig: vi.fn(() => ({})),
-        getBaseConfig: vi.fn(() => ({})),
-    })),
-}));
+vi.mock("../../../services/chartConfig", () => {
+    const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(this: any) {
+        this.getLineChartConfig = vi.fn(() => ({}));
+        this.getBarChartConfig = vi.fn(() => ({}));
+        this.getDoughnutChartConfig = vi.fn(() => ({}));
+        this.getBaseConfig = vi.fn(() => ({}));
+    });
+
+    return {
+        ChartConfigService: ChartConfigServiceMock,
+    };
+});
 
 vi.mock("../../../theme/components", () => ({
     ThemedBox: vi.fn(({ children, ...props }) => (

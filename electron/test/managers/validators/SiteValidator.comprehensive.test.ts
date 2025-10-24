@@ -4,12 +4,33 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import type { MonitorValidator as MonitorValidatorType } from "../../../managers/validators/MonitorValidator";
+
+const monitorValidatorCtor = vi.hoisted(() => {
+    const wrapper = vi.fn(function MockMonitorValidator() {
+        const instance: Partial<MonitorValidatorType> = {
+            validateMonitorConfiguration: vi.fn(),
+        };
+
+        wrapper.latestInstance = instance;
+
+        return instance;
+    }) as unknown as typeof vi.fn & {
+        latestInstance?: Partial<MonitorValidatorType>;
+    };
+
+    wrapper.latestInstance = undefined;
+
+    return wrapper;
+});
+
+vi.mock("../../../managers/validators/MonitorValidator", () => ({
+    MonitorValidator: monitorValidatorCtor,
+}));
+
 import { SiteValidator } from "../../../managers/validators/SiteValidator";
 import { MonitorValidator } from "../../../managers/validators/MonitorValidator";
 import type { Site } from "@shared/types";
-
-// Mock MonitorValidator
-vi.mock("../../../managers/validators/MonitorValidator");
 
 describe("SiteValidator - Comprehensive Coverage", () => {
     let siteValidator: SiteValidator;
@@ -19,17 +40,11 @@ describe("SiteValidator - Comprehensive Coverage", () => {
         // Reset all mocks
         vi.clearAllMocks();
 
-        // Create mock MonitorValidator
-        mockMonitorValidator = {
-            validateMonitorConfiguration: vi.fn(),
-        };
-
-        // Mock the MonitorValidator constructor
-        (MonitorValidator as any).mockImplementation(
-            () => mockMonitorValidator
-        );
-
         siteValidator = new SiteValidator();
+
+        const latestInstance = monitorValidatorCtor.latestInstance;
+        mockMonitorValidator = (latestInstance ??
+            new monitorValidatorCtor()) as Partial<MonitorValidator>;
     });
 
     describe("Constructor", () => {

@@ -22,62 +22,117 @@ vi.mock("../../utils/logger", () => ({
 }));
 
 // First add the same mocks as the main test
-const mockCache = {
-    get: vi.fn(),
-    set: vi.fn(),
-    delete: vi.fn(),
-    has: vi.fn(),
-    clear: vi.fn(),
-    size: 0,
-    keys: vi.fn().mockReturnValue([]),
-    getAll: vi.fn().mockReturnValue([]),
-    entries: vi.fn().mockReturnValue(new Map().entries()),
-    bulkUpdate: vi.fn(),
-    cleanup: vi.fn(),
-    invalidate: vi.fn(),
-    invalidateAll: vi.fn(),
-    getStats: vi
-        .fn()
-        .mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
-    onInvalidation: vi.fn().mockReturnValue(() => {}),
-};
+// First add the same mocks as the main test
+function createConstructableMock<T extends object>(
+    instance: T,
+    name: string
+): new () => T {
+    function Constructable(this: unknown): T {
+        return instance;
+    }
+
+    Object.defineProperty(Constructable, "name", { value: name });
+
+    return Constructable as unknown as new () => T;
+}
+
+const cacheMocks = vi.hoisted(() => {
+    const mockCache = {
+        get: vi.fn(),
+        set: vi.fn(),
+        delete: vi.fn(),
+        has: vi.fn(),
+        clear: vi.fn(),
+        keys: vi.fn().mockReturnValue([] as string[]),
+        getAll: vi.fn().mockReturnValue([] as unknown[]),
+        entries: vi.fn().mockReturnValue(new Map().entries()),
+        bulkUpdate: vi.fn(),
+        cleanup: vi.fn(),
+        invalidate: vi.fn(),
+        invalidateAll: vi.fn(),
+        getStats: vi
+            .fn()
+            .mockReturnValue({ hits: 0, misses: 0, hitRatio: 0, size: 0 }),
+        onInvalidation: vi.fn().mockReturnValue(() => {}),
+    };
+
+    const MockStandardizedCache = createConstructableMock(
+        mockCache,
+        "MockStandardizedCache"
+    );
+
+    return { mockCache, MockStandardizedCache };
+});
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
-    StandardizedCache: vi.fn(() => mockCache),
+    StandardizedCache: cacheMocks.MockStandardizedCache,
 }));
 
-const mockSiteRepositoryServiceInstance = {
-    getSitesFromDatabase: vi.fn().mockResolvedValue([]),
-};
+const repositoryMocks = vi.hoisted(() => {
+    const mockSiteRepositoryServiceInstance = {
+        getSitesFromDatabase: vi.fn().mockResolvedValue([] as unknown[]),
+    };
 
-const mockLoggerAdapterInstance = {
-    info: vi.fn(),
-    error: vi.fn(),
-    debug: vi.fn(),
-    warn: vi.fn(),
-};
+    const mockLoggerAdapterInstance = {
+        info: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        MockLoggerAdapter: createConstructableMock(
+            mockLoggerAdapterInstance,
+            "MockLoggerAdapter"
+        ),
+        MockSiteRepositoryService: createConstructableMock(
+            mockSiteRepositoryServiceInstance,
+            "MockSiteRepositoryService"
+        ),
+        mockLoggerAdapterInstance,
+        mockSiteRepositoryServiceInstance,
+    };
+});
 
 vi.mock("../../utils/database/serviceFactory", () => ({
-    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
-        return mockLoggerAdapterInstance;
-    }),
+    LoggerAdapter: repositoryMocks.MockLoggerAdapter,
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
-    SiteRepositoryService: vi.fn(() => mockSiteRepositoryServiceInstance),
+    SiteRepositoryService: repositoryMocks.MockSiteRepositoryService,
 }));
 
-const mockSiteWriterServiceInstance = {
-    createSite: vi.fn(),
-    updateSite: vi.fn(),
-    deleteSite: vi.fn(),
-    handleMonitorIntervalChanges: vi.fn(),
-    detectNewMonitors: vi.fn().mockReturnValue([]),
-};
+const siteWriterMocks = vi.hoisted(() => {
+    const mockSiteWriterServiceInstance = {
+        createSite: vi.fn(),
+        updateSite: vi.fn(),
+        deleteSite: vi.fn(),
+        handleMonitorIntervalChanges: vi.fn(),
+        detectNewMonitors: vi.fn().mockReturnValue([] as unknown[]),
+    };
+
+    return {
+        MockSiteWriterService: createConstructableMock(
+            mockSiteWriterServiceInstance,
+            "MockSiteWriterService"
+        ),
+        mockSiteWriterServiceInstance,
+    };
+});
 
 vi.mock("../../utils/database/SiteWriterService", () => ({
-    SiteWriterService: vi.fn(() => mockSiteWriterServiceInstance),
+    SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
+
+const { mockCache } = cacheMocks;
+const {
+    MockLoggerAdapter,
+    MockSiteRepositoryService,
+    mockLoggerAdapterInstance,
+    mockSiteRepositoryServiceInstance,
+} = repositoryMocks;
+const { MockSiteWriterService, mockSiteWriterServiceInstance } =
+    siteWriterMocks;
 
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {

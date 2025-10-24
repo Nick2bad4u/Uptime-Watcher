@@ -398,24 +398,25 @@ Object.defineProperty(window, "electronAPI", {
 
 // Mock Chart.js for component testing
 vi.mock("chart.js", () => {
-    const Chart = vi.fn();
-    Chart.register = vi.fn();
+    const Chart = Object.assign(vi.fn(), {
+        register: vi.fn(),
+    });
 
     return {
         Chart,
         registerables: [],
-    CategoryScale: vi.fn(),
-    LinearScale: vi.fn(),
-    TimeScale: vi.fn(),
-    BarElement: vi.fn(),
-    LineElement: vi.fn(),
-    PointElement: vi.fn(),
-    ArcElement: vi.fn(),
-    Title: vi.fn(),
-    Tooltip: vi.fn(),
-    Legend: vi.fn(),
-    Filler: vi.fn(),
-    Zoom: vi.fn(),
+        CategoryScale: vi.fn(),
+        LinearScale: vi.fn(),
+        TimeScale: vi.fn(),
+        BarElement: vi.fn(),
+        LineElement: vi.fn(),
+        PointElement: vi.fn(),
+        ArcElement: vi.fn(),
+        Title: vi.fn(),
+        Tooltip: vi.fn(),
+        Legend: vi.fn(),
+        Filler: vi.fn(),
+        Zoom: vi.fn(),
     };
 });
 

@@ -168,6 +168,14 @@ describe(ApplicationService, () => {
     beforeEach(async () => {
         vi.clearAllMocks();
 
+        mockUptimeOrchestrator.stopMonitoring.mockReset();
+        mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
+        mockUptimeOrchestrator.onTyped.mockReset();
+        mockUptimeOrchestrator.removeAllListeners.mockReset();
+
+        mockIpcService.cleanup.mockReset();
+        mockWindowService.closeMainWindow.mockReset();
+
         // Get the mocked ServiceContainer reference
         const serviceContainerModule = await import(
             "../../../services/ServiceContainer"
@@ -529,7 +537,7 @@ describe(ApplicationService, () => {
             const customSignal = abortController.signal;
 
             // Mock a long-running cleanup operation
-            mockUptimeOrchestrator.stopMonitoring.mockImplementation(
+            mockUptimeOrchestrator.stopMonitoring.mockImplementationOnce(
                 () =>
                     new Promise((resolve, reject) => {
                         // Simulate async operation that can be cancelled
@@ -563,6 +571,9 @@ describe(ApplicationService, () => {
 
             // Verify test signal is still intact
             expect(signal.aborted).toBeFalsy();
+
+            // Ensure subsequent tests start with resolved cleanup behavior
+            mockUptimeOrchestrator.stopMonitoring.mockResolvedValue(undefined);
         });
         it("should cleanup IPC service if cleanup method exists", async ({
             task,

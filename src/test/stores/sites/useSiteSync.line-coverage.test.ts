@@ -216,7 +216,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
                     StatusUpdateManagerMock.mockReset();
                     const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
-                    StatusUpdateManagerMock.mockImplementation(() => {
+                    StatusUpdateManagerMock.mockImplementation(function () {
                         const unsubscribe = vi.fn();
                         unsubscribeSpies.push(unsubscribe);
                         return {
@@ -276,7 +276,9 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(() => mockStatusUpdateManager);
+            ).mockImplementation(function () {
+                return mockStatusUpdateManager;
+            });
 
             const result =
                 await syncActions.subscribeToStatusUpdates(mockCallback);

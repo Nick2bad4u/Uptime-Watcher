@@ -469,7 +469,10 @@ describe("MonitorRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                {
+                    timeout: 5_000,
+                }
             );
         });
 
@@ -526,7 +529,10 @@ describe("MonitorRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                {
+                    timeout: 5_000,
+                }
             );
         });
 
@@ -586,7 +592,10 @@ describe("MonitorRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                {
+                    timeout: 5_000,
+                }
             );
         });
 

@@ -46,108 +46,147 @@ vi.mock("../../utils/logger", () => ({
     },
 }));
 
-vi.mock("../../utils/database/serviceFactory", () => {
-    const LoggerAdapter = vi.fn(function LoggerAdapterMock() {
-        return {
-            info: vi.fn(),
-            error: vi.fn(),
-            debug: vi.fn(),
-            warn: vi.fn(),
-        };
+function createConstructableMock<T extends object>(
+    instance: T,
+    name: string
+): new () => T {
+    function Constructable(this: unknown): T {
+        return instance;
+    }
+
+    Object.defineProperty(Constructable, "name", { value: name });
+
+    return Constructable as unknown as new () => T;
+}
+
+const cacheMocks = vi.hoisted(() => {
+    const cacheStore = new Map<string, Site>();
+
+    const mockCache = {
+        get: vi.fn((key: string) => cacheStore.get(key)),
+        set: vi.fn((key: string, value: Site) => {
+            cacheStore.set(key, value);
+        }),
+        delete: vi.fn((key: string) => cacheStore.delete(key)),
+        has: vi.fn((key: string) => cacheStore.has(key)),
+        clear: vi.fn(() => {
+            cacheStore.clear();
+        }),
+        keys: vi.fn(() => cacheStore.keys()),
+        getAll: vi.fn(() => Array.from(cacheStore.values())),
+        entries: vi.fn(() => cacheStore.entries()),
+        bulkUpdate: vi.fn(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
+            }
+        ),
+        replaceAll: vi.fn(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                cacheStore.clear();
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
+            }
+        ),
+        cleanup: vi.fn(() => 0),
+        invalidate: vi.fn(),
+        invalidateAll: vi.fn(),
+        getStats: vi.fn(() => ({
+            hits: 0,
+            misses: 0,
+            hitRatio: 0,
+            size: cacheStore.size,
+        })),
+        onInvalidation: vi.fn().mockReturnValue(() => {}),
+    };
+
+    Object.defineProperty(mockCache, "size", {
+        configurable: true,
+        enumerable: false,
+        get: () => cacheStore.size,
     });
 
-    return { LoggerAdapter };
-});
-
-// Mock StandardizedCache - Create shared mock instance backed by Map storage
-const cacheStore = new Map<string, Site>();
-
-const mockCache = {
-    get: vi.fn((key: string) => cacheStore.get(key)),
-    set: vi.fn((key: string, value: Site) => {
-        cacheStore.set(key, value);
-    }),
-    delete: vi.fn((key: string) => cacheStore.delete(key)),
-    has: vi.fn((key: string) => cacheStore.has(key)),
-    clear: vi.fn(() => {
-        cacheStore.clear();
-    }),
-    keys: vi.fn(() => cacheStore.keys()),
-    getAll: vi.fn(() => Array.from(cacheStore.values())),
-    entries: vi.fn(() => cacheStore.entries()),
-    bulkUpdate: vi.fn((items: { key: string; data: Site; ttl?: number }[]) => {
-        for (const item of items) {
-            cacheStore.set(item.key, item.data);
-        }
-    }),
-    replaceAll: vi.fn((items: { key: string; data: Site; ttl?: number }[]) => {
-        cacheStore.clear();
-        for (const item of items) {
-            cacheStore.set(item.key, item.data);
-        }
-    }),
-    cleanup: vi.fn(() => 0),
-    invalidate: vi.fn(),
-    invalidateAll: vi.fn(),
-    getStats: vi.fn(() => ({
-        hits: 0,
-        misses: 0,
-        hitRatio: 0,
-        size: cacheStore.size,
-    })),
-    onInvalidation: vi.fn().mockReturnValue(() => {}),
-};
-
-Object.defineProperty(mockCache, "size", {
-    configurable: true,
-    enumerable: false,
-    get: () => cacheStore.size,
+    return {
+        cacheStore,
+        mockCache,
+        MockStandardizedCache: createConstructableMock(
+            mockCache,
+            "MockStandardizedCache"
+        ),
+    };
 });
 
 vi.mock("../../utils/cache/StandardizedCache", () => ({
-    StandardizedCache: vi.fn(function StandardizedCacheMock() {
-        return mockCache;
-    }),
+    StandardizedCache: cacheMocks.MockStandardizedCache,
 }));
 
-// Create mock instances for dependency injection
-const mockSiteRepositoryServiceInstance = {
-    getSitesFromDatabase: vi.fn().mockResolvedValue([]),
-};
+const repositoryMocks = vi.hoisted(() => {
+    const mockSiteRepositoryServiceInstance = {
+        getSitesFromDatabase: vi.fn().mockResolvedValue([]),
+    };
 
-const mockLoggerAdapterInstance = {
-    info: vi.fn(),
-    error: vi.fn(),
-    debug: vi.fn(),
-    warn: vi.fn(),
-};
+    const mockLoggerAdapterInstance = {
+        info: vi.fn(),
+        error: vi.fn(),
+        debug: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        MockLoggerAdapter: createConstructableMock(
+            mockLoggerAdapterInstance,
+            "MockLoggerAdapter"
+        ),
+        MockSiteRepositoryService: createConstructableMock(
+            mockSiteRepositoryServiceInstance,
+            "MockSiteRepositoryService"
+        ),
+        mockLoggerAdapterInstance,
+        mockSiteRepositoryServiceInstance,
+    };
+});
 
 vi.mock("../../utils/database/serviceFactory", () => ({
-    LoggerAdapter: vi.fn(function LoggerAdapterMock() {
-        return mockLoggerAdapterInstance;
-    }),
+    LoggerAdapter: repositoryMocks.MockLoggerAdapter,
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
-    SiteRepositoryService: vi.fn(function SiteRepositoryServiceMock() {
-        return mockSiteRepositoryServiceInstance;
-    }),
+    SiteRepositoryService: repositoryMocks.MockSiteRepositoryService,
 }));
 
-// Mock module and create shared mock instance
-const mockSiteWriterServiceInstance = {
-    createSite: vi.fn(),
-    updateSite: vi.fn(),
-    deleteSite: vi.fn(),
-    handleMonitorIntervalChanges: vi.fn(),
-    detectNewMonitors: vi.fn().mockReturnValue([]),
-};
+const siteWriterMocks = vi.hoisted(() => {
+    const mockSiteWriterServiceInstance = {
+        createSite: vi.fn(),
+        updateSite: vi.fn(),
+        deleteSite: vi.fn(),
+        handleMonitorIntervalChanges: vi.fn(),
+        detectNewMonitors: vi.fn().mockReturnValue([]),
+    };
+
+    return {
+        MockSiteWriterService: createConstructableMock(
+            mockSiteWriterServiceInstance,
+            "MockSiteWriterService"
+        ),
+        mockSiteWriterServiceInstance,
+    };
+});
 
 vi.mock("../../utils/database/SiteWriterService", () => ({
-    SiteWriterService: vi.fn(function SiteWriterServiceMock() {
-        return mockSiteWriterServiceInstance;
-    }),
+    SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
+
+const { cacheStore, mockCache } = cacheMocks;
+const {
+    MockLoggerAdapter,
+    MockSiteRepositoryService,
+    mockLoggerAdapterInstance,
+    mockSiteRepositoryServiceInstance,
+} = repositoryMocks;
+const { MockSiteWriterService, mockSiteWriterServiceInstance } =
+    siteWriterMocks;
 
 describe("SiteManager - Comprehensive", () => {
     let siteManager: SiteManager;

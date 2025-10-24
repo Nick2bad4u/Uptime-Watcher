@@ -160,16 +160,16 @@ async function checkDnsResolution(
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     try {
-        const timeoutPromise = new Promise<never>((_resolve, reject) => {
+        const timeoutPromise = new Promise<string[]>((_resolve, reject) => {
             timeoutId = setTimeout(() => {
                 reject(new Error(`DNS resolution timeout after ${timeout}ms`));
             }, timeout);
         });
 
-        const addresses = (await Promise.race([
+        const addresses = await Promise.race([
             dns.resolve4(host),
             timeoutPromise,
-        ])) as string[];
+        ]);
 
         return {
             addresses,

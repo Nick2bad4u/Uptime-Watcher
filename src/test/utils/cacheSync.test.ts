@@ -12,6 +12,7 @@ import {
     it,
     vi,
 } from "vitest";
+import type { MockInstance } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { logger } from "../../services/logger";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -33,9 +34,7 @@ vi.mock("../../utils/monitorTypeHelper", () => ({
 const noopCleanup = (): void => {};
 
 const createSubscriptionMock = () =>
-    vi.fn(async (_callback: unknown) => {
-        return noopCleanup;
-    });
+    vi.fn(async (_callback: unknown) => noopCleanup);
 
 const mockEventsService = {
     initialize: vi.fn(async () => undefined),
@@ -137,9 +136,7 @@ const setOnCacheInvalidatedHandler = (
     handler: ReturnType<typeof vi.fn>
 ): void => {
     mockEventsService.onCacheInvalidated.mockImplementation(
-        async (callback: unknown) => {
-            return handler(callback);
-        }
+        async (callback: unknown) => handler(callback)
     );
 
     const electronWindow = globalThis.window as typeof globalThis.window & {
@@ -159,8 +156,8 @@ const flushAsyncOperations = async (): Promise<void> => {
 let setupCacheSync: (typeof import("../../utils/cacheSync"))["setupCacheSync"];
 let monitorStoreModule: typeof import("../../stores/monitor/useMonitorTypesStore");
 let sitesStoreModule: typeof import("../../stores/sites/useSitesStore");
-let monitorRefreshSpy!: ReturnType<typeof vi.spyOn>;
-let sitesResyncSpy!: ReturnType<typeof vi.spyOn>;
+let monitorRefreshSpy!: MockInstance<() => Promise<void>>;
+let sitesResyncSpy!: MockInstance<() => Promise<void>>;
 
 beforeAll(async () => {
     ({ setupCacheSync } = await import("../../utils/cacheSync"));
@@ -172,12 +169,12 @@ beforeAll(async () => {
     monitorRefreshSpy = vi.spyOn(
         monitorState,
         "refreshMonitorTypes"
-    );
+    ) as unknown as MockInstance<() => Promise<void>>;
     monitorRefreshSpy.mockImplementation(async () => {
         await mockRefreshMonitorTypes();
     });
     const sitesState = sitesStoreModule.useSitesStore.getState();
-    sitesResyncSpy = vi.spyOn(sitesState, "fullResyncSites");
+    sitesResyncSpy = vi.spyOn(sitesState, "fullResyncSites") as unknown as MockInstance<() => Promise<void>>;
     sitesResyncSpy.mockImplementation(async () => {
         await mockFullResyncSites();
     });

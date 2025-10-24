@@ -237,7 +237,7 @@ export class WindowService {
     private async waitForViteServer(): Promise<void> {
         const isFetchMock =
             typeof fetch === "function" &&
-            Object.prototype.hasOwnProperty.call(fetch, "mock");
+            Object.hasOwn(fetch, "mock");
 
         if (isFetchMock) {
             const controller = new AbortController();

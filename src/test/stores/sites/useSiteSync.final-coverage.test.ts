@@ -84,6 +84,7 @@ Object.defineProperty(globalThis, "window", {
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { logStoreAction } from "../../../stores/utils";
+import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
 
 describe("useSiteSync - Final 100% Coverage", () => {
     let mockDeps: any;

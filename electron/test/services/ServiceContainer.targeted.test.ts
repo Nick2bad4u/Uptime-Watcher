@@ -6,47 +6,52 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { ServiceContainer } from "../../services/ServiceContainer";
 
-// Create hoisted mock factory for TypedEventBus using constructor pattern
-const mockTypedEventBus = vi.hoisted(() => {
-    function MockTypedEventBus(name?: string) {
-        // Create a mock that has both EventEmitter and TypedEventBus methods
-        return {
-            // Standard EventEmitter methods
-            on: vi.fn(),
-            off: vi.fn(),
-            emit: vi.fn(),
-            once: vi.fn(),
-            removeListener: vi.fn(),
-            removeAllListeners: vi.fn(),
-            addListener: vi.fn(),
-            prependListener: vi.fn(),
-            prependOnceListener: vi.fn(),
-            listeners: vi.fn().mockReturnValue([]),
-            listenerCount: vi.fn().mockReturnValue(0),
-            eventNames: vi.fn().mockReturnValue([]),
-            setMaxListeners: vi.fn(),
-            getMaxListeners: vi.fn().mockReturnValue(10),
-
-            // TypedEventBus-specific methods
-            onTyped: vi.fn(),
-            emitTyped: vi.fn().mockResolvedValue(undefined),
-            offTyped: vi.fn(),
-            onceTyped: vi.fn(),
-            removeTypedListener: vi.fn(),
-            removeAllTypedListeners: vi.fn(),
-            getListenerCount: vi.fn().mockReturnValue(0),
-            hasListeners: vi.fn().mockReturnValue(false),
-            busId: name || "test-bus",
-            destroy: vi.fn(),
-        };
+function createConstructableMock<T extends object>(
+    instance: T,
+    name: string
+): new () => T {
+    function Constructable(this: unknown): T {
+        return instance;
     }
 
-    return MockTypedEventBus;
+    Object.defineProperty(Constructable, "name", { value: name });
+
+    return Constructable as unknown as new () => T;
+}
+
+// Create hoisted mock factory for TypedEventBus using constructor pattern
+const typedEventBusMocks = vi.hoisted(() => {
+    const typedEventBusInstance = {
+        on: vi.fn(),
+        off: vi.fn(),
+        once: vi.fn(),
+        emit: vi.fn(),
+        removeListener: vi.fn(),
+        removeAllListeners: vi.fn(),
+        listeners: vi.fn().mockReturnValue([] as unknown[]),
+        addListener: vi.fn(),
+        onTyped: vi.fn(),
+        emitTyped: vi.fn().mockResolvedValue(undefined),
+        removeTypedListener: vi.fn(),
+        removeAllTypedListeners: vi.fn(),
+        getListenerCount: vi.fn().mockReturnValue(0),
+        hasListeners: vi.fn().mockReturnValue(false),
+        destroy: vi.fn(),
+        busId: "test-bus",
+    };
+
+    return {
+        MockTypedEventBus: createConstructableMock(
+            typedEventBusInstance,
+            "MockTypedEventBus"
+        ),
+        typedEventBusInstance,
+    };
 });
 
 // Mock TypedEventBus using hoisted factory
 vi.mock("../../events/TypedEventBus", () => ({
-    TypedEventBus: mockTypedEventBus,
+    TypedEventBus: typedEventBusMocks.MockTypedEventBus,
 }));
 
 // Mock logger to prevent noise
@@ -83,86 +88,136 @@ vi.mock("../../services/database/DatabaseService", () => ({
 }));
 
 // Mock all repository classes
-vi.mock("../../services/database/HistoryRepository", () => ({
-    HistoryRepository: vi.fn().mockImplementation(() => ({
+const serviceMocks = vi.hoisted(() => {
+    const mockHistoryRepository = {
         initialize: vi.fn().mockResolvedValue(undefined),
         getAllHistory: vi.fn().mockResolvedValue([]),
         addHistoryEntry: vi.fn().mockResolvedValue(undefined),
         deleteHistory: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-    })),
-}));
+    };
 
-vi.mock("../../services/database/MonitorRepository", () => ({
-    MonitorRepository: vi.fn().mockImplementation(() => ({
+    const mockMonitorRepository = {
         initialize: vi.fn().mockResolvedValue(undefined),
         getAllMonitors: vi.fn().mockResolvedValue([]),
         createMonitor: vi.fn().mockResolvedValue(undefined),
         updateMonitor: vi.fn().mockResolvedValue(undefined),
         deleteMonitor: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-    })),
-}));
+    };
 
-vi.mock("../../services/database/SettingsRepository", () => ({
-    SettingsRepository: vi.fn().mockImplementation(() => ({
+    const mockSettingsRepository = {
         initialize: vi.fn().mockResolvedValue(undefined),
         getSettings: vi.fn().mockResolvedValue({}),
         updateSettings: vi.fn().mockResolvedValue(undefined),
         resetSettings: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-    })),
-}));
+    };
 
-vi.mock("../../services/database/SiteRepository", () => ({
-    SiteRepository: vi.fn().mockImplementation(() => ({
+    const mockSiteRepository = {
         initialize: vi.fn().mockResolvedValue(undefined),
         getAllSites: vi.fn().mockResolvedValue([]),
         createSite: vi.fn().mockResolvedValue(undefined),
         updateSite: vi.fn().mockResolvedValue(undefined),
         deleteSite: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-    })),
-}));
+    };
 
-// Mock ConfigurationManager
-vi.mock("../../managers/ConfigurationManager", () => ({
-    ConfigurationManager: vi.fn().mockImplementation(() => ({
+    const mockConfigurationManager = {
         initialize: vi.fn().mockResolvedValue(undefined),
         getConfig: vi.fn().mockReturnValue({}),
         updateConfig: vi.fn().mockResolvedValue(undefined),
         resetConfig: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
-    })),
-}));
+    };
 
-// Mock SiteManager
-vi.mock("../../managers/SiteManager", () => ({
-    SiteManager: vi.fn().mockImplementation((_dependencies) =>
-        // Store the event bus passed to the constructor so ServiceContainer can use it
+    const mockSiteManager = {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        getSitesCache: vi.fn().mockReturnValue(new Map()),
+        addSite: vi.fn().mockResolvedValue(undefined),
+        updateSite: vi.fn().mockResolvedValue(undefined),
+        deleteSite: vi.fn().mockResolvedValue(undefined),
+        isInitialized: vi.fn().mockReturnValue(true),
+    };
 
-        ({
-            initialize: vi.fn().mockResolvedValue(undefined),
-            getSitesCache: vi.fn().mockReturnValue(new Map()),
-            addSite: vi.fn().mockResolvedValue(undefined),
-            updateSite: vi.fn().mockResolvedValue(undefined),
-            deleteSite: vi.fn().mockResolvedValue(undefined),
-            isInitialized: vi.fn().mockReturnValue(true),
-        })
-    ),
-}));
-
-// Mock UptimeOrchestrator
-vi.mock("../../UptimeOrchestrator", () => ({
-    UptimeOrchestrator: vi.fn().mockImplementation(() => ({
+    const mockUptimeOrchestrator = {
         initialize: vi.fn().mockResolvedValue(undefined),
         start: vi.fn().mockResolvedValue(undefined),
         stop: vi.fn().mockResolvedValue(undefined),
         restart: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
         emitTyped: vi.fn().mockResolvedValue(undefined),
-    })),
+    };
+
+    return {
+        MockConfigurationManager: createConstructableMock(
+            mockConfigurationManager,
+            "MockConfigurationManager"
+        ),
+        MockHistoryRepository: createConstructableMock(
+            mockHistoryRepository,
+            "MockHistoryRepository"
+        ),
+        MockMonitorRepository: createConstructableMock(
+            mockMonitorRepository,
+            "MockMonitorRepository"
+        ),
+        MockSettingsRepository: createConstructableMock(
+            mockSettingsRepository,
+            "MockSettingsRepository"
+        ),
+        MockSiteManager: createConstructableMock(
+            mockSiteManager,
+            "MockSiteManager"
+        ),
+        MockSiteRepository: createConstructableMock(
+            mockSiteRepository,
+            "MockSiteRepository"
+        ),
+        MockUptimeOrchestrator: createConstructableMock(
+            mockUptimeOrchestrator,
+            "MockUptimeOrchestrator"
+        ),
+    };
+});
+
+vi.mock("../../services/database/HistoryRepository", () => ({
+    HistoryRepository: serviceMocks.MockHistoryRepository,
 }));
+
+vi.mock("../../services/database/MonitorRepository", () => ({
+    MonitorRepository: serviceMocks.MockMonitorRepository,
+}));
+
+vi.mock("../../services/database/SettingsRepository", () => ({
+    SettingsRepository: serviceMocks.MockSettingsRepository,
+}));
+
+vi.mock("../../services/database/SiteRepository", () => ({
+    SiteRepository: serviceMocks.MockSiteRepository,
+}));
+
+vi.mock("../../managers/ConfigurationManager", () => ({
+    ConfigurationManager: serviceMocks.MockConfigurationManager,
+}));
+
+vi.mock("../../managers/SiteManager", () => ({
+    SiteManager: serviceMocks.MockSiteManager,
+}));
+
+vi.mock("../../UptimeOrchestrator", () => ({
+    UptimeOrchestrator: serviceMocks.MockUptimeOrchestrator,
+}));
+
+const {
+    MockConfigurationManager,
+    MockHistoryRepository,
+    MockMonitorRepository,
+    MockSettingsRepository,
+    MockSiteManager,
+    MockSiteRepository,
+    MockUptimeOrchestrator,
+} = serviceMocks;
 
 describe("ServiceContainer - Targeted SiteManager Test", () => {
     beforeEach(() => {

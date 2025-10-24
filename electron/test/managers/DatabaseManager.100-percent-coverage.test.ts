@@ -61,12 +61,14 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
 }));
 
 vi.mock("../../services/commands/DatabaseCommands", () => ({
-    DatabaseCommandExecutor: vi.fn().mockImplementation(() => ({
-        execute: vi.fn().mockResolvedValue({ success: true }),
-        executeImport: vi.fn().mockResolvedValue({ success: true }),
-        executeExport: vi.fn().mockResolvedValue({ success: true }),
-        executeBackup: vi.fn().mockResolvedValue({ success: true }),
-    })),
+    DatabaseCommandExecutor: vi.fn().mockImplementation(function () {
+        return {
+            execute: vi.fn().mockResolvedValue({ success: true }),
+            executeImport: vi.fn().mockResolvedValue({ success: true }),
+            executeExport: vi.fn().mockResolvedValue({ success: true }),
+            executeBackup: vi.fn().mockResolvedValue({ success: true }),
+        };
+    }),
     DownloadBackupCommand: vi.fn(),
     ExportDataCommand: vi.fn(),
     ImportDataCommand: vi.fn(),
@@ -83,24 +85,29 @@ vi.mock("../../utils/database/serviceFactory", () => ({
         entries: vi.fn().mockReturnValue([]),
         keys: vi.fn().mockReturnValue([]),
         values: vi.fn().mockReturnValue([]),
+        replaceAll: vi.fn(),
     }),
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
-    SiteRepositoryService: vi.fn().mockImplementation(() => ({
-        getSitesFromDatabase: vi.fn().mockResolvedValue([]),
-    })),
-    SiteLoadingOrchestrator: vi.fn().mockImplementation(() => ({
-        loadSitesFromDatabase: vi.fn().mockResolvedValue({
-            success: true,
-            sitesLoaded: 0,
-            message: "Success",
-        }),
-        loadSitesFromRepository: vi.fn().mockResolvedValue([]),
-        addSiteToCache: vi.fn().mockResolvedValue(undefined),
-        updateSiteInCache: vi.fn().mockResolvedValue(undefined),
-        removeSiteFromCache: vi.fn().mockResolvedValue(undefined),
-    })),
+    SiteRepositoryService: vi.fn().mockImplementation(function () {
+        return {
+            getSitesFromDatabase: vi.fn().mockResolvedValue([]),
+        };
+    }),
+    SiteLoadingOrchestrator: vi.fn().mockImplementation(function () {
+        return {
+            loadSitesFromDatabase: vi.fn().mockResolvedValue({
+                success: true,
+                sitesLoaded: 0,
+                message: "Success",
+            }),
+            loadSitesFromRepository: vi.fn().mockResolvedValue([]),
+            addSiteToCache: vi.fn().mockResolvedValue(undefined),
+            updateSiteInCache: vi.fn().mockResolvedValue(undefined),
+            removeSiteFromCache: vi.fn().mockResolvedValue(undefined),
+        };
+    }),
 }));
 
 vi.mock("../../utils/database/historyLimitManager", () => ({

@@ -902,19 +902,6 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
-     * Emitted when a site's cache is updated internally.
-     *
-     * @param identifier - The unique identifier for the site.
-     * @param operation - The operation type (always "cache-updated").
-     * @param timestamp - Unix timestamp (ms) when the cache was updated.
-     */
-    "internal:site:cache-updated": {
-        identifier: string;
-        operation: "background-load" | "cache-updated" | "manual-refresh";
-        timestamp: number;
-    };
-
-    /**
      * Emitted when a site lookup misses the cache internally.
      *
      * @param backgroundLoading - Whether a background refresh was triggered.
@@ -926,6 +913,19 @@ export interface UptimeEvents extends UnknownRecord {
         backgroundLoading: boolean;
         identifier: string;
         operation: "cache-lookup";
+        timestamp: number;
+    };
+
+    /**
+     * Emitted when a site's cache is updated internally.
+     *
+     * @param identifier - The unique identifier for the site.
+     * @param operation - The operation type (always "cache-updated").
+     * @param timestamp - Unix timestamp (ms) when the cache was updated.
+     */
+    "internal:site:cache-updated": {
+        identifier: string;
+        operation: "background-load" | "cache-updated" | "manual-refresh";
         timestamp: number;
     };
 
@@ -1087,10 +1087,10 @@ export interface UptimeEvents extends UnknownRecord {
         identifier: string;
         /** The operation type (always "updated"). */
         operation: "updated";
-        /** The updated site object. */
-        site: Site;
         /** Previous site snapshot before the update (optional). */
         previousSite?: Site;
+        /** The updated site object. */
+        site: Site;
         /** Unix timestamp (ms) when the update occurred. */
         timestamp: number;
         /** Optional list of updated field names. */

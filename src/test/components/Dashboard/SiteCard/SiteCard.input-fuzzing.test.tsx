@@ -432,9 +432,8 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
         vi.clearAllMocks();
         mockSiteData = null;
         // Clean up any leftover containers from previous tests
-        for (const container of document.querySelectorAll(
-            '[id^="sitecard-test-"]'
-        )) {
+        const containers = document.querySelectorAll('[id^="sitecard-test-"]');
+        for (const container of containers) {
             container.remove();
         }
     });
@@ -442,9 +441,8 @@ describe("SiteCard Component - Property-Based Fuzzing Tests", () => {
     afterEach(() => {
         mockSiteData = null;
         // Clean up any leftover containers after each test
-        for (const container of document.querySelectorAll(
-            '[id^="sitecard-test-"]'
-        )) {
+        const containers = document.querySelectorAll('[id^="sitecard-test-"]');
+        for (const container of containers) {
             container.remove();
         }
     });

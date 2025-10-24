@@ -43,6 +43,35 @@ import { AutoUpdaterService } from "./updater/AutoUpdaterService";
 import { WindowService } from "./window/WindowService";
 
 /**
+ * Represents a service that optionally exposes an {@link initialize} method.
+ */
+interface PossiblyInitializableService {
+    /** Optional initializer invoked during container bootstrap. */
+    initialize?: (() => void) | (() => Promise<void>) | (() => unknown);
+}
+
+/**
+ * Type guard that determines if a service exposes an {@link initialize} method.
+ *
+ * @param value - Potential service instance to inspect.
+ *
+ * @returns True when the service defines an {@link initialize} method that can
+ *   be invoked safely.
+ */
+function hasInitializeMethod(
+    value: unknown
+): value is PossiblyInitializableService & {
+    initialize: () => unknown;
+} {
+    if (typeof value !== "object" || value === null) {
+        return false;
+    }
+
+    const candidate = value as PossiblyInitializableService;
+    return typeof candidate.initialize === "function";
+}
+
+/**
  * Supported payload formats for manager events forwarded to the orchestrator.
  *
  * @remarks
@@ -317,17 +346,50 @@ export class ServiceContainer {
     public async initialize(): Promise<void> {
         logger.info("[ServiceContainer] Initializing services");
         await this.getDatabaseService().initialize();
-        await this.getConfigurationManager().initialize?.();
+        await this.tryInitializeService(
+            this.getConfigurationManager(),
+            "ConfigurationManager"
+        );
         this.getHistoryRepository();
         this.getMonitorRepository();
         this.getSettingsRepository();
         this.getSiteRepository();
         await this.getDatabaseManager().initialize();
-        await this.getSiteManager().initialize?.();
-        await this.getMonitorManager().initialize?.();
+        await this.tryInitializeService(
+            this.getSiteManager(),
+            "SiteManager"
+        );
+        await this.tryInitializeService(
+            this.getMonitorManager(),
+            "MonitorManager"
+        );
         await this.getUptimeOrchestrator().initialize();
         this.getIpcService().setupHandlers();
         logger.info("[ServiceContainer] All services initialized successfully");
+    }
+
+    /**
+     * Attempts to call an optional {@code initialize} method on a service instance.
+     *
+     * @param service - Service instance that may expose an initialize method.
+     * @param serviceName - Human-readable name for diagnostics while debug logging is enabled.
+     */
+    private async tryInitializeService(
+        service: unknown,
+        serviceName: string
+    ): Promise<void> {
+        if (hasInitializeMethod(service)) {
+            const initializationResult = service.initialize.call(service);
+            await Promise.resolve(initializationResult);
+            return;
+        }
+
+        if (this.config.enableDebugLogging) {
+            logger.debug(
+                "[ServiceContainer] Service '%s' does not define an initializer.",
+                serviceName
+            );
+        }
     }
 
     /**

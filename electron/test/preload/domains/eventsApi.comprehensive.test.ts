@@ -60,6 +60,7 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
 
 const createMonitorFixture = (overrides: Partial<Monitor> = {}): Monitor => ({
     activeOperations: [],
@@ -657,14 +658,17 @@ describe("Events Domain API", () => {
             eventsApi.removeAllListeners();
 
             const expectedChannels = [
-                "cache:invalidated",
-                "monitor:down",
-                "monitoring:started",
-                "monitoring:stopped",
-                "monitor:status-changed",
-                "monitor:up",
-                "test-event",
-                "update-status",
+                RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
+                RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
+                RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
+                RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
+                RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,
+                RENDERER_EVENT_CHANNELS.MONITOR_UP,
+                RENDERER_EVENT_CHANNELS.SITE_ADDED,
+                RENDERER_EVENT_CHANNELS.SITE_REMOVED,
+                RENDERER_EVENT_CHANNELS.SITE_UPDATED,
+                RENDERER_EVENT_CHANNELS.TEST_EVENT,
+                RENDERER_EVENT_CHANNELS.UPDATE_STATUS,
             ];
 
             expect(mockIpcRenderer.removeAllListeners).toHaveBeenCalledTimes(

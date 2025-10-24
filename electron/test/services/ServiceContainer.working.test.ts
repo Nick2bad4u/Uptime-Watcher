@@ -61,55 +61,65 @@ const mockEventBus = vi.hoisted(() => {
 });
 
 const mockMonitorManager = vi.hoisted(() =>
-    vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        startMonitoring: vi.fn().mockResolvedValue(undefined),
-        stopMonitoring: vi.fn().mockResolvedValue(undefined),
-        getMonitorStatus: vi.fn().mockReturnValue("stopped"),
-        isInitialized: vi.fn().mockReturnValue(true),
-    }))
+    vi.fn().mockImplementation(function () {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            startMonitoring: vi.fn().mockResolvedValue(undefined),
+            stopMonitoring: vi.fn().mockResolvedValue(undefined),
+            getMonitorStatus: vi.fn().mockReturnValue("stopped"),
+            isInitialized: vi.fn().mockReturnValue(true),
+        };
+    })
 );
 
 const mockDatabaseService = vi.hoisted(() =>
-    vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true),
-        close: vi.fn().mockResolvedValue(undefined),
-        getConnection: vi.fn(),
-        beginTransaction: vi.fn(),
-        commitTransaction: vi.fn(),
-        rollbackTransaction: vi.fn(),
-        getInstance: vi.fn().mockReturnThis(),
-    }))
+    vi.fn().mockImplementation(function () {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            isInitialized: vi.fn().mockReturnValue(true),
+            close: vi.fn().mockResolvedValue(undefined),
+            getConnection: vi.fn(),
+            beginTransaction: vi.fn(),
+            commitTransaction: vi.fn(),
+            rollbackTransaction: vi.fn(),
+            getInstance: vi.fn().mockReturnThis(),
+        };
+    })
 );
 
 const mockDatabaseManager = vi.hoisted(() =>
-    vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        backup: vi.fn().mockResolvedValue(undefined),
-        restore: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true),
-        refreshSites: vi.fn().mockResolvedValue(undefined),
-    }))
+    vi.fn().mockImplementation(function () {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            backup: vi.fn().mockResolvedValue(undefined),
+            restore: vi.fn().mockResolvedValue(undefined),
+            isInitialized: vi.fn().mockReturnValue(true),
+            refreshSites: vi.fn().mockResolvedValue(undefined),
+        };
+    })
 );
 
 const mockUptimeOrchestrator = vi.hoisted(() =>
-    vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        start: vi.fn().mockResolvedValue(undefined),
-        stop: vi.fn().mockResolvedValue(undefined),
-        restart: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true),
-        getHistoryLimit: vi.fn().mockReturnValue(100),
-    }))
+    vi.fn().mockImplementation(function () {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            start: vi.fn().mockResolvedValue(undefined),
+            stop: vi.fn().mockResolvedValue(undefined),
+            restart: vi.fn().mockResolvedValue(undefined),
+            isInitialized: vi.fn().mockReturnValue(true),
+            getHistoryLimit: vi.fn().mockReturnValue(100),
+        };
+    })
 );
 
 const mockIpcService = vi.hoisted(() =>
-    vi.fn().mockImplementation(() => ({
-        setupHandlers: vi.fn(),
-        cleanup: vi.fn(),
-        isInitialized: vi.fn().mockReturnValue(true),
-    }))
+    vi.fn().mockImplementation(function () {
+        return {
+            setupHandlers: vi.fn(),
+            cleanup: vi.fn(),
+            isInitialized: vi.fn().mockReturnValue(true),
+        };
+    })
 );
 
 // Hoisted mocks for all dependencies
@@ -145,19 +155,27 @@ vi.mock("../../events/TypedEventBus", () => ({
 
 // Mock all repository services
 vi.mock("../../services/database/SettingsRepository", () => ({
-    SettingsRepository: vi.fn().mockImplementation(() => ({})),
+    SettingsRepository: vi.fn().mockImplementation(function () {
+        return {};
+    }),
 }));
 
 vi.mock("../../services/database/SiteRepository", () => ({
-    SiteRepository: vi.fn().mockImplementation(() => ({})),
+    SiteRepository: vi.fn().mockImplementation(function () {
+        return {};
+    }),
 }));
 
 vi.mock("../../services/database/MonitorRepository", () => ({
-    MonitorRepository: vi.fn().mockImplementation(() => ({})),
+    MonitorRepository: vi.fn().mockImplementation(function () {
+        return {};
+    }),
 }));
 
 vi.mock("../../services/database/HistoryRepository", () => ({
-    HistoryRepository: vi.fn().mockImplementation(() => ({})),
+    HistoryRepository: vi.fn().mockImplementation(function () {
+        return {};
+    }),
 }));
 
 vi.mock("../../services/configuration/ConfigurationManager", () => ({

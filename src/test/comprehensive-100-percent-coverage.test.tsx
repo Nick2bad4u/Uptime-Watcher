@@ -8,7 +8,7 @@
  */
 
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { ReactNode } from "react";
 
@@ -243,6 +243,16 @@ describe("100% Coverage Edge Cases", () => {
             configurable: true,
             writable: true,
             value: undefined,
+        });
+
+        vi.mocked(useMonitorTypes).mockReturnValue({
+            options: [
+                { label: "HTTP/HTTPS", value: "http" },
+                { label: "Port Check", value: "port" },
+            ],
+            isLoading: false,
+            error: undefined,
+            refresh: vi.fn(),
         });
     });
 
@@ -575,11 +585,12 @@ describe("100% Coverage Edge Cases", () => {
             expect(screen.getByTestId("selectedSite")).toBeInTheDocument();
         });
 
-        it("should handle monitor type validation", () => {
+        it("should handle monitor type validation", async () => {
             const mockUseAddSiteForm = vi.mocked(useAddSiteForm); // Updated: Removed require() and used direct import
             const setMonitorType = vi.fn();
             mockUseAddSiteForm.mockReturnValue(
                 buildAddSiteFormState({
+                    monitorType: "port",
                     setMonitorType,
                 })
             );
@@ -589,12 +600,16 @@ describe("100% Coverage Edge Cases", () => {
 
             // Test valid monitor type
             fireEvent.change(select, { target: { value: "http" } });
-            expect(setMonitorType).toHaveBeenCalledWith("http");
+            await waitFor(() =>
+                expect(setMonitorType).toHaveBeenCalledWith("http")
+            );
 
             // Test invalid monitor type - check that logger.error was called with some message
             fireEvent.change(select, { target: { value: "invalid" } });
-            expect(logger.error).toHaveBeenCalledWith(
-                expect.stringContaining("Invalid monitor type value")
+            await waitFor(() =>
+                expect(logger.error).toHaveBeenCalledWith(
+                    expect.stringContaining("Invalid monitor type value")
+                )
             );
         });
 

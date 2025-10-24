@@ -12,13 +12,16 @@ import type { Site } from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => {
-    const Notification = vi.fn(function NotificationMock() {
-        return {
-            show: vi.fn(),
-        };
-    });
-
-    Notification.isSupported = vi.fn(() => true);
+    const Notification = Object.assign(
+        vi.fn(function NotificationMock() {
+            return {
+                show: vi.fn(),
+            };
+        }),
+        {
+            isSupported: vi.fn(() => true),
+        }
+    );
 
     return {
         Notification,
@@ -55,7 +58,7 @@ describe(NotificationService, () => {
         (Notification as any).mockImplementation(function () {
             return mockNotification;
         });
-        (Notification as any).isSupported = vi.fn(() => true);
+        (Notification as any).isSupported.mockReturnValue(true);
 
         notificationService = new NotificationService();
     });

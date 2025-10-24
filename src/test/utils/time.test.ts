@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import type { MockInstance } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import {
     formatDuration,
@@ -212,11 +213,13 @@ describe("Time Utilities", () => {
     });
 
     describe(formatRelativeTimestamp, () => {
-        let mockNow: ReturnType<typeof vi.spyOn>;
+        let mockNow: MockInstance<() => number>;
 
         beforeEach(() => {
             // Mock Date.now to return a fixed timestamp
-              mockNow = vi.spyOn(Date, "now");
+                mockNow = vi.spyOn(Date, "now") as unknown as MockInstance<
+                    () => number
+                >;
               mockNow.mockReturnValue(1_640_995_200_000); // Jan 1, 2022 00:00:00 UTC
         });
 

@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { App } from "electron";
+import type { ApplicationService as ApplicationServiceType } from "../services/application/ApplicationService";
 
 // ========================================
 // MOCK ALL DEPENDENCIES BEFORE MAIN.TS IMPORT
@@ -49,7 +50,9 @@ const mockApplicationService = {
 };
 
 vi.mock("../services/application/ApplicationService", () => ({
-    ApplicationService: vi.fn(() => mockApplicationService),
+    ApplicationService: vi.fn(function ApplicationServiceMock() {
+        return mockApplicationService;
+    }),
 }));
 
 // Mock logger
@@ -603,7 +606,9 @@ describe("main.ts - Electron Main Process", () => {
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
-            (ApplicationService as any).mockImplementation(() => null);
+            (ApplicationService as any).mockImplementation(function () {
+                return null as unknown as ApplicationServiceType;
+            });
 
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -617,6 +622,11 @@ describe("main.ts - Electron Main Process", () => {
             expect(() => {
                 if (beforeExitHandler) beforeExitHandler();
             }).not.toThrow();
+
+            // Restore default implementation for subsequent tests
+            vi.mocked(ApplicationService).mockImplementation(function () {
+                return mockApplicationService as unknown as ApplicationServiceType;
+            });
         });
     });
     describe("Log Transport Configuration", () => {

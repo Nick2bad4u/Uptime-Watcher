@@ -175,12 +175,14 @@ vi.mock("../../services/database/HistoryRepository", () => ({
 
 // Mock Configuration manager
 vi.mock("../../managers/ConfigurationManager", () => ({
-    ConfigurationManager: vi.fn().mockImplementation(() => ({
-        initialize: vi.fn().mockResolvedValue(undefined),
-        isInitialized: vi.fn().mockReturnValue(true),
-        getSettings: vi.fn().mockReturnValue({}),
-        getSetting: vi.fn().mockReturnValue("default"),
-    })),
+    ConfigurationManager: vi.fn(function ConfigurationManagerMock() {
+        return {
+            initialize: vi.fn().mockResolvedValue(undefined),
+            isInitialized: vi.fn().mockReturnValue(true),
+            getSettings: vi.fn().mockReturnValue({}),
+            getSetting: vi.fn().mockReturnValue("default"),
+        };
+    }),
 }));
 
 import { ServiceContainer } from "../../services/ServiceContainer";

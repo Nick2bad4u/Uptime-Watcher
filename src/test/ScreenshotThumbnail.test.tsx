@@ -114,14 +114,6 @@ describe(ScreenshotThumbnail, () => {
             },
         });
 
-        // Use a simpler approach for defaultPrevented
-        const preventDefault = Event.prototype.preventDefault;
-        Event.prototype.preventDefault = vi.fn(function (this: Event) {
-            preventDefault.call(this);
-            // Track defaultPrevented state using a spy
-            vi.spyOn(this, "defaultPrevented", "get").mockReturnValue(true);
-        });
-
         Object.defineProperty(globalThis, "innerWidth", {
             value: 1920,
             writable: true,
@@ -320,9 +312,6 @@ describe(ScreenshotThumbnail, () => {
                 },
                 writable: true,
             });
-
-            // Mock window.open function directly
-            vi.spyOn(globalThis, "open").mockImplementation(mockWindowOpen);
 
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);

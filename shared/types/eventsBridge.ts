@@ -15,10 +15,9 @@ import type {
     TestEventData,
     UpdateStatusEventData,
 } from "@shared/types/events";
-import {
-    RENDERER_EVENT_CHANNELS,
-    type RendererEventPayload,
-} from "@shared/ipc/rendererEvents";
+
+import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
+import type { RendererEventPayload } from "@shared/ipc/rendererEvents";
 
 type SiteAddedRendererEventData = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.SITE_ADDED

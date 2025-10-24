@@ -48,7 +48,7 @@ vi.mock("node:path", () => ({
     join: vi.fn((...args: string[]) => args.join("/")),
     resolve: vi.fn((...args: string[]) => args.join("/")),
     dirname: vi.fn((target: string) =>
-        target.replace(/\\/gu, "/").split("/").slice(0, -1).join("/") || "."
+        target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") || "."
     ),
 }));
 

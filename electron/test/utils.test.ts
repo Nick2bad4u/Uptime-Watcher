@@ -27,17 +27,19 @@ vi.mock("electron", () => ({
         quit: vi.fn(),
         whenReady: vi.fn(() => Promise.resolve()),
     },
-    BrowserWindow: vi.fn(() => ({
-        close: vi.fn(),
-        loadFile: vi.fn(),
-        loadURL: vi.fn(),
-        on: vi.fn(),
-        show: vi.fn(),
-        webContents: {
+    BrowserWindow: vi.fn(function BrowserWindowMock() {
+        return {
+            close: vi.fn(),
+            loadFile: vi.fn(),
+            loadURL: vi.fn(),
             on: vi.fn(),
-            send: vi.fn(),
-        },
-    })),
+            show: vi.fn(),
+            webContents: {
+                on: vi.fn(),
+                send: vi.fn(),
+            },
+        };
+    }),
     contextBridge: {
         exposeInMainWorld: vi.fn(),
     },

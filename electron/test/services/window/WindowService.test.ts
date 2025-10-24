@@ -556,10 +556,12 @@ describe(WindowService, () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                windowService.createMainWindow();
+                const window = windowService.createMainWindow();
+                vi.mocked(window.isDestroyed).mockReturnValue(false);
 
-                // Wait for the async operation
-                await new Promise((resolve) => setTimeout(resolve, 0));
+                await (windowService as unknown as {
+                    loadDevelopmentContent: () => Promise<void>;
+                }).loadDevelopmentContent();
 
                 expect(globalThis.fetch).toHaveBeenCalledWith(
                     "http://localhost:5173",
@@ -567,12 +569,8 @@ describe(WindowService, () => {
                         signal: expect.any(AbortSignal),
                     })
                 );
+
                 await annotate("Type: Data Loading", "type");
-
-                const window = windowService.createMainWindow();
-
-                // Wait for the async operation
-                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 expect(window.loadURL).toHaveBeenCalledWith(
                     "http://localhost:5173"

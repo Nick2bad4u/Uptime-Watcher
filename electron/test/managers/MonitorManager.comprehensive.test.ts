@@ -57,12 +57,14 @@ const mockRestartMonitor = vi.fn(() => true);
 
 // Mock MonitorScheduler
 vi.mock("../../services/monitoring/MonitorScheduler", () => ({
-    MonitorScheduler: vi.fn(() => ({
-        setCheckCallback: mockSetCheckCallback,
-        getActiveCount: mockGetActiveCount,
-        isMonitoring: mockIsMonitoring,
-        restartMonitor: mockRestartMonitor,
-    })),
+    MonitorScheduler: vi.fn(function MonitorSchedulerMock() {
+        return {
+            setCheckCallback: mockSetCheckCallback,
+            getActiveCount: mockGetActiveCount,
+            isMonitoring: mockIsMonitoring,
+            restartMonitor: mockRestartMonitor,
+        };
+    }),
 }));
 
 vi.mock("../../utils/operationalHooks", () => ({

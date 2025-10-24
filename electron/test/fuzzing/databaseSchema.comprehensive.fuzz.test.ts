@@ -71,10 +71,7 @@ vi.mock("../../services/monitoring/MonitorTypeRegistry", () => ({
     ]),
 }));
 
-const {
-    DEFAULT_MONITOR_TABLE_SCHEMA,
-    createDefaultMonitorTableSchema,
-} = vi.hoisted(() => {
+const { createDefaultMonitorTableSchema } = vi.hoisted(() => {
     const DEFAULT_MONITOR_TABLE_SCHEMA = `
         CREATE TABLE IF NOT EXISTS monitors (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,7 +93,6 @@ const {
     const createDefaultMonitorTableSchema = () => DEFAULT_MONITOR_TABLE_SCHEMA;
 
     return {
-        DEFAULT_MONITOR_TABLE_SCHEMA,
         createDefaultMonitorTableSchema,
     };
 });

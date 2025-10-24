@@ -61,14 +61,24 @@ describe(generateUuid, () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const mockRandomUUID = vi
-                .spyOn(globalThis.crypto, "randomUUID")
-                .mockReturnValue("550e8400-e29b-41d4-a716-446655440000");
+            const mockRandomUUID = vi.fn(
+                () => "550e8400-e29b-41d4-a716-446655440000"
+            );
+            const original = globalThis.crypto;
 
-            const result = generateUuid();
+            try {
+                globalThis.crypto = {
+                    ...original,
+                    randomUUID: mockRandomUUID,
+                } as unknown as Crypto;
 
-            expect(mockRandomUUID).toHaveBeenCalledTimes(1);
-            expect(result).toBe("550e8400-e29b-41d4-a716-446655440000");
+                const result = generateUuid();
+
+                expect(mockRandomUUID).toHaveBeenCalledTimes(1);
+                expect(result).toBe("550e8400-e29b-41d4-a716-446655440000");
+            } finally {
+                globalThis.crypto = original;
+            }
         });
 
         it("should use fallback when crypto.randomUUID throws an error", async ({
@@ -81,15 +91,23 @@ describe(generateUuid, () => {
             await annotate("Type: Error Handling", "type");
 
             const failure = new Error("randomUUID not available");
-            const mockRandomUUID = vi
-                .spyOn(globalThis.crypto, "randomUUID")
-                .mockImplementation(() => {
-                    throw failure;
-                });
+            const mockRandomUUID = vi.fn(() => {
+                throw failure;
+            });
+            const original = globalThis.crypto;
 
-            const result = generateUuid();
-            expect(result).toMatch(/^site-[\da-z]+-\d+$/);
-            expect(mockRandomUUID).toHaveBeenCalledTimes(1);
+            try {
+                globalThis.crypto = {
+                    ...original,
+                    randomUUID: mockRandomUUID,
+                } as unknown as Crypto;
+
+                const result = generateUuid();
+                expect(result).toMatch(/^site-[\da-z]+-\d+$/);
+                expect(mockRandomUUID).toHaveBeenCalledTimes(1);
+            } finally {
+                globalThis.crypto = original;
+            }
         });
     });
 

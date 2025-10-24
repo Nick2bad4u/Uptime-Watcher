@@ -153,20 +153,71 @@ vi.mock("node-sqlite3-wasm", () => ({
     }),
 }));
 
-// Mock fs for file system operations
-vi.mock("fs", async () => {
-    const actual = await vi.importActual("fs");
+// Mock fs for file system operations with constructable partials
+const createFsMock = async (
+    moduleSpecifier: "fs" | "node:fs"
+): Promise<typeof import("node:fs")> => {
+    const actual = await vi.importActual<typeof import("node:fs")>(
+        moduleSpecifier
+    );
+
+    const readFileSyncMock = vi.fn(
+        (
+            ...args: Parameters<typeof actual.readFileSync>
+        ): ReturnType<typeof actual.readFileSync> =>
+            actual.readFileSync(...args)
+    );
+
+    const readFilePromiseMock = vi.fn(
+        (
+            ...args: Parameters<typeof actual.promises.readFile>
+        ): ReturnType<typeof actual.promises.readFile> =>
+            actual.promises.readFile(...args)
+    );
+
+    const accessPromiseMock = vi.fn(
+        (
+            ...args: Parameters<typeof actual.promises.access>
+        ): ReturnType<typeof actual.promises.access> =>
+            actual.promises.access(...args)
+    );
+
+    const writeFilePromiseMock = vi.fn(
+        async (
+            ...args: Parameters<typeof actual.promises.writeFile>
+        ): Promise<void> => {
+            // No-op to avoid mutating the real filesystem during tests
+            void args;
+        }
+    );
+
+    const mkdirPromiseMock = vi.fn(
+        async (
+            ...args: Parameters<typeof actual.promises.mkdir>
+        ): Promise<void> => {
+            // No-op to avoid mutating the real filesystem during tests
+            void args;
+        }
+    );
+
     return {
         ...actual,
+        existsSync: actual.existsSync.bind(actual),
+        readdirSync: actual.readdirSync.bind(actual),
+        statSync: actual.statSync.bind(actual),
+        readFileSync: readFileSyncMock,
         promises: {
-            readFile: vi.fn(),
-            writeFile: vi.fn(),
-            access: vi.fn(),
-            mkdir: vi.fn(),
+            ...actual.promises,
+            readFile: readFilePromiseMock,
+            writeFile: writeFilePromiseMock,
+            access: accessPromiseMock,
+            mkdir: mkdirPromiseMock,
         },
-        readFileSync: vi.fn(() => Buffer.from("mock-db-content")),
     };
-});
+};
+
+vi.mock("fs", () => createFsMock("fs"));
+vi.mock("node:fs", () => createFsMock("node:fs"));
 
 // Mock path modules
 const createPathMock = async <T extends typeof import("path")>(
@@ -241,7 +292,11 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
         );
 
         public readonly startSite = vi.fn(
-            (site: { identifier?: string; id?: string; monitors?: Array<{ id?: string | null; monitoring?: boolean | null }> }) => {
+            (site: {
+                identifier?: string;
+                id?: string;
+                monitors?: { id?: string | null; monitoring?: boolean | null }[];
+            }) => {
                 if (!site?.monitors?.length) {
                     return;
                 }
@@ -258,7 +313,7 @@ vi.mock("../services/monitoring/MonitorScheduler", () => {
         public readonly stopSite = vi.fn(
             (
                 siteIdentifier: string,
-                monitors?: Array<{ id?: string | null }>
+                monitors?: { id?: string | null }[]
             ) => {
                 if (monitors?.length) {
                     for (const monitor of monitors) {

@@ -14,11 +14,24 @@ vi.mock("../../../../../electron/utils/logger", () => ({
 }));
 
 // Mock node:fs module
-vi.mock("node:fs", () => ({
-    promises: {
-        readFile: vi.fn(),
-    },
-}));
+vi.mock("node:fs", async () => {
+    const actual = await vi.importActual<typeof import("node:fs")>(
+        "node:fs"
+    );
+
+    return {
+        ...actual,
+        default: actual,
+        existsSync: actual.existsSync.bind(actual),
+        readdirSync: actual.readdirSync.bind(actual),
+        statSync: actual.statSync.bind(actual),
+        readFileSync: actual.readFileSync.bind(actual),
+        promises: {
+            ...actual.promises,
+            readFile: vi.fn(),
+        },
+    };
+});
 
 // Import after mocking
 import {

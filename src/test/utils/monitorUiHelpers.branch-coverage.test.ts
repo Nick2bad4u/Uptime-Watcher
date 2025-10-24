@@ -5,6 +5,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { MockInstance } from "vitest";
 
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 
@@ -36,7 +37,7 @@ interface MonitorMockContext {
     getTypesWithFeature: (
         feature: "responseTime" | "advancedAnalytics"
     ) => Promise<string[]>;
-    spy: ReturnType<typeof vi.spyOn>;
+    spy: MockInstance<() => Promise<MonitorTypeConfig[]>>;
 }
 
 async function setupMonitorTypesMock(
@@ -46,7 +47,7 @@ async function setupMonitorTypesMock(
     const spy = vi.spyOn(
         monitorModule,
         "getAvailableMonitorTypes"
-    );
+    ) as unknown as MockInstance<() => Promise<MonitorTypeConfig[]>>;
     spy.mockResolvedValue(configs);
 
     const { getTypesWithFeature } = await import(
@@ -189,7 +190,7 @@ describe("monitorUiHelpers - Branch Coverage", () => {
             expect(Array.isArray(responseTimeResult)).toBeTruthy();
             expect(responseTimeResult).toEqual(["http", "ping"]);
 
-            spy.mockResolvedValue([
+            vi.mocked(spy).mockResolvedValue([
                 baseConfigs[0]!,
                 baseConfigs[1]!,
                 createMonitorConfig("ssl", {
