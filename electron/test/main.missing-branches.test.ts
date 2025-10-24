@@ -36,14 +36,24 @@ const mockApp = {
 };
 
 // Mock logger
+const mockLogger = {
+    log: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+};
+
+const mockDiagnosticsLogger = {
+    info: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+};
+
 vi.mock("../utils/logger", () => ({
-    logger: {
-        log: vi.fn(),
-        error: vi.fn(),
-        warn: vi.fn(),
-        info: vi.fn(),
-        debug: vi.fn(),
-    },
+    logger: mockLogger,
+    diagnosticsLogger: mockDiagnosticsLogger,
 }));
 
 vi.mock("electron-log/main", () => ({ default: mockLog }));

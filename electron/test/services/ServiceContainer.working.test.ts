@@ -61,7 +61,7 @@ const mockEventBus = vi.hoisted(() => {
 });
 
 const mockMonitorManager = vi.hoisted(() =>
-    vi.fn().mockImplementation(function () {
+    vi.fn(function MonitorManagerMock() {
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             startMonitoring: vi.fn().mockResolvedValue(undefined),
@@ -73,7 +73,7 @@ const mockMonitorManager = vi.hoisted(() =>
 );
 
 const mockDatabaseService = vi.hoisted(() =>
-    vi.fn().mockImplementation(function () {
+    vi.fn(function DatabaseServiceMock() {
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             isInitialized: vi.fn().mockReturnValue(true),
@@ -88,7 +88,7 @@ const mockDatabaseService = vi.hoisted(() =>
 );
 
 const mockDatabaseManager = vi.hoisted(() =>
-    vi.fn().mockImplementation(function () {
+    vi.fn(function DatabaseManagerMock() {
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             backup: vi.fn().mockResolvedValue(undefined),
@@ -100,7 +100,7 @@ const mockDatabaseManager = vi.hoisted(() =>
 );
 
 const mockUptimeOrchestrator = vi.hoisted(() =>
-    vi.fn().mockImplementation(function () {
+    vi.fn(function UptimeOrchestratorMock() {
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
             start: vi.fn().mockResolvedValue(undefined),
@@ -113,7 +113,7 @@ const mockUptimeOrchestrator = vi.hoisted(() =>
 );
 
 const mockIpcService = vi.hoisted(() =>
-    vi.fn().mockImplementation(function () {
+    vi.fn(function IpcServiceMock() {
         return {
             setupHandlers: vi.fn(),
             cleanup: vi.fn(),
@@ -155,35 +155,37 @@ vi.mock("../../events/TypedEventBus", () => ({
 
 // Mock all repository services
 vi.mock("../../services/database/SettingsRepository", () => ({
-    SettingsRepository: vi.fn().mockImplementation(function () {
+    SettingsRepository: vi.fn(function SettingsRepositoryMock() {
         return {};
     }),
 }));
 
 vi.mock("../../services/database/SiteRepository", () => ({
-    SiteRepository: vi.fn().mockImplementation(function () {
+    SiteRepository: vi.fn(function SiteRepositoryMock() {
         return {};
     }),
 }));
 
 vi.mock("../../services/database/MonitorRepository", () => ({
-    MonitorRepository: vi.fn().mockImplementation(function () {
+    MonitorRepository: vi.fn(function MonitorRepositoryMock() {
         return {};
     }),
 }));
 
 vi.mock("../../services/database/HistoryRepository", () => ({
-    HistoryRepository: vi.fn().mockImplementation(function () {
+    HistoryRepository: vi.fn(function HistoryRepositoryMock() {
         return {};
     }),
 }));
 
 vi.mock("../../services/configuration/ConfigurationManager", () => ({
-    ConfigurationManager: vi.fn().mockImplementation(() => ({
-        get: vi.fn(),
-        set: vi.fn(),
-        isInitialized: vi.fn().mockReturnValue(true),
-    })),
+    ConfigurationManager: vi.fn(function ConfigurationManagerMock() {
+        return {
+            get: vi.fn(),
+            set: vi.fn(),
+            isInitialized: vi.fn().mockReturnValue(true),
+        };
+    }),
 }));
 
 // Import after mocks

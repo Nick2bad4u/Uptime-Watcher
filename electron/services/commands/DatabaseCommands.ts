@@ -13,6 +13,7 @@
 
 import type { Site } from "@shared/types";
 
+import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -449,9 +450,33 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             await siteRepositoryService.getSitesFromDatabase();
 
         // Update cache
+        const previousSiteIdentifiers = new Set(
+            this.backupSites.map((site) => site.identifier)
+        );
+
         this.cache.clear();
+        const newlyImportedSites: Site[] = [];
+
         for (const site of reloadedSites) {
             this.cache.set(site.identifier, site);
+
+            if (!previousSiteIdentifiers.has(site.identifier)) {
+                newlyImportedSites.push(site);
+            }
+        }
+
+        if (newlyImportedSites.length > 0) {
+            await Promise.all(
+                newlyImportedSites.map((site) =>
+                    this.eventEmitter.emitTyped("internal:site:added", {
+                        identifier: site.identifier,
+                        operation: "added",
+                        site: structuredClone(site),
+                        source: SITE_ADDED_SOURCE.IMPORT,
+                        timestamp: Date.now(),
+                    })
+                )
+            );
         }
 
         await this.emitSuccessEvent("internal:database:data-imported", {

@@ -20,6 +20,7 @@ import type {
     MonitoringControlEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
+    SiteAddedSource,
 } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
@@ -898,6 +899,7 @@ export interface UptimeEvents extends UnknownRecord {
         identifier: string;
         operation: "added";
         site: Site;
+        source: SiteAddedSource;
         timestamp: number;
     };
 
@@ -1256,7 +1258,7 @@ export interface UptimeEvents extends UnknownRecord {
         /** The site object added. */
         site: Site;
         /** The source of the addition ("import", "migration", or "user"). */
-        source: "import" | "migration" | "user";
+        source: SiteAddedSource;
         /** Unix timestamp (ms) when the site was added. */
         timestamp: number;
     };

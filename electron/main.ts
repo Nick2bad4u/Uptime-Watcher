@@ -9,7 +9,10 @@
  * @packageDocumentation
  */
 
-import { app, BrowserWindow } from "electron";
+import type { BrowserWindow } from "electron";
+
+import { ensureError } from "@shared/utils/errorHandling";
+import { app } from "electron";
 import debug from "electron-debug";
 import {
     installExtension,
@@ -20,6 +23,7 @@ import log from "electron-log/main";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
+import { ServiceContainer } from "./services/ServiceContainer";
 import { logger } from "./utils/logger";
 
 // Initialize electron-debug for enhanced debugging capabilities
@@ -259,21 +263,49 @@ if (isDev()) {
         }
 
         // Proceed with hot reload
+        isReloadInProgress = true;
+
+        const container = ServiceContainer.getExistingInstance();
+        if (!container) {
+            logger.debug(
+                "[Main] Hot reload skipped - service container not initialized"
+            );
+            isReloadInProgress = false;
+            return;
+        }
+
+        let windows: BrowserWindow[] | null = null;
+
+        try {
+            windows = container.getWindowService().getAllWindows();
+        } catch (error) {
+            logger.error(
+                "[Main] Failed to obtain WindowService for hot reload",
+                ensureError(error)
+            );
+        }
+
+        if (!windows || windows.length === 0) {
+            logger.debug(
+                "[Main] Hot reload skipped - no windows currently available"
+            );
+            isReloadInProgress = false;
+            return;
+        }
+
         lastHotReloadTime = now;
         reloadHistory.push(now);
-        isReloadInProgress = true;
 
         logger.info(
             `[Main] Performing hot reload (${reloadHistory.length}/${MAX_RELOADS_PER_WINDOW} in window)`
         );
 
         try {
-            for (const win of BrowserWindow.getAllWindows()) {
-                // Hot reload preload scripts
+            for (const win of windows) {
                 win.webContents.reload();
             }
         } catch (error) {
-            logger.error("[Main] Error during hot reload", error);
+            logger.error("[Main] Error during hot reload", ensureError(error));
         } finally {
             // Always reset reload progress flag, even on error
             if (reloadProgressTimer) {

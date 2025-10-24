@@ -80,6 +80,43 @@ const baseEventDataSchema = z
     })
     .strict();
 
+const SITE_ADDED_SOURCE_VALUES = [
+    "import",
+    "migration",
+    "user",
+] as const;
+
+/**
+ * Supported origins for site addition events.
+ *
+ * @public
+ */
+export type SiteAddedSource = (typeof SITE_ADDED_SOURCE_VALUES)[number];
+
+/**
+ * Frozen mapping of site addition sources for convenient enumeration.
+ *
+ * @public
+ */
+export const SITE_ADDED_SOURCE: Readonly<{
+    readonly IMPORT: SiteAddedSource;
+    readonly MIGRATION: SiteAddedSource;
+    readonly USER: SiteAddedSource;
+}> = Object.freeze({
+    IMPORT: "import",
+    MIGRATION: "migration",
+    USER: "user",
+});
+
+/**
+ * Canonical list of site addition sources.
+ *
+ * @public
+ */
+export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
+    Array.from(SITE_ADDED_SOURCE_VALUES)
+);
+
 /**
  * Payload for state synchronization events.
  *

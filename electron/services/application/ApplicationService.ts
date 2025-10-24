@@ -508,7 +508,7 @@ export class ApplicationService {
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
                     {
                         identifier: data.site.identifier,
-                        updatedFields: data.updatedFields?.join(", ") ?? "",
+                        updatedFields: data.updatedFields.join(", "),
                     }
                 );
                 rendererBridge.sendToRenderers(

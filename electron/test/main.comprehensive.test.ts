@@ -63,8 +63,16 @@ const mockLogger = {
     debug: vi.fn(),
 };
 
+const mockDiagnosticsLogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+};
+
 vi.mock("../utils/logger", () => ({
     logger: mockLogger,
+    diagnosticsLogger: mockDiagnosticsLogger,
 }));
 
 // Mock electronUtils
@@ -606,9 +614,11 @@ describe("main.ts - Electron Main Process", () => {
             const { ApplicationService } = await import(
                 "../services/application/ApplicationService"
             );
-            (ApplicationService as any).mockImplementation(function () {
-                return null as unknown as ApplicationServiceType;
-            });
+            (ApplicationService as any).mockImplementation(
+                function NullApplicationServiceMock() {
+                    return null as unknown as ApplicationServiceType;
+                }
+            );
 
             const processOnSpy = vi.spyOn(process, "on");
 
@@ -624,9 +634,11 @@ describe("main.ts - Electron Main Process", () => {
             }).not.toThrow();
 
             // Restore default implementation for subsequent tests
-            vi.mocked(ApplicationService).mockImplementation(function () {
-                return mockApplicationService as unknown as ApplicationServiceType;
-            });
+            vi.mocked(ApplicationService).mockImplementation(
+                function ApplicationServiceResetMock() {
+                    return mockApplicationService as unknown as ApplicationServiceType;
+                }
+            );
         });
     });
     describe("Log Transport Configuration", () => {

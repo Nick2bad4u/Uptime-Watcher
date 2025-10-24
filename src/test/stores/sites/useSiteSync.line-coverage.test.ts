@@ -216,7 +216,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
                     StatusUpdateManagerMock.mockReset();
                     const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
-                    StatusUpdateManagerMock.mockImplementation(function () {
+                    StatusUpdateManagerMock.mockImplementation(
+                        function StatusUpdateManagerRetryMock() {
                         const unsubscribe = vi.fn();
                         unsubscribeSpies.push(unsubscribe);
                         return {
@@ -230,7 +231,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
                             })),
                             unsubscribe,
                         } as unknown as StatusUpdateManager;
-                    });
+                        }
+                    );
 
                     const callback = vi.fn();
                     await syncActions.subscribeToStatusUpdates(callback);
@@ -276,7 +278,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
 
             vi.mocked(
                 statusUpdateHandlerModule.StatusUpdateManager
-            ).mockImplementation(function () {
+            ).mockImplementation(function StatusUpdateManagerErrorMock() {
                 return mockStatusUpdateManager;
             });
 

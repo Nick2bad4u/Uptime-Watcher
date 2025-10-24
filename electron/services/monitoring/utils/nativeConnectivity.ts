@@ -27,6 +27,19 @@ import { performance } from "node:perf_hooks";
 import type { MonitorCheckResult } from "../types";
 
 /**
+ * Clears a timeout if the provided handle has been set.
+ *
+ * @param timerHandle - The timeout handle to clear, when available.
+ */
+function clearTimeoutIfPresent(
+    timerHandle?: ReturnType<typeof setTimeout>
+): void {
+    if (timerHandle !== undefined) {
+        clearTimeout(timerHandle);
+    }
+}
+
+/**
  * Configuration options for connectivity checking
  */
 export interface ConnectivityOptions {
@@ -157,7 +170,7 @@ async function checkDnsResolution(
     timeout: number
 ): Promise<DnsCheckResult> {
     const startTime = performance.now();
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
 
     try {
         const timeoutPromise = new Promise<string[]>((_resolve, reject) => {
@@ -182,9 +195,7 @@ async function checkDnsResolution(
             responseTime: performance.now() - startTime,
         };
     } finally {
-        if (timeoutId !== undefined) {
-            clearTimeout(timeoutId);
-        }
+        clearTimeoutIfPresent(timeoutId);
     }
 }
 
@@ -348,9 +359,9 @@ export async function checkConnectivity(
 ): Promise<MonitorCheckResult> {
     const opts = { ...DEFAULT_OPTIONS, ...options };
     const startTime = performance.now();
-    const cleanHost = host.replace(/^https?:\/\//iu, "");
+    const cleanHost = host.replace(/^https?:\/\//iv, "");
 
-    if (/^https?:\/\//iu.test(host)) {
+    if (/^https?:\/\//iv.test(host)) {
         return checkHttpConnectivity(host, opts.timeout);
     }
 

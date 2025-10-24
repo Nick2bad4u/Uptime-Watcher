@@ -1199,6 +1199,7 @@ describe(UptimeOrchestrator, () => {
             // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
             orchestrator.emitTyped("internal:site:added" as any, {
                 identifier: "test-site",
+                source: "user",
                 site: testSite,
                 timestamp: Date.now(),
             });
@@ -1210,6 +1211,42 @@ describe(UptimeOrchestrator, () => {
                 "site:added",
                 expect.objectContaining({
                     source: "user",
+                })
+            );
+        });
+
+        it("should forward site addition source metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            const testSite = {
+                identifier: "imported-site",
+                name: "Imported Site",
+                monitors: [],
+                monitoring: true,
+            };
+
+            orchestrator.emitTyped("internal:site:added" as any, {
+                identifier: "imported-site",
+                site: testSite,
+                source: "import",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:added",
+                expect.objectContaining({
+                    site: testSite,
+                    source: "import",
                 })
             );
         });

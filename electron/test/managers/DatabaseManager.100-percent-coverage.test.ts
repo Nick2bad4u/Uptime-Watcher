@@ -61,7 +61,7 @@ vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
 }));
 
 vi.mock("../../services/commands/DatabaseCommands", () => ({
-    DatabaseCommandExecutor: vi.fn().mockImplementation(function () {
+    DatabaseCommandExecutor: vi.fn(function DatabaseCommandExecutorMock() {
         return {
             execute: vi.fn().mockResolvedValue({ success: true }),
             executeImport: vi.fn().mockResolvedValue({ success: true }),
@@ -90,12 +90,12 @@ vi.mock("../../utils/database/serviceFactory", () => ({
 }));
 
 vi.mock("../../utils/database/SiteRepositoryService", () => ({
-    SiteRepositoryService: vi.fn().mockImplementation(function () {
+    SiteRepositoryService: vi.fn(function SiteRepositoryServiceMock() {
         return {
             getSitesFromDatabase: vi.fn().mockResolvedValue([]),
         };
     }),
-    SiteLoadingOrchestrator: vi.fn().mockImplementation(function () {
+    SiteLoadingOrchestrator: vi.fn(function SiteLoadingOrchestratorMock() {
         return {
             loadSitesFromDatabase: vi.fn().mockResolvedValue({
                 success: true,

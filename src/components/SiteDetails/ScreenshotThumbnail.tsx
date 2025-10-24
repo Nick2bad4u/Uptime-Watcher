@@ -61,7 +61,7 @@ export const ScreenshotThumbnail = ({
     // Set portal container after component mounts to avoid SSR issues
     useMount(
         useCallback(function initializePortalContainer() {
-            if (typeof document !== "undefined" && document.body) {
+            if (typeof document !== "undefined") {
                 setPortalContainer(document.body);
             }
         }, [])

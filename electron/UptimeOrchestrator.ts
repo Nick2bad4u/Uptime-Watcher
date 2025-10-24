@@ -77,8 +77,11 @@
  * @see {@link TypedEventBus} for event system implementation
  */
 
+/* eslint max-lines: ["error", { "max": 2000 }] -- Main orchestrator module */
+
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     ApplicationError,
@@ -126,6 +129,7 @@ interface RestartMonitoringRequestData {
 interface SiteEventData {
     identifier?: string;
     site?: Site;
+    source?: SiteAddedSource;
     timestamp: number;
     updatedFields?: string[];
 }
@@ -305,9 +309,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 return;
             }
             // Extract original data without _meta to prevent conflicts
+            const source = data.source ?? SITE_ADDED_SOURCE.USER;
+
             await this.emitTyped("site:added", {
                 site: data.site,
-                source: "user" as const,
+                source,
                 timestamp: data.timestamp,
             });
         })();

@@ -55,7 +55,7 @@ describe(NotificationService, () => {
             show: vi.fn(),
         };
 
-        (Notification as any).mockImplementation(function () {
+        (Notification as any).mockImplementation(function NotificationCtor() {
             return mockNotification;
         });
         (Notification as any).isSupported.mockReturnValue(true);

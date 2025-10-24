@@ -53,6 +53,7 @@ import type { Site } from "@shared/types";
 import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     interpolateLogTemplate,
@@ -258,7 +259,11 @@ export class SiteManager {
      *
      * @throws If site validation fails or database operation fails.
      */
-    public async addSite(siteData: Site): Promise<Site> {
+    public async addSite(
+        siteData: Site,
+        options: { source?: SiteAddedSource } = {}
+    ): Promise<Site> {
+        const source = options.source ?? SITE_ADDED_SOURCE.USER;
         // Business validation
         await this.validateSite(siteData);
 
@@ -286,6 +291,7 @@ export class SiteManager {
             identifier: sanitizedSite.identifier,
             operation: "added",
             site: sanitizedSite,
+            source,
             timestamp,
         });
 
@@ -300,6 +306,7 @@ export class SiteManager {
             interpolateLogTemplate(LOG_TEMPLATES.services.SITE_ADDED_SUCCESS, {
                 identifier: sanitizedSite.identifier,
                 name: sanitizedSite.name || "unnamed",
+                source,
             })
         );
         return sanitizedSite;

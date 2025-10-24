@@ -17,6 +17,7 @@ import type {
     MonitoringControlReason,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
+    SiteAddedSource,
     StateSyncEventData,
     TestEventData,
     UpdateStatusEventData,
@@ -83,7 +84,7 @@ export interface RendererEventPayloadMap {
     /** Payload for site added events. */
     "site:added": {
         site: Site;
-        source: "import" | "migration" | "user";
+        source: SiteAddedSource;
         timestamp: number;
     };
     /** Payload for site removed events. */

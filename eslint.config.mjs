@@ -145,6 +145,7 @@ import eslintPluginYml from "eslint-plugin-yml";
 import zod from "eslint-plugin-zod";
 import globals from "globals";
 import jsoncEslintParser from "jsonc-eslint-parser";
+import { createRequire } from "node:module";
 import path from "node:path";
 import tomlEslintParser from "toml-eslint-parser";
 import yamlEslintParser from "yaml-eslint-parser";
@@ -183,7 +184,25 @@ import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract
 // Schema: https://www.schemastore.org/eslintrc.json
 // const __filename = fileURLToPath(import.meta.url);
 // const gitignorePath = path.resolve(__dirname, ".gitignore");
+const require = createRequire(import.meta.url);
 const ROOT_DIR = import.meta.dirname;
+
+if (!process.env.RECHECK_JAR) {
+    const resolvedRecheckJarPath = (() => {
+        try {
+            return require.resolve("recheck-jar/recheck.jar");
+        } catch {
+            console.warn(
+                "[eslint.config] Unable to resolve \"recheck-jar/recheck.jar\". eslint-plugin-redos will rely on its internal resolution logic."
+            );
+            return undefined;
+        }
+    })();
+
+    if (resolvedRecheckJarPath) {
+        process.env.RECHECK_JAR = path.normalize(resolvedRecheckJarPath);
+    }
+}
 export default [
     gitignore({
         name: "Global .gitignore Rules",
@@ -720,6 +739,7 @@ export default [
         ignores: [
             "**/docs/packages/**",
             "**/docs/TSDoc/**",
+            "**/.github/agents/**",
         ],
         language: "markdown/gfm",
         name: "MD - **/*.{MD,MARKUP,ATOM,RSS,MARKDOWN} (with Remark)",

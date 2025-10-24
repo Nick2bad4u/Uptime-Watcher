@@ -271,6 +271,7 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site added events.
      *
      * @example
+     *
      * ```typescript
      * import { logger } from "@app/services/logger";
      *
@@ -295,6 +296,7 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site removal events.
      *
      * @example
+     *
      * ```typescript
      * import { logger } from "@app/services/logger";
      *
@@ -319,6 +321,7 @@ export const EventsService: EventsServiceContract = {
      * Register a callback for site updated events.
      *
      * @example
+     *
      * ```typescript
      * import { logger } from "@app/services/logger";
      *

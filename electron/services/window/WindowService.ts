@@ -189,7 +189,7 @@ export class WindowService {
                 // Delay opening DevTools to ensure renderer is ready
                 // eslint-disable-next-line clean-timer/assign-timer-id -- One-time dev tools initialization
                 setTimeout(() => {
-                    if (targetWindow && !targetWindow.isDestroyed()) {
+                    if (!targetWindow.isDestroyed()) {
                         try {
                             targetWindow.webContents.openDevTools();
                         } catch (error) {
@@ -236,8 +236,7 @@ export class WindowService {
      */
     private async waitForViteServer(): Promise<void> {
         const isFetchMock =
-            typeof fetch === "function" &&
-            Object.hasOwn(fetch, "mock");
+            typeof fetch === "function" && Object.hasOwn(fetch, "mock");
 
         if (isFetchMock) {
             const controller = new AbortController();
@@ -247,7 +246,9 @@ export class WindowService {
             );
 
             if (!mockResponse.ok) {
-                throw new Error("Mocked fetch reported Vite server as unavailable");
+                throw new Error(
+                    "Mocked fetch reported Vite server as unavailable"
+                );
             }
 
             logger.debug("[WindowService] Vite dev server ready (mocked)");

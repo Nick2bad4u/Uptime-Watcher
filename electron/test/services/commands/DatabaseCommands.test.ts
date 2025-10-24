@@ -778,6 +778,24 @@ describe("DatabaseCommands", () => {
             expect(mockCache.set).toHaveBeenCalledTimes(2); // For reloaded sites
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
                 1,
+                "internal:site:added",
+                expect.objectContaining({
+                    identifier: "test1",
+                    operation: "added",
+                    source: "import",
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                2,
+                "internal:site:added",
+                expect.objectContaining({
+                    identifier: "test2",
+                    operation: "added",
+                    source: "import",
+                })
+            );
+            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
+                3,
                 "internal:database:data-imported",
                 expect.objectContaining({
                     success: true,
@@ -785,7 +803,7 @@ describe("DatabaseCommands", () => {
                 })
             );
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
-                2,
+                4,
                 "sites:state-synchronized",
                 expect.objectContaining({
                     action: "bulk-sync",
@@ -794,7 +812,7 @@ describe("DatabaseCommands", () => {
                 })
             );
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
-                3,
+                5,
                 "cache:invalidated",
                 expect.objectContaining({
                     reason: "update",

@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site, Monitor } from "@shared/types";
+import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     SiteManager,
@@ -355,6 +356,7 @@ describe("SiteManager - Comprehensive", () => {
                 "internal:site:added",
                 expect.objectContaining({
                     identifier: mockSite.identifier,
+                    source: "user",
                 })
             );
             expect(mockDeps.eventEmitter.emitTyped).not.toHaveBeenCalledWith(
@@ -369,6 +371,32 @@ describe("SiteManager - Comprehensive", () => {
                 })
             );
             expect(result).toEqual(mockSite);
+        });
+
+        it("should forward custom site addition source metadata", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Metadata", "type");
+
+            mockSiteWriterServiceInstance.createSite.mockResolvedValue(
+                mockSite
+            );
+
+            await siteManager.addSite(mockSite, {
+                source: SITE_ADDED_SOURCE.MIGRATION,
+            });
+
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:added",
+                expect.objectContaining({
+                    identifier: mockSite.identifier,
+                    source: "migration",
+                })
+            );
         });
 
         it("should handle validation errors", async ({ task, annotate }) => {

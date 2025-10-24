@@ -25,6 +25,7 @@ import type {
     MonitorLifecycleEventData,
     MonitorStatusChangedEventData,
     MonitorUpEventData,
+    SiteAddedSource,
     TestEventData,
     UpdateStatus,
     UpdateStatusEventData,
@@ -40,6 +41,7 @@ import {
     CACHE_INVALIDATION_REASON_VALUES,
     CACHE_INVALIDATION_TYPE_VALUES,
     MONITORING_CONTROL_REASON_VALUES,
+    SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
 import {
@@ -241,14 +243,6 @@ const isUpdateStatusEventDataPayload = (
 
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
     isUnknownRecord(payload);
-
-const SITE_ADDED_SOURCES = [
-    "import",
-    "migration",
-    "user",
-] as const;
-
-type SiteAddedSource = (typeof SITE_ADDED_SOURCES)[number];
 
 const isSiteAddedSource = (value: unknown): value is SiteAddedSource =>
     typeof value === "string" &&

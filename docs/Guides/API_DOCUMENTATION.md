@@ -14,10 +14,10 @@ All IPC communication goes through the preload-exposed `window.electronAPI` obje
 
 ```typescript
 // Available in renderer process (React components)
-const result = await window.electronAPI.sites.getAll();
-const site = await window.electronAPI.sites.create(siteData);
-const settings = await window.electronAPI.settings.get();
-const monitorTypes = await window.electronAPI.monitorTypes.getAll();
+const sites = await window.electronAPI.sites.getSites();
+const createdSite = await window.electronAPI.sites.addSite(siteData);
+const historyLimit = await window.electronAPI.settings.getHistoryLimit();
+const monitorTypes = await window.electronAPI.monitorTypes.getMonitorTypes();
 ```
 
 ### Domain-Based API Organization
@@ -25,24 +25,32 @@ const monitorTypes = await window.electronAPI.monitorTypes.getAll();
 The `window.electronAPI` is organized into focused domains:
 
 ```typescript
-interface ElectronAPI {
- /** Site management operations (CRUD, monitoring control) */
- sites: SitesAPI;
- /** Data management operations (import/export, settings, backup) */
- data: DataAPI;
- /** Event listener registration for various system events */
- events: EventsAPI;
- /** Monitoring control operations (start/stop, validation, formatting) */
- monitoring: MonitoringAPI;
- /** Monitor type registry operations */
- monitorTypes: MonitorTypesAPI;
- /** Settings management operations */
- settings: SettingsAPI;
- /** State synchronization operations */
- stateSync: StateSyncAPI;
- /** System-level operations (external links, etc.) */
- system: SystemAPI;
-}
+import type { ElectronBridgeApi } from "@shared/types/preload";
+
+import type { EventsApi } from "./preload/domains/eventsApi";
+import type { SystemApi } from "./preload/domains/systemApi";
+
+import { dataApi } from "./preload/domains/dataApi";
+import { createEventsApi } from "./preload/domains/eventsApi";
+import { monitoringApi } from "./preload/domains/monitoringApi";
+import { monitorTypesApi } from "./preload/domains/monitorTypesApi";
+import { settingsApi } from "./preload/domains/settingsApi";
+import { sitesApi } from "./preload/domains/sitesApi";
+import { stateSyncApi } from "./preload/domains/stateSyncApi";
+import { systemApi } from "./preload/domains/systemApi";
+
+type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
+
+const electronAPI: ElectronAPI = {
+  data: dataApi,
+  events: createEventsApi(),
+  monitoring: monitoringApi,
+  monitorTypes: monitorTypesApi,
+  settings: settingsApi,
+  sites: sitesApi,
+  stateSync: stateSyncApi,
+  system: systemApi,
+};
 ```
 
 ### Type Safety and Validation
@@ -52,18 +60,16 @@ All IPC calls are fully typed with TypeScript interfaces and validated at the IP
 ```typescript
 // Backend: IPC handler with validation
 registerStandardizedIpcHandler(
-  "sites:create",
-  async (data: SiteCreationData): Promise<Site> => {
-    // Business logic handled by service managers
-    return await this.siteManager.createSite(data);
+  "add-site",
+  async (site: Site): Promise<Site> => {
+    return await this.uptimeOrchestrator.addSite(site);
   },
   // Validation function ensures type safety
-  (data): data is SiteCreationData =>
-    siteCreationSchema.safeParse(data).success
+  SiteHandlerValidators.addSite
 );
 
 // Frontend: Type-safe calls with automatic inference
-const newSite: Site = await window.electronAPI.sites.create({
+const newSite: Site = await window.electronAPI.sites.addSite({
   name: "Example Site",
   url: "https://example.com",
   monitors: [...]
@@ -74,27 +80,32 @@ const newSite: Site = await window.electronAPI.sites.create({
 
 ### Sites API (`window.electronAPI.sites`)
 
-#### `getAll(): Promise<Site[]>`
+#### `getSites(): Promise<Site[]>`
 
 Retrieves all configured sites with their monitors.
 
 ```typescript
-const sites = await window.electronAPI.sites.getAll();
+const sites = await window.electronAPI.sites.getSites();
 // Returns: Site[] with complete monitor configurations
 ```
 
-#### `create(data: SiteCreationData): Promise<Site>`
+#### `addSite(site: Site): Promise<Site>`
 
-Creates a new site with associated monitors using transaction safety.
+Creates a new site (and its monitors) using the transactional repository
+pipeline. The backend emits a `site:added` renderer event upon success.
 
 ```typescript
-const newSite = await window.electronAPI.sites.create({
+const newSite = await window.electronAPI.sites.addSite({
+ identifier: "site-001",
  name: "My Website",
  url: "https://mywebsite.com",
  description: "Production website monitoring",
+ monitoring: true,
  monitors: [
   {
+   id: "monitor-001",
    type: "http",
+   monitoring: true,
    config: {
     url: "https://mywebsite.com",
     method: "GET",
@@ -107,100 +118,159 @@ const newSite = await window.electronAPI.sites.create({
 });
 ```
 
-#### `update(id: string, data: Partial<SiteUpdateData>): Promise<Site>`
+#### `updateSite(identifier: string, updates: Partial<Site>): Promise<Site>`
 
-Updates an existing site and/or its monitors.
+Updates an existing site and/or its monitors. The backend broadcasts
+`site:updated` with the new snapshot and list of changed fields.
 
 ```typescript
-const updatedSite = await window.electronAPI.sites.update(siteIdentifier, {
- name: "New Site Name",
- description: "Updated description",
- monitors: [...updatedMonitors],
-});
+const updatedSite = await window.electronAPI.sites.updateSite(
+ siteIdentifier,
+ {
+  name: "New Site Name",
+  description: "Updated description",
+ }
+);
 ```
 
-#### `delete(id: string): Promise<void>`
+#### `removeSite(identifier: string): Promise<boolean>`
 
-Deletes a site and all its associated monitors and historical data.
+Deletes a site together with its monitors and history. Returns `true` on
+success and emits a `site:removed` event once cleanup is complete.
 
 ```typescript
-await window.electronAPI.sites.delete(siteIdentifier);
-// Triggers 'sites:deleted' event
+const removed = await window.electronAPI.sites.removeSite(siteIdentifier);
+if (removed) {
+ console.info(`Site ${siteIdentifier} removed`);
+}
 ```
 
-#### `startMonitoring(id: string): Promise<void>`
+#### `removeMonitor(siteIdentifier: string, monitorId: string): Promise<Site>`
 
-Starts monitoring for all monitors associated with a site.
-
-```typescript
-await window.electronAPI.sites.startMonitoring(siteIdentifier);
-// Triggers 'sites:monitoring-started' event
-```
-
-#### `stopMonitoring(id: string): Promise<void>`
-
-Stops monitoring for all monitors associated with a site.
+Removes a single monitor from a site and returns the updated site snapshot.
 
 ```typescript
-await window.electronAPI.sites.stopMonitoring(siteIdentifier);
-// Triggers 'sites:monitoring-stopped' event
-```
-
-### Monitoring API (`window.electronAPI.monitoring`)
-
-#### `checkManually(siteIdentifier: string, monitorId: string): Promise<MonitorCheckResult>`
-
-Performs a manual health check for a specific monitor.
-
-```typescript
-const result = await window.electronAPI.monitoring.checkManually(
+const updatedSite = await window.electronAPI.sites.removeMonitor(
  siteIdentifier,
  monitorId
 );
-// Returns: {
-//   status: "up" | "down",
-//   responseTime: number,
-//   details?: string,
-//   error?: string,
-//   timestamp: number
-// }
 ```
 
-#### `validateMonitorConfig(config: MonitorConfig): Promise<ValidationResult>`
+#### `deleteAllSites(): Promise<number>`
+
+Dangerous operation intended for test utilities. Removes every site in the
+database and returns the number of deleted records. Use with extreme caution.
+
+### Monitoring API (`window.electronAPI.monitoring`)
+
+#### `checkSiteNow(siteIdentifier: string, monitorId: string): Promise<StatusUpdate | undefined>`
+
+Performs a manual health check for a specific monitor and returns the most
+recent `StatusUpdate` when available.
+
+```typescript
+const result = await window.electronAPI.monitoring.checkSiteNow(
+ siteIdentifier,
+ monitorId
+);
+if (result) {
+ console.log(`Manual check completed at ${new Date(result.timestamp)}`);
+}
+```
+
+#### `startMonitoring(): Promise<boolean>`
+
+Starts monitoring for every configured site. Resolves to `true` when the
+backend accepts the request and emits `monitoring:started`.
+
+```typescript
+const started = await window.electronAPI.monitoring.startMonitoring();
+```
+
+#### `stopMonitoring(): Promise<boolean>`
+
+Stops all active monitors. Resolves to `true` when monitoring halts and
+emits `monitoring:stopped`.
+
+```typescript
+const stopped = await window.electronAPI.monitoring.stopMonitoring();
+```
+
+#### `startMonitoringForSite(siteIdentifier: string, monitorId?: string): Promise<boolean>`
+
+Starts monitoring for a specific site (optionally a single monitor). Emits the
+standard monitoring lifecycle and cache invalidation events when successful.
+
+```typescript
+await window.electronAPI.monitoring.startMonitoringForSite(
+ siteIdentifier,
+ specificMonitorId
+);
+```
+
+#### `stopMonitoringForSite(siteIdentifier: string, monitorId?: string): Promise<boolean>`
+
+Stops monitoring for a site (optionally a single monitor).
+
+```typescript
+await window.electronAPI.monitoring.stopMonitoringForSite(
+ siteIdentifier,
+ monitorId
+);
+```
+
+#### `validateMonitorData(type: string, data: unknown): Promise<ValidationResult>`
 
 Validates monitor configuration against type-specific schemas.
 
 ```typescript
-const validation = await window.electronAPI.monitoring.validateMonitorConfig({
- type: "http",
- config: { url: "https://example.com", timeout: 5000 },
-});
+const validation = await window.electronAPI.monitoring.validateMonitorData(
+ "http",
+ { url: "https://example.com", timeout: 5000 }
+);
 // Returns: { isValid: boolean, errors?: string[] }
 ```
 
+#### `formatMonitorDetail(type: string, detail: string): Promise<string>`
+
+Applies monitor-specific formatting to detail strings in the renderer UI.
+
+#### `formatMonitorTitleSuffix(type: string, monitor: Monitor): Promise<string>`
+
+Returns a human-friendly suffix for monitor titles (e.g., HTTP method or host
+name).
+
 ### Data API (`window.electronAPI.data`)
 
-#### `exportData(options?: ExportOptions): Promise<ExportResult>`
+#### `exportData(): Promise<string>`
 
-Exports application data (sites, monitors, history, settings).
+Exports the full application dataset (sites, monitors, history snapshots, and
+settings) as a JSON string.
 
 ```typescript
-const exportResult = await window.electronAPI.data.exportData({
- includeHistory: true,
- dateRange: { start: startDate, end: endDate },
- format: "json",
-});
+const payload = await window.electronAPI.data.exportData();
+const snapshot = JSON.parse(payload);
 ```
 
-#### `importData(data: ImportData, options?: ImportOptions): Promise<ImportResult>`
+#### `importData(serialized: string): Promise<boolean>`
 
-Imports previously exported data with conflict resolution.
+Imports a previously exported dataset. The argument must be the raw JSON string
+produced by `exportData()`.
 
 ```typescript
-const importResult = await window.electronAPI.data.importData(importData, {
- overwriteExisting: false,
- validateBeforeImport: true,
-});
+const success = await window.electronAPI.data.importData(payload);
+if (!success) {
+  notify("Import reported validation failures");
+}
+```
+
+#### `resetSettings(): Promise<void>`
+
+Restores application settings to their factory defaults while leaving sites and
+history untouched. Primarily used by diagnostic flows and test fixtures.
+
+```typescript
+await window.electronAPI.data.resetSettings();
 ```
 
 #### `downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult>`
@@ -226,50 +296,32 @@ await handleSQLiteBackupDownload(async () => backup);
 
 ### Monitor Types API (`window.electronAPI.monitorTypes`)
 
-#### `getAll(): Promise<MonitorTypeConfig[]>`
+#### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 
-Retrieves all available monitor type configurations.
-
-```typescript
-const monitorTypes = await window.electronAPI.monitorTypes.getAll();
-// Returns serialized configurations (no functions/schemas)
-```
-
-#### `getByType(type: string): Promise<MonitorTypeConfig | null>`
-
-Retrieves configuration for a specific monitor type.
+Retrieves the full registry of available monitor types, including validation
+metadata and editor hints.
 
 ```typescript
-const httpConfig = await window.electronAPI.monitorTypes.getByType("http");
+const monitorTypes = await window.electronAPI.monitorTypes.getMonitorTypes();
+// Returns serialized configurations (no prototype functions)
 ```
 
 ### Settings API (`window.electronAPI.settings`)
 
-#### `get(): Promise<AppSettings>`
+#### `getHistoryLimit(): Promise<number>`
 
-Retrieves current application settings.
+Retrieves the current history retention limit (in days).
 
 ```typescript
-const settings = await window.electronAPI.settings.get();
+const limit = await window.electronAPI.settings.getHistoryLimit();
 ```
 
-#### `update(data: Partial<AppSettings>): Promise<AppSettings>`
+#### `updateHistoryLimit(limitDays: number): Promise<number>`
 
-Updates application settings with validation.
+Sets the history retention limit and returns the persisted value.
 
 ```typescript
-const updated = await window.electronAPI.settings.update({
- notifications: {
-  enabled: true,
-  onStatusChange: true,
-  onFailure: true,
- },
- theme: "dark",
- monitoring: {
-  defaultCheckInterval: 60000,
-  maxRetryAttempts: 3,
- },
-});
+const updatedLimit = await window.electronAPI.settings.updateHistoryLimit(45);
 ```
 
 ### State Sync API (`window.electronAPI.stateSync`)
@@ -550,14 +602,17 @@ interface UptimeEvents {
 
 ```typescript
 // In Electron main process services
-eventBus.onTyped("sites:added", (data) => {
- console.log(`Site added: ${data.site.name} at ${data.timestamp}`);
+eventBus.onTyped("site:added", (data) => {
+ console.log(
+  `Site added from ${data.source} workflow: ${data.site.name}`
+ );
  // Automatically includes correlation ID and metadata
 });
 
 // Emit events
-await eventBus.emitTyped("sites:added", {
+await eventBus.emitTyped("site:added", {
  site: newSite,
+ source: "user",
  timestamp: Date.now(),
 });
 ```
@@ -583,17 +638,20 @@ function SiteManager() {
   const handleCreateSite = async (siteData: SiteCreationData) => {
     try {
       // Optimistic update to UI
-      const optimisticSite = { ...siteData, id: 'temp-id' };
+      const optimisticSite = {
+        ...siteData,
+        identifier: "temp-identifier",
+      };
       addSite(optimisticSite);
 
       // Call backend
-      const newSite = await window.electronAPI.sites.create(siteData);
+      const newSite = await window.electronAPI.sites.addSite(siteData);
 
       // Replace optimistic entry with real data
-      updateSite('temp-id', newSite);
+      updateSite("temp-identifier", newSite);
     } catch (error) {
       // Rollback optimistic update
-      removeSite('temp-id');
+      removeSite("temp-identifier");
       console.error("Failed to create site:", error);
     }
   };
@@ -602,9 +660,11 @@ function SiteManager() {
     <div>
       {sites.map((site) => (
         <SiteCard
-          key={site.id}
+          key={site.identifier}
           site={site}
-          onStartMonitoring={() => startMonitoring(site.id)}
+          onStartMonitoring={() =>
+            startMonitoring(site.identifier)
+          }
         />
       ))}
     </div>
@@ -632,7 +692,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
  fetchSites: async () => {
   set({ isLoading: true });
   try {
-   const sites = await window.electronAPI.sites.getAll();
+  const sites = await window.electronAPI.sites.getSites();
    set({ sites, lastSyncTime: Date.now() });
   } catch (error) {
    console.error("Failed to fetch sites:", error);
@@ -642,7 +702,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
  },
 
  createSite: async (siteData: SiteCreationData) => {
-  const newSite = await window.electronAPI.sites.create(siteData);
+  const newSite = await window.electronAPI.sites.addSite(siteData);
   // Don't manually add - event listener will handle it
   return newSite;
  },
@@ -763,7 +823,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-   const newSite = await window.electronAPI.sites.create(siteData);
+  const newSite = await window.electronAPI.sites.addSite(siteData);
    return newSite;
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -779,7 +839,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-   await window.electronAPI.sites.delete(siteIdentifier);
+  await window.electronAPI.sites.removeSite(siteIdentifier);
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
    setError(errorMessage);
@@ -910,7 +970,7 @@ All IPC calls include consistent error handling:
 
 ```typescript
 try {
- const site = await window.electronAPI.sites.create(siteData);
+ const site = await window.electronAPI.sites.addSite(siteData);
 } catch (error) {
  // Error includes:
  // - message: Human-readable error message
@@ -939,9 +999,15 @@ All IPC communication uses Electron's context isolation for security:
 // preload.ts - Secure exposure
 const electronAPI = {
  sites: {
-  getAll: () => ipcRenderer.invoke("sites:get-all"),
-  create: (data: SiteCreationData) => ipcRenderer.invoke("sites:create", data),
-  // ... other methods
+  getSites: () => ipcRenderer.invoke("get-sites"),
+  addSite: (data: SiteCreationData) => ipcRenderer.invoke("add-site", data),
+  updateSite: (identifier: string, updates: Partial<Site>) =>
+   ipcRenderer.invoke("update-site", identifier, updates),
+  removeSite: (identifier: string) =>
+   ipcRenderer.invoke("remove-site", identifier),
+  removeMonitor: (identifier: string, monitorId: string) =>
+   ipcRenderer.invoke("remove-monitor", identifier, monitorId),
+  deleteAllSites: () => ipcRenderer.invoke("delete-all-sites"),
  },
 } as const;
 
@@ -955,11 +1021,11 @@ All IPC handlers include input validation:
 ```typescript
 // Backend handler with validation
 ipcService.registerStandardizedIpcHandler(
- "sites:create",
- async (data: SiteCreationData) => {
-  return await siteManager.createSite(data);
+ "add-site",
+ async (site: Site) => {
+  return await uptimeOrchestrator.addSite(site);
  },
- isSiteCreationData // Type guard function
+ SiteHandlerValidators.addSite
 );
 ```
 

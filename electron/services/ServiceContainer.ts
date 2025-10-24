@@ -18,6 +18,8 @@ import type { Site } from "@shared/types";
 import type { EventMetadata } from "@shared/types/events";
 import type { UnknownRecord } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
+
 import type { UptimeEvents } from "../events/eventTypes";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
@@ -324,6 +326,14 @@ export class ServiceContainer {
     }
 
     /**
+     * Retrieves the existing service container instance without creating a new
+     * one.
+     */
+    public static getExistingInstance(): ServiceContainer | undefined {
+        return ServiceContainer.instance;
+    }
+
+    /**
      * Resets the singleton container for testing purposes.
      *
      * @remarks
@@ -381,7 +391,8 @@ export class ServiceContainer {
      * Attempts to call an optional `initialize` method on a service instance.
      *
      * @param service - Service instance that may expose an initialize method.
-     * @param serviceName - Human-readable name for diagnostics while debug logging is enabled.
+     * @param serviceName - Human-readable name for diagnostics while debug
+     *   logging is enabled.
      */
     private async tryInitializeService(
         service: unknown,
@@ -595,6 +606,7 @@ export class ServiceContainer {
                 services.push({ name: serviceName, service: serviceInstance });
             }
         }
+
         return services;
     }
 
@@ -1073,9 +1085,14 @@ export class ServiceContainer {
             try {
                 await mainOrchestrator.emitTyped(eventName, sanitizedPayload);
             } catch (error: unknown) {
+                const normalizedError = ensureError(error);
                 logger.error(
-                    `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}:`,
-                    error
+                    `[ServiceContainer] Error forwarding ${eventLabel} from ${managerName}`,
+                    normalizedError,
+                    {
+                        event: eventLabel,
+                        manager: managerName,
+                    }
                 );
             }
         })();
