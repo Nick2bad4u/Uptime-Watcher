@@ -7,14 +7,180 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[8ddc2fc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)...
+[8ddc2fc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8ddc2fcfb06d5a152acc56616933091cde1dd230...8ddc2fcfb06d5a152acc56616933091cde1dd230))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.3.0 [`(8ddc2fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)
+
+
+
+
+
+
+## [17.3.0] - 2025-10-24
+
+
 [[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)...
-[3f75e09](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3f75e09f75ce37b5ac3d498ca3894b6973db5449...3f75e09f75ce37b5ac3d498ca3894b6973db5449))
+[44c5964](https://github.com/Nick2bad4u/Uptime-Watcher/commit/44c5964cf784cb36e0e34b96ec0c100b739fb19c)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/3f75e09f75ce37b5ac3d498ca3894b6973db5449...44c5964cf784cb36e0e34b96ec0c100b739fb19c))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.2.0 [`(3f75e09)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f75e09f75ce37b5ac3d498ca3894b6973db5449)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Reorganize test files and improve orphan test script
+
+This commit refactors the project's test file structure and enhances the script for finding orphaned tests.
+
+🧹 [chore] Moves test files to dedicated `test` directories.
+ - Test files previously co-located with source code in `src/` and `shared/` are now organized into `src/test/` and `shared/test/` respectively.
+ - This improves project structure and separates test code from implementation code.
+ - Updates relative import paths within the moved test files to reflect their new locations.
+
+🔧 [build] Enhances the `Find-OrphanedTests.ps1` script.
+ - Adds `playwright/tests` to the list of main directories to scan for tests.
+ - Expands test file patterns to include Playwright (`.playwright.ts`), Cypress (`.cy.ts`), E2E (`.e2e.ts`), and module TypeScript (`.mts`) test files.
+ - Improves the exclusion list to ignore common cache (`.cache`, `.tmp`), build (`out`), and temporary (`temp`) directories, as well as the script itself.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(44c5964)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/44c5964cf784cb36e0e34b96ec0c100b739fb19c)
+
+
+- 🚜 [refactor] Improve service initialization and update dependencies
+
+This commit introduces several refactorings, dependency updates, and test improvements across the codebase. The most significant change is the enhancement of the service initialization logic in the `ServiceContainer` to more robustly handle both synchronous and asynchronous initializers.
+
+### Source Code Changes
+
+*   **🚜 [refactor] `electron/services/ServiceContainer.ts`:**
+    *   Improves the service initialization process to correctly handle methods that return a `Promise` and those that do not.
+    *   A new `isPromiseLike` type guard is introduced to check if an initializer's return value has a `then` method.
+    *   The `tryInitializeService` method now conditionally `await`s the result only if it's a promise, making the system more flexible.
+    *   The type for `PossiblyInitializableService`'s `initialize` method is simplified.
+
+*   **🎨 [style] `src/services/EventsService.ts`:**
+    *   Corrects formatting for JSDoc code examples.
+    *   Standardizes import statements for better consistency.
+
+*   **🎨 [style] `shared/types/eventsBridge.ts`:**
+    *   Standardizes import statement formatting.
+
+### Build & Configuration
+
+*   **🔧 [build] Vitest Configurations:**
+    *   Updates several Vitest configuration files (`vitest.config.ts`, `vitest.zero-coverage.config.ts`, `vitest.storybook.config.ts`) to use the renamed `ViteUserConfigFnObject` type from `vitest/config`.
+    *   Adds `as any` type assertions to work around outdated or incomplete type definitions in Vitest and its coverage plugins, silencing type errors.
+    *   Disables specific ESLint rules in configuration files where type overrides are necessary.
+
+### Test Suite Improvements
+
+*   **🧪 [test] General Test Refinements:**
+    *   Removes unused imports and variables from several test files, cleaning up the test code.
+    *   Replaces numeric separators (e.g., `5_000`) with standard integers (`5000`) in test timeouts for consistency.
+    *   Converts `NodeList` collections to arrays using `Array.from()` before iteration to prevent potential issues with live collections during DOM manipulation in tests.
+
+*   **🧪 [test] `electron/test/setup.ts`:**
+    *   Refactors `fs` mock creation by adding explicit type casts to mocked functions, improving type safety and clarity within the test setup.
+
+*   **🧪 [test] `src/test/utils/cacheSync.test.ts`:**
+    *   Refactors the setup for store mocks (`useMonitorTypesStore`, `useSitesStore`) to be more direct and less reliant on `vi.spyOn` with complex implementations, simplifying the test structure.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(26794e9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/26794e9ce30c8283b3fcb3b24ec194bd28cdf8a0)
+
+
+- 🚜 [refactor] Improve service initialization and modernize test mocks
+
+This commit introduces several refactoring improvements across the application, focusing on enhancing the service initialization process and standardizing the mocking strategy in tests for better debugging and maintainability.
+
+### Source Code Changes 🚀
+
+*   **🔧 [build] Refactor Service Initialization**
+    *   Introduces a `tryInitializeService` helper in the `ServiceContainer` to safely call optional `initialize` methods on services.
+    *   Adds a `hasInitializeMethod` type guard for improved type safety and robustness during the application's bootstrap sequence.
+    *   Adds debug logging for services that do not have an initializer, improving diagnostics.
+
+*   **🛠️ [fix] Correct DNS Resolution Promise Typing**
+    *   Fixes a type issue in the `checkDnsResolution` utility where a timeout promise was incorrectly typed, preventing potential runtime errors.
+
+*   **🎨 [style] Modernize Property Checking**
+    *   Replaces `Object.prototype.hasOwnProperty.call()` with the more modern and direct `Object.hasOwn()` in `WindowService`.
+
+### Test Suite Enhancements 🧪
+
+*   **🚜 [refactor] Standardize Mocking Strategy**
+    *   Replaces anonymous arrow functions in `vi.fn()` with named functions (e.g., `vi.fn(function MyMock() { ... })`) across numerous test files. This greatly improves debugging by providing meaningful names in stack traces.
+    *   Introduces a `createConstructableMock` helper to simplify the creation of mock classes, ensuring consistency and reducing boilerplate.
+
+*   **🧪 [test] Improve Test Isolation and Accuracy**
+    *   Enhances test isolation by resetting mock states and using `mockImplementationOnce` where appropriate, particularly in `ApplicationService` tests.
+    *   Corrects a test assertion in `ServiceContainer.fixed.test.ts` to reflect the expected behavior accurately.
+    *   Adds explicit timeouts to several long-running database repository tests to prevent CI hangs.
+
+*   **🧹 [chore] Update Test Utilities and Mocks**
+    *   Improves the `node:fs` mock in the global test setup to be more robust by delegating to the actual module while allowing specific functions to be spied on or replaced.
+    *   Refactors test hooks in `renderHook` calls to include cleanup (`unmount`) to prevent memory leaks between tests.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(afa27fa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/afa27fad81ede0afa3922048ea7ed612bb7b7759)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Revamps event emission and handling
+
+Updates documentation and code to reflect changes in event emission and handling, particularly regarding cache invalidation and site lifecycle events.
+
+- 🛠️ Improves event emission flow:
+ - Managers now emit only internal events (`internal:site:*`).
+ - The `UptimeOrchestrator` enriches these events and rebroadcasts renderer-facing `site:*` events.
+ - Translates cache telemetry into the `cache:invalidated` pipeline.
+- 📝 Updates documentation to reflect changes in event emission:
+ - Documents that `site:cache-miss` and `site:cache-updated` are no longer emitted directly by managers.
+ - Adds documentation for new `site:added`, `site:removed`, and `site:updated` events.
+- 🎨 Introduces dedicated helpers for site lifecycle events in the renderer:
+ - Exposes `EventsService` for `site:added`, `site:removed`, and `site:updated` events, which keeps cleanup logic consistent and avoids direct references to `window.electronAPI`.
+- 🧹 Removes deprecated `site:cache-miss` and `site:cache-updated` events.
+- 🧪 Updates tests to reflect changes in event emission and handling:
+ - Updates `eventTypes.comprehensive.test.ts` to no longer check for deprecated cache events.
+- 📝 Updates various documentation files to reflect the new event emissions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0681f76)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0681f764adcec471de8d8ec2e94bdae2ad02f505)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.2.0 [skip ci] [`(ab7c046)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab7c04658d76680949ef1f41b56ac1e8e2f1b32b)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Updates dependencies and WASM binary
+
+Updates dependencies in `package-lock.json` and `package.json` to their latest versions.
+
+ - ⬆️ Updates the node-sqlite3 wasm binary.
+ - 🧹 Updates development dependencies:
+  -  Updates `@biomejs/biome` from 2.2.6 to 2.2.7.
+  -  Updates `@cspell` related packages from 9.2.1 to 9.2.2.
+  -  Updates `@eslint-react` related packages from 2.2.2 to 2.2.3.
+  -  Updates `@eslint/markdown` from 7.4.1 to 7.5.0.
+  -  Updates `electron` from 38.3.0 to 38.4.0.
+  -  Updates `@vitest` related packages from 3.2.4 to 4.0.1.
+  -  Updates `eslint-plugin-es-x` from 9.1.1 to 9.1.2.
+  -  Updates `eslint-plugin-package-json` from 0.57.0 to 0.58.0.
+ - ⚙️ Updates the wasm version in `assets/.wasm-version` to `b2b295ae`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e0c8a7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e0c8a76e82da5d8cd05ab796451ad15ee58e196)
 
 
 
