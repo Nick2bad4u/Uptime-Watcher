@@ -50,6 +50,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
@@ -158,6 +159,15 @@ export interface SiteManagerDependencies {
     siteRepository: SiteRepository;
 }
 
+interface UpdateSitesCacheOptions {
+    readonly action?: StateSyncAction;
+    readonly emitSyncEvent?: boolean;
+    readonly siteIdentifier?: string;
+    readonly sites?: Site[];
+    readonly source?: StateSyncSource;
+    readonly timestamp?: number;
+}
+
 /**
  * @remarks
  * The SiteManager is the central coordinator for all site-related operations in
@@ -206,6 +216,33 @@ export class SiteManager {
     /** Service for writing and updating site data */
     private readonly siteWriterService: SiteWriterService;
 
+    private async emitSitesStateSynchronized({
+        action,
+        siteIdentifier,
+        sites,
+        source,
+        timestamp,
+    }: {
+        action: StateSyncAction;
+        siteIdentifier: string;
+        sites?: Site[];
+        source: StateSyncSource;
+        timestamp?: number;
+    }): Promise<void> {
+        const snapshot = (sites ?? this.getSitesSnapshot()).map((site) =>
+            structuredClone(site)
+        );
+        const effectiveTimestamp = timestamp ?? Date.now();
+
+        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            action,
+            siteIdentifier,
+            sites: snapshot,
+            source,
+            timestamp: effectiveTimestamp,
+        });
+    }
+
     /**
      * Adds a new site to the database and cache.
      *
@@ -252,18 +289,10 @@ export class SiteManager {
             timestamp,
         });
 
-        // Emit typed site added event
-        await this.eventEmitter.emitTyped("site:added", {
-            site: sanitizedSite,
-            source: "user" as const,
-            timestamp,
-        });
-
-        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+        await this.emitSitesStateSynchronized({
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: sanitizedSite.identifier,
-            sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.FRONTEND,
+            source: STATE_SYNC_SOURCE.DATABASE,
             timestamp,
         });
 
@@ -375,72 +404,92 @@ export class SiteManager {
      * @example
      *
      * ```typescript
-     * const success = await siteManager.removeMonitor(
+     * const updatedSite = await siteManager.removeMonitor(
      *     "site_123",
      *     "monitor_456"
      * );
+     *
+     * logger.info({ monitorCount: updatedSite.monitors.length });
      * ```
      *
      * @param siteIdentifier - The identifier of the site.
      * @param monitorId - The monitor ID to remove.
      *
-     * @returns True if the monitor was removed, false otherwise.
+     * @returns The updated {@link Site} snapshot after monitor removal.
      *
      * @throws If database or cache update fails.
      */
     public async removeMonitor(
         siteIdentifier: string,
         monitorId: string
-    ): Promise<boolean> {
-        // Remove the monitor from the database using transaction
-        const success = await this.executeMonitorDeletion(monitorId);
+    ): Promise<Site> {
+        const deletionSucceeded = await this.executeMonitorDeletion(monitorId);
 
-        if (success) {
-            // Refresh the cache by getting all sites (to ensure proper
-            // site structure)
-            const allSites =
-                await this.siteRepositoryService.getSitesFromDatabase();
-
-            // Update cache
-            await this.updateSitesCache(
-                allSites,
-                "SiteManager.refreshSitesFromDatabase"
+        if (!deletionSucceeded) {
+            throw new Error(
+                `Failed to delete monitor ${monitorId} for site ${siteIdentifier}`
             );
-
-            // Find the updated site for the event
-            const updatedSite = this.sitesCache.get(siteIdentifier);
-            if (updatedSite) {
-                // Emit internal site updated event
-                await this.eventEmitter.emitTyped("internal:site:updated", {
-                    identifier: siteIdentifier,
-                    operation: "updated",
-                    site: updatedSite,
-                    timestamp: Date.now(),
-                    updatedFields: ["monitors"],
-                });
-
-                // Emit sync event for state consistency
-                await this.eventEmitter.emitTyped("sites:state-synchronized", {
-                    action: STATE_SYNC_ACTION.UPDATE,
-                    siteIdentifier: siteIdentifier,
-                    sites: this.getSitesSnapshot(),
-                    source: STATE_SYNC_SOURCE.FRONTEND,
-                    timestamp: Date.now(),
-                });
-
-                logger.info(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
-                        {
-                            monitorId,
-                            siteIdentifier,
-                        }
-                    )
-                );
-            }
         }
 
-        return success;
+        // Refresh the cache by getting all sites (to ensure proper
+        // site structure)
+        const allSites =
+            await this.siteRepositoryService.getSitesFromDatabase();
+
+        // Update cache
+        await this.updateSitesCache(
+            allSites,
+            "SiteManager.refreshSitesFromDatabase"
+        );
+
+        // Find the updated site for the event
+        const updatedSite = this.sitesCache.get(siteIdentifier);
+
+        if (!updatedSite) {
+            const error = new Error(
+                `Updated site ${siteIdentifier} not found after monitor removal`
+            );
+            logger.error(
+                "[SiteManager] Missing site snapshot after monitor removal",
+                error,
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
+            );
+            throw error;
+        }
+
+        const timestamp = Date.now();
+
+        // Emit internal site updated event
+        await this.eventEmitter.emitTyped("internal:site:updated", {
+            identifier: siteIdentifier,
+            operation: "updated",
+            site: updatedSite,
+            timestamp,
+            updatedFields: ["monitors"],
+        });
+
+        // Emit sync event for state consistency
+        await this.emitSitesStateSynchronized({
+            action: STATE_SYNC_ACTION.UPDATE,
+            siteIdentifier,
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp,
+        });
+
+        logger.info(
+            interpolateLogTemplate(
+                LOG_TEMPLATES.services.MONITOR_REMOVED_FROM_SITE,
+                {
+                    monitorId,
+                    siteIdentifier,
+                }
+            )
+        );
+
+        return updatedSite;
     }
 
     /**
@@ -461,7 +510,9 @@ export class SiteManager {
     public async removeSite(identifier: string): Promise<boolean> {
         // Get site information BEFORE deletion for accurate event data
         const siteToRemove = this.sitesCache.get(identifier);
-        const siteName = siteToRemove?.name ?? "Unknown";
+        const sanitizedRemovedSite = siteToRemove
+            ? structuredClone(siteToRemove)
+            : undefined;
 
         const result = await this.siteWriterService.deleteSite(
             this.sitesCache,
@@ -479,23 +530,16 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("internal:site:removed", {
                 identifier,
                 operation: "removed",
-                timestamp,
-            });
-
-            // Emit typed site removed event with accurate site name
-            await this.eventEmitter.emitTyped("site:removed", {
-                cascade: true,
-                siteIdentifier: identifier,
-                siteName: siteName,
+                ...(sanitizedRemovedSite ? { site: sanitizedRemovedSite } : {}),
                 timestamp,
             });
 
             // Emit sync event for state consistency
-            await this.eventEmitter.emitTyped("sites:state-synchronized", {
+            await this.emitSitesStateSynchronized({
                 action: STATE_SYNC_ACTION.DELETE,
                 siteIdentifier: identifier,
                 sites: sitesAfterRemoval,
-                source: STATE_SYNC_SOURCE.FRONTEND,
+                source: STATE_SYNC_SOURCE.DATABASE,
                 timestamp,
             });
         }
@@ -563,24 +607,21 @@ export class SiteManager {
             await this.eventEmitter.emitTyped("internal:site:removed", {
                 identifier: site.identifier,
                 operation: "removed",
-                timestamp: Date.now(),
-            });
-            await this.eventEmitter.emitTyped("site:removed", {
-                cascade: true,
-                siteIdentifier: site.identifier,
-                siteName: site.name,
+                site: structuredClone(site),
                 timestamp: Date.now(),
             });
             /* eslint-enable no-await-in-loop -- Re-enable after controlled sequential event processing */
         }
 
+        const bulkSyncTimestamp = Date.now();
+
         // Emit bulk sync event for state consistency
-        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+        await this.emitSitesStateSynchronized({
             action: STATE_SYNC_ACTION.BULK_SYNC,
             siteIdentifier: "all",
             sites: [],
-            source: STATE_SYNC_SOURCE.FRONTEND,
-            timestamp: Date.now(),
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp: bulkSyncTimestamp,
         });
 
         logger.info(
@@ -676,21 +717,25 @@ export class SiteManager {
             );
         }
 
-        // Emit typed site updated event
-        await this.eventEmitter.emitTyped("site:updated", {
-            previousSite: originalSite,
-            site: refreshedSite,
-            timestamp: Date.now(),
+        const timestamp = Date.now();
+        const sanitizedUpdatedSite = structuredClone(refreshedSite);
+        const sanitizedPreviousSite = structuredClone(originalSite);
+
+        await this.eventEmitter.emitTyped("internal:site:updated", {
+            identifier,
+            operation: "updated",
+            previousSite: sanitizedPreviousSite,
+            site: sanitizedUpdatedSite,
+            timestamp,
             updatedFields: Object.keys(updates),
         });
 
         // Emit sync event for state consistency
-        await this.eventEmitter.emitTyped("sites:state-synchronized", {
+        await this.emitSitesStateSynchronized({
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier: identifier,
-            sites: this.getSitesSnapshot(),
-            source: STATE_SYNC_SOURCE.FRONTEND,
-            timestamp: Date.now(),
+            source: STATE_SYNC_SOURCE.DATABASE,
+            timestamp,
         });
 
         return refreshedSite;
@@ -720,7 +765,8 @@ export class SiteManager {
      */
     public async updateSitesCache(
         sites: Site[],
-        context?: string
+        context?: string,
+        options?: UpdateSitesCacheOptions
     ): Promise<void> {
         const duplicates = collectDuplicateSiteIdentifiers(sites);
         if (duplicates.length > 0) {
@@ -746,6 +792,27 @@ export class SiteManager {
             operation: "cache-updated",
             timestamp: Date.now(),
         });
+
+        if (options?.emitSyncEvent) {
+            const syncPayload: {
+                action: StateSyncAction;
+                siteIdentifier: string;
+                sites: Site[];
+                source: StateSyncSource;
+                timestamp?: number;
+            } = {
+                action: options.action ?? STATE_SYNC_ACTION.BULK_SYNC,
+                siteIdentifier: options.siteIdentifier ?? "all",
+                sites: options.sites ?? this.getSitesSnapshot(),
+                source: options.source ?? STATE_SYNC_SOURCE.CACHE,
+            };
+
+            if (typeof options.timestamp === "number") {
+                syncPayload.timestamp = options.timestamp;
+            }
+
+            await this.emitSitesStateSynchronized(syncPayload);
+        }
     }
 
     /**

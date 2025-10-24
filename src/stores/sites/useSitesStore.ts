@@ -89,35 +89,12 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
 
         // Create operations actions
         const operationsActions = createSiteOperationsActions({
-            addSite: stateActions.addSite,
             getSites,
             removeSite: stateActions.removeSite,
             services: {
                 data: {
                     downloadSqliteBackup: () =>
                         DataService.downloadSqliteBackup(),
-                },
-                monitoring: {
-                    startMonitoring: (
-                        siteIdentifier: string,
-                        monitorId: string
-                    ) =>
-                        MonitoringService.startMonitoring(
-                            siteIdentifier,
-                            monitorId
-                        ),
-                    startSiteMonitoring: (siteIdentifier: string) =>
-                        MonitoringService.startSiteMonitoring(siteIdentifier),
-                    stopMonitoring: (
-                        siteIdentifier: string,
-                        monitorId: string
-                    ) =>
-                        MonitoringService.stopMonitoring(
-                            siteIdentifier,
-                            monitorId
-                        ),
-                    stopSiteMonitoring: (siteIdentifier: string) =>
-                        MonitoringService.stopSiteMonitoring(siteIdentifier),
                 },
                 site: {
                     addSite: (site: Site) => SiteService.addSite(site),

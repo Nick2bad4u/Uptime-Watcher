@@ -79,12 +79,13 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     ApplicationError,
     type ApplicationErrorOptions,
 } from "@shared/utils/errorHandling";
 
-import type { UptimeEvents } from "./events/eventTypes";
+import type { EventReason, UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
@@ -124,7 +125,7 @@ interface RestartMonitoringRequestData {
 
 interface SiteEventData {
     identifier?: string;
-    site: Site;
+    site?: Site;
     timestamp: number;
     updatedFields?: string[];
 }
@@ -296,6 +297,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         data: SiteEventData & { _meta?: unknown }
     ): void => {
         void (async (): Promise<void> => {
+            if (!data.site) {
+                logger.error(
+                    "[UptimeOrchestrator] Received internal:site:added without site payload",
+                    { identifier: data.identifier }
+                );
+                return;
+            }
             // Extract original data without _meta to prevent conflicts
             await this.emitTyped("site:added", {
                 site: data.site,
@@ -321,11 +329,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         data: SiteEventData & { _meta?: unknown }
     ): void => {
         void (async (): Promise<void> => {
-            // Extract original data without _meta to prevent conflicts
+            const siteIdentifier =
+                data.identifier ?? data.site?.identifier ?? "unknown-site";
+            const siteName = data.site?.name ?? "Unknown";
+
+            if (!data.site) {
+                logger.warn(
+                    "[UptimeOrchestrator] internal:site:removed emitted without site snapshot; using fallback values",
+                    { siteIdentifier }
+                );
+            }
+
             await this.emitTyped("site:removed", {
                 cascade: true,
-                siteIdentifier: data.identifier ?? data.site.identifier,
-                siteName: data.site.name,
+                siteIdentifier,
+                siteName,
                 timestamp: data.timestamp,
             });
         })();
@@ -348,6 +366,13 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         data: SiteEventData & { _meta?: unknown; previousSite?: Site }
     ): void => {
         void (async (): Promise<void> => {
+            if (!data.site) {
+                logger.error(
+                    "[UptimeOrchestrator] Received internal:site:updated without site payload",
+                    { identifier: data.identifier }
+                );
+                return;
+            }
             // Extract original data without _meta to prevent conflicts
             await this.emitTyped("site:updated", {
                 previousSite: data.previousSite ?? data.site,
@@ -379,12 +404,17 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     timestamp: Date.now(),
                 });
 
+                const invalidationType =
+                    eventData.identifier === "all" ? "all" : "site";
+
                 // Emit cache invalidation to trigger frontend state refresh
                 await this.emitTyped("cache:invalidated", {
-                    identifier: eventData.identifier,
+                    ...(invalidationType === "site"
+                        ? { identifier: eventData.identifier }
+                        : {}),
                     reason: "update",
                     timestamp: Date.now(),
-                    type: "site",
+                    type: invalidationType,
                 });
             } catch (error) {
                 logger.error(
@@ -413,7 +443,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         identifier: string;
         monitorId?: string;
         operation: "stopped";
-        reason: string;
+        reason: EventReason;
         timestamp: number;
     }): void => {
         void (async (): Promise<void> => {
@@ -425,16 +455,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
                 await this.emitTyped("monitoring:stopped", {
                     activeMonitors,
-                    reason: "user" as const,
+                    reason: eventData.reason,
                     timestamp: Date.now(),
                 });
 
+                const invalidationType =
+                    eventData.identifier === "all" ? "all" : "site";
+
                 // Emit cache invalidation to trigger frontend state refresh
                 await this.emitTyped("cache:invalidated", {
-                    identifier: eventData.identifier,
+                    ...(invalidationType === "site"
+                        ? { identifier: eventData.identifier }
+                        : {}),
                     reason: "update",
                     timestamp: Date.now(),
-                    type: "site",
+                    type: invalidationType,
                 });
             } catch (error) {
                 logger.error(
@@ -891,7 +926,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     private async handleUpdateSitesCacheRequest(
         data: UpdateSitesCacheRequestData
     ): Promise<void> {
-        await this.siteManager.updateSitesCache(data.sites);
+        const timestamp = Date.now();
+
+        await this.siteManager.updateSitesCache(
+            data.sites,
+            "UptimeOrchestrator.handleUpdateSitesCacheRequest",
+            {
+                action: STATE_SYNC_ACTION.BULK_SYNC,
+                emitSyncEvent: true,
+                siteIdentifier: "all",
+                sites: data.sites,
+                source: STATE_SYNC_SOURCE.CACHE,
+                timestamp,
+            }
+        );
 
         // CRITICAL: Set up monitoring for each loaded site
         const setupResults = await Promise.allSettled(
@@ -982,7 +1030,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @param siteIdentifier - The site identifier.
      * @param monitorId - The monitor identifier.
      *
-     * @returns Promise resolving to true if removed, false otherwise.
+     * @returns Promise resolving to the updated {@link Site} snapshot after the
+     *   monitor has been removed.
      *
      * @throws When the removal operation fails critically
      * @throws When database inconsistency occurs and cannot be resolved
@@ -990,9 +1039,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public async removeMonitor(
         siteIdentifier: string,
         monitorId: string
-    ): Promise<boolean> {
+    ): Promise<Site> {
         let monitoringStopped = false;
-        let databaseRemoved = false;
 
         try {
             // Phase 1: Stop monitoring immediately (reversible)
@@ -1002,8 +1050,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             );
 
             // If stopping monitoring failed, log warning but continue with
-            // database removal The monitor may not be running, but database
-            // record should still be removed
+            // database removal. The monitor may not be running, but the database
+            // record should still be removed.
             if (!monitoringStopped) {
                 logger.warn(
                     `[UptimeOrchestrator] Failed to stop monitoring for ${siteIdentifier}/${monitorId}, but continuing with database removal`
@@ -1011,18 +1059,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
 
             // Phase 2: Remove monitor from database using transaction
-            // (irreversible)
-            databaseRemoved = await this.siteManager.removeMonitor(
+            // (irreversible) and return the persisted snapshot.
+            return await this.siteManager.removeMonitor(
                 siteIdentifier,
                 monitorId
             );
-
-            // If both phases succeeded, we're done
-            if (databaseRemoved) {
-                return true;
-            }
-
-            // If database removal failed, attempt compensation
+        } catch (error) {
+            let failureCause: unknown = error;
+            // If database removal failed after monitoring was stopped, attempt compensation
             if (monitoringStopped) {
                 logger.warn(
                     `[UptimeOrchestrator] Database removal failed for ${siteIdentifier}/${monitorId}, attempting to restart monitoring`
@@ -1054,17 +1098,14 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         severity: "critical",
                         timestamp: Date.now(),
                     });
-                    throw criticalError;
+                    failureCause = criticalError;
                 }
             }
 
-            return false;
-        } catch (error) {
             throw this.createContextualError({
-                cause: error,
+                cause: failureCause,
                 code: "ORCHESTRATOR_REMOVE_MONITOR_FAILED",
                 details: {
-                    databaseRemoved,
                     monitorId,
                     monitoringStopped,
                     siteIdentifier,

@@ -129,8 +129,10 @@ export function useSiteMonitor(site: Site): SiteMonitorResult {
     );
 
     const defaultMonitorId = getDefaultMonitorId(monitorIds);
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Selection map may be undefined before initialization.
+    const selectedMonitorIdsBySite = selectedMonitorIds ?? {};
     const selectedMonitorId =
-        selectedMonitorIds?.[latestSite.identifier] ??
+        selectedMonitorIdsBySite[latestSite.identifier] ??
         getSelectedMonitorId(latestSite.identifier) ??
         defaultMonitorId;
 

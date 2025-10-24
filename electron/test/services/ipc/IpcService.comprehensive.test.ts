@@ -193,8 +193,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
             getSites: vi.fn().mockResolvedValue(mockSites),
-            updateSite: vi.fn().mockResolvedValue(true),
-            removeMonitor: vi.fn().mockResolvedValue(true),
+            updateSite: vi.fn().mockResolvedValue(mockSites[0]!),
+            removeMonitor: vi.fn().mockResolvedValue(mockSites[0]!),
             startMonitoring: vi.fn().mockResolvedValue(undefined),
             stopMonitoring: vi.fn().mockResolvedValue(undefined),
             startMonitoringForSite: vi.fn().mockResolvedValue(true),
@@ -436,7 +436,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             expect(result).toEqual({
                 success: true,
-                data: true,
+                data: mockSites[0],
                 metadata: {
                     duration: expect.any(Number),
                     handler: "update-site",
@@ -467,7 +467,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             );
             expect(result).toEqual({
                 success: true,
-                data: true,
+                data: mockSites[0],
                 metadata: {
                     duration: expect.any(Number),
                     handler: "remove-monitor",

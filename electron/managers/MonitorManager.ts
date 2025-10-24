@@ -399,8 +399,9 @@ export class MonitorManager {
      * Starts monitoring for all sites.
      *
      * @remarks
-     * Initiates monitoring for all sites and emits a monitoring started event.
-     * Uses the repository and event-driven patterns for all operations.
+     * Initiates monitoring for all sites and emits an internal monitoring
+     * lifecycle event. Uses the repository and event-driven patterns for all
+     * operations.
      *
      * @example
      *
@@ -427,16 +428,13 @@ export class MonitorManager {
             this.isMonitoring
         );
 
-        // Emit typed monitoring started event
-        const sitesCache = this.dependencies.getSitesCache();
-        const sites = sitesCache.getAll();
-        await this.eventEmitter.emitTyped("monitoring:started", {
-            monitorCount: sites.reduce(
-                (total, site) => total + site.monitors.length,
-                0
-            ),
-            siteCount: sites.length,
-            timestamp: Date.now(),
+        // Emit internal monitoring started event for orchestrator forwarding
+        const timestamp = Date.now();
+
+        await this.eventEmitter.emitTyped("internal:monitor:started", {
+            identifier: "all",
+            operation: "started",
+            timestamp,
         });
     }
 
@@ -525,8 +523,8 @@ export class MonitorManager {
      * Stops monitoring for all sites.
      *
      * @remarks
-     * Stops all monitoring and emits a monitoring stopped event. Uses the
-     * repository and event-driven patterns for all operations.
+     * Stops all monitoring and emits an internal monitoring stopped event. Uses
+     * the repository and event-driven patterns for all operations.
      *
      * @example
      *
@@ -551,10 +549,10 @@ export class MonitorManager {
             sites: this.dependencies.getSitesCache(),
         });
 
-        // Emit typed monitoring stopped event
-        await this.eventEmitter.emitTyped("monitoring:stopped", {
-            activeMonitors: 0,
-            reason: "user" as const,
+        await this.eventEmitter.emitTyped("internal:monitor:stopped", {
+            identifier: "all",
+            operation: "stopped",
+            reason: "user",
             timestamp: Date.now(),
         });
     }

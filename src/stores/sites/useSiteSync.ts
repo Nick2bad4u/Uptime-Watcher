@@ -218,6 +218,11 @@ export const createSiteSyncActions = (
         fullResyncSites: async (): Promise<void> => {
             // If sync is already in progress, return the existing promise
             if (pendingSyncPromise) {
+                logStoreAction("SitesStore", "fullResyncSites", {
+                    coalesced: true,
+                    message: "Coalesced site resync request",
+                    status: "pending",
+                });
                 return pendingSyncPromise;
             }
 

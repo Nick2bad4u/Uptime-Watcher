@@ -143,18 +143,11 @@ describe("OperationHelpers", () => {
         const siteService = {
             addSite: vi.fn(async (site: Site) => site),
             getSites: vi.fn(async () => mockSites),
-            removeMonitor: vi.fn(async () => true),
+            removeMonitor: vi.fn(async () => mockSites[0]!),
             removeSite: vi.fn(async () => true),
             updateSite: vi.fn(async (identifier: string, updates: unknown) =>
                 mockElectronAPI.sites.updateSite(identifier, updates)
             ),
-        };
-
-        const monitoringService = {
-            startMonitoring: vi.fn(async () => {}),
-            startSiteMonitoring: vi.fn(async () => {}),
-            stopMonitoring: vi.fn(async () => {}),
-            stopSiteMonitoring: vi.fn(async () => {}),
         };
 
         getSitesSpy = vi.fn<() => Site[]>(() => mockSites);
@@ -163,12 +156,10 @@ describe("OperationHelpers", () => {
         mockDeps = {
             getSites: getSitesSpy,
             setSites: setSitesSpy,
-            addSite: vi.fn(),
             removeSite: vi.fn(),
             syncSites: vi.fn().mockResolvedValue(undefined),
             services: {
                 data: dataService,
-                monitoring: monitoringService,
                 site: siteService,
             },
         } satisfies SiteOperationsDependencies;

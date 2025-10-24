@@ -51,7 +51,8 @@ export interface SitesApiInterface extends SitesDomainBridge {
      * @param siteIdentifier - Identifier of the site containing the monitor
      * @param monitorId - Identifier of the monitor to remove
      *
-     * @returns Promise resolving to true when the monitor is removed
+     * @returns Promise resolving to the updated site snapshot emitted by the
+     *   backend after removal
      */
     removeMonitor: SitesDomainBridge["removeMonitor"];
 
@@ -110,7 +111,8 @@ export const sitesApi: SitesApiInterface = {
      * @param siteIdentifier - Identifier of the site containing the monitor
      * @param monitorId - Identifier of the monitor to remove
      *
-     * @returns Promise resolving to true when the monitor is removed
+     * @returns Promise resolving to the updated site snapshot emitted by the
+     *   backend after removal
      */
     removeMonitor: createTypedInvoker("remove-monitor"),
 

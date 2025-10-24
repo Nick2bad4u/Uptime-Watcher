@@ -197,8 +197,6 @@ export type SitesStore = Simplify<SitesActions & SitesState>;
  * @public
  */
 export interface SiteOperationsDependencies {
-    /** Add a new site to the store */
-    addSite: (site: Site) => void;
     /** Get all current sites from the store */
     getSites: () => Site[];
     /** Remove a site from the store */
@@ -219,14 +217,6 @@ export interface SiteOperationsDependencies {
 export interface SiteOperationsServiceDependencies {
     /** Data export operations */
     data: Pick<DataBackupService, "downloadSqliteBackup">;
-    /** Monitoring service operations */
-    monitoring: Pick<
-        SiteMonitoringService,
-        | "startMonitoring"
-        | "startSiteMonitoring"
-        | "stopMonitoring"
-        | "stopSiteMonitoring"
-    >;
     /** Site service operations */
     site: Pick<
         SiteDataService,
@@ -234,26 +224,10 @@ export interface SiteOperationsServiceDependencies {
     >;
 }
 
-interface SiteMonitoringService {
-    startMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    stopMonitoring: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<void>;
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-}
-
 interface SiteDataService {
     addSite: (site: Site) => Promise<Site>;
     getSites: () => Promise<Site[]>;
-    removeMonitor: (
-        siteIdentifier: string,
-        monitorId: string
-    ) => Promise<boolean>;
+    removeMonitor: (siteIdentifier: string, monitorId: string) => Promise<Site>;
     removeSite: (identifier: string) => Promise<boolean>;
     updateSite: (identifier: string, updates: Partial<Site>) => Promise<Site>;
 }

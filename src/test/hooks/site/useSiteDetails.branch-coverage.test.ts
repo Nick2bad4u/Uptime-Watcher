@@ -56,6 +56,9 @@ describe("useSiteDetails - Branch Coverage", () => {
         removeMonitorFromSite: vi.fn(),
         setSelectedMonitorId: vi.fn(),
         sites: [mockSite],
+        selectedMonitorIds: {
+            [mockSite.identifier]: mockSite.monitors[0]!.id,
+        },
         startSiteMonitoring: vi.fn(),
         startSiteMonitorMonitoring: vi.fn(),
         stopSiteMonitoring: vi.fn(),

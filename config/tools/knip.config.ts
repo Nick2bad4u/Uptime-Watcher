@@ -60,6 +60,7 @@ const knipConfig: KnipConfig = {
         "sloc",
         "ts-node",
         "tsg",
+        "winget",
         "yamllint",
     ],
     ignoreDependencies: [
@@ -212,6 +213,7 @@ const knipConfig: KnipConfig = {
         "typescript-eslint",
         "typescript-eslint-language-service",
         "typestat",
+        "utf-8-validate",
         "unified",
         "vite-bundle-visualizer",
         "vite-plugin-checker",

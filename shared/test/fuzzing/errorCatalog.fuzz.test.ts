@@ -22,6 +22,13 @@ import {
     isKnownErrorMessage,
 } from "../../utils/errorCatalog";
 
+const SAFE_PLACEHOLDER_KEY_REGEX = /^[A-Za-z0-9_-]+$/u;
+const RESERVED_PLACEHOLDER_KEYS = new Set([
+    "__proto__",
+    "constructor",
+    "prototype",
+]);
+
 describe("ErrorCatalog utilities fuzzing tests", () => {
     describe("Error catalog constants", () => {
         it("should have all expected error categories", () => {
@@ -143,9 +150,17 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                     { minLength: 0, maxLength: 5 }
                 )
                 .filter((pairs) => {
-                    // Ensure unique keys
+                    // Ensure unique, safe keys to avoid prototype edge cases
                     const keys = pairs.map(([key]) => key);
-                    return new Set(keys).size === keys.length;
+                    if (new Set(keys).size !== keys.length) {
+                        return false;
+                    }
+
+                    return keys.every(
+                        (key) =>
+                            SAFE_PLACEHOLDER_KEY_REGEX.test(key) &&
+                            !RESERVED_PLACEHOLDER_KEYS.has(key)
+                    );
                 }),
         ])(
             "should handle multiple parameter replacements",
