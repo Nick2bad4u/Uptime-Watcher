@@ -9,6 +9,10 @@
 import type { Monitor, MonitorFieldDefinition, Site } from "@shared/types";
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type {
+    StateSyncSource,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
 import type { UnknownRecord } from "type-fest";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -17,6 +21,7 @@ import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
 
+import type { UptimeEvents } from "../../events/eventTypes";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
@@ -438,6 +443,20 @@ export class IpcService {
     private readonly uptimeOrchestrator: UptimeOrchestrator;
 
     /**
+     * Cached synchronization status for responses to get-sync-status.
+     */
+    private stateSyncStatus: StateSyncStatusSummary;
+
+    /** Tracks whether the state sync listener has been registered. */
+    private stateSyncListenerRegistered = false;
+
+    private readonly handleStateSyncStatusUpdate = (
+        data: UptimeEvents["sites:state-synchronized"]
+    ): void => {
+        this.updateStateSyncStatus(data.sites, data.source, data.timestamp);
+    };
+
+    /**
      * Constructs a new IpcService instance.
      *
      * @remarks
@@ -468,6 +487,12 @@ export class IpcService {
     ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
+        this.stateSyncStatus = {
+            lastSyncAt: null,
+            siteCount: 0,
+            source: STATE_SYNC_SOURCE.CACHE,
+            synchronized: false,
+        } satisfies StateSyncStatusSummary;
     }
 
     /**
@@ -493,6 +518,14 @@ export class IpcService {
         }
 
         this.registeredIpcHandlers.clear();
+
+        if (this.stateSyncListenerRegistered) {
+            this.uptimeOrchestrator.off(
+                "sites:state-synchronized",
+                this.handleStateSyncStatusUpdate
+            );
+            this.stateSyncListenerRegistered = false;
+        }
     }
 
     /**
@@ -535,6 +568,32 @@ export class IpcService {
         this.setupSystemHandlers();
         this.setupStateSyncHandlers();
         this.setupDiagnosticsHandlers();
+        this.ensureStateSyncListener();
+    }
+
+    private ensureStateSyncListener(): void {
+        if (this.stateSyncListenerRegistered) {
+            return;
+        }
+
+        this.uptimeOrchestrator.onTyped(
+            "sites:state-synchronized",
+            this.handleStateSyncStatusUpdate
+        );
+        this.stateSyncListenerRegistered = true;
+    }
+
+    private updateStateSyncStatus(
+        sites: Site[],
+        source: StateSyncSource,
+        timestamp: number
+    ): void {
+        this.stateSyncStatus = {
+            lastSyncAt: timestamp,
+            siteCount: sites.length,
+            source,
+            synchronized: true,
+        } satisfies StateSyncStatusSummary;
     }
 
     /**
@@ -1022,6 +1081,11 @@ export class IpcService {
                 logger.debug("[IpcService] Full sync completed", {
                     siteCount: sites.length,
                 });
+                this.updateStateSyncStatus(
+                    sites,
+                    STATE_SYNC_SOURCE.DATABASE,
+                    timestamp
+                );
                 return {
                     completedAt: timestamp,
                     siteCount: sites.length,
@@ -1039,13 +1103,15 @@ export class IpcService {
             "get-sync-status",
             async () => {
                 const sites = await this.uptimeOrchestrator.getSites();
-                const timestamp = Date.now();
-                return {
-                    lastSyncAt: timestamp,
+                const summary: StateSyncStatusSummary = {
+                    lastSyncAt: this.stateSyncStatus.lastSyncAt ?? null,
                     siteCount: sites.length,
-                    source: STATE_SYNC_SOURCE.DATABASE,
-                    synchronized: true,
+                    source: this.stateSyncStatus.source,
+                    synchronized: this.stateSyncStatus.synchronized,
                 };
+
+                this.stateSyncStatus = summary;
+                return summary;
             },
             StateSyncHandlerValidators.getSyncStatus,
             this.registeredIpcHandlers

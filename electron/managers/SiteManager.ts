@@ -434,6 +434,8 @@ export class SiteManager {
         const siteSnapshot =
             await this.getSiteSnapshotForMutation(siteIdentifier);
 
+        const sanitizedPreviousSite = structuredClone(siteSnapshot);
+
         const monitorToRemove = siteSnapshot.monitors.find(
             (monitor) => monitor.id === monitorId
         );
@@ -471,6 +473,7 @@ export class SiteManager {
         await this.eventEmitter.emitTyped("internal:site:updated", {
             identifier: siteIdentifier,
             operation: "updated",
+            previousSite: sanitizedPreviousSite,
             site: sanitizedUpdatedSite,
             timestamp,
             updatedFields: ["monitors"],

@@ -107,6 +107,7 @@ describe("useSiteSync - Final 100% Coverage", () => {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
             setStatusSubscriptionSummary: vi.fn(),
+            onSiteDelta: vi.fn(),
         };
 
         syncActions = createSiteSyncActions(mockDeps);

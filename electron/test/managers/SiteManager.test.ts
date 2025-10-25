@@ -574,6 +574,12 @@ describe(SiteManager, () => {
                 "internal:site:updated",
                 expect.objectContaining({
                     identifier: site.identifier,
+                    previousSite: expect.objectContaining({
+                        monitors: expect.arrayContaining([
+                            expect.objectContaining({ id: "mon1" }),
+                            expect.objectContaining({ id: "mon2" }),
+                        ]),
+                    }),
                     updatedFields: ["monitors"],
                     site: expect.objectContaining({
                         monitors: [expect.objectContaining({ id: "mon2" })],

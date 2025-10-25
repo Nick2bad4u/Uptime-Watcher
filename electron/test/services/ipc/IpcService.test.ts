@@ -36,6 +36,8 @@ const {
         getHistoryLimit: vi.fn(),
         setHistoryLimit: vi.fn(),
         historyLimit: 500,
+        onTyped: vi.fn(),
+        off: vi.fn(),
     };
 
     const mockAutoUpdaterService = {

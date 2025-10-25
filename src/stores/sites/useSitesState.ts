@@ -15,6 +15,7 @@ import {
 } from "@shared/validation/siteIntegrity";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+import type { SiteSyncDelta } from "./siteSyncDelta";
 
 import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
@@ -29,6 +30,8 @@ import { logStoreAction } from "../utils";
  * @public
  */
 export interface SitesState {
+    /** Most recent synchronization delta captured from state sync events. */
+    lastSyncDelta: SiteSyncDelta | undefined;
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */
@@ -55,6 +58,8 @@ export interface SitesStateActions {
     getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
     getSelectedSite: () => Site | undefined;
+    /** Record the latest site synchronization delta */
+    recordSiteSyncDelta: (delta: SiteSyncDelta | undefined) => void;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
     /** Select a site for focused operations and UI display */
@@ -113,6 +118,14 @@ export const createSitesStateActions = (
             sites.find((site) => site.identifier === selectedSiteIdentifier) ??
             undefined
         );
+    },
+    recordSiteSyncDelta: (delta: SiteSyncDelta | undefined): void => {
+        logStoreAction("SitesStore", "recordSiteSyncDelta", {
+            addedCount: delta?.addedSites.length ?? 0,
+            removedCount: delta?.removedSiteIdentifiers.length ?? 0,
+            updatedCount: delta?.updatedSites.length ?? 0,
+        });
+        set(() => ({ lastSyncDelta: delta }));
     },
     removeSite: (identifier: string): void => {
         logStoreAction("SitesStore", "removeSite", { identifier });
@@ -180,7 +193,47 @@ export const createSitesStateActions = (
         }
 
         logStoreAction("SitesStore", "setSites", { count: sites.length });
-        set(() => ({ sites }));
+
+        set((state) => {
+            const validIdentifiers = new Set(
+                sites.map((site) => site.identifier)
+            );
+
+            const nextSelectedSiteIdentifier =
+                state.selectedSiteIdentifier !== undefined &&
+                validIdentifiers.has(state.selectedSiteIdentifier)
+                    ? state.selectedSiteIdentifier
+                    : undefined;
+
+            const siteLookup = new Map(
+                sites.map((site) => [site.identifier, site] as const)
+            );
+
+            const nextSelectedMonitorIds: Record<string, string> = {};
+            for (const [siteId, monitorId] of Object.entries(
+                state.selectedMonitorIds
+            )) {
+                if (validIdentifiers.has(siteId)) {
+                    const candidateSite = siteLookup.get(siteId);
+
+                    if (candidateSite) {
+                        const monitorExists = candidateSite.monitors.some(
+                            (monitor) => monitor.id === monitorId
+                        );
+
+                        if (monitorExists) {
+                            nextSelectedMonitorIds[siteId] = monitorId;
+                        }
+                    }
+                }
+            }
+
+            return {
+                selectedMonitorIds: nextSelectedMonitorIds,
+                selectedSiteIdentifier: nextSelectedSiteIdentifier,
+                sites,
+            };
+        });
     },
     setStatusSubscriptionSummary: (
         summary: StatusUpdateSubscriptionSummary | undefined
@@ -201,6 +254,7 @@ export const createSitesStateActions = (
  * @public
  */
 export const initialSitesState: SitesState = {
+    lastSyncDelta: undefined,
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],

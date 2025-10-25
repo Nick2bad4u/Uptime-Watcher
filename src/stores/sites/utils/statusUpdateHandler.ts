@@ -9,11 +9,9 @@
  *
  * @public
  */
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type {
-    MonitoringControlEventData,
-    MonitorStatusChangedEventData,
-} from "@shared/types/events";
+import type { MonitorStatusChangedEventData } from "@shared/types/events";
 
 import { isDevelopment } from "@shared/utils/environment";
 import { ensureError } from "@shared/utils/errorHandling";
@@ -359,7 +357,9 @@ export class StatusUpdateManager {
                 label: "monitoring-started",
                 register: () =>
                     EventsService.onMonitoringStarted(
-                        (event: MonitoringControlEventData) => {
+                        (
+                            event: RendererEventPayloadMap["monitoring:started"]
+                        ) => {
                             try {
                                 this.handleMonitoringLifecycleEvent(
                                     "started",
@@ -379,7 +379,9 @@ export class StatusUpdateManager {
                 label: "monitoring-stopped",
                 register: () =>
                     EventsService.onMonitoringStopped(
-                        (event: MonitoringControlEventData) => {
+                        (
+                            event: RendererEventPayloadMap["monitoring:stopped"]
+                        ) => {
                             try {
                                 this.handleMonitoringLifecycleEvent(
                                     "stopped",
@@ -522,19 +524,42 @@ export class StatusUpdateManager {
     }
 
     private handleMonitoringLifecycleEvent(
+        phase: "started",
+        event: RendererEventPayloadMap["monitoring:started"]
+    ): void;
+
+    private handleMonitoringLifecycleEvent(
+        phase: "stopped",
+        event: RendererEventPayloadMap["monitoring:stopped"]
+    ): void;
+
+    private handleMonitoringLifecycleEvent(
         phase: "started" | "stopped",
-        event: MonitoringControlEventData
+        event:
+            | RendererEventPayloadMap["monitoring:started"]
+            | RendererEventPayloadMap["monitoring:stopped"]
     ): void {
-        logger.debug("Received monitoring lifecycle event", {
-            ...(event.activeMonitors !== undefined && {
-                activeMonitors: event.activeMonitors,
-            }),
-            monitorCount: event.monitorCount,
-            phase,
-            ...(event.reason !== undefined && { reason: event.reason }),
-            siteCount: event.siteCount,
-            timestamp: event.timestamp,
-        });
+        const logPayload: Record<string, unknown> = { phase };
+
+        if (event.monitorCount !== undefined) {
+            logPayload["monitorCount"] = event.monitorCount;
+        }
+
+        if (event.siteCount !== undefined) {
+            logPayload["siteCount"] = event.siteCount;
+        }
+
+        logPayload["timestamp"] = event.timestamp;
+
+        if (typeof event.activeMonitors === "number") {
+            logPayload["activeMonitors"] = event.activeMonitors;
+        }
+
+        if (typeof event.reason === "string") {
+            logPayload["reason"] = event.reason;
+        }
+
+        logger.debug("Received monitoring lifecycle event", logPayload);
     }
 
     /**

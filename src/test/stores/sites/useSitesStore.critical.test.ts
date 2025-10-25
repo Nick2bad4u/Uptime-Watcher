@@ -195,6 +195,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof store.getSelectedSite).toBe("function");
             expect(typeof store.setSelectedMonitorId).toBe("function");
             expect(typeof store.getSelectedMonitorId).toBe("function");
+            expect(typeof store.recordSiteSyncDelta).toBe("function");
 
             // Verify all operation functions exist
             expect(typeof store.createSite).toBe("function");
@@ -231,6 +232,7 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(store.sites).toHaveLength(0);
             expect(store.selectedSiteIdentifier).toBeUndefined();
             expect(typeof store.selectedMonitorIds).toBe("object");
+            expect(store.lastSyncDelta).toBeUndefined();
         });
 
         it("should create shared functions correctly", () => {

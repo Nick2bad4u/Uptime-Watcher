@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
+import type { SiteSyncDelta } from "../../../stores/sites/siteSyncDelta";
 
 import {
     createSitesStateActions,
@@ -33,6 +34,7 @@ describe("useSitesState", () => {
     let mockGet: ReturnType<typeof vi.fn>;
     let stateActions: ReturnType<typeof createSitesStateActions>;
     let mockSite: Site;
+    const cloneSite = (site: Site): Site => structuredClone(site);
 
     beforeEach(() => {
         mockSet = vi.fn();
@@ -100,6 +102,7 @@ describe("useSitesState", () => {
                 selectedSiteIdentifier: undefined,
                 sites: [],
                 statusSubscriptionSummary: undefined,
+                lastSyncDelta: undefined,
             });
         });
     });
@@ -143,7 +146,82 @@ describe("useSitesState", () => {
                     sites: [],
                     statusSubscriptionSummary: undefined,
                 });
-                expect(result).toEqual({ sites: newSites });
+                expect(result).toEqual({
+                    selectedMonitorIds: {},
+                    selectedSiteIdentifier: undefined,
+                    sites: newSites,
+                });
+            }
+        });
+
+        it("should remove invalid selections when replacing sites", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Selection Coherency", "category");
+            await annotate("Type: Regression", "type");
+
+            const newSites: Site[] = [
+                {
+                    identifier: "site-a",
+                    monitors: [
+                        {
+                            checkInterval: 60,
+                            history: [],
+                            id: "mon-2",
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 0,
+                            status: "pending",
+                            timeout: 30,
+                            type: "http",
+                        },
+                    ],
+                    monitoring: true,
+                    name: "Site A",
+                },
+                {
+                    identifier: "site-c",
+                    monitors: [
+                        {
+                            checkInterval: 60,
+                            history: [],
+                            id: "mon-c1",
+                            monitoring: true,
+                            responseTime: 0,
+                            retryAttempts: 0,
+                            status: "pending",
+                            timeout: 30,
+                            type: "http",
+                        },
+                    ],
+                    monitoring: true,
+                    name: "Site C",
+                },
+            ];
+
+            stateActions.setSites(newSites);
+
+            const setFunction = mockSet.mock.calls.pop()?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction({
+                    selectedMonitorIds: {
+                        "site-a": "mon-1",
+                        "site-b": "mon-x",
+                        "site-c": "mon-c1",
+                    },
+                    selectedSiteIdentifier: "site-b",
+                    sites: [],
+                    statusSubscriptionSummary: undefined,
+                });
+
+                expect(result).toEqual({
+                    selectedMonitorIds: { "site-c": "mon-c1" },
+                    selectedSiteIdentifier: undefined,
+                    sites: newSites,
+                });
             }
         });
 
@@ -214,6 +292,56 @@ describe("useSitesState", () => {
                 })
             );
             expect(mockSet).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("recordSiteSyncDelta", () => {
+        it("should persist delta summaries", async ({ annotate }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Diagnostics", "category");
+            await annotate("Type: State Tracking", "type");
+
+            const delta = {
+                addedSites: [cloneSite(mockSite)],
+                removedSiteIdentifiers: ["removed-site"],
+                updatedSites: [
+                    {
+                        identifier: mockSite.identifier,
+                        previous: cloneSite(mockSite),
+                        next: {
+                            ...cloneSite(mockSite),
+                            name: "Updated",
+                        },
+                    },
+                ],
+            } satisfies SiteSyncDelta;
+
+            stateActions.recordSiteSyncDelta(delta);
+
+            expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
+
+            const setFunction = mockSet.mock.calls.pop()?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction({
+                    lastSyncDelta: undefined,
+                    selectedMonitorIds: {},
+                    selectedSiteIdentifier: undefined,
+                    sites: [],
+                    statusSubscriptionSummary: undefined,
+                });
+
+                expect(result).toEqual({ lastSyncDelta: delta });
+            }
+        });
+
+        it("should allow clearing delta summaries", async () => {
+            mockSet.mockClear();
+
+            stateActions.recordSiteSyncDelta(undefined);
+
+            expect(mockSet).toHaveBeenCalledWith(expect.any(Function));
         });
     });
 

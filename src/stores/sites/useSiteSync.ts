@@ -31,6 +31,7 @@ import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
+import { calculateSiteSyncDelta, type SiteSyncDelta } from "./siteSyncDelta";
 import {
     StatusUpdateManager,
     type StatusUpdateSubscriptionResult,
@@ -156,6 +157,8 @@ export interface SiteSyncActions {
 export interface SiteSyncDependencies {
     /** Function to get current sites from the store */
     getSites: () => Site[];
+    /** Optional callback to receive diffed site synchronization events */
+    onSiteDelta?: (delta: SiteSyncDelta) => void;
     /** Function to update sites in the store */
     setSites: (sites: Site[]) => void;
     /** Function to persist subscription diagnostics */
@@ -546,7 +549,23 @@ export const createSiteSyncActions = (
                     event.action === STATE_SYNC_ACTION.DELETE ||
                     event.action === STATE_SYNC_ACTION.UPDATE
                 ) {
+                    const previousSites = deps.getSites();
+                    const delta = calculateSiteSyncDelta(
+                        previousSites,
+                        event.sites
+                    );
+
+                    logStoreAction("SitesStore", "applySyncDelta", {
+                        action: event.action,
+                        addedCount: delta.addedSites.length,
+                        removedCount: delta.removedSiteIdentifiers.length,
+                        source: event.source,
+                        timestamp: event.timestamp,
+                        updatedCount: delta.updatedSites.length,
+                    });
+
                     deps.setSites(event.sites);
+                    deps.onSiteDelta?.(delta);
                     return;
                 }
 

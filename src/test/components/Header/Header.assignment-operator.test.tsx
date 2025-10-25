@@ -146,6 +146,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         setSelectedMonitorId: vi.fn(),
         setSites: vi.fn(),
         setStatusSubscriptionSummary: vi.fn(),
+        recordSiteSyncDelta: vi.fn(),
         startSiteMonitoring: vi.fn(async () => {}),
         startSiteMonitorMonitoring: vi.fn(async () => {}),
         stopSiteMonitoring: vi.fn(async () => {}),
@@ -160,6 +161,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         updateSiteCheckInterval: vi.fn(async () => {}),
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
+        lastSyncDelta: undefined,
         sites,
     };
 };

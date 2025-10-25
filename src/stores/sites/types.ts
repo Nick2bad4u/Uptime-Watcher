@@ -17,6 +17,7 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
+import type { SiteSyncDelta } from "./siteSyncDelta";
 
 /**
  * Sites store actions interface for managing site operations.
@@ -75,7 +76,9 @@ export interface SitesActions {
     }>;
     /** Modify an existing site */
     modifySite: (identifier: string, updates: Partial<Site>) => Promise<void>;
-    /** Remove a monitor from a site */
+    /** Record latest site synchronization delta information */
+    recordSiteSyncDelta: (delta: SiteSyncDelta | undefined) => void;
+    /** Remove a monitor from the store */
     removeMonitorFromSite: (
         siteIdentifier: string,
         monitorId: string
@@ -168,6 +171,8 @@ export interface SitesActions {
  * @public
  */
 export interface SitesState {
+    /** Most recent backend synchronization delta summary. */
+    lastSyncDelta: SiteSyncDelta | undefined;
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */

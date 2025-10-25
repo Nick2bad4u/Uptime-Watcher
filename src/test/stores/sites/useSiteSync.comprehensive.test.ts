@@ -120,6 +120,10 @@ Object.defineProperty(globalThis, "window", {
 
 // Import the modules after mocking
 import { createSiteSyncActions } from "../../../stores/sites/useSiteSync";
+import {
+    createSitesStateActions,
+    initialSitesState,
+} from "../../../stores/sites/useSitesState";
 import { logger } from "../../../services/logger";
 
 describe("useSiteSync", () => {
@@ -143,6 +147,7 @@ describe("useSiteSync", () => {
             getSites: vi.fn(() => mockSites),
             setSites: vi.fn(),
             setStatusSubscriptionSummary: vi.fn(),
+            onSiteDelta: vi.fn(),
         };
 
         syncActions = createSiteSyncActions(mockDeps);
@@ -516,6 +521,81 @@ describe("useSiteSync", () => {
             eventHandler(deleteEvent);
 
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.onSiteDelta).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    addedSites: expect.any(Array),
+                    removedSiteIdentifiers: expect.any(Array),
+                    updatedSites: expect.any(Array),
+                })
+            );
+        });
+
+        it("should reconcile selections and emit deltas for sync deletions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Data Integrity", "type");
+
+            let eventHandler: any;
+            mockStateSyncService.onStateSyncEvent.mockImplementation(
+                async (handler) => {
+                    eventHandler = handler;
+                    return vi.fn();
+                }
+            );
+
+            const state: typeof initialSitesState = {
+                selectedMonitorIds: {
+                    "site-1": "site-1-monitor",
+                },
+                selectedSiteIdentifier: "site-1",
+                sites: [],
+                statusSubscriptionSummary: undefined,
+                lastSyncDelta: undefined,
+            };
+
+            const stateActions = createSitesStateActions(
+                (updater) => {
+                    const partial = updater(state);
+                    Object.assign(state, { ...state, ...partial });
+                    return partial;
+                },
+                () => state
+            );
+
+            const initialSites = [buildSite("site-1"), buildSite("site-2")];
+            stateActions.setSites(initialSites);
+
+            mockDeps.getSites = () => state.sites;
+            mockDeps.setSites = stateActions.setSites;
+            mockDeps.onSiteDelta = vi.fn();
+
+            syncActions = createSiteSyncActions(mockDeps);
+
+            syncActions.subscribeToSyncEvents();
+
+            const deleteEvent = {
+                action: "delete" as const,
+                siteIdentifier: "site-1",
+                sites: [initialSites[1]!],
+                source: "database" as const,
+                timestamp: Date.now(),
+            };
+
+            eventHandler(deleteEvent);
+
+            expect(state.selectedSiteIdentifier).toBeUndefined();
+            expect(state.selectedMonitorIds).toEqual({});
+            expect(state.sites).toEqual([initialSites[1]]);
+            expect(mockDeps.onSiteDelta).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    removedSiteIdentifiers: ["site-1"],
+                    addedSites: [],
+                })
+            );
         });
 
         it("should handle update events without triggering full sync", async ({

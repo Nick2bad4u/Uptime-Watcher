@@ -70,6 +70,8 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
+ * ```
+ *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -80,11 +82,14 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import type { RenderResult } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import "@testing-library/jest-dom";
 import type { AppSettings } from "../../../stores/types";
@@ -241,6 +246,37 @@ vi.mock("../../../theme/components/ThemedText", () => ({
         );
     }),
 }));
+
+let activeRender: RenderResult | null = null;
+
+/**
+ * Ensures a clean DOM root before each property-based test iteration.
+ */
+const resetDom = (): HTMLElement => {
+    const previousContainer =
+        activeRender?.container ??
+        document.querySelector<HTMLElement>("#vitest-test-root");
+
+    if (activeRender) {
+        activeRender.unmount();
+        activeRender = null;
+    }
+
+    previousContainer?.remove();
+
+    const container = document.createElement("div");
+    container.id = "vitest-test-root";
+    document.body.append(container);
+
+    return container;
+};
+
+const renderSettingsComponent = (): RenderResult => {
+    const container = resetDom();
+    const view = render(<Settings onClose={mockOnClose} />, { container });
+    activeRender = view;
+    return view;
+};
 
 vi.mock("../../../theme/components/ThemedButton", () => ({
     ThemedButton: vi.fn(
@@ -441,13 +477,12 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle arbitrary valid settings configurations",
             async (settings) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
                 mockSettingsState = settings;
 
                 expect(() => {
-                    render(<Settings onClose={mockOnClose} />);
+                    renderSettingsComponent();
                 }).not.toThrow();
 
                 // Verify settings modal renders
@@ -464,13 +499,12 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle extreme settings configurations gracefully",
             async (extremeSettings) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
                 mockSettingsState = extremeSettings as AppSettings;
 
                 expect(() => {
-                    render(<Settings onClose={mockOnClose} />);
+                    renderSettingsComponent();
                 }).not.toThrow();
 
                 // Component should still render with defensive programming
@@ -487,10 +521,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             timeout: 25_000,
         })("should handle theme selection correctly", async (themeName) => {
             // Manual DOM cleanup for property-based testing iterations
-            document.body.innerHTML = '<div id="vitest-test-root"></div>';
             vi.clearAllMocks();
 
-            render(<Settings onClose={mockOnClose} />);
+            renderSettingsComponent();
 
             const themeSelect = screen.getAllByLabelText(
                 "Select application theme"
@@ -509,10 +542,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle rapid theme changes without issues",
             async (changeCount) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 const themeSelect = screen.getAllByLabelText(
                     "Select application theme"
@@ -543,10 +575,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle valid history limit changes",
             async (historyLimit) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 const historySelect = screen.getAllByLabelText(
                     "Maximum number of history records to keep per site"
@@ -569,10 +600,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle invalid history limit values gracefully",
             async (invalidLimit) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 const historySelect = screen.getAllByLabelText(
                     "Maximum number of history records to keep per site"
@@ -606,10 +636,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle checkbox setting changes",
             async (_checkboxSettings) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 // Test notifications checkbox
                 const notificationsCheckbox = screen.getByLabelText(
@@ -645,10 +674,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             timeout: 15_000,
         })("should handle rapid checkbox toggling", async (toggleCount) => {
             // Manual DOM cleanup for property-based testing iterations
-            document.body.innerHTML = '<div id="vitest-test-root"></div>';
             vi.clearAllMocks();
 
-            render(<Settings onClose={mockOnClose} />);
+            renderSettingsComponent();
 
             const notificationsCheckbox = screen.getByLabelText(
                 "Enable desktop notifications"
@@ -668,7 +696,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             timeout: 15_000,
         })("should handle sync operations", async (shouldFail) => {
             // Manual DOM cleanup for property-based testing iterations
-            document.body.innerHTML = '<div id="vitest-test-root"></div>';
             vi.clearAllMocks();
 
             if (shouldFail) {
@@ -679,22 +706,24 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 mockfullResyncSites.mockResolvedValueOnce(undefined);
             }
 
-            render(<Settings onClose={mockOnClose} />);
+            renderSettingsComponent();
 
             const syncButton = screen.getByRole("button", {
                 name: /refresh history/i,
             });
 
             // Click the button directly without waiting for state updates
-            fireEvent.click(syncButton);
+            const user = userEvent.setup();
+            await user.click(syncButton);
 
             // Check the mock was called immediately (sync operation is async but call is immediate)
             expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
 
             // For error checking, we need to give React a chance to update state
             if (shouldFail) {
-                await new Promise((resolve) => setTimeout(resolve, 10));
-                expect(mockSetError).toHaveBeenCalled();
+                await waitFor(() => {
+                    expect(mockSetError).toHaveBeenCalled();
+                });
             }
         });
 
@@ -741,12 +770,11 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle settings reset with confirmation",
             async (confirmReset) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
                 confirmMock.mockReset();
                 confirmMock.mockResolvedValue(confirmReset);
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 const resetButton = screen.getByRole("button", {
                     name: /reset everything/i,
@@ -764,10 +792,10 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
                 if (confirmReset) {
                     // Wait for async reset operation to complete
-                    await vi.waitFor(() => {
+                    await waitFor(() => {
                         expect(mockResetSettings).toHaveBeenCalled();
                     });
-                    await vi.waitFor(() => {
+                    await waitFor(() => {
                         expect(mockClearError).toHaveBeenCalled();
                     });
                 } else {
@@ -785,7 +813,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle error scenarios gracefully",
             async (errorScenario) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
                 if (errorScenario.hasError && errorScenario.errorMessage) {
@@ -794,7 +821,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 mockErrorState.isLoading = errorScenario.isLoading;
 
                 expect(() => {
-                    render(<Settings onClose={mockOnClose} />);
+                    renderSettingsComponent();
                 }).not.toThrow();
 
                 // Verify error display when present
@@ -814,10 +841,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             timeout: 5000,
         })("should handle close button interactions", async (clickCount) => {
             // Manual DOM cleanup for property-based testing iterations
-            document.body.innerHTML = '<div id="vitest-test-root"></div>';
             vi.clearAllMocks();
 
-            render(<Settings onClose={mockOnClose} />);
+            renderSettingsComponent();
 
             const closeButton = screen.getAllByLabelText("Close settings")[0]!;
 
@@ -837,12 +863,11 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should maintain accessibility attributes under all conditions",
             async (settings) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
                 mockSettingsState = settings;
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 // Verify essential accessibility attributes are present
                 expect(
@@ -908,10 +933,9 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             "should handle rapid setting changes efficiently",
             async (scenario) => {
                 // Manual DOM cleanup for property-based testing iterations
-                document.body.innerHTML = '<div id="vitest-test-root"></div>';
                 vi.clearAllMocks();
 
-                render(<Settings onClose={mockOnClose} />);
+                renderSettingsComponent();
 
                 const startTime = performance.now();
 

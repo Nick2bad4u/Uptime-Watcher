@@ -46,7 +46,11 @@ import { MonitoringService } from "./services/MonitoringService";
 import { SiteService } from "./services/SiteService";
 import { createSiteMonitoringActions } from "./useSiteMonitoring";
 import { createSiteOperationsActions } from "./useSiteOperations";
-import { createSitesStateActions, initialSitesState } from "./useSitesState";
+import {
+    createSitesStateActions,
+    initialSitesState,
+    type SitesState,
+} from "./useSitesState";
 import { createSiteSyncActions } from "./useSiteSync";
 
 /**
@@ -68,7 +72,12 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         get: () => SitesStore
     ) => {
         // Create state actions
-        const stateActions = createSitesStateActions(set, get);
+        const stateActions = createSitesStateActions(
+            (updater) => {
+                set((storeState) => updater(storeState as SitesState));
+            },
+            () => get() as SitesState
+        );
 
         // Shared getSites function - eliminates duplication and improves
         // testability
@@ -77,6 +86,7 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create sync actions (needed by other modules)
         const syncActions = createSiteSyncActions({
             getSites,
+            onSiteDelta: stateActions.recordSiteSyncDelta,
             setSites: stateActions.setSites,
             setStatusSubscriptionSummary:
                 stateActions.setStatusSubscriptionSummary,

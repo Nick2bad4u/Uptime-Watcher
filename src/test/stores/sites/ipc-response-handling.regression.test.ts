@@ -209,6 +209,7 @@ describe("IPC Response Handling Regression Tests", () => {
                 setSites: vi.fn(),
                 getSites: vi.fn().mockReturnValue([]),
                 setStatusSubscriptionSummary: vi.fn(),
+                    onSiteDelta: vi.fn(),
                 addSite: vi.fn(),
                 updateSite: vi.fn(),
                 deleteSite: vi.fn(),

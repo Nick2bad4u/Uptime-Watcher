@@ -1407,7 +1407,66 @@ describe(UptimeOrchestrator, () => {
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "site:updated",
                 expect.objectContaining({
+                    previousSite,
                     updatedFields: ["name"],
+                })
+            );
+        });
+
+        it("should retain previous site snapshot when monitors are removed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitor Removal", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            const previousSite = {
+                identifier: "site-monitor-test",
+                name: "Site With Two Monitors",
+                monitors: [
+                    { id: "monitor-1", monitoring: true },
+                    { id: "monitor-2", monitoring: true },
+                ],
+                monitoring: true,
+            } as Site;
+
+            const updatedSite = {
+                ...previousSite,
+                monitors: [
+                    {
+                        id: "monitor-1",
+                        monitoring: true,
+                    },
+                ],
+            } as Site;
+
+            orchestrator.emitTyped("internal:site:updated" as any, {
+                identifier: "site-monitor-test",
+                previousSite,
+                site: updatedSite,
+                timestamp: Date.now(),
+                updatedFields: ["monitors"],
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:updated",
+                expect.objectContaining({
+                    previousSite: expect.objectContaining({
+                        monitors: expect.arrayContaining([
+                            expect.objectContaining({ id: "monitor-2" }),
+                        ]),
+                    }),
+                    site: expect.objectContaining({
+                        monitors: expect.not.arrayContaining([
+                            expect.objectContaining({ id: "monitor-2" }),
+                        ]),
+                    }),
                 })
             );
         });

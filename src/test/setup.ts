@@ -125,12 +125,41 @@ fc.configureGlobal({
     // asyncReporter: async (runDetails) => { /* async reporting */ },
 });
 
-// Mock ResizeObserver for Chart.js testing
-globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
-}));
+/**
+ * Minimal mock implementation of {@link ResizeObserver} for the test
+ * environment.
+ */
+class MockResizeObserver {
+    /**
+     * Callback triggered when observed elements change size.
+     */
+    private readonly callback: ResizeObserverCallback;
+
+    /** Observe spy for assertions. */
+    public readonly observe: ReturnType<typeof vi.fn>;
+
+    /** Unobserve spy for assertions. */
+    public readonly unobserve: ReturnType<typeof vi.fn>;
+
+    /** Disconnect spy for assertions. */
+    public readonly disconnect: ReturnType<typeof vi.fn>;
+
+    constructor(callback: ResizeObserverCallback) {
+        this.callback = callback;
+        this.observe = vi.fn();
+        this.unobserve = vi.fn();
+        this.disconnect = vi.fn();
+    }
+
+    /**
+     * Utility helper for tests to manually trigger callbacks.
+     */
+    public trigger(entries: ResizeObserverEntry[] = []): void {
+        this.callback(entries, this as unknown as ResizeObserver);
+    }
+}
+
+globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
 
 /**
  * Minimal Web Storage implementation used when Node.js exposes an incomplete

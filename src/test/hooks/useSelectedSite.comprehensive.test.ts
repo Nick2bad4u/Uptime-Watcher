@@ -109,6 +109,7 @@ const createMockSitesStore = (
     setSelectedMonitorId: (_siteId: string, _monitorId: string) => {},
     setSites: (_sites: Site[]) => {},
     setStatusSubscriptionSummary: (_summary) => {},
+    recordSiteSyncDelta: (_delta) => {},
     startSiteMonitoring: async () => {},
     startSiteMonitorMonitoring: async () => {},
     stopSiteMonitoring: async () => {},
@@ -138,6 +139,7 @@ const createMockSitesStore = (
     selectedSiteIdentifier: undefined,
     sites: [],
     statusSubscriptionSummary: undefined,
+    lastSyncDelta: undefined,
     ...overrides,
 });
 

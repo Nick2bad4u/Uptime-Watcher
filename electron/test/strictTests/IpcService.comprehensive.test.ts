@@ -13,6 +13,7 @@ import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
+import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { type Site, type Monitor, BASE_MONITOR_TYPES } from "@shared/types";
 
 // Mock Electron modules
@@ -223,6 +224,8 @@ describe("IpcService - Comprehensive Coverage", () => {
                 fileName: "/path/to/backup.db",
             }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
+            onTyped: vi.fn(),
+            off: vi.fn(),
         } as unknown as UptimeOrchestrator;
 
         mockAutoUpdaterService = {
@@ -1228,10 +1231,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
-                lastSyncAt: expect.any(Number),
+                lastSyncAt: null,
                 siteCount: 1,
-                source: "database",
-                synchronized: true,
+                source: STATE_SYNC_SOURCE.CACHE,
+                synchronized: false,
             });
         });
     });

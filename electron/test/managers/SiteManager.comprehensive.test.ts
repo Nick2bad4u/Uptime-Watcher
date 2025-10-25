@@ -879,6 +879,12 @@ describe("SiteManager - Comprehensive", () => {
                 "internal:site:updated",
                 expect.objectContaining({
                     identifier: siteWithTwoMonitors.identifier,
+                    previousSite: expect.objectContaining({
+                        monitors: expect.arrayContaining([
+                            expect.objectContaining({ id: "monitor-1" }),
+                            expect.objectContaining({ id: "monitor-2" }),
+                        ]),
+                    }),
                     updatedFields: ["monitors"],
                 })
             );

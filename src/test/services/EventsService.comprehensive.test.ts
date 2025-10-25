@@ -7,7 +7,19 @@
  * to achieve 95%+ code coverage.
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
+import {
+    MONITORING_CONTROL_REASON,
+    type MonitoringControlEventData,
+} from "@shared/types/events";
+
+type MonitoringStartedEventData =
+    RendererEventPayloadMap["monitoring:started"];
+type MonitoringStoppedEventData =
+    RendererEventPayloadMap["monitoring:stopped"];
+type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
 
 import { EventsService } from "../../services/EventsService";
 
@@ -43,8 +55,14 @@ function createMockEventApi() {
     return {
         onCacheInvalidated: vi.fn(() => createEventCleanupFunction()),
         onMonitorDown: vi.fn(() => createEventCleanupFunction()),
-        onMonitoringStarted: vi.fn(() => createEventCleanupFunction()),
-        onMonitoringStopped: vi.fn(() => createEventCleanupFunction()),
+        onMonitoringStarted: vi.fn(
+            (_handler: MonitoringEventHandler) =>
+                createEventCleanupFunction()
+        ),
+        onMonitoringStopped: vi.fn(
+            (_handler: MonitoringEventHandler) =>
+                createEventCleanupFunction()
+        ),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
         onMonitorUp: vi.fn(() => createEventCleanupFunction()),
         onSiteAdded: vi.fn(() => createEventCleanupFunction()),
@@ -53,6 +71,34 @@ function createMockEventApi() {
         onTestEvent: vi.fn(() => createEventCleanupFunction()),
         onUpdateStatus: vi.fn(() => createEventCleanupFunction()),
     };
+}
+
+function createMonitoringStartedEventPayload(
+    overrides: Partial<MonitoringStartedEventData> = {}
+): MonitoringStartedEventData {
+    const payload: MonitoringStartedEventData = {
+        monitorCount: 2,
+        siteCount: 1,
+        timestamp: Date.now(),
+        ...overrides,
+    };
+
+    return payload;
+}
+
+function createMonitoringStoppedEventPayload(
+    overrides: Partial<MonitoringStoppedEventData> = {}
+): MonitoringStoppedEventData {
+    const payload: MonitoringStoppedEventData = {
+        activeMonitors: 0,
+        monitorCount: 2,
+        reason: MONITORING_CONTROL_REASON.USER,
+        siteCount: 1,
+        timestamp: Date.now(),
+        ...overrides,
+    };
+
+    return payload;
 }
 
 describe("EventsService", () => {
@@ -202,7 +248,23 @@ describe("EventsService", () => {
             expect(mockWaitForElectronAPI).toHaveBeenCalled();
             expect(
                 mockElectronAPI.events.onMonitoringStarted
-            ).toHaveBeenCalledWith(callback);
+            ).toHaveBeenCalledTimes(1);
+
+            const call = mockElectronAPI.events.onMonitoringStarted.mock.calls
+                .at(0) as [MonitoringEventHandler] | undefined;
+            expect(call).toBeDefined();
+            if (!call) {
+                throw new Error(
+                    "Expected onMonitoringStarted to register a handler"
+                );
+            }
+
+            const [registeredHandler] = call;
+            expect(typeof registeredHandler).toBe("function");
+
+            const payload = createMonitoringStartedEventPayload();
+            registeredHandler(payload);
+            expect(callback).toHaveBeenCalledWith(payload);
             expect(typeof cleanup).toBe("function");
         });
 
@@ -230,7 +292,23 @@ describe("EventsService", () => {
             expect(mockWaitForElectronAPI).toHaveBeenCalled();
             expect(
                 mockElectronAPI.events.onMonitoringStopped
-            ).toHaveBeenCalledWith(callback);
+            ).toHaveBeenCalledTimes(1);
+
+            const call = mockElectronAPI.events.onMonitoringStopped.mock.calls
+                .at(0) as [MonitoringEventHandler] | undefined;
+            expect(call).toBeDefined();
+            if (!call) {
+                throw new Error(
+                    "Expected onMonitoringStopped to register a handler"
+                );
+            }
+
+            const [registeredHandler] = call;
+            expect(typeof registeredHandler).toBe("function");
+
+            const payload = createMonitoringStoppedEventPayload();
+            registeredHandler(payload);
+            expect(callback).toHaveBeenCalledWith(payload);
             expect(typeof cleanup).toBe("function");
         });
 
@@ -537,10 +615,10 @@ describe("EventsService", () => {
             );
             expect(
                 mockElectronAPI.events.onMonitoringStarted
-            ).toHaveBeenCalledWith(callbacks[2]);
+            ).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.events.onMonitoringStopped
-            ).toHaveBeenCalledWith(callbacks[3]);
+            ).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
             ).toHaveBeenCalledWith(callbacks[4]);
@@ -553,6 +631,37 @@ describe("EventsService", () => {
             expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
                 callbacks[7]
             );
+
+            const startedCall =
+                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
+                    | [MonitoringEventHandler]
+                    | undefined;
+            const stoppedCall =
+                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
+                    | [MonitoringEventHandler]
+                    | undefined;
+
+            expect(startedCall).toBeDefined();
+            expect(stoppedCall).toBeDefined();
+            if (!startedCall || !stoppedCall) {
+                throw new Error(
+                    "Expected monitoring handlers to be registered during integration test"
+                );
+            }
+
+            const [monitoringStartedHandler] = startedCall;
+            const [monitoringStoppedHandler] = stoppedCall;
+
+            expect(typeof monitoringStartedHandler).toBe("function");
+            expect(typeof monitoringStoppedHandler).toBe("function");
+
+            const startedPayload = createMonitoringStartedEventPayload();
+            monitoringStartedHandler(startedPayload);
+            expect(callbacks[2]).toHaveBeenCalledWith(startedPayload);
+
+            const stoppedPayload = createMonitoringStoppedEventPayload();
+            monitoringStoppedHandler(stoppedPayload);
+            expect(callbacks[3]).toHaveBeenCalledWith(stoppedPayload);
         });
 
         it("should handle repeated initialization calls gracefully", async () => {

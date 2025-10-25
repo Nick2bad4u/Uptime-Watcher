@@ -163,6 +163,8 @@ describe("IpcService - Comprehensive Coverage", () => {
         },
     ];
 
+    let stateSyncListener: ((data: any) => void) | undefined;
+
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -188,6 +190,8 @@ describe("IpcService - Comprehensive Coverage", () => {
         } as unknown as IpcMainEvent;
 
         // Create mock services with all required methods
+        stateSyncListener = undefined;
+
         let historyLimit = 1000; // Track the history limit value
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
@@ -214,6 +218,20 @@ describe("IpcService - Comprehensive Coverage", () => {
                 fileName: "/path/to/backup.db",
             }),
             emitTyped: vi.fn().mockResolvedValue(undefined),
+            onTyped: vi.fn((eventName: string, handler: (data: any) => void) => {
+                if (eventName === "sites:state-synchronized") {
+                    stateSyncListener = handler;
+                }
+                return undefined;
+            }),
+            off: vi.fn((eventName: string, handler: (data: any) => void) => {
+                if (
+                    eventName === "sites:state-synchronized" &&
+                    handler === stateSyncListener
+                ) {
+                    stateSyncListener = undefined;
+                }
+            }),
         } as unknown as UptimeOrchestrator;
 
         mockAutoUpdaterService = {
@@ -1234,7 +1252,43 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
-                lastSyncAt: expect.any(Number),
+                lastSyncAt: null,
+                siteCount: 1,
+                source: "cache",
+                synchronized: false,
+            });
+        });
+
+        it("should reflect synchronized status after state sync events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "regression");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: State Sync", "type");
+
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find((call) => call[0] === "get-sync-status");
+            expect(handleCall).toBeDefined();
+
+            const handler = handleCall![1];
+
+            expect(stateSyncListener).toBeDefined();
+            const timestamp = Date.now();
+            stateSyncListener?.({
+                action: "bulk-sync",
+                sites: mockSites,
+                source: "database",
+                timestamp,
+            });
+
+            const result = await handler(mockIpcEvent);
+
+            expect(result.success).toBeTruthy();
+            expect(result.data).toEqual({
+                lastSyncAt: timestamp,
                 siteCount: 1,
                 source: "database",
                 synchronized: true,
@@ -1375,6 +1429,10 @@ describe("IpcService - Comprehensive Coverage", () => {
                 "quit-and-install"
             );
             expect(ipcMain.removeAllListeners).not.toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.off).toHaveBeenCalledWith(
+                "sites:state-synchronized",
+                expect.any(Function)
+            );
 
             // Verify that all registered channels are cleaned up
             const removeHandlerCalls = vi.mocked(ipcMain.removeHandler).mock

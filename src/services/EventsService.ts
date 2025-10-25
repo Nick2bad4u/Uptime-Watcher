@@ -38,6 +38,18 @@ const { ensureInitialized, wrap } = ((): ReturnType<
 type SiteAddedEventData = RendererEventPayloadMap["site:added"];
 type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
 type SiteUpdatedEventData = RendererEventPayloadMap["site:updated"];
+type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
+type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
+
+const isMonitoringStartedEventData = (
+    data: MonitoringControlEventData
+): data is MonitoringStartedEventData =>
+    typeof data.monitorCount === "number" && typeof data.siteCount === "number";
+
+const isMonitoringStoppedEventData = (
+    data: MonitoringControlEventData
+): data is MonitoringStoppedEventData =>
+    typeof data.activeMonitors === "number" && typeof data.reason === "string";
 
 interface EventsServiceContract {
     initialize: () => Promise<void>;
@@ -48,10 +60,10 @@ interface EventsServiceContract {
         callback: (data: MonitorDownEventData) => void
     ) => Promise<() => void>;
     onMonitoringStarted: (
-        callback: (data: MonitoringControlEventData) => void
+        callback: (data: MonitoringStartedEventData) => void
     ) => Promise<() => void>;
     onMonitoringStopped: (
-        callback: (data: MonitoringControlEventData) => void
+        callback: (data: MonitoringStoppedEventData) => void
     ) => Promise<() => void>;
     onMonitorStatusChanged: (
         callback: (update: MonitorStatusChangedEventData) => void
@@ -178,8 +190,18 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitoringStarted: wrap(
         "onMonitoringStarted",
-        (api, callback: (data: MonitoringControlEventData) => void) =>
-            Promise.resolve(api.events.onMonitoringStarted(callback))
+        (api, callback: (data: MonitoringStartedEventData) => void) =>
+            Promise.resolve(
+                api.events.onMonitoringStarted(
+                    (data: MonitoringControlEventData) => {
+                        if (!isMonitoringStartedEventData(data)) {
+                            return;
+                        }
+
+                        callback(data);
+                    }
+                )
+            )
     ),
 
     /**
@@ -206,8 +228,18 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitoringStopped: wrap(
         "onMonitoringStopped",
-        (api, callback: (data: MonitoringControlEventData) => void) =>
-            Promise.resolve(api.events.onMonitoringStopped(callback))
+        (api, callback: (data: MonitoringStoppedEventData) => void) =>
+            Promise.resolve(
+                api.events.onMonitoringStopped(
+                    (data: MonitoringControlEventData) => {
+                        if (!isMonitoringStoppedEventData(data)) {
+                            return;
+                        }
+
+                        callback(data);
+                    }
+                )
+            )
     ),
 
     /**
