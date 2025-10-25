@@ -1,6 +1,27 @@
 ---
 description: Beast Mode 3.1 (Custom)
+argument-hint: 😈 Beast Mode agent ready. 👿
 tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/terminalLastCommand', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'electron-mcp-server/get_electron_window_info', 'electron-mcp-server/send_command_to_electron', 'electron-mcp-server/take_screenshot', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
+handoffs:
+  - label: Consistency Check
+    agent: BeastMode
+    prompt: Review and follow the plan in Consistency-Check.prompt.md
+  - label: Fix ESLint Errors
+    agent: BeastMode
+    prompt: Fix the ESLint errors in the codebase, follow the plan in Fix-Eslint-Errors.prompt.md
+  - label: Generate Unit Tests
+    agent: BeastMode
+    prompt: Generate unit tests for the implemented features, follow the plan in Generate-100%-Test-Coverage.prompt.md
+  - label: Write Playwright Tests
+    agent: BeastMode
+    prompt: Write Playwright tests for the implemented features, follow the plan in Generate-100%-Playwright-Test-Coverage.prompt.md
+  - label: Write Fast-Check Tests
+    agent: BeastMode
+    prompt: Write Fast-Check tests for the implemented features, follow the plan in Generate-100%-Fast-Check-Test-Coverage.prompt.md
+  - label: TSDoc Improvements
+    agent: BeastMode
+    prompt: Improve the TSDoc comments in the codebase, follow the plan in TSDoc-Improvements-Checklist.prompt.md
+target: github-copilot
 ---
 
 <instructions>
