@@ -5,6 +5,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site, Monitor } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
@@ -125,6 +126,7 @@ vi.mock("../../utils/cache/StandardizedCache", () => ({
 
 const repositoryMocks = vi.hoisted(() => {
     const mockSiteRepositoryServiceInstance = {
+        getSiteFromDatabase: vi.fn().mockResolvedValue(undefined),
         getSitesFromDatabase: vi.fn().mockResolvedValue([]),
     };
 
@@ -224,6 +226,41 @@ describe("SiteManager - Comprehensive", () => {
         // Reset service mocks
         mockSiteRepositoryServiceInstance.getSitesFromDatabase.mockResolvedValue(
             []
+        );
+
+        mockCache.get.mockImplementation((key: string) =>
+            cacheStore.get(key)
+        );
+        mockCache.set.mockImplementation((key: string, value: Site) => {
+            cacheStore.set(key, value);
+        });
+        mockCache.delete.mockImplementation((key: string) =>
+            cacheStore.delete(key)
+        );
+        mockCache.has.mockImplementation((key: string) =>
+            cacheStore.has(key)
+        );
+        mockCache.clear.mockImplementation(() => {
+            cacheStore.clear();
+        });
+        mockCache.getAll.mockImplementation(() =>
+            Array.from(cacheStore.values())
+        );
+        mockCache.entries.mockImplementation(() => cacheStore.entries());
+        mockCache.bulkUpdate.mockImplementation(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
+            }
+        );
+        mockCache.replaceAll.mockImplementation(
+            (items: { key: string; data: Site; ttl?: number }[]) => {
+                cacheStore.clear();
+                for (const item of items) {
+                    cacheStore.set(item.key, item.data);
+                }
+            }
         );
 
         mockSite = {
@@ -698,9 +735,99 @@ describe("SiteManager - Comprehensive", () => {
         });
     });
 
+    describe("getSiteSnapshotForMutation", () => {
+        beforeEach(() => {
+            siteManager = new SiteManager(mockDeps);
+            mockCache.clear();
+        });
+
+        it("should return a cloned site snapshot from cache", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Retrieval", "type");
+
+            const cachedSite: Site = {
+                ...structuredClone(mockSite),
+                identifier: "cached-site",
+            };
+
+            mockCache.set(cachedSite.identifier, cachedSite);
+
+            const snapshot =
+                await siteManager["getSiteSnapshotForMutation"](
+                    cachedSite.identifier
+                );
+
+            expect(snapshot).toEqual(cachedSite);
+            expect(snapshot).not.toBe(cachedSite);
+            expect(
+                mockSiteRepositoryServiceInstance.getSiteFromDatabase
+            ).not.toHaveBeenCalled();
+        });
+
+        it("should hydrate from the database when cache misses", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Data Retrieval", "type");
+
+            const databaseSite: Site = {
+                ...structuredClone(mockSite),
+                identifier: "database-site",
+            };
+
+            mockCache.clear();
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
+                databaseSite
+            );
+
+            const snapshot =
+                await siteManager["getSiteSnapshotForMutation"](
+                    databaseSite.identifier
+                );
+
+            expect(snapshot).toEqual(databaseSite);
+            expect(mockCache.get(databaseSite.identifier)).toEqual(
+                databaseSite
+            );
+        });
+
+        it("should throw when the site cannot be located", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: SiteManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockCache.clear();
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
+                undefined
+            );
+
+            await expect(
+                siteManager["getSiteSnapshotForMutation"]("missing-site")
+            ).rejects.toThrow("Site with identifier missing-site not found");
+        });
+    });
+
     describe("removeMonitor", () => {
         beforeEach(() => {
             siteManager = new SiteManager(mockDeps);
+            mockCache.clear();
+            mockDeps.eventEmitter.emitTyped.mockClear();
+            mockSiteWriterServiceInstance.updateSite.mockReset();
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
+                undefined
+            );
         });
 
         it("should remove monitor successfully", async ({ task, annotate }) => {
@@ -709,13 +836,55 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Deletion", "type");
 
-            // This test requires complex mock setup that creates circular dependencies
-            // Note: Simplify SiteManager to improve testability
-            expect.hasAssertions();
-            expect(true).toBeTruthy(); // Placeholder assertion
+            const siteWithTwoMonitors: Site = {
+                ...structuredClone(mockSite),
+                monitors: [
+                    structuredClone(mockSite.monitors[0]!),
+                    createMockMonitor({ id: "monitor-2" }),
+                ],
+            };
+
+            mockCache.set(siteWithTwoMonitors.identifier, siteWithTwoMonitors);
+
+            const updatedSite: Site = {
+                ...siteWithTwoMonitors,
+                monitors: [
+                    structuredClone(
+                        siteWithTwoMonitors.monitors[1]!
+                    ),
+                ],
+            };
+
+            mockSiteWriterServiceInstance.updateSite.mockResolvedValue(
+                updatedSite
+            );
+
+            const result = await siteManager.removeMonitor(
+                siteWithTwoMonitors.identifier,
+                "monitor-1"
+            );
+
+            expect(mockSiteWriterServiceInstance.updateSite).toHaveBeenCalledWith(
+                mockCache,
+                siteWithTwoMonitors.identifier,
+                {
+                    monitors: [expect.objectContaining({ id: "monitor-2" })],
+                }
+            );
+            expect(result.monitors).toHaveLength(1);
+            const [remainingMonitor] = result.monitors;
+            expect(remainingMonitor).toBeDefined();
+            expect(remainingMonitor?.id).toBe("monitor-2");
+            expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:site:updated",
+                expect.objectContaining({
+                    identifier: siteWithTwoMonitors.identifier,
+                    updatedFields: ["monitors"],
+                })
+            );
         });
 
-        it("should handle monitor deletion failure", async ({
+        it("should reject when attempting to remove the final monitor", async ({
             task,
             annotate,
         }) => {
@@ -724,45 +893,60 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.mocked(mockDeps.monitorRepository.delete).mockResolvedValue(
-                false
-            );
+            const singleMonitorSite: Site = {
+                ...structuredClone(mockSite),
+                monitors: [structuredClone(mockSite.monitors[0]!)],
+            };
+
+            mockCache.set(singleMonitorSite.identifier, singleMonitorSite);
 
             await expect(
-                siteManager.removeMonitor("site-1", "monitor-1")
-            ).rejects.toThrow(
-                "Failed to delete monitor monitor-1 for site site-1"
-            );
+                siteManager.removeMonitor(
+                    singleMonitorSite.identifier,
+                    "monitor-1"
+                )
+            ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+
+            expect(mockSiteWriterServiceInstance.updateSite).not.toHaveBeenCalled();
         });
 
-        it("should handle deletion errors", async ({ task, annotate }) => {
+        it("should surface writer errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockDeps.monitorRepository.delete = vi
-                .fn()
-                .mockRejectedValue(new Error("Delete error"));
+            const siteWithTwoMonitors: Site = {
+                ...structuredClone(mockSite),
+                monitors: [
+                    structuredClone(mockSite.monitors[0]!),
+                    createMockMonitor({ id: "monitor-2" }),
+                ],
+            };
+
+            mockCache.set(siteWithTwoMonitors.identifier, siteWithTwoMonitors);
+
+            mockSiteWriterServiceInstance.updateSite.mockRejectedValue(
+                new Error("Update failed")
+            );
 
             await expect(
-                siteManager.removeMonitor("site-1", "monitor-1")
-            ).rejects.toThrow("Delete error");
+                siteManager.removeMonitor(
+                    siteWithTwoMonitors.identifier,
+                    "monitor-1"
+                )
+            ).rejects.toThrow("Update failed");
         });
 
-        it("should handle site not found after deletion", async ({
-            task,
-            annotate,
-        }) => {
+        it("should throw when the site is missing", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            // This test requires complex mock setup that creates circular dependencies
-            // Note: Simplify SiteManager to improve testability
-            expect.hasAssertions();
-            expect(true).toBeTruthy(); // Placeholder assertion
+            await expect(
+                siteManager.removeMonitor("missing-site", "monitor-1")
+            ).rejects.toThrow("Site with identifier missing-site not found");
         });
     });
 
@@ -1522,45 +1706,6 @@ describe("SiteManager - Comprehensive", () => {
         });
     });
 
-    describe("executeMonitorDeletion", () => {
-        beforeEach(() => {
-            siteManager = new SiteManager(mockDeps);
-        });
-
-        it("should execute monitor deletion successfully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteManager", "component");
-            await annotate("Category: Manager", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const result =
-                await siteManager["executeMonitorDeletion"]("monitor-1");
-
-            expect(mockDeps.monitorRepository.delete).toHaveBeenCalledWith(
-                "monitor-1"
-            );
-            expect(result).toBeTruthy();
-        });
-
-        it("should handle deletion failure", async ({ task, annotate }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: SiteManager", "component");
-            await annotate("Category: Manager", "category");
-            await annotate("Type: Error Handling", "type");
-
-            vi.mocked(mockDeps.monitorRepository.delete).mockResolvedValue(
-                false
-            );
-
-            const result =
-                await siteManager["executeMonitorDeletion"]("monitor-1");
-
-            expect(result).toBeFalsy();
-        });
-    });
 
     describe("Integration Tests", () => {
         it("should handle complex site lifecycle", async ({

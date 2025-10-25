@@ -177,6 +177,9 @@ describe(SiteRepository, () => {
 
             await repository.upsert(siteData);
 
+            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(
+                1
+            );
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT"),
                 expect.any(Array)
@@ -194,10 +197,11 @@ describe(SiteRepository, () => {
                 monitoring: true,
             };
 
-            // Mock getDatabase to throw an error
-            mockDatabaseService.getDatabase.mockImplementation(() => {
-                throw new Error("Upsert failed");
-            });
+            mockDatabaseService.executeTransaction.mockImplementation(
+                async () => {
+                    throw new Error("Upsert failed");
+                }
+            );
             await expect(repository.upsert(siteData)).rejects.toThrow(
                 "Upsert failed"
             );
@@ -399,7 +403,7 @@ describe(SiteRepository, () => {
 
                         // Upsert returns void, so we just verify it was called correctly
                         expect(
-                            mockDatabaseService.getDatabase
+                            mockDatabaseService.executeTransaction
                         ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
                             expect.stringContaining(
@@ -444,7 +448,7 @@ describe(SiteRepository, () => {
 
                         // Upsert returns void, so we just verify it was called correctly
                         expect(
-                            mockDatabaseService.getDatabase
+                            mockDatabaseService.executeTransaction
                         ).toHaveBeenCalled();
                         expect(mockDatabase.run).toHaveBeenCalledWith(
                             expect.stringContaining(

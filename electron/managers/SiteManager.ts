@@ -55,6 +55,7 @@ import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -430,55 +431,51 @@ export class SiteManager {
         siteIdentifier: string,
         monitorId: string
     ): Promise<Site> {
-        const deletionSucceeded = await this.executeMonitorDeletion(monitorId);
+        const siteSnapshot =
+            await this.getSiteSnapshotForMutation(siteIdentifier);
 
-        if (!deletionSucceeded) {
-            throw new Error(
-                `Failed to delete monitor ${monitorId} for site ${siteIdentifier}`
-            );
-        }
-
-        // Refresh the cache by getting all sites (to ensure proper
-        // site structure)
-        const allSites =
-            await this.siteRepositoryService.getSitesFromDatabase();
-
-        // Update cache
-        await this.updateSitesCache(
-            allSites,
-            "SiteManager.refreshSitesFromDatabase"
+        const monitorToRemove = siteSnapshot.monitors.find(
+            (monitor) => monitor.id === monitorId
         );
 
-        // Find the updated site for the event
-        const updatedSite = this.sitesCache.get(siteIdentifier);
-
-        if (!updatedSite) {
-            const error = new Error(
-                `Updated site ${siteIdentifier} not found after monitor removal`
+        if (!monitorToRemove) {
+            throw new Error(
+                `Monitor ${monitorId} not found on site ${siteIdentifier}`
             );
-            logger.error(
-                "[SiteManager] Missing site snapshot after monitor removal",
-                error,
-                {
-                    monitorId,
-                    siteIdentifier,
-                }
-            );
-            throw error;
         }
 
-        const timestamp = Date.now();
+        if (siteSnapshot.monitors.length <= 1) {
+            throw new Error(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+        }
 
-        // Emit internal site updated event
+        const updatedMonitors = siteSnapshot.monitors
+            .filter((monitor) => monitor.id !== monitorId)
+            .map((monitor) => structuredClone(monitor));
+
+        const validationCandidate: Site = {
+            ...structuredClone(siteSnapshot),
+            monitors: updatedMonitors,
+        };
+
+        await this.validateSite(validationCandidate);
+
+        const updatedSite = await this.siteWriterService.updateSite(
+            this.sitesCache,
+            siteIdentifier,
+            { monitors: updatedMonitors }
+        );
+
+        const timestamp = Date.now();
+        const sanitizedUpdatedSite = structuredClone(updatedSite);
+
         await this.eventEmitter.emitTyped("internal:site:updated", {
             identifier: siteIdentifier,
             operation: "updated",
-            site: updatedSite,
+            site: sanitizedUpdatedSite,
             timestamp,
             updatedFields: ["monitors"],
         });
 
-        // Emit sync event for state consistency
         await this.emitSitesStateSynchronized({
             action: STATE_SYNC_ACTION.UPDATE,
             siteIdentifier,
@@ -825,27 +822,6 @@ export class SiteManager {
     }
 
     /**
-     * Executes monitor deletion from the database.
-     *
-     * @remarks
-     * Used internally to remove a monitor from the database. The repository
-     * handles its own transaction.
-     *
-     * @param monitorId - The monitor ID to delete.
-     *
-     * @returns `true` if the monitor was deleted, `false` otherwise.
-     *
-     * @throws If database operation fails.
-     *
-     * @internal
-     */
-    private async executeMonitorDeletion(monitorId: string): Promise<boolean> {
-        // MonitorRepository.delete() already handles its own transaction,
-        // so we don't need to wrap it in another transaction
-        return this.repositories.monitorRepository.delete(monitorId);
-    }
-
-    /**
      * Loads a site in the background and updates cache.
      *
      * @remarks
@@ -932,6 +908,37 @@ export class SiteManager {
                 );
             }
         }
+    }
+
+    /**
+     * Retrieves a mutable site snapshot for mutation operations.
+     *
+     * @remarks
+     * Loads the site from cache when available, otherwise hydrates it from the
+     * database and seeds the cache. Returns a deep clone suitable for
+     * mutation-safe operations.
+     *
+     * @param identifier - The site identifier to retrieve.
+     *
+     * @returns A cloned {@link Site} snapshot ready for mutation.
+     */
+    private async getSiteSnapshotForMutation(
+        identifier: string
+    ): Promise<Site> {
+        const cachedSite = this.sitesCache.get(identifier);
+        if (cachedSite) {
+            return structuredClone(cachedSite);
+        }
+
+        const siteFromDatabase =
+            await this.siteRepositoryService.getSiteFromDatabase(identifier);
+
+        if (!siteFromDatabase) {
+            throw new Error(`Site with identifier ${identifier} not found`);
+        }
+
+        this.sitesCache.set(identifier, siteFromDatabase);
+        return structuredClone(siteFromDatabase);
     }
 
     /**

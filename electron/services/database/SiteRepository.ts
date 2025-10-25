@@ -357,10 +357,11 @@ export class SiteRepository {
         site: Pick<SiteRow, SiteRowUpsertFields>
     ): Promise<void> {
         return withDatabaseOperation(
-            () => {
-                this.upsertInternal(this.databaseService.getDatabase(), site);
-                return Promise.resolve();
-            },
+            () =>
+                this.databaseService.executeTransaction((db) => {
+                    this.upsertInternal(db, site);
+                    return Promise.resolve();
+                }),
             "site-upsert",
             undefined,
             { identifier: site.identifier }

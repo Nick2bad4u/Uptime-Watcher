@@ -89,9 +89,10 @@ graph TB
 6. [Standardized Cache Configuration](#standardized-cache-configuration)
 7. [Memory Management](#memory-management)
 8. [Race Condition Prevention](#race-condition-prevention)
-9. [Shared Utility Imports](#shared-utility-imports)
-10. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
-11. [Testing Patterns](#testing-patterns)
+9. [Site Mutation Pipeline](#site-mutation-pipeline)
+10. [Shared Utility Imports](#shared-utility-imports)
+11. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
+12. [Testing Patterns](#testing-patterns)
 
 ## Repository Pattern
 
@@ -1141,6 +1142,70 @@ class OperationQueue {
 - ✅ Use operation queues for critical sections
 - ❌ Don't rely on timing for synchronization
 - ❌ Don't ignore cancellation flags in long-running operations
+
+## Site Mutation Pipeline
+
+### Mutation Flow Overview
+
+The site mutation pipeline enforces a strict layering contract that keeps the database, in-memory caches, and monitoring orchestration in sync. Every write follows the same sequence:
+
+1. **SiteManager** receives a domain command (add/update/remove) and extracts a **mutable snapshot** via `getSiteSnapshotForMutation()`. The helper guarantees the caller works on a cloned structure so cache entries remain immutable.
+2. **Domain invariants** are enforced before touching persistent storage. Examples include preventing removal of the final monitor, validating monitor schemas, and re-running `validateSite()` with the proposed changes.
+3. **SiteWriterService** performs the actual mutation through `updateSite` / `createSite` / `deleteSite`. All write operations are wrapped in `DatabaseService.executeTransaction()` and reuse shared helpers such as `updateMonitorsPreservingHistory()` to keep history tables intact.
+4. **Repository layer** executes the SQL statements. Internal synchronous methods (`*_Internal`) are the only functions allowed to call `Database#run` / `Database#all` directly.
+5. **Cache synchronization** happens inside `SiteWriterService`, which updates the `StandardizedCache` instance that backs `SiteManager`. Only sanitized copies are stored to avoid accidental mutations.
+6. **Event emission** completes the cycle: `SiteManager` publishes `internal:site:*` and `sites:state-synchronized` events so the renderer, orchestrator, and automation hooks receive consistent updates.
+
+```mermaid
+sequenceDiagram
+        participant Orchestrator
+        participant SiteManager
+        participant SiteWriter
+        participant Database
+        participant Cache
+        participant EventBus
+
+        Orchestrator->>SiteManager: removeMonitor(siteId, monitorId)
+        SiteManager->>SiteManager: getSiteSnapshotForMutation()
+        SiteManager->>SiteManager: enforce invariants / validateSite()
+        SiteManager->>SiteWriter: updateSite({ monitors })
+        SiteWriter->>Database: executeTransaction(upsert/delete)
+        Database-->>SiteWriter: commit
+        SiteWriter->>Cache: set(siteId, updatedSite)
+        SiteManager->>EventBus: emit internal:site:updated
+        SiteManager->>EventBus: emit sites:state-synchronized
+        EventBus-->>Orchestrator: broadcast update
+```
+
+### Layer Responsibilities
+
+- **SiteManager**
+    - Protects domain invariants (e.g., cannot remove the final monitor from a site).
+    - Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
+    - Emits fully populated events with timestamps and updated field metadata.
+- **SiteWriterService**
+    - Owns transactional boundaries via `DatabaseService.executeTransaction`.
+    - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
+    - Writes sanitized copies into the shared `StandardizedCache` instance.
+- **Repositories**
+    - Contain only synchronous `*_Internal` helpers that assume an active transaction.
+    - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
+
+### Invariant Checklist
+
+- ✅ Every mutation must pass through `SiteWriterService`; bypassing it forfeits transactional hooks and cache consistency.
+- ✅ Never allow a site to reach zero monitors; throw `ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST` instead.
+- ✅ Run `validateSite()` with the candidate payload before invoking the writer to catch schema drift early.
+- ✅ Emit both `internal:site:*` and `sites:state-synchronized` events after successful commits to keep the renderer caches aligned.
+- ✅ Update unit and comprehensive tests whenever the pipeline changes to cover transaction outcomes and event emission.
+
+### Usage Guidelines
+
+- ✅ Fetch mutable data via `getSiteSnapshotForMutation()` or a repository call and immediately clone it before applying changes.
+- ✅ Limit direct repository usage to read-only helpers; prefer the writer for any mutation, even if it appears trivial.
+- ✅ When adding new mutations, extend `SiteWriterService` first, then point `SiteManager` to the new method.
+- ❌ Do not mutate objects retrieved from `sitesCache` in place; always build new structures and let the writer persist them.
+- ❌ Do not emit success events before the transaction commits; let the writer finish and emit only after the cache is updated.
 
 ## Best Practices Summary
 

@@ -20,6 +20,7 @@ import { SiteManager } from "../../managers/SiteManager";
 import type { MonitorRepositoryTransactionAdapter } from "../../services/database/MonitorRepository";
 import type { SiteRepositoryTransactionAdapter } from "../../services/database/SiteRepository";
 import type { Site } from "@shared/types";
+import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 
 describe(SiteManager, () => {
     let manager: SiteManager;
@@ -109,41 +110,6 @@ describe(SiteManager, () => {
             await annotate("Component: SiteManager", "component");
             await annotate(
                 "Test Type: Unit - Constructor Validation",
-                "test-type"
-            );
-            await annotate("Operation: Manager Instantiation", "operation");
-            await annotate(
-                "Priority: Critical - Core Component Initialization",
-                "priority"
-            );
-            await annotate(
-                "Complexity: Low - Basic Constructor Test",
-                "complexity"
-            );
-            await annotate(
-                "Dependencies: Injected repository and service dependencies",
-                "dependencies"
-            );
-            await annotate(
-                "Purpose: Ensure SiteManager can be instantiated without errors",
-                "purpose"
-            );
-
-            expect(manager).toBeDefined();
-        });
-    });
-
-    describe("addSite", () => {
-        it("should add a new site successfully", async ({ annotate }) => {
-            await annotate("Component: SiteManager", "component");
-            await annotate("Test Type: Unit - Business Logic", "test-type");
-            await annotate(
-                "Operation: Site Creation with Transaction",
-                "operation"
-            );
-            await annotate(
-                "Priority: Critical - Core Site Management",
-                "priority"
             );
             await annotate(
                 "Complexity: High - Multi-step Transaction",
@@ -543,37 +509,142 @@ describe(SiteManager, () => {
         });
     });
     describe("removeMonitor", () => {
-        it("should remove a monitor from a site", async () => {
-            mockDependencies.databaseService.executeTransaction.mockImplementation(
-                async (fn: any) => await fn()
-            );
-            mockDependencies.monitorRepository.findByIdentifier = vi
-                .fn()
-                .mockResolvedValue({
+        const buildSite = (): Site => ({
+            identifier: "site1",
+            name: "Site 1",
+            monitoring: true,
+            monitors: [
+                {
                     id: "mon1",
                     type: "http",
                     url: "https://example.com",
-                });
-            // Mock the getSitesFromDatabase method that will be called during removeMonitor
-            const mockSites = [
-                {
-                    identifier: "site1",
-                    name: "Site 1",
+                    checkInterval: 300,
+                    timeout: 50,
+                    retryAttempts: 1,
                     monitoring: true,
-                    monitors: [],
+                    status: "pending",
+                    responseTime: 0,
+                    history: [],
                 },
-            ];
+                {
+                    id: "mon2",
+                    type: "http",
+                    url: "https://example.org",
+                    checkInterval: 300,
+                    timeout: 50,
+                    retryAttempts: 1,
+                    monitoring: true,
+                    status: "pending",
+                    responseTime: 0,
+                    history: [],
+                },
+            ],
+        });
 
-            // Since siteRepositoryService is private, I need to mock it differently
-            // Let me spy on the getSitesFromDatabase method on the manager instance
-            vi.spyOn(
-                manager["siteRepositoryService"],
-                "getSitesFromDatabase"
-            ).mockResolvedValue(mockSites);
+        it("removes the specified monitor via SiteWriterService", async () => {
+            mockDependencies.eventEmitter.emitTyped.mockClear();
+            const site = buildSite();
+            manager["sitesCache"].set(site.identifier, site);
 
-            const result = await manager.removeMonitor("site1", "mon1");
+            const persistedSite: Site = {
+                ...site,
+                monitors: [structuredClone(site.monitors[1]!)],
+            };
 
-            expect(result).toBeTruthy();
+            const updateSpy = vi
+                .spyOn(manager["siteWriterService"], "updateSite")
+                .mockResolvedValue(persistedSite);
+
+            const result = await manager.removeMonitor(
+                site.identifier,
+                "mon1"
+            );
+
+            expect(updateSpy).toHaveBeenCalledWith(
+                manager["sitesCache"],
+                site.identifier,
+                {
+                    monitors: [expect.objectContaining({ id: "mon2" })],
+                }
+            );
+            expect(result).toEqual(persistedSite);
+            expect(
+                mockDependencies.eventEmitter.emitTyped
+            ).toHaveBeenCalledWith(
+                "internal:site:updated",
+                expect.objectContaining({
+                    identifier: site.identifier,
+                    updatedFields: ["monitors"],
+                    site: expect.objectContaining({
+                        monitors: [expect.objectContaining({ id: "mon2" })],
+                    }),
+                })
+            );
+        });
+
+        it("throws when attempting to remove the last monitor", async () => {
+            mockDependencies.eventEmitter.emitTyped.mockClear();
+            const site = buildSite();
+            site.monitors = [structuredClone(site.monitors[0]!)];
+            manager["sitesCache"].set(site.identifier, site);
+
+            const updateSpy = vi
+                .spyOn(manager["siteWriterService"], "updateSite")
+                .mockResolvedValue(site);
+
+            await expect(
+                manager.removeMonitor(site.identifier, "mon1")
+            ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
+
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+
+        it("throws when the monitor is not found", async () => {
+            const site = buildSite();
+            manager["sitesCache"].set(site.identifier, site);
+
+            const updateSpy = vi
+                .spyOn(manager["siteWriterService"], "updateSite")
+                .mockResolvedValue(site);
+
+            await expect(
+                manager.removeMonitor(site.identifier, "missing")
+            ).rejects.toThrow(
+                "Monitor missing not found on site site1"
+            );
+
+            expect(updateSpy).not.toHaveBeenCalled();
+        });
+
+        it("hydrates the cache from the database when the site is absent", async () => {
+            mockDependencies.eventEmitter.emitTyped.mockClear();
+            const site = buildSite();
+            manager["sitesCache"].clear();
+
+            const dbSpy = vi
+                .spyOn(manager["siteRepositoryService"], "getSiteFromDatabase")
+                .mockResolvedValue(structuredClone(site));
+
+            const persistedSite: Site = {
+                ...site,
+                monitors: [structuredClone(site.monitors[1]!)],
+            };
+
+            const updateSpy = vi
+                .spyOn(manager["siteWriterService"], "updateSite")
+                .mockResolvedValue(persistedSite);
+
+            const result = await manager.removeMonitor(
+                site.identifier,
+                "mon1"
+            );
+
+            expect(dbSpy).toHaveBeenCalledWith(site.identifier);
+            expect(updateSpy).toHaveBeenCalled();
+            expect(result.monitors).toHaveLength(1);
+            const [remainingMonitor] = result.monitors;
+            expect(remainingMonitor).toBeDefined();
+            expect(remainingMonitor?.id).toBe("mon2");
         });
     });
     describe("updateSitesCache diagnostics", () => {
@@ -784,42 +855,93 @@ describe(SiteManager, () => {
                 expect(formatted).toBe("");
             });
         });
-        describe("executeMonitorDeletion", () => {
-            it("should delete monitor successfully", async () => {
-                // Mock the monitor repository
-                vi.spyOn(
-                    manager["repositories"].monitorRepository,
-                    "delete"
-                ).mockResolvedValue(true);
+        describe("getSiteSnapshotForMutation", () => {
+            it("returns a cloned site from cache", async () => {
+                const site: Site = {
+                    identifier: "site-cache",
+                    name: "Cached Site",
+                    monitoring: true,
+                    monitors: [
+                        {
+                            id: "mon-cache",
+                            type: "http",
+                            url: "https://cached.example.com",
+                            checkInterval: 300,
+                            timeout: 50,
+                            retryAttempts: 2,
+                            monitoring: true,
+                            status: "pending",
+                            responseTime: 0,
+                            history: [],
+                        },
+                    ],
+                };
 
-                const result =
-                    await manager["executeMonitorDeletion"]("monitor1");
+                const dbSpy = vi.spyOn(
+                    manager["siteRepositoryService"],
+                    "getSiteFromDatabase"
+                );
+                manager["sitesCache"].set(site.identifier, site);
 
-                expect(result).toBeTruthy();
-                expect(
-                    manager["repositories"].monitorRepository.delete
-                ).toHaveBeenCalledWith("monitor1");
+                const snapshot =
+                    await manager["getSiteSnapshotForMutation"](
+                        site.identifier
+                    );
+
+                expect(snapshot).toEqual(site);
+                expect(snapshot).not.toBe(site);
+                expect(dbSpy).not.toHaveBeenCalled();
+                dbSpy.mockRestore();
             });
-            it("should handle monitor deletion failure", async () => {
+
+            it("hydrates the cache when the site is missing", async () => {
+                const site: Site = {
+                    identifier: "site-db",
+                    name: "Database Site",
+                    monitoring: true,
+                    monitors: [
+                        {
+                            id: "mon-db",
+                            type: "http",
+                            url: "https://db.example.com",
+                            checkInterval: 450,
+                            timeout: 60,
+                            retryAttempts: 2,
+                            monitoring: true,
+                            status: "pending",
+                            responseTime: 0,
+                            history: [],
+                        },
+                    ],
+                };
+
                 vi.spyOn(
-                    manager["repositories"].monitorRepository,
-                    "delete"
-                ).mockResolvedValue(false);
+                    manager["siteRepositoryService"],
+                    "getSiteFromDatabase"
+                ).mockResolvedValue(site);
 
-                const result =
-                    await manager["executeMonitorDeletion"]("monitor1");
+                const snapshot =
+                    await manager["getSiteSnapshotForMutation"](
+                        site.identifier
+                    );
 
-                expect(result).toBeFalsy();
+                expect(snapshot).toEqual(site);
+                expect(manager["sitesCache"].get(site.identifier)).toEqual(
+                    site
+                );
             });
-            it("should handle monitor deletion errors", async () => {
+
+            it("throws when the site cannot be located", async () => {
                 vi.spyOn(
-                    manager["repositories"].monitorRepository,
-                    "delete"
-                ).mockRejectedValue(new Error("Deletion failed"));
+                    manager["siteRepositoryService"],
+                    "getSiteFromDatabase"
+                ).mockResolvedValue(undefined);
 
                 await expect(
-                    manager["executeMonitorDeletion"]("monitor1")
-                ).rejects.toThrow("Deletion failed");
+                    manager["getSiteSnapshotForMutation"]("missing-site")
+                ).rejects.toThrow(
+                    "Site with identifier missing-site not found"
+                );
             });
         });
         describe("loadSiteInBackground", () => {
