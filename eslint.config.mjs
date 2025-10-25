@@ -193,7 +193,7 @@ if (!process.env.RECHECK_JAR) {
             return require.resolve("recheck-jar/recheck.jar");
         } catch {
             console.warn(
-                "[eslint.config] Unable to resolve \"recheck-jar/recheck.jar\". eslint-plugin-redos will rely on its internal resolution logic."
+                '[eslint.config] Unable to resolve "recheck-jar/recheck.jar". eslint-plugin-redos will rely on its internal resolution logic.'
             );
             return undefined;
         }

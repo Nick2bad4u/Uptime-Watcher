@@ -227,9 +227,13 @@ describe("SystemService", () => {
 
     describe("quitAndInstall", () => {
         it("should trigger quit-and-install successfully", async () => {
-            await expect(SystemService.quitAndInstall()).resolves.toBeUndefined();
+            await expect(
+                SystemService.quitAndInstall()
+            ).resolves.toBeUndefined();
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
-            expect(mockElectronAPI.system.quitAndInstall).toHaveBeenCalledTimes(1);
+            expect(mockElectronAPI.system.quitAndInstall).toHaveBeenCalledTimes(
+                1
+            );
         });
 
         it("should propagate initialization failure", async () => {
@@ -239,7 +243,9 @@ describe("SystemService", () => {
             await expect(SystemService.quitAndInstall()).rejects.toThrow(
                 "init failed"
             );
-            expect(mockElectronAPI.system.quitAndInstall).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.system.quitAndInstall
+            ).not.toHaveBeenCalled();
         });
 
         it("should reject when bridge resolves to non-boolean", async () => {
@@ -262,7 +268,9 @@ describe("SystemService", () => {
 
         it("should surface underlying errors", async () => {
             const failure = new Error("Updater blew up");
-            mockElectronAPI.system.quitAndInstall.mockRejectedValueOnce(failure);
+            mockElectronAPI.system.quitAndInstall.mockRejectedValueOnce(
+                failure
+            );
 
             await expect(SystemService.quitAndInstall()).rejects.toThrow(
                 "Updater blew up"

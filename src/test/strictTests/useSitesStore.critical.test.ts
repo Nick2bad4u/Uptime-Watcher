@@ -140,9 +140,9 @@ describe("useSitesStore Function Coverage Tests", () => {
         vi.mocked(MonitoringService.stopMonitoringForSite).mockResolvedValue(
             undefined
         );
-        vi.mocked(MonitoringService.startMonitoringForMonitor).mockResolvedValue(
-            undefined
-        );
+        vi.mocked(
+            MonitoringService.startMonitoringForMonitor
+        ).mockResolvedValue(undefined);
         vi.mocked(MonitoringService.stopMonitoringForMonitor).mockResolvedValue(
             undefined
         );
@@ -327,16 +327,12 @@ describe("useSitesStore Function Coverage Tests", () => {
             await store.startSiteMonitoring("site-id");
             expect(
                 MonitoringService.startMonitoringForSite
-            ).toHaveBeenCalledWith(
-                "site-id"
-            );
+            ).toHaveBeenCalledWith("site-id");
 
             await store.stopSiteMonitoring("site-id");
             expect(
                 MonitoringService.stopMonitoringForSite
-            ).toHaveBeenCalledWith(
-                "site-id"
-            );
+            ).toHaveBeenCalledWith("site-id");
 
             await store.checkSiteNow("site-id", "monitor-id");
             expect(MonitoringService.checkSiteNow).toHaveBeenCalledWith(

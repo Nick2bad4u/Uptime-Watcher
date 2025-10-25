@@ -218,19 +218,19 @@ describe("useSiteSync - Line Coverage Completion", () => {
                     const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
                     StatusUpdateManagerMock.mockImplementation(
                         function StatusUpdateManagerRetryMock() {
-                        const unsubscribe = vi.fn();
-                        unsubscribeSpies.push(unsubscribe);
-                        return {
-                            getExpectedListenerCount: vi.fn(() => 3),
-                            subscribe: vi.fn(async () => ({
-                                errors: [],
-                                expectedListeners: 3,
-                                listenersAttached: 3,
-                                listenerStates: buildListenerStates(3),
-                                success: true,
-                            })),
-                            unsubscribe,
-                        } as unknown as StatusUpdateManager;
+                            const unsubscribe = vi.fn();
+                            unsubscribeSpies.push(unsubscribe);
+                            return {
+                                getExpectedListenerCount: vi.fn(() => 3),
+                                subscribe: vi.fn(async () => ({
+                                    errors: [],
+                                    expectedListeners: 3,
+                                    listenersAttached: 3,
+                                    listenerStates: buildListenerStates(3),
+                                    success: true,
+                                })),
+                                unsubscribe,
+                            } as unknown as StatusUpdateManager;
                         }
                     );
 

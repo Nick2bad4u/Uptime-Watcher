@@ -555,8 +555,7 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                         }
                     }
                     const endsWithSchemeSeparator =
-                        schemeSeparatorIndex !== -1 &&
-                        validUrl.endsWith("://");
+                        schemeSeparatorIndex !== -1 && validUrl.endsWith("://");
 
                     if (
                         containsDisallowedCharacters ||

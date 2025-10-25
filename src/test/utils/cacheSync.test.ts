@@ -161,8 +161,8 @@ const setOnCacheInvalidatedHandler = (
         electronAPI: MockElectronAPI;
     };
 
-    electronWindow.electronAPI.events.onCacheInvalidated = handler as unknown as
-        typeof electronWindow.electronAPI.events.onCacheInvalidated;
+    electronWindow.electronAPI.events.onCacheInvalidated =
+        handler as unknown as typeof electronWindow.electronAPI.events.onCacheInvalidated;
 };
 
 const flushAsyncOperations = async (): Promise<void> => {

@@ -217,10 +217,10 @@ describe("Time Utilities", () => {
 
         beforeEach(() => {
             // Mock Date.now to return a fixed timestamp
-                mockNow = vi.spyOn(Date, "now") as unknown as MockInstance<
-                    () => number
-                >;
-              mockNow.mockReturnValue(1_640_995_200_000); // Jan 1, 2022 00:00:00 UTC
+            mockNow = vi.spyOn(Date, "now") as unknown as MockInstance<
+                () => number
+            >;
+            mockNow.mockReturnValue(1_640_995_200_000); // Jan 1, 2022 00:00:00 UTC
         });
 
         afterEach(() => {

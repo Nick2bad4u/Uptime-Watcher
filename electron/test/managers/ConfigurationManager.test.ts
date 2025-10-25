@@ -15,19 +15,18 @@ vi.mock("../../electronUtils", () => ({
     isDev: vi.fn(() => false),
 }));
 
-const {
-    monitorValidatorMockInstance,
-    siteValidatorMockInstance,
-} = vi.hoisted(() => ({
-    monitorValidatorMockInstance: {
-        shouldApplyDefaultInterval: vi.fn(),
-        validateMonitorConfiguration: vi.fn(),
-    },
-    siteValidatorMockInstance: {
-        shouldIncludeInExport: vi.fn(),
-        validateSiteConfiguration: vi.fn(),
-    },
-}));
+const { monitorValidatorMockInstance, siteValidatorMockInstance } = vi.hoisted(
+    () => ({
+        monitorValidatorMockInstance: {
+            shouldApplyDefaultInterval: vi.fn(),
+            validateMonitorConfiguration: vi.fn(),
+        },
+        siteValidatorMockInstance: {
+            shouldIncludeInExport: vi.fn(),
+            validateSiteConfiguration: vi.fn(),
+        },
+    })
+);
 
 vi.mock("../../managers/validators/MonitorValidator", () => ({
     MonitorValidator: vi.fn(function MonitorValidatorMock() {

@@ -47,7 +47,9 @@ describe("Stores Comprehensive Fuzzing", () => {
         fcTest.prop([arbitraryPartialSettings])(
             "should handle settings updates",
             (partialSettings) => {
-                const { result, unmount } = renderHook(() => useSettingsStore());
+                const { result, unmount } = renderHook(() =>
+                    useSettingsStore()
+                );
 
                 try {
                     expect(typeof result.current.updateSettings).toBe(
@@ -128,8 +130,12 @@ describe("Stores Comprehensive Fuzzing", () => {
         test("should handle update status and progress", () => {
             const { result, unmount } = renderHook(() => useUpdatesStore());
             try {
-                expect(typeof result.current.applyUpdateStatus).toBe("function");
-                expect(typeof result.current.setUpdateProgress).toBe("function");
+                expect(typeof result.current.applyUpdateStatus).toBe(
+                    "function"
+                );
+                expect(typeof result.current.setUpdateProgress).toBe(
+                    "function"
+                );
                 expect(typeof result.current.updateStatus).toBe("string");
                 expect(typeof result.current.updateProgress).toBe("number");
 
@@ -145,7 +151,9 @@ describe("Stores Comprehensive Fuzzing", () => {
 
     describe("Monitor Types Store", () => {
         test("should have monitor types store available", () => {
-            const { result, unmount } = renderHook(() => useMonitorTypesStore());
+            const { result, unmount } = renderHook(() =>
+                useMonitorTypesStore()
+            );
             try {
                 expect(result.current).toBeDefined();
                 expect(Array.isArray(result.current.monitorTypes)).toBeTruthy();
@@ -155,7 +163,9 @@ describe("Stores Comprehensive Fuzzing", () => {
         });
 
         test("should handle error states", () => {
-            const { result, unmount } = renderHook(() => useMonitorTypesStore());
+            const { result, unmount } = renderHook(() =>
+                useMonitorTypesStore()
+            );
             try {
                 expect(typeof result.current.setError).toBe("function");
                 expect(typeof result.current.clearError).toBe("function");

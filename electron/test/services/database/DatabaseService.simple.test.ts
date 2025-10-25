@@ -47,8 +47,10 @@ vi.mock("./utils/databaseSchema", () => ({
 vi.mock("node:path", () => ({
     join: vi.fn((...args: string[]) => args.join("/")),
     resolve: vi.fn((...args: string[]) => args.join("/")),
-    dirname: vi.fn((target: string) =>
-        target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") || "."
+    dirname: vi.fn(
+        (target: string) =>
+            target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") ||
+            "."
     ),
 }));
 

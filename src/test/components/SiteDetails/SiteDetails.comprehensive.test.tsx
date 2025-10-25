@@ -128,7 +128,9 @@ vi.mock("../../../theme/useTheme", () => ({
 }));
 
 vi.mock("../../../services/chartConfig", () => {
-    const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(this: any) {
+    const ChartConfigServiceMock = vi.fn(function ChartConfigServiceMock(
+        this: any
+    ) {
         this.getLineChartConfig = vi.fn(() => ({}));
         this.getBarChartConfig = vi.fn(() => ({}));
         this.getDoughnutChartConfig = vi.fn(() => ({}));

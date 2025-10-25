@@ -13,12 +13,7 @@
 import { describe, expect, test } from "vitest";
 import fc from "fast-check";
 
-import type {
-    Monitor,
-    MonitorType,
-    MonitorStatus,
-    Site,
-} from "@shared/types";
+import type { Monitor, MonitorType, MonitorStatus, Site } from "@shared/types";
 import { BASE_MONITOR_TYPES } from "@shared/types";
 import {
     createDefaultMonitor,

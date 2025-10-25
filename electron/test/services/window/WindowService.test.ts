@@ -559,9 +559,11 @@ describe(WindowService, () => {
                 const window = windowService.createMainWindow();
                 vi.mocked(window.isDestroyed).mockReturnValue(false);
 
-                await (windowService as unknown as {
-                    loadDevelopmentContent: () => Promise<void>;
-                }).loadDevelopmentContent();
+                await (
+                    windowService as unknown as {
+                        loadDevelopmentContent: () => Promise<void>;
+                    }
+                ).loadDevelopmentContent();
 
                 expect(globalThis.fetch).toHaveBeenCalledWith(
                     "http://localhost:5173",

@@ -124,7 +124,6 @@ vi.mock("../../utils/database/SiteWriterService", () => ({
     SiteWriterService: siteWriterMocks.MockSiteWriterService,
 }));
 
-
 // Test if our mocks are working correctly
 describe("SiteManager Mock Debug", () => {
     it("should create SiteManager with working mocks", async ({

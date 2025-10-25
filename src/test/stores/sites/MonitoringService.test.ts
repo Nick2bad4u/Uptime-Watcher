@@ -194,11 +194,12 @@ describe("MonitoringService", () => {
                 true
             );
 
-            await expect(MonitoringService.startMonitoring()).resolves
-                .toBeUndefined();
-            expect(mockElectronAPI.monitoring.startMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            await expect(
+                MonitoringService.startMonitoring()
+            ).resolves.toBeUndefined();
+            expect(
+                mockElectronAPI.monitoring.startMonitoring
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should throw when backend declines global start", async ({
@@ -398,11 +399,12 @@ describe("MonitoringService", () => {
                 true
             );
 
-            await expect(MonitoringService.stopMonitoring()).resolves
-                .toBeUndefined();
-            expect(mockElectronAPI.monitoring.stopMonitoring).toHaveBeenCalledTimes(
-                1
-            );
+            await expect(
+                MonitoringService.stopMonitoring()
+            ).resolves.toBeUndefined();
+            expect(
+                mockElectronAPI.monitoring.stopMonitoring
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should throw when backend declines global stop", async ({

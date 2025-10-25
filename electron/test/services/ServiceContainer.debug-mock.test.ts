@@ -80,12 +80,10 @@ const managerMocks = vi.hoisted(() => {
 
     const mockSiteManager = {
         getSitesCache: vi.fn().mockReturnValue(new Map()),
-        getEventBus: vi.
-            fn()
-            .mockReturnValue({
-                ...typedEventBusMocks.typedEventBusInstance,
-                busId: "test-site-manager-bus",
-            }),
+        getEventBus: vi.fn().mockReturnValue({
+            ...typedEventBusMocks.typedEventBusInstance,
+            busId: "test-site-manager-bus",
+        }),
         initialize: vi.fn().mockResolvedValue(undefined),
         isInitialized: vi.fn().mockReturnValue(true),
     };

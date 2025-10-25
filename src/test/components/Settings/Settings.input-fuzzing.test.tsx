@@ -70,8 +70,6 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
- * ```
- *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,7 +80,6 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";

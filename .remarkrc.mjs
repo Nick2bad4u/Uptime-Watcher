@@ -17,10 +17,12 @@ import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 // Type definitions for remark configuration
 /** @typedef {import("unified").Preset} Preset */
 /** @typedef {import("unified").Plugin} Plugin */
-/** @typedef {string
-    | Plugin
-    | Preset
-    | [string | Plugin | Preset, ...unknown[]]} PluginEntry */
+/**
+ * @typedef {string
+ *     | Plugin
+ *     | Preset
+ *     | [string | Plugin | Preset, ...unknown[]]} PluginEntry
+ */
 
 /**
  * Remark settings for markdown processing

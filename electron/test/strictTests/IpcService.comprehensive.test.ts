@@ -294,7 +294,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("start-monitoring");
             expect(registeredChannels).toContain("stop-monitoring");
             expect(registeredChannels).toContain("start-monitoring-for-site");
-            expect(registeredChannels).toContain("start-monitoring-for-monitor");
+            expect(registeredChannels).toContain(
+                "start-monitoring-for-monitor"
+            );
             expect(registeredChannels).toContain("stop-monitoring-for-site");
             expect(registeredChannels).toContain("stop-monitoring-for-monitor");
             expect(registeredChannels).toContain("check-site-now");
@@ -596,11 +598,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(
-                mockIpcEvent,
-                "site-id",
-                "monitor-id"
-            );
+            const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
                 mockUptimeOrchestrator.startMonitoringForSite
@@ -664,11 +662,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(
-                mockIpcEvent,
-                "site-id",
-                "monitor-id"
-            );
+            const result = await handler(mockIpcEvent, "site-id", "monitor-id");
 
             expect(
                 mockUptimeOrchestrator.stopMonitoringForSite

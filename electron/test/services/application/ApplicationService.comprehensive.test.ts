@@ -5,10 +5,7 @@
 
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ApplicationService } from "../../../services/application/ApplicationService";
-import {
-    STATE_SYNC_ACTION,
-    STATE_SYNC_SOURCE,
-} from "@shared/types/stateSync";
+import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 
 // Mock Electron app
 vi.mock("electron", () => ({

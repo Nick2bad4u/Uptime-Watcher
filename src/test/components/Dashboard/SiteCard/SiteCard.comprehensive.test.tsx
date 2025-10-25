@@ -27,9 +27,7 @@ vi.mock("../../../../theme/components", async (importOriginal) => {
 vi.mock("../SiteCardHeader", () => ({
     SiteCardHeader: () => (
         <div data-testid="site-card-header">
-            Site Header
-            {" "}
-            <div data-testid="site-card-footer">Site Footer</div>
+            Site Header <div data-testid="site-card-footer">Site Footer</div>
         </div>
     ),
 }));
@@ -49,7 +47,6 @@ vi.mock("../SiteCardMetrics", () => ({
         <div data-testid="site-card-metrics-content">Site Metrics</div>
     ),
 }));
-
 
 // Mock the hooks
 vi.mock("../../../../hooks/site/useSite", () => ({

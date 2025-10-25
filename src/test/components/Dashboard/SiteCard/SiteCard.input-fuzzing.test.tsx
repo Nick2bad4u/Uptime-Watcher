@@ -28,12 +28,7 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type { ReactNode } from "react";
-import type {
-    Site,
-    Monitor,
-    MonitorStatus,
-    MonitorType,
-} from "@shared/types";
+import type { Site, Monitor, MonitorStatus, MonitorType } from "@shared/types";
 
 import { SiteCard } from "../../../../components/Dashboard/SiteCard/SiteCard";
 
@@ -44,8 +39,7 @@ let mockSiteData: Site | null = null;
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: ({ site }: { site: { site: Site } }) => (
         <div data-testid={`site-card-header-${site.site.identifier}`}>
-            Header: {site.site.name}
-            {" "}
+            Header: {site.site.name}{" "}
             <div data-testid={`site-card-footer-${site.site.identifier}`}>
                 Click to view details
             </div>
@@ -111,7 +105,6 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
         </div>
     ),
 }));
-
 
 // Mock the useSite hook with comprehensive return data
 vi.mock("../../../../hooks/site/useSite", () => ({

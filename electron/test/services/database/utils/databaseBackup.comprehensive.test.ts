@@ -15,9 +15,7 @@ vi.mock("../../../../../electron/utils/logger", () => ({
 
 // Mock node:fs module
 vi.mock("node:fs", async () => {
-    const actual = await vi.importActual<typeof import("node:fs")>(
-        "node:fs"
-    );
+    const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
 
     return {
         ...actual,

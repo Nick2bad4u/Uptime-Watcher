@@ -42,14 +42,14 @@ import { systemApi } from "./preload/domains/systemApi";
 type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
 
 const electronAPI: ElectronAPI = {
-  data: dataApi,
-  events: createEventsApi(),
-  monitoring: monitoringApi,
-  monitorTypes: monitorTypesApi,
-  settings: settingsApi,
-  sites: sitesApi,
-  stateSync: stateSyncApi,
-  system: systemApi,
+ data: dataApi,
+ events: createEventsApi(),
+ monitoring: monitoringApi,
+ monitorTypes: monitorTypesApi,
+ settings: settingsApi,
+ sites: sitesApi,
+ stateSync: stateSyncApi,
+ system: systemApi,
 };
 ```
 
@@ -124,13 +124,10 @@ Updates an existing site and/or its monitors. The backend broadcasts
 `site:updated` with the new snapshot and list of changed fields.
 
 ```typescript
-const updatedSite = await window.electronAPI.sites.updateSite(
- siteIdentifier,
- {
-  name: "New Site Name",
-  description: "Updated description",
- }
-);
+const updatedSite = await window.electronAPI.sites.updateSite(siteIdentifier, {
+ name: "New Site Name",
+ description: "Updated description",
+});
 ```
 
 #### `removeSite(identifier: string): Promise<boolean>`
@@ -276,7 +273,7 @@ produced by `exportData()`.
 ```typescript
 const success = await window.electronAPI.data.importData(payload);
 if (!success) {
-  notify("Import reported validation failures");
+ notify("Import reported validation failures");
 }
 ```
 
@@ -619,9 +616,7 @@ interface UptimeEvents {
 ```typescript
 // In Electron main process services
 eventBus.onTyped("site:added", (data) => {
- console.log(
-  `Site added from ${data.source} workflow: ${data.site.name}`
- );
+ console.log(`Site added from ${data.source} workflow: ${data.site.name}`);
  // Automatically includes correlation ID and metadata
 });
 
@@ -839,7 +834,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-  const newSite = await window.electronAPI.sites.addSite(siteData);
+   const newSite = await window.electronAPI.sites.addSite(siteData);
    return newSite;
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -855,7 +850,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-  await window.electronAPI.sites.removeSite(siteIdentifier);
+   await window.electronAPI.sites.removeSite(siteIdentifier);
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
    setError(errorMessage);

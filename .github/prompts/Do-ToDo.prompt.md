@@ -5,7 +5,9 @@ argument-hint: "This task involves creating a detailed TODO list and systematica
 description: "Create Detailed TODO List and Address Issues"
 ---
 
-Begin by clearing any existing TODO list to ensure a fresh start. Then, compile a comprehensive list of all pending tasks, issues, or requirements into detailed TODO items. Each TODO item must include sufficient context, such as the problem description, relevant files or components, potential dependencies, estimated effort, and any prerequisites or blockers. Store these in the designated TODO.md file at the repository root, ensuring the descriptions are thorough enough that anyone can resume work on them without prior knowledge of the project or task history.
+- Begin by clearing any existing TODO list to ensure a fresh start. Then, compile a comprehensive list of all pending tasks, issues, or requirements into detailed TODO items.
+- Each TODO item must include sufficient context, such as the problem description, relevant files or components, potential dependencies, estimated effort, and any prerequisites or blockers.
+- Store these in the designated TODO.md file at the repository root, ensuring the descriptions are thorough enough that anyone can resume work on them without prior knowledge of the project or task history.
 
 Once the TODO list is populated, proceed to address each issue systematically. For each TODO item:
 

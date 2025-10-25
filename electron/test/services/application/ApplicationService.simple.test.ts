@@ -53,8 +53,10 @@ vi.mock("../../../electronUtils", () => ({
 vi.mock("node:path", () => ({
     join: vi.fn((...segments: string[]) => segments.join("/")),
     resolve: vi.fn((...segments: string[]) => segments.join("/")),
-    dirname: vi.fn((target: string) =>
-        target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") || "."
+    dirname: vi.fn(
+        (target: string) =>
+            target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") ||
+            "."
     ),
 }));
 

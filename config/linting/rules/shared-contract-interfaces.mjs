@@ -16,13 +16,15 @@ const buildRestrictedSyntaxEntries = () =>
     }));
 
 export default {
-    files: ["src/**/*.{ts,tsx}", "electron/**/*.{ts,tsx}", "docs/**/*.{ts,tsx}", "scripts/**/*.{ts,tsx}"],
+    files: [
+        "src/**/*.{ts,tsx}",
+        "electron/**/*.{ts,tsx}",
+        "docs/**/*.{ts,tsx}",
+        "scripts/**/*.{ts,tsx}",
+    ],
     ignores: ["shared/types/**/*", "**/*.d.ts"],
     name: "Shared Contract Interface Guard",
     rules: {
-        "no-restricted-syntax": [
-            "error",
-            ...buildRestrictedSyntaxEntries(),
-        ],
+        "no-restricted-syntax": ["error", ...buildRestrictedSyntaxEntries()],
     },
 };

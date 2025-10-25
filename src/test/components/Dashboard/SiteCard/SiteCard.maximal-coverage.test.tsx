@@ -40,10 +40,9 @@ vi.mock("@shared/utils/siteStatus", () => ({
 vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHeader", () => ({
     SiteCardHeader: vi.fn(({ site, display, interactions, monitoring }) => (
         <div data-testid="site-card-header" onClick={interactions?.onCheckNow}>
-            Header: {site?.site?.name || "Unknown"} | Loading: {" "}
-            {display?.isLoading ? "yes" : "no"} | Monitoring: {" "}
-            {monitoring?.isMonitoring ? "yes" : "no"}
-            {" "}
+            Header: {site?.site?.name || "Unknown"} | Loading:{" "}
+            {display?.isLoading ? "yes" : "no"} | Monitoring:{" "}
+            {monitoring?.isMonitoring ? "yes" : "no"}{" "}
             <div data-testid="site-card-footer">Footer: Click to expand</div>
         </div>
     )),
@@ -86,7 +85,6 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardHistory", () => ({
         </div>
     )),
 }));
-
 
 describe("SiteCard Component - Complete Coverage", () => {
     const mockSite: Site = {

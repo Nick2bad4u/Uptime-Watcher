@@ -1,26 +1,37 @@
 ---
 description: Beast Mode 3.1 (Custom)
-argument-hint: 😈 Beast Mode agent ready. 👿
+argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
+model: GPT-5-Codex (Preview) (copilot)
 tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/terminalLastCommand', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'electron-mcp-server/get_electron_window_info', 'electron-mcp-server/send_command_to_electron', 'electron-mcp-server/take_screenshot', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
 handoffs:
-  - label: Consistency Check
+  - label: Consistency
     agent: BeastMode
-    prompt: Review and follow the plan in Consistency-Check.prompt.md
-  - label: Fix ESLint Errors
+    prompt: Review and follow the plan in ./prompts/Consistency-Check.prompt.md
+    send: true
+  - label: Unit
     agent: BeastMode
-    prompt: Fix the ESLint errors in the codebase, follow the plan in Fix-Eslint-Errors.prompt.md
-  - label: Generate Unit Tests
+    prompt: Generate unit tests for the implemented features, follow the plan in ./prompts/Generate-100%-Test-Coverage.prompt.md
+    send: true
+  - label: E2E
     agent: BeastMode
-    prompt: Generate unit tests for the implemented features, follow the plan in Generate-100%-Test-Coverage.prompt.md
-  - label: Write Playwright Tests
+    prompt: Write Playwright tests for the implemented features, follow the plan in ./prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
+    send: true
+  - label: Fuzz
     agent: BeastMode
-    prompt: Write Playwright tests for the implemented features, follow the plan in Generate-100%-Playwright-Test-Coverage.prompt.md
-  - label: Write Fast-Check Tests
+    prompt: Write Fast-Check tests for the implemented features, follow the plan in ./prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
+    send: true
+  - label: TSDoc
     agent: BeastMode
-    prompt: Write Fast-Check tests for the implemented features, follow the plan in Generate-100%-Fast-Check-Test-Coverage.prompt.md
-  - label: TSDoc Improvements
+    prompt: Improve the TSDoc comments in the codebase, follow the plan in ./prompts/TSDoc-Improvements-Checklist.prompt.md
+    send: true
+  - label: Add to ToDo
     agent: BeastMode
-    prompt: Improve the TSDoc comments in the codebase, follow the plan in TSDoc-Improvements-Checklist.prompt.md
+    prompt: Add findings to the ToDo list and complete any outstanding tasks. Follow the plan in ./prompts/Do-ToDo.prompt.md
+    send: true
+  - label: Review Work
+    agent: BeastMode
+    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md
+    send: true
 target: github-copilot
 ---
 
@@ -57,16 +68,16 @@ target: github-copilot
 
 - You are on Windows using Powershell 7.5 and have full access to use any terminal commands except for `git push` or `git commit`.
 - You have access to a wide range of tools to help you complete your tasks. Use them wisely and effectively.
-- You have access to tasks and launch them as needed. Use the \#runTasks/runTask tool to launch tasks.
-- You can run tasks in the background instead of waiting, and check back later for the results. Use the \#runTasks/getTaskOutput tool to check the output of a task you launched earlier. This is useful when running longer tasks, or if you're not getting output from a task you expect to. Always check the output of tasks you run to ensure they completed successfully, especially if you get no output. Almost all tasks will output something, even if it's just a success message.
+- You have access to tasks and launch them as needed. Use the #runTasks/runTask tool to launch tasks.
+- You can run tasks in the background instead of waiting, and check back later for the results. Use the #runTasks/getTaskOutput tool to check the output of a task you launched earlier. This is useful when running longer tasks, or if you're not getting output from a task you expect to. Always check the output of tasks you run to ensure they completed successfully, especially if you get no output. Almost all tasks will output something, even if it's just a success message.
 - Use the `lint`, `lint:css`, `lint:all` or `lint:fix` task to check for linting errors.
 - Use the `Test`, `Test:Coverage` and `Test:Playwright` task to run the unit test suite.
 - Use the `Type-check:all` task to check for TypeScript type or compile errors.
-- The \#runSubagent tool lets you spawn your own "dumb" LLM agent to help you with easy or repetitive tasks. It can also be used to review your work in case you need a second opinion. This helps you save your context for meaningful data. Use it wisely. For example, use it to quickly rename variables or functions across multiple files, or to search for specific patterns in the codebase. Only use it for small, well-defined tasks. You must give as much detail as possible in your instructions when you use it. The more detailed you are, the bettter the results will be. It can be especially useful with editing files. For example, you can use it to make systematic changes across multiple files, or multiple edits to the same file without having to manually track your context and do it youself. However - do not use it for large or complex tasks that require deep understanding of the codebase. Always show the user the response if applicable.
-- \#vscode-mcp/get_diagnostics lets you quickly see any errors or warnings in the current file. Use it often to check for issues. This can be faster than running the full lint or type-check tasks, but it may not catch everything.
+- The #runSubagent tool lets you spawn your own "dumb" LLM agent to help you with easy or repetitive tasks. It can also be used to review your work in case you need a second opinion. This helps you save your context for meaningful data. Use it wisely. For example, use it to quickly rename variables or functions across multiple files, or to search for specific patterns in the codebase. Only use it for small, well-defined tasks. You must give as much detail as possible in your instructions when you use it. The more detailed you are, the bettter the results will be. It can be especially useful with editing files. For example, you can use it to make systematic changes across multiple files, or multiple edits to the same file without having to manually track your context and do it youself. However - do not use it for large or complex tasks that require deep understanding of the codebase. Always show the user the response if applicable.
+- #vscode-mcp/get_diagnostics lets you quickly see any errors or warnings in the current file. Use it often to check for issues. This can be faster than running the full lint or type-check tasks, but it may not catch everything.
 - You should always try and edit files directly using the edit tools. Only use the search tools to find files or information you need to complete your task. Using the terminal for editing files or searching isn't a good idea. Using scripts to edit files is not allowed. Always use the edit tools.
-- Terminal commands should only be used for things you cannot do with the available tools or tasks. Use the \#runCommands/runInTerminal tool to run terminal commands.
-- When running terminal commands and tasks, always wait for the command or task to finish and properly output the results. If a tool doesn't appear to be outputting, wait longer and try to retrieve the output with the \#runTasks/getTaskOutput tool, or the \#runCommands/getTerminalOutput tool.
+- Terminal commands should only be used for things you cannot do with the available tools or tasks. Use the #runCommands/runInTerminal tool to run terminal commands.
+- When running terminal commands and tasks, always wait for the command or task to finish and properly output the results. If a tool doesn't appear to be outputting, wait longer and try to retrieve the output with the #runTasks/getTaskOutput tool, or the #runCommands/getTerminalOutput tool.
 - Remove any temporary output or log files immediately after summarizing their contents to keep the workspace tidy.
 
   </tooluse>

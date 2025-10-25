@@ -453,7 +453,10 @@ describe("Electron Preload Script", () => {
                     "Test Type: Unit - IPC Bridge Validation",
                     "test-type"
                 );
-                await annotate("Operation: Site-Wide Monitoring Start", "operation");
+                await annotate(
+                    "Operation: Site-Wide Monitoring Start",
+                    "operation"
+                );
                 await annotate(
                     "Priority: High - Selective Monitoring Control",
                     "priority"
@@ -539,7 +542,10 @@ describe("Electron Preload Script", () => {
                     "Test Type: Unit - IPC Bridge Validation",
                     "test-type"
                 );
-                await annotate("Operation: Site-Wide Monitoring Stop", "operation");
+                await annotate(
+                    "Operation: Site-Wide Monitoring Stop",
+                    "operation"
+                );
                 await annotate(
                     "Priority: High - Selective Monitoring Control",
                     "priority"
@@ -1228,9 +1234,7 @@ describe("Electron Preload Script", () => {
                 expect(systemAPI).toHaveProperty("quitAndInstall");
             });
 
-            it("should invoke IPC for quitAndInstall", async ({
-                annotate,
-            }) => {
+            it("should invoke IPC for quitAndInstall", async ({ annotate }) => {
                 await annotate("Component: System API", "component");
                 await annotate(
                     "Test Type: Unit - IPC Communication",

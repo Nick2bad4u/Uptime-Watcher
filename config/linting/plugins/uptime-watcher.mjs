@@ -17,7 +17,12 @@ import ts from "typescript";
  * Derived relative to this plugin module so the rules remain portable when the
  * workspace is relocated.
  */
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+const REPO_ROOT = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "..",
+    "..",
+    ".."
+);
 
 /**
  * Absolute path to the shared type source that defines canonical monitor types.
@@ -60,7 +65,7 @@ function normalizePath(filename) {
  * source.
  *
  * @returns {readonly string[]} Monitor type identifiers defined in shared
- * configuration.
+ *   configuration.
  */
 function loadBaseMonitorTypes() {
     const source = fs.readFileSync(SHARED_TYPES_PATH, "utf8");
@@ -88,7 +93,9 @@ function loadBaseMonitorTypes() {
                     declaration.name.text === "BASE_MONITOR_TYPES" &&
                     declaration.initializer
                 ) {
-                    const arrayExpression = extractArrayLiteral(declaration.initializer);
+                    const arrayExpression = extractArrayLiteral(
+                        declaration.initializer
+                    );
                     if (arrayExpression) {
                         values = arrayExpression.elements
                             .filter(ts.isStringLiteral)
@@ -105,7 +112,9 @@ function loadBaseMonitorTypes() {
     visit(sourceFile);
 
     if (!values) {
-        throw new Error("Failed to load BASE_MONITOR_TYPES from shared/types.ts");
+        throw new Error(
+            "Failed to load BASE_MONITOR_TYPES from shared/types.ts"
+        );
     }
 
     return values;
@@ -115,10 +124,10 @@ function loadBaseMonitorTypes() {
  * Extracts an array literal from a potential TypeScript assertion wrapper.
  *
  * @param {ts.Expression} expression - Expression that may represent an array
- * literal or an assertion wrapping an array literal.
+ *   literal or an assertion wrapping an array literal.
  *
  * @returns {ts.ArrayLiteralExpression | null} Unwrapped array literal if one is
- * present.
+ *   present.
  */
 function extractArrayLiteral(expression) {
     if (ts.isArrayLiteralExpression(expression)) {
@@ -129,7 +138,10 @@ function extractArrayLiteral(expression) {
         return extractArrayLiteral(expression.expression);
     }
 
-    if (typeof ts.isSatisfiesExpression === "function" && ts.isSatisfiesExpression(expression)) {
+    if (
+        typeof ts.isSatisfiesExpression === "function" &&
+        ts.isSatisfiesExpression(expression)
+    ) {
         return extractArrayLiteral(expression.expression);
     }
 
@@ -144,11 +156,16 @@ function extractArrayLiteral(expression) {
  * Retrieves an ArrayExpression node from an ESTree initializer, unwrapping
  * TypeScript-specific wrappers like `as const`.
  *
- * @param {import("@typescript-eslint/utils").TSESTree.Expression | null | undefined} initializer -
+ * @param {import("@typescript-eslint/utils").TSESTree.Expression
+ *     | null
+ *     | undefined} initializer
+ *   -
+ *
  *   Initializer node from a variable declaration.
  *
- * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression | null} Array expression when
- * found.
+ * @returns {import("@typescript-eslint/utils").TSESTree.ArrayExpression
+ *     | null}
+ *   Array expression when found.
  */
 function getArrayExpression(initializer) {
     if (!initializer) {
@@ -173,12 +190,16 @@ function getArrayExpression(initializer) {
 /**
  * Extracts the string literal value from an object property.
  *
- * @param {import("@typescript-eslint/utils").TSESTree.Property} property - Object property node.
+ * @param {import("@typescript-eslint/utils").TSESTree.Property} property -
+ *   Object property node.
  *
  * @returns {string | null} String literal value when present.
  */
 function getPropertyStringValue(property) {
-    if (property.value.type === "Literal" && typeof property.value.value === "string") {
+    if (
+        property.value.type === "Literal" &&
+        typeof property.value.value === "string"
+    ) {
         return property.value.value;
     }
 
@@ -205,17 +226,17 @@ const monitorFallbackConsistencyRule = {
         },
         messages: {
             duplicateMonitorType:
-                "Monitor type \"{{type}}\" appears multiple times in FALLBACK_MONITOR_TYPE_OPTIONS.",
+                'Monitor type "{{type}}" appears multiple times in FALLBACK_MONITOR_TYPE_OPTIONS.',
             missingMonitorType:
                 "Monitor type(s) missing from FALLBACK_MONITOR_TYPE_OPTIONS: {{types}}.",
             missingValueProperty:
-                "Each fallback monitor option must declare a literal \"value\" property.",
+                'Each fallback monitor option must declare a literal "value" property.',
             unknownMonitorType:
-                "Monitor type \"{{type}}\" is not defined in shared BASE_MONITOR_TYPES.",
+                'Monitor type "{{type}}" is not defined in shared BASE_MONITOR_TYPES.',
             unsortedMonitorType:
-                "Monitor type \"{{type}}\" is out of order. Align fallback options with BASE_MONITOR_TYPES order.",
+                'Monitor type "{{type}}" is out of order. Align fallback options with BASE_MONITOR_TYPES order.',
             valueShouldBeLiteral:
-                "Fallback monitor option \"value\" must be a string literal for static analysis.",
+                'Fallback monitor option "value" must be a string literal for static analysis.',
         },
         schema: [],
         type: "problem",
@@ -243,7 +264,10 @@ const monitorFallbackConsistencyRule = {
                     return;
                 }
 
-                /** @type {Map<string, import("@typescript-eslint/utils").TSESTree.ObjectExpression>} */
+                /** @type {Map<
+    string,
+    import("@typescript-eslint/utils").TSESTree.ObjectExpression
+>} */
                 const optionMap = new Map();
                 const reportedNodes = new Set();
 
@@ -273,7 +297,8 @@ const monitorFallbackConsistencyRule = {
                         return;
                     }
 
-                    const monitorTypeValue = getPropertyStringValue(valueProperty);
+                    const monitorTypeValue =
+                        getPropertyStringValue(valueProperty);
                     if (!monitorTypeValue) {
                         if (!reportedNodes.has(valueProperty)) {
                             reportedNodes.add(valueProperty);
@@ -341,7 +366,8 @@ const monitorFallbackConsistencyRule = {
 const electronNoConsoleRule = {
     meta: {
         docs: {
-            description: "Require structured logger usage instead of console in electron runtime code",
+            description:
+                "Require structured logger usage instead of console in electron runtime code",
             recommended: false,
         },
         messages: {
@@ -383,7 +409,8 @@ const electronNoConsoleRule = {
 };
 
 /**
- * ESLint rule preventing renderer bundles from importing the Electron runtime directly.
+ * ESLint rule preventing renderer bundles from importing the Electron runtime
+ * directly.
  */
 const rendererNoElectronImportRule = {
     meta: {
@@ -414,10 +441,13 @@ const rendererNoElectronImportRule = {
         const importerDirectory = path.dirname(rawFilename);
 
         /**
-         * Determines whether the provided module specifier references Electron directly.
+         * Determines whether the provided module specifier references Electron
+         * directly.
          *
          * @param {string} moduleName - Module specifier under evaluation.
-         * @returns {boolean} True when the specifier targets the Electron runtime package.
+         *
+         * @returns {boolean} True when the specifier targets the Electron
+         *   runtime package.
          */
         function isDirectElectronModule(moduleName) {
             if (moduleName === "electron" || moduleName === "node:electron") {
@@ -432,17 +462,23 @@ const rendererNoElectronImportRule = {
         }
 
         /**
-         * Checks if a relative specifier resolves into the Electron backend directory.
+         * Checks if a relative specifier resolves into the Electron backend
+         * directory.
          *
-         * @param {string} moduleName - Module specifier from an import or require call.
-         * @returns {boolean} True when the resolved path lives inside the electron source tree.
+         * @param {string} moduleName - Module specifier from an import or
+         *   require call.
+         *
+         * @returns {boolean} True when the resolved path lives inside the
+         *   electron source tree.
          */
         function resolvesToElectronDirectory(moduleName) {
             if (!moduleName.startsWith(".")) {
                 return false;
             }
 
-            const resolved = normalizePath(path.resolve(importerDirectory, moduleName));
+            const resolved = normalizePath(
+                path.resolve(importerDirectory, moduleName)
+            );
             return (
                 resolved === NORMALIZED_ELECTRON_DIR ||
                 resolved.startsWith(`${NORMALIZED_ELECTRON_DIR}/`)
@@ -452,8 +488,10 @@ const rendererNoElectronImportRule = {
         /**
          * Reports an invalid Electron dependency usage.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST node to highlight.
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
+         *   node to highlight.
          * @param {string} moduleName - Name of the offending module specifier.
+         *
          * @returns {void}
          */
         function reportViolation(node, moduleName) {
@@ -465,10 +503,13 @@ const rendererNoElectronImportRule = {
         }
 
         /**
-         * Evaluates a static module specifier and raises a lint violation when it references Electron.
+         * Evaluates a static module specifier and raises a lint violation when
+         * it references Electron.
          *
-         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node owning the literal specifier.
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
+         *   owning the literal specifier.
          * @param {string} moduleName - Literal module specifier value.
+         *
          * @returns {void}
          */
         function handleStaticSpecifier(node, moduleName) {
@@ -482,12 +523,18 @@ const rendererNoElectronImportRule = {
 
         return {
             ImportDeclaration(node) {
-                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
             ImportExpression(node) {
-                if (node.source.type === "Literal" && typeof node.source.value === "string") {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
                     handleStaticSpecifier(node.source, node.source.value);
                 }
             },
@@ -502,7 +549,10 @@ const rendererNoElectronImportRule = {
                         firstArgument?.type === "Literal" &&
                         typeof firstArgument.value === "string"
                     ) {
-                        handleStaticSpecifier(firstArgument, firstArgument.value);
+                        handleStaticSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
                     }
                 }
             },
@@ -516,11 +566,13 @@ const rendererNoElectronImportRule = {
 const tsdocNoConsoleExampleRule = {
     meta: {
         docs: {
-            description: "Disallow console.* in TSDoc example code blocks; prefer structured logger",
+            description:
+                "Disallow console.* in TSDoc example code blocks; prefer structured logger",
             recommended: false,
         },
         messages: {
-            replaceConsole: "Replace console usage in examples with the structured logger.",
+            replaceConsole:
+                "Replace console usage in examples with the structured logger.",
         },
         schema: [],
         type: "suggestion",
@@ -532,7 +584,10 @@ const tsdocNoConsoleExampleRule = {
             Program() {
                 const comments = sourceCode.getAllComments();
                 for (const comment of comments) {
-                    if (comment.type !== "Block" || !comment.value.startsWith("*")) {
+                    if (
+                        comment.type !== "Block" ||
+                        !comment.value.startsWith("*")
+                    ) {
                         continue;
                     }
 
@@ -540,7 +595,9 @@ const tsdocNoConsoleExampleRule = {
                     const consolePattern = /console\.[a-zA-Z]+/u;
                     let match;
 
-                    while ((match = examplePattern.exec(comment.value)) !== null) {
+                    while (
+                        (match = examplePattern.exec(comment.value)) !== null
+                    ) {
                         if (!consolePattern.test(match[0])) {
                             continue;
                         }
@@ -549,7 +606,9 @@ const tsdocNoConsoleExampleRule = {
                         const loc = sourceCode.getLocFromIndex(reportIndex);
                         context.report({
                             loc: {
-                                end: sourceCode.getLocFromIndex(reportIndex + match[0].length),
+                                end: sourceCode.getLocFromIndex(
+                                    reportIndex + match[0].length
+                                ),
                                 start: loc,
                             },
                             messageId: "replaceConsole",
@@ -567,12 +626,14 @@ const tsdocNoConsoleExampleRule = {
 const preferSharedAliasRule = {
     meta: {
         docs: {
-            description: "Enforce @shared/* import aliases instead of relative shared paths",
+            description:
+                "Enforce @shared/* import aliases instead of relative shared paths",
             recommended: false,
         },
         fixable: "code",
         messages: {
-            useAlias: "Import from shared modules via the @shared alias instead of relative paths.",
+            useAlias:
+                "Import from shared modules via the @shared alias instead of relative paths.",
         },
         schema: [],
         type: "suggestion",
@@ -581,7 +642,10 @@ const preferSharedAliasRule = {
         const filename = context.getFilename();
         const normalizedFilename = normalizePath(filename);
 
-        if (normalizedFilename === "<input>" || normalizedFilename.includes("/shared/")) {
+        if (
+            normalizedFilename === "<input>" ||
+            normalizedFilename.includes("/shared/")
+        ) {
             return {};
         }
 
@@ -589,7 +653,10 @@ const preferSharedAliasRule = {
 
         return {
             ImportDeclaration(node) {
-                if (node.source.type !== "Literal" || typeof node.source.value !== "string") {
+                if (
+                    node.source.type !== "Literal" ||
+                    typeof node.source.value !== "string"
+                ) {
                     return;
                 }
 
@@ -598,14 +665,22 @@ const preferSharedAliasRule = {
                     return;
                 }
 
-                const importAbsolutePath = path.resolve(importerDirectory, importPath);
-                const normalizedImportAbsolute = normalizePath(importAbsolutePath);
+                const importAbsolutePath = path.resolve(
+                    importerDirectory,
+                    importPath
+                );
+                const normalizedImportAbsolute =
+                    normalizePath(importAbsolutePath);
 
                 if (normalizedImportAbsolute === NORMALIZED_SHARED_DIR) {
                     return;
                 }
 
-                if (!normalizedImportAbsolute.startsWith(`${NORMALIZED_SHARED_DIR}/`)) {
+                if (
+                    !normalizedImportAbsolute.startsWith(
+                        `${NORMALIZED_SHARED_DIR}/`
+                    )
+                ) {
                     return;
                 }
 
@@ -627,7 +702,10 @@ const preferSharedAliasRule = {
 
                 context.report({
                     fix(fixer) {
-                        return fixer.replaceText(node.source, `${quote}${aliasPath}${quote}`);
+                        return fixer.replaceText(
+                            node.source,
+                            `${quote}${aliasPath}${quote}`
+                        );
                     },
                     messageId: "useAlias",
                     node: node.source,
@@ -638,17 +716,20 @@ const preferSharedAliasRule = {
 };
 
 /**
- * ESLint rule ensuring files outside of src reference renderer modules via the @app alias.
+ * ESLint rule ensuring files outside of src reference renderer modules via the
+ * @app alias.
  */
 const preferAppAliasRule = {
     meta: {
         docs: {
-            description: "Use the @app alias instead of relative paths into src from external packages",
+            description:
+                "Use the @app alias instead of relative paths into src from external packages",
             recommended: false,
         },
         fixable: "code",
         messages: {
-            useAlias: "Import from src via the @app alias instead of relative paths.",
+            useAlias:
+                "Import from src via the @app alias instead of relative paths.",
         },
         schema: [],
         type: "suggestion",
@@ -668,7 +749,10 @@ const preferAppAliasRule = {
 
         return {
             ImportDeclaration(node) {
-                if (node.source.type !== "Literal" || typeof node.source.value !== "string") {
+                if (
+                    node.source.type !== "Literal" ||
+                    typeof node.source.value !== "string"
+                ) {
                     return;
                 }
 
@@ -677,12 +761,18 @@ const preferAppAliasRule = {
                     return;
                 }
 
-                const importAbsolutePath = path.resolve(importerDirectory, importPath);
-                const normalizedImportAbsolute = normalizePath(importAbsolutePath);
+                const importAbsolutePath = path.resolve(
+                    importerDirectory,
+                    importPath
+                );
+                const normalizedImportAbsolute =
+                    normalizePath(importAbsolutePath);
 
                 if (
                     normalizedImportAbsolute !== NORMALIZED_SRC_DIR &&
-                    !normalizedImportAbsolute.startsWith(`${NORMALIZED_SRC_DIR}/`)
+                    !normalizedImportAbsolute.startsWith(
+                        `${NORMALIZED_SRC_DIR}/`
+                    )
                 ) {
                     return;
                 }
@@ -700,7 +790,8 @@ const preferAppAliasRule = {
                     ""
                 );
                 const cleanedSuffix = aliasSuffix.replace(/^\.\/?/u, "");
-                const aliasPath = cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app";
+                const aliasPath =
+                    cleanedSuffix.length > 0 ? `@app/${cleanedSuffix}` : "@app";
                 const rawSource = node.source.raw ?? node.source.extra?.raw;
                 const quote = rawSource?.startsWith("'") ? "'" : '"';
 

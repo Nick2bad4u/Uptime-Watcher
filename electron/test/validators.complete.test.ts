@@ -365,18 +365,18 @@ describe("IPC Validators - Exported Validator Groups", () => {
             expect(
                 typeof MonitoringHandlerValidators.startMonitoringForMonitor
             ).toBe("function");
-            expect(typeof MonitoringHandlerValidators.startMonitoringForSite).toBe(
-                "function"
-            );
+            expect(
+                typeof MonitoringHandlerValidators.startMonitoringForSite
+            ).toBe("function");
             expect(typeof MonitoringHandlerValidators.stopMonitoring).toBe(
                 "function"
             );
             expect(
                 typeof MonitoringHandlerValidators.stopMonitoringForMonitor
             ).toBe("function");
-            expect(typeof MonitoringHandlerValidators.stopMonitoringForSite).toBe(
-                "function"
-            );
+            expect(
+                typeof MonitoringHandlerValidators.stopMonitoringForSite
+            ).toBe("function");
         });
 
         describe("checkSiteNow validator", () => {

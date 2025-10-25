@@ -11,11 +11,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import type {
-    SiteStatus,
-    MonitorStatus,
-    SiteForStatus,
-} from "@shared/types";
+import type { SiteStatus, MonitorStatus, SiteForStatus } from "@shared/types";
 /**
  * Site Status Utility Tests
  *

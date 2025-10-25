@@ -20,10 +20,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
 import { z } from "zod";
-import type {
-    MonitorFieldDefinition,
-    MonitorType,
-} from "@shared/types";
+import type { MonitorFieldDefinition, MonitorType } from "@shared/types";
 import type { IMonitorService } from "../../services/monitoring/types";
 import {
     getMonitorTypeConfig,

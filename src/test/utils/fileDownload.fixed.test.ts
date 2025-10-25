@@ -58,20 +58,22 @@ describe("File Download Utility - Fixed Coverage Tests", () => {
         } as any;
 
         // Mock Blob constructor with a newable factory to satisfy `new Blob()` usage
-        globalThis.Blob = vi
-            .fn(function MockBlob(parts: unknown[], options?: BlobPropertyBag) {
-                return {
-                    parts,
-                    options,
-                    type: options?.type ?? "",
-                    size: 100,
-                } satisfies {
-                    parts: unknown[];
-                    options: BlobPropertyBag | undefined;
-                    type: string;
-                    size: number;
-                };
-            }) as unknown as typeof Blob;
+        globalThis.Blob = vi.fn(function MockBlob(
+            parts: unknown[],
+            options?: BlobPropertyBag
+        ) {
+            return {
+                parts,
+                options,
+                type: options?.type ?? "",
+                size: 100,
+            } satisfies {
+                parts: unknown[];
+                options: BlobPropertyBag | undefined;
+                type: string;
+                size: number;
+            };
+        }) as unknown as typeof Blob;
     });
 
     afterEach(() => {
