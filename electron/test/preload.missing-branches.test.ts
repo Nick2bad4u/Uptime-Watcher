@@ -110,10 +110,22 @@ describe("preload.ts - Missing Branch Coverage", () => {
                 exposedAPI.monitoring.stopMonitoring()
             ).rejects.toThrow("Monitoring failed");
             await expect(
-                exposedAPI.monitoring.startMonitoringForSite("test", "monitor1")
+                exposedAPI.monitoring.startMonitoringForSite("test")
             ).rejects.toThrow("Monitoring failed");
             await expect(
-                exposedAPI.monitoring.stopMonitoringForSite("test", "monitor1")
+                exposedAPI.monitoring.stopMonitoringForSite("test")
+            ).rejects.toThrow("Monitoring failed");
+            await expect(
+                exposedAPI.monitoring.startMonitoringForMonitor(
+                    "test",
+                    "monitor1"
+                )
+            ).rejects.toThrow("Monitoring failed");
+            await expect(
+                exposedAPI.monitoring.stopMonitoringForMonitor(
+                    "test",
+                    "monitor1"
+                )
             ).rejects.toThrow("Monitoring failed");
         });
         it("should handle invoke errors in data API", async () => {
@@ -183,10 +195,16 @@ describe("preload.ts - Missing Branch Coverage", () => {
             // Test with empty string parameters
             await expect(exposedAPI.sites.removeSite("")).resolves.toBeTruthy();
             await expect(
-                exposedAPI.monitoring.startMonitoringForSite("", "")
+                exposedAPI.monitoring.startMonitoringForSite("")
             ).resolves.toBeTruthy();
             await expect(
-                exposedAPI.monitoring.stopMonitoringForSite("", "")
+                exposedAPI.monitoring.stopMonitoringForSite("")
+            ).resolves.toBeTruthy();
+            await expect(
+                exposedAPI.monitoring.startMonitoringForMonitor("", "")
+            ).resolves.toBeTruthy();
+            await expect(
+                exposedAPI.monitoring.stopMonitoringForMonitor("", "")
             ).resolves.toBeTruthy();
         });
         it("should handle invalid numeric parameters", async () => {

@@ -554,10 +554,14 @@ describe("Comprehensive Validation Function Fuzzing", () => {
                             hasDisallowedAdditionalScheme = true;
                         }
                     }
+                    const endsWithSchemeSeparator =
+                        schemeSeparatorIndex !== -1 &&
+                        validUrl.endsWith("://");
 
                     if (
                         containsDisallowedCharacters ||
-                        hasDisallowedAdditionalScheme
+                        hasDisallowedAdditionalScheme ||
+                        endsWithSchemeSeparator
                     ) {
                         expect(result).toBeFalsy();
                     } else {

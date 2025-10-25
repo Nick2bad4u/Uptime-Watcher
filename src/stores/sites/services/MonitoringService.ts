@@ -17,13 +17,19 @@
  *
  * ```typescript
  * // Start monitoring for a specific monitor
- * await MonitoringService.startMonitoring("site-123", "monitor-456");
+ * await MonitoringService.startMonitoringForMonitor(
+ *     "site-123",
+ *     "monitor-456"
+ * );
  *
  * // Start monitoring for all monitors of a site
- * await MonitoringService.startSiteMonitoring("site-123");
+ * await MonitoringService.startMonitoringForSite("site-123");
  *
  * // Stop specific monitor
- * await MonitoringService.stopMonitoring("site-123", "monitor-456");
+ * await MonitoringService.stopMonitoringForMonitor(
+ *     "site-123",
+ *     "monitor-456"
+ * );
  * ```
  *
  * @public
@@ -51,16 +57,18 @@ interface MonitoringServiceContract {
         monitorId: string
     ) => Promise<StatusUpdate | undefined>;
     initialize: () => Promise<void>;
-    startMonitoring: (
+    startMonitoring: () => Promise<void>;
+    startMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
-    startSiteMonitoring: (siteIdentifier: string) => Promise<void>;
-    stopMonitoring: (
+    startMonitoringForSite: (siteIdentifier: string) => Promise<void>;
+    stopMonitoring: () => Promise<void>;
+    stopMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
-    stopSiteMonitoring: (siteIdentifier: string) => Promise<void>;
+    stopMonitoringForSite: (siteIdentifier: string) => Promise<void>;
 }
 
 /**
@@ -98,30 +106,37 @@ export const MonitoringService: MonitoringServiceContract = {
      */
     initialize: ensureInitialized,
     /**
-     * Start monitoring for a specific monitor
+     * Starts monitoring across all configured sites.
      *
-     * @example
-     *
-     * ```typescript
-     * await MonitoringService.startMonitoring("site-123", "monitor-456");
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site containing the monitor
-     * @param monitorId - The identifier of the specific monitor to start
-     *
-     * @throws Error if the electron API is unavailable or the operation fails
+     * @throws Error when the backend declines to start global monitoring.
      */
-    startMonitoring: wrap(
-        "startMonitoring",
+    startMonitoring: wrap("startMonitoring", async (api): Promise<void> => {
+        const success = await api.monitoring.startMonitoring();
+
+        if (!success) {
+            throw new Error("Failed to start monitoring across all sites");
+        }
+    }),
+    /**
+     * Starts monitoring for a single monitor within a site.
+     *
+     * @param siteIdentifier - Site that owns the monitor.
+     * @param monitorId - Monitor identifier to start.
+     *
+     * @throws Error when the backend reports failure for the targeted monitor.
+     */
+    startMonitoringForMonitor: wrap(
+        "startMonitoringForMonitor",
         async (
             api,
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const success = await api.monitoring.startMonitoringForSite(
+            const success = await api.monitoring.startMonitoringForMonitor(
                 siteIdentifier,
                 monitorId
             );
+
             if (!success) {
                 throw new Error(
                     `Failed to start monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
@@ -130,29 +145,19 @@ export const MonitoringService: MonitoringServiceContract = {
         }
     ),
     /**
-     * Start monitoring for all monitors of a site
+     * Starts monitoring for every monitor within the specified site.
      *
-     * @remarks
-     * This method starts monitoring for all monitors associated with the
-     * specified site. It calls the same backend API as startMonitoring but
-     * without the monitorId parameter, which signals the backend to start all
-     * monitors for the site.
+     * @param siteIdentifier - Identifier of the site whose monitors should
+     *   begin monitoring.
      *
-     * @example
-     *
-     * ```typescript
-     * await MonitoringService.startSiteMonitoring("site-123");
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site to start monitoring
-     *
-     * @throws Error if the electron API is unavailable or the operation fails
+     * @throws Error when the backend declines the request.
      */
-    startSiteMonitoring: wrap(
-        "startSiteMonitoring",
+    startMonitoringForSite: wrap(
+        "startMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
             const success =
                 await api.monitoring.startMonitoringForSite(siteIdentifier);
+
             if (!success) {
                 throw new Error(
                     `Failed to start monitoring for site ${siteIdentifier}: Backend operation failed`
@@ -161,30 +166,37 @@ export const MonitoringService: MonitoringServiceContract = {
         }
     ),
     /**
-     * Stop monitoring for a specific monitor
+     * Stops monitoring across all configured sites.
      *
-     * @example
-     *
-     * ```typescript
-     * await MonitoringService.stopMonitoring("site-123", "monitor-456");
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site containing the monitor
-     * @param monitorId - The identifier of the specific monitor to stop
-     *
-     * @throws Error if the electron API is unavailable or the operation fails
+     * @throws Error when the backend declines to stop global monitoring.
      */
-    stopMonitoring: wrap(
-        "stopMonitoring",
+    stopMonitoring: wrap("stopMonitoring", async (api): Promise<void> => {
+        const success = await api.monitoring.stopMonitoring();
+
+        if (!success) {
+            throw new Error("Failed to stop monitoring across all sites");
+        }
+    }),
+    /**
+     * Stops monitoring for a specific monitor within a site.
+     *
+     * @param siteIdentifier - Site that owns the monitor.
+     * @param monitorId - Monitor identifier to stop.
+     *
+     * @throws Error when the backend reports failure for the targeted monitor.
+     */
+    stopMonitoringForMonitor: wrap(
+        "stopMonitoringForMonitor",
         async (
             api,
             siteIdentifier: string,
             monitorId: string
         ): Promise<void> => {
-            const success = await api.monitoring.stopMonitoringForSite(
+            const success = await api.monitoring.stopMonitoringForMonitor(
                 siteIdentifier,
                 monitorId
             );
+
             if (!success) {
                 throw new Error(
                     `Failed to stop monitoring for monitor ${monitorId} of site ${siteIdentifier}: Backend operation failed`
@@ -193,29 +205,19 @@ export const MonitoringService: MonitoringServiceContract = {
         }
     ),
     /**
-     * Stop monitoring for all monitors of a site
+     * Stops monitoring for every monitor belonging to the specified site.
      *
-     * @remarks
-     * This method stops monitoring for all monitors associated with the
-     * specified site. It calls the same backend API as stopMonitoring but
-     * without the monitorId parameter, which signals the backend to stop all
-     * monitors for the site.
+     * @param siteIdentifier - Identifier of the site whose monitors should stop
+     *   monitoring.
      *
-     * @example
-     *
-     * ```typescript
-     * await MonitoringService.stopSiteMonitoring("site-123");
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site to stop monitoring
-     *
-     * @throws Error if the electron API is unavailable or the operation fails
+     * @throws Error when the backend declines the request.
      */
-    stopSiteMonitoring: wrap(
-        "stopSiteMonitoring",
+    stopMonitoringForSite: wrap(
+        "stopMonitoringForSite",
         async (api, siteIdentifier: string): Promise<void> => {
             const success =
                 await api.monitoring.stopMonitoringForSite(siteIdentifier);
+
             if (!success) {
                 throw new Error(
                     `Failed to stop monitoring for site ${siteIdentifier}: Backend operation failed`

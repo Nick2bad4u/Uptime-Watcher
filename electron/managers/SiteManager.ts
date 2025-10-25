@@ -535,6 +535,7 @@ export class SiteManager {
             const timestamp = Date.now();
 
             await this.eventEmitter.emitTyped("internal:site:removed", {
+                cascade: false,
                 identifier,
                 operation: "removed",
                 ...(sanitizedRemovedSite ? { site: sanitizedRemovedSite } : {}),
@@ -612,6 +613,7 @@ export class SiteManager {
         for (const site of eventSites) {
             /* eslint-disable no-await-in-loop -- Sequential event emission required for consistency */
             await this.eventEmitter.emitTyped("internal:site:removed", {
+                cascade: true,
                 identifier: site.identifier,
                 operation: "removed",
                 site: structuredClone(site),

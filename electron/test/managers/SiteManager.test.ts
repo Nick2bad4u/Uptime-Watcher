@@ -390,6 +390,7 @@ describe(SiteManager, () => {
             ).toHaveBeenCalledWith(
                 "internal:site:removed",
                 expect.objectContaining({
+                    cascade: false,
                     identifier: "site1",
                     operation: "removed",
                 })

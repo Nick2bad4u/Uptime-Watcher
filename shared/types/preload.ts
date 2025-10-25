@@ -91,8 +91,10 @@ interface MonitoringChannelMap {
     readonly formatMonitorDetail: "format-monitor-detail";
     readonly formatMonitorTitleSuffix: "format-monitor-title-suffix";
     readonly startMonitoring: "start-monitoring";
+    readonly startMonitoringForMonitor: "start-monitoring-for-monitor";
     readonly startMonitoringForSite: "start-monitoring-for-site";
     readonly stopMonitoring: "stop-monitoring";
+    readonly stopMonitoringForMonitor: "stop-monitoring-for-monitor";
     readonly stopMonitoringForSite: "stop-monitoring-for-site";
     readonly validateMonitorData: "validate-monitor-data";
 }
@@ -102,8 +104,10 @@ const MONITORING_CHANNELS_DEFINITION: MonitoringChannelMap = {
     formatMonitorDetail: "format-monitor-detail",
     formatMonitorTitleSuffix: "format-monitor-title-suffix",
     startMonitoring: "start-monitoring",
+    startMonitoringForMonitor: "start-monitoring-for-monitor",
     startMonitoringForSite: "start-monitoring-for-site",
     stopMonitoring: "stop-monitoring",
+    stopMonitoringForMonitor: "stop-monitoring-for-monitor",
     stopMonitoringForSite: "stop-monitoring-for-site",
     validateMonitorData: "validate-monitor-data",
 };
@@ -268,10 +272,12 @@ export type StateSyncApiSurface = StateSyncDomainBridge & {
  */
 interface SystemChannelMap {
     readonly openExternal: "open-external";
+    readonly quitAndInstall: "quit-and-install";
 }
 
 const SYSTEM_CHANNELS_DEFINITION: SystemChannelMap = {
     openExternal: "open-external",
+    quitAndInstall: "quit-and-install",
 };
 
 /**

@@ -12,18 +12,7 @@ import type {
     SystemDomainBridge,
 } from "@shared/types/preload";
 
-/**
- * Renderer-specific augmentation of the shared system domain bridge surface.
- *
- * @remarks
- * Extends the preload-provided {@link SystemDomainBridge} with renderer-only
- * helpers such as `quitAndInstall` that are wired through the preload script.
- *
- * @internal
- */
-type RendererSystemApi = SystemDomainBridge & {
-    readonly quitAndInstall: () => void;
-};
+type RendererSystemApi = SystemDomainBridge;
 
 declare global {
     interface Window {

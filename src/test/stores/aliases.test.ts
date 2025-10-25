@@ -99,7 +99,7 @@ const mockElectronAPI = {
         validateSite: vi.fn().mockResolvedValue({ isValid: true }),
     },
     system: {
-        quitAndInstall: vi.fn(),
+        quitAndInstall: vi.fn().mockResolvedValue(true),
     },
 };
 

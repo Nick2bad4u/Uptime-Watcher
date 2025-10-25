@@ -266,9 +266,11 @@ const mockElectronAPI: {
         removeMonitor: AnyMock;
         startMonitor: AnyMock;
         startMonitoring: AnyMock;
+        startMonitoringForMonitor: AnyMock;
         startMonitoringForSite: AnyMock;
         stopMonitor: AnyMock;
         stopMonitoring: AnyMock;
+        stopMonitoringForMonitor: AnyMock;
         stopMonitoringForSite: AnyMock;
         validateMonitorConfig: AnyMock;
         formatHttpStatus: AnyMock;
@@ -370,9 +372,11 @@ const mockElectronAPI: {
         }),
         startMonitor: vi.fn().mockResolvedValue(true),
         startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
         validateMonitorConfig: vi.fn().mockReturnValue(true),
         formatHttpStatus: vi.fn().mockReturnValue("up"),
@@ -477,7 +481,7 @@ const mockElectronAPI: {
     },
     system: {
         openExternal: vi.fn().mockResolvedValue(true),
-        quitAndInstall: vi.fn(),
+        quitAndInstall: vi.fn().mockResolvedValue(true),
     },
 };
 

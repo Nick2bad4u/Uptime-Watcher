@@ -190,7 +190,6 @@ describe(IpcService, () => {
             // Use dynamic count since the number may change as handlers are added/removed
             const handleCallCount = mockIpcMain.handle.mock.calls.length;
             expect(handleCallCount).toBeGreaterThan(20); // Ensure reasonable number of handlers
-            expect(mockIpcMain.on).toHaveBeenCalled();
         });
         it("should setup site handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -292,6 +291,10 @@ describe(IpcService, () => {
             );
             expect(handleCalls).toContain("start-monitoring");
             expect(handleCalls).toContain("stop-monitoring");
+            expect(handleCalls).toContain("start-monitoring-for-site");
+            expect(handleCalls).toContain("start-monitoring-for-monitor");
+            expect(handleCalls).toContain("stop-monitoring-for-site");
+            expect(handleCalls).toContain("stop-monitoring-for-monitor");
             expect(handleCalls).toContain("check-site-now");
         });
         it("should setup monitor type handlers", async ({ task, annotate }) => {
@@ -326,10 +329,10 @@ describe(IpcService, () => {
 
             ipcService.setupHandlers();
 
-            // System handlers only use ipcMain.on, not ipcMain.handle
-            // Check for quit-and-install listener
-            const onCalls = mockIpcMain.on.mock.calls.map((call) => call[0]);
-            expect(onCalls).toContain("quit-and-install");
+            const handleCalls = mockIpcMain.handle.mock.calls.map(
+                (call) => call[0]
+            );
+            expect(handleCalls).toContain("quit-and-install");
         });
         it("should setup state sync handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -354,20 +357,18 @@ describe(IpcService, () => {
 
             ipcService.setupHandlers();
 
-            // Get the number of handlers that were registered
-            // Count both handle() calls and on() calls since both create handlers that need cleanup
-            const handleCallCount = mockIpcMain.handle.mock.calls.length;
-            const onCallCount = mockIpcMain.on.mock.calls.length;
-            const registeredHandlerCount = handleCallCount + onCallCount;
+            // Get the number of handlers that were registered via ipcMain.handle
+            const registeredHandlerCount = mockIpcMain.handle.mock.calls.length;
 
             ipcService.cleanup();
 
             expect(mockIpcMain.removeHandler).toHaveBeenCalledTimes(
                 registeredHandlerCount
             );
-            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
+            expect(mockIpcMain.removeHandler).toHaveBeenCalledWith(
                 "quit-and-install"
             );
+            expect(mockIpcMain.removeAllListeners).not.toHaveBeenCalled();
         });
         it("should handle cleanup when no handlers are registered", async ({
             task,
@@ -378,9 +379,8 @@ describe(IpcService, () => {
 
             ipcService.cleanup();
 
-            expect(mockIpcMain.removeAllListeners).toHaveBeenCalledWith(
-                "quit-and-install"
-            );
+            expect(mockIpcMain.removeHandler).not.toHaveBeenCalled();
+            expect(mockIpcMain.removeAllListeners).not.toHaveBeenCalled();
         });
     });
     describe("serializeMonitorTypeConfig", () => {
@@ -546,24 +546,31 @@ describe(IpcService, () => {
                 expect.fail("Handler not found for validate-monitor-data");
             }
         });
-        it("should handle quit-and-install listener", async ({
+        it("should handle quit-and-install handler", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: IpcService", "component");
 
-            const quitAndInstallListener = mockIpcMain.on.mock.calls.find(
+            const quitAndInstallHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === "quit-and-install"
             )?.[1];
 
-            expect(quitAndInstallListener).toBeDefined();
+            expect(quitAndInstallHandler).toBeDefined();
 
-            if (quitAndInstallListener) {
-                quitAndInstallListener();
+            if (quitAndInstallHandler) {
+                const result = await quitAndInstallHandler();
                 expect(
                     mockAutoUpdaterService.quitAndInstall
                 ).toHaveBeenCalled();
+                expect(result).toEqual({
+                    success: true,
+                    data: true,
+                    metadata: expect.objectContaining({
+                        handler: "quit-and-install",
+                    }),
+                });
             }
         });
         it("should handle state:get-history-limit requests", async () => {

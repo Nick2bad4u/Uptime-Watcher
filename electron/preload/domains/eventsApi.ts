@@ -44,6 +44,7 @@ import {
     SITE_ADDED_SOURCES,
     UPDATE_STATUS_VALUES,
 } from "@shared/types/events";
+import { validateSiteSnapshot } from "@shared/validation/guards";
 import {
     isEnrichedMonitorStatusChangedEventData,
     isMonitorStatusChangedEventData,
@@ -108,28 +109,6 @@ const isUpdateStatus = (value: unknown): value is UpdateStatus =>
 
 const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
-
-const isSiteCandidate = (value: unknown): value is Record<string, unknown> => {
-    if (!isUnknownRecord(value)) {
-        return false;
-    }
-
-    const { identifier, monitoring, monitors, name } = value;
-
-    if (typeof identifier !== "string" || typeof name !== "string") {
-        return false;
-    }
-
-    if (typeof monitoring !== "boolean") {
-        return false;
-    }
-
-    if (!Array.isArray(monitors)) {
-        return false;
-    }
-
-    return true;
-};
 
 const hasFiniteTimestamp = (value: unknown): value is number =>
     typeof value === "number" && Number.isFinite(value);
@@ -257,9 +236,11 @@ const isSiteAddedEventDataPayload = (
         return false;
     }
 
-    const { site, source, timestamp } = payload;
+    const record = payload;
+    const { site, source, timestamp } = record;
+    const parsedSite = validateSiteSnapshot(site);
 
-    if (!isSiteCandidate(site)) {
+    if (!parsedSite.success) {
         return false;
     }
 
@@ -270,6 +251,8 @@ const isSiteAddedEventDataPayload = (
     if (!hasFiniteTimestamp(timestamp)) {
         return false;
     }
+
+    Object.assign(record, { site: parsedSite.data });
 
     return true;
 };
@@ -305,9 +288,12 @@ const isSiteUpdatedEventDataPayload = (
         return false;
     }
 
-    const { previousSite, site, timestamp, updatedFields } = payload;
+    const record = payload;
+    const { previousSite, site, timestamp, updatedFields } = record;
+    const parsedCurrentSite = validateSiteSnapshot(site);
+    const parsedPreviousSite = validateSiteSnapshot(previousSite);
 
-    if (!isSiteCandidate(previousSite) || !isSiteCandidate(site)) {
+    if (!parsedCurrentSite.success || !parsedPreviousSite.success) {
         return false;
     }
 
@@ -319,7 +305,16 @@ const isSiteUpdatedEventDataPayload = (
         return false;
     }
 
-    return updatedFields.every((field) => typeof field === "string");
+    if (!updatedFields.every((field) => typeof field === "string")) {
+        return false;
+    }
+
+    Object.assign(record, {
+        previousSite: parsedPreviousSite.data,
+        site: parsedCurrentSite.data,
+    });
+
+    return true;
 };
 
 interface GuardSubscriptionOptions {

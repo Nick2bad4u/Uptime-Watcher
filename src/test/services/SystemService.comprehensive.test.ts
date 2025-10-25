@@ -27,6 +27,7 @@ const mockLogger = vi.hoisted(() => ({
 const mockElectronAPI = vi.hoisted(() => ({
     system: {
         openExternal: vi.fn(),
+        quitAndInstall: vi.fn(),
     },
 }));
 
@@ -55,6 +56,7 @@ describe("SystemService", () => {
         // Reset mock implementations
         mockWaitForElectronAPI.mockResolvedValue(undefined);
         mockElectronAPI.system.openExternal.mockResolvedValue(true);
+        mockElectronAPI.system.quitAndInstall.mockResolvedValue(true);
 
         // Set up global window.electronAPI mock
         (globalThis as any).window = {
@@ -72,6 +74,7 @@ describe("SystemService", () => {
             expect(SystemService).toBeDefined();
             expect(typeof SystemService.initialize).toBe("function");
             expect(typeof SystemService.openExternal).toBe("function");
+            expect(typeof SystemService.quitAndInstall).toBe("function");
         });
     });
 
@@ -218,6 +221,51 @@ describe("SystemService", () => {
 
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
                 urls.length
+            );
+        });
+    });
+
+    describe("quitAndInstall", () => {
+        it("should trigger quit-and-install successfully", async () => {
+            await expect(SystemService.quitAndInstall()).resolves.toBeUndefined();
+            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockElectronAPI.system.quitAndInstall).toHaveBeenCalledTimes(1);
+        });
+
+        it("should propagate initialization failure", async () => {
+            const error = new Error("init failed");
+            mockWaitForElectronAPI.mockRejectedValueOnce(error);
+
+            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+                "init failed"
+            );
+            expect(mockElectronAPI.system.quitAndInstall).not.toHaveBeenCalled();
+        });
+
+        it("should reject when bridge resolves to non-boolean", async () => {
+            mockElectronAPI.system.quitAndInstall.mockResolvedValueOnce(
+                "invalid"
+            );
+
+            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+                /Invalid response received from quitAndInstall/
+            );
+        });
+
+        it("should reject when bridge reports failure", async () => {
+            mockElectronAPI.system.quitAndInstall.mockResolvedValueOnce(false);
+
+            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+                "Electron declined to execute quitAndInstall request"
+            );
+        });
+
+        it("should surface underlying errors", async () => {
+            const failure = new Error("Updater blew up");
+            mockElectronAPI.system.quitAndInstall.mockRejectedValueOnce(failure);
+
+            await expect(SystemService.quitAndInstall()).rejects.toThrow(
+                "Updater blew up"
             );
         });
     });

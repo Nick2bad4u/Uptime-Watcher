@@ -66,7 +66,7 @@ describe("monitoringApi", () => {
         );
     });
 
-    it("supports optional monitor identifier when starting monitoring", async () => {
+    it("starts monitoring for a site", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
             data: true,
@@ -77,6 +77,50 @@ describe("monitoringApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
             "start-monitoring-for-site",
             "site-1"
+        );
+    });
+
+    it("starts monitoring for an individual monitor", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
+        });
+
+        await monitoringApi.startMonitoringForMonitor("site-1", "monitor-1");
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "start-monitoring-for-monitor",
+            "site-1",
+            "monitor-1"
+        );
+    });
+
+    it("stops monitoring for a site", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
+        });
+
+        await monitoringApi.stopMonitoringForSite("site-1");
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "stop-monitoring-for-site",
+            "site-1"
+        );
+    });
+
+    it("stops monitoring for an individual monitor", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+            data: true,
+        });
+
+        await monitoringApi.stopMonitoringForMonitor("site-1", "monitor-1");
+
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            "stop-monitoring-for-monitor",
+            "site-1",
+            "monitor-1"
         );
     });
 

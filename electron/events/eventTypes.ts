@@ -985,6 +985,8 @@ export interface UptimeEvents extends UnknownRecord {
      * @param timestamp - Unix timestamp (ms) when the site was removed.
      */
     "internal:site:removed": {
+        /** Whether the removal was part of a cascade/bulk operation. */
+        cascade?: boolean;
         identifier?: string;
         operation: "removed";
         site?: Site;

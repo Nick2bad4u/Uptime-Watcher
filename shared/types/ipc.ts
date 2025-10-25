@@ -175,6 +175,10 @@ export interface IpcInvokeChannelMap {
         params: readonly [url: string];
         result: boolean;
     };
+    "quit-and-install": {
+        params: readonly [];
+        result: boolean;
+    };
     "remove-monitor": {
         params: readonly [siteIdentifier: string, monitorId: string];
         result: Site;
@@ -195,16 +199,24 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: boolean;
     };
+    "start-monitoring-for-monitor": {
+        params: readonly [siteIdentifier: string, monitorId: string];
+        result: boolean;
+    };
     "start-monitoring-for-site": {
-        params: readonly [siteIdentifier: string, monitorId?: string];
+        params: readonly [siteIdentifier: string];
         result: boolean;
     };
     "stop-monitoring": {
         params: readonly [];
         result: boolean;
     };
+    "stop-monitoring-for-monitor": {
+        params: readonly [siteIdentifier: string, monitorId: string];
+        result: boolean;
+    };
     "stop-monitoring-for-site": {
-        params: readonly [siteIdentifier: string, monitorId?: string];
+        params: readonly [siteIdentifier: string];
         result: boolean;
     };
     "update-history-limit": {

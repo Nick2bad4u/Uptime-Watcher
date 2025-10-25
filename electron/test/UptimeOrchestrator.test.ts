@@ -1284,7 +1284,7 @@ describe(UptimeOrchestrator, () => {
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "site:removed",
                 expect.objectContaining({
-                    cascade: true,
+                    cascade: false,
                     siteIdentifier: "test-site",
                     siteName: "Test Site",
                 })
@@ -1323,9 +1323,44 @@ describe(UptimeOrchestrator, () => {
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "site:removed",
                 expect.objectContaining({
-                    cascade: true,
+                    cascade: false,
                     siteIdentifier: "fallback-site", // Should use site.identifier as fallback
                     siteName: "Test Site",
+                })
+            );
+        });
+
+        it("should forward cascade metadata when provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Data Deletion", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:site:removed" as any, {
+                cascade: true,
+                identifier: "bulk-site",
+                site: {
+                    identifier: "bulk-site",
+                    monitors: [],
+                    monitoring: false,
+                    name: "Bulk Site",
+                },
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "site:removed",
+                expect.objectContaining({
+                    cascade: true,
+                    siteIdentifier: "bulk-site",
+                    siteName: "Bulk Site",
                 })
             );
         });

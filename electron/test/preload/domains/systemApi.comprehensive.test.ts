@@ -40,9 +40,40 @@ describe("systemApi", () => {
         ).rejects.toThrow(/ipc operation failed/i);
     });
 
-    it("sends quit-and-install via send", () => {
-        systemApi.quitAndInstall();
+    it("invokes quit-and-install via invoke", async () => {
+        vi.mocked(ipcRenderer.invoke).mockImplementation(
+            async (channel: string, ...args: unknown[]) => {
+                if (channel === "diagnostics:verify-ipc-handler") {
+                    const targetChannel = args[0];
 
-        expect(ipcRenderer.send).toHaveBeenCalledWith("quit-and-install");
+                    return {
+                        success: true,
+                        data: {
+                            availableChannels: [
+                                "diagnostics:verify-ipc-handler",
+                                targetChannel,
+                            ],
+                            channel: targetChannel,
+                            registered: true,
+                        },
+                    };
+                }
+
+                if (channel === "quit-and-install") {
+                    return {
+                        success: true,
+                        data: true,
+                        metadata: { handler: channel },
+                    };
+                }
+
+                throw new Error(`Unexpected channel: ${channel}`);
+            }
+        );
+
+        const result = await systemApi.quitAndInstall();
+
+        expect(result).toBeTruthy();
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith("quit-and-install");
     });
 });

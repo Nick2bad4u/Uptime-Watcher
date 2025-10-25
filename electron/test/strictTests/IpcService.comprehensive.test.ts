@@ -278,10 +278,6 @@ describe("IpcService - Comprehensive Coverage", () => {
 
             // Verify multiple handlers are registered
             expect(ipcMain.handle).toHaveBeenCalled();
-            expect(ipcMain.on).toHaveBeenCalledWith(
-                "quit-and-install",
-                expect.any(Function)
-            );
 
             // Check that handle was called for various IPC channels
             const handleCalls = vi.mocked(ipcMain.handle).mock.calls;
@@ -298,7 +294,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("start-monitoring");
             expect(registeredChannels).toContain("stop-monitoring");
             expect(registeredChannels).toContain("start-monitoring-for-site");
+            expect(registeredChannels).toContain("start-monitoring-for-monitor");
             expect(registeredChannels).toContain("stop-monitoring-for-site");
+            expect(registeredChannels).toContain("stop-monitoring-for-monitor");
             expect(registeredChannels).toContain("check-site-now");
 
             // Monitor type handlers
@@ -314,6 +312,9 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("get-history-limit");
             expect(registeredChannels).toContain("reset-settings");
             expect(registeredChannels).toContain("download-sqlite-backup");
+
+            // System handlers
+            expect(registeredChannels).toContain("quit-and-install");
 
             // State sync handlers
             expect(registeredChannels).toContain("request-full-sync");
@@ -546,7 +547,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle start-monitoring-for-site with identifier and optional monitor", async ({
+        it("should handle start-monitoring-for-site with identifier", async ({
             task,
             annotate,
         }) => {
@@ -563,7 +564,43 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "site-id", "monitor-id");
+            const result = await handler(mockIpcEvent, "site-id");
+
+            expect(
+                mockUptimeOrchestrator.startMonitoringForSite
+            ).toHaveBeenCalledWith("site-id");
+            expect(result).toEqual({
+                success: true,
+                data: true,
+                metadata: {
+                    duration: expect.any(Number),
+                    handler: expect.any(String),
+                },
+            });
+        });
+
+        it("should handle start-monitoring-for-monitor with identifier and monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "start-monitoring-for-monitor"
+                );
+            expect(handleCall).toBeDefined();
+
+            const handler = handleCall![1];
+            const result = await handler(
+                mockIpcEvent,
+                "site-id",
+                "monitor-id"
+            );
 
             expect(
                 mockUptimeOrchestrator.startMonitoringForSite
@@ -578,7 +615,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             });
         });
 
-        it("should handle stop-monitoring-for-site with identifier and optional monitor", async ({
+        it("should handle stop-monitoring-for-site with identifier", async ({
             task,
             annotate,
         }) => {
@@ -595,7 +632,43 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(handleCall).toBeDefined();
 
             const handler = handleCall![1];
-            const result = await handler(mockIpcEvent, "site-id", "monitor-id");
+            const result = await handler(mockIpcEvent, "site-id");
+
+            expect(
+                mockUptimeOrchestrator.stopMonitoringForSite
+            ).toHaveBeenCalledWith("site-id");
+            expect(result).toEqual({
+                success: true,
+                data: true,
+                metadata: {
+                    duration: expect.any(Number),
+                    handler: expect.any(String),
+                },
+            });
+        });
+
+        it("should handle stop-monitoring-for-monitor with identifier and monitor", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const handleCall = vi
+                .mocked(ipcMain.handle)
+                .mock.calls.find(
+                    (call) => call[0] === "stop-monitoring-for-monitor"
+                );
+            expect(handleCall).toBeDefined();
+
+            const handler = handleCall![1];
+            const result = await handler(
+                mockIpcEvent,
+                "site-id",
+                "monitor-id"
+            );
 
             expect(
                 mockUptimeOrchestrator.stopMonitoringForSite
@@ -1183,21 +1256,22 @@ describe("IpcService - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Event Processing", "type");
 
-            expect(ipcMain.on).toHaveBeenCalledWith(
-                "quit-and-install",
-                expect.any(Function)
-            );
-
-            // Simulate the event handler being called
-            const onCall = vi
-                .mocked(ipcMain.on)
+            const handlerCall = vi
+                .mocked(ipcMain.handle)
                 .mock.calls.find((call) => call[0] === "quit-and-install");
-            expect(onCall).toBeDefined();
+            expect(handlerCall).toBeDefined();
 
-            const handler = onCall![1];
-            handler(mockMainEvent);
+            const handler = handlerCall![1];
+            const response = await handler(mockMainEvent);
 
             expect(mockAutoUpdaterService.quitAndInstall).toHaveBeenCalled();
+            expect(response).toEqual({
+                success: true,
+                data: true,
+                metadata: expect.objectContaining({
+                    handler: "quit-and-install",
+                }),
+            });
         });
     });
 
@@ -1305,9 +1379,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             ipcService.cleanup();
 
             expect(ipcMain.removeHandler).toHaveBeenCalled();
-            expect(ipcMain.removeAllListeners).toHaveBeenCalledWith(
+            expect(ipcMain.removeHandler).toHaveBeenCalledWith(
                 "quit-and-install"
             );
+            expect(ipcMain.removeAllListeners).not.toHaveBeenCalled();
 
             // Verify that all registered channels are cleaned up
             const removeHandlerCalls = vi.mocked(ipcMain.removeHandler).mock

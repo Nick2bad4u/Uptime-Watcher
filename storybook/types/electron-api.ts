@@ -13,13 +13,9 @@ import type {
     SystemDomainBridge,
 } from "@shared/types/preload";
 
-type StorybookSystemApi = SystemDomainBridge & {
-    readonly quitAndInstall: () => void;
-};
-
 export type ElectronAPI = ElectronBridgeApi<
     EventsDomainBridge,
-    StorybookSystemApi
+    SystemDomainBridge
 > & {
     readonly stateSync: StateSyncApiSurface;
 };

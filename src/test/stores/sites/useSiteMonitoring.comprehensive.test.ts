@@ -11,7 +11,9 @@ import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonito
 const mockElectronAPI = {
     monitoring: {
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
     sites: {},
@@ -53,26 +55,26 @@ describe("useSiteMonitoring", () => {
                         monitorId
                     )
             ),
-            startMonitoring: vi.fn(
+            startMonitoringForMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.startMonitoringForSite(
+                    mockElectronAPI.monitoring.startMonitoringForMonitor(
                         siteIdentifier,
                         monitorId
                     )
             ),
-            startSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
+            startMonitoringForSite: vi.fn(async (siteIdentifier: string) =>
                 mockElectronAPI.monitoring.startMonitoringForSite(
                     siteIdentifier
                 )
             ),
-            stopMonitoring: vi.fn(
+            stopMonitoringForMonitor: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>
-                    mockElectronAPI.monitoring.stopMonitoringForSite(
+                    mockElectronAPI.monitoring.stopMonitoringForMonitor(
                         siteIdentifier,
                         monitorId
                     )
             ),
-            stopSiteMonitoring: vi.fn(async (siteIdentifier: string) =>
+            stopMonitoringForSite: vi.fn(async (siteIdentifier: string) =>
                 mockElectronAPI.monitoring.stopMonitoringForSite(siteIdentifier)
             ),
         };
@@ -137,7 +139,7 @@ describe("useSiteMonitoring", () => {
             await actions.startSiteMonitorMonitoring(siteIdentifier, monitorId);
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
@@ -178,7 +180,7 @@ describe("useSiteMonitoring", () => {
             await actions.stopSiteMonitorMonitoring(siteIdentifier, monitorId);
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });

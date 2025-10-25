@@ -196,27 +196,43 @@ emits `monitoring:stopped`.
 const stopped = await window.electronAPI.monitoring.stopMonitoring();
 ```
 
-#### `startMonitoringForSite(siteIdentifier: string, monitorId?: string): Promise<boolean>`
+#### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
 
-Starts monitoring for a specific site (optionally a single monitor). Emits the
+Starts monitoring for a specific monitor belonging to the given site. Emits the
 standard monitoring lifecycle and cache invalidation events when successful.
 
 ```typescript
-await window.electronAPI.monitoring.startMonitoringForSite(
+await window.electronAPI.monitoring.startMonitoringForMonitor(
  siteIdentifier,
  specificMonitorId
 );
 ```
 
-#### `stopMonitoringForSite(siteIdentifier: string, monitorId?: string): Promise<boolean>`
+#### `startMonitoringForSite(siteIdentifier: string): Promise<boolean>`
 
-Stops monitoring for a site (optionally a single monitor).
+Starts monitoring for every monitor associated with the provided site.
 
 ```typescript
-await window.electronAPI.monitoring.stopMonitoringForSite(
+await window.electronAPI.monitoring.startMonitoringForSite(siteIdentifier);
+```
+
+#### `stopMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
+
+Stops monitoring for a single monitor.
+
+```typescript
+await window.electronAPI.monitoring.stopMonitoringForMonitor(
  siteIdentifier,
  monitorId
 );
+```
+
+#### `stopMonitoringForSite(siteIdentifier: string): Promise<boolean>`
+
+Stops monitoring for all monitors of a given site.
+
+```typescript
+await window.electronAPI.monitoring.stopMonitoringForSite(siteIdentifier);
 ```
 
 #### `validateMonitorData(type: string, data: unknown): Promise<ValidationResult>`

@@ -793,6 +793,7 @@ describe("SiteManager - Comprehensive", () => {
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:removed",
                 expect.objectContaining({
+                    cascade: false,
                     identifier: "site-1",
                     operation: "removed",
                 })

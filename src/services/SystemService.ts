@@ -29,6 +29,7 @@ const { ensureInitialized, wrap } = ((): ReturnType<
 interface SystemServiceContract {
     initialize: () => Promise<void>;
     openExternal: (url: string) => Promise<boolean>;
+    quitAndInstall: () => Promise<void>;
 }
 
 /**
@@ -110,4 +111,29 @@ export const SystemService: SystemServiceContract = {
             return opened;
         }
     ),
+
+    /**
+     * Quits the application and installs a pending update.
+     *
+     * @remarks
+     * Delegates to the preload system bridge which triggers the main-process
+     * auto-updater service. Resolves when the quit/install request has been
+     * forwarded successfully. The promise rejects if the underlying bridge is
+     * unavailable or the main-process handler reports failure.
+     */
+    quitAndInstall: wrap("quitAndInstall", async (api): Promise<void> => {
+        const result = await api.system.quitAndInstall();
+
+        if (typeof result !== "boolean") {
+            throw new TypeError(
+                `Invalid response received from quitAndInstall: ${typeof result}`
+            );
+        }
+
+        if (!result) {
+            throw new Error(
+                "Electron declined to execute quitAndInstall request"
+            );
+        }
+    }),
 };

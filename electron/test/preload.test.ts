@@ -453,10 +453,7 @@ describe("Electron Preload Script", () => {
                     "Test Type: Unit - IPC Bridge Validation",
                     "test-type"
                 );
-                await annotate(
-                    "Operation: Site-Specific Monitoring Start",
-                    "operation"
-                );
+                await annotate("Operation: Site-Wide Monitoring Start", "operation");
                 await annotate(
                     "Priority: High - Selective Monitoring Control",
                     "priority"
@@ -478,17 +475,59 @@ describe("Electron Preload Script", () => {
 
                 const exposedAPI = getExposedAPI();
                 const identifier = "test-site";
-                const monitorType = "http";
 
-                await exposedAPI.monitoring.startMonitoringForSite(
-                    identifier,
-                    monitorType
-                );
+                await exposedAPI.monitoring.startMonitoringForSite(identifier);
 
                 expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                     "start-monitoring-for-site",
+                    identifier
+                );
+            });
+
+            it("should properly invoke IPC for startMonitoringForMonitor", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Monitor-Specific Monitoring Start",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Selective Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Monitor-Level Control",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: start-monitoring-for-monitor",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure monitor-specific monitoring start works",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const identifier = "test-site";
+                const monitorId = "http";
+
+                await exposedAPI.monitoring.startMonitoringForMonitor(
                     identifier,
-                    monitorType
+                    monitorId
+                );
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "start-monitoring-for-monitor",
+                    identifier,
+                    monitorId
                 );
             });
 
@@ -500,10 +539,7 @@ describe("Electron Preload Script", () => {
                     "Test Type: Unit - IPC Bridge Validation",
                     "test-type"
                 );
-                await annotate(
-                    "Operation: Site-Specific Monitoring Stop",
-                    "operation"
-                );
+                await annotate("Operation: Site-Wide Monitoring Stop", "operation");
                 await annotate(
                     "Priority: High - Selective Monitoring Control",
                     "priority"
@@ -525,17 +561,59 @@ describe("Electron Preload Script", () => {
 
                 const exposedAPI = getExposedAPI();
                 const identifier = "test-site";
-                const monitorType = "port";
 
-                await exposedAPI.monitoring.stopMonitoringForSite(
-                    identifier,
-                    monitorType
-                );
+                await exposedAPI.monitoring.stopMonitoringForSite(identifier);
 
                 expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
                     "stop-monitoring-for-site",
+                    identifier
+                );
+            });
+
+            it("should properly invoke IPC for stopMonitoringForMonitor", async ({
+                annotate,
+            }) => {
+                await annotate("Component: Monitoring API", "component");
+                await annotate(
+                    "Test Type: Unit - IPC Bridge Validation",
+                    "test-type"
+                );
+                await annotate(
+                    "Operation: Monitor-Specific Monitoring Stop",
+                    "operation"
+                );
+                await annotate(
+                    "Priority: High - Selective Monitoring Control",
+                    "priority"
+                );
+                await annotate(
+                    "Complexity: Medium - Monitor-Level Control",
+                    "complexity"
+                );
+                await annotate(
+                    "IPC Channel: stop-monitoring-for-monitor",
+                    "ipc-channel"
+                );
+                await annotate(
+                    "Purpose: Ensure monitor-specific monitoring stop works",
+                    "purpose"
+                );
+
+                await import("../preload");
+
+                const exposedAPI = getExposedAPI();
+                const identifier = "test-site";
+                const monitorId = "port";
+
+                await exposedAPI.monitoring.stopMonitoringForMonitor(
                     identifier,
-                    monitorType
+                    monitorId
+                );
+
+                expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                    "stop-monitoring-for-monitor",
+                    identifier,
+                    monitorId
                 );
             });
 
@@ -1150,7 +1228,7 @@ describe("Electron Preload Script", () => {
                 expect(systemAPI).toHaveProperty("quitAndInstall");
             });
 
-            it("should properly send IPC for quitAndInstall", async ({
+            it("should invoke IPC for quitAndInstall", async ({
                 annotate,
             }) => {
                 await annotate("Component: System API", "component");
@@ -1173,17 +1251,46 @@ describe("Electron Preload Script", () => {
                     "purpose"
                 );
 
-                // Mock ipcRenderer.send for system API
-                const mockSend = vi.fn();
-                mockIpcRenderer.send = mockSend;
+                // Mock ipcRenderer.invoke for system API
+                const mockInvoke = vi.fn(
+                    async (channel: string, ...args: unknown[]) => {
+                        if (channel === "diagnostics:verify-ipc-handler") {
+                            const targetChannel = args[0];
+
+                            return {
+                                success: true,
+                                data: {
+                                    availableChannels: [
+                                        "diagnostics:verify-ipc-handler",
+                                        targetChannel,
+                                    ],
+                                    channel: targetChannel,
+                                    registered: true,
+                                },
+                            };
+                        }
+
+                        if (channel === "quit-and-install") {
+                            return {
+                                success: true,
+                                data: true,
+                                metadata: { handler: channel },
+                            };
+                        }
+
+                        return { success: true, data: true };
+                    }
+                );
+                mockIpcRenderer.invoke = mockInvoke;
 
                 await import("../preload");
 
                 const exposedAPI = getExposedAPI();
 
-                exposedAPI.system.quitAndInstall();
+                const result = await exposedAPI.system.quitAndInstall();
 
-                expect(mockSend).toHaveBeenCalledWith("quit-and-install");
+                expect(mockInvoke).toHaveBeenCalledWith("quit-and-install");
+                expect(result).toBeTruthy();
             });
         });
 

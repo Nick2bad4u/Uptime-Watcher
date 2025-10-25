@@ -34,8 +34,10 @@ interface DataHandlerValidatorsInterface {
 interface MonitoringHandlerValidatorsInterface {
     checkSiteNow: IpcParameterValidator;
     startMonitoring: IpcParameterValidator;
+    startMonitoringForMonitor: IpcParameterValidator;
     startMonitoringForSite: IpcParameterValidator;
     stopMonitoring: IpcParameterValidator;
+    stopMonitoringForMonitor: IpcParameterValidator;
     stopMonitoringForSite: IpcParameterValidator;
 }
 
@@ -74,6 +76,7 @@ interface StateSyncHandlerValidatorsInterface {
  */
 interface SystemHandlerValidatorsInterface {
     openExternal: IpcParameterValidator;
+    quitAndInstall: IpcParameterValidator;
     reportPreloadGuard: IpcParameterValidator;
     verifyIpcHandler: IpcParameterValidator;
 }
@@ -86,50 +89,6 @@ interface SystemHandlerValidatorsInterface {
 function createNoParamsValidator(): IpcParameterValidator {
     return (params: unknown[]): null | string[] =>
         params.length === 0 ? null : ["No parameters expected"];
-}
-
-/**
- * Helper function to create validators for handlers with optional second string
- * parameter.
- *
- * @param firstParamName - Name of the required first parameter
- * @param secondParamName - Name of the optional second parameter
- *
- * @returns A validator function that validates 1-2 string parameters
- */
-function createOptionalSecondStringValidator(
-    firstParamName: string,
-    secondParamName: string
-): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length === 0 || params.length > 2) {
-            errors.push("Expected 1 or 2 parameters");
-        }
-
-        if (params.length > 0) {
-            const firstError = IpcValidators.requiredString(
-                params[0],
-                firstParamName
-            );
-            if (firstError) {
-                errors.push(firstError);
-            }
-        }
-
-        if (params.length === 2) {
-            const secondError = IpcValidators.optionalString(
-                params[1],
-                secondParamName
-            );
-            if (secondError) {
-                errors.push(secondError);
-            }
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
 }
 
 /**
@@ -502,16 +461,25 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
         startMonitoring: createNoParamsValidator(),
 
         /**
-         * Validates parameters for the "start-monitoring-for-site" IPC handler.
+         * Validates parameters for the "start-monitoring-for-monitor" IPC
+         * handler.
          *
          * @remarks
-         * Expects one or two parameters: site identifier (string), and optional
-         * monitor ID (string).
+         * Expects two parameters: site identifier (string) and monitor ID
+         * (string).
          */
-        startMonitoringForSite: createOptionalSecondStringValidator(
+        startMonitoringForMonitor: createTwoStringValidator(
             "identifier",
             "monitorId"
         ),
+
+        /**
+         * Validates parameters for the "start-monitoring-for-site" IPC handler.
+         *
+         * @remarks
+         * Expects one parameter: site identifier (string).
+         */
+        startMonitoringForSite: createSingleStringValidator("identifier"),
 
         /**
          * Validates parameters for the "stop-monitoring" IPC handler.
@@ -522,16 +490,25 @@ export const MonitoringHandlerValidators: MonitoringHandlerValidatorsInterface =
         stopMonitoring: createNoParamsValidator(),
 
         /**
-         * Validates parameters for the "stop-monitoring-for-site" IPC handler.
+         * Validates parameters for the "stop-monitoring-for-monitor" IPC
+         * handler.
          *
          * @remarks
-         * Expects one or two parameters: site identifier (string), and optional
-         * monitor ID (string).
+         * Expects two parameters: site identifier (string) and monitor ID
+         * (string).
          */
-        stopMonitoringForSite: createOptionalSecondStringValidator(
+        stopMonitoringForMonitor: createTwoStringValidator(
             "identifier",
             "monitorId"
         ),
+
+        /**
+         * Validates parameters for the "stop-monitoring-for-site" IPC handler.
+         *
+         * @remarks
+         * Expects one parameter: site identifier (string).
+         */
+        stopMonitoringForSite: createSingleStringValidator("identifier"),
     } as const;
 
 /**
@@ -684,6 +661,13 @@ export const SystemHandlerValidators: SystemHandlerValidatorsInterface = {
      * Expects exactly one http(s) URL parameter (the destination to open).
      */
     openExternal: createSingleUrlValidator("url"),
+    /**
+     * Validates parameters for the "quit-and-install" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters; handler simply triggers the updater.
+     */
+    quitAndInstall: createNoParamsValidator(),
     reportPreloadGuard: createPreloadGuardReportValidator(),
     /**
      * Validates parameters for the diagnostics handler verification channel.

@@ -286,12 +286,18 @@ const mockElectronAPI: ElectronAPI = {
         startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
             async () => true
         ),
+        startMonitoringForMonitor: vi.fn<
+            ElectronAPI["monitoring"]["startMonitoringForMonitor"]
+        >(async () => true),
         startMonitoringForSite: vi.fn<
             ElectronAPI["monitoring"]["startMonitoringForSite"]
         >(async () => true),
         stopMonitoring: vi.fn<ElectronAPI["monitoring"]["stopMonitoring"]>(
             async () => true
         ),
+        stopMonitoringForMonitor: vi.fn<
+            ElectronAPI["monitoring"]["stopMonitoringForMonitor"]
+        >(async () => true),
         stopMonitoringForSite: vi.fn<
             ElectronAPI["monitoring"]["stopMonitoringForSite"]
         >(async () => true),
@@ -377,7 +383,7 @@ const mockElectronAPI: ElectronAPI = {
             async (url: string) => url.length > 0
         ),
         quitAndInstall: vi.fn<ElectronAPI["system"]["quitAndInstall"]>(
-            () => undefined
+            async () => true
         ),
     },
 };

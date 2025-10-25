@@ -491,8 +491,8 @@ export class IpcService {
         for (const channel of this.registeredIpcHandlers) {
             ipcMain.removeHandler(channel);
         }
-        // Remove listeners for channels registered with ipcMain.on
-        ipcMain.removeAllListeners("quit-and-install");
+
+        this.registeredIpcHandlers.clear();
     }
 
     /**
@@ -714,19 +714,32 @@ export class IpcService {
             this.registeredIpcHandlers
         );
 
-        // Start monitoring for specific site/monitor
+        // Start monitoring for all monitors within a specific site
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All monitoring handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
             "start-monitoring-for-site",
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
-                const monitorId = args[1] as string | undefined;
+                return this.uptimeOrchestrator.startMonitoringForSite(
+                    identifier
+                );
+            },
+            MonitoringHandlerValidators.startMonitoringForSite,
+            this.registeredIpcHandlers
+        );
+
+        // Start monitoring for specific monitor within a site
+        registerStandardizedIpcHandler(
+            "start-monitoring-for-monitor",
+            async (...args: unknown[]) => {
+                const identifier = args[0] as string;
+                const monitorId = args[1] as string;
                 return this.uptimeOrchestrator.startMonitoringForSite(
                     identifier,
                     monitorId
                 );
             },
-            MonitoringHandlerValidators.startMonitoringForSite,
+            MonitoringHandlerValidators.startMonitoringForMonitor,
             this.registeredIpcHandlers
         );
 
@@ -735,13 +748,26 @@ export class IpcService {
             "stop-monitoring-for-site",
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
-                const monitorId = args[1] as string | undefined;
+                return this.uptimeOrchestrator.stopMonitoringForSite(
+                    identifier
+                );
+            },
+            MonitoringHandlerValidators.stopMonitoringForSite,
+            this.registeredIpcHandlers
+        );
+
+        // Stop monitoring for specific monitor within a site
+        registerStandardizedIpcHandler(
+            "stop-monitoring-for-monitor",
+            async (...args: unknown[]) => {
+                const identifier = args[0] as string;
+                const monitorId = args[1] as string;
                 return this.uptimeOrchestrator.stopMonitoringForSite(
                     identifier,
                     monitorId
                 );
             },
-            MonitoringHandlerValidators.stopMonitoringForSite,
+            MonitoringHandlerValidators.stopMonitoringForMonitor,
             this.registeredIpcHandlers
         );
 
@@ -1031,10 +1057,9 @@ export class IpcService {
      *
      * @remarks
      * Handles system-level operations like quit/install and external URL
-     * opening. Uses {@link ipcMain.on} for event-based handlers that don't
-     * return values, and {@link registerStandardizedIpcHandler} for handlers
-     * that return data. All registered handlers and listeners must be removed
-     * via {@link cleanup}.
+     * opening. All handlers are registered through
+     * {@link registerStandardizedIpcHandler} for consistent diagnostics and
+     * cleanup semantics.
      *
      * @internal
      */
@@ -1052,11 +1077,16 @@ export class IpcService {
             this.registeredIpcHandlers
         );
 
-        this.registeredIpcHandlers.add("quit-and-install");
-        ipcMain.on("quit-and-install", () => {
-            logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
-            this.autoUpdaterService.quitAndInstall();
-        });
+        registerStandardizedIpcHandler(
+            "quit-and-install",
+            () => {
+                logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
+                this.autoUpdaterService.quitAndInstall();
+                return true;
+            },
+            SystemHandlerValidators.quitAndInstall,
+            this.registeredIpcHandlers
+        );
     }
 
     /**

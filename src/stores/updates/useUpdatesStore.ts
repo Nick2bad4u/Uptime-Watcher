@@ -38,12 +38,14 @@
 
 import type { Merge } from "type-fest";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { UpdateStatus } from "../types";
 import type { UpdateInfo, UpdatesStore } from "./types";
 
+import { SystemService } from "../../services/SystemService";
 import { logStoreAction } from "../utils";
 
 /**
@@ -100,12 +102,30 @@ export const useUpdatesStore: UpdatesStoreWithPersist = create<UpdatesStore>()(
     persist(
         (set) => ({
             // Actions
-            applyUpdate: (): void => {
-                // QuitAndInstall not available in current API
+            applyUpdate: async (): Promise<void> => {
+                set({ updateError: undefined });
                 logStoreAction("UpdatesStore", "applyUpdate", {
-                    message: "Update apply requested (not implemented)",
-                    success: false,
+                    message: "Attempting to apply downloaded update",
+                    success: true,
                 });
+
+                try {
+                    await SystemService.quitAndInstall();
+
+                    logStoreAction("UpdatesStore", "applyUpdate", {
+                        message: "Quit and install triggered successfully",
+                        success: true,
+                    });
+                } catch (error: unknown) {
+                    const normalizedError = ensureError(error);
+
+                    set({ updateError: normalizedError.message });
+                    logStoreAction("UpdatesStore", "applyUpdate", {
+                        error: normalizedError.message,
+                        message: "Failed to trigger quit-and-install operation",
+                        success: false,
+                    });
+                }
             },
             applyUpdateStatus: (status: UpdateStatus): void => {
                 logStoreAction("UpdatesStore", "applyUpdateStatus", { status });

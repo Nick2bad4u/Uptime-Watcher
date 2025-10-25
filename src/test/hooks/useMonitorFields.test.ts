@@ -65,8 +65,10 @@ const mockElectronAPI = {
     },
     monitoring: {
         startMonitoring: vi.fn(),
+        startMonitoringForMonitor: vi.fn(),
         startMonitoringForSite: vi.fn(),
         stopMonitoring: vi.fn(),
+        stopMonitoringForMonitor: vi.fn(),
         stopMonitoringForSite: vi.fn(),
     },
     monitorTypes: {
@@ -95,7 +97,7 @@ const mockElectronAPI = {
     },
     system: {
         openExternal: vi.fn(),
-        quitAndInstall: vi.fn(),
+        quitAndInstall: vi.fn().mockResolvedValue(true),
     },
 };
 

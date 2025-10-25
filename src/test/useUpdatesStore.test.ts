@@ -20,6 +20,11 @@ vi.mock("../stores/utils", () => ({
 // Mock window.electronAPI with fresh mock function
 const mockElectronAPIQuitAndInstall = vi.fn();
 
+const createSystemMock = () => ({
+    openExternal: vi.fn(),
+    quitAndInstall: mockElectronAPIQuitAndInstall,
+});
+
 // Helper to setup electronAPI mock
 const setupElectronAPIMock = (mockAPI: unknown) => {
     // Use a different approach to avoid property redefinition
@@ -29,9 +34,7 @@ const setupElectronAPIMock = (mockAPI: unknown) => {
 
 // Setup default mock
 setupElectronAPIMock({
-    system: {
-        quitAndInstall: mockElectronAPIQuitAndInstall,
-    },
+    system: createSystemMock(),
 });
 
 describe(useUpdatesStore, () => {
@@ -46,12 +49,12 @@ describe(useUpdatesStore, () => {
 
         // Reset mocks
         vi.clearAllMocks();
+        mockElectronAPIQuitAndInstall.mockReset();
+        mockElectronAPIQuitAndInstall.mockResolvedValue(true);
 
         // Reset the electronAPI mock
         setupElectronAPIMock({
-            system: {
-                openExternal: vi.fn(),
-            },
+            system: createSystemMock(),
         });
     });
 
@@ -451,12 +454,12 @@ describe(useUpdatesStore, () => {
 
             const { result } = renderHook(() => useUpdatesStore());
 
-            act(() => {
-                result.current.applyUpdate();
+            await act(async () => {
+                await result.current.applyUpdate();
             });
 
-            // ApplyUpdate now just logs since quitAndInstall is not available
-            expect(true).toBeTruthy();
+            expect(mockElectronAPIQuitAndInstall).toHaveBeenCalledTimes(1);
+            expect(result.current.updateError).toBeUndefined();
         });
 
         it("should apply update in downloaded state", async ({
@@ -480,13 +483,33 @@ describe(useUpdatesStore, () => {
             expect(result.current.updateProgress).toBe(100);
 
             // Apply update
-            act(() => {
-                result.current.applyUpdate();
+            await act(async () => {
+                await result.current.applyUpdate();
             });
 
-            // ApplyUpdate now just logs since quitAndInstall is not available
-            // Check that action is logged correctly
-            expect(true).toBeTruthy(); // Placeholder test
+            expect(mockElectronAPIQuitAndInstall).toHaveBeenCalledTimes(1);
+            expect(result.current.updateError).toBeUndefined();
+        });
+
+        it("should surface error when quitAndInstall rejects", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useUpdatesStore", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const failure = new Error("update failed");
+            mockElectronAPIQuitAndInstall.mockRejectedValueOnce(failure);
+
+            const { result } = renderHook(() => useUpdatesStore());
+
+            await act(async () => {
+                await result.current.applyUpdate();
+            });
+
+            expect(result.current.updateError).toBe("update failed");
         });
     });
 
@@ -508,13 +531,13 @@ describe(useUpdatesStore, () => {
             };
 
             // Test all actions that should log
-            act(() => {
+            await act(async () => {
                 result.current.applyUpdateStatus("checking");
                 result.current.setUpdateProgress(50);
                 result.current.setUpdateError("Test error");
                 result.current.setUpdateInfo(updateInfo);
                 result.current.clearUpdateError();
-                result.current.applyUpdate();
+                await result.current.applyUpdate();
             });
 
             expect(logStoreAction).toHaveBeenCalledWith(
@@ -549,8 +572,16 @@ describe(useUpdatesStore, () => {
                 "UpdatesStore",
                 "applyUpdate",
                 {
-                    message: "Update apply requested (not implemented)",
-                    success: false,
+                    message: "Attempting to apply downloaded update",
+                    success: true,
+                }
+            );
+            expect(logStoreAction).toHaveBeenCalledWith(
+                "UpdatesStore",
+                "applyUpdate",
+                {
+                    message: "Quit and install triggered successfully",
+                    success: true,
                 }
             );
         });

@@ -557,8 +557,10 @@ describe("Types Module", () => {
                     formatMonitorTitleSuffix: () => Promise.resolve("suffix"),
                     removeMonitor: () => Promise.resolve(true),
                     startMonitoring: () => Promise.resolve(true),
+                    startMonitoringForMonitor: () => Promise.resolve(true),
                     startMonitoringForSite: () => Promise.resolve(true),
                     stopMonitoring: () => Promise.resolve(true),
+                    stopMonitoringForMonitor: () => Promise.resolve(true),
                     stopMonitoringForSite: () => Promise.resolve(true),
                     validateMonitorData: () =>
                         Promise.resolve({
@@ -591,7 +593,7 @@ describe("Types Module", () => {
                         } as Site),
                 },
                 system: {
-                    quitAndInstall: () => {},
+                    quitAndInstall: () => Promise.resolve(true),
                 },
             };
 
@@ -615,7 +617,13 @@ describe("Types Module", () => {
                 "function"
             );
             expect(typeof mockAPI.monitoring.stopMonitoring).toBe("function");
+            expect(typeof mockAPI.monitoring.startMonitoringForMonitor).toBe(
+                "function"
+            );
             expect(typeof mockAPI.monitoring.startMonitoringForSite).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitoring.stopMonitoringForMonitor).toBe(
                 "function"
             );
             expect(typeof mockAPI.monitoring.stopMonitoringForSite).toBe(

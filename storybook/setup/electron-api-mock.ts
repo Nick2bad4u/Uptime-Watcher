@@ -258,21 +258,33 @@ const electronAPIMockDefinition = {
             }));
             return true;
         },
-        startMonitoringForSite: async (
+        startMonitoringForMonitor: async (
             siteIdentifier: string,
-            monitorId?: string
+            monitorId: string
+        ): Promise<boolean> => {
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitors: site.monitors.map((monitor) =>
+                    monitor.id === monitorId
+                        ? {
+                              ...monitor,
+                              monitoring: true,
+                          }
+                        : monitor
+                ),
+            }));
+            return true;
+        },
+        startMonitoringForSite: async (
+            siteIdentifier: string
         ): Promise<boolean> => {
             applySiteMutation(siteIdentifier, (site) => ({
                 ...site,
                 monitoring: true,
-                monitors: site.monitors.map((monitor) =>
-                    monitorId && monitor.id !== monitorId
-                        ? monitor
-                        : {
-                              ...monitor,
-                              monitoring: true,
-                          }
-                ),
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: true,
+                })),
             }));
             return true;
         },
@@ -287,21 +299,33 @@ const electronAPIMockDefinition = {
             }));
             return true;
         },
-        stopMonitoringForSite: async (
+        stopMonitoringForMonitor: async (
             siteIdentifier: string,
-            monitorId?: string
+            monitorId: string
         ): Promise<boolean> => {
             applySiteMutation(siteIdentifier, (site) => ({
                 ...site,
-                monitoring: monitorId ? site.monitoring : false,
                 monitors: site.monitors.map((monitor) =>
-                    monitorId && monitor.id !== monitorId
-                        ? monitor
-                        : {
+                    monitor.id === monitorId
+                        ? {
                               ...monitor,
                               monitoring: false,
                           }
+                        : monitor
                 ),
+            }));
+            return true;
+        },
+        stopMonitoringForSite: async (
+            siteIdentifier: string
+        ): Promise<boolean> => {
+            applySiteMutation(siteIdentifier, (site) => ({
+                ...site,
+                monitoring: false,
+                monitors: site.monitors.map((monitor) => ({
+                    ...monitor,
+                    monitoring: false,
+                })),
             }));
             return true;
         },
@@ -388,7 +412,7 @@ const electronAPIMockDefinition = {
     system: {
         openExternal: async (url: string): Promise<boolean> =>
             typeof url === "string" && url.length > 0,
-        quitAndInstall: noop,
+        quitAndInstall: async (): Promise<boolean> => true,
     },
 } as ElectronAPI;
 

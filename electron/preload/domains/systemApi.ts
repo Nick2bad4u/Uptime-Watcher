@@ -14,35 +14,14 @@
 
 import type { SystemDomainBridge } from "@shared/types/preload";
 
-import { ipcRenderer } from "electron";
-
 import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
- * Interface defining the system domain API operations.
+ * Type alias defining the system domain API operations.
  *
  * @public
  */
-export interface SystemApiInterface extends SystemDomainBridge {
-    /**
-     * Opens an external URL in the default browser
-     *
-     * @param url - URL to open externally
-     *
-     * @returns Promise resolving to true if URL was opened successfully
-     */
-    openExternal: SystemDomainBridge["openExternal"];
-
-    /**
-     * Quits the application and installs a pending update
-     *
-     * @remarks
-     * This method triggers the app to quit and automatically install a
-     * downloaded update. This is typically called after the user confirms they
-     * want to install an available update.
-     */
-    quitAndInstall: () => void;
-}
+export type SystemApiInterface = SystemDomainBridge;
 
 /**
  * System domain API providing system-level operations.
@@ -67,9 +46,7 @@ export const systemApi: SystemApiInterface = {
      * downloaded update. This is typically called after the user confirms they
      * want to install an available update.
      */
-    quitAndInstall: (): void => {
-        ipcRenderer.send("quit-and-install");
-    },
+    quitAndInstall: createTypedInvoker("quit-and-install"),
 } as const;
 
 /**
@@ -77,8 +54,6 @@ export const systemApi: SystemApiInterface = {
  *
  * @public
  */
-export interface SystemApi extends SystemDomainBridge {
-    readonly quitAndInstall: () => void;
-}
+export type SystemApi = SystemDomainBridge;
 
 /* eslint-enable ex/no-unhandled -- Re-enable exception handling warnings */

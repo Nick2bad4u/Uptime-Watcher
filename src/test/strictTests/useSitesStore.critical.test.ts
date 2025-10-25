@@ -68,10 +68,12 @@ vi.mock("../../stores/sites/services/SiteService", () => ({
 // Mock MonitoringService that monitoring operations use
 vi.mock("../../stores/sites/services/MonitoringService", () => ({
     MonitoringService: {
-        startSiteMonitoring: vi.fn(),
-        stopSiteMonitoring: vi.fn(),
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
+        startMonitoringForSite: vi.fn(),
+        stopMonitoringForSite: vi.fn(),
+        startMonitoringForMonitor: vi.fn(),
+        stopMonitoringForMonitor: vi.fn(),
         checkSiteNow: vi.fn(),
         initialize: vi.fn(),
     },
@@ -132,16 +134,16 @@ describe("useSitesStore Function Coverage Tests", () => {
 
         // Set up MonitoringService mocks
         vi.mocked(MonitoringService.checkSiteNow).mockResolvedValue(undefined);
-        vi.mocked(MonitoringService.startSiteMonitoring).mockResolvedValue(
+        vi.mocked(MonitoringService.startMonitoringForSite).mockResolvedValue(
             undefined
         );
-        vi.mocked(MonitoringService.stopSiteMonitoring).mockResolvedValue(
+        vi.mocked(MonitoringService.stopMonitoringForSite).mockResolvedValue(
             undefined
         );
-        vi.mocked(MonitoringService.startMonitoring).mockResolvedValue(
+        vi.mocked(MonitoringService.startMonitoringForMonitor).mockResolvedValue(
             undefined
         );
-        vi.mocked(MonitoringService.stopMonitoring).mockResolvedValue(
+        vi.mocked(MonitoringService.stopMonitoringForMonitor).mockResolvedValue(
             undefined
         );
         vi.mocked(MonitoringService.initialize).mockResolvedValue(undefined);
@@ -323,12 +325,16 @@ describe("useSitesStore Function Coverage Tests", () => {
 
             // Test monitoring functions
             await store.startSiteMonitoring("site-id");
-            expect(MonitoringService.startSiteMonitoring).toHaveBeenCalledWith(
+            expect(
+                MonitoringService.startMonitoringForSite
+            ).toHaveBeenCalledWith(
                 "site-id"
             );
 
             await store.stopSiteMonitoring("site-id");
-            expect(MonitoringService.stopSiteMonitoring).toHaveBeenCalledWith(
+            expect(
+                MonitoringService.stopMonitoringForSite
+            ).toHaveBeenCalledWith(
                 "site-id"
             );
 

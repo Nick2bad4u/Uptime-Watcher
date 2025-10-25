@@ -30,7 +30,7 @@ export interface UpdateInfo {
  */
 export interface UpdatesStore {
     /** Apply downloaded update and restart */
-    applyUpdate: () => void;
+    applyUpdate: () => Promise<void>;
     /**
      * Applies a new update status to the store with proper state management.
      *

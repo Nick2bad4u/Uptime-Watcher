@@ -13,7 +13,11 @@ vi.mock("../../../stores/utils", () => ({
 // Mock the electron window API
 const mockElectronAPI = {
     monitoring: {
+        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
 };
@@ -28,7 +32,7 @@ describe("MonitoringService", () => {
         vi.clearAllMocks();
     });
 
-    describe("startMonitoring", () => {
+    describe("startMonitoringForMonitor", () => {
         it("should start monitoring for a site and monitor", async ({
             task,
             annotate,
@@ -41,14 +45,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -65,12 +72,15 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to start monitoring");
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockRejectedValueOnce(
                 error
             );
 
             await expect(
-                MonitoringService.startMonitoring(siteIdentifier, monitorId)
+                MonitoringService.startMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
             ).rejects.toThrow("Failed to start monitoring");
         });
 
@@ -83,14 +93,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith("", monitorId);
         });
 
@@ -103,14 +116,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, "");
         });
 
@@ -126,14 +142,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -149,19 +168,75 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
 
-    describe("stopMonitoring", () => {
+    describe("startMonitoring", () => {
+        it("should start monitoring globally", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
+            mockElectronAPI.monitoring.startMonitoring.mockResolvedValueOnce(
+                true
+            );
+
+            await expect(MonitoringService.startMonitoring()).resolves
+                .toBeUndefined();
+            expect(mockElectronAPI.monitoring.startMonitoring).toHaveBeenCalledTimes(
+                1
+            );
+        });
+
+        it("should throw when backend declines global start", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.monitoring.startMonitoring.mockResolvedValueOnce(
+                false
+            );
+
+            await expect(MonitoringService.startMonitoring()).rejects.toThrow(
+                "Failed to start monitoring across all sites"
+            );
+        });
+
+        it("should surface underlying errors", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const failure = new Error("global failure");
+            mockElectronAPI.monitoring.startMonitoring.mockRejectedValueOnce(
+                failure
+            );
+
+            await expect(MonitoringService.startMonitoring()).rejects.toThrow(
+                "global failure"
+            );
+        });
+    });
+
+    describe("stopMonitoringForMonitor", () => {
         it("should stop monitoring for a site and monitor", async ({
             task,
             annotate,
@@ -174,14 +249,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -198,12 +276,15 @@ describe("MonitoringService", () => {
             const monitorId = "test-monitor-id";
             const error = new Error("Failed to stop monitoring");
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockRejectedValueOnce(
                 error
             );
 
             await expect(
-                MonitoringService.stopMonitoring(siteIdentifier, monitorId)
+                MonitoringService.stopMonitoringForMonitor(
+                    siteIdentifier,
+                    monitorId
+                )
             ).rejects.toThrow("Failed to stop monitoring");
         });
 
@@ -216,14 +297,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "";
             const monitorId = "test-monitor-id";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith("", monitorId);
         });
 
@@ -236,14 +320,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id";
             const monitorId = "";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, "");
         });
 
@@ -259,14 +346,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id@#$%";
             const monitorId = "test-monitor-id!@#";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -282,15 +372,74 @@ describe("MonitoringService", () => {
             const siteIdentifier = "test-site-id-🌟";
             const monitorId = "test-monitor-id-💻";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
+        });
+    });
+
+    describe("stopMonitoring", () => {
+        it("should stop monitoring globally", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Monitoring", "type");
+
+            mockElectronAPI.monitoring.stopMonitoring.mockResolvedValueOnce(
+                true
+            );
+
+            await expect(MonitoringService.stopMonitoring()).resolves
+                .toBeUndefined();
+            expect(mockElectronAPI.monitoring.stopMonitoring).toHaveBeenCalledTimes(
+                1
+            );
+        });
+
+        it("should throw when backend declines global stop", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.monitoring.stopMonitoring.mockResolvedValueOnce(
+                false
+            );
+
+            await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
+                "Failed to stop monitoring across all sites"
+            );
+        });
+
+        it("should surface underlying stop errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const failure = new Error("stop failed");
+            mockElectronAPI.monitoring.stopMonitoring.mockRejectedValueOnce(
+                failure
+            );
+
+            await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
+                "stop failed"
+            );
         });
     });
 
@@ -329,10 +478,10 @@ describe("MonitoringService", () => {
             );
 
             await expect(
-                MonitoringService.startMonitoring("test", "test")
+                MonitoringService.startMonitoringForMonitor("test", "test")
             ).rejects.toThrow("ElectronAPI not available");
             await expect(
-                MonitoringService.stopMonitoring("test", "test")
+                MonitoringService.stopMonitoringForMonitor("test", "test")
             ).rejects.toThrow("ElectronAPI not available");
 
             // Reset the mock for other tests
@@ -353,14 +502,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "valid-site-id";
             const monitorId = "valid-monitor-id";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -373,14 +525,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "a".repeat(1000);
             const monitorId = "b".repeat(1000);
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -396,14 +551,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "12345";
             const monitorId = "67890";
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.stopMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.stopMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
 
@@ -416,14 +574,17 @@ describe("MonitoringService", () => {
             const siteIdentifier = "550e8400-e29b-41d4-a716-446655440000";
             const monitorId = "6ba7b810-9dad-11d1-80b4-00c04fd430c8";
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValueOnce(
                 true
             );
 
-            await MonitoringService.startMonitoring(siteIdentifier, monitorId);
+            await MonitoringService.startMonitoringForMonitor(
+                siteIdentifier,
+                monitorId
+            );
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
         });
     });
@@ -436,12 +597,12 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             const networkError = new Error("Network error");
-            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockRejectedValueOnce(
                 networkError
             );
 
             await expect(
-                MonitoringService.startMonitoring("test", "test")
+                MonitoringService.startMonitoringForMonitor("test", "test")
             ).rejects.toThrow("Network error");
         });
 
@@ -455,12 +616,12 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             const validationError = new Error("Invalid site ID");
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockRejectedValueOnce(
                 validationError
             );
 
             await expect(
-                MonitoringService.stopMonitoring("invalid", "test")
+                MonitoringService.stopMonitoringForMonitor("invalid", "test")
             ).rejects.toThrow("Invalid site ID");
         });
 
@@ -471,12 +632,12 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             const timeoutError = new Error("Request timeout");
-            mockElectronAPI.monitoring.startMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockRejectedValueOnce(
                 timeoutError
             );
 
             await expect(
-                MonitoringService.startMonitoring("test", "test")
+                MonitoringService.startMonitoringForMonitor("test", "test")
             ).rejects.toThrow("Request timeout");
         });
 
@@ -490,12 +651,12 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             const serviceError = new Error("Monitoring service unavailable");
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockRejectedValueOnce(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockRejectedValueOnce(
                 serviceError
             );
 
             await expect(
-                MonitoringService.stopMonitoring("test", "test")
+                MonitoringService.stopMonitoringForMonitor("test", "test")
             ).rejects.toThrow("Monitoring service unavailable");
         });
     });
@@ -511,17 +672,20 @@ describe("MonitoringService", () => {
             await annotate("Type: Business Logic", "type");
 
             const operations = Array.from({ length: 5 }, (_, i) =>
-                MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
+                MonitoringService.startMonitoringForMonitor(
+                    `site-${i}`,
+                    `monitor-${i}`
+                )
             );
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
                 true
             );
 
             await Promise.all(operations);
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledTimes(5);
         });
 
@@ -535,17 +699,20 @@ describe("MonitoringService", () => {
             await annotate("Type: Business Logic", "type");
 
             const operations = Array.from({ length: 5 }, (_, i) =>
-                MonitoringService.stopMonitoring(`site-${i}`, `monitor-${i}`)
+                MonitoringService.stopMonitoringForMonitor(
+                    `site-${i}`,
+                    `monitor-${i}`
+                )
             );
 
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
                 true
             );
 
             await Promise.all(operations);
 
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledTimes(5);
         });
 
@@ -559,29 +726,32 @@ describe("MonitoringService", () => {
             await annotate("Type: Business Logic", "type");
 
             const startOps = Array.from({ length: 3 }, (_, i) =>
-                MonitoringService.startMonitoring(`site-${i}`, `monitor-${i}`)
+                MonitoringService.startMonitoringForMonitor(
+                    `site-${i}`,
+                    `monitor-${i}`
+                )
             );
             const stopOps = Array.from({ length: 3 }, (_, i) =>
-                MonitoringService.stopMonitoring(
+                MonitoringService.stopMonitoringForMonitor(
                     `site-${i + 3}`,
                     `monitor-${i + 3}`
                 )
             );
 
-            mockElectronAPI.monitoring.startMonitoringForSite.mockResolvedValue(
+            mockElectronAPI.monitoring.startMonitoringForMonitor.mockResolvedValue(
                 true
             );
-            mockElectronAPI.monitoring.stopMonitoringForSite.mockResolvedValue(
+            mockElectronAPI.monitoring.stopMonitoringForMonitor.mockResolvedValue(
                 true
             );
 
             await Promise.all([...startOps, ...stopOps]);
 
             expect(
-                mockElectronAPI.monitoring.startMonitoringForSite
+                mockElectronAPI.monitoring.startMonitoringForMonitor
             ).toHaveBeenCalledTimes(3);
             expect(
-                mockElectronAPI.monitoring.stopMonitoringForSite
+                mockElectronAPI.monitoring.stopMonitoringForMonitor
             ).toHaveBeenCalledTimes(3);
         });
 
@@ -594,15 +764,24 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Error Handling", "type");
 
-            mockElectronAPI.monitoring.startMonitoringForSite
+            mockElectronAPI.monitoring.startMonitoringForMonitor
                 .mockResolvedValueOnce(true)
                 .mockRejectedValueOnce(new Error("Failed"))
                 .mockResolvedValueOnce(true);
 
             const operations = [
-                MonitoringService.startMonitoring("site-1", "monitor-1"),
-                MonitoringService.startMonitoring("site-2", "monitor-2"),
-                MonitoringService.startMonitoring("site-3", "monitor-3"),
+                MonitoringService.startMonitoringForMonitor(
+                    "site-1",
+                    "monitor-1"
+                ),
+                MonitoringService.startMonitoringForMonitor(
+                    "site-2",
+                    "monitor-2"
+                ),
+                MonitoringService.startMonitoringForMonitor(
+                    "site-3",
+                    "monitor-3"
+                ),
             ];
 
             const results = await Promise.allSettled(operations);

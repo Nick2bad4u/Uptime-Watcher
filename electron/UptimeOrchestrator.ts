@@ -127,6 +127,7 @@ interface RestartMonitoringRequestData {
 }
 
 interface SiteEventData {
+    cascade?: boolean;
     identifier?: string;
     site?: Site;
     source?: SiteAddedSource;
@@ -338,6 +339,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             const siteIdentifier =
                 data.identifier ?? data.site?.identifier ?? "unknown-site";
             const siteName = data.site?.name ?? "Unknown";
+            const cascade = data.cascade === true;
 
             if (!data.site) {
                 logger.warn(
@@ -347,7 +349,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
 
             await this.emitTyped("site:removed", {
-                cascade: true,
+                cascade,
                 siteIdentifier,
                 siteName,
                 timestamp: data.timestamp,

@@ -331,10 +331,16 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 "startMonitoring"
             );
             expect(MonitoringHandlerValidators).toHaveProperty(
+                "startMonitoringForMonitor"
+            );
+            expect(MonitoringHandlerValidators).toHaveProperty(
                 "startMonitoringForSite"
             );
             expect(MonitoringHandlerValidators).toHaveProperty(
                 "stopMonitoring"
+            );
+            expect(MonitoringHandlerValidators).toHaveProperty(
+                "stopMonitoringForMonitor"
             );
             expect(MonitoringHandlerValidators).toHaveProperty(
                 "stopMonitoringForSite"
@@ -357,18 +363,24 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 "function"
             );
             expect(
-                typeof MonitoringHandlerValidators.startMonitoringForSite
+                typeof MonitoringHandlerValidators.startMonitoringForMonitor
             ).toBe("function");
+            expect(typeof MonitoringHandlerValidators.startMonitoringForSite).toBe(
+                "function"
+            );
             expect(typeof MonitoringHandlerValidators.stopMonitoring).toBe(
                 "function"
             );
             expect(
-                typeof MonitoringHandlerValidators.stopMonitoringForSite
+                typeof MonitoringHandlerValidators.stopMonitoringForMonitor
             ).toBe("function");
+            expect(typeof MonitoringHandlerValidators.stopMonitoringForSite).toBe(
+                "function"
+            );
         });
 
         describe("checkSiteNow validator", () => {
-            it("should return null for valid two string parameters", async ({
+            it("should return null for valid site and monitor identifiers", async ({
                 task,
                 annotate,
             }) => {
@@ -394,7 +406,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result = MonitoringHandlerValidators.checkSiteNow([
-                    "only-one",
+                    "only-site",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
@@ -431,24 +443,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("startMonitoringForSite validator", () => {
-            it("should return null for valid parameters with both strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result =
-                    MonitoringHandlerValidators.startMonitoringForSite([
-                        "site-id",
-                        "monitor-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return null for valid parameters with single string", async ({
+            it("should return null for valid site identifier", async ({
                 task,
                 annotate,
             }) => {
@@ -474,10 +469,58 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Type: Error Handling", "type");
 
                 const result =
+                    MonitoringHandlerValidators.startMonitoringForSite([]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("should return error array when too many parameters are provided", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
                     MonitoringHandlerValidators.startMonitoringForSite([
-                        "one",
-                        "two",
-                        "three",
+                        "site-id",
+                        "extra",
+                    ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("startMonitoringForMonitor validator", () => {
+            it("should return null for valid site and monitor identifiers", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result =
+                    MonitoringHandlerValidators.startMonitoringForMonitor([
+                        "site-id",
+                        "monitor-id",
+                    ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("should return error array for invalid parameter count", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
+                    MonitoringHandlerValidators.startMonitoringForMonitor([
+                        "only-site",
                     ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
@@ -514,24 +557,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
         });
 
         describe("stopMonitoringForSite validator", () => {
-            it("should return null for valid parameters with both strings", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result =
-                    MonitoringHandlerValidators.stopMonitoringForSite([
-                        "site-id",
-                        "monitor-id",
-                    ]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return null for valid parameters with single string", async ({
+            it("should return null for valid site identifier", async ({
                 task,
                 annotate,
             }) => {
@@ -558,6 +584,58 @@ describe("IPC Validators - Exported Validator Groups", () => {
 
                 const result =
                     MonitoringHandlerValidators.stopMonitoringForSite([]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+
+            it("should return error array when too many parameters are provided", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForSite([
+                        "site-id",
+                        "extra",
+                    ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("stopMonitoringForMonitor validator", () => {
+            it("should return null for valid site and monitor identifiers", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForMonitor([
+                        "site-id",
+                        "monitor-id",
+                    ]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("should return error array for invalid parameter count", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result =
+                    MonitoringHandlerValidators.stopMonitoringForMonitor([
+                        "only-site",
+                    ]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
@@ -986,6 +1064,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                         "http",
                         null,
                     ]);
+
                 const result2 =
                     MonitorTypeHandlerValidators.validateMonitorData([
                         "ping",

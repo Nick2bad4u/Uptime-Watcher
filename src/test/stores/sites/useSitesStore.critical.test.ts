@@ -89,8 +89,8 @@ const mockElectronAPI = {
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
-        startMonitoringForSiteMonitor: vi.fn().mockResolvedValue(true),
-        stopMonitoringForSiteMonitor: vi.fn().mockResolvedValue(true),
+        startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
+        stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
     },
     stateSync: {
         getSyncStatus: vi.fn(),

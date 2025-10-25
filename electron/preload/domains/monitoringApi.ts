@@ -60,10 +60,19 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     startMonitoring: MonitoringDomainBridge["startMonitoring"];
 
     /**
-     * Starts monitoring for a specific site or monitor
+     * Starts monitoring for a specific monitor within a site
      *
      * @param siteIdentifier - The site identifier
-     * @param monitorId - Optional monitor identifier
+     * @param monitorId - The monitor identifier to start
+     *
+     * @returns Promise resolving to true if monitoring started successfully
+     */
+    startMonitoringForMonitor: MonitoringDomainBridge["startMonitoringForMonitor"];
+
+    /**
+     * Starts monitoring for all monitors belonging to a specific site
+     *
+     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
@@ -77,10 +86,19 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     stopMonitoring: MonitoringDomainBridge["stopMonitoring"];
 
     /**
-     * Stops monitoring for a specific site or monitor
+     * Stops monitoring for a specific monitor within a site
      *
      * @param siteIdentifier - The site identifier
-     * @param monitorId - Optional monitor identifier
+     * @param monitorId - The monitor identifier to stop
+     *
+     * @returns Promise resolving to true if monitoring stopped successfully
+     */
+    stopMonitoringForMonitor: MonitoringDomainBridge["stopMonitoringForMonitor"];
+
+    /**
+     * Stops monitoring for all monitors belonging to a specific site
+     *
+     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
@@ -134,10 +152,21 @@ export const monitoringApi: MonitoringApiInterface = {
     startMonitoring: createTypedInvoker("start-monitoring"),
 
     /**
-     * Starts monitoring for a specific site or monitor
+     * Starts monitoring for a specific monitor within a site
      *
      * @param siteIdentifier - The site identifier
-     * @param monitorId - Optional monitor identifier
+     * @param monitorId - The monitor identifier to start
+     *
+     * @returns Promise resolving to true if monitoring started successfully
+     */
+    startMonitoringForMonitor: createTypedInvoker(
+        "start-monitoring-for-monitor"
+    ),
+
+    /**
+     * Starts monitoring for all monitors belonging to a specific site
+     *
+     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
@@ -151,10 +180,19 @@ export const monitoringApi: MonitoringApiInterface = {
     stopMonitoring: createTypedInvoker("stop-monitoring"),
 
     /**
-     * Stops monitoring for a specific site or monitor
+     * Stops monitoring for a specific monitor within a site
      *
      * @param siteIdentifier - The site identifier
-     * @param monitorId - Optional monitor identifier
+     * @param monitorId - The monitor identifier to stop
+     *
+     * @returns Promise resolving to true if monitoring stopped successfully
+     */
+    stopMonitoringForMonitor: createTypedInvoker("stop-monitoring-for-monitor"),
+
+    /**
+     * Stops monitoring for all monitors belonging to a specific site
+     *
+     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */

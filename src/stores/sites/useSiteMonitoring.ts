@@ -53,10 +53,10 @@ export interface SiteMonitoringDependencies {
     monitoringService: Pick<
         typeof MonitoringService,
         | "checkSiteNow"
-        | "startMonitoring"
-        | "startSiteMonitoring"
-        | "stopMonitoring"
-        | "stopSiteMonitoring"
+        | "startMonitoringForMonitor"
+        | "startMonitoringForSite"
+        | "stopMonitoringForMonitor"
+        | "stopMonitoringForSite"
     >;
 }
 
@@ -128,7 +128,7 @@ export const createSiteMonitoringActions = (
         await withErrorHandling(
             async () => {
                 try {
-                    await deps.monitoringService.startSiteMonitoring(
+                    await deps.monitoringService.startMonitoringForSite(
                         siteIdentifier
                     );
                     logStoreAction("SitesStore", "startSiteMonitoring", {
@@ -165,7 +165,7 @@ export const createSiteMonitoringActions = (
         await withErrorHandling(
             async () => {
                 try {
-                    await deps.monitoringService.startMonitoring(
+                    await deps.monitoringService.startMonitoringForMonitor(
                         siteIdentifier,
                         monitorId
                     );
@@ -204,7 +204,7 @@ export const createSiteMonitoringActions = (
         await withErrorHandling(
             async () => {
                 try {
-                    await deps.monitoringService.stopSiteMonitoring(
+                    await deps.monitoringService.stopMonitoringForSite(
                         siteIdentifier
                     );
                     logStoreAction("SitesStore", "stopSiteMonitoring", {
@@ -241,7 +241,7 @@ export const createSiteMonitoringActions = (
         await withErrorHandling(
             async () => {
                 try {
-                    await deps.monitoringService.stopMonitoring(
+                    await deps.monitoringService.stopMonitoringForMonitor(
                         siteIdentifier,
                         monitorId
                     );
