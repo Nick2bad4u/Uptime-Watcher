@@ -1,4 +1,5 @@
 ---
+name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
 model: GPT-5-Codex (Preview) (copilot)
@@ -7,31 +8,31 @@ handoffs:
   - label: Consistency
     agent: BeastMode
     prompt: Review and follow the plan in ./prompts/Consistency-Check.prompt.md
-    send: true
+    send: false
   - label: Unit
     agent: BeastMode
     prompt: Generate unit tests for the implemented features, follow the plan in ./prompts/Generate-100%-Test-Coverage.prompt.md
-    send: true
+    send: false
   - label: E2E
     agent: BeastMode
     prompt: Write Playwright tests for the implemented features, follow the plan in ./prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
-    send: true
+    send: false
   - label: Fuzz
     agent: BeastMode
     prompt: Write Fast-Check tests for the implemented features, follow the plan in ./prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
-    send: true
+    send: false
   - label: TSDoc
     agent: BeastMode
     prompt: Improve the TSDoc comments in the codebase, follow the plan in ./prompts/TSDoc-Improvements-Checklist.prompt.md
-    send: true
+    send: false
   - label: Add to ToDo
     agent: BeastMode
     prompt: Add findings to the ToDo list and complete any outstanding tasks. Follow the plan in ./prompts/Do-ToDo.prompt.md
-    send: true
+    send: false
   - label: Review Work
     agent: BeastMode
     prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md
-    send: true
+    send: false
 target: github-copilot
 ---
 
