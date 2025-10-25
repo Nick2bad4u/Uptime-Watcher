@@ -7,14 +7,168 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)...
+[cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc70f2344c3611939441c52e33d6474c55d6dbb7...cc70f2344c3611939441c52e33d6474c55d6dbb7))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.4.0 [`(cc70f23)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)
+
+
+
+
+
+
+## [17.4.0] - 2025-10-25
+
+
 [[8ddc2fc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)...
-[8ddc2fc](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8ddc2fcfb06d5a152acc56616933091cde1dd230...8ddc2fcfb06d5a152acc56616933091cde1dd230))
+[a15b7a5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a15b7a59b17721cda8678dfbd38f88eb954a11e3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8ddc2fcfb06d5a152acc56616933091cde1dd230...a15b7a59b17721cda8678dfbd38f88eb954a11e3))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.3.0 [`(8ddc2fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8ddc2fcfb06d5a152acc56616933091cde1dd230)
+
+
+
+### 🛠️ Other Changes
+
+- 🔧 [refactor] Centralize site addition source metadata and improve event handling 🎯
+
+Refactors site addition event sourcing to provide better traceability of where sites originate (user creation, imports, or migrations).
+
+**Source Code Changes:**
+
+- ✨ Extracts site addition source types into shared event types module, making `SiteAddedSource` and `SITE_ADDED_SOURCE` constants universally accessible across preload, main, and shared layers
+  - Defines canonical enum-like constants (`IMPORT`, `MIGRATION`, `USER`) with frozen object pattern for type safety
+  - Replaces inline string literals throughout codebase with centralized constants
+
+- 🎯 Updates `SiteManager.addSite()` to accept optional source metadata via options parameter, defaulting to user-initiated additions
+  - Passes source information through internal event emissions for proper audit trail
+
+- 📡 Enhances `UptimeOrchestrator` to preserve and forward source metadata when processing internal site addition events
+  - Ensures source context flows from backend services through to renderer event listeners
+
+- 💾 Implements automatic source tracking during data imports in `DatabaseCommands`
+  - Emits individual `internal:site:added` events for newly imported sites with `IMPORT` source
+  - Replaces batch processing with per-site event emissions for granular change tracking
+
+- 🔌 Updates preload API layer and event type definitions to use centralized source types
+
+**Supporting Changes:**
+
+- 🛠️ Improves error handling in main process hot reload logic with better null checks and service container validation
+  - Adds `ensureError()` utility calls for consistent error normalization
+  - Prevents crashes when service container or windows unavailable during reload
+
+- 📚 Updates API documentation with clarified method signatures and behavior descriptions
+  - Reflects renamed IPC handlers and updated parameter types
+  - Improves examples with source metadata usage
+
+- 🧪 Adds comprehensive test coverage for source metadata propagation through event pipeline
+  - Validates custom source preservation in site manager
+  - Tests import command properly emits source-tagged events
+
+- ⬆️ Upgrades development dependencies (Biome 2.3.0, Storybook 9.1.15, Vitest 4.0.3, Tailwind 4.1.16, etc.)
+- 🔧 Configures ESLint recheck-jar path resolution for improved regex validation linting
+- 🎨 Applies formatting improvements and mock function naming conventions for test clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(88d0f97)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/88d0f97ce2fa661ec0167c11dfb1510b8da6ca55)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Clarify monitoring API and standardize IPC handling
+
+This commit refactors the monitoring API for clarity, improves IPC handling, and enhances event data validation and context.
+
+✨ [feat] Introduce explicit monitoring API methods
+-   Splits the ambiguous `startMonitoringForSite` and `stopMonitoringForSite` methods, which previously used an optional `monitorId`, into distinct functions:
+    -   `startMonitoringForMonitor` / `stopMonitoringForMonitor`: Target a single monitor and require a `monitorId`.
+    -   `startMonitoringForSite` / `stopMonitoringForSite`: Target all monitors within a site.
+-   This change improves API ergonomics and removes ambiguity for developers.
+
+🚜 [refactor] Standardize `quitAndInstall` IPC handling
+-   Migrates the `quit-and-install` IPC call from `ipcMain.on` to `ipcMain.handle`.
+-   This makes it an async, promise-based operation consistent with other IPC handlers, allowing the renderer to await confirmation.
+-   The renderer-side `SystemService` is updated to `await` this call and handle potential errors.
+
+⚡ [perf] Enhance event payload validation
+-   Replaces local, manual type guards in the preload script (`eventsApi.ts`, `stateSyncApi.ts`) with robust, schema-based validators (`validateSiteSnapshot`, `safeParseStateSyncEventData`) from the shared package.
+-   This strengthens type safety at the IPC boundary and centralizes validation logic.
+
+✨ [feat] Add `cascade` flag to site removal events
+-   Introduces a `cascade: boolean` flag to `internal:site:removed` events.
+-   This flag differentiates between single site removals (`cascade: false`) and bulk removal operations (`cascade: true`), providing more context to event listeners.
+
+📝 [docs] Update API documentation
+-   Refreshes `API_DOCUMENTATION.md` to reflect the new, more explicit monitoring methods (`start/stopMonitoringForMonitor` and `start/stopMonitoringForSite`).
+
+🎨 [style] Adjust compact site card layout
+-   Updates the CSS for the compact site card status section to use `display: grid` for better alignment and responsiveness on smaller screens.
+
+🧪 [test] Update tests for API and IPC changes
+-   Aligns unit and comprehensive tests across the application to match the refactored monitoring API, standardized `quitAndInstall` IPC handling, and new event validation logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(753769f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/753769f0b036cd1ac856956dee3bfb167c59cb56)
+
+
+- 🚜 [refactor] Use RendererEventPayloadMap for site event typings and add TODO prompt
+
+ - 🚜 [refactor] Replace RENDERER_EVENT_CHANNELS + RendererEventPayload usage with RendererEventPayloadMap['site:added' | 'site:removed' | 'site:updated'] to derive site event payload types; remove unused imports and decouple channel constants from payload types (shared/types/eventsBridge.ts, src/services/EventsService.ts).
+ - 📝 [docs] Add .github/prompts/Add-To-ToDo.md: BeastMode agent prompt to generate and maintain a comprehensive TODO.md (clear existing TODOs, capture full context, list dependencies/estimates, implement, test, and iterate).
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(738962d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/738962d6cc50bf24dc85a72bb7ee753ad9be4a43)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Add handoffs and argument-hint to BeastMode agent metadata
+ - 🧹 [chore] Add argument-hint "😈 Beast Mode agent ready. 👿" to .github/agents/BeastMode.agent.md
+ - 🧹 [chore] Introduce handoffs array with labeled tasks and prompts (Consistency Check, Fix ESLint Errors, Generate Unit Tests, Write Playwright Tests, Write Fast-Check Tests, TSDoc Improvements)
+ - 🧹 [chore] Metadata-only update to improve agent handoff workflow; tools and target left unchanged
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e315e3d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e315e3d683e215cb883394838d7c7a003880b04a)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Refactor codebase with consistent formatting and style improvements
+
+This commit introduces a wide-ranging series of updates focused on improving code style, consistency, and readability across the entire project. It also enhances the BeastMode agent's capabilities and refines development and testing configurations.
+
+✨ [feat] Enhance BeastMode Agent Configuration
+ - Updates the agent to use the `GPT-5-Codex` model.
+ - Refines and expands the agent's handoff capabilities with new tasks for testing, TSDoc, and work review.
+ - Adds a new `Review.prompt.md` to guide the agent in comprehensive task validation.
+
+🎨 [style] Apply Consistent Code Formatting
+ - Applies standardized formatting to numerous TypeScript, JavaScript, and Markdown files.
+ - Improves JSDoc comments, type definitions, and code block indentation for better readability and maintainability.
+ - Reformats complex object and array declarations to follow a consistent multi-line style.
+
+🔧 [build] Refine ESLint and Build Configuration
+ - Adjusts ESLint plugin and rule definitions for improved clarity.
+ - Improves JSDoc in the Storybook test runner configuration.
+
+🧪 [test] Standardize Test File Formatting
+ - Applies consistent formatting across the test suite, including Vitest and Fast-Check tests.
+ - Cleans up mock implementations and test setups for better readability without changing logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a15b7a5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a15b7a59b17721cda8678dfbd38f88eb954a11e3)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.3.0 [skip ci] [`(ec2f1b7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec2f1b7d9052fb1ecadf6aa5f927fa939c24648f)
 
 
 
