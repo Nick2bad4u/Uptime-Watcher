@@ -7,10 +7,11 @@ import { StatusSubscriptionIndicator } from "../../../components/Header/StatusSu
 
 const healthySummary: StatusUpdateSubscriptionSummary = {
     errors: [],
-    expectedListeners: 3,
-    listenersAttached: 3,
+    expectedListeners: 4,
+    listenersAttached: 4,
     listenerStates: [
         { attached: true, name: "monitor-status-changed" },
+        { attached: true, name: "monitor-check-completed" },
         { attached: true, name: "monitoring-started" },
         { attached: true, name: "monitoring-stopped" },
     ],
@@ -21,10 +22,11 @@ const healthySummary: StatusUpdateSubscriptionSummary = {
 
 const fallbackSummary: StatusUpdateSubscriptionSummary = {
     errors: ["retry failed"],
-    expectedListeners: 3,
+    expectedListeners: 4,
     listenersAttached: 0,
     listenerStates: [
         { attached: false, name: "monitor-status-changed" },
+        { attached: false, name: "monitor-check-completed" },
         { attached: false, name: "monitoring-started" },
         { attached: false, name: "monitoring-stopped" },
     ],
@@ -67,7 +69,7 @@ describe(StatusSubscriptionIndicator, function describeIndicatorSuite() {
         );
         expect(trigger).toHaveAttribute(
             "aria-label",
-            expect.stringContaining("3 channels active")
+            expect.stringContaining("4 channels active")
         );
         expect(
             screen.queryByRole("button", {

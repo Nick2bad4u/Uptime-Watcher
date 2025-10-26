@@ -9,6 +9,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
+    "monitor-check-completed",
     "monitoring-started",
     "monitoring-stopped",
 ];
@@ -51,9 +52,9 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
         return {
             subscribe: vi.fn(async () => ({
                 errors: [],
-                expectedListeners: 3,
-                listenersAttached: 3,
-                listenerStates: buildListenerStates(3),
+                expectedListeners: LISTENER_NAMES.length,
+                listenersAttached: LISTENER_NAMES.length,
+                listenerStates: buildListenerStates(LISTENER_NAMES.length),
                 success: true,
             })),
             unsubscribe: vi.fn(),

@@ -159,7 +159,8 @@ class MockResizeObserver {
     }
 }
 
-globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver;
+globalThis.ResizeObserver =
+    MockResizeObserver as unknown as typeof ResizeObserver;
 
 /**
  * Minimal Web Storage implementation used when Node.js exposes an incomplete
@@ -278,6 +279,8 @@ const mockElectronAPI: {
         importData: AnyMock;
     };
     events: {
+        onMonitorCheckCompleted: SubscriptionMock;
+        onHistoryLimitUpdated: SubscriptionMock;
         onMonitorStatusChanged: SubscriptionMock;
         onMonitorUp: SubscriptionMock;
         onSiteAdded: SubscriptionMock;
@@ -345,6 +348,14 @@ const mockElectronAPI: {
         importData: vi.fn().mockResolvedValue(true),
     },
     events: {
+        onMonitorCheckCompleted: vi.fn((_callback: any) =>
+            // Mock implementation - return cleanup function
+            vi.fn()
+        ),
+        onHistoryLimitUpdated: vi.fn((_callback: any) =>
+            // Mock implementation - return cleanup function
+            vi.fn()
+        ),
         onMonitorStatusChanged: vi.fn((_callback: any) =>
             // Mock implementation - return cleanup function
             vi.fn()

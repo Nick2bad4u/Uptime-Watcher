@@ -115,12 +115,12 @@ describe("Backend Arrow Function Mutation Tests", () => {
                 isOnline: boolean;
                 lastSync: string;
                 syncInProgress: boolean;
-            }> => mockIpcRenderer.invoke("sync:getStatus");
+            }> => mockIpcRenderer.invoke("get-sync-status");
 
             const result = await getSyncStatus();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "sync:getStatus"
+                "get-sync-status"
             );
             expect(result).toHaveProperty("isOnline");
             expect(result).toHaveProperty("lastSync");
@@ -154,12 +154,12 @@ describe("Backend Arrow Function Mutation Tests", () => {
             const requestFullSync = (): Promise<{
                 siteCount: number;
                 success: boolean;
-            }> => mockIpcRenderer.invoke("sync:requestFull");
+            }> => mockIpcRenderer.invoke("request-full-sync");
 
             const result = await requestFullSync();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "sync:requestFull"
+                "request-full-sync"
             );
             expect(result).toHaveProperty("siteCount");
             expect(result).toHaveProperty("success");

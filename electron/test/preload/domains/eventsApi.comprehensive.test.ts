@@ -53,6 +53,8 @@ vi.mock("../../../preload/utils/preloadLogger", () => ({
 import { createEventsApi } from "../../../preload/domains/eventsApi";
 import type {
     CacheInvalidatedEventData,
+    HistoryLimitUpdatedEventData,
+    MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitorStatusChangedEventData,
     MonitoringControlEventData,
@@ -105,6 +107,8 @@ describe("Events Domain API", () => {
             const expectedMethods = [
                 "onCacheInvalidated",
                 "onMonitorDown",
+                "onMonitorCheckCompleted",
+                "onHistoryLimitUpdated",
                 "onMonitoringStarted",
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
@@ -439,6 +443,145 @@ describe("Events Domain API", () => {
         });
     });
 
+    describe("onMonitorCheckCompleted", () => {
+        it("should register listener for manual check completion events", () => {
+            const callback = vi.fn();
+
+            const cleanup = eventsApi.onMonitorCheckCompleted(callback);
+
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "monitor:check-completed",
+                expect.any(Function)
+            );
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should forward manual check completion payloads to callback", () => {
+            const callback = vi.fn();
+            const eventData: MonitorCheckCompletedEventData = {
+                checkType: "manual",
+                monitorId: "monitor-123",
+                result: {
+                    details: "Manual verification completed",
+                    monitor: createMonitorFixture(),
+                    monitorId: "monitor-123",
+                    previousStatus: "down",
+                    site: createSiteFixture(),
+                    siteIdentifier: "site-abc",
+                    status: "up",
+                    timestamp: new Date().toISOString(),
+                },
+                siteIdentifier: "site-abc",
+                timestamp: Date.now(),
+            };
+
+            eventsApi.onMonitorCheckCompleted(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, eventData);
+
+            expect(callback).toHaveBeenCalledWith(eventData);
+        });
+
+        it("should drop malformed manual check completion payloads", () => {
+            const callback = vi.fn();
+            const malformedPayload = {
+                checkType: "manual",
+                monitorId: "monitor-123",
+                siteIdentifier: "site-abc",
+                timestamp: Date.now(),
+                // Missing result payload entirely
+            };
+
+            mockIpcRenderer.on.mockClear();
+            eventsApi.onMonitorCheckCompleted(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, malformedPayload);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'monitor:check-completed'",
+                expect.objectContaining({
+                    guard: expect.stringContaining(
+                        "isMonitorCheckCompletedEventDataPayload"
+                    ),
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "monitor:check-completed",
+                    guard: "isMonitorCheckCompletedEventDataPayload",
+                    reason: "monitor-check-completed",
+                })
+            );
+        });
+    });
+
+    describe("onHistoryLimitUpdated", () => {
+        it("should register listener for history limit updates", () => {
+            const callback = vi.fn();
+
+            const cleanup = eventsApi.onHistoryLimitUpdated(callback);
+
+            expect(mockIpcRenderer.on).toHaveBeenCalledWith(
+                "settings:history-limit-updated",
+                expect.any(Function)
+            );
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should forward history limit payloads to callback", () => {
+            const callback = vi.fn();
+            const payload: HistoryLimitUpdatedEventData = {
+                limit: 750,
+                operation: "history-limit-updated",
+                previousLimit: 500,
+                timestamp: Date.now(),
+            };
+
+            eventsApi.onHistoryLimitUpdated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.({}, payload);
+
+            expect(callback).toHaveBeenCalledWith(payload);
+        });
+
+        it("should reject malformed history limit payloads", () => {
+            const callback = vi.fn();
+
+            eventsApi.onHistoryLimitUpdated(callback);
+
+            const eventHandler = mockIpcRenderer.on.mock.calls[0]?.[1];
+            eventHandler?.(
+                {},
+                {
+                    limit: "invalid",
+                    operation: "history-limit-updated",
+                    timestamp: Date.now(),
+                }
+            );
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(diagnosticsWarnSpy).toHaveBeenCalledWith(
+                "[eventsApi] Dropped malformed payload for 'settings:history-limit-updated'",
+                expect.objectContaining({
+                    guard: "isHistoryLimitUpdatedEventDataPayload",
+                    payloadType: "object",
+                })
+            );
+            expect(guardFailureSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    channel: "settings:history-limit-updated",
+                    guard: "isHistoryLimitUpdatedEventDataPayload",
+                    reason: "history-limit-updated",
+                })
+            );
+        });
+    });
+
     describe("onSiteAdded", () => {
         it("should register listener for site added events", () => {
             const callback = vi.fn();
@@ -663,6 +806,8 @@ describe("Events Domain API", () => {
             const expectedChannels = [
                 RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
                 RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
+                RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
+                RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
                 RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
                 RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
                 RENDERER_EVENT_CHANNELS.MONITOR_STATUS_CHANGED,

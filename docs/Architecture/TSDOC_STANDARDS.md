@@ -436,18 +436,18 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * Registers standardized IPC handler with validation and error handling.
  *
  * @remarks
- * **Channel Naming**: Must follow `domain:action` pattern (e.g.,
- * 'sites:create', 'monitors:update'). **Validation**: Parameters are validated
- * before handler execution if validator provided. **Error Handling**: Automatic
- * error logging and consistent error response format. **Type Safety**: Handler
- * and validator types are checked at compile time. **Duplicate Prevention**:
- * Prevents multiple handlers for the same channel.
+ * **Channel Naming**: Must follow verb-first, hyphenated identifiers (e.g.,
+ * 'add-site', 'start-monitoring-for-site'). **Validation**: Parameters are
+ * validated before handler execution if validator provided. **Error Handling**:
+ * Automatic error logging and consistent error response format. **Type
+ * Safety**: Handler and validator types are checked at compile time.
+ * **Duplicate Prevention**: Prevents multiple handlers for the same channel.
  *
  * @example
  *
  * ```typescript
  * // Simple handler without parameters
- * ipcService.registerStandardizedIpcHandler("sites:get-all", async () => {
+ * ipcService.registerStandardizedIpcHandler("get-sites", async () => {
  *  const sites = await siteManager.getAllSites();
  *  return sites;
  * });
@@ -458,7 +458,7 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * ```typescript
  * // Handler with validation
  * ipcService.registerStandardizedIpcHandler(
- *  "sites:create",
+ *  "add-site",
  *  async (params: SiteCreationData) => {
  *   const site = await siteManager.createSite(params);
  *   return site;
@@ -472,28 +472,16 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * ```typescript
  * // Complex handler with error handling
  * ipcService.registerStandardizedIpcHandler(
- *  "sites:bulk-update",
- *  async (params: BulkUpdateParams) => {
- *   const results = [];
- *   for (const update of params.updates) {
- *    try {
- *     const result = await siteManager.updateSite(update.id, update.data);
- *     results.push({ success: true, id: update.id, result });
- *    } catch (error) {
- *     results.push({
- *      success: false,
- *      id: update.id,
- *      error: error.message,
- *     });
- *    }
- *   }
- *   return { results, total: params.updates.length };
+ *  "update-site",
+ *  async (identifier: string, updates: Partial<Site>) => {
+ *   const result = await siteManager.updateSite(identifier, updates);
+ *   return result;
  *  },
- *  isBulkUpdateParams
+ *  validateSiteUpdate // Type guard function validating the updates object
  * );
  * ```
  *
- * @param channel - IPC channel name following domain:action pattern
+ * @param channel - IPC channel name following verb-first hyphenated pattern
  * @param handler - Async function to handle the IPC request
  * @param validator - Optional validation function for request parameters
  *

@@ -43,14 +43,14 @@ describe("systemApi", () => {
     it("invokes quit-and-install via invoke", async () => {
         vi.mocked(ipcRenderer.invoke).mockImplementation(
             async (channel: string, ...args: unknown[]) => {
-                if (channel === "diagnostics:verify-ipc-handler") {
+                if (channel === "diagnostics-verify-ipc-handler") {
                     const targetChannel = args[0];
 
                     return {
                         success: true,
                         data: {
                             availableChannels: [
-                                "diagnostics:verify-ipc-handler",
+                                "diagnostics-verify-ipc-handler",
                                 targetChannel,
                             ],
                             channel: targetChannel,

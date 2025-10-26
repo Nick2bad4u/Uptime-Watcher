@@ -179,6 +179,22 @@ The application uses a TypedEventBus for decoupled communication between compone
 - **Action**: Specific action in past tense for completed events
 - **Consistency**: Use kebab-case for multi-word actions
 
+### Settings Retention Synchronization
+
+The database retention policy is surfaced to renderers through the
+`settings:history-limit-updated` broadcast. The orchestrator tracks the last
+observed limit so the payload always includes both the **new** limit and the
+**previous** limit, enabling toast messaging and audit logs to explain why the
+value changed.
+
+- Subscribe via `EventsService.onHistoryLimitUpdated` inside the settings store.
+- Only mutate state if the incoming limit differs from the current store value
+  (the service already implements this guard).
+- Treat backend-originated changes (imports, CLI migrations) the same as UI
+  mutations—there is no special casing in the renderer.
+- The renderer callback runs inside the store module; avoid calling the IPC
+  service from within the handler to prevent feedback loops.
+
 ### Event-Driven Implementation Template
 
 ```typescript
@@ -559,11 +575,30 @@ export function SiteTitle({ title }: { title: string }): JSX.Element {
 - ❌ Don't mutate state directly
 - ❌ Don't persist transient UI state
 
+### Manual Monitoring Check Optimistic Updates
+
+Manual health checks now return the authoritative `StatusUpdate` payload from
+the backend. `createSiteMonitoringActions.checkSiteNow` applies the update via
+`applyStatusUpdateSnapshot`, providing instant UI feedback without waiting for
+the follow-up event broadcast.
+
+- The optimistic reducer reuses the same merge logic as the
+  `StatusUpdateManager`, guaranteeing consistency with live event handling.
+- If the payload is incomplete (missing a monitor or site snapshot), the helper
+  no-ops and logs a debug message—callers do not need additional guards.
+- Always update store state through the injected `setSites` action so that
+  derived selectors and persistence continue to work as expected.
+
 ## IPC Communication
 
 ### IPC Communication Overview
 
 Standardized IPC protocol using contextBridge with type safety, validation, and consistent error handling.
+
+> **Generation-first workflow:** The preload bridge and channel documentation
+> are generated from the canonical schema. Update the schema (typically
+> `RendererEventPayloadMap`/`IpcInvokeChannelMap`) and re-run
+> `npm run generate:ipc`; CI enforces drift detection via `npm run check:ipc`.
 
 ### Handler Registration Pattern
 
@@ -579,7 +614,7 @@ export function isExampleParams(data: unknown): data is ExampleParams {
 // 2. Register handlers by domain
 private registerExampleHandlers(deps: IpcServiceDependencies): void {
     this.registerStandardizedIpcHandler(
-        'example:create',
+        'create-example',
         async (params: ExampleParams) => {
             const result = await deps.exampleManager.create(params);
             return result;
@@ -588,7 +623,7 @@ private registerExampleHandlers(deps: IpcServiceDependencies): void {
     );
 
     this.registerStandardizedIpcHandler(
-        'example:get-all',
+        'get-examples',
         async () => {
             const results = await deps.exampleManager.getAll();
             return results;
@@ -605,8 +640,8 @@ private registerExampleHandlers(deps: IpcServiceDependencies): void {
 const electronAPI = {
  example: {
   create: (params: ExampleParams): Promise<Example> =>
-   ipcRenderer.invoke("example:create", params),
-  getAll: (): Promise<Example[]> => ipcRenderer.invoke("example:get-all"),
+   ipcRenderer.invoke("create-example", params),
+  getAll: (): Promise<Example[]> => ipcRenderer.invoke("get-examples"),
  },
  events: {
   onExampleEvent: (callback: (data: ExampleEventData) => void) => {
@@ -648,7 +683,7 @@ declare global {
 - ✅ Use domain-specific grouping for handlers
 - ✅ Include validation for all parameterized operations
 - ✅ Return cleanup functions for event listeners
-- ✅ Use consistent channel naming (`domain:action`)
+- ✅ Use consistent invoke channel naming (verb-first hyphenated) and retain domain-prefixed event names (`domain:event`)
 - ❌ Don't expose Node.js APIs directly to renderer
 - ❌ Don't bypass validation for any parameters
 
@@ -1180,16 +1215,16 @@ sequenceDiagram
 ### Layer Responsibilities
 
 - **SiteManager**
-    - Protects domain invariants (e.g., cannot remove the final monitor from a site).
-    - Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
-    - Emits fully populated events with timestamps and updated field metadata.
+  - Protects domain invariants (e.g., cannot remove the final monitor from a site).
+  - Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
+  - Emits fully populated events with timestamps and updated field metadata.
 - **SiteWriterService**
-    - Owns transactional boundaries via `DatabaseService.executeTransaction`.
-    - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
-    - Writes sanitized copies into the shared `StandardizedCache` instance.
+  - Owns transactional boundaries via `DatabaseService.executeTransaction`.
+  - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
+  - Writes sanitized copies into the shared `StandardizedCache` instance.
 - **Repositories**
-    - Contain only synchronous `*_Internal` helpers that assume an active transaction.
-    - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
+  - Contain only synchronous `*_Internal` helpers that assume an active transaction.
+  - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
 
 ### Invariant Checklist
 

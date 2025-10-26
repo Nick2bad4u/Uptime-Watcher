@@ -6,6 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ApplicationService } from "../../../services/application/ApplicationService";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import type { StatusUpdate } from "@shared/types";
 
 // Mock Electron app
 vi.mock("electron", () => ({
@@ -81,6 +82,10 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_FORWARD_MONITOR_STATUS_ERROR",
             APPLICATION_FORWARD_STATE_SYNC_ERROR:
                 "APPLICATION_FORWARD_STATE_SYNC_ERROR",
+            APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR:
+                "APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR",
+            APPLICATION_FORWARD_HISTORY_LIMIT_UPDATED_ERROR:
+                "APPLICATION_FORWARD_HISTORY_LIMIT_UPDATED_ERROR",
         },
         debug: {
             APPLICATION_CLEANUP_SERVICE: "APPLICATION_CLEANUP_SERVICE",
@@ -88,6 +93,8 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_FORWARDING_MONITOR_UP",
             APPLICATION_FORWARDING_MONITOR_DOWN:
                 "APPLICATION_FORWARDING_MONITOR_DOWN",
+            APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED:
+                "APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED",
             APPLICATION_FORWARDING_MONITORING_STARTED:
                 "APPLICATION_FORWARDING_MONITORING_STARTED",
             APPLICATION_FORWARDING_MONITORING_STOPPED:
@@ -98,6 +105,8 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
                 "APPLICATION_FORWARDING_MONITOR_STATUS",
             APPLICATION_FORWARDING_STATE_SYNC:
                 "APPLICATION_FORWARDING_STATE_SYNC",
+            APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED:
+                "APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED",
         },
         warnings: {
             APPLICATION_MONITOR_DOWN: "APPLICATION_MONITOR_DOWN",
@@ -416,6 +425,10 @@ describe(ApplicationService, () => {
             );
             expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
                 "cache:invalidated",
+                expect.any(Function)
+            );
+            expect(mockUptimeOrchestrator.onTyped).toHaveBeenCalledWith(
+                "settings:history-limit-updated",
                 expect.any(Function)
             );
         });
@@ -1006,6 +1019,159 @@ describe(ApplicationService, () => {
                 // Assert
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "APPLICATION_FORWARD_MONITOR_DOWN_ERROR",
+                    error
+                );
+            });
+        });
+        describe("monitor:check-completed event", () => {
+            it("should forward manual check completion event to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const manualCheckHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:check-completed"
+                    )?.[1];
+
+                const eventData = {
+                    checkType: "manual" as const,
+                    monitorId: "monitor-1",
+                    result: {
+                        monitorId: "monitor-1",
+                        siteIdentifier: "site-1",
+                        status: "up",
+                        timestamp: "2023-01-01T00:00:00Z",
+                    } as StatusUpdate,
+                    siteIdentifier: "site-1",
+                    timestamp: Date.now(),
+                };
+
+                manualCheckHandler?.(eventData);
+
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED",
+                    {
+                        checkType: "manual",
+                        monitorId: "monitor-1",
+                        siteIdentifier: "site-1",
+                    }
+                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith("monitor:check-completed", eventData);
+            });
+
+            it("should handle manual check completion forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const manualCheckHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "monitor:check-completed"
+                    )?.[1];
+
+                const eventData = {
+                    checkType: "manual" as const,
+                    monitorId: "monitor-1",
+                    result: {
+                        monitorId: "monitor-1",
+                        siteIdentifier: "site-1",
+                        status: "up",
+                        timestamp: "2023-01-01T00:00:00Z",
+                    } as StatusUpdate,
+                    siteIdentifier: "site-1",
+                    timestamp: Date.now(),
+                };
+
+                const error = new Error("Forward failed");
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
+
+                manualCheckHandler?.(eventData);
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR",
+                    error
+                );
+            });
+        });
+        describe("settings:history-limit-updated event", () => {
+            it("should forward history limit updates to renderer", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const historyLimitHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "settings:history-limit-updated"
+                    )?.[1];
+
+                const eventData = {
+                    limit: 750,
+                    operation: "history-limit-updated" as const,
+                    previousLimit: 500,
+                    timestamp: Date.now(),
+                };
+
+                historyLimitHandler?.(eventData);
+
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED",
+                    {
+                        limit: 750,
+                        previousLimit: 500,
+                        timestamp: eventData.timestamp,
+                    }
+                );
+                expect(
+                    mockRendererEventBridge.sendToRenderers
+                ).toHaveBeenCalledWith(
+                    "settings:history-limit-updated",
+                    eventData
+                );
+            });
+
+            it("should handle history limit forwarding errors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: ApplicationService", "component");
+
+                const historyLimitHandler =
+                    mockUptimeOrchestrator.onTyped.mock.calls.find(
+                        (call) => call[0] === "settings:history-limit-updated"
+                    )?.[1];
+
+                const eventData = {
+                    limit: 600,
+                    operation: "history-limit-updated" as const,
+                    previousLimit: 450,
+                    timestamp: Date.now(),
+                };
+
+                const error = new Error("Forward failed");
+                mockRendererEventBridge.sendToRenderers.mockImplementationOnce(
+                    () => {
+                        throw error;
+                    }
+                );
+
+                historyLimitHandler?.(eventData);
+
+                expect(mockLogger.error).toHaveBeenCalledWith(
+                    "APPLICATION_FORWARD_HISTORY_LIMIT_UPDATED_ERROR",
                     error
                 );
             });

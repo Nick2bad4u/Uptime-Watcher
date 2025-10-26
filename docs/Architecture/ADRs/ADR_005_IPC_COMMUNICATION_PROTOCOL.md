@@ -135,19 +135,19 @@ IPC handlers are organized by domain with consistent validation:
 ```typescript
 private registerSitesHandlers(deps: IpcServiceDependencies): void {
     this.registerStandardizedIpcHandler(
-        'sites:get-all',
+        'get-sites',
         async () => deps.siteManager.getAllSites(),
         // No parameters to validate
     );
 
     this.registerStandardizedIpcHandler(
-        'sites:add',
+        'add-site',
         async (params) => deps.siteManager.addSite(params),
         isSiteCreationData
     );
 
     this.registerStandardizedIpcHandler(
-        'sites:remove',
+        'remove-site',
         async (params) => deps.siteManager.removeSite(params.identifier),
         isIdentifierParams
     );
@@ -163,10 +163,10 @@ The preload script exposes a type-safe API to the renderer:
 const electronAPI = {
  sites: {
   addSite: (data: SiteCreationData): Promise<Site> =>
-   ipcRenderer.invoke("sites:add", data),
-  getSites: (): Promise<Site[]> => ipcRenderer.invoke("sites:get-all"),
+   ipcRenderer.invoke("add-site", data),
+  getSites: (): Promise<Site[]> => ipcRenderer.invoke("get-sites"),
   removeSite: (identifier: string): Promise<void> =>
-   ipcRenderer.invoke("sites:remove", { identifier }),
+   ipcRenderer.invoke("remove-site", { identifier }),
  },
  events: {
   onMonitorStatusChanged: (callback: (data: MonitorStatusData) => void) => {
@@ -195,6 +195,24 @@ aligned with the authoritative orchestrator payload and matches the guidance in
 [`SiteService.removeMonitor`](../../src/stores/sites/services/SiteService.ts),
 which validates the persisted snapshot with the shared guards before updating
 renderer state.
+
+#### 2025-10-26 Contract Update
+
+- Added the `settings:history-limit-updated` renderer broadcast to surface
+  persistence changes originating from imports, orchestrator migrations, or
+  database maintenance. Renderer consumers **must** subscribe via
+  `EventsService.onHistoryLimitUpdated` to keep the settings store in sync even
+  when the local UI did not initiate the change. The payload includes both the
+  new limit and the previously observed value so clients can display contextual
+  messaging.
+- Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel
+  inventory documentation are now generated from the canonical
+  `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run
+  `npm run generate:ipc` whenever event contracts change and gate CI with
+  `npm run check:ipc` to detect drift between code and docs.
+- The authoritative channel catalogue lives in
+  `docs/Architecture/generated/ipc-channel-inventory.md`. Do not hand-edit the
+  table; update the schema and regenerate instead.
 
 ### 4. Event Forwarding Protocol
 
@@ -263,7 +281,7 @@ sequenceDiagram
     Note right of API: e.g., sites.addSite(data)
 
     API->>+Preload: Type-safe IPC call
-    Note right of Preload: Channel: 'sites:add'
+    Note right of Preload: Channel: 'add-site'
 
     Preload->>+IpcMain: ipcRenderer.invoke()
     Note right of IpcMain: Crosses security boundary
@@ -308,9 +326,9 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     subgraph "Domain Channels"
-        SitesChannels["Sites Domain<br/>• sites:add<br/>• sites:remove<br/>• sites:get-all"]
-        MonitoringChannels["Monitoring Domain<br/>• monitoring:start<br/>• monitoring:stop<br/>• monitoring:status"]
-        SettingsChannels["Settings Domain<br/>• settings:get<br/>• settings:update"]
+        SitesChannels["Sites Domain<br/>• add-site<br/>• get-sites<br/>• remove-site<br/>• update-site"]
+        MonitoringChannels["Monitoring Domain<br/>• start-monitoring<br/>• stop-monitoring<br/>• start-monitoring-for-site<br/>• stop-monitoring-for-monitor"]
+        SettingsChannels["Settings Domain<br/>• get-history-limit<br/>• update-history-limit<br/>• reset-settings"]
         EventChannels["Event Channels<br/>• monitor:status-changed<br/>• site:added<br/>• site:removed"]
     end
 
@@ -427,29 +445,33 @@ mindmap
     root)IPC Channels(
         Domain Organization
             Sites Domain
-                sites:add
-                sites:remove
-                sites:get-all
-                sites:update
+                add-site
+                get-sites
+                remove-site
+                update-site
             Monitoring Domain
-                monitoring:start
-                monitoring:stop
-                monitoring:status
-                monitoring:history
+                start-monitoring
+                stop-monitoring
+                start-monitoring-for-site
+                check-site-now
             Settings Domain
-                settings:get
-                settings:update
-                settings:reset
-            System Domain
-                system:info
-                system:shutdown
-                system:restart
+                get-history-limit
+                update-history-limit
+                reset-settings
+            System & Data Domain
+                download-sqlite-backup
+                export-data
+                import-data
+                open-external
+            Diagnostics Domain
+                diagnostics-verify-ipc-handler
+                diagnostics-report-preload-guard
 
         Naming Rules
             Format
-                domain:action
-                kebab-case
-                verb-noun pattern
+                verb-first
+                hyphenated identifiers
+                resource suffix (site/monitor/system)
             Event Format
                 past-tense
                 domain:event-name
@@ -480,19 +502,22 @@ mindmap
                 Error handling coverage
 ```
 
-### Format: `domain:action`
+### Invoke channel format: verb-first hyphen-case
 
-- **Sites**: `sites:add`, `sites:remove`, `sites:get-all`
-- **Monitoring**: `monitoring:start`, `monitoring:stop`
-- **Settings**: `settings:get`, `settings:update`
-- **Events**: Use past tense for completed actions: `monitor:status-changed`
+- **Sites**: `add-site`, `get-sites`, `remove-site`, `update-site`
+- **Monitoring**: `start-monitoring`, `stop-monitoring`, `start-monitoring-for-site`, `check-site-now`
+- **Settings**: `get-history-limit`, `update-history-limit`, `reset-settings`
+- **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
+- **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
+- **Diagnostics**: `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`
+- **Events**: Continue using domain-prefixed, past-tense identifiers (e.g., `monitor:status-changed`, `sites:added`).
 
 ### Consistency Rules
 
-1. **Domain prefix** - Always use domain prefix for grouping
-2. **Kebab-case** - Use kebab-case for multi-word actions
-3. **Verb-noun pattern** - Action followed by resource (`get-sites`, not `sites-get`)
-4. **Past tense for events** - Events use past tense (`status-changed`)
+1. **Verb-first actions** - Begin each invoke channel with an imperative verb (`add-`, `get-`, `start-`).
+2. **Hyphenated resources** - Append the resource or scope using hyphenated nouns (`-site`, `-monitor`, `-history-limit`).
+3. **Namespace by bridge object** - Renderer services scope channels by API surface (`electronAPI.sites`, `electronAPI.monitoring`) rather than embedding domains in the identifier.
+4. **Event naming** - Retain `domain:event-name` with past-tense actions for broadcast events to distinguish them from invoke channels.
 
 ## Security Considerations
 

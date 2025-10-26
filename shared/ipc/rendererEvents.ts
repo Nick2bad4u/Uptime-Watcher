@@ -12,6 +12,8 @@
 import type { Site } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
+    HistoryLimitUpdatedEventData,
+    MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitoringControlReason,
@@ -35,6 +37,8 @@ export const RENDERER_EVENT_CHANNELS = {
     MONITOR_STATUS_CHANGED: "monitor:status-changed",
     /** Broadcast monitor up events. */
     MONITOR_UP: "monitor:up",
+    /** Broadcast monitor check completion events. */
+    MONITOR_CHECK_COMPLETED: "monitor:check-completed",
     /** Broadcast monitoring lifecycle start events. */
     MONITORING_STARTED: "monitoring:started",
     /** Broadcast monitoring lifecycle stop events. */
@@ -45,6 +49,8 @@ export const RENDERER_EVENT_CHANNELS = {
     SITE_REMOVED: "site:removed",
     /** Broadcast site updated events. */
     SITE_UPDATED: "site:updated",
+    /** Broadcast history limit updates originating from the database. */
+    SETTINGS_HISTORY_LIMIT_UPDATED: "settings:history-limit-updated",
     /** Broadcast incremental state synchronisation snapshots. */
     STATE_SYNC: "state-sync-event",
     /** Broadcast development/test events. */
@@ -71,6 +77,8 @@ export interface RendererEventPayloadMap {
     "monitor:status-changed": MonitorStatusChangedEventData;
     /** Payload for monitor up events. */
     "monitor:up": MonitorUpEventData;
+    /** Payload for monitor check completion events. */
+    "monitor:check-completed": MonitorCheckCompletedEventData;
     /** Payload for monitoring started events. */
     "monitoring:started": MonitoringControlEventData & {
         monitorCount: number;
@@ -101,6 +109,8 @@ export interface RendererEventPayloadMap {
         timestamp: number;
         updatedFields: string[];
     };
+    /** Payload for database history retention updates. */
+    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
     /** Payload for full state synchronisation broadcasts. */
     "state-sync-event": StateSyncEventData;
     /** Payload for development/test events. */

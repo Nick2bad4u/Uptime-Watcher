@@ -95,6 +95,8 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create monitoring actions
         const monitoringActions = createSiteMonitoringActions({
             monitoringService: MonitoringService,
+            getSites,
+            setSites: stateActions.setSites,
         });
 
         // Create operations actions

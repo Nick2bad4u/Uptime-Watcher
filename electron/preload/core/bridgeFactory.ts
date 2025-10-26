@@ -29,7 +29,7 @@ import {
 
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
 
-const DIAGNOSTICS_CHANNEL = "diagnostics:verify-ipc-handler" as const;
+const DIAGNOSTICS_CHANNEL = "diagnostics-verify-ipc-handler" as const;
 
 const globalProcess =
     typeof globalThis === "object" && "process" in globalThis

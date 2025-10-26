@@ -30,22 +30,24 @@ import { test as fcTest, fc } from "@fast-check/vitest";
 const ipcChannelNames = fc.oneof(
     // Valid IPC channels
     fc.constantFrom(
-        "monitor:create",
-        "monitor:update",
-        "monitor:delete",
-        "monitor:get",
-        "site:create",
-        "site:update",
-        "site:get",
-        "site:list",
-        "status:get",
-        "status:subscribe",
-        "config:get",
-        "config:set",
-        "logging:debug",
-        "logging:info",
-        "logging:warn",
-        "logging:error"
+        "add-site",
+        "remove-site",
+        "update-site",
+        "get-sites",
+        "check-site-now",
+        "start-monitoring",
+        "stop-monitoring",
+        "start-monitoring-for-site",
+        "stop-monitoring-for-monitor",
+        "get-monitor-types",
+        "get-history-limit",
+        "update-history-limit",
+        "request-full-sync",
+        "get-sync-status",
+        "export-data",
+        "import-data",
+        "diagnostics-verify-ipc-handler",
+        "diagnostics-report-preload-guard"
     ),
     // Edge case channels
     fc.constantFrom(

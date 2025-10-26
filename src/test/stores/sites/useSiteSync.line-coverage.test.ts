@@ -9,6 +9,7 @@ import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpda
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
+    "monitor-check-completed",
     "monitoring-started",
     "monitoring-stopped",
 ];
@@ -51,9 +52,9 @@ vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
         return {
             subscribe: vi.fn(async () => ({
                 errors: [],
-                expectedListeners: 3,
-                listenersAttached: 3,
-                listenerStates: buildListenerStates(3),
+                expectedListeners: LISTENER_NAMES.length,
+                listenersAttached: LISTENER_NAMES.length,
+                listenerStates: buildListenerStates(LISTENER_NAMES.length),
                 success: true,
             })),
             unsubscribe: vi.fn(),
@@ -198,7 +199,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                         mockDeps.setStatusSubscriptionSummary
                     ).toHaveBeenCalledWith(
                         expect.objectContaining({
-                            expectedListeners: 3,
+                            expectedListeners: LISTENER_NAMES.length,
                             listenersAttached: 0,
                             success: false,
                         })
@@ -222,12 +223,16 @@ describe("useSiteSync - Line Coverage Completion", () => {
                             const unsubscribe = vi.fn();
                             unsubscribeSpies.push(unsubscribe);
                             return {
-                                getExpectedListenerCount: vi.fn(() => 3),
+                                getExpectedListenerCount: vi.fn(
+                                    () => LISTENER_NAMES.length
+                                ),
                                 subscribe: vi.fn(async () => ({
                                     errors: [],
-                                    expectedListeners: 3,
-                                    listenersAttached: 3,
-                                    listenerStates: buildListenerStates(3),
+                                    expectedListeners: LISTENER_NAMES.length,
+                                    listenersAttached: LISTENER_NAMES.length,
+                                    listenerStates: buildListenerStates(
+                                        LISTENER_NAMES.length
+                                    ),
                                     success: true,
                                 })),
                                 unsubscribe,
@@ -257,8 +262,8 @@ describe("useSiteSync - Line Coverage Completion", () => {
                     ).toHaveBeenNthCalledWith(
                         2,
                         expect.objectContaining({
-                            expectedListeners: 3,
-                            listenersAttached: 3,
+                            expectedListeners: LISTENER_NAMES.length,
+                            listenersAttached: LISTENER_NAMES.length,
                             success: true,
                         })
                     );
@@ -270,7 +275,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
-                getExpectedListenerCount: vi.fn(() => 3),
+                getExpectedListenerCount: vi.fn(() => LISTENER_NAMES.length),
                 subscribe: vi.fn(async () => {
                     throw testError;
                 }),
@@ -296,7 +301,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
             expect(result.errors).toContain("Subscribe failed");
             expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    expectedListeners: 3,
+                    expectedListeners: LISTENER_NAMES.length,
                     listenersAttached: 0,
                     success: false,
                 })

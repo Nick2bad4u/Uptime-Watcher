@@ -6,6 +6,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
+import type { Site, StatusUpdate } from "@shared/types";
 
 // Mock electron API
 const mockElectronAPI = {
@@ -44,9 +45,19 @@ vi.mock("../../../stores/utils", () => ({
 
 describe("useSiteMonitoring", () => {
     let actions: ReturnType<typeof createSiteMonitoringActions>;
+    let currentSites: Site[];
+    let mockGetSites: ReturnType<typeof vi.fn>;
+    let mockSetSites: ReturnType<typeof vi.fn>;
+    let mockApplyStatusUpdate: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
         vi.clearAllMocks();
+        currentSites = [];
+        mockGetSites = vi.fn(() => currentSites);
+        mockSetSites = vi.fn((sites: Site[]) => {
+            currentSites = sites;
+        });
+        mockApplyStatusUpdate = vi.fn(() => currentSites);
         const monitoringService = {
             checkSiteNow: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>
@@ -79,7 +90,12 @@ describe("useSiteMonitoring", () => {
             ),
         };
 
-        actions = createSiteMonitoringActions({ monitoringService });
+        actions = createSiteMonitoringActions({
+            monitoringService,
+            getSites: mockGetSites,
+            setSites: mockSetSites,
+            applyStatusUpdate: mockApplyStatusUpdate,
+        });
     });
 
     describe("checkSiteNow", () => {
@@ -100,7 +116,79 @@ describe("useSiteMonitoring", () => {
             expect(
                 mockElectronAPI.monitoring.checkSiteNow
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
+            expect(mockApplyStatusUpdate).not.toHaveBeenCalled();
+            expect(mockSetSites).not.toHaveBeenCalled();
         });
+    });
+
+    it("should apply optimistic update when status update is returned", async ({
+        task,
+        annotate,
+    }) => {
+        await annotate(`Testing: ${task.name}`, "functional");
+        await annotate("Component: useSiteMonitoring", "component");
+        await annotate("Category: Store", "category");
+        await annotate("Type: Monitoring", "type");
+
+        const site: Site = {
+            identifier: "site-1",
+            monitoring: true,
+            monitors: [
+                {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 1_200,
+                    retryAttempts: 0,
+                    status: "down",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                },
+            ],
+            name: "Example Site",
+        };
+
+        const statusUpdate: StatusUpdate = {
+            details: "Manual check successful",
+            monitor: site.monitors[0],
+            monitorId: site.monitors[0].id,
+            previousStatus: "down",
+            responseTime: 456,
+            site,
+            siteIdentifier: site.identifier,
+            status: "up",
+            timestamp: new Date().toISOString(),
+        };
+
+        const updatedSites: Site[] = [
+            {
+                ...site,
+                monitors: [
+                    {
+                        ...site.monitors[0],
+                        status: "up",
+                        responseTime: statusUpdate.responseTime ?? 0,
+                    },
+                ],
+            },
+        ];
+
+        currentSites = [site];
+        mockApplyStatusUpdate.mockReturnValue(updatedSites);
+        mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce(
+            statusUpdate
+        );
+
+        await actions.checkSiteNow(site.identifier, site.monitors[0].id);
+
+        expect(mockApplyStatusUpdate).toHaveBeenCalledWith(
+            [site],
+            statusUpdate
+        );
+        expect(mockSetSites).toHaveBeenCalledWith(updatedSites);
     });
 
     describe("startSiteMonitoring", () => {

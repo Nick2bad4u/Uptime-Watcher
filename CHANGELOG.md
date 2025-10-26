@@ -7,6 +7,26 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+### ✨ Features
+
+- Surface database retention updates in the renderer via the new
+  `settings:history-limit-updated` event and propagate state updates through the
+  settings store.
+- Apply optimistic site status updates immediately after manual monitor checks
+  complete, reusing the shared merge logic for consistency with event-driven
+  updates.
+
+### 🛠️ Tooling
+
+- Add `npm run generate:ipc` to rebuild the preload bridge and generated IPC
+  documentation, and `npm run check:ipc` to enforce drift detection in CI.
+
+### 📝 Documentation
+
+- Document the history retention sync flow and optimistic manual checks in the
+  development patterns guide and technology evolution timeline.
+
+
 [[cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)...
 [cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)]
 ([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc70f2344c3611939441c52e33d6474c55d6dbb7...cc70f2344c3611939441c52e33d6474c55d6dbb7))

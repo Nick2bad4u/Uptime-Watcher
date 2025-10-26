@@ -173,6 +173,8 @@ export const DEBUG_LOGS = {
     /** Application forwarding events */
     APPLICATION_FORWARDING_CACHE_INVALIDATION:
         "[ApplicationService] Forwarding cache invalidation to renderer",
+    APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED:
+        "[ApplicationService] Forwarding manual monitor check completion to renderer",
     APPLICATION_FORWARDING_MONITOR_STATUS:
         "[ApplicationService] Forwarding monitor status change to renderer",
     APPLICATION_FORWARDING_MONITOR_UP:
@@ -189,6 +191,8 @@ export const DEBUG_LOGS = {
         "[ApplicationService] Forwarding site updated to renderer",
     APPLICATION_FORWARDING_STATE_SYNC:
         "[ApplicationService] Forwarding state sync event to renderer",
+    APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED:
+        "[ApplicationService] Forwarding history limit update to renderer",
 
     /** Background operations */
     BACKGROUND_LOAD_COMPLETE:
@@ -267,6 +271,8 @@ export const ERROR_LOGS = {
     APPLICATION_CLEANUP_ERROR: "[ApplicationService] Error during cleanup",
     APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR:
         "[ApplicationService] Failed to forward cache invalidation to renderer",
+    APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR:
+        "[ApplicationService] Failed to forward manual monitor check completion to renderer",
     APPLICATION_FORWARD_MONITOR_DOWN_ERROR:
         "[ApplicationService] Failed to forward monitor down to renderer",
     APPLICATION_FORWARD_MONITOR_STATUS_ERROR:
@@ -285,6 +291,8 @@ export const ERROR_LOGS = {
         "[ApplicationService] Failed to forward site updated to renderer",
     APPLICATION_FORWARD_STATE_SYNC_ERROR:
         "[ApplicationService] Failed to forward state sync event to renderer",
+    APPLICATION_FORWARD_HISTORY_LIMIT_UPDATED_ERROR:
+        "[ApplicationService] Failed to forward history limit update to renderer",
     APPLICATION_INITIALIZATION_ERROR:
         "[ApplicationService] Error during app initialization",
     APPLICATION_SYSTEM_ERROR: "[ApplicationService] System error: {context}",

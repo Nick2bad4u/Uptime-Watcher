@@ -28,6 +28,7 @@ Object.assign(console, mockConsole);
 // Mock EventsService
 vi.mock("../../../../services/EventsService", () => ({
     EventsService: {
+        onMonitorCheckCompleted: vi.fn(),
         onMonitorStatusChanged: vi.fn(),
         onMonitoringStarted: vi.fn(),
         onMonitoringStopped: vi.fn(),
@@ -52,6 +53,7 @@ vi.mock("../../../../../shared/utils/environment", () => ({
 // Mock EventsService
 vi.mock("../../../../services/EventsService", () => ({
     EventsService: {
+        onMonitorCheckCompleted: vi.fn(),
         onMonitorStatusChanged: vi.fn(),
         onMonitoringStarted: vi.fn(),
         onMonitoringStopped: vi.fn(),
@@ -170,6 +172,7 @@ describe("StatusUpdateHandler", () => {
         };
 
         // Setup EventsService mock methods to return cleanup functions
+        mockEventsService.onMonitorCheckCompleted.mockResolvedValue(() => {});
         mockEventsService.onMonitorStatusChanged.mockResolvedValue(() => {});
         mockEventsService.onMonitoringStarted.mockResolvedValue(() => {});
         mockEventsService.onMonitoringStopped.mockResolvedValue(() => {});

@@ -198,7 +198,7 @@ All IPC handlers use standardized registration with validation:
 ```typescript
 // Backend: electron/services/ipc/IpcService.ts
 registerStandardizedIpcHandler(
- "sites:create",
+ "add-site",
  async (data: SiteCreationData) => {
   // Business logic handled by managers
   return await this.siteManager.createSite(data);
@@ -213,7 +213,7 @@ registerStandardizedIpcHandler(
 // Frontend: React components via window.electronAPI
 const handleCreateSite = async (siteData: SiteCreationData) => {
  try {
-  const result = await window.electronAPI.sites.create(siteData);
+  const result = await window.electronAPI.sites.addSite(siteData);
   console.log("Site created:", result);
  } catch (error) {
   console.error("Failed to create site:", error);
@@ -299,7 +299,7 @@ const validateSiteForm = (formData: FormData) => {
 
 // Backend validation (automatic via IPC handler validation)
 registerStandardizedIpcHandler(
- "sites:create",
+ "add-site",
  async (data: SiteCreationData) => {
   // Data is already validated by IPC layer
   return await this.siteManager.createSite(data);

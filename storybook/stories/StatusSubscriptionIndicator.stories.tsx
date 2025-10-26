@@ -28,10 +28,11 @@ const logRetry = action("sites/retryStatusSubscription");
 
 const healthySummary: StatusUpdateSubscriptionSummary = {
     errors: [],
-    expectedListeners: 3,
-    listenersAttached: 3,
+    expectedListeners: 4,
+    listenersAttached: 4,
     listenerStates: [
         { attached: true, name: "Site Directory" },
+        { attached: true, name: "Manual Checks" },
         { attached: true, name: "Monitor Events" },
         { attached: true, name: "History Timeline" },
     ],
@@ -42,10 +43,11 @@ const healthySummary: StatusUpdateSubscriptionSummary = {
 
 const degradedSummary: StatusUpdateSubscriptionSummary = {
     errors: ["History timeline listener timed out."],
-    expectedListeners: 3,
-    listenersAttached: 2,
+    expectedListeners: 4,
+    listenersAttached: 3,
     listenerStates: [
         { attached: true, name: "Site Directory" },
+        { attached: true, name: "Manual Checks" },
         { attached: true, name: "Monitor Events" },
         { attached: false, name: "History Timeline" },
     ],
@@ -59,10 +61,11 @@ const failedSummary: StatusUpdateSubscriptionSummary = {
         "Realtime gateway unreachable.",
         "Automatic retries paused until manual intervention.",
     ],
-    expectedListeners: 3,
+    expectedListeners: 4,
     listenersAttached: 0,
     listenerStates: [
         { attached: false, name: "Site Directory" },
+        { attached: false, name: "Manual Checks" },
         { attached: false, name: "Monitor Events" },
         { attached: false, name: "History Timeline" },
     ],

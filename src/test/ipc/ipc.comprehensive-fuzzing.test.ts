@@ -632,7 +632,7 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 mockIpcMain.handle.mockClear();
                 registeredHandlers.clear();
 
-                const channel = "sites:create";
+                const channel = "add-site";
                 const handler = vi.fn(() =>
                     Promise.resolve({ id: "new-site" })
                 );

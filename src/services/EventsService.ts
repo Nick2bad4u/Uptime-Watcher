@@ -13,6 +13,8 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
+    HistoryLimitUpdatedEventData,
+    MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorStatusChangedEventData,
@@ -40,6 +42,10 @@ type SiteRemovedEventData = RendererEventPayloadMap["site:removed"];
 type SiteUpdatedEventData = RendererEventPayloadMap["site:updated"];
 type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
 type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
+type MonitorCheckCompletedEventPayload =
+    RendererEventPayloadMap["monitor:check-completed"];
+type HistoryLimitUpdatedEventPayload =
+    RendererEventPayloadMap["settings:history-limit-updated"];
 
 const isMonitoringStartedEventData = (
     data: MonitoringControlEventData
@@ -58,6 +64,12 @@ interface EventsServiceContract {
     ) => Promise<() => void>;
     onMonitorDown: (
         callback: (data: MonitorDownEventData) => void
+    ) => Promise<() => void>;
+    onMonitorCheckCompleted: (
+        callback: (data: MonitorCheckCompletedEventPayload) => void
+    ) => Promise<() => void>;
+    onHistoryLimitUpdated: (
+        callback: (data: HistoryLimitUpdatedEventPayload) => void
     ) => Promise<() => void>;
     onMonitoringStarted: (
         callback: (data: MonitoringStartedEventData) => void
@@ -164,6 +176,16 @@ export const EventsService: EventsServiceContract = {
         "onMonitorDown",
         (api, callback: (data: MonitorDownEventData) => void) =>
             Promise.resolve(api.events.onMonitorDown(callback))
+    ),
+    onMonitorCheckCompleted: wrap(
+        "onMonitorCheckCompleted",
+        (api, callback: (data: MonitorCheckCompletedEventData) => void) =>
+            Promise.resolve(api.events.onMonitorCheckCompleted(callback))
+    ),
+    onHistoryLimitUpdated: wrap(
+        "onHistoryLimitUpdated",
+        (api, callback: (data: HistoryLimitUpdatedEventData) => void) =>
+            Promise.resolve(api.events.onHistoryLimitUpdated(callback))
     ),
 
     /**

@@ -19,7 +19,7 @@ import log from "electron-log/renderer";
 
 const PRELOAD_PREFIX = "PRELOAD";
 const DIAGNOSTICS_PREFIX = "PRELOAD:DIAGNOSTICS";
-const DIAGNOSTICS_CHANNEL = "diagnostics:report-preload-guard" as const;
+const DIAGNOSTICS_CHANNEL = "diagnostics-report-preload-guard" as const;
 const PAYLOAD_PREVIEW_LIMIT = 512;
 
 const safeInvoke = (

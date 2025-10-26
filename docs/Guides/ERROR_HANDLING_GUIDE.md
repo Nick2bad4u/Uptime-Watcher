@@ -457,7 +457,7 @@ export const setupSitesIpc = (
  siteService: SiteService
 ) => {
  ipcService.registerStandardizedIpcHandler(
-  "sites:add",
+  "add-site",
   async (data: unknown) => {
    return await withErrorHandling(
     async () => {
@@ -474,7 +474,7 @@ export const setupSitesIpc = (
     },
     {
      logger,
-     operationName: "IPC sites:add",
+     operationName: "IPC add-site",
     }
    );
   },
@@ -482,7 +482,7 @@ export const setupSitesIpc = (
  );
 
  ipcService.registerStandardizedIpcHandler(
-  "sites:delete",
+  "remove-site",
   async (data: unknown) => {
    return await withErrorHandling(
     async () => {
@@ -497,7 +497,7 @@ export const setupSitesIpc = (
     },
     {
      logger,
-     operationName: "IPC sites:delete",
+     operationName: "IPC remove-site",
     }
    );
   },

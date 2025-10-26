@@ -476,6 +476,48 @@ export type MonitorLifecycleEventData = StatusUpdate & {
 };
 
 /**
+ * Payload for monitor check completion events (manual or scheduled).
+ *
+ * @remarks
+ * Conveys the result of a monitor check operation along with the originating
+ * site context. Uses {@link BaseEventData} for consistent timestamp metadata
+ * while embedding the canonical {@link StatusUpdate} payload in the `result`
+ * field.
+ *
+ * @public
+ */
+export interface MonitorCheckCompletedEventData extends BaseEventData {
+    /** Distinguishes manual checks from scheduled ones. */
+    readonly checkType: "manual" | "scheduled";
+    /** Identifier of the monitor that was checked. */
+    readonly monitorId: string;
+    /** Canonical status update emitted by the check operation. */
+    readonly result: StatusUpdate;
+    /** Identifier of the site that owns the monitor. */
+    readonly siteIdentifier: string;
+}
+
+/**
+ * Payload emitted when the database history retention limit changes.
+ *
+ * @remarks
+ * Provides both the new limit and optional context about the previous limit for
+ * UI telemetry and analytics. Uses the shared {@link BaseEventData} contract to
+ * include emission metadata, keeping renderer subscriptions consistent with
+ * other events.
+ *
+ * @public
+ */
+export interface HistoryLimitUpdatedEventData extends BaseEventData {
+    /** New maximum number of history records retained per monitor. */
+    readonly limit: number;
+    /** Operation identifier mirroring the originating database event. */
+    readonly operation: "history-limit-updated";
+    /** Previous history limit if known; omitted when unavailable. */
+    readonly previousLimit?: number | undefined;
+}
+
+/**
  * Payload for events when a monitor goes down (unavailable).
  *
  * @remarks

@@ -74,6 +74,22 @@ Error Handling: Centralized error store with withErrorHandling utility
 - 🛡️ **Robust error handling**: Centralized error management with domain isolation
 - 🔄 **Modular state management**: Zustand composition pattern for complex stores
 
+### 2025-10-26: Retention Sync & IPC Automation
+
+- ✅ Introduced the `settings:history-limit-updated` broadcast so renderer
+  settings stay aligned with database migrations, imports, and orchestrator
+  adjustments. The store subscribes via `EventsService.onHistoryLimitUpdated`
+  and applies changes idempotently.
+- ⚡ Manual monitor checks now hydrate the store immediately using the shared
+  `applyStatusUpdateSnapshot` reducer. Users receive instant feedback while the
+  backend processes the confirmation event.
+- 🛠️ Established an automated IPC artifact generator:
+  - `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and the
+    canonical inventory in `docs/Architecture/generated/ipc-channel-inventory.md`.
+  - `npm run check:ipc` enforces documentation parity during CI runs.
+- 📓 Updated the development patterns guide to codify the new synchronization
+  responsibilities for settings and manual checks.
+
 ### 🗃️ Database Migration: LowDB → SQLite
 
 #### Why the Migration?
@@ -410,7 +426,7 @@ export class IPCService {
 
 // Usage with type guards
 ipcService.registerStandardizedIpcHandler(
- "sites:create",
+ "add-site",
  async (data: SiteCreationData) => {
   return await siteManager.createSite(data);
  },

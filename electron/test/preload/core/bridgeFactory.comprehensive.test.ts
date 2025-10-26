@@ -170,7 +170,7 @@ describe("bridgeFactory", function describeBridgeFactorySuite() {
             });
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                "diagnostics:verify-ipc-handler",
+                "diagnostics-verify-ipc-handler",
                 missingChannel
             );
         });

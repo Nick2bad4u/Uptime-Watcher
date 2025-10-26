@@ -85,6 +85,99 @@ export interface StatusUpdateHandlerOptions {
     setSites: (sites: Site[]) => void;
 }
 
+function mergeMonitorStatusChange(
+    sites: Site[],
+    event: MonitorStatusChangedEvent
+): Site[] {
+    return sites.map((site) => {
+        if (site.identifier !== event.siteIdentifier) {
+            return site;
+        }
+
+        const monitorExists = site.monitors.some(
+            (monitor) => monitor.id === event.monitorId
+        );
+
+        if (!monitorExists && isDevelopment()) {
+            logger.debug(
+                `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
+            );
+        }
+
+        const updatedMonitors = site.monitors.map((monitor) => {
+            if (monitor.id !== event.monitorId) {
+                return monitor;
+            }
+
+            const mergedHistory =
+                event.monitor.history.length === 0 && monitor.history.length > 0
+                    ? monitor.history
+                    : event.monitor.history;
+
+            return {
+                ...event.monitor,
+                history: mergedHistory,
+            };
+        });
+
+        return {
+            ...site,
+            monitors: updatedMonitors,
+        };
+    });
+}
+
+/**
+ * Apply a status update snapshot to the provided site collection.
+ *
+ * @remarks
+ * Converts a {@link StatusUpdate} containing full monitor and site snapshots
+ * into the enriched monitor status change structure consumed by the
+ * orchestrated status update handler. This enables optimistic UI updates when
+ * manual checks return immediately from IPC invocations.
+ *
+ * @param sites - Current site collection from the store.
+ * @param statusUpdate - Snapshot emitted from manual check operations.
+ *
+ * @returns Updated site collection reflecting the provided status update.
+ */
+export const applyStatusUpdateSnapshot = (
+    sites: Site[],
+    statusUpdate: StatusUpdate
+): Site[] => {
+    if (!statusUpdate.site || !statusUpdate.monitor) {
+        if (isDevelopment()) {
+            logger.debug(
+                "[StatusUpdateHandler] Received status update without site or monitor context; skipping optimistic merge",
+                {
+                    monitorId: statusUpdate.monitorId,
+                    siteIdentifier: statusUpdate.siteIdentifier,
+                }
+            );
+        }
+
+        return sites;
+    }
+
+    const parsedTimestamp = Date.parse(statusUpdate.timestamp);
+    const timestamp = Number.isFinite(parsedTimestamp)
+        ? parsedTimestamp
+        : Date.now();
+
+    const event: MonitorStatusChangedEvent = {
+        details: statusUpdate.details,
+        monitor: statusUpdate.monitor,
+        monitorId: statusUpdate.monitorId,
+        previousStatus: statusUpdate.previousStatus,
+        site: statusUpdate.site,
+        siteIdentifier: statusUpdate.siteIdentifier,
+        status: statusUpdate.status,
+        timestamp,
+    };
+
+    return mergeMonitorStatusChange(sites, event);
+};
+
 /**
  * Result returned when attempting to subscribe to status updates.
  *
@@ -129,7 +222,7 @@ export interface StatusUpdateSubscriptionResult {
  */
 export class StatusUpdateManager {
     /** Number of listeners required for a healthy subscription. */
-    public static readonly EXPECTED_LISTENER_COUNT = 3;
+    public static readonly EXPECTED_LISTENER_COUNT = 4;
 
     /**
      * Array of cleanup functions for active event listeners.
@@ -352,6 +445,46 @@ export class StatusUpdateManager {
                         })();
                     }),
                 scope: "monitor-status-changed",
+            },
+            {
+                label: "monitor-check-completed",
+                register: () =>
+                    EventsService.onMonitorCheckCompleted(
+                        (
+                            event: RendererEventPayloadMap["monitor:check-completed"]
+                        ) => {
+                            void (async (): Promise<void> => {
+                                try {
+                                    if (
+                                        this.isMonitorStatusChangedEvent(
+                                            event.result
+                                        )
+                                    ) {
+                                        logger.debug(
+                                            "Processing manual monitor check completion event"
+                                        );
+                                        await this.handleIncrementalStatusUpdate(
+                                            event.result
+                                        );
+                                    } else {
+                                        if (isDevelopment()) {
+                                            logger.warn(
+                                                "Manual check completion payload missing enriched monitor/site data, triggering full sync",
+                                                event
+                                            );
+                                        }
+                                        await this.fullResyncSites();
+                                    }
+                                } catch (error) {
+                                    logger.error(
+                                        "Manual monitor check completion processing failed",
+                                        ensureError(error)
+                                    );
+                                }
+                            })();
+                        }
+                    ),
+                scope: "monitor-check-completed",
             },
             {
                 label: "monitoring-started",
@@ -582,49 +715,7 @@ export class StatusUpdateManager {
         sites: Site[],
         event: MonitorStatusChangedEvent
     ): Site[] {
-        return sites.map((site) => {
-            // Only update the site that contains this monitor
-            if (site.identifier !== event.siteIdentifier) {
-                return site;
-            }
-
-            // Log if monitor not found in site
-            const monitorExists = site.monitors.some(
-                (m) => m.id === event.monitorId
-            );
-            if (!monitorExists && isDevelopment()) {
-                logger.debug(
-                    `Monitor ${event.monitorId} not found in site ${event.siteIdentifier}`
-                );
-            }
-
-            // Update the specific monitor with fresh data from the event
-            const updatedMonitors = site.monitors.map((monitor) => {
-                if (monitor.id !== event.monitorId) {
-                    return monitor;
-                }
-
-                // Preserve existing history if the event has empty history
-                // This prevents the UI from flashing to zero during stop operations
-                const mergedHistory =
-                    event.monitor.history.length === 0 &&
-                    monitor.history.length > 0
-                        ? monitor.history
-                        : event.monitor.history;
-
-                // Use the fresh monitor data from the event but with preserved history
-                return {
-                    ...event.monitor,
-                    history: mergedHistory,
-                };
-            });
-
-            // Preserve the existing site structure but update monitors
-            return {
-                ...site,
-                monitors: updatedMonitors,
-            };
-        });
+        return mergeMonitorStatusChange(sites, event);
     }
 
     /**

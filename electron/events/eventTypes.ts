@@ -16,6 +16,7 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type {
     CacheInvalidatedEventData,
+    HistoryLimitUpdatedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorStatusChangedEventData,
@@ -1345,6 +1346,17 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
+     * Emitted when the database history retention limit changes.
+     *
+     * @remarks
+     * Forwarded to renderer clients so settings views remain synchronized when
+     * imports or backend tooling adjust the configured limit.
+     *
+     * @see {@link HistoryLimitUpdatedEventData} for payload structure.
+     */
+    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
+
+    /**
      * Emitted when site state is synchronized.
      *
      * @param action - The synchronization action ("bulk-sync", "delete", or
@@ -1715,6 +1727,11 @@ export const EVENT_CATEGORIES = {
         "site:updated",
         "sites:state-synchronized",
     ] as const,
+
+    /**
+     * Settings and configuration change events.
+     */
+    SETTINGS: ["settings:history-limit-updated"] as const,
 
     /**
      * System-level events.

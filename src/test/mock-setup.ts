@@ -191,6 +191,12 @@ const mockElectronAPI: ElectronAPI = {
         onCacheInvalidated: vi.fn<ElectronAPI["events"]["onCacheInvalidated"]>(
             (_callback) => () => undefined
         ),
+        onMonitorCheckCompleted: vi.fn<
+            ElectronAPI["events"]["onMonitorCheckCompleted"]
+        >((_callback) => () => undefined),
+        onHistoryLimitUpdated: vi.fn<
+            ElectronAPI["events"]["onHistoryLimitUpdated"]
+        >((_callback) => () => undefined),
         onMonitorDown: vi.fn<ElectronAPI["events"]["onMonitorDown"]>(
             (_callback) => () => undefined
         ),

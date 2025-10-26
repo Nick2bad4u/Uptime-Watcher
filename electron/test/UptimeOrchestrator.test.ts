@@ -282,6 +282,61 @@ describe(UptimeOrchestrator, () => {
         });
     });
 
+    describe("internal:database:history-limit-updated event", () => {
+        it("should forward history limit updates with previous limit tracking", async () => {
+            const handler = vi.fn();
+            orchestrator.on("settings:history-limit-updated", handler);
+
+            const firstPayload = {
+                limit: 750,
+                operation: "history-limit-updated" as const,
+                timestamp: Date.now(),
+            };
+
+            await orchestrator.emitTyped(
+                "internal:database:history-limit-updated",
+                firstPayload
+            );
+
+            expect(handler).toHaveBeenCalledWith({
+                ...firstPayload,
+                previousLimit: 1000,
+            });
+
+            const secondPayload = {
+                limit: 600,
+                operation: "history-limit-updated" as const,
+                timestamp: firstPayload.timestamp + 1,
+            };
+
+            await orchestrator.emitTyped(
+                "internal:database:history-limit-updated",
+                secondPayload
+            );
+
+            expect(handler).toHaveBeenLastCalledWith({
+                ...secondPayload,
+                previousLimit: 750,
+            });
+        });
+
+        it("should ignore payloads with invalid limits", async () => {
+            const handler = vi.fn();
+            orchestrator.on("settings:history-limit-updated", handler);
+
+            await orchestrator.emitTyped(
+                "internal:database:history-limit-updated",
+                {
+                    limit: -5,
+                    operation: "history-limit-updated" as const,
+                    timestamp: Date.now(),
+                }
+            );
+
+            expect(handler).not.toHaveBeenCalled();
+        });
+    });
+
     describe("Settings Management", () => {
         it("should reset settings successfully", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
@@ -1598,6 +1653,134 @@ describe(UptimeOrchestrator, () => {
 
             // Should not throw, but should log error
             expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+        });
+
+        it("should emit monitor check completion events for manual checks", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            const monitor = {
+                checkInterval: 60_000,
+                history: [],
+                id: "monitor-1",
+                monitoring: true,
+                responseTime: 150,
+                retryAttempts: 0,
+                status: "up",
+                timeout: 30_000,
+                type: "http",
+                url: "https://example.com",
+            } as unknown as Monitor;
+
+            const site = {
+                identifier: "test-site",
+                monitoring: true,
+                monitors: [monitor],
+                name: "Test Site",
+            } as unknown as Site;
+
+            const manualResult: StatusUpdate = {
+                monitor,
+                monitorId: monitor.id,
+                site,
+                siteIdentifier: site.identifier,
+                status: "up",
+                timestamp: new Date("2024-01-01T00:00:00.000Z").toISOString(),
+            };
+
+            const completionTimestamp = Date.now();
+
+            orchestrator.emitTyped("internal:monitor:manual-check-completed", {
+                identifier: site.identifier,
+                monitorId: monitor.id,
+                operation: "manual-check-completed",
+                result: manualResult,
+                timestamp: completionTimestamp,
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitor:check-completed",
+                expect.objectContaining({
+                    checkType: "manual",
+                    monitorId: monitor.id,
+                    siteIdentifier: site.identifier,
+                    timestamp: completionTimestamp,
+                })
+            );
+
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitor:check-completed",
+                expect.objectContaining({
+                    result: expect.objectContaining({
+                        monitor,
+                        monitorId: monitor.id,
+                        site,
+                        siteIdentifier: site.identifier,
+                    }),
+                })
+            );
+        });
+
+        it("should enrich manual check completion events using cached site data when missing snapshots", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            const getSiteFromCacheSpy = vi.spyOn(
+                mockSiteManager,
+                "getSiteFromCache"
+            );
+
+            const siteFromCache = mockSiteManager.getSiteFromCache();
+            const monitorId = siteFromCache.monitors[0]?.id ?? "monitor-1";
+
+            const manualResult: StatusUpdate = {
+                monitorId,
+                siteIdentifier: siteFromCache.identifier,
+                status: "up",
+                timestamp: new Date("2024-02-01T00:00:00.000Z").toISOString(),
+            };
+
+            orchestrator.emitTyped("internal:monitor:manual-check-completed", {
+                identifier: siteFromCache.identifier,
+                monitorId,
+                operation: "manual-check-completed",
+                result: manualResult,
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(getSiteFromCacheSpy).toHaveBeenCalledWith(
+                siteFromCache.identifier
+            );
+
+            const emittedPayload = emitTypedSpy.mock.calls.find(
+                ([eventName]) => eventName === "monitor:check-completed"
+            )?.[1] as
+                | {
+                      result: StatusUpdate;
+                  }
+                | undefined;
+
+            expect(emittedPayload).toBeDefined();
+            expect(emittedPayload?.result.site?.identifier).toBe(
+                siteFromCache.identifier
+            );
         });
 
         it("should handle monitor stopped events when monitoring is active", async ({

@@ -64,6 +64,9 @@ const mockElectronAPI = {
             },
         }),
     },
+    events: {
+        onHistoryLimitUpdated: vi.fn(() => vi.fn()),
+    },
     settings: {
         getHistoryLimit: vi.fn(),
         updateHistoryLimit: vi.fn(),
@@ -333,6 +336,51 @@ describe(useSettingsStore, () => {
                     setError: expect.any(Function),
                     setLoading: expect.any(Function),
                 })
+            );
+        });
+
+        it("should react to history limit updates from backend events", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSettingsStore", "component");
+            await annotate("Category: Store", "category");
+            await annotate("Type: Event Handling", "type");
+
+            mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
+
+            const { result } = renderHook(() => useSettingsStore());
+
+            await act(async () => {
+                await result.current.initializeSettings();
+            });
+
+            const eventHandler =
+                mockElectronAPI.events.onHistoryLimitUpdated.mock.calls[0]?.[0];
+
+            expect(eventHandler).toBeTypeOf("function");
+
+            const eventPayload = {
+                limit: 650,
+                operation: "history-limit-updated" as const,
+                previousLimit: 500,
+                timestamp: Date.now(),
+            };
+
+            await act(async () => {
+                eventHandler?.(eventPayload);
+            });
+
+            expect(result.current.settings.historyLimit).toBe(650);
+            expect(mockLogStoreAction).toHaveBeenCalledWith(
+                "SettingsStore",
+                "historyLimitUpdatedEvent",
+                {
+                    limit: 650,
+                    previousLimit: 500,
+                    timestamp: eventPayload.timestamp,
+                }
             );
         });
     });

@@ -1161,7 +1161,7 @@ export class IpcService {
      */
     private setupDiagnosticsHandlers(): void {
         registerStandardizedIpcHandler(
-            "diagnostics:verify-ipc-handler",
+            "diagnostics-verify-ipc-handler",
             (...args: unknown[]) => {
                 const [channelRaw] = args;
                 if (typeof channelRaw !== "string") {
@@ -1197,7 +1197,7 @@ export class IpcService {
         );
 
         registerStandardizedIpcHandler(
-            "diagnostics:report-preload-guard",
+            "diagnostics-report-preload-guard",
             (reportCandidate: unknown) => {
                 if (!isPreloadGuardDiagnosticsReport(reportCandidate)) {
                     throw new TypeError(

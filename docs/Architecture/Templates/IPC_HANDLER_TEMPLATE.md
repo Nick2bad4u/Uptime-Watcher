@@ -66,7 +66,7 @@ export function registerExampleHandlers(
 
  // GET operations (no parameters)
  ipcService.registerStandardizedIpcHandler(
-  "example:get-all",
+  "get-examples",
   async (): Promise<Example[]> => {
    logger.debug("[IPC] Getting all examples");
    const examples = await exampleManager.getAllExamples();
@@ -77,7 +77,7 @@ export function registerExampleHandlers(
 
  // GET operations (with parameters)
  ipcService.registerStandardizedIpcHandler(
-  "example:get-by-id",
+  "get-example-by-id",
   async (params: ExampleIdParams): Promise<Example | undefined> => {
    logger.debug(`[IPC] Getting example by ID: ${params.id}`);
    const example = await exampleManager.getExampleById(params.id);
@@ -88,7 +88,7 @@ export function registerExampleHandlers(
 
  // CREATE operations
  ipcService.registerStandardizedIpcHandler(
-  "example:create",
+  "create-example",
   async (params: ExampleCreateData): Promise<Example> => {
    logger.debug(`[IPC] Creating example: ${params.name}`);
    const example = await exampleManager.createExample(params);
@@ -99,7 +99,7 @@ export function registerExampleHandlers(
 
  // UPDATE operations
  ipcService.registerStandardizedIpcHandler(
-  "example:update",
+  "update-example",
   async (params: ExampleUpdateParams): Promise<void> => {
    logger.debug(`[IPC] Updating example: ${params.id}`);
    await exampleManager.updateExample(params.id, params.updates);
@@ -109,7 +109,7 @@ export function registerExampleHandlers(
 
  // DELETE operations
  ipcService.registerStandardizedIpcHandler(
-  "example:delete",
+  "delete-example",
   async (params: ExampleIdParams): Promise<void> => {
    logger.debug(`[IPC] Deleting example: ${params.id}`);
    await exampleManager.deleteExample(params.id);
@@ -119,7 +119,7 @@ export function registerExampleHandlers(
 
  // BULK operations
  ipcService.registerStandardizedIpcHandler(
-  "example:bulk-create",
+  "bulk-create-examples",
   async (params: ExampleBulkCreateData): Promise<Example[]> => {
    logger.debug(`[IPC] Bulk creating ${params.examples.length} examples`);
    const examples = await exampleManager.bulkCreateExamples(params.examples);
@@ -130,7 +130,7 @@ export function registerExampleHandlers(
 
  // UTILITY operations
  ipcService.registerStandardizedIpcHandler(
-  "example:validate-data",
+  "validate-example-data",
   async (params: ExampleValidationData): Promise<ValidationResult> => {
    logger.debug("[IPC] Validating example data");
    const result = await exampleManager.validateExampleData(params);
@@ -141,7 +141,7 @@ export function registerExampleHandlers(
 
  // EXPORT/IMPORT operations
  ipcService.registerStandardizedIpcHandler(
-  "example:export-data",
+  "export-example-data",
   async (): Promise<ExportData> => {
    logger.debug("[IPC] Exporting example data");
    const exportData = await exampleManager.exportExamples();
@@ -150,7 +150,7 @@ export function registerExampleHandlers(
  );
 
  ipcService.registerStandardizedIpcHandler(
-  "example:import-data",
+  "import-example-data",
   async (params: ExampleImportData): Promise<ImportResult> => {
    logger.debug(
     `[IPC] Importing example data: ${params.examples.length} items`
@@ -436,36 +436,36 @@ const electronAPI = {
 
  example: {
   // GET operations
-  getAll: (): Promise<Example[]> => ipcRenderer.invoke("example:get-all"),
+  getAll: (): Promise<Example[]> => ipcRenderer.invoke("get-examples"),
 
   getById: (id: string): Promise<Example | undefined> =>
-   ipcRenderer.invoke("example:get-by-id", { id }),
+   ipcRenderer.invoke("get-example-by-id", { id }),
 
   // CREATE operations
   create: (data: ExampleCreateData): Promise<Example> =>
-   ipcRenderer.invoke("example:create", data),
+   ipcRenderer.invoke("create-example", data),
 
   bulkCreate: (examples: ExampleCreateData[]): Promise<Example[]> =>
-   ipcRenderer.invoke("example:bulk-create", { examples }),
+   ipcRenderer.invoke("bulk-create-examples", { examples }),
 
   // UPDATE operations
   update: (id: string, updates: Partial<ExampleCreateData>): Promise<void> =>
-   ipcRenderer.invoke("example:update", { id, updates }),
+   ipcRenderer.invoke("update-example", { id, updates }),
 
   // DELETE operations
   delete: (id: string): Promise<void> =>
-   ipcRenderer.invoke("example:delete", { id }),
+   ipcRenderer.invoke("delete-example", { id }),
 
   // UTILITY operations
   validateData: (data: ExampleValidationData): Promise<ValidationResult> =>
-   ipcRenderer.invoke("example:validate-data", data),
+   ipcRenderer.invoke("validate-example-data", data),
 
   // EXPORT/IMPORT operations
   exportData: (): Promise<ExportData> =>
-   ipcRenderer.invoke("example:export-data"),
+   ipcRenderer.invoke("export-example-data"),
 
   importData: (data: ExampleImportData): Promise<ImportResult> =>
-   ipcRenderer.invoke("example:import-data", data),
+   ipcRenderer.invoke("import-example-data", data),
  },
 
  // ... existing API
@@ -594,12 +594,12 @@ describe("Example IPC Handlers", () => {
   registerExampleHandlers(mockIpcService, dependencies);
 
   expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-   "example:get-all",
+   "get-examples",
    expect.any(Function)
   );
 
   expect(mockIpcService.registerStandardizedIpcHandler).toHaveBeenCalledWith(
-   "example:create",
+   "create-example",
    expect.any(Function),
    expect.any(Function)
   );
@@ -619,7 +619,7 @@ describe("Example IPC Handlers", () => {
   // Get the registered handler
   const getAllHandler =
    mockIpcService.registerStandardizedIpcHandler.mock.calls.find(
-    (call) => call[0] === "example:get-all"
+    (call) => call[0] === "get-examples"
    )[1];
 
   const result = await getAllHandler();

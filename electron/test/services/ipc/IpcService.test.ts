@@ -218,7 +218,7 @@ describe(IpcService, () => {
             ipcService.setupHandlers();
 
             const diagnosticsEntry = mockIpcMain.handle.mock.calls.find(
-                ([channel]) => channel === "diagnostics:verify-ipc-handler"
+                ([channel]) => channel === "diagnostics-verify-ipc-handler"
             );
 
             expect(diagnosticsEntry).toBeDefined();
@@ -255,7 +255,7 @@ describe(IpcService, () => {
             ipcService.setupHandlers();
 
             const diagnosticsEntry = mockIpcMain.handle.mock.calls.find(
-                ([channel]) => channel === "diagnostics:report-preload-guard"
+                ([channel]) => channel === "diagnostics-report-preload-guard"
             );
 
             expect(diagnosticsEntry).toBeDefined();

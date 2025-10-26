@@ -587,7 +587,7 @@ interface UptimeEvents {
  "monitor:check-completed": {
   checkType: "manual" | "scheduled";
   monitorId: string;
-  result: MonitorCheckResult;
+  result: StatusUpdate;
   siteIdentifier: string;
   timestamp: number;
  };
@@ -1057,7 +1057,7 @@ export interface NewFeatureData {
 ```typescript
 // electron/services/ipc/IpcService.ts
 ipcService.registerStandardizedIpcHandler(
- "feature:create",
+ "create-feature",
  async (data: NewFeatureData) => {
   return await featureManager.create(data);
  },
@@ -1072,7 +1072,7 @@ ipcService.registerStandardizedIpcHandler(
 const electronAPI = {
  // ... existing APIs
  feature: {
-  create: (data: NewFeatureData) => ipcRenderer.invoke("feature:create", data),
+  create: (data: NewFeatureData) => ipcRenderer.invoke("create-feature", data),
  },
 };
 ```
@@ -1086,4 +1086,4 @@ const newFeature = await window.electronAPI.feature.create(featureData);
 
 ---
 
-💡 **Best Practices**: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the established naming conventions (`domain:action`).
+💡 **Best Practices**: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).

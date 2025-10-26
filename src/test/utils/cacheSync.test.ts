@@ -55,6 +55,8 @@ const createSubscriptionMock = () =>
 const mockEventsService = {
     initialize: vi.fn(async () => undefined),
     onCacheInvalidated: createSubscriptionMock(),
+    onMonitorCheckCompleted: createSubscriptionMock(),
+    onHistoryLimitUpdated: createSubscriptionMock(),
     onMonitorDown: createSubscriptionMock(),
     onMonitoringStarted: createSubscriptionMock(),
     onMonitoringStopped: createSubscriptionMock(),
@@ -99,6 +101,8 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
             ? vi.fn((_callback: unknown) => noopCleanup)
             : vi.fn().mockReturnValue(noopCleanup),
         onMonitorDown: vi.fn((_callback: unknown) => noopCleanup),
+        onMonitorCheckCompleted: vi.fn((_callback: unknown) => noopCleanup),
+        onHistoryLimitUpdated: vi.fn((_callback: unknown) => noopCleanup),
         onMonitoringStarted: vi.fn((_callback: unknown) => noopCleanup),
         onMonitoringStopped: vi.fn((_callback: unknown) => noopCleanup),
         onMonitorStatusChanged: vi.fn((_callback: unknown) => noopCleanup),

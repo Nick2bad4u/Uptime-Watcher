@@ -127,11 +127,11 @@ export interface IpcInvokeChannelMap {
         params: readonly [];
         result: number;
     };
-    "diagnostics:report-preload-guard": {
+    "diagnostics-report-preload-guard": {
         params: readonly [report: PreloadGuardDiagnosticsReport];
         result: undefined;
     };
-    "diagnostics:verify-ipc-handler": {
+    "diagnostics-verify-ipc-handler": {
         params: readonly [channel: string];
         result: IpcHandlerVerificationResult;
     };

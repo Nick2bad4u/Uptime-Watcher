@@ -232,6 +232,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     // Manager instances
     private readonly siteManager: SiteManager;
+    private lastKnownHistoryLimit: number;
 
     /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
@@ -291,6 +292,50 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:database:initialized:",
+                    error
+                );
+            }
+        })();
+    };
+
+    /** Event handler for history limit updates emitted by the database */
+    private readonly handleDatabaseHistoryLimitUpdatedEvent = (
+        eventData: OrchestratorEvents["internal:database:history-limit-updated"]
+    ): void => {
+        void (async (): Promise<void> => {
+            try {
+                const { limit, operation, timestamp } = eventData;
+
+                if (!Number.isFinite(limit) || limit <= 0) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Ignoring history limit update with invalid payload",
+                        { limit, timestamp }
+                    );
+                    return;
+                }
+
+                const previousLimit = this.lastKnownHistoryLimit;
+                this.lastKnownHistoryLimit = limit;
+
+                logger.debug(
+                    "[UptimeOrchestrator] Forwarding history limit update to renderer",
+                    {
+                        limit,
+                        operation,
+                        previousLimit,
+                        timestamp,
+                    }
+                );
+
+                await this.emitTyped("settings:history-limit-updated", {
+                    limit,
+                    operation,
+                    previousLimit,
+                    timestamp,
+                });
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling internal:database:history-limit-updated:",
                     error
                 );
             }
@@ -482,6 +527,83 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
+                    error
+                );
+            }
+        })();
+    };
+
+    /** Event handler for manual monitor check completion events */
+    private readonly handleManualCheckCompletedEvent = (eventData: {
+        identifier: string;
+        monitorId?: string;
+        operation: "manual-check-completed";
+        result: StatusUpdate;
+        timestamp: number;
+    }): void => {
+        void (async (): Promise<void> => {
+            try {
+                const monitorId =
+                    eventData.monitorId ?? eventData.result.monitorId;
+                const siteIdentifier =
+                    eventData.result.siteIdentifier ?? eventData.identifier;
+
+                if (!monitorId) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completed without monitor identifier",
+                        { eventIdentifier: eventData.identifier }
+                    );
+                    return;
+                }
+
+                if (!siteIdentifier) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completed without site identifier",
+                        { monitorId }
+                    );
+                    return;
+                }
+
+                let enrichedResult = eventData.result;
+
+                if (!enrichedResult.site || !enrichedResult.monitor) {
+                    const site =
+                        this.siteManager.getSiteFromCache(siteIdentifier);
+
+                    if (site) {
+                        const monitor = site.monitors.find(
+                            (candidate) => candidate.id === monitorId
+                        );
+                        enrichedResult = {
+                            ...enrichedResult,
+                            site,
+                            ...(monitor ? { monitor } : {}),
+                        };
+
+                        if (!monitor) {
+                            logger.warn(
+                                "[UptimeOrchestrator] Manual check completion had no monitor snapshot; populated from cache without monitor match",
+                                { monitorId, siteIdentifier }
+                            );
+                        }
+                    } else {
+                        logger.warn(
+                            "[UptimeOrchestrator] Manual check completion received but site missing from cache",
+                            { monitorId, siteIdentifier }
+                        );
+                    }
+                }
+
+                await this.emitTyped("monitor:check-completed", {
+                    checkType: "manual",
+                    monitorId,
+                    result: enrichedResult,
+                    siteIdentifier,
+                    timestamp: eventData.timestamp,
+                });
+            } catch (error) {
+                logger.error(
+                    "[UptimeOrchestrator] Error handling internal:monitor:manual-check-completed:",
                     error
                 );
             }
@@ -1572,6 +1694,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             this.handleGetSitesFromCacheRequestedEvent
         );
         this.off(
+            "internal:database:history-limit-updated",
+            this.handleDatabaseHistoryLimitUpdatedEvent
+        );
+        this.off(
             "internal:database:initialized",
             this.handleDatabaseInitializedEvent
         );
@@ -1584,6 +1710,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         // Remove monitoring event handlers
         this.off("internal:monitor:started", this.handleMonitorStartedEvent);
         this.off("internal:monitor:stopped", this.handleMonitorStoppedEvent);
+        this.off(
+            "internal:monitor:manual-check-completed",
+            this.handleManualCheckCompletedEvent
+        );
 
         // Remove site management event handlers
         this.off(
@@ -1645,6 +1775,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.databaseManager = dependencies.databaseManager;
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
+        this.lastKnownHistoryLimit = this.databaseManager.getHistoryLimit();
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
@@ -1685,6 +1816,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.on(
             "internal:database:get-sites-from-cache-requested",
             this.handleGetSitesFromCacheRequestedEvent
+        );
+
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
+        this.on(
+            "internal:database:history-limit-updated",
+            this.handleDatabaseHistoryLimitUpdatedEvent
         );
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
@@ -1742,6 +1879,12 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on("internal:monitor:stopped", this.handleMonitorStoppedEvent);
+
+        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Monitoring event listeners are intentionally persistent for the lifetime of the orchestrator
+        this.on(
+            "internal:monitor:manual-check-completed",
+            this.handleManualCheckCompletedEvent
+        );
     }
 
     /**

@@ -19,6 +19,8 @@ import type {
     CacheInvalidatedEventData,
     CacheInvalidationReason,
     CacheInvalidationType,
+    HistoryLimitUpdatedEventData,
+    MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitoringControlReason,
@@ -76,6 +78,12 @@ type SiteRemovedEventDataPayload = RendererEventPayload<
 type SiteUpdatedEventDataPayload = RendererEventPayload<
     typeof RENDERER_EVENT_CHANNELS.SITE_UPDATED
 >;
+type MonitorCheckCompletedEventDataPayload = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED
+>;
+type HistoryLimitUpdatedEventDataPayload = RendererEventPayload<
+    typeof RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED
+>;
 
 const isCacheInvalidationReason = (
     value: unknown
@@ -100,6 +108,11 @@ const isMonitoringControlReason = (
     MONITORING_CONTROL_REASON_VALUES.some(
         (reason): reason is MonitoringControlReason => reason === value
     );
+
+const isMonitorCheckType = (
+    value: unknown
+): value is MonitorCheckCompletedEventData["checkType"] =>
+    value === "manual" || value === "scheduled";
 
 const isUpdateStatus = (value: unknown): value is UpdateStatus =>
     typeof value === "string" &&
@@ -222,6 +235,72 @@ const isUpdateStatusEventDataPayload = (
 
 const isTestEventDataPayload = (payload: unknown): payload is TestEventData =>
     isUnknownRecord(payload);
+
+const isMonitorCheckCompletedEventDataPayload = (
+    payload: unknown
+): payload is MonitorCheckCompletedEventDataPayload => {
+    if (!isUnknownRecord(payload)) {
+        return false;
+    }
+
+    const { checkType, monitorId, result, siteIdentifier, timestamp } = payload;
+
+    if (!isMonitorCheckType(checkType)) {
+        return false;
+    }
+
+    if (typeof monitorId !== "string" || monitorId.length === 0) {
+        return false;
+    }
+
+    if (typeof siteIdentifier !== "string" || siteIdentifier.length === 0) {
+        return false;
+    }
+
+    if (!hasFiniteTimestamp(timestamp)) {
+        return false;
+    }
+
+    if (!isMonitorStatusChangedEventData(result)) {
+        return false;
+    }
+
+    return true;
+};
+
+const isHistoryLimitUpdatedEventDataPayload = (
+    payload: unknown
+): payload is HistoryLimitUpdatedEventDataPayload => {
+    if (!isUnknownRecord(payload)) {
+        return false;
+    }
+
+    const record = payload as Record<string, unknown>;
+    const { limit, operation, previousLimit, timestamp } = record;
+
+    if (typeof limit !== "number" || !Number.isFinite(limit) || limit <= 0) {
+        return false;
+    }
+
+    if (operation !== "history-limit-updated") {
+        return false;
+    }
+
+    if (!hasFiniteTimestamp(timestamp)) {
+        return false;
+    }
+
+    if (
+        previousLimit !== undefined &&
+        (typeof previousLimit !== "number" ||
+            !Number.isFinite(previousLimit) ||
+            previousLimit <= 0)
+    ) {
+        return false;
+    }
+
+    return true;
+};
 
 const isSiteAddedSource = (value: unknown): value is SiteAddedSource =>
     typeof value === "string" &&
@@ -380,6 +459,12 @@ export function createEventsApi(): EventsApi {
             RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED
         ),
         monitorDown: createEventManager(RENDERER_EVENT_CHANNELS.MONITOR_DOWN),
+        monitorCheckCompleted: createEventManager(
+            RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED
+        ),
+        historyLimitUpdated: createEventManager(
+            RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED
+        ),
         monitoringStarted: createEventManager(
             RENDERER_EVENT_CHANNELS.MONITORING_STARTED
         ),
@@ -451,6 +536,32 @@ export function createEventsApi(): EventsApi {
                 RENDERER_EVENT_CHANNELS.MONITOR_UP,
                 isMonitorUpEventDataPayload,
                 callback
+            ),
+        onMonitorCheckCompleted: (
+            callback: (data: MonitorCheckCompletedEventData) => void
+        ): (() => void) =>
+            subscribeWithGuard(
+                managers.monitorCheckCompleted,
+                RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
+                isMonitorCheckCompletedEventDataPayload,
+                callback,
+                {
+                    guardName: "isMonitorCheckCompletedEventDataPayload",
+                    reason: "monitor-check-completed",
+                }
+            ),
+        onHistoryLimitUpdated: (
+            callback: (data: HistoryLimitUpdatedEventData) => void
+        ): (() => void) =>
+            subscribeWithGuard(
+                managers.historyLimitUpdated,
+                RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
+                isHistoryLimitUpdatedEventDataPayload,
+                callback,
+                {
+                    guardName: "isHistoryLimitUpdatedEventDataPayload",
+                    reason: "history-limit-updated",
+                }
             ),
         onSiteAdded: (
             callback: (data: SiteAddedEventDataPayload) => void

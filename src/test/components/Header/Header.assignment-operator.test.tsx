@@ -91,10 +91,11 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
     const unsubscribe = vi.fn();
     const subscriptionSummary: StatusUpdateSubscriptionSummary = {
         errors: [],
-        expectedListeners: 3,
-        listenersAttached: 3,
+        expectedListeners: 4,
+        listenersAttached: 4,
         listenerStates: [
             { attached: true, name: "monitor-status-changed" },
+            { attached: true, name: "monitor-check-completed" },
             { attached: true, name: "monitoring-started" },
             { attached: true, name: "monitoring-stopped" },
         ],

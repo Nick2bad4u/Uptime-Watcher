@@ -15,10 +15,8 @@ import {
     type MonitoringControlEventData,
 } from "@shared/types/events";
 
-type MonitoringStartedEventData =
-    RendererEventPayloadMap["monitoring:started"];
-type MonitoringStoppedEventData =
-    RendererEventPayloadMap["monitoring:stopped"];
+type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
+type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
 type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
 
 import { EventsService } from "../../services/EventsService";
@@ -54,14 +52,14 @@ function createEventCleanupFunction(): () => void {
 function createMockEventApi() {
     return {
         onCacheInvalidated: vi.fn(() => createEventCleanupFunction()),
+        onMonitorCheckCompleted: vi.fn(() => createEventCleanupFunction()),
+        onHistoryLimitUpdated: vi.fn(() => createEventCleanupFunction()),
         onMonitorDown: vi.fn(() => createEventCleanupFunction()),
-        onMonitoringStarted: vi.fn(
-            (_handler: MonitoringEventHandler) =>
-                createEventCleanupFunction()
+        onMonitoringStarted: vi.fn((_handler: MonitoringEventHandler) =>
+            createEventCleanupFunction()
         ),
-        onMonitoringStopped: vi.fn(
-            (_handler: MonitoringEventHandler) =>
-                createEventCleanupFunction()
+        onMonitoringStopped: vi.fn((_handler: MonitoringEventHandler) =>
+            createEventCleanupFunction()
         ),
         onMonitorStatusChanged: vi.fn(() => createEventCleanupFunction()),
         onMonitorUp: vi.fn(() => createEventCleanupFunction()),
@@ -132,6 +130,8 @@ describe("EventsService", () => {
                 "initialize",
                 "onCacheInvalidated",
                 "onMonitorDown",
+                "onMonitorCheckCompleted",
+                "onHistoryLimitUpdated",
                 "onMonitoringStarted",
                 "onMonitoringStopped",
                 "onMonitorStatusChanged",
@@ -239,6 +239,63 @@ describe("EventsService", () => {
         });
     });
 
+    describe("onMonitorCheckCompleted", () => {
+        it("should register event listener after initialization", async () => {
+            const callback = vi.fn();
+
+            const cleanup =
+                await EventsService.onMonitorCheckCompleted(callback);
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.events.onMonitorCheckCompleted
+            ).toHaveBeenCalledWith(callback);
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should fail if initialization fails", async () => {
+            const callback = vi.fn();
+            const initializationError = new Error("Initialization failed");
+            mockWaitForElectronAPI.mockRejectedValueOnce(initializationError);
+
+            await expect(
+                EventsService.onMonitorCheckCompleted(callback)
+            ).rejects.toThrow("Initialization failed");
+
+            expect(
+                mockElectronAPI.events.onMonitorCheckCompleted
+            ).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("onHistoryLimitUpdated", () => {
+        it("should register event listener after initialization", async () => {
+            const callback = vi.fn();
+
+            const cleanup = await EventsService.onHistoryLimitUpdated(callback);
+
+            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(
+                mockElectronAPI.events.onHistoryLimitUpdated
+            ).toHaveBeenCalledWith(callback);
+            expect(typeof cleanup).toBe("function");
+        });
+
+        it("should fail if initialization fails", async () => {
+            const callback = vi.fn();
+            const initializationError = new Error("Initialization failed");
+            mockWaitForElectronAPI.mockRejectedValueOnce(initializationError);
+
+            await expect(
+                EventsService.onHistoryLimitUpdated(callback)
+            ).rejects.toThrow("Initialization failed");
+
+            expect(
+                mockElectronAPI.events.onHistoryLimitUpdated
+            ).not.toHaveBeenCalled();
+        });
+    });
+
     describe("onMonitoringStarted", () => {
         it("should register event listener after initialization", async () => {
             const callback = vi.fn();
@@ -250,8 +307,10 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onMonitoringStarted
             ).toHaveBeenCalledTimes(1);
 
-            const call = mockElectronAPI.events.onMonitoringStarted.mock.calls
-                .at(0) as [MonitoringEventHandler] | undefined;
+            const call =
+                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0) as
+                    | [MonitoringEventHandler]
+                    | undefined;
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -294,8 +353,10 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onMonitoringStopped
             ).toHaveBeenCalledTimes(1);
 
-            const call = mockElectronAPI.events.onMonitoringStopped.mock.calls
-                .at(0) as [MonitoringEventHandler] | undefined;
+            const call =
+                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0) as
+                    | [MonitoringEventHandler]
+                    | undefined;
             expect(call).toBeDefined();
             if (!call) {
                 throw new Error(
@@ -558,6 +619,7 @@ describe("EventsService", () => {
             const cleanupFunctions = await Promise.all([
                 EventsService.onCacheInvalidated(testCallback),
                 EventsService.onMonitorDown(testCallback),
+                EventsService.onMonitorCheckCompleted(testCallback),
                 EventsService.onMonitoringStarted(testCallback),
                 EventsService.onMonitoringStopped(testCallback),
                 EventsService.onMonitorStatusChanged(testCallback),
@@ -572,13 +634,14 @@ describe("EventsService", () => {
             }
 
             // All should have called initialization
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(8);
+            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(9);
         });
     });
 
     describe("Integration Testing", () => {
         it("should handle multiple simultaneous event registrations", async () => {
-            const callbacks = Array.from({ length: 8 }, () => vi.fn()) as [
+            const callbacks = Array.from({ length: 9 }, () => vi.fn()) as [
+                ReturnType<typeof vi.fn>,
                 ReturnType<typeof vi.fn>,
                 ReturnType<typeof vi.fn>,
                 ReturnType<typeof vi.fn>,
@@ -592,16 +655,17 @@ describe("EventsService", () => {
             const cleanupFunctions = await Promise.all([
                 EventsService.onCacheInvalidated(callbacks[0]),
                 EventsService.onMonitorDown(callbacks[1]),
-                EventsService.onMonitoringStarted(callbacks[2]),
-                EventsService.onMonitoringStopped(callbacks[3]),
-                EventsService.onMonitorStatusChanged(callbacks[4]),
-                EventsService.onMonitorUp(callbacks[5]),
-                EventsService.onTestEvent(callbacks[6]),
-                EventsService.onUpdateStatus(callbacks[7]),
+                EventsService.onMonitorCheckCompleted(callbacks[2]),
+                EventsService.onMonitoringStarted(callbacks[3]),
+                EventsService.onMonitoringStopped(callbacks[4]),
+                EventsService.onMonitorStatusChanged(callbacks[5]),
+                EventsService.onMonitorUp(callbacks[6]),
+                EventsService.onTestEvent(callbacks[7]),
+                EventsService.onUpdateStatus(callbacks[8]),
             ]);
 
             // All registrations should succeed
-            expect(cleanupFunctions).toHaveLength(8);
+            expect(cleanupFunctions).toHaveLength(9);
             for (const cleanup of cleanupFunctions) {
                 expect(typeof cleanup).toBe("function");
             }
@@ -614,6 +678,9 @@ describe("EventsService", () => {
                 callbacks[1]
             );
             expect(
+                mockElectronAPI.events.onMonitorCheckCompleted
+            ).toHaveBeenCalledWith(callbacks[2]);
+            expect(
                 mockElectronAPI.events.onMonitoringStarted
             ).toHaveBeenCalledTimes(1);
             expect(
@@ -621,15 +688,15 @@ describe("EventsService", () => {
             ).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
-            ).toHaveBeenCalledWith(callbacks[4]);
+            ).toHaveBeenCalledWith(callbacks[5]);
             expect(mockElectronAPI.events.onMonitorUp).toHaveBeenCalledWith(
-                callbacks[5]
-            );
-            expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
                 callbacks[6]
             );
-            expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
+            expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
                 callbacks[7]
+            );
+            expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
+                callbacks[8]
             );
 
             const startedCall =
@@ -657,11 +724,11 @@ describe("EventsService", () => {
 
             const startedPayload = createMonitoringStartedEventPayload();
             monitoringStartedHandler(startedPayload);
-            expect(callbacks[2]).toHaveBeenCalledWith(startedPayload);
+            expect(callbacks[3]).toHaveBeenCalledWith(startedPayload);
 
             const stoppedPayload = createMonitoringStoppedEventPayload();
             monitoringStoppedHandler(stoppedPayload);
-            expect(callbacks[3]).toHaveBeenCalledWith(stoppedPayload);
+            expect(callbacks[4]).toHaveBeenCalledWith(stoppedPayload);
         });
 
         it("should handle repeated initialization calls gracefully", async () => {

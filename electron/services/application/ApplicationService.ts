@@ -408,6 +408,54 @@ export class ApplicationService {
             }
         });
 
+        orchestrator.onTyped("monitor:check-completed", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug
+                        .APPLICATION_FORWARDING_MANUAL_CHECK_COMPLETED,
+                    {
+                        checkType: data.checkType,
+                        monitorId: data.monitorId,
+                        siteIdentifier: data.siteIdentifier,
+                    }
+                );
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.MONITOR_CHECK_COMPLETED,
+                    data
+                );
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_MANUAL_CHECK_COMPLETED_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
+        orchestrator.onTyped("settings:history-limit-updated", (data) => {
+            try {
+                logger.debug(
+                    LOG_TEMPLATES.debug
+                        .APPLICATION_FORWARDING_HISTORY_LIMIT_UPDATED,
+                    {
+                        limit: data.limit,
+                        previousLimit: data.previousLimit,
+                        timestamp: data.timestamp,
+                    }
+                );
+                rendererBridge.sendToRenderers(
+                    RENDERER_EVENT_CHANNELS.SETTINGS_HISTORY_LIMIT_UPDATED,
+                    data
+                );
+            } catch (error: unknown) {
+                logger.error(
+                    LOG_TEMPLATES.errors
+                        .APPLICATION_FORWARD_HISTORY_LIMIT_UPDATED_ERROR,
+                    ensureError(error)
+                );
+            }
+        });
+
         // Handle system errors
         orchestrator.onTyped("system:error", (data) => {
             logger.error(

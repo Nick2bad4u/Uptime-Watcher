@@ -176,7 +176,7 @@ const statusUpdateManager: {
     instance?: StatusUpdateManager;
 } = {};
 
-const FALLBACK_EXPECTED_LISTENERS = 3;
+const FALLBACK_EXPECTED_LISTENERS = 4;
 
 const resolveExpectedListenerCount = (): number => {
     const candidate = (

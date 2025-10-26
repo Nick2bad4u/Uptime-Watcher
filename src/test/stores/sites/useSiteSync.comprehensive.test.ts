@@ -82,12 +82,12 @@ vi.mock("../../../../shared/utils/errorHandling", () => ({
 vi.mock("../../../stores/sites/utils/statusUpdateHandler", () => ({
     StatusUpdateManager: vi.fn(function StatusUpdateManagerMock() {
         return {
-            getExpectedListenerCount: vi.fn(() => 3),
+            getExpectedListenerCount: vi.fn(() => 4),
             subscribe: vi.fn(async () => ({
                 errors: [],
-                expectedListeners: 3,
-                listenersAttached: 3,
-                listenerStates: buildListenerStates(3),
+                expectedListeners: 4,
+                listenersAttached: 4,
+                listenerStates: buildListenerStates(4),
                 success: true,
             })),
             unsubscribe: vi.fn(),
@@ -304,8 +304,8 @@ describe("useSiteSync", () => {
             expect(result).toEqual(
                 expect.objectContaining({
                     errors: [],
-                    expectedListeners: 3,
-                    listenersAttached: 3,
+                    expectedListeners: 4,
+                    listenersAttached: 4,
                     success: true,
                     subscribed: true,
                     message:
@@ -315,8 +315,8 @@ describe("useSiteSync", () => {
 
             expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    expectedListeners: 3,
-                    listenersAttached: 3,
+                    expectedListeners: 4,
+                    listenersAttached: 4,
                     success: true,
                 })
             );
@@ -338,7 +338,7 @@ describe("useSiteSync", () => {
                 "../../../stores/sites/utils/statusUpdateHandler"
             );
             const mockStatusUpdateManager = {
-                getExpectedListenerCount: vi.fn(() => 3),
+                getExpectedListenerCount: vi.fn(() => 4),
                 subscribe: vi.fn(async () => {
                     throw new Error("Subscribe failed");
                 }),
@@ -359,7 +359,7 @@ describe("useSiteSync", () => {
             expect(result.errors).toContain("Subscribe failed");
             expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    expectedListeners: 3,
+                    expectedListeners: 4,
                     listenersAttached: 0,
                     success: false,
                 })
@@ -383,12 +383,12 @@ describe("useSiteSync", () => {
                     const unsubscribe = vi.fn();
                     unsubscribeSpies.push(unsubscribe);
                     return {
-                        getExpectedListenerCount: vi.fn(() => 3),
+                        getExpectedListenerCount: vi.fn(() => 4),
                         subscribe: vi.fn(async () => ({
                             errors: [],
-                            expectedListeners: 3,
-                            listenersAttached: 3,
-                            listenerStates: buildListenerStates(3),
+                            expectedListeners: 4,
+                            listenersAttached: 4,
+                            listenerStates: buildListenerStates(4),
                             success: true,
                         })),
                         unsubscribe,
@@ -417,8 +417,8 @@ describe("useSiteSync", () => {
             ).toHaveBeenNthCalledWith(
                 2,
                 expect.objectContaining({
-                    expectedListeners: 3,
-                    listenersAttached: 3,
+                    expectedListeners: 4,
+                    listenersAttached: 4,
                     success: true,
                 })
             );
@@ -434,7 +434,7 @@ describe("useSiteSync", () => {
             );
             expect(mockDeps.setStatusSubscriptionSummary).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    expectedListeners: 3,
+                    expectedListeners: 4,
                     listenersAttached: 0,
                     success: false,
                 })
