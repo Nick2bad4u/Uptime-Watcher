@@ -1257,6 +1257,17 @@ export interface UptimeEvents extends UnknownRecord {
      *   "user").
      * @param timestamp - Unix timestamp (ms) when the site was added.
      */
+    /**
+     * Emitted when the database history retention limit changes.
+     *
+     * @remarks
+     * Forwarded to renderer clients so settings views remain synchronized when
+     * imports or backend tooling adjust the configured limit.
+     *
+     * @see {@link HistoryLimitUpdatedEventData} for payload structure.
+     */
+    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
+
     "site:added": {
         /** The site object added. */
         site: Site;
@@ -1344,17 +1355,6 @@ export interface UptimeEvents extends UnknownRecord {
         /** List of updated field names. */
         updatedFields: string[];
     };
-
-    /**
-     * Emitted when the database history retention limit changes.
-     *
-     * @remarks
-     * Forwarded to renderer clients so settings views remain synchronized when
-     * imports or backend tooling adjust the configured limit.
-     *
-     * @see {@link HistoryLimitUpdatedEventData} for payload structure.
-     */
-    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
 
     /**
      * Emitted when site state is synchronized.
@@ -1721,17 +1721,17 @@ export const EVENT_CATEGORIES = {
      * Events related to site operations including adding, removing, updating
      * sites and state synchronization.
      */
+    /**
+     * Settings and configuration change events.
+     */
+    SETTINGS: ["settings:history-limit-updated"] as const,
+
     SITE: [
         "site:added",
         "site:removed",
         "site:updated",
         "sites:state-synchronized",
     ] as const,
-
-    /**
-     * Settings and configuration change events.
-     */
-    SETTINGS: ["settings:history-limit-updated"] as const,
 
     /**
      * System-level events.
@@ -1822,6 +1822,7 @@ export const EVENT_PRIORITIES = {
     MEDIUM: [
         "config:changed",
         "monitor:added",
+        "settings:history-limit-updated",
         "site:added",
         "site:updated",
     ] as const,
@@ -1963,6 +1964,11 @@ export function isEventOfCategory(
         }
         case "PERFORMANCE": {
             return (EVENT_CATEGORIES.PERFORMANCE as readonly string[]).includes(
+                eventNameStr
+            );
+        }
+        case "SETTINGS": {
+            return (EVENT_CATEGORIES.SETTINGS as readonly string[]).includes(
                 eventNameStr
             );
         }

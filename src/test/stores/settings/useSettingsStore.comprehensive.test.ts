@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { test, fc } from "@fast-check/vitest";
+import type { ElectronAPI } from "../../../types";
 
 // Mock extractIpcData
 vi.mock("../../../types/ipc", () => ({
@@ -44,6 +45,7 @@ import { extractIpcData, safeExtractIpcData } from "../../../types/ipc";
 import { logStoreAction } from "../../../stores/utils";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { resetHistoryLimitSubscriptionForTesting } from "../../../stores/settings/operations";
 
 const mockExtractIpcData = vi.mocked(extractIpcData);
 const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
@@ -65,7 +67,9 @@ const mockElectronAPI = {
         }),
     },
     events: {
-        onHistoryLimitUpdated: vi.fn(() => vi.fn()),
+        onHistoryLimitUpdated: vi.fn<
+            ElectronAPI["events"]["onHistoryLimitUpdated"]
+        >(() => vi.fn()),
     },
     settings: {
         getHistoryLimit: vi.fn(),
@@ -96,6 +100,7 @@ if ((globalThis as any).window?.electronAPI) {
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        resetHistoryLimitSubscriptionForTesting();
 
         // Setup default mock returns - direct data values (preload APIs extract data automatically)
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
@@ -350,16 +355,34 @@ describe(useSettingsStore, () => {
 
             mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
 
+            let capturedHandler:
+                | Parameters<ElectronAPI["events"]["onHistoryLimitUpdated"]>[0]
+                | undefined;
+
+            mockElectronAPI.events.onHistoryLimitUpdated.mockImplementation(
+                (
+                    handler: Parameters<
+                        ElectronAPI["events"]["onHistoryLimitUpdated"]
+                    >[0]
+                ) => {
+                    capturedHandler = handler;
+                    return () => undefined;
+                }
+            );
+
             const { result } = renderHook(() => useSettingsStore());
 
             await act(async () => {
                 await result.current.initializeSettings();
             });
 
-            const eventHandler =
-                mockElectronAPI.events.onHistoryLimitUpdated.mock.calls[0]?.[0];
+            expect(capturedHandler).toBeTypeOf("function");
 
-            expect(eventHandler).toBeTypeOf("function");
+            if (!capturedHandler) {
+                throw new Error(
+                    "Expected onHistoryLimitUpdated handler to be registered"
+                );
+            }
 
             const eventPayload = {
                 limit: 650,
@@ -369,7 +392,7 @@ describe(useSettingsStore, () => {
             };
 
             await act(async () => {
-                eventHandler?.(eventPayload);
+                capturedHandler!(eventPayload);
             });
 
             expect(result.current.settings.historyLimit).toBe(650);

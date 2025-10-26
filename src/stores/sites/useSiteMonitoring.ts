@@ -9,13 +9,14 @@
  */
 
 import type { Site, StatusUpdate } from "@shared/types";
+
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
+import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { MonitoringService } from "./services/MonitoringService";
 import { applyStatusUpdateSnapshot } from "./utils/statusUpdateHandler";
-import { logger } from "../../services/logger";
 
 /**
  * Site monitoring actions interface for managing monitoring operations.
@@ -52,6 +53,16 @@ export interface SiteMonitoringActions {
  * @public
  */
 export interface SiteMonitoringDependencies {
+    /**
+     * Applies status update snapshots to the current sites collection.
+     *
+     * @remarks
+     * Defaults to {@link applyStatusUpdateSnapshot}. Override for testing to
+     * inspect inputs without mutating state.
+     */
+    applyStatusUpdate?: (sites: Site[], update: StatusUpdate) => Site[];
+    /** Reads current sites from the store for optimistic updates */
+    getSites: () => Site[];
     /** Monitoring service abstraction */
     monitoringService: Pick<
         typeof MonitoringService,
@@ -61,26 +72,16 @@ export interface SiteMonitoringDependencies {
         | "stopMonitoringForMonitor"
         | "stopMonitoringForSite"
     >;
-    /** Reads current sites from the store for optimistic updates */
-    getSites: () => Site[];
     /** Replaces the sites collection in the store */
     setSites: (sites: Site[]) => void;
-    /**
-     * Applies status update snapshots to the current sites collection.
-     *
-     * @remarks
-     * Defaults to {@link applyStatusUpdateSnapshot}. Override for testing to
-     * inspect inputs without mutating state.
-     */
-    applyStatusUpdate?: (sites: Site[], update: StatusUpdate) => Site[];
 }
 
 const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
     {
-        monitoringService: MonitoringService,
-        getSites: (): Site[] => [],
-        setSites: (): void => undefined,
         applyStatusUpdate: applyStatusUpdateSnapshot,
+        getSites: (): Site[] => [],
+        monitoringService: MonitoringService,
+        setSites: (): void => undefined,
     }
 );
 
@@ -99,14 +100,17 @@ const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
 export const createSiteMonitoringActions = (
     deps: SiteMonitoringDependencies = defaultMonitoringDependencies
 ): SiteMonitoringActions => {
-    const { monitoringService, getSites, setSites } = deps;
-    const applyStatusUpdate =
-        deps.applyStatusUpdate ?? applyStatusUpdateSnapshot;
+    const { applyStatusUpdate, getSites, monitoringService, setSites } = deps;
+    const safeApplyStatusUpdate =
+        applyStatusUpdate ?? applyStatusUpdateSnapshot;
 
     const applyOptimisticUpdate = (statusUpdate: StatusUpdate): void => {
         try {
             const currentSites = getSites();
-            const updatedSites = applyStatusUpdate(currentSites, statusUpdate);
+            const updatedSites = safeApplyStatusUpdate(
+                currentSites,
+                statusUpdate
+            );
             setSites(updatedSites);
 
             logger.debug(

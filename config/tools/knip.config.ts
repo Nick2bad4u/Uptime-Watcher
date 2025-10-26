@@ -149,6 +149,7 @@ const knipConfig: KnipConfig = {
         "eslint-plugin-tree-shaking",
         "eslint-summary",
         "force",
+        "fast-deep-equal",
         "fs-extra",
         "globals-vitest",
         "istanbul-lib-coverage",

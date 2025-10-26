@@ -164,8 +164,8 @@ const electronAPIMockDefinition = {
     },
     events: {
         onCacheInvalidated: registerListener,
-        onMonitorCheckCompleted: registerListener,
         onHistoryLimitUpdated: registerListener,
+        onMonitorCheckCompleted: registerListener,
         onMonitorDown: registerListener,
         onMonitoringStarted: registerListener,
         onMonitoringStopped: registerListener,
@@ -174,6 +174,7 @@ const electronAPIMockDefinition = {
         onSiteAdded: registerListener,
         onSiteRemoved: registerListener,
         onSiteUpdated: registerListener,
+        onStateSyncEvent: registerListener,
         onTestEvent: registerListener,
         onUpdateStatus: registerListener,
         removeAllListeners: noop,

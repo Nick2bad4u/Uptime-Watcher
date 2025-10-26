@@ -13,8 +13,6 @@
 import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import type {
     CacheInvalidatedEventData,
-    HistoryLimitUpdatedEventData,
-    MonitorCheckCompletedEventData,
     MonitorDownEventData,
     MonitoringControlEventData,
     MonitorStatusChangedEventData,
@@ -62,14 +60,14 @@ interface EventsServiceContract {
     onCacheInvalidated: (
         callback: (data: CacheInvalidatedEventData) => void
     ) => Promise<() => void>;
-    onMonitorDown: (
-        callback: (data: MonitorDownEventData) => void
+    onHistoryLimitUpdated: (
+        callback: (data: HistoryLimitUpdatedEventPayload) => void
     ) => Promise<() => void>;
     onMonitorCheckCompleted: (
         callback: (data: MonitorCheckCompletedEventPayload) => void
     ) => Promise<() => void>;
-    onHistoryLimitUpdated: (
-        callback: (data: HistoryLimitUpdatedEventPayload) => void
+    onMonitorDown: (
+        callback: (data: MonitorDownEventData) => void
     ) => Promise<() => void>;
     onMonitoringStarted: (
         callback: (data: MonitoringStartedEventData) => void
@@ -150,6 +148,30 @@ export const EventsService: EventsServiceContract = {
     ),
 
     /**
+     * Register a callback for database history limit updates.
+     *
+     * @param callback - Function invoked when the retention limit changes.
+     *
+     * @returns Cleanup function removing the registered listener.
+     */
+    onHistoryLimitUpdated: wrap(
+        "onHistoryLimitUpdated",
+        (api, callback: (data: HistoryLimitUpdatedEventPayload) => void) =>
+            Promise.resolve(api.events.onHistoryLimitUpdated(callback))
+    ),
+    /**
+     * Register a callback for monitor check completion events.
+     *
+     * @param callback - Function invoked with the completed check payload.
+     *
+     * @returns Cleanup function removing the registered listener.
+     */
+    onMonitorCheckCompleted: wrap(
+        "onMonitorCheckCompleted",
+        (api, callback: (data: MonitorCheckCompletedEventPayload) => void) =>
+            Promise.resolve(api.events.onMonitorCheckCompleted(callback))
+    ),
+    /**
      * Register a callback for monitor down events.
      *
      * @example
@@ -176,16 +198,6 @@ export const EventsService: EventsServiceContract = {
         "onMonitorDown",
         (api, callback: (data: MonitorDownEventData) => void) =>
             Promise.resolve(api.events.onMonitorDown(callback))
-    ),
-    onMonitorCheckCompleted: wrap(
-        "onMonitorCheckCompleted",
-        (api, callback: (data: MonitorCheckCompletedEventData) => void) =>
-            Promise.resolve(api.events.onMonitorCheckCompleted(callback))
-    ),
-    onHistoryLimitUpdated: wrap(
-        "onHistoryLimitUpdated",
-        (api, callback: (data: HistoryLimitUpdatedEventData) => void) =>
-            Promise.resolve(api.events.onHistoryLimitUpdated(callback))
     ),
 
     /**

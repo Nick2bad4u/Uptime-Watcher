@@ -63,6 +63,9 @@ jobs:
                   npm install -D
                   npm install typescript-eslint eslint-plugin-import @microsoft/eslint-formatter-sarif
 
+            - name: Check IPC artifacts
+              run: npm run check:ipc
+
             - name: Run ESLint
               env:
                   SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
@@ -80,6 +83,10 @@ jobs:
                   npx eslint . --ignore-pattern dist --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
               working-directory: .
               continue-on-error: true
+
+            - name: Verify IPC documentation artifacts
+              run: npm run check:ipc
+              working-directory: .
 
             - name: Upload analysis results to GitHub
               uses: github/codeql-action/upload-sarif@64d10c13136e1c5bce3e5fbde8d4906eeaafc885 # v2.27.0

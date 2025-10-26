@@ -140,7 +140,7 @@ describe("useSiteMonitoring", () => {
                     history: [],
                     id: "monitor-1",
                     monitoring: true,
-                    responseTime: 1_200,
+                    responseTime: 1200,
                     retryAttempts: 0,
                     status: "down",
                     timeout: 30_000,
@@ -151,10 +151,16 @@ describe("useSiteMonitoring", () => {
             name: "Example Site",
         };
 
+        const [primaryMonitor] = site.monitors;
+
+        if (!primaryMonitor) {
+            throw new Error("Expected site to provide at least one monitor");
+        }
+
         const statusUpdate: StatusUpdate = {
             details: "Manual check successful",
-            monitor: site.monitors[0],
-            monitorId: site.monitors[0].id,
+            monitor: primaryMonitor,
+            monitorId: primaryMonitor.id,
             previousStatus: "down",
             responseTime: 456,
             site,
@@ -168,7 +174,7 @@ describe("useSiteMonitoring", () => {
                 ...site,
                 monitors: [
                     {
-                        ...site.monitors[0],
+                        ...primaryMonitor,
                         status: "up",
                         responseTime: statusUpdate.responseTime ?? 0,
                     },
@@ -182,7 +188,7 @@ describe("useSiteMonitoring", () => {
             statusUpdate
         );
 
-        await actions.checkSiteNow(site.identifier, site.monitors[0].id);
+        await actions.checkSiteNow(site.identifier, primaryMonitor.id);
 
         expect(mockApplyStatusUpdate).toHaveBeenCalledWith(
             [site],

@@ -68,6 +68,7 @@ Step-by-step implementation instructions:
 
 | Guide                                                                              | Purpose                     | Complexity      |
 | ---------------------------------------------------------------------------------- | --------------------------- | --------------- |
+| [Renderer-Integration-Guide.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)           | Renderer/IPC integration    | 🟡 Intermediate |
 | [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) | Adding monitor types        | 🟡 Intermediate |
 | [UI-Feature-Development-Guide.md](../Guides/UI-Feature-Development-Guide.md)       | Frontend development        | 🟡 Intermediate |
 | [TESTING.md](../Guides/TESTING.md)                                                 | Testing setup and practices | 🟢 Beginner     |
@@ -159,6 +160,7 @@ Relevant historical context and lessons learned:
 - [ADR-002-Event-Driven-Architecture.md](../Architecture/ADRs/ADR-002-Event-Driven-Architecture.md) - Event system
 - [ADR-005-IPC-Communication-Protocol.md](../Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md) - IPC design
 - [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - Communication interfaces
+- [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md) - Renderer IPC integration
 - [IPC-Handler-Template.md](../Architecture/Templates/IPC-Handler-Template.md) - IPC implementation
 
 ### 🎨 Frontend & UI

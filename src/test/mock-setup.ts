@@ -221,6 +221,9 @@ const mockElectronAPI: ElectronAPI = {
         onSiteUpdated: vi.fn<ElectronAPI["events"]["onSiteUpdated"]>(
             (_callback) => () => undefined
         ),
+        onStateSyncEvent: vi.fn<ElectronAPI["events"]["onStateSyncEvent"]>(
+            (_callback) => () => undefined
+        ),
         onTestEvent: vi.fn<ElectronAPI["events"]["onTestEvent"]>(
             (_callback) => () => undefined
         ),

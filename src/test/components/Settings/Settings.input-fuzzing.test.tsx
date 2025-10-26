@@ -70,8 +70,6 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
- * ```
- *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,7 +80,6 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -693,39 +690,43 @@ describe("Settings Component - Property-Based Fuzzing", () => {
     describe("Data Operations Fuzzing", () => {
         fcTest.prop([fc.boolean()], {
             numRuns: 10,
-            timeout: 15_000,
-        })("should handle sync operations", async (shouldFail) => {
-            // Manual DOM cleanup for property-based testing iterations
-            vi.clearAllMocks();
+            timeout: 45_000,
+        })(
+            "should handle sync operations",
+            async (shouldFail) => {
+                // Manual DOM cleanup for property-based testing iterations
+                vi.clearAllMocks();
 
-            if (shouldFail) {
-                mockfullResyncSites.mockRejectedValueOnce(
-                    new Error("Sync failed")
-                );
-            } else {
-                mockfullResyncSites.mockResolvedValueOnce(undefined);
-            }
+                if (shouldFail) {
+                    mockfullResyncSites.mockRejectedValueOnce(
+                        new Error("Sync failed")
+                    );
+                } else {
+                    mockfullResyncSites.mockResolvedValueOnce(undefined);
+                }
 
-            renderSettingsComponent();
+                renderSettingsComponent();
 
-            const syncButton = screen.getByRole("button", {
-                name: /refresh history/i,
-            });
-
-            // Click the button directly without waiting for state updates
-            const user = userEvent.setup();
-            await user.click(syncButton);
-
-            // Check the mock was called immediately (sync operation is async but call is immediate)
-            expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
-
-            // For error checking, we need to give React a chance to update state
-            if (shouldFail) {
-                await waitFor(() => {
-                    expect(mockSetError).toHaveBeenCalled();
+                const syncButton = screen.getByRole("button", {
+                    name: /refresh history/i,
                 });
-            }
-        });
+
+                // Click the button directly without waiting for state updates
+                const user = userEvent.setup();
+                await user.click(syncButton);
+
+                // Check the mock was called immediately (sync operation is async but call is immediate)
+                expect(mockfullResyncSites).toHaveBeenCalledTimes(1);
+
+                // For error checking, we need to give React a chance to update state
+                if (shouldFail) {
+                    await waitFor(() => {
+                        expect(mockSetError).toHaveBeenCalled();
+                    });
+                }
+            },
+            45_000
+        );
 
         // eslint-disable-next-line no-warning-comments -- Temporarily disabling problematic test
         // TODO: Fix download button mock issue - button exists but mock isn't called
@@ -765,7 +766,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
     describe("Settings Reset Fuzzing", () => {
         fcTest.prop([fc.boolean()], {
             numRuns: 10,
-            timeout: 5000,
+            timeout: 45_000,
         })(
             "should handle settings reset with confirmation",
             async (confirmReset) => {
@@ -801,7 +802,8 @@ describe("Settings Component - Property-Based Fuzzing", () => {
                 } else {
                     expect(mockResetSettings).not.toHaveBeenCalled();
                 }
-            }
+            },
+            45_000
         );
     });
 

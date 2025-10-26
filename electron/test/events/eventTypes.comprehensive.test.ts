@@ -35,6 +35,7 @@ describe("eventTypes - Comprehensive Coverage", () => {
                 "MONITOR",
                 "MONITORING",
                 "PERFORMANCE",
+                "SETTINGS",
                 "SITE",
                 "SYSTEM",
             ];
@@ -77,6 +78,9 @@ describe("eventTypes - Comprehensive Coverage", () => {
             expect(EVENT_CATEGORIES.MONITORING).toContain("monitoring:started");
             expect(EVENT_CATEGORIES.PERFORMANCE).toContain(
                 "performance:metric"
+            );
+            expect(EVENT_CATEGORIES.SETTINGS).toContain(
+                "settings:history-limit-updated"
             );
             expect(EVENT_CATEGORIES.SITE).toContain("site:added");
             expect(EVENT_CATEGORIES.SYSTEM).toContain("system:error");

@@ -66,7 +66,7 @@ const mockSiteManager = {
         } as Site)
     ),
     removeSite: vi.fn(() => Promise.resolve(true)),
-    getSiteFromCache: vi.fn(() => ({
+    getSiteFromCache: vi.fn((_identifier?: string) => ({
         identifier: "test-site",
         name: "Test Site",
         monitors: [
@@ -216,7 +216,10 @@ describe(UptimeOrchestrator, () => {
             await annotate("Type: Initialization", "type");
 
             const invalidDependencies = {
-                databaseManager: { initialize: undefined } as any,
+                databaseManager: {
+                    getHistoryLimit: (): number => 1000,
+                    initialize: undefined,
+                } as any,
                 monitorManager: mockMonitorManager,
                 siteManager: mockSiteManager,
             };
@@ -298,10 +301,14 @@ describe(UptimeOrchestrator, () => {
                 firstPayload
             );
 
-            expect(handler).toHaveBeenCalledWith({
-                ...firstPayload,
-                previousLimit: 1000,
-            });
+            await new Promise((resolve) => setImmediate(resolve));
+
+            expect(handler).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    ...firstPayload,
+                    previousLimit: 1000,
+                })
+            );
 
             const secondPayload = {
                 limit: 600,
@@ -314,10 +321,14 @@ describe(UptimeOrchestrator, () => {
                 secondPayload
             );
 
-            expect(handler).toHaveBeenLastCalledWith({
-                ...secondPayload,
-                previousLimit: 750,
-            });
+            await new Promise((resolve) => setImmediate(resolve));
+
+            expect(handler).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    ...secondPayload,
+                    previousLimit: 750,
+                })
+            );
         });
 
         it("should ignore payloads with invalid limits", async () => {
@@ -1745,7 +1756,14 @@ describe(UptimeOrchestrator, () => {
                 "getSiteFromCache"
             );
 
-            const siteFromCache = mockSiteManager.getSiteFromCache();
+            const siteFromCache = mockSiteManager.getSiteFromCache("test-site");
+
+            if (!siteFromCache) {
+                throw new Error(
+                    "Expected site to exist in cache for test setup"
+                );
+            }
+
             const monitorId = siteFromCache.monitors[0]?.id ?? "monitor-1";
 
             const manualResult: StatusUpdate = {

@@ -7,22 +7,25 @@
  * Ensures the Electron preload layer and renderer agree on the shape of the
  * event subscription API exposed through `window.electronAPI.events`.
  */
-import type { RendererEventPayloadMap } from '@shared/ipc/rendererEvents';
+import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 
-type CacheInvalidatedPayload = RendererEventPayloadMap['cache:invalidated'];
-type MonitorDownPayload = RendererEventPayloadMap['monitor:down'];
-type MonitorStatusChangedPayload = RendererEventPayloadMap['monitor:status-changed'];
-type MonitorUpPayload = RendererEventPayloadMap['monitor:up'];
-type MonitorCheckCompletedPayload = RendererEventPayloadMap['monitor:check-completed'];
-type MonitoringStartedPayload = RendererEventPayloadMap['monitoring:started'];
-type MonitoringStoppedPayload = RendererEventPayloadMap['monitoring:stopped'];
-type SiteAddedPayload = RendererEventPayloadMap['site:added'];
-type SiteRemovedPayload = RendererEventPayloadMap['site:removed'];
-type SiteUpdatedPayload = RendererEventPayloadMap['site:updated'];
-type HistoryLimitUpdatedPayload = RendererEventPayloadMap['settings:history-limit-updated'];
-type StateSyncEventPayload = RendererEventPayloadMap['state-sync-event'];
-type TestEventPayload = RendererEventPayloadMap['test-event'];
-type UpdateStatusPayload = RendererEventPayloadMap['update-status'];
+type CacheInvalidatedPayload = RendererEventPayloadMap["cache:invalidated"];
+type HistoryLimitUpdatedPayload =
+    RendererEventPayloadMap["settings:history-limit-updated"];
+type MonitorCheckCompletedPayload =
+    RendererEventPayloadMap["monitor:check-completed"];
+type MonitorDownPayload = RendererEventPayloadMap["monitor:down"];
+type MonitoringStartedPayload = RendererEventPayloadMap["monitoring:started"];
+type MonitoringStoppedPayload = RendererEventPayloadMap["monitoring:stopped"];
+type MonitorStatusChangedPayload =
+    RendererEventPayloadMap["monitor:status-changed"];
+type MonitorUpPayload = RendererEventPayloadMap["monitor:up"];
+type SiteAddedPayload = RendererEventPayloadMap["site:added"];
+type SiteRemovedPayload = RendererEventPayloadMap["site:removed"];
+type SiteUpdatedPayload = RendererEventPayloadMap["site:updated"];
+type StateSyncEventPayload = RendererEventPayloadMap["state-sync-event"];
+type TestEventPayload = RendererEventPayloadMap["test-event"];
+type UpdateStatusPayload = RendererEventPayloadMap["update-status"];
 
 /**
  * Contract for the preload events bridge exposed to the renderer.
@@ -32,7 +35,10 @@ type UpdateStatusPayload = RendererEventPayloadMap['update-status'];
 export interface EventsDomainBridge {
     /**
      * Payload for cache invalidation notifications.
-     * @param callback - Invoked with payloads emitted on the `cache:invalidated` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `cache:invalidated` channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onCacheInvalidated: (
@@ -40,35 +46,23 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for monitor down events.
-     * @param callback - Invoked with payloads emitted on the `monitor:down` channel.
+     * Payload for database history retention updates.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `settings:history-limit-updated` channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
-    readonly onMonitorDown: (
-        callback: (data: MonitorDownPayload) => void
-    ) => () => void;
-
-    /**
-     * Payload for monitor status change events.
-     * @param callback - Invoked with payloads emitted on the `monitor:status-changed` channel.
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onMonitorStatusChanged: (
-        callback: (data: MonitorStatusChangedPayload) => void
-    ) => () => void;
-
-    /**
-     * Payload for monitor up events.
-     * @param callback - Invoked with payloads emitted on the `monitor:up` channel.
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onMonitorUp: (
-        callback: (data: MonitorUpPayload) => void
+    readonly onHistoryLimitUpdated: (
+        callback: (data: HistoryLimitUpdatedPayload) => void
     ) => () => void;
 
     /**
      * Payload for monitor check completion events.
-     * @param callback - Invoked with payloads emitted on the `monitor:check-completed` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `monitor:check-completed` channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onMonitorCheckCompleted: (
@@ -76,8 +70,23 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
+     * Payload for monitor down events.
+     *
+     * @param callback - Invoked with payloads emitted on the `monitor:down`
+     *   channel.
+     *
+     * @returns Cleanup function that removes the registered listener.
+     */
+    readonly onMonitorDown: (
+        callback: (data: MonitorDownPayload) => void
+    ) => () => void;
+
+    /**
      * Payload for monitoring started events.
-     * @param callback - Invoked with payloads emitted on the `monitoring:started` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `monitoring:started` channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onMonitoringStarted: (
@@ -86,7 +95,10 @@ export interface EventsDomainBridge {
 
     /**
      * Payload for monitoring stopped events.
-     * @param callback - Invoked with payloads emitted on the `monitoring:stopped` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `monitoring:stopped` channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onMonitoringStopped: (
@@ -94,8 +106,35 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
+     * Payload for monitor status change events.
+     *
+     * @param callback - Invoked with payloads emitted on the
+     *   `monitor:status-changed` channel.
+     *
+     * @returns Cleanup function that removes the registered listener.
+     */
+    readonly onMonitorStatusChanged: (
+        callback: (data: MonitorStatusChangedPayload) => void
+    ) => () => void;
+
+    /**
+     * Payload for monitor up events.
+     *
+     * @param callback - Invoked with payloads emitted on the `monitor:up`
+     *   channel.
+     *
+     * @returns Cleanup function that removes the registered listener.
+     */
+    readonly onMonitorUp: (
+        callback: (data: MonitorUpPayload) => void
+    ) => () => void;
+
+    /**
      * Payload for site added events.
-     * @param callback - Invoked with payloads emitted on the `site:added` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `site:added`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onSiteAdded: (
@@ -104,7 +143,10 @@ export interface EventsDomainBridge {
 
     /**
      * Payload for site removed events.
-     * @param callback - Invoked with payloads emitted on the `site:removed` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `site:removed`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onSiteRemoved: (
@@ -113,7 +155,10 @@ export interface EventsDomainBridge {
 
     /**
      * Payload for site updated events.
-     * @param callback - Invoked with payloads emitted on the `site:updated` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `site:updated`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onSiteUpdated: (
@@ -121,17 +166,11 @@ export interface EventsDomainBridge {
     ) => () => void;
 
     /**
-     * Payload for database history retention updates.
-     * @param callback - Invoked with payloads emitted on the `settings:history-limit-updated` channel.
-     * @returns Cleanup function that removes the registered listener.
-     */
-    readonly onHistoryLimitUpdated: (
-        callback: (data: HistoryLimitUpdatedPayload) => void
-    ) => () => void;
-
-    /**
      * Payload for full state synchronisation broadcasts.
-     * @param callback - Invoked with payloads emitted on the `state-sync-event` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `state-sync-event`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onStateSyncEvent: (
@@ -140,7 +179,10 @@ export interface EventsDomainBridge {
 
     /**
      * Payload for development/test events.
-     * @param callback - Invoked with payloads emitted on the `test-event` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `test-event`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onTestEvent: (
@@ -149,7 +191,10 @@ export interface EventsDomainBridge {
 
     /**
      * Payload for auto-updater status notifications.
-     * @param callback - Invoked with payloads emitted on the `update-status` channel.
+     *
+     * @param callback - Invoked with payloads emitted on the `update-status`
+     *   channel.
+     *
      * @returns Cleanup function that removes the registered listener.
      */
     readonly onUpdateStatus: (

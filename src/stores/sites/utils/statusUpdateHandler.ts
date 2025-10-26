@@ -161,17 +161,13 @@ export const applyStatusUpdateSnapshot = (
 
     const parsedTimestamp = Date.parse(statusUpdate.timestamp);
     const timestamp = Number.isFinite(parsedTimestamp)
-        ? parsedTimestamp
-        : Date.now();
+        ? new Date(parsedTimestamp).toISOString()
+        : new Date().toISOString();
 
     const event: MonitorStatusChangedEvent = {
-        details: statusUpdate.details,
+        ...statusUpdate,
         monitor: statusUpdate.monitor,
-        monitorId: statusUpdate.monitorId,
-        previousStatus: statusUpdate.previousStatus,
         site: statusUpdate.site,
-        siteIdentifier: statusUpdate.siteIdentifier,
-        status: statusUpdate.status,
         timestamp,
     };
 

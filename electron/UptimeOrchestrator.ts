@@ -86,6 +86,7 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     ApplicationError,
     type ApplicationErrorOptions,
+    ensureError,
 } from "@shared/utils/errorHandling";
 
 import type { EventReason, UptimeEvents } from "./events/eventTypes";
@@ -93,6 +94,7 @@ import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
 
+import { DEFAULT_HISTORY_LIMIT } from "./constants";
 import {
     createErrorHandlingMiddleware,
     createLoggingMiddleware,
@@ -232,6 +234,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
     // Manager instances
     private readonly siteManager: SiteManager;
+
     private lastKnownHistoryLimit: number;
 
     /** Event handler for sites cache update requests */
@@ -543,15 +546,19 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }): void => {
         void (async (): Promise<void> => {
             try {
-                const monitorId =
-                    eventData.monitorId ?? eventData.result.monitorId;
-                const siteIdentifier =
-                    eventData.result.siteIdentifier ?? eventData.identifier;
+                const {
+                    identifier,
+                    monitorId: manualMonitorId,
+                    result,
+                    timestamp,
+                } = eventData;
+                const monitorId = manualMonitorId ?? result.monitorId;
+                const { siteIdentifier } = result;
 
                 if (!monitorId) {
                     logger.warn(
                         "[UptimeOrchestrator] Manual check completed without monitor identifier",
-                        { eventIdentifier: eventData.identifier }
+                        { eventIdentifier: identifier }
                     );
                     return;
                 }
@@ -564,7 +571,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                let enrichedResult = eventData.result;
+                let enrichedResult = result;
 
                 if (!enrichedResult.site || !enrichedResult.monitor) {
                     const site =
@@ -599,7 +606,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     monitorId,
                     result: enrichedResult,
                     siteIdentifier,
-                    timestamp: eventData.timestamp,
+                    timestamp,
                 });
             } catch (error) {
                 logger.error(
@@ -1775,7 +1782,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.databaseManager = dependencies.databaseManager;
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
-        this.lastKnownHistoryLimit = this.databaseManager.getHistoryLimit();
+        this.lastKnownHistoryLimit = this.resolveInitialHistoryLimit();
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
@@ -1868,6 +1875,41 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.registerMiddleware(
             createLoggingMiddleware({ includeData: false, level: "info" })
         );
+    }
+
+    /**
+     * Safely resolves the initial history retention limit.
+     *
+     * @returns A positive history limit value.
+     */
+    private resolveInitialHistoryLimit(): number {
+        const { databaseManager } = this;
+
+        if (typeof databaseManager.getHistoryLimit !== "function") {
+            logger.warn(
+                "[UptimeOrchestrator] DatabaseManager missing getHistoryLimit; defaulting to configured baseline",
+                { defaultLimit: DEFAULT_HISTORY_LIMIT }
+            );
+            return DEFAULT_HISTORY_LIMIT;
+        }
+
+        try {
+            const limit = databaseManager.getHistoryLimit();
+
+            if (Number.isFinite(limit) && limit > 0) return limit;
+
+            logger.warn(
+                "[UptimeOrchestrator] DatabaseManager returned invalid history limit; defaulting to configured baseline",
+                { defaultLimit: DEFAULT_HISTORY_LIMIT, receivedLimit: limit }
+            );
+        } catch (error: unknown) {
+            logger.error(
+                "[UptimeOrchestrator] Failed to read history limit from DatabaseManager; defaulting to configured baseline",
+                ensureError(error)
+            );
+        }
+
+        return DEFAULT_HISTORY_LIMIT;
     }
 
     /**

@@ -5,9 +5,9 @@ import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { SettingsStore } from "./types";
 
-import { SettingsService } from "../../services/SettingsService";
 import { EventsService } from "../../services/EventsService";
 import { logger } from "../../services/logger";
+import { SettingsService } from "../../services/SettingsService";
 import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
@@ -17,7 +17,28 @@ import {
     type SettingsStoreSetter,
 } from "./state";
 
-let historyLimitSubscriptionCleanup: (() => void) | undefined;
+const historyLimitSubscriptionRef: {
+    /** Cleanup function returned by the events subscription. */
+    current: (() => void) | undefined;
+} = {
+    current: undefined,
+};
+
+/**
+ * Resets the cached history-limit subscription.
+ *
+ * @remarks
+ * Exposed for test environments to allow deterministic validation of the
+ * history-limit listener lifecycle. Invokes any existing cleanup callback and
+ * clears the cached reference so subsequent store initialization re-registers
+ * the renderer listener.
+ *
+ * @internal
+ */
+export function resetHistoryLimitSubscriptionForTesting(): void {
+    historyLimitSubscriptionRef.current?.();
+    historyLimitSubscriptionRef.current = undefined;
+}
 
 /**
  * Creates the operational slice containing asynchronous settings actions.
@@ -33,13 +54,13 @@ export const createSettingsOperationsSlice = (
     | "syncFromBackend"
 > => {
     const ensureHistoryLimitSubscription = async (): Promise<void> => {
-        if (historyLimitSubscriptionCleanup) {
+        if (historyLimitSubscriptionRef.current) {
             return;
         }
 
         try {
-            historyLimitSubscriptionCleanup =
-                await EventsService.onHistoryLimitUpdated((event) => {
+            const cleanup = await EventsService.onHistoryLimitUpdated(
+                (event) => {
                     const currentSettings = getState().settings;
 
                     if (currentSettings.historyLimit === event.limit) {
@@ -71,7 +92,16 @@ export const createSettingsOperationsSlice = (
                             historyLimit: event.limit,
                         },
                     });
-                });
+                }
+            );
+
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Guard against race conditions when concurrent callers initialize after await.
+            if (historyLimitSubscriptionRef.current) {
+                cleanup();
+                return;
+            }
+
+            historyLimitSubscriptionRef.current = cleanup;
         } catch (error: unknown) {
             const normalizedError = ensureError(error);
             logger.error(

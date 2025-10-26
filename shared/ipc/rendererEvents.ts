@@ -31,26 +31,26 @@ import type {
 export const RENDERER_EVENT_CHANNELS = {
     /** Broadcast cache invalidation events. */
     CACHE_INVALIDATED: "cache:invalidated",
+    /** Broadcast monitor check completion events. */
+    MONITOR_CHECK_COMPLETED: "monitor:check-completed",
     /** Broadcast monitor down events. */
     MONITOR_DOWN: "monitor:down",
     /** Broadcast monitor status change events with enriched payloads. */
     MONITOR_STATUS_CHANGED: "monitor:status-changed",
     /** Broadcast monitor up events. */
     MONITOR_UP: "monitor:up",
-    /** Broadcast monitor check completion events. */
-    MONITOR_CHECK_COMPLETED: "monitor:check-completed",
     /** Broadcast monitoring lifecycle start events. */
     MONITORING_STARTED: "monitoring:started",
     /** Broadcast monitoring lifecycle stop events. */
     MONITORING_STOPPED: "monitoring:stopped",
+    /** Broadcast history limit updates originating from the database. */
+    SETTINGS_HISTORY_LIMIT_UPDATED: "settings:history-limit-updated",
     /** Broadcast site added events. */
     SITE_ADDED: "site:added",
     /** Broadcast site removed events. */
     SITE_REMOVED: "site:removed",
     /** Broadcast site updated events. */
     SITE_UPDATED: "site:updated",
-    /** Broadcast history limit updates originating from the database. */
-    SETTINGS_HISTORY_LIMIT_UPDATED: "settings:history-limit-updated",
     /** Broadcast incremental state synchronisation snapshots. */
     STATE_SYNC: "state-sync-event",
     /** Broadcast development/test events. */
@@ -71,14 +71,14 @@ export type RendererEventChannel =
 export interface RendererEventPayloadMap {
     /** Payload for cache invalidation notifications. */
     "cache:invalidated": CacheInvalidatedEventData;
+    /** Payload for monitor check completion events. */
+    "monitor:check-completed": MonitorCheckCompletedEventData;
     /** Payload for monitor down events. */
     "monitor:down": MonitorDownEventData;
     /** Payload for monitor status change events. */
     "monitor:status-changed": MonitorStatusChangedEventData;
     /** Payload for monitor up events. */
     "monitor:up": MonitorUpEventData;
-    /** Payload for monitor check completion events. */
-    "monitor:check-completed": MonitorCheckCompletedEventData;
     /** Payload for monitoring started events. */
     "monitoring:started": MonitoringControlEventData & {
         monitorCount: number;
@@ -89,6 +89,8 @@ export interface RendererEventPayloadMap {
         activeMonitors: number;
         reason: MonitoringControlReason;
     };
+    /** Payload for database history retention updates. */
+    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
     /** Payload for site added events. */
     "site:added": {
         site: Site;
@@ -109,8 +111,6 @@ export interface RendererEventPayloadMap {
         timestamp: number;
         updatedFields: string[];
     };
-    /** Payload for database history retention updates. */
-    "settings:history-limit-updated": HistoryLimitUpdatedEventData;
     /** Payload for full state synchronisation broadcasts. */
     "state-sync-event": StateSyncEventData;
     /** Payload for development/test events. */
