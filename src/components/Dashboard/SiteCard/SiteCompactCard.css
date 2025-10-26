@@ -202,10 +202,12 @@
 .site-card__compact-status-item {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
     gap: 0.55rem;
-    inline-size: 100%;
-    min-inline-size: 0;
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
 }
 
 .site-card__compact-status-meta {
