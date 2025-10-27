@@ -26,6 +26,9 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     }
 })();
 
+/**
+ * Contract describing the renderer-facing settings service surface.
+ */
 interface SettingsServiceContract {
     getHistoryLimit: () => Promise<number>;
     initialize: () => Promise<void>;
@@ -95,7 +98,7 @@ export const SettingsService: SettingsServiceContract = {
      *   fails.
      */
     resetSettings: wrap("resetSettings", async (api) => {
-        await api.data.resetSettings();
+        await api.settings.resetSettings();
     }),
 
     /**

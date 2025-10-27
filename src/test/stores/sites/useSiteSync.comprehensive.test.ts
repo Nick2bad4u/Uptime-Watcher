@@ -4,10 +4,10 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { fc, test } from "@fast-check/vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
-import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
@@ -663,20 +663,6 @@ describe("useSiteSync", () => {
                 },
             ];
 
-            const duplicateError = new DuplicateSiteIdentifierError(
-                [
-                    {
-                        identifier: "duplicate",
-                        occurrences: 2,
-                    },
-                ],
-                "SitesStore.setSites"
-            );
-
-            mockDeps.setSites.mockImplementation(() => {
-                throw duplicateError;
-            });
-
             syncActions.subscribeToSyncEvents();
 
             const duplicateEvent = {
@@ -687,9 +673,7 @@ describe("useSiteSync", () => {
                 timestamp: Date.now(),
             };
 
-            expect(() => eventHandler(duplicateEvent)).toThrow(
-                DuplicateSiteIdentifierError
-            );
+            expect(() => eventHandler(duplicateEvent)).not.toThrow();
             expect(logger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected in state sync event",
                 expect.objectContaining({
@@ -700,11 +684,14 @@ describe("useSiteSync", () => {
                             occurrences: 2,
                         }),
                     ]),
-                    siteCount: duplicateSites.length,
+                    originalSiteCount: duplicateSites.length,
+                    sanitizedSiteCount: 1,
                     source: "database",
                 })
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith(duplicateSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([
+                expect.objectContaining({ identifier: "duplicate" }),
+            ]);
         });
     });
 
@@ -747,7 +734,7 @@ describe("useSiteSync", () => {
             );
         });
 
-        it("logs duplicate identifiers from backend full sync responses", async ({
+        it("deduplicates backend sync responses while logging duplicates", async ({
             task,
             annotate,
         }) => {
@@ -771,16 +758,6 @@ describe("useSiteSync", () => {
                 },
             ];
 
-            const duplicateError = new DuplicateSiteIdentifierError(
-                [
-                    {
-                        identifier: "duplicate",
-                        occurrences: 2,
-                    },
-                ],
-                "SitesStore.setSites"
-            );
-
             mockStateSyncService.requestFullSync.mockResolvedValue({
                 completedAt: Date.now(),
                 siteCount: duplicateSites.length,
@@ -789,13 +766,8 @@ describe("useSiteSync", () => {
                 synchronized: true,
             });
 
-            mockDeps.setSites.mockImplementation(() => {
-                throw duplicateError;
-            });
+            await expect(syncActions.syncSites()).resolves.toBeUndefined();
 
-            await expect(syncActions.syncSites()).rejects.toThrow(
-                DuplicateSiteIdentifierError
-            );
             expect(logger.error).toHaveBeenCalledWith(
                 "Duplicate site identifiers detected in full sync response",
                 expect.objectContaining({
@@ -805,12 +777,59 @@ describe("useSiteSync", () => {
                             occurrences: 2,
                         }),
                     ]),
-                    siteCount: duplicateSites.length,
+                    originalSiteCount: duplicateSites.length,
+                    sanitizedSiteCount: 1,
                     source: "database",
                 })
             );
-            expect(mockDeps.setSites).toHaveBeenCalledWith(duplicateSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([
+                expect.objectContaining({ identifier: "duplicate" }),
+            ]);
         });
+
+        test.prop([
+            fc.array(fc.string({ minLength: 1, maxLength: 6 }), {
+                minLength: 1,
+                maxLength: 8,
+            }),
+        ])(
+            "sanitizes duplicate identifiers in full sync payloads",
+            async (identifiers: readonly string[]) => {
+                mockDeps.setSites.mockClear();
+                mockStateSyncService.requestFullSync.mockClear();
+
+                const sites = identifiers.map((identifier) =>
+                    buildSite(identifier)
+                );
+
+                mockStateSyncService.requestFullSync.mockResolvedValueOnce({
+                    completedAt: Date.now(),
+                    siteCount: sites.length,
+                    sites,
+                    source: "property-test" as const,
+                    synchronized: true,
+                });
+
+                await syncActions.syncSites();
+
+                expect(mockDeps.setSites).toHaveBeenCalledTimes(1);
+                const [sanitizedSites] =
+                    mockDeps.setSites.mock.calls.at(-1) ?? [];
+
+                expect(Array.isArray(sanitizedSites)).toBe(true);
+                const sanitizedIdentifiers = sanitizedSites.map(
+                    (site: Site) => site.identifier
+                );
+
+                const uniqueIdentifiers = [...new Set(identifiers)].sort();
+                const sortedSanitized = [...sanitizedIdentifiers].sort();
+
+                expect(sortedSanitized).toEqual(uniqueIdentifiers);
+                expect(new Set(sanitizedIdentifiers).size).toBe(
+                    sanitizedIdentifiers.length
+                );
+            }
+        );
 
         it("should handle sync errors", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

@@ -154,7 +154,7 @@ describe("preload.ts - Missing Branch Coverage", () => {
             await expect(
                 exposedAPI.settings.updateHistoryLimit(100)
             ).rejects.toThrow("Settings failed");
-            await expect(exposedAPI.data.resetSettings()).rejects.toThrow(
+            await expect(exposedAPI.settings.resetSettings()).rejects.toThrow(
                 "Settings failed"
             );
         });

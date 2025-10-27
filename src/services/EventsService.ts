@@ -23,6 +23,8 @@ import type {
 
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { logger } from "./logger";
+import { subscribeWithValidatedCleanup } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -45,16 +47,87 @@ type MonitorCheckCompletedEventPayload =
 type HistoryLimitUpdatedEventPayload =
     RendererEventPayloadMap["settings:history-limit-updated"];
 
+/**
+ * Runtime type guard narrowing monitoring control payloads to the "started"
+ * variant.
+ *
+ * @param data - Raw payload emitted by the preload bridge.
+ *
+ * @returns `true` when the payload contains the counters associated with a
+ *   monitoring-start event.
+ */
 const isMonitoringStartedEventData = (
     data: MonitoringControlEventData
 ): data is MonitoringStartedEventData =>
     typeof data.monitorCount === "number" && typeof data.siteCount === "number";
 
+/**
+ * Runtime type guard narrowing monitoring control payloads to the "stopped"
+ * variant.
+ *
+ * @param data - Raw payload emitted by the preload bridge.
+ *
+ * @returns `true` when the payload contains the fields expected from a
+ *   monitoring-stop event.
+ */
 const isMonitoringStoppedEventData = (
     data: MonitoringControlEventData
 ): data is MonitoringStoppedEventData =>
     typeof data.activeMonitors === "number" && typeof data.reason === "string";
 
+/**
+ * Builds a defensive cleanup handler used when the preload bridge returns an
+ * invalid cleanup value.
+ *
+ * @param eventName - Name of the event whose cleanup failed validation.
+ *
+ * @returns A no-op cleanup function that logs a descriptive error when invoked.
+ */
+const createInvalidCleanupFallback = (eventName: string): (() => void) => {
+    return (): void => {
+        logger.error(
+            `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
+        );
+    };
+};
+
+/**
+ * Subscribes to a preload-managed event while enforcing cleanup contract
+ * expectations using the shared cleanup validation utilities.
+ *
+ * @param eventName - Name of the event being subscribed to.
+ * @param register - Callback invoking the preload registration function.
+ *
+ * @returns A promise resolving to a validated cleanup function.
+ */
+const subscribeWithValidation = async (
+    eventName: string,
+    register: () => unknown | Promise<unknown>
+): Promise<() => void> =>
+    subscribeWithValidatedCleanup(register, {
+        handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
+            logger.error(
+                `[EventsService] Preload bridge returned an invalid cleanup handler for ${eventName}`,
+                {
+                    actualType,
+                    value: cleanupCandidate,
+                }
+            );
+
+            return createInvalidCleanupFallback(eventName);
+        },
+        handleCleanupError: (error: unknown) => {
+            logger.error(
+                `[EventsService] Failed to cleanup ${eventName} listener:`,
+                ensureError(error)
+            );
+        },
+    });
+
+/**
+ * Contract describing the event subscription surface exposed by the
+ * `EventsService` facade.
+ */
 interface EventsServiceContract {
     initialize: () => Promise<void>;
     onCacheInvalidated: (
@@ -143,8 +216,10 @@ export const EventsService: EventsServiceContract = {
      */
     onCacheInvalidated: wrap(
         "onCacheInvalidated",
-        (api, callback: (data: CacheInvalidatedEventData) => void) =>
-            Promise.resolve(api.events.onCacheInvalidated(callback))
+        async (api, callback: (data: CacheInvalidatedEventData) => void) =>
+            subscribeWithValidation("onCacheInvalidated", () =>
+                api.events.onCacheInvalidated(callback)
+            )
     ),
 
     /**
@@ -156,8 +231,13 @@ export const EventsService: EventsServiceContract = {
      */
     onHistoryLimitUpdated: wrap(
         "onHistoryLimitUpdated",
-        (api, callback: (data: HistoryLimitUpdatedEventPayload) => void) =>
-            Promise.resolve(api.events.onHistoryLimitUpdated(callback))
+        async (
+            api,
+            callback: (data: HistoryLimitUpdatedEventPayload) => void
+        ) =>
+            subscribeWithValidation("onHistoryLimitUpdated", () =>
+                api.events.onHistoryLimitUpdated(callback)
+            )
     ),
     /**
      * Register a callback for monitor check completion events.
@@ -168,8 +248,13 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitorCheckCompleted: wrap(
         "onMonitorCheckCompleted",
-        (api, callback: (data: MonitorCheckCompletedEventPayload) => void) =>
-            Promise.resolve(api.events.onMonitorCheckCompleted(callback))
+        async (
+            api,
+            callback: (data: MonitorCheckCompletedEventPayload) => void
+        ) =>
+            subscribeWithValidation("onMonitorCheckCompleted", () =>
+                api.events.onMonitorCheckCompleted(callback)
+            )
     ),
     /**
      * Register a callback for monitor down events.
@@ -196,8 +281,10 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitorDown: wrap(
         "onMonitorDown",
-        (api, callback: (data: MonitorDownEventData) => void) =>
-            Promise.resolve(api.events.onMonitorDown(callback))
+        async (api, callback: (data: MonitorDownEventData) => void) =>
+            subscribeWithValidation("onMonitorDown", () =>
+                api.events.onMonitorDown(callback)
+            )
     ),
 
     /**
@@ -224,8 +311,8 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitoringStarted: wrap(
         "onMonitoringStarted",
-        (api, callback: (data: MonitoringStartedEventData) => void) =>
-            Promise.resolve(
+        async (api, callback: (data: MonitoringStartedEventData) => void) =>
+            subscribeWithValidation("onMonitoringStarted", () =>
                 api.events.onMonitoringStarted(
                     (data: MonitoringControlEventData) => {
                         if (!isMonitoringStartedEventData(data)) {
@@ -262,8 +349,8 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitoringStopped: wrap(
         "onMonitoringStopped",
-        (api, callback: (data: MonitoringStoppedEventData) => void) =>
-            Promise.resolve(
+        async (api, callback: (data: MonitoringStoppedEventData) => void) =>
+            subscribeWithValidation("onMonitoringStopped", () =>
                 api.events.onMonitoringStopped(
                     (data: MonitoringControlEventData) => {
                         if (!isMonitoringStoppedEventData(data)) {
@@ -300,8 +387,13 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitorStatusChanged: wrap(
         "onMonitorStatusChanged",
-        (api, callback: (update: MonitorStatusChangedEventData) => void) =>
-            Promise.resolve(api.events.onMonitorStatusChanged(callback))
+        async (
+            api,
+            callback: (update: MonitorStatusChangedEventData) => void
+        ) =>
+            subscribeWithValidation("onMonitorStatusChanged", () =>
+                api.events.onMonitorStatusChanged(callback)
+            )
     ),
 
     /**
@@ -329,8 +421,10 @@ export const EventsService: EventsServiceContract = {
      */
     onMonitorUp: wrap(
         "onMonitorUp",
-        (api, callback: (data: MonitorUpEventData) => void) =>
-            Promise.resolve(api.events.onMonitorUp(callback))
+        async (api, callback: (data: MonitorUpEventData) => void) =>
+            subscribeWithValidation("onMonitorUp", () =>
+                api.events.onMonitorUp(callback)
+            )
     ),
 
     /**
@@ -354,8 +448,10 @@ export const EventsService: EventsServiceContract = {
      */
     onSiteAdded: wrap(
         "onSiteAdded",
-        (api, callback: (data: SiteAddedEventData) => void) =>
-            Promise.resolve(api.events.onSiteAdded(callback))
+        async (api, callback: (data: SiteAddedEventData) => void) =>
+            subscribeWithValidation("onSiteAdded", () =>
+                api.events.onSiteAdded(callback)
+            )
     ),
 
     /**
@@ -379,8 +475,10 @@ export const EventsService: EventsServiceContract = {
      */
     onSiteRemoved: wrap(
         "onSiteRemoved",
-        (api, callback: (data: SiteRemovedEventData) => void) =>
-            Promise.resolve(api.events.onSiteRemoved(callback))
+        async (api, callback: (data: SiteRemovedEventData) => void) =>
+            subscribeWithValidation("onSiteRemoved", () =>
+                api.events.onSiteRemoved(callback)
+            )
     ),
 
     /**
@@ -409,8 +507,10 @@ export const EventsService: EventsServiceContract = {
      */
     onSiteUpdated: wrap(
         "onSiteUpdated",
-        (api, callback: (data: SiteUpdatedEventData) => void) =>
-            Promise.resolve(api.events.onSiteUpdated(callback))
+        async (api, callback: (data: SiteUpdatedEventData) => void) =>
+            subscribeWithValidation("onSiteUpdated", () =>
+                api.events.onSiteUpdated(callback)
+            )
     ),
 
     /**
@@ -435,8 +535,10 @@ export const EventsService: EventsServiceContract = {
      */
     onTestEvent: wrap(
         "onTestEvent",
-        (api, callback: (data: TestEventData) => void) =>
-            Promise.resolve(api.events.onTestEvent(callback))
+        async (api, callback: (data: TestEventData) => void) =>
+            subscribeWithValidation("onTestEvent", () =>
+                api.events.onTestEvent(callback)
+            )
     ),
 
     /**
@@ -461,7 +563,9 @@ export const EventsService: EventsServiceContract = {
      */
     onUpdateStatus: wrap(
         "onUpdateStatus",
-        (api, callback: (data: UpdateStatusEventData) => void) =>
-            Promise.resolve(api.events.onUpdateStatus(callback))
+        async (api, callback: (data: UpdateStatusEventData) => void) =>
+            subscribeWithValidation("onUpdateStatus", () =>
+                api.events.onUpdateStatus(callback)
+            )
     ),
 };

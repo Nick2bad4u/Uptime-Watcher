@@ -22,8 +22,14 @@ import { IpcValidators } from "./utils";
 interface DataHandlerValidatorsInterface {
     downloadSqliteBackup: IpcParameterValidator;
     exportData: IpcParameterValidator;
-    getHistoryLimit: IpcParameterValidator;
     importData: IpcParameterValidator;
+}
+
+/**
+ * Interface for settings handler validators.
+ */
+interface SettingsHandlerValidatorsInterface {
+    getHistoryLimit: IpcParameterValidator;
     resetSettings: IpcParameterValidator;
     updateHistoryLimit: IpcParameterValidator;
 }
@@ -537,20 +543,30 @@ export const DataHandlerValidators: DataHandlerValidatorsInterface = {
     exportData: createNoParamsValidator(),
 
     /**
-     * Validates parameters for the "get-history-limit" IPC handler.
-     *
-     * @remarks
-     * Expects no parameters.
-     */
-    getHistoryLimit: createNoParamsValidator(),
-
-    /**
      * Validates parameters for the "import-data" IPC handler.
      *
      * @remarks
      * Expects a single parameter: the data string.
      */
     importData: createSingleStringValidator("data"),
+} as const;
+
+/**
+ * Parameter validators for settings IPC handlers.
+ *
+ * @remarks
+ * Each property is a validator for a specific settings-related IPC channel.
+ *
+ * @public
+ */
+export const SettingsHandlerValidators: SettingsHandlerValidatorsInterface = {
+    /**
+     * Validates parameters for the "get-history-limit" IPC handler.
+     *
+     * @remarks
+     * Expects no parameters.
+     */
+    getHistoryLimit: createNoParamsValidator(),
 
     /**
      * Validates parameters for the "reset-settings" IPC handler.

@@ -211,6 +211,53 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onCacheInvalidated
             ).not.toHaveBeenCalled();
         });
+
+        it("should log and return fallback when preload returns invalid cleanup handler", async () => {
+            mockElectronAPI.events.onCacheInvalidated.mockReturnValueOnce(
+                undefined as unknown as () => void
+            );
+
+            const cleanup = await EventsService.onCacheInvalidated(vi.fn());
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[EventsService] Preload bridge returned an invalid cleanup handler for onCacheInvalidated",
+                expect.objectContaining({ actualType: "undefined" })
+            );
+            expect(typeof cleanup).toBe("function");
+
+            mockLogger.error.mockClear();
+
+            cleanup();
+
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[EventsService] Cleanup skipped for onCacheInvalidated: invalid cleanup handler returned by preload bridge"
+            );
+        });
+
+        it("should log when the cleanup handler throws", async () => {
+            const cleanupError = new Error("cleanup failed");
+            const cleanupSpy = vi.fn(() => {
+                throw cleanupError;
+            });
+
+            mockElectronAPI.events.onCacheInvalidated.mockReturnValueOnce(
+                cleanupSpy
+            );
+
+            const cleanup = await EventsService.onCacheInvalidated(vi.fn());
+
+            mockLogger.error.mockClear();
+            mockEnsureError.mockClear();
+
+            cleanup();
+
+            expect(cleanupSpy).toHaveBeenCalledTimes(1);
+            expect(mockEnsureError).toHaveBeenCalledWith(cleanupError);
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[EventsService] Failed to cleanup onCacheInvalidated listener:",
+                cleanupError
+            );
+        });
     });
 
     describe("onMonitorDown", () => {

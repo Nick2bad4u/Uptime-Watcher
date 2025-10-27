@@ -43,6 +43,7 @@ import {
     DataHandlerValidators,
     MonitoringHandlerValidators,
     MonitorTypeHandlerValidators,
+    SettingsHandlerValidators,
     SiteHandlerValidators,
     StateSyncHandlerValidators,
     SystemHandlerValidators,
@@ -565,6 +566,7 @@ export class IpcService {
         this.setupMonitoringHandlers();
         this.setupMonitorTypeHandlers();
         this.setupDataHandlers();
+        this.setupSettingsHandlers();
         this.setupSystemHandlers();
         this.setupStateSyncHandlers();
         this.setupDiagnosticsHandlers();
@@ -661,11 +663,10 @@ export class IpcService {
      * Registers IPC handlers for data management operations.
      *
      * @remarks
-     * Handles export/import of configuration, history limit management, and
-     * database backup using standardized IPC patterns. All handlers use
-     * consistent response formatting, parameter validation, and error handling.
-     * All handlers are registered with unique channel names and are tracked for
-     * cleanup.
+     * Handles export/import of configuration data and database backups using
+     * standardized IPC patterns. All handlers use consistent response
+     * formatting, parameter validation, and error handling. All handlers are
+     * registered with unique channel names and are tracked for cleanup.
      *
      * @internal
      */
@@ -687,36 +688,7 @@ export class IpcService {
             DataHandlerValidators.importData,
             this.registeredIpcHandlers
         );
-
-        // Update history limit handler with validation
-        registerStandardizedIpcHandler(
-            "update-history-limit",
-            async (...args: unknown[]) => {
-                await this.uptimeOrchestrator.setHistoryLimit(
-                    args[0] as number
-                );
-                return this.uptimeOrchestrator.getHistoryLimit();
-            },
-            DataHandlerValidators.updateHistoryLimit,
-            this.registeredIpcHandlers
-        );
         /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after validated IPC argument type conversion */
-
-        // Get history limit handler (no parameters)
-        registerStandardizedIpcHandler(
-            "get-history-limit",
-            () => this.uptimeOrchestrator.getHistoryLimit(),
-            DataHandlerValidators.getHistoryLimit,
-            this.registeredIpcHandlers
-        );
-
-        // Reset settings handler (no parameters)
-        registerStandardizedIpcHandler(
-            "reset-settings",
-            async () => this.uptimeOrchestrator.resetSettings(),
-            DataHandlerValidators.resetSettings,
-            this.registeredIpcHandlers
-        );
 
         // Download SQLite backup handler (no parameters)
         registerStandardizedIpcHandler(
@@ -736,6 +708,47 @@ export class IpcService {
             DataHandlerValidators.downloadSqliteBackup,
             this.registeredIpcHandlers
         );
+    }
+
+    /**
+     * Registers IPC handlers for settings management operations.
+     *
+     * @remarks
+     * Handles history limit queries, updates, and full settings resets using
+     * standardized IPC patterns. Handlers share consistent validation and
+     * cleanup semantics.
+     */
+    private setupSettingsHandlers(): void {
+        // Update history limit handler with validation
+        /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All settings handler arguments are validated by their respective validators before type assertion */
+        registerStandardizedIpcHandler(
+            "update-history-limit",
+            async (...args: unknown[]) => {
+                await this.uptimeOrchestrator.setHistoryLimit(
+                    args[0] as number
+                );
+                return this.uptimeOrchestrator.getHistoryLimit();
+            },
+            SettingsHandlerValidators.updateHistoryLimit,
+            this.registeredIpcHandlers
+        );
+
+        // Get history limit handler (no parameters)
+        registerStandardizedIpcHandler(
+            "get-history-limit",
+            () => this.uptimeOrchestrator.getHistoryLimit(),
+            SettingsHandlerValidators.getHistoryLimit,
+            this.registeredIpcHandlers
+        );
+
+        // Reset settings handler (no parameters)
+        registerStandardizedIpcHandler(
+            "reset-settings",
+            async () => this.uptimeOrchestrator.resetSettings(),
+            SettingsHandlerValidators.resetSettings,
+            this.registeredIpcHandlers
+        );
+        /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after validated IPC argument type conversion */
     }
 
     /**

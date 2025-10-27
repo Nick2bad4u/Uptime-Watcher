@@ -277,15 +277,6 @@ if (!success) {
 }
 ```
 
-#### `resetSettings(): Promise<void>`
-
-Restores application settings to their factory defaults while leaving sites and
-history untouched. Primarily used by diagnostic flows and test fixtures.
-
-```typescript
-await window.electronAPI.data.resetSettings();
-```
-
 #### `downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult>`
 
 Generates a SQLite database backup and returns a transferable payload
@@ -327,6 +318,15 @@ Retrieves the current history retention limit (in days).
 
 ```typescript
 const limit = await window.electronAPI.settings.getHistoryLimit();
+```
+
+#### `resetSettings(): Promise<void>`
+
+Restores application settings to their factory defaults while leaving domain
+state untouched (sites, monitors, and history remain intact).
+
+```typescript
+await window.electronAPI.settings.resetSettings();
 ```
 
 #### `updateHistoryLimit(limitDays: number): Promise<number>`

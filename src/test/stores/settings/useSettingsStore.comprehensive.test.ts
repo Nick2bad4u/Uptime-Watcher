@@ -55,7 +55,6 @@ const mockWithErrorHandling = vi.mocked(withErrorHandling);
 // Mock window.electronAPI
 const mockElectronAPI = {
     data: {
-        resetSettings: vi.fn(),
         downloadSqliteBackup: vi.fn().mockResolvedValue({
             buffer: new ArrayBuffer(100),
             fileName: "settings-backup.sqlite",
@@ -73,6 +72,7 @@ const mockElectronAPI = {
     },
     settings: {
         getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
     monitoring: {},
@@ -105,7 +105,7 @@ describe(useSettingsStore, () => {
         // Setup default mock returns - direct data values (preload APIs extract data automatically)
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500);
         mockElectronAPI.settings.updateHistoryLimit.mockResolvedValue(500);
-        mockElectronAPI.data.resetSettings.mockResolvedValue(undefined);
+        mockElectronAPI.settings.resetSettings.mockResolvedValue(undefined);
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(500); // This is what SettingsService actually calls
         mockElectronAPI.data.downloadSqliteBackup.mockResolvedValue({
             buffer: new ArrayBuffer(100),

@@ -21,6 +21,7 @@ import {
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { logger } from "./logger";
+import { resolveCleanupHandler } from "./utils/cleanupHandlers";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -114,33 +115,29 @@ export const StateSyncService: StateSyncServiceContract = {
                 })
             );
 
-            if (typeof unsubscribeCandidate !== "function") {
-                logger.error(
-                    "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
-                    {
-                        actualType: typeof unsubscribeCandidate,
-                    }
-                );
-
-                return (): void => {
+            return resolveCleanupHandler(unsubscribeCandidate, {
+                handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
                     logger.error(
-                        "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
+                        "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
+                        {
+                            actualType,
+                            value: cleanupCandidate,
+                        }
                     );
-                };
-            }
 
-            const unsubscribe = unsubscribeCandidate;
-
-            return (): void => {
-                try {
-                    unsubscribe();
-                } catch (error) {
+                    return (): void => {
+                        logger.error(
+                            "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
+                        );
+                    };
+                },
+                handleCleanupError: (error: unknown) => {
                     logger.error(
                         "[StateSyncService] Failed to cleanup state sync subscription:",
                         ensureError(error)
                     );
-                }
-            };
+                },
+            });
         }
     ),
 

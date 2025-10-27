@@ -178,6 +178,7 @@ describe("ErrorCatalog utilities fuzzing tests", () => {
                     params
                 );
 
+                expect(result).toBeDefined();
                 // All placeholders should be replaced (except dangerous ones like __proto__)
                 for (const [key, value] of paramPairs) {
                     if (

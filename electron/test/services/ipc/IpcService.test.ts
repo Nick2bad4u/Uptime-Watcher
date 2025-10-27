@@ -146,6 +146,7 @@ vi.mock("./", () => ({
         mockIpcMain.handle(channel, handler);
     }),
     DataHandlerValidators: {},
+    SettingsHandlerValidators: {},
     MonitoringHandlerValidators: {},
     MonitorTypeHandlerValidators: {},
     SiteHandlerValidators: {},

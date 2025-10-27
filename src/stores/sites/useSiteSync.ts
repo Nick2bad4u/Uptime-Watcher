@@ -20,7 +20,10 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
+import {
+    collectDuplicateSiteIdentifiers,
+    type DuplicateSiteIdentifier,
+} from "@shared/validation/siteIntegrity";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -216,6 +219,46 @@ export const createSiteSyncActions = (
 ): SiteSyncActions => {
     // Synchronization state to prevent concurrent syncs
     let pendingSyncPromise: null | Promise<void> = null;
+
+    /**
+     * Normalizes backend site snapshots by removing duplicate identifiers while
+     * preserving the first occurrence of each site.
+     *
+     * @param sites - Raw site collection returned by the backend service.
+     *
+     * @returns The sanitized site list alongside the identifiers that were
+     *   filtered out for observability.
+     */
+    const sanitizeSitesSnapshot = (
+        sites: Site[]
+    ): {
+        duplicates: readonly DuplicateSiteIdentifier[];
+        sanitizedSites: Site[];
+    } => {
+        const duplicates = collectDuplicateSiteIdentifiers(sites);
+
+        if (duplicates.length === 0) {
+            return {
+                duplicates,
+                sanitizedSites: sites,
+            };
+        }
+
+        const seen = new Set<string>();
+        const sanitizedSites = sites.filter((site) => {
+            if (seen.has(site.identifier)) {
+                return false;
+            }
+
+            seen.add(site.identifier);
+            return true;
+        });
+
+        return {
+            duplicates,
+            sanitizedSites,
+        };
+    };
 
     const actions: SiteSyncActions = {
         fullResyncSites: async (): Promise<void> => {
@@ -531,14 +574,17 @@ export const createSiteSyncActions = (
                     return;
                 }
 
-                const duplicates = collectDuplicateSiteIdentifiers(event.sites);
+                const { duplicates, sanitizedSites } = sanitizeSitesSnapshot(
+                    event.sites
+                );
                 if (duplicates.length > 0) {
                     logger.error(
                         "Duplicate site identifiers detected in state sync event",
                         {
                             action: event.action,
                             duplicates,
-                            siteCount: event.sites.length,
+                            originalSiteCount: event.sites.length,
+                            sanitizedSiteCount: sanitizedSites.length,
                             source: event.source,
                         }
                     );
@@ -552,19 +598,20 @@ export const createSiteSyncActions = (
                     const previousSites = deps.getSites();
                     const delta = calculateSiteSyncDelta(
                         previousSites,
-                        event.sites
+                        sanitizedSites
                     );
 
                     logStoreAction("SitesStore", "applySyncDelta", {
                         action: event.action,
                         addedCount: delta.addedSites.length,
                         removedCount: delta.removedSiteIdentifiers.length,
+                        sanitizedSiteCount: sanitizedSites.length,
                         source: event.source,
                         timestamp: event.timestamp,
                         updatedCount: delta.updatedSites.length,
                     });
 
-                    deps.setSites(event.sites);
+                    deps.setSites(sanitizedSites);
                     deps.onSiteDelta?.(delta);
                     return;
                 }
@@ -636,25 +683,27 @@ export const createSiteSyncActions = (
                             synchronized,
                         } = fullSyncResult;
 
-                        const duplicates =
-                            collectDuplicateSiteIdentifiers(sites);
+                        const { duplicates, sanitizedSites } =
+                            sanitizeSitesSnapshot(sites);
                         if (duplicates.length > 0) {
                             logger.error(
                                 "Duplicate site identifiers detected in full sync response",
                                 {
                                     duplicates,
-                                    siteCount,
+                                    originalSiteCount: siteCount,
+                                    sanitizedSiteCount: sanitizedSites.length,
                                     source,
                                 }
                             );
                         }
 
-                        deps.setSites(sites);
+                        deps.setSites(sanitizedSites);
 
                         logStoreAction("SitesStore", "syncSites", {
                             completedAt,
                             message: "Sites synchronized from backend",
-                            sitesCount: siteCount,
+                            originalSitesCount: siteCount,
+                            sitesCount: sanitizedSites.length,
                             source,
                             status: "success",
                             success: synchronized,

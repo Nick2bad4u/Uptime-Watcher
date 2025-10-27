@@ -313,10 +313,12 @@ describe("IpcService - Comprehensive Coverage", () => {
             // Data handlers
             expect(registeredChannels).toContain("export-data");
             expect(registeredChannels).toContain("import-data");
+            expect(registeredChannels).toContain("download-sqlite-backup");
+
+            // Settings handlers
             expect(registeredChannels).toContain("update-history-limit");
             expect(registeredChannels).toContain("get-history-limit");
             expect(registeredChannels).toContain("reset-settings");
-            expect(registeredChannels).toContain("download-sqlite-backup");
 
             // System handlers
             expect(registeredChannels).toContain("quit-and-install");

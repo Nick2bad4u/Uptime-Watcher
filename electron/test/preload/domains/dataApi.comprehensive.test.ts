@@ -49,7 +49,6 @@ describe("dataApi", () => {
                 "downloadSqliteBackup",
                 "exportData",
                 "importData",
-                "resetSettings",
             ].toSorted()
         );
     });
@@ -137,31 +136,6 @@ describe("dataApi", () => {
 
             await expect(dataApi.importData("{}")).rejects.toThrow(
                 "invalid export signature"
-            );
-        });
-    });
-
-    describe("resetSettings", () => {
-        it("delegates to the reset-settings channel", async () => {
-            const response: IpcResponse<void> = {
-                success: true,
-            };
-            ipcRenderer.invoke.mockResolvedValueOnce(response);
-
-            await dataApi.resetSettings();
-
-            expect(ipcRenderer.invoke).toHaveBeenCalledWith("reset-settings");
-        });
-
-        it("raises an error when the reset request fails", async () => {
-            const response: IpcResponse<void> = {
-                success: false,
-                error: "reset aborted",
-            };
-            ipcRenderer.invoke.mockResolvedValueOnce(response);
-
-            await expect(dataApi.resetSettings()).rejects.toThrow(
-                "reset aborted"
             );
         });
     });

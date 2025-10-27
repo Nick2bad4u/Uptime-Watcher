@@ -20,6 +20,7 @@ import {
     MonitoringHandlerValidators,
     DataHandlerValidators,
     MonitorTypeHandlerValidators,
+    SettingsHandlerValidators,
     StateSyncHandlerValidators,
 } from "../services/ipc/validators";
 
@@ -655,10 +656,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 "downloadSqliteBackup"
             );
             expect(DataHandlerValidators).toHaveProperty("exportData");
-            expect(DataHandlerValidators).toHaveProperty("getHistoryLimit");
             expect(DataHandlerValidators).toHaveProperty("importData");
-            expect(DataHandlerValidators).toHaveProperty("resetSettings");
-            expect(DataHandlerValidators).toHaveProperty("updateHistoryLimit");
         });
 
         it("should have validators as functions", async ({
@@ -674,14 +672,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 "function"
             );
             expect(typeof DataHandlerValidators.exportData).toBe("function");
-            expect(typeof DataHandlerValidators.getHistoryLimit).toBe(
-                "function"
-            );
             expect(typeof DataHandlerValidators.importData).toBe("function");
-            expect(typeof DataHandlerValidators.resetSettings).toBe("function");
-            expect(typeof DataHandlerValidators.updateHistoryLimit).toBe(
-                "function"
-            );
         });
 
         describe("downloadSqliteBackup validator", () => {
@@ -742,36 +733,6 @@ describe("IPC Validators - Exported Validator Groups", () => {
             });
         });
 
-        describe("getHistoryLimit validator", () => {
-            it("should return null for empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Business Logic", "type");
-
-                const result = DataHandlerValidators.getHistoryLimit([]);
-                expect(isValidationSuccess(result)).toBeTruthy();
-            });
-
-            it("should return error array for non-empty parameters", async ({
-                task,
-                annotate,
-            }) => {
-                await annotate(`Testing: ${task.name}`, "functional");
-                await annotate("Component: validators.complete", "component");
-                await annotate("Category: Core", "category");
-                await annotate("Type: Error Handling", "type");
-
-                const result = DataHandlerValidators.getHistoryLimit([
-                    "unexpected",
-                ]);
-                expect(isValidationFailure(result)).toBeTruthy();
-            });
-        });
-
         describe("importData validator", () => {
             it("should return null for valid single string parameter", async ({
                 task,
@@ -813,8 +774,46 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 expect(isValidationFailure(result)).toBeTruthy();
             });
         });
+    });
 
-        describe("resetSettings validator", () => {
+    describe("SettingsHandlerValidators", () => {
+        it("should have all required validator properties", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(SettingsHandlerValidators).toHaveProperty("getHistoryLimit");
+            expect(SettingsHandlerValidators).toHaveProperty("resetSettings");
+            expect(SettingsHandlerValidators).toHaveProperty(
+                "updateHistoryLimit"
+            );
+        });
+
+        it("should have validators as functions", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: validators.complete", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Business Logic", "type");
+
+            expect(typeof SettingsHandlerValidators.getHistoryLimit).toBe(
+                "function"
+            );
+            expect(typeof SettingsHandlerValidators.resetSettings).toBe(
+                "function"
+            );
+            expect(typeof SettingsHandlerValidators.updateHistoryLimit).toBe(
+                "function"
+            );
+        });
+
+        describe("getHistoryLimit validator", () => {
             it("should return null for empty parameters", async ({
                 task,
                 annotate,
@@ -824,7 +823,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const result = DataHandlerValidators.resetSettings([]);
+                const result = SettingsHandlerValidators.getHistoryLimit([]);
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
@@ -837,7 +836,37 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = DataHandlerValidators.resetSettings([
+                const result = SettingsHandlerValidators.getHistoryLimit([
+                    "unexpected",
+                ]);
+                expect(isValidationFailure(result)).toBeTruthy();
+            });
+        });
+
+        describe("resetSettings validator", () => {
+            it("should return null for empty parameters", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Business Logic", "type");
+
+                const result = SettingsHandlerValidators.resetSettings([]);
+                expect(isValidationSuccess(result)).toBeTruthy();
+            });
+
+            it("should return error array for non-empty parameters", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: validators.complete", "component");
+                await annotate("Category: Core", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const result = SettingsHandlerValidators.resetSettings([
                     "unexpected",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
@@ -854,7 +883,9 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const result = DataHandlerValidators.updateHistoryLimit([100]);
+                const result = SettingsHandlerValidators.updateHistoryLimit([
+                    100,
+                ]);
                 expect(isValidationSuccess(result)).toBeTruthy();
             });
 
@@ -867,7 +898,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = DataHandlerValidators.updateHistoryLimit([]);
+                const result = SettingsHandlerValidators.updateHistoryLimit([]);
                 expect(isValidationFailure(result)).toBeTruthy();
             });
 
@@ -880,7 +911,7 @@ describe("IPC Validators - Exported Validator Groups", () => {
                 await annotate("Category: Core", "category");
                 await annotate("Type: Error Handling", "type");
 
-                const result = DataHandlerValidators.updateHistoryLimit([
+                const result = SettingsHandlerValidators.updateHistoryLimit([
                     "not-a-number",
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();
@@ -1285,7 +1316,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = DataHandlerValidators.updateHistoryLimit([0]);
+            const result = SettingsHandlerValidators.updateHistoryLimit([0]);
             expect(isValidationSuccess(result)).toBeTruthy();
         });
 
@@ -1298,7 +1329,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = DataHandlerValidators.updateHistoryLimit([-1]);
+            const result = SettingsHandlerValidators.updateHistoryLimit([-1]);
             expect(isValidationSuccess(result)).toBeTruthy();
         });
     });
@@ -1447,7 +1478,9 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             ];
 
             for (const num of validNumbers) {
-                const result = DataHandlerValidators.updateHistoryLimit([num]);
+                const result = SettingsHandlerValidators.updateHistoryLimit([
+                    num,
+                ]);
                 expect(isValidationSuccess(result)).toBeTruthy();
             }
         });
@@ -1561,7 +1594,7 @@ describe("IPC Validators - Edge Cases and Error Handling", () => {
             ];
 
             for (const invalid of invalidNumbers) {
-                const result = DataHandlerValidators.updateHistoryLimit([
+                const result = SettingsHandlerValidators.updateHistoryLimit([
                     invalid,
                 ]);
                 expect(isValidationFailure(result)).toBeTruthy();

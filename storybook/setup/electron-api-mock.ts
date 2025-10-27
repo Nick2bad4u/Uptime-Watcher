@@ -158,9 +158,6 @@ const electronAPIMockDefinition = {
                 return false;
             }
         },
-        resetSettings: async (): Promise<void> => {
-            mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
-        },
     },
     events: {
         onCacheInvalidated: registerListener,
@@ -349,6 +346,9 @@ const electronAPIMockDefinition = {
     },
     settings: {
         getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
+        resetSettings: async (): Promise<void> => {
+            mockState.historyLimit = DEFAULT_HISTORY_LIMIT;
+        },
         updateHistoryLimit: async (limit: number): Promise<number> => {
             mockState.historyLimit = normalizeLimit(limit);
             return mockState.historyLimit;

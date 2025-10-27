@@ -2,8 +2,8 @@
  * Data Domain API - Auto-generated preload bridge for data operations
  *
  * @remarks
- * This module provides type-safe IPC communication for all data-related
- * operations including import/export, settings, and backup functionality.
+ * This module provides type-safe IPC communication for data lifecycle
+ * operations including import/export and database backup functionality.
  *
  * Exception handling: This domain API intentionally does not handle exceptions.
  * Errors are propagated to the frontend where they can be handled appropriately
@@ -16,7 +16,7 @@
 
 import type { DataDomainBridge } from "@shared/types/preload";
 
-import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
+import { createTypedInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the data domain API operations.
@@ -46,13 +46,6 @@ export interface DataApiInterface extends DataDomainBridge {
      * @returns Promise resolving to a boolean success flag
      */
     importData: DataDomainBridge["importData"];
-
-    /**
-     * Resets all application settings to defaults
-     *
-     * @returns Promise that resolves when settings are reset
-     */
-    resetSettings: DataDomainBridge["resetSettings"];
 }
 
 /**
@@ -83,13 +76,6 @@ export const dataApi: DataApiInterface = {
      * @returns Promise resolving to a boolean success flag
      */
     importData: createTypedInvoker("import-data"),
-
-    /**
-     * Resets all application settings to defaults
-     *
-     * @returns Promise that resolves when settings are reset
-     */
-    resetSettings: createVoidInvoker("reset-settings"),
 } as const;
 
 /**

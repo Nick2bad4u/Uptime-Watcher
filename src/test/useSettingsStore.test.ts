@@ -11,11 +11,10 @@ import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
 // Mock electron API - Updated to match new domain-based structure
 const mockElectronAPI = {
-    data: {
-        resetSettings: vi.fn(),
-    },
+    data: {},
     settings: {
         getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 };
@@ -122,7 +121,7 @@ describe(useSettingsStore, () => {
             await annotate("Type: Business Logic", "type");
 
             // Configure mocks for reset operation
-            mockElectronAPI.data.resetSettings.mockResolvedValue({
+            mockElectronAPI.settings.resetSettings.mockResolvedValue({
                 success: true,
                 message: "Settings reset successfully",
             });

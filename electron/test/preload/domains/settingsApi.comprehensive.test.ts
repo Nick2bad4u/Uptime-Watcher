@@ -41,11 +41,31 @@ describe("settingsApi", () => {
         expect(ipcRenderer.invoke).toHaveBeenCalledWith("get-history-limit");
     });
 
+    it("resets settings via IPC", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: true,
+        });
+
+        await expect(settingsApi.resetSettings()).resolves.toBeUndefined();
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith("reset-settings");
+    });
+
     it("throws when IPC returns failure", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({ success: false });
 
         await expect(settingsApi.getHistoryLimit()).rejects.toThrow(
             /ipc operation failed/i
+        );
+    });
+
+    it("throws when resetSettings fails", async () => {
+        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
+            success: false,
+            error: "reset failed",
+        });
+
+        await expect(settingsApi.resetSettings()).rejects.toThrow(
+            /reset failed/i
         );
     });
 });

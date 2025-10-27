@@ -26,11 +26,10 @@ const mockLogger = vi.hoisted(() => ({
 }));
 
 const mockElectronAPI = vi.hoisted(() => ({
-    data: {
-        resetSettings: vi.fn(),
-    },
+    data: {},
     settings: {
         getHistoryLimit: vi.fn(),
+        resetSettings: vi.fn(),
         updateHistoryLimit: vi.fn(),
     },
 }));
@@ -61,11 +60,10 @@ describe("SettingsService", () => {
         mockWaitForElectronAPI.mockResolvedValue(undefined);
 
         // Recreate fresh mocks for each test
-        mockElectronAPI.data = {
-            resetSettings: vi.fn().mockResolvedValue(undefined),
-        };
+        mockElectronAPI.data = {};
         mockElectronAPI.settings = {
             getHistoryLimit: vi.fn().mockResolvedValue(500),
+            resetSettings: vi.fn().mockResolvedValue(undefined),
             updateHistoryLimit: vi.fn().mockResolvedValue(1000),
         };
 
@@ -223,7 +221,9 @@ describe("SettingsService", () => {
                 SettingsService.resetSettings()
             ).resolves.toBeUndefined();
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
-            expect(mockElectronAPI.data.resetSettings).toHaveBeenCalledTimes(1);
+            expect(
+                mockElectronAPI.settings.resetSettings
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should fail if initialization fails", async () => {
@@ -233,18 +233,22 @@ describe("SettingsService", () => {
             await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Initialization failed"
             );
-            expect(mockElectronAPI.data.resetSettings).not.toHaveBeenCalled();
+            expect(
+                mockElectronAPI.settings.resetSettings
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle resetSettings API errors", async () => {
             const error = new Error("Failed to reset settings");
-            mockElectronAPI.data.resetSettings.mockRejectedValue(error);
+            mockElectronAPI.settings.resetSettings.mockRejectedValue(error);
 
             await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Failed to reset settings"
             );
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
-            expect(mockElectronAPI.data.resetSettings).toHaveBeenCalledTimes(1);
+            expect(
+                mockElectronAPI.settings.resetSettings
+            ).toHaveBeenCalledTimes(1);
         });
 
         it("should handle multiple reset calls", async () => {
@@ -252,7 +256,9 @@ describe("SettingsService", () => {
             await SettingsService.resetSettings();
             await SettingsService.resetSettings();
 
-            expect(mockElectronAPI.data.resetSettings).toHaveBeenCalledTimes(3);
+            expect(
+                mockElectronAPI.settings.resetSettings
+            ).toHaveBeenCalledTimes(3);
             expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
         });
     });
@@ -467,7 +473,7 @@ describe("SettingsService", () => {
             mockElectronAPI.settings.getHistoryLimit.mockImplementation(() => {
                 throw new TypeError("Cannot read properties of undefined");
             });
-            mockElectronAPI.data.resetSettings.mockImplementation(() => {
+            mockElectronAPI.settings.resetSettings.mockImplementation(() => {
                 throw new TypeError("Cannot read properties of undefined");
             });
             mockElectronAPI.settings.updateHistoryLimit.mockImplementation(
@@ -510,7 +516,9 @@ describe("SettingsService", () => {
             ];
 
             for (const error of fsErrors) {
-                mockElectronAPI.data.resetSettings.mockRejectedValueOnce(error);
+                mockElectronAPI.settings.resetSettings.mockRejectedValueOnce(
+                    error
+                );
                 await expect(SettingsService.resetSettings()).rejects.toThrow(
                     error.message
                 );

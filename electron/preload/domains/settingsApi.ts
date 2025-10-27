@@ -13,7 +13,7 @@
 
 import type { SettingsDomainBridge } from "@shared/types/preload";
 
-import { createTypedInvoker } from "../core/bridgeFactory";
+import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
 /**
  * Interface defining the settings domain API operations.
@@ -27,6 +27,13 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
      * @returns Promise resolving to the current history limit in days
      */
     getHistoryLimit: SettingsDomainBridge["getHistoryLimit"];
+
+    /**
+     * Resets all persisted application settings to their defaults
+     *
+     * @returns Promise that resolves when the reset completes
+     */
+    resetSettings: SettingsDomainBridge["resetSettings"];
 
     /**
      * Updates the history retention limit
@@ -50,6 +57,13 @@ export const settingsApi: SettingsApiInterface = {
      * @returns Promise resolving to the current history limit in days
      */
     getHistoryLimit: createTypedInvoker("get-history-limit"),
+
+    /**
+     * Resets all persisted application settings to their defaults
+     *
+     * @returns Promise that resolves when the reset completes
+     */
+    resetSettings: createVoidInvoker("reset-settings"),
 
     /**
      * Updates the history retention limit

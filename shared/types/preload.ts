@@ -57,14 +57,12 @@ interface DataChannelMap {
     readonly downloadSqliteBackup: "download-sqlite-backup";
     readonly exportData: "export-data";
     readonly importData: "import-data";
-    readonly resetSettings: "reset-settings";
 }
 
 const DATA_CHANNELS_DEFINITION: DataChannelMap = {
     downloadSqliteBackup: "download-sqlite-backup",
     exportData: "export-data",
     importData: "import-data",
-    resetSettings: "reset-settings",
 };
 
 /**
@@ -164,11 +162,13 @@ export type MonitorTypesDomainBridge = DomainBridge<
  */
 interface SettingsChannelMap {
     readonly getHistoryLimit: "get-history-limit";
+    readonly resetSettings: "reset-settings";
     readonly updateHistoryLimit: "update-history-limit";
 }
 
 const SETTINGS_CHANNELS_DEFINITION: SettingsChannelMap = {
     getHistoryLimit: "get-history-limit",
+    resetSettings: "reset-settings",
     updateHistoryLimit: "update-history-limit",
 };
 

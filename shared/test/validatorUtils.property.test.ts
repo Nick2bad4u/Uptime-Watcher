@@ -250,23 +250,22 @@ describe("Validator Utils Property-Based Tests", () => {
 
     describe(isValidUrl, () => {
         test.prop([fc.webUrl().filter((url) => !url.includes("'"))])(
-            "should return true for fast-check generated URLs",
+            "should align with URL parsing for fast-check generated URLs",
             (url) => {
                 const result = isValidUrl(url);
-                const schemeIndex = url.indexOf("://");
-                const remainder =
-                    schemeIndex === -1
-                        ? ""
-                        : url.slice(schemeIndex + 3).toLowerCase();
-                const hasDuplicateHttpScheme =
-                    remainder.includes("http://") ||
-                    remainder.includes("https://");
 
-                if (hasDuplicateHttpScheme) {
-                    expect(result).toBeFalsy();
-                } else {
-                    expect(result).toBeTruthy();
+                let expected = false;
+                try {
+                    const parsed = new URL(url);
+                    expected =
+                        (parsed.protocol === "http:" ||
+                            parsed.protocol === "https:") &&
+                        Boolean(parsed.hostname);
+                } catch {
+                    expected = false;
                 }
+
+                expect(result).toBe(expected);
             }
         );
 
