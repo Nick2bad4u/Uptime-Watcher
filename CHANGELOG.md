@@ -7,34 +7,277 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-### ✨ Features
+[[9496fe7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)...
+[9496fe7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9496fe76ced9171094021c4e8d9509d2fc6ed444...9496fe76ced9171094021c4e8d9509d2fc6ed444))
 
-- Surface database retention updates in the renderer via the new
-  `settings:history-limit-updated` event and propagate state updates through the
-  settings store.
-- Apply optimistic site status updates immediately after manual monitor checks
-  complete, reusing the shared merge logic for consistency with event-driven
-  updates.
 
-### 🛠️ Tooling
+### 📦 Dependencies
 
-- Add `npm run generate:ipc` to rebuild the preload bridge and generated IPC
-  documentation, and `npm run check:ipc` to enforce drift detection in CI.
+- [dependency] Update version 17.5.0 [`(9496fe7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)
 
-### 📝 Documentation
 
-- Document the history retention sync flow and optimistic manual checks in the
-  development patterns guide and technology evolution timeline.
+
+
+
+
+## [17.5.0] - 2025-10-27
 
 
 [[cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)...
-[cc70f23](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc70f2344c3611939441c52e33d6474c55d6dbb7...cc70f2344c3611939441c52e33d6474c55d6dbb7))
+[7cce37e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7cce37e8603d8f25e5d924f2be6f06fde4979326)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/cc70f2344c3611939441c52e33d6474c55d6dbb7...7cce37e8603d8f25e5d924f2be6f06fde4979326))
+
+
+### ✨ Features
+
+- ✨ [feat] Add DevTools snippets and improve data integrity
+
+This update introduces a suite of developer tools and significantly enhances the application's data integrity by preventing duplicate site entries.
+
+✨ [feat] Add Chrome DevTools Snippets for Testing
+-   Adds a new `DEVTOOLS_SNIPPETS.md` guide.
+-   Provides JavaScript snippets to run in the DevTools console for easier testing and debugging.
+-   Snippets include:
+    -   `Add Test Sites`: Creates a comprehensive set of test sites, one for each monitor type.
+    -   `Add Minimal Test Sites`: Quickly adds a few basic sites for rapid testing.
+    -   `Remove All Sites`: Deletes all sites from the application (with a confirmation prompt).
+    -   `List All Sites`: Prints a detailed list of all configured sites to the console.
+-   Also adds several snippets for pausing the debugger on hover or after a delay to inspect UI elements.
+
+🛠️ [fix] Implement Duplicate Site Sanitization
+-   Introduces a `sanitizeSitesByIdentifier` utility to detect and remove sites with duplicate identifiers, keeping only the first occurrence.
+-   The `SiteManager` now sanitizes site data when updating its cache, preventing duplicates from being stored or processed.
+-   Full state synchronization requests now return a sanitized list of sites, ensuring the UI does not display duplicates.
+
+🚜 [refactor] Improve Electron Bridge Readiness Checks
+-   Replaces the basic `waitForElectronAPI` function with a more robust `waitForElectronBridge` utility.
+-   This new system allows renderer services to declare their specific API "contracts" (required domains and methods).
+-   If the `electronAPI` bridge is not ready or a contract is not met after several retries, it throws a detailed `ElectronBridgeNotReadyError` with diagnostics, improving debuggability.
+-   All renderer services are updated to use this new, more reliable initialization check.
+
+📝 [docs] Create DevTools Snippets Guide
+-   Adds a comprehensive guide (`DEVTOOLS_SNIPPETS.md`) detailing how to use the new testing snippets.
+-   Includes instructions, troubleshooting tips, and the full code for each snippet.
+
+🧪 [test] Update Tests for New Logic
+-   Adjusts unit and comprehensive tests to align with the new duplicate sanitization logic and the refactored `emitSitesStateSynchronized` method.
+-   Adds new tests for the `electronBridgeReadiness` utility.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7cce37e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7cce37e8603d8f25e5d924f2be6f06fde4979326)
+
+
+- ✨ [feat] Introduce IPC automation and optimistic updates
+
+This commit introduces a generation-first workflow for Electron IPC contracts and implements optimistic UI updates for manual monitor checks. It also refactors and clarifies development scripts for consistency.
+
+✨ [feat] Adds optimistic updates for manual monitor checks.
+-   When a user triggers a manual check, the UI now updates immediately with an optimistic status.
+-   This avoids waiting for the full `monitor:check-completed` event, improving perceived performance.
+-   The new `check-site-now` IPC channel returns an enriched payload that the renderer uses for the instant update.
+
+👷 [ci] Implements an IPC automation workflow.
+-   Adds a new script `npm run generate:ipc` to auto-generate IPC bridge typings and Markdown documentation from shared TypeScript schemas. This ensures contracts between main, renderer, and preload are always synchronized.
+-   Introduces `npm run check:ipc` to verify that generated artifacts are up-to-date, which is now enforced in the CI pipeline.
+
+📝 [docs] Creates a new `IPC_AUTOMATION_WORKFLOW.md` guide.
+-   Documents the new generation-first process for developers, explaining how to modify IPC channels and regenerate the necessary files.
+-   Updates all related development guides (`DEVELOPER_QUICK_START`, `README`, etc.) to reference the new scripts and workflow.
+
+🔧 [build] Standardizes development NPM scripts.
+-   Renames `npm run start` to `npm run electron-dev` to better reflect its function of running Vite and Electron concurrently.
+-   Updates `package.json` to allow forwarding command-line arguments to the Electron process (e.g., `npm run electron-dev -- --log-debug`).
+-   Cleans up old script aliases and updates documentation to reflect the new canonical commands.
+
+🚜 [refactor] Adds TSDoc comments to the IPC generator script.
+-   Improves maintainability by documenting functions and interfaces within `scripts/generate-ipc-artifacts.mts`.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(603a0a4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/603a0a49abb20694a3a2b93cebacdc18ef731020)
+
+
+- ✨ [feat] Add IPC artifact generation and drift detection
+
+This commit introduces a comprehensive system for managing and verifying Inter-Process Communication (IPC) contracts, ensuring consistency between the main process, renderer, and documentation. It adds a new script to automatically generate IPC type definitions and documentation from the source code.
+
+✨ [feat] IPC and Event System Enhancements
+- Adds a new script (`generate-ipc-artifacts.mts`) to auto-generate the `eventsBridge.ts` type definitions and the `ipc-channel-inventory.md` documentation file from canonical source definitions.
+- Introduces a new CI check (`npm run check:ipc`) to prevent drift between the source code and generated artifacts, ensuring the IPC contract remains consistent.
+- Adds `fast-deep-equal` to the knip ignore list, as it is a dependency of the new generation script.
+
+📝 [docs] New Renderer Integration Guide
+- Adds a comprehensive `RENDERER_INTEGRATION_GUIDE.md` to document the updated IPC contract, patterns for optimistic UI updates, and history limit synchronization.
+- Updates the main documentation index to include the new guide.
+
+🛠️ [fix] Improve IPC Event Handling and Preload Guards
+- Refactors the preload `eventsApi` to add more specific type guards for `monitoring:started`, `monitoring:stopped`, and `state-sync-event` payloads, improving runtime safety.
+- Alphabetizes event channel definitions and handler registrations for better organization and consistency with generated artifacts.
+
+🚜 [refactor] Strengthen `UptimeOrchestrator` Logic
+- Improves the handler for manual monitor checks (`handleManualCheckCompleted`) by destructuring the event payload more robustly and ensuring monitor/site data is always enriched before being broadcast to the renderer.
+- Adds robust initialization logic for the history retention limit, falling back to a default value if the `DatabaseManager` fails or returns an invalid number.
+
+🎨 [style] Minor CSS and Code Style Adjustments
+- Adjusts CSS for the compact site card header to improve wrapping and alignment of elements.
+- Sorts properties in various event type definitions and log templates for improved readability and consistency.
+
+🧪 [test] Update and Expand Test Coverage
+- Updates Jest and Playwright tests to align with the refactored event handling and new IPC contract.
+- Adds a test utility to reset the history limit subscription, enabling more reliable testing of the settings store's initialization logic.
+- Corrects mock setups and test logic to use the updated, alphabetically sorted event API.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9d8628e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d8628e08372a0ad5fcbe46da73ccabdfe76e427)
+
+
+- ✨ [feat] Implement optimistic updates and IPC automation
+
+This commit introduces significant enhancements to the application's IPC protocol, state synchronization, and developer tooling.
+
+✨ [feat] Optimistic UI Updates & Event Sync
+- Implements optimistic updates for manual monitor checks. The UI now reflects the check result immediately by applying the returned `StatusUpdate` payload, rather than waiting for the event broadcast.
+- Introduces a new `settings:history-limit-updated` event to synchronize database retention policy changes (e.g., from imports or migrations) with the renderer's settings store, ensuring UI consistency. The payload includes both new and previous values for contextual display.
+
+🚜 [refactor] Standardize IPC Channel Naming
+- Overhauls the IPC channel naming convention from `domain:action` (e.g., `sites:add`) to a verb-first, hyphenated format (e.g., `add-site`). This improves clarity and consistency across the API surface.
+- Broadcast event channels retain their `domain:event-name` structure to distinguish them from invoke channels.
+
+🛠️ [tooling] Automate IPC Artifact Generation
+- Adds new npm scripts to automate IPC contract management:
+  - `npm run generate:ipc`: Rebuilds the preload bridge type definitions and generates a canonical IPC channel inventory markdown file.
+  - `npm run check:ipc`: A CI script to detect and prevent drift between the source code schema and the generated documentation.
+
+📝 [docs] Update Architecture & Development Guides
+- Updates all relevant documentation, including ADRs, development guides, and API references, to reflect the new IPC naming convention and synchronization patterns.
+- Adds a new auto-generated `ipc-channel-inventory.md` file as the single source of truth for all IPC channels.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(43e770d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/43e770d40d2ec9d2491cd05b2f07b69a7d06a987)
+
+
+- ✨ [feat] Introduce state sync delta tracking and improve status reporting
+
+This update introduces comprehensive tracking of site synchronization changes and enhances the accuracy of state sync status reporting. It also includes several fixes and refactorings to improve data integrity and type safety.
+
+✨ [feat] Implement Site Synchronization Delta Calculation
+ - Adds a new utility, `calculateSiteSyncDelta`, to compute the difference between two collections of sites.
+ - This function identifies added, removed, and updated sites, providing a structured `SiteSyncDelta` object.
+ - The `fast-deep-equal` package is used for efficient and accurate structural comparisons of site objects.
+
+✨ [feat] Integrate Delta Tracking into State Management
+ - The main sites store (`useSitesStore`) now tracks the `lastSyncDelta`.
+ - When a state synchronization event occurs, the store now calculates and records this delta.
+ - This allows the UI and other services to react to specific changes (e.g., site additions or removals) rather than just reloading the entire list.
+
+🛠️ [fix] Preserve Previous Site State on Monitor Removal
+ - In the `SiteManager`, when a monitor is removed, the site's state is now cloned *before* the modification.
+ - This ensures that `internal:site:updated` events emit the correct "previous" site snapshot, accurately reflecting the state before the monitor was deleted.
+
+🚜 [refactor] Enhance State Sync Status Reporting
+ - The `IpcService` now caches the synchronization status and listens for `sites:state-synchronized` events to keep it updated.
+ - The `get-sync-status` IPC handler now returns this cached status, providing a more accurate and persistent representation of the last sync operation, rather than generating a new status on each call.
+
+🎨 [style] Improve Event Handler Type Safety
+ - Strengthens type safety in `EventsService` for `onMonitoringStarted` and `onMonitoringStopped` events.
+ - Type guards are now used to ensure that callbacks receive the correctly structured event payload, preventing potential runtime errors.
+
+🧪 [test] Expand Test Coverage and Stability
+ - Adds extensive new tests for the site sync delta calculation and state management logic.
+ - Introduces a regression test in `UptimeOrchestrator` to verify that the `previousSite` snapshot is correctly preserved when monitors are removed.
+ - Improves the stability of property-based fuzzing tests for the Settings component by ensuring a clean DOM state for each test iteration.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5ce61d6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5ce61d69b8d069e8bf081282b0ffa6262092b58a)
+
+
+- ✨ [feat] Add name to BeastMode agent configuration
+
+✨ [feat] Introduces a `name` property to the BeastMode agent's metadata.
+ - This provides a formal, machine-readable name for the agent, which can be used for identification and display purposes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e7c8e60)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e7c8e60d57284632c56e789ca27de4fb54af5140)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Center site card status items and improve VS Code tasks
+
+🎨 [style] Centers the content of compact site card status items.
+ - Modifies flexbox properties to horizontally center the icon and text within the status item container for improved visual alignment.
+ - Replaces logical CSS properties (`inline-size`) with physical properties (`width`) for broader consistency.
+
+🔧 [build] Refines VS Code task configurations for a better development experience.
+ - Ensures problem matchers for linting and testing apply to all open documents, not just the active one.
+ - Configures tasks to use a new terminal for each run, preventing potential state conflicts from previous runs.
+ - Renames the "Install Dependencies (Force)" task to "Install Dependencies (UpdateDeps)" for clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(027132d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/027132d5be21320c5438b0e27ce62019c01236eb)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.4.0 [`(cc70f23)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc70f2344c3611939441c52e33d6474c55d6dbb7)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Relocate settings management to a dedicated domain
+
+🚜 [refactor] Creates a new `settings` IPC domain and moves all settings-related functionality out of the `data` domain. This improves code organization and clarifies the separation of concerns between general data operations (import/export, backups) and application settings management.
+- Moves `resetSettings`, `getHistoryLimit`, and `updateHistoryLimit` from the `data` API domain to a new `settings` API domain.
+- Creates a dedicated `setupSettingsHandlers` method in `IpcService` to register all settings-related IPC channels.
+- Establishes a new `SettingsHandlerValidators` group for IPC parameter validation, separating it from `DataHandlerValidators`.
+
+🛠️ [fix] Enhances site synchronization logic to handle duplicate identifiers.
+- Introduces a `sanitizeSitesSnapshot` utility to detect and remove duplicate sites received from the backend during state synchronization.
+- The first occurrence of a site is kept, and any subsequent duplicates are discarded to prevent store corruption.
+- Adds detailed logging when duplicates are detected to improve observability.
+
+⚡ [perf] Adds robust cleanup validation for event service subscriptions.
+- Implements a new `subscribeWithValidatedCleanup` utility to ensure that all event subscriptions return a valid cleanup function from the preload bridge.
+- Provides fallback cleanup handlers and logs detailed errors if an invalid value (e.g., `undefined`) is returned, preventing potential memory leaks and runtime errors.
+
+📝 [docs] Updates API documentation to reflect the new `settings` domain.
+- Moves the `resetSettings` function documentation from the Data API section to the new Settings API section.
+
+🧪 [test] Updates and expands tests for the new `settings` domain and enhanced cleanup logic.
+- Refactors tests for `IpcService`, preload APIs, and frontend services to align with the new domain structure.
+- Adds comprehensive tests for the `EventsService` to verify correct handling of invalid cleanup handlers and cleanup errors.
+- Adds property-based tests to ensure the `useSiteSync` hook correctly sanitizes payloads with duplicate site identifiers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d336379)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d3363795b6a071a92cfe1f12b5b4ce18c6916623)
+
+
+- 🚜 [refactor] Implement Site Mutation Pipeline for data consistency
+
+This refactoring introduces a standardized "Site Mutation Pipeline" to ensure transactional integrity and data consistency across the database, cache, and event bus when modifying site information.
+
+✨ **[feat] Site Mutation Pipeline**
+-   Adds a strict, layered contract for all write operations, ensuring the database, in-memory caches, and monitoring systems remain synchronized.
+-   The flow is now: `SiteManager` (invariant checks) → `SiteWriterService` (transaction management & cache updates) → `Repository` (SQL execution).
+
+🚜 **[refactor] `SiteManager.removeMonitor`**
+-   Rewrites the monitor removal logic to adhere to the new pipeline.
+-   Instead of direct repository calls and manual cache refreshes, it now uses `SiteWriterService` to handle the mutation atomically.
+-   Adds a domain invariant check to prevent the removal of the last monitor from a site, throwing a specific error.
+-   Ensures `validateSite` is called with the proposed changes before committing to the database.
+-   Events are now emitted only *after* the transaction and cache update are successfully completed by the `SiteWriterService`, guaranteeing consumers receive a consistent state.
+
+📝 **[docs] Development Patterns Guide**
+-   Adds a comprehensive "Site Mutation Pipeline" section to the development guide.
+-   Includes a sequence diagram, layer responsibilities, an invariant checklist, and usage guidelines to document the new pattern.
+
+🧪 **[test] Update Unit & Comprehensive Tests**
+-   Overhauls tests for `removeMonitor` to reflect the new pipeline logic, covering success cases, error handling (like removing the last monitor), and interaction with the `SiteWriterService`.
+-   Adds new tests for the `getSiteSnapshotForMutation` helper to verify its caching and cloning behavior.
+-   Adjusts `SiteRepository` tests to confirm that `upsert` operations are now correctly wrapped in a transaction.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(11d1782)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/11d178289f4a0221146a49f017c0a0cde412d17d)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.4.0 [skip ci] [`(6d5f053)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6d5f053a257a29cb9112c98616f3a89fb801e58b)
 
 
 
