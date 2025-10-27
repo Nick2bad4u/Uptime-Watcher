@@ -7,14 +7,94 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[e014bc1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)...
+[e014bc1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4...e014bc18bcf4b2dadc82ccfa284b11733ecee3f4))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.6.0 [`(e014bc1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)
+
+
+
+
+
+
+## [17.6.0] - 2025-10-27
+
+
 [[9496fe7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)...
-[9496fe7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9496fe76ced9171094021c4e8d9509d2fc6ed444...9496fe76ced9171094021c4e8d9509d2fc6ed444))
+[cb96c21](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb96c21ed015d63e00bf7ee5b00418a7bd63e45f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9496fe76ced9171094021c4e8d9509d2fc6ed444...cb96c21ed015d63e00bf7ee5b00418a7bd63e45f))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.5.0 [`(9496fe7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9496fe76ced9171094021c4e8d9509d2fc6ed444)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Extract coordinator and type definitions from UptimeOrchestrator
+
+This commit refactors the `UptimeOrchestrator` to improve modularity and separation of concerns.
+
+### Source Code Changes
+
+🚜 **[refactor]** Extracts history limit logic into a new `HistoryLimitCoordinator`.
+-   This new coordinator class encapsulates the responsibility of listening for history limit updates from the database, validating the new limit, and forwarding the event to the renderer.
+-   It maintains the last known limit to provide `previousLimit` telemetry in the forwarded event.
+-   `UptimeOrchestrator` now instantiates and uses this coordinator, simplifying its own logic by removing the `handleDatabaseHistoryLimitUpdatedEvent` method and related properties.
+
+📝 **[docs]** Moves `UptimeOrchestrator` type definitions to a dedicated `UptimeOrchestrator.types.ts` file.
+-   This cleans up the main orchestrator file, separating complex interface declarations from the implementation logic.
+
+🎨 **[style]** Improves site sanitization logic in `SiteManager`.
+-   Replaces the direct usage of `sanitizeSitesByIdentifier` with a local `getSanitizedSitesForManager` function that returns a strongly-typed snapshot. This enhances clarity and type safety within the manager.
+-   The `sanitizeSitesByIdentifier` function in the shared `siteIntegrity.ts` file is simplified for better readability.
+
+🔧 **[build]** Standardizes Electron bridge readiness checks across the frontend.
+-   Updates `createIpcServiceHelpers` to use a new centralized `waitForElectronAPI` utility.
+-   The `waitForElectronAPI` function in `stores/utils.ts` is enhanced to accept an optional array of bridge contracts to validate.
+-   Various service files (`EventsService`, `StateSyncService`) are updated to use the new validation patterns for event cleanup handlers, improving code consistency.
+
+### Test and Development Changes
+
+🧪 **[test]** Adds comprehensive tests for the new `HistoryLimitCoordinator`.
+-   Verifies correct event forwarding, telemetry (`previousLimit`), and handling of invalid or negative limit values.
+
+🧪 **[test]** Updates numerous test files to reflect the refactoring of the Electron bridge readiness checks.
+-   Mocks are updated from `waitForElectronAPI` to the underlying `waitForElectronBridge` utility.
+-   This affects tests for `DataService`, `EventsService`, `SettingsService`, `SystemService`, `MonitoringService`, `SiteService`, and several store hooks (`useSettingsStore`, `useSitesStore`), ensuring they align with the new initialization logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cb96c21)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cb96c21ed015d63e00bf7ee5b00418a7bd63e45f)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Apply consistent code formatting across the project
+
+This commit applies automated code formatting and style fixes across various files, ensuring consistency and improving readability.
+
+🎨 [style] Adjusts code formatting for consistency and brevity.
+ - Collapses several multi-line function calls, array initializations, and `expect` statements in test files into single lines.
+ - Standardizes indentation and spacing in test mocks and function arguments.
+ - Removes extraneous newlines from test files.
+
+📝 [docs] Improves JSDoc and comment formatting.
+ - Aligns type definitions within JSDoc blocks in the custom ESLint plugin for better readability.
+ - Adds minor formatting corrections to documentation blocks in test files.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f9ad293)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f9ad29353ef8106055541dd5451260004901515e)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.5.0 [skip ci] [`(e384204)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e38420407783cccac8c99d80716059e22465e4ec)
 
 
 
