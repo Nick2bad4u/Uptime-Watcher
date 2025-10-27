@@ -12,6 +12,54 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
+const MOCK_BRIDGE_ERROR_MESSAGE =
+    "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super(MOCK_BRIDGE_ERROR_MESSAGE);
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
+const mockSiteService = vi.hoisted(() => ({
+    addSite: vi.fn(),
+    getSites: vi.fn(),
+    removeMonitor: vi.fn(),
+    removeSite: vi.fn(),
+    updateSite: vi.fn(),
+}));
+
+const mockMonitoringService = vi.hoisted(() => ({
+    checkSiteNow: vi.fn(),
+    startMonitoring: vi.fn(),
+    startMonitoringForMonitor: vi.fn(),
+    startMonitoringForSite: vi.fn(),
+    stopMonitoring: vi.fn(),
+    stopMonitoringForMonitor: vi.fn(),
+    stopMonitoringForSite: vi.fn(),
+}));
+
+vi.mock("../../../stores/sites/services/SiteService", () => ({
+    SiteService: mockSiteService,
+}));
+
+vi.mock("../../../stores/sites/services/MonitoringService", () => ({
+    MonitoringService: mockMonitoringService,
+}));
+
 // Mock services first - these need to be hoisted above imports
 vi.mock("../../../services/DataService", () => ({
     DataService: {
@@ -69,6 +117,7 @@ const mockElectronAPI = {
         removeSite: vi.fn(),
         addMonitorToSite: vi.fn(),
         removeMonitorFromSite: vi.fn(),
+        removeMonitor: vi.fn(),
         updateMonitorTimeout: vi.fn(),
         updateMonitorRetryAttempts: vi.fn(),
         updateSiteCheckInterval: vi.fn(),
@@ -87,10 +136,12 @@ const mockElectronAPI = {
     },
     monitoring: {
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
+        startMonitoring: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(true),
     },
     stateSync: {
         getSyncStatus: vi.fn(),
@@ -151,6 +202,94 @@ describe("useSitesStore Function Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+        mockWaitForElectronBridge.mockImplementation(async () => {
+            const electronBridge =
+                (globalThis as any).window?.electronAPI ??
+                (globalThis as any).electronAPI;
+
+            if (!electronBridge) {
+                throw new MockElectronBridgeNotReadyError({
+                    attempts: 1,
+                    reason: "ElectronAPI not available",
+                });
+            }
+        });
+
+        mockSiteService.addSite.mockImplementation(async (site) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.sites.addSite(site);
+        });
+        mockSiteService.getSites.mockImplementation(async () => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.sites.getSites();
+        });
+        mockSiteService.updateSite.mockImplementation(async (id, updates) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.sites.updateSite(id, updates);
+        });
+        mockSiteService.removeSite.mockImplementation(async (id) => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.sites.removeSite(id);
+        });
+        mockSiteService.removeMonitor.mockImplementation(
+            async (siteIdentifier, monitorId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.sites.removeMonitor(
+                    siteIdentifier,
+                    monitorId
+                );
+            }
+        );
+
+        mockMonitoringService.checkSiteNow.mockImplementation(
+            async (siteId, monitorId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.monitoring.checkSiteNow(
+                    siteId,
+                    monitorId
+                );
+            }
+        );
+        mockMonitoringService.startMonitoring.mockImplementation(async () => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.monitoring.startMonitoring();
+        });
+        mockMonitoringService.stopMonitoring.mockImplementation(async () => {
+            await mockWaitForElectronBridge();
+            return mockElectronAPI.monitoring.stopMonitoring();
+        });
+        mockMonitoringService.startMonitoringForSite.mockImplementation(
+            async (siteId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.monitoring.startMonitoringForSite(
+                    siteId
+                );
+            }
+        );
+        mockMonitoringService.stopMonitoringForSite.mockImplementation(
+            async (siteId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.monitoring.stopMonitoringForSite(siteId);
+            }
+        );
+        mockMonitoringService.startMonitoringForMonitor.mockImplementation(
+            async (siteId, monitorId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.monitoring.startMonitoringForMonitor(
+                    siteId,
+                    monitorId
+                );
+            }
+        );
+        mockMonitoringService.stopMonitoringForMonitor.mockImplementation(
+            async (siteId, monitorId) => {
+                await mockWaitForElectronBridge();
+                return mockElectronAPI.monitoring.stopMonitoringForMonitor(
+                    siteId,
+                    monitorId
+                );
+            }
+        );
 
         // Set up default mock responses to prevent hanging
         mockElectronAPI.sites.getSites.mockResolvedValue([]);

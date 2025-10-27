@@ -13,6 +13,28 @@ import { SiteService } from "../../stores/sites/services/SiteService";
 import { logger } from "../../services/logger";
 import * as storeUtils from "../../stores/utils";
 
+const MOCK_BRIDGE_ERROR_MESSAGE =
+    "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: Record<string, unknown>;
+
+            public constructor(diagnostics: Record<string, unknown>) {
+                super(MOCK_BRIDGE_ERROR_MESSAGE);
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
 // Mock the waitForElectronAPI utility
 vi.mock("../../stores/utils", () => ({
     waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
@@ -96,6 +118,20 @@ describe("SiteService Critical Coverage Tests", () => {
         vi.mocked((globalThis as any).electronAPI.sites.updateSite).mockReset();
         vi.mocked((globalThis as any).electronAPI.sites.removeSite).mockReset();
         vi.mocked(storeUtils.waitForElectronAPI).mockReset();
+        mockWaitForElectronBridge.mockReset();
+
+        mockWaitForElectronBridge.mockImplementation(async () => {
+            const electronBridge =
+                (globalThis as any).window?.electronAPI ??
+                (globalThis as any).electronAPI;
+
+            if (!electronBridge) {
+                throw new MockElectronBridgeNotReadyError({
+                    attempts: 1,
+                    reason: "ElectronAPI not available",
+                });
+            }
+        });
 
         // Set default resolved values
         vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(undefined);

@@ -7,6 +7,28 @@ import type { Site } from "@shared/types";
 
 import { SiteService } from "../../../stores/sites/services/SiteService";
 
+const MOCK_BRIDGE_ERROR_MESSAGE =
+    "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super(MOCK_BRIDGE_ERROR_MESSAGE);
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
 // Mock the waitForElectronAPI utility
 vi.mock("../../../stores/utils", () => ({
     waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
@@ -91,6 +113,19 @@ const createValidSite = (
 describe("SiteService", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockWaitForElectronBridge.mockReset();
+        mockWaitForElectronBridge.mockImplementation(async () => {
+            const bridge =
+                (globalThis as any).window?.electronAPI ??
+                (globalThis as any).electronAPI;
+
+            if (!bridge) {
+                throw new MockElectronBridgeNotReadyError({
+                    attempts: 1,
+                    reason: "ElectronAPI not available",
+                });
+            }
+        });
     });
 
     describe("getSites", () => {

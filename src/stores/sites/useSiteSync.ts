@@ -20,10 +20,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import {
-    sanitizeSitesByIdentifier,
-    type DuplicateSiteIdentifier,
-} from "@shared/validation/siteIntegrity";
+import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -229,20 +226,6 @@ export const createSiteSyncActions = (
      * @returns The sanitized site list alongside the identifiers that were
      *   filtered out for observability.
      */
-    const sanitizeSitesSnapshot = (
-        sites: Site[]
-    ): {
-        duplicates: readonly DuplicateSiteIdentifier[];
-        sanitizedSites: Site[];
-    } => {
-        const { duplicates, sanitizedSites } = sanitizeSitesByIdentifier(sites);
-
-        return {
-            duplicates,
-            sanitizedSites,
-        };
-    };
-
     const actions: SiteSyncActions = {
         fullResyncSites: async (): Promise<void> => {
             // If sync is already in progress, return the existing promise
@@ -557,9 +540,8 @@ export const createSiteSyncActions = (
                     return;
                 }
 
-                const { duplicates, sanitizedSites } = sanitizeSitesSnapshot(
-                    event.sites
-                );
+                const { duplicates, sanitizedSites } =
+                    sanitizeSitesByIdentifier(event.sites);
                 if (duplicates.length > 0) {
                     logger.error(
                         "Duplicate site identifiers detected in state sync event",
@@ -667,7 +649,7 @@ export const createSiteSyncActions = (
                         } = fullSyncResult;
 
                         const { duplicates, sanitizedSites } =
-                            sanitizeSitesSnapshot(sites);
+                            sanitizeSitesByIdentifier(sites);
                         if (duplicates.length > 0) {
                             logger.error(
                                 "Duplicate site identifiers detected in full sync response",

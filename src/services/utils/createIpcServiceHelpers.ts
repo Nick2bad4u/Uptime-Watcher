@@ -6,13 +6,13 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import log from "electron-log/renderer";
 
-import {
-    ElectronBridgeNotReadyError,
-    type ElectronBridgeContract,
-    type WaitForElectronBridgeOptions,
-    waitForElectronBridge,
-} from "./electronBridgeReadiness";
+import { waitForElectronAPI } from "../../stores/utils";
 import * as loggerModule from "../logger";
+import {
+    type ElectronBridgeContract,
+    ElectronBridgeNotReadyError,
+    type WaitForElectronBridgeOptions,
+} from "./electronBridgeReadiness";
 
 /**
  * Minimal logging shape used by the IPC helper utilities.
@@ -108,12 +108,12 @@ const createStructuredFallbackLogger = (serviceName: string): LoggerLike => ({
  * @internal
  */
 interface CreateIpcServiceHelpersOptions {
-    /** Optional logger instance. Defaults to the shared renderer logger. */
-    logger?: LoggerLike;
     /** Contracts that must be satisfied before the service begins IPC calls. */
     bridgeContracts?: readonly ElectronBridgeContract[];
     /** Overrides for bridge polling parameters (contracts handled separately). */
     bridgeOptions?: Omit<WaitForElectronBridgeOptions, "contracts">;
+    /** Optional logger instance. Defaults to the shared renderer logger. */
+    logger?: LoggerLike;
 }
 
 /**
@@ -169,10 +169,11 @@ export function createIpcServiceHelpers(
         createStructuredFallbackLogger(serviceName);
     const ensureInitialized = async (): Promise<void> => {
         try {
-            await waitForElectronBridge({
-                ...(options.bridgeOptions ?? {}),
-                contracts: options.bridgeContracts ?? [],
-            });
+            await waitForElectronAPI(
+                options.bridgeOptions?.maxAttempts,
+                options.bridgeOptions?.baseDelay,
+                options.bridgeContracts
+            );
         } catch (error) {
             const normalizedError = ensureError(error);
             if (error instanceof ElectronBridgeNotReadyError) {
