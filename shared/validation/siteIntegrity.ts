@@ -98,3 +98,41 @@ export function ensureUniqueSiteIdentifiers(
         throw new DuplicateSiteIdentifierError(duplicates, context);
     }
 }
+
+/**
+ * Removes duplicate site identifiers while preserving first occurrences.
+ *
+ * @param sites - Site collection to sanitize.
+ *
+ * @returns Sanitized sites alongside duplicate identifier diagnostics.
+ */
+export function sanitizeSitesByIdentifier(sites: readonly Site[]): {
+    readonly duplicates: readonly DuplicateSiteIdentifier[];
+    readonly sanitizedSites: Site[];
+} {
+    const duplicates = collectDuplicateSiteIdentifiers(sites);
+
+    if (duplicates.length === 0) {
+        return {
+            duplicates,
+            sanitizedSites: [...sites],
+        };
+    }
+
+    const seen = new Set<string>();
+    const sanitizedSites: Site[] = [];
+
+    for (const site of sites) {
+        if (seen.has(site.identifier)) {
+            continue;
+        }
+
+        seen.add(site.identifier);
+        sanitizedSites.push(site);
+    }
+
+    return {
+        duplicates,
+        sanitizedSites,
+    };
+}

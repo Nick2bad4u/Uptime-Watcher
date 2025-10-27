@@ -27,7 +27,18 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("DataService");
+        return getIpcServiceHelpers("DataService", {
+            bridgeContracts: [
+                {
+                    domain: "data",
+                    methods: [
+                        "downloadSqliteBackup",
+                        "exportData",
+                        "importData",
+                    ],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

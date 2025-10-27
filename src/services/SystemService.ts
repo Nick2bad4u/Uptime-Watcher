@@ -20,7 +20,14 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("SystemService");
+        return getIpcServiceHelpers("SystemService", {
+            bridgeContracts: [
+                {
+                    domain: "system",
+                    methods: ["openExternal", "quitAndInstall"],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

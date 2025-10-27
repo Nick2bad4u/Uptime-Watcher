@@ -21,11 +21,29 @@ type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
 
 import { EventsService } from "../../services/EventsService";
 
-// Mock the waitForElectronAPI utility
-const mockWaitForElectronAPI = vi.hoisted(() => vi.fn());
-vi.mock("../../stores/utils", () => ({
-    waitForElectronAPI: mockWaitForElectronAPI,
+// Mock the bridge readiness helper to control initialization behavior
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super("Electron bridge not ready");
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
 }));
+
+// Backwards-compatible alias for existing tests that referenced waitForElectronAPI
+const mockWaitForElectronAPI = mockWaitForElectronBridge;
 
 // Mock the logger
 const mockLogger = vi.hoisted(() => ({
@@ -116,7 +134,7 @@ describe("EventsService", () => {
         };
 
         // Default successful initialization
-        mockWaitForElectronAPI.mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
     });
 
     afterEach(() => {
@@ -154,19 +172,19 @@ describe("EventsService", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(EventsService.initialize()).resolves.toBeUndefined();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
         it("should handle initialization errors and rethrow", async () => {
             const initializationError = new Error("Electron API not available");
-            mockWaitForElectronAPI.mockRejectedValue(initializationError);
+            mockWaitForElectronBridge.mockRejectedValue(initializationError);
 
             await expect(EventsService.initialize()).rejects.toThrow(
                 "Electron API not available"
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[EventsService] Failed to initialize:",
@@ -176,7 +194,7 @@ describe("EventsService", () => {
 
         it("should handle non-error initialization failures", async () => {
             const stringError = "String error message";
-            mockWaitForElectronAPI.mockRejectedValue(stringError);
+            mockWaitForElectronBridge.mockRejectedValue(stringError);
 
             await expect(EventsService.initialize()).rejects.toBe(stringError);
 
@@ -191,7 +209,7 @@ describe("EventsService", () => {
 
             const cleanup = await EventsService.onCacheInvalidated(callback);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.events.onCacheInvalidated
             ).toHaveBeenCalledWith(callback);
@@ -200,7 +218,7 @@ describe("EventsService", () => {
 
         it("should fail if initialization fails", async () => {
             const initError = new Error("Init failed");
-            mockWaitForElectronAPI.mockRejectedValue(initError);
+            mockWaitForElectronBridge.mockRejectedValue(initError);
             const callback = vi.fn();
 
             await expect(
@@ -387,6 +405,30 @@ describe("EventsService", () => {
                 mockElectronAPI.events.onMonitoringStarted
             ).not.toHaveBeenCalled();
         });
+
+        it("should log an error when the payload fails validation", async () => {
+            const callback = vi.fn();
+            await EventsService.onMonitoringStarted(callback);
+
+            const call =
+                mockElectronAPI.events.onMonitoringStarted.mock.calls.at(0);
+            expect(call).toBeDefined();
+            const [registeredHandler] = call as [MonitoringEventHandler];
+
+            mockLogger.error.mockClear();
+
+            const invalidPayload = {
+                invalid: true,
+            } as unknown as MonitoringControlEventData;
+            registeredHandler(invalidPayload);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[EventsService] Dropped monitoring-start payload: invalid monitoring control event",
+                undefined,
+                { payload: invalidPayload }
+            );
+        });
     });
 
     describe("onMonitoringStopped", () => {
@@ -432,6 +474,30 @@ describe("EventsService", () => {
             expect(
                 mockElectronAPI.events.onMonitoringStopped
             ).not.toHaveBeenCalled();
+        });
+
+        it("should log an error when the stop payload fails validation", async () => {
+            const callback = vi.fn();
+            await EventsService.onMonitoringStopped(callback);
+
+            const call =
+                mockElectronAPI.events.onMonitoringStopped.mock.calls.at(0);
+            expect(call).toBeDefined();
+            const [registeredHandler] = call as [MonitoringEventHandler];
+
+            mockLogger.error.mockClear();
+
+            const invalidPayload = {
+                invalid: true,
+            } as unknown as MonitoringControlEventData;
+            registeredHandler(invalidPayload);
+
+            expect(callback).not.toHaveBeenCalled();
+            expect(mockLogger.error).toHaveBeenCalledWith(
+                "[EventsService] Dropped monitoring-stop payload: invalid monitoring control event",
+                undefined,
+                { payload: invalidPayload }
+            );
         });
     });
 

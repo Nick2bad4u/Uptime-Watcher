@@ -20,7 +20,18 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("SettingsService");
+        return getIpcServiceHelpers("SettingsService", {
+            bridgeContracts: [
+                {
+                    domain: "settings",
+                    methods: [
+                        "getHistoryLimit",
+                        "resetSettings",
+                        "updateHistoryLimit",
+                    ],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

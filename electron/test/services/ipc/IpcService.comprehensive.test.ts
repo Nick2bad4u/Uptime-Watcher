@@ -217,13 +217,22 @@ describe("IpcService - Comprehensive Coverage", () => {
                 buffer: Buffer.from("mock backup data"),
                 fileName: "/path/to/backup.db",
             }),
+            emitSitesStateSynchronized: vi
+                .fn()
+                .mockImplementation(async ({ sites }) =>
+                    (sites ?? mockSites).map((site: Site) =>
+                        structuredClone(site)
+                    )
+                ),
             emitTyped: vi.fn().mockResolvedValue(undefined),
-            onTyped: vi.fn((eventName: string, handler: (data: any) => void) => {
-                if (eventName === "sites:state-synchronized") {
-                    stateSyncListener = handler;
+            onTyped: vi.fn(
+                (eventName: string, handler: (data: any) => void) => {
+                    if (eventName === "sites:state-synchronized") {
+                        stateSyncListener = handler;
+                    }
+                    return undefined;
                 }
-                return undefined;
-            }),
+            ),
             off: vi.fn((eventName: string, handler: (data: any) => void) => {
                 if (
                     eventName === "sites:state-synchronized" &&
@@ -1206,14 +1215,16 @@ describe("IpcService - Comprehensive Coverage", () => {
             const result = await handler(mockIpcEvent);
 
             expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
-            expect(mockUptimeOrchestrator.emitTyped).toHaveBeenCalledWith(
-                "sites:state-synchronized",
-                {
+            expect(
+                mockUptimeOrchestrator.emitSitesStateSynchronized
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
                     action: "bulk-sync",
-                    sites: expect.any(Array),
+                    siteIdentifier: "all",
+                    sites: mockSites,
                     source: "database",
                     timestamp: expect.any(Number),
-                }
+                })
             );
 
             expect(result).toEqual({
@@ -1230,6 +1241,12 @@ describe("IpcService - Comprehensive Coverage", () => {
                     handler: "request-full-sync",
                 },
             });
+
+            const responseSites = result.data?.sites as Site[] | undefined;
+            expect(responseSites).toBeDefined();
+            expect(responseSites).toEqual(mockSites);
+            expect(responseSites).not.toBe(mockSites);
+            expect(responseSites?.[0]).not.toBe(mockSites[0]);
         });
 
         it("should handle get-sync-status and return status info", async ({

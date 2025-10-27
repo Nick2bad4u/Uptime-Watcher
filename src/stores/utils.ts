@@ -12,6 +12,8 @@
 
 import { isDevelopment } from "@shared/utils/environment";
 
+import { waitForElectronBridge } from "../services/utils/electronBridgeReadiness";
+
 import type { BaseStore } from "./types";
 
 import { logger } from "../services/logger";
@@ -214,29 +216,18 @@ export async function waitForElectronAPI(
     maxAttempts = 50,
     baseDelay = 100
 ): Promise<void> {
-    for (const attempt of Array.from(
-        { length: maxAttempts },
-        (_, index) => index
-    )) {
-        try {
-            if (
-                typeof window.electronAPI.sites.getSites === "function" &&
-                typeof window.electronAPI.settings.getHistoryLimit ===
-                    "function"
-            ) {
-                return; // API is ready
-            }
-        } catch {
-            // Window.electronAPI not available yet
-        }
-
-        // Wait with exponential backoff
-        const delay = Math.min(baseDelay * 1.5 ** attempt, 2000);
-        // eslint-disable-next-line no-await-in-loop, no-promise-executor-return, clean-timer/assign-timer-id -- Sequential retry delay required, timer completes with Promise
-        await new Promise((resolve) => setTimeout(resolve, delay));
-    }
-
-    throw new Error(
-        "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
-    );
+    await waitForElectronBridge({
+        baseDelay,
+        contracts: [
+            {
+                domain: "sites",
+                methods: ["getSites"],
+            },
+            {
+                domain: "settings",
+                methods: ["getHistoryLimit"],
+            },
+        ],
+        maxAttempts,
+    });
 }

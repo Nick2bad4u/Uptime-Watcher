@@ -28,7 +28,14 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("StateSyncService");
+        return getIpcServiceHelpers("StateSyncService", {
+            bridgeContracts: [
+                {
+                    domain: "stateSync",
+                    methods: ["getSyncStatus", "requestFullSync"],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

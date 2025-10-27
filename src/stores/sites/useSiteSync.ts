@@ -21,7 +21,7 @@ import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import {
-    collectDuplicateSiteIdentifiers,
+    sanitizeSitesByIdentifier,
     type DuplicateSiteIdentifier,
 } from "@shared/validation/siteIntegrity";
 
@@ -235,24 +235,7 @@ export const createSiteSyncActions = (
         duplicates: readonly DuplicateSiteIdentifier[];
         sanitizedSites: Site[];
     } => {
-        const duplicates = collectDuplicateSiteIdentifiers(sites);
-
-        if (duplicates.length === 0) {
-            return {
-                duplicates,
-                sanitizedSites: sites,
-            };
-        }
-
-        const seen = new Set<string>();
-        const sanitizedSites = sites.filter((site) => {
-            if (seen.has(site.identifier)) {
-                return false;
-            }
-
-            seen.add(site.identifier);
-            return true;
-        });
+        const { duplicates, sanitizedSites } = sanitizeSitesByIdentifier(sites);
 
         return {
             duplicates,

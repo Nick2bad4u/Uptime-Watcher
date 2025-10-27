@@ -6,7 +6,12 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import log from "electron-log/renderer";
 
-import { waitForElectronAPI } from "../../stores/utils";
+import {
+    ElectronBridgeNotReadyError,
+    type ElectronBridgeContract,
+    type WaitForElectronBridgeOptions,
+    waitForElectronBridge,
+} from "./electronBridgeReadiness";
 import * as loggerModule from "../logger";
 
 /**
@@ -105,6 +110,10 @@ const createStructuredFallbackLogger = (serviceName: string): LoggerLike => ({
 interface CreateIpcServiceHelpersOptions {
     /** Optional logger instance. Defaults to the shared renderer logger. */
     logger?: LoggerLike;
+    /** Contracts that must be satisfied before the service begins IPC calls. */
+    bridgeContracts?: readonly ElectronBridgeContract[];
+    /** Overrides for bridge polling parameters (contracts handled separately). */
+    bridgeOptions?: Omit<WaitForElectronBridgeOptions, "contracts">;
 }
 
 /**
@@ -138,9 +147,10 @@ export interface GuardedIpcServiceHelpers {
  * {@link window.electronAPI}.
  *
  * @remarks
- * Each helper waits for {@link waitForElectronAPI} before executing the wrapped
- * handler and logs failures using the provided logger (or a console fallback).
- * Primarily used by renderer services to standardize preload access.
+ * Each helper waits for {@link waitForElectronBridge} before executing the
+ * wrapped handler and logs failures using the provided logger (or a console
+ * fallback). Primarily used by renderer services to standardize preload
+ * access.
  *
  * @param serviceName - Human-readable service name used for log messages.
  * @param options - Optional configuration overrides.
@@ -159,12 +169,24 @@ export function createIpcServiceHelpers(
         createStructuredFallbackLogger(serviceName);
     const ensureInitialized = async (): Promise<void> => {
         try {
-            await waitForElectronAPI();
+            await waitForElectronBridge({
+                ...(options.bridgeOptions ?? {}),
+                contracts: options.bridgeContracts ?? [],
+            });
         } catch (error) {
-            logger.error(
-                `[${serviceName}] Failed to initialize:`,
-                ensureError(error)
-            );
+            const normalizedError = ensureError(error);
+            if (error instanceof ElectronBridgeNotReadyError) {
+                logger.error(
+                    `[${serviceName}] Failed to initialize:`,
+                    normalizedError,
+                    { diagnostics: error.diagnostics }
+                );
+            } else {
+                logger.error(
+                    `[${serviceName}] Failed to initialize:`,
+                    normalizedError
+                );
+            }
             throw error;
         }
     };

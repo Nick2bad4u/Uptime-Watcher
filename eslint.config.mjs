@@ -308,6 +308,7 @@ export default [
             "Coverage/",
             "coverage/",
             "**/**dist**/**",
+            "scripts/devtools-snippets/**",
             "dist/",
             "docs/Archive/**",
             "docs/docusaurus/.docusaurus/**",

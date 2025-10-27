@@ -23,7 +23,14 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("MonitorTypesService");
+        return getIpcServiceHelpers("MonitorTypesService", {
+            bridgeContracts: [
+                {
+                    domain: "monitorTypes",
+                    methods: ["getMonitorTypes"],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

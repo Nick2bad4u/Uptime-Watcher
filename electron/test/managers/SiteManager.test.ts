@@ -108,9 +108,7 @@ describe(SiteManager, () => {
     describe("constructor", () => {
         it("should construct without error", async ({ annotate }) => {
             await annotate("Component: SiteManager", "component");
-            await annotate(
-                "Test Type: Unit - Constructor Validation",
-            );
+            await annotate("Test Type: Unit - Constructor Validation");
             await annotate(
                 "Complexity: High - Multi-step Transaction",
                 "complexity"
@@ -555,10 +553,7 @@ describe(SiteManager, () => {
                 .spyOn(manager["siteWriterService"], "updateSite")
                 .mockResolvedValue(persistedSite);
 
-            const result = await manager.removeMonitor(
-                site.identifier,
-                "mon1"
-            );
+            const result = await manager.removeMonitor(site.identifier, "mon1");
 
             expect(updateSpy).toHaveBeenCalledWith(
                 manager["sitesCache"],
@@ -615,9 +610,7 @@ describe(SiteManager, () => {
 
             await expect(
                 manager.removeMonitor(site.identifier, "missing")
-            ).rejects.toThrow(
-                "Monitor missing not found on site site1"
-            );
+            ).rejects.toThrow("Monitor missing not found on site site1");
 
             expect(updateSpy).not.toHaveBeenCalled();
         });
@@ -640,10 +633,7 @@ describe(SiteManager, () => {
                 .spyOn(manager["siteWriterService"], "updateSite")
                 .mockResolvedValue(persistedSite);
 
-            const result = await manager.removeMonitor(
-                site.identifier,
-                "mon1"
-            );
+            const result = await manager.removeMonitor(site.identifier, "mon1");
 
             expect(dbSpy).toHaveBeenCalledWith(site.identifier);
             expect(updateSpy).toHaveBeenCalled();
@@ -889,10 +879,9 @@ describe(SiteManager, () => {
                 );
                 manager["sitesCache"].set(site.identifier, site);
 
-                const snapshot =
-                    await manager["getSiteSnapshotForMutation"](
-                        site.identifier
-                    );
+                const snapshot = await manager["getSiteSnapshotForMutation"](
+                    site.identifier
+                );
 
                 expect(snapshot).toEqual(site);
                 expect(snapshot).not.toBe(site);
@@ -926,10 +915,9 @@ describe(SiteManager, () => {
                     "getSiteFromDatabase"
                 ).mockResolvedValue(site);
 
-                const snapshot =
-                    await manager["getSiteSnapshotForMutation"](
-                        site.identifier
-                    );
+                const snapshot = await manager["getSiteSnapshotForMutation"](
+                    site.identifier
+                );
 
                 expect(snapshot).toEqual(site);
                 expect(manager["sitesCache"].get(site.identifier)).toEqual(
@@ -1142,6 +1130,12 @@ describe(SiteManager, () => {
                 })
             );
             expect(replaceAllSpy).toHaveBeenCalledTimes(1);
+            expect(replaceAllSpy).toHaveBeenCalledWith([
+                expect.objectContaining({
+                    data: duplicateSites[0],
+                    key: duplicateSites[0]!.identifier,
+                }),
+            ]);
 
             errorSpy.mockRestore();
             replaceAllSpy.mockRestore();

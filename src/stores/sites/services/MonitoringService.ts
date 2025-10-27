@@ -45,7 +45,22 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("MonitoringService");
+        return getIpcServiceHelpers("MonitoringService", {
+            bridgeContracts: [
+                {
+                    domain: "monitoring",
+                    methods: [
+                        "checkSiteNow",
+                        "startMonitoring",
+                        "startMonitoringForMonitor",
+                        "startMonitoringForSite",
+                        "stopMonitoring",
+                        "stopMonitoringForMonitor",
+                        "stopMonitoringForSite",
+                    ],
+                },
+            ],
+        });
     } catch (error: unknown) {
         throw ensureError(error);
     }

@@ -82,7 +82,12 @@
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
-import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import {
+    STATE_SYNC_ACTION,
+    STATE_SYNC_SOURCE,
+    type StateSyncAction,
+    type StateSyncSource,
+} from "@shared/types/stateSync";
 import {
     ApplicationError,
     type ApplicationErrorOptions,
@@ -990,6 +995,37 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             message: "Failed to retrieve sites",
             operation: "orchestrator.getSites",
         });
+    }
+
+    /**
+     * Emits a sanitized site state synchronization event.
+     *
+     * @remarks
+     * Delegates to {@link SiteManager.emitSitesStateSynchronized} while
+     * preserving orchestrator-level error context. Returns the cloned site
+     * snapshot that was dispatched with the event for downstream consumers
+     * (e.g., IPC handlers).
+     *
+     * @param payload - Synchronization parameters controlling the emitted
+     *   event.
+     *
+     * @returns Cloned site snapshots included in the emitted event.
+     */
+    public async emitSitesStateSynchronized(payload: {
+        action: StateSyncAction;
+        siteIdentifier: string;
+        sites?: Site[];
+        source: StateSyncSource;
+        timestamp?: number;
+    }): Promise<Site[]> {
+        return this.runWithContext(
+            () => this.siteManager.emitSitesStateSynchronized(payload),
+            {
+                code: "ORCHESTRATOR_EMIT_SITES_STATE_SYNC_FAILED",
+                message: "Failed to emit site synchronization event",
+                operation: "orchestrator.emitSitesStateSynchronized",
+            }
+        );
     }
 
     /**

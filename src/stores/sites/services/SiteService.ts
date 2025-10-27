@@ -23,7 +23,21 @@ const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
     try {
-        return getIpcServiceHelpers("SiteService");
+        return getIpcServiceHelpers("SiteService", {
+            bridgeContracts: [
+                {
+                    domain: "sites",
+                    methods: [
+                        "addSite",
+                        "deleteAllSites",
+                        "getSites",
+                        "removeMonitor",
+                        "removeSite",
+                        "updateSite",
+                    ],
+                },
+            ],
+        });
     } catch (error) {
         throw ensureError(error);
     }

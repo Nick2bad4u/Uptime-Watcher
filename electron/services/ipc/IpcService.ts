@@ -1080,29 +1080,31 @@ export class IpcService {
                 const sites = await this.uptimeOrchestrator.getSites();
                 const timestamp = Date.now();
 
-                // Emit proper typed sync event
-                await this.uptimeOrchestrator.emitTyped(
-                    "sites:state-synchronized",
-                    {
+                const sanitizedSites =
+                    await this.uptimeOrchestrator.emitSitesStateSynchronized({
                         action: STATE_SYNC_ACTION.BULK_SYNC,
+                        siteIdentifier: "all",
                         sites,
                         source: STATE_SYNC_SOURCE.DATABASE,
                         timestamp,
-                    }
+                    });
+
+                const responseSites = sanitizedSites.map((site) =>
+                    structuredClone(site)
                 );
 
                 logger.debug("[IpcService] Full sync completed", {
-                    siteCount: sites.length,
+                    siteCount: responseSites.length,
                 });
                 this.updateStateSyncStatus(
-                    sites,
+                    responseSites,
                     STATE_SYNC_SOURCE.DATABASE,
                     timestamp
                 );
                 return {
                     completedAt: timestamp,
-                    siteCount: sites.length,
-                    sites,
+                    siteCount: responseSites.length,
+                    sites: responseSites,
                     source: STATE_SYNC_SOURCE.DATABASE,
                     synchronized: true,
                 };
