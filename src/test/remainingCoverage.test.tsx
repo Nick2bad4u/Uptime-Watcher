@@ -15,17 +15,19 @@ vi.mock("../stores", () => ({
     useSitesStore: vi.fn(),
 }));
 
-vi.mock("../services/logger", () => ({
-    default: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         debug: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
-        user: {
-            action: vi.fn(),
-        },
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 describe("Remaining Coverage Tests", () => {
     beforeEach(() => {

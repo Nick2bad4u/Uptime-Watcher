@@ -36,16 +36,23 @@ vi.mock("../constants", () => ({
 }));
 
 // Mock logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        debug: vi.fn(),
         error: vi.fn(),
+        info: vi.fn(),
         user: {
             action: vi.fn(),
             settingsChange: vi.fn(),
         },
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock stores
 const mockUpdateSettings = vi.fn();
@@ -60,10 +67,6 @@ const mockUseStore = {
             sizeBytes: 8,
         },
     }),
-    fullResyncSites: vi.fn().mockResolvedValue(undefined),
-    isLoading: false,
-    lastError: null as string | null,
-    resetSettings: vi.fn(),
     setError: vi.fn(),
     settings: {
         autoStart: false,

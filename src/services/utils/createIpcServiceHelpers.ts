@@ -6,11 +6,11 @@
 import { ensureError } from "@shared/utils/errorHandling";
 import log from "electron-log/renderer";
 
-import { waitForElectronAPI } from "../../stores/utils";
 import * as loggerModule from "../logger";
 import {
     type ElectronBridgeContract,
     ElectronBridgeNotReadyError,
+    waitForElectronBridge,
     type WaitForElectronBridgeOptions,
 } from "./electronBridgeReadiness";
 
@@ -169,11 +169,19 @@ export function createIpcServiceHelpers(
         createStructuredFallbackLogger(serviceName);
     const ensureInitialized = async (): Promise<void> => {
         try {
-            await waitForElectronAPI(
-                options.bridgeOptions?.maxAttempts,
-                options.bridgeOptions?.baseDelay,
-                options.bridgeContracts
-            );
+            const bridgeOptions: WaitForElectronBridgeOptions = {
+                ...(options.bridgeContracts !== undefined
+                    ? { contracts: options.bridgeContracts }
+                    : {}),
+                ...(options.bridgeOptions?.baseDelay !== undefined
+                    ? { baseDelay: options.bridgeOptions.baseDelay }
+                    : {}),
+                ...(options.bridgeOptions?.maxAttempts !== undefined
+                    ? { maxAttempts: options.bridgeOptions.maxAttempts }
+                    : {}),
+            };
+
+            await waitForElectronBridge(bridgeOptions);
         } catch (error) {
             const normalizedError = ensureError(error);
             if (error instanceof ElectronBridgeNotReadyError) {

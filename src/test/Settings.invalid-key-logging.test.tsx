@@ -5,16 +5,19 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        debug: vi.fn(),
         error: vi.fn(),
         info: vi.fn(),
-        user: {
-            settingsChange: vi.fn(),
-        },
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock the settings store
 const mockUpdateSettings = vi.fn();

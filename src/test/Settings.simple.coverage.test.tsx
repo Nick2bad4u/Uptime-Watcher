@@ -8,11 +8,19 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { logger } from "../services/logger";
 
 // Mock logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        logger: mockLogger,
+        Logger: mockLogger,
+    };
+});
 
 describe("Settings Component - Coverage Tests", () => {
     beforeEach(() => {

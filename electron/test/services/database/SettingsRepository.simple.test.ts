@@ -296,6 +296,8 @@ describe("SettingsRepository Coverage Tests", () => {
     });
 
     describe("Property-Based SettingsRepository Tests", () => {
+        const PROPERTY_BASED_TIMEOUT_MS = 20_000;
+
         it("should handle various setting key-value pairs", async () => {
             await fc.assert(
                 fc.asyncProperty(
@@ -319,10 +321,9 @@ describe("SettingsRepository Coverage Tests", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            // Mock successful database operations
-                            const mockRun = vi
-                                .fn()
-                                .mockReturnValue({ changes: 1 });
+                            const mockRun = vi.fn().mockReturnValue({
+                                changes: 1,
+                            });
                             const mockGet = vi.fn().mockReturnValue({
                                 key: settingKey,
                                 value: JSON.stringify(settingValue),
@@ -340,7 +341,6 @@ describe("SettingsRepository Coverage Tests", () => {
                                     })
                             );
 
-                            // Should handle various setting types
                             expect(repository).toBeDefined();
                             expect(typeof repository.set).toBe("function");
                             expect(typeof repository.get).toBe("function");
@@ -348,7 +348,8 @@ describe("SettingsRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
 
@@ -378,7 +379,6 @@ describe("SettingsRepository Coverage Tests", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            // Mock bulk operations
                             mockDatabaseService.executeTransaction.mockImplementation(
                                 async (callback: any) =>
                                     callback({
@@ -410,7 +410,6 @@ describe("SettingsRepository Coverage Tests", () => {
                             );
                             expect(typeof repository.getAll).toBe("function");
 
-                            // Validate settings structure
                             for (const [key, value] of Object.entries(
                                 settingsObject
                             )) {
@@ -430,7 +429,8 @@ describe("SettingsRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
 
@@ -465,7 +465,6 @@ describe("SettingsRepository Coverage Tests", () => {
                             });
 
                             for (const key of settingKeys) {
-                                // Mock key-specific operations
                                 const mockGet = vi.fn().mockReturnValue({
                                     key,
                                     value: JSON.stringify(`value-for-${key}`),
@@ -487,8 +486,6 @@ describe("SettingsRepository Coverage Tests", () => {
                                 expect(repository).toBeDefined();
                                 expect(key.length).toBeGreaterThan(0);
                                 expect(typeof key).toBe("string");
-
-                                // Key should be properly formatted
                                 expect(key).not.toMatch(/^\./);
                                 expect(key).not.toMatch(/\.$/);
                                 expect(key).not.toMatch(/\.\./);
@@ -497,7 +494,8 @@ describe("SettingsRepository Coverage Tests", () => {
                             expect(error).toBeInstanceOf(Error);
                         }
                     }
-                )
+                ),
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
 
@@ -527,7 +525,6 @@ describe("SettingsRepository Coverage Tests", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            // Mock serialization handling
                             mockDatabaseService.executeTransaction.mockImplementation(
                                 async (callback: any) =>
                                     callback({
@@ -549,12 +546,9 @@ describe("SettingsRepository Coverage Tests", () => {
 
                             expect(repository).toBeDefined();
 
-                            // Should handle various edge case values
                             if (edgeValue !== undefined) {
                                 const serialized = JSON.stringify(edgeValue);
                                 expect(typeof serialized).toBe("string");
-
-                                // Should be able to parse back
                                 const parsed = JSON.parse(serialized);
                                 expect(parsed).toEqual(edgeValue);
                             }
@@ -563,9 +557,7 @@ describe("SettingsRepository Coverage Tests", () => {
                         }
                     }
                 ),
-                {
-                    timeout: 5000,
-                }
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
 
@@ -595,7 +587,6 @@ describe("SettingsRepository Coverage Tests", () => {
                                 databaseService: mockDatabaseService,
                             });
 
-                            // Mock database error
                             const dbError = new Error(
                                 `Mock ${errorType} error`
                             );
@@ -609,7 +600,6 @@ describe("SettingsRepository Coverage Tests", () => {
 
                             expect(repository).toBeDefined();
 
-                            // Operations should handle errors gracefully
                             try {
                                 await repository.set(settingKey, settingValue);
                             } catch (error) {
@@ -620,9 +610,7 @@ describe("SettingsRepository Coverage Tests", () => {
                         }
                     }
                 ),
-                {
-                    timeout: 5000,
-                }
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
 
@@ -638,11 +626,9 @@ describe("SettingsRepository Coverage Tests", () => {
                             databaseService: mockDatabaseService,
                         });
 
-                        // Validate repository interface
                         expect(repository).toBeDefined();
                         expect(typeof repository).toBe("object");
 
-                        // Check for expected methods
                         const expectedMethods = [
                             "get",
                             "set",
@@ -660,7 +646,6 @@ describe("SettingsRepository Coverage Tests", () => {
                             }
                         }
 
-                        // Mock success/failure scenarios
                         if (mockSuccessfully) {
                             mockDatabaseService.executeTransaction.mockResolvedValue(
                                 true
@@ -675,7 +660,8 @@ describe("SettingsRepository Coverage Tests", () => {
                     } catch (error) {
                         expect(error).toBeInstanceOf(Error);
                     }
-                })
+                }),
+                { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
         });
     });

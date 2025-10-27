@@ -9,15 +9,22 @@ import "@testing-library/jest-dom";
 import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
 
 // Mock logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        debug: vi.fn(),
         error: vi.fn(),
+        info: vi.fn(),
         user: {
             action: vi.fn(),
         },
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock stores/utils
 vi.mock("../stores/utils", () => ({

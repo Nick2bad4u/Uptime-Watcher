@@ -19,7 +19,22 @@ import { useTheme } from "../theme/useTheme";
 
 // Mock environment functions
 vi.mock("@shared/utils/environment");
-vi.mock("../services/logger");
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        app: {
+            started: vi.fn(),
+        },
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock hooks and utilities
 vi.mock("../hooks/useBackendFocusSync", () => ({

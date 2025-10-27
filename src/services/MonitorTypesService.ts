@@ -29,6 +29,14 @@ const { ensureInitialized, wrap } = ((): ReturnType<
                     domain: "monitorTypes",
                     methods: ["getMonitorTypes"],
                 },
+                {
+                    domain: "monitoring",
+                    methods: [
+                        "formatMonitorDetail",
+                        "formatMonitorTitleSuffix",
+                        "validateMonitorData",
+                    ],
+                },
             ],
         });
     } catch (error: unknown) {

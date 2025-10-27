@@ -503,26 +503,24 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Import the mock so we can control it
-            const { waitForElectronAPI } = await import(
-                "../../../stores/utils"
-            );
+            const originalWindowBridge = (globalThis as any).window
+                ?.electronAPI;
+            const originalGlobalBridge = (globalThis as any).electronAPI;
 
-            // Make waitForElectronAPI reject for all calls in this test
-            const mockWaitForElectronAPI = vi.mocked(waitForElectronAPI);
-            mockWaitForElectronAPI.mockRejectedValue(
-                new Error("ElectronAPI not available")
-            );
+            (globalThis as any).window.electronAPI = undefined;
+            (globalThis as any).electronAPI = undefined;
 
-            await expect(
-                MonitoringService.startMonitoringForMonitor("test", "test")
-            ).rejects.toThrow("ElectronAPI not available");
-            await expect(
-                MonitoringService.stopMonitoringForMonitor("test", "test")
-            ).rejects.toThrow("ElectronAPI not available");
-
-            // Reset the mock for other tests
-            mockWaitForElectronAPI.mockResolvedValue(undefined);
+            try {
+                await expect(
+                    MonitoringService.startMonitoringForMonitor("test", "test")
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
+                await expect(
+                    MonitoringService.stopMonitoringForMonitor("test", "test")
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
+            } finally {
+                (globalThis as any).window.electronAPI = originalWindowBridge;
+                (globalThis as any).electronAPI = originalGlobalBridge;
+            }
         });
     });
 

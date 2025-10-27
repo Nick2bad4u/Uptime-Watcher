@@ -30,14 +30,19 @@ import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useUIStore } from "../stores/ui/useUiStore";
 
 // Simple mock for testing
-vi.mock("../services/logger", () => ({
-    Logger: {
-        error: vi.fn(),
-        warn: vi.fn(),
-        info: vi.fn(),
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         debug: vi.fn(),
-    },
-}));
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock window.electronAPI
 Object.defineProperty(window, "electronAPI", {

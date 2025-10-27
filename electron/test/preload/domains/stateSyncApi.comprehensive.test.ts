@@ -320,6 +320,17 @@ describe("State Sync Domain API", () => {
             registeredHandler({}, invalidEventData);
 
             expect(mockCallback).not.toHaveBeenCalled();
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                "diagnostics-report-preload-guard",
+                expect.objectContaining({
+                    channel: "state-sync-event",
+                    guard: "safeParseStateSyncEventData",
+                    metadata: expect.objectContaining({
+                        domain: "stateSyncApi",
+                    }),
+                    reason: "payload-validation",
+                })
+            );
         });
 
         it("should handle various event action types", () => {

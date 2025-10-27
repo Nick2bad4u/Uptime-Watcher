@@ -99,14 +99,19 @@ const buildAddSiteFormState = (
     }) as ReturnType<typeof useAddSiteForm>;
 
 // Mock all external dependencies
-vi.mock("../services/logger", () => ({
-    logger: {
-        error: vi.fn(),
-        warn: vi.fn(),
-        info: vi.fn(),
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         debug: vi.fn(),
-    },
-}));
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 vi.mock("../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({

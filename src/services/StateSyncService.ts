@@ -32,7 +32,11 @@ const { ensureInitialized, wrap } = ((): ReturnType<
             bridgeContracts: [
                 {
                     domain: "stateSync",
-                    methods: ["getSyncStatus", "requestFullSync"],
+                    methods: [
+                        "getSyncStatus",
+                        "onStateSyncEvent",
+                        "requestFullSync",
+                    ],
                 },
             ],
         });

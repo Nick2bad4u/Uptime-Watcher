@@ -18,14 +18,31 @@ import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbna
 import { logger } from "../services/logger";
 
 // Mock the logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
+        debug: vi.fn(),
         error: vi.fn(),
+        info: vi.fn(),
         user: {
             action: vi.fn(),
         },
         warn: vi.fn(),
-    },
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
+
+const mockSystemService = vi.hoisted(() => ({
+    initialize: vi.fn().mockResolvedValue(undefined),
+    openExternal: vi.fn().mockResolvedValue(true),
+    quitAndInstall: vi.fn(),
+}));
+
+vi.mock("../services/SystemService", () => ({
+    SystemService: mockSystemService,
 }));
 
 // Mock the store utils
@@ -60,14 +77,6 @@ Element.prototype.setAttribute = function (name: string, value: string) {
 
 // Mock window properties
 const mockWindowOpen = vi.fn();
-const mockElectronAPI = {
-    sites: {
-        getSites: vi.fn(),
-    },
-    system: {
-        openExternal: vi.fn().mockResolvedValue(true),
-    },
-};
 
 // Create a mock for getBoundingClientRect
 const createMockBoundingClientRect = (overrides = {}) => ({
@@ -91,6 +100,8 @@ describe(ScreenshotThumbnail, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        mockSystemService.initialize.mockResolvedValue(undefined);
+        mockSystemService.openExternal.mockResolvedValue(true);
 
         // Mock window.open to prevent navigation
         Object.defineProperty(globalThis, "open", {
@@ -215,7 +226,7 @@ describe(ScreenshotThumbnail, () => {
     });
 
     describe("Click Handling", () => {
-        it("should call electronAPI.openExternal when available", async ({
+        it("should open via SystemService when available", async ({
             task,
             annotate,
         }) => {
@@ -229,29 +240,28 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // Mock electronAPI with openExternal method
-            Object.defineProperty(globalThis, "electronAPI", {
-                value: mockElectronAPI,
-                writable: true,
-            });
-
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const link = screen.getByRole("link");
             await user.click(link);
 
-            expect(logger.user.action).toHaveBeenCalledWith(
-                "External URL opened",
-                {
-                    siteName: "Example Site",
-                    url: "https://example.com",
-                }
-            );
+            await waitFor(() => {
+                expect(mockSystemService.openExternal).toHaveBeenCalledWith(
+                    "https://example.com"
+                );
+            });
 
-            expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
-                "https://example.com"
-            );
+            await waitFor(() => {
+                expect(logger.user.action).toHaveBeenCalledWith(
+                    "External URL opened",
+                    {
+                        siteName: "Example Site",
+                        url: "https://example.com",
+                    }
+                );
+            });
+
             expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
@@ -284,7 +294,7 @@ describe(ScreenshotThumbnail, () => {
             expect(preventDefaultSpy).toHaveBeenCalled();
         });
 
-        it("should handle electronAPI without openExternal method", async ({
+        it("should fallback to window.open when SystemService rejects", async ({
             task,
             annotate,
         }) => {
@@ -298,20 +308,9 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            // Mock electronAPI without system.openExternal that throws an error
-            Object.defineProperty(globalThis, "electronAPI", {
-                value: {
-                    sites: {
-                        getSites: vi.fn(),
-                    },
-                    system: {
-                        openExternal: vi.fn().mockImplementation(() => {
-                            throw new Error("openExternal not available");
-                        }),
-                    },
-                },
-                writable: true,
-            });
+            mockSystemService.openExternal.mockRejectedValueOnce(
+                new Error("openExternal not available")
+            );
 
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
@@ -320,11 +319,13 @@ describe(ScreenshotThumbnail, () => {
             await user.click(link);
 
             // Verify window.open was called with the correct parameters (due to fallback)
-            expect(mockWindowOpen).toHaveBeenCalledWith(
-                "https://example.com",
-                "_blank",
-                "noopener,noreferrer"
-            );
+            await waitFor(() => {
+                expect(mockWindowOpen).toHaveBeenCalledWith(
+                    "https://example.com",
+                    "_blank",
+                    "noopener,noreferrer"
+                );
+            });
         });
     });
 
@@ -998,7 +999,7 @@ describe(ScreenshotThumbnail, () => {
     });
 
     describe("Type Guard Functionality", () => {
-        it("should use electronAPI when openExternal is available", async ({
+        it("should call SystemService when openExternal is available (type guard)", async ({
             task,
             annotate,
         }) => {
@@ -1012,20 +1013,6 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const apiWithOpenExternal = {
-                sites: {
-                    getSites: vi.fn(),
-                },
-                system: {
-                    openExternal: vi.fn(),
-                },
-            };
-
-            Object.defineProperty(globalThis, "electronAPI", {
-                value: apiWithOpenExternal,
-                writable: true,
-            });
-
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
 
@@ -1033,13 +1020,16 @@ describe(ScreenshotThumbnail, () => {
 
             await user.click(link);
 
-            // If hasOpenExternal works correctly, electronAPI.openExternal should be called
-            expect(
-                apiWithOpenExternal.system.openExternal
-            ).toHaveBeenCalledWith("https://example.com");
+            await waitFor(() => {
+                expect(mockSystemService.openExternal).toHaveBeenCalledWith(
+                    "https://example.com"
+                );
+            });
+
+            expect(mockWindowOpen).not.toHaveBeenCalled();
         });
 
-        it("should fallback to window.open when openExternal is not available", async ({
+        it("should fallback to window.open when SystemService rejects (type guard)", async ({
             task,
             annotate,
         }) => {
@@ -1053,21 +1043,9 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const apiWithoutOpenExternal = {
-                sites: {
-                    getSites: vi.fn(),
-                },
-                system: {
-                    openExternal: vi.fn().mockImplementation(() => {
-                        throw new Error("openExternal not available");
-                    }),
-                },
-            };
-
-            Object.defineProperty(globalThis, "electronAPI", {
-                value: apiWithoutOpenExternal,
-                writable: true,
-            });
+            mockSystemService.openExternal.mockRejectedValueOnce(
+                new Error("openExternal not available")
+            );
 
             const user = userEvent.setup();
             render(<ScreenshotThumbnail {...defaultProps} />);
@@ -1076,12 +1054,13 @@ describe(ScreenshotThumbnail, () => {
 
             await user.click(link);
 
-            // Should fall back to window.open
-            expect(mockWindowOpen).toHaveBeenCalledWith(
-                "https://example.com",
-                "_blank",
-                "noopener,noreferrer"
-            );
+            await waitFor(() => {
+                expect(mockWindowOpen).toHaveBeenCalledWith(
+                    "https://example.com",
+                    "_blank",
+                    "noopener,noreferrer"
+                );
+            });
         });
     });
 

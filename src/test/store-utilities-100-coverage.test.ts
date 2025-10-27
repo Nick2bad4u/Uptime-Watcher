@@ -13,14 +13,19 @@ import { createBaseStore, debounce, logStoreAction } from "../stores/utils";
 import { TRANSITION_ALL } from "../constants";
 
 // Mock logger and environment
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
         debug: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        logger: mockLogger,
+        Logger: mockLogger,
+    };
+});
 
 vi.mock("@shared/utils/environment", () => ({
     isDevelopment: vi.fn(() => true),

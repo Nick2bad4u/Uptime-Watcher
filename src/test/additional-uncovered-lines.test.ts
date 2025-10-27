@@ -22,14 +22,19 @@ vi.mock("../hooks/site/useSiteAnalytics", () => ({
     })),
 }));
 
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         error: vi.fn(),
         site: { error: vi.fn() },
         user: { action: vi.fn() },
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 // Mock window and setTimeout
 interface MockWindow {

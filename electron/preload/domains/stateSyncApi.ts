@@ -23,6 +23,11 @@ import {
 } from "@shared/types/events";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
+import {
+    buildPayloadPreview,
+    preloadDiagnosticsLogger,
+    reportPreloadGuardFailure,
+} from "../utils/preloadLogger";
 
 /**
  * Interface defining the state sync domain API operations.
@@ -61,6 +66,10 @@ export interface StateSyncApiInterface extends StateSyncDomainBridge {
  *
  * @public
  */
+const stateSyncEventManager = createEventManager(
+    RENDERER_EVENT_CHANNELS.STATE_SYNC
+);
+
 export const stateSyncApi: StateSyncApiInterface = {
     /**
      * Gets the current synchronization status
@@ -79,16 +88,39 @@ export const stateSyncApi: StateSyncApiInterface = {
     onStateSyncEvent: (
         callback: (data: StateSyncEventData) => void
     ): (() => void) =>
-        createEventManager(RENDERER_EVENT_CHANNELS.STATE_SYNC).on(
-            (data: unknown) => {
-                const parsed = safeParseStateSyncEventData(data);
+        stateSyncEventManager.on((payload: unknown) => {
+            const parsed = safeParseStateSyncEventData(payload);
 
-                if (parsed.success) {
-                    // eslint-disable-next-line n/callback-return -- Callback Return not required here as we just invoke the callback
-                    callback(parsed.data);
-                }
+            if (!parsed.success) {
+                const payloadPreview = buildPayloadPreview(payload);
+                const payloadType = Array.isArray(payload)
+                    ? "array"
+                    : typeof payload;
+
+                preloadDiagnosticsLogger.warn(
+                    "[stateSyncApi] Dropped malformed payload for 'state-sync-event'",
+                    {
+                        guard: "safeParseStateSyncEventData",
+                        payloadPreview,
+                        payloadType,
+                    }
+                );
+
+                void reportPreloadGuardFailure({
+                    channel: RENDERER_EVENT_CHANNELS.STATE_SYNC,
+                    guard: "safeParseStateSyncEventData",
+                    metadata: {
+                        domain: "stateSyncApi",
+                        payloadType,
+                    },
+                    payloadPreview,
+                    reason: "payload-validation",
+                });
+                return;
             }
-        ),
+
+            callback(parsed.data);
+        }),
 
     /**
      * Requests a full synchronization of all data

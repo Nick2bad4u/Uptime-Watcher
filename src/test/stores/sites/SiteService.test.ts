@@ -512,32 +512,30 @@ describe("SiteService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Import the mock so we can control it
-            const { waitForElectronAPI } = await import(
-                "../../../stores/utils"
-            );
+            const originalWindowBridge = (globalThis as any).window
+                ?.electronAPI;
+            const originalGlobalBridge = (globalThis as any).electronAPI;
 
-            // Make waitForElectronAPI reject for all calls in this test
-            const mockWaitForElectronAPI = vi.mocked(waitForElectronAPI);
-            mockWaitForElectronAPI.mockRejectedValue(
-                new Error("ElectronAPI not available")
-            );
+            (globalThis as any).window.electronAPI = undefined;
+            (globalThis as any).electronAPI = undefined;
 
-            await expect(SiteService.getSites()).rejects.toThrow(
-                "ElectronAPI not available"
-            );
-            await expect(
-                SiteService.addSite({} as Omit<Site, "id">)
-            ).rejects.toThrow("ElectronAPI not available");
-            await expect(SiteService.updateSite("test", {})).rejects.toThrow(
-                "ElectronAPI not available"
-            );
-            await expect(SiteService.removeSite("test")).rejects.toThrow(
-                "ElectronAPI not available"
-            );
-
-            // Reset the mock for other tests
-            mockWaitForElectronAPI.mockResolvedValue(undefined);
+            try {
+                await expect(SiteService.getSites()).rejects.toThrow(
+                    MOCK_BRIDGE_ERROR_MESSAGE
+                );
+                await expect(
+                    SiteService.addSite({} as Omit<Site, "id">)
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
+                await expect(
+                    SiteService.updateSite("test", {})
+                ).rejects.toThrow(MOCK_BRIDGE_ERROR_MESSAGE);
+                await expect(SiteService.removeSite("test")).rejects.toThrow(
+                    MOCK_BRIDGE_ERROR_MESSAGE
+                );
+            } finally {
+                (globalThis as any).window.electronAPI = originalWindowBridge;
+                (globalThis as any).electronAPI = originalGlobalBridge;
+            }
         });
     });
 

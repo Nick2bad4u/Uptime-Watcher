@@ -21,14 +21,19 @@ import {
 import { BASE_MONITOR_TYPES } from "@shared/types";
 
 // Mock any external dependencies
-vi.mock("../services/logger", () => ({
-    logger: {
-        error: vi.fn(),
-        warn: vi.fn(),
-        info: vi.fn(),
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         debug: vi.fn(),
-    },
-}));
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 describe("Constants and Configuration 100% Coverage", () => {
     beforeEach(() => {

@@ -18,14 +18,19 @@ import {
 import { isNullOrUndefined, withAsyncErrorHandling } from "../utils/fallbacks";
 
 // Mock logger
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         error: vi.fn(),
         warn: vi.fn(),
         info: vi.fn(),
         debug: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 describe("100% Coverage Edge Cases", () => {
     beforeEach(() => {

@@ -26,16 +26,22 @@ vi.mock("../hooks/useSelectedSite", () => ({
     useSelectedSite: vi.fn().mockReturnValue(null),
 }));
 
-vi.mock("../services/logger", () => ({
-    logger: {
+vi.mock("../services/logger", () => {
+    const mockLogger = {
         app: {
             started: vi.fn(),
         },
         debug: vi.fn(),
         error: vi.fn(),
+        info: vi.fn(),
         warn: vi.fn(),
-    },
-}));
+    };
+
+    return {
+        Logger: mockLogger,
+        logger: mockLogger,
+    };
+});
 
 vi.mock("../utils/cacheSync", () => ({
     setupCacheSync: vi.fn(() => vi.fn()),

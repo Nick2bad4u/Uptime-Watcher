@@ -15,7 +15,7 @@ import { createCoverageMap, type CoverageMapData } from "istanbul-lib-coverage";
 import { randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, access } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -30,30 +30,55 @@ const RETRYABLE_ERROR_PATTERN =
     /\b(?:EBUSY|EPERM)\b|resource busy or locked|operation not permitted/iu;
 const MAX_VITEST_ATTEMPTS = 7;
 const BASE_RETRY_DELAY_MS = 250;
+const DEFAULT_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Executes Vitest with automatic retries for transient filesystem issues that
- * regularly appear on Windows when the cache directory is still in use.
+ * regularly appear on Windows when the cache directory is still in use. Now
+ * includes a timeout to prevent indefinite hangs.
  */
 async function runVitestCommand(
     cwd: string,
-    vitestArgs: readonly string[]
+    vitestArgs: readonly string[],
+    timeoutMs: number = DEFAULT_TIMEOUT_MS
 ): Promise<{ stdout: string; stderr: string }> {
+    console.log(
+        `[runVitestCommand] Starting Vitest command with args: ${vitestArgs.join(" ")} (timeout: ${timeoutMs}ms)`
+    );
     for (let attempt = 1; attempt <= MAX_VITEST_ATTEMPTS; attempt += 1) {
         const invocation = getVitestInvocation(cwd, vitestArgs);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         try {
-            return await execFileAsync(invocation.command, invocation.args, {
-                cwd,
-                env: process.env,
-                windowsHide: true,
-                maxBuffer: 1024 * 1024 * 20,
-            });
+            const result = await execFileAsync(
+                invocation.command,
+                invocation.args,
+                {
+                    cwd,
+                    env: process.env,
+                    windowsHide: true,
+                    maxBuffer: 1024 * 1024 * 20,
+                    signal: controller.signal,
+                }
+            );
+            clearTimeout(timeoutId);
+            console.log(
+                `[runVitestCommand] Command succeeded on attempt ${attempt}`
+            );
+            return result;
         } catch (error) {
+            clearTimeout(timeoutId);
             const message =
                 error instanceof Error
                     ? `${error.message}\n${String((error as { stderr?: string }).stderr ?? "")}`
                     : String(error);
-            const shouldRetry = RETRYABLE_ERROR_PATTERN.test(message);
+            const shouldRetry =
+                RETRYABLE_ERROR_PATTERN.test(message) &&
+                !controller.signal.aborted;
             if (!shouldRetry || attempt === MAX_VITEST_ATTEMPTS) {
+                console.error(
+                    `[runVitestCommand] Command failed after ${attempt} attempts: ${message}`
+                );
                 throw error;
             }
 
@@ -134,6 +159,8 @@ interface CliOptions {
     readonly cwd: string;
     /** Optional explicit list of files provided via CLI. */
     readonly explicitFiles: readonly string[];
+    /** Timeout in milliseconds for each Vitest command execution. */
+    readonly timeoutMs: number;
 }
 
 /**
@@ -178,6 +205,7 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
     let maxFiles: number | null = null;
     let dryRun = false;
     let keepReports = false;
+    let timeoutMs = DEFAULT_TIMEOUT_MS;
 
     for (let index = 0; index < argv.length; index += 1) {
         const token = argv[index];
@@ -217,6 +245,19 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
                 keepReports = true;
                 break;
             }
+            case "--timeout-ms": {
+                const rawValue = argv[index + 1];
+                if (!rawValue) {
+                    throw new Error("--timeout-ms expects a numeric value");
+                }
+                const parsed = Number.parseInt(rawValue, 10);
+                if (Number.isNaN(parsed) || parsed <= 0) {
+                    throw new Error("--timeout-ms must be a positive integer");
+                }
+                timeoutMs = parsed;
+                index += 1;
+                break;
+            }
             default: {
                 if (token.startsWith("-")) {
                     throw new Error(`Unknown flag: ${token}`);
@@ -234,6 +275,7 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
         keepReports,
         cwd: process.cwd(),
         explicitFiles,
+        timeoutMs,
     };
 }
 
@@ -247,10 +289,30 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
 async function collectTestFiles(
     options: CliOptions
 ): Promise<readonly string[]> {
+    console.log(
+        `[collectTestFiles] Starting collection with options: ${JSON.stringify({ ...options, cwd: "[redacted]" })}`
+    );
     if (options.explicitFiles.length > 0) {
-        return options.explicitFiles.map((file) =>
+        const resolved = options.explicitFiles.map((file) =>
             path.resolve(options.cwd, file)
         );
+        console.log(
+            `[collectTestFiles] Using explicit files: ${resolved.length}`
+        );
+        return resolved;
+    }
+
+    // Check if the config file exists; if not, warn and disable it to prevent hangs
+    let effectiveConfigPath = options.configPath;
+    if (effectiveConfigPath) {
+        try {
+            await access(effectiveConfigPath);
+        } catch {
+            console.warn(
+                `[collectTestFiles] Config file '${effectiveConfigPath}' does not exist. Proceeding without --config.`
+            );
+            effectiveConfigPath = null;
+        }
     }
 
     const listingRoot = await mkdtemp(path.join(tmpdir(), "vitest-list-"));
@@ -262,13 +324,14 @@ async function collectTestFiles(
         `--json=${listingFile}`,
         "--silent",
     ];
-    if (options.configPath) {
-        args.push("--config", options.configPath);
+    if (effectiveConfigPath) {
+        args.push("--config", effectiveConfigPath);
     }
 
     let candidateFiles: string[] = [];
     try {
-        await runVitestCommand(options.cwd, args);
+        console.log(`[collectTestFiles] Running vitest list command`);
+        await runVitestCommand(options.cwd, args, options.timeoutMs);
 
         const rawListing = await readFile(listingFile, "utf8");
         const parsed = JSON.parse(rawListing) as Array<
@@ -287,6 +350,9 @@ async function collectTestFiles(
                 `Unexpected test listing entry: ${JSON.stringify(entry, null, 2)}`
             );
         });
+        console.log(
+            `[collectTestFiles] Parsed ${candidateFiles.length} candidate files`
+        );
     } finally {
         await rm(listingRoot, { recursive: true, force: true });
     }
@@ -299,6 +365,7 @@ async function collectTestFiles(
         return filtered.slice(0, options.maxFiles);
     }
 
+    console.log(`[collectTestFiles] Filtered to ${filtered.length} files`);
     return filtered;
 }
 
@@ -316,6 +383,7 @@ async function evaluateTestFile(
     options: CliOptions,
     reportDir: string
 ): Promise<EvaluationResult> {
+    console.log(`[evaluateTestFile] Starting evaluation for ${testFile}`);
     const reportFile = path.join(reportDir, `${randomUUID()}.json`);
     const args = [
         "run",
@@ -326,11 +394,24 @@ async function evaluateTestFile(
         "--silent",
     ];
 
-    if (options.configPath) {
-        args.push("--config", options.configPath);
+    // Check if the config file exists; if not, warn and disable it to prevent hangs
+    let effectiveConfigPath = options.configPath;
+    if (effectiveConfigPath) {
+        try {
+            await access(effectiveConfigPath);
+        } catch {
+            console.warn(
+                `[evaluateTestFile] Config file '${effectiveConfigPath}' does not exist. Proceeding without --config.`
+            );
+            effectiveConfigPath = null;
+        }
     }
 
-    await runVitestCommand(options.cwd, args);
+    if (effectiveConfigPath) {
+        args.push("--config", effectiveConfigPath);
+    }
+
+    await runVitestCommand(options.cwd, args, options.timeoutMs);
 
     const rawReport = await readFile(reportFile, "utf8");
     const parsedReport = JSON.parse(rawReport) as {
@@ -355,7 +436,7 @@ async function evaluateTestFile(
         await rm(reportFile, { force: true });
     }
 
-    return {
+    const evaluation = {
         testFile,
         summary: {
             instrumentedFiles,
@@ -363,6 +444,10 @@ async function evaluateTestFile(
             isZeroCoverage,
         },
     };
+    console.log(
+        `[evaluateTestFile] Completed evaluation for ${testFile}: ${evaluation.summary.isZeroCoverage ? "zero coverage" : `${evaluation.summary.coveredStatements} statements`}`
+    );
+    return evaluation;
 }
 
 /**
@@ -395,17 +480,24 @@ async function prepareReportDirectory(keepReports: boolean): Promise<string> {
  */
 /* eslint-disable-next-line unicorn/prefer-top-level-await */
 void (async () => {
+    console.log(`[main] Script started at ${new Date().toISOString()}`);
     let options: CliOptions | null = null;
     let reportDir: string | null = null;
     let exitCode = 0;
     try {
+        console.log(`[main] Parsing CLI arguments`);
         options = parseCliArguments(process.argv.slice(2));
+        console.log(
+            `[main] Options parsed: ${JSON.stringify({ ...options, cwd: "[redacted]" })}`
+        );
 
+        console.log(`[main] Collecting test files`);
         const testFiles = await collectTestFiles(options);
         if (testFiles.length === 0) {
             console.warn("No test files found using the provided filters.");
             return;
         }
+        console.log(`[main] Collected ${testFiles.length} test files`);
 
         if (options.dryRun) {
             console.log("Discovered test files:");
@@ -437,7 +529,7 @@ void (async () => {
                         : `${evaluation.summary.coveredStatements} statements covered`
                 );
             } catch (error) {
-                console.error("failed");
+                console.error(`[main] Evaluation failed for ${file}`);
                 throw error;
             }
         }
@@ -481,9 +573,8 @@ void (async () => {
             }
         }
     } catch (error) {
-        console.error("Zero coverage detection failed.");
         console.error(
-            error instanceof Error ? (error.stack ?? error.message) : error
+            `[main] Script failed: ${error instanceof Error ? (error.stack ?? error.message) : error}`
         );
         exitCode = 1;
     } finally {

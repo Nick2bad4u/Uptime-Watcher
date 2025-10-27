@@ -11,7 +11,6 @@ import type { Site } from "@shared/types";
 
 import { SiteService } from "../../stores/sites/services/SiteService";
 import { logger } from "../../services/logger";
-import * as storeUtils from "../../stores/utils";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
@@ -33,11 +32,6 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
 vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
     waitForElectronBridge: mockWaitForElectronBridge,
-}));
-
-// Mock the waitForElectronAPI utility
-vi.mock("../../stores/utils", () => ({
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the IPC utilities
@@ -117,7 +111,6 @@ describe("SiteService Critical Coverage Tests", () => {
         vi.mocked((globalThis as any).electronAPI.sites.getSites).mockReset();
         vi.mocked((globalThis as any).electronAPI.sites.updateSite).mockReset();
         vi.mocked((globalThis as any).electronAPI.sites.removeSite).mockReset();
-        vi.mocked(storeUtils.waitForElectronAPI).mockReset();
         mockWaitForElectronBridge.mockReset();
 
         mockWaitForElectronBridge.mockImplementation(async () => {
@@ -134,7 +127,7 @@ describe("SiteService Critical Coverage Tests", () => {
         });
 
         // Set default resolved values
-        vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
         vi.mocked(
             (globalThis as any).electronAPI.sites.removeMonitor
         ).mockResolvedValue(createMockSiteSnapshot("site-123"));
@@ -158,9 +151,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "site-123";
             const monitorId = "monitor-456";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
@@ -173,7 +164,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             // Assert
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
@@ -189,16 +180,14 @@ describe("SiteService Critical Coverage Tests", () => {
             const monitorId = "monitor-456";
             const initError = new Error("Electron API initialization failed");
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockRejectedValue(
-                initError
-            );
+            mockWaitForElectronBridge.mockRejectedValue(initError);
 
             // Act & Assert
             await expect(
                 SiteService.removeMonitor(siteIdentifier, monitorId)
             ).rejects.toThrow("Electron API initialization failed");
 
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).not.toHaveBeenCalled();
@@ -210,9 +199,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const monitorId = "monitor-456";
             const ipcError = new Error("IPC communication failed");
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockRejectedValue(ipcError);
@@ -222,7 +209,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 SiteService.removeMonitor(siteIdentifier, monitorId)
             ).rejects.toThrow("IPC communication failed");
 
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
@@ -233,9 +220,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "";
             const monitorId = "";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
@@ -248,7 +233,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 "Monitor removal returned an invalid site snapshot for /"
             );
 
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith("", "");
@@ -267,9 +252,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "site-123-test@example.com";
             const monitorId = "monitor-456-special_chars!";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             const persistedSite = createMockSiteSnapshot(siteIdentifier);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
@@ -282,7 +265,7 @@ describe("SiteService Critical Coverage Tests", () => {
             );
 
             // Assert
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(siteIdentifier, monitorId);
@@ -295,12 +278,10 @@ describe("SiteService Critical Coverage Tests", () => {
             const monitorId = "monitor-456";
             const callOrder: string[] = [];
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockImplementation(
-                async () => {
-                    callOrder.push("initialize");
-                    return undefined;
-                }
-            );
+            mockWaitForElectronBridge.mockImplementation(async () => {
+                callOrder.push("initialize");
+                return undefined;
+            });
 
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
@@ -321,9 +302,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "site-123";
             const monitorId = "monitor-456";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockImplementation(
@@ -347,9 +326,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "site-123";
             const monitorId = "monitor-456";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
 
             // Temporarily remove the removeMonitor method
             const originalRemoveMonitor = (globalThis as any).electronAPI.sites
@@ -372,9 +349,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const siteIdentifier = "site-123";
             const monitorId = "monitor-456";
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockResolvedValue(false);
@@ -520,9 +495,7 @@ describe("SiteService Critical Coverage Tests", () => {
             // Arrange
             const initError = new Error("API unavailable");
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockRejectedValue(
-                initError
-            );
+            mockWaitForElectronBridge.mockRejectedValue(initError);
 
             // Act & Assert
             await expect(SiteService.initialize()).rejects.toThrow(
@@ -536,13 +509,11 @@ describe("SiteService Critical Coverage Tests", () => {
 
         it("should successfully initialize when API is available", async () => {
             // Arrange
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
 
             // Act & Assert
             await expect(SiteService.initialize()).resolves.toBeUndefined();
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -555,9 +526,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 { siteIdentifier: "site-3", monitorId: "monitor-3" },
             ];
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockImplementation(async (identifier: string) =>
@@ -570,7 +539,7 @@ describe("SiteService Critical Coverage Tests", () => {
             }
 
             // Assert
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledTimes(3);
@@ -593,9 +562,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 { siteIdentifier: "site-3", monitorId: "monitor-3" },
             ];
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockImplementation(async (identifier: string) =>
@@ -610,7 +577,7 @@ describe("SiteService Critical Coverage Tests", () => {
             await Promise.all(promises);
 
             // Assert
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledTimes(3);
@@ -621,9 +588,7 @@ describe("SiteService Critical Coverage Tests", () => {
             const longSiteId = "a".repeat(1000);
             const longMonitorId = "b".repeat(1000);
 
-            vi.mocked(storeUtils.waitForElectronAPI).mockResolvedValue(
-                undefined
-            );
+            mockWaitForElectronBridge.mockResolvedValue(undefined);
             vi.mocked(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).mockResolvedValue(createMockSiteSnapshot(longSiteId));
@@ -635,7 +600,7 @@ describe("SiteService Critical Coverage Tests", () => {
                 `Monitor removal returned an invalid site snapshot for ${longSiteId}/${longMonitorId}`
             );
 
-            expect(storeUtils.waitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 (globalThis as any).electronAPI.sites.removeMonitor
             ).toHaveBeenCalledWith(longSiteId, longMonitorId);
