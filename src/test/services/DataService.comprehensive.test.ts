@@ -11,11 +11,31 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import { DataService } from "../../services/DataService";
 
-// Mock the waitForElectronAPI utility
-const mockWaitForElectronAPI = vi.hoisted(() => vi.fn());
-vi.mock("../../stores/utils", () => ({
-    waitForElectronAPI: mockWaitForElectronAPI,
+const MOCK_BRIDGE_ERROR_MESSAGE =
+    "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
+// Mock the bridge readiness helper to control initialization behavior
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super(MOCK_BRIDGE_ERROR_MESSAGE);
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
 }));
+
+// Backwards-compatible alias for existing assertions
+const mockWaitForElectronAPI = mockWaitForElectronBridge;
 
 // Mock the logger
 const mockLogger = vi.hoisted(() => ({
@@ -81,7 +101,19 @@ describe("DataService", () => {
         };
 
         // Default successful initialization
-        mockWaitForElectronAPI.mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockReset();
+        mockWaitForElectronBridge.mockImplementation(async () => {
+            const bridge =
+                (globalThis as any).window?.electronAPI ??
+                (globalThis as any).electronAPI;
+
+            if (!bridge) {
+                throw new MockElectronBridgeNotReadyError({
+                    attempts: 1,
+                    reason: "ElectronAPI not available",
+                });
+            }
+        });
     });
 
     afterEach(() => {

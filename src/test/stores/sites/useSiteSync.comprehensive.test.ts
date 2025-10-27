@@ -816,13 +816,15 @@ describe("useSiteSync", () => {
                 const [sanitizedSites] =
                     mockDeps.setSites.mock.calls.at(-1) ?? [];
 
-                expect(Array.isArray(sanitizedSites)).toBe(true);
+                expect(Array.isArray(sanitizedSites)).toBeTruthy();
                 const sanitizedIdentifiers = sanitizedSites.map(
                     (site: Site) => site.identifier
                 );
 
-                const uniqueIdentifiers = [...new Set(identifiers)].sort();
-                const sortedSanitized = [...sanitizedIdentifiers].sort();
+                const uniqueIdentifiers = Array.from(
+                    new Set(identifiers)
+                ).toSorted();
+                const sortedSanitized = sanitizedIdentifiers.toSorted();
 
                 expect(sortedSanitized).toEqual(uniqueIdentifiers);
                 expect(new Set(sanitizedIdentifiers).size).toBe(

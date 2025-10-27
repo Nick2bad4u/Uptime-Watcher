@@ -21,6 +21,16 @@ export interface DuplicateSiteIdentifier {
     readonly occurrences: number;
 }
 
+/**
+ * Result of sanitizing a site collection by identifier.
+ */
+export interface SanitizedSitesByIdentifierResult {
+    /** Duplicate identifiers detected during sanitization. */
+    readonly duplicates: readonly DuplicateSiteIdentifier[];
+    /** Sanitized site collection with duplicates removed. */
+    readonly sanitizedSites: Site[];
+}
+
 /** Readonly tuple representing identifier/count pairs from the map scan. */
 type IdentifierCountEntry = readonly [identifier: string, occurrences: number];
 
@@ -100,22 +110,22 @@ export function ensureUniqueSiteIdentifiers(
 }
 
 /**
- * Removes duplicate site identifiers while preserving first occurrences.
+ * Returns sanitized site data alongside duplicate diagnostics.
  *
- * @param sites - Site collection to sanitize.
+ * @param sites - Site collection to evaluate.
  *
  * @returns Sanitized sites alongside duplicate identifier diagnostics.
  */
-export function sanitizeSitesByIdentifier(sites: readonly Site[]): {
-    readonly duplicates: readonly DuplicateSiteIdentifier[];
-    readonly sanitizedSites: Site[];
-} {
+// eslint-disable-next-line function-name/starts-with-verb -- "sanitize" is a valid verb for data cleansing operations.
+export function sanitizeSitesByIdentifier(
+    sites: readonly Site[]
+): SanitizedSitesByIdentifierResult {
     const duplicates = collectDuplicateSiteIdentifiers(sites);
 
     if (duplicates.length === 0) {
         return {
             duplicates,
-            sanitizedSites: [...sites],
+            sanitizedSites: Array.from(sites),
         };
     }
 
@@ -123,12 +133,10 @@ export function sanitizeSitesByIdentifier(sites: readonly Site[]): {
     const sanitizedSites: Site[] = [];
 
     for (const site of sites) {
-        if (seen.has(site.identifier)) {
-            continue;
+        if (!seen.has(site.identifier)) {
+            seen.add(site.identifier);
+            sanitizedSites.push(site);
         }
-
-        seen.add(site.identifier);
-        sanitizedSites.push(site);
     }
 
     return {

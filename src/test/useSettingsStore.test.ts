@@ -9,6 +9,25 @@ import type { AppSettings } from "../stores/types";
 
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super("Electron bridge not ready");
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
 // Mock electron API - Updated to match new domain-based structure
 const mockElectronAPI = {
     data: {},
@@ -55,6 +74,7 @@ vi.mock("../constants", () => ({
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
         // Reset store state to defaults
         useSettingsStore.setState({
             settings: {

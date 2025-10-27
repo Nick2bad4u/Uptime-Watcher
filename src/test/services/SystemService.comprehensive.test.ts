@@ -16,7 +16,19 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { SystemService } from "../../services/SystemService";
 
 // Mock dependencies using vi.hoisted for proper initialization order
-const mockWaitForElectronAPI = vi.hoisted(() => vi.fn());
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super("Electron bridge not ready");
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
 const mockLogger = vi.hoisted(() => ({
     error: vi.fn(),
     info: vi.fn(),
@@ -31,10 +43,12 @@ const mockElectronAPI = vi.hoisted(() => ({
     },
 }));
 
-// Mock modules
-vi.mock("../../stores/utils", () => ({
-    waitForElectronAPI: mockWaitForElectronAPI,
+vi.mock("../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
 }));
+
+const mockWaitForElectronAPI = mockWaitForElectronBridge;
 
 vi.mock("../../services/logger", () => ({
     logger: mockLogger,

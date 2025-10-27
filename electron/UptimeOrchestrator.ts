@@ -81,7 +81,7 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
-import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
+import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import {
     STATE_SYNC_ACTION,
     STATE_SYNC_SOURCE,
@@ -91,123 +91,30 @@ import {
 import {
     ApplicationError,
     type ApplicationErrorOptions,
-    ensureError,
 } from "@shared/utils/errorHandling";
 
-import type { EventReason, UptimeEvents } from "./events/eventTypes";
+import type { EventReason } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
+import type {
+    IsMonitoringActiveRequestData,
+    OrchestratorEvents,
+    RestartMonitoringRequestData,
+    SiteEventData,
+    StartMonitoringRequestData,
+    StopMonitoringRequestData,
+    UpdateSitesCacheRequestData,
+    UptimeOrchestratorDependencies,
+} from "./UptimeOrchestrator.types";
 
-import { DEFAULT_HISTORY_LIMIT } from "./constants";
+import { HistoryLimitCoordinator } from "./coordinators/HistoryLimitCoordinator";
 import {
     createErrorHandlingMiddleware,
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
 import { diagnosticsLogger, logger } from "./utils/logger";
-
-/**
- * Data structure for internal monitoring status check events.
- *
- * @remarks
- * Internal use only for coordinating between managers.
- */
-interface IsMonitoringActiveRequestData {
-    /** Site identifier for the status check */
-    identifier: string;
-    /** Specific monitor ID to check */
-    monitorId: string;
-}
-
-/**
- * Data structure for internal monitor restart events.
- *
- * @remarks
- * Internal use only for coordinating between managers.
- */
-interface RestartMonitoringRequestData {
-    /** Site identifier for the restart request */
-    identifier: string;
-    /** Monitor configuration for restart */
-    monitor: Monitor;
-}
-
-interface SiteEventData {
-    cascade?: boolean;
-    identifier?: string;
-    site?: Site;
-    source?: SiteAddedSource;
-    timestamp: number;
-    updatedFields?: string[];
-}
-
-/**
- * Data structure for internal start monitoring request events.
- *
- * @remarks
- * Internal use only for coordinating between managers.
- */
-interface StartMonitoringRequestData {
-    /** Site identifier for the monitoring request */
-    identifier: string;
-    /** Specific monitor ID to start (optional for starting all monitors) */
-    monitorId?: string;
-}
-
-/**
- * Data structure for internal stop monitoring request events.
- *
- * @remarks
- * Internal use only for coordinating between managers.
- */
-interface StopMonitoringRequestData {
-    /** Site identifier for the monitoring request */
-    identifier: string;
-    /** Specific monitor ID to stop (optional for stopping all monitors) */
-    monitorId?: string;
-}
-
-/**
- * Data structure for internal sites cache update events.
- *
- * @remarks
- * Internal use only for coordinating between managers.
- */
-interface UpdateSitesCacheRequestData {
-    /** Updated sites array for cache synchronization */
-    sites: Site[];
-}
-
-/**
- * Dependencies for UptimeOrchestrator.
- *
- * @remarks
- * Following the repository pattern and service layer architecture, these
- * managers encapsulate domain-specific operations and provide a clean
- * separation between data access and business logic.
- *
- * Each manager implements the service layer pattern with underlying repository
- * pattern for data persistence, ensuring consistent transaction handling and
- * domain boundaries.
- */
-export interface UptimeOrchestratorDependencies {
-    /** Database manager for data persistence operations */
-    databaseManager: DatabaseManager;
-    /** Monitor manager for monitoring lifecycle operations */
-    monitorManager: MonitorManager;
-    /** Site manager for site management operations */
-    siteManager: SiteManager;
-}
-
-/**
- * Combined event interface for the orchestrator.
- *
- * @remarks
- * Supports both internal manager events and public frontend events, providing a
- * unified event system for the entire application.
- */
-type OrchestratorEvents = UptimeEvents;
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
@@ -240,7 +147,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     // Manager instances
     private readonly siteManager: SiteManager;
 
-    private lastKnownHistoryLimit: number;
+    /** Coordinator for history-limit event forwarding. */
+    private readonly historyLimitCoordinator: HistoryLimitCoordinator;
 
     /** Event handler for sites cache update requests */
     private readonly handleUpdateSitesCacheRequestedEvent = (
@@ -300,50 +208,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:database:initialized:",
-                    error
-                );
-            }
-        })();
-    };
-
-    /** Event handler for history limit updates emitted by the database */
-    private readonly handleDatabaseHistoryLimitUpdatedEvent = (
-        eventData: OrchestratorEvents["internal:database:history-limit-updated"]
-    ): void => {
-        void (async (): Promise<void> => {
-            try {
-                const { limit, operation, timestamp } = eventData;
-
-                if (!Number.isFinite(limit) || limit <= 0) {
-                    logger.warn(
-                        "[UptimeOrchestrator] Ignoring history limit update with invalid payload",
-                        { limit, timestamp }
-                    );
-                    return;
-                }
-
-                const previousLimit = this.lastKnownHistoryLimit;
-                this.lastKnownHistoryLimit = limit;
-
-                logger.debug(
-                    "[UptimeOrchestrator] Forwarding history limit update to renderer",
-                    {
-                        limit,
-                        operation,
-                        previousLimit,
-                        timestamp,
-                    }
-                );
-
-                await this.emitTyped("settings:history-limit-updated", {
-                    limit,
-                    operation,
-                    previousLimit,
-                    timestamp,
-                });
-            } catch (error) {
-                logger.error(
-                    "[UptimeOrchestrator] Error handling internal:database:history-limit-updated:",
                     error
                 );
             }
@@ -1727,6 +1591,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @private
      */
     private removeEventHandlers(): void {
+        this.historyLimitCoordinator.unregister();
+
         // Remove database event handlers
         this.off(
             "internal:database:update-sites-cache-requested",
@@ -1735,10 +1601,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.off(
             "internal:database:get-sites-from-cache-requested",
             this.handleGetSitesFromCacheRequestedEvent
-        );
-        this.off(
-            "internal:database:history-limit-updated",
-            this.handleDatabaseHistoryLimitUpdatedEvent
         );
         this.off(
             "internal:database:initialized",
@@ -1818,7 +1680,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.databaseManager = dependencies.databaseManager;
         this.monitorManager = dependencies.monitorManager;
         this.siteManager = dependencies.siteManager;
-        this.lastKnownHistoryLimit = this.resolveInitialHistoryLimit();
+        this.historyLimitCoordinator = new HistoryLimitCoordinator({
+            databaseManager: this.databaseManager,
+            eventBus: this,
+        });
 
         // Set up event-driven communication between managers
         this.setupEventHandlers();
@@ -1863,12 +1728,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
 
         // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
         this.on(
-            "internal:database:history-limit-updated",
-            this.handleDatabaseHistoryLimitUpdatedEvent
-        );
-
-        // eslint-disable-next-line listeners/no-missing-remove-event-listener -- Database event listeners are intentionally persistent for the lifetime of the orchestrator
-        this.on(
             "internal:database:initialized",
             this.handleDatabaseInitializedEvent
         );
@@ -1893,6 +1752,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     private setupEventHandlers(): void {
         this.setupDatabaseEventHandlers();
+        this.historyLimitCoordinator.register();
         this.setupEventForwarding();
         this.setupMonitoringEventHandlers();
         this.setupSiteEventHandlers();
@@ -1911,41 +1771,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
         this.registerMiddleware(
             createLoggingMiddleware({ includeData: false, level: "info" })
         );
-    }
-
-    /**
-     * Safely resolves the initial history retention limit.
-     *
-     * @returns A positive history limit value.
-     */
-    private resolveInitialHistoryLimit(): number {
-        const { databaseManager } = this;
-
-        if (typeof databaseManager.getHistoryLimit !== "function") {
-            logger.warn(
-                "[UptimeOrchestrator] DatabaseManager missing getHistoryLimit; defaulting to configured baseline",
-                { defaultLimit: DEFAULT_HISTORY_LIMIT }
-            );
-            return DEFAULT_HISTORY_LIMIT;
-        }
-
-        try {
-            const limit = databaseManager.getHistoryLimit();
-
-            if (Number.isFinite(limit) && limit > 0) return limit;
-
-            logger.warn(
-                "[UptimeOrchestrator] DatabaseManager returned invalid history limit; defaulting to configured baseline",
-                { defaultLimit: DEFAULT_HISTORY_LIMIT, receivedLimit: limit }
-            );
-        } catch (error: unknown) {
-            logger.error(
-                "[UptimeOrchestrator] Failed to read history limit from DatabaseManager; defaulting to configured baseline",
-                ensureError(error)
-            );
-        }
-
-        return DEFAULT_HISTORY_LIMIT;
     }
 
     /**

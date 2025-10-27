@@ -60,6 +60,25 @@ import { safeExtractIpcData } from "../../../types/ipc";
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super("Electron bridge not ready");
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
 const mockSafeExtractIpcData = vi.mocked(safeExtractIpcData);
 const mockWithErrorHandling = vi.mocked(withErrorHandling);
 
@@ -80,6 +99,8 @@ Object.defineProperty(globalThis, "electronAPI", {
 describe("useSettingsStore - Targeted Coverage", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
 
         // Reset store to initial state
         useSettingsStore.setState({

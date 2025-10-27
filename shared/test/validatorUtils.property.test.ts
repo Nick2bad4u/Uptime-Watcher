@@ -254,16 +254,18 @@ describe("Validator Utils Property-Based Tests", () => {
             (url) => {
                 const result = isValidUrl(url);
 
-                let expected = false;
-                try {
-                    const parsed = new URL(url);
-                    expected =
-                        (parsed.protocol === "http:" ||
-                            parsed.protocol === "https:") &&
-                        Boolean(parsed.hostname);
-                } catch {
-                    expected = false;
-                }
+                const expected = (() => {
+                    try {
+                        const parsed = new URL(url);
+                        return (
+                            (parsed.protocol === "http:" ||
+                                parsed.protocol === "https:") &&
+                            Boolean(parsed.hostname)
+                        );
+                    } catch {
+                        return false;
+                    }
+                })();
 
                 expect(result).toBe(expected);
             }
