@@ -264,10 +264,12 @@ const monitorFallbackConsistencyRule = {
                     return;
                 }
 
-                /** @type {Map<
-    string,
-    import("@typescript-eslint/utils").TSESTree.ObjectExpression
->} */
+                /**
+                 * @type {Map<
+                 *     string,
+                 *     import("@typescript-eslint/utils").TSESTree.ObjectExpression
+                 * >}
+                 */
                 const optionMap = new Map();
                 const reportedNodes = new Set();
 
@@ -717,6 +719,7 @@ const preferSharedAliasRule = {
 
 /**
  * ESLint rule ensuring files outside of src reference renderer modules via the
+ *
  * @app alias.
  */
 const preferAppAliasRule = {

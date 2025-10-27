@@ -177,9 +177,9 @@ describe(SiteRepository, () => {
 
             await repository.upsert(siteData);
 
-            expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(
-                1
-            );
+            expect(
+                mockDatabaseService.executeTransaction
+            ).toHaveBeenCalledTimes(1);
             expect(mockDatabase.run).toHaveBeenCalledWith(
                 expect.stringContaining("INSERT"),
                 expect.any(Array)
