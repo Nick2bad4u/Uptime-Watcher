@@ -21,6 +21,9 @@ type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
 
 import { EventsService } from "../../services/EventsService";
 
+const MOCK_BRIDGE_ERROR_MESSAGE =
+    "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
+
 // Mock the bridge readiness helper to control initialization behavior
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 
@@ -30,7 +33,7 @@ const MockElectronBridgeNotReadyError = vi.hoisted(
             public readonly diagnostics: unknown;
 
             public constructor(diagnostics: unknown) {
-                super("Electron bridge not ready");
+                super(MOCK_BRIDGE_ERROR_MESSAGE);
                 this.name = "ElectronBridgeNotReadyError";
                 this.diagnostics = diagnostics;
             }
@@ -134,7 +137,19 @@ describe("EventsService", () => {
         };
 
         // Default successful initialization
-        mockWaitForElectronBridge.mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockReset();
+        mockWaitForElectronBridge.mockImplementation(async () => {
+            const bridge =
+                (globalThis as any).window?.electronAPI ??
+                (globalThis as any).electronAPI;
+
+            if (!bridge) {
+                throw new MockElectronBridgeNotReadyError({
+                    attempts: 1,
+                    reason: "ElectronAPI not available",
+                });
+            }
+        });
     });
 
     afterEach(() => {

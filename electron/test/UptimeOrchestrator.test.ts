@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
-import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator";
+import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator.types";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";

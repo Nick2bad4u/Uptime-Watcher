@@ -12,11 +12,13 @@
 
 import { isDevelopment } from "@shared/utils/environment";
 
-import { waitForElectronBridge } from "../services/utils/electronBridgeReadiness";
-
 import type { BaseStore } from "./types";
 
 import { logger } from "../services/logger";
+import {
+    type ElectronBridgeContract,
+    waitForElectronBridge,
+} from "../services/utils/electronBridgeReadiness";
 
 /**
  * Creates a base store slice with common error handling functionality.
@@ -214,11 +216,12 @@ export const logStoreAction = (
  */
 export async function waitForElectronAPI(
     maxAttempts = 50,
-    baseDelay = 100
+    baseDelay = 100,
+    contracts?: readonly ElectronBridgeContract[]
 ): Promise<void> {
     await waitForElectronBridge({
         baseDelay,
-        contracts: [
+        contracts: contracts ?? [
             {
                 domain: "sites",
                 methods: ["getSites"],

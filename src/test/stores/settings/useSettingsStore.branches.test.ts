@@ -8,6 +8,26 @@ import { act, renderHook } from "@testing-library/react";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { logger } from "../../../services/logger";
 
+// Mock the bridge readiness helper to avoid real polling during tests
+const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+const MockElectronBridgeNotReadyError = vi.hoisted(
+    () =>
+        class extends Error {
+            public readonly diagnostics: unknown;
+
+            public constructor(diagnostics: unknown) {
+                super("Electron bridge not ready");
+                this.name = "ElectronBridgeNotReadyError";
+                this.diagnostics = diagnostics;
+            }
+        }
+);
+
+vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
+    ElectronBridgeNotReadyError: MockElectronBridgeNotReadyError,
+    waitForElectronBridge: mockWaitForElectronBridge,
+}));
+
 // Mock extractIpcData
 vi.mock("../../../types/ipc", () => ({
     extractIpcData: vi.fn(),
@@ -88,6 +108,8 @@ describe("useSettingsStore Branch Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
 
         // Setup default mock returns
         mockElectronAPI.settings.getHistoryLimit.mockResolvedValue(1000);

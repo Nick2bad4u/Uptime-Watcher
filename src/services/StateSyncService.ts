@@ -123,6 +123,12 @@ export const StateSyncService: StateSyncServiceContract = {
             );
 
             return resolveCleanupHandler(unsubscribeCandidate, {
+                handleCleanupError: (error: unknown) => {
+                    logger.error(
+                        "[StateSyncService] Failed to cleanup state sync subscription:",
+                        ensureError(error)
+                    );
+                },
                 handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
                     logger.error(
                         "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
@@ -137,12 +143,6 @@ export const StateSyncService: StateSyncServiceContract = {
                             "[StateSyncService] Skip cleanup, unsubscribe handler was not a function"
                         );
                     };
-                },
-                handleCleanupError: (error: unknown) => {
-                    logger.error(
-                        "[StateSyncService] Failed to cleanup state sync subscription:",
-                        ensureError(error)
-                    );
                 },
             });
         }

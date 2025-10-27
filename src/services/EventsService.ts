@@ -104,13 +104,13 @@ const isMonitoringStoppedEventData = (
  *
  * @returns A no-op cleanup function that logs a descriptive error when invoked.
  */
-const createInvalidCleanupFallback = (eventName: string): (() => void) => {
-    return (): void => {
+const createInvalidCleanupFallback =
+    (eventName: string): (() => void) =>
+    (): void => {
         logger.error(
             `[EventsService] Cleanup skipped for ${eventName}: invalid cleanup handler returned by preload bridge`
         );
     };
-};
 
 /**
  * Subscribes to a preload-managed event while enforcing cleanup contract
@@ -123,9 +123,15 @@ const createInvalidCleanupFallback = (eventName: string): (() => void) => {
  */
 const subscribeWithValidation = async (
     eventName: string,
-    register: () => unknown | Promise<unknown>
+    register: () => unknown
 ): Promise<() => void> =>
     subscribeWithValidatedCleanup(register, {
+        handleCleanupError: (error: unknown) => {
+            logger.error(
+                `[EventsService] Failed to cleanup ${eventName} listener:`,
+                ensureError(error)
+            );
+        },
         handleInvalidCleanup: ({ actualType, cleanupCandidate }) => {
             logger.error(
                 `[EventsService] Preload bridge returned an invalid cleanup handler for ${eventName}`,
@@ -136,12 +142,6 @@ const subscribeWithValidation = async (
             );
 
             return createInvalidCleanupFallback(eventName);
-        },
-        handleCleanupError: (error: unknown) => {
-            logger.error(
-                `[EventsService] Failed to cleanup ${eventName} listener:`,
-                ensureError(error)
-            );
         },
     });
 

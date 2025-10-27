@@ -228,18 +228,14 @@ describe("SiteManager - Comprehensive", () => {
             []
         );
 
-        mockCache.get.mockImplementation((key: string) =>
-            cacheStore.get(key)
-        );
+        mockCache.get.mockImplementation((key: string) => cacheStore.get(key));
         mockCache.set.mockImplementation((key: string, value: Site) => {
             cacheStore.set(key, value);
         });
         mockCache.delete.mockImplementation((key: string) =>
             cacheStore.delete(key)
         );
-        mockCache.has.mockImplementation((key: string) =>
-            cacheStore.has(key)
-        );
+        mockCache.has.mockImplementation((key: string) => cacheStore.has(key));
         mockCache.clear.mockImplementation(() => {
             cacheStore.clear();
         });
@@ -757,10 +753,9 @@ describe("SiteManager - Comprehensive", () => {
 
             mockCache.set(cachedSite.identifier, cachedSite);
 
-            const snapshot =
-                await siteManager["getSiteSnapshotForMutation"](
-                    cachedSite.identifier
-                );
+            const snapshot = await siteManager["getSiteSnapshotForMutation"](
+                cachedSite.identifier
+            );
 
             expect(snapshot).toEqual(cachedSite);
             expect(snapshot).not.toBe(cachedSite);
@@ -788,10 +783,9 @@ describe("SiteManager - Comprehensive", () => {
                 databaseSite
             );
 
-            const snapshot =
-                await siteManager["getSiteSnapshotForMutation"](
-                    databaseSite.identifier
-                );
+            const snapshot = await siteManager["getSiteSnapshotForMutation"](
+                databaseSite.identifier
+            );
 
             expect(snapshot).toEqual(databaseSite);
             expect(mockCache.get(databaseSite.identifier)).toEqual(
@@ -848,11 +842,7 @@ describe("SiteManager - Comprehensive", () => {
 
             const updatedSite: Site = {
                 ...siteWithTwoMonitors,
-                monitors: [
-                    structuredClone(
-                        siteWithTwoMonitors.monitors[1]!
-                    ),
-                ],
+                monitors: [structuredClone(siteWithTwoMonitors.monitors[1]!)],
             };
 
             mockSiteWriterServiceInstance.updateSite.mockResolvedValue(
@@ -864,13 +854,11 @@ describe("SiteManager - Comprehensive", () => {
                 "monitor-1"
             );
 
-            expect(mockSiteWriterServiceInstance.updateSite).toHaveBeenCalledWith(
-                mockCache,
-                siteWithTwoMonitors.identifier,
-                {
-                    monitors: [expect.objectContaining({ id: "monitor-2" })],
-                }
-            );
+            expect(
+                mockSiteWriterServiceInstance.updateSite
+            ).toHaveBeenCalledWith(mockCache, siteWithTwoMonitors.identifier, {
+                monitors: [expect.objectContaining({ id: "monitor-2" })],
+            });
             expect(result.monitors).toHaveLength(1);
             const [remainingMonitor] = result.monitors;
             expect(remainingMonitor).toBeDefined();
@@ -913,7 +901,9 @@ describe("SiteManager - Comprehensive", () => {
                 )
             ).rejects.toThrow(ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST);
 
-            expect(mockSiteWriterServiceInstance.updateSite).not.toHaveBeenCalled();
+            expect(
+                mockSiteWriterServiceInstance.updateSite
+            ).not.toHaveBeenCalled();
         });
 
         it("should surface writer errors", async ({ task, annotate }) => {
@@ -944,7 +934,10 @@ describe("SiteManager - Comprehensive", () => {
             ).rejects.toThrow("Update failed");
         });
 
-        it("should throw when the site is missing", async ({ task, annotate }) => {
+        it("should throw when the site is missing", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: SiteManager", "component");
             await annotate("Category: Manager", "category");
@@ -1711,7 +1704,6 @@ describe("SiteManager - Comprehensive", () => {
             expect(result).toBe("");
         });
     });
-
 
     describe("Integration Tests", () => {
         it("should handle complex site lifecycle", async ({
