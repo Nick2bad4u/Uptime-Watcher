@@ -21,11 +21,11 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ## 2. Canonical IPC & Event Channels
 
-| Concern                | Invoke Channel(s)                                                          | Renderer Event(s)                             | Notes                                                                                                                   |
-| ---------------------- | -------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`              | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.             |
-| Manual checks          | `check-monitor` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
-| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`       | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
+| Concern                | Invoke Channel(s)                                                           | Renderer Event(s)                             | Notes                                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`               | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.             |
+| Manual checks          | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
+| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
 
 > 🔗 Authoritative reference: `docs/Architecture/generated/ipc-channel-inventory.md` (auto-generated; do **not** edit manually).
 
@@ -113,8 +113,8 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 
 ## 6. Tooling & Automation
 
-- **Drift detection**: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI.
-- **Artifact regeneration**: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/ipc-channel-inventory.md`.
+- **Drift detection**: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI. See the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide for full instructions.
+- **Artifact regeneration**: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/ipc-channel-inventory.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
 - **Benchmarks**: When tweaking event payloads, run `npm run bench:tsnode` to ensure typed event bus throughput remains acceptable.
 
 ---

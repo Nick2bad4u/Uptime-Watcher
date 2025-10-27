@@ -1,7 +1,7 @@
 # 📊 Uptime Watcher
 
 <div align="center"><a href="https://github.com/Nick2bad4u/Uptime-Watcher/releases">
-  <img src="https://img.shields.io/badge/version-15.5.0-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-17.4.0-blue.svg" alt="Version">
 </a>
 <a href="LICENSE">
   <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
@@ -76,6 +76,8 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 - **📜 Historical Data**: Comprehensive uptime history with SQLite storage
 - **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
 - **💾 Data Persistence**: Local SQLite database with backup/restore functionality
+- **🔁 Retention Sync**: Renderer settings stay aligned with orchestrator/database changes via `settings:history-limit-updated`
+- **⚡ Instant Manual Checks**: Optimistic status updates immediately after manual monitor checks resolve
 
 ## Monitor types
 
@@ -169,7 +171,7 @@ cd Uptime-Watcher
 npm install
 
 # Start development environment
-npm run electron-dev
+npm run electron-dev               # Append flags if needed: npm run electron-dev -- --log-debug
 ```
 
 ## Screenshots & demo
@@ -199,7 +201,7 @@ npm run dev
 npm run electron
 
 # Start both Vite and Electron concurrently (recommended)
-npm run electron-dev
+npm run electron-dev               # Supports flags: npm run electron-dev -- --log-debug
 
 # Build for production
 npm run build
@@ -239,6 +241,13 @@ For running and tuning our fast-check based fuzzing suites, see:
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
 - Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
+
+### IPC automation workflow
+
+- `npm run generate:ipc` – Regenerates preload bridge typings and the channel inventory.
+- `npm run check:ipc` – Validates that generated artifacts are in sync; this command runs in CI.
+
+Need deeper guidance? See the [IPC Automation Workflow](./docs/Guides/IPC_AUTOMATION_WORKFLOW.md) guide for examples, troubleshooting, and CI integration tips.
 
 ## Architectural principles
 
@@ -371,4 +380,4 @@ We welcome contributions from the community! Here's how you can help:
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
-<em>Last updated: September 2025 • Version 15.5.0</em></div>
+<em>Last updated: October 2025 • Version 17.4.0</em></div>

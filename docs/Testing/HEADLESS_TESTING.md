@@ -52,9 +52,10 @@ npx playwright test --headed  # For browser portions only
 ### Manual Electron Launch (Headless)
 
 ```bash
-HEADLESS=true npm run start
-# or
-npm run start -- --headless
+cross-env HEADLESS=true npm run electron-dev
+# or (run Vite separately, then launch Electron headless)
+npm run dev
+npm run electron -- --headless
 ```
 
 ### CI Environment

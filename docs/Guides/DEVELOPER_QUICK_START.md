@@ -25,12 +25,12 @@ npm install
 ### 2. Start Development
 
 ```bash
-# Start both Vite dev server and Electron
-npm run start
+# Start both Vite dev server and Electron (concurrently)
+npm run electron-dev               # Append flags as needed: npm run electron-dev -- --log-debug
 
-# Or start separately:
-npm run dev          # Vite dev server (port 5173)
-npm run start:electron     # Electron (waits for Vite)
+# Or start separately (two terminals recommended):
+npm run dev           # Terminal 1: Vite dev server (port 5173)
+npm run electron      # Terminal 2: Electron shell (waits for Vite)
 ```
 
 ### 3. Verify Setup
@@ -167,6 +167,13 @@ npm run docs          # Generate TypeDoc documentation
 npm run context       # Generate AI context (for AI assistants)
 ```
 
+### IPC Automation
+
+```bash
+npm run generate:ipc  # Regenerate preload bridge typings + channel inventory
+npm run check:ipc      # Ensure generated IPC artifacts are in sync with schemas
+```
+
 ## 🎯 Key Development Patterns
 
 ### 1. Repository Pattern (Database)
@@ -221,7 +228,28 @@ const handleCreateSite = async (siteData: SiteCreationData) => {
 };
 ```
 
-### 3. Event-Driven Updates with TypedEventBus
+### 3. Optimistic Manual Monitor Checks
+
+Manual health checks resolve with enriched `StatusUpdate` payloads so the UI can update before the event bus broadcasts the completion event.
+
+```typescript
+// Renderer: src/stores/sites/useSiteMonitoring.ts
+const { checkSiteNow } = createSiteMonitoringActions({
+ applyStatusUpdate: applyStatusUpdateSnapshot,
+ getSites: () => get().sites,
+ monitoringService: MonitoringService,
+ setSites: (sites) => set({ sites }),
+});
+
+await checkSiteNow(siteIdentifier, monitorId);
+// The sites store updates immediately; follow-up events keep the UI in sync.
+```
+
+- Optimistic updates reuse `applyStatusUpdateSnapshot`, ensuring the same merge logic as the event-driven flow.
+- Telemetry (`logStoreAction`) captures whether the optimistic payload was applied for observability.
+- Subsequent `monitor:check-completed` or `monitor:status-changed` events reconcile the state and are idempotent.
+
+### 4. Event-Driven Updates with TypedEventBus
 
 Cross-service communication uses type-safe events:
 
@@ -245,7 +273,7 @@ useEffect(() => {
 }, []);
 ```
 
-### 4. Modular Zustand Store Pattern
+### 5. Modular Zustand Store Pattern
 
 Complex stores use modular composition for maintainability:
 
@@ -276,7 +304,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 const { sites, addSite, startMonitoring } = useSitesStore();
 ```
 
-### 5. Shared Validation Patterns
+### 6. Shared Validation Patterns
 
 Use centralized validation for consistency:
 
@@ -344,14 +372,14 @@ registerStandardizedIpcHandler(
 ### Logging
 
 ```bash
-# Enable debug logging
-npm run electron-dev -- --debug
+# Start Vite + Electron together and forward flags directly to Electron
+npm run electron-dev -- --log-debug      # Verbose debug logs
+npm run electron-dev -- --log-production # Production-style logging
+npm run electron-dev -- --log-info       # Info-level logging
 
-# Production-level logging
-npm run electron-dev -- --log-production
-
-# Info-level logging
-npm run electron-dev -- --log-info
+# Fallback: run processes manually if you need deeper customization
+npm run dev
+npm run electron -- --log-debug
 ```
 
 ## 📚 Essential Documentation

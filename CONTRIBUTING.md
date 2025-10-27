@@ -28,12 +28,12 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 3. **Start Development Environment**
 
    ```bash
-   npm run dev
+   npm run electron-dev
    ```
 
 4. **Verify Setup**
-   - The application should launch successfully
-   - Check that hot reloading works by making a small change
+   - The application window should launch successfully (Vite + Electron)
+   - Check that hot reloading works by making a small change in `src/`
 
 ## 📋 Development Guidelines
 
@@ -49,7 +49,8 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 | Script                   | Purpose      | Description                                    |
 | ------------------------ | ------------ | ---------------------------------------------- |
 | `npm run dev`            | Development  | Start Vite dev server for frontend development |
-| `npm run start`          | Full App     | Launch complete application (dev + electron)   |
+| `npm run electron-dev`   | Full App     | Launch complete application (Vite + Electron)  |
+| `npm run electron`       | Electron     | Launch Electron shell (requires Vite running)  |
 | `npm run build`          | Production   | Build application for production               |
 | `npm run test`           | Testing      | Run all test suites (unit, integration, E2E)   |
 | `npm run lint`           | Code Quality | Check code formatting and style                |
@@ -204,8 +205,9 @@ Use the feature request template and include:
 | Category          | Script                     | Description                                                       |
 | ----------------- | -------------------------- | ----------------------------------------------------------------- |
 | **Development**   | `npm run dev`              | Start Vite dev server                                             |
-|                   | `npm run start`            | Launch complete application                                       |
-|                   | `npm run start-both`       | Start dev server + electron concurrently                          |
+|                   | `npm run electron`         | Launch Electron shell (requires Vite dev server)                  |
+|                   | `npm run electron-dev`     | Start dev server + Electron concurrently                          |
+|                   | `npm run start-both`       | Alias for `electron-dev`                                          |
 | **Building**      | `npm run build`            | Build for production                                              |
 |                   | `npm run clean`            | Clean all build artifacts                                         |
 | **Code Quality**  | `npm run lint`             | Run ESLint checks                                                 |

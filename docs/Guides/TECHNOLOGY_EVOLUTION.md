@@ -89,6 +89,7 @@ Error Handling: Centralized error store with withErrorHandling utility
   - `npm run check:ipc` enforces documentation parity during CI runs.
 - 📓 Updated the development patterns guide to codify the new synchronization
   responsibilities for settings and manual checks.
+- 📘 Authored the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide to document the end-to-end process for contributors.
 
 ### 🗃️ Database Migration: LowDB → SQLite
 

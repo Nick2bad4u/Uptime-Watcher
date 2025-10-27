@@ -73,11 +73,11 @@ npm run dev -- --port 5174
 **Solutions**:
 
 ```bash
-# Check for hanging connections
-npm run electron-dev -- --debug
-# Look for unclosed database connections in logs
+# Inspect debug output (forwards flags while starting Vite + Electron together)
+npm run electron-dev -- --log-debug
+# Review the console for unclosed database connections
 
-# Force restart
+# Force restart if processes become unresponsive
 pkill -f electron
 npm run electron-dev
 ```

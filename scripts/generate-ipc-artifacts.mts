@@ -13,6 +13,11 @@ import {
     SyntaxKind,
 } from "ts-morph";
 
+/**
+ * Normalized renderer event metadata derived from the canonical schema.
+ *
+ * @internal
+ */
 interface RendererEventDefinition {
     channel: string;
     methodSuffix: string;
@@ -92,6 +97,15 @@ for (const property of payloadInterface.getProperties()) {
     payloadPropertyMap.set(channelName, { description });
 }
 
+/**
+ * Breaks an IPC channel name into PascalCase-friendly segments.
+ *
+ * @param input - Raw channel identifier such as
+ *   `settings:history-limit-updated`.
+ *
+ * @returns Array of normalized string segments used for method suffix
+ *   construction.
+ */
 function splitSegments(input: string): string[] {
     return input
         .split(/[:_-]/u)
@@ -105,6 +119,13 @@ function splitSegments(input: string): string[] {
 
 const prefixExclusions = new Set(["settings"]);
 
+/**
+ * Derives a stable method suffix for the generated bridge contract.
+ *
+ * @param channel - Renderer event channel name.
+ *
+ * @returns Suffix appended to `on` for bridge listener method names.
+ */
 function deriveMethodSuffix(channel: string): string {
     const [potentialPrefix, ...rest] = channel.split(":");
     const segments =
@@ -117,6 +138,14 @@ function deriveMethodSuffix(channel: string): string {
     return segments.flatMap((segment) => splitSegments(segment)).join("");
 }
 
+/**
+ * Builds a TSDoc summary for a generated bridge listener.
+ *
+ * @param description - Schema-sourced description of the renderer event.
+ * @param channel - Renderer channel identifier.
+ *
+ * @returns Fully formatted multi-line comment block.
+ */
 function formatDocComment(description: string, channel: string): string {
     const normalizedDescription = description.trim().replaceAll(/\s+/gu, " ");
     const summary =
@@ -286,6 +315,15 @@ const docPath = path.resolve(
 const normalizeForComparison = (content: string): string =>
     content.replaceAll("\r\n", "\n").trim();
 
+/**
+ * Formats generated output using the repository Prettier configuration.
+ *
+ * @param targetPath - Path used to resolve the appropriate Prettier
+ *   parser/config.
+ * @param content - Unformatted file contents.
+ *
+ * @returns The prettified artifact.
+ */
 async function formatWithPrettier(
     targetPath: string,
     content: string
@@ -299,12 +337,23 @@ async function formatWithPrettier(
     });
 }
 
+/**
+ * Result structure returned by artifact writes or drift checks.
+ */
 interface WriteOrCheckResult {
     success: boolean;
     path: string;
     message: string;
 }
 
+/**
+ * Writes a generated artifact to disk or verifies parity in check mode.
+ *
+ * @param targetPath - Destination file path for the artifact.
+ * @param content - Generated file contents prior to formatting.
+ *
+ * @returns Summary of the write/check outcome.
+ */
 async function writeOrCheck(
     targetPath: string,
     content: string
@@ -372,6 +421,9 @@ async function writeOrCheck(
     }
 }
 
+/**
+ * Entrypoint coordinating artifact generation or drift detection.
+ */
 async function main(): Promise<void> {
     const mode = checkMode ? "CHECK" : "GENERATE";
     console.log(`[ipc-artifacts] Starting IPC artifacts ${mode} mode...`);
