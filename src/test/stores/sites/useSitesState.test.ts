@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
-import type { SiteSyncDelta } from "../../../stores/sites/siteSyncDelta";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import {
     createSitesStateActions,

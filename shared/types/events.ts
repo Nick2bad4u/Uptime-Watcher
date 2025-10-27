@@ -15,8 +15,10 @@ import { siteSchema } from "@shared/validation/schemas";
 import * as z from "zod";
 
 import {
+    type SiteSyncDelta,
     type StateSyncAction,
     stateSyncActionSchema,
+    siteSyncDeltaSchema,
     type StateSyncSource,
     stateSyncSourceSchema,
 } from "./stateSync";
@@ -159,6 +161,8 @@ export interface StateSyncEventData extends BaseEventData {
     readonly sites: Site[];
     /** Source system that triggered the sync */
     readonly source: StateSyncSource;
+    /** Structured delta describing how the site collection changed */
+    readonly delta?: SiteSyncDelta;
 }
 
 const stateSyncSitesArraySchema = siteSchema.array();
@@ -173,6 +177,7 @@ export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
             siteIdentifier: z.string().min(1).optional(),
             sites: stateSyncSitesArraySchema,
             source: stateSyncSourceSchema,
+            delta: siteSyncDeltaSchema.optional(),
         })
         .strict();
 

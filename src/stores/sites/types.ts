@@ -17,7 +17,7 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
-import type { SiteSyncDelta } from "./siteSyncDelta";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 /**
  * Sites store actions interface for managing site operations.

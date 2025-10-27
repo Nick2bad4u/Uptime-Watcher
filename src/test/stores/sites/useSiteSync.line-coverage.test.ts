@@ -14,6 +14,13 @@ const LISTENER_NAMES = [
     "monitoring-stopped",
 ];
 
+const buildSite = (identifier: string): Site => ({
+    identifier,
+    monitoring: true,
+    monitors: [],
+    name: `Site ${identifier}`,
+});
+
 const buildListenerStates = (attachedCount: number) =>
     LISTENER_NAMES.map((name, index) => ({
         attached: index < attachedCount,
@@ -332,15 +339,16 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const deleteEvent = {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
-                sites: mockSites,
+                sites: [],
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
             // Trigger delete event (line 296-297)
+            mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([]);
         });
 
         it("should handle update event and apply provided snapshot", async ({
@@ -365,15 +373,28 @@ describe("useSiteSync - Line Coverage Completion", () => {
             const updateEvent = {
                 action: "update" as const,
                 siteIdentifier: "site-1",
-                sites: mockSites,
+                sites: [
+                    {
+                        ...buildSite("site-1"),
+                        name: "Updated Site 1",
+                    },
+                ],
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
             // Trigger update event (line 296-297)
+            mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(updateEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        identifier: "site-1",
+                        name: "Updated Site 1",
+                    }),
+                ])
+            );
             expect(mockStateSyncService.requestFullSync).not.toHaveBeenCalled();
         });
 
@@ -506,6 +527,7 @@ describe("useSiteSync - Line Coverage Completion", () => {
                 timestamp: Date.now(),
             };
 
+            mockDeps.getSites.mockReturnValueOnce([]);
             eventHandler(bulkSyncEvent);
 
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);

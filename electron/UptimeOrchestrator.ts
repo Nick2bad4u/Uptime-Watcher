@@ -862,6 +862,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     }
 
     /**
+     * Retrieves the current number of cached sites without touching the
+     * database.
+     *
+     * @remarks
+     * Leverages the {@link SiteManager} in-memory cache to avoid redundant
+     * round-trips through the repository layer when only aggregate metadata is
+     * required (for example, sync status calls).
+     *
+     * @returns The number of sites currently tracked in the cache.
+     */
+    public getCachedSiteCount(): number {
+        return this.siteManager.getSitesFromCache().length;
+    }
+
+    /**
      * Emits a sanitized site state synchronization event.
      *
      * @remarks

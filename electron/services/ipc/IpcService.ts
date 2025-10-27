@@ -1117,10 +1117,10 @@ export class IpcService {
         registerStandardizedIpcHandler(
             "get-sync-status",
             async () => {
-                const sites = await this.uptimeOrchestrator.getSites();
+                const siteCount = this.uptimeOrchestrator.getCachedSiteCount();
                 const summary: StateSyncStatusSummary = {
                     lastSyncAt: this.stateSyncStatus.lastSyncAt ?? null,
-                    siteCount: sites.length,
+                    siteCount,
                     source: this.stateSyncStatus.source,
                     synchronized: this.stateSyncStatus.synchronized,
                 };

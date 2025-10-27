@@ -160,11 +160,33 @@ const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
         }
     });
 
+const siteSyncDeltaUpdatedSiteSchema = z
+    .object({
+        identifier: z.string().min(1),
+        next: siteOutputSchema,
+        previous: siteOutputSchema,
+    })
+    .strict();
+
+const siteSyncDeltaSchemaInternal = z
+    .object({
+        addedSites: stateSyncSitesSchema,
+        removedSiteIdentifiers: z.array(z.string().min(1)),
+        updatedSites: z.array(siteSyncDeltaUpdatedSiteSchema),
+    })
+    .strict();
+
 /**
  * Zod schema validating full synchronization results.
  */
 export const stateSyncFullSyncResultSchema: typeof stateSyncFullSyncResultSchemaInternal =
     stateSyncFullSyncResultSchemaInternal;
+
+/**
+ * Zod schema describing valid {@link SiteSyncDelta} payloads.
+ */
+export const siteSyncDeltaSchema: typeof siteSyncDeltaSchemaInternal =
+    siteSyncDeltaSchemaInternal;
 
 /**
  * Summary returned from a `getSyncStatus` request.
@@ -183,6 +205,13 @@ export type StateSyncStatusSummary = z.infer<
 export type StateSyncFullSyncResult = z.infer<
     typeof stateSyncFullSyncResultSchema
 >;
+
+/**
+ * Structured delta describing how the site collection changed during a sync.
+ *
+ * @public
+ */
+export type SiteSyncDelta = z.infer<typeof siteSyncDeltaSchema>;
 
 /**
  * Safe parse result type for {@link StateSyncStatusSummary} payloads.

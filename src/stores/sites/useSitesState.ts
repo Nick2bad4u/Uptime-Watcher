@@ -15,7 +15,7 @@ import {
 } from "@shared/validation/siteIntegrity";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
-import type { SiteSyncDelta } from "./siteSyncDelta";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";

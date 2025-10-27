@@ -488,9 +488,16 @@ describe("useSiteSync", () => {
                 timestamp: Date.now(),
             };
 
+            mockDeps.getSites.mockReturnValueOnce([]);
             eventHandler(bulkSyncEvent);
 
             expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.onSiteDelta).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    addedSites: expect.arrayContaining(mockSites),
+                    removedSiteIdentifiers: [],
+                })
+            );
         });
 
         it("should handle delete events", async ({ task, annotate }) => {
@@ -513,19 +520,20 @@ describe("useSiteSync", () => {
             const deleteEvent = {
                 action: "delete" as const,
                 siteIdentifier: "site-1",
-                sites: mockSites,
+                sites: [],
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
+            mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(deleteEvent);
 
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith([]);
             expect(mockDeps.onSiteDelta).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    addedSites: expect.any(Array),
-                    removedSiteIdentifiers: expect.any(Array),
-                    updatedSites: expect.any(Array),
+                    addedSites: [],
+                    removedSiteIdentifiers: ["site-1"],
+                    updatedSites: [],
                 })
             );
         });
@@ -620,15 +628,35 @@ describe("useSiteSync", () => {
             const updateEvent = {
                 action: "update" as const,
                 siteIdentifier: "site-1",
-                sites: mockSites,
+                sites: [
+                    {
+                        ...buildSite("site-1"),
+                        name: "Updated Site 1",
+                    },
+                ],
                 source: "frontend" as const,
                 timestamp: Date.now(),
             };
 
+            mockDeps.getSites.mockReturnValueOnce([buildSite("site-1")]);
             eventHandler(updateEvent);
 
             expect(mockStateSyncService.requestFullSync).not.toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        identifier: "site-1",
+                        name: "Updated Site 1",
+                    }),
+                ])
+            );
+            expect(mockDeps.onSiteDelta).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    updatedSites: expect.arrayContaining([
+                        expect.objectContaining({ identifier: "site-1" }),
+                    ]),
+                })
+            );
         });
 
         it("logs and propagates duplicate identifiers received via sync events", async ({

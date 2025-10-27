@@ -634,6 +634,22 @@ describe(UptimeOrchestrator, () => {
             expect(mockSiteManager.getSites).toHaveBeenCalled();
             expect(result).toEqual([]);
         });
+
+        it("should expose cached site count without reloading from the database", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Caching", "type");
+
+            const count = orchestrator.getCachedSiteCount();
+
+            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+            expect(mockSiteManager.getSites).not.toHaveBeenCalled();
+            expect(count).toBe(1);
+        });
     });
 
     describe("Monitor Management", () => {

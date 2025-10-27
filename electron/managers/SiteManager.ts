@@ -60,7 +60,11 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { collectDuplicateSiteIdentifiers } from "@shared/validation/siteIntegrity";
+import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
+import {
+    sanitizeSitesByIdentifier,
+    type DuplicateSiteIdentifier,
+} from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -77,43 +81,6 @@ import { LoggerAdapter } from "../utils/database/serviceFactory";
 import { SiteRepositoryService } from "../utils/database/SiteRepositoryService";
 import { SiteWriterService } from "../utils/database/SiteWriterService";
 import { logger } from "../utils/logger";
-
-interface SiteSanitizationSnapshot {
-    readonly duplicates: ReturnType<typeof collectDuplicateSiteIdentifiers>;
-    readonly sanitizedSites: Site[];
-}
-
-type SiteSanitizationDuplicate = ReturnType<
-    typeof collectDuplicateSiteIdentifiers
->[number];
-
-const getSanitizedSitesForManager = (
-    sites: readonly Site[]
-): SiteSanitizationSnapshot => {
-    const duplicates = collectDuplicateSiteIdentifiers(sites);
-
-    if (duplicates.length === 0) {
-        return {
-            duplicates,
-            sanitizedSites: Array.from(sites),
-        } satisfies SiteSanitizationSnapshot;
-    }
-
-    const seen = new Set<string>();
-    const sanitizedSites: Site[] = [];
-
-    for (const site of sites) {
-        if (!seen.has(site.identifier)) {
-            seen.add(site.identifier);
-            sanitizedSites.push(site);
-        }
-    }
-
-    return {
-        duplicates,
-        sanitizedSites,
-    } satisfies SiteSanitizationSnapshot;
-};
 
 /**
  * @remarks
@@ -255,6 +222,9 @@ export class SiteManager {
     /** Service for writing and updating site data */
     private readonly siteWriterService: SiteWriterService;
 
+    /** Cached snapshot from the most recent state sync emission. */
+    private lastStateSyncSnapshot: Site[] = [];
+
     /**
      * Emits a sanitized site state synchronization event.
      *
@@ -286,20 +256,45 @@ export class SiteManager {
         source: StateSyncSource;
         timestamp?: number;
     }): Promise<Site[]> {
-        const snapshot = (sites ?? this.getSitesSnapshot()).map((site) =>
+        const candidateSites = sites ?? this.getSitesSnapshot();
+        const { duplicates, sanitizedSites } =
+            sanitizeSitesByIdentifier(candidateSites);
+
+        if (duplicates.length > 0) {
+            logger.error(
+                "[SiteManager] Duplicate site identifiers detected while emitting state sync event",
+                {
+                    action,
+                    siteIdentifier,
+                    source,
+                    duplicates,
+                }
+            );
+        }
+
+        const emissionSnapshot = sanitizedSites.map((site) =>
             structuredClone(site)
+        );
+        const delta = calculateSiteSyncDelta(
+            this.lastStateSyncSnapshot,
+            emissionSnapshot
         );
         const effectiveTimestamp = timestamp ?? Date.now();
 
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
             action,
+            delta,
             siteIdentifier,
-            sites: snapshot,
+            sites: emissionSnapshot,
             source,
             timestamp: effectiveTimestamp,
         });
 
-        return snapshot;
+        this.lastStateSyncSnapshot = emissionSnapshot.map((site) =>
+            structuredClone(site)
+        );
+
+        return emissionSnapshot;
     }
 
     /**
@@ -834,8 +829,7 @@ export class SiteManager {
         context?: string,
         options?: UpdateSitesCacheOptions
     ): Promise<void> {
-        const { duplicates, sanitizedSites }: SiteSanitizationSnapshot =
-            getSanitizedSitesForManager(sites);
+        const { duplicates, sanitizedSites } = sanitizeSitesByIdentifier(sites);
 
         if (duplicates.length > 0) {
             logger.error(
@@ -843,7 +837,7 @@ export class SiteManager {
                 {
                     context: context ?? "SiteManager.updateSitesCache",
                     droppedIdentifiers: duplicates.map(
-                        (entry: SiteSanitizationDuplicate) => entry.identifier
+                        (entry: DuplicateSiteIdentifier) => entry.identifier
                     ),
                     duplicates,
                 }
@@ -869,8 +863,7 @@ export class SiteManager {
             const {
                 duplicates: syncDuplicates,
                 sanitizedSites: sanitizedSyncSites,
-            }: SiteSanitizationSnapshot =
-                getSanitizedSitesForManager(syncSourceSites);
+            } = sanitizeSitesByIdentifier(syncSourceSites);
 
             if (syncDuplicates.length > 0) {
                 logger.error(
@@ -878,8 +871,7 @@ export class SiteManager {
                     {
                         context: context ?? "SiteManager.updateSitesCache",
                         droppedIdentifiers: syncDuplicates.map(
-                            (entry: SiteSanitizationDuplicate) =>
-                                entry.identifier
+                            (entry: DuplicateSiteIdentifier) => entry.identifier
                         ),
                         duplicates: syncDuplicates,
                     }

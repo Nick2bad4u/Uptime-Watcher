@@ -203,6 +203,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
             getSites: vi.fn().mockResolvedValue(mockSites),
+            getCachedSiteCount: vi.fn().mockReturnValue(mockSites.length),
             updateSite: vi.fn().mockResolvedValue(mockSites[0]!),
             removeMonitor: vi.fn().mockResolvedValue(mockSites[0]!),
             startMonitoring: vi.fn().mockResolvedValue(undefined),
@@ -1245,7 +1246,10 @@ describe("IpcService - Comprehensive Coverage", () => {
             const handler = handleCall![1];
             const result = await handler(mockIpcEvent);
 
-            expect(mockUptimeOrchestrator.getSites).toHaveBeenCalled();
+            expect(mockUptimeOrchestrator.getSites).not.toHaveBeenCalled();
+            expect(
+                mockUptimeOrchestrator.getCachedSiteCount
+            ).toHaveBeenCalled();
             expect(result.success).toBeTruthy();
             expect(result.data).toEqual({
                 lastSyncAt: null,

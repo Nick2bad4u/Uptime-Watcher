@@ -31,7 +31,8 @@ import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { calculateSiteSyncDelta, type SiteSyncDelta } from "./siteSyncDelta";
+import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 import {
     StatusUpdateManager,
     type StatusUpdateSubscriptionResult,
@@ -561,10 +562,13 @@ export const createSiteSyncActions = (
                     event.action === STATE_SYNC_ACTION.UPDATE
                 ) {
                     const previousSites = deps.getSites();
-                    const delta = calculateSiteSyncDelta(
-                        previousSites,
-                        sanitizedSites
-                    );
+                    const delta =
+                        event.delta ??
+                        calculateSiteSyncDelta(previousSites, sanitizedSites);
+                    const hasChanges =
+                        delta.addedSites.length > 0 ||
+                        delta.removedSiteIdentifiers.length > 0 ||
+                        delta.updatedSites.length > 0;
 
                     logStoreAction("SitesStore", "applySyncDelta", {
                         action: event.action,
@@ -575,6 +579,20 @@ export const createSiteSyncActions = (
                         timestamp: event.timestamp,
                         updatedCount: delta.updatedSites.length,
                     });
+
+                    if (!hasChanges) {
+                        logger.debug(
+                            "Sync event did not change site state; skipping store update",
+                            {
+                                action: event.action,
+                                siteIdentifier: event.siteIdentifier,
+                                source: event.source,
+                                timestamp: event.timestamp,
+                            }
+                        );
+                        deps.onSiteDelta?.(delta);
+                        return;
+                    }
 
                     deps.setSites(sanitizedSites);
                     deps.onSiteDelta?.(delta);

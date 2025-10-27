@@ -24,6 +24,7 @@ const {
     const mockUptimeOrchestrator = {
         addSite: vi.fn(),
         getSites: vi.fn(),
+        getCachedSiteCount: vi.fn(),
         removeSite: vi.fn(),
         updateSite: vi.fn(),
         removeMonitor: vi.fn(),

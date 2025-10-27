@@ -364,6 +364,47 @@ describe("cacheSync", () => {
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
             });
 
+            it("should ignore 'all' invalidations emitted by monitoring lifecycle events", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: cacheSync", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                setupCacheSync();
+                const invalidationHandler =
+                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+
+                const invalidationData = {
+                    type: "all" as const,
+                    reason: "update" as const,
+                };
+
+                mockClearMonitorTypeCache.mockClear();
+                monitorRefreshSpy.mockClear();
+                sitesResyncSpy.mockClear();
+
+                invalidationHandler(invalidationData);
+                await flushAsyncOperations();
+
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "Received cache invalidation event",
+                    invalidationData
+                );
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "[CacheSync] Ignoring monitoring lifecycle invalidation",
+                    {
+                        reason: "update",
+                        type: "all",
+                    }
+                );
+                expect(mockClearMonitorTypeCache).not.toHaveBeenCalled();
+                expect(monitorRefreshSpy).not.toHaveBeenCalled();
+                expect(sitesResyncSpy).not.toHaveBeenCalled();
+            });
+
             it("should handle 'monitor' cache invalidation type", async ({
                 task,
                 annotate,
@@ -509,7 +550,7 @@ describe("cacheSync", () => {
                 expect(monitorRefreshSpy).not.toHaveBeenCalled();
             });
 
-            it("should debounce duplicate site update invalidations", async ({
+            it("should ignore monitoring lifecycle site update invalidations", async ({
                 task,
                 annotate,
             }) => {
@@ -517,10 +558,6 @@ describe("cacheSync", () => {
                 await annotate("Component: cacheSync", "component");
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Monitoring", "type");
-
-                const nowSpy = vi.spyOn(Date, "now");
-                let currentTime = 1000;
-                nowSpy.mockImplementation(() => currentTime);
 
                 setupCacheSync();
                 const invalidationHandler =
@@ -538,32 +575,15 @@ describe("cacheSync", () => {
                 invalidationHandler(invalidationData);
                 await flushAsyncOperations();
 
-                expect(mockFullResyncSites).toHaveBeenCalledTimes(1);
-
-                mockFullResyncSites.mockClear();
-
-                currentTime += 100;
-                invalidationHandler(invalidationData);
-                await flushAsyncOperations();
-
                 expect(mockFullResyncSites).not.toHaveBeenCalled();
                 expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "[CacheSync] Skipping duplicate site update resync",
+                    "[CacheSync] Skipping site resync for monitoring lifecycle update",
                     expect.objectContaining({
                         identifier: "site-1",
                         reason: "update",
+                        type: "site",
                     })
                 );
-
-                mockLogger.debug.mockClear();
-
-                currentTime += 500;
-                invalidationHandler(invalidationData);
-                await flushAsyncOperations();
-
-                expect(mockFullResyncSites).toHaveBeenCalledTimes(1);
-
-                nowSpy.mockRestore();
             });
 
             it("should handle unknown cache invalidation type", async ({
