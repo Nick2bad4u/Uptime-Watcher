@@ -7,14 +7,184 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[e014bc1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)...
-[e014bc1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4...e014bc18bcf4b2dadc82ccfa284b11733ecee3f4))
+[[6efdf05](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)...
+[6efdf05](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6efdf056b8544b7f15e07b4e3a5677d9a295bd02...6efdf056b8544b7f15e07b4e3a5677d9a295bd02))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 17.7.0 [`(6efdf05)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)
+
+
+
+
+
+
+## [17.7.0] - 2025-10-28
+
+
+[[e014bc1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)...
+[06160b0](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06160b027e8d56dc1a1eabc9cf956bd53bfbd104)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4...06160b027e8d56dc1a1eabc9cf956bd53bfbd104))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce structured deltas for site synchronization events
+
+This enhances the site synchronization mechanism by calculating and embedding a structured delta within state sync events. This delta explicitly details which sites were added, removed, or updated, allowing the frontend to perform more efficient and precise state updates instead of re-rendering the entire site list.
+
+✨ [feat] Add structured delta to site synchronization events
+ - 🖥️ The `SiteManager` now calculates a `SiteSyncDelta` by comparing the new state against a cached snapshot of the previous state.
+ - 📡 This `delta` is included in the `sites:state-synchronized` event payload, providing granular details on additions, removals, and updates.
+ - ⚛️ The frontend `useSiteSync` store now leverages this `delta` if present, falling back to manual calculation if not. This avoids redundant work and streamlines state updates.
+ - 🛡️ Moves the `SiteSyncDelta` type definition and calculation logic to the shared package for reuse between the main and renderer processes.
+
+⚡ [perf] Optimize sync status retrieval to use cached data
+ - 🐢 The `get-sync-status` IPC handler previously loaded all sites from the database just to get a count.
+ - 🏎️ Adds a `getCachedSiteCount` method to `UptimeOrchestrator` that retrieves the site count directly from the in-memory cache, avoiding a database query and improving UI responsiveness.
+
+🚜 [refactor] Centralize site sanitization logic
+ - 🧹 Moves the logic for removing duplicate sites by identifier from `SiteManager` to a shared utility function `sanitizeSitesByIdentifier`.
+
+🧪 [test] Update and refactor tests for new features
+ - ✅ Adds unit tests for the new `getCachedSiteCount` method and delta calculation logic.
+ - 🧹 Simplifies and refactors the `MonitorRepository` tests, removing verbose property-based tests in favor of simpler, focused orchestration tests.
+ - 🔧 Updates IPC service and site store tests to reflect the new delta-based synchronization and cached site count logic.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4a39b24)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a39b2441d864d4d78515ba75ee9d081327e8205)
+
+
+- ✨ [feat] Add diagnostics for preload guard failures
+
+✨ [feat] Enhance preload event handling with diagnostics
+ - Adds robust error handling to the `stateSyncApi` event listener.
+ - 🛡️ When an incoming event payload fails validation, it is now dropped instead of being ignored silently.
+ - 🪵 A detailed warning is logged with a preview of the malformed payload for easier debugging.
+ - 📊 A formal "preload guard failure" diagnostic report is now sent to the main process for centralized monitoring and analysis.
+ - ♻️ Refactors the event manager to be created only once, improving efficiency.
+
+🚜 [refactor] Replace `waitForElectronAPI` with `waitForElectronBridge`
+ - Updates the IPC service helper to use the newer, more robust `waitForElectronBridge` utility.
+ - 🗑️ Removes the now-obsolete `waitForElectronAPI` utility from frontend stores.
+ - This change unifies the bridge readiness check across the application.
+
+🧪 [test] Overhaul repository and component tests
+ - 🔄 Replaces simple coverage-focused tests for `MonitorRepository` with comprehensive property-based tests using `fast-check`.
+ - 🧹 Cleans up and standardizes timeouts in `SettingsRepository` property-based tests.
+ - 🧩 Updates numerous component tests (`ScreenshotThumbnail`, `App`, `Settings`, etc.) to use a consistent and improved logger mock.
+ - 🔧 Refactors `ScreenshotThumbnail` click handling tests to use the `SystemService` instead of directly mocking the `electronAPI`.
+ - ➡️ Removes dependencies on the deprecated `waitForElectronAPI` from service tests, aligning them with the `waitForElectronBridge` refactor.
+
+🔧 [build] Improve zero-coverage test detection script
+ - ⏱️ Adds a configurable timeout (`--timeout-ms`) to individual Vitest commands to prevent the script from hanging.
+ - 📝 Introduces more detailed logging to provide better visibility into the script's execution flow.
+ - 📁 Adds a file existence check for the Vitest configuration path to avoid errors when the file is missing.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7bedb23)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7bedb231e49c4fbfcf3f4c30783e78ffa3cf2fff)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the npm-all group across 1 directory with 62 updates (#91) [`(c089f6b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c089f6b1e7ea3fed6477a534d6dda6facfaebd7d)
+
+
+- *(deps)* [dependency] Update EcksDy/vscode-version-matrix (#92) [`(4f3b46d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4f3b46d01315702fbb042b244306cdf36e082458)
+
+
 - [dependency] Update version 17.6.0 [`(e014bc1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e014bc18bcf4b2dadc82ccfa284b11733ecee3f4)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Update monitor schemas and improve URL validation
+
+This commit introduces several refactors and improvements across the application, focusing on updating monitor schemas and enhancing validation logic.
+
+🚜 [refactor] Updates monitor type schemas to be more robust and URL-based.
+ - 🌐 For `http-latency` monitors, renames `latencyThreshold` to `maxResponseTime` for clarity.
+ -  DNS monitors (`dns`) now use `host` instead of `hostname` and support an `expectedValue` field.
+ - 🔒 SSL monitors (`ssl`) are updated to use `host` instead of `hostname` and include a `port` field.
+ - 🔌 WebSocket monitors (`websocket-keepalive`) are simplified to use `maxPongDelayMs` instead of ping/pong messages and point to a new test endpoint.
+ - ❤️ Server Heartbeat monitors (`server-heartbeat`) are refactored to use a `url` for status checks, along with fields for status, timestamp, and drift, replacing the identifier-based model.
+ - 🔄 Replication monitors (`replication`) now use status URLs for the primary and replica, a timestamp field, and a maximum lag in seconds, replacing the host-based model.
+
+🛠️ [fix] Improves URL validation logic.
+ - Replaces a simple `endsWith("://")` check with a more precise regular expression `/^[a-z][a-z\d+\-.]*:\/\/$/iv` to correctly identify incomplete URL schemes and prevent invalid inputs.
+
+🔧 [build] Enhances dependency graph analysis configuration.
+ - 📈 Updates `madge` configuration (`.madgerc` and `package.json`) to include npm packages (`includeNpm: true`) and TypeScript type imports (`skipTypeImports: false`), providing a more complete and accurate dependency graph.
+
+🧪 [test] Adjusts test configurations for stability.
+ - ⏳ Increases timeouts for several long-running tests in `main.comprehensive.test.ts` and `cacheSync.test.ts` to prevent flakiness in slower environments.
+ - 📊 Makes a performance test threshold in `constants-theme-100-coverage.test.ts` dynamic, relaxing it during code coverage runs to account for instrumentation overhead.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(06160b0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/06160b027e8d56dc1a1eabc9cf956bd53bfbd104)
+
+
+- 🚜 [refactor] Enhance code style, validation, and build tooling
+
+This commit introduces a wide range of refactorings and improvements across the codebase, focusing on code quality, validation logic, build process robustness, and test suite consistency.
+
+✨ **[feat] Source Code Enhancements**
+*   **URL Validation Logic:** 🌐 Strengthens the `isValidUrl` utility by adding stricter checks.
+    *   It now rejects URLs that contain multiple protocol schemes (e.g., `https://http://...`).
+    *   Enforces the presence of `//` after `http:` or `https:` to prevent malformed URLs like `http:example.com`.
+*   **App Update Handling:** 🔄 Improves the application update process by wrapping the `applyUpdate` call in a `try...catch` block to gracefully handle and log potential errors during the update application. The click handler is also updated to properly handle the async nature of the action.
+
+🚜 **[refactor] Code & Configuration Refinements**
+*   **IPC Validators:** 🧱 Refactors IPC parameter validators by extracting inline arrow functions into standalone, named functions (`validateNoParams`, `validatePreloadGuardReport`). This improves readability, testability, and reusability.
+*   **Monitor Creation:** 简化 `createMonitorObject` function by directly returning a constructed object, removing redundant steps and improving conciseness.
+*   **DNS Monitor Payload:** DNS monitor payload creation is streamlined to conditionally add the `expectedValue` field only when it's defined, simplifying the logic.
+*   **ESLint Configuration:** 🧹 Reorganizes `unicorn` rules within `eslint.config.mjs` for better alphabetical consistency.
+*   **Graphviz Configuration:** 🗑️ Removes the hardcoded `graphVizPath` from `.madgerc`, assuming Graphviz is now available in the system's PATH.
+
+🧪 **[test] Testing and Build Script Improvements**
+*   **Build Scripts:** 🛠️ Enhances build script robustness in `vite.config.ts` and `storybook/viteSharedConfig.ts`.
+    *   Adds robust error handling and logging for path resolution and module loading.
+    *   Uses `import.meta.dirname` with fallbacks for more reliable directory resolution.
+    *   Replaces direct `require` with a safer, lazily-evaluated shim.
+*   **Test Code Style:** 🎨 Adopts more modern and concise syntax in tests.
+    *   Uses `new Map([...])` constructor for direct initialization instead of multiple `.set()` calls.
+    *   Uses `String.raw` for strings containing backslashes in `console.log` calls to prevent misinterpretation of escape sequences.
+*   **Type Imports:** 🏷️ Updates test setup to use `node:path` for imports, enforcing the explicit `node:` protocol for built-in modules.
+*   **Fuzzing Test:** 🐛 Fixes a minor issue in a fuzzing test by using `String.fromCodePoint` instead of `String.fromCharCode` for generating high Unicode plane characters.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6774815)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/677481550f6c42ed9d9e99772b5211587e595e4a)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Update dependencies and enhance project tooling
+
+This commit introduces a wide range of updates, primarily focused on dependency upgrades, tooling enhancements, and internal refactoring for improved code quality and maintainability.
+
+✨ **[feat] Feature Enhancements**
+- 🤝 Enhances the `sites:state-synchronized` event payload to include an optional `delta` object, providing more granular details about site additions, removals, and updates during state synchronization.
+
+🚜 **[refactor] Code Refactoring**
+- 📦 Moves shared type definitions for `SiteSyncDelta` into a dedicated file (`src/stores/sites/siteSyncDelta.ts`) to improve modularity and clarify its scope within the renderer.
+- 🚚 Relocates the `getCachedSiteCount` method in `UptimeOrchestrator` for better code organization without changing its functionality.
+- 🧹 Removes an unnecessary `async` keyword from the `get-sync-status` IPC handler, as the underlying operation is synchronous.
+- 🎨 Minor reordering of properties in type definitions and log statements for consistency.
+
+🔧 **[build] Build & Tooling**
+- 📦 Upgrades numerous production and development dependencies, including `electron`, `vitest`, `axios`, `eslint`, and their related plugins, to their latest versions.
+- ⚙️ Adds a new `.madgerc` configuration file to customize the output of the `madge` dependency graphing tool.
+- 警告 Adds the `--warning` flag to the `madge:circular` script to treat circular dependencies as non-fatal warnings.
+- 📜 Enables new ESLint rules from `eslint-plugin-unicorn` (`no-useless-collection-argument`, `no-immediate-mutation`, `prefer-response-static-json`) to catch potential issues.
+
+🧪 **[test] Testing**
+- 🦾 Strengthens test mocks and spies in `MonitorRepository.simple.test.ts` with more accurate types and robust assertions, improving test reliability.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a57084b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a57084b4f8fc6998c0978b0bafa196ec2889f4b3)
+
+
+- Update changelogs for v17.6.0 [skip ci] [`(b475da3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b475da32ac8f2ceb99abdba6b8996e8240454958)
 
 
 
