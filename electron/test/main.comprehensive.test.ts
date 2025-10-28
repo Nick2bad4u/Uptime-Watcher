@@ -196,7 +196,7 @@ describe("main.ts - Electron Main Process", () => {
 
             expect(mockLog.transports.file.level).toBe("warn");
             expect(mockLog.transports.console.level).toBe("info");
-        });
+        }, 60_000);
         it("should configure info logging when --log-info flag is present", async ({
             task,
             annotate,

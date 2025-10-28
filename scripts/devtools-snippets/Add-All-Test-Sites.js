@@ -140,7 +140,7 @@
                     id: `monitor-http-latency-${baseTimestamp}`,
                     type: "http-latency",
                     url: "https://example.com",
-                    latencyThreshold: 500,
+                    maxResponseTime: 500,
                     checkInterval: 60000,
                     timeout: 10000,
                     retryAttempts: 3,
@@ -198,8 +198,9 @@
                 {
                     id: `monitor-dns-${baseTimestamp}`,
                     type: "dns",
-                    hostname: "example.com",
+                    host: "example.com",
                     recordType: "A",
+                    expectedValue: "93.184.216.34",
                     checkInterval: 60000,
                     timeout: 10000,
                     retryAttempts: 3,
@@ -218,7 +219,8 @@
                 {
                     id: `monitor-ssl-${baseTimestamp}`,
                     type: "ssl",
-                    hostname: "example.com",
+                    host: "example.com",
+                    port: 443,
                     certificateWarningDays: 30,
                     checkInterval: 86400000, // 24 hours
                     timeout: 10000,
@@ -238,9 +240,8 @@
                 {
                     id: `monitor-websocket-${baseTimestamp}`,
                     type: "websocket-keepalive",
-                    url: "wss://echo.websocket.org",
-                    pingMessage: "ping",
-                    expectedPongMessage: "ping",
+                    url: "wss://echo.websocket.events",
+                    maxPongDelayMs: 5000,
                     checkInterval: 60000,
                     timeout: 10000,
                     retryAttempts: 3,
@@ -259,9 +260,11 @@
                 {
                     id: `monitor-heartbeat-${baseTimestamp}`,
                     type: "server-heartbeat",
-                    serverIdentifier: "test-server-01",
-                    heartbeatInterval: 60000,
-                    missedHeartbeatThreshold: 3,
+                    url: "https://status.example.com/heartbeat",
+                    heartbeatExpectedStatus: "ok",
+                    heartbeatMaxDriftSeconds: 300,
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
                     checkInterval: 60000,
                     timeout: 10000,
                     retryAttempts: 3,
@@ -280,9 +283,12 @@
                 {
                     id: `monitor-replication-${baseTimestamp}`,
                     type: "replication",
-                    primaryHost: "primary.db.example.com",
-                    replicaHost: "replica.db.example.com",
-                    lagThreshold: 5000,
+                    primaryStatusUrl:
+                        "https://primary.db.example.com/status.json",
+                    replicaStatusUrl:
+                        "https://replica.db.example.com/status.json",
+                    replicationTimestampField: "metrics.replication.timestamp",
+                    maxReplicationLagSeconds: 30,
                     checkInterval: 60000,
                     timeout: 10000,
                     retryAttempts: 3,

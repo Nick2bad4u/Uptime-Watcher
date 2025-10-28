@@ -303,7 +303,7 @@ export function isValidUrl(
         return false;
     }
 
-    if (value.endsWith("://")) {
+    if (/^[a-z][a-z\d+\-.]*:\/\/$/iv.test(value)) {
         return false;
     }
 

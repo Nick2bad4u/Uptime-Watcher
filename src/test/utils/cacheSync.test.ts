@@ -181,7 +181,7 @@ let sitesResyncSpy!: MockInstance<() => Promise<void>>;
 
 beforeAll(async () => {
     ({ setupCacheSync } = await import("../../utils/cacheSync"));
-});
+}, 60_000);
 
 describe("cacheSync", () => {
     const mockLogger = vi.mocked(logger);

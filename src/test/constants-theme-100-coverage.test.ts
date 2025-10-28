@@ -358,8 +358,15 @@ describe("Constants and Configuration 100% Coverage", () => {
 
             const end = performance.now();
 
-            // Should be very fast (less than 10ms for 10k accesses)
-            expect(end - start).toBeLessThan(10);
+            const isCoverageRun = Object.hasOwn(
+                globalThis,
+                "__coverage__"
+            );
+
+            const thresholdMs = isCoverageRun ? 25 : 10;
+
+            // Should be very fast (less than threshold for 10k accesses)
+            expect(end - start).toBeLessThan(thresholdMs);
         });
     });
 
