@@ -92,9 +92,12 @@ interface SystemHandlerValidatorsInterface {
  *
  * @returns A validator function that ensures no parameters are passed
  */
+function validateNoParams(params: unknown[]): null | string[] {
+    return params.length === 0 ? null : ["No parameters expected"];
+}
+
 function createNoParamsValidator(): IpcParameterValidator {
-    return (params: unknown[]): null | string[] =>
-        params.length === 0 ? null : ["No parameters expected"];
+    return validateNoParams;
 }
 
 /**
@@ -145,78 +148,77 @@ function createSingleObjectValidator(paramName: string): IpcParameterValidator {
     };
 }
 
-function createPreloadGuardReportValidator(): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
+function validatePreloadGuardReport(params: unknown[]): null | string[] {
+    const errors: string[] = [];
 
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
 
-        const [report] = params;
-        const objectError = IpcValidators.requiredObject(report, "guardReport");
+    const [report] = params;
+    const objectError = IpcValidators.requiredObject(report, "guardReport");
 
-        if (objectError) {
-            errors.push(objectError);
-            return errors.length > 0 ? errors : null;
-        }
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
-        const record = report as Record<string, unknown>;
-
-        const channelError = IpcValidators.requiredString(
-            record["channel"],
-            "channel"
-        );
-        if (channelError) {
-            errors.push(channelError);
-        }
-
-        const guardError = IpcValidators.requiredString(
-            record["guard"],
-            "guard"
-        );
-        if (guardError) {
-            errors.push(guardError);
-        }
-
-        const reasonError = IpcValidators.optionalString(
-            record["reason"],
-            "reason"
-        );
-        if (reasonError) {
-            errors.push(reasonError);
-        }
-
-        const payloadPreviewError = IpcValidators.optionalString(
-            record["payloadPreview"],
-            "payloadPreview"
-        );
-        if (payloadPreviewError) {
-            errors.push(payloadPreviewError);
-        }
-
-        const metadataValue = record["metadata"];
-        if (metadataValue !== undefined) {
-            const metadataError = IpcValidators.requiredObject(
-                metadataValue,
-                "metadata"
-            );
-            if (metadataError) {
-                errors.push(metadataError);
-            }
-        }
-
-        const timestampError = IpcValidators.requiredNumber(
-            record["timestamp"],
-            "timestamp"
-        );
-        if (timestampError) {
-            errors.push(timestampError);
-        }
-
+    if (objectError) {
+        errors.push(objectError);
         return errors.length > 0 ? errors : null;
-    };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- guardReport validated as object
+    const record = report as Record<string, unknown>;
+
+    const channelError = IpcValidators.requiredString(
+        record["channel"],
+        "channel"
+    );
+    if (channelError) {
+        errors.push(channelError);
+    }
+
+    const guardError = IpcValidators.requiredString(record["guard"], "guard");
+    if (guardError) {
+        errors.push(guardError);
+    }
+
+    const reasonError = IpcValidators.optionalString(
+        record["reason"],
+        "reason"
+    );
+    if (reasonError) {
+        errors.push(reasonError);
+    }
+
+    const payloadPreviewError = IpcValidators.optionalString(
+        record["payloadPreview"],
+        "payloadPreview"
+    );
+    if (payloadPreviewError) {
+        errors.push(payloadPreviewError);
+    }
+
+    const metadataValue = record["metadata"];
+    if (metadataValue !== undefined) {
+        const metadataError = IpcValidators.requiredObject(
+            metadataValue,
+            "metadata"
+        );
+        if (metadataError) {
+            errors.push(metadataError);
+        }
+    }
+
+    const timestampError = IpcValidators.requiredNumber(
+        record["timestamp"],
+        "timestamp"
+    );
+    if (timestampError) {
+        errors.push(timestampError);
+    }
+
+    return errors.length > 0 ? errors : null;
+}
+
+function createPreloadGuardReportValidator(): IpcParameterValidator {
+    return validatePreloadGuardReport;
 }
 
 /**

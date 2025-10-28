@@ -147,7 +147,7 @@ const extremeBoundaryStrings = fc.oneof(
     // Extremely long strings with patterns
     fc.string({ minLength: 50_000, maxLength: 100_000 }),
     // Control characters
-    fc.integer({ min: 0, max: 31 }).map(String.fromCharCode),
+    fc.integer({ min: 0, max: 31 }).map((value) => String.fromCodePoint(value)),
     // High Unicode planes
     fc.integer({ min: 0x1_00_00, max: 0x10_ff_ff }).map(String.fromCodePoint)
 );

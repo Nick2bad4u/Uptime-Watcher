@@ -163,11 +163,13 @@ describe("Site deletion orchestration", () => {
         const siteIdentifier = "site-writer";
         const sampleSite = createSampleSite(siteIdentifier);
 
-        const monitorsBySite = new Map<string, Site["monitors"]>();
-        monitorsBySite.set(siteIdentifier, Array.from(sampleSite.monitors));
+        const monitorsBySite = new Map<string, Site["monitors"]>([
+            [siteIdentifier, Array.from(sampleSite.monitors)],
+        ]);
 
-        const sites = new Map<string, Site>();
-        sites.set(siteIdentifier, { ...sampleSite });
+        const sites = new Map<string, Site>([
+            [siteIdentifier, { ...sampleSite }],
+        ]);
 
         const sitesCache = new StandardizedCache<Site>({
             name: "integration-sites",

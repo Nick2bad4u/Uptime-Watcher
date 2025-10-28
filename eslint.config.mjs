@@ -2350,10 +2350,8 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/no-useless-collection-argument": "warn",
-            "unicorn/no-immediate-mutation": "warn",
-            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-immediate-mutation": "warn",
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
@@ -2367,10 +2365,12 @@ export default [
             ],
             "unicorn/no-negated-condition": "warn", // Sometimes clearer
             "unicorn/no-null": "off", // Null is common in SQLite and IPC
+            "unicorn/no-useless-collection-argument": "warn",
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "warn", // CommonJS required for Electron
             "unicorn/prefer-node-protocol": "error", // Enforce for backend
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
             "unicorn/prefer-string-slice": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",
@@ -3914,10 +3914,8 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/no-useless-collection-argument": "warn",
-            "unicorn/no-immediate-mutation": "warn",
-            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-immediate-mutation": "warn",
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
@@ -3931,10 +3929,12 @@ export default [
             ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-negated-condition": "warn", // Sometimes clearer
             "unicorn/no-null": "off", // React commonly uses null for conditional rendering
+            "unicorn/no-useless-collection-argument": "warn",
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "warn", // CommonJS needed for Electron
             "unicorn/prefer-node-protocol": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/prefer-spread": "off",
             "unicorn/prefer-string-slice": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",
@@ -5261,10 +5261,8 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/no-useless-collection-argument": "warn",
-            "unicorn/no-immediate-mutation": "warn",
-            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-immediate-mutation": "warn",
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
@@ -5278,10 +5276,12 @@ export default [
             ],
             "unicorn/no-negated-condition": "warn", // Sometimes clearer
             "unicorn/no-null": "off", // Null is common in SQLite and IPC
+            "unicorn/no-useless-collection-argument": "warn",
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "warn", // CommonJS required for Electron
             "unicorn/prefer-node-protocol": "error", // Enforce for backend
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/prefer-spread": "off", // Prefer Array.From for readability
             "unicorn/prefer-string-slice": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",
@@ -6858,10 +6858,8 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
-            "unicorn/no-useless-collection-argument": "warn",
-            "unicorn/no-immediate-mutation": "warn",
-            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
+            "unicorn/no-immediate-mutation": "warn",
             "unicorn/no-keyword-prefix": [
                 "error",
                 {
@@ -6875,10 +6873,12 @@ export default [
             ], // Allow "class" prefix for className and other legitimate uses
             "unicorn/no-negated-condition": "warn", // Sometimes clearer
             "unicorn/no-null": "off", // React commonly uses null for conditional rendering
+            "unicorn/no-useless-collection-argument": "warn",
             "unicorn/prefer-global-this": "off", // Not suitable for Electron
             "unicorn/prefer-includes": "warn",
             "unicorn/prefer-module": "warn", // CommonJS needed for Electron
             "unicorn/prefer-node-protocol": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/prefer-spread": "off",
             "unicorn/prefer-string-slice": "warn",
             "unicorn/prefer-string-starts-ends-with": "warn",

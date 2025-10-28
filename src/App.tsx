@@ -502,13 +502,18 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
      * If an update has been downloaded, applies the update. Otherwise, resets
      * the update status to idle and clears any errors.
      */
-    const handleUpdateAction = useCallback(() => {
+    const handleUpdateAction = useCallback(async () => {
         if (updateStatus === "downloaded") {
-            applyUpdate();
-        } else {
-            applyUpdateStatus("idle");
-            setUpdateError(undefined);
+            try {
+                await applyUpdate();
+            } catch (error: unknown) {
+                logger.error("Failed to apply pending update:", error);
+            }
+            return;
         }
+
+        applyUpdateStatus("idle");
+        setUpdateError(undefined);
     }, [
         applyUpdate,
         applyUpdateStatus,
@@ -588,6 +593,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const UpdateDownloadingIcon = AppIcons.actions.refreshAlt;
     const UpdateReadyIcon = AppIcons.status.upFilled;
 
+    const handleUpdateButtonClick = useCallback(() => {
+        void handleUpdateAction();
+    }, [handleUpdateAction]);
+
     // Helper function to render update notification to reduce complexity
     const renderUpdateNotification = (): JSX.Element | null => {
         if (
@@ -628,7 +637,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                             </div>
                             <ThemedButton
                                 className="update-alert__action ml-4"
-                                onClick={handleUpdateAction}
+                                onClick={handleUpdateButtonClick}
                                 size="sm"
                                 variant="secondary"
                             >
@@ -684,7 +693,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                         {updateStatus === "downloaded" && (
                             <ThemedButton
                                 className="update-alert__action ml-4"
-                                onClick={handleUpdateAction}
+                                onClick={handleUpdateButtonClick}
                                 size="sm"
                                 variant="secondary"
                             >

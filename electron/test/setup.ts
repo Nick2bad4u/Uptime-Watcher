@@ -211,7 +211,7 @@ vi.mock("fs", () => createFsMock("fs"));
 vi.mock("node:fs", () => createFsMock("node:fs"));
 
 // Mock path modules
-const createPathMock = async <T extends typeof import("path")>(
+const createPathMock = async <T extends typeof import("node:path")>(
     moduleSpecifier: string
 ) => {
     const actual = await vi.importActual<T>(moduleSpecifier);

@@ -15,6 +15,8 @@ import { createRequire } from "node:module";
 import path from "node:path";
 // eslint-disable-next-line import-x/no-nodejs-modules -- URL helpers are required to compute project-relative paths.
 import { fileURLToPath } from "node:url";
+// eslint-disable-next-line import-x/no-nodejs-modules -- Utility inspection assists with rich error diagnostics during build-time operations.
+import { inspect } from "node:util";
 /* eslint-disable-next-line import-x/no-rename-default -- Shared Storybook helpers rely on root-level vite-tsconfig-paths dependency. */
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -75,11 +77,55 @@ export interface StorybookPluginOptions {
 /**
  * Lazily evaluated Node.js require helper used for optional peer dependencies.
  */
-const require = createRequire(import.meta.url);
+const formatUnknownError = (error: unknown): string => {
+    if (typeof error === "string") {
+        return error;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return inspect(error, { depth: 2 });
+};
+
+const createConfigError = (message: string, error: unknown): Error =>
+    new Error(`${message}: ${formatUnknownError(error)}`, { cause: error });
+
+type SafeRequire = (specifier: string) => unknown;
+
+const createSafeRequire = (): SafeRequire => {
+    try {
+        const nodeRequire = createRequire(import.meta.url);
+        return (specifier: string): unknown => nodeRequire(specifier);
+    } catch (error: unknown) {
+        throw createConfigError(
+            "Failed to create Storybook require shim",
+            error
+        );
+    }
+};
+
+const resolveStorybookModuleDirectory = (): string => {
+    try {
+        if (typeof import.meta.dirname === "string") {
+            return import.meta.dirname;
+        }
+
+        // eslint-disable-next-line unicorn/prefer-import-meta-properties -- Fallback for environments lacking import.meta.dirname support.
+        return path.dirname(fileURLToPath(import.meta.url));
+    } catch (error: unknown) {
+        throw createConfigError(
+            "Failed to resolve Storybook shared config directory",
+            error
+        );
+    }
+};
+
+const requireModule = createSafeRequire();
 
 /** Directory containing this shared configuration module. */
-// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Consumers script Storybook config in CJS environments where import.meta helpers are unavailable.
-const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
+const moduleDirectory = resolveStorybookModuleDirectory();
 
 /**
  * Absolute path to the repository root used by Storybook tooling.
@@ -192,7 +238,7 @@ const isBabelPlugin = (value: unknown): value is BabelPlugin =>
  */
 export const loadReactCompilerPlugins = (): readonly BabelPlugin[] => {
     try {
-        const pluginModule: unknown = require("babel-plugin-react-compiler");
+        const pluginModule = requireModule("babel-plugin-react-compiler");
 
         if (isBabelPlugin(pluginModule)) {
             return [pluginModule];
@@ -328,5 +374,6 @@ export const ensureStorybookCoverageDirectory = async (): Promise<void> => {
         );
     }
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Path was validated to reside within the project root above.
     await mkdir(storybookCoverageDirectory, { recursive: true });
 };

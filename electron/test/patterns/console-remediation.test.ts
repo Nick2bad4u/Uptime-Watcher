@@ -291,7 +291,7 @@ describe("Console Statement Remediation", () => {
                     statements,
                     categorized,
                 } of analysisResults.slice(0, 10)) {
-                    console.log(`\\n${file}:`);
+                    console.log(String.raw`\n${file}:`);
                     console.log(
                         `  Total: ${statements.length}, Needs fix: ${categorized.needsReplacement}, Legitimate: ${categorized.legitimate}`
                     );
@@ -354,14 +354,14 @@ describe("Console Statement Remediation", () => {
                     replacement,
                     reason,
                 } of replacementRecommendations.slice(0, 5)) {
-                    console.log(`\\n${file}:${line}`);
+                    console.log(String.raw`\n${file}:${line}`);
                     console.log(`  Original: ${original}`);
                     console.log(`  Replace with: ${replacement}`);
                     console.log(`  Reason: ${reason}`);
                 }
 
                 console.log(
-                    `\\n... and ${Math.max(0, replacementRecommendations.length - 5)} more replacements needed.`
+                    String.raw`\n... and ${Math.max(0, replacementRecommendations.length - 5)} more replacements needed.`
                 );
             } else {
                 console.log(
@@ -413,7 +413,7 @@ describe("Console Statement Remediation", () => {
             console.log("=".repeat(40));
 
             for (const { level, usage, example, when } of guidelines) {
-                console.log(`\\n${level.toUpperCase()}:`);
+                console.log(String.raw`\n${level.toUpperCase()}:`);
                 console.log(`  Purpose: ${usage}`);
                 console.log(`  Example: ${example}`);
                 console.log(`  Use when: ${when}`);
@@ -466,7 +466,7 @@ describe("Console Statement Remediation", () => {
             console.log("=".repeat(45));
 
             for (const { step, title, description, action } of migrationSteps) {
-                console.log(`\\n${step}. ${title}`);
+                console.log(String.raw`\n${step}. ${title}`);
                 console.log(`   ${description}`);
                 console.log(`   Action: ${action}`);
             }
@@ -519,22 +519,22 @@ describe("Console Statement Remediation", () => {
                 replacement,
                 description,
             } of replacementPatterns) {
-                console.log(`\\n${description}:`);
+                console.log(String.raw`\n${description}:`);
                 console.log(`  Pattern: ${pattern.source}`);
                 console.log(`  Replace: ${replacement}`);
             }
 
             // Example function to apply replacements (not actually run)
-            const generateReplacementScript = () => `
+            const generateReplacementScript = () => String.raw`
 // Example replacement script (manual review required)
 function replaceConsoleStatements(fileContent: string): string {
     let result = fileContent;
     
     // Add logger import if not present
     if (!result.includes('import logger') && !result.includes('from "../services/logger"')) {
-        const importSection = result.match(/^(import[^;]+;\\s*)+/m);
+        const importSection = result.match(/^(import[^;]+;\s*)+/m);
         if (importSection) {
-            result = result.replace(importSection[0], importSection[0] + 'import logger from "../services/logger";\\n');
+            result = result.replace(importSection[0], importSection[0] + 'import logger from "../services/logger";\n');
         }
     }
     

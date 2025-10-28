@@ -113,22 +113,22 @@ const recreatePlaceholders = async (typedocOutputs) => {
 const main = async () => {
     const typedocOutputs = await loadTypedocOutputPaths();
 
-    const removalTargets = new Map();
-    removalTargets.set(
-        path.join(docusaurusRoot, "build"),
-        "Removed Docusaurus build output"
-    );
-    removalTargets.set(
-        path.join(docusaurusRoot, ".docusaurus"),
-        "Removed Docusaurus cache directory"
-    );
+    const removalEntries = [
+        [path.join(docusaurusRoot, "build"), "Removed Docusaurus build output"],
+        [
+            path.join(docusaurusRoot, ".docusaurus"),
+            "Removed Docusaurus cache directory",
+        ],
+    ];
 
     for (const outputPath of typedocOutputs) {
-        removalTargets.set(
+        removalEntries.push([
             outputPath,
-            `Removed TypeDoc generated documentation at ${outputPath}`
-        );
+            `Removed TypeDoc generated documentation at ${outputPath}`,
+        ]);
     }
+
+    const removalTargets = new Map(removalEntries);
 
     const removed = await removeGeneratedTargets(removalTargets);
 

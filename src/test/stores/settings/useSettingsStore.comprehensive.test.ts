@@ -993,8 +993,7 @@ describe(useSettingsStore, () => {
                 const finalExpectedState: any = {};
 
                 for (const update of settingUpdates) {
-                    const partialSettings: any = {};
-                    partialSettings[update.setting] = update.value;
+                    const partialSettings: any = { [update.setting]: update.value,};
                     finalExpectedState[update.setting] = update.value;
 
                     act(() => {

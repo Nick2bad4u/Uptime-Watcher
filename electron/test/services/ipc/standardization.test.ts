@@ -520,7 +520,7 @@ registerStandardizedIpcHandler(
             console.log(String.raw`\nIPC Testing Patterns:`);
             console.log("=".repeat(30));
             for (const { name, description, example } of testingApproaches) {
-                console.log(`\\n${name}:`);
+                console.log(String.raw`\n${name}:`);
                 console.log(`  Description: ${description}`);
                 console.log(`  Example: ${example}`);
             }

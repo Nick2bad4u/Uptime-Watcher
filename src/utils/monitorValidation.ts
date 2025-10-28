@@ -87,22 +87,16 @@ export function createMonitorObject(
     type: MonitorType,
     fields: Partial<MonitorFormData>
 ): MonitorCreationData {
-    // Create base monitor with defaults
-    const baseData: MonitorCreationData = {
+    return {
         history: [],
         monitoring: true,
         responseTime: -1,
         retryAttempts: 3,
         status: "pending",
         timeout: 10_000,
-        type,
         ...fields,
+        type,
     };
-
-    // Ensure the type is preserved if it was valid
-    baseData.type = type;
-
-    return baseData;
 }
 
 /**
@@ -611,81 +605,67 @@ const validateCdnEdgeConsistencyMonitorFormData = (
 
 const validateReplicationMonitorFormData = (
     data: Partial<ReplicationFormData>
-): string[] => {
-    const errors: string[] = [
-        ...validateRequiredStringField(
-            "replication",
-            "primaryStatusUrl",
-            data.primaryStatusUrl,
-            "Primary status URL is required for replication monitors"
-        ),
-        ...validateRequiredStringField(
-            "replication",
-            "replicaStatusUrl",
-            data.replicaStatusUrl,
-            "Replica status URL is required for replication monitors"
-        ),
-        ...validateRequiredStringField(
-            "replication",
-            "replicationTimestampField",
-            data.replicationTimestampField,
-            "Replication timestamp field is required for replication monitors"
-        ),
-    ];
-
-    errors.push(
-        ...validateRequiredNumberField(
-            "replication",
-            "maxReplicationLagSeconds",
-            data.maxReplicationLagSeconds,
-            "Maximum replication lag is required for replication monitors"
-        )
-    );
-
-    return errors;
-};
+): string[] => [
+    ...validateRequiredStringField(
+        "replication",
+        "primaryStatusUrl",
+        data.primaryStatusUrl,
+        "Primary status URL is required for replication monitors"
+    ),
+    ...validateRequiredStringField(
+        "replication",
+        "replicaStatusUrl",
+        data.replicaStatusUrl,
+        "Replica status URL is required for replication monitors"
+    ),
+    ...validateRequiredStringField(
+        "replication",
+        "replicationTimestampField",
+        data.replicationTimestampField,
+        "Replication timestamp field is required for replication monitors"
+    ),
+    ...validateRequiredNumberField(
+        "replication",
+        "maxReplicationLagSeconds",
+        data.maxReplicationLagSeconds,
+        "Maximum replication lag is required for replication monitors"
+    ),
+];
 
 const validateServerHeartbeatMonitorFormData = (
     data: Partial<ServerHeartbeatFormData>
-): string[] => {
-    const errors: string[] = [
-        ...validateRequiredStringField(
-            "server-heartbeat",
-            "url",
-            data.url,
-            "Heartbeat URL is required for server heartbeat monitors"
-        ),
-        ...validateRequiredStringField(
-            "server-heartbeat",
-            "heartbeatStatusField",
-            data.heartbeatStatusField,
-            "Heartbeat status field is required for server heartbeat monitors"
-        ),
-        ...validateRequiredStringField(
-            "server-heartbeat",
-            "heartbeatTimestampField",
-            data.heartbeatTimestampField,
-            "Heartbeat timestamp field is required for server heartbeat monitors"
-        ),
-        ...validateRequiredStringField(
-            "server-heartbeat",
-            "heartbeatExpectedStatus",
-            data.heartbeatExpectedStatus,
-            "Expected heartbeat status is required for server heartbeat monitors"
-        ),
-    ];
-
-    errors.push(
-        ...validateRequiredNumberField(
-            "server-heartbeat",
-            "heartbeatMaxDriftSeconds",
-            data.heartbeatMaxDriftSeconds,
-            "Heartbeat drift tolerance is required for server heartbeat monitors"
-        )
-    );
-
-    return errors;
-};
+): string[] => [
+    ...validateRequiredStringField(
+        "server-heartbeat",
+        "url",
+        data.url,
+        "Heartbeat URL is required for server heartbeat monitors"
+    ),
+    ...validateRequiredStringField(
+        "server-heartbeat",
+        "heartbeatStatusField",
+        data.heartbeatStatusField,
+        "Heartbeat status field is required for server heartbeat monitors"
+    ),
+    ...validateRequiredStringField(
+        "server-heartbeat",
+        "heartbeatTimestampField",
+        data.heartbeatTimestampField,
+        "Heartbeat timestamp field is required for server heartbeat monitors"
+    ),
+    ...validateRequiredStringField(
+        "server-heartbeat",
+        "heartbeatExpectedStatus",
+        data.heartbeatExpectedStatus,
+        "Expected heartbeat status is required for server heartbeat monitors"
+    ),
+    ...validateRequiredNumberField(
+        "server-heartbeat",
+        "heartbeatMaxDriftSeconds",
+        data.heartbeatMaxDriftSeconds,
+        "Heartbeat drift tolerance is required for server heartbeat monitors"
+    ),
+];
 
 const validateWebsocketKeepaliveMonitorFormData = (
     data: Partial<WebsocketKeepaliveFormData>

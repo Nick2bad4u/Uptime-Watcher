@@ -130,22 +130,24 @@ const monitorValidationBuilders: Record<
     }),
     dns: ({ expectedValue, host, recordType }): UnknownRecord => {
         const trimmedRecordType = safeTrim(recordType);
-        const payload: UnknownRecord = {};
-
-        payload["host"] = toOptionalString(host);
-
         const candidate = toOptionalString(expectedValue);
+        const basePayload: UnknownRecord = {
+            host: toOptionalString(host),
+            recordType: trimmedRecordType || undefined,
+        };
+
         if (
             trimmedRecordType.length > 0 &&
             trimmedRecordType.toUpperCase() !== "ANY" &&
-            candidate
+            candidate !== undefined
         ) {
-            payload["expectedValue"] = candidate;
+            return {
+                ...basePayload,
+                expectedValue: candidate,
+            } satisfies UnknownRecord;
         }
 
-        payload["recordType"] = trimmedRecordType || undefined;
-
-        return payload;
+        return basePayload;
     },
     http: ({ url }): UnknownRecord => ({
         url: toOptionalString(url),

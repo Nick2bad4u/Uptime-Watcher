@@ -285,6 +285,20 @@ export function isValidUrl(
         return false;
     }
 
+    const urlOptions = {
+        allow_protocol_relative_urls: false,
+        allow_trailing_dot: false,
+        allow_underscores: false,
+        disallow_auth: false,
+        protocols: ["http", "https"],
+        require_host: true,
+        require_port: false,
+        require_protocol: true,
+        require_tld: false,
+        require_valid_protocol: true,
+        ...options,
+    } satisfies Parameters<typeof validator.isURL>[1];
+
     if (value.includes("'") || value.includes("`")) {
         return false;
     }
@@ -293,28 +307,49 @@ export function isValidUrl(
         return false;
     }
 
-    const firstSchemeSeparator = value.indexOf("://");
-    if (firstSchemeSeparator !== -1) {
-        const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
-        if (/^https?:\/\//v.test(remainder)) {
+    if (urlOptions.require_protocol && !value.includes("://")) {
+        return false;
+    }
+
+    const allowedProtocols = urlOptions.protocols ?? [];
+
+    const requiresAuthorityDelimiter = allowedProtocols.some((protocol) => {
+        const normalizedProtocol = protocol.toLowerCase();
+        return normalizedProtocol === "http" || normalizedProtocol === "https";
+    });
+
+    if (requiresAuthorityDelimiter) {
+        const normalizedValue = value.toLowerCase();
+
+        const hasMissingAuthoritySlashes = (scheme: string): boolean => {
+            if (!normalizedValue.startsWith(scheme)) {
+                return false;
+            }
+
+            const firstCharacter = normalizedValue.charAt(scheme.length);
+            const secondCharacter = normalizedValue.charAt(scheme.length + 1);
+            return firstCharacter !== "/" || secondCharacter !== "/";
+        };
+
+        if (hasMissingAuthoritySlashes("http:")) {
+            return false;
+        }
+
+        if (hasMissingAuthoritySlashes("https:")) {
             return false;
         }
     }
 
-    // Default options to allow localhost and restrict to HTTP/HTTPS
-    const urlOptions = {
-        allow_protocol_relative_urls: false,
-        allow_trailing_dot: false,
-        allow_underscores: false,
-        disallow_auth: false,
-        protocols: ["http", "https"], // Restrict to web protocols by default
-        require_host: true,
-        require_port: false,
-        require_protocol: true,
-        require_tld: false, // Allow localhost without TLD
-        require_valid_protocol: true,
-        ...options,
-    };
+    const firstSchemeSeparator = value.indexOf("://");
+    if (firstSchemeSeparator !== -1) {
+        const remainder = value.slice(firstSchemeSeparator + 3).toLowerCase();
+        if (
+            (remainder.startsWith("http:") && remainder.slice(5, 7) === "//") ||
+            (remainder.startsWith("https:") && remainder.slice(6, 8) === "//")
+        ) {
+            return false;
+        }
+    }
 
     return validator.isURL(value, urlOptions);
 }

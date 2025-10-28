@@ -23,7 +23,6 @@
     "noDependencyColor": "#00bfa6",
     "cyclicNodeColor": "#ff5f6d",
     "edgeColor": "#4c5d80",
-    "graphVizPath": "C:/Program Files/Graphviz/bin/dot.exe",
     "excludeRegExp": [
         "^\\.cache/",
         "^coverage/",

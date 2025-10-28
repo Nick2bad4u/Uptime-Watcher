@@ -1196,8 +1196,7 @@ describe("TypedEventBus and Event Processing Benchmarks", () => {
                         "site-status-changed",
                         async (event) => {
                             // Store event data in memory (simulate caching)
-                            const cache = new Map();
-                            cache.set(event.id, event);
+                            const cache = new Map([[event.id, event]]);
 
                             // Process event
                             const processed = {

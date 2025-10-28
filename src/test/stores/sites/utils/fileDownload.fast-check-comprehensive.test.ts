@@ -356,7 +356,7 @@ describe("fileDownload utilities - Comprehensive Fast-Check Coverage", () => {
 
                         // Since we're using safe characters, no need to escape
                         const pattern = new RegExp(
-                            `^${prefix}-\\d{4}-\\d{2}-\\d{2}\\.${extension}$`
+                            String.raw`^${prefix}-\d{4}-\d{2}-\d{2}\.${extension}$`
                         );
                         expect(fileName).toMatch(pattern);
                     }

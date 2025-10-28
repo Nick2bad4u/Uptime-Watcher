@@ -10,6 +10,7 @@ import reactScan from "@react-scan/vite-plugin-react-scan";
 import react from "@vitejs/plugin-react";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { inspect } from "node:util";
 import pc from "picocolors";
 import { visualizer } from "rollup-plugin-visualizer";
 import {
@@ -30,7 +31,47 @@ import { coverageConfigDefaults, defaultExclude } from "vitest/config";
 
 import { getEnvVar as getEnvironmentVariable } from "./shared/utils/environment";
 
-const dirname = import.meta.dirname;
+const formatUnknownError = (error: unknown): string => {
+    if (typeof error === "string") {
+        return error;
+    }
+
+    if (error instanceof Error) {
+        return error.message;
+    }
+
+    return inspect(error, { depth: 2 });
+};
+
+const wrapDirectoryResolutionError = (error: unknown): Error =>
+    new Error(
+        `Failed to resolve Vite configuration directory: ${formatUnknownError(
+            error
+        )}`,
+        { cause: error }
+    );
+
+const resolveFromConfigDir = (
+    baseDir: string,
+    relativePath: string
+): string => {
+    try {
+        return path.resolve(baseDir, relativePath);
+    } catch (error: unknown) {
+        throw new Error(
+            `Failed to resolve path from Vite config directory: ${relativePath}`,
+            { cause: error }
+        );
+    }
+};
+
+const dirname = (() => {
+    try {
+        return import.meta.dirname;
+    } catch (error: unknown) {
+        throw wrapDirectoryResolutionError(error);
+    }
+})();
 const VITE_BUILD_TARGET = "esnext";
 
 /**
@@ -42,16 +83,51 @@ const getWasmSourcePath = (): string => {
     const fallbackPath =
         "node_modules/node-sqlite3-wasm/dist/node-sqlite3-wasm.wasm";
 
+    const resolveAssetPath = (relativePath: string): null | string => {
+        try {
+            return normalizePath(resolveFromConfigDir(dirname, relativePath));
+        } catch (error: unknown) {
+            console.warn(
+                pc.red(
+                    `[WASM] ⚠️  Failed to resolve path '${relativePath}': ${formatUnknownError(
+                        error
+                    )}`
+                )
+            );
+            return null;
+        }
+    };
+
+    const assetPathExists = (absolutePath: null | string): boolean => {
+        if (absolutePath === null) {
+            return false;
+        }
+
+        try {
+            // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Paths are derived from validated project-relative inputs.
+            return existsSync(absolutePath);
+        } catch (error: unknown) {
+            console.warn(
+                pc.red(
+                    `[WASM] ⚠️  Failed to check existence for '${absolutePath}': ${formatUnknownError(
+                        error
+                    )}`
+                )
+            );
+            return false;
+        }
+    };
+
     // Check primary location (assets directory)
-    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Safe: checking build-time asset paths with known constants
-    if (existsSync(normalizePath(path.resolve(dirname, primaryPath)))) {
+    const resolvedPrimaryPath = resolveAssetPath(primaryPath);
+    if (assetPathExists(resolvedPrimaryPath)) {
         console.log(pc.green(`[WASM] ✅ Found SQLite WASM at ${primaryPath}`));
         return primaryPath;
     }
 
     // Check fallback location (node_modules)
-    // eslint-disable-next-line security/detect-non-literal-fs-filename, n/no-sync -- Safe: checking build-time asset paths with known constants
-    if (existsSync(normalizePath(path.resolve(dirname, fallbackPath)))) {
+    const resolvedFallbackPath = resolveAssetPath(fallbackPath);
+    if (assetPathExists(resolvedFallbackPath)) {
         console.log(
             pc.yellow(
                 `[WASM] ⚠️  Using fallback SQLite WASM from ${fallbackPath}`
