@@ -31,7 +31,7 @@ handoffs:
     send: false
   - label: Review Work
     agent: BeastMode
-    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md
+    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md - If everything is complete, clear the todo list.
     send: false
 target: github-copilot
 ---
