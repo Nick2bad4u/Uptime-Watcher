@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
-import { SiteService } from "../../stores/sites/services/SiteService";
+import { SiteService } from "../../services/SiteService";
 import { logger } from "../../services/logger";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =

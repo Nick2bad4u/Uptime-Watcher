@@ -13,9 +13,9 @@ import type { Site, StatusUpdate } from "@shared/types";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import { logger } from "../../services/logger";
+import { MonitoringService } from "../../services/MonitoringService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { MonitoringService } from "./services/MonitoringService";
 import { applyStatusUpdateSnapshot } from "./utils/statusUpdateHandler";
 
 /**

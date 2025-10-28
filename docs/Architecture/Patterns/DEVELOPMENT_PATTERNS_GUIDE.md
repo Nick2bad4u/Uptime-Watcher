@@ -669,7 +669,7 @@ declare global {
   the orchestrator. Treat the payload as authoritative and feed it directly
   into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
 - Cross-check the canonical implementation in
-  [`SiteService.removeMonitor`](../../../src/stores/sites/services/SiteService.ts),
+  [`SiteService.removeMonitor`](../../../src/services/SiteService.ts),
   which demonstrates validating the persisted snapshot with
   `validateSiteSnapshot` before mutating store state.
 - Avoid reconstructing monitor arrays in the renderer. Any transformation risks

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-import { MonitoringService } from "../../../stores/sites/services/MonitoringService";
+import { MonitoringService } from "../../../services/MonitoringService";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
 const MockElectronBridgeNotReadyError = vi.hoisted(

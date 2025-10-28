@@ -42,8 +42,8 @@ import { create, type StoreApi, type UseBoundStore } from "zustand";
 import type { SitesStore } from "./types";
 
 import { DataService } from "../../services/DataService";
-import { MonitoringService } from "./services/MonitoringService";
-import { SiteService } from "./services/SiteService";
+import { MonitoringService } from "../../services/MonitoringService";
+import { SiteService } from "../../services/SiteService";
 import { createSiteMonitoringActions } from "./useSiteMonitoring";
 import { createSiteOperationsActions } from "./useSiteOperations";
 import {

@@ -19,6 +19,10 @@ import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { validateMonitorData } from "@shared/validation/schemas";
+import {
+    type DuplicateSiteIdentifier,
+    sanitizeSitesByIdentifier,
+} from "@shared/validation/siteIntegrity";
 import { ipcMain, shell } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -1028,7 +1032,31 @@ export class IpcService {
         // Get sites handler (no parameters)
         registerStandardizedIpcHandler(
             "get-sites",
-            async () => this.uptimeOrchestrator.getSites(),
+            async () => {
+                const sites = await this.uptimeOrchestrator.getSites();
+                const { duplicates, sanitizedSites } =
+                    sanitizeSitesByIdentifier(sites);
+
+                if (duplicates.length > 0) {
+                    logger.error(
+                        "[IpcService] Duplicate site identifiers detected in get-sites response",
+                        undefined,
+                        {
+                            duplicateCount: duplicates.length,
+                            duplicates: duplicates.map(
+                                (entry: DuplicateSiteIdentifier) => ({
+                                    identifier: entry.identifier,
+                                    occurrences: entry.occurrences,
+                                })
+                            ),
+                            originalSites: sites.length,
+                            sanitizedSites: sanitizedSites.length,
+                        }
+                    );
+                }
+
+                return sanitizedSites.map((site) => structuredClone(site));
+            },
             SiteHandlerValidators.getSites,
             this.registeredIpcHandlers
         );

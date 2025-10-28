@@ -192,7 +192,7 @@ returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and
 avoid synthesizing partial results locally. This keeps optimistic updates
 aligned with the authoritative orchestrator payload and matches the guidance in
 `docs/TSDoc/stores/sites.md`. For a canonical implementation, reference
-[`SiteService.removeMonitor`](../../src/stores/sites/services/SiteService.ts),
+[`SiteService.removeMonitor`](../../src/services/SiteService.ts),
 which validates the persisted snapshot with the shared guards before updating
 renderer state.
 

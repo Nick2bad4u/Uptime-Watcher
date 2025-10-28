@@ -52,11 +52,11 @@ const mockMonitoringService = vi.hoisted(() => ({
     stopMonitoringForSite: vi.fn(),
 }));
 
-vi.mock("../../../stores/sites/services/SiteService", () => ({
+vi.mock("../../../services/SiteService", () => ({
     SiteService: mockSiteService,
 }));
 
-vi.mock("../../../stores/sites/services/MonitoringService", () => ({
+vi.mock("../../../services/MonitoringService", () => ({
     MonitoringService: mockMonitoringService,
 }));
 

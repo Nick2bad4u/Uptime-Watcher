@@ -186,7 +186,7 @@ describe("IPC Response Handling Regression Tests", () => {
 
             // Import the service after mocking
             const { SiteService } = await import(
-                "../../../stores/sites/services/SiteService"
+                "../../../services/SiteService"
             );
 
             const testSite: Site = {
@@ -215,7 +215,7 @@ describe("IPC Response Handling Regression Tests", () => {
             );
 
             const { SiteService } = await import(
-                "../../../stores/sites/services/SiteService"
+                "../../../services/SiteService"
             );
 
             try {
@@ -275,7 +275,7 @@ describe("IPC Response Handling Regression Tests", () => {
             );
 
             const { SiteService } = await import(
-                "../../../stores/sites/services/SiteService"
+                "../../../services/SiteService"
             );
 
             // The error should propagate and not be silently handled

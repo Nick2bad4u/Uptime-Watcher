@@ -16,8 +16,8 @@ import {
     validateSiteSnapshots,
 } from "@shared/validation/guards";
 
-import { logger } from "../../../services/logger";
-import { getIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+import { logger } from "./logger";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers

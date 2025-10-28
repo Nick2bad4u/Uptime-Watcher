@@ -160,7 +160,7 @@ describe(createSiteOperationsActions, () => {
             getSites: vi.fn(() => [mockSite]),
             removeSite: vi.fn(),
             setSites: vi.fn(),
-            syncSites: vi.fn(),
+            syncSites: vi.fn(async () => undefined),
             services: {
                 data: dataService,
                 site: siteService,
@@ -433,7 +433,7 @@ describe(createSiteOperationsActions, () => {
     });
 
     describe("initializeSites", () => {
-        it("should initialize sites from backend", async ({
+        it("should initialize sites from backend using state sync", async ({
             task,
             annotate,
         }) => {
@@ -443,15 +443,14 @@ describe(createSiteOperationsActions, () => {
             await annotate("Type: Initialization", "type");
 
             const mockSites = [mockSite];
-            // Mock preload API to return extracted Site array directly
-            mockElectronAPI.sites.getSites.mockResolvedValue(mockSites);
+            vi.mocked(mockDeps.getSites).mockReturnValue(mockSites);
 
             const result = await actions.initializeSites();
 
-            expect(mockElectronAPI.sites.getSites).toHaveBeenCalled();
-            expect(mockDeps.setSites).toHaveBeenCalledWith(mockSites);
+            expect(mockDeps.syncSites).toHaveBeenCalledTimes(1);
+            expect(mockDeps.setSites).not.toHaveBeenCalled();
             expect(result).toEqual({
-                message: "Successfully loaded 1 sites",
+                message: "Synchronized 1 sites from backend",
                 sitesLoaded: 1,
                 success: true,
             });
@@ -463,13 +462,12 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Mock preload API to return extracted empty array directly
-            mockElectronAPI.sites.getSites.mockResolvedValue([]);
+            vi.mocked(mockDeps.getSites).mockReturnValueOnce([]);
 
             const result = await actions.initializeSites();
 
             expect(result).toEqual({
-                message: "Successfully loaded 0 sites",
+                message: "Synchronized 0 sites from backend",
                 sitesLoaded: 0,
                 success: true,
             });
@@ -484,7 +482,7 @@ describe(createSiteOperationsActions, () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Initialization", "type");
 
-            mockElectronAPI.sites.getSites.mockRejectedValue(
+            vi.mocked(mockDeps.syncSites).mockRejectedValue(
                 new Error("Backend error")
             );
 

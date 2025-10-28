@@ -9,8 +9,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { mockElectronAPI } from "../setup";
-import { SiteService } from "../../stores/sites/services/SiteService";
-import { MonitoringService } from "../../stores/sites/services/MonitoringService";
+import { SiteService } from "../../services/SiteService";
+import { MonitoringService } from "../../services/MonitoringService";
 
 const mockStateSyncService = vi.hoisted(() => ({
     getSyncStatus: vi.fn(),
@@ -55,7 +55,7 @@ vi.mock("../../types/ipc", () => ({
 }));
 
 // Mock SiteService that the store operations use
-vi.mock("../../stores/sites/services/SiteService", () => ({
+vi.mock("../../services/SiteService", () => ({
     SiteService: {
         addSite: vi.fn(),
         getSites: vi.fn(),
@@ -66,7 +66,7 @@ vi.mock("../../stores/sites/services/SiteService", () => ({
 }));
 
 // Mock MonitoringService that monitoring operations use
-vi.mock("../../stores/sites/services/MonitoringService", () => ({
+vi.mock("../../services/MonitoringService", () => ({
     MonitoringService: {
         startMonitoring: vi.fn(),
         stopMonitoring: vi.fn(),
@@ -305,9 +305,6 @@ describe("useSitesStore Function Coverage Tests", () => {
         });
 
         it("should exercise initialization functions", async () => {
-            // Mock initialization response
-            mockElectronAPI.sites.getSites.mockResolvedValueOnce([]);
-
             const store = useSitesStore.getState();
 
             // Test initializeSites
@@ -317,7 +314,8 @@ describe("useSitesStore Function Coverage Tests", () => {
             expect(typeof result.success).toBe("boolean");
             expect(typeof result.sitesLoaded).toBe("number");
             expect(typeof result.message).toBe("string");
-            expect(SiteService.getSites).toHaveBeenCalled();
+            expect(mockStateSyncService.requestFullSync).toHaveBeenCalled();
+            expect(SiteService.getSites).not.toHaveBeenCalled();
         });
 
         it("should exercise monitoring operations", async () => {

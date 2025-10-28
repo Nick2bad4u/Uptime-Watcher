@@ -10,15 +10,20 @@ Uptime Watcher uses type-safe IPC (Inter-Process Communication) between the Elec
 
 ### Access Pattern
 
-All IPC communication goes through the preload-exposed `window.electronAPI` object with domain-based organization:
+Renderer code should consume the typed service layer under `src/services` rather than calling `window.electronAPI` directly. These helpers wait for the preload bridge, apply validation, and centralize error reporting.
 
 ```typescript
-// Available in renderer process (React components)
-const sites = await window.electronAPI.sites.getSites();
-const createdSite = await window.electronAPI.sites.addSite(siteData);
-const historyLimit = await window.electronAPI.settings.getHistoryLimit();
-const monitorTypes = await window.electronAPI.monitorTypes.getMonitorTypes();
+import { SiteService } from "src/services/SiteService";
+import { MonitoringService } from "src/services/MonitoringService";
+import { StateSyncService } from "src/services/StateSyncService";
+
+const sites = await SiteService.getSites();
+const createdSite = await SiteService.addSite(siteData);
+await MonitoringService.startMonitoring();
+const syncResult = await StateSyncService.requestFullSync();
 ```
+
+> ℹ️ **Low-level bridge**: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
 
 ### Domain-Based API Organization
 
@@ -69,7 +74,7 @@ registerStandardizedIpcHandler(
 );
 
 // Frontend: Type-safe calls with automatic inference
-const newSite: Site = await window.electronAPI.sites.addSite({
+const newSite: Site = await SiteService.addSite({
   name: "Example Site",
   url: "https://example.com",
   monitors: [...]
@@ -78,14 +83,16 @@ const newSite: Site = await window.electronAPI.sites.addSite({
 
 ## 🗂️ IPC API Reference
 
-### Sites API (`window.electronAPI.sites`)
+### Sites API (`SiteService`)
+
+> Primary entry point: `src/services/SiteService`. Under the hood this wraps `window.electronAPI.sites`.
 
 #### `getSites(): Promise<Site[]>`
 
 Retrieves all configured sites with their monitors.
 
 ```typescript
-const sites = await window.electronAPI.sites.getSites();
+const sites = await SiteService.getSites();
 // Returns: Site[] with complete monitor configurations
 ```
 
@@ -95,7 +102,7 @@ Creates a new site (and its monitors) using the transactional repository
 pipeline. The backend emits a `site:added` renderer event upon success.
 
 ```typescript
-const newSite = await window.electronAPI.sites.addSite({
+const newSite = await SiteService.addSite({
  identifier: "site-001",
  name: "My Website",
  url: "https://mywebsite.com",
@@ -124,7 +131,7 @@ Updates an existing site and/or its monitors. The backend broadcasts
 `site:updated` with the new snapshot and list of changed fields.
 
 ```typescript
-const updatedSite = await window.electronAPI.sites.updateSite(siteIdentifier, {
+const updatedSite = await SiteService.updateSite(siteIdentifier, {
  name: "New Site Name",
  description: "Updated description",
 });
@@ -136,7 +143,7 @@ Deletes a site together with its monitors and history. Returns `true` on
 success and emits a `site:removed` event once cleanup is complete.
 
 ```typescript
-const removed = await window.electronAPI.sites.removeSite(siteIdentifier);
+const removed = await SiteService.removeSite(siteIdentifier);
 if (removed) {
  console.info(`Site ${siteIdentifier} removed`);
 }
@@ -147,10 +154,7 @@ if (removed) {
 Removes a single monitor from a site and returns the updated site snapshot.
 
 ```typescript
-const updatedSite = await window.electronAPI.sites.removeMonitor(
- siteIdentifier,
- monitorId
-);
+const updatedSite = await SiteService.removeMonitor(siteIdentifier, monitorId);
 ```
 
 #### `deleteAllSites(): Promise<number>`
@@ -158,7 +162,9 @@ const updatedSite = await window.electronAPI.sites.removeMonitor(
 Dangerous operation intended for test utilities. Removes every site in the
 database and returns the number of deleted records. Use with extreme caution.
 
-### Monitoring API (`window.electronAPI.monitoring`)
+### Monitoring API (`MonitoringService`)
+
+> Primary entry point: `src/services/MonitoringService`. Internally this interacts with `window.electronAPI.monitoring`.
 
 #### `checkSiteNow(siteIdentifier: string, monitorId: string): Promise<StatusUpdate | undefined>`
 
@@ -166,10 +172,7 @@ Performs a manual health check for a specific monitor and returns the most
 recent `StatusUpdate` when available.
 
 ```typescript
-const result = await window.electronAPI.monitoring.checkSiteNow(
- siteIdentifier,
- monitorId
-);
+const result = await MonitoringService.checkSiteNow(siteIdentifier, monitorId);
 if (result) {
  console.log(`Manual check completed at ${new Date(result.timestamp)}`);
 }
@@ -181,7 +184,7 @@ Starts monitoring for every configured site. Resolves to `true` when the
 backend accepts the request and emits `monitoring:started`.
 
 ```typescript
-const started = await window.electronAPI.monitoring.startMonitoring();
+const started = await MonitoringService.startMonitoring();
 ```
 
 #### `stopMonitoring(): Promise<boolean>`
@@ -190,7 +193,7 @@ Stops all active monitors. Resolves to `true` when monitoring halts and
 emits `monitoring:stopped`.
 
 ```typescript
-const stopped = await window.electronAPI.monitoring.stopMonitoring();
+const stopped = await MonitoringService.stopMonitoring();
 ```
 
 #### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
@@ -199,7 +202,7 @@ Starts monitoring for a specific monitor belonging to the given site. Emits the
 standard monitoring lifecycle and cache invalidation events when successful.
 
 ```typescript
-await window.electronAPI.monitoring.startMonitoringForMonitor(
+await MonitoringService.startMonitoringForMonitor(
  siteIdentifier,
  specificMonitorId
 );
@@ -210,7 +213,7 @@ await window.electronAPI.monitoring.startMonitoringForMonitor(
 Starts monitoring for every monitor associated with the provided site.
 
 ```typescript
-await window.electronAPI.monitoring.startMonitoringForSite(siteIdentifier);
+await MonitoringService.startMonitoringForSite(siteIdentifier);
 ```
 
 #### `stopMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
@@ -218,10 +221,7 @@ await window.electronAPI.monitoring.startMonitoringForSite(siteIdentifier);
 Stops monitoring for a single monitor.
 
 ```typescript
-await window.electronAPI.monitoring.stopMonitoringForMonitor(
- siteIdentifier,
- monitorId
-);
+await MonitoringService.stopMonitoringForMonitor(siteIdentifier, monitorId);
 ```
 
 #### `stopMonitoringForSite(siteIdentifier: string): Promise<boolean>`
@@ -229,7 +229,7 @@ await window.electronAPI.monitoring.stopMonitoringForMonitor(
 Stops monitoring for all monitors of a given site.
 
 ```typescript
-await window.electronAPI.monitoring.stopMonitoringForSite(siteIdentifier);
+await MonitoringService.stopMonitoringForSite(siteIdentifier);
 ```
 
 #### `validateMonitorData(type: string, data: unknown): Promise<ValidationResult>`
@@ -237,10 +237,10 @@ await window.electronAPI.monitoring.stopMonitoringForSite(siteIdentifier);
 Validates monitor configuration against type-specific schemas.
 
 ```typescript
-const validation = await window.electronAPI.monitoring.validateMonitorData(
- "http",
- { url: "https://example.com", timeout: 5000 }
-);
+const validation = await MonitorTypesService.validateMonitorData("http", {
+ url: "https://example.com",
+ timeout: 5000,
+});
 // Returns: { isValid: boolean, errors?: string[] }
 ```
 
@@ -253,7 +253,9 @@ Applies monitor-specific formatting to detail strings in the renderer UI.
 Returns a human-friendly suffix for monitor titles (e.g., HTTP method or host
 name).
 
-### Data API (`window.electronAPI.data`)
+### Data API (`DataService`)
+
+> Primary entry point: `src/services/DataService`. Internally this wraps `window.electronAPI.data`.
 
 #### `exportData(): Promise<string>`
 
@@ -261,7 +263,7 @@ Exports the full application dataset (sites, monitors, history snapshots, and
 settings) as a JSON string.
 
 ```typescript
-const payload = await window.electronAPI.data.exportData();
+const payload = await DataService.exportData();
 const snapshot = JSON.parse(payload);
 ```
 
@@ -271,7 +273,7 @@ Imports a previously exported dataset. The argument must be the raw JSON string
 produced by `exportData()`.
 
 ```typescript
-const success = await window.electronAPI.data.importData(payload);
+const success = await DataService.importData(payload);
 if (!success) {
  notify("Import reported validation failures");
 }
@@ -287,7 +289,7 @@ name.
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 const backup: SerializedDatabaseBackupResult =
- await window.electronAPI.data.downloadSqliteBackup();
+ await DataService.downloadSqliteBackup();
 
 await handleSQLiteBackupDownload(async () => backup);
 // Downloads `backup.fileName` using the ArrayBuffer payload.
@@ -298,7 +300,9 @@ await handleSQLiteBackupDownload(async () => backup);
 > creation timestamp, and original on-disk location) can be used for analytics
 > or audit logging.
 
-### Monitor Types API (`window.electronAPI.monitorTypes`)
+### Monitor Types API (`MonitorTypesService`)
+
+> Primary entry point: `src/services/MonitorTypesService`. Internally this wraps `window.electronAPI.monitorTypes`.
 
 #### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 
@@ -306,18 +310,20 @@ Retrieves the full registry of available monitor types, including validation
 metadata and editor hints.
 
 ```typescript
-const monitorTypes = await window.electronAPI.monitorTypes.getMonitorTypes();
+const monitorTypes = await MonitorTypesService.getMonitorTypes();
 // Returns serialized configurations (no prototype functions)
 ```
 
-### Settings API (`window.electronAPI.settings`)
+### Settings API (`SettingsService`)
+
+> Primary entry point: `src/services/SettingsService`. Internally this wraps `window.electronAPI.settings`.
 
 #### `getHistoryLimit(): Promise<number>`
 
 Retrieves the current history retention limit (in days).
 
 ```typescript
-const limit = await window.electronAPI.settings.getHistoryLimit();
+const limit = await SettingsService.getHistoryLimit();
 ```
 
 #### `resetSettings(): Promise<void>`
@@ -326,7 +332,7 @@ Restores application settings to their factory defaults while leaving domain
 state untouched (sites, monitors, and history remain intact).
 
 ```typescript
-await window.electronAPI.settings.resetSettings();
+await SettingsService.resetSettings();
 ```
 
 #### `updateHistoryLimit(limitDays: number): Promise<number>`
@@ -334,17 +340,19 @@ await window.electronAPI.settings.resetSettings();
 Sets the history retention limit and returns the persisted value.
 
 ```typescript
-const updatedLimit = await window.electronAPI.settings.updateHistoryLimit(45);
+const updatedLimit = await SettingsService.updateHistoryLimit(45);
 ```
 
-### State Sync API (`window.electronAPI.stateSync`)
+### State Sync API (`StateSyncService`)
+
+> Primary entry point: `src/services/StateSyncService`. Internally this wraps `window.electronAPI.stateSync`.
 
 #### `getSyncStatus(): Promise<StateSyncStatusSummary>`
 
 Retrieves the latest synchronization status snapshot, including last sync time, site count, and origin.
 
 ```typescript
-const status = await window.electronAPI.stateSync.getSyncStatus();
+const status = await StateSyncService.getSyncStatus();
 console.log(`Last sync: ${status.lastSyncAt}`);
 ```
 
@@ -353,7 +361,7 @@ console.log(`Last sync: ${status.lastSyncAt}`);
 Performs a full synchronization round-trip and returns the authoritative site snapshot. The call also emits a `sites:state-synchronized` event to all renderers.
 
 ```typescript
-const { sites } = await window.electronAPI.stateSync.requestFullSync();
+const { sites } = await StateSyncService.requestFullSync();
 useSitesStore.getState().setSites(sites);
 ```
 
@@ -362,7 +370,7 @@ useSitesStore.getState().setSites(sites);
 Registers a listener for incremental state sync events (bulk-sync, update, delete). Returns a cleanup function to unsubscribe.
 
 ```typescript
-const cleanup = await window.electronAPI.stateSync.onStateSyncEvent((event) => {
+const cleanup = await StateSyncService.onStateSyncEvent((event) => {
  if (event.action === "bulk-sync") {
   useSitesStore.getState().setSites(event.sites);
  }

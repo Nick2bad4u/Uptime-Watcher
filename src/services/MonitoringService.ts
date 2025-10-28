@@ -39,7 +39,7 @@ import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
-import { getIpcServiceHelpers } from "../../../services/utils/createIpcServiceHelpers";
+import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers

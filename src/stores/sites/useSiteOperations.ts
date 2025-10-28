@@ -206,20 +206,25 @@ export const createSiteOperationsActions = (
         withSiteOperationReturning(
             "initializeSites",
             async () => {
-                // Preload now returns extracted data directly
-                const sites = await deps.services.site.getSites();
-                deps.setSites(sites);
+                await deps.syncSites();
+                const synchronizedSites = deps.getSites();
+
                 return {
-                    message: `Successfully loaded ${sites.length} sites`,
-                    sitesLoaded: sites.length,
+                    message: `Synchronized ${synchronizedSites.length} sites from backend`,
+                    sitesLoaded: synchronizedSites.length,
                     success: true,
                 };
             },
             deps,
             {
                 syncAfter: false,
-                telemetry: {},
-            } // Don't sync for initialization - we're loading the data
+                telemetry: {
+                    success: {
+                        message:
+                            "Renderer site initialization completed via state sync pipeline",
+                    },
+                },
+            }
         ),
     modifySite: async (
         identifier: string,

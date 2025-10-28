@@ -448,13 +448,26 @@ describe(IpcService, () => {
             ipcService.setupHandlers();
         });
         it("should handle sites:get requests", async () => {
+            const primarySite = {
+                identifier: "1",
+                name: "Test Site",
+                monitors: [],
+                monitoring: false,
+            };
+            const duplicateSite = {
+                ...primarySite,
+                name: "Duplicated Name",
+            };
+            const secondarySite = {
+                identifier: "2",
+                name: "Another Site",
+                monitors: [],
+                monitoring: true,
+            };
             const mockSites = [
-                {
-                    identifier: "1",
-                    name: "Test Site",
-                    monitors: [],
-                    monitoring: false,
-                },
+                primarySite,
+                duplicateSite,
+                secondarySite,
             ];
             vi.mocked(mockUptimeOrchestrator.getSites).mockResolvedValue(
                 mockSites
@@ -468,7 +481,7 @@ describe(IpcService, () => {
                 const result = await getHandler();
                 expect(result).toEqual({
                     success: true,
-                    data: mockSites,
+                    data: [primarySite, secondarySite],
                     metadata: expect.objectContaining({
                         handler: "get-sites",
                     }),

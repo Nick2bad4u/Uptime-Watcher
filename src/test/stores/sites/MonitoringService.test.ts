@@ -3,7 +3,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MonitoringService } from "../../../stores/sites/services/MonitoringService";
+import { MonitoringService } from "../../../services/MonitoringService";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
     "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment.";
