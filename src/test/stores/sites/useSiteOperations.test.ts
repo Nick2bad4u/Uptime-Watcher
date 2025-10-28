@@ -30,7 +30,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
     withErrorHandling: vi.fn(async (fn, handlers) => {
         try {
             return await fn().then((result: any) => {

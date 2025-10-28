@@ -44,7 +44,7 @@ Code-review priorities (order)
 Common patterns to check (project-specific)
 - Repository/service pattern: All DB access must go through repositories and use transactions. Check for direct sqlite/db calls in `electron/` or `src/` files.
 - Event flows: Changes to event contracts must include type updates and relevant event bus subscribers/publishers adjustments.
-- IPC surface: `electron/preload.ts` exposures and `window.electronAPI` shapes must stay typed and unchanged unless intentionally updated.
+- IPC surface: `electron/preload.ts` exposures and the renderer service contracts (which wrap `window.electronAPI`) must stay typed and unchanged unless intentionally updated.
 - No direct state mutations: Ensure state updates use store actions (Zustand) not direct mutations.
 - Type safety: No use of `any`, `unknown`, null/undefined leaks where types expect non-null.
 - Tests: New behavior must include tests or a short rationale explaining why tests are unnecessary.

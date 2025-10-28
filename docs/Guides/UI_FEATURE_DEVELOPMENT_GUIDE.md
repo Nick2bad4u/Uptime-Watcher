@@ -42,7 +42,7 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 ├─────────────────────────┤
 │      Validation Layer   │ ← Shared Validation (shared/validation)
 ├─────────────────────────┤
-│      IPC Bridge         │ ← Communication (window.electronAPI)
+│   Renderer Services     │ ← Communication via `src/services`
 ├─────────────────────────┤
 │      Electron Backend   │ ← Backend Logic (electron/)
 └─────────────────────────┘
@@ -511,6 +511,7 @@ Each store module has clear responsibilities:
 // ✅ Good: Consistent error handling with withErrorHandling
 import { withErrorHandling } from "@shared/utils/errorHandling";
 import { useErrorStore } from "../error/useErrorStore";
+import { SiteService } from "src/services/SiteService";
 
 export const createSiteOperationsActions = (
  deps: SiteOperationsDependencies
@@ -520,7 +521,7 @@ export const createSiteOperationsActions = (
   await withErrorHandling(
    async () => {
     // Perform operation
-  const savedSite = await window.electronAPI.sites.addSite(siteData);
+  const savedSite = await SiteService.addSite(siteData);
   applySavedSiteToStore(savedSite, deps);
   return savedSite;
    },

@@ -34,9 +34,6 @@ vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-// Backwards-compatible alias for existing assertions
-const mockWaitForElectronAPI = mockWaitForElectronBridge;
-
 // Mock the logger
 const mockLogger = vi.hoisted(() => ({
     error: vi.fn(),
@@ -141,19 +138,19 @@ describe("DataService", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(DataService.initialize()).resolves.toBeUndefined();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
         it("should handle initialization errors and rethrow", async () => {
             const initializationError = new Error("Electron API not available");
-            mockWaitForElectronAPI.mockRejectedValue(initializationError);
+            mockWaitForElectronBridge.mockRejectedValue(initializationError);
 
             await expect(DataService.initialize()).rejects.toThrow(
                 "Electron API not available"
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockEnsureError).toHaveBeenCalledWith(initializationError);
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "[DataService] Failed to initialize:",
@@ -163,7 +160,7 @@ describe("DataService", () => {
 
         it("should handle non-error initialization failures", async () => {
             const stringError = "String error message";
-            mockWaitForElectronAPI.mockRejectedValue(stringError);
+            mockWaitForElectronBridge.mockRejectedValue(stringError);
 
             await expect(DataService.initialize()).rejects.toBe(stringError);
 
@@ -173,7 +170,7 @@ describe("DataService", () => {
 
         it("should handle null/undefined initialization errors", async () => {
             const nullError = null;
-            mockWaitForElectronAPI.mockRejectedValue(nullError);
+            mockWaitForElectronBridge.mockRejectedValue(nullError);
 
             await expect(DataService.initialize()).rejects.toBe(nullError);
 
@@ -191,7 +188,7 @@ describe("DataService", () => {
 
             const result = await DataService.downloadSqliteBackup();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
             ).toHaveBeenCalled();
@@ -202,7 +199,7 @@ describe("DataService", () => {
 
         it("should fail if initialization fails", async () => {
             const initError = new Error("Init failed");
-            mockWaitForElectronAPI.mockRejectedValue(initError);
+            mockWaitForElectronBridge.mockRejectedValue(initError);
 
             await expect(DataService.downloadSqliteBackup()).rejects.toThrow(
                 "Init failed"
@@ -223,7 +220,7 @@ describe("DataService", () => {
                 "Backup failed"
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(
                 mockElectronAPI.data.downloadSqliteBackup
             ).toHaveBeenCalled();
@@ -256,7 +253,7 @@ describe("DataService", () => {
 
             const result = await DataService.exportData();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
             expect(result).toBe(mockExportData);
             expect(typeof result).toBe("string");
@@ -264,7 +261,7 @@ describe("DataService", () => {
 
         it("should fail if initialization fails", async () => {
             const initError = new Error("Init failed");
-            mockWaitForElectronAPI.mockRejectedValue(initError);
+            mockWaitForElectronBridge.mockRejectedValue(initError);
 
             await expect(DataService.exportData()).rejects.toThrow(
                 "Init failed"
@@ -281,7 +278,7 @@ describe("DataService", () => {
                 "Export failed"
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.exportData).toHaveBeenCalled();
         });
 
@@ -323,7 +320,7 @@ describe("DataService", () => {
 
             const result = await DataService.importData(importData);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
@@ -332,7 +329,7 @@ describe("DataService", () => {
 
         it("should fail if initialization fails", async () => {
             const initError = new Error("Init failed");
-            mockWaitForElectronAPI.mockRejectedValue(initError);
+            mockWaitForElectronBridge.mockRejectedValue(initError);
             const importData = '{"sites":[]}';
 
             await expect(DataService.importData(importData)).rejects.toThrow(
@@ -351,7 +348,7 @@ describe("DataService", () => {
                 "Import failed"
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalled();
+            expect(mockWaitForElectronBridge).toHaveBeenCalled();
             expect(mockElectronAPI.data.importData).toHaveBeenCalledWith(
                 importData
             );
@@ -442,7 +439,7 @@ describe("DataService", () => {
             expect(backup).toEqual(backupResult);
 
             // Should only initialize once due to shared initialization
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
         });
 
         it("should handle concurrent operations", async () => {
@@ -480,7 +477,7 @@ describe("DataService", () => {
                 DataService.initialize(),
             ]);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
         });
     });
 

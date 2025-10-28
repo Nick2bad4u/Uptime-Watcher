@@ -102,10 +102,6 @@ vi.mock("../../../../shared/utils", () => ({
     formatError: vi.fn((error) => error.message),
 }));
 
-vi.mock("../../utils", () => ({
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
-}));
-
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API

@@ -46,7 +46,6 @@ Object.defineProperty(globalThis, "electronAPI", {
 // Mock utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
     withErrorHandling: vi.fn((asyncFn, handlers) =>
         asyncFn().catch((error: Error) => {
             handlers.setError(error);

@@ -48,7 +48,6 @@ vi.mock("../services/SystemService", () => ({
 // Mock the store utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the theme hook

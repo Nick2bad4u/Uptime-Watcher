@@ -55,7 +55,6 @@ vi.mock("../../stores/utils", () => ({
         setLoading: mockErrorStore.setOperationLoading,
         clearError: mockErrorStore.clearStoreError,
     })),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../shared/utils/errorHandling", () => ({

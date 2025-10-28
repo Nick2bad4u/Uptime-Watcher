@@ -111,11 +111,6 @@ vi.mock("../../../services/DataService", () => ({
     },
 }));
 
-// Mock utility functions
-vi.mock("../../utils", () => ({
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
-}));
-
 describe("IPC Response Handling Regression Tests", () => {
     beforeEach(() => {
         vi.clearAllMocks();

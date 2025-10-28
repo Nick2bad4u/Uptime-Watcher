@@ -197,21 +197,20 @@ export const SitesProvider: React.FC = ({ children }) => {
 ###### **After (Zustand with Modular Composition)**:
 
 ```typescript
+import { SiteService } from "src/services/SiteService";
+
 // Modular store composition for complex stores
 export const createSitesStateActions = (
  set: SetState<SitesStore>,
  get: GetState<SitesStore>
 ) => ({
  addSite: async (siteData: SiteCreationData) => {
-  const newSite = await window.electronAPI.sites.create(siteData);
+  const newSite = await SiteService.addSite(siteData);
   set((state) => ({ sites: [...state.sites, newSite] }));
   return newSite;
  },
  updateSite: async (siteIdentifier: string, updates: Partial<Site>) => {
-  const updatedSite = await window.electronAPI.sites.update(
-   siteIdentifier,
-   updates
-  );
+  const updatedSite = await SiteService.updateSite(siteIdentifier, updates);
   set((state) => ({
    sites: state.sites.map((site) =>
     site.identifier === siteIdentifier ? updatedSite : site
@@ -225,7 +224,7 @@ export const createSiteOperationsActions = (
  get: GetState<SitesStore>
 ) => ({
  deleteSite: async (siteIdentifier: string) => {
-  await window.electronAPI.sites.delete(siteIdentifier);
+  await SiteService.removeSite(siteIdentifier);
   set((state) => ({
    sites: state.sites.filter((site) => site.identifier !== siteIdentifier),
   }));

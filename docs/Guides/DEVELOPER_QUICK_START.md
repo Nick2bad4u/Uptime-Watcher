@@ -82,7 +82,8 @@ The application follows a structured data flow pattern that ensures type safety 
 │   Zustand Stores        │ ← Modular composition (state + operations + sync + monitoring)
 │   (Modular Composition) │
 ├─────────────────────────┤
-│   window.electronAPI    │ ← Type-safe IPC bridge
+│   Renderer Services     │ ← `src/services/*` wrappers over contextBridge
+│   (SiteService, etc.)   │
 ├─────────────────────────┤
 │   IPC Service           │ ← registerStandardizedIpcHandler with validation
 ├─────────────────────────┤
@@ -127,7 +128,7 @@ The application follows a structured data flow pattern that ensures type safety 
 1. **Components**: Add to `src/components/`
 2. **State**: Create/modify modular Zustand stores in `src/stores/`
 3. **Styling**: Use Tailwind CSS classes
-4. **IPC**: Communicate via `window.electronAPI` (typed)
+4. **IPC**: Communicate via renderer services under `src/services`
 5. **Validation**: Use shared validation schemas from `shared/validation/`
 
 ## 🔧 Available Scripts
@@ -217,10 +218,12 @@ registerStandardizedIpcHandler(
   Array.isArray(data.monitors)
 );
 
-// Frontend: React components via window.electronAPI
+import { SiteService } from "src/services/SiteService";
+
+// Frontend: React components call the renderer services facade
 const handleCreateSite = async (siteData: SiteCreationData) => {
  try {
-  const result = await window.electronAPI.sites.addSite(siteData);
+  const result = await SiteService.addSite(siteData);
   console.log("Site created:", result);
  } catch (error) {
   console.error("Failed to create site:", error);
@@ -261,15 +264,23 @@ await this.eventBus.emitTyped("sites:added", {
  correlationId: generateCorrelationId(),
 });
 
-// Frontend: Listen for events via IPC forwarding
-useEffect(() => {
- const cleanup = window.electronAPI.events.onSiteAdded((data) => {
-  // Type-safe event data
-  sitesStore.addSite(data.site);
-  showNotification(`Site ${data.site.name} added successfully`);
- });
+import { EventsService } from "src/services/EventsService";
 
- return cleanup; // Automatic cleanup on unmount
+// Frontend: Listen for events via the renderer services facade
+useEffect(() => {
+ let unsubscribe: (() => void) | undefined;
+
+ void (async () => {
+  unsubscribe = await EventsService.onSiteAdded((data) => {
+   // Type-safe event data
+   sitesStore.addSite(data.site);
+   showNotification(`Site ${data.site.name} added successfully`);
+  });
+ })();
+
+ return () => {
+  unsubscribe?.();
+ };
 }, []);
 ```
 

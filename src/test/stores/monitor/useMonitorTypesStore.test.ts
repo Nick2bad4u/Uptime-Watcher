@@ -12,7 +12,6 @@ import type { ValidationResult } from "@shared/types/validation";
 // Mock the store utils module
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 import { useMonitorTypesStore } from "../../../stores/monitor/useMonitorTypesStore";

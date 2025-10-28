@@ -148,6 +148,6 @@ Because the reporter is always active, CI jobs simply need to run `npm run test:
 - **MDX warning** – the CLI may print `No story files found for the specified pattern: storybook\stories\**\*.mdx` because the project currently uses CSF-only stories. This is harmless; add an MDX story or remove the MDX story glob in `storybook/main.ts` if you want to silence it.
 - **Storybook port busy** – stop any running Storybook instance or change the port in both `storybookScript` and `storybookUrl` inside `vitest.storybook.config.ts`.
 - **Missing decorators/parameters** – ensure new preview changes land in `storybook/preview.ts`. The Vitest setup mirrors exactly what Storybook exports from that file.
-- **Electron API usage fails** – confirm the story imports `useMount` and relies on `window.electronAPI`. The `installElectronAPIMock` call in the setup guarantees the mock is present before tests run.
+- **Renderer services missing bridge** – confirm the story imports `useMount` and relies on the `installElectronAPIMock` helper so renderer services (e.g., `SiteService`) have a mocked bridge during the test run.
 
 For broader testing guidance (coverage thresholds, test location conventions, CI workflows), see `docs/Guides/TESTING.md` and `docs/Guides/TESTING_METHODOLOGY_REACT_COMPONENTS.md`

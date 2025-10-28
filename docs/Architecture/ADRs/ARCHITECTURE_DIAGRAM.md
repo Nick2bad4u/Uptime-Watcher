@@ -13,7 +13,7 @@ graph TB
         ZustandStores -->|calls| FrontendServices
         ReactComponents -->|dispatches actions| ZustandStores
 
-        FrontendServices -->|invokes| ContextBridge["window.electronAPI<br/>(contextBridge)"]
+        FrontendServices -->|invokes| ContextBridge["Renderer Services<br/>(wrap window.electronAPI)"]
     end
 
     ContextBridge -.->|"IPC BOUNDARY"| IPCService

@@ -276,7 +276,7 @@ export default function SystemArchitecture() {
     %% Domains
     subgraph Renderer["Renderer Process"]
         UI[AddSiteForm]
-        SitesSvc[SiteService\n(waitForElectronAPI)]
+        SitesSvc[SiteService\n(waitForElectronBridge)]
     end
 
     subgraph Preload["Preload Bridge"]

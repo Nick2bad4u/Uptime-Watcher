@@ -59,7 +59,7 @@ Before providing your solution, you must think through the problem systematicall
 
 - Frontend: React + TypeScript + Zustand + TailwindCSS + Vite
 - Backend: Electron main process + node-sqlite3-wasm + Node.js
-- IPC: Secure contextBridge communication (`window.electronAPI`)
+- IPC: Renderer services wrap the secure contextBridge (`window.electronAPI`)
 - State: Domain-specific Zustand stores
 - Database: Repository pattern with `executeTransaction()` wrapper
 - Events: TypedEventBus with middleware and correlation IDs

@@ -1,5 +1,9 @@
 # Zustand Store Template
 
+> **Note:** Replace `ExampleService` with your domain-specific renderer service
+> implementation under `src/services`. The snippets below assume such a facade
+> exists to encapsulate all preload bridge access.
+
 Use this template when creating new Zustand stores for frontend state management.
 
 ## Simple Store Template
@@ -38,14 +42,16 @@ For stores with straightforward state that don't require modular composition:
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; // Remove if no persistence needed
+import { ExampleService } from "src/services/ExampleService";
+import { SystemService } from "src/services/SystemService";
+import { logger } from "src/services/logger";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
-import type { ExampleItem } from "../types"; // Import relevant types
-import { SystemService } from "../../services/SystemService";
-import logger from "../../services/logger";
+import type { CreateItemData, ExampleItem } from "../types"; // Replace with your domain-specific types
 import { useErrorStore } from "../error/useErrorStore";
+import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import { logStoreAction } from "../utils";
 
 /**
@@ -118,7 +124,10 @@ const initialState: ExampleState = {
  userPreference: false,
 };
 
-const errorStore = useErrorStore.getState();
+const ERROR_STORE_KEY = "example-operations"; // Replace with a domain-specific error store key
+
+const buildErrorHandler = (operation: string) =>
+ createStoreErrorHandler(ERROR_STORE_KEY, operation);
 
 /**
  * Example store for managing [DOMAIN] state and interactions.
@@ -174,20 +183,24 @@ export const useExampleStore = create<ExampleStore>()(
 
    // Async actions
    fetchItems: async () => {
-    await withErrorHandling(async () => {
-     get().setLoading(true);
-     const items = await window.electronAPI.example.getItems();
-     set({ items });
-    }, errorStore);
-    get().setLoading(false);
+    get().setLoading(true);
+
+    try {
+     await withErrorHandling(async () => {
+      const items = await ExampleService.getItems();
+      set({ items });
+     }, buildErrorHandler("fetchItems"));
+    } finally {
+     get().setLoading(false);
+    }
    },
 
    createItem: async (data: CreateItemData) => {
     return await withErrorHandling(async () => {
-     const newItem = await window.electronAPI.example.createItem(data);
+     const newItem = await ExampleService.createItem(data);
      get().addItem(newItem);
      return newItem;
-    }, errorStore);
+    }, buildErrorHandler("createItem"));
    },
 
    deleteItem: async (id: string) => {
@@ -197,13 +210,13 @@ export const useExampleStore = create<ExampleStore>()(
      get().removeItem(id);
 
      try {
-      await window.electronAPI.example.deleteItem(id);
+      await ExampleService.deleteItem(id);
      } catch (error) {
       // Rollback on failure
       set({ items: originalItems });
       throw error;
      }
-    }, errorStore);
+    }, buildErrorHandler("deleteItem"));
    },
 
    // Utility actions
@@ -214,6 +227,8 @@ export const useExampleStore = create<ExampleStore>()(
 
    openExternal: (url: string, context?: { itemName?: string }) => {
     logStoreAction("ExampleStore", "openExternal", { url, context });
+
+    const errorStore = useErrorStore.getState();
 
     if (!isValidUrl(url)) {
      logger.warn("Blocked invalid external URL", { url, context });
@@ -583,7 +598,9 @@ describe("useExampleStore", () => {
  describe("Async Operations", () => {
   it("should handle fetchItems", async () => {
    const mockItems = [mockItem];
-   window.electronAPI.example.getItems = vi.fn().mockResolvedValue(mockItems);
+   const getItemsSpy = vi
+    .spyOn(ExampleService, "getItems")
+    .mockResolvedValue(mockItems);
 
    const { result } = renderHook(() => useExampleStore());
 
@@ -592,10 +609,13 @@ describe("useExampleStore", () => {
    });
 
    expect(result.current.items).toEqual(mockItems);
+   expect(getItemsSpy).toHaveBeenCalledTimes(1);
   });
 
   it("should handle createItem", async () => {
-   window.electronAPI.example.createItem = vi.fn().mockResolvedValue(mockItem);
+   const createSpy = vi
+    .spyOn(ExampleService, "createItem")
+    .mockResolvedValue(mockItem);
 
    const { result } = renderHook(() => useExampleStore());
 
@@ -604,13 +624,14 @@ describe("useExampleStore", () => {
    });
 
    expect(result.current.items).toContain(mockItem);
+   expect(createSpy).toHaveBeenCalledWith({ name: "Test Item" });
   });
  });
 
  describe("Error Handling", () => {
   it("should handle fetchItems errors gracefully", async () => {
-   window.electronAPI.example.getItems = vi
-    .fn()
+   vi
+    .spyOn(ExampleService, "getItems")
     .mockRejectedValue(new Error("Fetch failed"));
 
    const { result } = renderHook(() => useExampleStore());

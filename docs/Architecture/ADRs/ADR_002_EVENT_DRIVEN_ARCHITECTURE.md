@@ -132,12 +132,25 @@ Events are automatically forwarded from backend to frontend with proper cleanup:
 await this.eventBus.emitTyped("monitor:status-changed", eventData);
 
 // Frontend receives with automatic cleanup functions
-const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
- // Handle event
-});
+import { EventsService } from "src/services/EventsService";
 
-// Cleanup prevents memory leaks
-useEffect(() => cleanup, []);
+const registerMonitorUpdates = async () =>
+ await EventsService.onMonitorStatusChanged((data) => {
+  monitorStore.applyStatusUpdate(data);
+ });
+
+// Later in component cleanup
+useEffect(() => {
+ let cleanup: (() => void) | undefined;
+
+ void registerMonitorUpdates().then((unsubscribe) => {
+  cleanup = unsubscribe;
+ });
+
+ return () => {
+  cleanup?.();
+ };
+}, []);
 ```
 
 ### 6. Advanced Memory Management

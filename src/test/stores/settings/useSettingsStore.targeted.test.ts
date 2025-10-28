@@ -38,7 +38,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils with logStoreAction
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(true),
     createStoreErrorHandler: vi.fn((storeName, operation) => ({
         setError: mockErrorStore.setStoreError,
         setLoading: mockErrorStore.setOperationLoading,

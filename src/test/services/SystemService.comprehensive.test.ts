@@ -48,8 +48,6 @@ vi.mock("../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-const mockWaitForElectronAPI = mockWaitForElectronBridge;
-
 vi.mock("../../services/logger", () => ({
     logger: mockLogger,
 }));
@@ -68,7 +66,7 @@ describe("SystemService", () => {
         vi.clearAllMocks();
 
         // Reset mock implementations
-        mockWaitForElectronAPI.mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
         mockElectronAPI.system.openExternal.mockResolvedValue(true);
         mockElectronAPI.system.quitAndInstall.mockResolvedValue(true);
 
@@ -95,13 +93,13 @@ describe("SystemService", () => {
     describe("initialize", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(SystemService.initialize()).resolves.toBeUndefined();
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
         it("should handle initialization errors and rethrow", async () => {
             const error = new Error("Electron API unavailable");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SystemService.initialize()).rejects.toThrow(
                 "Electron API unavailable"
@@ -114,7 +112,7 @@ describe("SystemService", () => {
 
         it("should handle non-error initialization failures", async () => {
             const error = "String error";
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SystemService.initialize()).rejects.toBe(error);
             expect(mockLogger.error).toHaveBeenCalled();
@@ -122,7 +120,7 @@ describe("SystemService", () => {
         });
 
         it("should handle null/undefined initialization errors", async () => {
-            mockWaitForElectronAPI.mockRejectedValue(null);
+            mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SystemService.initialize()).rejects.toBeNull();
             expect(mockLogger.error).toHaveBeenCalled();
@@ -137,7 +135,7 @@ describe("SystemService", () => {
             await expect(
                 SystemService.openExternal(testUrl)
             ).resolves.toBeTruthy();
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 testUrl
             );
@@ -145,7 +143,7 @@ describe("SystemService", () => {
 
         it("should fail if initialization fails", async () => {
             const error = new Error("Initialization failed");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(
                 SystemService.openExternal("https://example.com")
@@ -160,7 +158,7 @@ describe("SystemService", () => {
             await expect(
                 SystemService.openExternal("https://example.com")
             ).rejects.toThrow("Failed to open external URL");
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledWith(
                 "https://example.com"
             );
@@ -205,7 +203,7 @@ describe("SystemService", () => {
                 ).rejects.toBeInstanceOf(TypeError);
             }
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(
                 invalidUrls.length
             );
             expect(mockElectronAPI.system.openExternal).not.toHaveBeenCalled();
@@ -244,7 +242,7 @@ describe("SystemService", () => {
             await expect(
                 SystemService.quitAndInstall()
             ).resolves.toBeUndefined();
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockElectronAPI.system.quitAndInstall).toHaveBeenCalledTimes(
                 1
             );
@@ -252,7 +250,7 @@ describe("SystemService", () => {
 
         it("should propagate initialization failure", async () => {
             const error = new Error("init failed");
-            mockWaitForElectronAPI.mockRejectedValueOnce(error);
+            mockWaitForElectronBridge.mockRejectedValueOnce(error);
 
             await expect(SystemService.quitAndInstall()).rejects.toThrow(
                 "init failed"
@@ -306,7 +304,9 @@ describe("SystemService", () => {
                 ).resolves.toBeTruthy();
             }
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(urls.length);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(
+                urls.length
+            );
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
                 urls.length
             );
@@ -330,7 +330,9 @@ describe("SystemService", () => {
                 Array.from({ length: urls.length }).fill(true)
             );
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(urls.length);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(
+                urls.length
+            );
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
                 urls.length
             );
@@ -341,7 +343,7 @@ describe("SystemService", () => {
             await SystemService.initialize();
             await SystemService.initialize();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
         });
 
         it("should handle mixed initialization and operation calls", async () => {
@@ -354,7 +356,7 @@ describe("SystemService", () => {
                 SystemService.openExternal("https://another.com")
             ).resolves.toBeTruthy();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(4); // 2 explicit + 2 from openExternal
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(4); // 2 explicit + 2 from openExternal
             expect(mockElectronAPI.system.openExternal).toHaveBeenCalledTimes(
                 2
             );
@@ -374,7 +376,7 @@ describe("SystemService", () => {
 
         it("should handle missing electron API gracefully", async () => {
             const error = new Error("Missing electron API");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(
                 SystemService.openExternal("https://example.com")

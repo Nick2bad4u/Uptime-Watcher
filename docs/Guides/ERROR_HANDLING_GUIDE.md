@@ -46,6 +46,9 @@ const { setStoreError, clearStoreError, getStoreError } = useErrorStore();
 const { setOperationLoading, getOperationLoading } = useErrorStore();
 
 // Example usage
+import { SiteService } from "src/services/SiteService";
+import { SettingsService } from "src/services/SettingsService";
+
 const handleSiteCreation = async () => {
  const errorStore = useErrorStore.getState();
 
@@ -53,7 +56,7 @@ const handleSiteCreation = async () => {
   errorStore.clearStoreError("sites");
   errorStore.setOperationLoading("createSite", true);
 
-  const newSite = await window.electronAPI.sites.addSite(siteData);
+  const newSite = await SiteService.addSite(siteData);
 
   // Success - clear any previous errors
   errorStore.clearStoreError("sites");
@@ -76,7 +79,7 @@ const handleMultipleOperations = async () => {
 
   try {
     // Site operation error won't affect settings operations
-    await window.electronAPI.sites.addSite(siteData);
+    await SiteService.addSite(siteData);
   } catch (error) {
     errorStore.setStoreError('sites', 'Failed to create site');
     // Settings operations can still succeed
@@ -84,7 +87,7 @@ const handleMultipleOperations = async () => {
 
   try {
     // Independent error handling
-    await window.electronAPI.settings.updateSettings(settings);
+    await SettingsService.updateHistoryLimit(settings.historyLimit);
   } catch (error) {
     errorStore.setStoreError('settings', 'Failed to update settings');
     // Sites operations remain unaffected
@@ -158,7 +161,7 @@ const createSite = async (siteData: SiteData) => {
 
  return await withErrorHandling(
   async () => {
-   const site = await window.electronAPI.sites.addSite(siteData);
+   const site = await SiteService.addSite(siteData);
    return site;
   },
   {
@@ -196,7 +199,7 @@ import { createStoreErrorHandler } from "@src/stores/utils/storeErrorHandling";
 await withErrorHandling(
  async () => {
   // Your async operation
-  await window.electronAPI.sites.addSite(site);
+  await SiteService.addSite(site);
  },
  createStoreErrorHandler("sites-operations", "createSite")
 );
@@ -306,7 +309,7 @@ export const createSiteOperationsActions = (
 
   return await withErrorHandling(
    async () => {
-    const site = await window.electronAPI.sites.addSite(siteData);
+    const site = await SiteService.addSite(siteData);
     await deps.syncSitesFromBackend();
     return site;
    },
@@ -324,7 +327,7 @@ export const createSiteOperationsActions = (
 
   return await withErrorHandling(
    async () => {
-    await window.electronAPI.sites.delete(siteIdentifier);
+    await SiteService.removeSite(siteIdentifier);
     deps.removeSite(siteIdentifier);
    },
    {
@@ -650,7 +653,7 @@ const handleFormSubmission = async (formData: FormData) => {
   const validatedData = addSiteSchema.parse(formData);
 
   // Process valid data
-  const site = await window.electronAPI.sites.addSite(validatedData);
+  const site = await SiteService.addSite(validatedData);
 
   return { success: true, data: site };
  } catch (error) {

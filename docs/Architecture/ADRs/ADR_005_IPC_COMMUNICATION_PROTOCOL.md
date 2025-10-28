@@ -398,8 +398,10 @@ flowchart TD
 Standard async operations use the request-response pattern:
 
 ```typescript
+import { SiteService } from "src/services/SiteService";
+
 // Frontend request
-const result = await window.electronAPI.sites.addSite(siteData);
+const result = await SiteService.addSite(siteData);
 
 // Backend handler
 async (params: SiteCreationData) => {
@@ -416,8 +418,10 @@ State changes are broadcast as events:
 // Backend emits event
 await this.eventBus.emitTyped("sites:added", { site: newSite });
 
+import { EventsService } from "src/services/EventsService";
+
 // Frontend listens for event
-const cleanup = window.electronAPI.events.onSiteAdded((data) => {
+const cleanup = await EventsService.onSiteAdded((data) => {
  sitesStore.addSite(data.site);
 });
 ```
@@ -428,11 +432,17 @@ Event listeners return cleanup functions:
 
 ```typescript
 useEffect(() => {
- const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
-  handleStatusChange(data);
- });
+ let unsubscribe: (() => void) | undefined;
 
- return cleanup; // Automatic cleanup on unmount
+ void (async () => {
+  unsubscribe = await EventsService.onMonitorStatusChanged((data) => {
+   handleStatusChange(data);
+  });
+ })();
+
+ return () => {
+  unsubscribe?.();
+ };
 }, []);
 ```
 

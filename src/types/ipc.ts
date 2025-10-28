@@ -22,14 +22,21 @@
  * @example
  *
  * ```typescript
- * // Type-safe IPC response handling
- * const response = await window.electronAPI.getSites();
+ * import { SiteService } from "../services/SiteService";
+ *
+ * // Preferred: use the renderer service facade, which handles bridge readiness
+ * // and validation internally.
+ * const sites = await SiteService.getSites();
+ * setSites(sites);
+ *
+ * // Low-level example for service authors extending the preload bridge.
+ * const response = await window.electronAPI.sites.getSites();
  * if (isIpcResponse<Site[]>(response)) {
  *     const sites = extractIpcData<Site[]>(response);
  *     setSites(sites);
  * }
  *
- * // Safe extraction with fallback
+ * // Safe extraction with fallback when raw responses are unavoidable.
  * const sites = safeExtractIpcData(response, []);
  * ```
  *

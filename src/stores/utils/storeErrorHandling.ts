@@ -28,7 +28,7 @@ import { useErrorStore } from "../error/useErrorStore";
  * await withErrorHandling(
  *     async () => {
  *         // Your async operation
- *         await window.electronAPI.sites.addSite(site);
+ *         await SiteService.addSite(site);
  *     },
  *     createStoreErrorHandler("sites-operations", "createSite")
  * );

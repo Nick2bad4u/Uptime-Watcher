@@ -14,7 +14,6 @@ import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 // Mock the logger
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock window.electronAPI with fresh mock function

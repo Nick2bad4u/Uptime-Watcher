@@ -727,7 +727,7 @@ logger.error("Event processing failed", {
 **Issue**: Events not crossing IPC boundary
 
 - **Check**: Ensure EventsService is properly initialized
-- **Check**: Verify electron API is available (`window.electronAPI`)
+- **Check**: Verify `EventsService.initialize()` resolves (renderer services available)
 - **Check**: Check preload script for proper API exposure
 
 ## Related Documentation

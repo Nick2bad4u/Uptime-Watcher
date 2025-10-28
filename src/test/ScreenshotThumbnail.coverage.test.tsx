@@ -29,7 +29,6 @@ vi.mock("../services/logger", () => {
 // Mock stores/utils
 vi.mock("../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock SystemService

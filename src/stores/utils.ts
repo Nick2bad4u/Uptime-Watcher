@@ -15,10 +15,6 @@ import { isDevelopment } from "@shared/utils/environment";
 import type { BaseStore } from "./types";
 
 import { logger } from "../services/logger";
-import {
-    type ElectronBridgeContract,
-    waitForElectronBridge,
-} from "../services/utils/electronBridgeReadiness";
 
 /**
  * Creates a base store slice with common error handling functionality.
@@ -182,55 +178,3 @@ export const logStoreAction = (
         }
     }
 };
-
-/**
- * Utility function to wait for electronAPI to be available.
- *
- * @remarks
- * Polls for the API with exponential backoff to handle timing issues during
- * application startup. This is necessary because the preload script may not
- * have finished executing when React components first mount.
- *
- * @example
- *
- * ```typescript
- * try {
- *     await waitForElectronAPI();
- *     // Safe to use window.electronAPI
- * } catch (error) {
- *     logger.error("ElectronAPI not available", error as Error);
- * }
- * ```
- *
- * @defaultValue maxAttempts - 50
- * @defaultValue baseDelay - 100
- *
- * @param maxAttempts - Maximum number of polling attempts
- * @param baseDelay - Base delay in milliseconds for exponential backoff
- *
- * @returns Promise that resolves when electronAPI is available
- *
- * @throws Error when electronAPI is not available after maximum attempts
- *
- * @public
- */
-export async function waitForElectronAPI(
-    maxAttempts = 50,
-    baseDelay = 100,
-    contracts?: readonly ElectronBridgeContract[]
-): Promise<void> {
-    await waitForElectronBridge({
-        baseDelay,
-        contracts: contracts ?? [
-            {
-                domain: "sites",
-                methods: ["getSites"],
-            },
-            {
-                domain: "settings",
-                methods: ["getHistoryLimit"],
-            },
-        ],
-        maxAttempts,
-    });
-}

@@ -53,7 +53,6 @@ vi.mock("@shared/utils/errorHandling", () => ({
 
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: originalLogStoreAction,
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock("../../../types/ipc", () => ({

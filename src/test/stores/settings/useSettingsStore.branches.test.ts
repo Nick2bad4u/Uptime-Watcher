@@ -60,7 +60,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock withErrorHandling from shared utils

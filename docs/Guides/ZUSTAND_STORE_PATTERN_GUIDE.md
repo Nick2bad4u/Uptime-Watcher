@@ -90,12 +90,14 @@ export const createSitesStateActions = (set, get) => ({
 });
 
 // useSiteOperations.ts - CRUD operations with IPC
+import { SiteService } from "src/services/SiteService";
+
 export const createSiteOperationsActions = (deps) => ({
  createSite: async (siteData: SiteCreationData): Promise<Site> => {
   logStoreAction("SitesStore", "createSite", { name: siteData.name });
 
   try {
-   const savedSite = await window.electronAPI.sites.create(siteData);
+   const savedSite = await SiteService.addSite(siteData);
    applySavedSiteToStore(savedSite, deps); // Replaces existing snapshot safely
    return savedSite;
   } catch (error) {
@@ -108,7 +110,7 @@ export const createSiteOperationsActions = (deps) => ({
   logStoreAction("SitesStore", "deleteSite", { siteIdentifier });
 
   try {
-   await window.electronAPI.sites.delete(siteIdentifier);
+   await SiteService.removeSite(siteIdentifier);
    deps.removeSite(siteIdentifier);
   } catch (error) {
    console.error("Failed to delete site:", error);
@@ -118,12 +120,14 @@ export const createSiteOperationsActions = (deps) => ({
 });
 
 // useSiteSync.ts - Backend synchronization
+import { StateSyncService } from "src/services/StateSyncService";
+
 export const createSiteSyncActions = (deps) => ({
  syncSites: async (): Promise<void> => {
   logStoreAction("SitesStore", "syncSites", {});
 
   try {
-   const sites = await window.electronAPI.sites.getAll();
+   const { sites } = await StateSyncService.requestFullSync();
    deps.setSites(sites);
   } catch (error) {
    console.error("Failed to sync sites:", error);
@@ -220,29 +224,34 @@ Both patterns integrate with the TypedEventBus for real-time updates:
 
 ```typescript
 // Event listener setup (usually in root component)
+import { EventsService } from "src/services/EventsService";
+
 export const useStoreEventListeners = () => {
  const sitesStore = useSitesStore();
  const settingsStore = useSettingsStore();
 
  useEffect(() => {
-  const cleanupFunctions = [
-   // Sites events
-   window.electronAPI.events.onSiteAdded((data) => {
-    sitesStore.handleSiteAdded(data.site);
-   }),
+  let cleanupFunctions: Array<() => void> = [];
 
-   window.electronAPI.events.onSiteDeleted((data) => {
-    sitesStore.handleSiteDeleted(data.siteIdentifier);
-   }),
-
-   // Settings events
-   window.electronAPI.events.onSettingsUpdated((data) => {
-    settingsStore.updateFromBackend(data.settings);
-   }),
-  ];
+  void (async () => {
+   cleanupFunctions = await Promise.all([
+    // Sites events
+    EventsService.onSiteAdded((data) => {
+     sitesStore.handleSiteAdded(data.site);
+    }),
+    EventsService.onSiteRemoved((data) => {
+     sitesStore.handleSiteDeleted(data.siteIdentifier);
+    }),
+    EventsService.onSiteUpdated((data) => {
+     sitesStore.handleSiteUpdated(data.site);
+    }),
+   ]);
+  })();
 
   return () => {
-   cleanupFunctions.forEach((cleanup) => cleanup());
+   cleanupFunctions.forEach((cleanup) => {
+    cleanup?.();
+   });
   };
  }, []);
 };

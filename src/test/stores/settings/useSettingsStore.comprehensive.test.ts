@@ -49,7 +49,6 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
 // Mock store utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    waitForElectronAPI: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock withErrorHandling from shared utils
@@ -993,7 +992,9 @@ describe(useSettingsStore, () => {
                 const finalExpectedState: any = {};
 
                 for (const update of settingUpdates) {
-                    const partialSettings: any = { [update.setting]: update.value,};
+                    const partialSettings: any = {
+                        [update.setting]: update.value,
+                    };
                     finalExpectedState[update.setting] = update.value;
 
                     act(() => {

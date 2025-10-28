@@ -57,7 +57,7 @@
 
 - **Frontend**: React + TypeScript + Zustand + TailwindCSS + Vite.
 - **Backend**: Electron main (Node.js) with `node-sqlite3-wasm` repositories wrapped by `executeTransaction()`.
-- **IPC**: Secure contextBridge via `window.electronAPI`.
+- **IPC**: Renderer services (`src/services/*`) wrap the secure contextBridge.
 - **State**: Domain-scoped Zustand stores; avoid global shared state.
 - **Events**: TypedEventBus with middleware, correlation IDs, and contracts.
 - **Logging**: Centralized structured logging with level support.

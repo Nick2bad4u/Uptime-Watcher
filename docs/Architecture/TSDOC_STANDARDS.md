@@ -289,9 +289,9 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  *
  * **State Management**: Uses immutable updates with automatic action logging.
  * **Error Handling**: Integrates with `withErrorHandling()` for consistent
- * error management. **IPC Integration**: Communicates with backend via
- * `window.electronAPI`. **Persistence**: [Describe what gets persisted and
- * why]
+ * error management. **IPC Integration**: Communicates with backend via Renderer
+ * services under `src/services`. **Persistence**: [Describe what gets persisted
+ * and why]
  *
  * @example
  *
@@ -372,7 +372,7 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * // Frontend usage with store integration
  * const handleUserAction = async () => {
  *  await withErrorHandling(async () => {
- *   const result = await window.electronAPI.sites.addSite(siteData);
+ *   const result = await SiteService.addSite(siteData);
  *   setSites((prevSites) => [...prevSites, result]);
  *   return result;
  *  }, errorStore); // Automatically manages loading/error state

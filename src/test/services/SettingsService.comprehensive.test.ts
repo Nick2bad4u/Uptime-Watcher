@@ -53,7 +53,6 @@ vi.mock("../../services/utils/electronBridgeReadiness", () => ({
 }));
 
 // Backwards-compatible alias for existing assertions
-const mockWaitForElectronAPI = mockWaitForElectronBridge;
 
 vi.mock("../../services/logger", () => ({
     logger: mockLogger,
@@ -73,7 +72,7 @@ describe("SettingsService", () => {
         vi.clearAllMocks();
 
         // Reset mock implementations
-        mockWaitForElectronAPI.mockResolvedValue(undefined);
+        mockWaitForElectronBridge.mockResolvedValue(undefined);
 
         // Recreate fresh mocks for each test
         mockElectronAPI.data = {};
@@ -107,13 +106,13 @@ describe("SettingsService", () => {
     describe("initialize", () => {
         it("should initialize successfully when electron API is available", async () => {
             await expect(SettingsService.initialize()).resolves.toBeUndefined();
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(mockLogger.error).not.toHaveBeenCalled();
         });
 
         it("should handle initialization errors and rethrow", async () => {
             const error = new Error("Electron API unavailable");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SettingsService.initialize()).rejects.toThrow(
                 "Electron API unavailable"
@@ -126,7 +125,7 @@ describe("SettingsService", () => {
 
         it("should handle non-error initialization failures", async () => {
             const error = "String error";
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SettingsService.initialize()).rejects.toBe(error);
             expect(mockLogger.error).toHaveBeenCalled();
@@ -134,7 +133,7 @@ describe("SettingsService", () => {
         });
 
         it("should handle null/undefined initialization errors", async () => {
-            mockWaitForElectronAPI.mockRejectedValue(null);
+            mockWaitForElectronBridge.mockRejectedValue(null);
 
             await expect(SettingsService.initialize()).rejects.toBeNull();
             expect(mockLogger.error).toHaveBeenCalled();
@@ -152,7 +151,7 @@ describe("SettingsService", () => {
             const result = await SettingsService.getHistoryLimit();
 
             expect(result).toBe(expectedLimit);
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).toHaveBeenCalledTimes(1);
@@ -160,7 +159,7 @@ describe("SettingsService", () => {
 
         it("should fail if initialization fails", async () => {
             const error = new Error("Initialization failed");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
                 "Initialization failed"
@@ -177,7 +176,7 @@ describe("SettingsService", () => {
             await expect(SettingsService.getHistoryLimit()).rejects.toThrow(
                 "Failed to get history limit"
             );
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).toHaveBeenCalledTimes(1);
@@ -236,7 +235,7 @@ describe("SettingsService", () => {
             await expect(
                 SettingsService.resetSettings()
             ).resolves.toBeUndefined();
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.resetSettings
             ).toHaveBeenCalledTimes(1);
@@ -244,7 +243,7 @@ describe("SettingsService", () => {
 
         it("should fail if initialization fails", async () => {
             const error = new Error("Initialization failed");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Initialization failed"
@@ -261,7 +260,7 @@ describe("SettingsService", () => {
             await expect(SettingsService.resetSettings()).rejects.toThrow(
                 "Failed to reset settings"
             );
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.resetSettings
             ).toHaveBeenCalledTimes(1);
@@ -275,7 +274,7 @@ describe("SettingsService", () => {
             expect(
                 mockElectronAPI.settings.resetSettings
             ).toHaveBeenCalledTimes(3);
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
         });
     });
 
@@ -289,7 +288,7 @@ describe("SettingsService", () => {
             await expect(
                 SettingsService.updateHistoryLimit(newLimit)
             ).resolves.toBe(newLimit);
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(newLimit);
@@ -297,7 +296,7 @@ describe("SettingsService", () => {
 
         it("should fail if initialization fails", async () => {
             const error = new Error("Initialization failed");
-            mockWaitForElectronAPI.mockRejectedValue(error);
+            mockWaitForElectronBridge.mockRejectedValue(error);
 
             await expect(
                 SettingsService.updateHistoryLimit(1000)
@@ -316,7 +315,7 @@ describe("SettingsService", () => {
             await expect(
                 SettingsService.updateHistoryLimit(1000)
             ).rejects.toThrow("Failed to update history limit");
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(1);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.settings.updateHistoryLimit
             ).toHaveBeenCalledWith(1000);
@@ -421,7 +420,7 @@ describe("SettingsService", () => {
             const resetLimit = await SettingsService.getHistoryLimit();
             expect(resetLimit).toBe(500);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(5);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(5);
         });
 
         it("should handle concurrent operations", async () => {
@@ -433,7 +432,7 @@ describe("SettingsService", () => {
 
             await Promise.all(promises);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).toHaveBeenCalledTimes(2);
@@ -447,7 +446,7 @@ describe("SettingsService", () => {
             await SettingsService.initialize();
             await SettingsService.initialize();
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(3);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(3);
         });
 
         it("should handle mixed initialization and operation calls", async () => {
@@ -456,7 +455,7 @@ describe("SettingsService", () => {
             await SettingsService.initialize();
             await SettingsService.updateHistoryLimit(2000);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(4); // 2 explicit + 2 from operations
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(4); // 2 explicit + 2 from operations
             expect(
                 mockElectronAPI.settings.getHistoryLimit
             ).toHaveBeenCalledTimes(1);
@@ -692,7 +691,7 @@ describe("SettingsService", () => {
 
             await Promise.all(promises);
 
-            expect(mockWaitForElectronAPI).toHaveBeenCalledTimes(30);
+            expect(mockWaitForElectronBridge).toHaveBeenCalledTimes(30);
         });
     });
 });

@@ -135,21 +135,23 @@ vi.stubGlobal("window", {
 #### Component Testing with Mocked APIs
 
 ```typescript
-import { render, screen, waitFor } from '@testing-library/react';
-import { SiteCard } from '../SiteCard';
+import { render, screen, waitFor } from "@testing-library/react";
+import { SiteCard } from "../SiteCard";
+import { SiteService } from "src/services/SiteService";
 
-describe('SiteCard', () => {
-  it('should handle site deletion', async () => {
-    const mockDeleteSite = vi.fn().mockResolvedValue(undefined);
-    window.electronAPI.sites.delete = mockDeleteSite;
+describe("SiteCard", () => {
+  it("should handle site deletion", async () => {
+    const removeSpy = vi
+      .spyOn(SiteService, "removeSite")
+      .mockResolvedValue(true);
 
     render(<SiteCard site={mockSite} />);
 
-    const deleteButton = screen.getByRole('button', { name: /delete/i });
+    const deleteButton = screen.getByRole("button", { name: /delete/i });
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
-      expect(mockDeleteSite).toHaveBeenCalledWith(mockSite.id);
+      expect(removeSpy).toHaveBeenCalledWith(mockSite.id);
     });
   });
 });
@@ -160,15 +162,16 @@ describe('SiteCard', () => {
 ```typescript
 import { act, renderHook } from "@testing-library/react";
 import { useSitesStore } from "../useSitesStore";
+import { SiteService } from "src/services/SiteService";
 
 describe("useSitesStore", () => {
  beforeEach(() => {
   useSitesStore.getState().reset();
  });
 
- it("should add site via API", async () => {
+ it("should add site via service", async () => {
   const mockSite = { id: "1", name: "Test Site", url: "https://test.com" };
-  window.electronAPI.sites.create.mockResolvedValue(mockSite);
+  vi.spyOn(SiteService, "addSite").mockResolvedValue(mockSite);
 
   const { result } = renderHook(() => useSitesStore());
 

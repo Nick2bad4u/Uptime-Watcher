@@ -155,9 +155,11 @@ export const useUIStore = create<UIStore>()(
 Stores integrate with the error handling system:
 
 ```typescript
+import { SiteService } from "src/services/SiteService";
+
 const performAction = async () => {
  await withErrorHandling(async () => {
-  const result = await window.electronAPI.sites.addSite(data);
+  const result = await SiteService.addSite(data);
   addSite(result); // Update store state
   return result;
  }, errorStore);
@@ -394,7 +396,7 @@ Async operations are handled in store actions:
 
 ```typescript
 createSite: async (siteData: CreateSiteData) => {
- const result = await window.electronAPI.sites.addSite(siteData);
+ const result = await SiteService.addSite(siteData);
  get().addSite(result);
  return result;
 };
@@ -486,13 +488,22 @@ stateDiagram-v2
 Stores listen to IPC events for backend state synchronization:
 
 ```typescript
+import { StateSyncService } from "src/services/StateSyncService";
+
 useEffect(() => {
- const cleanup = window.electronAPI.events.onStateSyncEvent((data) => {
-  if (data.type === "sites-updated") {
-   syncSitesFromBackend();
-  }
- });
- return cleanup;
+ let unsubscribe: (() => void) | undefined;
+
+ void (async () => {
+  unsubscribe = await StateSyncService.onStateSyncEvent((data) => {
+   if (data.type === "sites-updated") {
+    syncSitesFromBackend();
+   }
+  });
+ })();
+
+ return () => {
+  unsubscribe?.();
+ };
 }, [syncSitesFromBackend]);
 ```
 
@@ -507,7 +518,7 @@ deleteSite: async (identifier: string) => {
  removeSite(identifier);
 
  try {
-  await window.electronAPI.sites.removeSite(identifier);
+  await SiteService.removeSite(identifier);
  } catch (error) {
   // Rollback on failure
   setSites(originalSites);

@@ -327,9 +327,11 @@ Multi-layered error handling ensures system stability and provides consistent er
 
 ```typescript
 // For operations that need store state management
+import { SiteService } from "src/services/SiteService";
+
 const handleUserAction = async () => {
  await withErrorHandling(async () => {
-  const result = await window.electronAPI.sites.addSite(siteData);
+  const result = await SiteService.addSite(siteData);
   // Handle success
   return result;
  }, errorStore); // Automatically manages loading/error state
@@ -422,6 +424,8 @@ Zustand-based state management with modular composition for complex stores and t
 ### Simple Store Pattern
 
 ```typescript
+// ExampleService represents a domain-specific renderer facade exported from src/services
+
 interface SimpleStore {
  // State
  value: string;
@@ -452,8 +456,8 @@ export const useSimpleStore = create<SimpleStore>()((set, get) => ({
  performAsyncAction: async () => {
   await withErrorHandling(async () => {
    get().setLoading(true);
-   // Perform async operation
-   const result = await window.electronAPI.someOperation();
+   // Perform async operation via a renderer service facade
+   const result = await ExampleService.someOperation();
    get().setValue(result);
   }, errorStore);
   get().setLoading(false);
@@ -893,25 +897,35 @@ Comprehensive memory management patterns to prevent leaks and ensure optimal per
 
 ```typescript
 // Frontend component cleanup
+import { EventsService } from "src/services/EventsService";
+
 useEffect(() => {
- const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
-  handleStatusChange(data);
- });
+ let unsubscribe: (() => void) | undefined;
+
+ void (async () => {
+  unsubscribe = await EventsService.onMonitorStatusChanged((data) => {
+   handleStatusChange(data);
+  });
+ })();
 
  // Cleanup function prevents memory leaks
- return cleanup;
+ return () => {
+  unsubscribe?.();
+ };
 }, []);
 
 // Service event listener management
 class StatusUpdateManager {
  private cleanupFunctions: Array<() => void> = [];
 
- public subscribe(): void {
+ public async subscribe(): Promise<void> {
   // Clean up existing subscriptions first
   this.unsubscribe();
 
-  const cleanup1 = window.electronAPI.events.onMonitorStatusChanged(handler);
-  const cleanup2 = window.electronAPI.events.onMonitoringStarted(handler);
+  const [cleanup1, cleanup2] = await Promise.all([
+   EventsService.onMonitorStatusChanged(handler),
+   EventsService.onMonitoringStarted(handler),
+  ]);
 
   this.cleanupFunctions.push(cleanup1, cleanup2);
  }

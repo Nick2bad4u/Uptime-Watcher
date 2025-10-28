@@ -146,15 +146,17 @@ await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
 
 **Solutions**:
 
-1. **Check EventsService initialization**: Ensure service is properly initialized
-2. **Verify electronAPI availability**: Check that `window.electronAPI` is available
-3. **Check preload script**: Ensure proper API exposure in preload
-4. **Debug IPC bridge**: Check if events are being forwarded
+1. **Check EventsService initialization**: Ensure the renderer facade initializes successfully
+2. **Verify preload exposure**: If initialization fails, confirm the relevant domain exists in the preload script
+3. **Inspect bridge diagnostics**: Use structured logging to verify events are forwarded across the boundary
 
 ```typescript
+import { EventsService } from "src/services/EventsService";
+
 // Frontend debugging
-console.log("ElectronAPI available:", !!window.electronAPI);
-console.log("Events API:", !!window.electronAPI?.events);
+EventsService.initialize()
+ .then(() => console.log("EventsService ready"))
+ .catch((error) => console.error("EventsService failed to initialize", error));
 
 // Backend debugging
 eventBus.use(async (event, data, next) => {
@@ -179,16 +181,16 @@ eventBus.use(async (event, data, next) => {
 ```typescript
 // Proper cleanup pattern
 useEffect(() => {
- const cleanupFunctions: (() => void)[] = [];
+ const cleanupFunctions: Array<() => void> = [];
 
  const setupListeners = async () => {
   cleanupFunctions.push(
    await EventsService.onSiteUpdated(handleSiteUpdate),
-   await EventsService.onMonitorStatus(handleMonitorStatus)
+   await EventsService.onMonitorStatusChanged(handleMonitorStatus)
   );
  };
 
- setupListeners().catch(console.error);
+ void setupListeners().catch(console.error);
 
  return () => {
   cleanupFunctions.forEach((fn) => fn());
@@ -210,9 +212,11 @@ useEffect(() => {
 
 ```typescript
 // Use withErrorHandling wrapper
+import { SiteService } from "src/services/SiteService";
+
 const handleSiteCreation = withErrorHandling(
  async (siteData: SiteCreationData) => {
-  const newSite = await window.electronAPI.sites.create(siteData);
+  const newSite = await SiteService.addSite(siteData);
   addSite(newSite);
  },
  {

@@ -11,7 +11,6 @@ import {
     createPersistConfig,
     debounce,
     logStoreAction,
-    waitForElectronAPI,
 } from "../../stores/utils";
 
 // Mock logger
@@ -53,8 +52,6 @@ describe("Store Utils", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();
-        // Reset window.electronAPI
-        (globalThis as any).electronAPI = undefined;
     });
 
     afterEach(() => {
@@ -435,128 +432,6 @@ describe("Store Utils", () => {
             logStoreAction("TestStore", "testAction");
 
             expect(logger.info).not.toHaveBeenCalled();
-        });
-    });
-
-    describe(waitForElectronAPI, () => {
-        it("should resolve immediately when electronAPI is available", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Set up window.electronAPI (not globalThis)
-            (global as any).window = {
-                electronAPI: {
-                    sites: { getSites: vi.fn() },
-                    settings: { getHistoryLimit: vi.fn() },
-                },
-            };
-
-            await expect(waitForElectronAPI()).resolves.toBeUndefined();
-        });
-
-        it("should work with custom maxAttempts and baseDelay", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Business Logic", "type");
-
-            // Set up window.electronAPI (not globalThis)
-            (global as any).window = {
-                electronAPI: {
-                    sites: { getSites: vi.fn() },
-                    settings: { getHistoryLimit: vi.fn() },
-                },
-            };
-
-            await expect(waitForElectronAPI(10, 50)).resolves.toBeUndefined();
-        });
-
-        it("should throw error when electronAPI is not available after max attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Use real timers for this test
-            vi.useRealTimers();
-
-            // Mock window without electronAPI
-            vi.stubGlobal("window", {});
-
-            await expect(waitForElectronAPI(2, 10)).rejects.toThrow(
-                "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
-            );
-
-            // Restore original window and fake timers
-            vi.unstubAllGlobals();
-            vi.useFakeTimers();
-        });
-
-        it("should throw error when electronAPI exists but sites.getSites is not a function", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Use real timers for this test
-            vi.useRealTimers();
-
-            // Mock window with invalid electronAPI
-            vi.stubGlobal("window", {
-                electronAPI: {
-                    sites: { getSites: "not a function" },
-                },
-            });
-
-            await expect(waitForElectronAPI(2, 10)).rejects.toThrow(
-                "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
-            );
-
-            // Restore original window and fake timers
-            vi.unstubAllGlobals();
-            vi.useFakeTimers();
-        });
-
-        it("should handle window.electronAPI access errors gracefully", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: utils", "component");
-            await annotate("Category: Store", "category");
-            await annotate("Type: Error Handling", "type");
-
-            // Use real timers for this test
-            vi.useRealTimers();
-
-            // Mock window with getter that throws
-            vi.stubGlobal("window", {
-                get electronAPI() {
-                    throw new Error("Access denied");
-                },
-            });
-
-            await expect(waitForElectronAPI(2, 10)).rejects.toThrow(
-                "ElectronAPI not available after maximum attempts. The application may not be running in an Electron environment."
-            );
-
-            // Restore original window and fake timers
-            vi.unstubAllGlobals();
-            vi.useFakeTimers();
         });
     });
 });

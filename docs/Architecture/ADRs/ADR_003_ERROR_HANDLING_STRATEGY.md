@@ -219,9 +219,11 @@ async performOperation() {
 
 ```typescript
 // Frontend operations with store integration
+import { SiteService } from "src/services/SiteService";
+
 const handleAction = async () => {
  await withErrorHandling(async () => {
-  const result = await window.electronAPI.sites.addSite(siteData);
+  const result = await SiteService.addSite(siteData);
   // Success handling
   return result;
  }, errorStore);
@@ -417,17 +419,30 @@ Error handling utilities ensure proper resource cleanup:
 
 ```typescript
 // Automatic cleanup in event handlers
-const cleanup = window.electronAPI.events.onMonitorStatusChanged((data) => {
- try {
-  handleStatusChange(data);
- } catch (error) {
-  logger.error("Status change handler failed", error);
-  // Handler failure doesn't affect cleanup
- }
-});
+import { EventsService } from "src/services/EventsService";
+
+const registerStatusListener = async () =>
+ await EventsService.onMonitorStatusChanged((data) => {
+  try {
+   handleStatusChange(data);
+  } catch (error) {
+   logger.error("Status change handler failed", error);
+   // Handler failure doesn't affect cleanup
+  }
+ });
 
 // Cleanup always called even if handler throws
-useEffect(() => cleanup, []);
+useEffect(() => {
+ let cleanup: (() => void) | undefined;
+
+ void registerStatusListener().then((unsubscribe) => {
+  cleanup = unsubscribe;
+ });
+
+ return () => {
+  cleanup?.();
+ };
+}, []);
 ```
 
 ### Race Condition Protection

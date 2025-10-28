@@ -25,9 +25,9 @@ vi.mock("../../../services/utils/electronBridgeReadiness", () => ({
     waitForElectronBridge: mockWaitForElectronBridge,
 }));
 
-// Mock the waitForElectronAPI utility
+// Mock store utilities
 vi.mock("../../../stores/utils", () => ({
-    waitForElectronAPI: vi.fn().mockImplementation(() => Promise.resolve()),
+    logStoreAction: vi.fn(),
 }));
 
 // Mock window.electronAPI
