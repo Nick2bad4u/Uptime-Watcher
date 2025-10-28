@@ -170,15 +170,15 @@ export function createIpcServiceHelpers(
     const ensureInitialized = async (): Promise<void> => {
         try {
             const bridgeOptions: WaitForElectronBridgeOptions = {
-                ...(options.bridgeContracts !== undefined
-                    ? { contracts: options.bridgeContracts }
-                    : {}),
-                ...(options.bridgeOptions?.baseDelay !== undefined
-                    ? { baseDelay: options.bridgeOptions.baseDelay }
-                    : {}),
-                ...(options.bridgeOptions?.maxAttempts !== undefined
-                    ? { maxAttempts: options.bridgeOptions.maxAttempts }
-                    : {}),
+                ...(options.bridgeContracts === undefined
+                    ? {}
+                    : { contracts: options.bridgeContracts }),
+                ...(options.bridgeOptions?.baseDelay === undefined
+                    ? {}
+                    : { baseDelay: options.bridgeOptions.baseDelay }),
+                ...(options.bridgeOptions?.maxAttempts === undefined
+                    ? {}
+                    : { maxAttempts: options.bridgeOptions.maxAttempts }),
             };
 
             await waitForElectronBridge(bridgeOptions);

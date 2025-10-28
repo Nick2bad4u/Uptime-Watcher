@@ -16,9 +16,9 @@ import * as z from "zod";
 
 import {
     type SiteSyncDelta,
+    siteSyncDeltaSchema,
     type StateSyncAction,
     stateSyncActionSchema,
-    siteSyncDeltaSchema,
     type StateSyncSource,
     stateSyncSourceSchema,
 } from "./stateSync";
@@ -155,14 +155,14 @@ export const SITE_ADDED_SOURCES: readonly SiteAddedSource[] = Object.freeze(
 export interface StateSyncEventData extends BaseEventData {
     /** The synchronization action being performed */
     readonly action: StateSyncAction;
+    /** Structured delta describing how the site collection changed */
+    readonly delta?: SiteSyncDelta | undefined;
     /** Site identifier for targeted operations (delete, update) */
     readonly siteIdentifier?: string | undefined;
     /** Complete site dataset after the sync operation */
     readonly sites: Site[];
     /** Source system that triggered the sync */
     readonly source: StateSyncSource;
-    /** Structured delta describing how the site collection changed */
-    readonly delta?: SiteSyncDelta;
 }
 
 const stateSyncSitesArraySchema = siteSchema.array();
@@ -174,10 +174,10 @@ export const stateSyncEventDataSchema: z.ZodType<StateSyncEventData> =
     baseEventDataSchema
         .extend({
             action: stateSyncActionSchema,
+            delta: siteSyncDeltaSchema.optional(),
             siteIdentifier: z.string().min(1).optional(),
             sites: stateSyncSitesArraySchema,
             source: stateSyncSourceSchema,
-            delta: siteSyncDeltaSchema.optional(),
         })
         .strict();
 

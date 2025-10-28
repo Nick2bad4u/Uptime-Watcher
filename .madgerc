@@ -1,0 +1,75 @@
+{
+    "baseDir": ".",
+    "tsConfig": "./tsconfig.json",
+    "fileExtensions": [
+        "ts",
+        "tsx",
+        "mts",
+        "cts",
+        "js",
+        "jsx",
+        "mjs",
+        "cjs"
+    ],
+    "includeNpm": false,
+    "layout": "dot",
+    "rankdir": "LR",
+    "fontName": "Inter",
+    "fontSize": "12px",
+    "backgroundColor": "#0b0f19",
+    "nodeShape": "box",
+    "nodeStyle": "rounded",
+    "nodeColor": "#1f4aff",
+    "noDependencyColor": "#00bfa6",
+    "cyclicNodeColor": "#ff5f6d",
+    "edgeColor": "#4c5d80",
+    "graphVizPath": "C:/Program Files/Graphviz/bin/dot.exe",
+    "excludeRegExp": [
+        "^\\.cache/",
+        "^coverage/",
+        "^dist/",
+        "^storybook-static/",
+        "^temp/",
+        "^playwright/",
+        "^benchmarks/",
+        "^docs/",
+        "^scripts/",
+        ".*\\.test\\.[tj]sx?$",
+        ".*\\.spec\\.[tj]sx?$",
+        ".*\\.stories\\.[tj]sx?$"
+    ],
+    "detectiveOptions": {
+        "ts": {
+            "skipTypeImports": true
+        },
+        "graphVizOptions": {
+            "G": {
+                "bgcolor": "#0b0f19",
+                "rankdir": "LR",
+                "fontname": "Inter",
+                "fontsize": "12",
+                "color": "#172041",
+                "penwidth": "1.2",
+                "splines": "spline"
+            },
+            "N": {
+                "shape": "box",
+                "style": "rounded,filled",
+                "fontname": "Inter",
+                "fontsize": "11",
+                "fontcolor": "#e8f1ff",
+                "color": "#1f4aff",
+                "fillcolor": "#132145"
+            },
+            "E": {
+                "color": "#4c5d80",
+                "fontcolor": "#94a3c4",
+                "penwidth": "1.3",
+                "arrowhead": "vee"
+            }
+        },
+        "tsx": {
+            "skipTypeImports": true
+        }
+    }
+}

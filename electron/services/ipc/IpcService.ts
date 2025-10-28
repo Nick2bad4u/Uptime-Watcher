@@ -1116,7 +1116,7 @@ export class IpcService {
         // Get sync status handler (no parameters)
         registerStandardizedIpcHandler(
             "get-sync-status",
-            async () => {
+            () => {
                 const siteCount = this.uptimeOrchestrator.getCachedSiteCount();
                 const summary: StateSyncStatusSummary = {
                     lastSyncAt: this.stateSyncStatus.lastSyncAt ?? null,

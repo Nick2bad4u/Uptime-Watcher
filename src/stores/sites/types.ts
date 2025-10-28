@@ -10,14 +10,16 @@
 
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
-import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import type {
+    SiteSyncDelta,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
 import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
-import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 /**
  * Sites store actions interface for managing site operations.

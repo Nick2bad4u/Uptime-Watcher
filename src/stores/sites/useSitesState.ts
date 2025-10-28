@@ -6,6 +6,7 @@
  */
 
 import type { Site } from "@shared/types";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
 import { ensureError } from "@shared/utils/errorHandling";
@@ -15,7 +16,6 @@ import {
 } from "@shared/validation/siteIntegrity";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
-import type { SiteSyncDelta } from "@shared/types/stateSync";
 
 import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";

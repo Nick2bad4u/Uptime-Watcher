@@ -2350,6 +2350,9 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-useless-collection-argument": "warn",
+            "unicorn/no-immediate-mutation": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -3911,6 +3914,9 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-useless-collection-argument": "warn",
+            "unicorn/no-immediate-mutation": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -5255,6 +5261,9 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-useless-collection-argument": "warn",
+            "unicorn/no-immediate-mutation": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-keyword-prefix": [
                 "error",
@@ -6849,6 +6858,9 @@ export default [
                 },
             ],
             "unicorn/no-array-callback-reference": "off", // Conflicts with React
+            "unicorn/no-useless-collection-argument": "warn",
+            "unicorn/no-immediate-mutation": "warn",
+            "unicorn/prefer-response-static-json": "warn",
             "unicorn/no-array-for-each": "off", // ForEach is fine
             "unicorn/no-keyword-prefix": [
                 "error",

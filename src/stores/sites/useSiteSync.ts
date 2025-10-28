@@ -16,10 +16,14 @@
  */
 import type { Site, StatusUpdate } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
-import type { StateSyncStatusSummary } from "@shared/types/stateSync";
+import type {
+    SiteSyncDelta,
+    StateSyncStatusSummary,
+} from "@shared/types/stateSync";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
+import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
 import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
 
 import type {
@@ -31,8 +35,6 @@ import { logger } from "../../services/logger";
 import { StateSyncService } from "../../services/StateSyncService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
-import type { SiteSyncDelta } from "@shared/types/stateSync";
 import {
     StatusUpdateManager,
     type StatusUpdateSubscriptionResult,

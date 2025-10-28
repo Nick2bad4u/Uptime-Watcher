@@ -62,8 +62,8 @@ import {
 } from "@shared/utils/logTemplates";
 import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
 import {
-    sanitizeSitesByIdentifier,
     type DuplicateSiteIdentifier,
+    sanitizeSitesByIdentifier,
 } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../events/eventTypes";
@@ -265,9 +265,9 @@ export class SiteManager {
                 "[SiteManager] Duplicate site identifiers detected while emitting state sync event",
                 {
                     action,
+                    duplicates,
                     siteIdentifier,
                     source,
-                    duplicates,
                 }
             );
         }

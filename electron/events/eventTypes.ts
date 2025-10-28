@@ -23,6 +23,7 @@ import type {
     MonitorUpEventData,
     SiteAddedSource,
 } from "@shared/types/events";
+import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { UnknownRecord } from "type-fest";
 
 /**
@@ -1369,6 +1370,11 @@ export interface UptimeEvents extends UnknownRecord {
     "sites:state-synchronized": {
         /** The synchronization action ("bulk-sync", "delete", or "update"). */
         action: "bulk-sync" | "delete" | "update";
+        /**
+         * Structured delta describing the changes applied by the
+         * synchronization.
+         */
+        delta?: SiteSyncDelta;
         /** Optional site identifier. */
         siteIdentifier?: string;
         /** Complete dataset snapshot after the synchronization. */

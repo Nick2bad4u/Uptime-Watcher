@@ -4,7 +4,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const withDatabaseOperationMock = vi.hoisted(() =>
-    vi.fn(async <T>(operation: () => Promise<T>) => operation())
+    vi.fn(
+        async <T>(
+            operation: () => Promise<T>,
+            _operationName: string,
+            _eventEmitter?: unknown,
+            _context?: unknown
+        ) => await operation()
+    )
 );
 
 const loggerMock = vi.hoisted(() => ({
@@ -31,10 +38,10 @@ interface MockDatabaseService {
     getDatabase: ReturnType<typeof vi.fn>;
 }
 
-type MockDb = {
+interface MockDb {
     run: ReturnType<typeof vi.fn>;
     prepare: ReturnType<typeof vi.fn>;
-};
+}
 
 let mockDatabaseService: MockDatabaseService;
 let mockDb: MockDb;
@@ -54,9 +61,8 @@ describe("MonitorRepository simple orchestration", () => {
 
         mockDatabaseService = {
             executeTransaction: vi.fn(
-                async (callback: (db: MockDb) => Promise<void> | void) => {
-                    return await callback(mockDb);
-                }
+                async (callback: (db: MockDb) => Promise<void> | void) =>
+                    await callback(mockDb)
             ),
             getDatabase: vi.fn(() => mockDb),
         };
@@ -77,16 +83,23 @@ describe("MonitorRepository simple orchestration", () => {
 
         const updateInternalSpy = vi
             .spyOn(
-                repository as unknown as { updateInternal: Function },
+                repository as unknown as {
+                    updateInternal: (
+                        db: MockDb,
+                        identifier: string,
+                        payload: { activeOperations: [] }
+                    ) => void;
+                },
                 "updateInternal"
             )
-            .mockImplementation(() => {});
+            .mockImplementation(() => undefined);
 
         await repository.clearActiveOperations("monitor-123");
 
         expect(withDatabaseOperationMock).toHaveBeenCalledTimes(1);
-        const [operationFn, operationName] =
-            withDatabaseOperationMock.mock.calls[0] ?? [];
+        const firstCall = withDatabaseOperationMock.mock.calls[0];
+        expect(firstCall).toBeDefined();
+        const [operationFn, operationName] = firstCall!;
         expect(typeof operationFn).toBe("function");
         expect(operationName).toBe("MonitorRepository.clearActiveOperations");
         expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
@@ -103,17 +116,22 @@ describe("MonitorRepository simple orchestration", () => {
         const deleteInternalSpy = vi
             .spyOn(
                 repository as unknown as {
-                    deleteBySiteIdentifierInternal: Function;
+                    deleteBySiteIdentifierInternal: (
+                        db: MockDb,
+                        siteIdentifier: string
+                    ) => void;
                 },
                 "deleteBySiteIdentifierInternal"
             )
-            .mockImplementation(() => {});
+            .mockImplementation(() => undefined);
 
         await repository.deleteBySiteIdentifier("site-007");
 
         expect(withDatabaseOperationMock).toHaveBeenCalled();
-        const deleteCall = withDatabaseOperationMock.mock.calls[0] ?? [];
-        expect(deleteCall[1]).toBe("monitor-delete-by-site");
+        const deleteCall = withDatabaseOperationMock.mock.calls[0];
+        expect(deleteCall).toBeDefined();
+        const [, operationName] = deleteCall!;
+        expect(operationName).toBe("monitor-delete-by-site");
         expect(mockDatabaseService.executeTransaction).toHaveBeenCalledTimes(1);
         expect(deleteInternalSpy).toHaveBeenCalledWith(mockDb, "site-007");
     });
@@ -129,11 +147,14 @@ describe("MonitorRepository simple orchestration", () => {
         const deleteInternalSpy = vi
             .spyOn(
                 repository as unknown as {
-                    deleteBySiteIdentifierInternal: Function;
+                    deleteBySiteIdentifierInternal: (
+                        db: MockDb,
+                        siteIdentifier: string
+                    ) => void;
                 },
                 "deleteBySiteIdentifierInternal"
             )
-            .mockImplementation(() => {});
+            .mockImplementation(() => undefined);
 
         await expect(
             repository.deleteBySiteIdentifier("faulty-site")

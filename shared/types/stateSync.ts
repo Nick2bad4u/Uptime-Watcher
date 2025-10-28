@@ -105,9 +105,11 @@ export const STATE_SYNC_ACTION: Readonly<{
 export const STATE_SYNC_ACTIONS: readonly StateSyncAction[] =
     STATE_SYNC_ACTION_VALUES;
 
-const siteOutputSchema = siteSchema.transform((site): Site => site);
+const siteOutputSchema: z.ZodType<Site> = siteSchema.transform(
+    (site): Site => site
+);
 
-const stateSyncSitesSchema = z.array(siteOutputSchema);
+const stateSyncSitesSchema: z.ZodType<Site[]> = z.array(siteOutputSchema);
 
 /**
  * Zod schema validating state synchronization status summaries.
@@ -160,7 +162,25 @@ const stateSyncFullSyncResultSchemaInternal: z.ZodType<{
         }
     });
 
-const siteSyncDeltaUpdatedSiteSchema = z
+/**
+ * Describes an updated site within a synchronization delta.
+ *
+ * @remarks
+ * Captures the previous and next snapshots alongside the identifier so that
+ * consumers can reconcile precise differences for UI updates.
+ *
+ * @public
+ */
+export interface SiteSyncDeltaUpdatedSite {
+    /** Stable site identifier shared across snapshots. */
+    identifier: string;
+    /** Next site snapshot received during synchronization. */
+    next: Site;
+    /** Previous site snapshot prior to synchronization. */
+    previous: Site;
+}
+
+const siteSyncDeltaUpdatedSiteSchema: z.ZodType<SiteSyncDeltaUpdatedSite> = z
     .object({
         identifier: z.string().min(1),
         next: siteOutputSchema,
@@ -168,7 +188,21 @@ const siteSyncDeltaUpdatedSiteSchema = z
     })
     .strict();
 
-const siteSyncDeltaSchemaInternal = z
+/**
+ * Structured delta describing how the site collection changed during a sync.
+ *
+ * @public
+ */
+export interface SiteSyncDelta {
+    /** Collection of newly added sites. */
+    addedSites: Site[];
+    /** Identifiers corresponding to removed sites. */
+    removedSiteIdentifiers: string[];
+    /** Detailed snapshots for sites that changed between syncs. */
+    updatedSites: SiteSyncDeltaUpdatedSite[];
+}
+
+const siteSyncDeltaSchemaInternal: z.ZodType<SiteSyncDelta> = z
     .object({
         addedSites: stateSyncSitesSchema,
         removedSiteIdentifiers: z.array(z.string().min(1)),
@@ -205,13 +239,6 @@ export type StateSyncStatusSummary = z.infer<
 export type StateSyncFullSyncResult = z.infer<
     typeof stateSyncFullSyncResultSchema
 >;
-
-/**
- * Structured delta describing how the site collection changed during a sync.
- *
- * @public
- */
-export type SiteSyncDelta = z.infer<typeof siteSyncDeltaSchema>;
 
 /**
  * Safe parse result type for {@link StateSyncStatusSummary} payloads.
