@@ -47,9 +47,9 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
 // ESM equivalent of currentDirectory
-// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Legacy compatibility required for electron main process path resolution
+// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentFilename = fileURLToPath(import.meta.url);
-// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Legacy compatibility required for electron main process path resolution
+// eslint-disable-next-line unicorn/prefer-import-meta-properties -- Electron main-process path resolution under ESM requires an __dirname equivalent
 const currentDirectory = path.dirname(currentFilename);
 
 /**

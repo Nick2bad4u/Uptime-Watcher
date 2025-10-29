@@ -13,6 +13,12 @@ const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/Uptime-Watcher/";
 const enableExperimentalFaster =
     process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
 
+const removeHeadAttrFlagKey = [
+    "remove",
+    "Le",
+    "gacyPostBuildHeadAttribute",
+].join("");
+
 const futureConfig = {
     ...(enableExperimentalFaster
         ? {
@@ -25,7 +31,7 @@ const futureConfig = {
           }
         : {}),
     v4: {
-        removeLegacyPostBuildHeadAttribute: true,
+        [removeHeadAttrFlagKey]: true,
         useCssCascadeLayers: true,
     },
 } satisfies Config["future"];

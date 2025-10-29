@@ -328,8 +328,8 @@ export default function SystemArchitecture() {
     AppSvc --> Notify
     AppSvc --> RendererBridge
     SitesCache -->|cache-updated| EventBus
-    WindowSvc -->|ipcRenderer.send| EventsAPI
-    EventsAPI -->|dispatch cache/monitor events| SiteStore
+    RendererBridge -->|webContents.send| EventsAPI
+    EventsAPI -->|contextBridge dispatch| SiteStore
     SiteStore -->|hydrate state| UI
 
     classDef renderer fill:#3b82f6,stroke:#1e40af,color:#ffffff
@@ -344,7 +344,7 @@ export default function SystemArchitecture() {
     class Ipc,Orchestrator,SiteMgr,MonitorMgr,AppSvc,Notify main
     class Writer,DbTx,Repos,Scheduler,CheckerStart persistence
     class SitesCache,EventBus events
-    class WindowSvc,EventsAPI,SiteStore frontend
+    class RendererBridge,EventsAPI,SiteStore frontend
 `} />
 
                         ## UI Component Composition

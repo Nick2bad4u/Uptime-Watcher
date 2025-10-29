@@ -289,7 +289,8 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
     participant Bus as TypedEventBus<UptimeEvents>
     participant AppSvc as ApplicationService
     participant Notify as NotificationService
-    participant WinSvc as WindowService
+    participant RendererBridge as RendererEventBridge
+    participant Preload as Preload Events API
     participant Renderer as Renderer EventsService
     participant Stores as Zustand Stores & UI
 
@@ -329,8 +330,9 @@ This sequence illustrates how a scheduled monitor run traverses the enhanced mon
     Bus->>AppSvc: typed event handler invoked
     AppSvc->>Notify: notifyMonitorDown/Up(site, monitorId)
     AppSvc->>RendererBridge: sendToRenderers(channel, payload)
-    RendererBridge->>Renderer: ipcRenderer.emit(channel, payload)
-    Renderer->>Stores: apply status update & append history
+    RendererBridge->>Preload: webContents.send(channel, payload)
+    Preload->>Renderer: window.electronAPI.events.dispatch(channel, payload)
+    Renderer->>Stores: apply typed update & append history
     Stores->>UI: Re-render dashboards
 `} />
 

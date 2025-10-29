@@ -394,7 +394,7 @@ describe("StatusUpdateHandler", () => {
             expect(actualUpdate.status).toBe("down"); // Converted to status in StatusUpdate
         });
 
-        it("should ignore legacy monitor status payloads dropped by the preload guard", async ({
+        it("should ignore outdated monitor status payloads dropped by the preload guard", async ({
             task,
             annotate,
         }) => {
@@ -407,16 +407,16 @@ describe("StatusUpdateHandler", () => {
             mockSetSites.mockClear();
             mockOnUpdate.mockClear();
 
-            const legacyPayload = {
-                monitorId: "legacy-monitor",
+            const outdatedPayload = {
+                monitorId: "outdated-monitor",
                 newStatus: "down",
                 previousStatus: "up",
-                // INTENTIONAL LEGACY: ensure guard rejects legacy siteId payloads.
-                siteId: "legacy-site",
+                // INTENTIONAL: ensure guard rejects siteId payloads from older builds.
+                siteId: "outdated-site",
                 timestamp: Date.now(),
             };
 
-            await statusChangedCallback(legacyPayload);
+            await statusChangedCallback(outdatedPayload);
 
             expect(mockSetSites).not.toHaveBeenCalled();
             expect(mockOnUpdate).not.toHaveBeenCalled();

@@ -565,27 +565,6 @@ export class TypedEventBus<
     }
 
     /**
-     * Register middleware to process events before emission.
-     *
-     * @remarks
-     * Middleware is executed in registration order. Each middleware must call
-     * `next()` to continue the chain or throw an error to abort processing. A
-     * maximum middleware limit prevents memory leaks from excessive
-     * registrations. If you need more middleware, consider increasing the limit
-     * in the constructor or combining multiple middleware functions into one.
-     *
-     * @deprecated Use `use()` instead for consistency with Express.js style
-     *   middleware.
-     *
-     * @param middleware - Middleware function to register.
-     *
-     * @throws Error when the maximum middleware limit is exceeded.
-     */
-    public addMiddleware(middleware: EventMiddleware): void {
-        this.registerMiddleware(middleware);
-    }
-
-    /**
      * Create enhanced event data with metadata, handling edge cases safely.
      *
      * @remarks

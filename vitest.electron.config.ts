@@ -108,7 +108,7 @@ const vitestConfig = defineConfig({
                 lines: 90, // Minimum 90% line coverage for backend
                 statements: 90, // Minimum 90% statement coverage for backend
             },
-        } as any, // Cast: @vitest/coverage-v8 types currently omit legacy options we rely on.
+        } as any, // Cast: @vitest/coverage-v8 types currently omit older options we rely on.
         dangerouslyIgnoreUnhandledErrors: false,
         deps: {
             optimizer: {

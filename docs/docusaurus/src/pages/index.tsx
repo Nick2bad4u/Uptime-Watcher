@@ -2,8 +2,8 @@
 /* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
 
 /* eslint-disable @typescript-eslint/dot-notation -- Required for strict TypeScript configuration and dynamic property access */
-/* eslint-disable deprecation/deprecation -- Using legacy APIs that are still required for compatibility */
-/* eslint-disable etc/no-deprecated -- Legacy code patterns needed for Docusaurus compatibility */
+/* eslint-disable deprecation/deprecation -- Using older APIs that remain required for compatibility */
+/* eslint-disable etc/no-deprecated -- Older code patterns needed for Docusaurus compatibility */
 /* eslint-disable sonarjs/deprecation -- SonarJS deprecation warnings are acceptable in documentation context */
 /* eslint-disable @typescript-eslint/no-deprecated -- TypeScript deprecated APIs are still required here */
 
@@ -71,7 +71,7 @@ const handleCopyCode = (() => {
                 }
                 return;
             } catch {
-                // Fall through to legacy method
+                // Fall through to the older method
             }
         }
 
@@ -441,7 +441,7 @@ export default function Home(): JSX.Element {
     );
 }
 
-/* eslint-enable deprecation/deprecation -- re-enable deprecation warnings after legacy code section */
+/* eslint-enable deprecation/deprecation -- re-enable deprecation warnings after older code section */
 /* eslint-enable etc/no-deprecated -- re-enable deprecated feature detection */
 /* eslint-enable sonarjs/deprecation -- re-enable SonarJS deprecation analysis */
 /* eslint-enable @typescript-eslint/no-deprecated -- re-enable TypeScript deprecation warnings */

@@ -433,7 +433,7 @@ describe("Updater Service Benchmarks", () => {
                 verificationTime: { min: 200, max: 3000 },
             },
             {
-                name: "legacy-verification",
+                name: "compatibility-verification",
                 checksumAlgorithm: "sha256",
                 hasSignature: 0.3,
                 checksumValidRate: 0.97,

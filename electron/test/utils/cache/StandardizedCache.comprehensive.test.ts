@@ -762,7 +762,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            cache.set("old-key", "legacy");
+            cache.set("old-key", "outdated");
 
             const clearedSpy = vi.fn();
             const bulkSpy = vi.fn();
@@ -804,7 +804,7 @@ describe("StandardizedCache - Comprehensive Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Data Update", "type");
 
-            cache.set("old-key", "legacy");
+            cache.set("old-key", "outdated");
 
             const bulkSpy = vi.fn();
             eventBus.on("internal:cache:bulk-updated", bulkSpy);

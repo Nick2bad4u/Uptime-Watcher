@@ -408,14 +408,14 @@ describe("Events Domain API", () => {
             expect(callback).toHaveBeenCalledWith(canonicalPayload);
         });
 
-        it("should drop legacy monitor status payloads", () => {
+        it("should drop outdated monitor status payloads", () => {
             const callback = vi.fn();
-            const legacyPayload = {
-                monitorId: "monitor-legacy",
+            const outdatedPayload = {
+                monitorId: "monitor-outdated",
                 newStatus: "down",
                 previousStatus: "up",
-                // INTENTIONAL LEGACY: verify preload guard rejects legacy siteId payloads.
-                siteId: "site-legacy",
+                // INTENTIONAL: verify preload guard rejects siteId payloads from earlier builds.
+                siteId: "site-outdated",
                 timestamp: Date.now(),
             };
 
@@ -423,7 +423,7 @@ describe("Events Domain API", () => {
             eventsApi.onMonitorStatusChanged(callback);
 
             const eventHandler = mockIpcRenderer.on.mock.calls.at(-1)?.[1];
-            eventHandler?.({}, legacyPayload);
+            eventHandler?.({}, outdatedPayload);
 
             expect(callback).not.toHaveBeenCalled();
             expect(diagnosticsWarnSpy).toHaveBeenCalledWith(

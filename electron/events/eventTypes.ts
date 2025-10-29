@@ -1279,47 +1279,6 @@ export interface UptimeEvents extends UnknownRecord {
     };
 
     /**
-     * @deprecated Legacy public cache miss event. No longer emitted by
-     *   managers; use `internal:site:cache-miss` instead.
-     *
-     * @param backgroundLoading - Whether background loading is in progress.
-     * @param identifier - The unique identifier for the site.
-     * @param operation - The operation type (always "cache-lookup").
-     * @param timestamp - Unix timestamp (ms) when the cache miss occurred.
-     */
-    "site:cache-miss": {
-        /** Whether background loading is in progress. */
-        backgroundLoading: boolean;
-        /** The unique identifier for the site. */
-        identifier: string;
-        /** The operation type (always "cache-lookup"). */
-        operation: "cache-lookup";
-        /** Unix timestamp (ms) when the cache miss occurred. */
-        timestamp: number;
-    };
-
-    /**
-     * @deprecated Legacy public cache update event. No longer emitted by
-     *   managers; use `internal:site:cache-updated` instead.
-     *
-     * @param identifier - The unique identifier for the site.
-     * @param operation - The operation type ("background-load",
-     *   "cache-updated", or "manual-refresh").
-     * @param timestamp - Unix timestamp (ms) when the cache was updated.
-     */
-    "site:cache-updated": {
-        /** The unique identifier for the site. */
-        identifier: string;
-        /**
-         * The operation type ("background-load", "cache-updated", or
-         * "manual-refresh").
-         */
-        operation: "background-load" | "cache-updated" | "manual-refresh";
-        /** Unix timestamp (ms) when the cache was updated. */
-        timestamp: number;
-    };
-
-    /**
      * Emitted when a site is removed.
      *
      * @param cascade - Whether the removal was cascaded.
@@ -1583,11 +1542,7 @@ export const EVENT_CATEGORIES = {
      * Events related to cache management, including invalidation notifications
      * and cache state changes for sites and monitors.
      */
-    CACHE: [
-        "cache:invalidated",
-        "site:cache-miss",
-        "site:cache-updated",
-    ] as const,
+    CACHE: ["cache:invalidated"] as const,
 
     /**
      * Configuration change events.

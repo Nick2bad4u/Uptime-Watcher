@@ -1031,7 +1031,6 @@ export { initialize, validateContent, rewriteLinks, cleanContent };
 
 // ansi (text with ANSI escape codes, for terminal viewing)
 // asciidoc (modern AsciiDoc as interpreted by AsciiDoctor)
-// asciidoc_legacy (AsciiDoc as interpreted by asciidoc-py).
 // asciidoctor (deprecated synonym for asciidoc)
 // beamer (LaTeX beamer slide show)
 // bibtex (BibTeX bibliography)

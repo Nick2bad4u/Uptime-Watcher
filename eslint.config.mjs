@@ -267,6 +267,24 @@ export default [
             "uptime-watcher/renderer-no-electron-import": "error",
         },
     },
+    {
+        files: [
+            "electron/**/*.{ts,tsx}",
+            "shared/**/*.{ts,tsx}",
+            "src/**/*.{ts,tsx}",
+        ],
+        ignores: [
+            "electron/test/**/*",
+            "src/test/**/*",
+        ],
+        name: "No Deprecated Exports",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/no-deprecated-exports": "error",
+        },
+    },
     importX.flatConfigs.typescript,
     progress.configs.recommended,
     noBarrelFiles.flat,

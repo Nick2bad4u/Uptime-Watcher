@@ -4,7 +4,7 @@
  * @remarks
  * Listens to the global confirmation dialog store and renders a themed modal
  * whenever a confirmation is requested. Provides a consistent, accessible
- * replacement for legacy `window.confirm` usage.
+ * replacement for direct `window.confirm` usage.
  */
 
 import type { JSX } from "react/jsx-runtime";

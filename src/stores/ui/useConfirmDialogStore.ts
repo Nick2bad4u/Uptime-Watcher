@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides a centralized mechanism for rendering modern confirmation dialogs
- * without relying on legacy browser alert APIs. Consumers call
+ * without relying on the browser's built-in alert APIs. Consumers call
  * {@link requestConfirmation} to display the dialog and receive the user's
  * response as a promise.
  *

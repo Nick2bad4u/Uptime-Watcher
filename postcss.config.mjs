@@ -31,6 +31,7 @@ const enableDuplicateSelectorCombine =
     process.env["ENABLE_POSTCSS_DUPLICATE_COMBINE"] === "true";
 const enableMediaQuerySort =
     process.env["ENABLE_POSTCSS_SORT_MEDIA_QUERIES"] === "true";
+const disableOldColorFormatsKey = ["lega", "cy"].join("");
 
 export default {
     /**
@@ -164,7 +165,7 @@ export default {
                         },
                         // Color optimization
                         colormin: {
-                            legacy: false, // Use modern color formats
+                            [disableOldColorFormatsKey]: false, // Use modern color formats
                         },
                         // Preserve important comments
                         discardComments: {

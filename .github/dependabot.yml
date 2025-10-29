@@ -38,6 +38,9 @@ updates:
                   - "*"
 
     - package-ecosystem: npm
+      cooldown:
+          default-days: 3
+          include: ["*"]
       directory: /
       schedule:
           interval: weekly
@@ -74,6 +77,9 @@ updates:
                   - "file:*"
 
     - package-ecosystem: npm
+      cooldown:
+          default-days: 3
+          include: ["*"]
       directory: /docs/docusaurus
       schedule:
           interval: weekly

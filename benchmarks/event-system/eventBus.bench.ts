@@ -98,11 +98,11 @@ describe("Event Bus Performance", () => {
         "emit events with middleware",
         () => {
             eventBus = new TypedEventBus<TestEventTypes>("benchmark-bus");
-            eventBus.addMiddleware(async (eventName, data, next) => {
+            eventBus.registerMiddleware(async (eventName, data, next) => {
                 // Process the data and continue to next middleware
                 await next();
             });
-            eventBus.addMiddleware(async (eventName, data, next) => {
+            eventBus.registerMiddleware(async (eventName, data, next) => {
                 // Another middleware layer
                 await next();
             });

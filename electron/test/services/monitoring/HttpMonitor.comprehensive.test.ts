@@ -10,6 +10,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AxiosResponse } from "axios";
 
 import type { Site } from "@shared/types";
+import type { HttpMonitorConfig } from "@shared/types/monitorConfig";
 import type {
     MonitorCheckResult,
     MonitorConfig,
@@ -76,6 +77,43 @@ vi.mock("@shared/utils/logTemplates", () => ({
 describe("HttpMonitor - Comprehensive Coverage", () => {
     let httpMonitor: HttpMonitor;
     let mockAxiosInstance: any;
+
+    const createHttpMonitorConfig = (
+        overrides: Partial<HttpMonitorConfig> = {}
+    ): HttpMonitorConfig => ({
+        checkInterval: 60_000,
+        enabled: true,
+        expectedStatusCodes: [200],
+        followRedirects: true,
+        id: "http-monitor-id",
+        method: "GET",
+        name: "HTTP Monitor",
+        retryAttempts: 3,
+        timeout: 5000,
+        type: "http",
+        url: "https://example.com",
+        ...overrides,
+    });
+
+    const createSingleCheckParams = (
+        overrides: Partial<{
+            monitor: HttpMonitorConfig;
+            signal: AbortSignal;
+            timeout: number;
+            url: string;
+        }> = {}
+    ) => {
+        const monitor = overrides.monitor ?? createHttpMonitorConfig();
+        const timeout = overrides.timeout ?? monitor.timeout;
+
+        return {
+            context: undefined,
+            monitor,
+            timeout,
+            url: overrides.url ?? monitor.url,
+            ...(overrides.signal ? { signal: overrides.signal } : {}),
+        } as const;
+    };
 
     beforeEach(async () => {
         vi.clearAllMocks();
@@ -487,15 +525,15 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             determineMonitorStatus.mockReturnValue("up");
 
             // Access private method through public interface
+            const singleCheckParams = createSingleCheckParams();
             const result = await (httpMonitor as any).performSingleHealthCheck(
-                "https://example.com",
-                5000
+                singleCheckParams
             );
 
             expect(mockAxiosInstance.get).toHaveBeenCalledWith(
-                "https://example.com",
+                singleCheckParams.url,
                 expect.objectContaining({
-                    timeout: 5000,
+                    timeout: singleCheckParams.timeout,
                     signal: expect.any(AbortSignal),
                 })
             );
@@ -533,9 +571,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("up");
 
+            const singleCheckParams = createSingleCheckParams();
             const result = await (httpMonitor as any).performSingleHealthCheck(
-                "https://example.com",
-                5000
+                singleCheckParams
             );
 
             expect(result.responseTime).toBe(0);
@@ -568,9 +606,9 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             mockAxiosInstance.get.mockResolvedValue(mockResponse);
             determineMonitorStatus.mockReturnValue("down");
 
+            const singleCheckParams = createSingleCheckParams();
             const result = await (httpMonitor as any).performSingleHealthCheck(
-                "https://example.com",
-                5000
+                singleCheckParams
             );
 
             expect(result).toEqual({
@@ -621,8 +659,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
 
             await (httpMonitor as any).performSingleHealthCheck(
-                "https://example.com",
-                5000
+                createSingleCheckParams()
             );
 
             expect(logger.debug).toHaveBeenCalledWith(
@@ -670,8 +707,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             determineMonitorStatus.mockReturnValue("up");
 
             await (httpMonitor as any).performSingleHealthCheck(
-                "https://example.com",
-                5000
+                createSingleCheckParams()
             );
 
             expect(logger.debug).not.toHaveBeenCalled();

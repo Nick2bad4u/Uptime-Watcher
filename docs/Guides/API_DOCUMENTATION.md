@@ -571,11 +571,12 @@ interface UptimeEvents {
 }
 ```
 
-> **Legacy note:** Historical topics `site:cache-miss` and `site:cache-updated`
-> are no longer emitted by managers. Cache telemetry now flows through the
+> **Historical note:** Prior to the bridge refactor, managers emitted
+> `site:cache-miss` and `site:cache-updated`. These topics have been fully
+> removed from the public API—cache telemetry now flows exclusively through the
 > internal equivalents (`internal:site:cache-miss` /
-> `internal:site:cache-updated`) and the orchestrator decides whether a
-> renderer-facing `cache:invalidated` needs to be broadcast.
+> `internal:site:cache-updated`), and the orchestrator emits `cache:invalidated`
+> when the renderer must react.
 
 #### Monitor Events
 

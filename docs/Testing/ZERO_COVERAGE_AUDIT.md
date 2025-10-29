@@ -1,6 +1,6 @@
 # Zero coverage audit workflow
 
-Legacy test files occasionally survive refactors and end up exercising no executable code. The `test:zero-coverage` helper runs each Vitest file in isolation with coverage enabled, highlights the ones that never touch instrumented source lines, and leaves the final deletion decision to humans.
+Older test files occasionally survive refactors and end up exercising no executable code. The `test:zero-coverage` helper runs each Vitest file in isolation with coverage enabled, highlights the ones that never touch instrumented source lines, and leaves the final deletion decision to humans.
 
 ## Overview
 
@@ -43,7 +43,7 @@ Each executed file prints its relative path and a short status:
 
 ```text
 Analyzing src/features/core/foo.test.tsx... 128 statements covered
-Analyzing src/utils/legacy/obsolete.test.ts... no coverage
+Analyzing src/utils/archive/obsolete.test.ts... no coverage
 ```
 
 The summary section provides totals plus a ranked list of the top coverage-producing specs, which is handy when verifying that the run behaved as expected.

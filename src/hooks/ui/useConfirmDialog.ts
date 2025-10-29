@@ -3,7 +3,7 @@
  *
  * @remarks
  * Provides a stable callback that opens the centralized confirmation dialog and
- * resolves with the user's choice. Helps components migrate away from legacy
+ * resolves with the user's choice. Helps components replace direct
  * `window.confirm` usage while keeping implementation details encapsulated.
  *
  * @public

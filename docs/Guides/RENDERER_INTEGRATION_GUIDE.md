@@ -31,7 +31,7 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ### Channel Normalization Checklist
 
-- ✅ Replace legacy `domain:action` invoke strings (e.g. `settings:updateHistoryLimit`) with hyphenated, verb-first channels.
+- ✅ Replace older `domain:action` invoke strings (e.g. `settings:updateHistoryLimit`) with hyphenated, verb-first channels.
 - ✅ Update preload wrappers to forward the normalized channel names.
 - ✅ Regenerate bridge/doc artifacts after schema changes: `npm run generate:ipc`.
 - ✅ Run `npm run check:ipc` in CI/PR validation.

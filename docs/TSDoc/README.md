@@ -110,7 +110,7 @@ For developers new to TSDoc:
 | [`@internal`](./tsdoc-tag-internal.md) | Mark as internal implementation | Internal code |
 | [`@alpha`](./tsdoc-tag-alpha.md) | Mark as alpha/experimental | Early development |
 | [`@beta`](./tsdoc-tag-beta.md) | Mark as beta/preview | Pre-release features |
-| [`@deprecated`](./tsdoc-tag-deprecated.md) | Mark as deprecated | Legacy code |
+| [`@deprecated`](./tsdoc-tag-deprecated.md) | Mark as deprecated | Deprecated code |
 
 ### Advanced tags
 

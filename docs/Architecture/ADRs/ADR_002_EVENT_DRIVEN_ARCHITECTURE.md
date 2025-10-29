@@ -179,10 +179,11 @@ Other Backend Services (via event listeners)
 - `site:removed` - When a site is deleted
 - `sites:state-synchronized` - When frontend and backend state are synchronized
 
-_Legacy notice_: the historical `site:cache-updated` and `site:cache-miss`
-topics are no longer emitted directly. Cache telemetry now flows through the
-internal namespace and the orchestrator converts it into `cache:invalidated`
-when the renderer must react.
+_Historical note_: the former `site:cache-updated` and `site:cache-miss`
+topics were retired in favor of the internal namespace. Cache telemetry now
+flows exclusively through those internal channels and the orchestrator
+converts them into the canonical `cache:invalidated` broadcast when the
+renderer must react.
 
 **Internal Events:**
 

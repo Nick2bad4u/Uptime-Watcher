@@ -1,5 +1,5 @@
 /* Shared Animations for Themed Components */
-/* stylelint-disable keyframes-name-pattern -- legacy animation names are consumed across existing components */
+/* stylelint-disable keyframes-name-pattern -- historical animation names are consumed across existing components */
 
 @keyframes spin {
     from {

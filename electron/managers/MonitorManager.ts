@@ -653,8 +653,8 @@ export class MonitorManager {
     }
 
     /**
-     * Enhanced start all monitoring - replaces legacy startAllMonitoring
-     * function.
+     * Enhanced start all monitoring - replaces the previous startAllMonitoring
+     * implementation function.
      *
      * @param config - Configuration object with required dependencies
      * @param isMonitoring - Current monitoring state
@@ -730,8 +730,8 @@ export class MonitorManager {
     }
 
     /**
-     * Enhanced stop all monitoring - replaces legacy stopAllMonitoring
-     * function.
+     * Enhanced stop all monitoring - replaces the previous stopAllMonitoring
+     * implementation function.
      *
      * @param config - Configuration object with required dependencies
      *
@@ -799,7 +799,7 @@ export class MonitorManager {
     }
 
     /**
-     * Enhanced start monitoring for site - replaces legacy
+     * Enhanced start monitoring for site - replaces the earlier implementation
      * startMonitoringForSite function.
      *
      * @param config - Configuration object with required dependencies
@@ -920,8 +920,8 @@ export class MonitorManager {
     }
 
     /**
-     * Enhanced stop monitoring for site - replaces legacy stopMonitoringForSite
-     * function.
+     * Enhanced stop monitoring for site - replaces the previous
+     * stopMonitoringForSite implementation function.
      *
      * @param config - Configuration object with required dependencies
      * @param identifier - Site identifier
@@ -1373,8 +1373,8 @@ export class MonitorManager {
      * @remarks
      * This helper ensures consistency between cache updates, database
      * persistence, and event emission for monitor status changes. Used by
-     * enhanced lifecycle methods to maintain parity with legacy monitoring
-     * behavior.
+     * enhanced lifecycle methods to maintain parity with the former monitoring
+     * implementation behavior.
      *
      * @param site - Site containing the monitor
      * @param monitor - Monitor to update
@@ -1453,7 +1453,7 @@ export class MonitorManager {
      * **Architecture Integration:**
      *
      * - Enhanced services are always provided by the ServiceContainer
-     * - No fallback to legacy monitoring systems
+     * - No fallback to prior monitoring systems
      * - All monitoring operations use the unified enhanced system
      * - Operation correlation prevents race conditions across concurrent
      *   operations

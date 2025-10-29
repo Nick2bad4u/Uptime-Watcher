@@ -528,7 +528,8 @@ export interface HistoryLimitUpdatedEventData extends BaseEventData {
  * @remarks
  * Emitted when a monitored endpoint or service is detected as down. Uses the
  * canonical {@link StatusUpdate} schema with `status` constrained to `"down"`,
- * `siteIdentifier` replacing legacy `siteId`, and ISO-8601 timestamps.
+ * the modern `siteIdentifier` field (which supersedes the older `siteId`), and
+ * ISO-8601 timestamps.
  *
  * @example // Example event payload for a monitor down event
  *

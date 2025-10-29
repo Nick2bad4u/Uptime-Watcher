@@ -133,7 +133,7 @@ describe("Architectural Fixes Regression Tests", () => {
 
     describe("Enhanced Monitoring Integration", () => {
         it("should verify enhanced monitoring system is available", async () => {
-            // Legacy monitoring lifecycle has been replaced with enhanced monitoring
+            // The previous monitoring lifecycle has been replaced with enhanced monitoring
             await expect(async () => {
                 // The enhanced monitoring system should import without throwing
                 await import(

@@ -17,7 +17,7 @@ import { useUIStore } from "../../../stores/ui/useUiStore";
 // Mock the shared utils
 vi.mock("../../../stores/utils", () => ({
     logStoreAction: vi.fn(),
-    // Legacy bridge helper mock removed
+    // Prior bridge helper mock removed
 }));
 
 // Mock localStorage for persistence testing

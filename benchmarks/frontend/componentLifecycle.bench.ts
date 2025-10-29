@@ -443,7 +443,7 @@ class MockComponentLifecycle {
                 break;
             }
             case "componentWillMount": {
-                // Legacy method simulation
+                // Prior method simulation
                 break;
             }
             case "componentDidMount": {

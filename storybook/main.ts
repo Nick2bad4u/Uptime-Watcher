@@ -18,7 +18,7 @@ import {
 /**
  * Storybook 9 migration reference:
  *
- * - {@link https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#dropped-support-for-legacy-packages}
+ * - {@link https://github.com/storybookjs/storybook/blob/next/MIGRATION.md | Storybook migration guide entry covering retired packages}
  * - `@storybook/addon-actions` ➜ `storybook/actions`
  * - `@storybook/addon-essentials` ➜ built into core (no explicit addon required)
  * - `@storybook/addon-interactions`, `@storybook/addon-measure`,

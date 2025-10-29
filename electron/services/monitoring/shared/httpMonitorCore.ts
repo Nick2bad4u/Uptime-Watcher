@@ -285,53 +285,8 @@ export function createHttpMonitorService<
 
         protected async performSingleHealthCheck(
             params: SingleCheckParams
-        ): Promise<MonitorCheckResult>;
-
-        protected async performSingleHealthCheck(
-            url: string,
-            timeout: number,
-            signal?: AbortSignal
-        ): Promise<MonitorCheckResult>;
-
-        protected async performSingleHealthCheck(
-            paramsOrUrl: SingleCheckParams | string,
-            timeout?: number,
-            signal?: AbortSignal
         ): Promise<MonitorCheckResult> {
-            if (typeof paramsOrUrl === "string") {
-                if (behavior.type !== "http") {
-                    throw new Error(
-                        `${behavior.scope} requires monitor context for direct performSingleHealthCheck invocation`
-                    );
-                }
-
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Legacy testing path constructs minimal monitor stub for compatibility
-                const compatibilityMonitor = {
-                    type: behavior.type,
-                    url: paramsOrUrl,
-                } as TMonitor;
-                const validation =
-                    behavior.validateMonitorSpecifics(compatibilityMonitor);
-
-                if (validation.kind === "error") {
-                    return validation.result;
-                }
-
-                const compatibilityParams: SingleCheckParams = {
-                    context: validation.context,
-                    monitor: compatibilityMonitor,
-                    timeout:
-                        timeout ??
-                        this.config.timeout ??
-                        DEFAULT_REQUEST_TIMEOUT,
-                    url: paramsOrUrl,
-                    ...(signal ? { signal } : {}),
-                };
-
-                return this.executeSingleCheck(compatibilityParams);
-            }
-
-            return this.executeSingleCheck(paramsOrUrl);
+            return this.executeSingleCheck(params);
         }
 
         private async makeRequest(

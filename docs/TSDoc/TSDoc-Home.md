@@ -104,7 +104,7 @@ balancing several competing design requirements:
     discarded during parsing.
 3.  **Familiar syntax:** As much as possible, TSDoc should preserve the
     familiar style of JSDoc/Markdown. This also maximizes the likelihood
-    that legacy comments will parse correctly as TSDoc.
+    that older comments will parse correctly as TSDoc.
 
 ***Why can't JSDoc be the standard?*** The JSDoc grammar is not
 rigorously specified, but rather inferred from the behavior of a

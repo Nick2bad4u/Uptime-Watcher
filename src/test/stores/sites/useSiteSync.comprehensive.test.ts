@@ -283,7 +283,7 @@ describe("useSiteSync", () => {
             });
         });
 
-        // Removed legacy withErrorHandling-specific fallback test; getSyncStatus now
+        // Removed historical withErrorHandling-specific fallback test; getSyncStatus now
         // relies on direct try/catch error handling (covered above).
     });
 

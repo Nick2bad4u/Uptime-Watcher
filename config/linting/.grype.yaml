@@ -294,7 +294,7 @@ sort-by: "risk" # default to risk-based sorting for better prioritization
 #     version: 1.5.1
 #     type: npm
 #     location: "/usr/local/lib/node_modules/**"
-#   reason: "Legacy CVE - code path verified safe in our implementation"
+#   reason: "Archived CVE - code path verified safe in our implementation"
 # EPSS-based filtering considerations (implement via JSON output processing)
 # - vulnerability: CVE-2023-*
 #   reason: "Low exploitation probability per EPSS analysis (<10% percentile)"
