@@ -219,7 +219,7 @@ jobs:
 
             - name: Upload mutation testing reports
               if: always() # Upload reports even if Stryker fails
-              uses: actions/upload-artifact@ef09cdac3e2d3e60d8ccadda691f4f1cec5035cb # v5.0.0
+              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
               with:
                   name: stryker-reports-${{ github.sha }}
                   path: |
