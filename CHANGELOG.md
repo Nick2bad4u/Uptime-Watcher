@@ -7,14 +7,184 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[7d60de1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)...
+[7d60de1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee...7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 17.8.0 [`(7d60de1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)
+
+
+
+
+
+
+## [17.8.0] - 2025-10-30
+
+
 [[6efdf05](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)...
-[6efdf05](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6efdf056b8544b7f15e07b4e3a5677d9a295bd02...6efdf056b8544b7f15e07b4e3a5677d9a295bd02))
+[12247c6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/12247c6e92c0e1cddac1116041543efd4c596c39)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6efdf056b8544b7f15e07b4e3a5677d9a295bd02...12247c6e92c0e1cddac1116041543efd4c596c39))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance monitoring lifecycle and add architectural lint rules
+
+This commit introduces significant improvements to the monitoring lifecycle, event system, and architectural integrity through new ESLint rules.
+
+✨ **[feat] Monitoring Lifecycle Summaries**
+- `startMonitoring` and `stopMonitoring` methods now return detailed `MonitoringStartSummary` and `MonitoringStopSummary` objects instead of `void`.
+- This provides callers (including the IPC layer) with granular results, detailing how many monitors were successfully started/stopped, failed, or skipped.
+- 📤 IPC handlers for `start-monitoring` and `stop-monitoring` now forward these summary objects to the renderer, enabling more informative UI feedback.
+
+⚡ **[perf] Event Metadata & System Refinements**
+- 🚇 Introduces a robust `attachForwardedMetadata` utility to correctly propagate event correlation IDs and metadata when internal events are re-emitted to the renderer.
+  - This fixes potential metadata loss or conflicts during event forwarding.
+  - 🛡️ Utilizes `Reflect` and a private `Symbol` in `TypedEventBus` for safer and more reliable metadata handling on event payloads.
+- 📈 `UptimeOrchestrator` now enriches `monitoring:started` and `monitoring:stopped` events with the new lifecycle summaries, providing a comprehensive view of monitoring state changes.
+- 🔧 The minimum monitor check interval is increased from 1s to 5s to reduce system load and prevent excessive checks.
+- 🧹 Imported monitor configurations now have their `checkInterval` clamped to this new minimum, ensuring data integrity.
+
+🚜 **[refactor] MonitorManager Enhanced Lifecycle**
+- 🏗️ Extracts complex monitoring lifecycle logic (start/stop all, start/stop for site) from `MonitorManager` into pure, testable helper functions in a new `MonitorManagerEnhancedLifecycle.ts` file.
+- 📖 `MonitorManager` documentation is significantly streamlined to improve clarity and focus on its public API. JSDoc is refined for better developer experience.
+- 🧪 The `MonitorScheduler` is updated to be injectable with a logger instance, improving testability.
+
+🔧 **[build] New Architectural ESLint Rules**
+- 🧱 Adds a `shared-no-outside-imports` rule to enforce that `shared` code remains platform-agnostic by preventing imports from the `electron` or `renderer` layers.
+- ⛔ Adds an `electron-no-renderer-import` rule to prevent Electron main process code from importing renderer-specific modules.
+- 🚫 Adds a `renderer-no-browser-dialogs` rule to discourage the use of native `alert()`, `confirm()`, and `prompt()` in favor of the app's custom dialog system for a consistent UX.
+
+📝 **[docs] Agent & Config Updates**
+- 🤖 Updates the `BeastMode` agent prompt to recommend using `lint:fix` for auto-formatting, improving agent efficiency.
+- 🎨 Formats agent tool and handoff lists for better readability.
+
+🧪 **[test] Comprehensive Test Updates**
+- 🔄 Updates unit and integration tests for `UptimeOrchestrator`, `IpcService`, and `MonitorManager` to align with the new method signatures that return lifecycle summaries.
+- 🔬 Adds tests to verify correct event metadata forwarding and payload enrichment.
+- 🛠️ Increases timeouts for some long-running tests to prevent flakiness in CI environments.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(12247c6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/12247c6e92c0e1cddac1116041543efd4c596c39)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.7.0 [`(6efdf05)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6efdf056b8544b7f15e07b4e3a5677d9a295bd02)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Standardize terminology, remove deprecated exports, and enhance tooling
+
+This commit introduces a broad set of refactoring and tooling improvements focused on standardizing terminology, enforcing code quality with new linting rules, and cleaning up deprecated code patterns.
+
+### ✨ Features
+-   **ESLint:** Introduces a new custom ESLint rule, `no-deprecated-exports`, to prevent the export of any code marked with `@deprecated` in its TSDoc comments. This rule is now enforced across the codebase to ensure deprecated APIs are not accidentally used externally.
+
+### 🚜 Refactor
+-   **Terminology Standardization:** Systematically replaces the term "legacy" across the entire codebase—including documentation, comments, tests, and configuration files—with more descriptive synonyms like "former," "outdated," "historical," and "prior." This improves clarity and consistency in project-wide language.
+-   **Event System:**
+    -   Renames `addMiddleware` to `registerMiddleware` in `TypedEventBus` for better semantic clarity.
+    -   Removes the deprecated `addMiddleware` compatibility method.
+    -   Removes the deprecated `site:cache-miss` and `site:cache-updated` event types, which are now handled exclusively through internal channels.
+-   **Monitoring Services:** Removes the overloaded `performSingleHealthCheck` method signature that provided a compatibility layer. The method now strictly accepts a single parameter object, simplifying its interface and removing outdated call patterns.
+
+### 🧹 Chores
+-   **Dependabot Configuration:** Adds a 3-day cooldown period for `npm` dependency updates to reduce the frequency of pull requests and streamline dependency management.
+
+### 📝 Documentation
+-   **IPC Diagrams:** Updates system architecture and workflow diagrams to accurately reflect the event flow from the `RendererBridge` via `webContents.send` instead of the older `WindowService` model.
+-   **Terminology Update:** All documentation has been updated to use the new standardized terminology, replacing "legacy" with more specific terms.
+
+### 🧪 Testing
+-   **Test Updates:** Adjusts test descriptions, variable names, and assertions across numerous test files to align with the project-wide terminology and API refactorings, ensuring all tests continue to pass and accurately reflect the current state of the code.
+-   **Monitor Tests:** Refactors `HttpMonitor` tests to use a new factory function for creating test parameters, removing reliance on the now-deleted compatibility-focused method signature.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ac8ef8d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ac8ef8d78e4367401518aad483f0dc06acb7aa05)
+
+
+- 🚜 [refactor] Introduce renderer services to abstract IPC calls
+
+This commit introduces a significant architectural refactor by creating a renderer-side service layer to abstract all Inter-Process Communication (IPC). Previously, UI components and Zustand stores directly accessed `window.electronAPI`, coupling them to the raw context bridge.
+
+✨ **[feat] New Renderer Service Layer (`src/services/*`)**
+- A new facade layer of domain-specific services (e.g., `SiteService`, `EventsService`, `SettingsService`) is introduced in the renderer process.
+- These services now encapsulate all interactions with the `window.electronAPI` context bridge.
+- This abstraction decouples UI and state management logic from the underlying IPC implementation, improving modularity and testability.
+- Bridge readiness logic, previously handled by a global `waitForElectronAPI` helper, is now managed within each service's initialization, simplifying consumer code.
+
+🚜 **[refactor] Update Application-Wide IPC Usage**
+- All direct calls to `window.electronAPI` throughout the codebase (in stores, components, and utilities) are replaced with calls to the new renderer services.
+- Event listener registration is now consistently asynchronous, as methods like `EventsService.onSiteAdded()` return a `Promise` that resolves to the cleanup function.
+
+📝 **[docs] Update All Architectural and Developer Documentation**
+- All documentation, including ADRs, developer guides, and templates, has been updated to reflect the new service-based IPC pattern.
+- Code examples and architectural diagrams are modified to show `SiteService`, `EventsService`, etc., as the primary method for frontend-to-backend communication.
+- The `ZUSTAND_STORE_TEMPLATE.md` is overhauled to use the new pattern, providing a clear blueprint for future development.
+
+🧪 **[test] Adapt Tests to Service-Based Mocking**
+- Unit and component tests are updated to mock the new service layer using `vi.spyOn` instead of mocking the global `window.electronAPI` object.
+- The `waitForElectronAPI` utility function has been removed, and its corresponding mocks are deleted from all test files.
+
+🧹 **[chore] Remove Deprecated `waitForElectronAPI` Utility**
+- The `waitForElectronAPI` function in `src/stores/utils.ts` is removed as its responsibility is now delegated to the individual service initializers.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4cc300d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4cc300d4f14f7bcd4d636c485b612cfc7de584ea)
+
+
+- 🚜 [refactor] Centralize services and add duplicate site handling
+
+This commit introduces a major refactoring by centralizing IPC-related services and improving data integrity.
+
+### Source Code Changes
+
+✨ **[feat] Add Duplicate Site Identifier Sanitization**
+- 🛡️ Implements a sanitization step in the main process `get-sites` IPC handler.
+- 🔍 Detects and removes sites with duplicate `identifier` values before sending the site list to the renderer.
+- 🪵 Adds detailed error logging when duplicates are found, including the count and specific identifiers, to aid in debugging data corruption issues.
+
+🚜 **[refactor] Centralize Renderer Services**
+- 📂 Moves `SiteService` and `MonitoringService` from `src/stores/sites/services` to a new top-level `src/services` directory.
+- 🎯 This establishes a clear, unified location for all renderer-side services that communicate with the main process.
+
+⚡ **[perf] Refine Site Initialization**
+- 🔄 Updates the `initializeSites` action in the sites store to use the `syncSites` function.
+- ⬇️ This ensures the initial site load leverages the full state synchronization pipeline, rather than a direct `getSites` call, for better consistency.
+
+### Documentation and Test Changes
+
+📝 **[docs] Update API Documentation for Service Layer**
+- 📖 Overhauls the API documentation to strongly recommend using the new, centralized service modules (`SiteService`, `MonitoringService`, etc.) instead of directly accessing `window.electronAPI`.
+- 💻 Updates all code examples and API references to reflect the new service-based access pattern.
+- 🔗 Corrects broken links in architecture documents that pointed to the old service file locations.
+
+🧪 **[test] Adapt Tests to Refactoring and New Logic**
+- 🧩 Updates all unit and integration tests to import services from their new `src/services` location.
+- ⚙️ Modifies the `IpcService` test to account for the new duplicate site filtering logic, ensuring it correctly returns a sanitized list.
+- ♻️ Adjusts store-level tests to reflect the change in the `initializeSites` implementation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(838bd17)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/838bd17a55aeffbfd1c49a2f7f8123a5bb3e5a27)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Clarify Review Work handoff to clear ToDo list when complete
+ - Update .github/agents/BeastMode.agent.md: append explicit instruction to clear the ToDo list in the "Review Work" handoff prompt.
+ - Ensures the agent removes completed tasks and keeps the ToDo list tidy after verification.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(58bd338)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58bd3386d6c0db9fff7d5c3db86b60eaa8d8d4d4)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.7.0 [skip ci] [`(0c88002)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0c88002da934f439735cf477ecb6e600c4ba52a7)
 
 
 
@@ -3233,7 +3403,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8ddd
  - Adds `ws` and `@types/ws` to dependencies for the WebSocket monitor implementation.
 
 🧹 [chore] Updates the BeastMode chatmode tool configuration.
- - Refines the available tools, removing several long-retired or unused commands and adding new capabilities like `fileSearch`, `runInTerminal`, and `websearch`.
+ - Refines the available tools, removing several legacy or unused commands and adding new capabilities like `fileSearch`, `runInTerminal`, and `websearch`.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(89b3123)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/89b3123f1a193bdac1785bc1877983d198e25ccd)
 
@@ -3879,7 +4049,7 @@ This commit introduces a series of improvements across the build system, TypeScr
 
 ### 🔧 Build & Configuration Improvements
 *   **TypeScript Configuration (`tsconfig.json`):**
-    *   Refines compiler options for stricter, more modern standards by enabling `verbatimModuleSyntax` and disabling outdated decorator options.
+    *   Refines compiler options for stricter, more modern standards by enabling `verbatimModuleSyntax` and disabling legacy decorator options.
     *   Simplifies `lib` and `include` arrays for better clarity.
     *   Moves `tsBuildInfoFile` output from the `dist` to a dedicated `cache` directory to separate build artifacts from cache files.
 *   **Vite & Vitest Configuration:**
@@ -4795,12 +4965,12 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(29dc
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(04f054c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/04f054cd5fa34f2ea6c140c418ce6921cc21feae)
 
 
-- 🚜 [refactor] Replace earlier monitor lifecycle with enhanced system
+- 🚜 [refactor] Replace legacy monitor lifecycle with enhanced system
 
-- Migrates monitor management to fully use the enhanced monitoring system, removing former lifecycle utilities and tests.
+- Migrates monitor management to fully use the enhanced monitoring system, removing legacy lifecycle utilities and tests.
 - Updates all logic and tests to invoke enhanced monitor start/stop functions, improving reliability and consistency.
 - Preserves monitor history in UI during stop events to prevent empty history flashes.
-- Modernizes architectural regression tests to validate enhanced system imports rather than former modules.
+- Modernizes architectural regression tests to validate enhanced system imports rather than legacy modules.
 - Cleans up type imports and re-exports for core monitoring types.
 
 Improves maintainability and prepares for future advanced monitoring features.
@@ -4810,7 +4980,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6c4e
 
 - 🚜 [refactor] Improve cache and monitor status consistency
 
-- Refactors cache configuration to support both long-standing and extended TTL options, removing redundant adapter logic and improving runtime validation for cache lifecycle management.
+- Refactors cache configuration to support both legacy and extended TTL options, removing redundant adapter logic and improving runtime validation for cache lifecycle management.
 - Enhances site and monitor update operations for transactional integrity, ensuring cached state aligns with database changes and avoiding stale or inconsistent data.
 - Updates monitor lifecycle event emission to provide richer, more accurate payloads, including full site and monitor details and previous status information, improving observability and debugging.
 - Simplifies and clarifies site cache refresh logic, consolidating duplicate code and making cache updates more predictable.
@@ -5139,7 +5309,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b20d
 
 - 🧪 [test] Refactors E2E tests to unify app launch and error handling
 
-- Simplifies Playwright test workflows by consistently launching the app within each test, removing outdated parameter usage and merge artifacts.
+- Simplifies Playwright test workflows by consistently launching the app within each test, removing legacy parameter usage and merge artifacts.
 - Wraps major test steps in try blocks for improved error reporting and robustness.
 - Enhances maintainability and clarity by using a unified approach across accessibility, workflow, and edge case tests.
 
@@ -5404,11 +5574,11 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9469
 
 ### 🧪 Testing
 
-- 🧪 [test] Remove retired and redundant Playwright test suites
+- 🧪 [test] Remove legacy and redundant Playwright test suites
 
 Removes a large number of Playwright and E2E test files including accessibility, integration, navigation, performance, error handling, UI, and theme switching coverage.
 
- - Motivated by test suite consolidation, deprecation of historical scenarios, or migration to a new testing strategy.
+ - Motivated by test suite consolidation, deprecation of legacy scenarios, or migration to a new testing strategy.
  - Reduces maintenance overhead and potential for outdated or duplicate test logic.
  - Improves build speed and focus for future QA and automation efforts.
 
@@ -5420,7 +5590,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d3cc
 - 🧪 [test] Add comprehensive coverage for shared utilities
 
 - Introduces exhaustive unit tests for form validation, modal handler, and error handling utilities, ensuring 100% coverage and robust input edge case handling.
-- Refactors older Playwright modal test to a minimal stub for easier debugging and future rework.
+- Refactors legacy Playwright modal test to a minimal stub for easier debugging and future rework.
 - Increases input fuzzing and realistic test timeouts for AddSiteForm, improving reliability for slow environments and complex scenarios.
 - Enhances maintainability by validating all error, modal, and form logic against realistic and adversarial inputs.
 
@@ -5500,7 +5670,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c66a
 
 - 🧹 [chore] Remove lint-staged and Husky pre-commit tooling
 
-- Cleans up former pre-commit linting and formatting setup to streamline development workflow.
+- Cleans up legacy pre-commit linting and formatting setup to streamline development workflow.
 - Deletes configuration, scripts, and dependencies related to lint-staged and Husky.
 - Updates linting rules to allow usage of certain process.env variables, improving clarity and safety in environment checks.
 - Simplifies Playwright test environment config by removing redundant test mode variable.
@@ -6407,7 +6577,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(88f0
 - Enhances ESLint configuration with new rules, more granular naming for overrides, and improved plugin coverage, including stricter code quality and formatting standards.
 - Updates conditional rendering patterns and disables/enables relevant lint rules contextually for maintainable and readable JSX.
 - Adds property-based and realistic test cases to strengthen coverage and ensure robustness across edge cases and complex scenarios.
-- Refactors middleware registration logic for event handling and replaces ambiguous or long-standing patterns with clear, future-proof APIs.
+- Refactors middleware registration logic for event handling and replaces ambiguous or legacy patterns with clear, future-proof APIs.
 - Improves cache, database, and retry logic to correctly handle edge conditions, finite numbers, and expiration checks for increased reliability.
 - Modernizes documentation, comments, and code annotations to clarify rationale and intent, increasing maintainability and onboarding ease.
 Relates to stability, DX, and maintainability improvements.
@@ -6539,7 +6709,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7265
 - Ensures comprehensive edge case coverage for string, numeric, array, error handling, cache, chart, duration, download, monitor, status, and time utilities.
 - Refines some test logic for correctness and consistency, including protocol validation for URLs (restricts to HTTP/HTTPS).
 - Improves test performance and reliability by exploring a wide range of input scenarios and enforcing invariants.
-- Updates older tests to use modern fast-check property-based patterns.
+- Updates legacy tests to use modern fast-check property-based patterns.
 - Fixes minor issues in test assertions and aligns protocol validation rules across modules.
 
 Relates to enhanced robustness and reliability in testing.
@@ -6701,7 +6871,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9dbf
 
 - 🚜 [refactor] Improve type safety, code clarity, and input handling
 
-- Refactors input change handlers for better type safety, introduces specialized and compatibility-focused functions, and updates tests for stricter validation logic.
+- Refactors input change handlers for better type safety, introduces specialized and legacy-compatible functions, and updates tests for stricter validation logic.
 - Adds defensive runtime checks, explicit type assertions, and targeted eslint-disable comments for safe type narrowing and property access.
 - Standardizes number formatting with numeric separators and corrects edge case values across tests and benchmarks.
 - Removes redundant type definitions, switches to direct imports, and simplifies logic in several utility and validation functions.
@@ -6874,7 +7044,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7b48
 
 - Cleans up the repository by deleting outdated documentation files, migration script readmes, and PowerShell utility scripts related to ESLint rule organization, tree-shaking, and TypeScript migration.
 - Reduces clutter and potential confusion, ensuring only relevant and current tooling and documentation remain.
-- Improves overall maintainability by eliminating long-retired artifacts no longer needed for the build process or codebase management.
+- Improves overall maintainability by eliminating legacy artifacts no longer needed for the build process or codebase management.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(16da65b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/16da65b4b36760c5f335c03097c1a01eecdfd138)
 
@@ -7077,7 +7247,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7615
 - Updates hybrid Chart.js type system documentation and implementation, promoting type safety and maintainability.
 - Improves type-safe utility function signatures and test coverage for all frontend components.
 - Updates build and test configs to optimize dependency chunking and ensure compatibility with named imports in Vite and Vitest.
-- Provides scripts and documentation for fixing long-lived logger mocks and finding problematic shared imports.
+- Provides scripts and documentation for fixing legacy logger mocks and finding problematic shared imports.
 - Ensures full architecture compliance and validates the change with comprehensive test and type/lint passes.
 
 Relates to tree-shaking optimization and modern React patterns.
@@ -7403,7 +7573,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3ef6
 
 - 🧪 [test] Migrate shared tests to Vitest globals and update setup
 
-- Replaces long-standing Jest context and fail function usage with Vitest's built-in globals in shared and frontend tests.
+- Replaces legacy Jest context and fail function usage with Vitest's built-in globals in shared and frontend tests.
 - Adds Vitest setup files for test context injection and updates test environment configuration for improved consistency.
 - Removes obsolete Jest types and dependencies from configs and lockfile for leaner dev tooling.
 - Updates TypeScript and ESLint package versions for compatibility with latest Vitest and lint rules.
@@ -7653,7 +7823,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1340
 
 ### 🧹 Chores
 
-- 🧹 [chore] Remove retired ESLint config and unused Prism language
+- 🧹 [chore] Remove legacy ESLint config and unused Prism language
 
 - Eliminates the shared ESLint configuration for Uptime Watcher projects, streamlining project dependencies and maintenance.
 - Removes the "logs" language from Prism syntax highlighting, reducing unnecessary code highlighting options.
@@ -7709,7 +7879,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(89d5
 
 - 🔧 [build] Update config for improved v4 compatibility
 
-- Refactors configuration to nest earlier head attribute removal and CSS cascade layer options under the upcoming v4 compatibility flag.
+- Refactors configuration to nest legacy head attribute removal and CSS cascade layer options under the upcoming v4 compatibility flag.
 - Prepares for future Docusaurus v4 upgrades by aligning with expected schema structure.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1e19e13)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1e19e137ae9641cd1d831332cbbd35050744f205)
@@ -8116,7 +8286,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3ef4
 
 - Adds comprehensive unit tests to reach full coverage for utility, store, schema validation, monitor forms, and React hooks, targeting previously uncovered lines and edge cases.
 - Refactors TypeDoc configuration and build workflow to leverage markdown plugins, update schemas, and enhance MDX compatibility.
-- Cleans up long-lived scripts, replaces CommonJS with ESM for documentation post-processing, and updates npm dependencies to support new markdown and remark plugins.
+- Cleans up legacy scripts, replaces CommonJS with ESM for documentation post-processing, and updates npm dependencies to support new markdown and remark plugins.
 - Improves CI and build pipeline for documentation deployments, switches artifact output to unified docs, and updates VS Code settings to reflect new documentation structure.
 - Motivated by the need for robust code quality metrics and seamless documentation generation.
 
@@ -8285,7 +8455,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7983
 
 - Converts all project scripts from CommonJS to ESM for consistency and better future Node.js compatibility
 - Updates script references in configuration to use .mjs extensions
-- Removes unused and long-retired script files
+- Removes unused and legacy script files
 - Improves maintainability by standardizing import/export usage across scripts
 - Cleans up package scripts to avoid ambiguity and reduce risk of execution errors due to mixed module types
 
@@ -8328,7 +8498,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(91d4
 
 - Removes duplicated and frontend-only site status utility wrappers, consolidating usage to shared module for consistency and maintainability.
 - Updates all test imports to reference the shared site status utilities, simplifying the frontend/backend boundary.
-- Refactors documentation build scripts and Typedoc configs: adds a single local config and updates related scripts, removing superseded config files for clarity.
+- Refactors documentation build scripts and Typedoc configs: adds a single local config and updates related scripts, removing legacy config files for clarity.
 - Expands documentation sidebar categories and Typedoc entry points for improved navigation and coverage.
 - Deletes redundant and outdated comprehensive test suites to streamline the codebase.
 
@@ -8341,7 +8511,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b9db
 
 - Refactors variable and function names for consistency and clarity, improving code readability and maintainability.
 - Updates regular expressions to use named capture groups and more precise patterns, enhancing robustness and future compatibility.
-- Replaces long-standing type and property checks (e.g., `.hasOwnProperty`, `isNaN`, `== null`) with modern, explicit methods (`Object.hasOwn`, `Number.isNaN`, `=== null`), preventing subtle bugs and aligning with current ECMAScript standards.
+- Replaces legacy type and property checks (e.g., `.hasOwnProperty`, `isNaN`, `== null`) with modern, explicit methods (`Object.hasOwn`, `Number.isNaN`, `=== null`), preventing subtle bugs and aligning with current ECMAScript standards.
 - Refactors debounce/throttle implementations for clarity and type safety.
 - Adds missing imports and updates test suite setups for React and Vitest.
 - Removes redundant or obsolete files and improves placeholder comments.
@@ -8384,7 +8554,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ca32
 
 - Adds detailed JSDoc comments to interfaces, function return types, and component props throughout the codebase for improved code readability and developer onboarding
 - Refines descriptions for many UI, store, service, and utility types, clarifying usage, expected values, and domain context
-- Removes the old error catalog and related tests to streamline error handling and reduce redundancy
+- Removes legacy error catalog and related tests to streamline error handling and reduce redundancy
 
 Improves code maintainability and discoverability by making interfaces, data structures, and API contracts more self-explanatory.
 
@@ -8403,7 +8573,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5243
 
 - 📝 [docs] Remove archived historical and implementation documentation
 
-- Cleans up historical analysis, implementation records, review summaries, and planning docs from the archive folder.
+- Cleans up legacy analysis, implementation records, review summaries, and planning docs from the archive folder.
 - Reduces repository clutter and improves focus on current, actionable documentation.
 - Preserves historical context in git history for reference.
 
@@ -9063,7 +9233,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e65d
 - 🎨 [style] Enforces consistent array/object formatting in tests
 
 - Improves readability and maintainability by vertically formatting array and object literals across all test files and documentation examples.
-- Removes two historical AI Copilot instruction files to clean up project standards.
+- Removes two legacy AI copilot instruction files to clean up project standards.
 - Enhances clarity in code samples and test coverage by standardizing indentation and spacing, making future updates and review easier.
 - Does not alter any logic or behavior; focuses solely on visual and structural consistency.
 
@@ -9232,7 +9402,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6b92
 - Expands ignore, exclusion, and allowlist patterns for better performance and fewer false positives in linting, secret scanning, vulnerability analysis, duplication detection, and link checking.
 - Refines build, test, and CI/CD configs for Electron, React, and TypeScript workflows, including Flatpak manifest, SonarCloud, and pre-commit hooks.
 - Improves clarity and maintainability of project metadata, reporting, and changelog grouping.
-- Removes the old stylelint config, consolidates CSS tooling, and enhances asset handling in PostCSS.
+- Removes legacy stylelint config, consolidates CSS tooling, and enhances asset handling in PostCSS.
 - Enhances support for modern file types, environments, and security gating.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6e6e7f0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e6e7f009807ad5af960210e54390b48e058e34e)
@@ -9247,7 +9417,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6e6e
 - Updates workflow scripts, package scripts, and documentation to consistently reference new shared test commands.
 - Removes redundant test coverage and optimizes inclusion/exclusion patterns for frontend, backend, and shared test suites.
 - Improves test reliability, reporting, and coverage thresholds for shared code.
-- Cleans up previously used workflow assets and aligns configuration files for better maintenance.
+- Cleans up legacy workflow and aligns configuration files for better maintenance.
 
 Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3151972)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/315197276f56fa43b65846357ea7c2b0ba984874)
 
@@ -9474,7 +9644,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1aba
 - Refactors sequential async operations to run in parallel where safe, improving performance for monitor and site history operations, and uses Promise.all or Promise.allSettled for batch processing
 - Converts function expressions to concise arrow functions and removes unnecessary curly braces, enhancing code readability and consistency
 - Updates React component definitions to use implicit returns for stateless components, streamlining JSX rendering
-- Adds and adjusts ESLint directives for historical dialog usage, side-effect constructors, and loop awaits to clarify intentional design and maintain code quality
+- Adds and adjusts ESLint directives for legacy dialog usage, side-effect constructors, and loop awaits to clarify intentional design and maintain code quality
 - Moves helper utilities and type guards to top-level definitions, ensuring proper ordering and avoiding duplicate declarations
 - Refactors error handling, logging, and template interpolation for clarity and maintainability
 - Updates environment and validation utilities for improved type safety and explicitness
@@ -9742,7 +9912,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5d35
 - Centralizes error handling, event listener management, and monitor validation logic to reusable factories and helpers, reducing code repetition across stores and services.
 - Refactors form components and chart imports to use shared wrappers and direct imports, improving accessibility and reducing boilerplate.
 - Updates validation utilities and schemas to share host/port logic, streamlining monitor configuration checks.
-- Cleans up unused files and long-retired wrappers, focusing on unified sources of truth for types and logic.
+- Cleans up unused files and legacy wrappers, focusing on unified sources of truth for types and logic.
 - Improves cleanup processes for app, window, and auto-updater event listeners to prevent memory leaks.
 - Enhances store operation helpers for error state consistency and easier future extensions.
 
@@ -9758,7 +9928,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(65ff
 - Refines chunk splitting in Vite for better cache and load times; implements stricter chunk size warnings for vendor bundles.
 - Expands static copy plugin for WASM validation and reliability; adds a validator script for performance config correctness.
 - Updates ESLint config: adds new plugins for SQL, JSDoc, observer, and comment length checks; improves TypeScript path aliasing; disables false positive rules for store files.
-- Removes unused or long-standing TypeScript aliases across configs for clarity and consistency.
+- Removes unused/legacy TypeScript aliases across configs for clarity and consistency.
 - Adds documentation on performance profiling and warmup strategy.
 - Enables hot reload of Electron preload scripts in development for improved DX.
 - Relates to improved reliability, faster cold starts, and higher code quality.
@@ -10582,7 +10752,7 @@ Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2c70
 
 - 📝 [docs] Overhaul documentation structure and add architecture guides
 
-- Reorganizes documentation for clarity, separating current docs from historical materials by moving long-term analysis and implementation records into an Archive directory with an index for easy reference.
+- Reorganizes documentation for clarity, separating current docs from historical materials by moving legacy analysis and implementation records into an Archive directory with an index for easy reference.
 - Adds comprehensive architecture documentation, including ADRs for repository pattern, event-driven design, error handling, frontend state management, and IPC protocol.
 - Introduces detailed development patterns, code templates, and TSDoc standards to standardize future contributions.
 - Provides a new developer quick start, environment setup, troubleshooting guide, and full documentation index to streamline onboarding and daily workflow.
@@ -10689,7 +10859,7 @@ Fixes type consistency and maintainability issues identified in previous reviews
 - Refactors mapping functions, data access, and validation logic to leverage new types, reducing reliance on generic records and unsafe property access.
 - Adds a reusable hook for delayed button loading states, streamlining UI feedback and eliminating duplicate logic.
 - Unifies type guards and default value handling for monitor forms, chart configs, and themes, enabling future extensibility and consistent validation.
-- Cleans up long-standing ESLint disables and removes unsafe object injection comments, reflecting improved code safety.
+- Cleans up legacy ESLint disables and removes unsafe object injection comments, reflecting improved code safety.
 - Improves error logging clarity and standardizes output messaging for better debugging. [`(ddcf6ca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ddcf6caba0eb43cfcd8b30de21e48d69088ccb29)
 
 
@@ -10871,10 +11041,10 @@ These changes enhance usability, robustness, and performance of UI interactions.
 
 ### 🚜 Refactor
 
-- 🚜 [refactor] Remove earlier monitor status logic, fully adopt enhanced monitoring
+- 🚜 [refactor] Remove legacy monitor status logic, fully adopt enhanced monitoring
 
 - Migrates all monitoring operations to the enhanced, race-condition-safe service bundle
-- Eliminates former fallback monitor checking and outdated status update handler
+- Eliminates legacy fallback monitor checking and outdated status update handler
 - Strengthens dependency injection and clarifies service requirements for better testability and maintainability
 - Refines error handling and documentation, ensuring safer and more predictable monitoring workflows
 - Updates API contracts and construction patterns to align with the unified architecture [`(cd8e41e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cd8e41e6a9a34e8cf0499ac037c506ca3b25e695)
@@ -10916,10 +11086,10 @@ These changes enhance usability, robustness, and performance of UI interactions.
 
 ### 📝 Documentation
 
-- 📝 [docs] Update docs for compatibility cleanup and monitoring migration
+- 📝 [docs] Update docs for backwards compatibility cleanup and monitoring migration
 
-- Details the completed removal of historical fallback monitoring systems and documents the migration to a unified enhanced monitoring architecture.
-- Adds a comprehensive summary of compatibility cleanup, including deprecated code removal, improved type safety, and standardized IPC response formats.
+- Details the completed removal of legacy fallback monitoring systems and documents the migration to a unified enhanced monitoring architecture.
+- Adds a comprehensive summary of backwards compatibility cleanup, including deprecated code removal, improved type safety, and standardized IPC response formats.
 - Updates build scripts for prettier to simplify command usage.
 - Upgrades dependencies for eslint and typedoc plugins to maintain tooling consistency.
 - Improves maintainability, reliability, and test coverage by clarifying current architecture and future roadmap in documentation. [`(844957e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/844957e5a5b1aec860dba9131bd7c48f1364159e)
@@ -10948,7 +11118,7 @@ Improves maintainability, code quality, and developer onboarding by providing ac
 
 - 🧪 [test] Refactors MonitorManager tests to use enhanced checker mocks
 
-- Updates MonitorManager tests to mock and use enhanced checker services for manual site checks, replacing former monitorStatusChecker mocks.
+- Updates MonitorManager tests to mock and use enhanced checker services for manual site checks, replacing legacy monitorStatusChecker mocks.
 - Improves test clarity and maintainability by aligning with updated service injection patterns.
 - Adjusts related site and settings store tests to expect new API response structure for greater consistency. [`(c0ce9d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c0ce9d9183b36015937697f7bd5fbf566d226b6b)
 
@@ -11022,7 +11192,7 @@ Improves maintainability and reliability of backend validation and conversion ut
 - Refactors validation logic across backend and frontend to use centralized, well-tested utilities for consistent string, URL, and identifier checks.
 - Updates monitor schema and shared types to track active operations, ensuring safer concurrent state transitions.
 - Improves site cache refresh logic to guarantee UI and scheduler reflect the latest monitor state after lifecycle changes.
-- Marks former monitoring utilities as fallback-only and documents preferred usage of the enhanced system. [`(56b26f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/56b26f42f7751ba1251233ee6f7ec114615a57f0)
+- Marks legacy monitoring utilities as fallback-only and documents preferred usage of the enhanced system. [`(56b26f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/56b26f42f7751ba1251233ee6f7ec114615a57f0)
 
 
 - ✨ [feat] Add modal-driven site creation and unified site monitoring controls
@@ -11153,7 +11323,7 @@ Helps ensure tools resolve configs and tests more reliably. [`(8ba8471)`](https:
 - 👷 [ci] Update coverage workflow and test config; remove summary report
 
 - Adds explicit config to coverage workflow for reliability
-- Removes the former coverage summary report test to streamline the suite
+- Removes legacy coverage summary report test to streamline test suite
 - Adjusts source map settings and Vite coverage options for improved performance and accuracy
 - Fixes object property merge logic in test config for consistency
 - Updates test expectations to reflect revised initial values
@@ -11356,7 +11526,7 @@ Overall, these changes reduce subtle UI bugs, improve maintainability, and make 
 
 - Adds and configures new ESLint plugins for YAML, HTML, React, exception handling, canonical rules, and XSS protection
 - Expands linting to YAML and HTML files; improves React and TypeScript linting coverage
-- Replaces the previous import plugin with a newer alternative for improved compatibility
+- Replaces legacy import plugin with a newer alternative for improved compatibility
 - Updates multiple dependencies to latest versions for bug fixes and enhanced stability
 - Enhances code quality, security, and maintainability through expanded linting and up-to-date tooling [`(aff261a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aff261a85194c86090025615231a5687a9422604)
 
@@ -11680,7 +11850,7 @@ These changes boost maintainability, ensure test predictability, and align styli
 - Targets 90%+ branch coverage, focusing on edge cases, error handling, and type safety
 - Ensures coverage for dynamic theme, help text, monitor field/type, chart utilities, cache, and site selection logic
 - Replaces or modernizes several test mocks to improve isolation and test reliability
-- Retires the old site operations test suite in favor of granular, more maintainable coverage
+- Removes legacy site operations test suite in favor of granular, more maintainable coverage
 - Improves maintainability and confidence in code quality by systematically validating all critical branches and behaviors [`(78d8787)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/78d878791b6da3be721d26b39c2ed77ac37fd952)
 
 
@@ -12101,7 +12271,7 @@ Improves CI resilience during partial test failures. [`(68eef81)`](https://githu
 
 ### 🧪 Testing
 
-- 🧪 [test] Add and update unit tests, remove outdated and obsolete tests
+- 🧪 [test] Add and update unit tests, remove legacy and obsolete tests
 
 - Introduces new and improved test coverage for backend utilities, cache logic, logger, and monitor lifecycle.
 - Removes outdated, redundant, or overly broad frontend and backend test suites for improved maintainability and clarity.
