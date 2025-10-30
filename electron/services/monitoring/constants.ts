@@ -1,3 +1,6 @@
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+
+const SHARED_MINIMUM_INTERVAL_MS = MIN_MONITOR_CHECK_INTERVAL_MS;
 /**
  * Configuration constants for monitoring services.
  *
@@ -29,11 +32,11 @@ export const DEFAULT_RETRY_ATTEMPTS = 3;
  * Used to warn about potentially problematic short intervals. Intervals below
  * this value may cause excessive load or unreliable results.
  *
- * @defaultValue 1000
+ * @defaultValue 5000
  *
  * @public
  */
-export const MIN_CHECK_INTERVAL = 1000; // 1 second
+export const MIN_CHECK_INTERVAL: number = SHARED_MINIMUM_INTERVAL_MS; // 5 seconds
 
 /**
  * Default monitor timeout when none is specified, in seconds.

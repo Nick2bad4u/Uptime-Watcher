@@ -17,6 +17,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.unmock("../../../services/monitoring/MonitorScheduler");
 
 import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 // Use vi.hoisted to properly initialize mocks before they're used
 const mockLogger = vi.hoisted(() => ({
@@ -40,6 +41,7 @@ vi.mock("../../utils/logger", () => ({
 
 // Import after mocking
 import { MonitorScheduler } from "../../../services/monitoring/MonitorScheduler";
+import { MIN_CHECK_INTERVAL } from "../../../services/monitoring/constants";
 import type { Monitor } from "@shared/types";
 
 // Helper function to create complete Monitor objects
@@ -69,7 +71,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         vi.clearAllMocks();
 
         // Create new instance
-        scheduler = new MonitorScheduler();
+        scheduler = new MonitorScheduler(mockLogger as unknown as Logger);
 
         // Create mock check callback
         mockCheckCallback = vi.fn().mockResolvedValue(undefined);
@@ -227,6 +229,7 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
+            const setIntervalSpy = vi.spyOn(global, "setInterval");
             const monitor = createValidMonitor({
                 id: "monitor1",
                 type: "http",
@@ -240,6 +243,15 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             expect(result).toBeTruthy();
             // The monitor should still be started with minimum interval
             expect(scheduler.isMonitoring("site1", "monitor1")).toBeTruthy();
+            expect(setIntervalSpy).toHaveBeenCalledWith(
+                expect.any(Function),
+                MIN_CHECK_INTERVAL
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                `[MonitorScheduler] Check interval 1000ms is below minimum ${MIN_CHECK_INTERVAL}ms; clamping to minimum`
+            );
+
+            setIntervalSpy.mockRestore();
         });
 
         it("should execute check callback at specified intervals", async ({

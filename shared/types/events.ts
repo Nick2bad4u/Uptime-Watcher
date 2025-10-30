@@ -8,7 +8,12 @@
  * @packageDocumentation
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringOperationSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import type { UnknownRecord } from "type-fest";
 
 import { siteSchema } from "@shared/validation/schemas";
@@ -590,6 +595,7 @@ export const MONITORING_CONTROL_REASON_VALUES: readonly MonitoringControlReason[
  * all monitors.
  *
  * - `monitorCount`: Number of monitors involved in the operation.
+ * - `summary`: Optional aggregate metrics describing the lifecycle result.
  * - `reason`: Reason for stopping (for stopped events).
  * - `siteCount`: Number of sites involved in the operation.
  * - `timestamp`: The time (in ms since epoch) when the event occurred.
@@ -627,6 +633,10 @@ export interface MonitoringControlEventData extends BaseEventData {
      * Number of sites involved in the operation.
      */
     readonly siteCount?: number;
+    /**
+     * Aggregate metrics describing the monitoring lifecycle outcome.
+     */
+    readonly summary?: MonitoringOperationSummary;
 }
 
 /**

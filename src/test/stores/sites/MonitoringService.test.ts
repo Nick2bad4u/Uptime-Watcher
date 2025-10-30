@@ -3,6 +3,11 @@
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+} from "@shared/types";
+
 import { MonitoringService } from "../../../services/MonitoringService";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
@@ -33,12 +38,40 @@ vi.mock("../../../stores/utils", () => ({
 }));
 
 // Mock the electron window API
+const createStartSummary = (
+    overrides: Partial<MonitoringStartSummary> = {}
+): MonitoringStartSummary => ({
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: true,
+    alreadyActive: false,
+    ...overrides,
+});
+
+const createStopSummary = (
+    overrides: Partial<MonitoringStopSummary> = {}
+): MonitoringStopSummary => ({
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: false,
+    alreadyInactive: false,
+    ...overrides,
+});
+
 const mockElectronAPI = {
     monitoring: {
-        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoring: vi.fn().mockResolvedValue(createStartSummary()),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
-        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(createStopSummary()),
         stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },
@@ -226,7 +259,7 @@ describe("MonitoringService", () => {
             await annotate("Type: Monitoring", "type");
 
             mockElectronAPI.monitoring.startMonitoring.mockResolvedValueOnce(
-                true
+                createStartSummary()
             );
 
             await expect(
@@ -247,11 +280,16 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             mockElectronAPI.monitoring.startMonitoring.mockResolvedValueOnce(
-                false
+                createStartSummary({
+                    attempted: 1,
+                    failed: 1,
+                    succeeded: 0,
+                    isMonitoring: false,
+                })
             );
 
             await expect(MonitoringService.startMonitoring()).rejects.toThrow(
-                "Failed to start monitoring across all sites"
+                "Failed to start monitoring across all sites: 0/1 monitors activated."
             );
         });
 
@@ -431,7 +469,7 @@ describe("MonitoringService", () => {
             await annotate("Type: Monitoring", "type");
 
             mockElectronAPI.monitoring.stopMonitoring.mockResolvedValueOnce(
-                true
+                createStopSummary()
             );
 
             await expect(
@@ -452,11 +490,16 @@ describe("MonitoringService", () => {
             await annotate("Type: Error Handling", "type");
 
             mockElectronAPI.monitoring.stopMonitoring.mockResolvedValueOnce(
-                false
+                createStopSummary({
+                    attempted: 2,
+                    failed: 2,
+                    succeeded: 0,
+                    isMonitoring: true,
+                })
             );
 
             await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
-                "Failed to stop monitoring across all sites"
+                "Failed to stop monitoring across all sites: 2/2 monitors remained active."
             );
         });
 

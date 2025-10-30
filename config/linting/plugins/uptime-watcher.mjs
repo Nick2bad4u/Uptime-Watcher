@@ -11,6 +11,17 @@ import { fileURLToPath } from "node:url";
 import ts from "typescript";
 
 /**
+ * Normalizes a file path to POSIX separators for uniform rule matching.
+ *
+ * @param {string} filename - File path to normalize.
+ *
+ * @returns {string} Normalized POSIX-style path.
+ */
+function normalizePath(filename) {
+    return filename.replace(/\\/gu, "/");
+}
+
+/**
  * Absolute path to the repository root.
  *
  * @remarks
@@ -41,23 +52,27 @@ const ELECTRON_DIR = path.resolve(REPO_ROOT, "electron");
 const NORMALIZED_ELECTRON_DIR = normalizePath(ELECTRON_DIR);
 
 /**
- * Lazily cached canonical monitor type identifiers for rule evaluations.
+ * Lazily loads and caches canonical monitor type identifiers for rule
+ * evaluations.
  *
  * @remarks
  * Parsed once from the shared TypeScript source to avoid repeated filesystem
- * reads when multiple files trigger the rule.
+ * reads when multiple files trigger the rule. This avoids blocking the event
+ * loop at module initialization.
  */
-const BASE_MONITOR_TYPES = loadBaseMonitorTypes();
+let BASE_MONITOR_TYPES_CACHE = null;
 
 /**
- * Normalizes a file path to POSIX separators for uniform rule matching.
+ * Returns the cached monitor types, loading them if necessary.
  *
- * @param {string} filename - File path to normalize.
- *
- * @returns {string} Normalized POSIX-style path.
+ * @returns {readonly string[]} Monitor type identifiers defined in shared
+ *   configuration.
  */
-function normalizePath(filename) {
-    return filename.replace(/\\/gu, "/");
+function getBaseMonitorTypes() {
+    if (!BASE_MONITOR_TYPES_CACHE) {
+        BASE_MONITOR_TYPES_CACHE = loadBaseMonitorTypes();
+    }
+    return BASE_MONITOR_TYPES_CACHE;
 }
 
 /**
@@ -247,7 +262,7 @@ const monitorFallbackConsistencyRule = {
             return {};
         }
 
-        const baseMonitorTypes = BASE_MONITOR_TYPES;
+        const baseMonitorTypes = getBaseMonitorTypes();
         const baseMonitorTypeSet = new Set(baseMonitorTypes);
 
         return {
@@ -557,6 +572,368 @@ const rendererNoElectronImportRule = {
                         );
                     }
                 }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule preventing shared layer modules from depending on renderer or
+ * Electron runtime code.
+ */
+const sharedNoOutsideImportsRule = {
+    meta: {
+        docs: {
+            description:
+                "Restrict shared layer modules to local/shared dependencies only",
+            recommended: false,
+        },
+        messages: {
+            noExternalImports:
+                'Shared modules must not import from "{{module}}". Shared code should remain platform agnostic.',
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (normalizedFilename !== NORMALIZED_SHARED_DIR &&
+                !normalizedFilename.startsWith(`${NORMALIZED_SHARED_DIR}/`))
+        ) {
+            return {};
+        }
+
+        const importerDirectory = path.dirname(rawFilename);
+
+        /**
+         * Reports a violation when a shared module references an external
+         * layer.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - Node
+         *   to highlight.
+         * @param {string} moduleName - The offending module specifier.
+         */
+        function report(node, moduleName) {
+            context.report({
+                data: { module: moduleName },
+                messageId: "noExternalImports",
+                node,
+            });
+        }
+
+        /**
+         * Determines whether a module specifier refers to a disallowed target.
+         *
+         * @param {import("@typescript-eslint/utils").TSESTree.Node} node - AST
+         *   node to highlight if violation occurs.
+         * @param {string} moduleName - Module specifier to inspect.
+         */
+        function handleModuleSpecifier(node, moduleName) {
+            if (moduleName.startsWith("@shared")) {
+                return;
+            }
+
+            if (
+                moduleName === "@app" ||
+                moduleName.startsWith("@app/") ||
+                moduleName === "@electron" ||
+                moduleName.startsWith("@electron/") ||
+                moduleName.startsWith("src/") ||
+                moduleName.startsWith("electron/")
+            ) {
+                report(node, moduleName);
+                return;
+            }
+
+            if (!moduleName.startsWith(".")) {
+                return;
+            }
+
+            const resolved = normalizePath(
+                path.resolve(importerDirectory, moduleName)
+            );
+
+            if (
+                resolved === NORMALIZED_SHARED_DIR ||
+                resolved.startsWith(`${NORMALIZED_SHARED_DIR}/`)
+            ) {
+                return;
+            }
+
+            report(node, moduleName);
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
+                    handleModuleSpecifier(node.source, node.source.value);
+                }
+            },
+            ImportExpression(node) {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
+                    handleModuleSpecifier(node.source, node.source.value);
+                }
+            },
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleModuleSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
+                    }
+                }
+            },
+        };
+    },
+};
+
+/**
+ * ESLint rule ensuring Electron runtime code never depends on renderer bundles.
+ */
+const electronNoRendererImportRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow Electron runtime modules from importing renderer bundles",
+            recommended: false,
+        },
+        messages: {
+            noRendererImport:
+                'Electron runtime code must not import from "{{module}}". Use shared contracts or preload bridges instead.',
+        },
+        schema: [],
+        type: "problem",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            (!normalizedFilename.startsWith(`${NORMALIZED_ELECTRON_DIR}/`) &&
+                normalizedFilename !== NORMALIZED_ELECTRON_DIR) ||
+            normalizedFilename.includes("/electron/test/") ||
+            normalizedFilename.includes("/electron/benchmarks/")
+        ) {
+            return {};
+        }
+
+        const importerDirectory = path.dirname(rawFilename);
+
+        function referencesRenderer(moduleName) {
+            if (moduleName === "@app" || moduleName.startsWith("@app/")) {
+                return true;
+            }
+
+            if (moduleName.startsWith("src/")) {
+                return true;
+            }
+
+            if (!moduleName.startsWith(".")) {
+                return false;
+            }
+
+            const resolved = normalizePath(
+                path.resolve(importerDirectory, moduleName)
+            );
+
+            return (
+                resolved === NORMALIZED_SRC_DIR ||
+                resolved.startsWith(`${NORMALIZED_SRC_DIR}/`)
+            );
+        }
+
+        function handleModuleSpecifier(node, moduleName) {
+            if (referencesRenderer(moduleName)) {
+                context.report({
+                    data: { module: moduleName },
+                    messageId: "noRendererImport",
+                    node,
+                });
+            }
+        }
+
+        return {
+            ImportDeclaration(node) {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
+                    handleModuleSpecifier(node.source, node.source.value);
+                }
+            },
+            ImportExpression(node) {
+                if (
+                    node.source.type === "Literal" &&
+                    typeof node.source.value === "string"
+                ) {
+                    handleModuleSpecifier(node.source, node.source.value);
+                }
+            },
+            CallExpression(node) {
+                if (
+                    node.callee.type === "Identifier" &&
+                    node.callee.name === "require" &&
+                    node.arguments.length > 0
+                ) {
+                    const [firstArgument] = node.arguments;
+                    if (
+                        firstArgument?.type === "Literal" &&
+                        typeof firstArgument.value === "string"
+                    ) {
+                        handleModuleSpecifier(
+                            firstArgument,
+                            firstArgument.value
+                        );
+                    }
+                }
+            },
+        };
+    },
+};
+
+const FORBIDDEN_BROWSER_DIALOG_NAMES = new Set([
+    "alert",
+    "confirm",
+    "prompt",
+]);
+
+/**
+ * ESLint rule discouraging usage of native browser dialogs in favour of the
+ * dedicated confirmation dialog infrastructure.
+ */
+const rendererNoBrowserDialogsRule = {
+    meta: {
+        docs: {
+            description:
+                "Disallow alert/confirm/prompt in renderer code so UX flows use the shared dialog system",
+            recommended: false,
+        },
+        messages: {
+            avoidBrowserDialog:
+                'Replace browser dialog "{{dialog}}" with the shared confirmation dialog utilities.',
+        },
+        schema: [],
+        type: "suggestion",
+    },
+    create(context) {
+        const rawFilename = context.getFilename();
+        const normalizedFilename = normalizePath(rawFilename);
+
+        if (
+            normalizedFilename === "<input>" ||
+            !normalizedFilename.startsWith(`${NORMALIZED_SRC_DIR}/`) ||
+            normalizedFilename.includes("/src/test/")
+        ) {
+            return {};
+        }
+
+        function hasLocalBinding(name) {
+            let scope = context.getScope();
+            while (scope) {
+                const variable = scope.set.get(name);
+                if (variable && variable.defs.length > 0) {
+                    return true;
+                }
+                scope = scope.upper;
+            }
+            return false;
+        }
+
+        function unwrapChain(expression) {
+            return expression.type === "ChainExpression"
+                ? unwrapChain(expression.expression)
+                : expression;
+        }
+
+        function getMemberPropertyName(memberExpression) {
+            if (memberExpression.computed) {
+                if (
+                    memberExpression.property.type === "Literal" &&
+                    typeof memberExpression.property.value === "string"
+                ) {
+                    return memberExpression.property.value;
+                }
+                return null;
+            }
+
+            if (memberExpression.property.type === "Identifier") {
+                return memberExpression.property.name;
+            }
+
+            return null;
+        }
+
+        function getForbiddenDialogFromCallee(callee) {
+            const unwrapped = unwrapChain(callee);
+
+            if (unwrapped.type === "Identifier") {
+                if (
+                    FORBIDDEN_BROWSER_DIALOG_NAMES.has(unwrapped.name) &&
+                    !hasLocalBinding(unwrapped.name)
+                ) {
+                    return unwrapped.name;
+                }
+                return null;
+            }
+
+            if (unwrapped.type !== "MemberExpression") {
+                return null;
+            }
+
+            const propertyName = getMemberPropertyName(unwrapped);
+            if (
+                !propertyName ||
+                !FORBIDDEN_BROWSER_DIALOG_NAMES.has(propertyName)
+            ) {
+                return null;
+            }
+
+            const object = unwrapChain(unwrapped.object);
+            if (object.type === "Identifier") {
+                if (
+                    object.name === "window" ||
+                    object.name === "globalThis" ||
+                    object.name === "global"
+                ) {
+                    return propertyName;
+                }
+            }
+
+            return null;
+        }
+
+        return {
+            CallExpression(node) {
+                const dialog = getForbiddenDialogFromCallee(node.callee);
+                if (!dialog) {
+                    return;
+                }
+
+                context.report({
+                    data: { dialog },
+                    messageId: "avoidBrowserDialog",
+                    node,
+                });
             },
         };
     },
@@ -943,8 +1320,11 @@ const uptimeWatcherPlugin = {
     rules: {
         "monitor-fallback-consistency": monitorFallbackConsistencyRule,
         "electron-no-console": electronNoConsoleRule,
+        "electron-no-renderer-import": electronNoRendererImportRule,
         "renderer-no-electron-import": rendererNoElectronImportRule,
+        "renderer-no-browser-dialogs": rendererNoBrowserDialogsRule,
         "tsdoc-no-console-example": tsdocNoConsoleExampleRule,
+        "shared-no-outside-imports": sharedNoOutsideImportsRule,
         "prefer-shared-alias": preferSharedAliasRule,
         "prefer-app-alias": preferAppAliasRule,
         "no-deprecated-exports": noDeprecatedExportsRule,

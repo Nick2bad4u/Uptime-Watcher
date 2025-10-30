@@ -8,6 +8,10 @@ import type { MockInstance } from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import { logger } from "../../services/logger";
 import { ensureError } from "@shared/utils/errorHandling";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+} from "@shared/types";
 import type { CacheInvalidatedEventData } from "@shared/types/events";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 
@@ -81,6 +85,34 @@ const mockFullResyncSites = vi.fn(async () => {
     // No-op default implementation
 });
 
+const buildStartSummary = (
+    overrides: Partial<MonitoringStartSummary> = {}
+): MonitoringStartSummary => ({
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: true,
+    alreadyActive: false,
+    ...overrides,
+});
+
+const buildStopSummary = (
+    overrides: Partial<MonitoringStopSummary> = {}
+): MonitoringStopSummary => ({
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: false,
+    alreadyInactive: false,
+    ...overrides,
+});
+
 // Mock electronAPI for various scenarios
 const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     data: {
@@ -116,10 +148,10 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
     },
     monitoring: {
         checkSiteNow: vi.fn(),
-        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoring: vi.fn().mockResolvedValue(buildStartSummary()),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
-        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(buildStopSummary()),
         stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
     },

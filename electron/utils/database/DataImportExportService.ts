@@ -10,6 +10,7 @@ import type { Site, StatusHistory } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { UnknownRecord } from "type-fest";
 
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { ERROR_CATALOG } from "@shared/utils/errorCatalog";
 import {
     safeJsonParse,
@@ -52,6 +53,7 @@ export interface DataImportExportConfig {
  */
 export interface ImportSite {
     identifier: string;
+    monitoring?: boolean;
     monitors?: Site["monitors"];
     name?: string;
 }
@@ -167,6 +169,9 @@ export class DataImportExportService {
         settings: null | Record<string, string> | undefined
     ): Promise<void> {
         const safeSettings = settings ?? {};
+        const normalizedSites = sites.map((site) =>
+            this.normalizeImportSite(site)
+        );
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
@@ -186,31 +191,44 @@ export class DataImportExportService {
                     historyTransactionAdapter.deleteAll();
 
                     // Import sites using bulk insert
-                    const siteRows = sites.map((site) => ({
-                        identifier: site.identifier,
-                        ...(site.name && { name: site.name }),
-                        monitoring: true, // Default monitoring to true for imported sites
-                    }));
+                    const siteRows = normalizedSites.map((site) => {
+                        const monitoring = site.monitoring ?? true;
+
+                        const row: {
+                            identifier: string;
+                            monitoring: boolean;
+                            name?: string;
+                        } = {
+                            identifier: site.identifier,
+                            monitoring,
+                        };
+
+                        if (site.name) {
+                            row.name = site.name;
+                        }
+
+                        return row;
+                    });
                     siteTransactionAdapter.bulkInsert(siteRows);
 
                     // Import monitors and history
                     await this.importMonitorsWithHistory(
                         historyTransactionAdapter,
-                        sites
+                        normalizedSites
                     );
 
                     settingsTransactionAdapter.bulkInsert(safeSettings);
                 });
 
                 this.logger.info(
-                    `Successfully imported ${sites.length} sites and ${Object.keys(safeSettings).length} settings`
+                    `Successfully imported ${normalizedSites.length} sites and ${Object.keys(safeSettings).length} settings`
                 );
             },
             "data-import-persist",
             this.eventEmitter,
             {
                 settingsCount: Object.keys(safeSettings).length,
-                sitesCount: sites.length,
+                sitesCount: normalizedSites.length,
             }
         );
     }
@@ -304,6 +322,79 @@ export class DataImportExportService {
         );
 
         throw new SiteLoadingError(message, normalizedError);
+    }
+
+    /**
+     * Returns a normalized copy of the imported site ensuring required fields
+     * adhere to runtime constraints.
+     */
+    private normalizeImportSite(site: ImportSite): ImportSite {
+        const normalizedMonitoring =
+            typeof site.monitoring === "boolean" ? site.monitoring : true;
+
+        const normalizedSite: ImportSite = {
+            ...site,
+            monitoring: normalizedMonitoring,
+        };
+
+        if (Array.isArray(site.monitors) && site.monitors.length > 0) {
+            normalizedSite.monitors = site.monitors.map((monitor) =>
+                this.normalizeImportedMonitor(site.identifier, monitor)
+            );
+        }
+
+        return normalizedSite;
+    }
+
+    /**
+     * Normalizes imported monitor configuration to meet minimum cadence
+     * requirements.
+     */
+    private normalizeImportedMonitor(
+        siteIdentifier: string,
+        monitor: Site["monitors"][0]
+    ): Site["monitors"][0] {
+        const normalizedMonitor: Site["monitors"][0] = {
+            ...monitor,
+        };
+
+        const originalInterval = normalizedMonitor.checkInterval;
+
+        const isValidInterval =
+            typeof originalInterval === "number" &&
+            Number.isFinite(originalInterval) &&
+            originalInterval > 0;
+
+        if (!isValidInterval) {
+            this.logger.warn(
+                "[DataImportExportService] Imported monitor missing valid checkInterval; defaulting to minimum",
+                {
+                    monitorId: normalizedMonitor.id || "unknown-monitor",
+                    siteIdentifier,
+                }
+            );
+            normalizedMonitor.checkInterval = MIN_MONITOR_CHECK_INTERVAL_MS;
+            return normalizedMonitor;
+        }
+
+        if (originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS) {
+            this.logger.warn(
+                "[DataImportExportService] Imported monitor checkInterval below minimum; clamping to shared floor",
+                {
+                    minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
+                    monitorId: normalizedMonitor.id || "unknown-monitor",
+                    originalInterval,
+                    siteIdentifier,
+                }
+            );
+            normalizedMonitor.checkInterval = MIN_MONITOR_CHECK_INTERVAL_MS;
+            return normalizedMonitor;
+        }
+
+        // Normalize to whole milliseconds while preserving values above the minimum.
+        normalizedMonitor.checkInterval = Math.floor(originalInterval);
+
+        return normalizedMonitor;
     }
 
     public constructor(config: DataImportExportConfig) {

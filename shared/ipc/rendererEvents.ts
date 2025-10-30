@@ -9,7 +9,11 @@
  * mutations.
  */
 
-import type { Site } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+} from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     HistoryLimitUpdatedEventData,
@@ -83,11 +87,13 @@ export interface RendererEventPayloadMap {
     "monitoring:started": MonitoringControlEventData & {
         monitorCount: number;
         siteCount: number;
+        summary?: MonitoringStartSummary;
     };
     /** Payload for monitoring stopped events. */
     "monitoring:stopped": MonitoringControlEventData & {
         activeMonitors: number;
         reason: MonitoringControlReason;
+        summary?: MonitoringStopSummary;
     };
     /** Payload for database history retention updates. */
     "settings:history-limit-updated": HistoryLimitUpdatedEventData;

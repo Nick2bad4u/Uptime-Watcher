@@ -1,8 +1,9 @@
 import type { Site } from "@shared/types";
+import type { Logger } from "@shared/utils/logger/interfaces";
 
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 import { isDev } from "../../electronUtils";
-import { logger } from "../../utils/logger";
+import { logger as backendLogger } from "../../utils/logger";
 import { MIN_CHECK_INTERVAL } from "./constants";
 
 /**
@@ -27,6 +28,15 @@ import { MIN_CHECK_INTERVAL } from "./constants";
  * @public
  */
 export class MonitorScheduler {
+    /**
+     * Logger instance used for emitting scheduler diagnostics.
+     *
+     * @remarks
+     * Injected via the constructor to simplify testing scenarios that need to
+     * assert on logging behaviour without relying on the shared singleton.
+     */
+    private readonly logger: Logger;
+
     /**
      * Map of interval keys to active NodeJS.Timeout objects.
      *
@@ -92,12 +102,22 @@ export class MonitorScheduler {
                     siteIdentifier,
                     monitorId
                 );
-                logger.error(
+                this.logger.error(
                     `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
                     error
                 );
             }
         }
+    }
+
+    /**
+     * Creates a new {@link MonitorScheduler}.
+     *
+     * @param loggerInstance - Optional logger implementation to use for
+     *   diagnostic output. Defaults to the shared backend logger.
+     */
+    public constructor(loggerInstance: Logger = backendLogger) {
+        this.logger = loggerInstance;
     }
 
     /**
@@ -229,7 +249,7 @@ export class MonitorScheduler {
         monitor: Site["monitors"][0]
     ): boolean {
         if (!monitor.id) {
-            logger.warn(
+            this.logger.warn(
                 `[MonitorScheduler] Cannot start monitoring for monitor without ID: ${siteIdentifier}`
             );
             return false;
@@ -250,7 +270,7 @@ export class MonitorScheduler {
         );
 
         if (isDev()) {
-            logger.debug(
+            this.logger.debug(
                 `[MonitorScheduler] Monitor checkInterval: ${monitor.checkInterval}, using: ${checkInterval}ms for ${siteIdentifier}|${monitor.id}`
             );
         }
@@ -262,7 +282,7 @@ export class MonitorScheduler {
                     try {
                         await this.onCheckCallback(siteIdentifier, monitor.id);
                     } catch (error) {
-                        logger.error(
+                        this.logger.error(
                             `[MonitorScheduler] Error during scheduled check for ${intervalKey}`,
                             error
                         );
@@ -282,7 +302,7 @@ export class MonitorScheduler {
                         monitor.id
                     );
                 } catch (error) {
-                    logger.error(
+                    this.logger.error(
                         `[MonitorScheduler] Error during immediate check for ${intervalKey}`,
                         error
                     );
@@ -291,7 +311,7 @@ export class MonitorScheduler {
         }
 
         if (isDev()) {
-            logger.debug(
+            this.logger.debug(
                 `[MonitorScheduler] Started monitoring for ${intervalKey} with interval ${checkInterval}ms (immediate check triggered)`
             );
         }
@@ -344,7 +364,7 @@ export class MonitorScheduler {
             clearInterval(interval);
         }
         this.intervals.clear();
-        logger.info("[MonitorScheduler] Stopped all monitoring intervals");
+        this.logger.info("[MonitorScheduler] Stopped all monitoring intervals");
     }
 
     /**
@@ -376,7 +396,7 @@ export class MonitorScheduler {
         if (interval) {
             clearInterval(interval);
             this.intervals.delete(intervalKey);
-            logger.debug(
+            this.logger.debug(
                 `[MonitorScheduler] Stopped monitoring for ${intervalKey}`
             );
             return true;
@@ -519,9 +539,10 @@ export class MonitorScheduler {
 
         // Minimum interval to prevent excessive CPU usage
         if (checkInterval < MIN_CHECK_INTERVAL) {
-            logger.warn(
-                `Check interval ${checkInterval}ms is very short, minimum recommended: ${MIN_CHECK_INTERVAL}ms`
+            this.logger.warn(
+                `[MonitorScheduler] Check interval ${checkInterval}ms is below minimum ${MIN_CHECK_INTERVAL}ms; clamping to minimum`
             );
+            return MIN_CHECK_INTERVAL;
         }
 
         return checkInterval;

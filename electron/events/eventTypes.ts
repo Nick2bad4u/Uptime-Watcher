@@ -13,7 +13,13 @@
  * @see {@link UptimeEvents}
  */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import type {
     CacheInvalidatedEventData,
     HistoryLimitUpdatedEventData,
@@ -869,6 +875,7 @@ export interface UptimeEvents extends UnknownRecord {
         identifier: string;
         monitorId?: string;
         operation: "started";
+        summary?: MonitoringStartSummary;
         timestamp: number;
     };
 
@@ -886,6 +893,7 @@ export interface UptimeEvents extends UnknownRecord {
         monitorId?: string;
         operation: "stopped";
         reason: EventReason;
+        summary?: MonitoringStopSummary;
         timestamp: number;
     };
 
@@ -1191,6 +1199,8 @@ export interface UptimeEvents extends UnknownRecord {
         monitorCount: number;
         /** The number of sites involved. */
         siteCount: number;
+        /** Detailed summary of the lifecycle results. */
+        summary?: MonitoringStartSummary;
     };
 
     /**
@@ -1203,6 +1213,8 @@ export interface UptimeEvents extends UnknownRecord {
         activeMonitors: number;
         /** The reason for stopping. */
         reason: "error" | "shutdown" | "user";
+        /** Detailed summary of the lifecycle results. */
+        summary?: MonitoringStopSummary;
     };
 
     /**

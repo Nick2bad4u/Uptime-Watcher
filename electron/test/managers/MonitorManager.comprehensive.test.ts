@@ -5,7 +5,13 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MonitorManager } from "../../managers/MonitorManager";
-import type { Site, StatusUpdate, Monitor } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import { DEFAULT_CHECK_INTERVAL } from "../../constants";
 
 /**
@@ -620,14 +626,26 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
     describe("Start/Stop Monitoring - Enhanced Coverage", () => {
         it("should start monitoring for all sites using enhanced system", async () => {
+            const summary = {
+                attempted: 3,
+                failed: 0,
+                partialFailures: false,
+                siteCount: 2,
+                skipped: 0,
+                succeeded: 3,
+                isMonitoring: true,
+                alreadyActive: false,
+            } satisfies MonitoringStartSummary;
+
             // Spy on the enhanced method directly
             const startAllSpy = vi
                 .spyOn(manager, "startAllMonitoringEnhanced" as any)
-                .mockResolvedValue(true);
+                .mockResolvedValue(summary);
 
-            await manager.startMonitoring();
+            const resultSummary = await manager.startMonitoring();
 
             expect(startAllSpy).toHaveBeenCalled();
+            expect(resultSummary).toEqual(summary);
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -635,6 +653,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                 expect.objectContaining({
                     identifier: "all",
                     operation: "started",
+                    summary,
                 })
             );
         });
@@ -704,14 +723,26 @@ describe("MonitorManager - Comprehensive Coverage", () => {
         });
 
         it("should stop monitoring for all sites using enhanced system", async () => {
+            const summary = {
+                attempted: 3,
+                failed: 0,
+                partialFailures: false,
+                siteCount: 2,
+                skipped: 0,
+                succeeded: 3,
+                isMonitoring: false,
+                alreadyInactive: false,
+            } satisfies MonitoringStopSummary;
+
             // Spy on the enhanced method directly
             const stopAllSpy = vi
                 .spyOn(manager, "stopAllMonitoringEnhanced" as any)
-                .mockResolvedValue(false);
+                .mockResolvedValue(summary);
 
-            await manager.stopMonitoring();
+            const resultSummary = await manager.stopMonitoring();
 
             expect(stopAllSpy).toHaveBeenCalled();
+            expect(resultSummary).toEqual(summary);
             expect(
                 mockDependencies.eventEmitter.emitTyped
             ).toHaveBeenCalledWith(
@@ -720,6 +751,7 @@ describe("MonitorManager - Comprehensive Coverage", () => {
                     identifier: "all",
                     operation: "stopped",
                     reason: "user",
+                    summary,
                 })
             );
         });

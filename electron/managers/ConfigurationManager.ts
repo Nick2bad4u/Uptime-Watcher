@@ -371,7 +371,7 @@ export class ConfigurationManager {
     /**
      * Gets the minimum allowed check interval according to business rules.
      *
-     * @returns The minimum allowed check interval in milliseconds (1000 ms).
+     * @returns The minimum allowed check interval in milliseconds (5000 ms).
      */
     public getMinimumCheckInterval(): number {
         return MIN_MONITOR_CHECK_INTERVAL_MS;

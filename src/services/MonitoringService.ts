@@ -39,6 +39,7 @@ import type { StatusUpdate } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
+import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
 const { ensureInitialized, wrap } = ((): ReturnType<
@@ -126,10 +127,29 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws Error when the backend declines to start global monitoring.
      */
     startMonitoring: wrap("startMonitoring", async (api): Promise<void> => {
-        const success = await api.monitoring.startMonitoring();
+        const summary = await api.monitoring.startMonitoring();
 
-        if (!success) {
-            throw new Error("Failed to start monitoring across all sites");
+        if (summary.partialFailures) {
+            logger.warn(
+                "[MonitoringService] Global monitoring start completed with partial failures",
+                summary
+            );
+        }
+
+        if (!summary.isMonitoring) {
+            const message =
+                summary.attempted === 0
+                    ? "No eligible monitors were available to start. Configure at least one monitor and try again."
+                    : `Failed to start monitoring across all sites: ${summary.succeeded}/${summary.attempted} monitors activated.`;
+
+            logger.error(
+                "[MonitoringService] Global monitoring start failed",
+                summary
+            );
+
+            const error = new Error(message);
+            (error as Error & { summary?: typeof summary }).summary = summary;
+            throw error;
         }
     }),
     /**
@@ -186,10 +206,29 @@ export const MonitoringService: MonitoringServiceContract = {
      * @throws Error when the backend declines to stop global monitoring.
      */
     stopMonitoring: wrap("stopMonitoring", async (api): Promise<void> => {
-        const success = await api.monitoring.stopMonitoring();
+        const summary = await api.monitoring.stopMonitoring();
 
-        if (!success) {
-            throw new Error("Failed to stop monitoring across all sites");
+        if (summary.partialFailures) {
+            logger.warn(
+                "[MonitoringService] Global monitoring stop completed with partial failures",
+                summary
+            );
+        }
+
+        if (summary.isMonitoring) {
+            const message =
+                summary.attempted === 0
+                    ? "Monitoring remained active because no running monitors were located."
+                    : `Failed to stop monitoring across all sites: ${summary.failed}/${summary.attempted} monitors remained active.`;
+
+            logger.error(
+                "[MonitoringService] Global monitoring stop failed",
+                summary
+            );
+
+            const error = new Error(message);
+            (error as Error & { summary?: typeof summary }).summary = summary;
+            throw error;
         }
     }),
     /**

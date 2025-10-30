@@ -771,10 +771,7 @@ export class IpcService {
         // Start monitoring globally (no parameters)
         registerStandardizedIpcHandler(
             "start-monitoring",
-            async () => {
-                await this.uptimeOrchestrator.startMonitoring();
-                return true;
-            },
+            async () => this.uptimeOrchestrator.startMonitoring(),
             MonitoringHandlerValidators.startMonitoring,
             this.registeredIpcHandlers
         );
@@ -782,10 +779,7 @@ export class IpcService {
         // Stop monitoring globally (no parameters)
         registerStandardizedIpcHandler(
             "stop-monitoring",
-            async () => {
-                await this.uptimeOrchestrator.stopMonitoring();
-                return true;
-            },
+            async () => this.uptimeOrchestrator.stopMonitoring(),
             MonitoringHandlerValidators.stopMonitoring,
             this.registeredIpcHandlers
         );

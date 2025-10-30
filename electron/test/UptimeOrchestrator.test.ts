@@ -10,7 +10,15 @@ import type { UptimeOrchestratorDependencies } from "../UptimeOrchestrator.types
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
-import type { Site, Monitor, StatusUpdate } from "@shared/types";
+import type { UptimeEvents } from "../events/eventTypes";
+import type { EventMetadata } from "@shared/types/events";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ApplicationError } from "@shared/utils/errorHandling";
 
@@ -48,8 +56,30 @@ const mockMonitorManager = {
     ),
     startMonitoringForSite: vi.fn(() => Promise.resolve(true)),
     stopMonitoringForSite: vi.fn(() => Promise.resolve(true)),
-    startMonitoring: vi.fn(() => Promise.resolve()),
-    stopMonitoring: vi.fn(() => Promise.resolve()),
+    startMonitoring: vi.fn(() =>
+        Promise.resolve({
+            attempted: 2,
+            failed: 0,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 2,
+            isMonitoring: true,
+            alreadyActive: false,
+        } satisfies MonitoringStartSummary)
+    ),
+    stopMonitoring: vi.fn(() =>
+        Promise.resolve({
+            attempted: 2,
+            failed: 0,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 2,
+            isMonitoring: false,
+            alreadyInactive: false,
+        } satisfies MonitoringStopSummary)
+    ),
     isMonitoringActive: vi.fn(() => true),
     getActiveMonitorCount: vi.fn(() => 5),
     isMonitorActiveInScheduler: vi.fn(() => true),
@@ -906,9 +936,10 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            await orchestrator.startMonitoring();
+            const summary = await orchestrator.startMonitoring();
 
             expect(mockMonitorManager.startMonitoring).toHaveBeenCalled();
+            expect(summary.isMonitoring).toBeTruthy();
         });
 
         it("should stop monitoring", async ({ task, annotate }) => {
@@ -917,9 +948,10 @@ describe(UptimeOrchestrator, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Monitoring", "type");
 
-            await orchestrator.stopMonitoring();
+            const summary = await orchestrator.stopMonitoring();
 
             expect(mockMonitorManager.stopMonitoring).toHaveBeenCalled();
+            expect(summary.isMonitoring).toBeFalsy();
         });
     });
 
@@ -1268,6 +1300,13 @@ describe(UptimeOrchestrator, () => {
             await annotate("Type: Event Processing", "type");
 
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            const forwardedSiteAddedEvents: (UptimeEvents["site:added"] & {
+                    _meta?: EventMetadata;
+                    _originalMeta?: EventMetadata;
+                })[] = [];
+            orchestrator.onTyped("site:added", (payload) => {
+                forwardedSiteAddedEvents.push(payload);
+            });
 
             // Create the test site object
             const testSite = {
@@ -1277,14 +1316,33 @@ describe(UptimeOrchestrator, () => {
                 monitoring: true,
             };
 
-            // Emit internal site event with SiteEventData format (what the actual implementation expects)
-            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
-            orchestrator.emitTyped("internal:site:added" as any, {
+            const metadata = {
+                busId: "internal-bus",
+                correlationId: "corr-1",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            };
+
+            const internalEventPayload: Record<string, unknown> = {
                 identifier: "test-site",
                 source: "user",
                 site: testSite,
                 timestamp: Date.now(),
+            };
+
+            Object.defineProperty(internalEventPayload, "_meta", {
+                configurable: true,
+                enumerable: false,
+                value: metadata,
+                writable: false,
             });
+
+            // Emit internal site event with SiteEventData format (what the actual implementation expects)
+            // Note: Using 'as any' due to type mismatch between eventTypes.ts and actual implementation
+            orchestrator.emitTyped(
+                "internal:site:added" as any,
+                internalEventPayload
+            );
 
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
@@ -1295,6 +1353,24 @@ describe(UptimeOrchestrator, () => {
                     source: "user",
                 })
             );
+
+            const emittedPayload = emitTypedSpy.mock.calls.at(-1)?.[1] as
+                | Record<string, unknown>
+                | undefined;
+            expect(emittedPayload).toBeDefined();
+            expect(Object.hasOwn(emittedPayload!, "_meta")).toBeTruthy();
+            const forwardedMeta = (
+                emittedPayload as {
+                    _meta: EventMetadata;
+                }
+            )._meta;
+            expect(forwardedMeta.busId).toBe("UptimeOrchestrator");
+            expect(forwardedMeta.eventName).toBe("site:added");
+
+            expect(forwardedSiteAddedEvents).toHaveLength(1);
+            expect(
+                forwardedSiteAddedEvents[0]?._originalMeta as EventMetadata
+            ).toStrictEqual(metadata);
         });
 
         it("should forward site addition source metadata", async ({
@@ -1604,6 +1680,10 @@ describe(UptimeOrchestrator, () => {
             await annotate("Type: Monitoring", "type");
 
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+            const forwardedManualEvents: any[] = [];
+            orchestrator.onTyped("monitor:check-completed", (payload) => {
+                forwardedManualEvents.push(payload);
+            });
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:started", {
@@ -1724,13 +1804,42 @@ describe(UptimeOrchestrator, () => {
 
             const completionTimestamp = Date.now();
 
-            orchestrator.emitTyped("internal:monitor:manual-check-completed", {
+            const forwardedManualEvents: (UptimeEvents["monitor:check-completed"] & {
+                    _meta?: unknown;
+                    _originalMeta?: unknown;
+                })[] = [];
+            orchestrator.onTyped("monitor:check-completed", (payload) => {
+                forwardedManualEvents.push(payload);
+            });
+
+            const manualCompletionEvent: UptimeEvents["internal:monitor:manual-check-completed"] & {
+                _meta?: unknown;
+            } = {
                 identifier: site.identifier,
                 monitorId: monitor.id,
                 operation: "manual-check-completed",
                 result: manualResult,
                 timestamp: completionTimestamp,
+            };
+
+            const manualCheckMeta = {
+                busId: "internal-bus",
+                correlationId: "manual-corr-1",
+                eventName: "internal:monitor:manual-check-completed",
+                timestamp: completionTimestamp,
+            };
+
+            Object.defineProperty(manualCompletionEvent, "_meta", {
+                configurable: true,
+                enumerable: false,
+                value: manualCheckMeta,
+                writable: false,
             });
+
+            orchestrator.emitTyped(
+                "internal:monitor:manual-check-completed",
+                manualCompletionEvent
+            );
 
             await new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -1755,6 +1864,33 @@ describe(UptimeOrchestrator, () => {
                     }),
                 })
             );
+
+            const forwardedPayload = emitTypedSpy.mock.calls
+                .findLast(
+                    ([eventName]) => eventName === "monitor:check-completed"
+                )?.[1] as Record<string, unknown> | undefined;
+
+            expect(forwardedPayload).toBeDefined();
+            expect(Object.hasOwn(forwardedPayload!, "_meta")).toBeTruthy();
+            const forwardedMeta = (
+                forwardedPayload as {
+                    _meta: EventMetadata;
+                }
+            )._meta;
+            expect(forwardedMeta.busId).toBe("UptimeOrchestrator");
+            expect(forwardedMeta.eventName).toBe("monitor:check-completed");
+
+            const originalMeta = (
+                forwardedPayload as {
+                    _originalMeta?: EventMetadata;
+                }
+            )._originalMeta;
+            expect(originalMeta).toStrictEqual(manualCheckMeta);
+
+            expect(forwardedManualEvents).toHaveLength(1);
+            expect(
+                forwardedManualEvents[0]?._originalMeta as EventMetadata
+            ).toStrictEqual(manualCheckMeta);
         });
 
         it("should enrich manual check completion events using cached site data when missing snapshots", async ({

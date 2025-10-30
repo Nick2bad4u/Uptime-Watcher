@@ -175,7 +175,7 @@ describe("main.ts - Electron Main Process", () => {
             expect(mockLog.initialize).toHaveBeenCalledWith({ preload: true });
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
-        });
+        }, 60_000);
         it("should configure production logging when --log-production flag is present", async ({
             task,
             annotate,

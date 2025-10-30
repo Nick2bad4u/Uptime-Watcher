@@ -8,7 +8,13 @@
  * Electron main process (for handler registration) and the renderer (for typed
  * invokers), satisfying ADR-005's strict typing requirements.
  */
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
     StateSyncFullSyncResult,
@@ -197,7 +203,7 @@ export interface IpcInvokeChannelMap {
     };
     "start-monitoring": {
         params: readonly [];
-        result: boolean;
+        result: MonitoringStartSummary;
     };
     "start-monitoring-for-monitor": {
         params: readonly [siteIdentifier: string, monitorId: string];
@@ -209,7 +215,7 @@ export interface IpcInvokeChannelMap {
     };
     "stop-monitoring": {
         params: readonly [];
-        result: boolean;
+        result: MonitoringStopSummary;
     };
     "stop-monitoring-for-monitor": {
         params: readonly [siteIdentifier: string, monitorId: string];

@@ -6,7 +6,11 @@
 import { vi, type MockInstance } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
-import type { StatusUpdate } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    StatusUpdate,
+} from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 import EventEmitter from "node:events";
@@ -272,6 +276,28 @@ ensureStorage("sessionStorage");
 type AnyMock = MockInstance;
 type SubscriptionMock = MockInstance;
 
+const defaultStartSummary: MonitoringStartSummary = {
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: true,
+    alreadyActive: false,
+};
+
+const defaultStopSummary: MonitoringStopSummary = {
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: false,
+    alreadyInactive: false,
+};
+
 const mockElectronAPI: {
     data: {
         downloadSqliteBackup: AnyMock;
@@ -411,11 +437,11 @@ const mockElectronAPI: {
             name: "Test Site",
         }),
         startMonitor: vi.fn().mockResolvedValue(true),
-        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoring: vi.fn().mockResolvedValue(defaultStartSummary),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitor: vi.fn().mockResolvedValue(true),
-        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(defaultStopSummary),
         stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
         validateMonitorConfig: vi.fn().mockReturnValue(true),

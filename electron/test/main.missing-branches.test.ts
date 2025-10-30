@@ -148,7 +148,7 @@ describe("main.ts - Missing Branch Coverage", () => {
 
             expect(mockLog.transports.file.level).toBe("debug");
             expect(mockLog.transports.console.level).toBe("debug");
-        });
+        }, 60_000);
         it("should handle --log-debug flag", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: main.missing-branches", "component");

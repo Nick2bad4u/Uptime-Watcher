@@ -62,7 +62,7 @@ describe(MonitorScheduler, () => {
         vi.mocked(logger.warn).mockClear();
         vi.mocked(logger.error).mockClear();
 
-        scheduler = new MonitorScheduler();
+        scheduler = new MonitorScheduler(logger);
         mockCheckCallback = vi.fn().mockResolvedValue(undefined);
         (isDev as any).mockReturnValue(false);
     });

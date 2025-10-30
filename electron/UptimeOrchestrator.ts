@@ -79,7 +79,13 @@
 
 /* eslint max-lines: ["error", { "max": 2000 }] -- Main orchestrator module */
 
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
 import {
@@ -93,7 +99,7 @@ import {
     type ApplicationErrorOptions,
 } from "@shared/utils/errorHandling";
 
-import type { EventReason } from "./events/eventTypes";
+import type { UptimeEvents } from "./events/eventTypes";
 import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
@@ -114,7 +120,11 @@ import {
     createLoggingMiddleware,
 } from "./events/middleware";
 import { TypedEventBus } from "./events/TypedEventBus";
+import { attachForwardedMetadata } from "./utils/eventMetadataForwarding";
 import { diagnosticsLogger, logger } from "./utils/logger";
+
+/** Logical event bus identifier applied to forwarded renderer events. */
+const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
@@ -228,12 +238,20 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             }
             // Extract original data without _meta to prevent conflicts
             const source = data.source ?? SITE_ADDED_SOURCE.USER;
-
-            await this.emitTyped("site:added", {
+            const payload = {
                 site: data.site,
                 source,
                 timestamp: data.timestamp,
+            } satisfies UptimeEvents["site:added"];
+
+            attachForwardedMetadata({
+                busId: ORCHESTRATOR_BUS_ID,
+                forwardedEvent: "site:added",
+                payload,
+                source: data,
             });
+
+            await this.emitTyped("site:added", payload);
         })();
     };
 
@@ -265,12 +283,21 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 );
             }
 
-            await this.emitTyped("site:removed", {
+            const payload = {
                 cascade,
                 siteIdentifier,
                 siteName,
                 timestamp: data.timestamp,
+            } satisfies UptimeEvents["site:removed"];
+
+            attachForwardedMetadata({
+                busId: ORCHESTRATOR_BUS_ID,
+                forwardedEvent: "site:removed",
+                payload,
+                source: data,
             });
+
+            await this.emitTyped("site:removed", payload);
         })();
     };
 
@@ -299,48 +326,84 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 return;
             }
             // Extract original data without _meta to prevent conflicts
-            await this.emitTyped("site:updated", {
+            const payload = {
                 previousSite: data.previousSite ?? data.site,
                 site: data.site,
                 timestamp: data.timestamp,
                 updatedFields: data.updatedFields ?? [],
+            } satisfies UptimeEvents["site:updated"];
+
+            attachForwardedMetadata({
+                busId: ORCHESTRATOR_BUS_ID,
+                forwardedEvent: "site:updated",
+                payload,
+                source: data,
             });
+
+            await this.emitTyped("site:updated", payload);
         })();
     };
 
     /** Event handler for monitor start events */
-    private readonly handleMonitorStartedEvent = (eventData: {
-        identifier: string;
-        monitorId?: string;
-        operation: "started";
-        timestamp: number;
-    }): void => {
+    private readonly handleMonitorStartedEvent = (
+        eventData: UptimeEvents["internal:monitor:started"] & {
+            _meta?: unknown;
+        }
+    ): void => {
         void (async (): Promise<void> => {
             try {
                 const sites = this.siteManager.getSitesFromCache();
-                const totalMonitors = sites.reduce(
-                    (total: number, site: Site) => total + site.monitors.length,
-                    0
-                );
+                const { identifier, summary } = eventData;
 
-                await this.emitTyped("monitoring:started", {
-                    monitorCount: totalMonitors,
-                    siteCount: sites.length,
+                const siteCount = summary?.siteCount ?? sites.length;
+                const monitorCount =
+                    summary?.succeeded ??
+                    sites.reduce(
+                        (total: number, site: Site) =>
+                            total + site.monitors.length,
+                        0
+                    );
+
+                const payloadBase = {
+                    monitorCount,
+                    siteCount,
                     timestamp: Date.now(),
+                };
+
+                const payload: UptimeEvents["monitoring:started"] = summary
+                    ? { ...payloadBase, summary }
+                    : payloadBase;
+
+                attachForwardedMetadata({
+                    busId: ORCHESTRATOR_BUS_ID,
+                    forwardedEvent: "monitoring:started",
+                    payload,
+                    source: eventData,
                 });
 
-                const invalidationType =
-                    eventData.identifier === "all" ? "all" : "site";
+                await this.emitTyped("monitoring:started", payload);
+
+                const invalidationType = identifier === "all" ? "all" : "site";
 
                 // Emit cache invalidation to trigger frontend state refresh
-                await this.emitTyped("cache:invalidated", {
-                    ...(invalidationType === "site"
-                        ? { identifier: eventData.identifier }
-                        : {}),
+                const cacheInvalidationPayload = {
+                    ...(invalidationType === "site" ? { identifier } : {}),
                     reason: "update",
                     timestamp: Date.now(),
                     type: invalidationType,
+                } satisfies UptimeEvents["cache:invalidated"];
+
+                attachForwardedMetadata({
+                    busId: ORCHESTRATOR_BUS_ID,
+                    forwardedEvent: "cache:invalidated",
+                    payload: cacheInvalidationPayload,
+                    source: eventData,
                 });
+
+                await this.emitTyped(
+                    "cache:invalidated",
+                    cacheInvalidationPayload
+                );
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:started:",
@@ -364,13 +427,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @internal
      */
-    private readonly handleMonitorStoppedEvent = (eventData: {
-        identifier: string;
-        monitorId?: string;
-        operation: "stopped";
-        reason: EventReason;
-        timestamp: number;
-    }): void => {
+    private readonly handleMonitorStoppedEvent = (
+        eventData: UptimeEvents["internal:monitor:stopped"] & {
+            _meta?: unknown;
+        }
+    ): void => {
         void (async (): Promise<void> => {
             try {
                 // Always get the actual active monitor count from scheduler
@@ -378,24 +439,51 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                 const activeMonitors =
                     this.monitorManager.getActiveMonitorCount();
 
-                await this.emitTyped("monitoring:stopped", {
+                const { identifier, reason, summary } = eventData;
+
+                const stopPayloadBase = {
                     activeMonitors,
-                    reason: eventData.reason,
+                    reason,
                     timestamp: Date.now(),
+                };
+
+                const payload: UptimeEvents["monitoring:stopped"] = summary
+                    ? {
+                          ...stopPayloadBase,
+                          summary,
+                      }
+                    : stopPayloadBase;
+
+                attachForwardedMetadata({
+                    busId: ORCHESTRATOR_BUS_ID,
+                    forwardedEvent: "monitoring:stopped",
+                    payload,
+                    source: eventData,
                 });
 
-                const invalidationType =
-                    eventData.identifier === "all" ? "all" : "site";
+                await this.emitTyped("monitoring:stopped", payload);
+
+                const invalidationType = identifier === "all" ? "all" : "site";
 
                 // Emit cache invalidation to trigger frontend state refresh
-                await this.emitTyped("cache:invalidated", {
-                    ...(invalidationType === "site"
-                        ? { identifier: eventData.identifier }
-                        : {}),
+                const cacheInvalidationPayload = {
+                    ...(invalidationType === "site" ? { identifier } : {}),
                     reason: "update",
                     timestamp: Date.now(),
                     type: invalidationType,
+                } satisfies UptimeEvents["cache:invalidated"];
+
+                attachForwardedMetadata({
+                    busId: ORCHESTRATOR_BUS_ID,
+                    forwardedEvent: "cache:invalidated",
+                    payload: cacheInvalidationPayload,
+                    source: eventData,
                 });
+
+                await this.emitTyped(
+                    "cache:invalidated",
+                    cacheInvalidationPayload
+                );
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
@@ -406,13 +494,11 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     };
 
     /** Event handler for manual monitor check completion events */
-    private readonly handleManualCheckCompletedEvent = (eventData: {
-        identifier: string;
-        monitorId?: string;
-        operation: "manual-check-completed";
-        result: StatusUpdate;
-        timestamp: number;
-    }): void => {
+    private readonly handleManualCheckCompletedEvent = (
+        eventData: UptimeEvents["internal:monitor:manual-check-completed"] & {
+            _meta?: unknown;
+        }
+    ): void => {
         void (async (): Promise<void> => {
             try {
                 const {
@@ -470,13 +556,22 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     }
                 }
 
-                await this.emitTyped("monitor:check-completed", {
-                    checkType: "manual",
+                const payload = {
+                    checkType: "manual" as const,
                     monitorId,
                     result: enrichedResult,
                     siteIdentifier,
                     timestamp,
+                } satisfies UptimeEvents["monitor:check-completed"];
+
+                attachForwardedMetadata({
+                    busId: ORCHESTRATOR_BUS_ID,
+                    forwardedEvent: "monitor:check-completed",
+                    payload,
+                    source: eventData,
                 });
+
+                await this.emitTyped("monitor:check-completed", payload);
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:manual-check-completed:",
@@ -1294,12 +1389,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @returns Promise that resolves when monitoring has started.
      */
-    public async startMonitoring(): Promise<void> {
-        await this.runWithContext(() => this.monitorManager.startMonitoring(), {
-            code: "ORCHESTRATOR_START_MONITORING_FAILED",
-            message: "Failed to start monitoring",
-            operation: "orchestrator.startMonitoring",
-        });
+    public async startMonitoring(): Promise<MonitoringStartSummary> {
+        return this.runWithContext(
+            () => this.monitorManager.startMonitoring(),
+            {
+                code: "ORCHESTRATOR_START_MONITORING_FAILED",
+                message: "Failed to start monitoring",
+                operation: "orchestrator.startMonitoring",
+            }
+        );
     }
 
     /**
@@ -1334,8 +1432,8 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      *
      * @returns Promise that resolves when monitoring has stopped.
      */
-    public async stopMonitoring(): Promise<void> {
-        await this.runWithContext(() => this.monitorManager.stopMonitoring(), {
+    public async stopMonitoring(): Promise<MonitoringStopSummary> {
+        return this.runWithContext(() => this.monitorManager.stopMonitoring(), {
             code: "ORCHESTRATOR_STOP_MONITORING_FAILED",
             message: "Failed to stop monitoring",
             operation: "orchestrator.stopMonitoring",
@@ -1833,8 +1931,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
             this.handleRestartMonitoringRequestedEvent
         );
     }
-
-    // Status Information
 
     /**
      * Validates that all managers are properly initialized.

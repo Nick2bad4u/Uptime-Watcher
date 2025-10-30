@@ -44,6 +44,13 @@ import { logger as baseLogger } from "../utils/logger";
 const logger = createTemplateLogger(baseLogger);
 
 /**
+ * Internal symbol used to carry original metadata through event forwarding.
+ */
+export const ORIGINAL_METADATA_SYMBOL: unique symbol = Symbol(
+    "typed-event-bus:original-meta"
+);
+
+/**
  * Diagnostic information about a {@link TypedEventBus} instance.
  *
  * @remarks
@@ -637,19 +644,56 @@ export class TypedEventBus<
         }
 
         // Handle objects with potential _meta conflicts
-        const hasExistingMeta = Object.hasOwn(data, "_meta");
+        const hasExistingMeta = Reflect.has(data, "_meta");
         if (hasExistingMeta) {
             logger.debug(
                 `[TypedEventBus:${this.busId}] Event data contains _meta property, preserving as _originalMeta`
             );
-            // Type-safe access to _meta property
-            // eslint-disable-next-line no-underscore-dangle -- _meta is conventional metadata property in event systems
-            const existingMeta = (data as { _meta?: unknown })._meta;
-            return {
-                ...data,
-                _meta: metadata,
-                _originalMeta: existingMeta,
-            };
+
+            const existingMetaCandidate = Reflect.get(data, "_meta") as unknown;
+            const existingOriginalMetaCandidate = Reflect.has(
+                data,
+                "_originalMeta"
+            )
+                ? (Reflect.get(data, "_originalMeta") as unknown)
+                : undefined;
+            const symbolOriginalMetaCandidate = Reflect.has(
+                data,
+                ORIGINAL_METADATA_SYMBOL
+            )
+                ? (Reflect.get(data, ORIGINAL_METADATA_SYMBOL) as unknown)
+                : undefined;
+
+            const resolvedOriginalMeta =
+                symbolOriginalMetaCandidate ??
+                existingOriginalMetaCandidate ??
+                existingMetaCandidate;
+
+            const enhanced = { ...data } as Record<string, unknown>;
+
+            if (Reflect.has(enhanced, "_meta")) {
+                Reflect.deleteProperty(enhanced, "_meta");
+            }
+
+            if (Reflect.has(enhanced, "_originalMeta")) {
+                Reflect.deleteProperty(enhanced, "_originalMeta");
+            }
+
+            if (Reflect.has(enhanced, ORIGINAL_METADATA_SYMBOL)) {
+                Reflect.deleteProperty(enhanced, ORIGINAL_METADATA_SYMBOL);
+            }
+
+            if (symbolOriginalMetaCandidate !== undefined) {
+                Reflect.deleteProperty(data, ORIGINAL_METADATA_SYMBOL);
+            }
+
+            enhanced["_meta"] = metadata;
+
+            if (resolvedOriginalMeta !== undefined) {
+                enhanced["_originalMeta"] = resolvedOriginalMeta;
+            }
+
+            return enhanced;
         }
 
         // Safe transformation: spreading object and adding _meta

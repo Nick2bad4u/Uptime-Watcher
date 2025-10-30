@@ -1,6 +1,11 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Context: Storybook mock for Electron API
 /* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-unsafe-type-assertion, @typescript-eslint/no-unnecessary-type-parameters, @typescript-eslint/no-unnecessary-condition, sonarjs/pseudo-random -- Disable Strict Rules */
-import type { Site, StatusUpdate } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
@@ -247,7 +252,21 @@ const electronAPIMockDefinition = {
             }));
             return true;
         },
-        startMonitoring: async (): Promise<boolean> => {
+        startMonitoring: async (): Promise<MonitoringStartSummary> => {
+            const siteCount = mockState.sites.length;
+            let attempted = 0;
+
+            for (const site of mockState.sites) {
+                attempted += site.monitors.length;
+            }
+            const alreadyActive =
+                siteCount > 0 &&
+                mockState.sites.every(
+                    (site) =>
+                        site.monitoring &&
+                        site.monitors.every((monitor) => monitor.monitoring)
+                );
+
             mockState.sites = mockState.sites.map((site) => ({
                 ...site,
                 monitoring: true,
@@ -256,7 +275,19 @@ const electronAPIMockDefinition = {
                     monitoring: true,
                 })),
             }));
-            return true;
+
+            const succeeded = attempted;
+
+            return {
+                alreadyActive,
+                attempted,
+                failed: 0,
+                isMonitoring: alreadyActive || succeeded > 0,
+                partialFailures: false,
+                siteCount,
+                skipped: 0,
+                succeeded,
+            };
         },
         startMonitoringForMonitor: async (
             siteIdentifier: string,
@@ -288,7 +319,18 @@ const electronAPIMockDefinition = {
             }));
             return true;
         },
-        stopMonitoring: async (): Promise<boolean> => {
+        stopMonitoring: async (): Promise<MonitoringStopSummary> => {
+            const siteCount = mockState.sites.length;
+            let attempted = 0;
+
+            for (const site of mockState.sites) {
+                for (const monitor of site.monitors) {
+                    if (monitor.monitoring) {
+                        attempted += 1;
+                    }
+                }
+            }
+
             mockState.sites = mockState.sites.map((site) => ({
                 ...site,
                 monitoring: false,
@@ -297,7 +339,17 @@ const electronAPIMockDefinition = {
                     monitoring: false,
                 })),
             }));
-            return true;
+
+            return {
+                alreadyInactive: attempted === 0,
+                attempted,
+                failed: 0,
+                isMonitoring: false,
+                partialFailures: false,
+                siteCount,
+                skipped: 0,
+                succeeded: attempted,
+            };
         },
         stopMonitoringForMonitor: async (
             siteIdentifier: string,

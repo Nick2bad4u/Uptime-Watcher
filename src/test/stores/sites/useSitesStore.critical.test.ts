@@ -9,7 +9,11 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Site } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+} from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 
 const MOCK_BRIDGE_ERROR_MESSAGE =
@@ -105,6 +109,34 @@ vi.mock("../../../../shared/utils", () => ({
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
 
 // Mock the electron API
+const createStartSummary = (
+    overrides: Partial<MonitoringStartSummary> = {}
+): MonitoringStartSummary => ({
+    attempted: 3,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 3,
+    isMonitoring: true,
+    alreadyActive: false,
+    ...overrides,
+});
+
+const createStopSummary = (
+    overrides: Partial<MonitoringStopSummary> = {}
+): MonitoringStopSummary => ({
+    attempted: 3,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 3,
+    isMonitoring: false,
+    alreadyInactive: false,
+    ...overrides,
+});
+
 const mockElectronAPI = {
     sites: {
         addSite: vi.fn(),
@@ -132,12 +164,12 @@ const mockElectronAPI = {
     },
     monitoring: {
         checkSiteNow: vi.fn().mockResolvedValue(undefined),
-        startMonitoring: vi.fn().mockResolvedValue(true),
+        startMonitoring: vi.fn().mockResolvedValue(createStartSummary()),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
         stopMonitoringForSite: vi.fn().mockResolvedValue(true),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         stopMonitoringForMonitor: vi.fn().mockResolvedValue(true),
-        stopMonitoring: vi.fn().mockResolvedValue(true),
+        stopMonitoring: vi.fn().mockResolvedValue(createStopSummary()),
     },
     stateSync: {
         getSyncStatus: vi.fn(),

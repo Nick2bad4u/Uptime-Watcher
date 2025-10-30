@@ -1,68 +1,23 @@
 /**
- * Orchestrates all monitoring operations for sites and monitors, including
- * scheduling, status checking, and lifecycle management across the Electron
- * backend.
+ * Central coordinator for backend monitor lifecycle management.
  *
  * @remarks
- * Coordinates monitor lifecycle, scheduling, and event-driven updates for sites
- * and monitors. All backend monitoring logic flows through this manager.
- * Interacts with repositories, event bus, and service layer according to the
- * repository and event-driven patterns.
- *
- * Key responsibilities:
- *
- * - Monitor lifecycle management (create, start, stop, delete)
- * - Scheduled monitoring with configurable intervals
- * - Status checking and health monitoring for sites
- * - Event emission for monitor state changes and status updates
- * - Cache coordination for real-time monitor data access
- * - Integration with enhanced monitoring services
- * - Error handling and recovery for failed monitoring operations
- * - Transaction management for monitor database operations
- *
- * @example Basic monitor operations:
- *
- * ```typescript
- * const monitorManager = new MonitorManager({
- *     eventBus,
- *     siteRepository,
- *     monitorRepository,
- *     historyRepository,
- *     databaseService,
- *     cache,
- * });
- *
- * // Start monitoring for a site
- * const monitor = await monitorManager.startMonitoring(siteIdentifier);
- *
- * // Check status manually
- * const status = await monitorManager.checkSiteStatus(siteIdentifier);
- * ```
- *
- * @example Event-driven monitoring:
- *
- * ```typescript
- * import { logger } from "../utils/logger";
- *
- * // Listen for status updates
- * eventBus.onTyped("monitor:statusUpdated", (data) => {
- *     logger.info("Monitor status update", data);
- * });
- *
- * // Monitor will emit events automatically
- * await monitorManager.startMonitoring(siteIdentifier);
- * ```
- *
- * @packageDocumentation
+ * Manages scheduling, state transitions, and event propagation for every
+ * monitor by composing repository, cache, and enhanced monitoring services.
  *
  * @public
  */
 
-import type { Monitor, MonitorStatus, Site, StatusUpdate } from "@shared/types";
-import type { Logger } from "@shared/utils/logger/interfaces";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    MonitorStatus,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 
 import { shouldRemediateMonitorInterval } from "@shared/constants/monitoring";
-import { MONITOR_STATUS } from "@shared/types";
 import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
@@ -82,15 +37,22 @@ import { isDev } from "../electronUtils";
 import { MonitorScheduler } from "../services/monitoring/MonitorScheduler";
 import { logger } from "../utils/logger";
 import { withDatabaseOperation } from "../utils/operationalHooks";
+import {
+    type EnhancedLifecycleConfig,
+    type EnhancedLifecycleHost,
+    type MonitorActionDelegate,
+    startAllMonitoringEnhancedFlow,
+    startMonitoringForSiteEnhancedFlow,
+    stopAllMonitoringEnhancedFlow,
+    stopMonitoringForSiteEnhancedFlow,
+} from "./MonitorManagerEnhancedLifecycle";
 
 /**
- * Defines the dependencies required by {@link MonitorManager} for orchestration
- * and data access.
+ * Dependency contract consumed by {@link MonitorManager}.
  *
  * @remarks
- * All dependencies are injected to support testability and separation of
- * concerns. This interface is used for dependency injection in the
- * {@link MonitorManager} constructor.
+ * Supplies repositories, cache accessors, and services required for monitor
+ * orchestration.
  *
  * @public
  */
@@ -156,85 +118,28 @@ export interface MonitorManagerDependencies {
  * @public
  */
 export class MonitorManager {
-    /**
-     * Injected dependencies for orchestration and data access.
-     *
-     * @readonly
-     *
-     * @public
-     */
+    /** Injected dependencies for orchestration and data access. */
     private readonly dependencies: MonitorManagerDependencies;
 
-    /**
-     * Enhanced monitoring services for race condition prevention.
-     *
-     * @remarks
-     * Provides operation correlation and state-aware monitoring operations.
-     *
-     * @readonly
-     */
+    /** Enhanced monitoring services that coordinate stateful operations. */
     private readonly enhancedMonitoringServices!: EnhancedMonitoringServices;
 
-    /**
-     * Event bus for monitor events.
-     *
-     * @readonly
-     *
-     * @public
-     */
+    /** Typed event bus used for monitor event emission. */
     private readonly eventEmitter: TypedEventBus<UptimeEvents>;
 
-    /**
-     * Indicates if monitoring is currently active for any site or monitor.
-     *
-     * @remarks
-     * Used to track the global monitoring state.
-     *
-     * @defaultValue false
-     *
-     * @public
-     */
+    /** Tracks whether any monitors are currently active. */
     private isMonitoring = false;
 
-    /**
-     * Scheduler for monitor intervals and checks.
-     *
-     * @remarks
-     * Handles scheduling and execution of periodic monitor checks.
-     *
-     * @readonly
-     *
-     * @public
-     */
+    /** Schedules monitor checks and lifecycle callbacks. */
     private readonly monitorScheduler: MonitorScheduler;
 
     /**
-     * Manually checks a site or monitor and returns the resulting status
-     * update.
+     * Triggers an immediate monitor check and emits completion events.
      *
-     * @remarks
-     * Triggers a manual check for a site or monitor, emits a completion event,
-     * and returns the result. Uses the repository and event-driven patterns for
-     * all operations.
+     * @param identifier - Site identifier to inspect.
+     * @param monitorId - Optional monitor identifier to target.
      *
-     * @example
-     *
-     * ```ts
-     * const update = await manager.checkSiteManually(
-     *     "site-123",
-     *     "monitor-456"
-     * );
-     * ```
-     *
-     * @param identifier - The site identifier to check.
-     * @param monitorId - Optional monitor ID for targeted check.
-     *
-     * @returns The {@link StatusUpdate} for the site or monitor, or `undefined`
-     *   if not found.
-     *
-     * @throws Any error encountered during the check is logged and re-thrown.
-     *
-     * @public
+     * @returns Latest {@link StatusUpdate} when available.
      */
     public async checkSiteManually(
         identifier: string,
@@ -292,26 +197,10 @@ export class MonitorManager {
     }
 
     /**
-     * Sets up new monitors that were added to an existing site.
+     * Applies default configuration for monitors newly attached to a site.
      *
-     * @remarks
-     * Ensures new monitors receive the same initialization as those in new
-     * sites, including default interval assignment and auto-start logic.
-     *
-     * @example
-     *
-     * ```ts
-     * await manager.setupNewMonitors(siteObj, ["monitor-1", "monitor-2"]);
-     * ```
-     *
-     * @param site - The {@link Site} containing the new monitors.
-     * @param newMonitorIds - Array of new monitor IDs to set up.
-     *
-     * @returns A promise that resolves when setup is complete.
-     *
-     * @throws Any error encountered during setup is logged and re-thrown.
-     *
-     * @public
+     * @param site - Site containing the monitors.
+     * @param newMonitorIds - Monitor identifiers to initialize.
      */
     public async setupNewMonitors(
         site: Site,
@@ -353,27 +242,10 @@ export class MonitorManager {
     }
 
     /**
-     * Sets up a new site for monitoring, including initial checks, interval
-     * assignment, and auto-start logic.
+     * Prepares a site for scheduling by applying default cadence and auto-start
+     * rules.
      *
-     * @remarks
-     * Applies business rules for default intervals and auto-starting
-     * monitoring. Initial checks are handled by {@link MonitorScheduler} when
-     * monitoring starts.
-     *
-     * @example
-     *
-     * ```ts
-     * await manager.setupSiteForMonitoring(siteObj);
-     * ```
-     *
-     * @param site - The {@link Site} to set up for monitoring.
-     *
-     * @returns A promise that resolves when setup is complete.
-     *
-     * @throws Any error encountered during setup is logged and re-thrown.
-     *
-     * @public
+     * @param site - Site to prime before monitoring begins.
      */
     public async setupSiteForMonitoring(site: Site): Promise<void> {
         // Apply business rules for default intervals
@@ -396,27 +268,12 @@ export class MonitorManager {
     }
 
     /**
-     * Starts monitoring for all sites.
+     * Starts monitoring across the full fleet and emits lifecycle events.
      *
-     * @remarks
-     * Initiates monitoring for all sites and emits an internal monitoring
-     * lifecycle event. Uses the repository and event-driven patterns for all
-     * operations.
-     *
-     * @example
-     *
-     * ```ts
-     * await manager.startMonitoring();
-     * ```
-     *
-     * @returns A promise that resolves when monitoring has started.
-     *
-     * @throws Any error encountered during start is logged and re-thrown.
-     *
-     * @public
+     * @returns Summary describing attempted and successful starts.
      */
-    public async startMonitoring(): Promise<void> {
-        this.isMonitoring = await this.startAllMonitoringEnhanced(
+    public async startMonitoring(): Promise<MonitoringStartSummary> {
+        const summary = await this.startAllMonitoringEnhanced(
             {
                 databaseService: this.dependencies.databaseService,
                 eventEmitter: this.eventEmitter,
@@ -428,40 +285,52 @@ export class MonitorManager {
             this.isMonitoring
         );
 
-        // Emit internal monitoring started event for orchestrator forwarding
-        const timestamp = Date.now();
+        this.isMonitoring = summary.isMonitoring;
 
-        await this.eventEmitter.emitTyped("internal:monitor:started", {
-            identifier: "all",
-            operation: "started",
-            timestamp,
-        });
+        if (summary.partialFailures) {
+            logger.warn(
+                "[MonitorManager] startMonitoring completed with partial failures",
+                summary
+            );
+        }
+
+        if (
+            !summary.isMonitoring &&
+            summary.attempted > 0 &&
+            !summary.alreadyActive
+        ) {
+            logger.error(
+                "[MonitorManager] No monitors transitioned to an active state during startMonitoring",
+                summary
+            );
+            const error = new Error(
+                "Failed to start monitoring: no monitors reported as active"
+            );
+            // Attach summary for upstream error handling and diagnostics.
+            (error as Error & { summary?: MonitoringStartSummary }).summary =
+                summary;
+            throw error;
+        }
+
+        // Emit internal monitoring started event for orchestrator forwarding
+        if (summary.isMonitoring || summary.alreadyActive) {
+            await this.eventEmitter.emitTyped("internal:monitor:started", {
+                identifier: "all",
+                operation: "started",
+                summary,
+                timestamp: Date.now(),
+            });
+        }
+
+        return summary;
     }
 
     /**
-     * Starts monitoring for a specific site or monitor.
+     * Starts monitoring for a site or a single monitor and emits lifecycle
+     * events.
      *
-     * @remarks
-     * Initiates monitoring for a site or monitor and emits a started event.
-     * Handles recursive calls to avoid infinite loops.
-     *
-     * @example
-     *
-     * ```ts
-     * const started = await manager.startMonitoringForSite(
-     *     "site-123",
-     *     "monitor-456"
-     * );
-     * ```
-     *
-     * @param identifier - The site identifier to start monitoring for.
-     * @param monitorId - Optional monitor ID for targeted monitoring.
-     *
-     * @returns `true` if monitoring started successfully, `false` otherwise.
-     *
-     * @throws Any error encountered during start is logged and re-thrown.
-     *
-     * @public
+     * @param identifier - Site identifier being toggled.
+     * @param monitorId - Optional monitor identifier to scope the request.
      */
     public async startMonitoringForSite(
         identifier: string,
@@ -520,27 +389,12 @@ export class MonitorManager {
     }
 
     /**
-     * Stops monitoring for all sites.
+     * Stops monitoring globally and reports the resulting summary.
      *
-     * @remarks
-     * Stops all monitoring and emits an internal monitoring stopped event. Uses
-     * the repository and event-driven patterns for all operations.
-     *
-     * @example
-     *
-     * ```ts
-     * await manager.stopMonitoring();
-     * ```
-     *
-     * @returns A promise that resolves when monitoring has stopped.
-     *
-     * @throws Any error encountered during stop is logged and re-thrown.
-     *
-     * @public
+     * @returns Breakdown of attempted and successful stops.
      */
-    public async stopMonitoring(): Promise<void> {
-        // Use enhanced monitoring lifecycle which handles operation cleanup
-        this.isMonitoring = await this.stopAllMonitoringEnhanced({
+    public async stopMonitoring(): Promise<MonitoringStopSummary> {
+        const summary = await this.stopAllMonitoringEnhanced({
             databaseService: this.dependencies.databaseService,
             eventEmitter: this.eventEmitter,
             logger,
@@ -549,38 +403,49 @@ export class MonitorManager {
             sites: this.dependencies.getSitesCache(),
         });
 
+        this.isMonitoring = summary.isMonitoring;
+
+        if (summary.partialFailures) {
+            logger.warn(
+                "[MonitorManager] stopMonitoring completed with partial failures",
+                summary
+            );
+        }
+
+        if (
+            summary.isMonitoring &&
+            summary.attempted > 0 &&
+            !summary.alreadyInactive
+        ) {
+            logger.error(
+                "[MonitorManager] Some monitors failed to stop during stopMonitoring",
+                summary
+            );
+            const error = new Error(
+                "Failed to stop monitoring: one or more monitors remain active"
+            );
+            (error as Error & { summary?: MonitoringStopSummary }).summary =
+                summary;
+            throw error;
+        }
+
         await this.eventEmitter.emitTyped("internal:monitor:stopped", {
             identifier: "all",
             operation: "stopped",
             reason: "user",
+            summary,
             timestamp: Date.now(),
         });
+
+        return summary;
     }
 
     /**
-     * Stops monitoring for a specific site or monitor.
+     * Stops monitoring for a site or individual monitor and emits lifecycle
+     * events.
      *
-     * @remarks
-     * Stops monitoring for a site or monitor and emits a stopped event. Handles
-     * recursive calls to avoid infinite loops.
-     *
-     * @example
-     *
-     * ```ts
-     * const stopped = await manager.stopMonitoringForSite(
-     *     "site-123",
-     *     "monitor-456"
-     * );
-     * ```
-     *
-     * @param identifier - The site identifier to stop monitoring for.
-     * @param monitorId - Optional monitor ID for targeted stop.
-     *
-     * @returns `true` if monitoring stopped successfully, `false` otherwise.
-     *
-     * @throws Any error encountered during stop is logged and re-thrown.
-     *
-     * @public
+     * @param identifier - Site identifier being toggled.
+     * @param monitorId - Optional monitor identifier to scope the request.
      */
     public async stopMonitoringForSite(
         identifier: string,
@@ -663,70 +528,15 @@ export class MonitorManager {
      *
      * @internal
      */
-    private async startAllMonitoringEnhanced(
-        config: {
-            databaseService: DatabaseService;
-            eventEmitter: TypedEventBus<UptimeEvents>;
-            logger: Logger;
-            monitorRepository: MonitorRepository;
-            monitorScheduler: MonitorScheduler;
-            sites: StandardizedCache<Site>;
-        },
+    private startAllMonitoringEnhanced(
+        config: EnhancedLifecycleConfig,
         isMonitoring: boolean
-    ): Promise<boolean> {
-        if (isMonitoring) {
-            config.logger.debug("Monitoring already running");
-            return isMonitoring;
-        }
-
-        config.logger.info(
-            `Starting monitoring with ${config.sites.size} sites (enhanced system)`
-        );
-
-        const sites = config.sites.getAll();
-
-        await this.runSequentially(sites, async (site) => {
-            try {
-                const monitorsToStart = site.monitors.filter(
-                    (monitor): monitor is Monitor & { id: string } =>
-                        Boolean(monitor.id && monitor.checkInterval)
-                );
-
-                await this.runSequentially(
-                    monitorsToStart,
-                    async (monitorWithId) => {
-                        const started =
-                            await this.enhancedMonitoringServices.checker.startMonitoring(
-                                site.identifier,
-                                monitorWithId.id
-                            );
-
-                        if (started) {
-                            await this.applyMonitorState(
-                                site,
-                                monitorWithId,
-                                {
-                                    activeOperations: [],
-                                    monitoring: true,
-                                    status: MONITOR_STATUS.PENDING,
-                                },
-                                MONITOR_STATUS.PENDING
-                            );
-                        }
-                    }
-                );
-
-                config.monitorScheduler.startSite(site);
-            } catch (error) {
-                config.logger.error(
-                    `Failed to start monitoring for site ${site.identifier}`,
-                    error
-                );
-            }
+    ): Promise<MonitoringStartSummary> {
+        return startAllMonitoringEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            isMonitoring,
         });
-
-        config.logger.info("Started all monitoring operations (enhanced)");
-        return true;
     }
 
     /**
@@ -739,63 +549,13 @@ export class MonitorManager {
      *
      * @internal
      */
-    private async stopAllMonitoringEnhanced(config: {
-        databaseService: DatabaseService;
-        eventEmitter: TypedEventBus<UptimeEvents>;
-        logger: Logger;
-        monitorRepository: MonitorRepository;
-        monitorScheduler: MonitorScheduler;
-        sites: StandardizedCache<Site>;
-    }): Promise<boolean> {
-        config.logger.info(
-            "Stopping all monitoring operations (enhanced system)"
-        );
-
-        const sites = config.sites.getAll();
-
-        await this.runSequentially(sites, async (site) => {
-            try {
-                const monitorsToStop = site.monitors.filter(
-                    (monitor): monitor is Monitor & { id: string } =>
-                        Boolean(monitor.id && monitor.monitoring)
-                );
-
-                await this.runSequentially(
-                    monitorsToStop,
-                    async (monitorWithId) => {
-                        const stopped =
-                            await this.enhancedMonitoringServices.checker.stopMonitoring(
-                                site.identifier,
-                                monitorWithId.id
-                            );
-
-                        if (stopped) {
-                            await this.applyMonitorState(
-                                site,
-                                monitorWithId,
-                                {
-                                    activeOperations: [],
-                                    monitoring: false,
-                                    status: MONITOR_STATUS.PAUSED,
-                                },
-                                MONITOR_STATUS.PAUSED
-                            );
-                        }
-                    }
-                );
-            } catch (error) {
-                config.logger.error(
-                    `Failed to stop monitoring for site ${site.identifier}`,
-                    error
-                );
-            }
+    private stopAllMonitoringEnhanced(
+        config: EnhancedLifecycleConfig
+    ): Promise<MonitoringStopSummary> {
+        return stopAllMonitoringEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
         });
-
-        // Stop all scheduled operations after state updates are complete
-        config.monitorScheduler.stopAll();
-
-        config.logger.info("Stopped all monitoring operations (enhanced)");
-        return false;
     }
 
     /**
@@ -811,112 +571,19 @@ export class MonitorManager {
      *
      * @internal
      */
-    private async startMonitoringForSiteEnhanced(
-        config: {
-            databaseService: DatabaseService;
-            eventEmitter: TypedEventBus<UptimeEvents>;
-            logger: Logger;
-            monitorRepository: MonitorRepository;
-            monitorScheduler: MonitorScheduler;
-            sites: StandardizedCache<Site>;
-        },
+    private startMonitoringForSiteEnhanced(
+        config: EnhancedLifecycleConfig,
         identifier: string,
         monitorId?: string,
-        monitorAction?: (
-            identifier: string,
-            monitorId?: string
-        ) => Promise<boolean>
+        monitorAction?: MonitorActionDelegate
     ): Promise<boolean> {
-        const site = config.sites.get(identifier);
-        if (!site) {
-            config.logger.warn(`Site not found: ${identifier}`);
-            return false;
-        }
-
-        if (monitorId) {
-            // Start specific monitor
-            const monitor = site.monitors.find((m) => m.id === monitorId);
-            if (!monitor?.id) {
-                config.logger.warn(
-                    `Monitor ${monitorId} not found in site ${identifier}`
-                );
-                return false;
-            }
-
-            if (!monitor.checkInterval) {
-                config.logger.warn(
-                    `Monitor ${identifier}:${monitorId} has no valid check interval set`
-                );
-                return false;
-            }
-
-            try {
-                const result =
-                    await this.enhancedMonitoringServices.checker.startMonitoring(
-                        identifier,
-                        monitorId
-                    );
-
-                if (result) {
-                    await this.applyMonitorState(
-                        site,
-                        monitor,
-                        {
-                            activeOperations: [],
-                            monitoring: true,
-                            status: MONITOR_STATUS.PENDING,
-                        },
-                        MONITOR_STATUS.PENDING
-                    );
-
-                    config.logger.debug(
-                        `Started monitoring for ${identifier}:${monitorId} (enhanced)`
-                    );
-                    return config.monitorScheduler.startMonitor(
-                        identifier,
-                        monitor
-                    );
-                }
-                return false;
-            } catch (error) {
-                config.logger.error(
-                    `Enhanced start failed for ${identifier}:${monitorId}`,
-                    error
-                );
-                return false;
-            }
-        }
-
-        // Start all monitors in site sequentially - succeed if any monitor starts
-        const validMonitors = site.monitors.filter(
-            (monitor): monitor is Monitor & { id: string } =>
-                Boolean(monitor.id)
-        );
-
-        let hasSuccessfulStart = false;
-
-        await this.runSequentially(validMonitors, async (monitorWithId) => {
-            try {
-                const result = monitorAction
-                    ? await monitorAction(identifier, monitorWithId.id)
-                    : await this.startMonitoringForSiteEnhanced(
-                          config,
-                          identifier,
-                          monitorWithId.id
-                      );
-
-                if (result) {
-                    hasSuccessfulStart = true;
-                }
-            } catch (error) {
-                config.logger.error(
-                    `Enhanced start failed for ${identifier}:${monitorWithId.id}`,
-                    error
-                );
-            }
+        return startMonitoringForSiteEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            identifier,
+            ...(monitorId === undefined ? {} : { monitorId }),
+            ...(monitorAction === undefined ? {} : { monitorAction }),
         });
-
-        return hasSuccessfulStart;
     }
 
     /**
@@ -932,126 +599,25 @@ export class MonitorManager {
      *
      * @internal
      */
-    private async stopMonitoringForSiteEnhanced(
-        config: {
-            databaseService: DatabaseService;
-            eventEmitter: TypedEventBus<UptimeEvents>;
-            logger: Logger;
-            monitorRepository: MonitorRepository;
-            monitorScheduler: MonitorScheduler;
-            sites: StandardizedCache<Site>;
-        },
+    private stopMonitoringForSiteEnhanced(
+        config: EnhancedLifecycleConfig,
         identifier: string,
         monitorId?: string,
-        monitorAction?: (
-            identifier: string,
-            monitorId?: string
-        ) => Promise<boolean>
+        monitorAction?: MonitorActionDelegate
     ): Promise<boolean> {
-        const site = config.sites.get(identifier);
-        if (!site) {
-            config.logger.warn(`Site not found: ${identifier}`);
-            return false;
-        }
-
-        if (monitorId) {
-            // Stop specific monitor
-            const monitor = site.monitors.find((m) => m.id === monitorId);
-            if (!monitor?.id) {
-                config.logger.warn(
-                    `Monitor ${monitorId} not found in site ${identifier}`
-                );
-                return false;
-            }
-
-            try {
-                const result =
-                    await this.enhancedMonitoringServices.checker.stopMonitoring(
-                        identifier,
-                        monitorId
-                    );
-
-                if (result) {
-                    await this.applyMonitorState(
-                        site,
-                        monitor,
-                        {
-                            activeOperations: [],
-                            monitoring: false,
-                            status: MONITOR_STATUS.PAUSED,
-                        },
-                        MONITOR_STATUS.PAUSED
-                    );
-
-                    config.logger.debug(
-                        `Stopped monitoring for ${identifier}:${monitorId} (enhanced)`
-                    );
-                    return config.monitorScheduler.stopMonitor(
-                        identifier,
-                        monitorId
-                    );
-                }
-                return false;
-            } catch (error) {
-                config.logger.error(
-                    `Enhanced stop failed for ${identifier}:${monitorId}`,
-                    error
-                );
-                return false;
-            }
-        }
-
-        // Stop all monitors in site sequentially - fail if any monitor fails to stop
-        const validMonitors = site.monitors.filter(
-            (monitor): monitor is Monitor & { id: string } =>
-                Boolean(monitor.id && monitor.monitoring)
-        );
-
-        let allStoppedSuccessfully = true;
-
-        await this.runSequentially(validMonitors, async (monitorWithId) => {
-            try {
-                const result = monitorAction
-                    ? await monitorAction(identifier, monitorWithId.id)
-                    : await this.stopMonitoringForSiteEnhanced(
-                          config,
-                          identifier,
-                          monitorWithId.id
-                      );
-
-                if (!result) {
-                    allStoppedSuccessfully = false;
-                }
-            } catch (error) {
-                config.logger.error(
-                    `Enhanced stop failed for ${identifier}:${monitorWithId.id}`,
-                    error
-                );
-                allStoppedSuccessfully = false;
-            }
+        return stopMonitoringForSiteEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            identifier,
+            ...(monitorId === undefined ? {} : { monitorId }),
+            ...(monitorAction === undefined ? {} : { monitorAction }),
         });
-
-        return allStoppedSuccessfully;
     }
 
     /**
-     * Applies default check intervals for monitors that do not have one set.
+     * Ensures every monitor in the site respects the shared minimum interval.
      *
-     * @remarks
-     * Ensures all monitors have a check interval set according to business
-     * rules. Updates the database first, then allows the cache/state to be
-     * updated through proper channels.
-     *
-     * @param site - The {@link Site} whose monitors should be checked for
-     *   default interval assignment.
-     *
-     * @returns A promise that resolves when all applicable monitors have been
-     *   updated.
-     *
-     * @throws Any error encountered during database update is logged and
-     *   re-thrown.
-     *
-     * @internal
+     * @param site - Site whose monitors need remediation.
      */
     private async applyDefaultIntervals(site: Site): Promise<void> {
         logger.debug(
@@ -1138,20 +704,7 @@ export class MonitorManager {
         );
     }
 
-    /**
-     * Automatically starts monitoring if appropriate according to business
-     * rules.
-     *
-     * @remarks
-     * Site-level monitoring acts as a master switch. Only monitors with
-     * monitoring enabled are started.
-     *
-     * @param site - The {@link Site} to evaluate for auto-start.
-     *
-     * @returns A promise that resolves when auto-start logic is complete.
-     *
-     * @internal
-     */
+    /** Applies auto-start rules for a site that has newly loaded monitors. */
     private async autoStartMonitoringIfAppropriate(site: Site): Promise<void> {
         logger.debug(
             `[MonitorManager] Evaluating auto-start for site: ${site.identifier} (site.monitoring: ${site.monitoring})`
@@ -1227,19 +780,7 @@ export class MonitorManager {
         );
     }
 
-    /**
-     * Auto-starts monitoring for new monitors if appropriate.
-     *
-     * @remarks
-     * Only monitors with monitoring enabled will be auto-started.
-     *
-     * @param site - The {@link Site} containing the new monitors.
-     * @param newMonitors - Array of new monitors to potentially auto-start.
-     *
-     * @returns A promise that resolves when auto-start logic is complete.
-     *
-     * @internal
-     */
+    /** Auto-starts eligible monitors that have just been added to a site. */
     private async autoStartNewMonitors(
         site: Site,
         newMonitors: Site["monitors"]
@@ -1316,22 +857,7 @@ export class MonitorManager {
         }
     }
 
-    /**
-     * Sets up individual new monitors.
-     *
-     * @remarks
-     * New monitors are handled differently as they have not been persisted yet.
-     * Default intervals are applied directly to the monitor objects before they
-     * are saved to the database. Auto-start logic is also applied if
-     * appropriate.
-     *
-     * @param site - The {@link Site} containing the new monitors.
-     * @param newMonitors - Array of new monitors to set up.
-     *
-     * @returns A promise that resolves when setup is complete.
-     *
-     * @internal
-     */
+    /** Applies default intervals and optional auto-start for new monitors. */
     private async setupIndividualNewMonitors(
         site: Site,
         newMonitors: Site["monitors"]
@@ -1367,21 +893,12 @@ export class MonitorManager {
     }
 
     /**
-     * Applies monitor state changes to cache, database, and emits
-     * status-changed events.
+     * Applies state changes, writes them to the database, and emits events.
      *
-     * @remarks
-     * This helper ensures consistency between cache updates, database
-     * persistence, and event emission for monitor status changes. Used by
-     * enhanced lifecycle methods to maintain parity with the former monitoring
-     * implementation behavior.
-     *
-     * @param site - Site containing the monitor
-     * @param monitor - Monitor to update
-     * @param changes - Partial monitor changes to apply
-     * @param newStatus - New monitor status for event emission
-     *
-     * @internal
+     * @param site - Site containing the monitor.
+     * @param monitor - Monitor to update.
+     * @param changes - Partial mutations to persist.
+     * @param newStatus - Status used for downstream notifications.
      */
     private async applyMonitorState(
         site: Site,
@@ -1441,46 +958,24 @@ export class MonitorManager {
     }
 
     /**
-     * Constructs a new {@link MonitorManager} instance with enhanced monitoring
-     * capabilities.
+     * Builds the lifecycle context consumed by enhanced monitoring helpers.
      *
-     * @remarks
-     * All dependencies are injected to support testability and separation of
-     * concerns. The enhanced monitoring services are required and provide race
-     * condition prevention, operation correlation, and advanced timeout
-     * management for all monitoring operations.
+     * @returns Bound callbacks and services required for helper execution.
+     */
+    private createEnhancedLifecycleHost(): EnhancedLifecycleHost {
+        return {
+            applyMonitorState: this.applyMonitorState.bind(this),
+            runSequentially: this.runSequentially.bind(this),
+            services: this.enhancedMonitoringServices,
+        };
+    }
+
+    /**
+     * Creates a new manager using the supplied dependencies and enhanced
+     * services.
      *
-     * **Architecture Integration:**
-     *
-     * - Enhanced services are always provided by the ServiceContainer
-     * - No fallback to prior monitoring systems
-     * - All monitoring operations use the unified enhanced system
-     * - Operation correlation prevents race conditions across concurrent
-     *   operations
-     *
-     * @example Basic Construction
-     *
-     * ```typescript
-     * const manager = new MonitorManager(dependencies, enhancedServices);
-     * ```
-     *
-     * @example Via ServiceContainer (Recommended)
-     *
-     * ```typescript
-     * const container = ServiceContainer.getInstance();
-     * const manager = container.getMonitorManager();
-     * // Enhanced services are automatically provided
-     * ```
-     *
-     * @param dependencies - The required {@link MonitorManagerDependencies} for
-     *   orchestration and data access
-     * @param enhancedServices - The required {@link EnhancedMonitoringServices}
-     *   for advanced monitoring capabilities
-     *
-     * @public
-     *
-     * @see {@link EnhancedMonitoringServices} for enhanced monitoring capabilities
-     * @see {@link ServiceContainer} for dependency injection and service creation
+     * @param dependencies - Data, cache, and event collaborators.
+     * @param enhancedServices - Enhanced monitoring orchestrator bundle.
      */
     public constructor(
         dependencies: MonitorManagerDependencies,
@@ -1495,50 +990,16 @@ export class MonitorManager {
         );
     }
 
-    /**
-     * Gets the count of active monitors currently being scheduled.
-     *
-     * @remarks
-     * Returns the number of monitors that are currently scheduled for periodic
-     * checks.
-     *
-     * @example
-     *
-     * ```ts
-     * const count = manager.getActiveMonitorCount();
-     * ```
-     *
-     * @returns The number of active monitors in the scheduler.
-     *
-     * @public
-     */
+    /** Returns the number of monitors currently scheduled for checks. */
     public getActiveMonitorCount(): number {
         return this.monitorScheduler.getActiveCount();
     }
 
     /**
-     * Checks if a specific monitor is actively being scheduled for checks.
+     * Checks whether a specific monitor currently has a scheduled job.
      *
-     * @remarks
-     * Returns whether the given monitor is currently scheduled for periodic
-     * checks by the scheduler.
-     *
-     * @example
-     *
-     * ```ts
-     * const isActive = manager.isMonitorActiveInScheduler(
-     *     "site-123",
-     *     "monitor-456"
-     * );
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site.
-     * @param monitorId - The monitor ID to check.
-     *
-     * @returns `true` if the monitor is active in the scheduler, `false`
-     *   otherwise.
-     *
-     * @public
+     * @param siteIdentifier - Site containing the monitor.
+     * @param monitorId - Monitor identifier under inspection.
      */
     public isMonitorActiveInScheduler(
         siteIdentifier: string,
@@ -1547,45 +1008,16 @@ export class MonitorManager {
         return this.monitorScheduler.isMonitoring(siteIdentifier, monitorId);
     }
 
-    /**
-     * Indicates whether monitoring is currently active for any site or monitor.
-     *
-     * @remarks
-     * Returns the global monitoring state.
-     *
-     * @returns `true` if monitoring is active, `false` otherwise.
-     *
-     * @public
-     */
+    /** Reports whether any monitors are currently active. */
     public isMonitoringActive(): boolean {
         return this.isMonitoring;
     }
 
     /**
-     * Restarts monitoring for a specific monitor with updated configuration.
+     * Restarts a monitor after its configuration changes.
      *
-     * @remarks
-     * Useful when monitor intervals or settings change and need immediate
-     * application. Delegates to the {@link MonitorScheduler} for actual restart
-     * logic.
-     *
-     * @example
-     *
-     * ```ts
-     * const success = manager.restartMonitorWithNewConfig(
-     *     "site-123",
-     *     monitorObj
-     * );
-     * ```
-     *
-     * @param siteIdentifier - The identifier of the site containing the
-     *   monitor.
-     * @param monitor - The monitor object with updated configuration.
-     *
-     * @returns `true` if the monitor was successfully restarted, `false`
-     *   otherwise.
-     *
-     * @public
+     * @param siteIdentifier - Site containing the monitor.
+     * @param monitor - Updated monitor definition.
      */
     public restartMonitorWithNewConfig(
         siteIdentifier: string,
@@ -1595,20 +1027,9 @@ export class MonitorManager {
     }
 
     /**
-     * Determines if a monitor should receive a default interval.
+     * Determines whether the default interval should be applied to a monitor.
      *
-     * @remarks
-     * Checks for falsy `checkInterval` values. Zero is considered a valid
-     * interval and will not trigger default assignment. The type system
-     * guarantees `checkInterval` is a number, but runtime values may still be
-     * falsy due to initialization or data import scenarios.
-     *
-     * @param monitor - The monitor to check for default interval application.
-     *
-     * @returns `true` if the monitor should receive the default interval,
-     *   `false` otherwise.
-     *
-     * @internal
+     * @param monitor - Monitor candidate for remediation.
      */
     private shouldApplyDefaultInterval(monitor: Site["monitors"][0]): boolean {
         return shouldRemediateMonitorInterval(monitor.checkInterval);

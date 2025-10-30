@@ -228,6 +228,7 @@ export default [
         },
         rules: {
             "uptime-watcher/electron-no-console": "error",
+            "uptime-watcher/electron-no-renderer-import": "error",
         },
     },
     {
@@ -257,6 +258,16 @@ export default [
         },
     },
     {
+        files: ["shared/**/*.{ts,tsx,cts,mts}"],
+        name: "Shared Layer Isolation",
+        plugins: {
+            "uptime-watcher": uptimeWatcherPlugin,
+        },
+        rules: {
+            "uptime-watcher/shared-no-outside-imports": "error",
+        },
+    },
+    {
         files: ["src/**/*.{ts,tsx,mts,cts,mjs,js,jsx,cjs}"],
         ignores: ["src/test/**/*"],
         name: "Renderer Electron Isolation",
@@ -264,6 +275,7 @@ export default [
             "uptime-watcher": uptimeWatcherPlugin,
         },
         rules: {
+            "uptime-watcher/renderer-no-browser-dialogs": "error",
             "uptime-watcher/renderer-no-electron-import": "error",
         },
     },
@@ -628,6 +640,7 @@ export default [
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
+            "package-json/exports-subpaths-style": "warn",
             "package-json/no-empty-fields": "warn",
             // Package.json Plugin Rules (package-json/*)
             "package-json/no-redundant-files": "warn",
@@ -642,6 +655,7 @@ export default [
             "package-json/require-engines": "warn",
             "package-json/require-files": "off", // Not needed for Electron applications
             "package-json/require-keywords": "warn",
+            "package-json/require-license": "warn",
             "package-json/require-name": "warn",
             "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
             "package-json/require-peerDependencies": "off",
@@ -827,6 +841,7 @@ export default [
             "css/no-invalid-properties": "off",
             "css/prefer-logical-properties": "warn",
             "css/relative-font-units": "warn",
+            "css/selector-complexity": "off",
             "css/use-baseline": "off",
             "css/use-layers": "off",
         },
@@ -1197,6 +1212,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1304,7 +1320,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -1315,9 +1331,13 @@ export default [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/dom/no-missing-button-type": "warn",
+            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
+            "@eslint-react/dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-void-elements-with-children": "warn",
+            "@eslint-react/dom/prefer-namespace-import": "warn",
             "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
@@ -1350,7 +1370,10 @@ export default [
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unstable-context-value": "warn",
+            "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
+            "@eslint-react/no-unused-state": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
@@ -1548,6 +1571,7 @@ export default [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -1821,6 +1845,7 @@ export default [
             // "no-console": "warn", // Allow in development, but warn - DISABLED FOR NOW
             "consistent-return": "warn",
             "css/no-invalid-properties": "off",
+            "css/selector-complexity": "off",
             curly: [
                 "error",
                 "all",
@@ -2228,6 +2253,16 @@ export default [
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks/automatic-effect-dependencies": "warn",
+            "react-hooks/capitalized-calls": "warn",
+            "react-hooks/fbt": "warn",
+            "react-hooks/fire": "warn",
+            "react-hooks/hooks": "warn",
+            "react-hooks/invariant": "warn",
+            "react-hooks/memoized-effect-dependencies": "warn",
+            "react-hooks/no-deriving-state-in-effects": "warn",
+            "react-hooks/rule-suppression": "warn",
+            "react-hooks/syntax": "warn",
             "react/forbid-component-props": "off",
             // Disable problematic rules for Docusaurus
             "react/function-component-definition": "off", // Allow Docusaurus component patterns
@@ -2467,6 +2502,7 @@ export default [
             "css/no-important": "off", // Allow !important in Docusaurus CSS
             "css/no-invalid-at-rules": "off",
             "css/no-invalid-properties": "off",
+            "css/selector-complexity": "off",
             "css/use-baseline": "off",
             // CSS Classes Rules (undefined-css-classes/*)
             "undefined-css-classes/no-undefined-css-classes": "warn",
@@ -2551,6 +2587,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2675,7 +2712,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -2687,9 +2724,13 @@ export default [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/dom/no-missing-button-type": "warn",
+            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
+            "@eslint-react/dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-void-elements-with-children": "warn",
+            "@eslint-react/dom/prefer-namespace-import": "warn",
             "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
@@ -2722,7 +2763,10 @@ export default [
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unstable-context-value": "warn",
+            "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
+            "@eslint-react/no-unused-state": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
@@ -2932,6 +2976,7 @@ export default [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -3550,9 +3595,19 @@ export default [
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks/automatic-effect-dependencies": "warn",
+            "react-hooks/capitalized-calls": "warn",
             // React Hooks
             "react-hooks/exhaustive-deps": "warn",
+            "react-hooks/fbt": "warn",
+            "react-hooks/fire": "warn",
+            "react-hooks/hooks": "warn",
+            "react-hooks/invariant": "warn",
+            "react-hooks/memoized-effect-dependencies": "warn",
+            "react-hooks/no-deriving-state-in-effects": "warn",
+            "react-hooks/rule-suppression": "warn",
             "react-hooks/rules-of-hooks": "error",
+            "react-hooks/syntax": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
                 { allowComponentDidCatch: false },
@@ -4114,6 +4169,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4223,16 +4279,20 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/dom/no-missing-button-type": "warn",
+            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
+            "@eslint-react/dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-void-elements-with-children": "warn",
+            "@eslint-react/dom/prefer-namespace-import": "warn",
             "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
@@ -4264,7 +4324,10 @@ export default [
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unstable-context-value": "warn",
+            "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
+            "@eslint-react/no-unused-state": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
@@ -4473,6 +4536,7 @@ export default [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -5160,6 +5224,16 @@ export default [
             "promise/prefer-catch": "warn",
             "promise/spec-only": "warn",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks/automatic-effect-dependencies": "warn",
+            "react-hooks/capitalized-calls": "warn",
+            "react-hooks/fbt": "warn",
+            "react-hooks/fire": "warn",
+            "react-hooks/hooks": "warn",
+            "react-hooks/invariant": "warn",
+            "react-hooks/memoized-effect-dependencies": "warn",
+            "react-hooks/no-deriving-state-in-effects": "warn",
+            "react-hooks/rule-suppression": "warn",
+            "react-hooks/syntax": "warn",
             // Security for backend
             "redos/no-vulnerable": "error",
             // RegExp
@@ -5468,6 +5542,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5591,6 +5666,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -5600,9 +5676,13 @@ export default [
             "@eslint-community/eslint-comments/no-use": "off",
             "@eslint-community/eslint-comments/require-description": "warn",
             "@eslint-react/avoid-shorthand-boolean": "off",
+            "@eslint-react/dom/no-missing-button-type": "warn",
+            "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
             "@eslint-react/dom/no-unknown-property": "warn",
+            "@eslint-react/dom/no-unsafe-target-blank": "warn",
             /* DOM subplugin */
             "@eslint-react/dom/no-void-elements-with-children": "warn",
+            "@eslint-react/dom/prefer-namespace-import": "warn",
             "@eslint-react/hooks-extra/ensure-use-callback-has-non-empty-deps":
                 "off",
             "@eslint-react/hooks-extra/ensure-use-memo-has-non-empty-deps":
@@ -5635,7 +5715,10 @@ export default [
             "@eslint-react/no-unnecessary-use-callback": "off",
             "@eslint-react/no-unnecessary-use-memo": "off",
             "@eslint-react/no-unnecessary-use-prefix": "warn",
+            "@eslint-react/no-unstable-context-value": "warn",
+            "@eslint-react/no-unstable-default-props": "warn",
             "@eslint-react/no-unused-props": "warn",
+            "@eslint-react/no-unused-state": "warn",
             "@eslint-react/no-useless-forward-ref": "warn",
             "@eslint-react/no-useless-fragment": "warn",
             "@eslint-react/prefer-destructuring-assignment": "warn",
@@ -5845,6 +5928,7 @@ export default [
             ],
             "@typescript-eslint/no-shadow": "warn",
             "@typescript-eslint/no-this-alias": "warn",
+            "@typescript-eslint/no-type-alias": "off",
             "@typescript-eslint/no-unnecessary-boolean-literal-compare": "warn",
             // Null safety for backend operations
             "@typescript-eslint/no-unnecessary-condition": [
@@ -6494,9 +6578,19 @@ export default [
             "react-form-fields/styled-no-only-value-prop": "error",
             "react-hook-form/no-use-watch": "error",
             "react-hooks-addons/no-unused-deps": "warn",
+            "react-hooks/automatic-effect-dependencies": "warn",
+            "react-hooks/capitalized-calls": "warn",
             // React Hooks
             "react-hooks/exhaustive-deps": "warn",
+            "react-hooks/fbt": "warn",
+            "react-hooks/fire": "warn",
+            "react-hooks/hooks": "warn",
+            "react-hooks/invariant": "warn",
+            "react-hooks/memoized-effect-dependencies": "warn",
+            "react-hooks/no-deriving-state-in-effects": "warn",
+            "react-hooks/rule-suppression": "warn",
             "react-hooks/rules-of-hooks": "error",
+            "react-hooks/syntax": "warn",
             "react-prefer-function-component/react-prefer-function-component": [
                 "error",
                 { allowComponentDidCatch: false },

@@ -11,7 +11,11 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
-import type { Site } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+} from "@shared/types";
 import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
@@ -699,8 +703,26 @@ describe("SiteWriterService Coverage Tests", () => {
             mockMonitoringConfig = {
                 setHistoryLimit: vi.fn(),
                 setupNewMonitors: vi.fn().mockResolvedValue(undefined),
-                startMonitoring: vi.fn().mockResolvedValue(undefined),
-                stopMonitoring: vi.fn().mockResolvedValue(undefined),
+                startMonitoring: vi.fn().mockResolvedValue({
+                    attempted: 1,
+                    failed: 0,
+                    partialFailures: false,
+                    siteCount: 1,
+                    skipped: 0,
+                    succeeded: 1,
+                    isMonitoring: true,
+                    alreadyActive: false,
+                } satisfies MonitoringStartSummary),
+                stopMonitoring: vi.fn().mockResolvedValue({
+                    attempted: 1,
+                    failed: 0,
+                    partialFailures: false,
+                    siteCount: 1,
+                    skipped: 0,
+                    succeeded: 1,
+                    isMonitoring: false,
+                    alreadyInactive: false,
+                } satisfies MonitoringStopSummary),
             };
         });
 

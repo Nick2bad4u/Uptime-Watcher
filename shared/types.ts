@@ -420,6 +420,68 @@ export interface StatusUpdate {
 }
 
 /**
+ * Summary metrics describing the outcome of a monitoring lifecycle operation.
+ *
+ * @remarks
+ * Produced by Electron monitoring managers after attempting to start or stop
+ * monitoring across multiple sites. Provides aggregate counts that renderer
+ * components and diagnostics tooling can use to surface user feedback and
+ * telemetry without inspecting internal logs.
+ *
+ * @public
+ */
+export interface MonitoringOperationSummary {
+    /**
+     * Number of monitors that were eligible and attempted during the operation.
+     */
+    readonly attempted: number;
+    /**
+     * Number of monitors that failed to change state because the backend
+     * returned an error or `false`.
+     */
+    readonly failed: number;
+    /**
+     * Reflects the resulting global monitoring state after the operation has
+     * completed.
+     */
+    readonly isMonitoring: boolean;
+    /**
+     * Indicates whether any failures were recorded while still having at least
+     * one monitor succeed.
+     */
+    readonly partialFailures: boolean;
+    /** Number of site configurations evaluated during the operation. */
+    readonly siteCount: number;
+    /**
+     * Number of monitors skipped automatically (missing identifiers or already
+     * satisfied state).
+     */
+    readonly skipped: number;
+    /** Number of monitors that completed the requested operation successfully. */
+    readonly succeeded: number;
+}
+
+/**
+ * Summary returned after attempting to start global monitoring.
+ *
+ * @public
+ */
+export interface MonitoringStartSummary extends MonitoringOperationSummary {
+    /** `true` when monitoring was already active before the start request. */
+    readonly alreadyActive: boolean;
+}
+
+/**
+ * Summary returned after attempting to stop global monitoring.
+ *
+ * @public
+ */
+export interface MonitoringStopSummary extends MonitoringOperationSummary {
+    /** `true` when monitoring was already inactive at the time of the request. */
+    readonly alreadyInactive: boolean;
+}
+
+/**
  * Validates that active operation identifiers are well-formed strings.
  *
  * @param activeOperations - Value supplied for the `activeOperations` field.

@@ -14,7 +14,13 @@ import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import { type Site, type Monitor, BASE_MONITOR_TYPES } from "@shared/types";
+import {
+    BASE_MONITOR_TYPES,
+    type Monitor,
+    type MonitoringStartSummary,
+    type MonitoringStopSummary,
+    type Site,
+} from "@shared/types";
 
 // Mock Electron modules
 vi.mock("electron", () => ({
@@ -173,6 +179,9 @@ describe("IpcService - Comprehensive Coverage", () => {
         },
     ];
 
+    let startSummary: MonitoringStartSummary;
+    let stopSummary: MonitoringStopSummary;
+
     beforeEach(() => {
         vi.clearAllMocks();
 
@@ -199,6 +208,26 @@ describe("IpcService - Comprehensive Coverage", () => {
 
         // Create mock services with all required methods
         let historyLimit = 1000; // Track the history limit value
+        startSummary = {
+            attempted: 4,
+            failed: 0,
+            partialFailures: false,
+            siteCount: mockSites.length,
+            skipped: 0,
+            succeeded: 4,
+            isMonitoring: true,
+            alreadyActive: false,
+        };
+        stopSummary = {
+            attempted: 4,
+            failed: 0,
+            partialFailures: false,
+            siteCount: mockSites.length,
+            skipped: 0,
+            succeeded: 4,
+            isMonitoring: false,
+            alreadyInactive: false,
+        };
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
@@ -206,8 +235,8 @@ describe("IpcService - Comprehensive Coverage", () => {
             getCachedSiteCount: vi.fn().mockReturnValue(mockSites.length),
             updateSite: vi.fn().mockResolvedValue(mockSites[0]!),
             removeMonitor: vi.fn().mockResolvedValue(mockSites[0]!),
-            startMonitoring: vi.fn().mockResolvedValue(undefined),
-            stopMonitoring: vi.fn().mockResolvedValue(undefined),
+            startMonitoring: vi.fn().mockResolvedValue(startSummary),
+            stopMonitoring: vi.fn().mockResolvedValue(stopSummary),
             startMonitoringForSite: vi.fn().mockResolvedValue(true),
             stopMonitoringForSite: vi.fn().mockResolvedValue(true),
             checkSiteManually: vi.fn().mockResolvedValue(true),
@@ -526,7 +555,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.startMonitoring).toHaveBeenCalled();
             expect(result).toEqual({
                 success: true,
-                data: true,
+                data: startSummary,
                 metadata: {
                     duration: expect.any(Number),
                     handler: expect.any(String),
@@ -554,7 +583,7 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(mockUptimeOrchestrator.stopMonitoring).toHaveBeenCalled();
             expect(result).toEqual({
                 success: true,
-                data: true,
+                data: stopSummary,
                 metadata: {
                     duration: expect.any(Number),
                     handler: expect.any(String),

@@ -57,9 +57,9 @@ describe("Monitoring Service Constants", () => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitoring constants", "component");
             await annotate("Constant: MIN_CHECK_INTERVAL", "constant");
-            await annotate("Expected value: 1000ms (1 second)", "expected");
+            await annotate("Expected value: 5000ms (5 seconds)", "expected");
 
-            expect(MIN_CHECK_INTERVAL).toBe(1000);
+            expect(MIN_CHECK_INTERVAL).toBe(5000);
             expect(typeof MIN_CHECK_INTERVAL).toBe("number");
         });
 
@@ -117,8 +117,8 @@ describe("Monitoring Service Constants", () => {
                 "performance"
             );
 
-            // Minimum check interval should be at least 100ms (avoid spam)
-            expect(MIN_CHECK_INTERVAL).toBeGreaterThanOrEqual(100);
+            // Minimum check interval should remain sufficiently high to avoid hot loops
+            expect(MIN_CHECK_INTERVAL).toBeGreaterThanOrEqual(5000);
 
             // Default timeout should be reasonable (5-120 seconds)
             expect(DEFAULT_MONITOR_TIMEOUT_SECONDS).toBeGreaterThanOrEqual(5);
@@ -253,7 +253,9 @@ describe("Monitoring Service Constants", () => {
 
             const defaultTimeoutMs =
                 DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
-            expect(MIN_CHECK_INTERVAL).toBeLessThan(defaultTimeoutMs / 10); // At least 10x difference
+            expect(defaultTimeoutMs).toBeGreaterThanOrEqual(
+                MIN_CHECK_INTERVAL * 6
+            ); // Ensure timeout significantly exceeds minimum interval
         });
 
         it("should have retry attempts appropriate for timeout duration", async ({
@@ -403,7 +405,7 @@ describe("Monitoring Service Constants", () => {
             );
 
             // Simulate a monitoring check with retries
-            const checkInterval = MIN_CHECK_INTERVAL * 60; // 1 minute intervals
+            const checkInterval = MIN_CHECK_INTERVAL * 60; // 5 minute intervals
             const timeoutMs =
                 DEFAULT_MONITOR_TIMEOUT_SECONDS * SECONDS_TO_MS_MULTIPLIER;
             const bufferMs = MONITOR_TIMEOUT_BUFFER_MS;
@@ -435,7 +437,7 @@ describe("Monitoring Service Constants", () => {
             expect(timeoutMs).toBeGreaterThan(frequentCheckInterval * 5); // At least 5x longer
 
             // Should allow for buffer time
-            expect(MONITOR_TIMEOUT_BUFFER_MS).toBeGreaterThan(
+            expect(MONITOR_TIMEOUT_BUFFER_MS).toBeGreaterThanOrEqual(
                 frequentCheckInterval
             );
         });

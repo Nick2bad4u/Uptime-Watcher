@@ -20,6 +20,7 @@ import {
     beforeEach,
     type MockedFunction,
 } from "vitest";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { Site } from "@shared/types";
 import type { Database } from "node-sqlite3-wasm";
 
@@ -517,7 +518,12 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 "../../../utils/operationalHooks"
             );
             const mockSites: ImportSite[] = [
-                { identifier: "site1", name: "Site 1", monitors: [] },
+                {
+                    identifier: "site1",
+                    monitoring: false,
+                    name: "Site 1",
+                    monitors: [],
+                },
                 { identifier: "site2", name: "Site 2" }, // No monitors
             ];
             const mockSettings = { theme: "dark", historyLimit: "500" };
@@ -559,7 +565,7 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
             expect(
                 mockRepositories.site.bulkInsertInternal
             ).toHaveBeenCalledWith(mockDatabase, [
-                { identifier: "site1", name: "Site 1", monitoring: true },
+                { identifier: "site1", name: "Site 1", monitoring: false },
                 { identifier: "site2", name: "Site 2", monitoring: true },
             ]);
             expect(
@@ -600,6 +606,67 @@ describe("DataImportExportService - Comprehensive Coverage", () => {
                 { identifier: "site1", monitoring: true }, // No name property
                 { identifier: "site2", monitoring: true }, // No name property for empty string
             ]);
+        });
+
+        it("should clamp imported monitor intervals below the shared minimum", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DataImportExportService", "component");
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Data Sanitization", "type");
+
+            const { withDatabaseOperation } = await import(
+                "../../../utils/operationalHooks"
+            );
+            const lowIntervalMonitor = {
+                checkInterval: 1000,
+                history: [],
+                id: "monitor-1",
+                monitoring: true,
+                retryAttempts: 3,
+                timeout: 5000,
+                type: "http" as const,
+                url: "https://example.com",
+            };
+
+            const mockSites: ImportSite[] = [
+                {
+                    identifier: "site-with-low-interval",
+                    monitors: [lowIntervalMonitor as any],
+                },
+            ];
+
+            (withDatabaseOperation as MockedFunction<any>).mockImplementation(
+                async (operation: any) => await operation()
+            );
+
+            mockRepositories.monitor.bulkCreate.mockResolvedValue([
+                { ...lowIntervalMonitor, id: "created-monitor" },
+            ]);
+
+            await service.persistImportedData(mockSites, {});
+
+            expect(mockRepositories.monitor.bulkCreate).toHaveBeenCalledWith(
+                "site-with-low-interval",
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                        id: "monitor-1",
+                    }),
+                ])
+            );
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[DataImportExportService] Imported monitor checkInterval below minimum; clamping to shared floor",
+                expect.objectContaining({
+                    minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
+                    monitorId: "monitor-1",
+                    originalInterval: 1000,
+                    siteIdentifier: "site-with-low-interval",
+                })
+            );
         });
 
         it("should handle empty sites and settings arrays", async ({

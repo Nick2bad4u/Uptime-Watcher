@@ -55,7 +55,8 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Starts the global monitoring system
      *
-     * @returns Promise resolving to true if monitoring started successfully
+     * @returns Promise resolving to the lifecycle summary returned by the
+     *   backend.
      */
     startMonitoring: MonitoringDomainBridge["startMonitoring"];
 
@@ -81,7 +82,8 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Stops the global monitoring system
      *
-     * @returns Promise resolving to true if monitoring stopped successfully
+     * @returns Promise resolving to the lifecycle summary returned by the
+     *   backend.
      */
     stopMonitoring: MonitoringDomainBridge["stopMonitoring"];
 
@@ -147,7 +149,8 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Starts the global monitoring system
      *
-     * @returns Promise resolving to true if monitoring started successfully
+     * @returns Promise resolving to the lifecycle summary emitted by the
+     *   backend.
      */
     startMonitoring: createTypedInvoker("start-monitoring"),
 
@@ -175,7 +178,8 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Stops the global monitoring system
      *
-     * @returns Promise resolving to true if monitoring stopped successfully
+     * @returns Promise resolving to the lifecycle summary emitted by the
+     *   backend.
      */
     stopMonitoring: createTypedInvoker("stop-monitoring"),
 

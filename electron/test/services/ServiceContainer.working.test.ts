@@ -4,6 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { EventEmitter } from "node:events";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+} from "@shared/types";
 
 // Create comprehensive mocks using vi.hoisted to ensure they're available before imports
 const mockSiteManager = vi.hoisted(() => {
@@ -62,10 +66,30 @@ const mockEventBus = vi.hoisted(() => {
 
 const mockMonitorManager = vi.hoisted(() =>
     vi.fn(function MonitorManagerMock() {
+        const startSummary: MonitoringStartSummary = {
+            attempted: 2,
+            failed: 0,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 2,
+            isMonitoring: true,
+            alreadyActive: false,
+        };
+        const stopSummary: MonitoringStopSummary = {
+            attempted: 2,
+            failed: 0,
+            partialFailures: false,
+            siteCount: 1,
+            skipped: 0,
+            succeeded: 2,
+            isMonitoring: false,
+            alreadyInactive: false,
+        };
         return {
             initialize: vi.fn().mockResolvedValue(undefined),
-            startMonitoring: vi.fn().mockResolvedValue(undefined),
-            stopMonitoring: vi.fn().mockResolvedValue(undefined),
+            startMonitoring: vi.fn().mockResolvedValue(startSummary),
+            stopMonitoring: vi.fn().mockResolvedValue(stopSummary),
             getMonitorStatus: vi.fn().mockReturnValue("stopped"),
             isInitialized: vi.fn().mockReturnValue(true),
         };

@@ -16,7 +16,13 @@ process.setMaxListeners(MAX_LISTENERS);
 
 import { vi } from "vitest";
 import fc from "fast-check";
-import type { Monitor, Site, StatusUpdate } from "@shared/types";
+import type {
+    Monitor,
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    Site,
+    StatusUpdate,
+} from "@shared/types";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
@@ -56,6 +62,28 @@ Object.defineProperty(URL, "createObjectURL", {
     value: undefined,
     writable: true,
 });
+
+const startSummaryMock: MonitoringStartSummary = {
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: true,
+    alreadyActive: false,
+};
+
+const stopSummaryMock: MonitoringStopSummary = {
+    attempted: 2,
+    failed: 0,
+    partialFailures: false,
+    siteCount: 1,
+    skipped: 0,
+    succeeded: 2,
+    isMonitoring: false,
+    alreadyInactive: false,
+};
 
 Object.defineProperty(URL, "revokeObjectURL", {
     configurable: true,
@@ -290,7 +318,7 @@ const mockElectronAPI: ElectronAPI = {
             ElectronAPI["monitoring"]["formatMonitorTitleSuffix"]
         >(async (monitorType, monitor) => `${monitor.id}-${monitorType}`),
         startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
-            async () => true
+            async () => startSummaryMock
         ),
         startMonitoringForMonitor: vi.fn<
             ElectronAPI["monitoring"]["startMonitoringForMonitor"]
@@ -299,7 +327,7 @@ const mockElectronAPI: ElectronAPI = {
             ElectronAPI["monitoring"]["startMonitoringForSite"]
         >(async () => true),
         stopMonitoring: vi.fn<ElectronAPI["monitoring"]["stopMonitoring"]>(
-            async () => true
+            async () => stopSummaryMock
         ),
         stopMonitoringForMonitor: vi.fn<
             ElectronAPI["monitoring"]["stopMonitoringForMonitor"]

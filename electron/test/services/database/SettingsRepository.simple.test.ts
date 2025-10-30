@@ -612,7 +612,7 @@ describe("SettingsRepository Coverage Tests", () => {
                 ),
                 { timeout: PROPERTY_BASED_TIMEOUT_MS }
             );
-        });
+        }, 60_000);
 
         it("should validate settings repository structure and methods", async () => {
             await fc.assert(

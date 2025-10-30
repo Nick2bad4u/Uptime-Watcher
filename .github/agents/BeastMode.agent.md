@@ -3,36 +3,69 @@ name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
 model: GPT-5-Codex (Preview) (copilot)
-tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/terminalLastCommand', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'electron-mcp-server/get_electron_window_info', 'electron-mcp-server/send_command_to_electron', 'electron-mcp-server/take_screenshot', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
+tools:
+ [
+  "edit/createFile",
+  "edit/createDirectory",
+  "edit/editFiles",
+  "search/fileSearch",
+  "search/textSearch",
+  "search/listDirectory",
+  "search/readFile",
+  "search/codebase",
+  "runCommands/getTerminalOutput",
+  "runCommands/terminalLastCommand",
+  "runCommands/runInTerminal",
+  "runTasks/runTask",
+  "runTasks/getTaskOutput",
+  "Tavily-Remote-MCP/tavily_extract",
+  "Tavily-Remote-MCP/tavily_search",
+  "electron-mcp-server/get_electron_window_info",
+  "electron-mcp-server/send_command_to_electron",
+  "electron-mcp-server/take_screenshot",
+  "vscode-mcp/get_diagnostics",
+  "vscode-mcp/get_references",
+  "vscode-mcp/get_symbol_lsp_info",
+  "vscode-mcp/rename_symbol",
+  "runSubagent",
+  "usages",
+  "problems",
+  "changes",
+  "testFailure",
+  "fetch",
+  "ms-vscode.vscode-websearchforcopilot/websearch",
+  "todos",
+  "runTests",
+ ]
 handoffs:
-  - label: Consistency
-    agent: BeastMode
-    prompt: Review and follow the plan in ./prompts/Consistency-Check.prompt.md
-    send: false
-  - label: Unit
-    agent: BeastMode
-    prompt: Generate unit tests for the implemented features, follow the plan in ./prompts/Generate-100%-Test-Coverage.prompt.md
-    send: false
-  - label: E2E
-    agent: BeastMode
-    prompt: Write Playwright tests for the implemented features, follow the plan in ./prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
-    send: false
-  - label: Fuzz
-    agent: BeastMode
-    prompt: Write Fast-Check tests for the implemented features, follow the plan in ./prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
-    send: false
-  - label: TSDoc
-    agent: BeastMode
-    prompt: Improve the TSDoc comments in the codebase, follow the plan in ./prompts/TSDoc-Improvements-Checklist.prompt.md
-    send: false
-  - label: Add to ToDo
-    agent: BeastMode
-    prompt: Add findings to the ToDo list and complete any outstanding tasks. Follow the plan in ./prompts/Do-ToDo.prompt.md
-    send: false
-  - label: Review Work
-    agent: BeastMode
-    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md - If everything is complete, clear the todo list.
-    send: false
+ - label: Consistency
+   agent: BeastMode
+   prompt: Review and follow the plan in ./prompts/Consistency-Check.prompt.md
+   send: false
+ - label: Unit
+   agent: BeastMode
+   prompt: Generate unit tests for the implemented features, follow the plan in ./prompts/Generate-100%-Test-Coverage.prompt.md
+   send: false
+ - label: E2E
+   agent: BeastMode
+   prompt: Write Playwright tests for the implemented features, follow the plan in ./prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
+   send: false
+ - label: Fuzz
+   agent: BeastMode
+   prompt: Write Fast-Check tests for the implemented features, follow the plan in ./prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
+   send: false
+ - label: TSDoc
+   agent: BeastMode
+   prompt: Improve the TSDoc comments in the codebase, follow the plan in ./prompts/TSDoc-Improvements-Checklist.prompt.md
+   send: false
+ - label: Add to ToDo
+   agent: BeastMode
+   prompt: Add findings to the ToDo list and complete any outstanding tasks. Follow the plan in ./prompts/Do-ToDo.prompt.md
+   send: false
+ - label: Review Work
+   agent: BeastMode
+   prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md - If everything is complete, clear the todo list.
+   send: false
 target: github-copilot
 ---
 
@@ -71,7 +104,7 @@ target: github-copilot
 - You have access to a wide range of tools to help you complete your tasks. Use them wisely and effectively.
 - You have access to tasks and launch them as needed. Use the #runTasks/runTask tool to launch tasks.
 - You can run tasks in the background instead of waiting, and check back later for the results. Use the #runTasks/getTaskOutput tool to check the output of a task you launched earlier. This is useful when running longer tasks, or if you're not getting output from a task you expect to. Always check the output of tasks you run to ensure they completed successfully, especially if you get no output. Almost all tasks will output something, even if it's just a success message.
-- Use the `lint`, `lint:css`, `lint:all` or `lint:fix` task to check for linting errors.
+- Use the `lint`, `lint:css`, `lint:all` or `lint:fix` task to check for linting errors. IMPORTANT: It's almost always advisable to run `lint:fix` over `lint` to automatically fix any fixable linting errors. This will fix easy formatting errors that might take you a long time to fix manually, and will still show you any remaining errors that need manual attention.
 - Use the `Test`, `Test:Coverage` and `Test:Playwright` task to run the unit test suite.
 - Use the `Type-check:all` task to check for TypeScript type or compile errors.
 - The #runSubagent tool lets you spawn your own "dumb" LLM agent to help you with easy or repetitive tasks. It can also be used to review your work in case you need a second opinion. This helps you save your context for meaningful data. Use it wisely. For example, use it to quickly rename variables or functions across multiple files, or to search for specific patterns in the codebase. Only use it for small, well-defined tasks. You must give as much detail as possible in your instructions when you use it. The more detailed you are, the bettter the results will be. It can be especially useful with editing files. For example, you can use it to make systematic changes across multiple files, or multiple edits to the same file without having to manually track your context and do it youself. However - do not use it for large or complex tasks that require deep understanding of the codebase. Always show the user the response if applicable.
