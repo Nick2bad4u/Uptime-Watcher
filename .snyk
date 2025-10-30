@@ -1,0 +1,15 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:marked:20150520':
+    - tidy-markdown > marked:
+        patched: '2025-10-30T22:10:05.270Z'
+        id: 'npm:marked:20150520'
+        path: tidy-markdown > marked
+  'npm:mime:20170907':
+    - force > mime:
+        patched: '2025-10-30T22:10:05.270Z'
+        id: 'npm:mime:20170907'
+        path: force > mime
