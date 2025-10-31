@@ -173,9 +173,16 @@ vi.mock("../../services/ipc/IpcService", () => ({
     IpcService: mockIpcService,
 }));
 
-vi.mock("../../events/TypedEventBus", () => ({
-    TypedEventBus: mockEventBus,
-}));
+vi.mock("../../events/TypedEventBus", async () => {
+    const actual = await vi.importActual<
+        typeof import("../../events/TypedEventBus")
+    >("../../events/TypedEventBus");
+
+    return {
+        ...actual,
+        TypedEventBus: mockEventBus,
+    };
+});
 
 // Mock all repository services
 vi.mock("../../services/database/SettingsRepository", () => ({
@@ -214,6 +221,10 @@ vi.mock("../../services/configuration/ConfigurationManager", () => ({
 
 // Import after mocks
 import { ServiceContainer } from "../../services/ServiceContainer";
+import {
+    FORWARDED_METADATA_PROPERTY_KEY,
+    ORIGINAL_METADATA_PROPERTY_KEY,
+} from "../../utils/eventMetadataForwarding";
 
 describe("ServiceContainer - Working Tests", () => {
     let container: ServiceContainer;
@@ -375,6 +386,180 @@ describe("ServiceContainer - Working Tests", () => {
 
             expect(container).toBeDefined();
             expect(() => container.getSiteManager()).not.toThrow();
+        });
+    });
+
+    describe("Metadata forwarding preservation", () => {
+        const invokeStripEventMetadata = (
+            eventName: string,
+            payload: unknown
+        ): unknown => {
+            const { stripEventMetadata } = container as unknown as {
+                stripEventMetadata: (eventName: string, payload: unknown) => unknown;
+            };
+
+            return stripEventMetadata.call(container, eventName, payload);
+        };
+
+        it("should reattach metadata for object payloads as non-enumerable properties", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-object",
+                eventName: "internal:site:added",
+                timestamp: Date.now(),
+            } as const;
+
+            const originalMetadata = {
+                busId: "orchestrator-bus",
+                correlationId: "orig-object",
+                eventName: "site:added",
+                timestamp: Date.now() - 10,
+            } as const;
+
+            const payload = {
+                identifier: "site-object",
+                site: {
+                    identifier: "site-object",
+                    monitoring: true,
+                    monitors: [],
+                    name: "Object Site",
+                },
+            } as Record<string, unknown>;
+
+            Object.assign(payload, {
+                [FORWARDED_METADATA_PROPERTY_KEY]: forwardedMetadata,
+                [ORIGINAL_METADATA_PROPERTY_KEY]: originalMetadata,
+            });
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as Record<string, unknown>;
+
+            expect(sanitized).not.toBe(payload);
+            expect(sanitized["identifier"]).toBe("site-object");
+            const forwardedDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                FORWARDED_METADATA_PROPERTY_KEY
+            );
+            expect(forwardedDescriptor).toBeDefined();
+            expect(forwardedDescriptor?.enumerable).toBeFalsy();
+            expect(
+                Reflect.get(sanitized, FORWARDED_METADATA_PROPERTY_KEY)
+            ).toEqual(forwardedMetadata);
+
+            const originalDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                ORIGINAL_METADATA_PROPERTY_KEY
+            );
+            expect(originalDescriptor).toBeDefined();
+            expect(originalDescriptor?.enumerable).toBeFalsy();
+            expect(
+                Reflect.get(sanitized, ORIGINAL_METADATA_PROPERTY_KEY)
+            ).toEqual(originalMetadata);
+
+            const metadataSymbols = Object.getOwnPropertySymbols(sanitized);
+            const originalMetaSymbol = metadataSymbols.find(
+                (symbol) => symbol.description === "typed-event-bus:original-meta"
+            );
+
+            expect(originalMetaSymbol).toBeDefined();
+            const symbolDescriptor =
+                originalMetaSymbol === undefined
+                    ? undefined
+                    : Object.getOwnPropertyDescriptor(
+                          sanitized,
+                          originalMetaSymbol
+                      );
+            expect(symbolDescriptor).toBeDefined();
+            expect(symbolDescriptor?.enumerable).toBeFalsy();
+            expect(
+                originalMetaSymbol
+                    ? Reflect.get(sanitized, originalMetaSymbol)
+                    : undefined
+            ).toEqual(originalMetadata);
+
+            // Original payload should retain enumerable metadata properties
+            const sourceDescriptor = Object.getOwnPropertyDescriptor(
+                payload,
+                FORWARDED_METADATA_PROPERTY_KEY
+            );
+            expect(sourceDescriptor).toBeDefined();
+            expect(sourceDescriptor?.enumerable).toBeTruthy();
+        });
+
+        it("should reattach metadata for array payloads while preserving order", () => {
+            const forwardedMetadata = {
+                busId: "manager-bus",
+                correlationId: "corr-array",
+                eventName: "internal:monitor:batch",
+                timestamp: Date.now(),
+            } as const;
+
+            const originalMetadata = {
+                busId: "orchestrator-bus",
+                correlationId: "orig-array",
+                eventName: "monitoring:started",
+                timestamp: Date.now() - 25,
+            } as const;
+
+            const payload = [
+                {
+                    identifier: "site-array",
+                    monitorId: "monitor-1",
+                    status: "up",
+                },
+            ] as unknown[];
+
+            Object.assign(payload, {
+                [FORWARDED_METADATA_PROPERTY_KEY]: forwardedMetadata,
+                [ORIGINAL_METADATA_PROPERTY_KEY]: originalMetadata,
+            });
+
+            const sanitized = invokeStripEventMetadata(
+                "site:added",
+                payload
+            ) as unknown[] & Record<string | symbol, unknown>;
+
+            expect(Array.isArray(sanitized)).toBeTruthy();
+            expect(sanitized).not.toBe(payload);
+            expect(sanitized).toHaveLength(1);
+            expect(sanitized[0]).toEqual(payload[0]);
+
+            const metaDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                FORWARDED_METADATA_PROPERTY_KEY
+            );
+            expect(metaDescriptor).toBeDefined();
+            expect(metaDescriptor?.enumerable).toBeFalsy();
+            expect(metaDescriptor?.value).toEqual(forwardedMetadata);
+
+            const originalDescriptor = Object.getOwnPropertyDescriptor(
+                sanitized,
+                ORIGINAL_METADATA_PROPERTY_KEY
+            );
+            expect(originalDescriptor).toBeDefined();
+            expect(originalDescriptor?.enumerable).toBeFalsy();
+            expect(originalDescriptor?.value).toEqual(originalMetadata);
+
+            const metadataSymbols = Object.getOwnPropertySymbols(sanitized);
+            const originalMetaSymbol = metadataSymbols.find(
+                (symbol) => symbol.description === "typed-event-bus:original-meta"
+            );
+
+            expect(originalMetaSymbol).toBeDefined();
+            expect(
+                originalMetaSymbol
+                    ? Reflect.get(sanitized, originalMetaSymbol)
+                    : undefined
+            ).toEqual(originalMetadata);
+
+            const sourceDescriptor = Object.getOwnPropertyDescriptor(
+                payload,
+                FORWARDED_METADATA_PROPERTY_KEY
+            );
+            expect(sourceDescriptor).toBeDefined();
+            expect(sourceDescriptor?.enumerable).toBeTruthy();
         });
     });
 });

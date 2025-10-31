@@ -141,7 +141,7 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             const sitesStore = {
-                downloadSQLiteBackup: vi.fn().mockResolvedValue({
+                downloadSqliteBackup: vi.fn().mockResolvedValue({
                     buffer: new ArrayBuffer(8),
                     fileName: "backup.db",
                     metadata: {
@@ -153,13 +153,13 @@ describe("Settings Component Coverage Tests", () => {
                 fullResyncSites: vi.fn(),
             };
 
-            expect(typeof sitesStore.downloadSQLiteBackup).toBe("function");
+            expect(typeof sitesStore.downloadSqliteBackup).toBe("function");
             expect(typeof sitesStore.fullResyncSites).toBe("function");
 
-            sitesStore.downloadSQLiteBackup();
+            sitesStore.downloadSqliteBackup();
             sitesStore.fullResyncSites();
 
-            expect(sitesStore.downloadSQLiteBackup).toHaveBeenCalled();
+            expect(sitesStore.downloadSqliteBackup).toHaveBeenCalled();
             expect(sitesStore.fullResyncSites).toHaveBeenCalled();
         });
 
@@ -507,7 +507,7 @@ describe("Settings Component Coverage Tests", () => {
             await annotate("Category: Component", "category");
             await annotate("Type: Backup Operation", "type");
 
-            const downloadSQLiteBackup = vi.fn().mockResolvedValue({
+            const downloadSqliteBackup = vi.fn().mockResolvedValue({
                 buffer: new ArrayBuffer(8),
                 fileName: "uptime-watcher-backup.db",
                 metadata: {
@@ -518,7 +518,7 @@ describe("Settings Component Coverage Tests", () => {
             });
 
             const handleBackup = async () => {
-                await downloadSQLiteBackup();
+                await downloadSqliteBackup();
             };
 
             expect(typeof handleBackup).toBe("function");

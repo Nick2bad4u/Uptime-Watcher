@@ -24,12 +24,19 @@ import type { UptimeEvents } from "../events/eventTypes";
 import type { IMonitoringOperations } from "../managers/SiteManager";
 import type { StandardizedCache } from "../utils/cache/StandardizedCache";
 
-import { TypedEventBus } from "../events/TypedEventBus";
+import {
+    ORIGINAL_METADATA_SYMBOL,
+    TypedEventBus,
+} from "../events/TypedEventBus";
 import { ConfigurationManager } from "../managers/ConfigurationManager";
 import { DatabaseManager } from "../managers/DatabaseManager";
 import { MonitorManager } from "../managers/MonitorManager";
 import { SiteManager } from "../managers/SiteManager";
 import { UptimeOrchestrator } from "../UptimeOrchestrator";
+import {
+    FORWARDED_METADATA_PROPERTY_KEY,
+    ORIGINAL_METADATA_PROPERTY_KEY,
+} from "../utils/eventMetadataForwarding";
 import { logger } from "../utils/logger";
 import { DatabaseService } from "./database/DatabaseService";
 import { HistoryRepository } from "./database/HistoryRepository";
@@ -1119,45 +1126,56 @@ export class ServiceContainer {
         eventName: EventName,
         payload: ForwardableEventPayload<EventName>
     ): UptimeEvents[EventName] {
-        if (Array.isArray(payload)) {
-            return Array.from(payload) as UptimeEvents[EventName];
-        }
-
         if (!this.isPayloadWithMetadata(payload)) {
+            if (Array.isArray(payload)) {
+                return Array.from(payload) as UptimeEvents[EventName];
+            }
+
             return payload;
         }
 
         const payloadWithMeta: ForwardablePayloadWithMeta<EventName> = payload;
+        const { forwarded, original } =
+            this.extractForwardingMetadata(payloadWithMeta);
 
         if (this.config.enableDebugLogging) {
             const eventLabel = String(eventName);
-            const metadataForLog = Reflect.get(payloadWithMeta, "_meta") as
-                | EventMetadata
-                | undefined;
-            const originalMetadataForLog = Reflect.get(
-                payloadWithMeta,
-                "_originalMeta"
-            );
             logger.debug(
                 `[ServiceContainer] Stripped metadata from ${eventLabel} payload before forwarding`,
                 {
-                    metadata: metadataForLog,
-                    originalMetadata: originalMetadataForLog,
+                    metadata: forwarded,
+                    originalMetadata: original,
                 }
             );
         }
 
-        return this.omitEventMetadata(payloadWithMeta);
+        if (Array.isArray(payloadWithMeta)) {
+            const clonedArray = Array.from(payloadWithMeta);
+            this.applyForwardingMetadata(clonedArray, forwarded, original);
+            return clonedArray as UptimeEvents[EventName];
+        }
+
+        const clone: Record<string, unknown> = { ...payloadWithMeta };
+
+        if (Reflect.has(clone, FORWARDED_METADATA_PROPERTY_KEY)) {
+            Reflect.deleteProperty(clone, FORWARDED_METADATA_PROPERTY_KEY);
+        }
+
+        if (Reflect.has(clone, ORIGINAL_METADATA_PROPERTY_KEY)) {
+            Reflect.deleteProperty(clone, ORIGINAL_METADATA_PROPERTY_KEY);
+        }
+
+        if (Reflect.has(clone, ORIGINAL_METADATA_SYMBOL)) {
+            Reflect.deleteProperty(clone, ORIGINAL_METADATA_SYMBOL);
+        }
+
+        this.applyForwardingMetadata(clone, forwarded, original);
+
+        return clone as UptimeEvents[EventName];
     }
 
     /**
      * Determines whether a payload contains event bus metadata properties.
-     *
-     * @typeParam EventName - Event identifier forwarded to the orchestrator.
-     *
-     * @param payload - Payload emitted by the manager event bus.
-     *
-     * @returns True when metadata is present and needs to be removed.
      */
     private isPayloadWithMetadata<EventName extends keyof UptimeEvents>(
         payload: ForwardableEventPayload<EventName>
@@ -1165,25 +1183,107 @@ export class ServiceContainer {
         return (
             typeof payload === "object" &&
             payload !== null &&
-            "_meta" in payload
+            FORWARDED_METADATA_PROPERTY_KEY in payload
         );
     }
 
-    /**
-     * Produces a shallow clone of the payload without event bus metadata props.
-     *
-     * @remarks
-     * The orchestrator expects pristine payloads that mirror the original event
-     * data contracts. Manager event buses append `_meta` and `_originalMeta`
-     * fields for diagnostics; this helper strips those fields while leaving the
-     * rest of the structure untouched.
-     */
-    private omitEventMetadata<EventName extends keyof UptimeEvents>(
+    private normalizeEventMetadata(
+        candidate: unknown
+    ): EventMetadata | undefined {
+        if (candidate === null || typeof candidate !== "object") {
+            return undefined;
+        }
+
+        const maybeMetadata = candidate as Partial<EventMetadata>;
+
+        if (
+            typeof maybeMetadata.busId !== "string" ||
+            typeof maybeMetadata.correlationId !== "string" ||
+            typeof maybeMetadata.eventName !== "string" ||
+            typeof maybeMetadata.timestamp !== "number"
+        ) {
+            return undefined;
+        }
+
+        return {
+            busId: maybeMetadata.busId,
+            correlationId: maybeMetadata.correlationId,
+            eventName: maybeMetadata.eventName,
+            timestamp: maybeMetadata.timestamp,
+        } satisfies EventMetadata;
+    }
+
+    private extractForwardingMetadata<EventName extends keyof UptimeEvents>(
         payload: ForwardablePayloadWithMeta<EventName>
-    ): UptimeEvents[EventName] {
-        const clone: Record<string, unknown> = { ...payload };
-        Reflect.deleteProperty(clone, "_meta");
-        Reflect.deleteProperty(clone, "_originalMeta");
-        return clone as UptimeEvents[EventName];
+    ): {
+        forwarded?: EventMetadata;
+        original?: EventMetadata;
+    } {
+        const forwarded = this.normalizeEventMetadata(
+            Reflect.get(payload, FORWARDED_METADATA_PROPERTY_KEY)
+        );
+
+        const originalFromProperty = this.normalizeEventMetadata(
+            Reflect.has(payload, ORIGINAL_METADATA_PROPERTY_KEY)
+                ? Reflect.get(payload, ORIGINAL_METADATA_PROPERTY_KEY)
+                : undefined
+        );
+
+        const originalFromSymbol = this.normalizeEventMetadata(
+            Reflect.has(payload, ORIGINAL_METADATA_SYMBOL)
+                ? Reflect.get(payload, ORIGINAL_METADATA_SYMBOL)
+                : undefined
+        );
+
+        const original =
+            originalFromSymbol ?? originalFromProperty ?? forwarded;
+
+        const result: {
+            forwarded?: EventMetadata;
+            original?: EventMetadata;
+        } = {};
+
+        if (forwarded) {
+            result.forwarded = forwarded;
+        }
+
+        if (original) {
+            result.original = original;
+        }
+
+        return result;
+    }
+
+    private applyForwardingMetadata(
+        target: object,
+        forwarded: EventMetadata | undefined,
+        original: EventMetadata | undefined
+    ): void {
+        if (!forwarded) {
+            return;
+        }
+
+        const resolvedOriginal = original ?? forwarded;
+
+        Object.defineProperty(target, FORWARDED_METADATA_PROPERTY_KEY, {
+            configurable: true,
+            enumerable: false,
+            value: forwarded,
+            writable: false,
+        });
+
+        Object.defineProperty(target, ORIGINAL_METADATA_PROPERTY_KEY, {
+            configurable: true,
+            enumerable: false,
+            value: resolvedOriginal,
+            writable: false,
+        });
+
+        Object.defineProperty(target, ORIGINAL_METADATA_SYMBOL, {
+            configurable: true,
+            enumerable: false,
+            value: resolvedOriginal,
+            writable: false,
+        });
     }
 }

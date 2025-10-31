@@ -518,103 +518,6 @@ export class MonitorManager {
     }
 
     /**
-     * Enhanced start all monitoring - replaces the previous startAllMonitoring
-     * implementation function.
-     *
-     * @param config - Configuration object with required dependencies
-     * @param isMonitoring - Current monitoring state
-     *
-     * @returns Promise<boolean> - New monitoring state
-     *
-     * @internal
-     */
-    private startAllMonitoringEnhanced(
-        config: EnhancedLifecycleConfig,
-        isMonitoring: boolean
-    ): Promise<MonitoringStartSummary> {
-        return startAllMonitoringEnhancedFlow({
-            config,
-            host: this.createEnhancedLifecycleHost(),
-            isMonitoring,
-        });
-    }
-
-    /**
-     * Enhanced stop all monitoring - replaces the previous stopAllMonitoring
-     * implementation function.
-     *
-     * @param config - Configuration object with required dependencies
-     *
-     * @returns Promise<boolean> - Always false (monitoring stopped)
-     *
-     * @internal
-     */
-    private stopAllMonitoringEnhanced(
-        config: EnhancedLifecycleConfig
-    ): Promise<MonitoringStopSummary> {
-        return stopAllMonitoringEnhancedFlow({
-            config,
-            host: this.createEnhancedLifecycleHost(),
-        });
-    }
-
-    /**
-     * Enhanced start monitoring for site - replaces the earlier implementation
-     * startMonitoringForSite function.
-     *
-     * @param config - Configuration object with required dependencies
-     * @param identifier - Site identifier
-     * @param monitorId - Optional monitor ID
-     * @param monitorAction - Optional recursive handler for nested starts
-     *
-     * @returns Promise<boolean> - True if operation succeeded
-     *
-     * @internal
-     */
-    private startMonitoringForSiteEnhanced(
-        config: EnhancedLifecycleConfig,
-        identifier: string,
-        monitorId?: string,
-        monitorAction?: MonitorActionDelegate
-    ): Promise<boolean> {
-        return startMonitoringForSiteEnhancedFlow({
-            config,
-            host: this.createEnhancedLifecycleHost(),
-            identifier,
-            ...(monitorId === undefined ? {} : { monitorId }),
-            ...(monitorAction === undefined ? {} : { monitorAction }),
-        });
-    }
-
-    /**
-     * Enhanced stop monitoring for site - replaces the previous
-     * stopMonitoringForSite implementation function.
-     *
-     * @param config - Configuration object with required dependencies
-     * @param identifier - Site identifier
-     * @param monitorId - Optional monitor ID
-     * @param monitorAction - Optional recursive handler for nested stops
-     *
-     * @returns Promise<boolean> - True if operation succeeded
-     *
-     * @internal
-     */
-    private stopMonitoringForSiteEnhanced(
-        config: EnhancedLifecycleConfig,
-        identifier: string,
-        monitorId?: string,
-        monitorAction?: MonitorActionDelegate
-    ): Promise<boolean> {
-        return stopMonitoringForSiteEnhancedFlow({
-            config,
-            host: this.createEnhancedLifecycleHost(),
-            identifier,
-            ...(monitorId === undefined ? {} : { monitorId }),
-            ...(monitorAction === undefined ? {} : { monitorAction }),
-        });
-    }
-
-    /**
      * Ensures every monitor in the site respects the shared minimum interval.
      *
      * @param site - Site whose monitors need remediation.
@@ -704,6 +607,28 @@ export class MonitorManager {
         );
     }
 
+    /**
+     * Enhanced start all monitoring - replaces the previous startAllMonitoring
+     * implementation function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param isMonitoring - Current monitoring state
+     *
+     * @returns Promise<boolean> - New monitoring state
+     *
+     * @internal
+     */
+    private async startAllMonitoringEnhanced(
+        config: EnhancedLifecycleConfig,
+        isMonitoring: boolean
+    ): Promise<MonitoringStartSummary> {
+        return startAllMonitoringEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            isMonitoring,
+        });
+    }
+
     /** Applies auto-start rules for a site that has newly loaded monitors. */
     private async autoStartMonitoringIfAppropriate(site: Site): Promise<void> {
         logger.debug(
@@ -780,6 +705,25 @@ export class MonitorManager {
         );
     }
 
+    /**
+     * Enhanced stop all monitoring - replaces the previous stopAllMonitoring
+     * implementation function.
+     *
+     * @param config - Configuration object with required dependencies
+     *
+     * @returns Promise<boolean> - Always false (monitoring stopped)
+     *
+     * @internal
+     */
+    private async stopAllMonitoringEnhanced(
+        config: EnhancedLifecycleConfig
+    ): Promise<MonitoringStopSummary> {
+        return stopAllMonitoringEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+        });
+    }
+
     /** Auto-starts eligible monitors that have just been added to a site. */
     private async autoStartNewMonitors(
         site: Site,
@@ -808,6 +752,34 @@ export class MonitorManager {
         });
 
         await Promise.all(startPromises);
+    }
+
+    /**
+     * Enhanced start monitoring for site - replaces the earlier implementation
+     * startMonitoringForSite function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param identifier - Site identifier
+     * @param monitorId - Optional monitor ID
+     * @param monitorAction - Optional recursive handler for nested starts
+     *
+     * @returns Promise<boolean> - True if operation succeeded
+     *
+     * @internal
+     */
+    private async startMonitoringForSiteEnhanced(
+        config: EnhancedLifecycleConfig,
+        identifier: string,
+        monitorId?: string,
+        monitorAction?: MonitorActionDelegate
+    ): Promise<boolean> {
+        return startMonitoringForSiteEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            identifier,
+            ...(monitorId === undefined ? {} : { monitorId }),
+            ...(monitorAction === undefined ? {} : { monitorAction }),
+        });
     }
 
     /**
@@ -855,6 +827,34 @@ export class MonitorManager {
                 error
             );
         }
+    }
+
+    /**
+     * Enhanced stop monitoring for site - replaces the previous
+     * stopMonitoringForSite implementation function.
+     *
+     * @param config - Configuration object with required dependencies
+     * @param identifier - Site identifier
+     * @param monitorId - Optional monitor ID
+     * @param monitorAction - Optional recursive handler for nested stops
+     *
+     * @returns Promise<boolean> - True if operation succeeded
+     *
+     * @internal
+     */
+    private async stopMonitoringForSiteEnhanced(
+        config: EnhancedLifecycleConfig,
+        identifier: string,
+        monitorId?: string,
+        monitorAction?: MonitorActionDelegate
+    ): Promise<boolean> {
+        return stopMonitoringForSiteEnhancedFlow({
+            config,
+            host: this.createEnhancedLifecycleHost(),
+            identifier,
+            ...(monitorId === undefined ? {} : { monitorId }),
+            ...(monitorAction === undefined ? {} : { monitorAction }),
+        });
     }
 
     /** Applies default intervals and optional auto-start for new monitors. */

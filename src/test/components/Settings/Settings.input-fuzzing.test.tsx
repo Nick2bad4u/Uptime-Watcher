@@ -70,8 +70,6 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
- * ```
- *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -82,7 +80,6 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
- * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -157,7 +154,7 @@ const mockfullResyncSites = vi.fn(async () => {
     // Simulate sync operation
 });
 
-const mockDownloadSQLiteBackup = vi.fn(async () => ({
+const mockDownloadSqliteBackup = vi.fn(async () => ({
     buffer: new ArrayBuffer(32),
     fileName: "uptime-watcher-backup.db",
     metadata: {
@@ -200,7 +197,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
         sites: mockSitesState.sites,
         isLoading: mockSitesState.isLoading,
         fullResyncSites: mockfullResyncSites,
-        downloadSQLiteBackup: mockDownloadSQLiteBackup,
+        downloadSqliteBackup: mockDownloadSqliteBackup,
     })),
 }));
 
@@ -731,39 +728,41 @@ describe("Settings Component - Property-Based Fuzzing", () => {
             45_000
         );
 
-        // eslint-disable-next-line no-warning-comments -- Temporarily disabling problematic test
-        // TODO: Fix download button mock issue - button exists but mock isn't called
-        // fcTest.prop([fc.boolean()], {
-        //     numRuns: 10,
-        //     timeout: 5000,
-        // })("should handle backup download operations", async (shouldFail) => {
-        //     // Manual DOM cleanup for property-based testing iterations
-        //     document.body.innerHTML = '<div id="vitest-test-root"></div>';
-        //     vi.clearAllMocks();
-        //
-        //     if (shouldFail) {
-        //         mockDownloadSQLiteBackup.mockRejectedValueOnce(
-        //             new Error("Download failed")
-        //         );
-        //     } else {
-        //         mockDownloadSQLiteBackup.mockResolvedValueOnce(undefined);
-        //     }
-        //
-        //     render(<Settings onClose={mockOnClose} />);
-        //     const downloadButton = screen.getByText("Download SQLite Backup");
-        //
-        //     const user = userEvent.setup();
-        //     await user.click(downloadButton);
-        //
-        //     await waitFor(() => {
-        //         expect(mockDownloadSQLiteBackup).toHaveBeenCalledTimes(1);
-        //     });
-        //
-        //     if (shouldFail) {
-        //         await new Promise(resolve => setTimeout(resolve, 10));
-        //         expect(mockSetError).toHaveBeenCalled();
-        //     }
-        // });
+        fcTest.prop([fc.boolean()], {
+            numRuns: 10,
+            timeout: 5000,
+        })("should handle backup download operations", async (shouldFail) => {
+            // Manual DOM cleanup for property-based testing iterations
+            document.body.innerHTML = '<div id="vitest-test-root"></div>';
+            vi.clearAllMocks();
+
+            if (shouldFail) {
+                mockDownloadSqliteBackup.mockRejectedValueOnce(
+                    new Error("Download failed")
+                );
+            }
+
+            renderSettingsComponent();
+
+            const downloadButton = screen.getByRole("button", {
+                name: /export monitoring data/i,
+            });
+
+            const user = userEvent.setup();
+            await user.click(downloadButton);
+
+            await waitFor(() => {
+                expect(mockDownloadSqliteBackup).toHaveBeenCalledTimes(1);
+            });
+
+            if (shouldFail) {
+                await waitFor(() => {
+                    expect(mockSetError).toHaveBeenCalled();
+                });
+            } else {
+                expect(mockSetError).not.toHaveBeenCalled();
+            }
+        });
     });
 
     describe("Settings Reset Fuzzing", () => {
