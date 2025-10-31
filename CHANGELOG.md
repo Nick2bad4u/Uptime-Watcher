@@ -7,14 +7,89 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[7d60de1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)...
-[7d60de1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee...7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee))
+[[2a651d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)...
+[2a651d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3...2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 17.9.0 [`(2a651d5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)
+
+
+
+
+
+
+## [17.9.0] - 2025-10-31
+
+
+[[7d60de1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)...
+[b0be106](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0be106dc82d83ee637967ca301f4eaa24afbe13)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee...b0be106dc82d83ee637967ca301f4eaa24afbe13))
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the npm_and_yarn group across 1 directory with 2 updates (#93) [`(9d153f4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9d153f4d58f9a617bdbc35fe5d11fcb70b0141f9)
+
+
+- *(deps)* [dependency] Update dependency group (#94) [`(69cfad0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/69cfad0d5e0df37501b4b3e2cf97682278b3ae3e)
+
+
+- *(deps)* [dependency] Update the npm-all group (#95) [`(b511158)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b5111581bc271f4bcb7ef079315159e1ae1cb90d)
+
+
 - [dependency] Update version 17.8.0 [`(7d60de1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d60de1de11d816a8ca0c6e2a4db8ddd1f67bdee)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Reorganize MonitorManager enhanced lifecycle helpers
+ - Move startAllMonitoringEnhanced / stopAllMonitoringEnhanced / startMonitoringForSiteEnhanced / stopMonitoringForSiteEnhanced closer to related lifecycle methods for better locality and readability.
+ - Make these helpers async to standardize signatures and prepare for future await-based flows.
+
+🛠️ [fix] Preserve and normalize event metadata when forwarding in ServiceContainer
+ - Extract forwarded/original metadata from both property keys and symbol, normalize the metadata shape, and reattach as non-enumerable properties on cloned payloads.
+ - Handle both array and object payloads, remove reliance on enumerable _meta/_originalMeta fields, and consistently apply FORWARDED_METADATA_PROPERTY_KEY, ORIGINAL_METADATA_PROPERTY_KEY and ORIGINAL_METADATA_SYMBOL.
+ - Improves correctness of event metadata forwarding to the orchestrator and preserves diagnostics for downstream consumers.
+
+🧪 [test] Validate metadata forwarding and adjust TypedEventBus mocking
+ - Change TypedEventBus mock to importActual and override only TypedEventBus to preserve symbol behavior in tests.
+ - Add "Metadata forwarding preservation" tests in ServiceContainer.working.test.ts to assert non-enumerable descriptors and symbol-based original metadata for object and array payloads.
+
+🧪 [test] Normalize SQLite backup mock name and re-enable backup fuzzing
+ - Rename downloadSQLiteBackup → downloadSqliteBackup across Settings tests (invalid-key, comprehensive, input-fuzzing) to match runtime API.
+ - Re-enable and improve property-based fuzzing backup test: use render helper, target the export button, assert mockDownloadSqliteBackup is invoked and error handling behavior is exercised.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(459c8ab)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/459c8ab0b2fcf7fa1cbe1fe4034419fd6984540e)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v17.8.0 [skip ci] [`(c039bf7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c039bf7069c766723b059ae7a44b6f2b1a9c7420)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] [dependency] Update Storybook 10.0.2 and update Storybook-related packages
+ - Upgrade @storybook packages and shims to 10.0.2 and update package-lock entries / integrity hashes
+ - Affects: @storybook/addon-a11y, @storybook/addon-docs, @storybook/addon-links, @storybook/addon-themes, @storybook/addon-vitest, @storybook/builder-vite, @storybook/react, @storybook/react-vite, csf-plugin, react-dom-shim, etc.
+
+🧹 [chore] Upgrade testing/linting/tooling deps
+ - @vitest/eslint-plugin -> 1.4.0
+ - eslint-plugin-package-json -> 0.59.1 (and validate-npm-package-name -> 7.0.0 with updated node engine range)
+ - node-abi -> 4.17.0
+ - typedoc-plugin-external-package-links -> 0.2.0
+
+🧹 [chore] Sync lockfiles and mark docs peers
+ - Apply package-lock.json updates across repo to reflect bumped devDependencies
+ - Add "peer": true flags across docs/docusaurus/package-lock.json for multiple Docusaurus plugins/themes to reflect peerDependencies and keep lockfile consistent
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(b0be106)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b0be106dc82d83ee637967ca301f4eaa24afbe13)
 
 
 
