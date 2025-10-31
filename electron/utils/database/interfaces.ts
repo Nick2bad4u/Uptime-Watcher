@@ -20,8 +20,15 @@ import type { SiteRepository } from "../../services/database/SiteRepository";
  * Configuration for monitoring operations.
  */
 export interface MonitoringConfig {
-    /** Function to set history limit */
-    setHistoryLimit: (limit: number) => void;
+    /**
+     * Function to set history limit.
+     *
+     * @remarks
+     * Implementations may perform asynchronous work (database mutation,
+     * orchestrator notifications). Callers must await completion to guarantee
+     * deterministic ordering with subsequent state-sync emissions.
+     */
+    setHistoryLimit: (limit: number) => Promise<void>;
     /** Function to setup new monitors for a site */
     setupNewMonitors: (site: Site, newMonitorIds: string[]) => Promise<void>;
     /** Function to start monitoring for a site/monitor */

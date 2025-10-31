@@ -50,9 +50,9 @@ The summary section provides totals plus a ranked list of the top coverage-produ
 
 ## Triage guidelines
 
-- Double-check zero-coverage candidates before removal; many failures indicate that helpers or mocks stub out the interesting parts.
-- If a file intentionally asserts runtime behavior without hitting instrumented code (for example, type-only tests), consider removing it or moving the assertions into a smoke test that does execute logic.
-- Keep the generated JSON reports (`--keep-reports`) when you want to diff coverage maps or inspect the raw Istanbul data.
+* Double-check zero-coverage candidates before removal; many failures indicate that helpers or mocks stub out the interesting parts.
+* If a file intentionally asserts runtime behavior without hitting instrumented code (for example, type-only tests), consider removing it or moving the assertions into a smoke test that does execute logic.
+* Keep the generated JSON reports (`--keep-reports`) when you want to diff coverage maps or inspect the raw Istanbul data.
 
 ## Fast-check considerations
 
@@ -60,6 +60,6 @@ Fast-check based fuzzers often rely on helper utilities and still touch applicat
 
 ## When to rerun
 
-- After large refactors to ensure obsolete tests are cleaned up promptly.
-- Before pruning the test suite to verify that removal candidates truly provide no coverage.
-- On branches that introduce major module moves to catch tests that no longer import the correct entry points.
+* After large refactors to ensure obsolete tests are cleaned up promptly.
+* Before pruning the test suite to verify that removal candidates truly provide no coverage.
+* On branches that introduce major module moves to catch tests that no longer import the correct entry points.

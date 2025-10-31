@@ -35,7 +35,7 @@ const {
         exportData: vi.fn(),
         importData: vi.fn(),
         getHistoryLimit: vi.fn(),
-        setHistoryLimit: vi.fn(),
+        setHistoryLimit: vi.fn().mockResolvedValue(undefined),
         historyLimit: 500,
         onTyped: vi.fn(),
         off: vi.fn(),

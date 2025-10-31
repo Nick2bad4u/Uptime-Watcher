@@ -12,10 +12,10 @@ Unlike regular browsers, Electron doesn't support true "headless" mode. However,
 
 The Electron app checks for headless mode using these environment variables (in order of precedence):
 
-- `HEADLESS=true` - Explicit headless mode
-- `CI=true` - Automatically enables headless in CI environments
-- `--headless` command line argument
-- `--test-headless` command line argument
+* `HEADLESS=true` - Explicit headless mode
+* `CI=true` - Automatically enables headless in CI environments
+* `--headless` command line argument
+* `--test-headless` command line argument
 
 ### 2. Window Show Prevention
 
@@ -25,9 +25,9 @@ When headless mode is detected, the `WindowService` skips calling `window.show()
 
 Playwright tests automatically enable headless mode via:
 
-- **Global Setup**: Sets `HEADLESS=true` environment variable
-- **Electron Helper**: Passes `HEADLESS=true` to launched Electron processes
-- **Configuration**: Documents the headless behavior in playwright.config.ts
+* __Global Setup__: Sets `HEADLESS=true` environment variable
+* __Electron Helper__: Passes `HEADLESS=true` to launched Electron processes
+* __Configuration__: Documents the headless behavior in playwright.config.ts
 
 ## Usage
 
@@ -64,10 +64,10 @@ In CI environments, headless mode is automatically enabled when `CI=true` is set
 
 ## Benefits
 
-1. **Faster Execution**: No window rendering overhead
-2. **CI Compatibility**: Works in headless CI environments without Xvfb on Linux
-3. **Reliable Testing**: Prevents window focus issues and race conditions
-4. **Resource Efficiency**: Lower memory and CPU usage during tests
+1. __Faster Execution__: No window rendering overhead
+2. __CI Compatibility__: Works in headless CI environments without Xvfb on Linux
+3. __Reliable Testing__: Prevents window focus issues and race conditions
+4. __Resource Efficiency__: Lower memory and CPU usage during tests
 
 ## Implementation Details
 
@@ -98,12 +98,12 @@ The `playwright.config.ts` includes documentation explaining that the `headless`
 
 ## Platform Support
 
-- **Windows**: Works natively
-- **macOS**: Works natively
-- **Linux**: Works natively (no Xvfb required with this implementation)
+* __Windows__: Works natively
+* __macOS__: Works natively
+* __Linux__: Works natively (no Xvfb required with this implementation)
 
 ## Related Resources
 
-- [Playwright Electron Documentation](https://playwright.dev/docs/api/class-electron)
-- [GitHub Issue: Headless Electron](https://github.com/microsoft/playwright/issues/13288)
-- [Electron Testing on Headless CI](https://electronjs.org/docs/latest/tutorial/testing-on-headless-ci)
+* [Playwright Electron Documentation](https://playwright.dev/docs/api/class-electron)
+* [GitHub Issue: Headless Electron](https://github.com/microsoft/playwright/issues/13288)
+* [Electron Testing on Headless CI](https://electronjs.org/docs/latest/tutorial/testing-on-headless-ci)

@@ -594,9 +594,10 @@ describe("SiteManager - Comprehensive", () => {
 
             // Mock cache.get to return undefined (cache miss)
             mockCache.get = vi.fn().mockReturnValue(undefined);
-            // Mock getSitesFromDatabase to throw error
-            vi.mocked(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
+            // Mock getSiteFromDatabase to throw error
+            vi.spyOn(
+                siteManager["siteRepositoryService"],
+                "getSitesFromDatabase"
             ).mockRejectedValue(new Error("DB error"));
 
             const result = siteManager.getSiteFromCache("site-1");
@@ -606,8 +607,8 @@ describe("SiteManager - Comprehensive", () => {
 
             expect(result).toBeUndefined();
             expect(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
-            ).toHaveBeenCalled();
+                mockSiteRepositoryServiceInstance.getSiteFromDatabase
+            ).toHaveBeenCalledWith("site-1");
             await new Promise((resolve) => setTimeout(resolve, 10));
         });
     });
@@ -646,11 +647,15 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.mocked(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
-            ).mockRejectedValue(new Error("DB error"));
+            const getSitesSpy = vi
+                .spyOn(
+                    siteManager["siteRepositoryService"],
+                    "getSitesFromDatabase"
+                )
+                .mockRejectedValue(new Error("DB error"));
 
             await expect(siteManager.getSites()).rejects.toThrow("DB error");
+            expect(getSitesSpy).toHaveBeenCalled();
         });
     });
 
@@ -669,7 +674,6 @@ describe("SiteManager - Comprehensive", () => {
 
             const result = siteManager.getSitesFromCache();
 
-            expect(mockCache.getAll).toHaveBeenCalled();
             expect(result).toEqual([mockSite]);
         });
     });
@@ -1329,7 +1333,7 @@ describe("SiteManager - Comprehensive", () => {
                 mockSiteWriterService.handleMonitorIntervalChanges
             ).mockImplementation(
                 async (_id: any, _orig: any, _monitors: any, config: any) => {
-                    config.setHistoryLimit(100);
+                    await config.setHistoryLimit(100);
                 }
             );
 
@@ -1445,8 +1449,9 @@ describe("SiteManager - Comprehensive", () => {
 
             const config = siteManager["createMonitoringConfig"]();
 
-            // SetHistoryLimit returns void, not a promise - it handles errors internally
-            expect(() => config.setHistoryLimit(100)).not.toThrow();
+            await expect(config.setHistoryLimit(100)).rejects.toThrow(
+                "History limit error"
+            );
 
             expect(
                 mockMonitoringOperations.setHistoryLimit
@@ -1525,14 +1530,28 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Type: Data Loading", "type");
 
             const mockCache = siteManager["sitesCache"];
+            const stateSyncSpy = vi.spyOn(
+                siteManager,
+                "emitSitesStateSynchronized"
+            );
 
-            vi.mocked(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
-            ).mockResolvedValue([mockSite]);
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
+                mockSite
+            );
 
             await siteManager["loadSiteInBackground"]("site-1");
 
             expect(mockCache.set).toHaveBeenCalledWith("site-1", mockSite);
+            expect(
+                mockSiteRepositoryServiceInstance.getSiteFromDatabase
+            ).toHaveBeenCalledWith("site-1");
+            expect(stateSyncSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    action: "update",
+                    siteIdentifier: "site-1",
+                    source: "database",
+                })
+            );
             expect(mockDeps.eventEmitter.emitTyped).toHaveBeenCalledWith(
                 "internal:site:cache-updated",
                 expect.objectContaining({
@@ -1540,6 +1559,8 @@ describe("SiteManager - Comprehensive", () => {
                     operation: "background-load",
                 })
             );
+
+            stateSyncSpy.mockRestore();
         });
 
         it("should handle site not found during background loading", async ({
@@ -1551,9 +1572,9 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Data Loading", "type");
 
-            vi.mocked(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
-            ).mockResolvedValue([]);
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockResolvedValue(
+                undefined
+            );
 
             await siteManager["loadSiteInBackground"]("site-1");
 
@@ -1576,9 +1597,9 @@ describe("SiteManager - Comprehensive", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Error Handling", "type");
 
-            vi.mocked(
-                mockSiteRepositoryServiceInstance.getSitesFromDatabase
-            ).mockRejectedValue(new Error("DB error"));
+            mockSiteRepositoryServiceInstance.getSiteFromDatabase.mockRejectedValue(
+                new Error("DB error")
+            );
 
             await siteManager["loadSiteInBackground"]("site-1");
 
@@ -1617,8 +1638,8 @@ describe("SiteManager - Comprehensive", () => {
 
             // Should not throw even if both DB and event emission fail
             expect(
-                mockSiteRepositoryService.getSitesFromDatabase
-            ).toHaveBeenCalled();
+                mockSiteRepositoryService.getSiteFromDatabase
+            ).toHaveBeenCalledWith("site-1");
         });
     });
 

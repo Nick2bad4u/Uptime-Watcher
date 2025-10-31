@@ -6,12 +6,12 @@ This document outlines how to use the performance profiling scripts and warmup c
 
 ### Development and Profiling Scripts
 
-- **`npm run dev`** - Standard development server with warmup enabled
-- **`npm run dev:warmup`** - Development server with transform debugging to verify warmup
-- **`npm run profile`** - Runs Vite with CPU profiling enabled
-- **`npm run profile:debug`** - Combines profiling with debug output
-- **`npm run profile:transform`** - Shows detailed transform timing information
-- **`npm run dev:profile`** - Development server with profiling enabled
+* __`npm run dev`__ - Standard development server with warmup enabled
+* __`npm run dev:warmup`__ - Development server with transform debugging to verify warmup
+* __`npm run profile`__ - Runs Vite with CPU profiling enabled
+* __`npm run profile:debug`__ - Combines profiling with debug output
+* __`npm run profile:transform`__ - Shows detailed transform timing information
+* __`npm run dev:profile`__ - Development server with profiling enabled
 
 ## 📊 How to Use Profiling
 
@@ -38,9 +38,9 @@ npm run profile
 2. Press `p + enter` in terminal to record profile
 3. A `.cpuprofile` file will be generated
 4. Open with tools like:
-   - [Speedscope](https://speedscope.app) (online)
-   - Chrome DevTools Performance tab
-   - VS Code flame graph extensions
+   * [Speedscope](https://speedscope.app) (online)
+   * Chrome DevTools Performance tab
+   * VS Code flame graph extensions
 
 ### 3. Monitoring Warmup Effectiveness
 
@@ -56,55 +56,55 @@ The following files are pre-warmed for optimal performance in `vite.config.ts`:
 
 ### Core Application Entry Points
 
-- `./src/App.tsx` - Main app component
-- `./src/main.tsx` - Entry point
+* `./src/App.tsx` - Main app component
+* `./src/main.tsx` - Entry point
 
 ### State Management (Zustand stores)
 
-- `./src/stores/sites/useSitesStore.ts` - Site data management
-- `./src/stores/settings/useSettingsStore.ts` - App settings
-- `./src/stores/ui/useUiStore.ts` - UI state
-- `./src/stores/error/useErrorStore.ts` - Error handling
+* `./src/stores/sites/useSitesStore.ts` - Site data management
+* `./src/stores/settings/useSettingsStore.ts` - App settings
+* `./src/stores/ui/useUiStore.ts` - UI state
+* `./src/stores/error/useErrorStore.ts` - Error handling
 
 ### Theme System
 
-- `./src/theme/components/ThemeProvider.tsx` - Theme context
-- `./src/theme/components/ThemedBox.tsx` - Common box component
-- `./src/theme/components/ThemedButton.tsx` - Common button
-- `./src/theme/components/ThemedText.tsx` - Common text
-- `./src/theme/useTheme.ts` - Theme hook
+* `./src/theme/components/ThemeProvider.tsx` - Theme context
+* `./src/theme/components/ThemedBox.tsx` - Common box component
+* `./src/theme/components/ThemedButton.tsx` - Common button
+* `./src/theme/components/ThemedText.tsx` - Common text
+* `./src/theme/useTheme.ts` - Theme hook
 
 ### Chart Components (Chart.js - Heavy)
 
-- `./src/components/SiteDetails/charts/ResponseTimeChart.tsx`
-- `./src/components/SiteDetails/charts/UptimeChart.tsx`
-- `./src/components/SiteDetails/charts/StatusChart.tsx`
-- `./src/components/common/HistoryChart.tsx`
+* `./src/components/SiteDetails/charts/ResponseTimeChart.tsx`
+* `./src/components/SiteDetails/charts/UptimeChart.tsx`
+* `./src/components/SiteDetails/charts/StatusChart.tsx`
+* `./src/components/common/HistoryChart.tsx`
 
 ### Chart Utilities
 
-- `./src/services/chartConfig.ts` - Chart.js configuration
-- `./src/utils/chartUtils.ts` - Chart utility functions
+* `./src/services/chartConfig.ts` - Chart.js configuration
+* `./src/utils/chartUtils.ts` - Chart utility functions
 
 ### Frequently Used Components
 
-- `./src/components/Dashboard/SiteList/SiteList.tsx` - Main dashboard
-- `./src/components/Header/Header.tsx` - App header
-- `./src/components/SiteDetails/SiteDetails.tsx` - Site details view
+* `./src/components/Dashboard/SiteList/SiteList.tsx` - Main dashboard
+* `./src/components/Header/Header.tsx` - App header
+* `./src/components/SiteDetails/SiteDetails.tsx` - Site details view
 
 ### Shared Infrastructure
 
-- `./shared/types.ts` - Type definitions
-- `./shared/utils/environment.ts` - Environment utilities
+* `./shared/types.ts` - Type definitions
+* `./shared/utils/environment.ts` - Environment utilities
 
 ## 🎯 Performance Benefits
 
 ### Expected Improvements:
 
-1. **Faster Initial Load** - Pre-warmed files ready immediately
-2. **Reduced Request Waterfalls** - Critical imports cached
-3. **Better Chart Performance** - Chart.js components pre-loaded
-4. **Smoother Navigation** - Core components ready
+1. __Faster Initial Load__ - Pre-warmed files ready immediately
+2. __Reduced Request Waterfalls__ - Critical imports cached
+3. __Better Chart Performance__ - Chart.js components pre-loaded
+4. __Smoother Navigation__ - Core components ready
 
 ### Monitoring Results:
 
@@ -120,9 +120,9 @@ npm run profile:transform
 
 Look for:
 
-- Files taking >50ms to transform
-- Frequently imported utilities
-- Large component trees
+* Files taking >50ms to transform
+* Frequently imported utilities
+* Large component trees
 
 ### Finding Import Waterfalls:
 
@@ -247,7 +247,7 @@ Watch console for warmup effectiveness and transform times.
 
 ### Component Optimization
 
-1. **Use React.memo for expensive components**:
+1. __Use React.memo for expensive components__:
 
    ```tsx
    const SiteCard = React.memo(({ site }: { site: Site }) => {
@@ -255,13 +255,13 @@ Watch console for warmup effectiveness and transform times.
    });
    ```
 
-2. **Lazy load heavy components**:
+2. __Lazy load heavy components__:
 
    ```tsx
    const ChartComponent = lazy(() => import("./ChartComponent"));
    ```
 
-3. **Minimize prop drilling with Zustand stores**:
+3. __Minimize prop drilling with Zustand stores__:
    ```tsx
    // Instead of passing props through multiple levels
    const { sites, updateSite } = useSitesStore();
@@ -269,7 +269,7 @@ Watch console for warmup effectiveness and transform times.
 
 ### Import Optimization
 
-1. **Use barrel exports sparingly**:
+1. __Use barrel exports sparingly__:
 
    ```typescript
    // Prefer direct imports
@@ -279,7 +279,7 @@ Watch console for warmup effectiveness and transform times.
    import { Button } from "./components";
    ```
 
-2. **Import only what you need**:
+2. __Import only what you need__:
 
    ```typescript
    // Good
@@ -289,27 +289,27 @@ Watch console for warmup effectiveness and transform times.
    import * as dateFns from "date-fns";
    ```
 
-3. **Use dynamic imports for large libraries**:
+3. __Use dynamic imports for large libraries__:
    ```typescript
    const chartJs = await import("chart.js");
    ```
 
 ### Build Optimization
 
-1. **Monitor bundle size regularly**:
+1. __Monitor bundle size regularly__:
 
    ```bash
    npm run analyze:bundle
    ```
 
-2. **Use profiling to identify bottlenecks**:
+2. __Use profiling to identify bottlenecks__:
 
    ```bash
    npm run profile:transform
    npm run dev:profile
    ```
 
-3. **Keep dependencies up to date**:
+3. __Keep dependencies up to date__:
    ```bash
    npm run dep:check
    npm run dep:update
@@ -317,10 +317,10 @@ Watch console for warmup effectiveness and transform times.
 
 ## 📚 Related Resources
 
-- [Environment Setup Guide](./environment-setup.md) - Development environment configuration
-- [Testing Guide](./testing.md) - Test configuration and performance
-- [Troubleshooting Guide](./troubleshooting.md) - Performance debugging
-- [Type-Fest Patterns](./type-fest-patterns.md) - TypeScript optimization patterns
+* [Environment Setup Guide](./environment-setup.md) - Development environment configuration
+* [Testing Guide](./testing.md) - Test configuration and performance
+* [Troubleshooting Guide](./troubleshooting.md) - Performance debugging
+* [Type-Fest Patterns](./type-fest-patterns.md) - TypeScript optimization patterns
 
 ## 🎯 Quick Reference
 
@@ -345,34 +345,34 @@ npm run build -- --reporter verbose
 
 ### Key Files
 
-- `vite.config.ts` - Vite configuration and optimizations
-- `package.json` - Performance-related scripts
-- `tsconfig.json` - TypeScript compilation settings
-- `src/main.tsx` - Application entry point with warmup
-- `electron/main.ts` - Electron main process optimizations
+* `vite.config.ts` - Vite configuration and optimizations
+* `package.json` - Performance-related scripts
+* `tsconfig.json` - TypeScript compilation settings
+* `src/main.tsx` - Application entry point with warmup
+* `electron/main.ts` - Electron main process optimizations
 
 ## 📝 Notes
 
-- **Don't over-warmup**: Only warm frequently used files to avoid startup overhead
-- **Monitor bundle size**: Warmup doesn't change bundle size, just loading timing
-- **Profile regularly**: Re-profile after major changes to identify new bottlenecks
-- **Use --open**: Consider adding `server.open` for automatic warmup on startup
+* __Don't over-warmup__: Only warm frequently used files to avoid startup overhead
+* __Monitor bundle size__: Warmup doesn't change bundle size, just loading timing
+* __Profile regularly__: Re-profile after major changes to identify new bottlenecks
+* __Use --open__: Consider adding `server.open` for automatic warmup on startup
 
 ## 🚨 Troubleshooting
 
 ### Profile files not generating?
 
-- Ensure you press `p + enter` in the terminal running Vite
-- Check current directory for `.cpuprofile` files
+* Ensure you press `p + enter` in the terminal running Vite
+* Check current directory for `.cpuprofile` files
 
 ### Transform times seem wrong?
 
-- Times are estimates due to async operations
-- Look for relative patterns, not absolute numbers
-- Use multiple runs for consistency
+* Times are estimates due to async operations
+* Look for relative patterns, not absolute numbers
+* Use multiple runs for consistency
 
 ### Warmup not working?
 
-- Check file paths are correct relative to project root
-- Verify files exist and are valid TypeScript/JavaScript
-- Monitor console for warmup-related errors
+* Check file paths are correct relative to project root
+* Verify files exist and are valid TypeScript/JavaScript
+* Monitor console for warmup-related errors

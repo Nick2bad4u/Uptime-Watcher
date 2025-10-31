@@ -55,25 +55,25 @@ playwright/
 
 ### Test Configuration Files
 
-- `playwright.config.ts` - Main Playwright configuration
-- `playwright/tsconfig.json` - TypeScript settings for tests
-- `playwright/fixtures/global-setup.ts` - Pre-test environment setup
-- `playwright/fixtures/global-teardown.ts` - Post-test cleanup
+* `playwright.config.ts` - Main Playwright configuration
+* `playwright/tsconfig.json` - TypeScript settings for tests
+* `playwright/fixtures/global-setup.ts` - Pre-test environment setup
+* `playwright/fixtures/global-teardown.ts` - Post-test cleanup
 
 ## ⚠️ Critical Issues & Solutions
 
 ### 🔴 Issue: Electron Launch Method
 
-**Problem:** Tests fail with timeout errors or blank windows when using incorrect Electron launch arguments.
+__Problem:__ Tests fail with timeout errors or blank windows when using incorrect Electron launch arguments.
 
-**Symptoms:**
+__Symptoms:__
 
-- Tests timeout waiting for `firstWindow()`
-- Blank/empty Electron windows
-- `waitForAppInitialization` failures
-- Dev tools show `file://` URLs instead of `http://localhost:5173`
+* Tests timeout waiting for `firstWindow()`
+* Blank/empty Electron windows
+* `waitForAppInitialization` failures
+* Dev tools show `file://` URLs instead of `http://localhost:5173`
 
-**Root Cause:** Using absolute path to `main.js` instead of project root directory.
+__Root Cause:__ Using absolute path to `main.js` instead of project root directory.
 
 #### ❌ Incorrect Approach (Causes Issues)
 
@@ -113,7 +113,7 @@ export async function launchElectronApp() {
 }
 ```
 
-**Why This Works:**
+__Why This Works:__
 
 1. `args: ["."]` launches from project root directory
 2. Electron reads `package.json` to find `"main": "dist/main.js"`
@@ -121,13 +121,13 @@ export async function launchElectronApp() {
 4. Allows correct relative path resolution
 5. Maintains environment inheritance for dev/prod detection
 
-**Reference:** This follows the same pattern as our working `scripts/codegen.mjs` script.
+__Reference:__ This follows the same pattern as our working `scripts/codegen.mjs` script.
 
 ### 🔴 Issue: Test Discovery
 
-**Problem:** Tests not found with "No tests found" error.
+__Problem:__ Tests not found with "No tests found" error.
 
-**Solution:** Ensure test files match the naming patterns defined in `playwright.config.ts`:
+__Solution:__ Ensure test files match the naming patterns defined in `playwright.config.ts`:
 
 ```typescript
 // Test file naming must match these patterns:
@@ -140,18 +140,18 @@ testMatch: "**/e2e-*.e2e.playwright.test.ts"; // E2E tests
 
 ### 🔴 Issue: Environment Detection
 
-**Problem:** App behaves differently in test vs normal mode.
+__Problem:__ App behaves differently in test vs normal mode.
 
-**Solution:** The app uses `isDev()` function that checks:
+__Solution:__ The app uses `isDev()` function that checks:
 
 1. `NODE_ENV === "development"`
 2. `!app.isPackaged`
 
 For tests to work properly:
 
-- Don't override `NODE_ENV` in test environment
-- Let environment inherit from current shell
-- Run tests with `NODE_ENV=development` if needed
+* Don't override `NODE_ENV` in test environment
+* Let environment inherit from current shell
+* Run tests with `NODE_ENV=development` if needed
 
 ## 🧪 Common Test Patterns
 
@@ -222,35 +222,35 @@ for (let i = 0; i < buttons.length; i++) {
 
 ## 🎯 Best Practices
 
-### 1. **Always Use Proper Launch Method**
+### 1. __Always Use Proper Launch Method__
 
-- Use `args: ["."]` not absolute paths to `main.js`
-- Include timeout for reliability
-- Don't override `NODE_ENV` unless necessary
+* Use `args: ["."]` not absolute paths to `main.js`
+* Include timeout for reliability
+* Don't override `NODE_ENV` unless necessary
 
-### 2. **Test Isolation**
+### 2. __Test Isolation__
 
-- Each test should launch its own Electron instance
-- Always close apps in `finally` blocks
-- Use unique test data to avoid conflicts
+* Each test should launch its own Electron instance
+* Always close apps in `finally` blocks
+* Use unique test data to avoid conflicts
 
-### 3. **Wait Strategies**
+### 3. __Wait Strategies__
 
-- Use `waitForAppInitialization()` for app readiness
-- Use appropriate timeouts for different operations
-- Wait for specific elements before interacting
+* Use `waitForAppInitialization()` for app readiness
+* Use appropriate timeouts for different operations
+* Wait for specific elements before interacting
 
-### 4. **Error Handling**
+### 4. __Error Handling__
 
-- Wrap tests in try/finally blocks
-- Take screenshots on failures for debugging
-- Log relevant state for troubleshooting
+* Wrap tests in try/finally blocks
+* Take screenshots on failures for debugging
+* Log relevant state for troubleshooting
 
-### 5. **Performance**
+### 5. __Performance__
 
-- Use `fullyParallel: false` for Electron tests
-- Limit workers for stability
-- Avoid running too many Electron instances simultaneously
+* Use `fullyParallel: false` for Electron tests
+* Limit workers for stability
+* Avoid running too many Electron instances simultaneously
 
 ## 🔍 Troubleshooting
 
@@ -286,10 +286,10 @@ for (let i = 0; i < buttons.length; i++) {
 
 Usually caused by:
 
-- Incorrect launch arguments (use `args: ["."]`)
-- Wrong environment detection
-- Missing dev server
-- Build issues
+* Incorrect launch arguments (use `args: ["."]`)
+* Wrong environment detection
+* Missing dev server
+* Build issues
 
 ### Element Not Found
 
@@ -300,18 +300,18 @@ Usually caused by:
 
 ## 📚 Additional Resources
 
-- [Playwright Electron Documentation](https://playwright.dev/docs/api/class-electronapplication)
-- [Project Codegen Guide](./PLAYWRIGHT_CODEGEN_GUIDE.md)
-- [Electron Testing Best Practices](https://www.electronjs.org/docs/latest/tutorial/automated-testing)
+* [Playwright Electron Documentation](https://playwright.dev/docs/api/class-electronapplication)
+* [Project Codegen Guide](./PLAYWRIGHT_CODEGEN_GUIDE.md)
+* [Electron Testing Best Practices](https://www.electronjs.org/docs/latest/tutorial/automated-testing)
 
 ## 🚨 Emergency Fixes
 
 If tests suddenly stop working:
 
-1. **Check Electron launch method** - ensure using `args: ["."]`
-2. **Verify NODE_ENV** - should inherit from environment
-3. **Confirm build exists** - run `npm run build`
-4. **Test manually** - try `node scripts/codegen.mjs --electron`
-5. **Check dev server** - ensure it starts when needed
+1. __Check Electron launch method__ - ensure using `args: ["."]`
+2. __Verify NODE\_ENV__ - should inherit from environment
+3. __Confirm build exists__ - run `npm run build`
+4. __Test manually__ - try `node scripts/codegen.mjs --electron`
+5. __Check dev server__ - ensure it starts when needed
 
 This issue was documented after resolving massive test failures (202/206 failing) caused by incorrect Electron launch configuration.

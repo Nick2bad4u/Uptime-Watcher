@@ -14,46 +14,46 @@ The application enforces data quality through a layered validation pipeline. Eac
 
 ## Principles
 
-1. **Single Responsibility Per Layer**: Do not duplicate validation logic across layers. Shape validation lives in preload/IPC, business rules in managers, persistence guarantees in repositories.
-2. **Fail Fast**: Reject invalid data as early as possible with actionable error messages. IPC handlers should never pass an invalid payload to managers.
-3. **Structured Errors**: Use `ApplicationError` (or a more specific subclass) when propagating validation failures up the stack. Include metadata that helps renderer code present meaningful feedback.
-4. **Immutable Inputs**: Treat incoming data as immutable. Create sanitized copies rather than mutating caller arguments.
-5. **Tests at the Source**: Each validation rule must have unit tests in the layer that owns it. Avoid “integration-only” validation coverage unless the rule spans multiple layers.
+1. __Single Responsibility Per Layer__: Do not duplicate validation logic across layers. Shape validation lives in preload/IPC, business rules in managers, persistence guarantees in repositories.
+2. __Fail Fast__: Reject invalid data as early as possible with actionable error messages. IPC handlers should never pass an invalid payload to managers.
+3. __Structured Errors__: Use `ApplicationError` (or a more specific subclass) when propagating validation failures up the stack. Include metadata that helps renderer code present meaningful feedback.
+4. __Immutable Inputs__: Treat incoming data as immutable. Create sanitized copies rather than mutating caller arguments.
+5. __Tests at the Source__: Each validation rule must have unit tests in the layer that owns it. Avoid “integration-only” validation coverage unless the rule spans multiple layers.
 
 ## Implementing New Validation Rules
 
-1. **Define the Contract**
-   - Add or update the relevant Zod schema in `shared/validation` for IPC payloads.
-   - Extend typed validators in `IpcService` (e.g., `SiteHandlerValidators`, `MonitoringHandlerValidators`).
+1. __Define the Contract__
+   * Add or update the relevant Zod schema in `shared/validation` for IPC payloads.
+   * Extend typed validators in `IpcService` (e.g., `SiteHandlerValidators`, `MonitoringHandlerValidators`).
 
-2. **Enforce Business Rules**
-   - Implement domain checks inside the appropriate manager (often before calling repositories).
-   - Throw an `ApplicationError` with `code`, `operation`, and `details` describing the violated rule.
+2. __Enforce Business Rules__
+   * Implement domain checks inside the appropriate manager (often before calling repositories).
+   * Throw an `ApplicationError` with `code`, `operation`, and `details` describing the violated rule.
 
-3. **Persist Safely**
-   - Ensure repository methods use transactions and SQL constraints to guarantee data integrity.
-   - Normalize data (e.g., trimming strings, coercing booleans) right before persistence.
+3. __Persist Safely__
+   * Ensure repository methods use transactions and SQL constraints to guarantee data integrity.
+   * Normalize data (e.g., trimming strings, coercing booleans) right before persistence.
 
-4. **Test Thoroughly**
-   - Add schema tests (fast-check or unit) for IPC validators.
-   - Add manager-level tests covering business rule branches.
-   - Add repository tests for constraint enforcement when practical.
+4. __Test Thoroughly__
+   * Add schema tests (fast-check or unit) for IPC validators.
+   * Add manager-level tests covering business rule branches.
+   * Add repository tests for constraint enforcement when practical.
 
 ## Cross-Layer Example
 
 When adding a new monitor type:
 
-1. **IPC Schema**: Update the monitor configuration Zod schema so preload rejects malformed input.
-2. **Manager Rule**: Extend `MonitorManager` to verify business requirements (e.g., mutually exclusive options, interval bounds) and throw an `ApplicationError` if invalid.
-3. **Repository Guard**: Ensure monitor persistence paths normalize identifiers and wrap writes in `DatabaseService.executeTransaction`.
-4. **Testing**: Cover each validation stage with targeted tests to prevent regressions.
+1. __IPC Schema__: Update the monitor configuration Zod schema so preload rejects malformed input.
+2. __Manager Rule__: Extend `MonitorManager` to verify business requirements (e.g., mutually exclusive options, interval bounds) and throw an `ApplicationError` if invalid.
+3. __Repository Guard__: Ensure monitor persistence paths normalize identifiers and wrap writes in `DatabaseService.executeTransaction`.
+4. __Testing__: Cover each validation stage with targeted tests to prevent regressions.
 
 ## Checklist for Reviews
 
-- [ ] IPC handler rejects invalid payloads before reaching managers.
-- [ ] Managers throw structured errors with remediation-friendly messages.
-- [ ] Repositories never assume the data is valid—transactions or constraints enforce integrity.
-- [ ] Tests exist for new validation logic at each layer.
-- [ ] Documentation (schemas, guides) reflects the new rule.
+* [ ] IPC handler rejects invalid payloads before reaching managers.
+* [ ] Managers throw structured errors with remediation-friendly messages.
+* [ ] Repositories never assume the data is valid—transactions or constraints enforce integrity.
+* [ ] Tests exist for new validation logic at each layer.
+* [ ] Documentation (schemas, guides) reflects the new rule.
 
 Following this strategy keeps validation consistent, discoverable, and verifiable as the codebase grows.

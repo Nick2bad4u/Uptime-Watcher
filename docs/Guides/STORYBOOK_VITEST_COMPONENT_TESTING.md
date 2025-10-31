@@ -6,9 +6,9 @@ This guide explains how the project runs browser-driven tests against Storybook 
 
 Running tests through Storybook lets us exercise rendered stories inside a real browser context. The addon bridges Storybook's story annotations with Vitest so that:
 
-- decorators, globals, and parameters defined in `storybook/preview.ts` are reused in tests
-- component stories run inside Chromium via Playwright, matching how the UI behaves in Storybook
-- Electron preload bridges stay mocked consistently between Storybook and Vitest
+* decorators, globals, and parameters defined in `storybook/preview.ts` are reused in tests
+* component stories run inside Chromium via Playwright, matching how the UI behaves in Storybook
+* Electron preload bridges stay mocked consistently between Storybook and Vitest
 
 Use this suite for interactive component behaviour that requires a browser or when you want to validate Storybook play functions.
 
@@ -16,19 +16,19 @@ Use this suite for interactive component behaviour that requires a browser or wh
 
 Key pieces live alongside the main Storybook configuration:
 
-- `storybook/main.ts` registers `@storybook/addon-vitest`, configures `@storybook/addon-coverage` with the same include/exclude globbing as Vitest, and keeps our shared Vite customisations (React compiler, CSS modules, aliases, optimiseDeps for MSW).
-- `.storybook/main.ts` extends the shared config and guarantees the addon stays enabled for any consumer of the `.storybook` directory.
-- `storybook/preview.ts` initialises `msw-storybook-addon`, registers the global `mswLoader`, injects the shared theme styles, and installs the Electron preload mock so the UI and tests share identical network stubs.
-- `storybook/vitest.setup.ts` installs the Electron preload mock and forwards the Storybook preview annotations (including MSW handlers and decorators) to Vitest via `setProjectAnnotations`.
-- `vitest.storybook.config.ts` is a dedicated Vitest config that:
-  - loads the same React compiler plugins used in Storybook
-  - enables the `storybookTest()` Vite plugin with `configDir: .storybook`
-  - runs tests in Playwright Chromium (`test.browser`) to match Storybook's runtime
-  - pre-configures the dot reporter so CLI output stays consistent even without script overrides
-  - keeps coverage disabled by default but wires JSON/LCOV reporters when `--coverage` is supplied, storing artefacts in `coverage/storybook`
-  - writes structured results (`test-results.json`) plus a Sonar-compatible XML report (`sonar-report.xml`) to `coverage/storybook`
-  - pre-bundles Storybook/MSW dependencies so the warmup pass stays deterministic
-- `tsconfig.json` and `vite.config.ts` both reference `vitest.storybook.config.ts` so type information and tooling stay aware of the new project.
+* `storybook/main.ts` registers `@storybook/addon-vitest`, configures `@storybook/addon-coverage` with the same include/exclude globbing as Vitest, and keeps our shared Vite customisations (React compiler, CSS modules, aliases, optimiseDeps for MSW).
+* `.storybook/main.ts` extends the shared config and guarantees the addon stays enabled for any consumer of the `.storybook` directory.
+* `storybook/preview.ts` initialises `msw-storybook-addon`, registers the global `mswLoader`, injects the shared theme styles, and installs the Electron preload mock so the UI and tests share identical network stubs.
+* `storybook/vitest.setup.ts` installs the Electron preload mock and forwards the Storybook preview annotations (including MSW handlers and decorators) to Vitest via `setProjectAnnotations`.
+* `vitest.storybook.config.ts` is a dedicated Vitest config that:
+  * loads the same React compiler plugins used in Storybook
+  * enables the `storybookTest()` Vite plugin with `configDir: .storybook`
+  * runs tests in Playwright Chromium (`test.browser`) to match Storybook's runtime
+  * pre-configures the dot reporter so CLI output stays consistent even without script overrides
+  * keeps coverage disabled by default but wires JSON/LCOV reporters when `--coverage` is supplied, storing artefacts in `coverage/storybook`
+  * writes structured results (`test-results.json`) plus a Sonar-compatible XML report (`sonar-report.xml`) to `coverage/storybook`
+  * pre-bundles Storybook/MSW dependencies so the warmup pass stays deterministic
+* `tsconfig.json` and `vite.config.ts` both reference `vitest.storybook.config.ts` so type information and tooling stay aware of the new project.
 
 When customising Storybook's Vite behaviour, keep `storybook/main.ts` as the single source of truth and import it from `.storybook/main.ts` to avoid divergence between local builds and addons.
 
@@ -63,8 +63,8 @@ flowchart TD
 
 The addon supports two primary patterns:
 
-1. **Play functions** – stories export `play` implementations that drive user interactions. Any assertions inside the play function run automatically when the story executes in Vitest.
-2. **`tests` exports** – stories can export a `tests` object mapping a label to a callback. The callback receives the testing context (canvas, fixture, `expect`) and is ideal for declarative assertions that do not belong in `play`.
+1. __Play functions__ – stories export `play` implementations that drive user interactions. Any assertions inside the play function run automatically when the story executes in Vitest.
+2. __`tests` exports__ – stories can export a `tests` object mapping a label to a callback. The callback receives the testing context (canvas, fixture, `expect`) and is ideal for declarative assertions that do not belong in `play`.
 
 Example excerpt inside a story module:
 
@@ -91,8 +91,8 @@ Every story still benefits from our standard lint rules (for example, always pre
 
 Instrumentation is gated behind the `VITE_COVERAGE` environment variable. Storybook loads `vite-plugin-istanbul` through `@storybook/addon-coverage` with `requireEnv: true`, so regular browsing sessions avoid the runtime cost unless coverage is explicitly requested.
 
-- `npm run test:storybook:coverage` sets `VITE_COVERAGE=true` and enables Vitest's `--coverage` flag. The V8 provider applies the same include/exclude filters as Storybook and writes artefacts to `coverage/storybook` (LCOV, JSON summary, and per-test JSON).
-- To explore results inside Storybook's UI, start the dev server with instrumentation enabled: `VITE_COVERAGE=true npm run storybook`. The Vitest addon reuses the Istanbul output to show the "Coverage" section once a run completes and mirrors the HTML report inside Storybook's cache directory.
+* `npm run test:storybook:coverage` sets `VITE_COVERAGE=true` and enables Vitest's `--coverage` flag. The V8 provider applies the same include/exclude filters as Storybook and writes artefacts to `coverage/storybook` (LCOV, JSON summary, and per-test JSON).
+* To explore results inside Storybook's UI, start the dev server with instrumentation enabled: `VITE_COVERAGE=true npm run storybook`. The Vitest addon reuses the Istanbul output to show the "Coverage" section once a run completes and mirrors the HTML report inside Storybook's cache directory.
 
 With the flag unset, instrumentation stays off for both Storybook and Vitest, keeping everyday feedback loops quick and avoiding accidental pollution of the shared `coverage/` directory.
 
@@ -100,10 +100,10 @@ With the flag unset, instrumentation stays off for both Storybook and Vitest, ke
 
 Storybook and the Vitest suite share the same Mock Service Worker setup via `msw-storybook-addon`.
 
-- The service worker lives in `public/mockServiceWorker.js`. Regenerate it with `npx msw init public --save` whenever MSW updates.
-- Declare handlers inside stories using the standard `parameters.msw.handlers` API. Both Storybook's preview and the test runner pick them up automatically.
-- The shared `mswLoader` waits for the worker activation and applies handlers ahead of each story/test run, replacing the deprecated decorator hook.
-- Handlers run in the browser context, so they can rely on cookies, headers, and other request metadata exactly as the UI would receive them.
+* The service worker lives in `public/mockServiceWorker.js`. Regenerate it with `npx msw init public --save` whenever MSW updates.
+* Declare handlers inside stories using the standard `parameters.msw.handlers` API. Both Storybook's preview and the test runner pick them up automatically.
+* The shared `mswLoader` waits for the worker activation and applies handlers ahead of each story/test run, replacing the deprecated decorator hook.
+* Handlers run in the browser context, so they can rely on cookies, headers, and other request metadata exactly as the UI would receive them.
 
 Example usage inside a story module:
 
@@ -137,17 +137,17 @@ During tests the decorator mirrors Storybook's behaviour, so you do not need to 
 
 Each Storybook Vitest run emits machine-consumable artefacts alongside console output:
 
-- `coverage/storybook/test-results.json` – Vitest's structured result file used for triaging flaky specs.
-- `coverage/storybook/sonar-report.xml` – Generated by `vitest-sonar-reporter` and already registered in `sonar-project.properties` as both `sonar.testExecutionReportPaths` and `sonar.genericTest.reportPaths`.
-- `coverage/storybook/lcov.info` – Produced when `VITE_COVERAGE=true`, enabling Sonar and other coverage dashboards to merge component coverage with the rest of the suite.
+* `coverage/storybook/test-results.json` – Vitest's structured result file used for triaging flaky specs.
+* `coverage/storybook/sonar-report.xml` – Generated by `vitest-sonar-reporter` and already registered in `sonar-project.properties` as both `sonar.testExecutionReportPaths` and `sonar.genericTest.reportPaths`.
+* `coverage/storybook/lcov.info` – Produced when `VITE_COVERAGE=true`, enabling Sonar and other coverage dashboards to merge component coverage with the rest of the suite.
 
 Because the reporter is always active, CI jobs simply need to run `npm run test:storybook` (optionally with `npm run test:storybook:coverage`) before invoking the Sonar scanner. Downstream tooling can rely on the artefacts being refreshed on every run.
 
 ## Troubleshooting
 
-- **MDX warning** – the CLI may print `No story files found for the specified pattern: storybook\stories\**\*.mdx` because the project currently uses CSF-only stories. This is harmless; add an MDX story or remove the MDX story glob in `storybook/main.ts` if you want to silence it.
-- **Storybook port busy** – stop any running Storybook instance or change the port in both `storybookScript` and `storybookUrl` inside `vitest.storybook.config.ts`.
-- **Missing decorators/parameters** – ensure new preview changes land in `storybook/preview.ts`. The Vitest setup mirrors exactly what Storybook exports from that file.
-- **Renderer services missing bridge** – confirm the story imports `useMount` and relies on the `installElectronAPIMock` helper so renderer services (e.g., `SiteService`) have a mocked bridge during the test run.
+* __MDX warning__ – the CLI may print `No story files found for the specified pattern: storybook\stories\**\*.mdx` because the project currently uses CSF-only stories. This is harmless; add an MDX story or remove the MDX story glob in `storybook/main.ts` if you want to silence it.
+* __Storybook port busy__ – stop any running Storybook instance or change the port in both `storybookScript` and `storybookUrl` inside `vitest.storybook.config.ts`.
+* __Missing decorators/parameters__ – ensure new preview changes land in `storybook/preview.ts`. The Vitest setup mirrors exactly what Storybook exports from that file.
+* __Renderer services missing bridge__ – confirm the story imports `useMount` and relies on the `installElectronAPIMock` helper so renderer services (e.g., `SiteService`) have a mocked bridge during the test run.
 
 For broader testing guidance (coverage thresholds, test location conventions, CI workflows), see `docs/Guides/TESTING.md` and `docs/Guides/TESTING_METHODOLOGY_REACT_COMPONENTS.md`

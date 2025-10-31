@@ -1,20 +1,18 @@
----
+***
+
 title: Engineering Tooling Pipelines
 description: Diagrams for linting, type-checking, documentation, and site builds
----
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
+--------------------------------------------------------------------------------
+
+{/\* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX \*/}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
 export default function EngineeringTooling() {
-  return (
-    <Layout
-      title="Engineering Tooling Pipelines"
-      description="Detailed diagrams for linting, type-checking, documentation, and site builds"
-    >
-      <div className="container margin-vert--lg">
-        <div className="row">
-          <div className="col">
+return ( <Layout
+   title="Engineering Tooling Pipelines"
+   description="Detailed diagrams for linting, type-checking, documentation, and site builds"
+ > <div className="container margin-vert--lg"> <div className="row"> <div className="col">
 
 # Engineering Tooling Pipelines
 
@@ -24,304 +22,325 @@ Each section below breaks down a major developer workflow using Mermaid diagrams
 
 This topology shows how `package.json` scripts fan out into ESLint, Stylelint, Prettier, Remark, and auxiliary analyzers (madge, commitlint, actionlint, cognitive complexity, dependency hygiene). Caches and config files are included so you can jump straight to the right file when something fails locally or in CI.
 
-<Mermaid value={`graph TD
-    subgraph CLI["npm scripts (package.json)"]
-        lint["npm run lint"]
-        lintAll["npm run lint:all"]
-        lintCI["npm run lint:ci"]
-        lintQuick["npm run lint:quick"]
-        lintPrettier["npm run lint:prettier"]
-        lintPrettierFix["npm run lint:prettier-fix"]
-        lintCSS["npm run lint:css"]
-        lintCSSDocs["npm run lint:css:docs"]
-        lintRemark["npm run remark:check"]
-        lintRemarkFix["npm run remark:fix"]
-        lintMadge["npm run lint:circular"]
-        lintAction["npm run lint:actions"]
-        lintCommit["npm run lint:commit"]
-        lintComplexity["npm run lint:complexity"]
-        lintKnip["npm run knip"]
-        lintDepcheck["npm run lint:unused-deps"]
-    end
+\<Mermaid value={\`graph TD
+subgraph CLI\["npm scripts (package.json)"]
+lint\["npm run lint"]
+lintAll\["npm run lint:all"]
+lintCI\["npm run lint:ci"]
+lintQuick\["npm run lint:quick"]
+lintPrettier\["npm run lint:prettier"]
+lintPrettierFix\["npm run lint:prettier-fix"]
+lintCSS\["npm run lint:css"]
+lintCSSDocs\["npm run lint:css:docs"]
+lintRemark\["npm run remark:check"]
+lintRemarkFix\["npm run remark:fix"]
+lintMadge\["npm run lint:circular"]
+lintAction\["npm run lint:actions"]
+lintCommit\["npm run lint:commit"]
+lintComplexity\["npm run lint:complexity"]
+lintKnip\["npm run knip"]
+lintDepcheck\["npm run lint:unused-deps"]
+end
 
-    subgraph ESLint["ESLint runner"]
-        ESLintRunner["eslint --cache --cache-location .cache/.eslintcache"]
-        ESLintConfig["eslint.config.mjs\n(imports >50 plugins)"]
-        ESLintCache[".cache/.eslintcache"]
-    end
+```
+subgraph ESLint["ESLint runner"]
+    ESLintRunner["eslint --cache --cache-location .cache/.eslintcache"]
+    ESLintConfig["eslint.config.mjs\n(imports >50 plugins)"]
+    ESLintCache[".cache/.eslintcache"]
+end
 
-    subgraph Stylelint["Stylelint runner"]
-        StylelintRunner["stylelint --cache --cache-location .cache/stylelintcache"]
-        StylelintConfig["stylelint.config.mjs"]
-        StylelintDocsConfig["docs/docusaurus/stylelint.config.mjs"]
-        StylelintCache[".cache/stylelintcache"]
-    end
+subgraph Stylelint["Stylelint runner"]
+    StylelintRunner["stylelint --cache --cache-location .cache/stylelintcache"]
+    StylelintConfig["stylelint.config.mjs"]
+    StylelintDocsConfig["docs/docusaurus/stylelint.config.mjs"]
+    StylelintCache[".cache/stylelintcache"]
+end
 
-    subgraph Prettier["Prettier formatting"]
-        PrettierRunner["prettier . --cache --cache-location .cache/.prettier-cache"]
-        PrettierConfig[".prettierrc + plugins"]
-        PrettierCache[".cache/.prettier-cache"]
-    end
+subgraph Prettier["Prettier formatting"]
+    PrettierRunner["prettier . --cache --cache-location .cache/.prettier-cache"]
+    PrettierConfig[".prettierrc + plugins"]
+    PrettierCache[".cache/.prettier-cache"]
+end
 
-    subgraph Remark["Remark lint"]
-        RemarkRunner["remark --rc-path .remarkrc.mjs --ignore .remarkignore"]
-        RemarkConfig[".remarkrc.mjs\n(GFM + lint presets)"]
-    end
+subgraph Remark["Remark lint"]
+    RemarkRunner["remark --rc-path .remarkrc.mjs --ignore .remarkignore"]
+    RemarkConfig[".remarkrc.mjs\n(GFM + lint presets)"]
+end
 
-    subgraph AuxTools["Auxiliary analyzers"]
-        Madge["madge --circular src/ electron/ shared/"]
-        Actionlint["actionlint -c config/linting/ActionLintConfig.yaml"]
-        Commitlint["commitlint --config config/linting/commitlint.config.mjs"]
-        Complexity["eslint complexity override\n + cognitive-complexity-ts"]
-        Knip["knip -- include unused exports"]
-        Depcheck["depcheck --ignores @types/*"]
-        Yamllint["yamllint -c config/linting/.yamllint"]
-        Grype["grype . -c config/linting/.grype.yaml"]
-    end
+subgraph AuxTools["Auxiliary analyzers"]
+    Madge["madge --circular src/ electron/ shared/"]
+    Actionlint["actionlint -c config/linting/ActionLintConfig.yaml"]
+    Commitlint["commitlint --config config/linting/commitlint.config.mjs"]
+    Complexity["eslint complexity override\n + cognitive-complexity-ts"]
+    Knip["knip -- include unused exports"]
+    Depcheck["depcheck --ignores @types/*"]
+    Yamllint["yamllint -c config/linting/.yamllint"]
+    Grype["grype . -c config/linting/.grype.yaml"]
+end
 
-    lint --> ESLintRunner
-    lintQuick --> ESLintRunner
-    lintCI --> ESLintRunner
-    lintAll --> ESLintRunner
-    lintAll --> StylelintRunner
-    lintAll --> RemarkRunner
-    lintAll --> Madge
-    lintAll --> Knip
+lint --> ESLintRunner
+lintQuick --> ESLintRunner
+lintCI --> ESLintRunner
+lintAll --> ESLintRunner
+lintAll --> StylelintRunner
+lintAll --> RemarkRunner
+lintAll --> Madge
+lintAll --> Knip
 
-    lintPrettier --> PrettierRunner
-    lintPrettierFix --> PrettierRunner
+lintPrettier --> PrettierRunner
+lintPrettierFix --> PrettierRunner
 
-    lintCSS --> StylelintRunner
-    lintCSSDocs --> StylelintDocsConfig
+lintCSS --> StylelintRunner
+lintCSSDocs --> StylelintDocsConfig
 
-    lintRemark --> RemarkRunner
-    lintRemarkFix --> RemarkRunner
+lintRemark --> RemarkRunner
+lintRemarkFix --> RemarkRunner
 
-    lintMadge --> Madge
-    lintAction --> Actionlint
-    lintCommit --> Commitlint
-    lintComplexity --> Complexity
-    lintKnip --> Knip
-    lintDepcheck --> Depcheck
+lintMadge --> Madge
+lintAction --> Actionlint
+lintCommit --> Commitlint
+lintComplexity --> Complexity
+lintKnip --> Knip
+lintDepcheck --> Depcheck
 
-    ESLintRunner --> ESLintConfig
-    ESLintRunner --> ESLintCache
-    StylelintRunner --> StylelintConfig
-    StylelintRunner --> StylelintCache
-    StylelintDocsConfig --> StylelintRunner
-    PrettierRunner --> PrettierConfig
-    PrettierRunner --> PrettierCache
-    RemarkRunner --> RemarkConfig
+ESLintRunner --> ESLintConfig
+ESLintRunner --> ESLintCache
+StylelintRunner --> StylelintConfig
+StylelintRunner --> StylelintCache
+StylelintDocsConfig --> StylelintRunner
+PrettierRunner --> PrettierConfig
+PrettierRunner --> PrettierCache
+RemarkRunner --> RemarkConfig
 
-    classDef cli fill:#0ea5e9,stroke:#0369a1,color:#ffffff
-    classDef runner fill:#312e81,stroke:#1e1b4b,color:#ffffff
-    classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
+classDef cli fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+classDef runner fill:#312e81,stroke:#1e1b4b,color:#ffffff
+classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
 
-    class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
-    class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
-    class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsConfig,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
-` } />
+class lint,lintAll,lintCI,lintQuick,lintPrettier,lintPrettierFix,lintCSS,lintCSSDocs,lintRemark,lintRemarkFix,lintMadge,lintAction,lintCommit,lintComplexity,lintKnip,lintDepcheck cli
+class ESLintRunner,StylelintRunner,PrettierRunner,RemarkRunner,Madge,Actionlint,Commitlint,Complexity,Knip,Depcheck,Yamllint,Grype runner
+class ESLintConfig,ESLintCache,StylelintConfig,StylelintDocsConfig,StylelintCache,PrettierConfig,PrettierCache,RemarkConfig config
+```
+
+\` } />
 
 With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
 
-<Mermaid value={`graph TD
-    subgraph Scripts["Type-check scripts"]
-        checkTypes["npm run check-types"]
-        checkAll["npm run check:all"]
-        checkAllAll["npm run check:all:all"]
-        checkPlaywright["npm run check:playwright"]
-    end
+\<Mermaid value={\`graph TD
+subgraph Scripts\["Type-check scripts"]
+checkTypes\["npm run check-types"]
+checkAll\["npm run check:all"]
+checkAllAll\["npm run check:all:all"]
+checkPlaywright\["npm run check:playwright"]
+end
 
-    subgraph TSProjects["tsconfig project references"]
-        tsApp["tsconfig.json (frontend)"]
-        tsElectron["tsconfig.electron.json"]
-        tsShared["tsconfig.shared.json"]
-        tsTestFrontend["config/testing/tsconfig.test.json"]
-        tsTestElectron["config/testing/tsconfig.electron.test.json"]
-        tsTestShared["config/testing/tsconfig.shared.test.json"]
-        tsBenchmarks["config/benchmarks/tsconfig.bench.json"]
-        tsConfigs["config/testing/tsconfig.configs.json"]
-        tsPlaywright["playwright/tsconfig.json"]
-        tsStorybook["storybook/tsconfig.json"]
-    end
+```
+subgraph TSProjects["tsconfig project references"]
+    tsApp["tsconfig.json (frontend)"]
+    tsElectron["tsconfig.electron.json"]
+    tsShared["tsconfig.shared.json"]
+    tsTestFrontend["config/testing/tsconfig.test.json"]
+    tsTestElectron["config/testing/tsconfig.electron.test.json"]
+    tsTestShared["config/testing/tsconfig.shared.test.json"]
+    tsBenchmarks["config/benchmarks/tsconfig.bench.json"]
+    tsConfigs["config/testing/tsconfig.configs.json"]
+    tsPlaywright["playwright/tsconfig.json"]
+    tsStorybook["storybook/tsconfig.json"]
+end
 
-    subgraph Outputs["Artifacts"]
-        dtsOut["dist/**/*.d.ts"]
-        tsbuildInfo[".tsbuildinfo caches"]
-        diagnostics["tsc diagnostics"]
-    end
+subgraph Outputs["Artifacts"]
+    dtsOut["dist/**/*.d.ts"]
+    tsbuildInfo[".tsbuildinfo caches"]
+    diagnostics["tsc diagnostics"]
+end
 
-    checkTypes --> tsApp
-    checkTypes --> tsElectron
-    checkTypes --> tsShared
+checkTypes --> tsApp
+checkTypes --> tsElectron
+checkTypes --> tsShared
 
-    checkAll --> checkTypes
-    checkAll --> tsTestFrontend
-    checkAll --> tsTestElectron
-    checkAll --> tsTestShared
-    checkAll --> tsPlaywright
+checkAll --> checkTypes
+checkAll --> tsTestFrontend
+checkAll --> tsTestElectron
+checkAll --> tsTestShared
+checkAll --> tsPlaywright
 
-    checkAllAll --> checkAll
-    checkAllAll --> tsBenchmarks
-    checkAllAll --> tsConfigs
-    checkAllAll --> tsStorybook
+checkAllAll --> checkAll
+checkAllAll --> tsBenchmarks
+checkAllAll --> tsConfigs
+checkAllAll --> tsStorybook
 
-    checkPlaywright --> tsPlaywright
+checkPlaywright --> tsPlaywright
 
-    tsApp --> Outputs
-    tsElectron --> Outputs
-    tsShared --> Outputs
-    tsTestFrontend --> diagnostics
-    tsTestElectron --> diagnostics
-    tsTestShared --> diagnostics
-    tsPlaywright --> diagnostics
-    tsStorybook --> diagnostics
+tsApp --> Outputs
+tsElectron --> Outputs
+tsShared --> Outputs
+tsTestFrontend --> diagnostics
+tsTestElectron --> diagnostics
+tsTestShared --> diagnostics
+tsPlaywright --> diagnostics
+tsStorybook --> diagnostics
 
-    classDef script fill:#f97316,stroke:#c2410c,color:#fff7ed
-    classDef tsconfig fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
-    classDef artifact fill:#15803d,stroke:#166534,color:#f0fdf4
+classDef script fill:#f97316,stroke:#c2410c,color:#fff7ed
+classDef tsconfig fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
+classDef artifact fill:#15803d,stroke:#166534,color:#f0fdf4
 
-    class checkTypes,checkAll,checkAllAll,checkPlaywright script
-    class tsApp,tsElectron,tsShared,tsTestFrontend,tsTestElectron,tsTestShared,tsBenchmarks,tsConfigs,tsPlaywright,tsStorybook tsconfig
-    class dtsOut,tsbuildInfo,diagnostics artifact
-`} />
+class checkTypes,checkAll,checkAllAll,checkPlaywright script
+class tsApp,tsElectron,tsShared,tsTestFrontend,tsTestElectron,tsTestShared,tsBenchmarks,tsConfigs,tsPlaywright,tsStorybook tsconfig
+class dtsOut,tsbuildInfo,diagnostics artifact
+```
+
+\`} />
 
 ## Documentation & Content Toolchain
 
 Uptime Watcher’s documentation stack combines Markdown/MDX linting, TypeDoc API extraction, and manual content in `docs/docusaurus/src`. The diagram highlights how Remark, Prettier, and TypeDoc coordinate.
 
-<Mermaid value={`flowchart LR
-    DocsSrc["docs/ + docs/docusaurus/src/pages"] --> RemarkLint
-    Guides["docs/Guides/**"] --> RemarkLint
-    TSDoc["docs/TSDoc/**"] --> RemarkLint
-    RemarkLint["remark --rc-path .remarkrc.mjs"] --> PrettierDocs["prettier --cache"]
+\<Mermaid value={\`flowchart LR
+DocsSrc\["docs/ + docs/docusaurus/src/pages"] --> RemarkLint
+Guides\["docs/Guides/__"] --> RemarkLint
+TSDoc\["docs/TSDoc/__"] --> RemarkLint
+RemarkLint\["remark --rc-path .remarkrc.mjs"] --> PrettierDocs\["prettier --cache"]
 
-    subgraph TypeDoc["TypeDoc generation"]
-        TypedocCmd["npm run docs:typedoc"]
-        TypedocConfig["docs/docusaurus/typedoc.config.json"]
-        TypedocTSConfig["docs/docusaurus/tsconfig.typedoc.json"]
-        TypedocPlugins["typedoc-plugin-markdown + coverage + remark"]
-    end
+```
+subgraph TypeDoc["TypeDoc generation"]
+    TypedocCmd["npm run docs:typedoc"]
+    TypedocConfig["docs/docusaurus/typedoc.config.json"]
+    TypedocTSConfig["docs/docusaurus/tsconfig.typedoc.json"]
+    TypedocPlugins["typedoc-plugin-markdown + coverage + remark"]
+end
 
-    TypedocCmd --> TypedocConfig
-    TypedocCmd --> TypedocTSConfig
-    TypedocConfig --> TypedocPlugins
-    TypedocCmd --> ApiMarkdown["docs/docusaurus/docs/api/**"]
+TypedocCmd --> TypedocConfig
+TypedocCmd --> TypedocTSConfig
+TypedocConfig --> TypedocPlugins
+TypedocCmd --> ApiMarkdown["docs/docusaurus/docs/api/**"]
 
-    PrettierDocs --> DocsReviewed["Formatted MD/MDX"]
-    ApiMarkdown --> DocsReviewed
+PrettierDocs --> DocsReviewed["Formatted MD/MDX"]
+ApiMarkdown --> DocsReviewed
 
-    classDef content fill:#8b5cf6,stroke:#6d28d9,color:#f5f3ff
-    classDef tooling fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
+classDef content fill:#8b5cf6,stroke:#6d28d9,color:#f5f3ff
+classDef tooling fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
 
-    class DocsSrc,Guides,TSDoc,ApiMarkdown content
-    class RemarkLint,PrettierDocs,TypedocCmd,TypedocConfig,TypedocTSConfig,TypedocPlugins,DocsReviewed tooling
-`} />
+class DocsSrc,Guides,TSDoc,ApiMarkdown content
+class RemarkLint,PrettierDocs,TypedocCmd,TypedocConfig,TypedocTSConfig,TypedocPlugins,DocsReviewed tooling
+```
+
+\`} />
 
 ## Docusaurus Site Architecture
 
 The following diagram maps the Docusaurus site located in `docs/docusaurus`. It shows how the core config, theme customisations, plugins, and static assets plug together.
 
-<Mermaid value={`graph TB
-    DocusaurusRoot["docs/docusaurus"]
-    DocusaurusRoot --> ConfigTS["docusaurus.config.ts"]
-    DocusaurusRoot --> Sidebars["sidebars.ts"]
-    DocusaurusRoot --> ThemeOverrides["src/theme/**"]
-    DocusaurusRoot --> LiveCode["plugins: @docusaurus/theme-live-codeblock"]
-    DocusaurusRoot --> MermaidPlugin["plugins: @docusaurus/theme-mermaid"]
-    DocusaurusRoot --> ZoomPlugin["plugins: docusaurus-plugin-image-zoom"]
-    DocusaurusRoot --> CopyButton["plugins: docusaurus-plugin-copy-page-button"]
-    DocusaurusRoot --> ClientModules["src/js/modernEnhancements.ts"]
+\<Mermaid value={\`graph TB
+DocusaurusRoot\["docs/docusaurus"]
+DocusaurusRoot --> ConfigTS\["docusaurus.config.ts"]
+DocusaurusRoot --> Sidebars\["sidebars.ts"]
+DocusaurusRoot --> ThemeOverrides\["src/theme/\*\*"]
+DocusaurusRoot --> LiveCode\["plugins: @docusaurus/theme-live-codeblock"]
+DocusaurusRoot --> MermaidPlugin\["plugins: @docusaurus/theme-mermaid"]
+DocusaurusRoot --> ZoomPlugin\["plugins: docusaurus-plugin-image-zoom"]
+DocusaurusRoot --> CopyButton\["plugins: docusaurus-plugin-copy-page-button"]
+DocusaurusRoot --> ClientModules\["src/js/modernEnhancements.ts"]
 
-    ConfigTS --> Deployment["deploymentBranch = gh-pages"]
-    ConfigTS --> BaseUrl["baseUrl = /Uptime-Watcher/"]
-    ConfigTS --> MarkdownPipeline["markdown: mermaid + anchors + mdx1Compat"]
-    ConfigTS --> FutureFlags["future.experimental_faster"]
-    ConfigTS --> ThemeConfig["classic preset theme, navbar, footer"]
+```
+ConfigTS --> Deployment["deploymentBranch = gh-pages"]
+ConfigTS --> BaseUrl["baseUrl = /Uptime-Watcher/"]
+ConfigTS --> MarkdownPipeline["markdown: mermaid + anchors + mdx1Compat"]
+ConfigTS --> FutureFlags["future.experimental_faster"]
+ConfigTS --> ThemeConfig["classic preset theme, navbar, footer"]
 
-    ThemeOverrides --> CodeBlocks["prism themes"]
-    ThemeOverrides --> CustomPages["custom MDX pages"]
+ThemeOverrides --> CodeBlocks["prism themes"]
+ThemeOverrides --> CustomPages["custom MDX pages"]
 
-    staticAssets["docs/docusaurus/static/**"] --> BuildArtifacts["build output"]
+staticAssets["docs/docusaurus/static/**"] --> BuildArtifacts["build output"]
 
-    classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
-    classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
-    classDef plugin fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
+classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+classDef config fill:#1f2937,stroke:#111827,color:#f1f5f9
+classDef plugin fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
 
-    class DocusaurusRoot root
-    class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
-    class LiveCode,MermaidPlugin,ZoomPlugin,CopyButton,BuildArtifacts plugin
-`} />
+class DocusaurusRoot root
+class ConfigTS,Sidebars,ThemeOverrides,Deployment,BaseUrl,MarkdownPipeline,FutureFlags,ThemeConfig,CodeBlocks,CustomPages,ClientModules,staticAssets config
+class LiveCode,MermaidPlugin,ZoomPlugin,CopyButton,BuildArtifacts plugin
+```
+
+\`} />
 
 ## Docusaurus Build & TypeDoc Pipeline
 
 `npm run docs:build` chains TypeDoc generation, ESLint inspector export, and the Docusaurus build. The sequence diagram shows the order of operations and where artefacts land.
 
-<Mermaid value={`sequenceDiagram
-    autonumber
-    participant Dev as Developer CLI
-    participant Scripts as npm scripts
-    participant TypeDoc as docs:typedoc
-    participant Inspector as build:eslint-inspector
-    participant Docusaurus as docusaurus build
-    participant Output as Artifacts
+\<Mermaid value={\`sequenceDiagram
+autonumber
+participant Dev as Developer CLI
+participant Scripts as npm scripts
+participant TypeDoc as docs:typedoc
+participant Inspector as build:eslint-inspector
+participant Docusaurus as docusaurus build
+participant Output as Artifacts
 
-    Dev->>Scripts: npm run docs:build
-    Scripts->>TypeDoc: cd docs/docusaurus && typedoc --options typedoc.config.json
-    TypeDoc->>Output: docs/docusaurus/docs/api/** (Markdown)
-    TypeDoc-->>Scripts: exit 0
-    Scripts->>Inspector: npm run build:eslint-inspector
-    Inspector->>Output: docs/docusaurus/static/eslint-inspector/**
-    Inspector-->>Scripts: exit 0
-    Scripts->>Docusaurus: cd docs/docusaurus && npx docusaurus build
-    Docusaurus->>Output: build/ (static site)
-    Docusaurus-->>Dev: Build summary + sitemap
+```
+Dev->>Scripts: npm run docs:build
+Scripts->>TypeDoc: cd docs/docusaurus && typedoc --options typedoc.config.json
+TypeDoc->>Output: docs/docusaurus/docs/api/** (Markdown)
+TypeDoc-->>Scripts: exit 0
+Scripts->>Inspector: npm run build:eslint-inspector
+Inspector->>Output: docs/docusaurus/static/eslint-inspector/**
+Inspector-->>Scripts: exit 0
+Scripts->>Docusaurus: cd docs/docusaurus && npx docusaurus build
+Docusaurus->>Output: build/ (static site)
+Docusaurus-->>Dev: Build summary + sitemap
 
-    Note over TypeDoc,Docusaurus: Build steps reuse HEADLESS env when running on CI
-`} />
+Note over TypeDoc,Docusaurus: Build steps reuse HEADLESS env when running on CI
+```
+
+\`} />
 
 ## Quality Gate Orchestrator (Bonus)
 
 Beyond linting/type-checking, `npm run quality` is the umbrella command CI uses to assert code health. It fans out to linting, testing, dependency hygiene, and broken link checks. Use this map when debugging a failing pipeline run.
 
-<Mermaid value={`graph LR
-    quality["npm run quality"] --> lintAll
-    quality --> testAllCoverage["npm run test:all:coverage"]
-    quality --> docusaurusCheck["npm run docusaurus:broken-links"]
-    quality --> depScan["npm run lint:vulnerability"]
+\<Mermaid value={\`graph LR
+quality\["npm run quality"] --> lintAll
+quality --> testAllCoverage\["npm run test:all:coverage"]
+quality --> docusaurusCheck\["npm run docusaurus:broken-links"]
+quality --> depScan\["npm run lint:vulnerability"]
 
-    lintAll --> lint
-    lintAll --> lintRemark
-    lintAll --> lintMadge
-    lintAll --> typeCheckAll
-    lintAll --> knip["npm run knip"]
+```
+lintAll --> lint
+lintAll --> lintRemark
+lintAll --> lintMadge
+lintAll --> typeCheckAll
+lintAll --> knip["npm run knip"]
 
-    testAllCoverage --> frontendCov["vitest --config vitest.config.ts --coverage"]
-    testAllCoverage --> electronCov["vitest --config vitest.electron.config.ts --coverage"]
-    testAllCoverage --> sharedCov["vitest --config vitest.shared.config.ts --coverage"]
-    testAllCoverage --> storybookCov["vitest --config vitest.storybook.config.ts --coverage"]
+testAllCoverage --> frontendCov["vitest --config vitest.config.ts --coverage"]
+testAllCoverage --> electronCov["vitest --config vitest.electron.config.ts --coverage"]
+testAllCoverage --> sharedCov["vitest --config vitest.shared.config.ts --coverage"]
+testAllCoverage --> storybookCov["vitest --config vitest.storybook.config.ts --coverage"]
 
-    docusaurusCheck --> typedocRefresh["npm run docs:typedoc"]
-    docusaurusCheck --> docusaurusBuildCheck["npx docusaurus check"]
+docusaurusCheck --> typedocRefresh["npm run docs:typedoc"]
+docusaurusCheck --> docusaurusBuildCheck["npx docusaurus check"]
 
-    depScan --> grypeScan["grype ."]
-    depScan --> depcheckScan["depcheck"]
+depScan --> grypeScan["grype ."]
+depScan --> depcheckScan["depcheck"]
 
-    classDef gate fill:#0f172a,stroke:#0b1120,color:#f8fafc
-    classDef child fill:#334155,stroke:#1e293b,color:#f1f5f9
+classDef gate fill:#0f172a,stroke:#0b1120,color:#f8fafc
+classDef child fill:#334155,stroke:#1e293b,color:#f1f5f9
 
-    class quality gate
-    class lintAll,testAllCoverage,docusaurusCheck,depScan gate
-    class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,depcheckScan child
-`} />
+class quality gate
+class lintAll,testAllCoverage,docusaurusCheck,depScan gate
+class lint,lintRemark,lintMadge,typeCheckAll,knip,frontendCov,electronCov,sharedCov,storybookCov,typedocRefresh,docusaurusBuildCheck,grypeScan,depcheckScan child
+```
 
----
+\`} />
+
+***
 
 With these diagrams you can quickly trace the exact scripts and configuration files responsible for quality gates, documentation output, and the Docusaurus website lifecycle. Keep them handy when extending tooling or triaging CI issues.
 
-          </div>
-        </div>
+```
       </div>
-    </Layout>
-  );
+    </div>
+  </div>
+</Layout>
+```
+
+);
 }

@@ -1,6 +1,6 @@
 # 🚀 Developer Quick Start Guide
 
-> **Fast Track**: Get up and running with Uptime Watcher development in minutes.
+> __Fast Track__: Get up and running with Uptime Watcher development in minutes.
 
 ## 📋 Overview
 
@@ -10,9 +10,9 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 
 ### Prerequisites
 
-- **Node.js**: 24.8+ (required)
-- **npm**: 11.5.2+ (comes with Node.js)
-- **Git**: Latest version
+* __Node.js__: 24.8+ (required)
+* __npm__: 11.5.2+ (comes with Node.js)
+* __Git__: Latest version
 
 ### 1. Clone & Install
 
@@ -35,20 +35,20 @@ npm run electron      # Terminal 2: Electron shell (waits for Vite)
 
 ### 3. Verify Setup
 
-- Application window should open automatically
-- React DevTools available in development
-- Hot reload enabled for both frontend and backend changes
+* Application window should open automatically
+* React DevTools available in development
+* Hot reload enabled for both frontend and backend changes
 
 ## 🏗️ Architecture Quick Reference
 
 ### Technology Stack
 
-- **Frontend**: React + TypeScript + Tailwind CSS + Vite
-- **Desktop**: Electron (main + renderer processes)
-- **Database**: SQLite (node-sqlite3-wasm)
-- **State**: Zustand (domain-specific stores with modular composition)
-- **Testing**: Vitest (dual configuration)
-- **IPC**: Type-safe Electron contextBridge with `registerStandardizedIpcHandler`
+* __Frontend__: React + TypeScript + Tailwind CSS + Vite
+* __Desktop__: Electron (main + renderer processes)
+* __Database__: SQLite (node-sqlite3-wasm)
+* __State__: Zustand (domain-specific stores with modular composition)
+* __Testing__: Vitest (dual configuration)
+* __IPC__: Type-safe Electron contextBridge with `registerStandardizedIpcHandler`
 
 ### Project Structure
 
@@ -99,37 +99,37 @@ The application follows a structured data flow pattern that ensures type safety 
 
 ### Key Data Flow Principles
 
-1. **Unidirectional Data Flow**: Data flows down from stores to components
-2. **Event-Driven Updates**: Backend changes propagate via TypedEventBus events
-3. **Optimistic Updates**: UI updates immediately, then syncs with backend
-4. **Transaction Safety**: All database operations wrapped in executeTransaction()
-5. **Type Safety**: Strict TypeScript with validation at IPC boundaries
+1. __Unidirectional Data Flow__: Data flows down from stores to components
+2. __Event-Driven Updates__: Backend changes propagate via TypedEventBus events
+3. __Optimistic Updates__: UI updates immediately, then syncs with backend
+4. __Transaction Safety__: All database operations wrapped in executeTransaction()
+5. __Type Safety__: Strict TypeScript with validation at IPC boundaries
 
 ## 🛠️ Common Development Tasks
 
 ### Adding a New Feature
 
-1. **Backend**: Add service/repository in `electron/services/`
-2. **IPC**: Create type-safe handlers using `registerStandardizedIpcHandler`
-3. **Frontend**: Add components and modular store in `src/`
-4. **Types**: Define shared types in `shared/types/`
-5. **Tests**: Add tests in both `electron/test/` and `src/test/`
+1. __Backend__: Add service/repository in `electron/services/`
+2. __IPC__: Create type-safe handlers using `registerStandardizedIpcHandler`
+3. __Frontend__: Add components and modular store in `src/`
+4. __Types__: Define shared types in `shared/types/`
+5. __Tests__: Add tests in both `electron/test/` and `src/test/`
 
 ### Database Changes
 
-1. **Repository**: Create/modify in `electron/services/database/`
-2. **Manager**: Update business logic in `electron/managers/`
-3. **Migration**: Handle schema changes in DatabaseService
-4. **Types**: Update interfaces in `shared/types/`
-5. **Events**: Emit appropriate events via TypedEventBus
+1. __Repository__: Create/modify in `electron/services/database/`
+2. __Manager__: Update business logic in `electron/managers/`
+3. __Migration__: Handle schema changes in DatabaseService
+4. __Types__: Update interfaces in `shared/types/`
+5. __Events__: Emit appropriate events via TypedEventBus
 
 ### Frontend Changes
 
-1. **Components**: Add to `src/components/`
-2. **State**: Create/modify modular Zustand stores in `src/stores/`
-3. **Styling**: Use Tailwind CSS classes
-4. **IPC**: Communicate via renderer services under `src/services`
-5. **Validation**: Use shared validation schemas from `shared/validation/`
+1. __Components__: Add to `src/components/`
+2. __State__: Create/modify modular Zustand stores in `src/stores/`
+3. __Styling__: Use Tailwind CSS classes
+4. __IPC__: Communicate via renderer services under `src/services`
+5. __Validation__: Use shared validation schemas from `shared/validation/`
 
 ## 🔧 Available Scripts
 
@@ -248,9 +248,9 @@ await checkSiteNow(siteIdentifier, monitorId);
 // The sites store updates immediately; follow-up events keep the UI in sync.
 ```
 
-- Optimistic updates reuse `applyStatusUpdateSnapshot`, ensuring the same merge logic as the event-driven flow.
-- Telemetry (`logStoreAction`) captures whether the optimistic payload was applied for observability.
-- Subsequent `monitor:check-completed` or `monitor:status-changed` events reconcile the state and are idempotent.
+* Optimistic updates reuse `applyStatusUpdateSnapshot`, ensuring the same merge logic as the event-driven flow.
+* Telemetry (`logStoreAction`) captures whether the optimistic payload was applied for observability.
+* Subsequent `monitor:check-completed` or `monitor:status-changed` events reconcile the state and are idempotent.
 
 ### 4. Event-Driven Updates with TypedEventBus
 
@@ -351,34 +351,34 @@ registerStandardizedIpcHandler(
 
 ### DO's ✅
 
-- **Follow TypeScript strict mode** - No `any` or type shortcuts
-- **Use established patterns** - Repository, Service, IPC patterns
-- **Write tests** - Both frontend and backend tests required
-- **Document with TSDoc** - Follow established standards
-- **Use error handling utilities** - `withErrorHandling()` for consistency
+* __Follow TypeScript strict mode__ - No `any` or type shortcuts
+* __Use established patterns__ - Repository, Service, IPC patterns
+* __Write tests__ - Both frontend and backend tests required
+* __Document with TSDoc__ - Follow established standards
+* __Use error handling utilities__ - `withErrorHandling()` for consistency
 
 ### DON'Ts ❌
 
-- **No direct database access** - Always use repositories
-- **No untyped IPC** - All communication must be typed
-- **No global state** - Keep Zustand stores domain-specific
-- **No direct state mutations** - Use store actions
-- **No bypassing error handling** - Use established patterns
+* __No direct database access__ - Always use repositories
+* __No untyped IPC__ - All communication must be typed
+* __No global state__ - Keep Zustand stores domain-specific
+* __No direct state mutations__ - Use store actions
+* __No bypassing error handling__ - Use established patterns
 
 ## 🐛 Debugging
 
 ### Development Tools
 
-- **React DevTools**: Available in development mode
-- **Electron DevTools**: F12 in the application window
-- **VS Code Debugging**: Configured launch configurations available
+* __React DevTools__: Available in development mode
+* __Electron DevTools__: F12 in the application window
+* __VS Code Debugging__: Configured launch configurations available
 
 ### Common Issues
 
-1. **SQLite WASM not found**: Run `npm run postbuild`
-2. **IPC communication fails**: Check type definitions and handlers
-3. **Hot reload not working**: Restart development server
-4. **Database errors**: Check transaction safety and repository usage
+1. __SQLite WASM not found__: Run `npm run postbuild`
+2. __IPC communication fails__: Check type definitions and handlers
+3. __Hot reload not working__: Restart development server
+4. __Database errors__: Check transaction safety and repository usage
 
 ### Logging
 
@@ -397,35 +397,35 @@ npm run electron -- --log-debug
 
 ### Architecture Understanding
 
-- [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) - AI assistant guide
-- [`docs/Architecture/ADRs/`](../Architecture/ADRs/) - Architectural decisions
-- [`docs/Architecture/Patterns/`](../Architecture/Patterns/) - Development patterns
+* [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) - AI assistant guide
+* [`docs/Architecture/ADRs/`](../Architecture/ADRs/) - Architectural decisions
+* [`docs/Architecture/Patterns/`](../Architecture/Patterns/) - Development patterns
 
 ### Implementation Guides
 
-- [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)
-- [`docs/Guides/ui-feature-development-guide.md`](./ui-feature-development-guide.md)
-- [`docs/Architecture/Templates/`](../Architecture/Templates/) - Code templates
+* [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)
+* [`docs/Guides/ui-feature-development-guide.md`](./ui-feature-development-guide.md)
+* [`docs/Architecture/Templates/`](../Architecture/Templates/) - Code templates
 
 ### Code Standards
 
-- [`docs/TSDoc/`](../TSDoc/) - TSDoc documentation standards
+* [`docs/TSDoc/`](../TSDoc/) - TSDoc documentation standards
 
 ## 🎯 Next Steps
 
 ### For New Contributors
 
-1. **Read**: [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for project understanding
-2. **Explore**: Run the application and explore existing features
-3. **Practice**: Try adding a simple feature following the patterns
-4. **Ask**: Check documentation first, then ask questions
+1. __Read__: [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for project understanding
+2. __Explore__: Run the application and explore existing features
+3. __Practice__: Try adding a simple feature following the patterns
+4. __Ask__: Check documentation first, then ask questions
 
 ### For AI Assistants
 
-1. **Context**: Load [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for comprehensive context
-2. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
-3. **Examples**: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
+1. __Context__: Load [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for comprehensive context
+2. __Patterns__: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
+3. __Examples__: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
 
----
+***
 
-🎉 **Ready to contribute!** The codebase follows strict patterns and comprehensive documentation. When in doubt, check the existing code and documentation patterns.
+🎉 __Ready to contribute!__ The codebase follows strict patterns and comprehensive documentation. When in doubt, check the existing code and documentation patterns.

@@ -811,20 +811,30 @@ describe(SiteManager, () => {
                 expect(typeof config.startMonitoring).toBe("function");
                 expect(typeof config.stopMonitoring).toBe("function");
             });
-            it("should create config with proper methods", () => {
+            it("should create config with proper methods", async () => {
                 const config = manager["createMonitoringConfig"]();
 
                 // Test that the methods exist and are callable
-                expect(() => config.setHistoryLimit(100)).not.toThrow();
-                expect(() =>
-                    config.setupNewMonitors({ identifier: "site1" } as Site, [])
-                ).not.toThrow();
-                expect(() =>
+                await expect(
+                    config.setHistoryLimit(100)
+                ).resolves.toBeUndefined();
+                await expect(
+                    config.setupNewMonitors(
+                        {
+                            identifier: "site1",
+                            name: "Test Site",
+                            monitoring: true,
+                            monitors: [],
+                        } as Site,
+                        []
+                    )
+                ).resolves.toBeUndefined();
+                await expect(
                     config.startMonitoring("site1", "monitor1")
-                ).not.toThrow();
-                expect(() =>
+                ).resolves.toBeTruthy();
+                await expect(
                     config.stopMonitoring("site1", "monitor1")
-                ).not.toThrow();
+                ).resolves.toBeTruthy();
             });
         });
         describe("formatValidationErrors", () => {
@@ -951,8 +961,8 @@ describe(SiteManager, () => {
                 // Mock the repository service
                 vi.spyOn(
                     manager["siteRepositoryService"],
-                    "getSitesFromDatabase"
-                ).mockResolvedValue([testSite]);
+                    "getSiteFromDatabase"
+                ).mockResolvedValue(testSite);
                 vi.spyOn(manager["sitesCache"], "set").mockImplementation(
                     () => {}
                 );
@@ -962,8 +972,8 @@ describe(SiteManager, () => {
                 ).resolves.not.toThrow();
 
                 expect(
-                    manager["siteRepositoryService"].getSitesFromDatabase
-                ).toHaveBeenCalled();
+                    manager["siteRepositoryService"].getSiteFromDatabase
+                ).toHaveBeenCalledWith("site1");
                 expect(manager["sitesCache"].set).toHaveBeenCalledWith(
                     "site1",
                     testSite
@@ -975,8 +985,8 @@ describe(SiteManager, () => {
 
                 vi.spyOn(
                     manager["siteRepositoryService"],
-                    "getSitesFromDatabase"
-                ).mockResolvedValue([]);
+                    "getSiteFromDatabase"
+                ).mockResolvedValue(undefined);
 
                 await expect(
                     manager["loadSiteInBackground"]("nonexistent")
@@ -988,7 +998,7 @@ describe(SiteManager, () => {
             it("should handle background load errors", async () => {
                 vi.spyOn(
                     manager["siteRepositoryService"],
-                    "getSitesFromDatabase"
+                    "getSiteFromDatabase"
                 ).mockRejectedValue(new Error("Database error"));
 
                 // Should not throw error but should handle it gracefully

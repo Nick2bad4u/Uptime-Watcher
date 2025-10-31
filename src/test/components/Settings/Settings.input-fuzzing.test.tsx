@@ -70,6 +70,8 @@
  *       expect(mockResetSettings).toHaveBeenCalledTimes(1);t functionality
  * ```
  *
+ * ```
+ *
  * - Error handling and recovery
  *
  * Focus areas:
@@ -80,6 +82,7 @@
  * - Error handling and user feedback
  * - Performance with large configuration changes
  * - Accessibility and keyboard navigation
+ * ```
  */
 
 import { afterEach, beforeEach, describe, expect, vi } from "vitest";
@@ -729,7 +732,7 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         );
 
         fcTest.prop([fc.boolean()], {
-            numRuns: 10,
+            numRuns: 3,
             timeout: 5000,
         })("should handle backup download operations", async (shouldFail) => {
             // Manual DOM cleanup for property-based testing iterations

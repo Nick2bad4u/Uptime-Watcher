@@ -922,19 +922,29 @@ export class SiteManager {
                 )
             );
 
-            const sites =
-                await this.siteRepositoryService.getSitesFromDatabase();
-            const site = sites.find((s) => s.identifier === identifier);
+            const site =
+                await this.siteRepositoryService.getSiteFromDatabase(
+                    identifier
+                );
 
             if (site) {
                 this.sitesCache.set(identifier, site);
+
+                const timestamp = Date.now();
+
+                await this.emitSitesStateSynchronized({
+                    action: STATE_SYNC_ACTION.UPDATE,
+                    siteIdentifier: identifier,
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                    timestamp,
+                });
 
                 await this.eventEmitter.emitTyped(
                     "internal:site:cache-updated",
                     {
                         identifier,
                         operation: "background-load",
-                        timestamp: Date.now(),
+                        timestamp,
                     }
                 );
 
@@ -1214,24 +1224,22 @@ export class SiteManager {
      */
     private createMonitoringConfig(): MonitoringConfig {
         return {
-            setHistoryLimit: (limit: number): void => {
+            setHistoryLimit: async (limit: number): Promise<void> => {
                 if (!this.monitoringOperations) {
                     throw new Error(
                         "MonitoringOperations not available but required for setHistoryLimit"
                     );
                 }
-                const operations = this.monitoringOperations;
-                // Execute but don't await the promise
-                void (async (): Promise<void> => {
-                    try {
-                        await operations.setHistoryLimit(limit);
-                    } catch (error) {
-                        logger.error(
-                            LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
-                            error
-                        );
-                    }
-                })();
+
+                try {
+                    await this.monitoringOperations.setHistoryLimit(limit);
+                } catch (error) {
+                    logger.error(
+                        LOG_TEMPLATES.errors.SITE_HISTORY_LIMIT_FAILED,
+                        error
+                    );
+                    throw error;
+                }
             },
             setupNewMonitors: async (
                 site: Site,

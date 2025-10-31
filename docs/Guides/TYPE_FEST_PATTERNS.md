@@ -4,31 +4,31 @@ This document provides comprehensive patterns for integrating type-fest utilitie
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Pattern 1: UnknownRecord Replacement](#pattern-1-unknownrecord-replacement)
-- [Pattern 2: LiteralUnion Enhancement](#pattern-2-literalunion-enhancement)
-- [Pattern 3: Simplify Union Types](#pattern-3-simplify-union-types)
-- [Pattern 4: SetOptional API Design](#pattern-4-setoptional-api-design)
-- [Pattern 5: CamelCase String Transformation](#pattern-5-camelcase-string-transformation)
-- [Pattern 6: ReadonlyDeep Immutability](#pattern-6-readonlydeep-immutability)
-- [Pattern 7: PartialDeep Testing Utilities](#pattern-7-partialdeep-testing-utilities)
-- [Multi-Feature Enhancement Strategy](#multi-feature-enhancement-strategy)
-- [Implementation Guidelines](#implementation-guidelines)
-- [Validation Checklist](#validation-checklist)
+* [Overview](#overview)
+* [Pattern 1: UnknownRecord Replacement](#pattern-1-unknownrecord-replacement)
+* [Pattern 2: LiteralUnion Enhancement](#pattern-2-literalunion-enhancement)
+* [Pattern 3: Simplify Union Types](#pattern-3-simplify-union-types)
+* [Pattern 4: SetOptional API Design](#pattern-4-setoptional-api-design)
+* [Pattern 5: CamelCase String Transformation](#pattern-5-camelcase-string-transformation)
+* [Pattern 6: ReadonlyDeep Immutability](#pattern-6-readonlydeep-immutability)
+* [Pattern 7: PartialDeep Testing Utilities](#pattern-7-partialdeep-testing-utilities)
+* [Multi-Feature Enhancement Strategy](#multi-feature-enhancement-strategy)
+* [Implementation Guidelines](#implementation-guidelines)
+* [Validation Checklist](#validation-checklist)
 
 ## Overview
 
 Type-fest utilities provide enterprise-grade type safety and developer experience improvements. This document establishes consistent patterns for their use across the codebase.
 
-**Core Principle**: Apply multiple type-fest features together for maximum impact per file ("easy wins" approach).
+__Core Principle__: Apply multiple type-fest features together for maximum impact per file ("easy wins" approach).
 
 ## Pattern 1: UnknownRecord Replacement
 
 ### UnknownRecord - When to Apply
 
-- Replace all instances of `Record<string, unknown>` with `UnknownRecord`
-- Use for type-safe property access without index signature issues
-- Apply in interfaces, function parameters, and return types
+* Replace all instances of `Record<string, unknown>` with `UnknownRecord`
+* Use for type-safe property access without index signature issues
+* Apply in interfaces, function parameters, and return types
 
 ### UnknownRecord - Before/After Examples
 
@@ -82,19 +82,19 @@ export function isObject(value: unknown): value is UnknownRecord {
 
 ### UnknownRecord - Benefits
 
-- Avoids TypeScript index signature issues
-- Better type safety for property access
-- Consistent naming across codebase
-- Improved IntelliSense support
+* Avoids TypeScript index signature issues
+* Better type safety for property access
+* Consistent naming across codebase
+* Improved IntelliSense support
 
 ## Pattern 2: LiteralUnion Enhancement
 
 ### LiteralUnion - When to Apply
 
-- String literal union types that need extensibility
-- Theme values, status types, configuration options
-- Any fixed set of values that might need custom extensions
-- Component size, variant, and styling properties
+* String literal union types that need extensibility
+* Theme values, status types, configuration options
+* Any fixed set of values that might need custom extensions
+* Component size, variant, and styling properties
 
 ### LiteralUnion - Before/After Examples
 
@@ -172,19 +172,19 @@ export type BadgeSize = LiteralUnion<"lg" | "md" | "sm" | "xs", string>;
 
 ### LiteralUnion - Benefits
 
-- Provides autocomplete for known values
-- Allows custom values for extensibility
-- Better developer experience
-- Type-safe with flexibility
-- Backward compatible with existing string union usage
+* Provides autocomplete for known values
+* Allows custom values for extensibility
+* Better developer experience
+* Type-safe with flexibility
+* Backward compatible with existing string union usage
 
 ## Pattern 3: Simplify Union Types
 
 ### Simplify - When to Apply
 
-- Complex union types with many branches
-- Types that would benefit from flattened IntelliSense
-- Cache value types, configuration unions
+* Complex union types with many branches
+* Types that would benefit from flattened IntelliSense
+* Cache value types, configuration unions
 
 ### Simplify - Before/After Examples
 
@@ -236,18 +236,18 @@ export type MonitorFormData = Simplify<
 
 ### Simplify - Benefits
 
-- Cleaner IntelliSense display
-- Better type resolution
-- Improved developer experience
-- Flattened union member access
+* Cleaner IntelliSense display
+* Better type resolution
+* Improved developer experience
+* Flattened union member access
 
 ## Pattern 4: SetOptional API Design
 
 ### SetOptional - When to Apply
 
-- Interfaces where some properties should be optional
-- Function parameter objects with defaults
-- Configuration objects with optional settings
+* Interfaces where some properties should be optional
+* Function parameter objects with defaults
+* Configuration objects with optional settings
 
 ### SetOptional - Before/After Examples
 
@@ -294,19 +294,19 @@ function createDefaultFormData(data: Partial<FormData>): FormData;
 
 ### SetOptional - Benefits
 
-- Better API design with logical defaults
-- Type-safe optional parameter handling
-- Improved function overloading
-- Clear intent about required vs optional properties
+* Better API design with logical defaults
+* Type-safe optional parameter handling
+* Improved function overloading
+* Clear intent about required vs optional properties
 
 ## Pattern 5: CamelCase String Transformation
 
 ### CamelCase - When to Apply
 
-- Converting user-provided strings to valid identifiers
-- Creating type-safe property names from dynamic strings
-- Template variable processing and code generation
-- String transformation with compile-time type safety
+* Converting user-provided strings to valid identifiers
+* Creating type-safe property names from dynamic strings
+* Template variable processing and code generation
+* String transformation with compile-time type safety
 
 ### CamelCase - Before/After Examples
 
@@ -359,19 +359,19 @@ function createTemplateVariable<T extends string>(name: T): CamelCase<T> {
 
 ### CamelCase - Benefits
 
-- Compile-time type safety for string transformations
-- Predictable identifier generation
-- Type-safe code generation patterns
-- Enhanced IntelliSense for generated identifiers
+* Compile-time type safety for string transformations
+* Predictable identifier generation
+* Type-safe code generation patterns
+* Enhanced IntelliSense for generated identifiers
 
 ## Pattern 6: ReadonlyDeep Immutability
 
 ### ReadonlyDeep - When to Apply
 
-- Configuration objects that should never be modified
-- Fallback data structures requiring immutability
-- Constants and default values that need deep protection
-- API response data that should remain unchanged
+* Configuration objects that should never be modified
+* Fallback data structures requiring immutability
+* Constants and default values that need deep protection
+* API response data that should remain unchanged
 
 ### ReadonlyDeep - Before/After Examples
 
@@ -425,19 +425,19 @@ const defaultMonitorConfig: ReadonlyDeep<MonitorConfig> = {
 
 ### ReadonlyDeep - Benefits
 
-- Prevents accidental mutations at any nesting level
-- Clear intent for immutable data structures
-- Compile-time protection against modifications
-- Enhanced type safety for configuration objects
+* Prevents accidental mutations at any nesting level
+* Clear intent for immutable data structures
+* Compile-time protection against modifications
+* Enhanced type safety for configuration objects
 
 ## Pattern 7: PartialDeep Testing Utilities
 
 ### PartialDeep - When to Apply
 
-- Test data creation with minimal required properties
-- Mock object generation for complex interfaces
-- Factory functions for test fixtures
-- Partial object matching in tests
+* Test data creation with minimal required properties
+* Mock object generation for complex interfaces
+* Factory functions for test fixtures
+* Partial object matching in tests
 
 ### PartialDeep - Before/After Examples
 
@@ -530,10 +530,10 @@ expect(result).toMatchObject(expectedPartial);
 
 ### PartialDeep - Benefits
 
-- Type-safe test fixture creation
-- Flexible mock object generation
-- Reduced test boilerplate
-- Precise test assertions with partial matching
+* Type-safe test fixture creation
+* Flexible mock object generation
+* Reduced test boilerplate
+* Precise test assertions with partial matching
 
 ## Multi-Feature Enhancement Strategy
 
@@ -541,10 +541,10 @@ expect(result).toMatchObject(expectedPartial);
 
 Target files where multiple type-fest utilities can be applied together for maximum impact:
 
-1. **Identify Target Files**: Look for files with multiple enhancement opportunities
-2. **Apply Multiple Patterns**: Use 2-4 type-fest utilities per file when possible
-3. **Validate Collectively**: Test all changes together
-4. **Document Impact**: Record improvements achieved
+1. __Identify Target Files__: Look for files with multiple enhancement opportunities
+2. __Apply Multiple Patterns__: Use 2-4 type-fest utilities per file when possible
+3. __Validate Collectively__: Test all changes together
+4. __Document Impact__: Record improvements achieved
 
 ### Example Multi-Feature Enhancement
 
@@ -596,9 +596,9 @@ function createTestState(
 
 ### 1. Import Management
 
-- Import only needed type-fest utilities
-- Use `import type` for type-only imports
-- Group type-fest imports together
+* Import only needed type-fest utilities
+* Use `import type` for type-only imports
+* Group type-fest imports together
 
 ```typescript
 import type {
@@ -625,55 +625,55 @@ import type {
 
 ### 3. Documentation Requirements
 
-- Update TSDoc comments when types change
-- Add examples showing enhanced autocomplete
-- Document benefits of type-fest usage
+* Update TSDoc comments when types change
+* Add examples showing enhanced autocomplete
+* Document benefits of type-fest usage
 
 ### 4. Testing Strategy
 
-- Run TypeScript type checking after each enhancement
-- Verify no compilation errors
-- Test enhanced IntelliSense functionality
-- Validate linting passes
+* Run TypeScript type checking after each enhancement
+* Verify no compilation errors
+* Test enhanced IntelliSense functionality
+* Validate linting passes
 
 ## Validation Checklist
 
 ### Before Implementation
 
-- [ ] File has multiple type enhancement opportunities
-- [ ] Changes align with existing codebase patterns
-- [ ] TSDoc documentation is planned
+* [ ] File has multiple type enhancement opportunities
+* [ ] Changes align with existing codebase patterns
+* [ ] TSDoc documentation is planned
 
 ### During Implementation
 
-- [ ] Type-fest imports added correctly
-- [ ] All Record<string, unknown> replaced with UnknownRecord
-- [ ] String literal unions enhanced with LiteralUnion
-- [ ] Complex unions simplified with Simplify
-- [ ] Optional parameters optimized with SetOptional
-- [ ] Immutable data protected with ReadonlyDeep
-- [ ] Test utilities use PartialDeep for flexibility
-- [ ] String transformations use CamelCase where applicable
+* [ ] Type-fest imports added correctly
+* [ ] All Record\<string, unknown> replaced with UnknownRecord
+* [ ] String literal unions enhanced with LiteralUnion
+* [ ] Complex unions simplified with Simplify
+* [ ] Optional parameters optimized with SetOptional
+* [ ] Immutable data protected with ReadonlyDeep
+* [ ] Test utilities use PartialDeep for flexibility
+* [ ] String transformations use CamelCase where applicable
 
 ### After Implementation
 
-- [ ] TypeScript compilation passes
-- [ ] ESLint validation passes
-- [ ] No unused imports
-- [ ] Enhanced IntelliSense verified
-- [ ] Documentation updated
-- [ ] Changes tested in context
+* [ ] TypeScript compilation passes
+* [ ] ESLint validation passes
+* [ ] No unused imports
+* [ ] Enhanced IntelliSense verified
+* [ ] Documentation updated
+* [ ] Changes tested in context
 
 ### Global Consistency
 
-- [ ] Pattern applied consistently across similar files
-- [ ] No remaining Record<string, unknown> instances
-- [ ] All eligible string unions use LiteralUnion
-- [ ] Complex unions use Simplify where beneficial
-- [ ] Optional parameters use SetOptional appropriately
-- [ ] Immutable configurations use ReadonlyDeep
-- [ ] Test utilities leverage PartialDeep patterns
-- [ ] String transformations use CamelCase for type safety
+* [ ] Pattern applied consistently across similar files
+* [ ] No remaining Record\<string, unknown> instances
+* [ ] All eligible string unions use LiteralUnion
+* [ ] Complex unions use Simplify where beneficial
+* [ ] Optional parameters use SetOptional appropriately
+* [ ] Immutable configurations use ReadonlyDeep
+* [ ] Test utilities leverage PartialDeep patterns
+* [ ] String transformations use CamelCase for type safety
 
 ## Search Patterns for Global Application
 

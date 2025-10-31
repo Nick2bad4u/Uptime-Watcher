@@ -50,7 +50,7 @@ vi.mock("../../utils/database/serviceFactory", () => {
 });
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn(),
+    setHistoryLimit: vi.fn().mockResolvedValue(undefined),
     getHistoryLimit: vi.fn(() => Promise.resolve(100)),
 }));
 
@@ -77,7 +77,7 @@ describe("DatabaseManager - Coverage Tests", () => {
             async (params) => {
                 // Call the setHistoryLimit callback with the limit to simulate the real behavior
                 if (params.setHistoryLimit) {
-                    params.setHistoryLimit(params.limit);
+                    await params.setHistoryLimit(params.limit);
                 }
             }
         );

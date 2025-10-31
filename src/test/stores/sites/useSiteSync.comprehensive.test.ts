@@ -35,6 +35,7 @@ const buildSite = (identifier: string): Site => ({
             status: "up",
             timeout: 5000,
             type: "http",
+            url: `https://example.com/${identifier}`,
         },
     ],
     name: `Site ${identifier}`,
@@ -124,7 +125,10 @@ import {
     createSitesStateActions,
     initialSitesState,
 } from "../../../stores/sites/useSitesState";
+import { logStoreAction } from "../../../stores/utils";
 import { logger } from "../../../services/logger";
+
+const logStoreActionMock = vi.mocked(logStoreAction);
 
 describe("useSiteSync", () => {
     let mockDeps: any;
@@ -760,6 +764,13 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith(
                 fullSyncResult.sites
             );
+
+            const lastLog =
+                logStoreActionMock.mock.calls.at(-1)?.[2] ?? undefined;
+            expect(lastLog).toMatchObject({
+                status: "success",
+                success: true,
+            });
         });
 
         it("deduplicates backend sync responses while logging duplicates", async ({
@@ -813,6 +824,52 @@ describe("useSiteSync", () => {
             expect(mockDeps.setSites).toHaveBeenCalledWith([
                 expect.objectContaining({ identifier: "duplicate" }),
             ]);
+        });
+
+        it("logs failure telemetry when backend reports unsynchronized state", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: useSiteSync", "component");
+            await annotate("Category: Telemetry", "category");
+            await annotate("Type: Regression", "type");
+
+            const fullSyncResult = {
+                completedAt: Date.now(),
+                siteCount: 1,
+                sites: [buildSite("site-unsynced")],
+                source: "database" as const,
+                synchronized: false,
+            };
+
+            mockStateSyncService.requestFullSync.mockResolvedValue(
+                fullSyncResult as any
+            );
+
+            await syncActions.syncSites();
+
+            expect(mockDeps.setSites).toHaveBeenCalledWith(
+                fullSyncResult.sites
+            );
+
+            const lastLogArgs = logStoreActionMock.mock.calls.at(-1);
+            expect(lastLogArgs?.[0]).toBe("SitesStore");
+            expect(lastLogArgs?.[1]).toBe("syncSites");
+            expect(lastLogArgs?.[2]).toMatchObject({
+                status: "failure",
+                success: false,
+                failureReason: "backend-not-synchronized",
+            });
+
+            expect(logger.warn).toHaveBeenCalledWith(
+                "Backend full sync completed without synchronized flag",
+                expect.objectContaining({
+                    originalSitesCount: fullSyncResult.siteCount,
+                    sanitizedSiteCount: fullSyncResult.sites.length,
+                    source: fullSyncResult.source,
+                })
+            );
         });
 
         test.prop([

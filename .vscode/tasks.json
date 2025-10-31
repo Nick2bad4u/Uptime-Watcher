@@ -25,8 +25,8 @@
                 "applyTo": "allDocuments",
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*"
+                    "beginsPattern": "^\\s*VITE v\\d+",
+                    "endsPattern": "^\\s*(?:➜|›)\\s+(?:Local|Network):|ready in \\d+ms"
                 },
                 "owner": "vite",
                 "pattern": {
@@ -34,7 +34,7 @@
                     "file": 1,
                     "line": 2,
                     "message": 5,
-                    "regexp": "^(?:\\u001b\\[[0-9;]*m)*(?:File:\\s+)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+):\\s*(?:(error|warning)(?::|\\s+-)?\\s*)?(.*)$",
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(?:\\[.*?\\]\\s*)?(?:File:\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)(?::\\s*(?:(error|warning|info)))?[:\\s-]*(.*)$",
                     "severity": 4
                 },
                 "severity": "error"
@@ -70,18 +70,13 @@
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": ".*VITE v.*",
-                    "endsPattern": ".*ready in.*"
-                },
                 "owner": "vite",
                 "pattern": {
                     "column": 3,
                     "file": 1,
                     "line": 2,
                     "message": 5,
-                    "regexp": "^(?:\\u001b\\[[0-9;]*m)*(?:File:\\s+)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+):\\s*(?:(error|warning)(?::|\\s+-)?\\s*)?(.*)$",
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(?:\\[.*?\\]\\s*)?(?:File:\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)(?::\\s*(?:(error|warning|info)))?[:\\s-]*(.*)$",
                     "severity": 4
                 },
                 "severity": "error"
@@ -148,21 +143,27 @@
             "problemMatcher": {
                 "applyTo": "allDocuments",
                 "owner": "eslint",
-                "pattern": {
-                    "column": 2,
-                    "file": 1,
-                    "line": 3,
-                    "message": 4,
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
-                    "severity": 5
-                },
-                "severity": "error"
+                "pattern": [
+                    {
+                        "file": 1,
+                        "regexp": "^([^\\s].*?)$"
+                    },
+                    {
+                        "code": 5,
+                        "column": 2,
+                        "line": 1,
+                        "loop": true,
+                        "message": 4,
+                        "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
+                        "severity": 3
+                    }
+                ]
             },
             "runOptions": {
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "lint",
+            "script": "lint:fix",
             "type": "npm"
         },
         {
@@ -172,7 +173,7 @@
                 "color": "terminal.ansiMagenta",
                 "id": "symbol-color"
             },
-            "label": "Lint:CSS",
+            "label": "Lint:CSS:Fix",
             "presentation": {
                 "clear": true,
                 "close": false,
@@ -189,11 +190,12 @@
                 "applyTo": "allDocuments",
                 "owner": "stylelint",
                 "pattern": {
+                    "code": 5,
                     "column": 3,
                     "file": 1,
                     "line": 2,
                     "message": 4,
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$"
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)\\s*(?:\\x1b\\[[0-9;]*m)*[✖×](?:\\x1b\\[[0-9;]*m)*\\s+(.+?)\\s{2,}(.*)$"
                 },
                 "severity": "error"
             },
@@ -201,7 +203,7 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "lint:css",
+            "script": "lint:css:fix",
             "type": "npm"
         },
         {
@@ -228,11 +230,13 @@
                 "applyTo": "allDocuments",
                 "owner": "typescript",
                 "pattern": {
+                    "code": 5,
                     "column": 3,
                     "file": 1,
                     "line": 2,
-                    "message": 4,
-                    "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(.*)$"
+                    "message": 6,
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                    "severity": 4
                 },
                 "severity": "error"
             },
@@ -266,15 +270,21 @@
             "problemMatcher": {
                 "applyTo": "allDocuments",
                 "owner": "eslint",
-                "pattern": {
-                    "column": 2,
-                    "file": 1,
-                    "line": 3,
-                    "message": 4,
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
-                    "severity": 5
-                },
-                "severity": "error"
+                "pattern": [
+                    {
+                        "file": 1,
+                        "regexp": "^([^\\s].*?)$"
+                    },
+                    {
+                        "code": 5,
+                        "column": 2,
+                        "line": 1,
+                        "loop": true,
+                        "message": 4,
+                        "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
+                        "severity": 3
+                    }
+                ]
             },
             "runOptions": {
                 "instanceLimit": 1,
@@ -309,13 +319,13 @@
                 "pattern": [
                     {
                         "message": 1,
-                        "regexp": "^\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError):\\s+(.*)$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
                     },
                     {
                         "column": 3,
                         "file": 1,
                         "line": 2,
-                        "regexp": "^\\s*at\\s+(?:.+\\()?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\)?$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
                     }
                 ],
                 "severity": "error"
@@ -355,7 +365,7 @@
                     "file": 1,
                     "line": 2,
                     "message": 4,
-                    "regexp": "^\\s*(?:\\d+\\)\\s*)?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\s+›\\s+(.*)$"
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:\\d+\\)\\s*)?((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n]+?):(\\d+):(\\d+)\\s+[›▶]\\s+(.*)$"
                 },
                 "severity": "error"
             },
@@ -392,13 +402,13 @@
                 "pattern": [
                     {
                         "message": 1,
-                        "regexp": "^\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError):\\s+(.*)$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(?:AssertionError|Error|RangeError|ReferenceError|TypeError|SyntaxError|AggregateError):\\s*(?:\\x1b\\[[0-9;]*m)*(.*)$"
                     },
                     {
                         "column": 3,
                         "file": 1,
                         "line": 2,
-                        "regexp": "^\\s*at\\s+(?:.+\\()?((?:[A-Za-z]:)?[^:\\r\\n]+):(\\d+):(\\d+)\\)?$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*at\\s+(?:.+?\\s+\\()?(?:\\x1b\\[[0-9;]*m)*((?:[A-Za-z]:[\\\\/]|[\\\\/])?[^:\\r\\n()]+?):(\\d+):(\\d+)\\)?"
                     }
                 ],
                 "severity": "error"
@@ -417,7 +427,7 @@
                 "color": "terminal.ansiYellow",
                 "id": "checklist"
             },
-            "label": "Lint:All",
+            "label": "Lint:All:Fix",
             "presentation": {
                 "clear": true,
                 "close": false,
@@ -434,34 +444,76 @@
                 {
                     "owner": "typescript",
                     "pattern": {
+                        "code": 5,
                         "column": 3,
                         "file": 1,
                         "line": 2,
-                        "message": 4,
-                        "regexp": "^(.*)\\((\\d+),(\\d+)\\):\\s+(.*)$"
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                        "severity": 4
                     },
                     "severity": "error"
                 },
                 {
                     "owner": "eslint",
+                    "pattern": [
+                        {
+                            "file": 1,
+                            "regexp": "^([^\\s].*?)$"
+                        },
+                        {
+                            "code": 5,
+                            "column": 2,
+                            "line": 1,
+                            "loop": true,
+                            "message": 4,
+                            "regexp": "^\\s+(\\d+):(\\d+)\\s+(error|warning|info)\\s+(.+?)\\s{2,}(.*)$",
+                            "severity": 3
+                        }
+                    ]
+                },
+                {
+                    "owner": "stylelint",
                     "pattern": {
-                        "column": 2,
+                        "code": 5,
+                        "column": 3,
                         "file": 1,
-                        "line": 3,
+                        "line": 2,
                         "message": 4,
-                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)\\s+\\[(error|warning)\\]$",
-                        "severity": 5
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)\\s*(?:\\x1b\\[[0-9;]*m)*[✖×](?:\\x1b\\[[0-9;]*m)*\\s+(.+?)\\s{2,}(.*)$"
                     },
                     "severity": "error"
                 },
                 {
-                    "owner": "stylelint",
+                    "owner": "remark",
+                    "pattern": {
+                        "code": 7,
+                        "column": 3,
+                        "endColumn": 4,
+                        "file": 1,
+                        "line": 2,
+                        "message": 6,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?):(\\d+):(\\d+)(?:-(\\d+))?\\s+(warning|error)\\s+(.+?)\\s{2,}(.*)$",
+                        "severity": 5
+                    },
+                    "severity": "warning"
+                },
+                {
+                    "owner": "knip",
                     "pattern": {
                         "column": 3,
                         "file": 1,
                         "line": 2,
                         "message": 4,
-                        "regexp": "^(.*):(\\d+):(\\d+):\\s+(.*)$"
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?):(\\d+):(\\d+)\\s+(.*)$"
+                    },
+                    "severity": "warning"
+                },
+                {
+                    "owner": "madge",
+                    "pattern": {
+                        "message": 1,
+                        "regexp": "^(?:\\x1b\\[[0-9;]*m)*\\s*(.+?)\\s*$"
                     },
                     "severity": "error"
                 }
@@ -470,7 +522,7 @@
                 "instanceLimit": 1,
                 "instancePolicy": "terminateOldest"
             },
-            "script": "lint:all",
+            "script": "lint:all:fix",
             "type": "npm"
         }
     ],

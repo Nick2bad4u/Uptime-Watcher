@@ -22,9 +22,9 @@ Is your store managing multiple domains/entities?
 
 ### Modular Composition Pattern (RECOMMENDED)
 
-**Best for:** Complex stores with multiple responsibilities and cross-cutting concerns
+__Best for:__ Complex stores with multiple responsibilities and cross-cutting concerns
 
-**Real Implementation Example - Sites Store:**
+__Real Implementation Example - Sites Store:__
 
 ```typescript
 // Main store file: useSitesStore.ts
@@ -66,7 +66,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 });
 ```
 
-**Module Structure Example:**
+__Module Structure Example:__
 
 ```typescript
 // useSitesState.ts - Core state management
@@ -143,20 +143,20 @@ export const createSiteSyncActions = (deps) => ({
 });
 ```
 
-**Benefits of Modular Composition:**
+__Benefits of Modular Composition:__
 
-- ✅ **Clear Separation of Concerns**: Each module has a focused responsibility
-- ✅ **Dependency Injection**: Modules receive only what they need
-- ✅ **Independent Testing**: Each module can be tested in isolation
-- ✅ **Reusability**: Modules can be shared across similar stores
-- ✅ **Maintainability**: Changes are localized to specific modules
-- ✅ **Type Safety**: Full TypeScript support with interface composition
+* ✅ __Clear Separation of Concerns__: Each module has a focused responsibility
+* ✅ __Dependency Injection__: Modules receive only what they need
+* ✅ __Independent Testing__: Each module can be tested in isolation
+* ✅ __Reusability__: Modules can be shared across similar stores
+* ✅ __Maintainability__: Changes are localized to specific modules
+* ✅ __Type Safety__: Full TypeScript support with interface composition
 
 ### Direct Create Pattern
 
-**Best for:** Simple stores with single responsibility and minimal complexity
+__Best for:__ Simple stores with single responsibility and minimal complexity
 
-**Real Implementation Example - UI Store:**
+__Real Implementation Example - UI Store:__
 
 ```typescript
 // Direct pattern for simple state management
@@ -199,22 +199,22 @@ export const useUIStore = create<UIStore>()((set, get) => ({
 }));
 ```
 
-**Characteristics of Direct Pattern:**
+__Characteristics of Direct Pattern:__
 
-- Single domain/responsibility
-- Typically <150 lines of code
-- Straightforward state and actions
-- Limited cross-cutting concerns
-- Simple business logic
-- No complex interdependencies
+* Single domain/responsibility
+* Typically <150 lines of code
+* Straightforward state and actions
+* Limited cross-cutting concerns
+* Simple business logic
+* No complex interdependencies
 
-**When to Use Direct Pattern:**
+__When to Use Direct Pattern:__
 
-- ✅ UI state management (themes, modals, loading states)
-- ✅ Simple settings or preferences
-- ✅ Notification/alert management
-- ✅ Form state for individual components
-- ✅ Cache stores with simple operations
+* ✅ UI state management (themes, modals, loading states)
+* ✅ Simple settings or preferences
+* ✅ Notification/alert management
+* ✅ Form state for individual components
+* ✅ Cache stores with simple operations
 
 ## Data Flow Integration
 
@@ -278,12 +278,12 @@ export const useUIStore = create<UIStore>()(
 );
 ```
 
-- Typically >300 lines of code
-- Complex business logic
-- Requires dependency injection between modules
-- Benefits from separation of concerns
+* Typically >300 lines of code
+* Complex business logic
+* Requires dependency injection between modules
+* Benefits from separation of concerns
 
-**Template:**
+__Template:__
 
 ```typescript
 export const useComplexStore = create<ComplexStore>()((set, get) => {
@@ -316,45 +316,45 @@ export const useComplexStore = create<ComplexStore>()((set, get) => {
 
 #### useErrorStore
 
-- **Purpose**: Global error state management
-- **Size**: ~127 lines
-- **Justification**: Single responsibility (error handling), simple state
+* __Purpose__: Global error state management
+* __Size__: \~127 lines
+* __Justification__: Single responsibility (error handling), simple state
 
 #### useUpdatesStore
 
-- **Purpose**: Application update management
-- **Size**: ~151 lines
-- **Justification**: Single domain (updates), straightforward operations
+* __Purpose__: Application update management
+* __Size__: \~151 lines
+* __Justification__: Single domain (updates), straightforward operations
 
 #### useSettingsStore
 
-- **Purpose**: Application settings persistence
-- **Size**: ~385 lines
-- **Justification**: Focused on settings domain, no complex interdependencies
+* __Purpose__: Application settings persistence
+* __Size__: \~385 lines
+* __Justification__: Focused on settings domain, no complex interdependencies
 
 #### useUIStore
 
-- **Purpose**: UI state (modals, selections, preferences)
-- **Justification**: Simple UI state management, single responsibility
+* __Purpose__: UI state (modals, selections, preferences)
+* __Justification__: Simple UI state management, single responsibility
 
 #### useMonitorTypesStore
 
-- **Purpose**: Monitor type configuration management
-- **Size**: ~436 lines
-- **Justification**: Focused domain, limited cross-cutting concerns
+* __Purpose__: Monitor type configuration management
+* __Size__: \~436 lines
+* __Justification__: Focused domain, limited cross-cutting concerns
 
 ### Modular Composition Pattern Examples
 
 #### useSitesStore
 
-- **Purpose**: Site and monitor management
-- **Size**: Large (distributed across modules)
-- **Justification**: Multiple domains (sites, monitors, history, sync), complex operations, extensive business logic
-- **Modules**:
-  - `useSitesState` - Basic state management
-  - `useSiteOperations` - CRUD operations
-  - `useSiteSync` - Backend synchronization
-  - `useSiteMonitoring` - Monitoring operations
+* __Purpose__: Site and monitor management
+* __Size__: Large (distributed across modules)
+* __Justification__: Multiple domains (sites, monitors, history, sync), complex operations, extensive business logic
+* __Modules__:
+  * `useSitesState` - Basic state management
+  * `useSiteOperations` - CRUD operations
+  * `useSiteSync` - Backend synchronization
+  * `useSiteMonitoring` - Monitoring operations
 
 ## Migration Guidelines
 
@@ -362,37 +362,37 @@ export const useComplexStore = create<ComplexStore>()((set, get) => {
 
 Consider migrating when a direct create store:
 
-- Exceeds 300 lines
-- Starts managing multiple domains
-- Develops complex interdependencies
-- Becomes difficult to test or maintain
+* Exceeds 300 lines
+* Starts managing multiple domains
+* Develops complex interdependencies
+* Becomes difficult to test or maintain
 
 ### When to Keep Direct Pattern
 
 Keep the direct pattern when:
 
-- Store remains focused on single responsibility
-- Logic is straightforward
-- No complex business rules
-- Easy to understand and maintain
+* Store remains focused on single responsibility
+* Logic is straightforward
+* No complex business rules
+* Easy to understand and maintain
 
 ## Best Practices
 
 ### For Direct Create Pattern
 
-- Keep actions simple and focused
-- Use meaningful action names
-- Include consistent logging
-- Maintain type safety
-- Document complex logic
+* Keep actions simple and focused
+* Use meaningful action names
+* Include consistent logging
+* Maintain type safety
+* Document complex logic
 
 ### For Modular Composition Pattern
 
-- Separate concerns into logical modules
-- Use dependency injection between modules
-- Maintain clear interfaces between modules
-- Test modules independently
-- Document module responsibilities
+* Separate concerns into logical modules
+* Use dependency injection between modules
+* Maintain clear interfaces between modules
+* Test modules independently
+* Document module responsibilities
 
 ## Anti-Patterns to Avoid
 
@@ -436,7 +436,7 @@ const useMonolithicStore = create((set) => ({
 
 ## Related Documentation
 
-- [ADR-004: Frontend State Management](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)
-- [UI Feature Development Guide](./ui-feature-development-guide.md)
-- [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md)
-- [API Documentation](./api-documentation.md)
+* [ADR-004: Frontend State Management](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)
+* [UI Feature Development Guide](./ui-feature-development-guide.md)
+* [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md)
+* [API Documentation](./api-documentation.md)

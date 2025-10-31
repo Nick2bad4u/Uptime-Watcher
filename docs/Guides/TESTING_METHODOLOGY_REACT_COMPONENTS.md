@@ -2,15 +2,15 @@
 
 ## Overview
 
-Comprehensive testing approach for React components in the Uptime Watcher application using **Vitest**, **React Testing Library**, and current implementation patterns. This guide reflects actual testing practices and patterns used throughout the codebase.
+Comprehensive testing approach for React components in the Uptime Watcher application using __Vitest__, __React Testing Library__, and current implementation patterns. This guide reflects actual testing practices and patterns used throughout the codebase.
 
 ## Current Testing Architecture
 
-- **Testing Framework**: Vitest for unit and integration testing
-- **Component Testing**: React Testing Library with @testing-library/react
-- **Mocking Strategy**: Comprehensive ElectronAPI and store mocking
-- **Pattern**: Component interaction testing with proper event simulation
-- **Target**: High coverage through realistic user interaction scenarios
+* __Testing Framework__: Vitest for unit and integration testing
+* __Component Testing__: React Testing Library with @testing-library/react
+* __Mocking Strategy__: Comprehensive ElectronAPI and store mocking
+* __Pattern__: Component interaction testing with proper event simulation
+* __Target__: High coverage through realistic user interaction scenarios
 
 ## Validated Testing Patterns
 
@@ -452,31 +452,31 @@ describe("useStoreHook", () => {
 
 ### 1. Mock Strategy
 
-- **ElectronAPI**: Always mock with consistent interface
-- **External Dependencies**: Mock at module level
-- **Store State**: Reset between tests
-- **Event Cleanup**: Verify cleanup functions are called
+* __ElectronAPI__: Always mock with consistent interface
+* __External Dependencies__: Mock at module level
+* __Store State__: Reset between tests
+* __Event Cleanup__: Verify cleanup functions are called
 
 ### 2. Async Testing
 
-- **Use waitFor**: For DOM updates after async operations
-- **Use act**: For store state changes
-- **Proper Cleanup**: Clean up mocks and timeouts
-- **Error Handling**: Test both success and error paths
+* __Use waitFor__: For DOM updates after async operations
+* __Use act__: For store state changes
+* __Proper Cleanup__: Clean up mocks and timeouts
+* __Error Handling__: Test both success and error paths
 
 ### 3. Event Testing
 
-- **Prevent Propagation**: Verify events don't bubble when they shouldn't
-- **Keyboard Events**: Test escape keys and form submissions
-- **Form Validation**: Use real validation schemas in tests
-- **Event Cleanup**: Test that event listeners are properly removed
+* __Prevent Propagation__: Verify events don't bubble when they shouldn't
+* __Keyboard Events__: Test escape keys and form submissions
+* __Form Validation__: Use real validation schemas in tests
+* __Event Cleanup__: Test that event listeners are properly removed
 
 ### 4. Coverage Strategy
 
-- **Component Interactions**: Focus on user behavior rather than implementation details
-- **Error Paths**: Test error handling and logging
-- **Edge Cases**: Test boundary conditions and invalid inputs
-- **Integration Points**: Test component-store interactions
+* __Component Interactions__: Focus on user behavior rather than implementation details
+* __Error Paths__: Test error handling and logging
+* __Edge Cases__: Test boundary conditions and invalid inputs
+* __Integration Points__: Test component-store interactions
 
 ## Common Testing Patterns
 
@@ -548,16 +548,16 @@ npm test -- path/to/test.tsx --coverage
 
 ### Coverage Analysis
 
-- **Target Coverage**: Aim for >90% coverage on critical components
-- **Focus Areas**: User interactions, error handling, store integration
-- **Quality Metrics**: Test reliability, maintainability, readability
-- **Continuous Improvement**: Regular coverage analysis and improvement
+* __Target Coverage__: Aim for >90% coverage on critical components
+* __Focus Areas__: User interactions, error handling, store integration
+* __Quality Metrics__: Test reliability, maintainability, readability
+* __Continuous Improvement__: Regular coverage analysis and improvement
 
 ## Success Metrics
 
-- **Coverage Improvement**: Significant percentage point gains through realistic testing
-- **Test Reliability**: 100% test pass rate with proper async handling
-- **Pattern Consistency**: Reusable patterns across component tests
-- **Integration Coverage**: Components work correctly with stores and events
+* __Coverage Improvement__: Significant percentage point gains through realistic testing
+* __Test Reliability__: 100% test pass rate with proper async handling
+* __Pattern Consistency__: Reusable patterns across component tests
+* __Integration Coverage__: Components work correctly with stores and events
 
 This methodology provides a comprehensive, systematic approach for testing React components with current implementation patterns, ensuring high-quality, maintainable test suites that reflect real-world usage scenarios.

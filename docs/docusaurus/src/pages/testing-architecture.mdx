@@ -1,20 +1,18 @@
----
+***
+
 title: Testing Architecture & Quality Gates
 description: Deep dive into automated testing pipelines for Uptime Watcher
----
-{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
+--------------------------------------------------------------------------
+
+{/\* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX \*/}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
 export default function TestingArchitecture() {
-  return (
-    <Layout
-      title="Testing Architecture & Quality Gates"
-      description="Deep dive into automated testing pipelines for Uptime Watcher"
-    >
-      <div className="container margin-vert--lg">
-        <div className="row">
-          <div className="col">
+return ( <Layout
+   title="Testing Architecture & Quality Gates"
+   description="Deep dive into automated testing pipelines for Uptime Watcher"
+ > <div className="container margin-vert--lg"> <div className="row"> <div className="col">
 
 # Testing Architecture & Quality Gates
 
@@ -24,202 +22,214 @@ This document maps every automated test surface in Uptime Watcher—unit, integr
 
 The first diagram connects the NPM scripts, Vitest projects, and Playwright projects to the code they exercise. Nodes use the same naming found in `package.json` and the dedicated Vitest configs (`vitest.config.ts`, `vitest.electron.config.ts`, `vitest.shared.config.ts`, `vitest.storybook.config.ts`).
 
-<Mermaid value={`graph TD
-    subgraph CLI["npm scripts (package.json)"]
-        testAll["npm run test:all"]
-        testAllCoverage["npm run test:all:coverage"]
-        testAllDetailed["npm run test:all:detailed"]
-        testE2E["npm run test:e2e"]
-        fuzz["npm run fuzz"]
-    end
+\<Mermaid value={\`graph TD
+subgraph CLI\["npm scripts (package.json)"]
+testAll\["npm run test:all"]
+testAllCoverage\["npm run test:all:coverage"]
+testAllDetailed\["npm run test:all:detailed"]
+testE2E\["npm run test:e2e"]
+fuzz\["npm run fuzz"]
+end
 
-    subgraph VitestFront["Vitest Frontend\n(vitest.config.ts)"]
-        FrontDir["src/test/**/*.*"]
-        FrontSetup["src/test/setup.ts\n& src/test/dom-setup.ts"]
-        FrontEnv["JSDOM + @testing-library/jest-dom"]
-    end
+```
+subgraph VitestFront["Vitest Frontend\n(vitest.config.ts)"]
+    FrontDir["src/test/**/*.*"]
+    FrontSetup["src/test/setup.ts\n& src/test/dom-setup.ts"]
+    FrontEnv["JSDOM + @testing-library/jest-dom"]
+end
 
-    subgraph VitestElectron["Vitest Electron\n(vitest.electron.config.ts)"]
-        ElectronDir["electron/test/**/*.*"]
-        ElectronSetup["electron/test/setup.ts\n(mocked electron, fc.configureGlobal)"]
-        ElectronEnv["Node environment\n+ threads pool"]
-    end
+subgraph VitestElectron["Vitest Electron\n(vitest.electron.config.ts)"]
+    ElectronDir["electron/test/**/*.*"]
+    ElectronSetup["electron/test/setup.ts\n(mocked electron, fc.configureGlobal)"]
+    ElectronEnv["Node environment\n+ threads pool"]
+end
 
-    subgraph VitestShared["Vitest Shared\n(vitest.shared.config.ts)"]
-        SharedDir["shared/test/**/*.*"]
-        SharedSetup["shared/test/setup.ts"]
-        SharedFc["@fast-check/vitest\nnumRuns=10, verbose=2"]
-    end
+subgraph VitestShared["Vitest Shared\n(vitest.shared.config.ts)"]
+    SharedDir["shared/test/**/*.*"]
+    SharedSetup["shared/test/setup.ts"]
+    SharedFc["@fast-check/vitest\nnumRuns=10, verbose=2"]
+end
 
-    subgraph VitestStorybook["Vitest Storybook\n(vitest.storybook.config.ts)"]
-        StorybookDir["storybook stories\nvia @storybook/addon-vitest"]
-        StorybookPlugins["storyboardTest plugin\n+ React compiler"]
-    end
+subgraph VitestStorybook["Vitest Storybook\n(vitest.storybook.config.ts)"]
+    StorybookDir["storybook stories\nvia @storybook/addon-vitest"]
+    StorybookPlugins["storyboardTest plugin\n+ React compiler"]
+end
 
-    subgraph Playwright["Playwright E2E & UI\n(playwright.config.ts)"]
-        GlobalSetup["global-setup.ts\nbuild:electron-main + HEADLESS"]
-        GlobalTeardown["global-teardown.ts\nkill lingering electron"]
-        ElectronHelpers["fixtures/electron-helpers.ts\nlaunchElectronApp"]
-        PWTests["playwright/tests/**/*.playwright.test.ts"]
-    end
+subgraph Playwright["Playwright E2E & UI\n(playwright.config.ts)"]
+    GlobalSetup["global-setup.ts\nbuild:electron-main + HEADLESS"]
+    GlobalTeardown["global-teardown.ts\nkill lingering electron"]
+    ElectronHelpers["fixtures/electron-helpers.ts\nlaunchElectronApp"]
+    PWTests["playwright/tests/**/*.playwright.test.ts"]
+end
 
-    subgraph Typecheck["TS type-check configs\n(config/testing)"]
-        tsFrontend["tsconfig.test.json"]
-        tsElectron["tsconfig.electron.test.json"]
-        tsShared["tsconfig.shared.test.json"]
-        tsPlaywright["playwright/tsconfig.json"]
-    end
+subgraph Typecheck["TS type-check configs\n(config/testing)"]
+    tsFrontend["tsconfig.test.json"]
+    tsElectron["tsconfig.electron.test.json"]
+    tsShared["tsconfig.shared.test.json"]
+    tsPlaywright["playwright/tsconfig.json"]
+end
 
-    testAll -->|runs| VitestFront
-    testAll -->|runs| VitestElectron
-    testAll -->|runs| VitestShared
-    testAll -->|runs| VitestStorybook
+testAll -->|runs| VitestFront
+testAll -->|runs| VitestElectron
+testAll -->|runs| VitestShared
+testAll -->|runs| VitestStorybook
 
-    testAllCoverage -->|collects| VitestFront
-    testAllCoverage -->|collects| VitestElectron
-    testAllCoverage -->|collects| VitestShared
-    testAllCoverage -->|collects| VitestStorybook
+testAllCoverage -->|collects| VitestFront
+testAllCoverage -->|collects| VitestElectron
+testAllCoverage -->|collects| VitestShared
+testAllCoverage -->|collects| VitestStorybook
 
-    testAllDetailed -->|verbose reports| VitestFront
-    testAllDetailed -->|verbose reports| VitestElectron
-    testAllDetailed -->|verbose reports| VitestShared
-    testAllDetailed -->|verbose reports| VitestStorybook
+testAllDetailed -->|verbose reports| VitestFront
+testAllDetailed -->|verbose reports| VitestElectron
+testAllDetailed -->|verbose reports| VitestShared
+testAllDetailed -->|verbose reports| VitestStorybook
 
-    testE2E --> Playwright
-    fuzz --> SharedDir
+testE2E --> Playwright
+fuzz --> SharedDir
 
-    VitestFront --> FrontDir
-    VitestFront --> FrontSetup
-    VitestFront --> FrontEnv
+VitestFront --> FrontDir
+VitestFront --> FrontSetup
+VitestFront --> FrontEnv
 
-    VitestElectron --> ElectronDir
-    VitestElectron --> ElectronSetup
-    VitestElectron --> ElectronEnv
+VitestElectron --> ElectronDir
+VitestElectron --> ElectronSetup
+VitestElectron --> ElectronEnv
 
-    VitestShared --> SharedDir
-    VitestShared --> SharedSetup
-    VitestShared --> SharedFc
+VitestShared --> SharedDir
+VitestShared --> SharedSetup
+VitestShared --> SharedFc
 
-    VitestStorybook --> StorybookDir
-    VitestStorybook --> StorybookPlugins
+VitestStorybook --> StorybookDir
+VitestStorybook --> StorybookPlugins
 
-    Playwright --> GlobalSetup
-    Playwright --> PWTests
-    Playwright --> ElectronHelpers
-    Playwright --> GlobalTeardown
+Playwright --> GlobalSetup
+Playwright --> PWTests
+Playwright --> ElectronHelpers
+Playwright --> GlobalTeardown
 
-    TsDeps["npm run check:frontend:test"] --> tsFrontend
-    TsDeps2["npm run check:electron:test"] --> tsElectron
-    TsDeps3["npm run check:shared:test"] --> tsShared
-    TsDeps4["npm run check:playwright"] --> tsPlaywright
+TsDeps["npm run check:frontend:test"] --> tsFrontend
+TsDeps2["npm run check:electron:test"] --> tsElectron
+TsDeps3["npm run check:shared:test"] --> tsShared
+TsDeps4["npm run check:playwright"] --> tsPlaywright
 
-    classDef cli fill:#0ea5e9,stroke:#0369a1,color:#ffffff
-    classDef vitest fill:#312e81,stroke:#1e1b4b,color:#ffffff
-    classDef setup fill:#1f2937,stroke:#111827,color:#f1f5f9
-    classDef type fill:#15803d,stroke:#166534,color:#f0fdf4
+classDef cli fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+classDef vitest fill:#312e81,stroke:#1e1b4b,color:#ffffff
+classDef setup fill:#1f2937,stroke:#111827,color:#f1f5f9
+classDef type fill:#15803d,stroke:#166534,color:#f0fdf4
 
-    class testAll,testAllCoverage,testAllDetailed,testE2E,fuzz cli
-    class VitestFront,VitestElectron,VitestShared,VitestStorybook,Playwright vitest
-    class FrontDir,FrontSetup,FrontEnv setup
-    class ElectronDir,ElectronSetup,ElectronEnv setup
-    class SharedDir,SharedSetup,SharedFc setup
-    class StorybookDir,StorybookPlugins setup
-    class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
-    class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
-`} />
+class testAll,testAllCoverage,testAllDetailed,testE2E,fuzz cli
+class VitestFront,VitestElectron,VitestShared,VitestStorybook,Playwright vitest
+class FrontDir,FrontSetup,FrontEnv setup
+class ElectronDir,ElectronSetup,ElectronEnv setup
+class SharedDir,SharedSetup,SharedFc setup
+class StorybookDir,StorybookPlugins setup
+class GlobalSetup,GlobalTeardown,ElectronHelpers,PWTests setup
+class tsFrontend,tsElectron,tsShared,tsPlaywright,TsDeps,TsDeps2,TsDeps3,TsDeps4 type
+```
+
+\`} />
 
 ## Property & Fuzz Validation Pipelines
 
 Shared and Electron tests use `@fast-check/vitest` (see `shared/test/setup.ts`, `electron/test/setup.ts`, `src/test/dom-setup.ts`) to hammer the Zod schemas, monitor factories, and error-handling routines. The diagram outlines how arbitraries feed into validators and what invariants each suite asserts.
 
-<Mermaid value={`flowchart LR
-    Arbitraries["Custom fast-check arbitraries\n(shared/test/schemas.property.test.ts)"] -->|generate Site & Monitor payloads| Validators["Zod schemas\nshared/validation/schemas.ts"]
-    Validators -->|validated objects| Sanitizers["validateSiteData / validateMonitorData"]
-    Sanitizers -->|round-trip clones| Invariants["Assertions: status enum, intervals, history shape"]
-    Invariants -->|feed| DerivedStats["useSiteStats & monitor math\n(src/hooks/site/useSiteStats.ts)"]
+\<Mermaid value={\`flowchart LR
+Arbitraries\["Custom fast-check arbitraries\n(shared/test/schemas.property.test.ts)"] -->|generate Site & Monitor payloads| Validators\["Zod schemas\nshared/validation/schemas.ts"]
+Validators -->|validated objects| Sanitizers\["validateSiteData / validateMonitorData"]
+Sanitizers -->|round-trip clones| Invariants\["Assertions: status enum, intervals, history shape"]
+Invariants -->|feed| DerivedStats\["useSiteStats & monitor math\n(src/hooks/site/useSiteStats.ts)"]
 
-    subgraph Fuzzing["Fuzz harnesses"]
-        ErrorFuzz["errorHandling.fuzz.test.ts"]
-        SiteStatusFuzz["siteStatus.fuzz.test.ts"]
-        ConversionFuzz["safeConversions.fuzz.test.ts"]
-    end
+```
+subgraph Fuzzing["Fuzz harnesses"]
+    ErrorFuzz["errorHandling.fuzz.test.ts"]
+    SiteStatusFuzz["siteStatus.fuzz.test.ts"]
+    ConversionFuzz["safeConversions.fuzz.test.ts"]
+end
 
-    Fuzzing -->|mutate inputs| CoreUtils["@shared/utils/**"]
-    CoreUtils -->|surface| LoggerGuards["ensureError / withErrorHandling\nproduces console + logger fallbacks"]
+Fuzzing -->|mutate inputs| CoreUtils["@shared/utils/**"]
+CoreUtils -->|surface| LoggerGuards["ensureError / withErrorHandling\nproduces console + logger fallbacks"]
 
-    subgraph ElectronShared["Electron property suites"]
-        EnhancedCheckerProp["EnhancedMonitorChecker.comprehensive.test.ts"]
-        MonitorRegistryProp["MonitorTypeRegistry.test.ts"]
-    end
+subgraph ElectronShared["Electron property suites"]
+    EnhancedCheckerProp["EnhancedMonitorChecker.comprehensive.test.ts"]
+    MonitorRegistryProp["MonitorTypeRegistry.test.ts"]
+end
 
-    ElectronShared -->|mocked electron bridges| ElectronMocks["vi.mock('electron')\n in electron/test/setup.ts"]
-    ElectronMocks -->|emit| EventBusChecks["TypedEventBus invariants\n(electron/test/events/*)"]
+ElectronShared -->|mocked electron bridges| ElectronMocks["vi.mock('electron')\n in electron/test/setup.ts"]
+ElectronMocks -->|emit| EventBusChecks["TypedEventBus invariants\n(electron/test/events/*)"]
 
-    classDef stage fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
-    classDef fuzz fill:#9333ea,stroke:#6b21a8,color:#f3e8ff
-    classDef util fill:#15803d,stroke:#166534,color:#f0fdf4
+classDef stage fill:#2563eb,stroke:#1d4ed8,color:#f8fafc
+classDef fuzz fill:#9333ea,stroke:#6b21a8,color:#f3e8ff
+classDef util fill:#15803d,stroke:#166534,color:#f0fdf4
 
-    class Arbitraries stage
-    class ErrorFuzz,SiteStatusFuzz,ConversionFuzz fuzz
-    class Validators,Sanitizers,Invariants,DerivedStats,CoreUtils,LoggerGuards,EnhancedCheckerProp,MonitorRegistryProp,ElectronMocks,EventBusChecks util
-`} />
+class Arbitraries stage
+class ErrorFuzz,SiteStatusFuzz,ConversionFuzz fuzz
+class Validators,Sanitizers,Invariants,DerivedStats,CoreUtils,LoggerGuards,EnhancedCheckerProp,MonitorRegistryProp,ElectronMocks,EventBusChecks util
+```
+
+\`} />
 
 ## Playwright & Electron End-to-End Flow
 
 Playwright projects exercise the packaged Electron app. Global setup builds the main process, fixtures launch Electron via `_electron.launch`, and each project records artefacts (`playwright/test-results`, `playwright/reports/html-report`). The sequence diagram captures the control flow for a typical E2E run.
 
-<Mermaid value={`sequenceDiagram
-    autonumber
-    participant CLI as npm run test:e2e
-    participant PW as Playwright Runner
-    participant Setup as global-setup.ts
-    participant Build as npm run build:electron-main
-    participant Fixture as launchElectronApp()
-    participant App as ElectronApplication
-    participant Test as *.playwright.test.ts
-    participant Report as Reports & Artifacts
+\<Mermaid value={\`sequenceDiagram
+autonumber
+participant CLI as npm run test:e2e
+participant PW as Playwright Runner
+participant Setup as global-setup.ts
+participant Build as npm run build:electron-main
+participant Fixture as launchElectronApp()
+participant App as ElectronApplication
+participant Test as \*.playwright.test.ts
+participant Report as Reports & Artifacts
 
-    CLI->>PW: invoke playwright test
-    PW->>Setup: execute globalSetup()
-    Setup->>Build: exec npm run build:electron-main
-    Build-->>Setup: dist/main.js ready
-    Setup->>Fixture: preload HEADLESS env
-    PW->>Fixture: beforeEach launchElectronApp()
-    Fixture->>App: _electron.launch({ args: ['.', '--test-mode'] })
-    App-->>Fixture: ElectronApplication handle
-    Fixture-->>Test: expose handles (windows, mainProcess)
-    Test->>App: orchestrate UI (selectors, IPC via preload)
-    Test->>Report: capture screenshot/video on failure
-    PW->>Report: write trace.zip + results.json/xml
-    PW->>globalTeardown: kill residual electron (taskkill/pkill)
-    globalTeardown-->>PW: cleanup complete
+```
+CLI->>PW: invoke playwright test
+PW->>Setup: execute globalSetup()
+Setup->>Build: exec npm run build:electron-main
+Build-->>Setup: dist/main.js ready
+Setup->>Fixture: preload HEADLESS env
+PW->>Fixture: beforeEach launchElectronApp()
+Fixture->>App: _electron.launch({ args: ['.', '--test-mode'] })
+App-->>Fixture: ElectronApplication handle
+Fixture-->>Test: expose handles (windows, mainProcess)
+Test->>App: orchestrate UI (selectors, IPC via preload)
+Test->>Report: capture screenshot/video on failure
+PW->>Report: write trace.zip + results.json/xml
+PW->>globalTeardown: kill residual electron (taskkill/pkill)
+globalTeardown-->>PW: cleanup complete
 
-    Note over Fixture,App: HEADLESS=true ensures WindowService skips show()
-    Note over Test,Report: Traces stored in playwright/test-results + html-report
-`} />
+Note over Fixture,App: HEADLESS=true ensures WindowService skips show()
+Note over Test,Report: Traces stored in playwright/test-results + html-report
+```
+
+\`} />
 
 ## Coverage & Quality Gates
 
-- **Front-end Vitest**: 90% line/function thresholds enforced by default reporter (`vitest.config.ts`). DOM helpers and `useSite*` hooks are covered through component tests such as `src/test/App.comprehensive.test.tsx`.
-- **Electron Vitest**: `vitest.electron.config.ts` enforces 90%+ coverage with mocked Electron APIs and ensures `UptimeOrchestrator` event propagation is verified (`electron/test/UptimeOrchestrator.test.ts`).
-- **Shared Utilities**: Property-based and fuzz suites under `shared/test` guard serialization, schema validation, and error handling (`jsonSafety.property.test.ts`, `errorHandling.fuzz.test.ts`).
-- **Storybook Vitest**: `vitest.storybook.config.ts` uses `@storybook/addon-vitest` so Storybook stories are regression tested alongside UI snapshots.
-- **Playwright**: Projects in `playwright/tests` span main-process boot, renderer workflows, accessibility, and UI regression. Traces/snapshots are retained for first retry or failure as configured in `playwright.config.ts`.
+* __Front-end Vitest__: 90% line/function thresholds enforced by default reporter (`vitest.config.ts`). DOM helpers and `useSite*` hooks are covered through component tests such as `src/test/App.comprehensive.test.tsx`.
+* __Electron Vitest__: `vitest.electron.config.ts` enforces 90%+ coverage with mocked Electron APIs and ensures `UptimeOrchestrator` event propagation is verified (`electron/test/UptimeOrchestrator.test.ts`).
+* __Shared Utilities__: Property-based and fuzz suites under `shared/test` guard serialization, schema validation, and error handling (`jsonSafety.property.test.ts`, `errorHandling.fuzz.test.ts`).
+* __Storybook Vitest__: `vitest.storybook.config.ts` uses `@storybook/addon-vitest` so Storybook stories are regression tested alongside UI snapshots.
+* __Playwright__: Projects in `playwright/tests` span main-process boot, renderer workflows, accessibility, and UI regression. Traces/snapshots are retained for first retry or failure as configured in `playwright.config.ts`.
 
 ## Running the Matrix
 
 Common commands:
 
-- `npm run test:all` — Runs frontend, Electron, shared, and Storybook suites without coverage noise.
-- `npm run test:all:coverage` — Same as above but produces HTML/LCOV reports per suite (`coverage/frontend`, `coverage/electron`, `coverage/shared`, `coverage/storybook`).
-- `npm run test:e2e` — Executes the Playwright matrix with single worker + Electron HEADLESS mode.
-- `npm run fuzz` — Filters Vitest to any test name containing `fuzz` or `fuzzing`, ideal for quick property regression sweeps.
+* `npm run test:all` — Runs frontend, Electron, shared, and Storybook suites without coverage noise.
+* `npm run test:all:coverage` — Same as above but produces HTML/LCOV reports per suite (`coverage/frontend`, `coverage/electron`, `coverage/shared`, `coverage/storybook`).
+* `npm run test:e2e` — Executes the Playwright matrix with single worker + Electron HEADLESS mode.
+* `npm run fuzz` — Filters Vitest to any test name containing `fuzz` or `fuzzing`, ideal for quick property regression sweeps.
 
 By following the diagrams and commands above, contributors can reason about where to place new tests, how existing suites interact, and which quality gates will guard their changes.
 
-          </div>
-        </div>
+```
       </div>
-    </Layout>
-  );
+    </div>
+  </div>
+</Layout>
+```
+
+);
 }

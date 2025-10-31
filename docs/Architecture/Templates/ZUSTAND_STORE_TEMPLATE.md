@@ -1,6 +1,6 @@
 # Zustand Store Template
 
-> **Note:** Replace `ExampleService` with your domain-specific renderer service
+> __Note:__ Replace `ExampleService` with your domain-specific renderer service
 > implementation under `src/services`. The snippets below assume such a facade
 > exists to encapsulate all preload bridge access.
 
@@ -663,12 +663,12 @@ describe("useExampleStore", () => {
 
 When using this template:
 
-- [ ] Replace `Example` with your domain name
-- [ ] Update state interface with your specific properties
-- [ ] Add your specific actions and their implementations
-- [ ] Configure persistence settings if needed
-- [ ] Update TSDoc comments with domain-specific information
-- [ ] Add any domain-specific computed values
-- [ ] Create corresponding test file
-- [ ] Add IPC integration for backend communication
-- [ ] Consider if modular composition is needed for complex state
+* [ ] Replace `Example` with your domain name
+* [ ] Update state interface with your specific properties
+* [ ] Add your specific actions and their implementations
+* [ ] Configure persistence settings if needed
+* [ ] Update TSDoc comments with domain-specific information
+* [ ] Add any domain-specific computed values
+* [ ] Create corresponding test file
+* [ ] Add IPC integration for backend communication
+* [ ] Consider if modular composition is needed for complex state

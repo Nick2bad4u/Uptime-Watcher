@@ -15,6 +15,7 @@ import {
 import {
     parseStateSyncFullSyncResult,
     parseStateSyncStatusSummary,
+    STATE_SYNC_ACTION,
     type StateSyncFullSyncResult,
     type StateSyncStatusSummary,
 } from "@shared/types/stateSync";
@@ -72,11 +73,6 @@ interface StateSyncServiceContract {
     readonly requestFullSync: () => Promise<StateSyncFullSyncResult>;
 }
 
-/**
- * State synchronization service bridging renderer and main process IPC.
- *
- * @public
- */
 export const StateSyncService: StateSyncServiceContract = {
     /**
      * Retrieves the latest synchronization summary from the backend.
@@ -106,8 +102,54 @@ export const StateSyncService: StateSyncServiceContract = {
     onStateSyncEvent: wrap(
         "onStateSyncEvent",
         async (api, callback: (event: StateSyncEventData) => void) => {
+            /* eslint-disable n/no-sync, n/callback-return -- IPC bridge exposes asynchronous APIs with "Sync" suffix and forwards callbacks */
+            let pendingRecovery: null | Promise<void> = null;
+
+            const scheduleRecovery = (): void => {
+                if (pendingRecovery) {
+                    return;
+                }
+
+                pendingRecovery = (async (): Promise<void> => {
+                    try {
+                        logger.warn(
+                            "[StateSyncService] Attempting full sync recovery after invalid state sync event"
+                        );
+
+                        const rawFullSync =
+                            await api.stateSync.requestFullSync();
+                        const fullSync =
+                            parseStateSyncFullSyncResult(rawFullSync);
+
+                        const syntheticEvent: StateSyncEventData = {
+                            action: STATE_SYNC_ACTION.BULK_SYNC,
+                            siteIdentifier: "all",
+                            sites: fullSync.sites,
+                            source: fullSync.source,
+                            timestamp: fullSync.completedAt,
+                        };
+
+                        logger.info(
+                            "[StateSyncService] Full sync recovery completed",
+                            {
+                                siteCount: fullSync.siteCount,
+                                source: fullSync.source,
+                            }
+                        );
+
+                        callback(syntheticEvent);
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[StateSyncService] Full sync recovery failed",
+                            ensureError(error)
+                        );
+                    } finally {
+                        pendingRecovery = null;
+                    }
+                })();
+            };
+
             const unsubscribeCandidate = await Promise.resolve(
-                // eslint-disable-next-line n/no-sync -- IPC channel is asynchronous despite "Sync" suffix.
                 api.stateSync.onStateSyncEvent((rawEvent) => {
                     const parsedEvent = safeParseStateSyncEventData(rawEvent);
 
@@ -119,12 +161,15 @@ export const StateSyncService: StateSyncServiceContract = {
                                 rawEvent,
                             }
                         );
+
+                        scheduleRecovery();
                         return;
                     }
 
                     callback(parsedEvent.data);
                 })
             );
+            /* eslint-enable n/no-sync, n/callback-return -- Restore linting after state sync subscription block */
 
             return resolveCleanupHandler(unsubscribeCandidate, {
                 handleCleanupError: (error: unknown) => {

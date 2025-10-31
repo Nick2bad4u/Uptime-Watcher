@@ -4,19 +4,19 @@ This document outlines the architectural patterns, conventions, and standards fo
 
 ## Table of Contents
 
-- [Error Handling Standards](#error-handling-standards)
-- [Logging Patterns](#logging-patterns)
-- [Dependency Injection](#dependency-injection)
-- [Code Documentation](#code-documentation)
-- [Architectural Patterns](#architectural-patterns)
-- [TypeScript Standards](#typescript-standards)
-- [Testing Conventions](#testing-conventions)
+* [Error Handling Standards](#error-handling-standards)
+* [Logging Patterns](#logging-patterns)
+* [Dependency Injection](#dependency-injection)
+* [Code Documentation](#code-documentation)
+* [Architectural Patterns](#architectural-patterns)
+* [TypeScript Standards](#typescript-standards)
+* [Testing Conventions](#testing-conventions)
 
 ## Error Handling Standards
 
 ### 1. Use withErrorHandling for All Service Operations
 
-**Pattern**: All service methods that can fail should use the standardized `withErrorHandling()` utility.
+__Pattern__: All service methods that can fail should use the standardized `withErrorHandling()` utility.
 
 ```typescript
 // ✅ Correct - Using withErrorHandling
@@ -39,11 +39,11 @@ public async migrateData(): Promise<void> {
 }
 ```
 
-**Files Using This Pattern**:
+__Files Using This Pattern__:
 
-- `electron/services/monitoring/MigrationSystem.ts`
-- `electron/services/window/WindowService.ts`
-- All service classes in `electron/services/`
+* `electron/services/monitoring/MigrationSystem.ts`
+* `electron/services/window/WindowService.ts`
+* All service classes in `electron/services/`
 
 ### 2. Error Context and Correlation
 
@@ -62,7 +62,7 @@ return withErrorHandling(async () => {
 
 ### 1. Use logger Instead of console
 
-**Pattern**: Always use the structured logger from `@electron/utils/logger`.
+__Pattern__: Always use the structured logger from `@electron/utils/logger`.
 
 ```typescript
 // ✅ Correct - Using logger
@@ -117,7 +117,7 @@ logger.debug(
 
 ### 1. Standardized Dependency Interfaces
 
-**Pattern**: Services should use standardized dependency injection with clear interfaces.
+__Pattern__: Services should use standardized dependency injection with clear interfaces.
 
 ```typescript
 // ✅ Correct - Dependency interface pattern
@@ -212,7 +212,7 @@ Use comprehensive TSDoc comments following the project standards:
 
 ### 2. Logger in Examples
 
-**Always use logger in JSDoc examples**, never console:
+__Always use logger in JSDoc examples__, never console:
 
 ````typescript
 // ✅ Correct - JSDoc with logger
@@ -287,18 +287,18 @@ eventBus.subscribe("monitor:status-changed", (event) => {
 
 Maintain clear separation between services:
 
-- **Data Layer**: Repositories and database utilities
-- **Service Layer**: Business logic and orchestration
-- **API Layer**: IPC handlers and external interfaces
-- **UI Layer**: React components and state management
+* __Data Layer__: Repositories and database utilities
+* __Service Layer__: Business logic and orchestration
+* __API Layer__: IPC handlers and external interfaces
+* __UI Layer__: React components and state management
 
 ## TypeScript Standards
 
 ### 1. Strict Type Safety
 
-- Never use `any` or `unknown` without explicit justification
-- Use proper type guards and assertions
-- Leverage TypeScript's strict configuration
+* Never use `any` or `unknown` without explicit justification
+* Use proper type guards and assertions
+* Leverage TypeScript's strict configuration
 
 ```typescript
 // ✅ Type-safe approach
@@ -328,10 +328,10 @@ constructor(config?: MonitorConfig, logger?: Logger, client?: AxiosInstance)
 
 ### 3. Shared Contract Interfaces
 
-- Canonical DTOs live in the `shared` package. Do **not** redeclare interfaces such as `MonitorTypeOption`; import them from `@shared/types/monitorTypes`.
-- Favor re-exporting shared contracts from feature modules (e.g. `src/constants.ts`) instead of introducing renderer-only clones.
-- When introducing a new shared interface, add it to `shared/types/*` and extend the ESLint guard (`config/linting/rules/shared-contract-interfaces.mjs`) so duplicates are caught automatically.
-- Use the `@app` path alias whenever referencing renderer code from outside `src` (Storybook, benchmarks, tests, scripts). Relative deep imports such as `../../src/components/...` are disallowed by ESLint and should be rewritten to `@app/components/...`.
+* Canonical DTOs live in the `shared` package. Do __not__ redeclare interfaces such as `MonitorTypeOption`; import them from `@shared/types/monitorTypes`.
+* Favor re-exporting shared contracts from feature modules (e.g. `src/constants.ts`) instead of introducing renderer-only clones.
+* When introducing a new shared interface, add it to `shared/types/*` and extend the ESLint guard (`config/linting/rules/shared-contract-interfaces.mjs`) so duplicates are caught automatically.
+* Use the `@app` path alias whenever referencing renderer code from outside `src` (Storybook, benchmarks, tests, scripts). Relative deep imports such as `../../src/components/...` are disallowed by ESLint and should be rewritten to `@app/components/...`.
 
 ## Testing Conventions
 
@@ -377,15 +377,15 @@ const mockLogger = vi.fn();
 
 When implementing new features or modifying existing code, ensure:
 
-- [ ] **Error Handling**: Uses `withErrorHandling()` for all operations that can fail
-- [ ] **Logging**: Uses structured logger instead of console statements
-- [ ] **Dependencies**: Follows dependency injection patterns with clear interfaces
-- [ ] **Documentation**: Includes comprehensive TSDoc with logger examples
-- [ ] **Type Safety**: Uses strict TypeScript without `any` or unsafe assertions
-- [ ] **Testing**: Includes proper test coverage with consistent mocking
-- [ ] **Architecture**: Follows established patterns (repository, service layer, etc.)
-- [ ] **Events**: Uses TypedEventBus for inter-service communication
-- [ ] **Configuration**: Properly handles config merging and defaults
+* [ ] __Error Handling__: Uses `withErrorHandling()` for all operations that can fail
+* [ ] __Logging__: Uses structured logger instead of console statements
+* [ ] __Dependencies__: Follows dependency injection patterns with clear interfaces
+* [ ] __Documentation__: Includes comprehensive TSDoc with logger examples
+* [ ] __Type Safety__: Uses strict TypeScript without `any` or unsafe assertions
+* [ ] __Testing__: Includes proper test coverage with consistent mocking
+* [ ] __Architecture__: Follows established patterns (repository, service layer, etc.)
+* [ ] __Events__: Uses TypedEventBus for inter-service communication
+* [ ] __Configuration__: Properly handles config merging and defaults
 
 ## Validation Commands
 

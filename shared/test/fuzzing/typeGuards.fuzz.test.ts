@@ -549,13 +549,24 @@ describe("TypeGuards Fuzzing Tests", () => {
 
         test.prop([
             fc.oneof(
-                fc.integer({ min: -1000, max: 0 }),
-                fc.integer({
-                    min: Date.now() + 86_400_000 + 1000,
-                    max: Date.now() + 86_400_000 * 30,
-                }) // More than 1 day + buffer in future
+                fc.record({
+                    tag: fc.constant("raw"),
+                    value: fc.integer({ min: -1000, max: 0 }),
+                }),
+                fc.record({
+                    tag: fc.constant("future"),
+                    offset: fc.integer({
+                        min: 1000,
+                        max: 86_400_000 * 30,
+                    }),
+                })
             ),
-        ])("should return false for invalid timestamps", (invalidTimestamp) => {
+        ])("should return false for invalid timestamps", (candidate) => {
+            const invalidTimestamp =
+                candidate.tag === "future"
+                    ? Date.now() + 86_400_000 + candidate.offset
+                    : candidate.value;
+
             expect(isValidTimestamp(invalidTimestamp)).toBeFalsy();
         });
     });

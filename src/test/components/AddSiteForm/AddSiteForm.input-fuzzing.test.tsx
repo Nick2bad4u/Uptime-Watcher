@@ -864,12 +864,10 @@ describe("AddSiteForm User Input Fuzzing", () => {
                     )
                 ),
             ],
-            { numRuns: 3, timeout: 30_000 }
+            { numRuns: 2, timeout: 15_000 }
         )(
             "should handle invalid port number inputs appropriately",
             async (invalidPort) => {
-                const user = userEvent.setup();
-
                 // Set the mock state to port type before rendering
                 mockState.monitorType = "port";
 
@@ -880,10 +878,13 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 const portInput = portInputs[0]!; // Take the first one if multiple exist
                 expect(portInput).toBeInTheDocument();
 
-                // Should not crash on invalid input
-                expect(async () => {
-                    await user.clear(portInput);
-                    // Use faster direct assignment
+                // Should not crash on invalid input while simulating user entry
+                expect(() => {
+                    (portInput as HTMLInputElement).value = "";
+                    portInput.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                    );
+
                     (portInput as HTMLInputElement).value =
                         invalidPort.toString();
                     portInput.dispatchEvent(

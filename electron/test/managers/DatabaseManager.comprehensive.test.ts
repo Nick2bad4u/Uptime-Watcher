@@ -385,9 +385,13 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
-            // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
-                new Error("Event emission failed")
+            // Mock event emission to fail for specific database events only
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
+                async (eventName, _payload) => {
+                    if (eventName === "database:transaction-completed") {
+                        throw new Error("Event emission failed");
+                    }
+                }
             );
 
             // Should not throw even if event emission fails
@@ -566,9 +570,15 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
             // Initialize first
             await databaseManager.initialize();
 
-            // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
-                new Error("Event emission failed")
+            // Mock event emission to fail specifically for start monitoring
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
+                async (eventName, _payload) => {
+                    if (
+                        eventName === "internal:site:start-monitoring-requested"
+                    ) {
+                        throw new Error("Event emission failed");
+                    }
+                }
             );
 
             // Should not throw even if event emission fails
@@ -615,13 +625,23 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 }
             );
 
+            (databaseManager as any).siteLoadingOrchestrator =
+                mockOrchestrator as any;
+
             // Mock event emission to fail
-            vi.mocked(mockEventEmitter.emitTyped).mockRejectedValue(
-                new Error("Event emission failed")
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
+                async (eventName, _payload) => {
+                    if (
+                        eventName === "internal:site:start-monitoring-requested"
+                    ) {
+                        throw new Error("Event emission failed");
+                    }
+                }
             );
 
-            // Should still complete successfully even if events fail
-            await expect(databaseManager.initialize()).resolves.toBeUndefined();
+            await expect(databaseManager.initialize()).rejects.toThrow(
+                "Event emission failed"
+            );
         });
     });
 
@@ -808,6 +828,53 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Should complete without errors
             await expect(databaseManager.initialize()).resolves.toBeUndefined();
+        });
+
+        it("should propagate stopMonitoring event failures", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const mockOrchestrator = createSiteLoadingOrchestratorMock({
+                loadSitesFromDatabase: vi
+                    .fn()
+                    .mockImplementation(async (_tempCache, config) => {
+                        if (config.stopMonitoring) {
+                            await config.stopMonitoring("site1", "monitor1");
+                        }
+                        return {
+                            success: true,
+                            sitesLoaded: 1,
+                            message: "Success",
+                        };
+                    }),
+            });
+            vi.mocked(SiteLoadingOrchestrator).mockImplementation(
+                function SiteLoadingOrchestratorStopFailureMock() {
+                    return mockOrchestrator as any;
+                }
+            );
+
+            (databaseManager as any).siteLoadingOrchestrator =
+                mockOrchestrator as any;
+
+            vi.mocked(mockEventEmitter.emitTyped).mockImplementation(
+                async (eventName, _payload) => {
+                    if (
+                        eventName === "internal:site:stop-monitoring-requested"
+                    ) {
+                        throw new Error("Stop event failed");
+                    }
+                }
+            );
+
+            await expect(databaseManager.initialize()).rejects.toThrow(
+                "Stop event failed"
+            );
         });
 
         it("should handle setupNewMonitors callback in loadSites", async ({

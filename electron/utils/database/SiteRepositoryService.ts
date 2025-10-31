@@ -133,7 +133,7 @@ export class SiteRepositoryService {
     ): Promise<void> {
         const limit = await this.getHistoryLimitSetting();
         if (limit !== undefined) {
-            monitoringConfig.setHistoryLimit(limit);
+            await monitoringConfig.setHistoryLimit(limit);
             this.logger.info(`History limit applied: ${limit}`);
         }
     }

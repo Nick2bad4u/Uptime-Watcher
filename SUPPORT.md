@@ -36,10 +36,10 @@ flowchart TD
 
 First, please check our comprehensive documentation:
 
-- **[README.md](README.md)** - Project overview and quick start
-- **[docs/](docs/)** - Detailed documentation and guides
-- **[Developer Quick Start](docs/Guides/DEVELOPER-QUICK-START.md)** - Getting started with development
-- **[Troubleshooting Guide](docs/Guides/troubleshooting.md)** - Common issues and solutions
+* __[README.md](README.md)__ - Project overview and quick start
+* __[docs/](docs/)__ - Detailed documentation and guides
+* __[Developer Quick Start](docs/Guides/DEVELOPER-QUICK-START.md)__ - Getting started with development
+* __[Troubleshooting Guide](docs/Guides/troubleshooting.md)__ - Common issues and solutions
 
 ### 🐛 Reporting Bugs
 
@@ -61,8 +61,8 @@ To request a new feature:
 
 For questions, ideas, or general discussion:
 
-- Use [GitHub Discussions](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
-- Check the [Q&A section](https://github.com/Nick2bad4u/Uptime-Watcher/discussions/categories/q-a) for common questions
+* Use [GitHub Discussions](https://github.com/Nick2bad4u/Uptime-Watcher/discussions)
+* Check the [Q\&A section](https://github.com/Nick2bad4u/Uptime-Watcher/discussions/categories/q-a) for common questions
 
 ## 🤝 Community Guidelines
 
@@ -70,28 +70,28 @@ Please follow these guidelines when seeking support:
 
 ### ✅ Do
 
-- Be respectful and patient
-- Provide clear, detailed information
-- Search existing issues and discussions first
-- Use appropriate templates when creating issues
-- Include relevant system information (OS, version, etc.)
-- Provide minimal reproducible examples for bugs
+* Be respectful and patient
+* Provide clear, detailed information
+* Search existing issues and discussions first
+* Use appropriate templates when creating issues
+* Include relevant system information (OS, version, etc.)
+* Provide minimal reproducible examples for bugs
 
 ### ❌ Don't
 
-- Use issues for general questions (use Discussions instead)
-- Open duplicate issues
-- Ask for urgent fixes or timeline commitments
-- Include sensitive information (passwords, API keys, etc.)
+* Use issues for general questions (use Discussions instead)
+* Open duplicate issues
+* Ask for urgent fixes or timeline commitments
+* Include sensitive information (passwords, API keys, etc.)
 
 ## 🔧 Self-Help Resources
 
 ### Common Issues
 
-1. **Application won't start**: Check Node.js version (>=24.8.0 required)
-2. **Build failures**: Try `npm clean-install` to refresh dependencies
-3. **Test failures**: Ensure you're using the correct Node.js version
-4. **Electron issues**: Check our [Electron troubleshooting guide](docs/Guides/troubleshooting.md)
+1. __Application won't start__: Check Node.js version (>=24.8.0 required)
+2. __Build failures__: Try `npm clean-install` to refresh dependencies
+3. __Test failures__: Ensure you're using the correct Node.js version
+4. __Electron issues__: Check our [Electron troubleshooting guide](docs/Guides/troubleshooting.md)
 
 ### Development Setup
 
@@ -105,38 +105,38 @@ If you're having trouble setting up the development environment:
 
 ### Project Maintainer
 
-- **Nick2bad4u** - [@Nick2bad4u](https://github.com/Nick2bad4u)
-- Email: <20943337+Nick2bad4u@users.noreply.github.com>
+* __Nick2bad4u__ - [@Nick2bad4u](https://github.com/Nick2bad4u)
+* Email: <20943337+Nick2bad4u@users.noreply.github.com>
 
 ### Response Times
 
-- **Bug reports**: We aim to respond within 48 hours
-- **Feature requests**: We review these weekly
-- **Security issues**: Please follow our [security policy](SECURITY.md)
+* __Bug reports__: We aim to respond within 48 hours
+* __Feature requests__: We review these weekly
+* __Security issues__: Please follow our [security policy](SECURITY.md)
 
 ## 🏷️ Issue Labels
 
 We use these labels to organize issues:
 
-- `bug` - Something isn't working
-- `enhancement` - New feature or request
-- `documentation` - Improvements or additions to documentation
-- `good first issue` - Good for newcomers
-- `help wanted` - Extra attention is needed
-- `question` - Further information is requested
+* `bug` - Something isn't working
+* `enhancement` - New feature or request
+* `documentation` - Improvements or additions to documentation
+* `good first issue` - Good for newcomers
+* `help wanted` - Extra attention is needed
+* `question` - Further information is requested
 
 ## 📈 Contributing
 
 If you'd like to help improve Uptime Watcher:
 
-- Read our [contributing guidelines](CONTRIBUTING.md)
-- Check issues labeled `good first issue` or `help wanted`
-- Join discussions about new features and improvements
+* Read our [contributing guidelines](CONTRIBUTING.md)
+* Check issues labeled `good first issue` or `help wanted`
+* Join discussions about new features and improvements
 
 ## 🛡️ Security
 
 For security-related issues, please follow our [Security Policy](SECURITY.md) rather than opening a public issue.
 
----
+***
 
 Thank you for being part of the Uptime Watcher community! 🚀

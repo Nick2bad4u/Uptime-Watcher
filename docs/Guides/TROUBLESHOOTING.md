@@ -1,4 +1,4 @@
-# 🔧 Trouble**Solutions**:
+# 🔧 Troubl&#x65;__&#x53;olutions__:
 
 ```bash
 # Copy WASM file to dist
@@ -8,9 +8,9 @@ npm run copy-wasm
 ls dist/*.wasm
 ```
 
-**Prevention**: The `postbuild` script should handle this automatically, but sometimes fails in certain environments.uide
+__Prevention__: The `postbuild` script should handle this automatically, but sometimes fails in certain environments.uide
 
-> **Debug Like a Pro**: Common issues, solutions, and debugging techniques for Uptime Watcher development.
+> __Debug Like a Pro__: Common issues, solutions, and debugging techniques for Uptime Watcher development.
 
 ## 🚨 Common Issues & Solutions
 
@@ -18,9 +18,9 @@ ls dist/*.wasm
 
 #### 1. SQLite WASM Not Found
 
-**Error**: `Error: Cannot find module 'node-sqlite3-wasm.wasm'`
+__Error__: `Error: Cannot find module 'node-sqlite3-wasm.wasm'`
 
-**Solution**:
+__Solution__:
 
 ```bash
 # Copy WASM file to dist
@@ -29,13 +29,13 @@ npm run postbuild
 npm run copy-wasm
 ```
 
-**Prevention**: The `postinstall` script should handle this automatically, but sometimes fails in certain environments.
+__Prevention__: The `postinstall` script should handle this automatically, but sometimes fails in certain environments.
 
 #### 2. Port 5173 Already in Use
 
-**Error**: `Port 5173 is already in use`
+__Error__: `Port 5173 is already in use`
 
-**Solutions**:
+__Solutions__:
 
 ```bash
 # Kill the process using the port
@@ -47,30 +47,30 @@ npm run dev -- --port 5174
 
 #### 3. Electron Won't Start
 
-**Error**: Electron starts but shows blank screen
+__Error__: Electron starts but shows blank screen
 
-**Solutions**:
+__Solutions__:
 
-1. **Check Vite dev server**: Ensure `npm run dev` is running on port 5173
-2. **Clear cache**: Delete `.vite` and `dist` directories
-3. **Rebuild**: `npm run clean && npm install && npm run copy-wasm`
+1. __Check Vite dev server__: Ensure `npm run dev` is running on port 5173
+2. __Clear cache__: Delete `.vite` and `dist` directories
+3. __Rebuild__: `npm run clean && npm install && npm run copy-wasm`
 
 #### 4. Hot Reload Not Working
 
-**Solutions**:
+__Solutions__:
 
-1. **Restart dev server**: Stop and restart `npm run electron-dev`
-2. **Check file watchers**: Ensure file system watchers aren't exceeded
-3. **Reload manually**: Use Ctrl+R in Electron window
-4. **Check HMR logs**: Look for HMR errors in the console
+1. __Restart dev server__: Stop and restart `npm run electron-dev`
+2. __Check file watchers__: Ensure file system watchers aren't exceeded
+3. __Reload manually__: Use Ctrl+R in Electron window
+4. __Check HMR logs__: Look for HMR errors in the console
 
 ### Database Issues
 
 #### 1. Database Locked Error
 
-**Error**: `database is locked`
+__Error__: `database is locked`
 
-**Solutions**:
+__Solutions__:
 
 ```bash
 # Inspect debug output (forwards flags while starting Vite + Electron together)
@@ -82,29 +82,29 @@ pkill -f electron
 npm run electron-dev
 ```
 
-**Prevention**: Always use repository pattern and transactions
+__Prevention__: Always use repository pattern and transactions
 
 #### 2. Migration Errors
 
-**Error**: Schema/migration related errors
+__Error__: Schema/migration related errors
 
-**Solutions**:
+__Solutions__:
 
-1. **Backup data**: Export data if needed
-2. **Delete database**: Remove SQLite files in user data directory
-3. **Restart**: Application will recreate with latest schema
+1. __Backup data__: Export data if needed
+2. __Delete database__: Remove SQLite files in user data directory
+3. __Restart__: Application will recreate with latest schema
 
-**Database Locations**:
+__Database Locations__:
 
-- **Windows**: `%APPDATA%/uptime-watcher/`
-- **macOS**: `~/Library/Application Support/uptime-watcher/`
-- **Linux**: `~/.config/uptime-watcher/`
+* __Windows__: `%APPDATA%/uptime-watcher/`
+* __macOS__: `~/Library/Application Support/uptime-watcher/`
+* __Linux__: `~/.config/uptime-watcher/`
 
 #### 3. Transaction Errors
 
-**Error**: `cannot start a transaction within a transaction`
+__Error__: `cannot start a transaction within a transaction`
 
-**Solution**: Use internal repository methods within existing transactions:
+__Solution__: Use internal repository methods within existing transactions:
 
 ```typescript
 // ❌ Wrong - creates nested transaction
@@ -122,14 +122,14 @@ await databaseService.executeTransaction(async (db) => {
 
 #### 1. Events Not Reaching Listeners
 
-**Error**: Event listeners not triggering
+__Error__: Event listeners not triggering
 
-**Solutions**:
+__Solutions__:
 
-1. **Check event names**: Ensure exact name matching (case-sensitive)
-2. **Verify listener registration**: Check that listeners are registered before emission
-3. **Check middleware errors**: Look for middleware that might prevent emission
-4. **Debug correlation IDs**: Use correlation IDs to trace event flow
+1. __Check event names__: Ensure exact name matching (case-sensitive)
+2. __Verify listener registration__: Check that listeners are registered before emission
+3. __Check middleware errors__: Look for middleware that might prevent emission
+4. __Debug correlation IDs__: Use correlation IDs to trace event flow
 
 ```typescript
 // Debug event emission
@@ -142,13 +142,13 @@ await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
 
 #### 2. IPC Events Not Crossing Boundary
 
-**Error**: Events emitted in backend not reaching frontend
+__Error__: Events emitted in backend not reaching frontend
 
-**Solutions**:
+__Solutions__:
 
-1. **Check EventsService initialization**: Ensure the renderer facade initializes successfully
-2. **Verify preload exposure**: If initialization fails, confirm the relevant domain exists in the preload script
-3. **Inspect bridge diagnostics**: Use structured logging to verify events are forwarded across the boundary
+1. __Check EventsService initialization__: Ensure the renderer facade initializes successfully
+2. __Verify preload exposure__: If initialization fails, confirm the relevant domain exists in the preload script
+3. __Inspect bridge diagnostics__: Use structured logging to verify events are forwarded across the boundary
 
 ```typescript
 import { EventsService } from "src/services/EventsService";
@@ -170,13 +170,13 @@ eventBus.use(async (event, data, next) => {
 
 #### 3. Memory Leaks from Event Listeners
 
-**Error**: Growing memory usage from uncleaned listeners
+__Error__: Growing memory usage from uncleaned listeners
 
-**Solutions**:
+__Solutions__:
 
-1. **Always clean up listeners**: Use cleanup functions returned by EventsService
-2. **Use AbortController**: For automatic cleanup on component unmount
-3. **Monitor listener counts**: Check event bus diagnostics
+1. __Always clean up listeners__: Use cleanup functions returned by EventsService
+2. __Use AbortController__: For automatic cleanup on component unmount
+3. __Monitor listener counts__: Check event bus diagnostics
 
 ```typescript
 // Proper cleanup pattern
@@ -202,13 +202,13 @@ useEffect(() => {
 
 #### 1. Unhandled Promise Rejections
 
-**Error**: Uncaught promise rejections in async operations
+__Error__: Uncaught promise rejections in async operations
 
-**Solutions**:
+__Solutions__:
 
-1. **Use withErrorHandling utility**: Wrap async operations
-2. **Check error boundaries**: Ensure React error boundaries are in place
-3. **Centralized error handling**: Use error store for consistent handling
+1. __Use withErrorHandling utility__: Wrap async operations
+2. __Check error boundaries__: Ensure React error boundaries are in place
+3. __Centralized error handling__: Use error store for consistent handling
 
 ```typescript
 // Use withErrorHandling wrapper
@@ -228,13 +228,13 @@ const handleSiteCreation = withErrorHandling(
 
 #### 2. Type Guard Failures
 
-**Error**: Type validation failures in IPC communication
+__Error__: Type validation failures in IPC communication
 
-**Solutions**:
+__Solutions__:
 
-1. **Check type guard implementations**: Ensure type guards match current interfaces
-2. **Validate data shapes**: Check that data being sent matches expected types
-3. **Update shared types**: Ensure frontend and backend use same type definitions
+1. __Check type guard implementations__: Ensure type guards match current interfaces
+2. __Validate data shapes__: Check that data being sent matches expected types
+3. __Update shared types__: Ensure frontend and backend use same type definitions
 
 ```typescript
 // Debug type validation
@@ -248,13 +248,13 @@ if (!isSiteCreationData(data)) {
 
 #### 3. Store State Corruption
 
-**Error**: Zustand store state becomes inconsistent
+__Error__: Zustand store state becomes inconsistent
 
-**Solutions**:
+__Solutions__:
 
-1. **Check action implementations**: Ensure state updates are immutable
-2. **Use store debugging**: Enable Zustand devtools
-3. **Reset store state**: Provide reset functionality for development
+1. __Check action implementations__: Ensure state updates are immutable
+2. __Use store debugging__: Enable Zustand devtools
+3. __Reset store state__: Provide reset functionality for development
 
 ```typescript
 // Store debugging
@@ -275,31 +275,31 @@ export const useSitesStore = create<SitesStore>()(
 
 #### 1. Type Errors in IPC
 
-**Error**: TypeScript errors on `window.electronAPI`
+__Error__: TypeScript errors on `window.electronAPI`
 
-**Solutions**:
+__Solutions__:
 
-1. **Check preload types**: Ensure types are properly exposed
-2. **Restart TypeScript**: Reload VS Code or restart TypeScript service
-3. **Check imports**: Verify type imports in components
+1. __Check preload types__: Ensure types are properly exposed
+2. __Restart TypeScript__: Reload VS Code or restart TypeScript service
+3. __Check imports__: Verify type imports in components
 
 #### 2. Module Resolution Errors
 
-**Error**: Cannot resolve module paths
+__Error__: Cannot resolve module paths
 
-**Solutions**:
+__Solutions__:
 
-1. **Check tsconfig.json**: Verify path mappings
-2. **Restart TypeScript**: Reload language service
-3. **Check imports**: Use correct relative/absolute paths
+1. __Check tsconfig.json__: Verify path mappings
+2. __Restart TypeScript__: Reload language service
+3. __Check imports__: Use correct relative/absolute paths
 
 ### Build & Packaging Issues
 
 #### 1. Build Fails
 
-**Error**: Various build-time errors
+__Error__: Various build-time errors
 
-**Solutions**:
+__Solutions__:
 
 ```bash
 # Clean and rebuild
@@ -316,19 +316,19 @@ npm run lint
 
 #### 2. Missing Dependencies in Production
 
-**Error**: Module not found in packaged app
+__Error__: Module not found in packaged app
 
-**Solutions**:
+__Solutions__:
 
-1. **Check package.json**: Ensure dependencies (not devDependencies)
-2. **Test build locally**: `npm run dist` and test the built app
-3. **Check bundling**: Verify Vite/Electron builder configuration
+1. __Check package.json__: Ensure dependencies (not devDependencies)
+2. __Test build locally__: `npm run dist` and test the built app
+3. __Check bundling__: Verify Vite/Electron builder configuration
 
 #### 3. WASM File Missing in Package
 
-**Error**: SQLite WASM not found in packaged app
+__Error__: SQLite WASM not found in packaged app
 
-**Solution**: Ensure `copy-wasm` script runs:
+__Solution__: Ensure `copy-wasm` script runs:
 
 ```json
 // package.json
@@ -344,15 +344,15 @@ npm run lint
 
 #### 1. Memory Leaks
 
-**Symptoms**: App becomes slow over time, high memory usage
+__Symptoms__: App becomes slow over time, high memory usage
 
-**Solutions**:
+__Solutions__:
 
-1. **Check event listeners**: Ensure proper cleanup
-2. **Monitor stores**: Look for state that grows infinitely
-3. **Database connections**: Verify proper connection management
+1. __Check event listeners__: Ensure proper cleanup
+2. __Monitor stores__: Look for state that grows infinitely
+3. __Database connections__: Verify proper connection management
 
-**Debugging**:
+__Debugging__:
 
 ```typescript
 // Monitor memory in development
@@ -364,23 +364,23 @@ console.log(eventBus.listenerCount());
 
 #### 2. Performance Issues
 
-**Symptoms**: Slow UI, delayed responses
+__Symptoms__: Slow UI, delayed responses
 
-**Solutions**:
+__Solutions__:
 
-1. **Profile React**: Use React DevTools Profiler
-2. **Check database queries**: Monitor query performance
-3. **Optimize stores**: Use selectors to prevent unnecessary re-renders
+1. __Profile React__: Use React DevTools Profiler
+2. __Check database queries__: Monitor query performance
+3. __Optimize stores__: Use selectors to prevent unnecessary re-renders
 
 #### 3. Notification Issues
 
-**Error**: Desktop notifications don't work
+__Error__: Desktop notifications don't work
 
-**Solutions**:
+__Solutions__:
 
-1. **Check permissions**: Verify notification permissions
-2. **Platform differences**: Test on target platforms
-3. **Service worker**: Ensure notification service is running
+1. __Check permissions__: Verify notification permissions
+2. __Platform differences__: Test on target platforms
+3. __Service worker__: Ensure notification service is running
 
 ## 🔍 Debugging Techniques
 
@@ -428,16 +428,16 @@ logStoreAction("SitesStore", "addSite", { site });
 
 #### React DevTools
 
-- **Installation**: Automatically available in development
-- **Usage**: Inspect component state, props, and performance
-- **Profiler**: Profile component render performance
+* __Installation__: Automatically available in development
+* __Usage__: Inspect component state, props, and performance
+* __Profiler__: Profile component render performance
 
 #### Electron DevTools
 
-- **Access**: F12 in the application window
-- **Console**: Check for JavaScript errors and logs
-- **Network**: Monitor network requests (though limited in Electron)
-- **Sources**: Debug TypeScript/JavaScript code
+* __Access__: F12 in the application window
+* __Console__: Check for JavaScript errors and logs
+* __Network__: Monitor network requests (though limited in Electron)
+* __Sources__: Debug TypeScript/JavaScript code
 
 #### VS Code Debugging
 
@@ -556,52 +556,52 @@ npm run test:shared
 
 ### Database Performance
 
-1. **Use transactions** for multiple operations
-2. **Batch operations** where possible
-3. **Index frequently queried fields**
-4. **Monitor query performance** with logging
+1. __Use transactions__ for multiple operations
+2. __Batch operations__ where possible
+3. __Index frequently queried fields__
+4. __Monitor query performance__ with logging
 
 ### Frontend Performance
 
-1. **Use React.memo** for expensive components
-2. **Optimize Zustand selectors** to prevent unnecessary re-renders
-3. **Debounce user input** for search/filter operations
-4. **Virtualize large lists** if needed
+1. __Use React.memo__ for expensive components
+2. __Optimize Zustand selectors__ to prevent unnecessary re-renders
+3. __Debounce user input__ for search/filter operations
+4. __Virtualize large lists__ if needed
 
 ### Memory Management
 
-1. **Clean up event listeners** in useEffect cleanup
-2. **Dispose of subscriptions** when components unmount
-3. **Monitor store state growth** to prevent memory leaks
-4. **Use WeakMap/WeakSet** for caching when appropriate
+1. __Clean up event listeners__ in useEffect cleanup
+2. __Dispose of subscriptions__ when components unmount
+3. __Monitor store state growth__ to prevent memory leaks
+4. __Use WeakMap/WeakSet__ for caching when appropriate
 
 ## 📞 Getting Help
 
 ### Internal Resources
 
-1. **Documentation**: Check `docs/` directory first
-2. **Code Examples**: Look at existing implementations
-3. **Tests**: Check test files for usage examples
-4. **Architecture**: Review ADRs for design decisions
+1. __Documentation__: Check `docs/` directory first
+2. __Code Examples__: Look at existing implementations
+3. __Tests__: Check test files for usage examples
+4. __Architecture__: Review ADRs for design decisions
 
 ### External Resources
 
-1. **Electron Issues**: [Electron GitHub Issues](https://github.com/electron/electron/issues)
-2. **React Issues**: [React GitHub Issues](https://github.com/facebook/react/issues)
-3. **Vite Issues**: [Vite GitHub Issues](https://github.com/vitejs/vite/issues)
-4. **TypeScript Issues**: [TypeScript GitHub Issues](https://github.com/microsoft/TypeScript/issues)
+1. __Electron Issues__: [Electron GitHub Issues](https://github.com/electron/electron/issues)
+2. __React Issues__: [React GitHub Issues](https://github.com/facebook/react/issues)
+3. __Vite Issues__: [Vite GitHub Issues](https://github.com/vitejs/vite/issues)
+4. __TypeScript Issues__: [TypeScript GitHub Issues](https://github.com/microsoft/TypeScript/issues)
 
 ### Reporting Issues
 
 When reporting issues, include:
 
-1. **Environment**: OS, Node.js version, npm version
-2. **Steps to reproduce**: Exact steps to reproduce the issue
-3. **Expected behavior**: What should happen
-4. **Actual behavior**: What actually happens
-5. **Logs**: Relevant console/file logs
-6. **Code**: Minimal reproducible example
+1. __Environment__: OS, Node.js version, npm version
+2. __Steps to reproduce__: Exact steps to reproduce the issue
+3. __Expected behavior__: What should happen
+4. __Actual behavior__: What actually happens
+5. __Logs__: Relevant console/file logs
+6. __Code__: Minimal reproducible example
 
----
+***
 
-💡 **Pro Tip**: When debugging, start with the logs and work backwards. Most issues leave a trail in the console or log files.
+💡 __Pro Tip__: When debugging, start with the logs and work backwards. Most issues leave a trail in the console or log files.

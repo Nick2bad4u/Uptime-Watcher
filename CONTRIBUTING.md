@@ -6,43 +6,43 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Prerequisites
 
-- **Node.js** 24.8+ (required)
-- **npm** 11.5.2+ (included with Node.js)
-- **Git** (latest version)
+* __Node.js__ 24.8+ (required)
+* __npm__ 11.5.2+ (included with Node.js)
+* __Git__ (latest version)
 
 ### Development Setup
 
-1. **Fork and Clone**
+1. __Fork and Clone__
 
    ```bash
    git clone https://github.com/your-username/Uptime-Watcher.git
    cd Uptime-Watcher
    ```
 
-2. **Install Dependencies**
+2. __Install Dependencies__
 
    ```bash
    npm install
    ```
 
-3. **Start Development Environment**
+3. __Start Development Environment__
 
    ```bash
    npm run electron-dev
    ```
 
-4. **Verify Setup**
-   - The application window should launch successfully (Vite + Electron)
-   - Check that hot reloading works by making a small change in `src/`
+4. __Verify Setup__
+   * The application window should launch successfully (Vite + Electron)
+   * Check that hot reloading works by making a small change in `src/`
 
 ## 📋 Development Guidelines
 
 ### Code Quality Standards
 
-- **TypeScript**: Strict TypeScript with comprehensive type safety
-- **ESLint**: 50+ plugins configured for comprehensive code checking
-- **Testing**: >90% test coverage requirement with multiple test types
-- **Documentation**: TSDoc comments required for all public APIs
+* __TypeScript__: Strict TypeScript with comprehensive type safety
+* __ESLint__: 50+ plugins configured for comprehensive code checking
+* __Testing__: >90% test coverage requirement with multiple test types
+* __Documentation__: TSDoc comments required for all public APIs
 
 ### Development Scripts
 
@@ -59,10 +59,10 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Architecture Standards
 
-- **State Management**: Zustand stores with domain separation
-- **Database**: Repository pattern with transaction safety
-- **IPC**: Secure contextBridge communication only
-- **Testing**: Vitest + Stryker + Playwright + fast-check coverage
+* __State Management__: Zustand stores with domain separation
+* __Database__: Repository pattern with transaction safety
+* __IPC__: Secure contextBridge communication only
+* __Testing__: Vitest + Stryker + Playwright + fast-check coverage
 
 ### Git Workflow
 
@@ -93,28 +93,28 @@ flowchart LR
     Review -- Approved --> Merge --> Celebrate
 ```
 
-1. **Create a Feature Branch**
+1. __Create a Feature Branch__
 
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-2. **Make Your Changes**
-   - Keep commits small and focused
-   - Write clear commit messages
-   - Follow conventional commit format when possible
+2. __Make Your Changes__
+   * Keep commits small and focused
+   * Write clear commit messages
+   * Follow conventional commit format when possible
 
-3. **Test Your Changes**
+3. __Test Your Changes__
 
    ```bash
    npm run build
    npm run test  # if tests exist
    ```
 
-4. **Submit a Pull Request**
-   - Use the provided PR template
-   - Include screenshots for UI changes
-   - Reference any related issues
+4. __Submit a Pull Request__
+   * Use the provided PR template
+   * Include screenshots for UI changes
+   * Reference any related issues
 
 ### Commit Message Format
 
@@ -128,15 +128,15 @@ Detailed explanation if needed
 Fixes #123
 ```
 
-**Types:**
+__Types:__
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+* `feat`: New feature
+* `fix`: Bug fix
+* `docs`: Documentation changes
+* `style`: Code style changes (formatting, etc.)
+* `refactor`: Code refactoring
+* `test`: Adding or updating tests
+* `chore`: Maintenance tasks
 
 ## 🧩 Project Structure
 
@@ -151,10 +151,10 @@ Fixes #123
 
 ### Key Files
 
-- `electron/main.ts` - Electron main process entry point
-- `src/App.tsx` - React application root
-- `src/store.ts` - Zustand state management
-- `docs/` - Complete documentation system
+* `electron/main.ts` - Electron main process entry point
+* `src/App.tsx` - React application root
+* `src/store.ts` - Zustand state management
+* `docs/` - Complete documentation system
 
 ## 🐛 Reporting Issues
 
@@ -162,41 +162,41 @@ Fixes #123
 
 Use the bug report template and include:
 
-- **Environment**: OS, Node.js version, app version
-- **Steps to Reproduce**: Clear, step-by-step instructions
-- **Expected Behavior**: What should have happened
-- **Actual Behavior**: What actually happened
-- **Screenshots**: If applicable
+* __Environment__: OS, Node.js version, app version
+* __Steps to Reproduce__: Clear, step-by-step instructions
+* __Expected Behavior__: What should have happened
+* __Actual Behavior__: What actually happened
+* __Screenshots__: If applicable
 
 ### Feature Requests
 
 Use the feature request template and include:
 
-- **Problem Statement**: What problem does this solve?
-- **Proposed Solution**: Detailed description of the feature
-- **Alternatives**: Other solutions you've considered
-- **Additional Context**: Any other relevant information
+* __Problem Statement__: What problem does this solve?
+* __Proposed Solution__: Detailed description of the feature
+* __Alternatives__: Other solutions you've considered
+* __Additional Context__: Any other relevant information
 
 ## 📝 Documentation
 
 ### Writing Documentation
 
-- Use clear, concise language
-- Include code examples where appropriate
-- Follow the existing documentation structure
-- Ensure all links work correctly
+* Use clear, concise language
+* Include code examples where appropriate
+* Follow the existing documentation structure
+* Ensure all links work correctly
 
 ### Documentation Structure
 
-- **API Docs**: In `docs/api/` - auto-generated from JSDoc
-- **Guides**: In `docs/guides/` - user and developer guides
-- **Component Docs**: In `docs/component-docs/` - React component documentation
+* __API Docs__: In `docs/api/` - auto-generated from JSDoc
+* __Guides__: In `docs/guides/` - user and developer guides
+* __Component Docs__: In `docs/component-docs/` - React component documentation
 
 ### Updating Documentation
 
-- Update relevant docs when changing functionality
-- Ensure markdown passes linting (use markdownlint)
-- Run `npm run docs:check-links` to verify Architecture and Docusaurus routes
+* Update relevant docs when changing functionality
+* Ensure markdown passes linting (use markdownlint)
+* Run `npm run docs:check-links` to verify Architecture and Docusaurus routes
 
 ## 🔧 Development Tasks
 
@@ -204,80 +204,80 @@ Use the feature request template and include:
 
 | Category          | Script                     | Description                                                       |
 | ----------------- | -------------------------- | ----------------------------------------------------------------- |
-| **Development**   | `npm run dev`              | Start Vite dev server                                             |
+| __Development__   | `npm run dev`              | Start Vite dev server                                             |
 |                   | `npm run electron`         | Launch Electron shell (requires Vite dev server)                  |
 |                   | `npm run electron-dev`     | Start dev server + Electron concurrently                          |
 |                   | `npm run start-both`       | Alias for `electron-dev`                                          |
-| **Building**      | `npm run build`            | Build for production                                              |
+| __Building__      | `npm run build`            | Build for production                                              |
 |                   | `npm run clean`            | Clean all build artifacts                                         |
-| **Code Quality**  | `npm run lint`             | Run ESLint checks                                                 |
+| __Code Quality__  | `npm run lint`             | Run ESLint checks                                                 |
 |                   | `npm run lint:fix`         | Fix ESLint issues automatically                                   |
 |                   | `npm run format`           | Format code with Prettier                                         |
 |                   | `npm run type-check:all`   | TypeScript type checking                                          |
-| **Documentation** | `npm run docs:check-links` | Validate internal documentation links (Architecture & Docusaurus) |
-| **Testing**       | `npm run test`             | Run all test suites                                               |
+| __Documentation__ | `npm run docs:check-links` | Validate internal documentation links (Architecture & Docusaurus) |
+| __Testing__       | `npm run test`             | Run all test suites                                               |
 |                   | `npm run test:coverage`    | Generate coverage reports                                         |
 |                   | `npm run test:electron`    | Run Electron-specific tests                                       |
 
 ### Testing Requirements
 
-- **Unit Tests**: Required for all business logic components
-- **Integration Tests**: Required for IPC and database operations
-- **E2E Tests**: Required for critical user workflows using Playwright
-- **Property Tests**: Use fast-check for complex algorithmic functions
-- **Mutation Testing**: Stryker configuration validates test quality
-- **Coverage**: Maintain >90% coverage across all modules
+* __Unit Tests__: Required for all business logic components
+* __Integration Tests__: Required for IPC and database operations
+* __E2E Tests__: Required for critical user workflows using Playwright
+* __Property Tests__: Use fast-check for complex algorithmic functions
+* __Mutation Testing__: Stryker configuration validates test quality
+* __Coverage__: Maintain >90% coverage across all modules
 
 ### Validation Layers
 
-- Follow the layered validation contract when adding features. Shape validation belongs in preload/IPC schemas, business rules in managers, and persistence checks in repositories.
-- Emit structured `ApplicationError` instances when validation fails so renderer error handling stays consistent.
-- Review the [Validation Strategy](docs/Guides/validation-strategy.md) guide before introducing new input flows or modifying existing schemas.
+* Follow the layered validation contract when adding features. Shape validation belongs in preload/IPC schemas, business rules in managers, and persistence checks in repositories.
+* Emit structured `ApplicationError` instances when validation fails so renderer error handling stays consistent.
+* Review the [Validation Strategy](docs/Guides/validation-strategy.md) guide before introducing new input flows or modifying existing schemas.
 
 ## � Priority Contribution Areas
 
 ### High Impact Opportunities
 
-- **Enhanced Monitoring**: Advanced notification rules and alerting systems
-- **Data Visualization**: Improved dashboard analytics and trending
-- **Configuration Management**: Import/export of monitoring configurations
-- **Performance Optimization**: Monitoring efficiency and UI responsiveness
-- **Accessibility**: Enhanced keyboard navigation and screen reader support
+* __Enhanced Monitoring__: Advanced notification rules and alerting systems
+* __Data Visualization__: Improved dashboard analytics and trending
+* __Configuration Management__: Import/export of monitoring configurations
+* __Performance Optimization__: Monitoring efficiency and UI responsiveness
+* __Accessibility__: Enhanced keyboard navigation and screen reader support
 
 ### Technical Improvements
 
-- **Additional Test Coverage**: Expand edge case testing
-- **Error Recovery**: Enhanced error handling and user feedback
-- **Internationalization**: Multi-language support infrastructure
-- **Advanced Analytics**: Historical data analysis and reporting
-- **Plugin Architecture**: Extensible monitoring modules
+* __Additional Test Coverage__: Expand edge case testing
+* __Error Recovery__: Enhanced error handling and user feedback
+* __Internationalization__: Multi-language support infrastructure
+* __Advanced Analytics__: Historical data analysis and reporting
+* __Plugin Architecture__: Extensible monitoring modules
 
 ### Documentation Enhancements
 
-- **Tutorial Content**: Step-by-step usage guides with screenshots
-- **API Documentation**: Comprehensive API reference materials
-- **Migration Guides**: Version upgrade and data migration instructions
-- **Integration Examples**: Sample configurations and use cases
+* __Tutorial Content__: Step-by-step usage guides with screenshots
+* __API Documentation__: Comprehensive API reference materials
+* __Migration Guides__: Version upgrade and data migration instructions
+* __Integration Examples__: Sample configurations and use cases
 
 ## �🌟 Recognition
 
 Contributors are recognized in:
 
-- Release notes for significant contributions
-- GitHub contributors section
-- Special thanks in documentation
+* Release notes for significant contributions
+* GitHub contributors section
+* Special thanks in documentation
 
 ## 📞 Getting Help
 
-- **Documentation**: Check the [docs](README.md) first
-- **Discussions**: Use GitHub Discussions for questions
-- **Issues**: Create an issue for bugs or feature requests
-- **Chat**: Join our development discussions (if applicable)
+* __Documentation__: Check the [docs](README.md) first
+* __Discussions__: Use GitHub Discussions for questions
+* __Issues__: Create an issue for bugs or feature requests
+* __Chat__: Join our development discussions (if applicable)
 
 ## 📄 License
 
 By contributing to Uptime Watcher, you agree that your contributions will be licensed under the MIT License.
 
----
+***
 
 Thank you for contributing to Uptime Watcher! 🎉

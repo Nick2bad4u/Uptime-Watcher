@@ -2,29 +2,29 @@
 
 ## Status
 
-**Accepted** - Implemented across all cache-using managers and services
+__Accepted__ - Implemented across all cache-using managers and services
 
 ## Context
 
 The application required consistent caching behavior across multiple managers and services, but cache configurations were scattered throughout the codebase with inconsistent TTL values, size limits, and naming conventions. This led to:
 
-- Inconsistent cache expiration times (5 minutes vs 10 minutes vs 30 minutes)
-- Varying cache size limits without clear reasoning
-- Non-standardized cache naming patterns
-- Difficulty in adjusting cache behavior application-wide
-- Maintenance overhead when cache requirements changed
-- Performance variations due to inconsistent configurations
+* Inconsistent cache expiration times (5 minutes vs 10 minutes vs 30 minutes)
+* Varying cache size limits without clear reasoning
+* Non-standardized cache naming patterns
+* Difficulty in adjusting cache behavior application-wide
+* Maintenance overhead when cache requirements changed
+* Performance variations due to inconsistent configurations
 
 ## Decision
 
-We will implement **Standardized Cache Configuration** using centralized constants and configuration objects with the following characteristics:
+We will implement __Standardized Cache Configuration__ using centralized constants and configuration objects with the following characteristics:
 
 ### 1. Centralized Configuration
 
-- **Shared configuration file** (`shared/constants/cacheConfig.ts`) containing all cache settings
-- **Domain-specific configurations** (SITES, MONITORS, SETTINGS, VALIDATION, TEMPORARY)
-- **Consistent TTL values** based on data freshness requirements
-- **Standardized size limits** based on expected data volume
+* __Shared configuration file__ (`shared/constants/cacheConfig.ts`) containing all cache settings
+* __Domain-specific configurations__ (SITES, MONITORS, SETTINGS, VALIDATION, TEMPORARY)
+* __Consistent TTL values__ based on data freshness requirements
+* __Standardized size limits__ based on expected data volume
 
 ### 2. Configuration Structure
 
@@ -132,9 +132,9 @@ export const CACHE_CONFIG = Object.freeze({
 
 ### 3. Naming Conventions
 
-- **Standardized naming functions** for consistent cache identifiers
-- **Dynamic naming** for temporary operations (`temporary-import`, `temporary-export`)
-- **Suffix support** for specialized caches (`sites-temp`, `monitors-backup`)
+* __Standardized naming functions__ for consistent cache identifiers
+* __Dynamic naming__ for temporary operations (`temporary-import`, `temporary-export`)
+* __Suffix support__ for specialized caches (`sites-temp`, `monitors-backup`)
 
 ```typescript
 export const CACHE_NAMES = Object.freeze({
@@ -208,50 +208,50 @@ quadrantChart
     Settings: [0.1, 0.9]
 ```
 
-- **SITES (10 minutes)**: Moderate expiration balancing freshness with performance for site management operations
-- **MONITORS (5 minutes)**: Shorter expiration for real-time monitoring requirements
-- **SETTINGS (30 minutes)**: Longer expiration since configuration changes are infrequent
-- **VALIDATION (5 minutes)**: Moderate expiration balancing accuracy with performance
-- **TEMPORARY (5 minutes)**: Short expiration for ephemeral operations
+* __SITES (10 minutes)__: Moderate expiration balancing freshness with performance for site management operations
+* __MONITORS (5 minutes)__: Shorter expiration for real-time monitoring requirements
+* __SETTINGS (30 minutes)__: Longer expiration since configuration changes are infrequent
+* __VALIDATION (5 minutes)__: Moderate expiration balancing accuracy with performance
+* __TEMPORARY (5 minutes)__: Short expiration for ephemeral operations
 
 ### 6. Size Limit Reasoning
 
-- **SITES (500)**: Expected maximum of ~200-300 sites in typical deployments
-- **MONITORS (1000)**: Multiple monitors per site, higher volume expected
-- **SETTINGS (100)**: Limited number of configuration values
-- **VALIDATION (200)**: Moderate cache for validation results
-- **TEMPORARY (1000)**: Large buffer for temporary operations
+* __SITES (500)__: Expected maximum of \~200-300 sites in typical deployments
+* __MONITORS (1000)__: Multiple monitors per site, higher volume expected
+* __SETTINGS (100)__: Limited number of configuration values
+* __VALIDATION (200)__: Moderate cache for validation results
+* __TEMPORARY (1000)__: Large buffer for temporary operations
 
 ## Consequences
 
 ### Positive
 
-- **Consistency**: All caches use standardized configurations appropriate for their data type
-- **Maintainability**: Single location to adjust cache behavior application-wide
-- **Performance**: Optimized TTL and size settings based on data characteristics
-- **Debugging**: Predictable cache behavior across all components
-- **Documentation**: Clear reasoning for cache configuration decisions
-- **Type Safety**: TypeScript interfaces ensure correct configuration usage
+* __Consistency__: All caches use standardized configurations appropriate for their data type
+* __Maintainability__: Single location to adjust cache behavior application-wide
+* __Performance__: Optimized TTL and size settings based on data characteristics
+* __Debugging__: Predictable cache behavior across all components
+* __Documentation__: Clear reasoning for cache configuration decisions
+* __Type Safety__: TypeScript interfaces ensure correct configuration usage
 
 ### Negative
 
-- **Migration Effort**: Existing cache configurations need to be updated
-- **Additional Abstraction**: One more layer between cache usage and configuration
-- **Test Updates**: Tests referencing hardcoded cache values require updates
+* __Migration Effort__: Existing cache configurations need to be updated
+* __Additional Abstraction__: One more layer between cache usage and configuration
+* __Test Updates__: Tests referencing hardcoded cache values require updates
 
 ### Neutral
 
-- **Backward Compatibility**: Changes are internal to implementation, no public API changes
-- **Performance Impact**: Negligible - configuration lookup is compile-time resolved
+* __Backward Compatibility__: Changes are internal to implementation, no public API changes
+* __Performance Impact__: Negligible - configuration lookup is compile-time resolved
 
 ## Implementation
 
 ### Files Modified
 
-1. **`shared/constants/cacheConfig.ts`** - New centralized configuration file
-2. **`electron/managers/SiteManager.ts`** - Updated to use `CACHE_CONFIG.SITES`
-3. **`electron/utils/database/serviceFactory.ts`** - Updated to use `CACHE_CONFIG.TEMPORARY`
-4. **`electron/constants.ts`** - Extended `CACHE_TTL` and `CACHE_SIZE_LIMITS` for new cache types
+1. __`shared/constants/cacheConfig.ts`__ - New centralized configuration file
+2. __`electron/managers/SiteManager.ts`__ - Updated to use `CACHE_CONFIG.SITES`
+3. __`electron/utils/database/serviceFactory.ts`__ - Updated to use `CACHE_CONFIG.TEMPORARY`
+4. __`electron/constants.ts`__ - Extended `CACHE_TTL` and `CACHE_SIZE_LIMITS` for new cache types
 
 ### Configuration Matrix
 
@@ -304,15 +304,15 @@ flowchart LR
 
 ## Related ADRs
 
-- **ADR-001**: Repository Pattern - Provides the database layer that caches optimize
-- **ADR-002**: Event-Driven Architecture - Cache events integrate with the event system
-- **ADR-003**: Error Handling Strategy - Cache operations use standardized error handling
+* __ADR-001__: Repository Pattern - Provides the database layer that caches optimize
+* __ADR-002__: Event-Driven Architecture - Cache events integrate with the event system
+* __ADR-003__: Error Handling Strategy - Cache operations use standardized error handling
 
 ## Review
 
 This ADR should be reviewed when:
 
-- Cache performance requirements change significantly
-- New cache types are introduced to the system
-- TTL requirements change based on usage patterns
-- Memory constraints require cache size adjustments
+* Cache performance requirements change significantly
+* New cache types are introduced to the system
+* TTL requirements change based on usage patterns
+* Memory constraints require cache size adjustments

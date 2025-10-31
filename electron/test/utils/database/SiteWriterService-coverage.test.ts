@@ -701,7 +701,7 @@ describe("SiteWriterService Coverage Tests", () => {
 
         beforeEach(() => {
             mockMonitoringConfig = {
-                setHistoryLimit: vi.fn(),
+                setHistoryLimit: vi.fn().mockResolvedValue(undefined),
                 setupNewMonitors: vi.fn().mockResolvedValue(undefined),
                 startMonitoring: vi.fn().mockResolvedValue({
                     attempted: 1,

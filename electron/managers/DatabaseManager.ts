@@ -666,9 +666,12 @@ export class DatabaseManager {
                         "[DatabaseManager] Failed to emit start monitoring requested event:",
                         error
                     );
+                    throw error instanceof Error
+                        ? error
+                        : new Error(String(error));
                 }
 
-                return true; // Always return true for the interface
+                return true;
             },
             stopMonitoring: async (
                 identifier: string,
@@ -690,9 +693,12 @@ export class DatabaseManager {
                         "[DatabaseManager] Failed to emit stop monitoring requested event:",
                         error
                     );
+                    throw error instanceof Error
+                        ? error
+                        : new Error(String(error));
                 }
 
-                return true; // Always return true for the interface
+                return true;
             },
         };
 

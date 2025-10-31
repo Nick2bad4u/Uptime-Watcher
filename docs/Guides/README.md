@@ -32,9 +32,9 @@ docs/Guides/
 
 For new developers, start with these essential guides:
 
-1. **[Developer quick start](./DEVELOPER-QUICK-START.md)** - Get up and running in minutes
-2. **[Environment setup](./ENVIRONMENT-SETUP.md)** - Complete development environment
-3. **[AI context guide](./AI-CONTEXT.md)** - Essential context for AI assistants
+1. __[Developer quick start](./DEVELOPER-QUICK-START.md)__ - Get up and running in minutes
+2. __[Environment setup](./ENVIRONMENT-SETUP.md)__ - Complete development environment
+3. __[AI context guide](./AI-CONTEXT.md)__ - Essential context for AI assistants
 
 ## 📖 Core documentation
 
@@ -74,10 +74,10 @@ For new developers, start with these essential guides:
 
 ## 🗂️ Navigation
 
-- **[Documentation index](./DOCUMENTATION-INDEX.md)** - Complete navigation hub for all documentation
-- **[Architecture documentation](../Architecture/README.md)** - System design and ADRs
-- **[Testing documentation](../Testing/README.md)** - Testing guides and best practices
-- **[TSDoc documentation](../TSDoc/README.md)** - Code documentation standards
+* __[Documentation index](./DOCUMENTATION-INDEX.md)__ - Complete navigation hub for all documentation
+* __[Architecture documentation](../Architecture/README.md)__ - System design and ADRs
+* __[Testing documentation](../Testing/README.md)__ - Testing guides and best practices
+* __[TSDoc documentation](../TSDoc/README.md)__ - Code documentation standards
 
 ## 📝 Contributing
 

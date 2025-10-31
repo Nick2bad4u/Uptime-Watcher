@@ -142,9 +142,9 @@ await expect(page.getByRole("button", { name: "Toggle theme" })).toContainText(
 
 Our `playwright.config.ts` already includes:
 
-- `testIdAttribute: "data-testid"` - Makes codegen prefer test IDs
-- Proper timeout settings
-- TypeScript support
+* `testIdAttribute: "data-testid"` - Makes codegen prefer test IDs
+* Proper timeout settings
+* TypeScript support
 
 ## Automated Linting
 

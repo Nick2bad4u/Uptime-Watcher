@@ -684,15 +684,40 @@ export const createSiteSyncActions = (
 
                         deps.setSites(sanitizedSites);
 
-                        logStoreAction("SitesStore", "syncSites", {
+                        if (!synchronized) {
+                            logger.warn(
+                                "Backend full sync completed without synchronized flag",
+                                {
+                                    completedAt,
+                                    originalSitesCount: siteCount,
+                                    sanitizedSiteCount: sanitizedSites.length,
+                                    source,
+                                }
+                            );
+                        }
+
+                        const telemetryPayload: Record<string, unknown> = {
                             completedAt,
-                            message: "Sites synchronized from backend",
+                            message: synchronized
+                                ? "Sites synchronized from backend"
+                                : "Backend full sync completed but reported unsynchronized state",
                             originalSitesCount: siteCount,
                             sitesCount: sanitizedSites.length,
                             source,
-                            status: "success",
+                            status: synchronized ? "success" : "failure",
                             success: synchronized,
-                        });
+                        };
+
+                        if (!synchronized) {
+                            telemetryPayload["failureReason"] =
+                                "backend-not-synchronized";
+                        }
+
+                        logStoreAction(
+                            "SitesStore",
+                            "syncSites",
+                            telemetryPayload
+                        );
                     } catch (error) {
                         const normalizedError = ensureError(error);
                         logStoreAction("SitesStore", "syncSites", {

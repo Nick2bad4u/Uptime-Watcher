@@ -635,35 +635,35 @@ describe("Example IPC Handlers", () => {
 
 When creating new IPC handlers:
 
-- [ ] Create handler registration function in domain-specific file
-- [ ] Create comprehensive validation functions
-- [ ] Add handlers to main IpcService initialization
-- [ ] Update preload API with new methods
-- [ ] Add TypeScript type definitions
-- [ ] Create comprehensive tests
-- [ ] Update documentation with examples
-- [ ] Test error handling paths
-- [ ] Verify type safety works end-to-end
-- [ ] Add logging for debugging
+* [ ] Create handler registration function in domain-specific file
+* [ ] Create comprehensive validation functions
+* [ ] Add handlers to main IpcService initialization
+* [ ] Update preload API with new methods
+* [ ] Add TypeScript type definitions
+* [ ] Create comprehensive tests
+* [ ] Update documentation with examples
+* [ ] Test error handling paths
+* [ ] Verify type safety works end-to-end
+* [ ] Add logging for debugging
 
 ## Channel Naming Convention
 
 Follow these naming patterns:
 
-- **GET operations**: `domain:get-all`, `domain:get-by-id`
-- **CREATE operations**: `domain:create`, `domain:bulk-create`
-- **UPDATE operations**: `domain:update`, `domain:bulk-update`
-- **DELETE operations**: `domain:delete`, `domain:delete-all`
-- **UTILITY operations**: `domain:validate-data`, `domain:export-data`
-- **EVENTS**: `domain:event-name` (past tense for completed events)
+* __GET operations__: `domain:get-all`, `domain:get-by-id`
+* __CREATE operations__: `domain:create`, `domain:bulk-create`
+* __UPDATE operations__: `domain:update`, `domain:bulk-update`
+* __DELETE operations__: `domain:delete`, `domain:delete-all`
+* __UTILITY operations__: `domain:validate-data`, `domain:export-data`
+* __EVENTS__: `domain:event-name` (past tense for completed events)
 
 ## Error Handling
 
 All handlers automatically get:
 
-- Parameter validation
-- Error logging
-- Consistent error response format
-- Type-safe error handling
+* Parameter validation
+* Error logging
+* Consistent error response format
+* Type-safe error handling
 
 The `registerStandardizedIpcHandler` method handles these concerns automatically.

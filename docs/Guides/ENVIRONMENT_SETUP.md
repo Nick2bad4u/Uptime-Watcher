@@ -1,21 +1,21 @@
 # 🛠️ Environment Setup Guide
 
-> **Complete Setup**: Comprehensive guide for setting up the perfect development environment for Uptime Watcher.
+> __Complete Setup__: Comprehensive guide for setting up the perfect development environment for Uptime Watcher.
 
 ## 📋 Prerequisites
 
 ### Required Software
 
-- **Node.js**: 20.15+ LTS (required)
-- **npm**: 10+ (comes with Node.js)
-- **Git**: Latest version
-- **VS Code**: Recommended IDE (with extensions)
+* __Node.js__: 20.15+ LTS (required)
+* __npm__: 10+ (comes with Node.js)
+* __Git__: Latest version
+* __VS Code__: Recommended IDE (with extensions)
 
 ### Operating System Support
 
-- ✅ **Windows**: 10+ (tested on Windows 11)
-- ✅ **macOS**: 11+ (Big Sur and later)
-- ✅ **Linux**: Ubuntu 20.04+ (or equivalent)
+* ✅ __Windows__: 10+ (tested on Windows 11)
+* ✅ __macOS__: 11+ (Big Sur and later)
+* ✅ __Linux__: Ubuntu 20.04+ (or equivalent)
 
 ## 🔧 Development Environment
 
@@ -59,12 +59,12 @@ code --install-extension ms-playwright.playwright
 
 Or install from VS Code Extensions marketplace:
 
-- **TypeScript and JavaScript**: Latest TypeScript features
-- **Tailwind CSS IntelliSense**: Autocomplete for CSS classes
-- **ESLint**: JavaScript/TypeScript linting
-- **Prettier**: Code formatting
-- **Jest**: Testing support
-- **Playwright**: E2E testing (if used)
+* __TypeScript and JavaScript__: Latest TypeScript features
+* __Tailwind CSS IntelliSense__: Autocomplete for CSS classes
+* __ESLint__: JavaScript/TypeScript linting
+* __Prettier__: Code formatting
+* __Jest__: Testing support
+* __Playwright__: E2E testing (if used)
 
 #### Recommended Extensions
 
@@ -307,10 +307,10 @@ Create `.vscode/uptime-watcher.code-workspace`:
 
 ### WebStorm/IntelliJ Setup
 
-1. **Install Node.js plugin**
-2. **Configure TypeScript**: Settings → Languages → TypeScript → use project TypeScript
-3. **Configure ESLint**: Settings → Languages → JavaScript → Code Quality Tools → ESLint
-4. **Configure Prettier**: Settings → Languages → JavaScript → Prettier
+1. __Install Node.js plugin__
+2. __Configure TypeScript__: Settings → Languages → TypeScript → use project TypeScript
+3. __Configure ESLint__: Settings → Languages → JavaScript → Code Quality Tools → ESLint
+4. __Configure Prettier__: Settings → Languages → JavaScript → Prettier
 
 ## 🧪 Testing Environment
 
@@ -505,30 +505,30 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- [ ] Node.js 20.15+ installed and active
-- [ ] npm 10+ available
-- [ ] Git configured with user details
-- [ ] VS Code with recommended extensions
-- [ ] Project cloned and dependencies installed
+* [ ] Node.js 20.15+ installed and active
+* [ ] npm 10+ available
+* [ ] Git configured with user details
+* [ ] VS Code with recommended extensions
+* [ ] Project cloned and dependencies installed
 
 ### Development Verification
 
-- [ ] `npm run dev` starts Vite dev server successfully
-- [ ] `npm run electron-dev` starts both Vite and Electron
-- [ ] Hot reload works for both frontend and backend changes
-- [ ] TypeScript compilation works without errors
-- [ ] Linting passes without errors
-- [ ] Tests run successfully
-- [ ] Build process completes successfully
+* [ ] `npm run dev` starts Vite dev server successfully
+* [ ] `npm run electron-dev` starts both Vite and Electron
+* [ ] Hot reload works for both frontend and backend changes
+* [ ] TypeScript compilation works without errors
+* [ ] Linting passes without errors
+* [ ] Tests run successfully
+* [ ] Build process completes successfully
 
 ### Tool Verification
 
-- [ ] ESLint integration working in IDE
-- [ ] Prettier formatting on save
-- [ ] TypeScript IntelliSense working
-- [ ] Debugging configuration functional
-- [ ] Git hooks executing properly
+* [ ] ESLint integration working in IDE
+* [ ] Prettier formatting on save
+* [ ] TypeScript IntelliSense working
+* [ ] Debugging configuration functional
+* [ ] Git hooks executing properly
 
----
+***
 
-🎉 **You're all set!** Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md) for next steps.
+🎉 __You're all set!__ Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md) for next steps.

@@ -836,3 +836,4 @@ dist-playwright/
 *storybook.log
 storybook-static
 TODO.md
+temp/

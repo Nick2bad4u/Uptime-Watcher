@@ -304,10 +304,10 @@ export function createMockRepositories(): any {
 export function createMockConfigurationManager(): any {
     return {
         getMonitoringConfiguration: vi.fn().mockReturnValue({
-            setHistoryLimit: vi.fn(),
-            setupNewMonitors: vi.fn(),
-            startMonitoring: vi.fn(),
-            stopMonitoring: vi.fn(),
+            setHistoryLimit: vi.fn().mockResolvedValue(undefined),
+            setupNewMonitors: vi.fn().mockResolvedValue(undefined),
+            startMonitoring: vi.fn().mockResolvedValue(undefined),
+            stopMonitoring: vi.fn().mockResolvedValue(undefined),
         }),
         getHistoryRetentionRules: vi.fn().mockReturnValue({
             defaultLimit: 500,

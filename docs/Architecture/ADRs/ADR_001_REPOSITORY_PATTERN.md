@@ -2,22 +2,22 @@
 
 ## Status
 
-**Accepted** - Implemented across all database operations with comprehensive transaction safety and race condition prevention
+__Accepted__ - Implemented across all database operations with comprehensive transaction safety and race condition prevention
 
 ## Context
 
 The application needed a consistent, testable, and transaction-safe approach to database operations. Direct database access throughout the codebase would lead to:
 
-- Inconsistent error handling
-- Difficult testing due to tight coupling
-- Lack of transaction safety
-- Code duplication
-- Race conditions in concurrent data access
-- Poor separation of concerns between business logic and data access
+* Inconsistent error handling
+* Difficult testing due to tight coupling
+* Lack of transaction safety
+* Code duplication
+* Race conditions in concurrent data access
+* Poor separation of concerns between business logic and data access
 
 ## Decision
 
-We will use the **Repository Pattern** for all database access with the following characteristics:
+We will use the __Repository Pattern__ for all database access with the following characteristics:
 
 ### Repository operation lifecycle
 
@@ -46,15 +46,15 @@ stateDiagram-v2
 
 ### 1. Dual Method Pattern
 
-- **Public async methods** that create transactions (`deleteAll()`)
-- **Internal sync methods** for use within existing transactions (`deleteAllInternal()`)
+* __Public async methods__ that create transactions (`deleteAll()`)
+* __Internal sync methods__ for use within existing transactions (`deleteAllInternal()`)
 
 ### 2. Enhanced Transaction Safety
 
-- All mutations wrapped in `DatabaseService.executeTransaction()`
-- All operations use `withDatabaseOperation()` for retry logic and event emission
-- **Synchronous database operations** (node-sqlite3-wasm) eliminate race conditions
-- **Atomic cache updates** prevent inconsistent state during concurrent access
+* All mutations wrapped in `DatabaseService.executeTransaction()`
+* All operations use `withDatabaseOperation()` for retry logic and event emission
+* __Synchronous database operations__ (node-sqlite3-wasm) eliminate race conditions
+* __Atomic cache updates__ prevent inconsistent state during concurrent access
 
 ### 3. Consistent Structure
 
@@ -386,52 +386,52 @@ const QUERIES = {
 
 ### 4. Query Constants
 
-- Centralized query strings in constants object
-- Prevents SQL duplication and improves maintainability
+* Centralized query strings in constants object
+* Prevents SQL duplication and improves maintainability
 
 ## Consequences
 
 ### Positive
 
-- **Consistent error handling** across all database operations
-- **Easy testing** through dependency injection and mocking
-- **Enhanced transaction safety** prevents data corruption and race conditions
-- **Clear separation** between transactional and non-transactional operations
-- **Retry logic** and event emission through operational hooks
-- **Race condition prevention** through synchronous database operations (node-sqlite3-wasm)
-- **Atomic cache updates** ensure data consistency during concurrent access
-- **Comprehensive logging** and monitoring of all database operations
+* __Consistent error handling__ across all database operations
+* __Easy testing__ through dependency injection and mocking
+* __Enhanced transaction safety__ prevents data corruption and race conditions
+* __Clear separation__ between transactional and non-transactional operations
+* __Retry logic__ and event emission through operational hooks
+* __Race condition prevention__ through synchronous database operations (node-sqlite3-wasm)
+* __Atomic cache updates__ ensure data consistency during concurrent access
+* __Comprehensive logging__ and monitoring of all database operations
 
 ### Negative
 
-- **Slight complexity increase** with dual method pattern
-- **Learning curve** for developers unfamiliar with repository pattern
-- **Additional abstraction layer** may seem unnecessary for simple operations
+* __Slight complexity increase__ with dual method pattern
+* __Learning curve__ for developers unfamiliar with repository pattern
+* __Additional abstraction layer__ may seem unnecessary for simple operations
 
 ## Implementation Quality Assurance
 
 ### Race Condition Prevention
 
-- **Synchronous Operations**: node-sqlite3-wasm ensures all database operations complete synchronously
-- **Atomic Transactions**: BEGIN/COMMIT/ROLLBACK operations are atomic
-- **Cache Consistency**: Atomic cache replacement patterns prevent race conditions
+* __Synchronous Operations__: node-sqlite3-wasm ensures all database operations complete synchronously
+* __Atomic Transactions__: BEGIN/COMMIT/ROLLBACK operations are atomic
+* __Cache Consistency__: Atomic cache replacement patterns prevent race conditions
 
 ### Memory Management
 
-- **Proper Cleanup**: All repositories implement proper resource cleanup
-- **Event Listener Management**: Event emissions are handled asynchronously with proper error handling
-- **Connection Pooling**: Single database connection managed by DatabaseService singleton
+* __Proper Cleanup__: All repositories implement proper resource cleanup
+* __Event Listener Management__: Event emissions are handled asynchronously with proper error handling
+* __Connection Pooling__: Single database connection managed by DatabaseService singleton
 
 ## Compliance
 
 All repository classes implement this pattern:
 
-- `SiteRepository`
-- `MonitorRepository`
-- `HistoryRepository`
-- `SettingsRepository`
+* `SiteRepository`
+* `MonitorRepository`
+* `HistoryRepository`
+* `SettingsRepository`
 
 ## Related ADRs
 
-- [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
-- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+* [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
+* [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
