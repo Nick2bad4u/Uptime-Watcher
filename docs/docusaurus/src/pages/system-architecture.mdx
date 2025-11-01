@@ -1,549 +1,536 @@
-***
-
+---
 title: System Architecture Overview
 description: Comprehensive system architecture and component relationships
---------------------------------------------------------------------------
-
-{/\* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX \*/}
+---
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
 import Layout from '@theme/Layout';
 import Mermaid from '@theme/Mermaid';
 
 export default function SystemArchitecture() {
-return ( <Layout
-         title="System Architecture Overview"
-         description="Comprehensive system architecture and component relationships for Uptime Watcher"
-     > <div className="container margin-vert--lg"> <div className="row"> <div className="col">
+    return (
+        <Layout
+            title="System Architecture Overview"
+            description="Comprehensive system architecture and component relationships for Uptime Watcher"
+        >
+            <div className="container margin-vert--lg">
+                <div className="row">
+                    <div className="col">
 
-```
-                    # System Architecture Overview
+                        # System Architecture Overview
 
-                    This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.
+                        This page provides a comprehensive view of the Uptime Watcher system architecture using interactive Mermaid diagrams.
 
-                    ## High-Level System Architecture
+                        ## High-Level System Architecture
 
-                    The following diagram shows the overall system architecture and how the main components interact:
+                        The following diagram shows the overall system architecture and how the main components interact:
 
-                    <Mermaid value={`graph TB
-%% Main Application Layer
-UI[Frontend UI<br/>React + TypeScript]
-Store[State Management<br/>Zustand Stores]
+                        <Mermaid value={`graph TB
+    %% Main Application Layer
+    UI[Frontend UI<br/>React + TypeScript]
+    Store[State Management<br/>Zustand Stores]
 
-%% IPC Communication
-IPC[IPC Bridge<br/>Secure Context Bridge]
+    %% IPC Communication
+    IPC[IPC Bridge<br/>Secure Context Bridge]
 
-%% Electron Main Process
-Main[Electron Main Process]
-Services[Service Container<br/>Dependency Injection]
+    %% Electron Main Process
+    Main[Electron Main Process]
+    Services[Service Container<br/>Dependency Injection]
 
-%% Core Services
-Monitor[Monitor Manager<br/>Dynamic Registry:<br/> HTTP • DNS • SSL • Ping • Port • CDN • Replication • Heartbeat • WebSocket]
-Config[Configuration Manager<br/>Settings & Preferences]
-DB[Database Manager<br/>SQLite Operations]
+    %% Core Services
+    Monitor[Monitor Manager<br/>Dynamic Registry:<br/> HTTP • DNS • SSL • Ping • Port • CDN • Replication • Heartbeat • WebSocket]
+    Config[Configuration Manager<br/>Settings & Preferences]
+    DB[Database Manager<br/>SQLite Operations]
 
-%% Database & Storage
-SQLite[(SQLite Database<br/>Sites, History, Settings)]
+    %% Database & Storage
+    SQLite[(SQLite Database<br/>Sites, History, Settings)]
 
-%% External Systems
-Network[Network Resources<br/>Monitored Sites]
+    %% External Systems
+    Network[Network Resources<br/>Monitored Sites]
 
-%% UI Components
-UI --> Store
-Store --> IPC
-IPC --> Main
+    %% UI Components
+    UI --> Store
+    Store --> IPC
+    IPC --> Main
 
-%% Main Process Services
-Main --> Services
-Services --> Monitor
-Services --> Site
-Services --> Config
-Services --> DB
+    %% Main Process Services
+    Main --> Services
+    Services --> Monitor
+    Services --> Site
+    Services --> Config
+    Services --> DB
 
-%% Database Operations
-DB --> SQLite
+    %% Database Operations
+    DB --> SQLite
 
-%% External Monitoring
-Monitor --> Network
+    %% External Monitoring
+    Monitor --> Network
 
-%% Data Flow
-SQLite -.-> Site
-Site -.-> Store
-Monitor -.-> Store
+    %% Data Flow
+    SQLite -.-> Site
+    Site -.-> Store
+    Monitor -.-> Store
 
-%% Styling
-classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
-classDef backend fill:#059669,stroke:#047857,color:#ffffff
-classDef database fill:#dc2626,stroke:#b91c1c,color:#ffffff
-classDef external fill:#7c3aed,stroke:#5b21b6,color:#ffffff
-classDef ipc fill:#ea580c,stroke:#c2410c,color:#ffffff
+    %% Styling
+    classDef frontend fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef backend fill:#059669,stroke:#047857,color:#ffffff
+    classDef database fill:#dc2626,stroke:#b91c1c,color:#ffffff
+    classDef external fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef ipc fill:#ea580c,stroke:#c2410c,color:#ffffff
 
-class UI,Store frontend
-class Main,Services,Monitor,Site,Config,DB backend
-class SQLite database
-class Network external
-class IPC ipc`} />
+    class UI,Store frontend
+    class Main,Services,Monitor,Site,Config,DB backend
+    class SQLite database
+    class Network external
+    class IPC ipc`} />
 
-                    ## Component Interaction Flow
+                        ## Component Interaction Flow
 
-                    This diagram illustrates how different components interact during a typical monitoring cycle:
+                        This diagram illustrates how different components interact during a typical monitoring cycle:
 
-                    <Mermaid value={`sequenceDiagram
-participant UI as Frontend UI
-participant Store as Zustand Store
-participant IPC as IPC Bridge
-participant MM as Monitor Manager
-participant SM as Site Manager
-participant DB as Database
-participant Net as Network
+                        <Mermaid value={`sequenceDiagram
+    participant UI as Frontend UI
+    participant Store as Zustand Store
+    participant IPC as IPC Bridge
+    participant MM as Monitor Manager
+    participant SM as Site Manager
+    participant DB as Database
+    participant Net as Network
 
-Note over UI, Net: Site Monitoring Cycle
+    Note over UI, Net: Site Monitoring Cycle
 
-UI->>Store: User adds new site
-Store->>IPC: Create site request
-IPC->>SM: Validate & create site
-SM->>DB: Store site configuration
-DB-->>SM: Confirm storage
-SM-->>Store: Site created successfully
-Store-->>UI: Update site list
+    UI->>Store: User adds new site
+    Store->>IPC: Create site request
+    IPC->>SM: Validate & create site
+    SM->>DB: Store site configuration
+    DB-->>SM: Confirm storage
+    SM-->>Store: Site created successfully
+    Store-->>UI: Update site list
 
-Note over MM, Net: Monitoring Process
+    Note over MM, Net: Monitoring Process
 
-MM->>DB: Get active sites
-DB-->>MM: Return site list
-MM->>Net: Monitor site health
-Net-->>MM: Return health status
-MM->>DB: Store monitoring result
-MM->>Store: Broadcast status update
-Store-->>UI: Update site status
+    MM->>DB: Get active sites
+    DB-->>MM: Return site list
+    MM->>Net: Monitor site health
+    Net-->>MM: Return health status
+    MM->>DB: Store monitoring result
+    MM->>Store: Broadcast status update
+    Store-->>UI: Update site status
 
-Note over UI, DB: Data Persistence
+    Note over UI, DB: Data Persistence
 
-UI->>Store: View site history
-Store->>IPC: Request history data
-IPC->>SM: Get site history
-SM->>DB: Query historical data
-DB-->>SM: Return history records
-SM-->>Store: History data
-Store-->>UI: Display charts`} />
+    UI->>Store: View site history
+    Store->>IPC: Request history data
+    IPC->>SM: Get site history
+    SM->>DB: Query historical data
+    DB-->>SM: Return history records
+    SM-->>Store: History data
+    Store-->>UI: Display charts`} />
 
-                    ## Monitor Type Hierarchy
+                        ## Monitor Type Hierarchy
 
-                    This diagram shows the different types of monitors and their relationships:
+                        This diagram shows the different types of monitors and their relationships:
 
-                    <Mermaid value={`classDiagram
-class MonitorTypeRegistry {
-    +registerMonitorType(config: BaseMonitorConfig): void
-    +getMonitorServiceFactory(type: string): () => IMonitorService
-    +getAllMonitorTypeConfigs(): BaseMonitorConfig[]
-}
+                        <Mermaid value={`classDiagram
+    class MonitorTypeRegistry {
+        +registerMonitorType(config: BaseMonitorConfig): void
+        +getMonitorServiceFactory(type: string): () => IMonitorService
+        +getAllMonitorTypeConfigs(): BaseMonitorConfig[]
+    }
 
-class BaseMonitorConfig {
-    +type: string
-    +displayName: string
-    +fields: MonitorFieldDefinition[]
-    +serviceFactory(): IMonitorService
-}
+    class BaseMonitorConfig {
+        +type: string
+        +displayName: string
+        +fields: MonitorFieldDefinition[]
+        +serviceFactory(): IMonitorService
+    }
 
-class IMonitorService {
-    <<interface>>
-    +getType(): MonitorType
-    +updateConfig(config: Partial<MonitorConfig>): void
-    +check(monitor: Monitor, signal?: AbortSignal): Promise<MonitorCheckResult>
-}
+    class IMonitorService {
+        <<interface>>
+        +getType(): MonitorType
+        +updateConfig(config: Partial<MonitorConfig>): void
+        +check(monitor: Monitor, signal?: AbortSignal): Promise<MonitorCheckResult>
+    }
 
-class MonitorManager {
-    +performMonitorCheck(monitor: Monitor): Promise<void>
-    +executeMonitorCheck(monitor: Monitor): Promise<MonitorCheckResult>
-}
+    class MonitorManager {
+        +performMonitorCheck(monitor: Monitor): Promise<void>
+        +executeMonitorCheck(monitor: Monitor): Promise<MonitorCheckResult>
+    }
 
-class HttpMonitor
-class HttpHeaderMonitor
-class HttpKeywordMonitor
-class HttpJsonMonitor
-class HttpStatusMonitor
-class HttpLatencyMonitor
-class PingMonitor
-class PortMonitor
-class DnsMonitor
-class SslMonitor
-class CdnEdgeConsistencyMonitor
-class ReplicationMonitor
-class ServerHeartbeatMonitor
-class WebsocketKeepaliveMonitor
+    class HttpMonitor
+    class HttpHeaderMonitor
+    class HttpKeywordMonitor
+    class HttpJsonMonitor
+    class HttpStatusMonitor
+    class HttpLatencyMonitor
+    class PingMonitor
+    class PortMonitor
+    class DnsMonitor
+    class SslMonitor
+    class CdnEdgeConsistencyMonitor
+    class ReplicationMonitor
+    class ServerHeartbeatMonitor
+    class WebsocketKeepaliveMonitor
 
-IMonitorService <|.. HttpMonitor
-IMonitorService <|.. HttpHeaderMonitor
-IMonitorService <|.. HttpKeywordMonitor
-IMonitorService <|.. HttpJsonMonitor
-IMonitorService <|.. HttpStatusMonitor
-IMonitorService <|.. HttpLatencyMonitor
-IMonitorService <|.. PingMonitor
-IMonitorService <|.. PortMonitor
-IMonitorService <|.. DnsMonitor
-IMonitorService <|.. SslMonitor
-IMonitorService <|.. CdnEdgeConsistencyMonitor
-IMonitorService <|.. ReplicationMonitor
-IMonitorService <|.. ServerHeartbeatMonitor
-IMonitorService <|.. WebsocketKeepaliveMonitor
+    IMonitorService <|.. HttpMonitor
+    IMonitorService <|.. HttpHeaderMonitor
+    IMonitorService <|.. HttpKeywordMonitor
+    IMonitorService <|.. HttpJsonMonitor
+    IMonitorService <|.. HttpStatusMonitor
+    IMonitorService <|.. HttpLatencyMonitor
+    IMonitorService <|.. PingMonitor
+    IMonitorService <|.. PortMonitor
+    IMonitorService <|.. DnsMonitor
+    IMonitorService <|.. SslMonitor
+    IMonitorService <|.. CdnEdgeConsistencyMonitor
+    IMonitorService <|.. ReplicationMonitor
+    IMonitorService <|.. ServerHeartbeatMonitor
+    IMonitorService <|.. WebsocketKeepaliveMonitor
 
-MonitorTypeRegistry --> BaseMonitorConfig
-MonitorTypeRegistry --> IMonitorService
-MonitorManager --> MonitorTypeRegistry`} />
+    MonitorTypeRegistry --> BaseMonitorConfig
+    MonitorTypeRegistry --> IMonitorService
+    MonitorManager --> MonitorTypeRegistry`} />
 
-                    ## State Management Architecture
+                        ## State Management Architecture
 
-                    This diagram shows how state is managed across the application:
+                        This diagram shows how state is managed across the application:
 
-                    <Mermaid value={`graph TB
-subgraph "Frontend State Management"
-    UI[React Components]
+                        <Mermaid value={`graph TB
+    subgraph "Frontend State Management"
+        UI[React Components]
 
-    subgraph "Zustand Stores"
-        SiteStore[Sites Store<br/>Site data & operations]
-        MonitorStore[Monitor Store<br/>Monitor types & configs]
-        SettingsStore[Settings Store<br/>User preferences]
-        UIStore[UI Store<br/>Interface state]
-        ErrorStore[Error Store<br/>Error handling]
+        subgraph "Zustand Stores"
+            SiteStore[Sites Store<br/>Site data & operations]
+            MonitorStore[Monitor Store<br/>Monitor types & configs]
+            SettingsStore[Settings Store<br/>User preferences]
+            UIStore[UI Store<br/>Interface state]
+            ErrorStore[Error Store<br/>Error handling]
+        end
+
+        subgraph "Store Services"
+            SiteService[Site Service<br/>Site operations]
+            MonitorService[Monitor Service<br/>Monitor operations]
+        end
     end
 
-    subgraph "Store Services"
-        SiteService[Site Service<br/>Site operations]
-        MonitorService[Monitor Service<br/>Monitor operations]
+    subgraph "IPC Communication"
+        ContextBridge[Context Bridge<br/>Secure IPC]
     end
-end
 
-subgraph "IPC Communication"
-    ContextBridge[Context Bridge<br/>Secure IPC]
-end
-
-subgraph "Backend Services"
-    ServiceContainer[Service Container]
-    SiteManager[Site Manager]
-    MonitorManager[Monitor Manager]
-    ConfigManager[Configuration Manager]
-end
-
-subgraph "Data Layer"
-    Repositories[Repository Pattern<br/>Data Access]
-    Database[(SQLite Database)]
-end
-
-%% Component relationships
-UI --> SiteStore
-UI --> MonitorStore
-UI --> SettingsStore
-UI --> UIStore
-UI --> ErrorStore
-
-SiteStore --> SiteService
-MonitorStore --> MonitorService
-
-SiteService --> ContextBridge
-MonitorService --> ContextBridge
-SettingsStore --> ContextBridge
-
-ContextBridge --> ServiceContainer
-ServiceContainer --> SiteManager
-ServiceContainer --> MonitorManager
-ServiceContainer --> ConfigManager
-
-SiteManager --> Repositories
-MonitorManager --> Repositories
-ConfigManager --> Repositories
-
-Repositories --> Database
-
-%% Styling
-classDef uiLayer fill:#3b82f6,stroke:#1e40af,color:#ffffff
-classDef storeLayer fill:#10b981,stroke:#059669,color:#ffffff
-classDef serviceLayer fill:#f59e0b,stroke:#d97706,color:#ffffff
-classDef ipcLayer fill:#ef4444,stroke:#dc2626,color:#ffffff
-classDef backendLayer fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
-classDef dataLayer fill:#6b7280,stroke:#4b5563,color:#ffffff
-
-class UI uiLayer
-class SiteStore,MonitorStore,SettingsStore,UIStore,ErrorStore storeLayer
-class SiteService,MonitorService serviceLayer
-class ContextBridge ipcLayer
-class ServiceContainer,SiteManager,MonitorManager,ConfigManager backendLayer
-class Repositories,Database dataLayer`} />
-
-                    ## Site Provisioning Control Plane
-
-                    This flow diagrams the real add-site control plane, from the React form through ServiceContainer-managed managers, database transactions, automatic monitor bootstrapping, and finally the renderer state hydration.
-
-                    <Mermaid value={`flowchart LR
-%% Domains
-subgraph Renderer["Renderer Process"]
-    UI[AddSiteForm]
-    SitesSvc[SiteService\n(waitForElectronBridge)]
-end
-
-subgraph Preload["Preload Bridge"]
-    SitesAPI[electronAPI.sites.addSite]
-end
-
-subgraph MainProcess["Electron Main Process"]
-    Ipc[IpcService\nregisterStandardizedIpcHandler]
-    subgraph Managers["ServiceContainer Managers"]
-        Orchestrator[UptimeOrchestrator.addSite]
-        SiteMgr[SiteManager.addSite]
-        MonitorMgr[MonitorManager.setupSiteForMonitoring]
-        AppSvc[ApplicationService]
-        Notify[NotificationService]
+    subgraph "Backend Services"
+        ServiceContainer[Service Container]
+        SiteManager[Site Manager]
+        MonitorManager[Monitor Manager]
+        ConfigManager[Configuration Manager]
     end
-    subgraph Persistence["Persistence & Scheduling"]
-        Writer[SiteWriterService.createSite]
-        DbTx[DatabaseService.executeTransaction]
-        Repos[Site/Monitor Repositories]
-        Scheduler[MonitorScheduler.startSite]
-        CheckerStart[EnhancedMonitorChecker.startMonitoring]
+
+    subgraph "Data Layer"
+        Repositories[Repository Pattern<br/>Data Access]
+        Database[(SQLite Database)]
     end
-end
 
-subgraph Events["Cache & Event Bus"]
-    SitesCache[StandardizedCache&lt;Site&gt;]
-    EventBus[TypedEventBus&lt;UptimeEvents&gt;]
-end
+    %% Component relationships
+    UI --> SiteStore
+    UI --> MonitorStore
+    UI --> SettingsStore
+    UI --> UIStore
+    UI --> ErrorStore
 
-subgraph FrontendSync["Renderer Sync"]
-    RendererBridge[RendererEventBridge.sendToRenderers]
-    EventsAPI[electronAPI.events.on...]
-    SiteStore[useSiteSync & sites store]
-end
+    SiteStore --> SiteService
+    MonitorStore --> MonitorService
 
-UI -->|submit site config| SitesSvc
-SitesSvc -->|invoke| SitesAPI
-SitesAPI -->|ipc invoke "add-site"| Ipc
-Ipc --> Orchestrator
-Orchestrator --> SiteMgr
-SiteMgr -->|validate & persist| Writer
-Writer --> DbTx --> Repos --> SiteMgr
-SiteMgr -->|cache set| SitesCache
-SiteMgr -->|emit "site:added"| EventBus
-Orchestrator -->|auto setup| MonitorMgr
-MonitorMgr --> Scheduler --> CheckerStart
-CheckerStart -->|start monitoring events| EventBus
-EventBus --> AppSvc
-AppSvc --> Notify
-AppSvc --> RendererBridge
-SitesCache -->|cache-updated| EventBus
-RendererBridge -->|webContents.send| EventsAPI
-EventsAPI -->|contextBridge dispatch| SiteStore
-SiteStore -->|hydrate state| UI
+    SiteService --> ContextBridge
+    MonitorService --> ContextBridge
+    SettingsStore --> ContextBridge
 
-classDef renderer fill:#3b82f6,stroke:#1e40af,color:#ffffff
-classDef preload fill:#ea580c,stroke:#c2410c,color:#ffffff
-classDef main fill:#059669,stroke:#047857,color:#ffffff
-classDef persistence fill:#0f766e,stroke:#115e59,color:#ffffff
-classDef events fill:#7c3aed,stroke:#5b21b6,color:#ffffff
-classDef frontend fill:#1f2937,stroke:#111827,color:#ffffff
+    ContextBridge --> ServiceContainer
+    ServiceContainer --> SiteManager
+    ServiceContainer --> MonitorManager
+    ServiceContainer --> ConfigManager
 
-class UI,SitesSvc renderer
-class SitesAPI preload
-class Ipc,Orchestrator,SiteMgr,MonitorMgr,AppSvc,Notify main
-class Writer,DbTx,Repos,Scheduler,CheckerStart persistence
-class SitesCache,EventBus events
-class RendererBridge,EventsAPI,SiteStore frontend
-```
+    SiteManager --> Repositories
+    MonitorManager --> Repositories
+    ConfigManager --> Repositories
 
-\`} />
+    Repositories --> Database
 
-```
-                    ## UI Component Composition
+    %% Styling
+    classDef uiLayer fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef storeLayer fill:#10b981,stroke:#059669,color:#ffffff
+    classDef serviceLayer fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef ipcLayer fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef backendLayer fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef dataLayer fill:#6b7280,stroke:#4b5563,color:#ffffff
 
-                    The React shell in `src/App.tsx` wraps the application with error handling and theme context before rendering the header, dashboard, overlays, and modal surfaces. The diagram below maps the concrete components sourced from `src/components/**` so new contributors can trace the composition quickly.
-```
+    class UI uiLayer
+    class SiteStore,MonitorStore,SettingsStore,UIStore,ErrorStore storeLayer
+    class SiteService,MonitorService serviceLayer
+    class ContextBridge ipcLayer
+    class ServiceContainer,SiteManager,MonitorManager,ConfigManager backendLayer
+    class Repositories,Database dataLayer`} />
 
-\<Mermaid value={\`flowchart LR
-%% Application shell composition
-subgraph Shell\["App.tsx Composition"]
-ErrorBoundary\[ErrorBoundary
+                        ## Site Provisioning Control Plane
+
+                        This flow diagrams the real add-site control plane, from the React form through ServiceContainer-managed managers, database transactions, automatic monitor bootstrapping, and finally the renderer state hydration.
+
+                        <Mermaid value={`flowchart LR
+    %% Domains
+    subgraph Renderer["Renderer Process"]
+        UI[AddSiteForm]
+        SitesSvc[SiteService\n(waitForElectronBridge)]
+    end
+
+    subgraph Preload["Preload Bridge"]
+        SitesAPI[electronAPI.sites.addSite]
+    end
+
+    subgraph MainProcess["Electron Main Process"]
+        Ipc[IpcService\nregisterStandardizedIpcHandler]
+        subgraph Managers["ServiceContainer Managers"]
+            Orchestrator[UptimeOrchestrator.addSite]
+            SiteMgr[SiteManager.addSite]
+            MonitorMgr[MonitorManager.setupSiteForMonitoring]
+            AppSvc[ApplicationService]
+            Notify[NotificationService]
+        end
+        subgraph Persistence["Persistence & Scheduling"]
+            Writer[SiteWriterService.createSite]
+            DbTx[DatabaseService.executeTransaction]
+            Repos[Site/Monitor Repositories]
+            Scheduler[MonitorScheduler.startSite]
+            CheckerStart[EnhancedMonitorChecker.startMonitoring]
+        end
+    end
+
+    subgraph Events["Cache & Event Bus"]
+        SitesCache[StandardizedCache&lt;Site&gt;]
+        EventBus[TypedEventBus&lt;UptimeEvents&gt;]
+    end
+
+    subgraph FrontendSync["Renderer Sync"]
+        RendererBridge[RendererEventBridge.sendToRenderers]
+        EventsAPI[electronAPI.events.on...]
+        SiteStore[useSiteSync & sites store]
+    end
+
+    UI -->|submit site config| SitesSvc
+    SitesSvc -->|invoke| SitesAPI
+    SitesAPI -->|ipc invoke "add-site"| Ipc
+    Ipc --> Orchestrator
+    Orchestrator --> SiteMgr
+    SiteMgr -->|validate & persist| Writer
+    Writer --> DbTx --> Repos --> SiteMgr
+    SiteMgr -->|cache set| SitesCache
+    SiteMgr -->|emit "site:added"| EventBus
+    Orchestrator -->|auto setup| MonitorMgr
+    MonitorMgr --> Scheduler --> CheckerStart
+    CheckerStart -->|start monitoring events| EventBus
+    EventBus --> AppSvc
+    AppSvc --> Notify
+    AppSvc --> RendererBridge
+    SitesCache -->|cache-updated| EventBus
+    RendererBridge -->|webContents.send| EventsAPI
+    EventsAPI -->|contextBridge dispatch| SiteStore
+    SiteStore -->|hydrate state| UI
+
+    classDef renderer fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef preload fill:#ea580c,stroke:#c2410c,color:#ffffff
+    classDef main fill:#059669,stroke:#047857,color:#ffffff
+    classDef persistence fill:#0f766e,stroke:#115e59,color:#ffffff
+    classDef events fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+    classDef frontend fill:#1f2937,stroke:#111827,color:#ffffff
+
+    class UI,SitesSvc renderer
+    class SitesAPI preload
+    class Ipc,Orchestrator,SiteMgr,MonitorMgr,AppSvc,Notify main
+    class Writer,DbTx,Repos,Scheduler,CheckerStart persistence
+    class SitesCache,EventBus events
+    class RendererBridge,EventsAPI,SiteStore frontend
+`} />
+
+                        ## UI Component Composition
+
+                        The React shell in `src/App.tsx` wraps the application with error handling and theme context before rendering the header, dashboard, overlays, and modal surfaces. The diagram below maps the concrete components sourced from `src/components/**` so new contributors can trace the composition quickly.
+
+
+<Mermaid value={`flowchart LR
+    %% Application shell composition
+    subgraph Shell["App.tsx Composition"]
+        ErrorBoundary[ErrorBoundary
 (stores/error)]
-ThemeProvider\[ThemeProvider
+        ThemeProvider[ThemeProvider
 (theme/components)]
-AppRoot\[App.tsx]
-ErrorBoundary --> ThemeProvider
-ThemeProvider --> AppRoot
-end
+        AppRoot[App.tsx]
+        ErrorBoundary --> ThemeProvider
+        ThemeProvider --> AppRoot
+    end
 
-```
-subgraph HeaderStack["Header/"]
-    Header[Header]
-    StatusSummary[StatusSummary]
-    HeaderControls[HeaderControls]
-    Header --> StatusSummary
-    Header --> HeaderControls
-end
+    subgraph HeaderStack["Header/"]
+        Header[Header]
+        StatusSummary[StatusSummary]
+        HeaderControls[HeaderControls]
+        Header --> StatusSummary
+        Header --> HeaderControls
+    end
 
-subgraph Dashboard["Dashboard/SiteList"]
-    SiteList[SiteList]
-    subgraph SiteCardStack["SiteCard/"]
+    subgraph Dashboard["Dashboard/SiteList"]
+        SiteList[SiteList]
+        subgraph SiteCardStack["SiteCard/"]
+            SiteCard[SiteCard]
+            SiteCardHeader[SiteCardHeader]
+            SiteCardStatus[SiteCardStatus]
+            SiteCardMetrics[SiteCardMetrics]
+            SiteCardHistory[SiteCardHistory]
+            SiteCardFooter[SiteCardFooter]
+            SiteCard --> SiteCardHeader
+            SiteCard --> SiteCardStatus
+            SiteCard --> SiteCardMetrics
+            SiteCard --> SiteCardHistory
+            SiteCard --> SiteCardFooter
+        end
+        SiteList --> SiteCard
+    end
+
+    subgraph ModalLayer["Modal Surfaces"]
+        AddSiteModal[AddSiteModal]
+        SettingsModal[Settings]
+        SiteDetailsModal[SiteDetails]
+        subgraph AddSiteFormStack["AddSiteForm/"]
+            AddSiteForm[AddSiteForm]
+            DynamicMonitorFields[DynamicMonitorFields]
+            FormField[FormField/TextField/SelectField]
+            SubmitControls[Submit]
+            AddSiteForm --> DynamicMonitorFields
+            AddSiteForm --> FormField
+            AddSiteForm --> SubmitControls
+        end
+        subgraph SiteDetailsStack["SiteDetails tabs"]
+            SiteDetailsHeader[SiteDetailsHeader]
+            SiteDetailsNav[SiteDetailsNavigation]
+            SiteOverviewTab[SiteOverviewTab]
+            OverviewTab[OverviewTab]
+            HistoryTab[HistoryTab]
+            AnalyticsTab[AnalyticsTab]
+            SettingsTab[SettingsTab]
+            SiteDetailsModal --> SiteDetailsHeader
+            SiteDetailsModal --> SiteDetailsNav
+            SiteDetailsModal --> SiteOverviewTab
+            SiteDetailsModal --> OverviewTab
+            SiteDetailsModal --> HistoryTab
+            SiteDetailsModal --> AnalyticsTab
+            SiteDetailsModal --> SettingsTab
+        end
+    end
+
+    subgraph Overlays["Global Overlays"]
+        LoadingOverlay[Loading overlay]
+        ErrorAlert[ErrorAlert]
+        UpdateNotice[Update notification]
+    end
+
+    AppRoot --> Header
+    AppRoot --> Dashboard
+    AppRoot --> Overlays
+    AppRoot --> AddSiteModal
+    AppRoot --> SettingsModal
+    AppRoot --> SiteDetailsModal
+
+    classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+    classDef section fill:#312e81,stroke:#1e1b4b,color:#ffffff
+    classDef component fill:#1f2937,stroke:#111827,color:#f1f5f9
+
+    class AppRoot root
+    class ErrorBoundary,ThemeProvider,Header,SiteList,AddSiteModal,SettingsModal,SiteDetailsModal,LoadingOverlay,ErrorAlert,UpdateNotice component
+    class HeaderStack,Dashboard,ModalLayer,Overlays,Shell,SiteCardStack,AddSiteFormStack,SiteDetailsStack section
+`} />
+
+
+                        ## UI-State Integration Map
+
+                        UI components consume shared Zustand stores and renderer services instead of talking to Electron directly. This view shows which surfaces subscribe to each store and which services bridge to `electronAPI` IPC channels, based on hooks in `src/hooks/site` and the store modules under `src/stores/**`.
+
+
+<Mermaid value={`flowchart LR
+    subgraph UI["UI Components"]
+        Header[Header]
+        SiteList[SiteList]
         SiteCard[SiteCard]
-        SiteCardHeader[SiteCardHeader]
-        SiteCardStatus[SiteCardStatus]
-        SiteCardMetrics[SiteCardMetrics]
-        SiteCardHistory[SiteCardHistory]
-        SiteCardFooter[SiteCardFooter]
-        SiteCard --> SiteCardHeader
-        SiteCard --> SiteCardStatus
-        SiteCard --> SiteCardMetrics
-        SiteCard --> SiteCardHistory
-        SiteCard --> SiteCardFooter
+        AddSiteModal[AddSiteModal]
+        SettingsPanel[Settings]
+        SiteDetailsView[SiteDetails]
+        UpdateNotice[Update notification]
+        ErrorBanner[ErrorAlert]
     end
-    SiteList --> SiteCard
-end
 
-subgraph ModalLayer["Modal Surfaces"]
-    AddSiteModal[AddSiteModal]
-    SettingsModal[Settings]
-    SiteDetailsModal[SiteDetails]
-    subgraph AddSiteFormStack["AddSiteForm/"]
-        AddSiteForm[AddSiteForm]
-        DynamicMonitorFields[DynamicMonitorFields]
-        FormField[FormField/TextField/SelectField]
-        SubmitControls[Submit]
-        AddSiteForm --> DynamicMonitorFields
-        AddSiteForm --> FormField
-        AddSiteForm --> SubmitControls
+    subgraph HooksStores["Hooks & Zustand Stores"]
+        SitesStore[useSitesStore]
+        UIStore[useUIStore]
+        SettingsStore[useSettingsStore]
+        ErrorStore[useErrorStore]
+        UpdatesStore[useUpdatesStore]
+        ThemeHook[useTheme / useAvailabilityColors]
+        SiteHook[useSite]
+        SiteDetailsHook[useSiteDetails]
     end
-    subgraph SiteDetailsStack["SiteDetails tabs"]
-        SiteDetailsHeader[SiteDetailsHeader]
-        SiteDetailsNav[SiteDetailsNavigation]
-        SiteOverviewTab[SiteOverviewTab]
-        OverviewTab[OverviewTab]
-        HistoryTab[HistoryTab]
-        AnalyticsTab[AnalyticsTab]
-        SettingsTab[SettingsTab]
-        SiteDetailsModal --> SiteDetailsHeader
-        SiteDetailsModal --> SiteDetailsNav
-        SiteDetailsModal --> SiteOverviewTab
-        SiteDetailsModal --> OverviewTab
-        SiteDetailsModal --> HistoryTab
-        SiteDetailsModal --> AnalyticsTab
-        SiteDetailsModal --> SettingsTab
-    end
-end
 
-subgraph Overlays["Global Overlays"]
-    LoadingOverlay[Loading overlay]
-    ErrorAlert[ErrorAlert]
-    UpdateNotice[Update notification]
-end
-
-AppRoot --> Header
-AppRoot --> Dashboard
-AppRoot --> Overlays
-AppRoot --> AddSiteModal
-AppRoot --> SettingsModal
-AppRoot --> SiteDetailsModal
-
-classDef root fill:#0ea5e9,stroke:#0369a1,color:#ffffff
-classDef section fill:#312e81,stroke:#1e1b4b,color:#ffffff
-classDef component fill:#1f2937,stroke:#111827,color:#f1f5f9
-
-class AppRoot root
-class ErrorBoundary,ThemeProvider,Header,SiteList,AddSiteModal,SettingsModal,SiteDetailsModal,LoadingOverlay,ErrorAlert,UpdateNotice component
-class HeaderStack,Dashboard,ModalLayer,Overlays,Shell,SiteCardStack,AddSiteFormStack,SiteDetailsStack section
-```
-
-\`} />
-
-```
-                    ## UI-State Integration Map
-
-                    UI components consume shared Zustand stores and renderer services instead of talking to Electron directly. This view shows which surfaces subscribe to each store and which services bridge to `electronAPI` IPC channels, based on hooks in `src/hooks/site` and the store modules under `src/stores/**`.
-```
-
-\<Mermaid value={\`flowchart LR
-subgraph UI\["UI Components"]
-Header\[Header]
-SiteList\[SiteList]
-SiteCard\[SiteCard]
-AddSiteModal\[AddSiteModal]
-SettingsPanel\[Settings]
-SiteDetailsView\[SiteDetails]
-UpdateNotice\[Update notification]
-ErrorBanner\[ErrorAlert]
-end
-
-```
-subgraph HooksStores["Hooks & Zustand Stores"]
-    SitesStore[useSitesStore]
-    UIStore[useUIStore]
-    SettingsStore[useSettingsStore]
-    ErrorStore[useErrorStore]
-    UpdatesStore[useUpdatesStore]
-    ThemeHook[useTheme / useAvailabilityColors]
-    SiteHook[useSite]
-    SiteDetailsHook[useSiteDetails]
-end
-
-subgraph Services["Renderer Services"]
-    SiteSvc[SiteService
-```
-
+    subgraph Services["Renderer Services"]
+        SiteSvc[SiteService
 (electronAPI.sites)]
-MonitoringSvc\[MonitoringService
+        MonitoringSvc[MonitoringService
 (monitoring IPC)]
-EventsSvc\[EventsService
+        EventsSvc[EventsService
 (electronAPI.events)]
-ChartConfigSvc\[ChartConfigService]
-end
+        ChartConfigSvc[ChartConfigService]
+    end
 
-```
-Header --> SitesStore
-Header --> UIStore
-Header --> ThemeHook
+    Header --> SitesStore
+    Header --> UIStore
+    Header --> ThemeHook
 
-SiteList --> SitesStore
+    SiteList --> SitesStore
 
-SiteCard --> SiteHook
-SiteHook --> SitesStore
-SiteHook --> ErrorStore
+    SiteCard --> SiteHook
+    SiteHook --> SitesStore
+    SiteHook --> ErrorStore
 
-AddSiteModal --> SitesStore
-AddSiteModal --> UIStore
-AddSiteModal --> SiteSvc
+    AddSiteModal --> SitesStore
+    AddSiteModal --> UIStore
+    AddSiteModal --> SiteSvc
 
-SettingsPanel --> SettingsStore
-SettingsPanel --> ThemeHook
-SettingsPanel --> SitesStore
-SettingsPanel --> ErrorStore
+    SettingsPanel --> SettingsStore
+    SettingsPanel --> ThemeHook
+    SettingsPanel --> SitesStore
+    SettingsPanel --> ErrorStore
 
-SiteDetailsView --> SiteDetailsHook
-SiteDetailsHook --> SitesStore
-SiteDetailsHook --> UIStore
-SiteDetailsHook --> MonitoringSvc
-SiteDetailsHook --> ChartConfigSvc
+    SiteDetailsView --> SiteDetailsHook
+    SiteDetailsHook --> SitesStore
+    SiteDetailsHook --> UIStore
+    SiteDetailsHook --> MonitoringSvc
+    SiteDetailsHook --> ChartConfigSvc
 
-UpdateNotice --> UpdatesStore
-ErrorBanner --> ErrorStore
+    UpdateNotice --> UpdatesStore
+    ErrorBanner --> ErrorStore
 
-SitesStore --> SiteSvc
-SitesStore --> MonitoringSvc
-SitesStore --> EventsSvc
+    SitesStore --> SiteSvc
+    SitesStore --> MonitoringSvc
+    SitesStore --> EventsSvc
 
-classDef ui fill:#0ea5e9,stroke:#0369a1,color:#ffffff
-classDef store fill:#312e81,stroke:#1e1b4b,color:#ffffff
-classDef service fill:#1f2937,stroke:#111827,color:#f1f5f9
+    classDef ui fill:#0ea5e9,stroke:#0369a1,color:#ffffff
+    classDef store fill:#312e81,stroke:#1e1b4b,color:#ffffff
+    classDef service fill:#1f2937,stroke:#111827,color:#f1f5f9
 
-class Header,SiteList,SiteCard,AddSiteModal,SettingsPanel,SiteDetailsView,UpdateNotice,ErrorBanner ui
-class SitesStore,UIStore,SettingsStore,ErrorStore,UpdatesStore,ThemeHook,SiteHook,SiteDetailsHook store
-class SiteSvc,MonitoringSvc,EventsSvc,ChartConfigSvc service
-```
+    class Header,SiteList,SiteCard,AddSiteModal,SettingsPanel,SiteDetailsView,UpdateNotice,ErrorBanner ui
+    class SitesStore,UIStore,SettingsStore,ErrorStore,UpdatesStore,ThemeHook,SiteHook,SiteDetailsHook store
+    class SiteSvc,MonitoringSvc,EventsSvc,ChartConfigSvc service
+`} />
 
-\`} />
 
-```
-                    ---
+                        ---
 
-                    The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.
+                        The diagrams above illustrate the core architecture and component interactions of Uptime Watcher. For deeper insights into each module, see the [API documentation](../api/overview.md) and [code references](../../src) for implementation details and maintainability guidelines.
 
+                    </div>
                 </div>
             </div>
-        </div>
-    </Layout>
-);
-```
-
+        </Layout>
+    );
 }

@@ -36,10 +36,12 @@ vi.mock("ws", async () => {
 
         public static readonly CLOSED = 3;
 
+        public readonly url: string;
         public readyState: number = LocalWebSocket.CONNECTING;
 
-        public constructor(public readonly url: string) {
+        public constructor(url: string) {
             super();
+            this.url = url;
         }
 
         public readonly ping = vi.fn();

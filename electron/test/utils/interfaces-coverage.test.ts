@@ -3,7 +3,7 @@
  *   coverage by testing all interface exports and type definitions
  */
 
-import { describe, it, expect, vi, type MockedFunction } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
 describe("Interfaces Coverage Tests", () => {
@@ -284,18 +284,25 @@ describe("Interfaces Coverage Tests", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Business Logic", "type");
 
-            const asyncLogger: Logger = {
-                debug: vi.fn().mockResolvedValue(undefined),
-                info: vi.fn().mockResolvedValue(undefined),
-                warn: vi.fn().mockResolvedValue(undefined),
-                error: vi.fn().mockResolvedValue(undefined),
+            const asyncLogger = {
+                debug: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                info: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                warn: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
+                error: vi.fn(
+                    async (_message: string, ..._args: unknown[]) => {}
+                ),
             };
 
-            // Even though interface methods return void, implementations can be async
-            await (asyncLogger.debug as MockedFunction<any>)("async debug");
-            await (asyncLogger.info as MockedFunction<any>)("async info");
-            await (asyncLogger.warn as MockedFunction<any>)("async warn");
-            await (asyncLogger.error as MockedFunction<any>)("async error");
+            await asyncLogger.debug("async debug");
+            await asyncLogger.info("async info");
+            await asyncLogger.warn("async warn");
+            await asyncLogger.error("async error");
 
             expect(asyncLogger.debug).toHaveBeenCalledWith("async debug");
             expect(asyncLogger.info).toHaveBeenCalledWith("async info");
@@ -426,7 +433,11 @@ describe("Interfaces Coverage Tests", () => {
             await annotate("Type: Business Logic", "type");
 
             class Service {
-                constructor(private logger: Logger) {}
+                private readonly logger: Logger;
+
+                constructor(logger: Logger) {
+                    this.logger = logger;
+                }
 
                 doSomething() {
                     this.logger.info("Service action performed");

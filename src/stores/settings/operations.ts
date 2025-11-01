@@ -1,6 +1,10 @@
 /**
  * Operational slice housing settings persistence and synchronization actions.
  */
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { SettingsStore } from "./types";
@@ -186,18 +190,28 @@ export const createSettingsOperationsSlice = (
 
             await withErrorHandling(
                 async () => {
-                    getState().updateSettings({ historyLimit: limit });
-
-                    const backendLimit =
-                        await SettingsService.updateHistoryLimit(limit);
-
-                    const validBackendLimit =
-                        Number.isFinite(backendLimit) && backendLimit > 0
-                            ? backendLimit
-                            : limit;
+                    const sanitizedLimit: number = normalizeHistoryLimit(
+                        limit,
+                        DEFAULT_HISTORY_LIMIT_RULES
+                    );
 
                     getState().updateSettings({
-                        historyLimit: validBackendLimit,
+                        historyLimit: sanitizedLimit,
+                    });
+
+                    const backendLimit: number =
+                        await SettingsService.updateHistoryLimit(
+                            sanitizedLimit
+                        );
+
+                    const normalizedBackendLimit: number =
+                        normalizeHistoryLimit(
+                            backendLimit,
+                            DEFAULT_HISTORY_LIMIT_RULES
+                        );
+
+                    getState().updateSettings({
+                        historyLimit: normalizedBackendLimit,
                     });
                 },
                 {

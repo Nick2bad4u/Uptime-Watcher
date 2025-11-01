@@ -10,8 +10,11 @@
  * @packageDocumentation
  */
 
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
-import { safeNumberConversion } from "@shared/utils/safeConversions";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -75,9 +78,24 @@ export const SettingsService: SettingsServiceContract = {
      * @throws If the electron API is unavailable or the backend operation
      *   fails.
      */
-    getHistoryLimit: wrap("getHistoryLimit", async (api) =>
-        api.settings.getHistoryLimit()
-    ),
+    getHistoryLimit: wrap("getHistoryLimit", async (api) => {
+        const rawLimit = await api.settings.getHistoryLimit();
+
+        try {
+            return normalizeHistoryLimit(rawLimit, DEFAULT_HISTORY_LIMIT_RULES);
+        } catch (error: unknown) {
+            const normalizedError = ensureError(error);
+            logger.warn(
+                "Received invalid history limit from backend; defaulting to shared rule",
+                {
+                    error: normalizedError.message,
+                    receivedValue: rawLimit,
+                }
+            );
+
+            return DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+        }
+    }),
 
     /**
      * Ensures the electron API is available before making backend calls.
@@ -138,20 +156,28 @@ export const SettingsService: SettingsServiceContract = {
         "updateHistoryLimit",
         async (api, limit: number): Promise<number> => {
             const updatedLimit = await api.settings.updateHistoryLimit(limit);
-            const sanitizedLimit = safeNumberConversion(updatedLimit, limit);
 
-            if (sanitizedLimit !== updatedLimit) {
+            try {
+                return normalizeHistoryLimit(
+                    updatedLimit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
+            } catch (error: unknown) {
+                const normalizedError = ensureError(error);
                 logger.warn(
                     "Received invalid history limit from backend; falling back to requested value",
                     {
+                        error: normalizedError.message,
                         receivedValue: updatedLimit,
                         requestedLimit: limit,
-                        sanitizedLimit,
                     }
                 );
-            }
 
-            return sanitizedLimit;
+                return normalizeHistoryLimit(
+                    limit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
+            }
         }
     ),
 };

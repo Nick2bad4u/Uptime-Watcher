@@ -108,6 +108,7 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
     }),
 }));
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
 import { TypedEventBus } from "../../events/TypedEventBus";
@@ -433,6 +434,60 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Should set the history limit from database
             expect(databaseManager.getHistoryLimit()).toBe(250);
+        });
+
+        it("should normalise persisted history limits below the minimum during initialize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
+            vi.mocked(mockSettingsRepository.get).mockResolvedValue("10");
+
+            await databaseManager.initialize();
+
+            expect(databaseManager.getHistoryLimit()).toBe(
+                DEFAULT_HISTORY_LIMIT_RULES.minLimit
+            );
+        });
+
+        it("should convert negative persisted history limits to unlimited during initialize", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
+            vi.mocked(mockSettingsRepository.get).mockResolvedValue("-15");
+
+            await databaseManager.initialize();
+
+            expect(databaseManager.getHistoryLimit()).toBe(0);
+        });
+
+        it("should fall back to default when persisted history limit is invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseManager", "component");
+            await annotate("Category: Manager", "category");
+            await annotate("Type: Initialization", "type");
+
+            vi.mocked(mockSettingsRepository.get).mockResolvedValue(
+                "not-a-number"
+            );
+
+            await databaseManager.initialize();
+
+            expect(databaseManager.getHistoryLimit()).toBe(
+                DEFAULT_HISTORY_LIMIT_RULES.defaultLimit
+            );
         });
     });
 
@@ -1219,17 +1274,19 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             await databaseManager.setHistoryLimit(10);
 
-            // Utility enforces minimum of 10, not ConfigurationManager's minLimit
+            // Utility enforces ConfigurationManager's minimum limit (25)
             expect(mockSetInternal).toHaveBeenCalledWith(
                 expect.anything(),
                 "historyLimit",
-                "10"
+                DEFAULT_HISTORY_LIMIT_RULES.minLimit.toString()
             );
             expect(mockPruneAllHistoryInternal).toHaveBeenCalledWith(
                 expect.anything(),
-                10
+                DEFAULT_HISTORY_LIMIT_RULES.minLimit
             );
-            expect(databaseManager.getHistoryLimit()).toBe(10);
+            expect(databaseManager.getHistoryLimit()).toBe(
+                DEFAULT_HISTORY_LIMIT_RULES.minLimit
+            );
         });
 
         it("should handle setHistoryLimit with database error", async ({

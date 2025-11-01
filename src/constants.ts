@@ -27,6 +27,8 @@
 
 import type { MonitorTypeOption as SharedMonitorTypeOption } from "@shared/types/monitorTypes";
 
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
+
 /**
  * CSS transition timing for consistent animations.
  *
@@ -290,7 +292,8 @@ export const DEFAULT_REQUEST_TIMEOUT_SECONDS = 10;
  * Set to 500 records as a reasonable default for most use cases, balancing data
  * retention with storage efficiency.
  */
-export const DEFAULT_HISTORY_LIMIT = 500;
+export const DEFAULT_HISTORY_LIMIT: number =
+    DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
 
 /**
  * History limit options for controlling data retention.

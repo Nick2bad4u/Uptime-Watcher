@@ -726,8 +726,16 @@ describe(DatabaseManager, () => {
         });
 
         it("should handle negative history limit", async () => {
-            await expect(databaseManager.setHistoryLimit(-1)).rejects.toThrow(
-                "History limit must be non-negative, received: -1"
+            await databaseManager.setHistoryLimit(-1);
+
+            const historyManager = await import(
+                "../../utils/database/historyLimitManager"
+            );
+            expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    limit: -1,
+                    rules: expect.objectContaining({ minLimit: 25 }),
+                })
             );
         });
     });

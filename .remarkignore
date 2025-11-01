@@ -13,6 +13,15 @@
 # Docusaurus Build Directory
 /build/
 
+# Skip complex MDX architecture diagrams (handled manually)
+docs/docusaurus/src/pages/data-models.mdx
+docs/docusaurus/src/pages/deployment-infrastructure.mdx
+docs/docusaurus/src/pages/engineering-tooling.mdx
+docs/docusaurus/src/pages/monitoring-workflows.mdx
+docs/docusaurus/src/pages/performance-metrics.mdx
+docs/docusaurus/src/pages/system-architecture.mdx
+docs/docusaurus/src/pages/testing-architecture.mdx
+
 ### Docusaurus.Node Stack ###
 # Logs
 logs

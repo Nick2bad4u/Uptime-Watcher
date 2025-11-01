@@ -1,3 +1,4 @@
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import { DEFAULT_SITE_NAME as SHARED_DEFAULT_SITE_NAME } from "@shared/constants/sites";
 
 /**
@@ -9,6 +10,12 @@ import { DEFAULT_SITE_NAME as SHARED_DEFAULT_SITE_NAME } from "@shared/constants
  *
  * @packageDocumentation
  */
+
+/**
+ * Shared default history limit for backend operations.
+ */
+export const DEFAULT_HISTORY_LIMIT: number =
+    DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
 
 /**
  * Interface for retry backoff configuration.
@@ -73,17 +80,6 @@ export const RETRY_BACKOFF: RetryBackoffConfig = Object.freeze({
     /** Maximum delay in milliseconds between retries. */
     MAX_DELAY: 5000,
 });
-
-/**
- * Default number of history records to retain per monitor.
- *
- * @remarks
- * Used to limit the number of status check records stored for each monitor in
- * the database.
- *
- * @defaultValue 500
- */
-export const DEFAULT_HISTORY_LIMIT = 500;
 
 /**
  * Main database file name.

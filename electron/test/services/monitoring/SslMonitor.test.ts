@@ -37,6 +37,7 @@ class MockTlsSocket extends EventEmitter {
 
     public authorizationError?: Error | string;
 
+    private readonly certificate: PeerCertificate;
     public destroyed = false;
 
     public readonly setTimeout = vi.fn(
@@ -51,13 +52,14 @@ class MockTlsSocket extends EventEmitter {
     });
 
     public constructor(
-        private readonly certificate: PeerCertificate,
+        certificate: PeerCertificate,
         options: {
             authorized?: boolean;
             authorizationError?: Error | string;
         } = {}
     ) {
         super();
+        this.certificate = certificate;
         this.authorized = options.authorized ?? true;
         if (options.authorizationError !== undefined) {
             this.authorizationError = options.authorizationError;

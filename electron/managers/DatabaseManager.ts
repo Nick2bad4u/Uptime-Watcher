@@ -49,7 +49,8 @@
 
 import type { Site } from "@shared/types";
 
-import { withErrorHandling } from "@shared/utils/errorHandling";
+import { normalizeHistoryLimit } from "@shared/constants/history";
+import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -339,25 +340,52 @@ export class DatabaseManager {
             async () => {
                 // First, load current settings from database including history
                 // limit
+                const historyRules =
+                    this.configurationManager.getHistoryRetentionRules();
+                this.historyLimit = historyRules.defaultLimit;
+
                 try {
-                    const currentLimit =
+                    const rawHistoryLimit =
                         await this.dependencies.repositories.settings.get(
                             "historyLimit"
                         );
-                    if (currentLimit) {
-                        this.historyLimit = Number(currentLimit);
-                        monitorLogger.info(
-                            `[DatabaseManager] Loaded history limit from database: ${this.historyLimit}`
-                        );
-                    } else {
+
+                    if (rawHistoryLimit === undefined) {
                         monitorLogger.info(
                             `[DatabaseManager] No history limit in database, using default: ${this.historyLimit}`
                         );
+                    } else {
+                        const parsedHistoryLimit = Number(rawHistoryLimit);
+
+                        try {
+                            const normalizedHistoryLimit =
+                                normalizeHistoryLimit(
+                                    parsedHistoryLimit,
+                                    historyRules
+                                );
+
+                            this.historyLimit = normalizedHistoryLimit;
+                            monitorLogger.info(
+                                `[DatabaseManager] Loaded history limit from database: ${this.historyLimit}`
+                            );
+                        } catch (validationError) {
+                            const normalizedError =
+                                ensureError(validationError);
+                            monitorLogger.warn(
+                                "[DatabaseManager] Invalid history limit detected in database; reverting to default",
+                                {
+                                    defaultApplied: historyRules.defaultLimit,
+                                    error: normalizedError.message,
+                                    receivedValue: rawHistoryLimit,
+                                }
+                            );
+                        }
                     }
                 } catch (error) {
+                    const normalizedError = ensureError(error);
                     monitorLogger.error(
                         "[DatabaseManager] Failed to load history limit from database, using default:",
-                        error
+                        normalizedError
                     );
                 }
 
@@ -483,8 +511,8 @@ export class DatabaseManager {
      * @returns A promise that resolves when the history limit is updated.
      *
      * @throws TypeError if limit is not a valid number or integer.
-     * @throws RangeError if limit is negative, infinite, or exceeds the
-     *   configured maximum.
+     * @throws RangeError if limit is infinite or exceeds the configured
+     *   maximum.
      */
     public async setHistoryLimit(limit: number): Promise<void> {
         // Comprehensive input validation
@@ -497,12 +525,6 @@ export class DatabaseManager {
         if (!Number.isInteger(limit)) {
             throw new TypeError(
                 `[DatabaseManager.setHistoryLimit] History limit must be an integer, received: ${limit}`
-            );
-        }
-
-        if (limit < 0) {
-            throw new RangeError(
-                `[DatabaseManager.setHistoryLimit] History limit must be non-negative, received: ${limit}`
             );
         }
 
@@ -530,6 +552,7 @@ export class DatabaseManager {
                 history: this.dependencies.repositories.history,
                 settings: this.dependencies.repositories.settings,
             },
+            rules: historyRules,
             setHistoryLimit: (newLimit) => {
                 this.historyLimit = newLimit;
                 // Use centralized event emission (fire and forget)

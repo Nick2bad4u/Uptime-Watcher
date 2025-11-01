@@ -52,12 +52,16 @@ import type { Site } from "@shared/types";
 import type { ConfigValue } from "@shared/types/configTypes";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    type HistoryLimitRules,
+} from "@shared/constants/history";
 import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import { CacheKeys } from "@shared/utils/cacheKeys";
 
 import type { ValidationResult } from "./validators/interfaces";
 
-import { DEFAULT_CHECK_INTERVAL, DEFAULT_HISTORY_LIMIT } from "../constants";
+import { DEFAULT_CHECK_INTERVAL } from "../constants";
 import { isDev } from "../electronUtils";
 import { StandardizedCache } from "../utils/cache/StandardizedCache";
 import { MonitorValidator } from "./validators/MonitorValidator";
@@ -79,21 +83,11 @@ export interface HistoryRetentionConfig {
     /**
      * The default history retention limit.
      *
-     * @defaultValue DEFAULT_HISTORY_LIMIT
+     * @defaultValue DEFAULT_HISTORY_LIMIT_RULES.defaultLimit
      */
-    defaultLimit: number;
-    /**
-     * The maximum allowed history retention limit.
-     *
-     * @defaultValue Number.MAX_SAFE_INTEGER
-     */
-    maxLimit: number;
-    /**
-     * The minimum allowed history retention limit.
-     *
-     * @defaultValue 25
-     */
-    minLimit: number;
+    defaultLimit: HistoryLimitRules["defaultLimit"];
+    maxLimit: HistoryLimitRules["maxLimit"];
+    minLimit: HistoryLimitRules["minLimit"];
 }
 
 /**
@@ -352,11 +346,7 @@ export class ConfigurationManager {
      *   minimum, and maximum history limits.
      */
     public getHistoryRetentionRules(): HistoryRetentionConfig {
-        return {
-            defaultLimit: DEFAULT_HISTORY_LIMIT,
-            maxLimit: Number.MAX_SAFE_INTEGER, // Matches "Unlimited" option
-            minLimit: 25, // Matches lowest option in UI
-        };
+        return { ...DEFAULT_HISTORY_LIMIT_RULES };
     }
 
     /**

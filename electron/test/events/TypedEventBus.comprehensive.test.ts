@@ -3,7 +3,15 @@
  * all middleware, error handling, data transformation, and edge cases
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    beforeEach,
+    vi,
+    afterEach,
+    type Mock,
+} from "vitest";
 import {
     TypedEventBus,
     createTypedEventBus,
@@ -54,12 +62,12 @@ describe("TypedEventBus - Comprehensive Coverage", () => {
     let eventBus: TypedEventBus<TestEvents>;
     let mockMiddleware: EventMiddleware;
     let mockMiddleware2: EventMiddleware;
-    let mockListener: ReturnType<typeof vi.fn>;
+    let mockListener: Mock<(data: any) => void>;
 
     beforeEach(() => {
         vi.clearAllMocks();
         eventBus = new TypedEventBus<TestEvents>("test-bus");
-        mockListener = vi.fn();
+        mockListener = vi.fn<(data: any) => void>();
         mockMiddleware = vi.fn(async (_event, _data, next) => {
             await next();
         });

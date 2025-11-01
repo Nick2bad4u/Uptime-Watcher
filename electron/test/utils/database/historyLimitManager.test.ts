@@ -24,6 +24,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { DEFAULT_HISTORY_LIMIT_RULES } from "@shared/constants/history";
 import {
     setHistoryLimit,
     getHistoryLimit,
@@ -130,6 +131,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -151,7 +153,7 @@ describe("historyLimitManager", () => {
             );
         });
 
-        it("should set minimum limit of 10 for small positive values", async ({
+        it("should apply configured minimum for small positive values", async ({
             task,
             annotate,
         }) => {
@@ -162,7 +164,7 @@ describe("historyLimitManager", () => {
 
             const setHistoryLimitCallback = vi.fn();
             const limit = 5;
-            const expectedLimit = 10;
+            const expectedLimit = DEFAULT_HISTORY_LIMIT_RULES.minLimit;
 
             await setHistoryLimit({
                 limit,
@@ -171,6 +173,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -209,6 +212,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -250,6 +254,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -287,6 +292,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
             });
 
@@ -318,6 +324,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -352,6 +359,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -483,6 +491,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });
@@ -517,7 +526,7 @@ describe("historyLimitManager", () => {
             const setHistoryLimitCallback = vi.fn();
             const getHistoryLimitCallback = vi.fn();
             const limit = 3;
-            const expectedLimit = 10;
+            const expectedLimit = DEFAULT_HISTORY_LIMIT_RULES.minLimit;
 
             // Set the limit
             await setHistoryLimit({
@@ -527,6 +536,7 @@ describe("historyLimitManager", () => {
                     history: mockHistoryRepository,
                     settings: mockSettingsRepository,
                 },
+                rules: DEFAULT_HISTORY_LIMIT_RULES,
                 setHistoryLimit: setHistoryLimitCallback,
                 logger: mockLogger,
             });

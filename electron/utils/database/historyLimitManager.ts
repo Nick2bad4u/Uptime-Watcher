@@ -9,7 +9,10 @@
  * @packageDocumentation
  */
 
+import type { HistoryLimitRules } from "@shared/constants/history";
 import type { Logger } from "@shared/utils/logger/interfaces";
+
+import { normalizeHistoryLimit } from "@shared/constants/history";
 
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type { HistoryRepository } from "../../services/database/HistoryRepository";
@@ -45,6 +48,11 @@ interface SetHistoryLimitParams {
     };
 
     /**
+     * History retention business rules to apply when normalizing the limit.
+     */
+    rules: HistoryLimitRules;
+
+    /**
      * Callback to update the internal history limit
      *
      * @remarks
@@ -76,8 +84,9 @@ export function getHistoryLimit(getHistoryLimitFn: () => number): number {
  * Limit behavior:
  *
  * - 0 or negative: Disables history retention (unlimited)
- * - 1-9: Will be increased to minimum of 10
- * - 10+: Used as specified
+ * - Positive values below the configured minimum: raised to the rules-driven
+ *   minimum (25 by default)
+ * - Positive values within the configured range: used as provided
  *
  * @param params - Parameters for setting history limit
  *
@@ -91,13 +100,11 @@ export async function setHistoryLimit(
         limit,
         logger,
         repositories,
+        rules,
         setHistoryLimit: updateHistoryLimit,
     } = params;
 
-    // Determine the appropriate limit value
-    // Special case: 0 or negative disables history retention (unlimited)
-    // Otherwise: enforce minimum of 10 for meaningful history retention
-    const finalLimit = limit <= 0 ? 0 : Math.max(10, limit);
+    const finalLimit = normalizeHistoryLimit(limit, rules);
 
     // Update the internal limit
     updateHistoryLimit(finalLimit);

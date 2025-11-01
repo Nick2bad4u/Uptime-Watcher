@@ -11,7 +11,7 @@
  * @coverage Targeting 100% coverage of MonitorScheduler.ts
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 // Unmock MonitorScheduler for this test file so we can test the real implementation
 vi.unmock("../../../services/monitoring/MonitorScheduler");
@@ -64,7 +64,9 @@ function createValidMonitor(overrides: Partial<Monitor> = {}): Monitor {
 
 describe("MonitorScheduler - Comprehensive Coverage", () => {
     let scheduler: MonitorScheduler;
-    let mockCheckCallback: ReturnType<typeof vi.fn>;
+    let mockCheckCallback: Mock<
+        (siteIdentifier: string, monitorId: string) => Promise<void>
+    >;
 
     beforeEach(() => {
         // Reset all mocks
@@ -74,7 +76,9 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
         scheduler = new MonitorScheduler(mockLogger as unknown as Logger);
 
         // Create mock check callback
-        mockCheckCallback = vi.fn().mockResolvedValue(undefined);
+        mockCheckCallback = vi.fn<
+            (siteIdentifier: string, monitorId: string) => Promise<void>
+        >(async () => {});
 
         // Use fake timers
         vi.useFakeTimers();
@@ -143,8 +147,12 @@ describe("MonitorScheduler - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const firstCallback = vi.fn().mockResolvedValue(undefined);
-            const secondCallback = vi.fn().mockResolvedValue(undefined);
+            const firstCallback = vi.fn<
+                (siteIdentifier: string, monitorId: string) => Promise<void>
+            >(async () => {});
+            const secondCallback = vi.fn<
+                (siteIdentifier: string, monitorId: string) => Promise<void>
+            >(async () => {});
 
             scheduler.setCheckCallback(firstCallback);
             scheduler.setCheckCallback(secondCallback);
