@@ -13,16 +13,14 @@ import type {
     StateSyncSource,
     StateSyncStatusSummary,
 } from "@shared/types/stateSync";
+import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 import type { UnknownRecord } from "type-fest";
 
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 import { validateMonitorData } from "@shared/validation/schemas";
-import {
-    type DuplicateSiteIdentifier,
-    sanitizeSitesByIdentifier,
-} from "@shared/validation/siteIntegrity";
 import { ipcMain, shell } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
@@ -1028,28 +1026,29 @@ export class IpcService {
             "get-sites",
             async () => {
                 const sites = await this.uptimeOrchestrator.getSites();
-                const { duplicates, sanitizedSites } =
-                    sanitizeSitesByIdentifier(sites);
+                const snapshot = deriveSiteSnapshot(sites);
 
-                if (duplicates.length > 0) {
+                if (snapshot.duplicates.length > 0) {
                     logger.error(
                         "[IpcService] Duplicate site identifiers detected in get-sites response",
                         undefined,
                         {
-                            duplicateCount: duplicates.length,
-                            duplicates: duplicates.map(
+                            duplicateCount: snapshot.duplicates.length,
+                            duplicates: snapshot.duplicates.map(
                                 (entry: DuplicateSiteIdentifier) => ({
                                     identifier: entry.identifier,
                                     occurrences: entry.occurrences,
                                 })
                             ),
                             originalSites: sites.length,
-                            sanitizedSites: sanitizedSites.length,
+                            sanitizedSites: snapshot.sanitizedSites.length,
                         }
                     );
                 }
 
-                return sanitizedSites.map((site) => structuredClone(site));
+                return snapshot.sanitizedSites.map((site) =>
+                    structuredClone(site)
+                );
             },
             SiteHandlerValidators.getSites,
             this.registeredIpcHandlers

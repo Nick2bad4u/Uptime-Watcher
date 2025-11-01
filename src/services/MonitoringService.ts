@@ -35,7 +35,11 @@
  * @public
  */
 
-import type { StatusUpdate } from "@shared/types";
+import type {
+    MonitoringStartSummary,
+    MonitoringStopSummary,
+    StatusUpdate,
+} from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 
@@ -73,13 +77,13 @@ interface MonitoringServiceContract {
         monitorId: string
     ) => Promise<StatusUpdate | undefined>;
     initialize: () => Promise<void>;
-    startMonitoring: () => Promise<void>;
+    startMonitoring: () => Promise<MonitoringStartSummary>;
     startMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
     ) => Promise<void>;
     startMonitoringForSite: (siteIdentifier: string) => Promise<void>;
-    stopMonitoring: () => Promise<void>;
+    stopMonitoring: () => Promise<MonitoringStopSummary>;
     stopMonitoringForMonitor: (
         siteIdentifier: string,
         monitorId: string
@@ -124,34 +128,43 @@ export const MonitoringService: MonitoringServiceContract = {
     /**
      * Starts monitoring across all configured sites.
      *
+     * @returns A cloned {@link MonitoringStartSummary} describing the result of
+     *   the global start request.
+     *
      * @throws Error when the backend declines to start global monitoring.
      */
-    startMonitoring: wrap("startMonitoring", async (api): Promise<void> => {
-        const summary = await api.monitoring.startMonitoring();
+    startMonitoring: wrap(
+        "startMonitoring",
+        async (api): Promise<MonitoringStartSummary> => {
+            const summary = await api.monitoring.startMonitoring();
 
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitoringService] Global monitoring start completed with partial failures",
-                summary
-            );
+            if (summary.partialFailures) {
+                logger.warn(
+                    "[MonitoringService] Global monitoring start completed with partial failures",
+                    summary
+                );
+            }
+
+            if (!summary.isMonitoring) {
+                const message =
+                    summary.attempted === 0
+                        ? "No eligible monitors were available to start. Configure at least one monitor and try again."
+                        : `Failed to start monitoring across all sites: ${summary.succeeded}/${summary.attempted} monitors activated.`;
+
+                logger.error(
+                    "[MonitoringService] Global monitoring start failed",
+                    summary
+                );
+
+                const error = new Error(message);
+                (error as Error & { summary?: typeof summary }).summary =
+                    summary;
+                throw error;
+            }
+
+            return { ...summary };
         }
-
-        if (!summary.isMonitoring) {
-            const message =
-                summary.attempted === 0
-                    ? "No eligible monitors were available to start. Configure at least one monitor and try again."
-                    : `Failed to start monitoring across all sites: ${summary.succeeded}/${summary.attempted} monitors activated.`;
-
-            logger.error(
-                "[MonitoringService] Global monitoring start failed",
-                summary
-            );
-
-            const error = new Error(message);
-            (error as Error & { summary?: typeof summary }).summary = summary;
-            throw error;
-        }
-    }),
+    ),
     /**
      * Starts monitoring for a single monitor within a site.
      *
@@ -203,34 +216,43 @@ export const MonitoringService: MonitoringServiceContract = {
     /**
      * Stops monitoring across all configured sites.
      *
+     * @returns A cloned {@link MonitoringStopSummary} describing the outcome of
+     *   the global stop request.
+     *
      * @throws Error when the backend declines to stop global monitoring.
      */
-    stopMonitoring: wrap("stopMonitoring", async (api): Promise<void> => {
-        const summary = await api.monitoring.stopMonitoring();
+    stopMonitoring: wrap(
+        "stopMonitoring",
+        async (api): Promise<MonitoringStopSummary> => {
+            const summary = await api.monitoring.stopMonitoring();
 
-        if (summary.partialFailures) {
-            logger.warn(
-                "[MonitoringService] Global monitoring stop completed with partial failures",
-                summary
-            );
+            if (summary.partialFailures) {
+                logger.warn(
+                    "[MonitoringService] Global monitoring stop completed with partial failures",
+                    summary
+                );
+            }
+
+            if (summary.isMonitoring) {
+                const message =
+                    summary.attempted === 0
+                        ? "Monitoring remained active because no running monitors were located."
+                        : `Failed to stop monitoring across all sites: ${summary.failed}/${summary.attempted} monitors remained active.`;
+
+                logger.error(
+                    "[MonitoringService] Global monitoring stop failed",
+                    summary
+                );
+
+                const error = new Error(message);
+                (error as Error & { summary?: typeof summary }).summary =
+                    summary;
+                throw error;
+            }
+
+            return { ...summary };
         }
-
-        if (summary.isMonitoring) {
-            const message =
-                summary.attempted === 0
-                    ? "Monitoring remained active because no running monitors were located."
-                    : `Failed to stop monitoring across all sites: ${summary.failed}/${summary.attempted} monitors remained active.`;
-
-            logger.error(
-                "[MonitoringService] Global monitoring stop failed",
-                summary
-            );
-
-            const error = new Error(message);
-            (error as Error & { summary?: typeof summary }).summary = summary;
-            throw error;
-        }
-    }),
+    ),
     /**
      * Stops monitoring for a specific monitor within a site.
      *

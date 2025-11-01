@@ -837,3 +837,4 @@ dist-playwright/
 storybook-static
 TODO.md
 temp/
+codeql-agent-results/

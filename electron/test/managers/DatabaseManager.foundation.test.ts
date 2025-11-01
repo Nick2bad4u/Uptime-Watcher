@@ -282,6 +282,13 @@ describe("DatabaseManager Foundation Tests", () => {
                     operation: "data-imported",
                 })
             );
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:database:update-sites-cache-requested",
+                expect.objectContaining({
+                    operation: "update-sites-cache-requested",
+                    sites: expect.any(Array),
+                })
+            );
         });
 
         it("should initialize successfully", async ({ task, annotate }) => {

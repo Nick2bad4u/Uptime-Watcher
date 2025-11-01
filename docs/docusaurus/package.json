@@ -1,6 +1,6 @@
 {
     "name": "docs-docusaurus",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "private": true,
     "description": "Documentation site for Uptime Watcher using Docusaurus",
     "keywords": [
@@ -21,9 +21,7 @@
     "license": "UnLicense",
     "author": "Nick2bad4u",
     "contributors": [],
-    "main": "",
-    "bin": {},
-    "man": "",
+    "main": "src/index.tsx",
     "directories": {},
     "files": [],
     "scripts": {

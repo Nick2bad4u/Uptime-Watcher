@@ -1,0 +1,312 @@
+{
+    "pages": [
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Introduce Uptime Watcher, explaining its purpose as an Electron-based desktop application for monitoring websites, APIs, servers, and network services. Provide high-level context about the application's capabilities and architecture.",
+            "title": "Overview"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Overview",
+            "purpose": "Detail the 14 monitor types supported by the application (HTTP, DNS, SSL, Port, Ping, CDN, Replication, etc.) and explain the core features like real-time monitoring, status tracking, and alerting capabilities.",
+            "title": "Key Features & Monitor Types"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Overview",
+            "purpose": "Document the key technologies used: Electron 38, React 19, TypeScript, Zustand for state management, Vite for building, Vitest for testing, and SQLite for persistence. Include major dependencies and their versions.",
+            "title": "Technology Stack"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Provide comprehensive architectural overview showing how the Electron multi-process model, React frontend, backend services, and monitoring engine interact to form a cohesive desktop application.",
+            "title": "Architecture"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Architecture",
+            "purpose": "Present the high-level system architecture including the separation between renderer and main processes, the role of the preload script, and the overall data flow through the application.",
+            "title": "System Architecture Overview"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Architecture",
+            "purpose": "Explain Electron's multi-process model as implemented in Uptime Watcher: main process (backend services), renderer process (React UI), preload script (secure IPC bridge), and how they communicate.",
+            "title": "Process Architecture"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Architecture",
+            "purpose": "Document key interaction flows: site provisioning, monitor execution lifecycle, status update propagation, and event-driven UI updates. Include sequence diagrams showing request-response and event patterns.",
+            "title": "Component Interaction Flows"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Introduce the backend architecture running in Electron's main process, including service orchestration, monitoring engine, database layer, and event system.",
+            "title": "Backend Systems"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Document the SiteManager, MonitorManager, DatabaseManager, and ConfigurationManager - their responsibilities, interfaces, and how they coordinate through the UptimeOrchestrator.",
+            "title": "Core Service Managers"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Explain the ServiceContainer's dependency injection pattern, the UptimeOrchestrator's coordination role, and the ApplicationService's lifecycle management.",
+            "title": "Service Container & Orchestration"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Detail the IPC architecture: IpcService handler registration, preload script's context bridge exposure, domain-based API structure, and error handling patterns.",
+            "title": "IPC Communication Layer"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Explain the monitoring execution pipeline: MonitorScheduler (interval management), EnhancedMonitorChecker (execution engine), MonitorOperationRegistry (correlation tracking), and OperationTimeoutManager (abort signal control).",
+            "title": "Monitoring Engine"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Document the MonitorTypeRegistry, the IMonitorService interface, and detailed specifications for all 14 monitor types including their configuration fields, validation rules, and check logic.",
+            "title": "Monitor Type System"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Explain the repository pattern implementation: SiteRepository, MonitorRepository, HistoryRepository, SettingsRepository, DatabaseService (SQLite wrapper), transaction management, and StandardizedCache.",
+            "title": "Database Layer"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Backend Systems",
+            "purpose": "Document the TypedEventBus, event types (site:added, monitor:status-changed, etc.), RendererEventBridge for cross-process events, and event-driven architecture patterns.",
+            "title": "Event System & Communication"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Introduce the React-based frontend architecture including state management, UI components, real-time updates, and theme system.",
+            "title": "Frontend Systems"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Document App.tsx structure, initialization flow, ErrorBoundary implementation, ThemeProvider setup, and application lifecycle management including cleanup and hot reload protection.",
+            "title": "Application Shell & Lifecycle"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Explain Zustand store architecture: useSitesStore, useUIStore, useSettingsStore, useErrorStore, useMonitorTypesStore. Cover store composition, service layer abstraction, persistence middleware, and error handling patterns.",
+            "title": "State Management Architecture"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Document the component hierarchy: Header, AppSidebar, Dashboard, SiteList, SiteCard, and reusable common components. Explain composition patterns and custom hooks.",
+            "title": "Core UI Components"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Detail the SiteDetails modal system with tabbed interface (Overview, Analytics, History, Settings), useSiteDetails hook, analytics calculations, and chart components.",
+            "title": "Site Details & Analytics"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Explain the theming system: ThemeProvider, dark/light mode support, CSS modules, PostCSS configuration, Tailwind integration, and theme-aware component patterns.",
+            "title": "Themed Component System"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Document the modal management system: AddSiteModal with dynamic form fields, Settings modal, SiteDetails modal, ConfirmDialog, escape key handling, and priority-based modal closure.",
+            "title": "Modal System & Interactions"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Frontend Systems",
+            "purpose": "Explain the StatusUpdateManager, incremental vs. full resync strategies, event subscription lifecycle, and how monitor status changes propagate to the UI in real-time.",
+            "title": "Real-Time Updates & Event Subscriptions"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Cover the shared type system, validation strategies, database schema, and data transformation patterns used across frontend and backend.",
+            "title": "Data Management"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Data Management",
+            "purpose": "Document the TypeScript types shared between main and renderer processes: Site, Monitor, MonitorType, StatusUpdate, IpcResponse, and how they ensure type safety across the IPC boundary.",
+            "title": "Shared Type System"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Data Management",
+            "purpose": "Explain the layered validation strategy: Zod schemas at the IPC boundary, manager-level business logic validation, repository-level database constraint validation, and monitor-type-specific validation.",
+            "title": "Validation & Schemas"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Data Management",
+            "purpose": "Document the repository implementations: table schemas, CRUD operations, transaction adapters, internal methods for coordinated operations, and error handling patterns.",
+            "title": "Database Repositories"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Data Management",
+            "purpose": "Explain data transformation between database rows and domain objects, StandardizedCache implementation, data import/export via DatabaseCommandExecutor, and backup/restore functionality.",
+            "title": "Data Mapping & Persistence"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "purpose": "Document the build system, testing infrastructure, documentation generation, CI/CD pipelines, and code quality enforcement mechanisms.",
+            "title": "Development Infrastructure"
+        },
+        {
+            "page_notes": [
+                {
+                    "content": ""
+                }
+            ],
+            "parent": "Development Infrastructure",
+            "purpose": "Detail the build system: Vite configuration, TypeScript project references (6 tsconfig files), electron-builder multi-platform setup, PostCSS processing, and development server configuration including hot reload protection.",
+            "title": "Build Configuration & Tools"
+        }
+    ],
+    "repo_notes": [
+        {
+            "content": ""
+        },
+        {
+            "content": "Uptime Watcher pairs an Electron main process (ServiceContainer, UptimeOrchestrator, monitoring services) with a React renderer that consumes real-time status updates through the preload IPC bridge. The wiki should emphasize how these processes stay synchronized via shared TypeScript contracts and event propagation."
+        },
+        {
+            "content": "Please surface the most important directories: electron/ for orchestration, monitoring, IPC, and database layers; src/ for React components, Zustand stores, theming, and UI flows; shared/ for domain types and validation; scripts/ and config/ for tooling; docs/ for existing architecture guides and diagrams."
+        },
+        {
+            "content": "Call out the monitoring engine (MonitorScheduler, EnhancedMonitorChecker, MonitorTypeRegistry), the 14 built-in monitor types, SQLite persistence with transaction adapters, real-time state synchronization, and the testing/quality toolchain (Vitest, Fast-Check, Playwright, linting, GitHub Actions)."
+        }
+    ]
+}

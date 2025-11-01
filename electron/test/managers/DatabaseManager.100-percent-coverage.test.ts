@@ -568,6 +568,12 @@ describe("DatabaseManager - 100% Coverage", () => {
             // Assert
             expect(result).toBeTruthy();
             expect(mockCommandExecutor.execute).toHaveBeenCalled();
+            expect(mockEventEmitter.emitTyped).toHaveBeenCalledWith(
+                "internal:database:update-sites-cache-requested",
+                expect.objectContaining({
+                    operation: "update-sites-cache-requested",
+                })
+            );
         });
 
         it("should handle import errors and emit failure event", async ({

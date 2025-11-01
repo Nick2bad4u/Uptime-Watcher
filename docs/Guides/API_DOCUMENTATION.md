@@ -1,6 +1,6 @@
 # 📡 API & IPC Documentation
 
-> __Interface Reference__: Comprehensive guide to IPC communication, events, and API patterns in Uptime Watcher.
+> **Interface Reference**: Comprehensive guide to IPC communication, events, and API patterns in Uptime Watcher.
 
 ## 📋 Overview
 
@@ -19,11 +19,16 @@ import { StateSyncService } from "src/services/StateSyncService";
 
 const sites = await SiteService.getSites();
 const createdSite = await SiteService.addSite(siteData);
-await MonitoringService.startMonitoring();
+const startSummary = await MonitoringService.startMonitoring();
+if (startSummary.isMonitoring) {
+ console.info(
+  `Activated ${startSummary.succeeded}/${startSummary.attempted} monitors`
+ );
+}
 const syncResult = await StateSyncService.requestFullSync();
 ```
 
-> ℹ️ __Low-level bridge__: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
+> ℹ️ **Low-level bridge**: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
 
 ### Domain-Based API Organization
 
@@ -178,22 +183,51 @@ if (result) {
 }
 ```
 
-#### `startMonitoring(): Promise<boolean>`
+#### `startMonitoring(): Promise<MonitoringStartSummary>`
 
-Starts monitoring for every configured site. Resolves to `true` when the
-backend accepts the request and emits `monitoring:started`.
+Starts monitoring for every configured site. Resolves to a
+`MonitoringStartSummary` describing how many monitors were attempted, how many
+succeeded, and whether any partial failures occurred. The summary is also
+attached to the `monitoring:started` renderer event.
 
 ```typescript
-const started = await MonitoringService.startMonitoring();
+const summary = await MonitoringService.startMonitoring();
+
+if (!summary.isMonitoring) {
+ throw new Error(
+  `Monitoring failed: ${summary.failed}/${summary.attempted} monitors could not be activated.`
+ );
+}
+
+if (summary.partialFailures) {
+ console.warn(
+  `${summary.failed} monitors failed to start; check backend diagnostics for details.`
+ );
+}
 ```
 
-#### `stopMonitoring(): Promise<boolean>`
+#### `stopMonitoring(): Promise<MonitoringStopSummary>`
 
-Stops all active monitors. Resolves to `true` when monitoring halts and
-emits `monitoring:stopped`.
+Stops all active monitors. Resolves to a `MonitoringStopSummary` detailing how
+many monitors were stopped, which ones (if any) remained active, and whether
+the system was already inactive. The summary is mirrored to the
+`monitoring:stopped` renderer event.
 
 ```typescript
-const stopped = await MonitoringService.stopMonitoring();
+const summary = await MonitoringService.stopMonitoring();
+
+if (summary.isMonitoring) {
+ console.warn(
+  `${summary.failed} monitors remained active after stop request. ` +
+   "Investigate backend logs for stuck monitors."
+ );
+}
+
+if (summary.partialFailures) {
+ console.warn(
+  `${summary.failed} monitors still running out of ${summary.attempted}.`
+ );
+}
 ```
 
 #### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
@@ -386,7 +420,7 @@ const cleanup = await StateSyncService.onStateSyncEvent((event) => {
 Opens HTTP(S) URLs in the user's default external browser. The call resolves
 to `true` when Electron successfully delegates the navigation request.
 
-> __Recommendation:__ Access this capability through the renderer
+> **Recommendation:** Access this capability through the renderer
 > `SystemService` (`@app/services/SystemService`) rather than using the raw
 > preload bridge. The service enforces URL validation, logging, and consistent
 > error reporting.
@@ -425,19 +459,21 @@ The application uses a sophisticated event system for real-time communication:
 
 ### Event Listener Registration
 
-Realtime listeners exposed via `window.electronAPI.events` focus on monitoring, cache invalidation, update status, and diagnostic test events:
+Realtime listeners exposed via the renderer `EventsService` focus on monitoring, cache invalidation, update status, and diagnostic test events. These helpers wrap the underlying `window.electronAPI.events` bridge and ensure consistent cleanup semantics:
 
 ```typescript
+import { EventsService } from "../services/EventsService";
+
 const cleanupFunctions: Array<() => void> = [];
 
 cleanupFunctions.push(
- await window.electronAPI.events.onCacheInvalidated((data) => {
+ await EventsService.onCacheInvalidated((data) => {
   console.log(`Cache invalidated: ${data.type} → ${data.reason}`);
  })
 );
 
 cleanupFunctions.push(
- await window.electronAPI.events.onMonitorStatusChanged((update) => {
+ await EventsService.onMonitorStatusChanged((update) => {
   sitesStore.updateMonitorStatus(update.monitorId, update.status);
  })
 );
@@ -445,13 +481,13 @@ cleanupFunctions.push(
 // `update` adheres to the shared StatusUpdate contract (see shared/types.ts)
 
 cleanupFunctions.push(
- await window.electronAPI.events.onMonitoringStarted((info) => {
+ await EventsService.onMonitoringStarted((info) => {
   console.log(`Monitoring resumed for ${info.monitorCount} monitors`);
  })
 );
 
 cleanupFunctions.push(
- await window.electronAPI.events.onUpdateStatus((event) => {
+ await EventsService.onUpdateStatus((event) => {
   console.log(`Updater status: ${event.status}`);
  })
 );
@@ -464,22 +500,22 @@ const cleanup = () => {
 };
 ```
 
-State synchronization events are delivered via the dedicated `stateSync` domain:
+State synchronization events are delivered via the dedicated `StateSyncService`:
 
 ```typescript
-const cleanupSync = await window.electronAPI.stateSync.onStateSyncEvent(
- (event) => {
-  switch (event.action) {
-   case "bulk-sync":
-    sitesStore.setSites(event.sites);
-    break;
-   case "update":
-   case "delete":
-    sitesStore.setSites(event.sites);
-    break;
-  }
+import { StateSyncService } from "../services/StateSyncService";
+
+const cleanupSync = await StateSyncService.onStateSyncEvent((event) => {
+ switch (event.action) {
+  case "bulk-sync":
+   sitesStore.setSites(event.sites);
+   break;
+  case "update":
+  case "delete":
+   sitesStore.setSites(event.sites);
+   break;
  }
-);
+});
 
 // Later
 cleanup();
@@ -571,7 +607,7 @@ interface UptimeEvents {
 }
 ```
 
-> __Historical note:__ Prior to the bridge refactor, managers emitted
+> **Historical note:** Prior to the bridge refactor, managers emitted
 > `site:cache-miss` and `site:cache-updated`. These topics have been fully
 > removed from the public API—cache telemetry now flows exclusively through the
 > internal equivalents (`internal:site:cache-miss` /
@@ -642,6 +678,7 @@ await eventBus.emitTyped("site:added", {
 ### React Component Integration
 
 ```typescript
+import { SiteService } from "../services/SiteService";
 import { useSitesStore } from "../stores/useSitesStore";
 
 function SiteManager() {
@@ -665,7 +702,7 @@ function SiteManager() {
       addSite(optimisticSite);
 
       // Call backend
-      const newSite = await window.electronAPI.sites.addSite(siteData);
+      const newSite = await SiteService.addSite(siteData);
 
       // Replace optimistic entry with real data
       updateSite("temp-identifier", newSite);
@@ -695,6 +732,9 @@ function SiteManager() {
 ### Store Integration with Event Listeners
 
 ````typescript
+import { SiteService } from "../services/SiteService";
+import { StateSyncService } from "../services/StateSyncService";
+
 // Zustand store with comprehensive IPC and event integration
 export const useSitesStore = create<SitesStore>()((set, get) => ({
  sites: [],
@@ -712,7 +752,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
  fetchSites: async () => {
   set({ isLoading: true });
   try {
-  const sites = await window.electronAPI.sites.getSites();
+  const sites = await SiteService.getSites();
    set({ sites, lastSyncTime: Date.now() });
   } catch (error) {
    console.error("Failed to fetch sites:", error);
@@ -722,14 +762,14 @@ export const useSitesStore = create<SitesStore>()((set, get) => ({
  },
 
  createSite: async (siteData: SiteCreationData) => {
-  const newSite = await window.electronAPI.sites.addSite(siteData);
+  const newSite = await SiteService.addSite(siteData);
   // Don't manually add - event listener will handle it
   return newSite;
  },
 
  // Event-driven sync (called by event listeners)
  syncFromBackend: async () => {
-  const { sites } = await window.electronAPI.stateSync.requestFullSync();
+  const { sites } = await StateSyncService.requestFullSync();
   set({ sites, lastSyncTime: Date.now() });
  },
 }));
@@ -742,7 +782,7 @@ export const useSiteEventListeners = () => {
   let disposed = false;
 
   const setup = async () => {
-   const cleanup = await window.electronAPI.stateSync.onStateSyncEvent(
+   const cleanup = await StateSyncService.onStateSyncEvent(
     (event) => {
      if (disposed) {
       return;
@@ -833,6 +873,8 @@ export const useSiteEventListeners = () => {
 ### Custom Hooks for IPC Operations
 
 ```typescript
+import { SiteService } from "../services/SiteService";
+
 // Custom hook for site operations with loading states
 export const useSiteOperations = () => {
  const [isLoading, setIsLoading] = useState(false);
@@ -843,7 +885,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-   const newSite = await window.electronAPI.sites.addSite(siteData);
+   const newSite = await SiteService.addSite(siteData);
    return newSite;
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -859,7 +901,7 @@ export const useSiteOperations = () => {
   setError(null);
 
   try {
-   await window.electronAPI.sites.removeSite(siteIdentifier);
+   await SiteService.removeSite(siteIdentifier);
   } catch (err) {
    const errorMessage = err instanceof Error ? err.message : "Unknown error";
    setError(errorMessage);
@@ -989,8 +1031,10 @@ All configuration interfaces also inherit scheduling, retry, and timeout control
 All IPC calls include consistent error handling:
 
 ```typescript
+import { SiteService } from "../services/SiteService";
+
 try {
- const site = await window.electronAPI.sites.addSite(siteData);
+ const site = await SiteService.addSite(siteData);
 } catch (error) {
  // Error includes:
  // - message: Human-readable error message
@@ -1002,12 +1046,12 @@ try {
 
 ### Common Error Codes
 
-* `VALIDATION_ERROR`: Invalid input data
-* `NOT_FOUND`: Resource doesn't exist
-* `ALREADY_EXISTS`: Duplicate resource
-* `DATABASE_ERROR`: Database operation failed
-* `NETWORK_ERROR`: Network request failed
-* `PERMISSION_DENIED`: Insufficient permissions
+- `VALIDATION_ERROR`: Invalid input data
+- `NOT_FOUND`: Resource doesn't exist
+- `ALREADY_EXISTS`: Duplicate resource
+- `DATABASE_ERROR`: Database operation failed
+- `NETWORK_ERROR`: Network request failed
+- `PERMISSION_DENIED`: Insufficient permissions
 
 ## 🔒 Security
 
@@ -1090,9 +1134,11 @@ const electronAPI = {
 
 ```typescript
 // src/components/FeatureComponent.tsx
-const newFeature = await window.electronAPI.feature.create(featureData);
+import { FeatureService } from "../services/FeatureService";
+
+const newFeature = await FeatureService.create(featureData);
 ```
 
-***
+---
 
-💡 __Best Practices__: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).
+💡 **Best Practices**: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).

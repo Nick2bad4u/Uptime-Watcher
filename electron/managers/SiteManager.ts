@@ -51,6 +51,7 @@
 
 import type { Site } from "@shared/types";
 import type { StateSyncAction, StateSyncSource } from "@shared/types/stateSync";
+import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 
 import { CACHE_CONFIG } from "@shared/constants/cacheConfig";
 import { SITE_ADDED_SOURCE, type SiteAddedSource } from "@shared/types/events";
@@ -60,11 +61,10 @@ import {
     interpolateLogTemplate,
     LOG_TEMPLATES,
 } from "@shared/utils/logTemplates";
-import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
 import {
-    type DuplicateSiteIdentifier,
-    sanitizeSitesByIdentifier,
-} from "@shared/validation/siteIntegrity";
+    deriveSiteSnapshot,
+    prepareSiteSyncSnapshot,
+} from "@shared/utils/siteSnapshots";
 
 import type { UptimeEvents } from "../events/eventTypes";
 import type { TypedEventBus } from "../events/TypedEventBus";
@@ -257,8 +257,12 @@ export class SiteManager {
         timestamp?: number;
     }): Promise<Site[]> {
         const candidateSites = sites ?? this.getSitesSnapshot();
-        const { duplicates, sanitizedSites } =
-            sanitizeSitesByIdentifier(candidateSites);
+        const { delta, duplicates, emissionSnapshot } = prepareSiteSyncSnapshot(
+            {
+                previousSnapshot: this.lastStateSyncSnapshot,
+                sites: candidateSites,
+            }
+        );
 
         if (duplicates.length > 0) {
             logger.error(
@@ -272,13 +276,6 @@ export class SiteManager {
             );
         }
 
-        const emissionSnapshot = sanitizedSites.map((site) =>
-            structuredClone(site)
-        );
-        const delta = calculateSiteSyncDelta(
-            this.lastStateSyncSnapshot,
-            emissionSnapshot
-        );
         const effectiveTimestamp = timestamp ?? Date.now();
 
         await this.eventEmitter.emitTyped("sites:state-synchronized", {
@@ -829,23 +826,23 @@ export class SiteManager {
         context?: string,
         options?: UpdateSitesCacheOptions
     ): Promise<void> {
-        const { duplicates, sanitizedSites } = sanitizeSitesByIdentifier(sites);
+        const snapshot = deriveSiteSnapshot(sites);
 
-        if (duplicates.length > 0) {
+        if (snapshot.duplicates.length > 0) {
             logger.error(
                 "[SiteManager] Duplicate site identifiers detected while updating cache",
                 {
                     context: context ?? "SiteManager.updateSitesCache",
-                    droppedIdentifiers: duplicates.map(
+                    droppedIdentifiers: snapshot.duplicates.map(
                         (entry: DuplicateSiteIdentifier) => entry.identifier
                     ),
-                    duplicates,
+                    duplicates: snapshot.duplicates,
                 }
             );
         }
 
         this.sitesCache.replaceAll(
-            sanitizedSites.map((site: Site) => ({
+            snapshot.sanitizedSites.map((site: Site) => ({
                 data: site,
                 key: site.identifier,
             }))
@@ -859,21 +856,18 @@ export class SiteManager {
         });
 
         if (options?.emitSyncEvent) {
-            const syncSourceSites = options.sites ?? sanitizedSites;
-            const {
-                duplicates: syncDuplicates,
-                sanitizedSites: sanitizedSyncSites,
-            } = sanitizeSitesByIdentifier(syncSourceSites);
+            const syncSourceSites = options.sites ?? snapshot.sanitizedSites;
+            const syncSnapshot = deriveSiteSnapshot(syncSourceSites);
 
-            if (syncDuplicates.length > 0) {
+            if (syncSnapshot.duplicates.length > 0) {
                 logger.error(
                     "[SiteManager] Duplicate site identifiers detected in synchronization payload",
                     {
                         context: context ?? "SiteManager.updateSitesCache",
-                        droppedIdentifiers: syncDuplicates.map(
+                        droppedIdentifiers: syncSnapshot.duplicates.map(
                             (entry: DuplicateSiteIdentifier) => entry.identifier
                         ),
-                        duplicates: syncDuplicates,
+                        duplicates: syncSnapshot.duplicates,
                     }
                 );
             }
@@ -887,7 +881,7 @@ export class SiteManager {
             } = {
                 action: options.action ?? STATE_SYNC_ACTION.BULK_SYNC,
                 siteIdentifier: options.siteIdentifier ?? "all",
-                sites: sanitizedSyncSites,
+                sites: syncSnapshot.sanitizedSites,
                 source: options.source ?? STATE_SYNC_SOURCE.CACHE,
             };
 

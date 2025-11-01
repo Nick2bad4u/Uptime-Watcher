@@ -892,7 +892,25 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      */
     public async importData(data: string): Promise<boolean> {
         return this.runWithContext(
-            () => this.databaseManager.importData(data),
+            async () => {
+                const importSucceeded =
+                    await this.databaseManager.importData(data);
+
+                if (!importSucceeded) {
+                    return false;
+                }
+
+                const refreshedSites = await this.siteManager.getSites();
+
+                await this.emitSitesStateSynchronized({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    siteIdentifier: "all",
+                    sites: refreshedSites,
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                });
+
+                return true;
+            },
             {
                 code: "ORCHESTRATOR_IMPORT_DATA_FAILED",
                 details: { payloadSize: data.length },

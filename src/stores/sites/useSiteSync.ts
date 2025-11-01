@@ -23,8 +23,11 @@ import type {
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
-import { calculateSiteSyncDelta } from "@shared/utils/siteSyncDelta";
-import { sanitizeSitesByIdentifier } from "@shared/validation/siteIntegrity";
+import {
+    deriveSiteSnapshot,
+    hasSiteSyncChanges,
+    prepareSiteSyncSnapshot,
+} from "@shared/utils/siteSnapshots";
 
 import type {
     StatusUpdateSubscriptionSummary,
@@ -543,43 +546,45 @@ export const createSiteSyncActions = (
                     return;
                 }
 
-                const { duplicates, sanitizedSites } =
-                    sanitizeSitesByIdentifier(event.sites);
-                if (duplicates.length > 0) {
-                    logger.error(
-                        "Duplicate site identifiers detected in state sync event",
-                        {
-                            action: event.action,
-                            duplicates,
-                            originalSiteCount: event.sites.length,
-                            sanitizedSiteCount: sanitizedSites.length,
-                            source: event.source,
-                        }
-                    );
-                }
-
                 if (
                     event.action === STATE_SYNC_ACTION.BULK_SYNC ||
                     event.action === STATE_SYNC_ACTION.DELETE ||
                     event.action === STATE_SYNC_ACTION.UPDATE
                 ) {
-                    const previousSites = deps.getSites();
-                    const delta =
-                        event.delta ??
-                        calculateSiteSyncDelta(previousSites, sanitizedSites);
+                    const snapshot = prepareSiteSyncSnapshot({
+                        previousSnapshot: deps.getSites(),
+                        sites: event.sites,
+                    });
+
+                    if (snapshot.duplicates.length > 0) {
+                        logger.error(
+                            "Duplicate site identifiers detected in state sync event",
+                            {
+                                action: event.action,
+                                duplicates: snapshot.duplicates,
+                                originalSiteCount: event.sites.length,
+                                sanitizedSiteCount:
+                                    snapshot.emissionSnapshot.length,
+                                source: event.source,
+                            }
+                        );
+                    }
+
+                    const effectiveDelta = event.delta ?? snapshot.delta;
                     const hasChanges =
-                        delta.addedSites.length > 0 ||
-                        delta.removedSiteIdentifiers.length > 0 ||
-                        delta.updatedSites.length > 0;
+                        event.delta === undefined
+                            ? hasSiteSyncChanges(snapshot.delta)
+                            : hasSiteSyncChanges(event.delta);
 
                     logStoreAction("SitesStore", "applySyncDelta", {
                         action: event.action,
-                        addedCount: delta.addedSites.length,
-                        removedCount: delta.removedSiteIdentifiers.length,
-                        sanitizedSiteCount: sanitizedSites.length,
+                        addedCount: effectiveDelta.addedSites.length,
+                        removedCount:
+                            effectiveDelta.removedSiteIdentifiers.length,
+                        sanitizedSiteCount: snapshot.emissionSnapshot.length,
                         source: event.source,
                         timestamp: event.timestamp,
-                        updatedCount: delta.updatedSites.length,
+                        updatedCount: effectiveDelta.updatedSites.length,
                     });
 
                     if (!hasChanges) {
@@ -592,12 +597,12 @@ export const createSiteSyncActions = (
                                 timestamp: event.timestamp,
                             }
                         );
-                        deps.onSiteDelta?.(delta);
+                        deps.onSiteDelta?.(effectiveDelta);
                         return;
                     }
 
-                    deps.setSites(sanitizedSites);
-                    deps.onSiteDelta?.(delta);
+                    deps.setSites(snapshot.emissionSnapshot);
+                    deps.onSiteDelta?.(effectiveDelta);
                     return;
                 }
 
@@ -668,21 +673,21 @@ export const createSiteSyncActions = (
                             synchronized,
                         } = fullSyncResult;
 
-                        const { duplicates, sanitizedSites } =
-                            sanitizeSitesByIdentifier(sites);
-                        if (duplicates.length > 0) {
+                        const snapshot = deriveSiteSnapshot(sites);
+                        if (snapshot.duplicates.length > 0) {
                             logger.error(
                                 "Duplicate site identifiers detected in full sync response",
                                 {
-                                    duplicates,
+                                    duplicates: snapshot.duplicates,
                                     originalSiteCount: siteCount,
-                                    sanitizedSiteCount: sanitizedSites.length,
+                                    sanitizedSiteCount:
+                                        snapshot.sanitizedSites.length,
                                     source,
                                 }
                             );
                         }
 
-                        deps.setSites(sanitizedSites);
+                        deps.setSites(snapshot.sanitizedSites);
 
                         if (!synchronized) {
                             logger.warn(
@@ -690,7 +695,8 @@ export const createSiteSyncActions = (
                                 {
                                     completedAt,
                                     originalSitesCount: siteCount,
-                                    sanitizedSiteCount: sanitizedSites.length,
+                                    sanitizedSiteCount:
+                                        snapshot.sanitizedSites.length,
                                     source,
                                 }
                             );
@@ -702,7 +708,7 @@ export const createSiteSyncActions = (
                                 ? "Sites synchronized from backend"
                                 : "Backend full sync completed but reported unsynchronized state",
                             originalSitesCount: siteCount,
-                            sitesCount: sanitizedSites.length,
+                            sitesCount: snapshot.sanitizedSites.length,
                             source,
                             status: synchronized ? "success" : "failure",
                             success: synchronized,

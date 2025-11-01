@@ -40,31 +40,31 @@ tools:
 handoffs:
  - label: Consistency
    agent: BeastMode
-   prompt: Review and follow the plan in ./prompts/Consistency-Check.prompt.md
+   prompt: Review and follow the plan in .github/prompts/Consistency-Check.prompt.md
    send: false
  - label: Unit
    agent: BeastMode
-   prompt: Generate unit tests for the implemented features to achieve maximum coverage, follow the plan in ./prompts/Generate-100%-Test-Coverage.prompt.md
+   prompt: Generate unit tests for the implemented features to achieve maximum coverage, follow the plan in .github/prompts/Generate-100%-Test-Coverage.prompt.md
    send: false
  - label: E2E
    agent: BeastMode
-   prompt: Write Playwright tests for the implemented features, follow the plan in ./prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
+   prompt: Write Playwright tests for the implemented features, follow the plan in .github/prompts/Generate-100%-Playwright-Test-Coverage.prompt.md
    send: false
  - label: Fuzz
    agent: BeastMode
-   prompt: Write Fast-Check tests for the implemented features, follow the plan in ./prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
+   prompt: Write Fast-Check tests for the implemented features, follow the plan in .github/prompts/Generate-100%-Fast-Check-Test-Coverage.prompt.md
    send: false
  - label: TSDoc
    agent: BeastMode
-   prompt: Improve the TSDoc comments in the codebase, follow the plan in ./prompts/TSDoc-Improvements-Checklist.prompt.md
+   prompt: Improve the TSDoc comments in the codebase, follow the plan in .github/prompts/TSDoc-Improvements-Checklist.prompt.md
    send: false
- - label: Add to ToDo
+ - label: Add to ToDo and Finish ToDo
    agent: BeastMode
-   prompt: Add findings to the ToDo list (if any new findings) and complete any outstanding tasks on the todo list. Follow the plan in ./prompts/Do-ToDo.prompt.md
+   prompt: Add findings to the ToDo list (if any new findings) and complete any outstanding tasks on the todo list. Follow the plan in .github/prompts/Do-ToDo.prompt.md
    send: false
  - label: Review Work
    agent: BeastMode
-   prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in ./prompts/Review.prompt.md - If everything is complete, clear the todo list.
+   prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false
 target: github-copilot
 ---

@@ -258,13 +258,15 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
+            const summary = createStartSummary();
             mockElectronAPI.monitoring.startMonitoring.mockResolvedValueOnce(
-                createStartSummary()
+                summary
             );
 
-            await expect(
-                MonitoringService.startMonitoring()
-            ).resolves.toBeUndefined();
+            const result = await MonitoringService.startMonitoring();
+
+            expect(result).toEqual(summary);
+            expect(result).not.toBe(summary);
             expect(
                 mockElectronAPI.monitoring.startMonitoring
             ).toHaveBeenCalledTimes(1);
@@ -288,9 +290,18 @@ describe("MonitoringService", () => {
                 })
             );
 
-            await expect(MonitoringService.startMonitoring()).rejects.toThrow(
-                "Failed to start monitoring across all sites: 0/1 monitors activated."
-            );
+            await expect(
+                MonitoringService.startMonitoring()
+            ).rejects.toMatchObject({
+                message:
+                    "Failed to start monitoring across all sites: 0/1 monitors activated.",
+                summary: expect.objectContaining({
+                    attempted: 1,
+                    failed: 1,
+                    succeeded: 0,
+                    isMonitoring: false,
+                }),
+            });
         });
 
         it("should surface underlying errors", async ({ task, annotate }) => {
@@ -468,13 +479,15 @@ describe("MonitoringService", () => {
             await annotate("Category: Store", "category");
             await annotate("Type: Monitoring", "type");
 
+            const summary = createStopSummary();
             mockElectronAPI.monitoring.stopMonitoring.mockResolvedValueOnce(
-                createStopSummary()
+                summary
             );
 
-            await expect(
-                MonitoringService.stopMonitoring()
-            ).resolves.toBeUndefined();
+            const result = await MonitoringService.stopMonitoring();
+
+            expect(result).toEqual(summary);
+            expect(result).not.toBe(summary);
             expect(
                 mockElectronAPI.monitoring.stopMonitoring
             ).toHaveBeenCalledTimes(1);
@@ -498,9 +511,18 @@ describe("MonitoringService", () => {
                 })
             );
 
-            await expect(MonitoringService.stopMonitoring()).rejects.toThrow(
-                "Failed to stop monitoring across all sites: 2/2 monitors remained active."
-            );
+            await expect(
+                MonitoringService.stopMonitoring()
+            ).rejects.toMatchObject({
+                message:
+                    "Failed to stop monitoring across all sites: 2/2 monitors remained active.",
+                summary: expect.objectContaining({
+                    attempted: 2,
+                    failed: 2,
+                    succeeded: 0,
+                    isMonitoring: true,
+                }),
+            });
         });
 
         it("should surface underlying stop errors", async ({

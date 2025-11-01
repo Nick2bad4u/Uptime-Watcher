@@ -123,6 +123,7 @@ const mockSiteManager = {
             monitoring: true,
         } as Site,
     ]),
+    emitSitesStateSynchronized: vi.fn(() => Promise.resolve([])),
     updateSitesCache: vi.fn(() => Promise.resolve()),
     removeMonitor: vi.fn(() =>
         Promise.resolve({
@@ -998,6 +999,16 @@ describe(UptimeOrchestrator, () => {
             expect(mockDatabaseManager.importData).toHaveBeenCalledWith(
                 testData
             );
+            expect(mockSiteManager.getSites).toHaveBeenCalledTimes(1);
+            expect(
+                mockSiteManager.emitSitesStateSynchronized
+            ).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    action: STATE_SYNC_ACTION.BULK_SYNC,
+                    siteIdentifier: "all",
+                    source: STATE_SYNC_SOURCE.DATABASE,
+                })
+            );
             expect(result).toBeTruthy();
         });
 
@@ -1301,9 +1312,9 @@ describe(UptimeOrchestrator, () => {
 
             const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
             const forwardedSiteAddedEvents: (UptimeEvents["site:added"] & {
-                    _meta?: EventMetadata;
-                    _originalMeta?: EventMetadata;
-                })[] = [];
+                _meta?: EventMetadata;
+                _originalMeta?: EventMetadata;
+            })[] = [];
             orchestrator.onTyped("site:added", (payload) => {
                 forwardedSiteAddedEvents.push(payload);
             });
@@ -1805,9 +1816,9 @@ describe(UptimeOrchestrator, () => {
             const completionTimestamp = Date.now();
 
             const forwardedManualEvents: (UptimeEvents["monitor:check-completed"] & {
-                    _meta?: unknown;
-                    _originalMeta?: unknown;
-                })[] = [];
+                _meta?: unknown;
+                _originalMeta?: unknown;
+            })[] = [];
             orchestrator.onTyped("monitor:check-completed", (payload) => {
                 forwardedManualEvents.push(payload);
             });
@@ -1865,10 +1876,9 @@ describe(UptimeOrchestrator, () => {
                 })
             );
 
-            const forwardedPayload = emitTypedSpy.mock.calls
-                .findLast(
-                    ([eventName]) => eventName === "monitor:check-completed"
-                )?.[1] as Record<string, unknown> | undefined;
+            const forwardedPayload = emitTypedSpy.mock.calls.findLast(
+                ([eventName]) => eventName === "monitor:check-completed"
+            )?.[1] as Record<string, unknown> | undefined;
 
             expect(forwardedPayload).toBeDefined();
             expect(Object.hasOwn(forwardedPayload!, "_meta")).toBeTruthy();

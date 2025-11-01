@@ -294,6 +294,7 @@ export class DatabaseManager {
                         data
                     );
                     await this.commandExecutor.execute(command);
+                    await this.emitSitesCacheUpdateRequested();
                 },
                 { logger: monitorLogger, operationName: "import data" }
             );
