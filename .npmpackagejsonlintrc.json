@@ -1,7 +1,12 @@
 {
+    "$schema": "https://www.schemastore.org/npmpackagejsonlintrc.json",
+    "extends": "",
     "rules": {
         "bin-type": "error",
+        "bundledDependencies-type": "error",
         "config-type": "error",
+        "cpu-type": "error",
+        "dependencies-type": "error",
         "description-type": "error",
         "devDependencies-type": "error",
         "directories-type": "error",
@@ -14,6 +19,8 @@
         "man-type": "error",
         "name-format": "error",
         "name-type": "error",
+        "no-absolute-version-dependencies": "error",
+        "no-absolute-version-devDependencies": "error",
         "no-restricted-dependencies": [
             "error",
             [
@@ -38,18 +45,94 @@
                 "gulping-npm-package-json-lint"
             ]
         ],
+        "optionalDependencies-type": "error",
+        "os-type": "error",
+        "peerDependencies-type": "error",
+        "prefer-caret-version-dependencies": "error",
+        "prefer-caret-version-devDependencies": [
+            "error",
+            {
+                "exceptions": [
+                    "vitest-environment-browser"
+                ]
+            }
+        ],
+        "prefer-no-engineStrict": "error",
+        "prefer-property-order": [
+            "error",
+            [
+                "$schema",
+                "name",
+                "version",
+                "private",
+                "description",
+                "keywords",
+                "homepage",
+                "bugs",
+                "repository",
+                "license",
+                "author",
+                "maintainers",
+                "contributors",
+                "type",
+                "main",
+                "bin",
+                "man",
+                "directories",
+                "files",
+                "scripts",
+                "config",
+                "eslintConfig",
+                "overrides",
+                "dependencies",
+                "devDependencies",
+                "peerDependencies",
+                "optionalDependencies",
+                "bundledDependencies",
+                "bundleDependencies",
+                "packageManager",
+                "engines",
+                "os",
+                "cpu",
+                "preferGlobal",
+                "icon",
+                "appid",
+                "build",
+                "msw",
+                "readme"
+            ]
+        ],
         "preferGlobal-type": "error",
         "private-type": "error",
         "repository-type": "error",
         "require-author": "error",
+        "require-bin": "error",
         "require-bugs": "error",
+        "require-bundledDependencies": "error",
+        "require-config": "error",
+        "require-contributors": "error",
+        "require-cpu": "error",
+        "require-dependencies": "error",
         "require-description": "error",
+        "require-devDependencies": "error",
+        "require-directories": "error",
         "require-engines": "error",
+        "require-files": "error",
         "require-homepage": "error",
         "require-keywords": "error",
         "require-license": "error",
+        "require-main": "error",
+        "require-man": "error",
+        "require-module": "off",
         "require-name": "error",
+        "require-optionalDependencies": "error",
+        "require-os": "error",
+        "require-peerDependencies": "error",
+        "require-preferGlobal": "error",
+        "require-private": "error",
+        "require-publishConfig": "error",
         "require-repository": "error",
+        "require-scripts": "error",
         "require-version": "error",
         "scripts-type": "error",
         "valid-values-author": [
@@ -59,6 +142,14 @@
                 "Typpi",
                 "Nick",
                 "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://nick2bad4u.github.io/Uptime-Watcher/)"
+            ]
+        ],
+        "valid-values-license": [
+            "error",
+            [
+                "MIT",
+                "Unlicense",
+                "UnLicense"
             ]
         ],
         "valid-values-private": [

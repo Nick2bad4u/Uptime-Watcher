@@ -5,6 +5,10 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
+import {
     DatabaseManager,
     type DatabaseManagerDependencies,
 } from "../../managers/DatabaseManager";
@@ -50,7 +54,17 @@ vi.mock("../../utils/database/serviceFactory", () => {
 });
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn().mockResolvedValue(undefined),
+    setHistoryLimit: vi.fn(async (params: any) => {
+        if (params?.setHistoryLimit) {
+            const finalLimit = normalizeHistoryLimit(
+                params.limit,
+                params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+            );
+            await params.setHistoryLimit(finalLimit);
+        }
+
+        return undefined;
+    }),
     getHistoryLimit: vi.fn(() => Promise.resolve(100)),
 }));
 
@@ -75,9 +89,12 @@ describe("DatabaseManager - Coverage Tests", () => {
         );
         vi.mocked(historyLimitManager.setHistoryLimit).mockImplementation(
             async (params) => {
-                // Call the setHistoryLimit callback with the limit to simulate the real behavior
-                if (params.setHistoryLimit) {
-                    await params.setHistoryLimit(params.limit);
+                if (params?.setHistoryLimit) {
+                    const nextLimit = normalizeHistoryLimit(
+                        params.limit,
+                        params.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+                    );
+                    await params.setHistoryLimit(nextLimit);
                 }
             }
         );
@@ -206,11 +223,13 @@ describe("DatabaseManager - Coverage Tests", () => {
             expect(retrievedLimit).toBe(0); // Zero is allowed
         });
 
-        it("should handle negative history limit", async ({ annotate }) => {
+        it("should clamp negative history limits to zero", async ({
+            annotate,
+        }) => {
             await annotate("Component: DatabaseManager", "component");
-            await annotate("Test Type: Unit - Error Handling", "test-type");
+            await annotate("Test Type: Unit - Normalization", "test-type");
             await annotate(
-                "Operation: Negative History Limit Validation",
+                "Operation: Negative History Limit Normalization",
                 "operation"
             );
             await annotate("Priority: High - Input Validation", "priority");
@@ -219,17 +238,16 @@ describe("DatabaseManager - Coverage Tests", () => {
                 "complexity"
             );
             await annotate(
-                "Error Case: Negative values should be rejected",
-                "error-case"
+                "Scenario: Negative values should normalize to the unlimited sentinel",
+                "scenario"
             );
             await annotate(
-                "Purpose: Ensure negative history limits are rejected",
+                "Purpose: Ensure negative history limits are clamped to zero",
                 "purpose"
             );
 
-            await expect(
-                databaseManager.setHistoryLimit(-100)
-            ).rejects.toThrow();
+            await databaseManager.setHistoryLimit(-100);
+            expect(databaseManager.getHistoryLimit()).toBe(0);
         });
 
         it("should emit event when history limit is updated", async ({

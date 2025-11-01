@@ -13,10 +13,19 @@ import type { RendererEventPayloadMap } from "@shared/ipc/rendererEvents";
 import {
     MONITORING_CONTROL_REASON,
     type MonitoringControlEventData,
+    type CacheInvalidatedEventData,
+    type MonitorDownEventData,
+    type MonitorStatusChangedEventData,
+    type MonitorUpEventData,
+    type TestEventData,
+    type UpdateStatusEventData,
 } from "@shared/types/events";
+import { createMockFunction } from "../utils/mockFactories";
 
 type MonitoringStartedEventData = RendererEventPayloadMap["monitoring:started"];
 type MonitoringStoppedEventData = RendererEventPayloadMap["monitoring:stopped"];
+type MonitorCheckCompletedEventPayload =
+    RendererEventPayloadMap["monitor:check-completed"];
 type MonitoringEventHandler = (payload: MonitoringControlEventData) => void;
 
 import { EventsService } from "../../services/EventsService";
@@ -26,6 +35,23 @@ const MOCK_BRIDGE_ERROR_MESSAGE =
 
 // Mock the bridge readiness helper to control initialization behavior
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
+
+const buildEventCallbacks = () => ({
+    cacheInvalidated:
+        createMockFunction<(data: CacheInvalidatedEventData) => void>(),
+    monitorDown: createMockFunction<(data: MonitorDownEventData) => void>(),
+    monitorCheckCompleted:
+        createMockFunction<(data: MonitorCheckCompletedEventPayload) => void>(),
+    monitoringStarted:
+        createMockFunction<(data: MonitoringStartedEventData) => void>(),
+    monitoringStopped:
+        createMockFunction<(data: MonitoringStoppedEventData) => void>(),
+    monitorStatusChanged:
+        createMockFunction<(data: MonitorStatusChangedEventData) => void>(),
+    monitorUp: createMockFunction<(data: MonitorUpEventData) => void>(),
+    testEvent: createMockFunction<(data: TestEventData) => void>(),
+    updateStatus: createMockFunction<(data: UpdateStatusEventData) => void>(),
+});
 
 const MockElectronBridgeNotReadyError = vi.hoisted(
     () =>
@@ -769,28 +795,22 @@ describe("EventsService", () => {
 
     describe("Integration Testing", () => {
         it("should handle multiple simultaneous event registrations", async () => {
-            const callbacks = Array.from({ length: 9 }, () => vi.fn()) as [
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-                ReturnType<typeof vi.fn>,
-            ];
+            const callbacks = buildEventCallbacks();
 
             const cleanupFunctions = await Promise.all([
-                EventsService.onCacheInvalidated(callbacks[0]),
-                EventsService.onMonitorDown(callbacks[1]),
-                EventsService.onMonitorCheckCompleted(callbacks[2]),
-                EventsService.onMonitoringStarted(callbacks[3]),
-                EventsService.onMonitoringStopped(callbacks[4]),
-                EventsService.onMonitorStatusChanged(callbacks[5]),
-                EventsService.onMonitorUp(callbacks[6]),
-                EventsService.onTestEvent(callbacks[7]),
-                EventsService.onUpdateStatus(callbacks[8]),
+                EventsService.onCacheInvalidated(callbacks.cacheInvalidated),
+                EventsService.onMonitorDown(callbacks.monitorDown),
+                EventsService.onMonitorCheckCompleted(
+                    callbacks.monitorCheckCompleted
+                ),
+                EventsService.onMonitoringStarted(callbacks.monitoringStarted),
+                EventsService.onMonitoringStopped(callbacks.monitoringStopped),
+                EventsService.onMonitorStatusChanged(
+                    callbacks.monitorStatusChanged
+                ),
+                EventsService.onMonitorUp(callbacks.monitorUp),
+                EventsService.onTestEvent(callbacks.testEvent),
+                EventsService.onUpdateStatus(callbacks.updateStatus),
             ]);
 
             // All registrations should succeed
@@ -802,13 +822,13 @@ describe("EventsService", () => {
             // All electron API methods should have been called
             expect(
                 mockElectronAPI.events.onCacheInvalidated
-            ).toHaveBeenCalledWith(callbacks[0]);
+            ).toHaveBeenCalledWith(callbacks.cacheInvalidated);
             expect(mockElectronAPI.events.onMonitorDown).toHaveBeenCalledWith(
-                callbacks[1]
+                callbacks.monitorDown
             );
             expect(
                 mockElectronAPI.events.onMonitorCheckCompleted
-            ).toHaveBeenCalledWith(callbacks[2]);
+            ).toHaveBeenCalledWith(callbacks.monitorCheckCompleted);
             expect(
                 mockElectronAPI.events.onMonitoringStarted
             ).toHaveBeenCalledTimes(1);
@@ -817,15 +837,15 @@ describe("EventsService", () => {
             ).toHaveBeenCalledTimes(1);
             expect(
                 mockElectronAPI.events.onMonitorStatusChanged
-            ).toHaveBeenCalledWith(callbacks[5]);
+            ).toHaveBeenCalledWith(callbacks.monitorStatusChanged);
             expect(mockElectronAPI.events.onMonitorUp).toHaveBeenCalledWith(
-                callbacks[6]
+                callbacks.monitorUp
             );
             expect(mockElectronAPI.events.onTestEvent).toHaveBeenCalledWith(
-                callbacks[7]
+                callbacks.testEvent
             );
             expect(mockElectronAPI.events.onUpdateStatus).toHaveBeenCalledWith(
-                callbacks[8]
+                callbacks.updateStatus
             );
 
             const startedCall =
@@ -853,11 +873,15 @@ describe("EventsService", () => {
 
             const startedPayload = createMonitoringStartedEventPayload();
             monitoringStartedHandler(startedPayload);
-            expect(callbacks[3]).toHaveBeenCalledWith(startedPayload);
+            expect(callbacks.monitoringStarted).toHaveBeenCalledWith(
+                startedPayload
+            );
 
             const stoppedPayload = createMonitoringStoppedEventPayload();
             monitoringStoppedHandler(stoppedPayload);
-            expect(callbacks[4]).toHaveBeenCalledWith(stoppedPayload);
+            expect(callbacks.monitoringStopped).toHaveBeenCalledWith(
+                stoppedPayload
+            );
         });
 
         it("should handle repeated initialization calls gracefully", async () => {

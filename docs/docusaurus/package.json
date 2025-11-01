@@ -10,6 +10,7 @@
         "monitoring",
         "electron"
     ],
+    "homepage": "https://nick2bad4u.github.io/Uptime-Watcher/",
     "bugs": {
         "url": "https://github.com/Nick2bad4u/Uptime-Watcher/issues"
     },
@@ -18,8 +19,13 @@
         "url": "git+https://github.com/Nick2bad4u/Uptime-Watcher.git"
     },
     "license": "UnLicense",
-    "homepage": "https://nick2bad4u.github.io/Uptime-Watcher/",
     "author": "Nick2bad4u",
+    "contributors": [],
+    "main": "",
+    "bin": {},
+    "man": "",
+    "directories": {},
+    "files": [],
     "scripts": {
         "build": "npm run generate-docs && cd ../../ && npm run build:eslint-inspector && cd docs/docusaurus && docusaurus build",
         "build:fast": "cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
@@ -42,6 +48,7 @@
         "write-heading-ids": "docusaurus write-heading-ids",
         "write-translations": "docusaurus write-translations"
     },
+    "config": {},
     "browserslist": {
         "development": [
             "last 3 chrome version",
@@ -55,13 +62,13 @@
         ]
     },
     "dependencies": {
-        "@docusaurus/core": "3.9.2",
-        "@docusaurus/faster": "3.9.2",
-        "@docusaurus/plugin-content-docs": "3.9.2",
-        "@docusaurus/preset-classic": "3.9.2",
-        "@docusaurus/theme-live-codeblock": "3.9.2",
-        "@docusaurus/theme-mermaid": "3.9.2",
-        "@docusaurus/theme-search-algolia": "3.9.2",
+        "@docusaurus/core": "^3.9.2",
+        "@docusaurus/faster": "^3.9.2",
+        "@docusaurus/plugin-content-docs": "^3.9.2",
+        "@docusaurus/preset-classic": "^3.9.2",
+        "@docusaurus/theme-live-codeblock": "^3.9.2",
+        "@docusaurus/theme-mermaid": "^3.9.2",
+        "@docusaurus/theme-search-algolia": "^3.9.2",
         "@docusaurus/types": "^3.9.2",
         "@easyops-cn/docusaurus-search-local": "^0.52.1",
         "@grnet/docusaurus-glossary-view": "^2.0.0-rc.2",
@@ -84,9 +91,16 @@
         "typedoc": "^0.28.14",
         "typedoc-docusaurus-theme": "^1.4.2",
         "typedoc-plugin-markdown": "^4.9.0",
-        "typescript": "~5.9.3"
+        "typescript": "^5.9.3"
     },
+    "peerDependencies": {},
+    "optionalDependencies": {},
+    "bundledDependencies": [],
     "engines": {
         "node": ">=18.0"
-    }
+    },
+    "os": [],
+    "cpu": [],
+    "preferGlobal": false,
+    "publishConfig": {}
 }

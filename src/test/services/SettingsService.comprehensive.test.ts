@@ -12,6 +12,10 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 import { ensureError } from "@shared/utils/errorHandling";
 
 import { SettingsService } from "../../services/SettingsService";
@@ -197,8 +201,16 @@ describe("SettingsService", () => {
                 mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
+                mockLogger.warn.mockClear();
+
                 const result = await SettingsService.getHistoryLimit();
-                expect(result).toBe(limit);
+                const expected = normalizeHistoryLimit(
+                    limit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
+
+                expect(result).toBe(expected);
+                expect(mockLogger.warn).not.toHaveBeenCalled();
             }
 
             expect(
@@ -207,24 +219,47 @@ describe("SettingsService", () => {
         });
 
         it("should handle negative and unusual numeric values", async () => {
-            const unusualValues = [
-                -1,
-                -999,
-                Infinity,
-                -Infinity,
-                Number.NaN,
+            const defaultLimit = DEFAULT_HISTORY_LIMIT_RULES.defaultLimit;
+            const cases: {
+                readonly expected: number;
+                readonly expectWarn: boolean;
+                readonly value: number;
+            }[] = [
+                { value: -1, expected: 0, expectWarn: false },
+                { value: -999, expected: 0, expectWarn: false },
+                {
+                    value: Number.NEGATIVE_INFINITY,
+                    expected: defaultLimit,
+                    expectWarn: true,
+                },
+                {
+                    value: Number.POSITIVE_INFINITY,
+                    expected: defaultLimit,
+                    expectWarn: true,
+                },
+                { value: Number.NaN, expected: defaultLimit, expectWarn: true },
             ];
 
-            for (const value of unusualValues) {
+            for (const { expected, expectWarn, value } of cases) {
+                mockLogger.warn.mockClear();
                 mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     value
                 );
+
                 const result = await SettingsService.getHistoryLimit();
 
-                if (Number.isNaN(value)) {
-                    expect(Number.isNaN(result)).toBeTruthy();
+                expect(result).toBe(expected);
+
+                if (expectWarn) {
+                    expect(mockLogger.warn).toHaveBeenCalledWith(
+                        "Received invalid history limit from backend; defaulting to shared rule",
+                        expect.objectContaining({
+                            error: expect.any(String),
+                            receivedValue: value,
+                        })
+                    );
                 } else {
-                    expect(result).toBe(value);
+                    expect(mockLogger.warn).not.toHaveBeenCalled();
                 }
             }
         });
@@ -337,11 +372,15 @@ describe("SettingsService", () => {
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
+                const expectedLimit = normalizeHistoryLimit(
+                    limit,
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
-                expect(result).toBe(limit);
+                expect(result).toBe(expectedLimit);
             }
 
             expect(
@@ -350,23 +389,49 @@ describe("SettingsService", () => {
         });
 
         it("should handle edge case limit values", async () => {
-            const edgeCases = [
+            const resolvableEdgeCases = [
                 -1,
                 0,
                 999_999,
-                Infinity,
-                -Infinity,
             ];
-
-            for (const limit of edgeCases) {
+            for (const limit of resolvableEdgeCases) {
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
+                );
+                const expectedLimit = normalizeHistoryLimit(
+                    limit,
+                    DEFAULT_HISTORY_LIMIT_RULES
                 );
                 const result = await SettingsService.updateHistoryLimit(limit);
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
-                expect(result).toBe(limit);
+                expect(result).toBe(expectedLimit);
+            }
+
+            const rejectingEdgeCases = [
+                Number.POSITIVE_INFINITY,
+                Number.NEGATIVE_INFINITY,
+            ];
+
+            for (const limit of rejectingEdgeCases) {
+                mockLogger.warn.mockClear();
+                mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
+                    limit
+                );
+
+                await expect(
+                    SettingsService.updateHistoryLimit(limit)
+                ).rejects.toThrow(RangeError);
+
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    "Received invalid history limit from backend; falling back to requested value",
+                    expect.objectContaining({
+                        error: expect.any(String),
+                        receivedValue: limit,
+                        requestedLimit: limit,
+                    })
+                );
             }
         });
 
@@ -386,7 +451,11 @@ describe("SettingsService", () => {
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
-                expect(result).toBe(Math.floor(limit));
+                const expectedLimit = normalizeHistoryLimit(
+                    Math.floor(limit),
+                    DEFAULT_HISTORY_LIMIT_RULES
+                );
+                expect(result).toBe(expectedLimit);
             }
         });
     });
@@ -554,31 +623,62 @@ describe("SettingsService", () => {
             ];
 
             for (const value of unexpectedValues) {
+                mockLogger.warn.mockClear();
                 mockElectronAPI.settings.getHistoryLimit.mockResolvedValueOnce(
                     value
                 );
                 const result = await SettingsService.getHistoryLimit();
-                expect(result).toBe(value);
+                expect(result).toBe(DEFAULT_HISTORY_LIMIT_RULES.defaultLimit);
+                expect(mockLogger.warn).toHaveBeenCalledWith(
+                    "Received invalid history limit from backend; defaulting to shared rule",
+                    expect.objectContaining({
+                        error: expect.any(String),
+                        receivedValue: value,
+                    })
+                );
             }
         });
 
         it("should handle extremely large limit values", async () => {
-            const largeLimits = [
-                Number.MAX_SAFE_INTEGER,
-                Number.MAX_VALUE,
-                1e10,
+            const validLargeLimits = [
+                DEFAULT_HISTORY_LIMIT_RULES.maxLimit,
+                10_000_000_000,
                 9_999_999_999,
             ];
 
-            for (const limit of largeLimits) {
+            for (const limit of validLargeLimits) {
+                mockLogger.warn.mockClear();
                 mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                     limit
                 );
-                await SettingsService.updateHistoryLimit(limit);
+
+                const result = await SettingsService.updateHistoryLimit(limit);
+
+                expect(result).toBe(
+                    normalizeHistoryLimit(limit, DEFAULT_HISTORY_LIMIT_RULES)
+                );
                 expect(
                     mockElectronAPI.settings.updateHistoryLimit
                 ).toHaveBeenCalledWith(limit);
+                expect(mockLogger.warn).not.toHaveBeenCalled();
             }
+
+            mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
+                Number.MAX_VALUE
+            );
+
+            await expect(
+                SettingsService.updateHistoryLimit(Number.MAX_VALUE)
+            ).rejects.toThrow(TypeError);
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "Received invalid history limit from backend; falling back to requested value",
+                expect.objectContaining({
+                    error: expect.any(String),
+                    receivedValue: Number.MAX_VALUE,
+                    requestedLimit: Number.MAX_VALUE,
+                })
+            );
         });
 
         it("should handle special numeric values", async () => {
@@ -591,22 +691,42 @@ describe("SettingsService", () => {
             ];
 
             for (const value of specialValues) {
-                if (Number.isNaN(value)) {
-                    mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
-                        Number.NaN
-                    );
-                    await SettingsService.updateHistoryLimit(value);
-                    expect(
-                        mockElectronAPI.settings.updateHistoryLimit
-                    ).toHaveBeenCalledWith(value);
-                } else {
+                mockLogger.warn.mockClear();
+
+                if (Number.isFinite(value) && Number.isInteger(value)) {
                     mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
                         value
                     );
-                    await SettingsService.updateHistoryLimit(value);
+                    const result =
+                        await SettingsService.updateHistoryLimit(value);
                     expect(
                         mockElectronAPI.settings.updateHistoryLimit
                     ).toHaveBeenCalledWith(value);
+                    expect(result).toBe(
+                        normalizeHistoryLimit(
+                            value,
+                            DEFAULT_HISTORY_LIMIT_RULES
+                        )
+                    );
+                    expect(mockLogger.warn).not.toHaveBeenCalled();
+                } else {
+                    mockElectronAPI.settings.updateHistoryLimit.mockResolvedValueOnce(
+                        value as number
+                    );
+                    await expect(
+                        SettingsService.updateHistoryLimit(value)
+                    ).rejects.toThrow();
+                    expect(
+                        mockElectronAPI.settings.updateHistoryLimit
+                    ).toHaveBeenCalledWith(value);
+                    expect(mockLogger.warn).toHaveBeenCalledWith(
+                        "Received invalid history limit from backend; falling back to requested value",
+                        expect.objectContaining({
+                            error: expect.any(String),
+                            receivedValue: value,
+                            requestedLimit: value,
+                        })
+                    );
                 }
             }
         });
@@ -630,21 +750,30 @@ describe("SettingsService", () => {
                 const expectedResult =
                     typeof returnValue === "number" &&
                     Number.isFinite(returnValue)
-                        ? returnValue
-                        : 100;
+                        ? normalizeHistoryLimit(
+                              returnValue,
+                              DEFAULT_HISTORY_LIMIT_RULES
+                          )
+                        : normalizeHistoryLimit(
+                              100,
+                              DEFAULT_HISTORY_LIMIT_RULES
+                          );
                 await expect(
                     SettingsService.updateHistoryLimit(100)
                 ).resolves.toBe(expectedResult);
 
-                if (expectedResult === returnValue) {
+                if (
+                    typeof returnValue === "number" &&
+                    Number.isFinite(returnValue)
+                ) {
                     expect(mockLogger.warn).not.toHaveBeenCalled();
                 } else {
                     expect(mockLogger.warn).toHaveBeenCalledWith(
                         "Received invalid history limit from backend; falling back to requested value",
                         expect.objectContaining({
+                            error: expect.stringContaining("History limit"),
                             receivedValue: returnValue,
                             requestedLimit: 100,
-                            sanitizedLimit: expectedResult,
                         })
                     );
                 }

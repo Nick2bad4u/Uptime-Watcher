@@ -27,7 +27,7 @@
  * - Error handling with invalid props
  */
 
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
@@ -35,6 +35,7 @@ import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { SaveButton } from "../../../components/shared/SaveButton";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
+import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock ThemedButton component
 vi.mock("../../../theme/components/ThemedButton", () => ({
@@ -134,10 +135,10 @@ const interactionScenarioArbitrary = fc.record({
 });
 
 describe("SaveButton Component - Property-Based Fuzzing", () => {
-    let mockOnClick: ReturnType<typeof vi.fn>;
+    let mockOnClick: Mock<() => void>;
 
     beforeEach(() => {
-        mockOnClick = vi.fn();
+        mockOnClick = createMockFunction();
         vi.clearAllMocks();
     });
 
@@ -341,7 +342,7 @@ describe("SaveButton Component - Property-Based Fuzzing", () => {
             document.body.append(container);
 
             // Create a fresh mock for this specific test instance
-            const localMockOnClick = vi.fn();
+            const localMockOnClick = createMockFunction<() => void>();
 
             try {
                 render(<SaveButton onClick={localMockOnClick} />, {

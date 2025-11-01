@@ -1221,7 +1221,7 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
 
             // Should throw RangeError, not clamp
             await expect(databaseManager.setHistoryLimit(1500)).rejects.toThrow(
-                "History limit too large (max: 1000), received: 1500"
+                "History limit exceeds maximum of 1000, received: 1500"
             );
         });
 
@@ -1413,9 +1413,8 @@ describe("DatabaseManager - Comprehensive Error Coverage", () => {
                 mockConfigurationManager.getHistoryRetentionRules
             ).mockReturnValue(undefined as any);
 
-            // Should throw error when trying to access maxLimit of undefined
             await expect(databaseManager.setHistoryLimit(300)).rejects.toThrow(
-                "Cannot read properties of undefined"
+                "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
             );
         });
 

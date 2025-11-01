@@ -2,6 +2,7 @@
   "$schema": "https://www.schemastore.org/package.json",
   "name": "uptime-watcher",
   "version": "17.9.0",
+  "private": false,
   "description": "An Electron app to monitor website uptime status",
   "keywords": [
     "electron",
@@ -35,6 +36,8 @@
   ],
   "type": "commonjs",
   "main": "dist/main.js",
+  "directories": {},
+  "files": [],
   "scripts": {
     "ai:context": "npm run context",
     "analyze:ipc": "tsx scripts/analyze-ipc-channels.ts",
@@ -70,11 +73,11 @@
     "check:electron": "tsc --build tsconfig.electron.json",
     "check:electron:test": "tsc --build config/testing/tsconfig.electron.test.json",
     "check:frontend": "tsc --build tsconfig.json",
-    "check:other:all": "tsc --build config/testing/tsconfig.AllOtherRoot.json",
     "check:frontend:test": "tsc --build config/testing/tsconfig.test.json",
     "check:ipc": "tsx scripts/generate-ipc-artifacts.mts --check",
     "check:js": "tsc --build config/testing/tsconfig.js.json",
     "check:js:test": "npm run check:js",
+    "check:other:all": "tsc --build config/testing/tsconfig.AllOtherRoot.json",
     "check:playwright": "tsc --build playwright/tsconfig.json",
     "check:shared": "tsc --build tsconfig.shared.json",
     "check:shared:test": "tsc --build config/testing/tsconfig.shared.test.json",
@@ -264,10 +267,11 @@
     "lint:metrics": "npm run sloc",
     "lint:orphans": "npm run madge:orphans",
     "lint:ossf-scorecard": "npm run ossf-scorecard",
-    "lint:package": "sort-package-json && npm run lint:package-check",
+    "lint:package": "sort-package-json && npm run lint:package-check && npmPkgJsonLint . --config .npmpackagejsonlintrc.json && echo \"Package.json lint done!\"",
     "lint:package-check": "publint && attw --pack .",
     "lint:package-sort": "sort-package-json",
     "lint:package-sort-check": "sort-package-json --check",
+    "lint:packagelintrc": "npmPkgJsonLint . --config .npmpackagejsonlintrc.json",
     "lint:prettier": "prettier . --cache --cache-location=.cache/.prettier-cache --cache-strategy=content --check",
     "lint:prettier-fix": "prettier . --cache --cache-location=.cache/.prettier-cache --cache-strategy=content --write",
     "lint:pretty": "npm run lint:prettier-fix",
@@ -315,7 +319,7 @@
     "lint:unused-exports:electron": "ts-unused-exports electron/main.ts",
     "lint:vuln": "npm run lint:vulnerability",
     "lint:vulnerability": "grype . -c config/linting/.grype.yaml --name Uptime-Watcher",
-    "lint:yaml": "yamllint -c config/linting/.yamllint ./** -f colored",
+    "lint:yaml": "yamllint -c config/linting/.yamllint . -f colored",
     "lpf": "npm run lint:fix && npm run lint:prettynow",
     "madge:circular": "madge --circular --include-npm --warning --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])\"",
     "madge:leaves": "madge --leaves --include-npm --ts-config tsconfig.json --extensions ts,tsx,js,jsx src/ electron/ shared/ --exclude \"(^|[\\/])(test|dist|node_modules)($|[\\/])\"",
@@ -335,6 +339,7 @@
     "open:coverage": "open-cli coverage/index.html",
     "open:docs": "open-cli docs/index.html",
     "ossf-scorecard": "scorecard-check",
+    "packagelintrc": "npmPkgJsonLint . --config .npmpackagejsonlintrc.json",
     "playwright": "cross-env NODE_OPTIONS=--disable-warning=DEP0190 playwright test --config playwright.config.ts",
     "playwright:codegen": "node scripts/codegen.mjs",
     "playwright:codegen-chrome": "node scripts/codegen.mjs --dev",
@@ -530,6 +535,7 @@
     "validate:components": "node scripts/validate-components.mjs",
     "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs"
   },
+  "config": {},
   "eslintConfig": {
     "extends": "eslint.config.mjs"
   },
@@ -653,7 +659,7 @@
     "@arethetypeswrong/cli": "^0.18.2",
     "@arthurgeron/eslint-plugin-react-usememo": "^2.5.0",
     "@awmottaz/prettier-plugin-void-html": "^1.9.0",
-    "@biomejs/biome": "2.3.2",
+    "@biomejs/biome": "^2.3.2",
     "@codecov/vite-plugin": "^1.9.1",
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
@@ -755,7 +761,7 @@
     "@typescript-eslint/parser": "^8.46.2",
     "@typescript-eslint/types": "^8.46.2",
     "@vitejs/plugin-react": "^5.1.0",
-    "@vitest/browser": "4.0.6",
+    "@vitest/browser": "^4.0.6",
     "@vitest/browser-playwright": "^4.0.6",
     "@vitest/coverage-istanbul": "^4.0.6",
     "@vitest/coverage-v8": "^4.0.6",
@@ -1074,6 +1080,10 @@
   "peerDependencies": {
     "react-scan": "^0.4.3"
   },
+  "optionalDependencies": {},
+  "bundledDependencies": [
+    "node-sqlite3-wasm"
+  ],
   "bundleDependencies": [],
   "packageManager": "npm@11.6.2",
   "engines": {
@@ -1126,6 +1136,17 @@
     "rpm",
     "snap"
   ],
+  "cpu": [
+    "x64",
+    "arm64",
+    "ia32",
+    "armv7l",
+    "arm"
+  ],
+  "preferGlobal": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "icon": "icons/favicon.ico",
   "appid": "io.github.uptime-watcher",
   "build": {

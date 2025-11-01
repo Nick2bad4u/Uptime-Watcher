@@ -3,11 +3,20 @@
  * site sync functions
  */
 
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type Mock,
+} from "vitest";
 import { fc, test } from "@fast-check/vitest";
 import type { Site } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { StatusUpdateManager } from "../../../stores/sites/utils/statusUpdateHandler";
+import { createMockFunction } from "../../utils/mockFactories";
 
 const LISTENER_NAMES = [
     "monitor-status-changed",
@@ -381,10 +390,10 @@ describe("useSiteSync", () => {
             );
 
             StatusUpdateManagerMock.mockReset();
-            const unsubscribeSpies: ReturnType<typeof vi.fn>[] = [];
+            const unsubscribeSpies: Mock<() => void>[] = [];
             StatusUpdateManagerMock.mockImplementation(
                 function StatusUpdateManagerRetryMock() {
-                    const unsubscribe = vi.fn();
+                    const unsubscribe = createMockFunction<() => void>();
                     unsubscribeSpies.push(unsubscribe);
                     return {
                         getExpectedListenerCount: vi.fn(() => 4),

@@ -118,8 +118,10 @@ class EnhancedAlertSystem {
     private rules = new Map<string, AlertRule>();
     private alerts = new Map<string, Alert>();
     private monitorData = new Map<string, any[]>();
+    private readonly notificationService: NotificationService;
 
-    constructor(private notificationService: NotificationService) {
+    constructor(notificationService: NotificationService) {
+        this.notificationService = notificationService;
         this.initializeTestData();
     }
 

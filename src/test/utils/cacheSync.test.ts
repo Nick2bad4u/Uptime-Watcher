@@ -12,7 +12,13 @@ import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
 } from "@shared/types";
-import type { CacheInvalidatedEventData } from "@shared/types/events";
+import {
+    CACHE_INVALIDATION_REASON,
+    CACHE_INVALIDATION_REASON_VALUES,
+    CACHE_INVALIDATION_TYPE,
+    CACHE_INVALIDATION_TYPE_VALUES,
+    type CacheInvalidatedEventData,
+} from "@shared/types/events";
 import { clearMonitorTypeCache } from "../../utils/monitorTypeHelper";
 
 // Mock dependencies
@@ -186,19 +192,107 @@ const createMockElectronAPI = (_hasAPI = true, hasEvents = true) => ({
 
 type MockElectronAPI = ReturnType<typeof createMockElectronAPI>;
 
+const DEFAULT_EVENT_TIMESTAMP = 1_700_000_000_000;
+
+const BASE_CACHE_INVALIDATION_EVENT: CacheInvalidatedEventData = {
+    reason: CACHE_INVALIDATION_REASON.MANUAL,
+    timestamp: DEFAULT_EVENT_TIMESTAMP,
+    type: CACHE_INVALIDATION_TYPE.ALL,
+};
+
+const buildCacheInvalidatedEvent = (
+    overrides: Partial<CacheInvalidatedEventData> = {}
+): CacheInvalidatedEventData => ({
+    ...BASE_CACHE_INVALIDATION_EVENT,
+    ...overrides,
+});
+
+const normalizeCacheInvalidatedEvent = (
+    candidate: unknown
+): CacheInvalidatedEventData => {
+    if (candidate === null || typeof candidate !== "object") {
+        throw new TypeError(
+            "Cache invalidation event payloads must be objects before normalization."
+        );
+    }
+
+    const normalized = buildCacheInvalidatedEvent(
+        candidate as Partial<CacheInvalidatedEventData>
+    );
+
+    Object.assign(candidate as Record<string, unknown>, normalized);
+
+    return normalized;
+};
+
+const expectCacheInvalidationHandler = (
+    mock: ReturnType<typeof vi.fn>
+): ((event: CacheInvalidatedEventData) => unknown | Promise<unknown>) => {
+    const calls = mock.mock.calls;
+    expect(calls.length).toBeGreaterThan(0);
+    const handler = calls.at(-1)?.[0];
+    expect(handler).toBeTypeOf("function");
+    return handler as (
+        event: CacheInvalidatedEventData
+    ) => unknown | Promise<unknown>;
+};
+
+const triggerCacheInvalidation = async (
+    mock: ReturnType<typeof vi.fn>,
+    overrides: Partial<CacheInvalidatedEventData> = {}
+): Promise<CacheInvalidatedEventData> => {
+    const handler = expectCacheInvalidationHandler(mock);
+    const payload = buildCacheInvalidatedEvent(overrides);
+    await Promise.resolve(handler(payload));
+    return payload;
+};
+
 const setOnCacheInvalidatedHandler = (
-    handler: ReturnType<typeof vi.fn>
+    handler: ReturnType<typeof vi.fn>,
+    options: { normalize?: boolean } = {}
 ): void => {
+    const { normalize = true } = options;
+    const invokeHandler = async (
+        callback: (
+            event: CacheInvalidatedEventData
+        ) => unknown | Promise<unknown>
+    ): Promise<() => void> => {
+        const cleanup = await (
+            handler as unknown as (
+                cb: (event: unknown) => unknown | Promise<unknown>
+            ) => Promise<(() => void) | undefined> | (() => void) | undefined
+        )(async (candidate: unknown) =>
+            callback(
+                normalize
+                    ? normalizeCacheInvalidatedEvent(candidate)
+                    : (candidate as CacheInvalidatedEventData)
+            )
+        );
+
+        return (cleanup ?? noopCleanup) as () => void;
+    };
+
     mockEventsService.onCacheInvalidated.mockImplementation(
-        async (callback: unknown) => handler(callback)
+        async (callback: unknown) =>
+            invokeHandler(
+                callback as (
+                    event: CacheInvalidatedEventData
+                ) => unknown | Promise<unknown>
+            )
     );
 
     const electronWindow = globalThis.window as typeof globalThis.window & {
         electronAPI: MockElectronAPI;
     };
 
-    electronWindow.electronAPI.events.onCacheInvalidated =
-        handler as unknown as typeof electronWindow.electronAPI.events.onCacheInvalidated;
+    electronWindow.electronAPI.events.onCacheInvalidated = ((
+        callback: (
+            event: CacheInvalidatedEventData
+        ) => unknown | Promise<unknown>
+    ) =>
+        invokeHandler(
+            callback
+        )) as typeof electronWindow.electronAPI.events.onCacheInvalidated;
 };
 
 const flushAsyncOperations = async (): Promise<void> => {
@@ -370,20 +464,18 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "Full cache refresh requested",
-                };
-
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.ALL,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing all frontend caches"
@@ -406,30 +498,30 @@ describe("cacheSync", () => {
                 await annotate("Type: Monitoring", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "update" as const,
-                };
 
                 mockClearMonitorTypeCache.mockClear();
                 monitorRefreshSpy.mockClear();
                 sitesResyncSpy.mockClear();
 
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        reason: CACHE_INVALIDATION_REASON.UPDATE,
+                        type: CACHE_INVALIDATION_TYPE.ALL,
+                    }
+                );
+
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Ignoring monitoring lifecycle invalidation",
                     {
-                        reason: "update",
-                        type: "all",
+                        reason: CACHE_INVALIDATION_REASON.UPDATE,
+                        type: CACHE_INVALIDATION_TYPE.ALL,
                     }
                 );
                 expect(mockClearMonitorTypeCache).not.toHaveBeenCalled();
@@ -447,21 +539,19 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "monitor" as const,
-                    reason: "Monitor configuration updated",
-                    identifier: "monitor-123",
-                };
-
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        identifier: "monitor-123",
+                        reason: CACHE_INVALIDATION_REASON.UPDATE,
+                        type: CACHE_INVALIDATION_TYPE.MONITOR,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing monitor-related caches",
@@ -484,20 +574,18 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "monitor" as const,
-                    reason: "Global monitor refresh",
-                };
-
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.MONITOR,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing monitor-related caches",
@@ -520,21 +608,19 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "site" as const,
-                    reason: "Site data updated",
-                    identifier: "site-456",
-                };
-
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        identifier: "site-456",
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.SITE,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing site-related caches",
@@ -557,20 +643,18 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "site" as const,
-                    reason: "General site refresh",
-                };
-
-                invalidationHandler(invalidationData);
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.SITE,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "[CacheSync] Clearing site-related caches",
@@ -592,19 +676,15 @@ describe("cacheSync", () => {
                 await annotate("Type: Monitoring", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    identifier: "site-1",
-                    reason: "update" as const,
-                    type: "site" as const,
-                };
 
                 mockFullResyncSites.mockClear();
                 mockLogger.debug.mockClear();
 
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    identifier: "site-1",
+                    reason: CACHE_INVALIDATION_REASON.UPDATE,
+                    type: CACHE_INVALIDATION_TYPE.SITE,
+                });
                 await flushAsyncOperations();
 
                 expect(mockFullResyncSites).not.toHaveBeenCalled();
@@ -612,8 +692,8 @@ describe("cacheSync", () => {
                     "[CacheSync] Skipping site resync for monitoring lifecycle update",
                     expect.objectContaining({
                         identifier: "site-1",
-                        reason: "update",
-                        type: "site",
+                        reason: CACHE_INVALIDATION_REASON.UPDATE,
+                        type: CACHE_INVALIDATION_TYPE.SITE,
                     })
                 );
             });
@@ -628,19 +708,21 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+                const invalidationHandler = expectCacheInvalidationHandler(
+                    mockOnCacheInvalidated
+                );
 
-                const invalidationData = {
+                const invalidationEvent = {
+                    ...buildCacheInvalidatedEvent(),
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
                     type: "unknown",
-                    reason: "Invalid type test",
-                };
+                } as unknown as CacheInvalidatedEventData;
 
-                invalidationHandler(invalidationData);
+                await Promise.resolve(invalidationHandler(invalidationEvent));
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
-                    invalidationData
+                    invalidationEvent
                 );
                 expect(mockLogger.warn).toHaveBeenCalledWith(
                     "Unknown cache invalidation type:",
@@ -663,15 +745,11 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "Error test",
-                };
-
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.ALL,
+                });
                 await flushAsyncOperations();
 
                 expect(mockEnsureError).toHaveBeenCalledWith(testError);
@@ -698,15 +776,11 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "Cache clear error test",
-                };
-
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.ALL,
+                });
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -730,14 +804,6 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
-
-                const invalidationData = {
-                    type: "monitor" as const,
-                    reason: "Full test data",
-                    identifier: "test-monitor-789",
-                };
 
                 expect(monitorStoreState.refreshMonitorTypes).toBe(
                     monitorRefreshSpy
@@ -750,7 +816,14 @@ describe("cacheSync", () => {
                     });
                 });
 
-                invalidationHandler(invalidationData);
+                const invalidationData = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        identifier: "test-monitor-789",
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.MONITOR,
+                    }
+                );
                 await refreshCall;
                 await flushAsyncOperations();
 
@@ -779,15 +852,14 @@ describe("cacheSync", () => {
                 await annotate("Type: Validation", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "site" as const,
-                    reason: "Minimal test",
-                };
-
-                invalidationHandler(invalidationData);
+                const invalidationData = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    {
+                        reason: CACHE_INVALIDATION_REASON.MANUAL,
+                        type: CACHE_INVALIDATION_TYPE.SITE,
+                    }
+                );
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -817,15 +889,11 @@ describe("cacheSync", () => {
                 mockFullResyncSites.mockRejectedValueOnce(resyncError);
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "Force resync failure",
-                };
-
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.ALL,
+                });
 
                 await Promise.resolve();
                 await Promise.resolve();
@@ -852,15 +920,11 @@ describe("cacheSync", () => {
                 mockFullResyncSites.mockRejectedValueOnce(resyncError);
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "site" as const,
-                    reason: "Resync failure",
-                };
-
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.SITE,
+                });
 
                 await Promise.resolve();
                 await Promise.resolve();
@@ -935,12 +999,19 @@ describe("cacheSync", () => {
                 await annotate("Category: Utility", "category");
                 await annotate("Type: Validation", "type");
 
+                setOnCacheInvalidatedHandler(mockOnCacheInvalidated, {
+                    normalize: false,
+                });
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+                const invalidationHandler = expectCacheInvalidationHandler(
+                    mockOnCacheInvalidated
+                );
 
-                // Test with null data (should throw error and be caught)
-                invalidationHandler(null);
+                await Promise.resolve(
+                    invalidationHandler(
+                        null as unknown as CacheInvalidatedEventData
+                    )
+                );
 
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "Error handling cache invalidation:",
@@ -963,15 +1034,11 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "monitor" as const,
-                    reason: "Error test",
-                };
-
-                invalidationHandler(invalidationData);
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.MONITOR,
+                });
 
                 expect(mockLogger.error).toHaveBeenCalledWith(
                     "Error handling cache invalidation:",
@@ -989,15 +1056,17 @@ describe("cacheSync", () => {
                 await annotate("Type: Business Logic", "type");
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+                const invalidationHandler = expectCacheInvalidationHandler(
+                    mockOnCacheInvalidated
+                );
 
                 const invalidationData = {
-                    type: "all" as const,
+                    ...buildCacheInvalidatedEvent(),
                     reason: "",
-                };
+                    type: CACHE_INVALIDATION_TYPE.ALL,
+                } as unknown as CacheInvalidatedEventData;
 
-                invalidationHandler(invalidationData);
+                await Promise.resolve(invalidationHandler(invalidationData));
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
@@ -1026,16 +1095,18 @@ describe("cacheSync", () => {
                 setOnCacheInvalidatedHandler(mockOnCacheInvalidated);
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
+                const invalidationHandler = expectCacheInvalidationHandler(
+                    mockOnCacheInvalidated
+                );
 
                 const invalidationData = {
-                    type: "monitor" as const,
-                    reason: "Empty identifier test",
-                    identifier: "",
-                };
+                    ...buildCacheInvalidatedEvent({
+                        identifier: "",
+                        type: CACHE_INVALIDATION_TYPE.MONITOR,
+                    }),
+                } as CacheInvalidatedEventData;
 
-                invalidationHandler(invalidationData);
+                await Promise.resolve(invalidationHandler(invalidationData));
                 await flushAsyncOperations();
 
                 expect(mockLogger.debug).toHaveBeenCalledWith(
@@ -1050,13 +1121,20 @@ describe("cacheSync", () => {
     });
 
     describe("Property-based Tests", () => {
-        let mockOnCacheInvalidated: ReturnType<typeof vi.fn>;
-        let mockCleanup: ReturnType<typeof vi.fn>;
+        let mockOnCacheInvalidated: ReturnType<
+            typeof vi.fn<
+                (
+                    callback: (event: CacheInvalidatedEventData) => unknown
+                ) => () => void
+            >
+        >;
+        let mockCleanup: ReturnType<typeof vi.fn<() => void>>;
 
         beforeEach(() => {
-            mockOnCacheInvalidated = vi.fn();
-            mockCleanup = vi.fn();
-            mockOnCacheInvalidated.mockReturnValue(mockCleanup);
+            mockCleanup = vi.fn<() => void>(() => undefined);
+            mockOnCacheInvalidated = vi.fn(() => () => {
+                mockCleanup();
+            });
 
             (globalThis as any).window = {
                 electronAPI: createMockElectronAPI(true, true),
@@ -1067,34 +1145,38 @@ describe("cacheSync", () => {
 
         test.prop([
             fc.record({
-                type: fc.constantFrom("all", "monitor", "site" as const),
-                reason: fc.string({ minLength: 1, maxLength: 100 }),
+                type: fc.constantFrom(...CACHE_INVALIDATION_TYPE_VALUES),
+                reason: fc.constantFrom(...CACHE_INVALIDATION_REASON_VALUES),
                 identifier: fc.option(fc.string({ maxLength: 50 }), {
                     nil: undefined,
                 }),
             }),
         ])(
             "should handle all valid cache invalidation data combinations",
-            (invalidationData) => {
+            async (invalidationData) => {
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                // Property: All valid cache invalidation data should be processed without errors
-                expect(() =>
-                    invalidationHandler(invalidationData)
-                ).not.toThrow();
+                const overrides: Partial<CacheInvalidatedEventData> = {
+                    reason: invalidationData.reason,
+                    type: invalidationData.type,
+                    ...(invalidationData.identifier === undefined
+                        ? {}
+                        : { identifier: invalidationData.identifier }),
+                };
 
-                // Property: Logger should be called for all valid invalidation types
-                expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "Received cache invalidation event",
-                    invalidationData
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    overrides
                 );
 
-                // Property: Appropriate cache clearers should be called based on type
+                expect(mockLogger.debug).toHaveBeenCalledWith(
+                    "Received cache invalidation event",
+                    dispatchedEvent
+                );
+
                 if (
-                    invalidationData.type === "all" ||
-                    invalidationData.type === "monitor"
+                    dispatchedEvent.type === CACHE_INVALIDATION_TYPE.ALL ||
+                    dispatchedEvent.type === CACHE_INVALIDATION_TYPE.MONITOR
                 ) {
                     expect(mockClearMonitorTypeCache).toHaveBeenCalled();
                 }
@@ -1103,73 +1185,91 @@ describe("cacheSync", () => {
 
         test.prop([
             fc.record({
-                type: fc.constantFrom("monitor", "site" as const),
-                reason: fc.string({ minLength: 1, maxLength: 50 }),
+                type: fc.constantFrom(
+                    CACHE_INVALIDATION_TYPE.MONITOR,
+                    CACHE_INVALIDATION_TYPE.SITE
+                ),
+                reason: fc.constantFrom(...CACHE_INVALIDATION_REASON_VALUES),
                 identifier: fc.string({ minLength: 0, maxLength: 100 }),
             }),
         ])(
             "should handle cache invalidation with various identifier patterns",
-            (invalidationData) => {
+            async (invalidationData) => {
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                invalidationHandler(invalidationData);
+                const overrides: Partial<CacheInvalidatedEventData> = {
+                    identifier: invalidationData.identifier,
+                    reason: invalidationData.reason,
+                    type: invalidationData.type,
+                };
 
-                // Property: All identifier strings should be logged correctly
-                if (invalidationData.type === "monitor") {
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    overrides
+                );
+
+                if (dispatchedEvent.type === CACHE_INVALIDATION_TYPE.MONITOR) {
                     expect(mockLogger.debug).toHaveBeenCalledWith(
                         "[CacheSync] Clearing monitor-related caches",
-                        { identifier: invalidationData.identifier }
+                        { identifier: dispatchedEvent.identifier }
                     );
-                } else if (invalidationData.type === "site") {
-                    expect(mockLogger.debug).toHaveBeenCalledWith(
-                        "[CacheSync] Clearing site-related caches",
-                        { identifier: invalidationData.identifier }
-                    );
-                }
-
-                // Property: Monitor type cache should be cleared for monitor invalidations
-                if (invalidationData.type === "monitor") {
                     expect(mockClearMonitorTypeCache).toHaveBeenCalled();
+                } else if (
+                    dispatchedEvent.type === CACHE_INVALIDATION_TYPE.SITE
+                ) {
+                    if (
+                        dispatchedEvent.reason ===
+                        CACHE_INVALIDATION_REASON.UPDATE
+                    ) {
+                        expect(mockLogger.debug).toHaveBeenCalledWith(
+                            "[CacheSync] Skipping site resync for monitoring lifecycle update",
+                            expect.objectContaining({
+                                identifier: dispatchedEvent.identifier,
+                                reason: dispatchedEvent.reason,
+                                type: dispatchedEvent.type,
+                            })
+                        );
+                    } else {
+                        expect(mockLogger.debug).toHaveBeenCalledWith(
+                            "[CacheSync] Clearing site-related caches",
+                            { identifier: dispatchedEvent.identifier }
+                        );
+                    }
                 }
             }
         );
 
         test.prop([
             fc.record({
-                type: fc.constantFrom("all", "monitor", "site" as const),
-                reason: fc.oneof(
-                    fc.string({ minLength: 1, maxLength: 200 }),
-                    fc.constant(""),
-                    fc
-                        .string()
-                        .map((s) =>
-                            s.repeat(Math.fround(Math.random() * 3) + 1)
-                        )
-                ),
+                type: fc.constantFrom(...CACHE_INVALIDATION_TYPE_VALUES),
+                reason: fc.constantFrom(...CACHE_INVALIDATION_REASON_VALUES),
                 identifier: fc.option(fc.string({ maxLength: 30 }), {
                     nil: undefined,
                 }),
             }),
         ])(
-            "should handle cache invalidation with various reason strings",
-            (invalidationData) => {
+            "should handle cache invalidation with enumerated reasons",
+            async (invalidationData) => {
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                // Property: Any reason string should not cause processing to fail
-                expect(() =>
-                    invalidationHandler(invalidationData)
-                ).not.toThrow();
+                const overrides: Partial<CacheInvalidatedEventData> = {
+                    reason: invalidationData.reason,
+                    type: invalidationData.type,
+                    ...(invalidationData.identifier === undefined
+                        ? {}
+                        : { identifier: invalidationData.identifier }),
+                };
 
-                // Property: Reason should be included in the logged event data
+                const dispatchedEvent = await triggerCacheInvalidation(
+                    mockOnCacheInvalidated,
+                    overrides
+                );
+
                 expect(mockLogger.debug).toHaveBeenCalledWith(
                     "Received cache invalidation event",
                     expect.objectContaining({
-                        reason: invalidationData.reason,
-                        type: invalidationData.type,
+                        reason: dispatchedEvent.reason,
+                        type: dispatchedEvent.type,
                     })
                 );
             }
@@ -1182,7 +1282,7 @@ describe("cacheSync", () => {
             }),
         ])(
             "should handle cache clearing errors gracefully",
-            (errorMessages) => {
+            async (errorMessages) => {
                 // Test that cache clearing errors are properly handled
                 const testErrors = errorMessages.map((msg) => new Error(msg));
                 let errorIndex = 0;
@@ -1194,18 +1294,11 @@ describe("cacheSync", () => {
                 });
 
                 setupCacheSync();
-                const invalidationHandler =
-                    mockOnCacheInvalidated.mock.calls[0]?.[0];
 
-                const invalidationData = {
-                    type: "all" as const,
-                    reason: "Error handling test",
-                };
-
-                // Property: Cache clearing errors should not prevent handler completion
-                expect(() =>
-                    invalidationHandler(invalidationData)
-                ).not.toThrow();
+                await triggerCacheInvalidation(mockOnCacheInvalidated, {
+                    reason: CACHE_INVALIDATION_REASON.MANUAL,
+                    type: CACHE_INVALIDATION_TYPE.ALL,
+                });
 
                 // Property: Errors should be properly logged (during clearAllFrontendCaches)
                 if (testErrors.length > 0) {
@@ -1255,9 +1348,15 @@ describe("cacheSync", () => {
                             throw new Error("Cache events unavailable");
                         }
 
-                        return mockOnCacheInvalidated(
-                            callback as CacheInvalidatedEventData
-                        );
+                        if (typeof callback !== "function") {
+                            throw new TypeError(
+                                "Cache invalidation listener must be callable"
+                            );
+                        }
+
+                        return () => {
+                            mockCleanup();
+                        };
                     }
                 );
 

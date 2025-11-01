@@ -154,11 +154,17 @@ beforeAll(() => {
 
     // Mock File and FileReader for file upload testing
     globalThis.File = class MockFile {
-        constructor(
-            public chunks: any[],
-            public name: string,
-            public options: any = {}
-        ) {}
+        public readonly chunks: any[];
+
+        public readonly name: string;
+
+        public readonly options: any;
+
+        public constructor(chunks: any[], name: string, options: any = {}) {
+            this.chunks = chunks;
+            this.name = name;
+            this.options = options;
+        }
         get size() {
             return this.chunks.reduce((acc, chunk) => acc + chunk.length, 0);
         }

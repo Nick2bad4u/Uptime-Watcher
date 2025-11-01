@@ -14,18 +14,16 @@ import type {
 
 type RendererSystemApi = SystemDomainBridge;
 
+export type ElectronAPI = ElectronBridgeApi<
+    EventsDomainBridge,
+    RendererSystemApi
+>;
+
 declare global {
     interface Window {
         /**
          * Secure Electron API exposed through the preload bridge.
          */
-        electronAPI: ElectronBridgeApi<EventsDomainBridge, RendererSystemApi>;
+        electronAPI: ElectronAPI;
     }
 }
-
-/**
- * Convenient alias for the Electron API surface available in the renderer.
- *
- * @public
- */
-export type ElectronAPI = Window["electronAPI"];

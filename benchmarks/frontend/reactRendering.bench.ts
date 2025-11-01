@@ -105,7 +105,11 @@ class MockReactRenderer {
 
 // Mock component implementations
 class MockSiteCard {
-    constructor(public props: any) {}
+    public readonly props: any;
+
+    constructor(props: any) {
+        this.props = props;
+    }
 
     render(): ReactElement {
         return {
@@ -153,7 +157,11 @@ class MockSiteCard {
 }
 
 class MockSiteList {
-    constructor(public props: any) {}
+    public readonly props: any;
+
+    constructor(props: any) {
+        this.props = props;
+    }
 
     render(): ReactElement {
         return {
@@ -169,7 +177,11 @@ class MockSiteList {
 }
 
 class MockMonitorStatus {
-    constructor(public props: any) {}
+    public readonly props: any;
+
+    constructor(props: any) {
+        this.props = props;
+    }
 
     render(): ReactElement {
         const { monitor } = this.props;
@@ -214,7 +226,11 @@ class MockMonitorStatus {
 }
 
 class MockDashboard {
-    constructor(public props: any) {}
+    public readonly props: any;
+
+    constructor(props: any) {
+        this.props = props;
+    }
 
     render(): ReactElement {
         const { summary, sites, recentActivity } = this.props;

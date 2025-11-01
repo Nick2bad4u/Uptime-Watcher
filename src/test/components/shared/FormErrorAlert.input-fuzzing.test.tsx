@@ -38,7 +38,7 @@
 
 /* eslint-disable unicorn/prefer-string-replace-all */
 
-import { describe, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, vi, beforeEach, afterEach, type Mock } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
 import {
     render,
@@ -52,6 +52,7 @@ import "@testing-library/jest-dom";
 import type { JSX } from "react/jsx-runtime";
 import { FormErrorAlert } from "../../../components/shared/FormErrorAlert";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
+import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock themed components
 vi.mock("../../../theme/components/ThemedBox", () => ({
@@ -170,10 +171,10 @@ const errorTransitionArbitrary = fc.record({
 });
 
 describe("FormErrorAlert Component - Property-Based Fuzzing", () => {
-    let mockOnClearError: ReturnType<typeof vi.fn>;
+    let mockOnClearError: Mock<() => void>;
 
     beforeEach(() => {
-        mockOnClearError = vi.fn();
+        mockOnClearError = createMockFunction();
         vi.clearAllMocks();
     });
 

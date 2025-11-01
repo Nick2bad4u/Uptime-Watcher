@@ -7,6 +7,8 @@
         "cacheStrategy": "metadata",
         "useCache": true
     },
+    "caseSensitive": false,
+    "description": "CSpell configuration for Uptime-Watcher project",
     "dictionaries": [
         "aws",
         "bash",
@@ -77,7 +79,19 @@
         "scss",
         "less"
     ],
+    "enableGlobDot": false,
+    "enabled": true,
+    "enabledFileTypes": {},
+    "enabledLanguageIds": [],
+    "failFast": false,
+    "features": {
+        "weighted-suggestions": true
+    },
+    "files": [],
+    "flagWords": [],
     "gitignoreRoot": "./",
+    "globRoot": "./",
+    "id": "uptime-watcher-cspell-config",
     "ignorePaths": [
         ".cspell.json",
         ".checkov.yml",
@@ -125,9 +139,13 @@
         "**/*.js.map",
         "**/*.css.map"
     ],
+    "ignoreRandomStrings": true,
+    "ignoreRegExpList": [],
     "ignoreWords": [],
     "import": [],
+    "includeRegExpList": [],
     "language": "en",
+    "languageId": "typescript,javascript,typescriptreact,javascriptreact,json,jsonc,markdown,html,css,scss,less,yaml,yml,toml",
     "languageSettings": [
         {
             "allowCompoundWords": true,
@@ -181,10 +199,16 @@
             "languageId": "html"
         }
     ],
+    "loadDefaultConfiguration": true,
     "maxDuplicateProblems": 5,
     "maxNumberOfProblems": 100,
+    "minRandomLength": 40,
     "minWordLength": 3,
+    "name": "Uptime-Watcher CSpell Configuration",
+    "noConfigSearch": false,
+    "noSuggestDictionaries": [],
     "numSuggestions": 10,
+    "overrides": [],
     "patterns": [
         {
             "name": "camelCase",
@@ -199,8 +223,22 @@
             "pattern": "/\\b[A-Z][A-Z0-9_]*\\b/g"
         }
     ],
+    "pnpFiles": [
+        ".pnp.js",
+        ".pnp.cjs"
+    ],
+    "readonly": false,
+    "reporters": [
+        "default",
+        "json"
+    ],
+    "suggestWords": [],
+    "suggestionNumChanges": 3,
     "suggestionsTimeout": 800,
+    "unknownWords": "report-common-typos",
     "useGitignore": true,
+    "usePnP": false,
+    "userWords": [],
     "validateDirectives": true,
     "version": "0.2",
     "words": []

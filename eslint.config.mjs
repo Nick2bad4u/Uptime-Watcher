@@ -11,7 +11,7 @@
  * - Enhanced security and performance rules
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
-/* eslint-disable n/no-unpublished-import, import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
+/* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */
 import pluginUseMemo2 from "@arthurgeron/eslint-plugin-react-usememo";
 import pluginDocusaurus from "@docusaurus/eslint-plugin";
 import pluginComments from "@eslint-community/eslint-plugin-eslint-comments/configs";
@@ -354,6 +354,12 @@ export default [
             "report/**",
             "reports/**",
             "playwright/codegen-template.mjs",
+            "shared/types.d.ts",
+            "shared/types.js",
+            "shared/types/**/*.d.ts",
+            "shared/types/**/*.js",
+            "src/stores/ui/useConfirmDialogStore.d.ts",
+            "src/stores/ui/useConfirmDialogStore.js",
             // "config/testing/vitest.electron.config.ts", // Ignore Vitest electron config
             // "config/testing/vitest.shared.config.ts", // Ignore vitest shared config
             // "vite.config.ts", // Ignore vite config due to parsing issues
@@ -7966,7 +7972,11 @@ export default [
                     allowDefaultProject: [
                         "*.js",
                         "playwright.config.ts",
+                        "vite.config.ts",
                         "vite.playwright-coverage.config.ts",
+                        "vitest.config.ts",
+                        "vitest.shared.config.ts",
+                        "vitest.storybook.config.ts",
                         "vitest.stryker.config.ts",
                         "config/testing/vitest.zero-coverage.config.ts",
                         "config/tools/knip.config.ts",

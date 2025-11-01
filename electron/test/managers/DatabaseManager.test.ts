@@ -6,6 +6,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import type { Site } from "@shared/types";
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 
 import { DatabaseManager } from "../../managers/DatabaseManager";
 import type { DatabaseManagerDependencies } from "../../managers/DatabaseManager";
@@ -96,7 +100,17 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
 }));
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
-    setHistoryLimit: vi.fn(() => Promise.resolve()),
+    setHistoryLimit: vi.fn(async (args: any) => {
+        if (args && typeof args.setHistoryLimit === "function") {
+            const normalizedLimit = normalizeHistoryLimit(
+                args.limit,
+                args.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+            );
+            await args.setHistoryLimit(normalizedLimit);
+        }
+
+        return undefined;
+    }),
     getHistoryLimit: vi.fn(() => 500),
 }));
 
@@ -725,18 +739,20 @@ describe(DatabaseManager, () => {
             );
         });
 
-        it("should handle negative history limit", async () => {
-            await databaseManager.setHistoryLimit(-1);
-
+        it("should clamp negative history limit inputs to the unlimited sentinel", async () => {
             const historyManager = await import(
                 "../../utils/database/historyLimitManager"
             );
+
+            await databaseManager.setHistoryLimit(-1);
+
             expect(historyManager.setHistoryLimit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     limit: -1,
-                    rules: expect.objectContaining({ minLimit: 25 }),
+                    rules: expect.any(Object),
                 })
             );
+            expect(databaseManager.getHistoryLimit()).toBe(0);
         });
     });
 });

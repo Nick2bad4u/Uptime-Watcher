@@ -41,9 +41,10 @@ export const DEFAULT_HISTORY_LIMIT: number =
  * Computes the effective history limit after applying business rules.
  *
  * @remarks
- * Validates that the candidate is a finite integer within the supported bounds,
+ * Validates that the candidate is a finite number within the supported bounds,
  * then clamps values below the minimum to the configured minimum while treating
- * zero or negative inputs as "unlimited" (represented as `0`).
+ * zero or negative inputs as "unlimited" (represented as `0`). Fractional
+ * values above the minimum are preserved to avoid surprising the caller.
  *
  * @param candidate - History limit provided by a consumer.
  * @param rules - Rules to use when normalising the value. Defaults to the
@@ -70,12 +71,6 @@ export function normalizeHistoryLimit(
         );
     }
 
-    if (!Number.isInteger(candidate)) {
-        throw new TypeError(
-            `History limit must be an integer, received: ${candidate}`
-        );
-    }
-
     if (candidate > rules.maxLimit) {
         throw new RangeError(
             `History limit exceeds maximum of ${rules.maxLimit}, received: ${candidate}`
@@ -86,5 +81,11 @@ export function normalizeHistoryLimit(
         return 0;
     }
 
-    return Math.max(rules.minLimit, candidate);
+    const normalizedCandidate = Math.floor(candidate);
+
+    if (normalizedCandidate < rules.minLimit) {
+        return rules.minLimit;
+    }
+
+    return normalizedCandidate;
 }

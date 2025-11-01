@@ -261,7 +261,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(5000);
         });
 
-        it("should use provided limit when backend returns invalid number", async ({
+        it("should clamp backend invalid number to unlimited", async ({
             task,
             annotate,
         }) => {
@@ -278,11 +278,11 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await result.current.persistHistoryLimit(3000);
             });
 
-            // Should use the provided limit (3000) since backend returned invalid number
-            expect(result.current.settings.historyLimit).toBe(3000);
+            // Negative backend value is normalised to the unlimited sentinel (0)
+            expect(result.current.settings.historyLimit).toBe(0);
         });
 
-        it("should use provided limit when backend returns zero", async ({
+        it("should respect backend zero as unlimited", async ({
             task,
             annotate,
         }) => {
@@ -299,8 +299,8 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await result.current.persistHistoryLimit(2500);
             });
 
-            // Should use the provided limit (2500) since backend returned 0
-            expect(result.current.settings.historyLimit).toBe(2500);
+            // Backend zero indicates unlimited history retention and should be preserved
+            expect(result.current.settings.historyLimit).toBe(0);
         });
 
         it("should use provided limit when backend returns non-number", async ({
@@ -351,7 +351,7 @@ describe("useSettingsStore Branch Coverage Tests", () => {
             expect(result.current.settings.historyLimit).toBe(4000);
         });
 
-        it("should handle backendLimit value check - second condition false", async ({
+        it("should clamp negative backendLimit values to unlimited", async ({
             task,
             annotate,
         }) => {
@@ -368,8 +368,8 @@ describe("useSettingsStore Branch Coverage Tests", () => {
                 await result.current.persistHistoryLimit(3500);
             });
 
-            // Should use provided limit since value check fails
-            expect(result.current.settings.historyLimit).toBe(3500);
+            // Negative backend value results in unlimited history retention (0)
+            expect(result.current.settings.historyLimit).toBe(0);
         });
     });
 });

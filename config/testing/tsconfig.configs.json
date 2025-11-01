@@ -11,13 +11,13 @@
         "outDir": "../../.cache/builds/configs",
         "paths": {
             "@app/*": [
-                "src/*"
+                ".cache/builds/app/types/src/*"
             ],
             "@electron/*": [
-                "electron/*"
+                ".cache/builds/app/types/electron/*"
             ],
             "@shared/*": [
-                "shared/*"
+                ".cache/builds/app/types/shared/*"
             ]
         },
         "rootDir": "../..",
@@ -25,7 +25,6 @@
     },
     "exclude": [
         "node_modules",
-        "**/*.d.ts",
         "**/.cache/builds/configs/**/*.d.ts",
         "**/config/tools/knip.config.ts",
         "../../config/tools/knip.config.ts",
@@ -64,6 +63,8 @@
         "**/playwright.config.ts",
         "../../playwright/utils/createPlaywrightCoveragePlugin.ts",
         "../../storybook/viteSharedConfig.ts",
+        "../../storybook/**/*.ts",
+        "../../storybook/**/*.tsx",
         "../../vitest.config.ts",
         "../../vitest.shared.config.ts",
         "../../vitest.storybook.config.ts",
@@ -79,6 +80,9 @@
         },
         {
             "path": "../../tsconfig.electron.json"
+        },
+        {
+            "path": "../../tsconfig.json"
         }
     ]
 }

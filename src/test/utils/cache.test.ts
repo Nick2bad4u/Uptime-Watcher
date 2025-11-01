@@ -8,7 +8,15 @@
  *   operations, and edge cases with different data types and sizes.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    beforeEach,
+    afterEach,
+    vi,
+    type Mock,
+} from "vitest";
 import { test, fc } from "@fast-check/vitest";
 import {
     TypedCache,
@@ -17,6 +25,7 @@ import {
     clearAllCaches,
     getCachedOrFetch,
 } from "../../utils/cache";
+import { createMockFunction } from "./mockFactories";
 
 // Mock Date.now for predictable timing tests
 const mockNow = vi.fn();
@@ -716,11 +725,11 @@ describe("Cache Utilities", () => {
 
     describe("getCachedOrFetch helper", () => {
         let cache: TypedCache<string, string>;
-        let mockFetcher: ReturnType<typeof vi.fn>;
+        let mockFetcher: Mock<() => Promise<string | null>>;
 
         beforeEach(() => {
             cache = new TypedCache<string, string>();
-            mockFetcher = vi.fn();
+            mockFetcher = createMockFunction<() => Promise<string | null>>();
         });
 
         it("should return cached value if available", async ({
@@ -842,12 +851,14 @@ describe("Cache Utilities", () => {
                 ],
             };
             const objectCache = new TypedCache<string, typeof complexObject>();
-            mockFetcher.mockResolvedValue(complexObject);
+            const complexFetcher =
+                createMockFunction<() => Promise<typeof complexObject>>();
+            complexFetcher.mockResolvedValue(complexObject);
 
             const result = await getCachedOrFetch(
                 objectCache,
                 "complex",
-                mockFetcher
+                complexFetcher
             );
 
             expect(result).toEqual(complexObject);

@@ -522,25 +522,13 @@ export class DatabaseManager {
             );
         }
 
-        if (!Number.isInteger(limit)) {
-            throw new TypeError(
-                `[DatabaseManager.setHistoryLimit] History limit must be an integer, received: ${limit}`
-            );
-        }
-
-        if (!Number.isFinite(limit)) {
-            throw new RangeError(
-                `[DatabaseManager.setHistoryLimit] History limit must be finite, received: ${limit}`
-            );
-        }
-
-        // Use ConfigurationManager to get proper business rules for history
-        // limits
         const historyRules =
             this.configurationManager.getHistoryRetentionRules();
-        if (historyRules.maxLimit < limit) {
-            throw new RangeError(
-                `[DatabaseManager.setHistoryLimit] History limit too large (max: ${historyRules.maxLimit}), received: ${limit}`
+
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Configuration manager may temporarily return undefined during legacy migrations; surface an explicit error for diagnostics.
+        if (!historyRules) {
+            throw new TypeError(
+                "[DatabaseManager.setHistoryLimit] History retention rules are not configured"
             );
         }
 

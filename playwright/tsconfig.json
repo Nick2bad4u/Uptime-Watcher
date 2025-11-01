@@ -3,7 +3,7 @@
     "compilerOptions": {
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "baseUrl": ".",
+        "baseUrl": "../",
         "checkJs": true,
         "declaration": true,
         "declarationDir": ".cache/builds/test/playwright/types",
@@ -17,23 +17,33 @@
         "outDir": "../.cache/builds/test/playwright",
         "paths": {
             "@/*": [
-                "../src/*"
+                ".cache/builds/app/types/src/*"
             ],
             "@/electron/*": [
-                "../electron/*"
+                ".cache/builds/app/types/electron/*"
             ],
             "@/playwright/*": [
-                "../playwright/*"
+                "playwright/*"
             ],
             "@/shared/*": [
-                "../shared/*"
+                ".cache/builds/app/types/shared/*"
+            ],
+            "@app/*": [
+                ".cache/builds/app/types/src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                ".cache/builds/app/types/electron/*"
             ],
             "@shared/*": [
-                "../shared/*"
+                ".cache/builds/app/types/shared/*"
             ]
         },
         "pretty": true,
         "resolveJsonModule": true,
+        "rootDir": "../",
         "skipLibCheck": false,
         "strict": true,
         "target": "ES2024",
@@ -55,11 +65,26 @@
     ],
     "extends": "../tsconfig.json",
     "include": [
+        "**/*.ts",
+        "**/*.tsx",
         "**/*.js",
         "**/*.mjs",
-        "**/*.ts",
+        "**/*.cjs",
+        "fixtures/**/*.ts",
+        "fixtures/**/*.tsx",
         "fixtures/**/*.js",
         "fixtures/**/*.mjs",
-        "fixtures/**/*.ts"
+        "fixtures/**/*.cjs"
+    ],
+    "references": [
+        {
+            "path": "../tsconfig.json"
+        },
+        {
+            "path": "../tsconfig.electron.json"
+        },
+        {
+            "path": "../tsconfig.shared.json"
+        }
     ]
 }

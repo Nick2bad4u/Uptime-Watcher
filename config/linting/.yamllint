@@ -11,6 +11,8 @@ yaml-files:
     - ".yamllint.yml"
     - "docker-compose*.yml"
     - "docker-compose*.yaml"
+    - "**/*.yaml"
+    - "**/*.yml"
 
 # Files and directories to ignore
 ignore: |
@@ -40,6 +42,8 @@ ignore: |
     docs/_config.yml
     .codecov.yml
     config/tools/.pre-commit-config.yaml
+    docs/docusaurus/docs/documents/docs/Packages/**
+
 rules:
     # Enable anchor rules for better YAML structure
     anchors:
@@ -52,6 +56,9 @@ rules:
         level: warning
         max-spaces-inside: 5
         min-spaces-inside: 0
+        forbid: false
+        min-spaces-inside-empty: -1
+        max-spaces-inside-empty: -1
 
     # Brackets configuration for flow sequences
     brackets:

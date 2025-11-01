@@ -19,6 +19,42 @@ import { ensureError } from "@shared/utils/errorHandling";
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
 
+const HISTORY_LIMIT_MAXIMUM_ERROR_FRAGMENT = "History limit exceeds maximum";
+
+/**
+ * Normalises thrown history limit errors into the public shape required by
+ * renderer callers.
+ *
+ * @remarks
+ * The shared normaliser raises {@link RangeError} instances for both non-finite
+ * values and numbers exceeding the configured maximum. Renderer consumers,
+ * however, expect `TypeError` when the caller supplied a value that cannot be
+ * represented (e.g. exceeding the configured maximum). This helper converts the
+ * internal error types into the renderer-facing contract while preserving the
+ * original diagnostics.
+ *
+ * @param backendError - Error raised when validating the backend response.
+ * @param requestError - Optional error raised while validating the original
+ *   request payload.
+ *
+ * @returns The error instance that should be re-thrown.
+ */
+const normalizeHistoryLimitError = (
+    backendError: Error,
+    requestError?: Error
+): Error => {
+    const primaryError = requestError ?? backendError;
+
+    if (
+        primaryError instanceof RangeError &&
+        primaryError.message.includes(HISTORY_LIMIT_MAXIMUM_ERROR_FRAGMENT)
+    ) {
+        return new TypeError(primaryError.message);
+    }
+
+    return primaryError;
+};
+
 const { ensureInitialized, wrap } = ((): ReturnType<
     typeof getIpcServiceHelpers
 > => {
@@ -155,28 +191,53 @@ export const SettingsService: SettingsServiceContract = {
     updateHistoryLimit: wrap(
         "updateHistoryLimit",
         async (api, limit: number): Promise<number> => {
+            const historyRules = DEFAULT_HISTORY_LIMIT_RULES;
+            let sanitizedRequestLimit: number | undefined = undefined;
+            let requestNormalizationError: Error | undefined = undefined;
+
+            try {
+                sanitizedRequestLimit = normalizeHistoryLimit(
+                    limit,
+                    historyRules
+                );
+            } catch (error: unknown) {
+                requestNormalizationError = ensureError(error);
+            }
+
             const updatedLimit = await api.settings.updateHistoryLimit(limit);
 
             try {
-                return normalizeHistoryLimit(
-                    updatedLimit,
-                    DEFAULT_HISTORY_LIMIT_RULES
-                );
+                return normalizeHistoryLimit(updatedLimit, historyRules);
             } catch (error: unknown) {
                 const normalizedError = ensureError(error);
+
+                if (sanitizedRequestLimit === undefined) {
+                    logger.warn(
+                        "Received invalid history limit from backend; falling back to requested value",
+                        {
+                            error: normalizedError.message,
+                            receivedValue: updatedLimit,
+                            requestedLimit: limit,
+                        }
+                    );
+
+                    throw normalizeHistoryLimitError(
+                        normalizedError,
+                        requestNormalizationError
+                    );
+                }
+
                 logger.warn(
                     "Received invalid history limit from backend; falling back to requested value",
                     {
                         error: normalizedError.message,
                         receivedValue: updatedLimit,
                         requestedLimit: limit,
+                        sanitizedLimit: sanitizedRequestLimit,
                     }
                 );
 
-                return normalizeHistoryLimit(
-                    limit,
-                    DEFAULT_HISTORY_LIMIT_RULES
-                );
+                return sanitizedRequestLimit;
             }
         }
     ),

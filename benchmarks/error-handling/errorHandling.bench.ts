@@ -19,32 +19,32 @@ import { bench, describe, beforeAll } from "vitest";
 
 // Error types for benchmarking
 class ValidationError extends Error {
-    constructor(
-        message: string,
-        public errors: string[] = []
-    ) {
+    public readonly errors: string[];
+
+    constructor(message: string, errors: string[] = []) {
         super(message);
         this.name = "ValidationError";
+        this.errors = errors;
     }
 }
 
 class NetworkError extends Error {
-    constructor(
-        message: string,
-        public statusCode?: number
-    ) {
+    public readonly statusCode?: number;
+
+    constructor(message: string, statusCode?: number) {
         super(message);
         this.name = "NetworkError";
+        this.statusCode = statusCode;
     }
 }
 
 class DatabaseError extends Error {
-    constructor(
-        message: string,
-        public query?: string
-    ) {
+    public readonly query?: string;
+
+    constructor(message: string, query?: string) {
         super(message);
         this.name = "DatabaseError";
+        this.query = query;
     }
 }
 

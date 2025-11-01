@@ -1008,8 +1008,11 @@ class CircuitBreaker {
     private failures = 0;
     private lastFailureTime = 0;
     private successes = 0;
+    private readonly config: CircuitBreakerConfig;
 
-    constructor(private config: CircuitBreakerConfig) {}
+    constructor(config: CircuitBreakerConfig) {
+        this.config = config;
+    }
 
     isOpen(): boolean {
         if (this.state === "open") {

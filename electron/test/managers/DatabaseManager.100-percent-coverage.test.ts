@@ -23,6 +23,10 @@ import type { Site } from "@shared/types";
 import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 
 import { DEFAULT_HISTORY_LIMIT } from "../../constants";
+import {
+    DEFAULT_HISTORY_LIMIT_RULES,
+    normalizeHistoryLimit,
+} from "@shared/constants/history";
 
 // Mock all external dependencies
 vi.mock("../../services/factories/DatabaseServiceFactory", () => ({
@@ -112,9 +116,12 @@ vi.mock("../../utils/database/SiteRepositoryService", () => ({
 
 vi.mock("../../utils/database/historyLimitManager", () => ({
     setHistoryLimit: vi.fn(async (args: any) => {
-        // Simulate util updating in-memory limit via provided callback
         if (args && typeof args.setHistoryLimit === "function") {
-            args.setHistoryLimit(args.limit);
+            const normalizedLimit = normalizeHistoryLimit(
+                args.limit,
+                args.rules ?? DEFAULT_HISTORY_LIMIT_RULES
+            );
+            await args.setHistoryLimit(normalizedLimit);
         }
         return undefined;
     }),
@@ -779,7 +786,10 @@ describe("DatabaseManager - 100% Coverage", () => {
             ).rejects.toThrow(TypeError);
         });
 
-        it("should reject non-integer values", async ({ task, annotate }) => {
+        it("should normalize non-integer values", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
                 "Component: DatabaseManager.100-percent-coverage",
@@ -788,16 +798,19 @@ describe("DatabaseManager - 100% Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Act & Assert
-            await expect(
-                databaseManager.setHistoryLimit(123.45)
-            ).rejects.toThrow(TypeError);
-            await expect(databaseManager.setHistoryLimit(0.5)).rejects.toThrow(
-                TypeError
+            await databaseManager.setHistoryLimit(123.45);
+            expect((databaseManager as any).historyLimit).toBe(123);
+
+            await databaseManager.setHistoryLimit(0.5);
+            expect((databaseManager as any).historyLimit).toBe(
+                DEFAULT_HISTORY_LIMIT_RULES.minLimit
             );
         });
 
-        it("should reject negative values", async ({ task, annotate }) => {
+        it("should clamp negative values to zero", async ({
+            task,
+            annotate,
+        }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate(
                 "Component: DatabaseManager.100-percent-coverage",
@@ -806,13 +819,11 @@ describe("DatabaseManager - 100% Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Business Logic", "type");
 
-            // Act & Assert
-            await expect(databaseManager.setHistoryLimit(-1)).rejects.toThrow(
-                RangeError
-            );
-            await expect(databaseManager.setHistoryLimit(-100)).rejects.toThrow(
-                RangeError
-            );
+            await databaseManager.setHistoryLimit(-1);
+            expect((databaseManager as any).historyLimit).toBe(0);
+
+            await databaseManager.setHistoryLimit(-100);
+            expect((databaseManager as any).historyLimit).toBe(0);
         });
 
         it("should reject infinite values", async ({ task, annotate }) => {
@@ -824,13 +835,13 @@ describe("DatabaseManager - 100% Coverage", () => {
             await annotate("Category: Manager", "category");
             await annotate("Type: Initialization", "type");
 
-            // Act & Assert - Infinity is caught by integer check first, so TypeError is expected
+            // Act & Assert - Normalization rejects non-finite values with RangeError
             await expect(
                 databaseManager.setHistoryLimit(Infinity)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrow(RangeError);
             await expect(
                 databaseManager.setHistoryLimit(-Infinity)
-            ).rejects.toThrow(TypeError);
+            ).rejects.toThrow(RangeError);
         });
 
         it("should reject values exceeding maximum limit", async ({

@@ -3,10 +3,11 @@
  * lifecycle operations for sites and monitors.
  */
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, type Mock } from "vitest";
 
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import type { Site, StatusUpdate } from "@shared/types";
+import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock electron API
 const mockElectronAPI = {
@@ -45,18 +46,25 @@ vi.mock("../../../stores/utils", () => ({
 describe("useSiteMonitoring", () => {
     let actions: ReturnType<typeof createSiteMonitoringActions>;
     let currentSites: Site[];
-    let mockGetSites: ReturnType<typeof vi.fn>;
-    let mockSetSites: ReturnType<typeof vi.fn>;
-    let mockApplyStatusUpdate: ReturnType<typeof vi.fn>;
+    let mockGetSites: Mock<() => Site[]>;
+    let mockSetSites: Mock<(sites: Site[]) => void>;
+    let mockApplyStatusUpdate: Mock<
+        (sites: Site[], update: StatusUpdate) => Site[]
+    >;
 
     beforeEach(() => {
         vi.clearAllMocks();
         currentSites = [];
-        mockGetSites = vi.fn(() => currentSites);
-        mockSetSites = vi.fn((sites: Site[]) => {
+        mockGetSites = createMockFunction(() => currentSites);
+        mockSetSites = createMockFunction<(sites: Site[]) => void>((sites) => {
             currentSites = sites;
         });
-        mockApplyStatusUpdate = vi.fn(() => currentSites);
+        mockApplyStatusUpdate = createMockFunction<
+            (sites: Site[], update: StatusUpdate) => Site[]
+        >((sites) => {
+            currentSites = sites;
+            return currentSites;
+        });
         const monitoringService = {
             checkSiteNow: vi.fn(
                 async (siteIdentifier: string, monitorId: string) =>

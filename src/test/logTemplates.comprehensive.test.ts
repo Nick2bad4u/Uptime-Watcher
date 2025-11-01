@@ -6,7 +6,7 @@
  * @author GitHub Copilot
  */
 
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, type Mock } from "vitest";
 
 import {
     DEBUG_LOGS,
@@ -20,6 +20,7 @@ import {
     type LogTemplatesInterface,
     type TemplateVariables,
 } from "@shared/utils/logTemplates";
+import { createMockFunction } from "./utils/mockFactories";
 
 describe("logTemplates.ts - Comprehensive Coverage", () => {
     describe("Template Constants", () => {
@@ -592,20 +593,25 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
     });
 
     describe(createTemplateLogger, () => {
+        type LoggerMethod = (
+            message: string,
+            context?: Record<string, unknown>
+        ) => void;
+
         let mockLogger: {
-            debug: ReturnType<typeof vi.fn>;
-            error: ReturnType<typeof vi.fn>;
-            info: ReturnType<typeof vi.fn>;
-            warn: ReturnType<typeof vi.fn>;
+            debug: Mock<LoggerMethod>;
+            error: Mock<LoggerMethod>;
+            info: Mock<LoggerMethod>;
+            warn: Mock<LoggerMethod>;
         };
         let templateLogger: ReturnType<typeof createTemplateLogger>;
 
         beforeEach(() => {
             mockLogger = {
-                debug: vi.fn(),
-                error: vi.fn(),
-                info: vi.fn(),
-                warn: vi.fn(),
+                debug: createMockFunction<LoggerMethod>(),
+                error: createMockFunction<LoggerMethod>(),
+                info: createMockFunction<LoggerMethod>(),
+                warn: createMockFunction<LoggerMethod>(),
             };
             templateLogger = createTemplateLogger(mockLogger);
         });

@@ -340,7 +340,7 @@ describe("historyLimitManager", () => {
             ).toHaveBeenCalledWith(mockDatabase, limit);
         });
 
-        it("should handle float values by using them as-is", async ({
+        it("should normalize float values to integers", async ({
             task,
             annotate,
         }) => {
@@ -351,6 +351,7 @@ describe("historyLimitManager", () => {
 
             const setHistoryLimitCallback = vi.fn();
             const limit = 50.7;
+            const expectedLimit = Math.floor(limit);
 
             await setHistoryLimit({
                 limit,
@@ -364,15 +365,15 @@ describe("historyLimitManager", () => {
                 logger: mockLogger,
             });
 
-            expect(setHistoryLimitCallback).toHaveBeenCalledWith(limit);
+            expect(setHistoryLimitCallback).toHaveBeenCalledWith(expectedLimit);
             expect(mockSettingsRepository.setInternal).toHaveBeenCalledWith(
                 mockDatabase,
                 "historyLimit",
-                limit.toString()
+                expectedLimit.toString()
             );
             expect(
                 mockHistoryRepository.pruneAllHistoryInternal
-            ).toHaveBeenCalledWith(mockDatabase, limit);
+            ).toHaveBeenCalledWith(mockDatabase, expectedLimit);
         });
     });
 

@@ -2,9 +2,18 @@
  * Tests for operationHelpers.ts - covering all branches and scenarios.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+    type Mock,
+} from "vitest";
 import type { Site } from "@shared/types";
 import type { SiteOperationsDependencies } from "../../../../stores/sites/types";
+import { createMockFunction } from "../../../utils/mockFactories";
 
 // Mock the error catalog
 vi.mock("../../../../../shared/utils/errorCatalog", () => ({
@@ -83,8 +92,8 @@ const mockLogger = vi.mocked(logger);
 describe("OperationHelpers", () => {
     let mockDeps: SiteOperationsDependencies;
     let mockSites: Site[];
-    let getSitesSpy: ReturnType<typeof vi.fn>;
-    let setSitesSpy: ReturnType<typeof vi.fn>;
+    let getSitesSpy: Mock<() => Site[]>;
+    let setSitesSpy: Mock<(sites: Site[]) => void>;
 
     const createMockSite = (id: string, monitorId: string): Site => ({
         identifier: id,
@@ -141,8 +150,10 @@ describe("OperationHelpers", () => {
             ),
         };
 
-        getSitesSpy = vi.fn<() => Site[]>(() => mockSites);
-        setSitesSpy = vi.fn<(sites: Site[]) => void>();
+        getSitesSpy = createMockFunction(() => mockSites);
+        setSitesSpy = createMockFunction<(sites: Site[]) => void>((sites) => {
+            mockSites = sites;
+        });
 
         mockDeps = {
             getSites: getSitesSpy,
@@ -211,12 +222,14 @@ describe("OperationHelpers", () => {
                 name: "Brand New",
             };
 
+            const originalSiteCount = mockSites.length;
+
             applySavedSiteToStore(newSite, mockDeps);
 
             expect(setSitesSpy).toHaveBeenCalledTimes(1);
             const setSitesArg = setSitesSpy.mock.calls[0]?.[0];
             expect(setSitesArg).toBeDefined();
-            expect(setSitesArg).toHaveLength(mockSites.length + 1);
+            expect(setSitesArg).toHaveLength(originalSiteCount + 1);
             expect(
                 setSitesArg?.some(
                     (site: Site) => site.identifier === "site-new"
@@ -339,11 +352,13 @@ describe("OperationHelpers", () => {
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
             mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
+            const originalSite = mockSites[0]!;
+
             await updateMonitorAndSave("site1", "monitor1", updates, mockDeps);
 
             expect(getSitesSpy).toHaveBeenCalledTimes(2);
             expect(mockUpdateMonitorInSite).toHaveBeenCalledWith(
-                mockSites[0]!,
+                originalSite,
                 "monitor1",
                 updates
             );
@@ -1091,6 +1106,8 @@ describe("OperationHelpers", () => {
             mockUpdateMonitorInSite.mockReturnValue(updatedSite);
             mockElectronAPI.sites.updateSite.mockResolvedValue(updatedSite);
 
+            const originalSite = mockSites[0]!;
+
             await updateMonitorAndSave(
                 "site1",
                 "monitor1",
@@ -1099,7 +1116,7 @@ describe("OperationHelpers", () => {
             );
 
             expect(mockUpdateMonitorInSite).toHaveBeenCalledWith(
-                mockSites[0]!,
+                originalSite,
                 "monitor1",
                 complexUpdates
             );

@@ -105,10 +105,17 @@ class MockHookManager {
 // Mock component implementations using hooks
 class MockSiteCardComponent {
     private hookManager = new MockHookManager();
+    private readonly props: {
+        site: any;
+        onStatusChange?: (status: string) => void;
+    };
 
-    constructor(
-        private props: { site: any; onStatusChange?: (status: string) => void }
-    ) {}
+    constructor(props: {
+        site: any;
+        onStatusChange?: (status: string) => void;
+    }) {
+        this.props = props;
+    }
 
     render() {
         const [isExpanded, setIsExpanded] = this.hookManager.useState(false);
@@ -159,8 +166,11 @@ class MockSiteCardComponent {
 
 class MockSiteListComponent {
     private hookManager = new MockHookManager();
+    private readonly props: { sites: any[]; filters?: any };
 
-    constructor(private props: { sites: any[]; filters?: any }) {}
+    constructor(props: { sites: any[]; filters?: any }) {
+        this.props = props;
+    }
 
     render() {
         const [selectedSites, setSelectedSites] = this.hookManager.useState<
@@ -237,8 +247,11 @@ class MockSiteListComponent {
 
 class MockDashboardComponent {
     private hookManager = new MockHookManager();
+    private readonly props: { initialData?: any };
 
-    constructor(private props: { initialData?: any }) {}
+    constructor(props: { initialData?: any }) {
+        this.props = props;
+    }
 
     render() {
         const [dashboardData, setDashboardData] = this.hookManager.useState(
@@ -332,10 +345,17 @@ class MockDashboardComponent {
 
 class MockFormComponent {
     private hookManager = new MockHookManager();
+    private readonly props: {
+        initialValues?: any;
+        onSubmit?: (values: any) => void;
+    };
 
-    constructor(
-        private props: { initialValues?: any; onSubmit?: (values: any) => void }
-    ) {}
+    constructor(props: {
+        initialValues?: any;
+        onSubmit?: (values: any) => void;
+    }) {
+        this.props = props;
+    }
 
     render() {
         const [formData, setFormData] = this.hookManager.useState(

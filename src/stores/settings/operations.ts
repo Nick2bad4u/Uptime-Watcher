@@ -204,28 +204,33 @@ export const createSettingsOperationsSlice = (
                             sanitizedLimit
                         );
 
-                    const normalizedBackendLimit: number =
-                        normalizeHistoryLimit(
-                            backendLimit,
-                            DEFAULT_HISTORY_LIMIT_RULES
-                        );
+                    const normalizedBackendLimit = ((): number => {
+                        try {
+                            return normalizeHistoryLimit(
+                                backendLimit,
+                                DEFAULT_HISTORY_LIMIT_RULES
+                            );
+                        } catch {
+                            return sanitizedLimit;
+                        }
+                    })();
 
                     getState().updateSettings({
                         historyLimit: normalizedBackendLimit,
                     });
                 },
                 {
-                    clearError: () => {
+                    clearError: (): void => {
                         useErrorStore.getState().clearStoreError("settings");
                     },
-                    setError: (error: string | undefined) => {
+                    setError: (error: string | undefined): void => {
                         const errorStore = useErrorStore.getState();
                         errorStore.setStoreError("settings", error);
                         getState().updateSettings({
                             historyLimit: currentSettings.historyLimit,
                         });
                     },
-                    setLoading: (loading: boolean) => {
+                    setLoading: (loading: boolean): void => {
                         useErrorStore
                             .getState()
                             .setOperationLoading("updateHistoryLimit", loading);

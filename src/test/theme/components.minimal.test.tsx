@@ -3,8 +3,17 @@
  */
 
 import { fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+    type Mock,
+} from "vitest";
 
+import type { ClickHandler, EventHandlers } from "@shared/types/componentProps";
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBadge } from "../../theme/components/ThemedBadge";
 import { ThemedBox } from "../../theme/components/ThemedBox";
@@ -14,14 +23,19 @@ import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedInput } from "../../theme/components/ThemedInput";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 import { ThemedText } from "../../theme/components/ThemedText";
+import { createMockFunction } from "../utils/mockFactories";
 
 describe("Theme Components - Basic Functionality", () => {
-    let mockOnClick: ReturnType<typeof vi.fn>;
-    let mockOnChange: ReturnType<typeof vi.fn>;
+    type UniversalChangeHandler = EventHandlers.ChangeWithEvent<
+        HTMLInputElement | HTMLSelectElement
+    >;
+
+    let mockOnClick: Mock<ClickHandler>;
+    let mockOnChange: Mock<UniversalChangeHandler>;
 
     beforeEach(() => {
-        mockOnClick = vi.fn();
-        mockOnChange = vi.fn();
+        mockOnClick = createMockFunction();
+        mockOnChange = createMockFunction<UniversalChangeHandler>();
     });
 
     afterEach(() => {

@@ -38,9 +38,29 @@
  * @packageDocumentation
  */
 
+import { vi, type Mock } from "vitest";
 import type { PartialDeep, SetOptional } from "type-fest";
 
 import type { MonitorStatus, MonitorType, StatusHistory } from "@shared/types";
+
+/**
+ * Create a strongly typed Vitest mock for a given function signature.
+ *
+ * @typeParam Fn - Function signature the mock should adhere to.
+ *
+ * @param implementation - Optional implementation executed by the mock.
+ *
+ * @returns A Vitest mock constrained to the supplied signature.
+ */
+export function createMockFunction<Fn extends (...args: any[]) => any>(
+    implementation?: Fn
+): Mock<Fn> {
+    if (implementation !== undefined) {
+        return vi.fn<Fn>(implementation);
+    }
+
+    return vi.fn<Fn>();
+}
 
 /**
  * Complete site interface for testing purposes.

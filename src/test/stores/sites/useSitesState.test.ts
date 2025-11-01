@@ -2,7 +2,7 @@
  * Tests for useSitesState module Tests core state management functionality
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { Site } from "@shared/types";
 import { DuplicateSiteIdentifierError } from "@shared/validation/siteIntegrity";
@@ -11,7 +11,9 @@ import type { SiteSyncDelta } from "@shared/types/stateSync";
 import {
     createSitesStateActions,
     initialSitesState,
+    type SitesState,
 } from "../../../stores/sites/useSitesState";
+import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
 vi.mock("../../../stores/utils", () => ({
@@ -30,15 +32,25 @@ vi.mock("../../../services/logger", () => ({
 import { logger } from "../../../services/logger";
 
 describe("useSitesState", () => {
-    let mockSet: ReturnType<typeof vi.fn>;
-    let mockGet: ReturnType<typeof vi.fn>;
+    let mockSet: Mock<
+        (function_: (state: SitesState) => Partial<SitesState>) => void
+    >;
+    let mockGet: Mock<() => SitesState>;
     let stateActions: ReturnType<typeof createSitesStateActions>;
     let mockSite: Site;
     const cloneSite = (site: Site): Site => structuredClone(site);
+    const createState = (overrides: Partial<SitesState> = {}): SitesState => ({
+        lastSyncDelta: undefined,
+        selectedMonitorIds: {},
+        selectedSiteIdentifier: undefined,
+        sites: [],
+        statusSubscriptionSummary: undefined,
+        ...overrides,
+    });
 
     beforeEach(() => {
-        mockSet = vi.fn();
-        mockGet = vi.fn();
+        mockSet = createMockFunction();
+        mockGet = createMockFunction();
 
         mockSite = {
             identifier: "test-site",
@@ -60,11 +72,7 @@ describe("useSitesState", () => {
         };
 
         // Setup initial state
-        mockGet.mockReturnValue({
-            selectedMonitorIds: {},
-            selectedSiteIdentifier: undefined,
-            sites: [mockSite],
-        });
+        mockGet.mockReturnValue(createState({ sites: [mockSite] }));
 
         stateActions = createSitesStateActions(mockSet, mockGet);
     });
@@ -140,12 +148,14 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result).toEqual({
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,
@@ -206,16 +216,18 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {
-                        "site-a": "mon-1",
-                        "site-b": "mon-x",
-                        "site-c": "mon-c1",
-                    },
-                    selectedSiteIdentifier: "site-b",
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {
+                            "site-a": "mon-1",
+                            "site-b": "mon-2",
+                            "site-c": "mon-c1",
+                        },
+                        selectedSiteIdentifier: "site-b",
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
 
                 expect(result).toEqual({
                     selectedMonitorIds: { "site-c": "mon-c1" },
@@ -380,12 +392,14 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [mockSite],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [mockSite],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result.sites).toHaveLength(2);
                 expect(result.sites).toContain(mockSite);
                 expect(result.sites).toContain(newSite);
@@ -413,7 +427,7 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({ sites: [] });
+            mockGet.mockReturnValue(createState({ sites: [] }));
 
             stateActions.addSite(mockSite);
 
@@ -421,12 +435,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result.sites).toEqual([mockSite]);
             }
         });
@@ -456,12 +472,14 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedMonitorIds: {},
-                selectedSiteIdentifier: "test-site",
-                sites: [mockSite],
-                statusSubscriptionSummary: undefined,
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedMonitorIds: {},
+                    selectedSiteIdentifier: "test-site",
+                    sites: [mockSite],
+                    statusSubscriptionSummary: undefined,
+                })
+            );
 
             stateActions.removeSite("test-site");
 
@@ -469,12 +487,14 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: "test-site",
-                    sites: [mockSite],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: "test-site",
+                        sites: [mockSite],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result.selectedSiteIdentifier).toBeUndefined();
             }
         });
@@ -511,12 +531,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result).toEqual({ selectedSiteIdentifier: "test-site" });
             }
         });
@@ -548,12 +570,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result).toEqual({ selectedSiteIdentifier: undefined });
             }
         });
@@ -578,10 +602,12 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedSiteIdentifier: "test-site",
-                sites: [mockSite],
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedSiteIdentifier: "test-site",
+                    sites: [mockSite],
+                })
+            );
 
             const result = stateActions.getSelectedSite();
 
@@ -614,10 +640,12 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedSiteIdentifier: undefined,
-                sites: [mockSite],
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedSiteIdentifier: undefined,
+                    sites: [mockSite],
+                })
+            );
 
             const result = stateActions.getSelectedSite();
 
@@ -647,12 +675,14 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedMonitorIds: {},
-                selectedSiteIdentifier: "non-existent",
-                sites: [mockSite],
-                statusSubscriptionSummary: undefined,
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedMonitorIds: {},
+                    selectedSiteIdentifier: "non-existent",
+                    sites: [mockSite],
+                    statusSubscriptionSummary: undefined,
+                })
+            );
 
             const result = stateActions.getSelectedSite();
 
@@ -690,12 +720,14 @@ describe("useSitesState", () => {
             expect(setFunction).toBeDefined();
 
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result.selectedMonitorIds?.["test-site"]).toBe(
                     "monitor-1"
                 );
@@ -729,12 +761,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                const result = setFunction({
-                    selectedMonitorIds: { "test-site": "monitor-1" },
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                const result = setFunction(
+                    createState({
+                        selectedMonitorIds: { "test-site": "monitor-1" },
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
                 expect(result.selectedMonitorIds?.["test-site"]).toBe(
                     "monitor-2"
                 );
@@ -763,9 +797,11 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedMonitorIds: { "test-site": "monitor-1" },
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedMonitorIds: { "test-site": "monitor-1" },
+                })
+            );
 
             const result = stateActions.getSelectedMonitorId("test-site");
 
@@ -798,12 +834,14 @@ describe("useSitesState", () => {
                 "purpose"
             );
 
-            mockGet.mockReturnValue({
-                selectedMonitorIds: {},
-                selectedSiteIdentifier: undefined,
-                sites: [],
-                statusSubscriptionSummary: undefined,
-            });
+            mockGet.mockReturnValue(
+                createState({
+                    selectedMonitorIds: {},
+                    selectedSiteIdentifier: undefined,
+                    sites: [],
+                    statusSubscriptionSummary: undefined,
+                })
+            );
 
             const result = stateActions.getSelectedMonitorId("test-site");
 
@@ -847,12 +885,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                setFunction({
-                    selectedMonitorIds: {},
-                    selectedSiteIdentifier: undefined,
-                    sites: originalSites,
-                    statusSubscriptionSummary: undefined,
-                });
+                setFunction(
+                    createState({
+                        selectedMonitorIds: {},
+                        selectedSiteIdentifier: undefined,
+                        sites: originalSites,
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
 
                 // Original array should be unchanged
                 expect(originalSites).toHaveLength(1);
@@ -892,12 +932,14 @@ describe("useSitesState", () => {
 
             const setFunction = mockSet.mock.calls[0]?.[0];
             if (setFunction) {
-                setFunction({
-                    selectedMonitorIds: originalIds,
-                    selectedSiteIdentifier: undefined,
-                    sites: [],
-                    statusSubscriptionSummary: undefined,
-                });
+                setFunction(
+                    createState({
+                        selectedMonitorIds: originalIds,
+                        selectedSiteIdentifier: undefined,
+                        sites: [],
+                        statusSubscriptionSummary: undefined,
+                    })
+                );
 
                 // Original object should be unchanged
                 expect(originalIds).toEqual({
