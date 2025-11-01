@@ -48,7 +48,8 @@
         "../../tailwind.config.mjs",
         "../../scripts/*.mjs",
         "../../scripts/*.cjs",
-        "../../scripts/*.js"
+        "../../scripts/*.js",
+        "../../config/linting/**/**.mjs"
     ],
     "references": [
         {

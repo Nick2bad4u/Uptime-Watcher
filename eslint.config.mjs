@@ -303,7 +303,6 @@ export default [
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
     pluginComments.recommended,
-    // @ts-expect-error: pluginCompat.configs.recommended may not have correct types, but runtime usage is verified and safe
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1208,11 +1207,10 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1230,7 +1228,6 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -1252,7 +1249,6 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -1260,7 +1256,6 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -1289,7 +1284,6 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -1305,11 +1299,8 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -1320,7 +1311,6 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -2583,11 +2573,10 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2606,7 +2595,6 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -2637,7 +2625,6 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -2646,7 +2633,6 @@ export default [
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             storybook: storybook,
             "styled-components-a11y": styledA11y,
@@ -2677,7 +2663,6 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -2694,11 +2679,8 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -2712,7 +2694,6 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -4165,11 +4146,10 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4187,7 +4167,6 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -4210,7 +4189,6 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -4218,7 +4196,6 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -4247,7 +4224,6 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -4264,11 +4240,8 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -4279,7 +4252,6 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -5538,11 +5510,10 @@ export default [
             compat: pluginCompat,
             css: css,
             depend: depend,
-            // @ts-expect-error -- TS Error from fixupPluginRules
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5561,7 +5532,6 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -5592,7 +5562,6 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -5601,7 +5570,6 @@ export default [
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
-            // @ts-expect-error -- TS Error from fixupPluginRules
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -5631,7 +5599,6 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -5648,11 +5615,8 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -5666,7 +5630,6 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
-            // @ts-expect-error -- Outdated types from old plugin or incorrect types. Manually verified as working.
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -8063,7 +8026,6 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -8761,7 +8723,6 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
-            // @ts-expect-error  -- Wrong types but runtime usage is working
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,

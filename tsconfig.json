@@ -11,6 +11,7 @@
         "assumeChangesOnlyAffectDirectDependencies": true,
         "baseUrl": ".",
         "checkJs": false,
+        "composite": true,
         "declaration": true,
         "declarationDir": ".cache/builds/app/types",
         "declarationMap": true,
@@ -22,8 +23,10 @@
         "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
         "experimentalDecorators": false,
+        "explainFiles": false,
         "extendedDiagnostics": false,
         "forceConsistentCasingInFileNames": true,
+        "generateCpuProfile": "profile.cpuprofile",
         "importHelpers": true,
         "incremental": true,
         "isolatedDeclarations": true,
@@ -43,6 +46,7 @@
         "noCheck": false,
         "noEmit": false,
         "noEmitHelpers": false,
+        "noEmitOnError": false,
         "noErrorTruncation": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -77,6 +81,9 @@
                 "name": "@styled/typescript-styled-plugin"
             }
         ],
+        "preserveConstEnums": true,
+        "preserveSymlinks": false,
+        "preserveWatchOutput": false,
         "pretty": true,
         "removeComments": false,
         "resolveJsonModule": true,
@@ -91,9 +98,11 @@
         "strictFunctionTypes": true,
         "strictNullChecks": true,
         "strictPropertyInitialization": true,
+        "stripInternal": false,
         "suppressExcessPropertyErrors": false,
         "suppressImplicitAnyIndexErrors": false,
         "target": "ES2024",
+        "traceResolution": false,
         "tsBuildInfoFile": "./.cache/tsconfig.tsbuildinfo",
         "types": [
             "@testing-library/jest-dom",
@@ -127,18 +136,19 @@
         "release",
         "src/**/*.test.ts",
         "src/**/*.test.tsx",
-        "src/test/**"
+        "src/test/**",
+        "storybook/**",
+        "temp",
+        "temp/**",
+        ".cache",
+        ".cache/**",
+        ".coverage",
+        ".storybook/**",
+        "storybook-static/**"
     ],
     "include": [
         "global.d.ts",
-        "src/**/*",
-        "vite.config.ts",
-        "vite/client",
-        "vitest.config.ts",
-        "vitest.shared.config.ts",
-        "vitest.storybook.config.ts",
-        "storybook/vitest.setup.ts",
-        "tailwind.config.mjs"
+        "src/**/*"
     ],
     "references": [
         {
@@ -149,6 +159,28 @@
         }
     ],
     "typeAcquisition": {
-        "enable": true
+        "enable": true,
+        "exclude": [],
+        "include": []
+    },
+    "watchOptions": {
+        "excludeDirectories": [
+            "**/node_modules",
+            "_build",
+            "temp/*",
+            "dist/*",
+            "out/*",
+            "release/*",
+            ".cache",
+            ".coverage",
+            ".git",
+            ".husky",
+            ".vscode"
+        ],
+        "excludeFiles": [],
+        "fallbackPolling": "dynamicPriority",
+        "synchronousWatchDirectory": true,
+        "watchDirectory": "useFsEvents",
+        "watchFile": "useFsEvents"
     }
 }

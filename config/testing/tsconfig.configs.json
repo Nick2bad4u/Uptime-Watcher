@@ -63,7 +63,15 @@
         "docs/docusaurus/stylelint.config.mjs",
         "**/playwright.config.ts",
         "../../playwright/utils/createPlaywrightCoveragePlugin.ts",
-        "../../storybook/viteSharedConfig.ts"
+        "../../storybook/viteSharedConfig.ts",
+        "../../vitest.config.ts",
+        "../../vitest.shared.config.ts",
+        "../../vitest.storybook.config.ts",
+        "../../storybook/vitest.setup.ts",
+        "../../vite.config.ts",
+        "../../tailwind.config.mjs",
+        "storybook/viteSharedConfig",
+        "vite/client"
     ],
     "references": [
         {

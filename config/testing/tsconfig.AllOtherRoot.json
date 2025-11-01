@@ -1,0 +1,53 @@
+{
+    "$schema": "https://www.schemastore.org/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": "../..",
+        "checkJs": true,
+        "composite": true,
+        "declaration": true,
+        "declarationDir": ".cache/builds/AllOtherRoot/types",
+        "incremental": true,
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "rootDir": "../..",
+        "tsBuildInfoFile": "../../dist/tsconfig.AllOtherRoot.tsbuildinfo"
+    },
+    "exclude": [
+        "../../electron/**/*.test.ts",
+        "../../electron/**/*.test.tsx"
+    ],
+    "extends": "../../tsconfig.json",
+    "include": [],
+    "references": [
+        {
+            "path": "./tsconfig.configs.json"
+        },
+        {
+            "path": "./tsconfig.test.json"
+        },
+        {
+            "path": "./tsconfig.electron.test.json"
+        },
+        {
+            "path": "./tsconfig.js.json"
+        },
+        {
+            "path": "./tsconfig.scripts.json"
+        },
+        {
+            "path": "./tsconfig.shared.test.json"
+        }
+    ]
+}

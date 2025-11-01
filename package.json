@@ -70,6 +70,7 @@
     "check:electron": "tsc --build tsconfig.electron.json",
     "check:electron:test": "tsc --build config/testing/tsconfig.electron.test.json",
     "check:frontend": "tsc --build tsconfig.json",
+    "check:other:all": "tsc --build config/testing/tsconfig.AllOtherRoot.json",
     "check:frontend:test": "tsc --build config/testing/tsconfig.test.json",
     "check:ipc": "tsx scripts/generate-ipc-artifacts.mts --check",
     "check:js": "tsc --build config/testing/tsconfig.js.json",
