@@ -131,7 +131,7 @@ rules:
 
     # New lines configuration
     new-lines:
-        type: dos
+        type: platform
 
     # Disable truthy for flexibility with CI/CD configs
     truthy: disable

@@ -47,7 +47,8 @@ jobs:
                       npm-${{ hashFiles('**/package.json') }}
 
             # Install dependencies (robust error handling for package-lock.json and npm presence)
-            # This PowerShell script checks for npm, then installs dependencies using 'npm ci' if package-lock.json exists, otherwise 'npm install' if only package.json is present. Errors if neither file is found.
+            # This PowerShell script checks for npm, then installs dependencies using 'npm ci' if package-lock.json exists,
+            # otherwise 'npm install' if only package.json is present. Errors if neither file is found.
             - name: Install dependencies
               run: |
                   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
