@@ -22,6 +22,7 @@
 # For more information on configuring the `actions/stale` action, visit:
 # https://github.com/actions/stale
 
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Mark stale issues and pull requests
 
 on:

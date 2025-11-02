@@ -27,6 +27,7 @@
 # For more information on configuring and using the Super Linter, visit:
 # https://github.com/github/super-linter
 
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Lint Code Base
 
 on:

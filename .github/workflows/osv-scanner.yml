@@ -1,7 +1,9 @@
 # This GitHub Actions workflow is designed to periodically scan for vulnerabilities using OSV-Scanner.
 # It performs scans on pull requests, merge groups, scheduled events, and pushes to the main branch.
 #
-# Workflow Name: OSV-Scanner
+# Workflow
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: OSV-Scanner
 #
 # Triggers:
 # - pull_request: Triggers when a pull request is made to the main branch.

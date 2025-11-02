@@ -14,6 +14,7 @@ updates:
       cooldown:
           default-days: 3
           include: ["*"]
+      open-pull-requests-limit: 5
       directory: /
       schedule:
           interval: weekly
@@ -41,10 +42,12 @@ updates:
       cooldown:
           default-days: 3
           include: ["*"]
+      open-pull-requests-limit: 5
       directory: /
       schedule:
           interval: weekly
       assignees: ["Nick2bad4u"]
+      rebase-strategy: auto
       versioning-strategy: increase
       allow:
           # Allow both direct and indirect updates for all packages
@@ -84,6 +87,7 @@ updates:
       schedule:
           interval: weekly
       assignees: ["Nick2bad4u"]
+      rebase-strategy: auto
       versioning-strategy: increase
       allow:
           # Allow both direct and indirect updates for all packages
@@ -93,11 +97,14 @@ updates:
           - "dependabot"
           - "dependencies"
       commit-message:
+          include: "scope"
           prefix: "[dependency][docusaurus]"
           prefix-development: "[dev-dependency][docusaurus][skip-ci]"
-          include: "scope"
+
       groups:
           npm-all:
               applies-to: version-updates
               patterns:
                   - "*"
+
+enable-beta-ecosystems: true

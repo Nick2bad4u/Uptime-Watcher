@@ -1,6 +1,7 @@
 # GitHub Action to build Flatpak using flatpak-builder
 # This workflow builds your Electron app as a Flatpak using flatpak-builder directly.
 
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Build Flatpak
 
 on:

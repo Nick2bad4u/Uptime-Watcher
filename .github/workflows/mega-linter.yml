@@ -1,4 +1,5 @@
 # MegaLinter workflow customized for Uptime-Watcher
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: MegaLinter
 
 on:

@@ -53,6 +53,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "CodeQL"
 
 on:

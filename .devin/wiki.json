@@ -297,16 +297,44 @@
     ],
     "repo_notes": [
         {
-            "content": ""
+            "author": "Auto-generated",
+            "content": "Uptime Watcher is an Electron-based desktop application for monitoring websites, APIs, servers, and network services. This repository contains the complete source code organized into distinct layers: electron/ for the main process backend, src/ for the React renderer frontend, and shared/ for common TypeScript types and contracts."
         },
         {
+            "author": "Auto-generated",
             "content": "Uptime Watcher pairs an Electron main process (ServiceContainer, UptimeOrchestrator, monitoring services) with a React renderer that consumes real-time status updates through the preload IPC bridge. The wiki should emphasize how these processes stay synchronized via shared TypeScript contracts and event propagation."
         },
         {
+            "author": "Auto-generated",
             "content": "Please surface the most important directories: electron/ for orchestration, monitoring, IPC, and database layers; src/ for React components, Zustand stores, theming, and UI flows; shared/ for domain types and validation; scripts/ and config/ for tooling; docs/ for existing architecture guides and diagrams."
         },
         {
+            "author": "Auto-generated",
             "content": "Call out the monitoring engine (MonitorScheduler, EnhancedMonitorChecker, MonitorTypeRegistry), the 14 built-in monitor types, SQLite persistence with transaction adapters, real-time state synchronization, and the testing/quality toolchain (Vitest, Fast-Check, Playwright, linting, GitHub Actions)."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "The electron/ directory is critical and contains: 1) ServiceContainer for dependency injection, 2) UptimeOrchestrator for service coordination, 3) MonitorScheduler and EnhancedMonitorChecker for the monitoring execution pipeline, 4) IpcService for secure cross-process communication, 5) Repository pattern implementations (SiteRepository, MonitorRepository, HistoryRepository) for SQLite data access, and 6) TypedEventBus for event-driven architecture."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "The src/ directory contains the React 19 frontend with: 1) Zustand stores (useSitesStore, useUIStore, useSettingsStore) for state management, 2) Component hierarchy (App.tsx, Dashboard, SiteList, SiteCard, SiteDetails), 3) Modal system (AddSiteModal, Settings, ConfirmDialog) with escape key handling, 4) ThemeProvider for dark/light mode support, 5) StatusUpdateManager for real-time event subscriptions, and 6) Custom hooks and service layer abstractions."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "The shared/ directory bridges frontend and backend with TypeScript types (Site, Monitor, MonitorType, StatusUpdate, IpcResponse), Zod validation schemas for IPC boundary safety, and common utility functions. This ensures type safety across the Electron IPC boundary and prevents runtime errors from malformed data."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "The monitoring system supports 14 monitor types: HTTP/HTTPS (status codes, response time, content validation), DNS (record validation, propagation checks), SSL/TLS (certificate expiration, chain validation), Port (TCP/UDP connectivity), Ping (ICMP reachability), CDN (edge server performance), Database Replication (lag monitoring), and more. Each type implements the IMonitorService interface with specific configuration fields and validation logic."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "Testing infrastructure includes: 1) Vitest for unit and integration tests, 2) Fast-Check for property-based testing, 3) Playwright for end-to-end UI testing, 4) ESLint and Prettier for code quality, 5) TypeScript strict mode for compile-time safety, and 6) GitHub Actions CI/CD pipeline for automated testing and builds across Windows, macOS, and Linux."
+        },
+        {
+            "author": "Nick2bad4u",
+            "content": "Build system uses: 1) Vite for fast development server and optimized production builds, 2) TypeScript project references across 6 tsconfig files for proper module resolution, 3) electron-builder for multi-platform packaging (Windows .exe, macOS .dmg, Linux .AppImage/.deb), 4) PostCSS for CSS processing, and 5) Tailwind CSS for utility-first styling with theme support."
         }
     ]
 }

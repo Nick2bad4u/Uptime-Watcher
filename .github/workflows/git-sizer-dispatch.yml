@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Analyze Repo with git-sizer
 run-name: Analyze Repo with git-sizer - ${{ github.event.inputs.repo }}
 

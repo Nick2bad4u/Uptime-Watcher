@@ -1,6 +1,7 @@
 # Electronegativity GitHub Action
 # Scans Electron apps for security issues and uploads SARIF results for code scanning alerts
 
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Electronegativity Scan
 
 on:

@@ -1,8 +1,9 @@
 # GitHub Sponsors funding configuration for Uptime Watcher
 # This file enables the "Sponsor" button on the repository
 # See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
-
 # GitHub Sponsors
+# yaml-language-server: $schema=https://www.schemastore.org/github-funding.json
+
 github: [Nick2bad4u]
 # Other funding platforms (uncomment and fill as needed)
 # patreon: your-patreon-username
