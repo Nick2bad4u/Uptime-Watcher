@@ -10,7 +10,9 @@
  *
  * @see {@link https://github.com/remarkjs/remark-lint} for available rules
  * @see {@link https://github.com/remarkjs/remark-gfm} for GitHub Flavored Markdown
+ * @see {@link https://www.schemastore.org/remarkrc.json} for JSON schema validation
  */
+// @ts-check
 
 import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 

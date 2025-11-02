@@ -2,6 +2,7 @@
 # See: https://docs.codecov.com/docs/codecov-yaml
 # Optimized for Electron + React + TypeScript architecture with domain-driven design
 # Updated for 2025 Codecov best practices
+# yaml-language-server: $schema=https://www.schemastore.org/codecov.json
 
 codecov:
     archive:

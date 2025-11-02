@@ -3,7 +3,7 @@
 #
 # Workflow
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: OSV-Scanner
+# name: OSV-Scanner
 #
 # Triggers:
 # - pull_request: Triggers when a pull request is made to the main branch.

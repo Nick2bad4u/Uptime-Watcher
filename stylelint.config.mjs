@@ -27,7 +27,15 @@
  *
  * @see {@link https://stylelint.io/user-guide/configure | Stylelint Config Schema}
  */
-/** @type {import("stylelint").Config} */
+/** @typedef {import("stylelint").Config} */
+/** @typedef {import("stylelint").LinterOptions} */
+/** @typedef {import("stylelint").PostcssPluginOptions} */
+/** @typedef {import("stylelint").WarningOptions} */
+/** @typedef {import("stylelint").RuleOptions} */
+/** @typedef {import("stylelint").RuleOptionsPossible} */
+/** @typedef {import("stylelint").PostcssPluginOptions} */
+/** @typedef {import("stylelint").LinterOptions} */
+/** @typedef {import("stylelint").GetPostcssOptions} */
 
 /**
  * Enhanced configuration helper that provides TypeScript intellisense and
@@ -39,7 +47,7 @@
  *
  * @see {@link https://github.com/stylelint-types/stylelint-define-config | stylelint-define-config}
  */
-// eslint-disable-next-line n/no-unpublished-import, import-x/no-named-as-default -- dev tools
+// eslint-disable-next-line import-x/no-named-as-default -- Rule wants packages not in dev, doesn't apply here
 import defineConfig from "stylelint-define-config";
 
 /**

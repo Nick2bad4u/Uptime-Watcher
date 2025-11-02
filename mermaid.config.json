@@ -1,4 +1,5 @@
 {
+    "$schema": "https://mermaid.js.org/schemas/config.schema.json",
     "arrowMarkerAbsolute": false,
     "c4": {
         "boundaryFontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",

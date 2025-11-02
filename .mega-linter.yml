@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oxsecurity/megalinter/refs/heads/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
 # Config file references
 ACTION_ACTIONLINT_CONFIG_FILE: config/tools/ActionLintConfig.yaml
 # Fixes

@@ -12,6 +12,11 @@
  * This replaces the complex JavaScript configuration approach of v3 with a
  * clean, maintainable CSS-first approach for better performance.
  */
+/** @typedef {import("tailwindcss").Config} */
+/** @typedef {import("tailwindcss").Features} */
+/** @typedef {import("tailwindcss").Polyfills} */
+/** @typedef {import("tailwindcss").DecodedSourceMap} */
+
 export default {
     content: [
         "./index.html",

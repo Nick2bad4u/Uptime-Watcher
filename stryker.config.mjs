@@ -1,4 +1,5 @@
 // @ts-check
+/** @see {@link https://raw.githubusercontent.com/stryker-mutator/stryker/master/packages/api/schema/stryker-core.json} for JSON schema validation */
 /** @type {import("@stryker-mutator/api/core").PartialStrykerOptions} */
 
 const config = {

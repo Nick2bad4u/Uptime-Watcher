@@ -23,7 +23,29 @@
  * - Place SVG icons in './icons' (project root).
  * - Place other assets in './src/assets' (project root).
  * - Ensure both directories exist for PostCSS plugins to resolve assets
- *   correctly.
+ *
+ * @see {@link https://www.schemastore.org/postcssrc.json} for JSON schema validation
+ */
+/**
+ * @typedef {import("postcss").Processor} Processor
+ *
+ * @typedef {import("postcss").Plugin} Plugin
+ *
+ * @typedef {import("postcss").AcceptedPlugin} AcceptedPlugin
+ *
+ * @typedef {import("postcss").CssSyntaxError} CssSyntaxError
+ *
+ * @typedef {import("postcss").ProcessOptions} ProcessOptions
+ *
+ * @typedef {import("postcss").WarningOptions} WarningOptions
+ *
+ * @typedef {import("postcss").NodeErrorOptions} NodeErrorOptions
+ *
+ * @typedef {import("postcss").Input} Input
+ *
+ * @typedef {import("postcss").Result} Result
+ *
+ * @typedef {import("postcss").Message} Message
  */
 
 const isProduction = process.env.NODE_ENV === "production";
