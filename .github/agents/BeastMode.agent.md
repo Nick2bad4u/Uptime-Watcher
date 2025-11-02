@@ -3,40 +3,7 @@ name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
 model: GPT-5-Codex (Preview) (copilot)
-tools:
- [
-  "edit/createFile",
-  "edit/createDirectory",
-  "edit/editFiles",
-  "search/fileSearch",
-  "search/textSearch",
-  "search/listDirectory",
-  "search/readFile",
-  "search/codebase",
-  "runCommands/getTerminalOutput",
-  "runCommands/terminalLastCommand",
-  "runCommands/runInTerminal",
-  "runTasks/runTask",
-  "runTasks/getTaskOutput",
-  "Tavily-Remote-MCP/tavily_extract",
-  "Tavily-Remote-MCP/tavily_search",
-  "electron-mcp-server/get_electron_window_info",
-  "electron-mcp-server/send_command_to_electron",
-  "electron-mcp-server/take_screenshot",
-  "vscode-mcp/get_diagnostics",
-  "vscode-mcp/get_references",
-  "vscode-mcp/get_symbol_lsp_info",
-  "vscode-mcp/rename_symbol",
-  "runSubagent",
-  "usages",
-  "problems",
-  "changes",
-  "testFailure",
-  "fetch",
-  "ms-vscode.vscode-websearchforcopilot/websearch",
-  "todos",
-  "runTests",
- ]
+tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'deepwiki/*', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
 handoffs:
  - label: Consistency
    agent: BeastMode
@@ -66,7 +33,7 @@ handoffs:
    agent: BeastMode
    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false
-target: github-copilot
+target: vscode
 ---
 
 <instructions>
@@ -142,9 +109,9 @@ target: github-copilot
 
   <overrideConstraints>
 
-All constraints are updated to `unlimited` or `maximum` for this session.
-Making decisions based on time is not allowed.
-You have time to finish any task no matter how large it is or long it takes.
+- All constraints are updated to `unlimited` or `maximum` for this session.
+- Making decisions based on time is not allowed.
+- You have time to finish any task no matter how large it is or long it takes.
 
   </overrideConstraints>
 </instructions>

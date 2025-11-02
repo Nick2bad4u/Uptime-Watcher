@@ -1,6 +1,6 @@
 # 📡 API & IPC Documentation
 
-> **Interface Reference**: Comprehensive guide to IPC communication, events, and API patterns in Uptime Watcher.
+> __Interface Reference__: Comprehensive guide to IPC communication, events, and API patterns in Uptime Watcher.
 
 ## 📋 Overview
 
@@ -28,7 +28,7 @@ if (startSummary.isMonitoring) {
 const syncResult = await StateSyncService.requestFullSync();
 ```
 
-> ℹ️ **Low-level bridge**: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
+> ℹ️ __Low-level bridge__: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
 
 ### Domain-Based API Organization
 
@@ -420,7 +420,7 @@ const cleanup = await StateSyncService.onStateSyncEvent((event) => {
 Opens HTTP(S) URLs in the user's default external browser. The call resolves
 to `true` when Electron successfully delegates the navigation request.
 
-> **Recommendation:** Access this capability through the renderer
+> __Recommendation:__ Access this capability through the renderer
 > `SystemService` (`@app/services/SystemService`) rather than using the raw
 > preload bridge. The service enforces URL validation, logging, and consistent
 > error reporting.
@@ -607,7 +607,7 @@ interface UptimeEvents {
 }
 ```
 
-> **Historical note:** Prior to the bridge refactor, managers emitted
+> __Historical note:__ Prior to the bridge refactor, managers emitted
 > `site:cache-miss` and `site:cache-updated`. These topics have been fully
 > removed from the public API—cache telemetry now flows exclusively through the
 > internal equivalents (`internal:site:cache-miss` /
@@ -1046,12 +1046,12 @@ try {
 
 ### Common Error Codes
 
-- `VALIDATION_ERROR`: Invalid input data
-- `NOT_FOUND`: Resource doesn't exist
-- `ALREADY_EXISTS`: Duplicate resource
-- `DATABASE_ERROR`: Database operation failed
-- `NETWORK_ERROR`: Network request failed
-- `PERMISSION_DENIED`: Insufficient permissions
+* `VALIDATION_ERROR`: Invalid input data
+* `NOT_FOUND`: Resource doesn't exist
+* `ALREADY_EXISTS`: Duplicate resource
+* `DATABASE_ERROR`: Database operation failed
+* `NETWORK_ERROR`: Network request failed
+* `PERMISSION_DENIED`: Insufficient permissions
 
 ## 🔒 Security
 
@@ -1139,6 +1139,6 @@ import { FeatureService } from "../services/FeatureService";
 const newFeature = await FeatureService.create(featureData);
 ```
 
----
+***
 
-💡 **Best Practices**: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).
+💡 __Best Practices__: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).

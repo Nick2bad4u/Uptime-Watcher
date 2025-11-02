@@ -10,6 +10,8 @@
         "./**/*.tsx",
         "./**/*.mts",
         "./**/*.cts",
+        "../constants/**/*.ts",
+        "../utils/**/*.ts",
         "../validation/**/*.ts",
         "../types/**/*.ts"
     ]

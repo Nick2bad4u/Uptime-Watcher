@@ -414,16 +414,41 @@ export function registerStandardizedIpcHandler<T>(
     validateParams: IpcParameterValidator | null,
     registeredHandlers: Set<string>
 ): void {
+    if (registeredHandlers.has(channelName)) {
+        const errorMessage = `[IpcService] Attempted to register duplicate IPC handler for channel '${channelName}'`;
+
+        logger.error(errorMessage, {
+            channel: channelName,
+            registeredHandlers: Array.from(registeredHandlers),
+        });
+
+        throw new Error(errorMessage);
+    }
+
     registeredHandlers.add(channelName);
 
-    ipcMain.handle(channelName, async (_, ...args: unknown[]) =>
-        validateParams
-            ? withIpcHandlerValidation(
-                  channelName,
-                  handler,
-                  validateParams,
-                  args
-              )
-            : withIpcHandler(channelName, () => handler(...args))
-    );
+    try {
+        ipcMain.handle(channelName, async (_, ...args: unknown[]) =>
+            validateParams
+                ? withIpcHandlerValidation(
+                      channelName,
+                      handler,
+                      validateParams,
+                      args
+                  )
+                : withIpcHandler(channelName, () => handler(...args))
+        );
+    } catch (rawError) {
+        registeredHandlers.delete(channelName);
+
+        const error =
+            rawError instanceof Error ? rawError : new Error(String(rawError));
+
+        logger.error(
+            `[IpcService] Failed to register IPC handler for channel '${channelName}'`,
+            error
+        );
+
+        throw error;
+    }
 }

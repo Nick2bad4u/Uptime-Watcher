@@ -388,10 +388,9 @@ describe(IpcService, () => {
         });
     });
     describe("serializeMonitorTypeConfig", () => {
-        beforeEach(() => {
-            ipcService.setupHandlers();
-        });
         it("should handle monitor type configs with undefined uiConfig", async () => {
+            ipcService.setupHandlers();
+
             // This test verifies that the handler works regardless of mock setup
             const getAllHandler = mockIpcMain.handle.mock.calls.find(
                 (call) => call[0] === "get-monitor-types"

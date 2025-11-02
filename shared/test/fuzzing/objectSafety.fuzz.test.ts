@@ -472,7 +472,10 @@ describe("objectSafety.ts fuzzing tests", () => {
                 expect(values).toHaveLength(objValues.length);
 
                 for (const value of values) {
-                    expect(objValues).toContain(value);
+                    const containsValue = objValues.some((candidate) =>
+                        Object.is(candidate, value)
+                    );
+                    expect(containsValue).toBeTruthy();
                 }
             }
         );

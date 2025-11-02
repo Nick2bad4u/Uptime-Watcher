@@ -161,16 +161,6 @@ export function setupCacheSync(): () => void {
 
             switch (data.type) {
                 case "all": {
-                    if (data.reason === CACHE_INVALIDATION_REASON.UPDATE) {
-                        logger.debug(
-                            "[CacheSync] Ignoring monitoring lifecycle invalidation",
-                            {
-                                reason: data.reason,
-                                type: data.type,
-                            }
-                        );
-                        break;
-                    }
                     clearAllFrontendCaches();
                     const refreshMonitorTypes = async (): Promise<void> => {
                         try {
@@ -207,22 +197,6 @@ export function setupCacheSync(): () => void {
                     break;
                 }
                 case "site": {
-                    const isLifecycleUpdate =
-                        data.reason === CACHE_INVALIDATION_REASON.UPDATE &&
-                        typeof data.identifier === "string";
-
-                    if (isLifecycleUpdate) {
-                        logger.debug(
-                            "[CacheSync] Skipping site resync for monitoring lifecycle update",
-                            {
-                                identifier: data.identifier,
-                                reason: data.reason,
-                                type: data.type,
-                            }
-                        );
-                        break;
-                    }
-
                     clearSiteRelatedCaches(data.identifier);
                     if (data.reason === CACHE_INVALIDATION_REASON.UPDATE) {
                         const now = Date.now();

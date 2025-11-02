@@ -488,7 +488,7 @@ describe("cacheSync", () => {
                 expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
             });
 
-            it("should ignore 'all' invalidations emitted by monitoring lifecycle events", async ({
+            it("should resync and refresh caches for global update invalidations", async ({
                 task,
                 annotate,
             }) => {
@@ -518,15 +518,11 @@ describe("cacheSync", () => {
                     dispatchedEvent
                 );
                 expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "[CacheSync] Ignoring monitoring lifecycle invalidation",
-                    {
-                        reason: CACHE_INVALIDATION_REASON.UPDATE,
-                        type: CACHE_INVALIDATION_TYPE.ALL,
-                    }
+                    "[CacheSync] Clearing all frontend caches"
                 );
-                expect(mockClearMonitorTypeCache).not.toHaveBeenCalled();
-                expect(monitorRefreshSpy).not.toHaveBeenCalled();
-                expect(sitesResyncSpy).not.toHaveBeenCalled();
+                expect(mockClearMonitorTypeCache).toHaveBeenCalledWith();
+                expect(monitorRefreshSpy).toHaveBeenCalledTimes(1);
+                expect(sitesResyncSpy).toHaveBeenCalledTimes(1);
             });
 
             it("should handle 'monitor' cache invalidation type", async ({
@@ -666,7 +662,7 @@ describe("cacheSync", () => {
                 expect(monitorRefreshSpy).not.toHaveBeenCalled();
             });
 
-            it("should ignore monitoring lifecycle site update invalidations", async ({
+            it("should resync site state after monitoring lifecycle update invalidation", async ({
                 task,
                 annotate,
             }) => {
@@ -687,14 +683,12 @@ describe("cacheSync", () => {
                 });
                 await flushAsyncOperations();
 
-                expect(mockFullResyncSites).not.toHaveBeenCalled();
+                expect(mockFullResyncSites).toHaveBeenCalledTimes(1);
                 expect(mockLogger.debug).toHaveBeenCalledWith(
-                    "[CacheSync] Skipping site resync for monitoring lifecycle update",
-                    expect.objectContaining({
+                    "[CacheSync] Clearing site-related caches",
+                    {
                         identifier: "site-1",
-                        reason: CACHE_INVALIDATION_REASON.UPDATE,
-                        type: CACHE_INVALIDATION_TYPE.SITE,
-                    })
+                    }
                 );
             });
 
@@ -1217,24 +1211,10 @@ describe("cacheSync", () => {
                 } else if (
                     dispatchedEvent.type === CACHE_INVALIDATION_TYPE.SITE
                 ) {
-                    if (
-                        dispatchedEvent.reason ===
-                        CACHE_INVALIDATION_REASON.UPDATE
-                    ) {
-                        expect(mockLogger.debug).toHaveBeenCalledWith(
-                            "[CacheSync] Skipping site resync for monitoring lifecycle update",
-                            expect.objectContaining({
-                                identifier: dispatchedEvent.identifier,
-                                reason: dispatchedEvent.reason,
-                                type: dispatchedEvent.type,
-                            })
-                        );
-                    } else {
-                        expect(mockLogger.debug).toHaveBeenCalledWith(
-                            "[CacheSync] Clearing site-related caches",
-                            { identifier: dispatchedEvent.identifier }
-                        );
-                    }
+                    expect(mockLogger.debug).toHaveBeenCalledWith(
+                        "[CacheSync] Clearing site-related caches",
+                        { identifier: dispatchedEvent.identifier }
+                    );
                 }
             }
         );

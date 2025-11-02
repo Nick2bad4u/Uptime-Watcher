@@ -7,6 +7,8 @@
 import { ipcMain } from "electron";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { logger } from "../../../utils/logger";
+
 import {
     IpcValidators,
     createErrorResponse,
@@ -1612,6 +1614,75 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 expect(registeredHandlers.has("handler1")).toBeTruthy();
                 expect(registeredHandlers.has("handler2")).toBeTruthy();
                 expect(registeredHandlers.has("handler3")).toBeTruthy();
+            });
+
+            it("should reject duplicate handler registrations", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Validation", "type");
+
+                const registeredHandlers = new Set<string>();
+
+                registerStandardizedIpcHandler(
+                    "duplicate-channel",
+                    vi.fn(),
+                    null,
+                    registeredHandlers
+                );
+
+                expect(() =>
+                    registerStandardizedIpcHandler(
+                        "duplicate-channel",
+                        vi.fn(),
+                        null,
+                        registeredHandlers
+                    )
+                ).toThrow(
+                    "[IpcService] Attempted to register duplicate IPC handler for channel 'duplicate-channel'"
+                );
+
+                expect(logger.error).toHaveBeenCalledWith(
+                    "[IpcService] Attempted to register duplicate IPC handler for channel 'duplicate-channel'",
+                    expect.objectContaining({
+                        channel: "duplicate-channel",
+                    })
+                );
+                expect(ipcMain.handle).toHaveBeenCalledTimes(1);
+            });
+
+            it("should rollback handler registration when ipcMain.handle throws", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "regression");
+                await annotate("Component: utils", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                const registeredHandlers = new Set<string>();
+                const registrationError = new Error("ipcMain failure");
+                vi.mocked(ipcMain.handle).mockImplementationOnce(() => {
+                    throw registrationError;
+                });
+
+                expect(() =>
+                    registerStandardizedIpcHandler(
+                        "failing-channel",
+                        vi.fn(),
+                        null,
+                        registeredHandlers
+                    )
+                ).toThrow(registrationError);
+
+                expect(registeredHandlers.has("failing-channel")).toBeFalsy();
+                expect(logger.error).toHaveBeenCalledWith(
+                    "[IpcService] Failed to register IPC handler for channel 'failing-channel'",
+                    registrationError
+                );
             });
         });
     });

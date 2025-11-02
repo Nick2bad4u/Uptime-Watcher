@@ -152,6 +152,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryChannelName])(
             "should handle channel registration",
             (channel) => {
+                mockIpcMain.handle.mockClear();
+                registeredHandlers.clear();
+
                 const handler = vi.fn(() => Promise.resolve());
 
                 expect(() => {
@@ -362,6 +365,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             "should validate all inputs",
             async (input) => {
                 const channel = "test:validation";
+                mockIpcMain.handle.mockClear();
+                registeredHandlers.clear();
                 const handler = vi.fn(() => Promise.resolve("success"));
                 const strictValidator = (
                     data: unknown
@@ -404,6 +409,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryChannelName, fc.anything()])(
             "should handle handler errors",
             async (channel, input) => {
+                mockIpcMain.handle.mockClear();
+                registeredHandlers.clear();
                 const errorHandler = vi.fn(() => {
                     throw new Error("Handler error");
                 });
@@ -439,6 +446,9 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
                 'test\neval("malicious code")',
                 String.raw`test\${process.exit()}`,
             ];
+
+            mockIpcMain.handle.mockClear();
+            registeredHandlers.clear();
 
             for (const maliciousChannel of maliciousChannels) {
                 expect(() => {
@@ -496,6 +506,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
             "should handle high volume IPC calls",
             async (callCount) => {
                 const channel = "test:volume";
+                mockIpcMain.handle.mockClear();
+                registeredHandlers.clear();
                 const handler = vi.fn(() => Promise.resolve("response"));
 
                 registerStandardizedIpcHandler(
@@ -556,6 +568,8 @@ describe("IPC Communication - 100% Fast-Check Fuzzing Coverage", () => {
         fcTest.prop([arbitraryChannelName])(
             "should handle async handler errors",
             async (channel) => {
+                mockIpcMain.handle.mockClear();
+                registeredHandlers.clear();
                 const asyncErrorHandler = vi.fn(async () => {
                     await new Promise((resolve) => setTimeout(resolve, 1));
                     throw new Error("Async error");
