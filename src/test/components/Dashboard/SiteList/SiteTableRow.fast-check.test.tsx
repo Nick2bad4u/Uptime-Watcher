@@ -371,7 +371,7 @@ describe("SiteTableRow fast-check coverage", () => {
             handleCardClick.mockClear();
             const expectedRowAccessibleName =
                 `Open details for ${latestSite.name}`
-                    .replace(/\s+/gu, " ")
+                    .replaceAll(/\s+/gu, " ")
                     .trim();
             const rowElement = screen.getByRole("row", {
                 name: expectedRowAccessibleName,

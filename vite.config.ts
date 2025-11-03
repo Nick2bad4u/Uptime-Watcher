@@ -825,7 +825,11 @@ export default defineConfig(({ mode }) => {
                 // exercised in runtime. The revised values enforce strong coverage for
                 // executable logic without blocking on non-actionable gaps.
                 thresholds: {
-                    autoUpdate: true,
+                    // Auto-update requires Vitest to rewrite the originating config file.
+                    // Our configuration is generated dynamically via defineConfig callbacks,
+                    // which Magicast cannot safely mutate, so we keep this disabled to
+                    // avoid runtime parse failures during coverage reporting.
+                    autoUpdate: false,
                     branches: 77, // Tightened to reflect real-world branch coverage considering JSX/CSS-module instrumentation (see analysis)
                     functions: 92,
                     lines: 93,

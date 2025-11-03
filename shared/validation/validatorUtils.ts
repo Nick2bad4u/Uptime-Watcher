@@ -349,6 +349,9 @@ export function isValidUrl(
         ) {
             return false;
         }
+        if (value.endsWith("://")) {
+            return false;
+        }
     }
 
     return validator.isURL(value, urlOptions);

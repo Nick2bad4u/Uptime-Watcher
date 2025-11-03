@@ -8032,6 +8032,8 @@ export default /** @type {EslintConfig} */ [
                         "config/tools/createPlaywrightCoveragePlugin.ts",
                     ],
                     defaultProject: "config/testing/tsconfig.configs.json",
+                    maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING:
+                        24,
                 },
                 sourceType: "module",
                 tsconfigRootDir: path.resolve(import.meta.dirname),

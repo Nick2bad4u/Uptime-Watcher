@@ -67,6 +67,7 @@ const vitestConfig = defineConfig({
             exclude: [
                 "**/*.config.*",
                 "**/*.d.ts",
+                "**/*.types.ts",
                 "**/dist*/**", // Covers dist/ plus any dist-* cache directories
                 "**/node_modules/**",
                 "**/docs/**",
@@ -155,6 +156,7 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions (describe, it, expect)
         include: [
             "electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "tests/strictTests/electron/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true,
         isolate: true,

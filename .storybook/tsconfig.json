@@ -5,5 +5,11 @@
         "noEmit": true
     },
     "extends": "../tsconfig.json",
-    "include": ["./**/*.ts", "./**/*.tsx"]
+    "exclude": [],
+    "include": [
+        "./**/*.ts",
+        "./**/*.tsx",
+        "../storybook/**/*.ts",
+        "../storybook/**/*.tsx"
+    ]
 }

@@ -13,19 +13,25 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("electron", () => {
     // Create a single mock browser window that can be reused
     const mockWindow = {
-        getAllWindows: vi.fn(),
-        isDestroyed: vi.fn(() => false),
         close: vi.fn(),
-        show: vi.fn(),
-        loadURL: vi.fn().mockResolvedValue(undefined),
+        isDestroyed: vi.fn(() => false),
         loadFile: vi.fn().mockResolvedValue(undefined),
-        once: vi.fn(),
+        loadURL: vi.fn().mockResolvedValue(undefined),
         on: vi.fn(),
+        once: vi.fn(),
+        removeListener: vi.fn(),
+        show: vi.fn(),
         webContents: {
-            send: vi.fn(),
-            openDevTools: vi.fn(),
-            once: vi.fn(),
             on: vi.fn(),
+            once: vi.fn(),
+            openDevTools: vi.fn(),
+            removeListener: vi.fn(),
+            send: vi.fn(),
+            session: {
+                webRequest: {
+                    onHeadersReceived: vi.fn(),
+                },
+            },
         },
     };
 
@@ -33,6 +39,7 @@ vi.mock("electron", () => {
         return mockWindow;
     }) as any;
     MockBrowserWindow.getAllWindows = vi.fn();
+    MockBrowserWindow.__mockWindow = mockWindow;
 
     return {
         BrowserWindow: MockBrowserWindow,
@@ -91,6 +98,27 @@ describe(WindowService, () => {
         // Setup default mock returns
         vi.mocked(isDev).mockReturnValue(false);
         vi.mocked(BrowserWindow.getAllWindows).mockReturnValue([]);
+
+        const mockWindowRef = (
+            BrowserWindow as unknown as { __mockWindow: any }
+        ).__mockWindow;
+        vi.mocked(mockWindowRef.isDestroyed).mockReturnValue(false);
+        vi.mocked(mockWindowRef.removeListener).mockImplementation(() => {
+            // noop for cleanup assertions
+        });
+        vi.mocked(mockWindowRef.webContents.removeListener).mockImplementation(
+            () => {
+                // noop for cleanup assertions
+            }
+        );
+        vi.mocked(
+            mockWindowRef.webContents.session.webRequest.onHeadersReceived
+        ).mockImplementation(() => {
+            // Default noop
+        });
+        vi.mocked(mockWindowRef.webContents.openDevTools).mockImplementation(
+            () => undefined
+        );
 
         // Create new service instance
         windowService = new WindowService();
@@ -379,6 +407,40 @@ describe(WindowService, () => {
             expect(window.show).toHaveBeenCalled();
         });
 
+        it("should avoid showing the window when headless flags are set", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Event Processing", "type");
+
+            const originalHeadless = process.env.HEADLESS;
+            process.env.HEADLESS = "true";
+
+            const window = windowService.createMainWindow();
+            const readyCallback = (
+                vi.mocked(window.once).mock.calls as any[]
+            ).find(
+                (call: any) => call[0] === "ready-to-show"
+            )?.[1] as () => void;
+
+            expect(readyCallback).toBeDefined();
+            readyCallback();
+
+            expect(logger.info).toHaveBeenCalledWith(
+                "[WindowService] Running in headless mode - window will not be shown"
+            );
+            expect(window.show).not.toHaveBeenCalled();
+
+            if (originalHeadless === undefined) {
+                delete process.env.HEADLESS;
+            } else {
+                process.env.HEADLESS = originalHeadless;
+            }
+        });
+
         it("should handle dom-ready event", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: WindowService", "component");
@@ -658,6 +720,160 @@ describe(WindowService, () => {
                     })
                 );
             });
+
+            it("should log a warning when opening DevTools fails", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Error Handling", "type");
+
+                vi.useFakeTimers();
+
+                try {
+                    const window = windowService.createMainWindow();
+                    vi.mocked(window.isDestroyed).mockReturnValue(false);
+                    vi.mocked(
+                        window.webContents.openDevTools
+                    ).mockImplementation(() => {
+                        throw new Error("DevTools blocked");
+                    });
+
+                    await (
+                        windowService as unknown as {
+                            loadDevelopmentContent: () => Promise<void>;
+                        }
+                    ).loadDevelopmentContent();
+
+                    await vi.runAllTimersAsync();
+
+                    expect(logger.warn).toHaveBeenCalledWith(
+                        "[WindowService] Failed to open DevTools",
+                        expect.objectContaining({
+                            error: "DevTools blocked",
+                            windowState: "active",
+                        })
+                    );
+                } finally {
+                    vi.useRealTimers();
+                }
+            });
+
+            it("should skip DevTools opening when the window is destroyed before the delay elapses", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: WindowService", "component");
+                await annotate("Category: Service", "category");
+                await annotate("Type: Business Logic", "type");
+
+                vi.useFakeTimers();
+
+                try {
+                    const window = windowService.createMainWindow();
+                    vi.mocked(window.isDestroyed).mockReturnValue(false);
+
+                    await (
+                        windowService as unknown as {
+                            loadDevelopmentContent: () => Promise<void>;
+                        }
+                    ).loadDevelopmentContent();
+
+                    vi.mocked(window.isDestroyed).mockReturnValue(true);
+
+                    await vi.runAllTimersAsync();
+
+                    expect(
+                        window.webContents.openDevTools
+                    ).not.toHaveBeenCalled();
+                } finally {
+                    vi.useRealTimers();
+                }
+            });
+        });
+    });
+
+    describe("security headers", () => {
+        it("should apply strict production security headers", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const mockWindowRef = (
+                BrowserWindow as unknown as { __mockWindow: any }
+            ).__mockWindow;
+            const headerSpy = vi.mocked(
+                mockWindowRef.webContents.session.webRequest.onHeadersReceived
+            );
+
+            windowService.createMainWindow();
+
+            expect(headerSpy).toHaveBeenCalledWith(expect.any(Function));
+            const [handler] = headerSpy.mock.calls[0];
+            const callback = vi.fn();
+
+            handler(
+                {
+                    responseHeaders: {},
+                } as any,
+                callback
+            );
+
+            expect(callback).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    cancel: false,
+                    responseHeaders: expect.objectContaining({
+                        "Permissions-Policy": [
+                            "camera=(), microphone=(), geolocation=(), fullscreen=()",
+                        ],
+                        "Referrer-Policy": ["no-referrer"],
+                        "X-Content-Type-Options": ["nosniff"],
+                        "X-Frame-Options": ["DENY"],
+                    }),
+                })
+            );
+        });
+
+        it("should warn when applying security middleware fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Security", "type");
+
+            vi.mocked(isDev).mockReturnValue(false);
+
+            const mockWindowRef = (
+                BrowserWindow as unknown as { __mockWindow: any }
+            ).__mockWindow;
+            const headerSpy = vi.mocked(
+                mockWindowRef.webContents.session.webRequest.onHeadersReceived
+            );
+            headerSpy.mockImplementationOnce(() => {
+                throw new Error("session unavailable");
+            });
+
+            windowService.createMainWindow();
+
+            expect(logger.warn).toHaveBeenCalledWith(
+                "[WindowService] Failed to attach security header middleware",
+                expect.objectContaining({
+                    error: expect.objectContaining({
+                        message: "session unavailable",
+                    }),
+                })
+            );
         });
     });
 
@@ -704,6 +920,61 @@ describe(WindowService, () => {
                     }),
                 })
             );
+        });
+    });
+
+    describe("lifecycle cleanup", () => {
+        it("should remove window event listeners during cleanup", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const window = windowService.createMainWindow();
+
+            windowService.cleanupWindowEvents();
+
+            expect(window.removeListener).toHaveBeenCalledWith(
+                "ready-to-show",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "dom-ready",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "did-finish-load",
+                expect.any(Function)
+            );
+            expect(window.webContents.removeListener).toHaveBeenCalledWith(
+                "did-fail-load",
+                expect.any(Function)
+            );
+            expect(window.removeListener).toHaveBeenCalledWith(
+                "closed",
+                expect.any(Function)
+            );
+        });
+
+        it("should skip cleanup when the window has been destroyed", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const window = windowService.createMainWindow();
+            vi.mocked(window.isDestroyed).mockReturnValue(true);
+
+            windowService.cleanupWindowEvents();
+
+            expect(window.removeListener).not.toHaveBeenCalled();
+            expect(window.webContents.removeListener).not.toHaveBeenCalled();
         });
     });
 
@@ -773,6 +1044,250 @@ describe(WindowService, () => {
         });
     });
 
+    describe("Vite server detection", () => {
+        it("should detect server readiness when fetch is not mocked", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const originalFetch = globalThis.fetch;
+
+            const plainFetch = async () => ({ ok: true }) as Response;
+
+            (globalThis as unknown as { fetch: typeof plainFetch }).fetch =
+                plainFetch;
+
+            vi.mocked(logger.debug).mockClear();
+
+            try {
+                await (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer();
+
+                expect(logger.debug).toHaveBeenCalledWith(
+                    "[WindowService] Vite dev server is ready"
+                );
+            } finally {
+                (globalThis as any).fetch = originalFetch;
+            }
+        });
+
+        it("should retry until the server responds successfully", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Business Logic", "type");
+
+            const originalFetch = globalThis.fetch;
+            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
+
+            let attempts = 0;
+            const retryingFetch = async () => {
+                attempts += 1;
+                return { ok: attempts > 1 } as Response;
+            };
+
+            (globalThis as any).fetch = retryingFetch;
+
+            try {
+                const waitPromise = (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer();
+
+                await waitPromise;
+
+                expect(attempts).toBe(2);
+                expect(logger.debug).toHaveBeenCalledWith(
+                    expect.stringContaining("Waiting 500ms before retry 2/20")
+                );
+            } finally {
+                (globalThis as any).fetch = originalFetch;
+                randomSpy.mockRestore();
+            }
+        });
+
+        it("should surface errors when mocked fetch indicates server unavailability", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            const originalFetch = globalThis.fetch;
+            const failingFetch = vi.fn().mockResolvedValue({
+                ok: false,
+            } as Response);
+
+            (globalThis as any).fetch = failingFetch;
+
+            await expect(
+                (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer()
+            ).rejects.toThrow(
+                "Mocked fetch reported Vite server as unavailable"
+            );
+
+            (globalThis as any).fetch = originalFetch;
+        });
+
+        it("should exhaust retries when the server never becomes available", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.useFakeTimers();
+
+            const originalFetch = globalThis.fetch;
+            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
+
+            let attempts = 0;
+            (globalThis as any).fetch = async () => {
+                attempts += 1;
+                return { ok: false } as Response;
+            };
+
+            try {
+                const waitPromise = (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer();
+
+                for (let attempt = 0; attempt < 19; attempt++) {
+                    await vi.advanceTimersToNextTimerAsync();
+                }
+
+                await expect(waitPromise).rejects.toThrow(
+                    "Vite dev server did not become available after 20 attempts"
+                );
+                expect(attempts).toBe(20);
+            } finally {
+                (globalThis as any).fetch = originalFetch;
+                randomSpy.mockRestore();
+                vi.useRealTimers();
+            }
+        });
+
+        it("should log retry diagnostics for non-abort errors", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.useFakeTimers();
+
+            const originalFetch = globalThis.fetch;
+            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
+            vi.mocked(logger.debug).mockClear();
+
+            let attempts = 0;
+            (globalThis as any).fetch = async () => {
+                attempts += 1;
+                if (attempts === 1) {
+                    throw new Error("network down");
+                }
+                return { ok: true } as Response;
+            };
+
+            try {
+                const waitPromise = (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer();
+
+                await vi.advanceTimersToNextTimerAsync();
+                await waitPromise;
+
+                expect(attempts).toBe(2);
+                expect(logger.debug).toHaveBeenCalledWith(
+                    expect.stringContaining("network down")
+                );
+            } finally {
+                (globalThis as any).fetch = originalFetch;
+                randomSpy.mockRestore();
+                vi.useRealTimers();
+            }
+        });
+
+        it("should avoid redundant logs for abort errors before the final attempt", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: WindowService", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Error Handling", "type");
+
+            vi.useFakeTimers();
+
+            const originalFetch = globalThis.fetch;
+            const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
+            vi.mocked(logger.debug).mockClear();
+
+            let attempts = 0;
+            (globalThis as any).fetch = async () => {
+                attempts += 1;
+                if (attempts < 3) {
+                    const abortError = new Error("timeout");
+                    abortError.name = "AbortError";
+                    throw abortError;
+                }
+                return { ok: true } as Response;
+            };
+
+            try {
+                const waitPromise = (
+                    windowService as unknown as {
+                        waitForViteServer: () => Promise<void>;
+                    }
+                ).waitForViteServer();
+
+                await vi.advanceTimersToNextTimerAsync();
+                await vi.advanceTimersToNextTimerAsync();
+
+                await waitPromise;
+
+                const retryLogs = vi
+                    .mocked(logger.debug)
+                    .mock.calls.filter(
+                        ([message]) =>
+                            typeof message === "string" &&
+                            message.includes("Vite server not ready")
+                    );
+                expect(retryLogs).toHaveLength(0);
+                expect(attempts).toBe(3);
+            } finally {
+                (globalThis as any).fetch = originalFetch;
+                randomSpy.mockRestore();
+                vi.useRealTimers();
+            }
+        });
+    });
+
     describe("edge cases", () => {
         it("should handle destroyed window in ready-to-show event", async ({
             task,
@@ -798,6 +1313,44 @@ describe(WindowService, () => {
 
             // Should not crash when trying to show destroyed window
             expect(() => readyCallback()).not.toThrow();
+        });
+    });
+
+    describe("environment flag helper", () => {
+        it("should return false when process is undefined", () => {
+            const originalProcess = globalThis.process;
+
+            try {
+                (globalThis as any).process = undefined;
+                expect(
+                    (
+                        windowService as unknown as {
+                            getEnvFlag: (name: string) => boolean;
+                        }
+                    ).getEnvFlag("SHOULD_NOT_EXIST")
+                ).toBeFalsy();
+            } finally {
+                (globalThis as any).process = originalProcess;
+            }
+        });
+
+        it("should read boolean environment flags safely", () => {
+            const originalValue = process.env.HEADLESS;
+            process.env.HEADLESS = "true";
+
+            expect(
+                (
+                    windowService as unknown as {
+                        getEnvFlag: (name: string) => boolean;
+                    }
+                ).getEnvFlag("HEADLESS")
+            ).toBeTruthy();
+
+            if (originalValue === undefined) {
+                delete process.env.HEADLESS;
+            } else {
+                process.env.HEADLESS = originalValue;
+            }
         });
     });
 });
