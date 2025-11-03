@@ -30,27 +30,35 @@ interface HealthIndicatorProperties {
 export const HealthIndicator = ({
     getAvailabilityColor,
     uptimePercentage,
-}: HealthIndicatorProperties): JSX.Element => (
-    <div
-        className="group health-badge flex items-center space-x-2 rounded-md px-3 py-1 transition-all duration-200"
-        data-health-color={getAvailabilityColor(uptimePercentage)}
-    >
+}: HealthIndicatorProperties): JSX.Element => {
+    const healthColor = getAvailabilityColor(uptimePercentage);
+
+    return (
         <div
-            className="health-dot h-3 w-3 animate-pulse rounded-full"
-            data-health-color={getAvailabilityColor(uptimePercentage)}
-        />
-        <div className="flex flex-col">
-            <ThemedText
-                className="health-text"
-                data-health-color={getAvailabilityColor(uptimePercentage)}
-                size="sm"
-                weight="bold"
-            >
-                {uptimePercentage}%
-            </ThemedText>
-            <ThemedText className="leading-none" size="xs" variant="secondary">
-                Health
-            </ThemedText>
+            className="group health-badge flex items-center space-x-2 rounded-md px-3 py-1 transition-all duration-200"
+            data-health-color={healthColor}
+        >
+            <div
+                className="health-dot h-3 w-3 animate-pulse rounded-full"
+                data-health-color={healthColor}
+            />
+            <div className="flex flex-col">
+                <ThemedText
+                    className="health-text"
+                    data-health-color={healthColor}
+                    size="sm"
+                    weight="bold"
+                >
+                    {uptimePercentage}%
+                </ThemedText>
+                <ThemedText
+                    className="leading-none"
+                    size="xs"
+                    variant="secondary"
+                >
+                    Health
+                </ThemedText>
+            </div>
         </div>
-    </div>
-);
+    );
+};

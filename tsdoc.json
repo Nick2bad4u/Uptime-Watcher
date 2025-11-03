@@ -4,7 +4,7 @@
         "typedoc/tsdoc.json"
     ],
     "noStandardTags": false,
-    "supportForTags": {},
     "reportUnsupportedHtmlElements": true,
+    "supportForTags": {},
     "tagDefinitions": []
 }

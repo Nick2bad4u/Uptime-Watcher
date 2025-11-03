@@ -537,6 +537,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             []
         );
 
+        const resolvedErrorMessage = formError ?? lastError ?? "";
+        const shouldRenderErrorAlert = resolvedErrorMessage.length > 0;
+
         return (
             <SurfaceContainer
                 className="mx-auto max-w-md"
@@ -645,9 +648,9 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                     </ThemedButton>
 
                     {/* Error Message */}
-                    {(lastError ?? formError) ? (
+                    {shouldRenderErrorAlert ? (
                         <ErrorAlert
-                            message={formError ?? lastError ?? ""}
+                            message={resolvedErrorMessage}
                             onDismiss={onClearError}
                             variant="error"
                         />

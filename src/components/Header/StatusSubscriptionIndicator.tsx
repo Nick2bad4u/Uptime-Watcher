@@ -16,89 +16,13 @@ import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { AppIcons } from "../../utils/icons";
 import { Tooltip } from "../common/Tooltip/Tooltip";
+import {
+    formatListenerDetail,
+    formatListenerSummary,
+    formatRetryAttemptSummary,
+} from "./StatusSubscriptionIndicator.utils";
 
 const RefreshIconComponent = AppIcons.actions.refresh;
-
-/**
- * Formats the channel label based on the supplied count.
- *
- * @param count - Number of channels attached.
- *
- * @returns Singular or plural channel label.
- */
-const formatChannelLabel = (count: number): string =>
-    count === 1 ? "channel" : "channels";
-
-/**
- * Builds a concise summary describing realtime channel attachment progress.
- *
- * @param summary - Latest realtime subscription summary from the sites store.
- *
- * @returns Human-readable sentence describing channel status.
- */
-const formatListenerSummary = (
-    summary: StatusUpdateSubscriptionSummary | undefined
-): string => {
-    if (!summary) {
-        return "Connection pending";
-    }
-
-    const { expectedListeners, listenersAttached } = summary;
-    if (expectedListeners === 0) {
-        return "Realtime channels disabled";
-    }
-
-    if (listenersAttached >= expectedListeners) {
-        const noun = expectedListeners === 1 ? "channel" : "channels";
-        return `${expectedListeners} ${noun} active`;
-    }
-
-    const noun = expectedListeners === 1 ? "channel" : "channels";
-    return `${listenersAttached}/${expectedListeners} ${noun} attached`;
-};
-
-/**
- * Creates a detailed progress message for tooltip descriptions.
- *
- * @param summary - Latest realtime subscription summary from the sites store.
- *
- * @returns Detailed explanation of current channel attachment progress.
- */
-const formatListenerDetail = (
-    summary: StatusUpdateSubscriptionSummary | undefined
-): string => {
-    if (!summary) {
-        return "Awaiting the initial realtime channel attachment.";
-    }
-
-    const { expectedListeners, listenersAttached } = summary;
-    if (expectedListeners === 0) {
-        return "No realtime channels are required in this environment.";
-    }
-
-    if (listenersAttached >= expectedListeners) {
-        const noun = expectedListeners === 1 ? "channel" : "channels";
-        return `All ${expectedListeners} ${noun} are currently attached.`;
-    }
-
-    const noun = expectedListeners === 1 ? "channel" : "channels";
-    const attachedNoun = listenersAttached === 1 ? "channel" : "channels";
-    return `${listenersAttached} ${attachedNoun} attached out of ${expectedListeners} ${noun}.`;
-};
-
-/**
- * Formats tooltip copy describing the latest retry attempt outcome.
- *
- * @param attempt - Most recent retry attempt summary.
- *
- * @returns Description of the retry attempt when available.
- */
-const formatRetryAttemptSummary = (
-    attempt: null | StatusUpdateSubscriptionSummary
-): string | undefined =>
-    attempt
-        ? `Last retry attached ${attempt.listenersAttached}/${attempt.expectedListeners} ${formatChannelLabel(attempt.expectedListeners)}.`
-        : undefined;
 
 /**
  * Renders realtime subscription health summary with retry controls.
