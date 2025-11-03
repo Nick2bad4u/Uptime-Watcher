@@ -9,6 +9,8 @@
  * - High code quality with reduced false positives
  * - Modern ES2024+ features
  * - Enhanced security and performance rules
+ *
+ * @see {@link https://www.schemastore.org/eslintrc.json} for JSON schema validation
  */
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Eslint doesn't use default */
 /* eslint-disable import-x/no-named-as-default-member -- Rule wants packages not in dev, doesn't apply, eslint doesnt use default import */

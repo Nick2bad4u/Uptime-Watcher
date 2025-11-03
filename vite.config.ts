@@ -764,6 +764,7 @@ export default defineConfig(({ mode }) => {
                 exclude: [
                     "**/*.config.*",
                     "**/*.d.ts",
+                    "**/assets/**", // Exclude any assets folder anywhere
                     "**/dist/**", // Exclude any dist folder anywhere
                     "**/docs/**", // Exclude documentation files
                     "**/index.ts", // Exclude all barrel export files

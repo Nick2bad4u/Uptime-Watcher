@@ -8,6 +8,8 @@ description: "Run a consistency audit tailored for the Uptime Watcher Electron +
 
 ## Objective
 
+This is a generic prompt to conduct a thorough consistency audit of the Uptime Watcher codebase, ensuring architectural alignment and uniformity across layers and modules. You might have to adapt based on the current state of the codebase or recent changes.
+
 Review implementation code across the stack to confirm the project continues to follow its layered Electron + React architecture. Cover foundational utilities, services, platform glue, and renderer-facing modules without dwelling on test-only files.
 
 Go in detail to identify inconsistencies in structure, data flow, logic, and interfaces that could lead to maintenance challenges or bugs. Provide a prioritized report of findings with actionable recommendations for alignment.

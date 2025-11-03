@@ -25,11 +25,14 @@ handoffs:
    agent: BeastMode
    prompt: Improve the TSDoc comments in the codebase, follow the plan in .github/prompts/TSDoc-Improvements-Checklist.prompt.md
    send: false
- - label: Add to ToDo and Finish ToDo
+ - label: Add ToDo
    agent: BeastMode
-   prompt: Add findings to the ToDo list (if any new findings) and complete any outstanding tasks on the todo list. Follow the plan in .github/prompts/Do-ToDo.prompt.md
+   prompt: Add findings to the ToDo list (if any new findings). Follow the plan in .github/prompts/Add-ToDo.prompt.md
+ - label: Continue
+   agent: BeastMode
+   prompt: Continue working on the ToDo list items. Follow the plan in .github/prompts/Continue.prompt.md
    send: false
- - label: Review Work
+ - label: Review
    agent: BeastMode
    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false

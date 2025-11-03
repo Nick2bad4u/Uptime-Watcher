@@ -1,4 +1,5 @@
 {
+    "$schema": "../config/schemas/devin-wiki.schema.json",
     "pages": [
         {
             "page_notes": [

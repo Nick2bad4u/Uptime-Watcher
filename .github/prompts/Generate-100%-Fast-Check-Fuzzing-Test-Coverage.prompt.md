@@ -5,6 +5,7 @@ tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fil
 description: "Generate 100% Fast-Check Fuzzing Test Coverage"
 
 ---
+*Note: This is a generic prompt to achieve complete Playwright test coverage for a JavaScript/TypeScript project. You might have to adapt based on the current state of the codebase or recent changes. Use unlimited time and requests as needed.*
 
 # Review All Coverage and Test Files
 
