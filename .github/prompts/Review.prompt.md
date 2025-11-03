@@ -1,8 +1,8 @@
 ---
 agent: "BeastMode"
-tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/terminalLastCommand', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'electron-mcp-server/get_electron_window_info', 'electron-mcp-server/send_command_to_electron', 'electron-mcp-server/take_screenshot', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
 argument-hint: "This task involves reviewing the entire TODO list for completion, finishing any unfinished items, ensuring all linters, tests, and typechecks pass, and conducting a final review of all work."
 description: "Review TODO List Completion, Run Quality Checks, and Review Work"
+name: "Review"
 ---
 
 - Begin by reviewing the entire TODO list in the designated TODO.md file at the repository root. Assess each item for completion status, implementation details, and any outstanding issues.

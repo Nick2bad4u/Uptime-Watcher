@@ -1,8 +1,8 @@
 ---
 agent: "BeastMode"
-tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/terminalLastCommand', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'electron-mcp-server/get_electron_window_info', 'electron-mcp-server/send_command_to_electron', 'electron-mcp-server/take_screenshot', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runSubagent', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runTests']
 argument-hint: "Continue working through the existing TODO list, resuming from where you left off."
 description: "Continue Addressing TODO List Items"
+name: "Continue"
 ---
 
 - This is a generic continuation prompt to pick up where you left off in the TODO list, you might have to adapt based on the current state of the TODO list.
@@ -26,3 +26,4 @@ description: "Continue Addressing TODO List Items"
 - Review your work thoroughly to ensure all tasks are completed correctly and the codebase remains stable.
 - After finishing the TODO list, take your time to review your work rigorously, especially any changes you made. Your solution must be perfect. If not, continue working on it.
 - Always run linters, tests, and type checks after making changes to ensure everything is functioning correctly.
+- You have unlimited time and resources to complete this task thoroughly. Do not rush; focus on quality and correctness. Complete as much as you can until all items in the TODO list are resolved.

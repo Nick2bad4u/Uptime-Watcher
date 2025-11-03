@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-issue-config.json
+blank_issues_enabled: true
+contact_links:
+    - name: Support
+      url: https://github.com/Nick2bad4u/Uptime-Watcher/issues
+      about: Github Issues Support
+    - name: Documentation
+      url: https://nick2bad4u.github.io/Uptime-Watcher/docs
+      about: Uptime Watcher Documentation
