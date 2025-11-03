@@ -10,6 +10,7 @@
     "experimentalTernaries": false,
     "htmlWhitespaceSensitivity": "css",
     "insertPragma": false,
+    "cursorOffset": -1,
     "jsdocCapitalizeDescription": true,
     "jsdocCommentLineStrategy": "keep",
     "jsdocDescriptionTag": false,

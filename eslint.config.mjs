@@ -186,6 +186,15 @@ import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract
 // Schema: https://www.schemastore.org/eslintrc.json
 // const __filename = fileURLToPath(import.meta.url);
 // const gitignorePath = path.resolve(__dirname, ".gitignore");
+
+/**
+ * @see {@link https://www.schemastore.org/eslintrc.json} for JSON schema validation
+ */
+
+/** @typedef {import("eslint").Linter.Config} EslintConfig */
+/** @typedef {import("eslint").Linter.BaseConfig} BaseEslintConfig */
+/** @typedef {import("eslint").Linter.LinterOptions} LinterOptions */
+
 const require = createRequire(import.meta.url);
 const ROOT_DIR = import.meta.dirname;
 
@@ -205,7 +214,7 @@ if (!process.env.RECHECK_JAR) {
         process.env.RECHECK_JAR = path.normalize(resolvedRecheckJarPath);
     }
 }
-export default [
+export default /** @type {EslintConfig} */ [
     gitignore({
         name: "Global .gitignore Rules",
         root: true,
@@ -305,6 +314,7 @@ export default [
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
     pluginComments.recommended,
+    // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1219,6 +1229,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -1236,6 +1247,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -1257,6 +1269,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -1264,6 +1277,7 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -1292,6 +1306,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -1307,8 +1322,11 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -1319,6 +1337,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...etc.configs.recommended.rules,
             "@docusaurus/no-html-links": "warn",
             "@docusaurus/no-untranslated-text": "off",
@@ -1661,7 +1680,7 @@ export default [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/unified-signatures": "off",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "boundaries/element-types": [
                 "off",
@@ -2585,6 +2604,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -2603,6 +2623,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -2633,6 +2654,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -2641,6 +2663,7 @@ export default [
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "ssr-friendly": fixupPluginRules(pluginSSR),
             storybook: storybook,
             "styled-components-a11y": styledA11y,
@@ -2671,6 +2694,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -2687,8 +2711,11 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -2702,6 +2729,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...etc.configs.recommended.rules,
             ...pluginBetterTailwindcss.configs.correctness.rules,
             "@arthurgeron/react-usememo/require-memo": "off",
@@ -3056,7 +3084,7 @@ export default [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/unified-signatures": "off",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -4158,6 +4186,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             etc: fixupPluginRules(etc),
             ex: ex,
             "format-sql": pluginFormatSQL,
@@ -4175,6 +4204,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -4197,6 +4227,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -4204,6 +4235,7 @@ export default [
             "sort-destructure-keys": pluginSortDestructure,
             "sort-keys-fix": pluginSortKeysFix,
             "sql-template": sqlTemplate,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -4232,6 +4264,7 @@ export default [
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
             ...importX.flatConfigs.electron.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -4248,8 +4281,11 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginMicrosoftSdl.configs.required.rules,
             ...listeners.configs.strict.rules,
             ...pluginNFDAR.rules,
@@ -4260,6 +4296,7 @@ export default [
             ...moduleInterop.configs.recommended.rules,
             ...pluginTotalFunctions.configs.recommended.rules,
             ...styledA11y.flatConfigs.strict.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...etc.configs.recommended.rules,
             "@eslint-community/eslint-comments/no-restricted-disable": "warn",
             "@eslint-community/eslint-comments/no-unused-disable": "warn",
@@ -4607,7 +4644,7 @@ export default [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/unified-signatures": "off",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -5522,6 +5559,7 @@ export default [
             deprecation: fixupPluginRules(pluginDeprecation),
             "eslint-plugin-goodeffects": pluginGoodEffects,
             "eslint-plugin-toplevel": pluginTopLevel,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             etc: fixupPluginRules(etc),
             ex: ex,
             "filename-export": pluginFilenameExport,
@@ -5540,6 +5578,7 @@ export default [
             math: eslintPluginMath,
             "module-interop": moduleInterop,
             n: nodePlugin,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             neverthrow: fixupPluginRules(pluginNeverThrow),
             "no-constructor-bind": pluginNoConstructBind,
             "no-explicit-type-exports": pluginNoExplicitTypeExports,
@@ -5570,6 +5609,7 @@ export default [
             redos: pluginRedos,
             regexp: pluginRegexp,
             "require-jsdoc": pluginJSDoc,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "safe-jsx": fixupPluginRules(pluginSafeJSX),
             security: pluginSecurity,
             sonarjs: pluginSonarjs,
@@ -5578,6 +5618,7 @@ export default [
             "sort-keys-fix": pluginSortKeysFix,
             "sort-react-dependency-arrays": pluginSortReactDependency,
             "sql-template": sqlTemplate,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             "ssr-friendly": fixupPluginRules(pluginSSR),
             "styled-components-a11y": styledA11y,
             "switch-case": pluginSwitchCase,
@@ -5607,6 +5648,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -5623,8 +5665,11 @@ export default [
             ...pluginComments.recommended.rules,
             ...pluginCanonical.configs.recommended.rules,
             ...eslintReact.configs["recommended-type-checked"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginSortClassMembers.configs["flat/recommended"].rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...eslintPluginNoUseExtendNative.configs.recommended.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginMicrosoftSdl.configs.required.rules,
             ...reactCompiler.configs.recommended.rules,
             ...listeners.configs.strict.rules,
@@ -5638,6 +5683,7 @@ export default [
             ...styledA11y.flatConfigs.strict.rules,
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...etc.configs.recommended.rules,
             "@arthurgeron/react-usememo/require-memo": "warn",
             "@arthurgeron/react-usememo/require-usememo": "error",
@@ -5990,7 +6036,7 @@ export default [
             "@typescript-eslint/switch-exhaustiveness-check": "error", // Ensure switch statements are exhaustive
             "@typescript-eslint/triple-slash-reference": "warn",
             "@typescript-eslint/unbound-method": "warn",
-            "@typescript-eslint/unified-signatures": "warn",
+            "@typescript-eslint/unified-signatures": "off",
             "@typescript-eslint/use-unknown-in-catch-callback-variable": "warn",
             "antfu/consistent-chaining": "warn",
             "antfu/consistent-list-newline": "off",
@@ -7811,6 +7857,7 @@ export default [
             "@typescript-eslint/no-unsafe-function-type": "off",
             "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/require-await": "off", // Benchmarks may have async patterns
+            "@typescript-eslint/unified-signatures": "off",
             camelcase: "off",
             "capitalized-comments": [
                 "error",
@@ -8038,6 +8085,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...jsxA11y.flatConfigs.strict.rules,
@@ -8735,6 +8783,7 @@ export default [
             ...importX.flatConfigs.electron.rules,
             ...importX.flatConfigs.react.rules,
             ...importX.flatConfigs.typescript.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, using fixupPluginRules causes this
             ...pluginPromise.configs["flat/recommended"].rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginReact.configs.all.rules,
@@ -9205,6 +9254,7 @@ export default [
             "@typescript-eslint/prefer-ts-expect-error": "off", // Deprecated
             "@typescript-eslint/sort-type-constituents": "off", // Deprecated
             "@typescript-eslint/typedef": "off", // Deprecated
+            "@typescript-eslint/unified-signatures": "off", // Broken due to: TypeError: typeParameters.params is not iterable
             // Better-tailwindcss
             "better-tailwindcss/multiline": "off",
             "better-tailwindcss/sort-classes": "off",
@@ -9273,6 +9323,7 @@ export default [
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "unicorn/prefer-spread": "off", // Prefer Array.from
+
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules

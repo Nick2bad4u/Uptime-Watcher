@@ -60,6 +60,9 @@ import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 /** @typedef {{ allowExtensionless?: boolean; extensions?: string[] }} FileExtensionOptions */
 
 /** @type {RemarkConfig} */
+
+/** @typedef {RemarkConfig} */
+
 const remarkConfig = {
     // Core plugins for GitHub Flavored Markdown and formatting integration
     plugins: [
@@ -177,4 +180,4 @@ const remarkConfig = {
     },
 };
 
-export default remarkConfig;
+export default /** @type {RemarkConfig} */ remarkConfig;

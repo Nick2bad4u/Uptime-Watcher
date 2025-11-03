@@ -5,7 +5,7 @@ description: "Continue Addressing TODO List Items"
 name: "Continue"
 ---
 
-- This is a generic continuation prompt to pick up where you left off in the TODO list, you might have to adapt based on the current state of the TODO list.
+- This is a generic continuation prompt to pick up where you left off in the TODO list, you might have to adapt based on the current state of the TODO list. The file is located at the repository root as TODO.md.
 - Start by reviewing the TODO.md file at the repository root to identify the current state of all pending tasks.
 - Update current if any completed tasks have not yet been marked as done.
 - Locate the next incomplete TODO item (those not marked as done or resolved).
