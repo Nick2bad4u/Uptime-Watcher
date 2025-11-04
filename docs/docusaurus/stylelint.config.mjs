@@ -10,6 +10,22 @@
  */
 /** @type {import("stylelint").Config} */
 
+/**
+ * Type definition for the complete Stylelint configuration object.
+ *
+ * @see {@link https://stylelint.io/user-guide/configure | Stylelint Config Schema}
+ */
+
+/** @typedef {import("stylelint").Config} */
+/** @typedef {import("stylelint").LinterOptions} */
+/** @typedef {import("stylelint").PostcssPluginOptions} */
+/** @typedef {import("stylelint").WarningOptions} */
+/** @typedef {import("stylelint").RuleOptions} */
+/** @typedef {import("stylelint").RuleOptionsPossible} */
+/** @typedef {import("stylelint").PostcssPluginOptions} */
+/** @typedef {import("stylelint").LinterOptions} */
+/** @typedef {import("stylelint").GetPostcssOptions} */
+
 export default {
     extends: [
         "stylelint-config-standard",

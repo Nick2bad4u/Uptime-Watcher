@@ -1,6 +1,10 @@
-# eslint-disable toml/key-spacing, toml/array-bracket-spacing -- Schema doesnt like it
+# eslint-disable toml/key-spacing -- Schema doesnt like it
 # ~/.taplo.toml
 # yaml-language-server: $schema=https://www.schemastore.org/taplo.json
+[schema]
+    enabled = true
+    url     = "https://www.schemastore.org/taplo.json"
+
 [formatting]
     # Match Prettier's 4-space indent / spaces, not tabs
     indent_string         = "    "
@@ -48,22 +52,22 @@
         array_auto_collapse = false
 
 [[rule]]
-    include = ["eslint.config.mjs"]
+    include = [ "eslint.config.mjs" ]
 
     [rule.formatting]
         array_auto_collapse = false
 
 [[rule]]
-    include = ["*.html"]
+    include = [ "*.html" ]
 
     [rule.formatting]
         column_width          = 80
         compact_inline_tables = false
 
 [[rule]]
-    include = ["*.md"]
+    include = [ "*.md" ]
 
     [rule.formatting]
         # Prettier tabWidth: 1
         indent_string = " "
-        # eslint-enable toml/key-spacing, toml/array-bracket-spacing  -- Schema doesnt like it
+        # eslint-enable toml/key-spacing  -- Schema doesnt like it

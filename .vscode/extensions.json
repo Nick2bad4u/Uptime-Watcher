@@ -1,4 +1,5 @@
 {
+    "$schema": "vscode://schemas/extensions",
     "recommendations": [
         "slevesque.vscode-zipexplorer",
         "vscode-icons-team.vscode-icons",

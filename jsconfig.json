@@ -1,0 +1,26 @@
+{
+    "$schema": "https://www.schemastore.org/jsconfig.json",
+    "compilerOptions": {
+        "allowJs": true,
+        "composite": true,
+        "incremental": true,
+        "isolatedDeclarations": false,
+        "outDir": ".cache/builds/jsconfig",
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ],
+            "@assets/*": [
+                "assets/*"
+            ],
+            "@electron/*": [
+                "electron/*"
+            ],
+            "@shared/*": [
+                "shared/*"
+            ]
+        },
+        "tsBuildInfoFile": "./.cache/tsconfig.jsconfig.tsbuildinfo"
+    },
+    "extends": "./tsconfig.json"
+}

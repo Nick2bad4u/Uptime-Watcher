@@ -1,4 +1,5 @@
 {
+    "$schema": "vscode://schemas/settings/workspace",
     "chat.mcp.serverSampling": {
         "Uptime-Watcher/.vscode/mcp.json: storybook": {
             "allowedModels": [

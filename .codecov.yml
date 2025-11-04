@@ -5,16 +5,25 @@
 # yaml-language-server: $schema=https://www.schemastore.org/codecov.json
 
 codecov:
+    allow_pseudo_compare: true # Better handling of pseudo comparisons
     archive:
         uploads: true # Keep historical data for analytics
-
+    assume_all_flags: false # Explicit flag management
     branch: main
+    disable_default_path_fixes: false # Keep default path fixes enabled
     max_report_age: "24h" # Modern syntax - reject reports older than 24 hours
     notify:
         manual_trigger: false # Explicit setting for modern CI/CD pipelines
         notify_error: true # Show upload failures in comments
         wait_for_ci: true
     require_ci_to_pass: true
+    slug: Nick2bad4u/Uptime-Watcher
+    ui:
+        hide_complexity: false # Show complexity metrics
+        hide_contextual: false # Show contextual info in UI
+        hide_density: false # Show density graphs
+        hide_search: false # Enable search functionality
+        hide_sunburst: false # Show sunburst for visual coverage
 comment:
     behavior: default
     hide_project_coverage: false
