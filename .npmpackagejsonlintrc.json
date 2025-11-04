@@ -93,7 +93,6 @@
                 "peerDependencies",
                 "optionalDependencies",
                 "bundledDependencies",
-                "bundleDependencies",
                 "packageManager",
                 "engines",
                 "os",
