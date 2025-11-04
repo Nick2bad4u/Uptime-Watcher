@@ -2,13 +2,31 @@
  * Unit tests for the database initialization helper.
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, expectTypeOf } from "vitest";
 
-vi.mock("../../../../../electron/utils/logger", () => ({
-    monitorLogger: {
+import type { Logger } from "@shared/utils/logger/interfaces";
+
+type LoggerMock = Record<keyof Logger, ReturnType<typeof vi.fn>>;
+
+function createLoggerMock(): LoggerMock {
+    return {
+        debug: vi.fn(),
         error: vi.fn(),
-    },
-}));
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+}
+
+vi.mock("../../../../../electron/utils/logger", () => {
+    const monitorLoggerInstance = createLoggerMock();
+
+    return {
+        dbLogger: createLoggerMock() as unknown as Logger,
+        diagnosticsLogger: createLoggerMock() as unknown as Logger,
+        logger: createLoggerMock() as unknown as Logger,
+        monitorLogger: monitorLoggerInstance as unknown as Logger,
+    } satisfies typeof import("../../../../../electron/utils/logger");
+});
 
 vi.mock("../../../../../electron/utils/operationalHooks", () => ({
     withDatabaseOperation: vi.fn(),
@@ -21,8 +39,11 @@ import type { TypedEventBus } from "../../../../../electron/events/TypedEventBus
 import type { UptimeEvents } from "../../../../../electron/events/eventTypes";
 import type { DatabaseService } from "../../../../../electron/services/database/DatabaseService";
 
+type DatabaseErrorPayload = UptimeEvents["database:error"];
+
 /**
- * Creates a mock database service instance with an instrumented initialize method.
+ * Creates a mock database service instance with an instrumented initialize
+ * method.
  */
 function createDatabaseServiceMock(): {
     initialize: ReturnType<typeof vi.fn>;
@@ -85,7 +106,7 @@ describe("databaseInitializer", () => {
         const loadSites = vi.fn().mockResolvedValue(undefined);
         const initError = new Error("failed to initialize");
 
-        service.initialize = vi.fn(() => {
+        vi.spyOn(service, "initialize").mockImplementation(() => {
             throw initError;
         });
 
@@ -102,14 +123,22 @@ describe("databaseInitializer", () => {
         );
         expect(emitTyped).toHaveBeenCalledTimes(1);
 
-        const [channel, payload] = emitTyped.mock.calls[0];
+        const firstCall = emitTyped.mock.calls.at(0);
+        expect(firstCall).toBeDefined();
+
+        const [channel, payload] = firstCall as [
+            keyof UptimeEvents,
+            DatabaseErrorPayload,
+        ];
+
         expect(channel).toBe("database:error");
         expect(payload).toMatchObject({
             details: "Failed to initialize database",
             error: initError,
             operation: "initialize-database",
         });
-        expect(typeof payload.timestamp).toBe("number");
+
+        expectTypeOf(payload.timestamp).toBeNumber();
     });
 
     it("wraps non-Error failures from the loadSites operation", async () => {
@@ -136,7 +165,14 @@ describe("databaseInitializer", () => {
         );
         expect(emitTyped).toHaveBeenCalledTimes(1);
 
-        const payload = emitTyped.mock.calls[0][1];
+        const firstCall = emitTyped.mock.calls.at(0);
+        expect(firstCall).toBeDefined();
+
+        const [, payload] = firstCall as [
+            keyof UptimeEvents,
+            DatabaseErrorPayload,
+        ];
+
         expect(payload.error).toBeInstanceOf(Error);
         expect(payload.error).toHaveProperty("message", "load failure");
     });

@@ -212,9 +212,18 @@ export async function waitForAppInitialization(
  * Removes every persisted site in the application by calling the electron
  * bridge.
  *
+ * @remarks
+ * When the tests are running against an isolated userData directory (as
+ * indicated by the `PLAYWRIGHT_USER_DATA_DIR` environment variable), this
+ * helper becomes a no-op because the database is discarded after each test.
+ *
  * @param page - Playwright page bound to the primary renderer window.
  */
 export async function removeAllSites(page: Page): Promise<void> {
+    if (typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] === "string") {
+        return;
+    }
+
     await waitForAppInitialization(page);
 
     await page.evaluate(async () => {
@@ -251,7 +260,8 @@ export async function removeAllSites(page: Page): Promise<void> {
  * Clears both local and session storage to discard any persisted Zustand store
  * snapshots before reloading the renderer window. After the reload completes,
  * the helper invokes {@link removeAllSites} to guarantee that the dashboard
- * starts without any persisted site records.
+ * starts without any persisted site records unless the tests are running with
+ * an isolated userData directory (where the database is already empty).
  *
  * @param page - The Playwright page bound to the primary renderer window.
  */
@@ -279,8 +289,12 @@ export async function resetApplicationState(page: Page): Promise<void> {
     });
 
     await page.reload({ waitUntil: "domcontentloaded" });
+    if (typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] !== "string") {
+        await removeAllSites(page);
+        return;
+    }
 
-    await removeAllSites(page);
+    await waitForAppInitialization(page);
 }
 
 /**

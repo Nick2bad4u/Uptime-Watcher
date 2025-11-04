@@ -1,7 +1,7 @@
 /* V8 ignore start */
 
 /** @internal Runtime marker to satisfy coverage for the pure type module. */
-export const __validatorInterfacesRuntimeMarker = true as const;
+export const VALIDATOR_INTERFACES_RUNTIME_MARKER = true as const;
 
 /**
  * Represents the result of a validation operation, providing error details and

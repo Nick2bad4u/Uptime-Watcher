@@ -6,23 +6,9 @@
  * React frontend and user interactions.
  */
 
-import { test, expect, _electron as electron } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-function buildRendererTestEnv(
-    overrides: Record<string, string> = {}
-): Record<string, string> {
-    const baseEnv = Object.entries(process.env).reduce<Record<string, string>>(
-        (accumulator, [key, value]) => {
-            if (typeof value === "string") {
-                accumulator[key] = value;
-            }
-            return accumulator;
-        },
-        {}
-    );
-
-    return { ...baseEnv, ...overrides };
-}
+import { launchElectronApp } from "../fixtures/electron-helpers";
 
 test.describe(
     "electron renderer process",
@@ -55,9 +41,8 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
+                const electronApp = await launchElectronApp([], {
+                    NODE_ENV: "test",
                 });
 
                 // Get the main window
@@ -102,9 +87,8 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
+                const electronApp = await launchElectronApp([], {
+                    NODE_ENV: "test",
                 });
 
                 const window = await electronApp.firstWindow();
@@ -144,9 +128,8 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
+                const electronApp = await launchElectronApp([], {
+                    NODE_ENV: "test",
                 });
 
                 const window = await electronApp.firstWindow();
@@ -184,9 +167,8 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
+                const electronApp = await launchElectronApp([], {
+                    NODE_ENV: "test",
                 });
 
                 const window = await electronApp.firstWindow();
@@ -242,9 +224,8 @@ test.describe(
                 ],
             },
             async () => {
-                const electronApp = await electron.launch({
-                    args: ["."],
-                    env: buildRendererTestEnv({ NODE_ENV: "test" }),
+                const electronApp = await launchElectronApp([], {
+                    NODE_ENV: "test",
                 });
 
                 const window = await electronApp.firstWindow();

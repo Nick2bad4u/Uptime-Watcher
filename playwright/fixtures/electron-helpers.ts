@@ -9,6 +9,9 @@
 
 import { _electron as electron } from "@playwright/test";
 import type { ElectronApplication } from "@playwright/test";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import * as path from "node:path";
 
 import {
     collectCoverageFromElectronApp,
@@ -39,11 +42,56 @@ export async function launchElectronApp(
     customArgs: string[] = [],
     customEnv: Record<string, string> = {}
 ): Promise<ElectronApplication> {
+    const userDataDir = await mkdtemp(
+        path.join(tmpdir(), "uptime-watcher-playwright-")
+    );
+    const previousUserDataDir = process.env["PLAYWRIGHT_USER_DATA_DIR"];
+    process.env["PLAYWRIGHT_USER_DATA_DIR"] = userDataDir;
+
     const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
     const disableWarningOption = "--disable-warning=DEP0190";
     const nodeOptions = existingNodeOptions.includes(disableWarningOption)
         ? existingNodeOptions
         : [existingNodeOptions, disableWarningOption].filter(Boolean).join(" ");
+
+    const cleanupTasks: Array<() => Promise<void>> = [
+        async () => {
+            try {
+                await rm(userDataDir, { recursive: true, force: true });
+            } catch (error) {
+                console.warn(
+                    "[Playwright] Failed to remove temporary userData directory",
+                    {
+                        directory: userDataDir,
+                        error,
+                    }
+                );
+            }
+        },
+        async () => {
+            if (previousUserDataDir === undefined) {
+                delete process.env["PLAYWRIGHT_USER_DATA_DIR"];
+                return;
+            }
+
+            process.env["PLAYWRIGHT_USER_DATA_DIR"] = previousUserDataDir;
+        },
+    ];
+
+    let cleanupTriggered = false;
+    const runCleanup = async (): Promise<void> => {
+        if (cleanupTriggered) {
+            return;
+        }
+
+        cleanupTriggered = true;
+
+        await Promise.allSettled(
+            cleanupTasks.map(async (task) => {
+                await task();
+            })
+        );
+    };
 
     const app = await electron.launch({
         args: [
@@ -70,12 +118,17 @@ export async function launchElectronApp(
             // Enable headless mode for Electron during testing
             HEADLESS: "true",
             PLAYWRIGHT_TEST: "true",
+            PLAYWRIGHT_USER_DATA_DIR: userDataDir,
             NODE_OPTIONS: nodeOptions,
             // Disable Electron sandbox in CI
             ...(process.env["CI"] && { ELECTRON_DISABLE_SANDBOX: "1" }),
             ...customEnv,
         },
         timeout: 30000, // Add timeout like codegen script
+    });
+
+    app.on("close", () => {
+        void runCleanup();
     });
 
     if (isCoverageEnabled) {
@@ -87,12 +140,54 @@ export async function launchElectronApp(
                 close: ElectronApplication["close"];
             }
         ).close = (async () => {
+            let coverageError: unknown;
+
             if (!coverageCollected) {
-                await collectCoverageFromElectronApp(app);
-                coverageCollected = true;
+                try {
+                    await collectCoverageFromElectronApp(app);
+                    coverageCollected = true;
+                } catch (error) {
+                    coverageError = error;
+                }
             }
 
-            await originalClose();
+            let closeError: unknown;
+            try {
+                await originalClose();
+            } catch (error) {
+                closeError = error;
+            }
+
+            await runCleanup();
+
+            if (coverageError) {
+                throw coverageError;
+            }
+
+            if (closeError) {
+                throw closeError;
+            }
+        }) as ElectronApplication["close"];
+    } else {
+        const originalClose = app.close.bind(app);
+
+        (
+            app as ElectronApplication & {
+                close: ElectronApplication["close"];
+            }
+        ).close = (async () => {
+            let closeError: unknown;
+            try {
+                await originalClose();
+            } catch (error) {
+                closeError = error;
+            }
+
+            await runCleanup();
+
+            if (closeError) {
+                throw closeError;
+            }
         }) as ElectronApplication["close"];
     }
 

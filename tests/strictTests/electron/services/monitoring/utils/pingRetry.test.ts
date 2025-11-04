@@ -101,7 +101,7 @@ describe("pingRetry utilities", () => {
         const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
         const { performSinglePingCheck } = module;
 
-        await expect(performSinglePingCheck("unlucky", 10)).rejects.toThrowError(
+        await expect(performSinglePingCheck("unlucky", 10)).rejects.toThrow(
             /Connectivity check failed: boom/
         );
     });

@@ -4,6 +4,9 @@
 import type { MonitorType } from "../../../../../shared/types.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+type WithErrorHandling =
+    (typeof import("../../../../../shared/utils/errorHandling"))["withErrorHandling"];
+
 const migratorMock = {
     migrateMonitorData: vi.fn(),
 };
@@ -24,20 +27,50 @@ const exampleMigrationsMock = {
     portV1_0_to_1_1: vi.fn(),
 };
 
-const loggerMock = {
-    debug: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
+import type { Logger } from "@shared/utils/logger/interfaces";
+
+type LoggerMock = Record<keyof Logger, ReturnType<typeof vi.fn>>;
+
+function createLoggerMock(): LoggerMock {
+    return {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+}
+
+let loggerMock: LoggerMock | undefined;
+
+const getLoggerMock = (): LoggerMock => {
+    if (!loggerMock) {
+        throw new Error("loggerMock has not been initialized");
+    }
+
+    return loggerMock;
 };
 
-const withErrorHandlingMock = vi.fn(
-    async <T>(operation: () => Promise<T>) => operation()
+function loggerModuleMockFactory(): typeof import("../../../../../electron/utils/logger") {
+    loggerMock = createLoggerMock();
+
+    return {
+        dbLogger: createLoggerMock() as unknown as Logger,
+        diagnosticsLogger: createLoggerMock() as unknown as Logger,
+        logger: loggerMock as unknown as Logger,
+        monitorLogger: createLoggerMock() as unknown as Logger,
+    } satisfies typeof import("../../../../../electron/utils/logger");
+}
+
+const passthroughWithErrorHandling: WithErrorHandling = async <T>(
+    operation: () => Promise<T>,
+    _storeOrContext: Parameters<WithErrorHandling>[1]
+): Promise<T> => operation();
+
+const withErrorHandlingMock = vi.fn<WithErrorHandling>(
+    passthroughWithErrorHandling
 );
 
-vi.mock("../../../../../electron/utils/logger", () => ({
-    logger: loggerMock,
-}));
+vi.mock("../../../../../electron/utils/logger", loggerModuleMockFactory);
 
 vi.mock("../../../../../electron/services/monitoring/MigrationSystem", () => ({
     createMigrationOrchestrator: createMigrationOrchestratorMock,
@@ -47,7 +80,8 @@ vi.mock("../../../../../electron/services/monitoring/MigrationSystem", () => ({
 }));
 
 vi.mock("../../../../../shared/utils/errorHandling", () => ({
-    withErrorHandling: withErrorHandlingMock,
+    withErrorHandling:
+        withErrorHandlingMock as (typeof import("../../../../../shared/utils/errorHandling"))["withErrorHandling"],
 }));
 
 describe("migrateMonitorType", () => {
@@ -58,11 +92,13 @@ describe("migrateMonitorType", () => {
         versionManagerMock.setVersion.mockClear();
         exampleMigrationsMock.httpV1_0_to_1_1.mockClear();
         exampleMigrationsMock.portV1_0_to_1_1.mockClear();
-        Object.values(loggerMock).forEach((fn) => fn.mockClear());
+        if (loggerMock) {
+            for (const fn of Object.values(loggerMock)) {
+                fn.mockClear();
+            }
+        }
         withErrorHandlingMock.mockReset();
-        withErrorHandlingMock.mockImplementation(
-            async <T>(operation: () => Promise<T>) => operation()
-        );
+        withErrorHandlingMock.mockImplementation(passthroughWithErrorHandling);
     });
 
     it("returns validation error when monitor type is not registered", async () => {
@@ -98,7 +134,9 @@ describe("migrateMonitorType", () => {
             errors: [],
             success: true,
         });
-        expect(loggerMock.info).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.info).toHaveBeenCalledWith(
             "Migrating monitor type http from 1.0.0 to 1.0.0"
         );
         expect(createMigrationOrchestratorMock).not.toHaveBeenCalled();
@@ -130,7 +168,9 @@ describe("migrateMonitorType", () => {
             errors: [],
             success: true,
         };
-        migratorMock.migrateMonitorData.mockResolvedValueOnce(orchestratorResult);
+        migratorMock.migrateMonitorData.mockResolvedValueOnce(
+            orchestratorResult
+        );
 
         const result = await migrateMonitorType("http", "1.0.0", "1.2.0", {
             url: "https://example.com",

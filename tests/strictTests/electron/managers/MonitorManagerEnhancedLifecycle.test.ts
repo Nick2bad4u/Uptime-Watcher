@@ -52,7 +52,7 @@ function createMonitor(overrides: Partial<Monitor> = {}): Monitor {
  */
 function createSite(
     identifier: string,
-    monitors: Array<Monitor | undefined>,
+    monitors: (Monitor | undefined)[],
     overrides: Partial<Site> = {}
 ): Site {
     return {
@@ -171,12 +171,12 @@ function createLifecycleHarness(sites: Site[]): LifecycleTestHarness {
     } satisfies LifecycleTestHarness;
 }
 
-describe("MonitorManagerEnhancedLifecycle", () => {
+describe("monitorManagerEnhancedLifecycle", () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    describe("startAllMonitoringEnhancedFlow", () => {
+    describe(startAllMonitoringEnhancedFlow, () => {
         it("returns cached summary when monitoring already active", async () => {
             const site = createSite("alpha", [createMonitor({ id: "m-1" })]);
             const harness = createLifecycleHarness([site]);
@@ -327,7 +327,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
         });
     });
 
-    describe("stopAllMonitoringEnhancedFlow", () => {
+    describe(stopAllMonitoringEnhancedFlow, () => {
         it("coordinates partial failures while ensuring stopAll executes", async () => {
             const undefinedSlot = undefined;
             const missingIdMonitor = createMonitor({ id: "", monitoring: true });
@@ -430,7 +430,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
         });
     });
 
-    describe("startMonitoringForSiteEnhancedFlow", () => {
+    describe(startMonitoringForSiteEnhancedFlow, () => {
         it("returns false and logs when site is missing", async () => {
             const harness = createLifecycleHarness([]);
 
@@ -440,7 +440,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 identifier: "missing",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.logger.warn).toHaveBeenCalledWith(
                 "Site not found: missing"
             );
@@ -461,7 +461,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "broken",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.logger.warn).toHaveBeenCalledWith(
                 "Monitor zeta:broken has no valid check interval set"
             );
@@ -482,7 +482,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "deny",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.applyMonitorState).not.toHaveBeenCalled();
             expect(harness.scheduler.startMonitor).not.toHaveBeenCalled();
         });
@@ -501,7 +501,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "approve",
             });
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(harness.applyMonitorState).toHaveBeenCalledWith(
                 site,
                 monitor,
@@ -516,7 +516,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 "theta",
                 monitor
             );
-            expect(monitor.monitoring).toBe(true);
+            expect(monitor.monitoring).toBeTruthy();
         });
 
         it("handles checker exceptions gracefully", async () => {
@@ -534,7 +534,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "explode",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.logger.error).toHaveBeenCalledWith(
                 "Enhanced start failed for iota:explode",
                 failure
@@ -557,7 +557,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 identifier: "kappa",
             });
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(harness.checker.startMonitoring).toHaveBeenCalledWith(
                 "kappa",
                 "first"
@@ -587,13 +587,13 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorAction: delegateMock as MonitorActionDelegate,
             });
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(delegateMock).toHaveBeenCalledTimes(2);
             expect(delegateMock).toHaveBeenLastCalledWith("lambda", "second");
         });
     });
 
-    describe("stopMonitoringForSiteEnhancedFlow", () => {
+    describe(stopMonitoringForSiteEnhancedFlow, () => {
         it("logs and returns false when the site cannot be located", async () => {
             const harness = createLifecycleHarness([]);
 
@@ -603,7 +603,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 identifier: "missing",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.logger.warn).toHaveBeenCalledWith(
                 "Site not found: missing"
             );
@@ -623,7 +623,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "stop-me",
             });
 
-            expect(result).toBe(true);
+            expect(result).toBeTruthy();
             expect(harness.applyMonitorState).toHaveBeenCalledWith(
                 site,
                 monitor,
@@ -638,7 +638,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 "mu",
                 "stop-me"
             );
-            expect(monitor.monitoring).toBe(false);
+            expect(monitor.monitoring).toBeFalsy();
         });
 
         it("propagates false when checker declines to stop", async () => {
@@ -655,7 +655,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "busy",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.applyMonitorState).not.toHaveBeenCalled();
             expect(harness.scheduler.stopMonitor).not.toHaveBeenCalled();
         });
@@ -675,7 +675,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorId: "errant",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.logger.error).toHaveBeenCalledWith(
                 "Enhanced stop failed for omicron:errant",
                 error
@@ -699,7 +699,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 identifier: "pi",
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(harness.checker.stopMonitoring).toHaveBeenCalledWith(
                 "pi",
                 "m1"
@@ -732,7 +732,7 @@ describe("MonitorManagerEnhancedLifecycle", () => {
                 monitorAction: delegateMock as MonitorActionDelegate,
             });
 
-            expect(result).toBe(false);
+            expect(result).toBeFalsy();
             expect(delegateMock).toHaveBeenCalledTimes(2);
             expect(delegateMock).toHaveBeenCalledWith("rho", "a");
             expect(delegateMock).toHaveBeenCalledWith("rho", "b");

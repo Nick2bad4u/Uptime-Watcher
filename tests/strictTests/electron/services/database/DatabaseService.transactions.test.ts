@@ -4,12 +4,39 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LOG_TEMPLATES } from "../../../../../shared/utils/logTemplates";
 import { DB_FILE_NAME } from "../../../../../electron/constants";
 
-const loggerMock = {
-    debug: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warn: vi.fn(),
+import type { Logger } from "@shared/utils/logger/interfaces";
+
+type LoggerMock = Record<keyof Logger, ReturnType<typeof vi.fn>>;
+
+function createLoggerMock(): LoggerMock {
+    return {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    };
+}
+
+let loggerMock: LoggerMock | undefined;
+
+const getLoggerMock = (): LoggerMock => {
+    if (!loggerMock) {
+        throw new Error("loggerMock has not been initialized");
+    }
+
+    return loggerMock;
 };
+
+function loggerModuleMockFactory(): typeof import("../../../../../electron/utils/logger") {
+    loggerMock = createLoggerMock();
+
+    return {
+        dbLogger: createLoggerMock() as unknown as Logger,
+        diagnosticsLogger: createLoggerMock() as unknown as Logger,
+        logger: loggerMock as unknown as Logger,
+        monitorLogger: createLoggerMock() as unknown as Logger,
+    } satisfies typeof import("../../../../../electron/utils/logger");
+}
 
 const getPathMock = vi.fn();
 const createDatabaseSchemaMock = vi.fn();
@@ -24,39 +51,51 @@ interface MockDatabaseInstance {
 const databaseInstances: MockDatabaseInstance[] = [];
 let databaseConstructionHook: ((path: string) => void) | undefined;
 
-vi.mock("../../../../../electron/utils/logger", () => ({
-    logger: loggerMock,
-}));
+class MockDatabase {
+    public inTransaction = false;
+
+    public readonly run = vi.fn((query: string) => {
+        void query;
+        return this;
+    });
+
+    public readonly close = vi.fn();
+
+    public readonly path: string;
+
+    public constructor(path: string) {
+        this.path = path;
+        databaseConstructionHook?.(path);
+        databaseInstances.push(this);
+    }
+}
+
+const sqliteModuleMock = {
+    Database:
+        MockDatabase as unknown as (typeof import("node-sqlite3-wasm"))["Database"],
+} satisfies Partial<typeof import("node-sqlite3-wasm")>;
+
+vi.mock("../../../../../electron/utils/logger", loggerModuleMockFactory);
 
 vi.mock("electron", () => ({
     app: {
         getPath: getPathMock,
-    },
+    } as unknown as (typeof import("electron"))["app"],
 }));
 
-vi.mock("../../../../../electron/services/database/utils/databaseSchema", () => ({
-    createDatabaseSchema: createDatabaseSchemaMock,
-}));
+vi.mock(
+    "../../../../../electron/services/database/utils/databaseSchema",
+    () =>
+        ({
+            createDatabaseSchema: createDatabaseSchemaMock,
+        }) satisfies Partial<
+            typeof import("../../../../../electron/services/database/utils/databaseSchema")
+        >
+);
 
-vi.mock("node-sqlite3-wasm", () => ({
-    Database: class MockDatabase {
-        public inTransaction = false;
+vi.mock("node-sqlite3-wasm", () => sqliteModuleMock);
 
-        public readonly run = vi.fn((query: string) => {
-            void query;
-            return this;
-        });
-
-        public readonly close = vi.fn();
-
-        public constructor(public readonly path: string) {
-            databaseConstructionHook?.(path);
-            databaseInstances.push(this);
-        }
-    },
-}));
-
-describe("DatabaseService strict coverage", () => {
+describe("databaseService strict coverage", () => {
     beforeEach(() => {
         databaseConstructionHook = undefined;
         databaseInstances.length = 0;
@@ -64,6 +103,12 @@ describe("DatabaseService strict coverage", () => {
         getPathMock.mockReset();
         vi.resetModules();
         vi.clearAllMocks();
+        const currentLogger = loggerMock;
+        if (currentLogger) {
+            for (const fn of Object.values(currentLogger)) {
+                fn.mockClear();
+            }
+        }
     });
 
     it("throws when attempting to read database before initialization", async () => {
@@ -89,20 +134,23 @@ describe("DatabaseService strict coverage", () => {
         const firstConnection = service.initialize();
         const expectedPath = path.join("/tmp/runtime-test", DB_FILE_NAME);
 
-        expect(createDatabaseSchemaMock).toHaveBeenCalledWith(
-            firstConnection
-        );
+        expect(createDatabaseSchemaMock).toHaveBeenCalledWith(firstConnection);
         expect(databaseInstances).toHaveLength(1);
+
         const db = databaseInstances[0];
+
         expect(db).toBeDefined();
         expect(db!.path).toContain(DB_FILE_NAME);
         expect(db!.path).toContain("runtime-test");
         expect(path.normalize(db!.path)).toBe(path.normalize(expectedPath));
-        expect(loggerMock.info).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.info).toHaveBeenCalledWith(
             `[DatabaseService] Initializing SQLite DB at: ${db!.path}`
         );
 
         const secondConnection = service.initialize();
+
         expect(secondConnection).toBe(firstConnection);
         expect(databaseInstances).toHaveLength(1);
     });
@@ -119,7 +167,9 @@ describe("DatabaseService strict coverage", () => {
         };
 
         expect(() => service.initialize()).toThrow("boom");
-        expect(loggerMock.error).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.error).toHaveBeenCalledWith(
             LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
             expect.any(Error)
         );
@@ -136,12 +186,15 @@ describe("DatabaseService strict coverage", () => {
         service.initialize();
 
         const [db] = databaseInstances;
+
         expect(db).toBeDefined();
 
         service.close();
 
         expect(db?.close).toHaveBeenCalledTimes(1);
-        expect(loggerMock.info).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.info).toHaveBeenCalledWith(
             LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED
         );
         expect(() => service.getDatabase()).toThrow(
@@ -165,7 +218,9 @@ describe("DatabaseService strict coverage", () => {
         });
 
         expect(() => service.close()).toThrow(closeError);
-        expect(loggerMock.error).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.error).toHaveBeenCalledWith(
             LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
             closeError
         );
@@ -189,7 +244,9 @@ describe("DatabaseService strict coverage", () => {
         expect(result).toBe("nested result");
         expect(operation).toHaveBeenCalledWith(db);
         expect(db!.run).not.toHaveBeenCalled();
-        expect(loggerMock.warn).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.warn).toHaveBeenCalledWith(
             expect.stringContaining("Nested transaction detected")
         );
     });
@@ -219,10 +276,12 @@ describe("DatabaseService strict coverage", () => {
         expect(result).toBe("ok");
         expect(db!.run).toHaveBeenCalledWith("BEGIN TRANSACTION");
         expect(db!.run).toHaveBeenCalledWith("COMMIT");
-        expect(loggerMock.debug).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.debug).toHaveBeenCalledWith(
             "[DatabaseService] Started new transaction"
         );
-        expect(loggerMock.debug).toHaveBeenCalledWith(
+        expect(logger.debug).toHaveBeenCalledWith(
             "[DatabaseService] Successfully committed transaction"
         );
     });
@@ -256,11 +315,13 @@ describe("DatabaseService strict coverage", () => {
         ).rejects.toThrow(failure);
 
         expect(db!.run).toHaveBeenCalledWith("ROLLBACK");
-        expect(loggerMock.error).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.error).toHaveBeenCalledWith(
             "[DatabaseService] Transaction operation failed",
             failure
         );
-        expect(loggerMock.debug).toHaveBeenCalledWith(
+        expect(logger.debug).toHaveBeenCalledWith(
             "[DatabaseService] Successfully rolled back transaction"
         );
     });
@@ -293,7 +354,9 @@ describe("DatabaseService strict coverage", () => {
             })
         ).rejects.toThrow("intermediate failure");
 
-        expect(loggerMock.error).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.error).toHaveBeenCalledWith(
             "[DatabaseService] Failed to rollback active transaction",
             rollbackError
         );
@@ -323,7 +386,9 @@ describe("DatabaseService strict coverage", () => {
             })
         ).rejects.toThrow("auto rollback");
 
-        expect(loggerMock.debug).toHaveBeenCalledWith(
+        const logger = getLoggerMock();
+
+        expect(logger.debug).toHaveBeenCalledWith(
             "[DatabaseService] No active transaction to rollback (transaction was already rolled back by SQLite)"
         );
     });

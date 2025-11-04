@@ -78,6 +78,7 @@ const knipConfig: KnipConfig = {
         "@eslint/mcp",
         "@executeautomation/database-server",
         "@jscpd/badge-reporter",
+        "@jscpd/leveldb-store",
         "@microsoft/eslint-formatter-sarif",
         "@microsoft/tsdoc-config",
         "@modelcontextprotocol/server-sequential-thinking",

@@ -30,9 +30,11 @@ describe("monitorFactoryUtils.buildMonitorFactory", () => {
             buildMonitorFactory(() => {
                 throw thrownError;
             }, "Ping Monitor");
+
             expect.fail("Expected factory invocation to throw");
         } catch (error) {
             const normalized = error as Error;
+
             expect(normalized).toBe(thrownError);
             expect(normalized.message).toBe(
                 "Failed to initialise Ping Monitor: socket timeout"
@@ -46,6 +48,7 @@ describe("monitorFactoryUtils.buildMonitorFactory", () => {
         const normalizedError = new Error("string failure");
         ensureErrorSpy.mockImplementation((input) => {
             expect(input).toBe("boom");
+
             return normalizedError;
         });
 

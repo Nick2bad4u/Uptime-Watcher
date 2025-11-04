@@ -18,7 +18,7 @@ import type { DatabaseManager } from "./managers/DatabaseManager";
 import type { MonitorManager } from "./managers/MonitorManager";
 import type { SiteManager } from "./managers/SiteManager";
 
-export const __uptimeOrchestratorTypesRuntimeMarker = true as const;
+export const UPTIME_ORCHESTRATOR_TYPES_RUNTIME_MARKER = true as const;
 
 /**
  * Payload describing a request to check the active monitoring status for a

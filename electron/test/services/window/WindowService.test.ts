@@ -416,8 +416,8 @@ describe(WindowService, () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Event Processing", "type");
 
-            const originalHeadless = process.env.HEADLESS;
-            process.env.HEADLESS = "true";
+            const originalHeadless = process.env["HEADLESS"];
+            process.env["HEADLESS"] = "true";
 
             const window = windowService.createMainWindow();
             const readyCallback = (
@@ -435,9 +435,9 @@ describe(WindowService, () => {
             expect(window.show).not.toHaveBeenCalled();
 
             if (originalHeadless === undefined) {
-                delete process.env.HEADLESS;
+                delete process.env["HEADLESS"];
             } else {
-                process.env.HEADLESS = originalHeadless;
+                process.env["HEADLESS"] = originalHeadless;
             }
         });
 
@@ -1335,8 +1335,8 @@ describe(WindowService, () => {
         });
 
         it("should read boolean environment flags safely", () => {
-            const originalValue = process.env.HEADLESS;
-            process.env.HEADLESS = "true";
+            const originalValue = process.env["HEADLESS"];
+            process.env["HEADLESS"] = "true";
 
             expect(
                 (
@@ -1347,9 +1347,9 @@ describe(WindowService, () => {
             ).toBeTruthy();
 
             if (originalValue === undefined) {
-                delete process.env.HEADLESS;
+                delete process.env["HEADLESS"];
             } else {
-                process.env.HEADLESS = originalValue;
+                process.env["HEADLESS"] = originalValue;
             }
         });
     });

@@ -3,16 +3,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const modulePath = "../../../../../../electron/utils/database/siteDeletion";
 const errorUtilsPath = "../../../../../../shared/utils/errorHandling";
 
-type MonitorAdapterMocks = {
+interface MonitorAdapterMocks {
     deleteBySiteIdentifier: ReturnType<typeof vi.fn>;
     findBySiteIdentifier: ReturnType<typeof vi.fn>;
-};
+}
 
-type SiteAdapterMocks = {
+interface SiteAdapterMocks {
     delete: ReturnType<typeof vi.fn>;
-};
+}
 
-type SiteMonitorsStub = Array<{ id: string }>;
+type SiteMonitorsStub = { id: string }[];
 
 function createMonitorAdapter(overrides: Partial<MonitorAdapterMocks> = {}) {
     const monitorMocks: MonitorAdapterMocks = {
@@ -65,10 +65,7 @@ describe("deleteSiteWithAdapters", () => {
             monitorCount: preloadedMonitors.length,
             siteDeleted: true,
         });
-        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledOnce();
-        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledWith(
-            "site-123"
-        );
+        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledExactlyOnceWith("site-123");
         expect(monitorMocks.findBySiteIdentifier).not.toHaveBeenCalled();
         expect(siteMocks.delete).toHaveBeenCalledWith("site-123");
     });
@@ -94,8 +91,7 @@ describe("deleteSiteWithAdapters", () => {
             siteAdapter: siteAdapter as unknown,
         });
 
-        expect(monitorMocks.findBySiteIdentifier).toHaveBeenCalledOnce();
-        expect(monitorMocks.findBySiteIdentifier).toHaveBeenCalledWith("site-789");
+        expect(monitorMocks.findBySiteIdentifier).toHaveBeenCalledExactlyOnceWith("site-789");
         expect(result).toStrictEqual({
             monitorCount: monitors.length,
             siteDeleted: false,
@@ -123,16 +119,18 @@ describe("deleteSiteWithAdapters", () => {
             });
         } catch (error) {
             const deletionError = error as InstanceType<typeof SiteDeletionError>;
+
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(failure);
             expect(deletionError.message).toBe(
                 "Failed to delete monitors for site site-err: database offline"
             );
+
             capturedError = deletionError;
         }
 
         expect(capturedError).toBeInstanceOf(SiteDeletionError);
-        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledOnce();
+        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledTimes(1);
 
         expect(siteMocks.delete).not.toHaveBeenCalled();
         expect(monitorMocks.findBySiteIdentifier).not.toHaveBeenCalled();
@@ -159,14 +157,17 @@ describe("deleteSiteWithAdapters", () => {
                 preloadedMonitors: [] as unknown,
                 siteAdapter: siteAdapter as unknown,
             });
+
             expect.fail("Expected site deletion to throw when monitor removal fails");
         } catch (error) {
             const deletionError = error as InstanceType<typeof SiteDeletionError>;
+
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(normalized);
             expect(deletionError.message).toBe(
                 "Failed to delete monitors for site site-non-error: normalized cause"
             );
+
             capturedError = deletionError;
         }
 

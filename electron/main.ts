@@ -20,11 +20,72 @@ import {
     REDUX_DEVTOOLS,
 } from "electron-devtools-installer";
 import log from "electron-log/main";
+import { mkdirSync } from "node:fs";
+// eslint-disable-next-line unicorn/import-style -- Need namespace import for path resolution utilities
+import * as path from "node:path";
 
 import { isDev } from "./electronUtils";
 import { ApplicationService } from "./services/application/ApplicationService";
 import { ServiceContainer } from "./services/ServiceContainer";
 import { logger } from "./utils/logger";
+
+/**
+ * Environment variable keys that can override Electron's userData path during
+ * startup.
+ */
+const USER_DATA_ENV_KEYS = [
+    "UPTIME_WATCHER_USER_DATA_DIR",
+    "PLAYWRIGHT_USER_DATA_DIR",
+] as const;
+
+/**
+ * Resolves a requested Electron userData path override from known environment
+ * variables.
+ *
+ * @returns The resolved path override when defined; otherwise `undefined`.
+ */
+const resolveUserDataOverride = (): string | undefined => {
+    for (const key of USER_DATA_ENV_KEYS) {
+        // eslint-disable-next-line n/no-process-env -- intentionally reading environment variables during startup configuration
+        const candidate = process.env[key];
+        if (typeof candidate === "string" && candidate.trim().length > 0) {
+            return candidate;
+        }
+    }
+
+    return undefined;
+};
+
+/**
+ * Configures Electron to use a custom userData directory when an override is
+ * provided.
+ */
+const configureUserDataPath = (): void => {
+    const overridePath = resolveUserDataOverride();
+    if (!overridePath) {
+        return;
+    }
+
+    try {
+        const resolvedPath = path.resolve(overridePath);
+        mkdirSync(resolvedPath, { recursive: true });
+        app.setPath("userData", resolvedPath);
+        logger.info("[Main] Using custom userData path override", {
+            path: resolvedPath,
+        });
+    } catch (error: unknown) {
+        const normalizedError = ensureError(error);
+        logger.error(
+            "[Main] Failed to configure custom userData path override",
+            normalizedError,
+            {
+                requestedPath: overridePath,
+            }
+        );
+    }
+};
+
+configureUserDataPath();
 
 // Initialize electron-debug for enhanced debugging capabilities
 debug({
