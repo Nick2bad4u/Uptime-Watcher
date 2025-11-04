@@ -317,10 +317,9 @@ describe("objectSafety.ts fuzzing tests", () => {
         ])("should pick only specified keys", (obj, keysToPick) => {
             const result = safeObjectPick(obj, keysToPick);
 
-            const expectedEntries = keysToPick
-                .filter((key): key is keyof typeof obj =>
-                    Object.hasOwn(obj, key)
-                )
+            const typedKeys = keysToPick as readonly (keyof typeof obj)[];
+            const expectedEntries = typedKeys
+                .filter((key) => Object.hasOwn(obj, key))
                 .map((key) => [key, obj[key]] as const);
 
             expect(result).toEqual(Object.fromEntries(expectedEntries));

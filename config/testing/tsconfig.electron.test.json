@@ -45,7 +45,12 @@
         "../../tests/strictTests/electron/**/*.ts",
         "../../tests/strictTests/electron/**/*.mts",
         "../../tests/strictTests/electron/**/*.cts",
-        "../../tests/strictTests/electron/**/*.tsx"
+        "../../tests/strictTests/electron/**/*.tsx",
+        "../../shared/**/*.ts",
+        "../../shared/**/*.mts",
+        "../../shared/**/*.cts",
+        "../../shared/**/*.tsx",
+        "../../shared/test/**/*"
     ],
     "references": [
         {

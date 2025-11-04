@@ -12,7 +12,7 @@
 
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import path from "node:path";
 import process from "node:process";
 
 type MutableProcessEnv = Record<string, string | undefined>;
@@ -46,8 +46,8 @@ const npmInvocation: NpmInvocation = (() => {
         } satisfies NpmInvocation;
     }
 
-    const bundledCli = join(
-        dirname(process.execPath),
+    const bundledCli = path.join(
+        path.dirname(process.execPath),
         "node_modules",
         "npm",
         "bin",
@@ -340,4 +340,4 @@ async function main(): Promise<void> {
     }
 }
 
-void main();
+void main(); // eslint-disable-line unicorn/prefer-top-level-await -- CommonJS entrypoints cannot use top-level await reliably across tooling

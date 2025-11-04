@@ -68,7 +68,13 @@ const configureUserDataPath = (): void => {
 
     try {
         const resolvedPath = path.resolve(overridePath);
-        mkdirSync(resolvedPath, { recursive: true });
+        if (!path.isAbsolute(resolvedPath)) {
+            throw new Error(
+                `User data override path must be absolute. Received '${overridePath}'`
+            );
+        }
+
+        mkdirSync(resolvedPath, { recursive: true }); // eslint-disable-line security/detect-non-literal-fs-filename, n/no-sync -- Dynamic but validated path is required during early startup and sync IO guarantees the directory exists before Electron proceeds
         app.setPath("userData", resolvedPath);
         logger.info("[Main] Using custom userData path override", {
             path: resolvedPath,
