@@ -16,6 +16,7 @@ process.setMaxListeners(MAX_LISTENERS);
 
 import { vi } from "vitest";
 import fc from "fast-check";
+import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -93,6 +94,8 @@ Object.defineProperty(URL, "revokeObjectURL", {
 
 // Configure fast-check for property-based testing
 const current = fc.readConfigureGlobal() ?? {};
+const baseNumRuns = (current as { numRuns?: number }).numRuns ?? 10;
+const fastCheckOverrides = resolveFastCheckEnvOverrides(baseNumRuns);
 
 // Optional: example custom reporter (uncomment + adapt if you want structured output)
 // const jsonReporter = (runDetails: any) => {
@@ -106,8 +109,7 @@ const current = fc.readConfigureGlobal() ?? {};
 
 fc.configureGlobal({
     ...current,
-    // Required by you:
-    numRuns: 10,
+    ...fastCheckOverrides,
 
     // Reporting / debugging helpers
     verbose: 2, // 0 = quiet, 1 = medium, 2 = most verbose

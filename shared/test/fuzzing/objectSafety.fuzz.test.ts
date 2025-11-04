@@ -317,17 +317,13 @@ describe("objectSafety.ts fuzzing tests", () => {
         ])("should pick only specified keys", (obj, keysToPick) => {
             const result = safeObjectPick(obj, keysToPick);
 
-            // Check that picked keys are present if they exist in source
-            for (const key of keysToPick) {
-                if (Object.hasOwn(obj, key)) {
-                    expect(result).toHaveProperty(key, obj[key]);
-                }
-            }
+            const expectedEntries = keysToPick
+                .filter((key): key is keyof typeof obj =>
+                    Object.hasOwn(obj, key)
+                )
+                .map((key) => [key, obj[key]] as const);
 
-            // Check that result only has picked keys
-            for (const key of Object.keys(result)) {
-                expect(keysToPick as unknown as string[]).toContain(key);
-            }
+            expect(result).toEqual(Object.fromEntries(expectedEntries));
         });
 
         test.prop([

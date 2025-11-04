@@ -176,6 +176,7 @@
     "fuzz:electron": "vitest run --config vitest.electron.config.ts --reporter=default -t \"fuzz|fuzzing\"",
     "fuzz:minimal": "vitest run --reporter=dot -t \"fuzz|fuzzing\"",
     "fuzz:quiet": "vitest run --reporter=default --silent -t \"fuzz|fuzzing\"",
+    "fuzz:runs": "tsx scripts/run-fast-check-fuzzing.ts",
     "fuzz:shared": "vitest run --config vitest.shared.config.ts --reporter=default -t \"fuzz|fuzzing\"",
     "fuzz:verbose": "vitest run --reporter=verbose -t \"fuzz|fuzzing\"",
     "generate:ipc": "tsx scripts/generate-ipc-artifacts.mts",
