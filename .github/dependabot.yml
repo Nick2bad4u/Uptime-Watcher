@@ -7,7 +7,7 @@
 # - The schedule for checking updates (daily).
 # - Allowing both direct and indirect updates for all packages.
 # - Grouping updates by ecosystem with specific patterns for version updates.
-
+# yaml-language-server: $schema=https://www.schemastore.org/dependabot-2.0.json
 version: 2
 updates:
     - package-ecosystem: github-actions

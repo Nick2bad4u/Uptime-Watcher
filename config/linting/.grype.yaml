@@ -1,8 +1,10 @@
 # Grype vulnerability scanner configuration
 # Enhanced configuration for 2025 with VEX support, EPSS integration, and modern security features.
 # Compatible with Grype v0.89+ and database schema v6
+# yaml-language-server: $schema=https://raw.githubusercontent.com/anchore/grype/refs/heads/main/schema/grype/db/blob/json/schema-latest.json
 
 # Generate CPEs for packages without CPE data (improves matching coverage)
+
 add-cpes-if-none: true
 
 # Orient results by CVE instead of original vulnerability ID when possible

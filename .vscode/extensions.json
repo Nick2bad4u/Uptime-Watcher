@@ -30,5 +30,6 @@
         "automatalabs.copilot-mcp",
         "kevinkyang.auto-comment-blocks",
         "edwinhuish.better-comments-next"
-    ]
+    ],
+    "unwantedRecommendations": []
 }

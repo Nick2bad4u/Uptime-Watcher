@@ -1,4 +1,4 @@
-node*modulesdocs/docusaurus/
+node_modules/docs/docusaurus/
 docs/Packages/
 docs/Validator.md
 .github/instructions/*.md

@@ -1,5 +1,8 @@
 {
     "$schema": "https://www.schemastore.org/jscpd.json",
+    "absolute": false,
+    "blame": false,
+    "exitCode": 0,
     "gitignore": true,
     "ignore": [
         "**/node_modules/**",
@@ -53,10 +56,13 @@
         "**/*.bin",
         "**/*.wasm"
     ],
+    "ignoreCase": false,
+    "maxLines": 10000,
     "maxSize": "100kb",
     "minLines": 10,
     "minTokens": 50,
     "mode": "mild",
+    "noSymlinks": false,
     "output": "./reports/jscpd/",
     "reporters": [
         "html",
@@ -66,5 +72,17 @@
         "xml",
         "csv"
     ],
-    "threshold": 50
+    "reportersOptions": {
+        "badge": {
+            "color": "purple",
+            "iconWidth": 13,
+            "label": "jscpd",
+            "style": "flat"
+        }
+    },
+    "silent": false,
+    "skipLocal": false,
+    "store": "leveldb",
+    "threshold": 50,
+    "verbose": false
 }

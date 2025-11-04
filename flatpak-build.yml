@@ -3,7 +3,7 @@
 # Flatpak Application Manifest for Uptime Watcher
 # Modern configuration with enhanced security, sandboxing, and 2025 best practices
 # yaml-language-server: $schema=https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
-
+$schema: https://raw.githubusercontent.com/flatpak/flatpak-builder/refs/heads/main/data/flatpak-manifest.schema.json
 # Application metadata
 app-id: io.github.uptimewatcher
 runtime: org.freedesktop.Platform
@@ -103,11 +103,13 @@ modules:
     - name: nodejs
       buildsystem: simple
       build-commands:
-          # Node.js SDK extension is made available by system-wide install in CI workflow.
-          # We intentionally do NOT hard fail here; earlier workflow verification already
-          # guarantees presence. This keeps local ad-hoc builds more forgiving.
-          - echo "(info) Node.js from extension version: $(node --version 2>/dev/null || echo 'unavailable')"
-          - echo "(info) npm version: $(npm --version 2>/dev/null || echo 'unavailable')"
+          - |
+              set -e
+              # Node.js SDK extension is made available by system-wide install in CI workflow.
+              # We intentionally do NOT hard fail here; earlier workflow verification already
+              # guarantees presence. This keeps local ad-hoc builds more forgiving.
+              echo "(info) Node.js from extension version: $(node --version 2>/dev/null || echo 'unavailable')"
+              echo "(info) npm version: $(npm --version 2>/dev/null || echo 'unavailable')"
       sources: []
 
     # Main application module
@@ -119,100 +121,94 @@ modules:
               ELECTRON_BUILDER_CACHE: /run/build/uptime-watcher/electron-builder-cache
 
       build-commands:
-          # Pre-build validation
-          - echo "Building Uptime Watcher Flatpak v$(cat package.json | grep '\"version\"' | cut -d'\"' -f4)"
-          - echo "Node.js version:" && node --version
-          - echo "npm version:" && npm --version
-
-          # Verify required files exist
-          - test -f package.json || (echo "package.json not found" && exit 1)
-          - test -d dist || (echo "dist directory not found" && exit 1)
-          - test -f io.github.uptimewatcher.desktop || (echo "Desktop file not found" && exit 1)
-          - test -f io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file not found" && exit 1)
-
-          # Create application directories
-          - mkdir -p /app/{bin,lib,share/{applications,icons/hicolor,metainfo}}
-
-          # Copy built application files with proper permissions
-          - cp -r dist /app/
-          - chmod +x /app/dist/main.js 2>/dev/null || true
-
-          # Copy distribution files
-          - mkdir -p /app/dist
-          - cp -r dist/* /app/dist/ 2>/dev/null || echo "No dist directory, skipping"
-
-          # Copy Node.js dependencies (optimized)
-          - cp -r node_modules /app/
-          - find /app/node_modules -name "*.node" -exec chmod +x {} \; 2>/dev/null || true
-
-          # Copy static assets
-          - cp -r icons /app/
-          - cp package.json /app/
-          - chmod 644 /app/package.json
-
-          # Install Electron binary from BaseApp or node_modules
           - |
+              set -e
+
+              # Pre-build validation
+              echo "Building Uptime Watcher Flatpak v$(grep '\"version\"' package.json | cut -d'\"' -f4)"
+              echo "Node.js version:" && node --version
+              echo "npm version:" && npm --version
+
+              # Verify required files exist
+              test -f package.json || (echo "package.json not found" && exit 1)
+              test -d dist || (echo "dist directory not found" && exit 1)
+              test -f io.github.uptimewatcher.desktop || (echo "Desktop file not found" && exit 1)
+              test -f io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file not found" && exit 1)
+
+              # Create application directories
+              mkdir -p /app/{bin,lib,share/{applications,icons/hicolor,metainfo}}
+
+              # Copy built application files with proper permissions
+              cp -r dist /app/
+              chmod +x /app/dist/main.js 2>/dev/null || true
+
+              # Copy distribution files
+              mkdir -p /app/dist
+              cp -r dist/* /app/dist/ 2>/dev/null || echo "No dist directory, skipping"
+
+              # Copy Node.js dependencies (optimized)
+              cp -r node_modules /app/
+              find /app/node_modules -name "*.node" -exec chmod +x {} \; 2>/dev/null || true
+
+              # Copy static assets
+              cp -r icons /app/
+              cp package.json /app/
+              chmod 644 /app/package.json
+
+              # Install Electron binary from BaseApp or node_modules
               if [ -f /usr/bin/electron ]; then
-                install -Dm755 /usr/bin/electron /app/bin/electron
+                  install -Dm755 /usr/bin/electron /app/bin/electron
               elif [ -f node_modules/electron/dist/electron ]; then
-                install -Dm755 node_modules/electron/dist/electron /app/bin/electron
+                  install -Dm755 node_modules/electron/dist/electron /app/bin/electron
               else
-                echo "Warning: Electron binary not found, relying on BaseApp"
+                  echo "Warning: Electron binary not found, relying on BaseApp"
               fi
 
-          # Install application wrapper script
-          - install -Dm755 run-electron.sh /app/bin/run-electron.sh
+              # Install application wrapper script
+              install -Dm755 run-electron.sh /app/bin/run-electron.sh
 
-          # Install desktop integration files
-          - install -Dm644 io.github.uptimewatcher.desktop
-            /app/share/applications/io.github.uptimewatcher.desktop
+              # Install desktop integration files
+              install -Dm644 io.github.uptimewatcher.desktop /app/share/applications/io.github.uptimewatcher.desktop
 
-          # Install application icons (multiple resolutions for HiDPI)
-          - install -Dm644 icons/icon.png
-            /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-256.png
-            /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-128.png
-            /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-64.png
-            /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-24.png
-            /app/share/icons/hicolor/24x24/apps/io.github.uptimewatcher.png
-          - install -Dm644 icons/icon-16.png
-            /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
+              # Install application icons (multiple resolutions for HiDPI)
+              install -Dm644 icons/icon.png /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
+              install -Dm644 icons/icon-256.png /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
+              install -Dm644 icons/icon-128.png /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
+              install -Dm644 icons/icon-64.png /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
+              install -Dm644 icons/icon-24.png /app/share/icons/hicolor/24x24/apps/io.github.uptimewatcher.png
+              install -Dm644 icons/icon-16.png /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
 
-          # Install AppStream metadata for software centers
-          - install -Dm644 io.github.uptimewatcher.metainfo.xml
-            /app/share/metainfo/io.github.uptimewatcher.metainfo.xml
+              # Install AppStream metadata for software centers
+              install -Dm644 io.github.uptimewatcher.metainfo.xml /app/share/metainfo/io.github.uptimewatcher.metainfo.xml
 
-          # Desktop file validation and patching
-          - desktop-file-validate /app/share/applications/io.github.uptimewatcher.desktop || echo "Desktop file validation warnings"
+              # Desktop file validation and patching
+              desktop-file-validate /app/share/applications/io.github.uptimewatcher.desktop || echo "Desktop file validation warnings"
 
-          # Fix desktop file name for Flatpak compatibility
-          - patch-desktop-filename /app/dist/resources/app.asar 2>/dev/null || echo "Desktop filename patch not needed"
+              # Fix desktop file name for Flatpak compatibility
+              patch-desktop-filename /app/dist/resources/app.asar 2>/dev/null || echo "Desktop filename patch not needed"
 
-          # Security: Remove unnecessary files and set proper permissions
-          - find /app -name "*.md" -delete 2>/dev/null || true
-          - find /app -name "*.txt" -delete 2>/dev/null || true
-          - find /app -name "LICENSE*" -delete 2>/dev/null || true
-          - find /app -type f -name "*.so*" -exec chmod 755 {} \; 2>/dev/null || true
-          - find /app -type f -name "*.node" -exec chmod 755 {} \; 2>/dev/null || true
+              # Security: Remove unnecessary files and set proper permissions
+              find /app -name "*.md" -delete 2>/dev/null || true
+              find /app -name "*.txt" -delete 2>/dev/null || true
+              find /app -name "LICENSE*" -delete 2>/dev/null || true
+              find /app -type f -name "*.so*" -exec chmod 755 {} \; 2>/dev/null || true
+              find /app -type f -name "*.node" -exec chmod 755 {} \; 2>/dev/null || true
 
-          # Optimize application size
-          - find /app/node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true
-          - find /app/node_modules -name "tests" -type d -exec rm -rf {} + 2>/dev/null || true
-          - find /app/node_modules -name "*.test.js" -delete 2>/dev/null || true
-          - find /app/node_modules -name "*.spec.js" -delete 2>/dev/null || true
+              # Optimize application size
+              find /app/node_modules -name "test" -type d -exec rm -rf {} + 2>/dev/null || true
+              find /app/node_modules -name "tests" -type d -exec rm -rf {} + 2>/dev/null || true
+              find /app/node_modules -name "*.test.js" -delete 2>/dev/null || true
+              find /app/node_modules -name "*.spec.js" -delete 2>/dev/null || true
 
-          # Validate installation
-          - test -x /app/bin/run-electron.sh || (echo "Wrapper script not executable" && exit 1)
-          - test -f /app/share/applications/io.github.uptimewatcher.desktop || (echo "Desktop file missing" && exit 1)
-          - test -f /app/share/metainfo/io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file missing" && exit 1)
+              # Validate installation
+              test -x /app/bin/run-electron.sh || (echo "Wrapper script not executable" && exit 1)
+              test -f /app/share/applications/io.github.uptimewatcher.desktop || (echo "Desktop file missing" && exit 1)
+              test -f /app/share/metainfo/io.github.uptimewatcher.metainfo.xml || (echo "MetaInfo file missing" && exit 1)
 
-          # Final build report
-          - echo "Flatpak build completed successfully"
-          - echo "Application size: $(du -sh /app | cut -f1)"
-          - echo "Electron binary: $(ls -la /app/bin/electron 2>/dev/null || echo 'Not found')"
+              # Final build report
+              echo "Flatpak build completed successfully"
+              echo "Application size: $(du -sh /app | cut -f1)"
+              echo "Electron binary: $(ls -la /app/bin/electron 2>/dev/null || echo 'Not found')"
 
       sources:
           - type: dir

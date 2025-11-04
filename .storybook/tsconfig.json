@@ -4,8 +4,8 @@
         "composite": false,
         "noEmit": true
     },
-    "extends": "../tsconfig.json",
     "exclude": [],
+    "extends": "../tsconfig.json",
     "include": [
         "./**/*.ts",
         "./**/*.tsx",

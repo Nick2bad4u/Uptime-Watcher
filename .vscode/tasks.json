@@ -1,4 +1,5 @@
 {
+    "$schema": "vscode://schemas/tasks",
     "tasks": [
         {
             "detail": "Starts the Vite development server for the application.",

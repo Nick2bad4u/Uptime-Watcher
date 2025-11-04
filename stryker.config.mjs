@@ -1,6 +1,7 @@
 // @ts-check
 /** @see {@link https://raw.githubusercontent.com/stryker-mutator/stryker/master/packages/api/schema/stryker-core.json} for JSON schema validation */
 /** @type {import("@stryker-mutator/api/core").PartialStrykerOptions} */
+/** @typedef {import("@stryker-mutator/api/core").StrykerOptions} */
 
 const config = {
     // === CORE CONFIGURATION ===
@@ -37,7 +38,6 @@ const config = {
     dashboard: {
         baseUrl: "https://dashboard.stryker-mutator.io", // Default URL
         project: "github.com/Nick2bad4u/Uptime-Watcher", // Will be auto-detected in CI
-        // @ts-expect-error -- Type definition missing reportType
         reportType: "full", // Options: "full" | "mutationScore"
     },
 
@@ -48,7 +48,6 @@ const config = {
     eventReporter: {
         baseDir: "coverage/events",
     },
-    // @ts-expect-error -- Type definition missing reportType
     fileLogLevel: "trace", // Detailed logs in stryker.log (off|fatal|error|warn|info|debug|trace)
     // 📊 HTML REPORTER CONFIGURATION
     htmlReporter: {
@@ -110,7 +109,6 @@ const config = {
     jsonReporter: {
         fileName: "coverage/stryker.json",
     },
-    // @ts-expect-error -- Type definition missing reportType
     logLevel: "info", // Console log level (off|fatal|error|warn|info|debug|trace)
     maxTestRunnerReuse: 100, // Reuse test runners for performance
     // === ADVANCED MUTATOR CONFIGURATION ===

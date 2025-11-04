@@ -1,5 +1,6 @@
 ---
 applyTo: "**"
+name: "Copilot-Instructions"
 description: "Instructions for the extremely capable TypeScript AI coding assistant."
 ---
 

@@ -1,4 +1,5 @@
 {
+    "$schema": "vscode://schemas/launch",
     "compounds": [
         {
             "configurations": [

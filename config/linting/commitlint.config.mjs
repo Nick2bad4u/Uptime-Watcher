@@ -10,11 +10,13 @@
  *
  * @type {import("@commitlint/types").UserConfig}
  *
+ * @typedef {import("@commitlint/types").UserConfig} CommitlintConfig
+ *
  * @see {@link https://commitlint.js.org/ | Commitlint Documentation}
  * @see {@link https://www.conventionalcommits.org/ | Conventional Commits Specification}
  */
 
-export default {
+export default /** @type {CommitlintConfig} */ {
     $schema: "https://www.schemastore.org/commitlintrc.json",
 
     /**

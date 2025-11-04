@@ -1,5 +1,9 @@
 {
     "$schema": "https://www.schemastore.org/htmlhint.json",
+    "attr-sorted": false,
+    "attr-value-single-quotes": false,
+    "attr-whitespace": false,
+    "tags-check": true,
     "alt-require": true,
     "attr-lowercase": true,
     "attr-no-duplication": true,

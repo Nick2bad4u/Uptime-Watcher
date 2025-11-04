@@ -688,6 +688,7 @@
     "@html-eslint/parser": "^0.47.0",
     "@jcoreio/eslint-plugin-implicit-dependencies": "^1.2.0",
     "@jscpd/badge-reporter": "^4.0.1",
+    "@jscpd/leveldb-store": "^4.0.1",
     "@metamask/eslint-plugin-design-tokens": "^1.1.1",
     "@microsoft/eslint-formatter-sarif": "^3.1.0",
     "@microsoft/eslint-plugin-sdl": "^1.1.0",
@@ -1081,7 +1082,6 @@
   "peerDependencies": {
     "react-scan": "^0.4.3"
   },
-  "optionalDependencies": {},
   "bundledDependencies": [
     "node-sqlite3-wasm"
   ],
@@ -1293,5 +1293,8 @@
       "public"
     ]
   },
-  "readme": "README.md"
+  "readme": "README.md",
+  "bundleDependencies": [
+    "node-sqlite3-wasm"
+  ]
 }

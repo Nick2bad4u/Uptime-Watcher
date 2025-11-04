@@ -1,5 +1,7 @@
 ---
 applyTo: "**"
+name: "Copilot-Instructions"
+description: "Short Instructions for the extremely capable TypeScript AI coding assistant."
 ---
 
 Thinking Mode Highest Level: Deep Think - Ultra Think - Think Harder - Super Think - Think Twice - Think More - Think Better

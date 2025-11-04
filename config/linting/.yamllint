@@ -1,6 +1,7 @@
 ---
 $schema: "https://www.schemastore.org/yamllint.json"
 extends: default
+# yaml-language-server: $schema=https://www.schemastore.org/yamllint.json
 
 # Define which files to consider as YAML
 yaml-files:
