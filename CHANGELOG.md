@@ -7,14 +7,563 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[d6fd43c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)...
+[d6fd43c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d...d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.0.0 [`(d6fd43c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)
+
+
+
+
+
+
+## [18.0.0] - 2025-11-04
+
+
 [[2a651d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)...
-[2a651d5](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3...2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3))
+[292b064](https://github.com/Nick2bad4u/Uptime-Watcher/commit/292b0646abe164bd68c56d4e555948f8e19cbda4)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3...292b0646abe164bd68c56d4e555948f8e19cbda4))
+
+
+### ✨ Features
+
+- ✨ [feat] Add configurable Electron userData override and ensure directory creation
+ - 🗂️ Read override from UPTIME_WATCHER_USER_DATA_DIR / PLAYWRIGHT_USER_DATA_DIR at startup
+ - 🛠️ mkdirSync(resolvedPath, { recursive: true }) then app.setPath("userData", resolvedPath)
+ - 🐞 Log success/failure and normalise errors with ensureError
+ - 📁 Enables isolated userData for Playwright runs and manual dev overrides
+
+🚜 [refactor] Harden Playwright electron fixture: allocate isolated userData & robust cleanup
+ - 🔧 Allocate mkdtemp temporary userData dir and set process.env["PLAYWRIGHT_USER_DATA_DIR"]
+ - 🧹 Register cleanup tasks (rm temp dir, restore previous env) and ensure single-run via runCleanup()
+ - 🔁 Hook app.on("close") and wrap app.close() (coverage and non-coverage paths) to collect coverage, run cleanup and surface errors
+
+🧪 [test] Consume shared launch helper & adapt UI helpers for isolated userData
+ - 🔗 Replace inline electron.launch usages in renderer tests with launchElectronApp
+ - 🧭 playwright/utils/ui-helpers: make removeAllSites a no-op when PLAYWRIGHT_USER_DATA_DIR is present; adjust resetApplicationState to avoid redundant DB clears
+ - 🔒 WindowService tests: use bracketed env access (process.env["HEADLESS"]) for safer typing
+
+🎨 [style] Standardise runtime-only type module markers
+ - 🔤 Rename __uptimeOrchestratorTypesRuntimeMarker -> UPTIME_ORCHESTRATOR_TYPES_RUNTIME_MARKER
+ - 🔤 Rename __validatorInterfacesRuntimeMarker -> VALIDATOR_INTERFACES_RUNTIME_MARKER
+ - ✅ Aligns naming across type-only modules and coverage instrumentation
+
+🧹 [chore] Tooling & config tweaks
+ - ⚙️ .vscode/tasks.json: split task groups into explicit buckets (vite-dev, vite-build, deps-install, lint-*, test-*, test-coverage, etc.) for clearer runner UI
+ - 🧰 config/tools/knip.config.ts: add @jscpd/leveldb-store to knip config
+
+🧪 [test] Unify test logger mocks & tighten test hygiene across strict suites
+ - 🧩 Introduce createLoggerMock(), loggerModuleMockFactory(), getLoggerMock() and satisfy typed logger exports in multiple tests
+ - 🧰 Centralise MockDatabase / sqlite mocks and use vi.spyOn for controlled stubs; reset mocks cleanly between tests
+ - ✅ Replace brittle assertions with robust matchers (toBeFalsy/toBeTruthy, toHaveBeenCalledExactlyOnceWith, expectTypeOf(...).toBeNumber(), use .at(0) for call inspection)
+ - ♻️ Minor test housekeeping: WithErrorHandling typing, toThrow -> toThrow simplification, and small expectation ordering fixes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ec3c561)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ec3c5617eae11d21489a5359f2de512380d86afd)
+
+
+- ✨ [feat] Enhance IPC registration and add comprehensive test coverage
+
+This commit introduces significant improvements to the application's stability, developer experience, and testing infrastructure. Key enhancements include robust IPC handler registration, a more resilient overflow detection hook, and a major expansion of strict test coverage across the shared codebase.
+
+✨ **[feat] Robust IPC Handler Registration**
+- 🛡️ Implements duplicate handler detection in `registerStandardizedIpcHandler` to prevent channel collisions at runtime.
+- ↩️ Adds transactional safety by rolling back registration if `ipcMain.handle` fails, ensuring the system remains in a consistent state.
+- 📝 Introduces detailed error logging for both duplicate and failed registrations, improving debuggability.
+
+🎨 **[style] Standardize Documentation Formatting**
+- ✍️ Updates Markdown files (`.md`) to use consistent formatting for blockquotes, bold text, and lists, improving readability.
+
+⚡ **[perf] Optimize Overflow Marquee Hook**
+- 🧠 Refactors the `useOverflowMarquee` hook to use a shared `ResizeObserver` registry (`WeakMap`).
+- 🔄 This reduces memory usage and allocations by reusing observer instances for the same element across re-renders, especially in React's Strict Mode.
+- 🧼 Implements a deferred cleanup mechanism to safely disconnect observers without interfering with potential component remounts.
+
+🧹 **[chore] Improve Cache Invalidation Logic**
+- 🔄 Adjusts `cacheSync` to correctly handle global (`all`) and site-specific (`site`) invalidation events triggered by monitoring lifecycle updates.
+- 🗑️ This ensures that caches are now properly cleared and resynchronized in response to these events, preventing stale data from being displayed in the UI.
+
+🐛 **[fix] Stabilize Full Sync Recovery**
+- 🔄 Overhauls the `StateSyncService` recovery logic to handle the asynchrony between fetching a full sync snapshot and receiving its corresponding broadcast event.
+- ⏳ Introduces a timed expectation for the broadcast, logging a warning if it doesn't arrive within a 5-second window, preventing the system from waiting indefinitely.
+- 🧹 Enhances the subscription cleanup process to correctly terminate pending recovery operations and timers, preventing memory leaks and race conditions upon component unmount.
+
+🧪 **[test] Add Comprehensive Strict Test Suites**
+- 🎯 Introduces numerous new "complete-coverage" test files under `shared/test/strictTests` to achieve exhaustive validation of critical shared utilities and constants.
+- 🏗️ Adds `shared/test/fixtures/siteFactories.ts` to provide standardized, reusable test data for sites and monitors.
+- 🛡️ Creates exhaustive tests for:
+  - Error handling utilities (`ApplicationError`, `withErrorHandling`).
+  - History retention limits and normalization logic.
+  - Shared logging helpers and interfaces.
+  - Monitor status event validation guards.
+  - Monitoring interval constants and remediation logic.
+  - Renderer IPC event contracts.
+  - Site data validation, sanitation, and synchronization utilities.
+- ⚙️ Adds new tests for the improved IPC handler registration to verify duplicate rejection and rollback behavior.
+- 🖼️ Adds coverage tests for the `useOverflowMarquee` hook and `toSentenceCase` utility.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0a0585a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0a0585a77a6696b511538f8136b908065cad5116)
+
+
+- ✨ [feat] Enhance monitoring summaries and data import synchronization
+
+This commit introduces several enhancements across the application, focusing on providing more detailed feedback from monitoring operations and improving data synchronization after imports.
+
+✨ **[feat] Monitoring Service Enhancements**
+- 📞 The `startMonitoring` and `stopMonitoring` IPC methods now return detailed summary objects (`MonitoringStartSummary`, `MonitoringStopSummary`) instead of a simple boolean.
+-  Frontend `MonitoringService` is updated to return these summaries, providing the UI layer with richer context about how many monitors succeeded or failed to start/stop.
+- 💥 Error handling is improved to include the summary object when a start/stop operation fails or partially fails.
+
+🚜 **[refactor] Centralize Site Snapshot and Sanitization Logic**
+- 📦 Adds a new `siteSnapshots.ts` utility module to centralize logic for creating sanitized site snapshots.
+- 🚮 This handles the removal of duplicate site identifiers and calculates deltas between states.
+- 🔄 `SiteManager`, `IpcService`, and the frontend `useSiteSync` hook are refactored to use these new utilities, ensuring consistent behavior across the main and renderer processes.
+
+🛠️ **[fix] Ensure UI Updates After Data Import**
+- 🔄 After a successful data import, the `UptimeOrchestrator` now fetches the refreshed site list and emits a `BULK_SYNC` event.
+- 📢 This ensures the frontend state is immediately synchronized with the newly imported database content, fixing a bug where the UI would not reflect the changes without a manual refresh.
+- ➡️ The `DatabaseManager` now emits an internal event to request a cache update after an import, improving separation of concerns.
+
+📝 **[docs] Update API Documentation and Add Wiki Structure**
+- 📄 Updates `API_DOCUMENTATION.md` to reflect the new return types for monitoring functions and to strongly recommend using the renderer service layer (`SiteService`, `MonitoringService`, etc.) over the raw IPC bridge.
+- ✨ Adds a new `wiki.json` file, laying out a comprehensive structure for project documentation, covering architecture, technology stack, and key features.
+
+🔧 **[build] Build & Linting Adjustments**
+- 📦 Updates the docusaurus `package.json` version and main entry point.
+- ⚙️ Disables the `require-bin` and `require-man` rules in `npmpackagejsonlintrc.json` to align with project structure.
+- 🙈 Adds `codeql-agent-results/` to `.gitignore`.
+
+🧪 **[test] Update Tests for New Features**
+- ✅ Unit and integration tests are updated to align with the new monitoring summary return types and the improved data import flow.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a5bd5fc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a5bd5fcf9252b4b02f2717ae69ca61f32844cdf8)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Validate & create absolute Electron userData path during startup
+
+🛠️ [fix] Ensure userData override is absolute and directory exists
+ - 🧭 Add path.isAbsolute validation for userData override and throw a clear error when a non-absolute value is provided (message includes the received value).
+ - 🗂️ Ensure the target directory exists using mkdirSync(..., { recursive: true }) during early startup and justify the sync IO with an eslint disable comment.
+ - 🔎 Continue to set app.setPath("userData", resolvedPath) and log the chosen path for diagnostics.
+
+🚜 [refactor] Use node:path default import & tidy fuzz runner script
+ - ♻️ Replace named dirname/join imports with a single default import from node:path and use path.join / path.dirname for bundled CLI resolution.
+ - 🧾 Append an eslint-disable comment to the entrypoint call (void main()) to satisfy lint rules about top-level await in CommonJS entrypoints.
+
+🔧 [build] Include shared sources in electron test tsconfig
+ - 🧩 Add shared/**/*.ts|mts|cts|tsx and shared/test/**/* globs to config/testing/tsconfig.electron.test.json include array so shared files are picked up by the electron test build / typechecker.
+
+📝 [docs] Normalize FAST_CHECK_FUZZING_GUIDE.md formatting
+ - ✍️ Convert inconsistent hyphen list markers to standard Markdown bullets, fix glob examples, and escape FAST_CHECK_* env var names for clearer documentation.
+
+🧪 [test] Improve typing in safeObjectPick fuzz test
+ - 🛡️ Cast keysToPick to a typed readonly (keyof typeof obj)[] (typedKeys) before filtering and mapping, simplifying the type logic and producing a type-safe expected value for assertions.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(292b064)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/292b0646abe164bd68c56d4e555948f8e19cbda4)
+
+
+- 🛠️ [fix] Harden URL validation & mark type-only modules for coverage
+ - shared/validation/validatorUtils.ts: reject values ending with "://", preventing false-positive scheme-only URLs
+ - electron/UptimeOrchestrator.types.ts & electron/managers/validators/interfaces.ts: add /* V8 ignore start *///* V8 ignore end */ wrappers and export runtime marker constants to satisfy coverage tooling for pure-type modules
+
+🧹 [chore] Adjust lint / tsconfig / build settings
+ - .npmpackagejsonlintrc.json: normalize "description-format" to ["error", {}] to satisfy schema validation
+ - .storybook/tsconfig.json: expand include globs and add explicit exclude placeholder to pick up storybook sources
+ - eslint.config.mjs: add project-match tuning (maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 24) to reduce parser noise
+ - vite.config.ts: disable coverage autoUpdate and tighten thresholds with explanation to avoid Magicast mutation issues
+ - storybook/test-runner-jest.config.js: refine eslint-disable comment for CommonJS config
+ - vitest.electron.config.ts: exclude "**/*.types.ts" and include tests/strictTests/electron/**/* to surface strict backend tests
+
+🧪 [test] Add comprehensive runtime & strict test coverage and improve existing tests
+ - Add many new tests across electron/, src/, and tests/strictTests/ (MonitorTypeRegistry coverage/migration, siteDeletion coverage/strict, DatabaseService transactions, MonitorManagerEnhancedLifecycle, monitorFactoryUtils, pingRetry, databaseInitializer, useSiteSync/useSiteMonitoring/useSiteSync throttling, and more)
+ - electron/test/services/window/WindowService.test.ts: enhance BrowserWindow/webContents mocks and add scenarios (headless behavior, DevTools failure handling, security header middleware, lifecycle cleanup, Vite server readiness/retries, env-flag helper)
+ - src/test/components/.../SiteTableRow.fast-check.test.tsx: small test normalization tweak (.replace -> .replaceAll) to stabilize accessible name assertions
+
+📝 [docs] Update agent prompt & tool ordering
+ - .github/agents/BeastMode.agent.md: clarify "Continue" handoff prompt (unlimited compute/resources) and reorder tool list for clarity
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ccc5c50)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ccc5c503cddaf581106d1c13a1fb640618e1e537)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 17.9.0 [`(2a651d5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a651d5c0bf2c45d51aed55e61d4ec29e1f36eb3)
+
+
+
+### 🚜 Refactor
+
+- 🚜 [refactor] Extract subscription-format helpers & simplify component render logic
+ - ✂️ Introduce src/components/Header/StatusSubscriptionIndicator.utils.ts containing formatChannelLabel, formatListenerSummary, formatListenerDetail, formatRetryAttemptSummary with full JSDoc → centralizes pluralization/tooltip formatting and improves testability.
+ - ♻️ Replace inline formatting functions in StatusSubscriptionIndicator with imports from the new utils file → reduces duplication and clarifies intent.
+ - 🧼 Simplify HealthIndicator rendering by computing healthColor = getAvailabilityColor(uptimePercentage) once and reusing it in attributes/children → avoids repeated calls and tightens JSX structure.
+ - 🧾 Improve AddSiteForm error rendering by computing resolvedErrorMessage = formError ?? lastError ?? "" and shouldRenderErrorAlert boolean → removes repeated null-coalescing expressions and makes conditional rendering clearer.
+
+🧪 [test] Add and expand comprehensive tests (unit / behavior / fast-check / strict coverage)
+ - ✅ Add focused unit tests for HealthIndicator and StatusSubscriptionIndicator formatting helpers and update existing tests to use the new utils.
+ - ✅ Add many behavioral & fast-check suites to increase coverage across header, dashboard, site-details, common components, hooks, stores and IPC helpers:
+   - src/test/components/AddSiteForm/AddSiteModal.test.tsx
+   - src/test/components/Dashboard/SiteCard/SiteCardHeader.behavior.test.tsx
+   - src/test/components/Dashboard/SiteCard/SiteCardMonitorList.test.tsx
+   - src/test/components/Dashboard/SiteCard/SiteCompactCard.fast-check.test.tsx
+   - src/test/components/Dashboard/SiteList/SiteList.layout-behavior.test.tsx
+   - src/test/components/Dashboard/SiteList/SiteTableRow.fast-check.test.tsx
+   - src/test/components/Dashboard/SiteList/SiteTableView.fast-check.test.tsx
+   - src/test/components/Header/HealthIndicator.test.tsx
+   - src/test/components/Header/StatusSubscriptionIndicator.test.tsx (updated to exercise utils)
+   - src/test/components/SiteDetails/MonitoringStatusDisplay.fast-check.test.tsx
+   - src/test/components/SiteDetails/tabs/AnalyticsTab.test.tsx
+   - src/test/components/common/ConfirmDialog/ConfirmDialog.test.tsx
+   - src/test/services/utils/createIpcServiceHelpers.test.ts
+   - src/test/hooks/ui/useConfirmDialog.hook.test.ts
+   - src/test/stores/ui/useConfirmDialogStore.test.ts
+   - plus many new strictTests for AddSiteForm/AddSiteModal/DynamicField/Header/OverviewTab/SiteCardHeader/SiteTableRow/StatusIndicator/StatusSubscriptionIndicator/StatusSummary and utility test modules
+ - 🧰 Tests use component mocking and fast-check property-based tests where appropriate to exercise runtime branches and improve resilience.
+
+👷 [ci] Adjust Vitest coverage thresholds and add rationale
+ - 🔧 Update vite.config.ts coverage config: enable autoUpdate and relax/tune thresholds to realistic values (branches: 77, functions: 92, lines: 93, statements: 89) and add comment explaining JSX/CSS-module instrumentation leads to synthetic branches that cannot be exercised; thresholds chosen to enforce strong executable-logic coverage without blocking on non-actionable gaps.
+
+📝 [docs] Minor tsdoc ordering normalization
+ - 🧹 Reorder tsdoc.json keys (move supportForTags) to match expected schema ordering (no behavioral change).
+
+Notes:
+ - Prioritized source-level refactors first (helpers, component simplification) and then added test coverage and CI tuning.
+ - Changes improve modularity, testability and reduce redundant runtime calls while bringing a large suite of tests to validate behavior and runtime invariants.
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fa1157a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fa1157a00b3b8b9552fe202a2076265f787689d6)
+
+
+- 🚜 [refactor] Centralize history-limit validation & normalize error semantics
+ - Move normalization into shared normalizeHistoryLimit: accept numeric input, treat <=0 as unlimited (0), floor fractions, clamp to minLimit and throw RangeError for > maxLimit.
+ - Remove redundant integer/finite guards in DatabaseManager and surface explicit error when history rules are unavailable.
+ - Update SettingsService to pre-normalize requests, map backend RangeError->TypeError for renderer-facing contract, and gracefully fallback to sanitized request when backend returns invalid values.
+
+🧪 [test] Align tests with normalization behavior and typed mocks
+ - Update DatabaseManager/SettingsService/unit/integration tests to use DEFAULT_HISTORY_LIMIT_RULES + normalizeHistoryLimit and assert normalization/clamping instead of rejection.
+ - Adjust historyLimitManager tests to expect floored integer behavior and update mock implementations to apply normalization.
+
+✨ [feat] Add typed test mock factory and migrate tests
+ - Introduce createMockFunction<Fn> helper for strongly-typed vitest mocks and migrate many vi.fn usages to typed Mock + createMockFunction for clearer test intent and typings.
+
+🚜 [refactor] Harden runtime/bench code for immutability & clarity
+ - Make fields explicit readonly and switch from parameter-property shorthand to explicit constructor assignment across benchmark classes, mock components, MockFile, alert/monitor classes and other small runtime helpers.
+ - Bind notificationService/config dependencies to readonly fields where relevant.
+
+🔧 [build] Normalize and tighten tooling / config files
+ - Expand and normalize .cspell.json, .npmpackagejsonlintrc.json, .hintrc, .yamllint and eslint.config.mjs rules/ignores; update tsconfig.* (testing, scripts, playwright) path mappings and references to use cached build artifacts.
+ - Update root and docs/docusaurus package.json metadata, scripts and dependency ranges; add package lint scripts and packaging metadata used by CI/tooling.
+
+🧹 [chore] Unify Electron API typing for renderer & Storybook
+ - Introduce a single ElectronAPI alias in src/types and update storybook/type alias to import/export it, keeping global window typing consistent.
+
+🧪 [test] Refactor cacheSync property-based tests & helpers
+ - Add build/trigger/expect helpers for CacheInvalidated events, use CACHE_INVALIDATION_* enums in tests, and simplify async assertions and error handling for property-based scenarios.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f5262c0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f5262c084ed00f6a57ec30a3fd52fad0d7c6cdfc)
+
+
+- 🚜 [refactor] Centralize history limit rules and normalize values
+
+This commit refactors history retention logic by centralizing business rules into a new shared module, ensuring consistent validation and normalization across the application.
+
+✨ [feat] Introduce shared history limit rules
+- ➕ Adds a new `shared/constants/history.ts` file to define canonical `HistoryLimitRules` (`defaultLimit`, `minLimit`, `maxLimit`).
+- 🔄 Introduces a `normalizeHistoryLimit` utility function to validate and sanitize history limit values, handling integers, bounds checking, and treating non-positive values as "unlimited" (0).
+
+🚜 [refactor] Refactor backend to use shared history rules
+- 🏠 `DatabaseManager` and `ConfigurationManager` now source history limit rules from the new shared constant.
+- 🛡️ `DatabaseManager` initialization is hardened to use `normalizeHistoryLimit` when loading the persisted value, falling back to the default on validation errors.
+- 🧰 The `historyLimitManager` utility is updated to accept and apply these rules, centralizing the clamping and validation logic previously duplicated in different layers.
+
+🎨 [style] Format Docusaurus MDX documentation
+- 🧹 Applies consistent formatting to all architecture and guide `.mdx` pages.
+- 💅 Standardizes Markdown syntax, JSX layout indentation, and cleans up Mermaid diagram definitions.
+- ⛔ Adds complex MDX page diagrams to `.remarkignore` to prevent linter conflicts with manual formatting.
+
+🧪 [test] Improve test suite robustness
+- 🔧 Updates Vitest configurations and tests to align with the refactored history limit logic.
+- 🔒 Enhances type safety in test mocks and constructor initializations.
+- 🎯 Adjusts property-based tests to correctly assert against the new centralized minimum limit instead of a hardcoded value.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d9f794b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d9f794b4597ac577998b32e94c25885a706ad0c2)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardize markdown formatting across all documentation
+
+This commit introduces a comprehensive and consistent formatting standard across all Markdown (`.md`) files in the repository.
+
+### ✨ Key Changes
+
+*   📝 **Consistent List Formatting**:
+    *   Uniformly replaces hyphen-based (`-`) lists with asterisk-based (`*`) lists.
+    *   Standardizes section headers within lists to use bold (`__Header__`) for improved readability.
+
+*   💅 **Visual Style Unification**:
+    *   Replaces all horizontal rules (`----`) with a consistent three-asterisk separator (`***`) for a cleaner visual appearance.
+
+*   🚀 **Developer Experience Enhancements**:
+    *   Improves VS Code task problem matchers in `tasks.json` with more robust regular expressions to better parse output from tools like Vite, ESLint, Stylelint, and TypeScript, including handling of ANSI color codes.
+    *   Defaults linting tasks (`lint`, `lint:css`, `lint:all`) to their auto-fixing equivalents (`lint:fix`, `lint:css:fix`, `lint:all:fix`) to streamline the development workflow.
+    *   Adds problem matchers for `remark`, `knip`, and `madge` to the `Lint:All:Fix` task.
+
+*   🔧 **Tooling and Configuration**:
+    *   Adds a new `.npmpackagejsonlintrc.json` configuration file to enforce `package.json` structure and correctness.
+    *   Updates `.gitignore` to exclude the `temp/` directory.
+    *   Refines agent prompts in `BeastMode.agent.md` for better clarity and effectiveness.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eb7300a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eb7300ae40165a6315fe9828fb8c67685cda9db0)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Centralize fast-check env config, add fuzz runner, and wire into test setups
+
+ - ✨ [feat] Add shared/test/utils/fastCheckEnv.ts: resolveFastCheckEnvOverrides reads FAST_CHECK_NUM_RUNS & FAST_CHECK_SEED, validates inputs, emits warnings for invalid values, and returns an object suitable for fc.configureGlobal
+ - ✨ [feat] Add scripts/run-fast-check-fuzzing.ts + package.json:fuzz:runs: CLI to run targeted fuzzing suites with --runs / --seed / --targets, picks an npm invocation strategy, and forwards FAST_CHECK_* env vars to child processes
+ - 🧪 [test] Replace hardcoded numRuns in test setup files (src/test/*, shared/test/*, electron/test/setup.ts, shared/test/setup.ts, src/test/vitest-context-setup.ts, src/test/dom-setup.ts, src/test/mock-setup.ts, src/test/global-setup.ts) to use resolveFastCheckEnvOverrides for consistent, environment-driven fast-check configuration
+ - 🚜 [refactor] Simplify objectSafety.fuzz.test.ts assertion: compute expected entries via filter/map and assert equality with Object.fromEntries for clearer, stricter expectations
+ - 📝 [docs] Update FAST_CHECK_FUZZING_GUIDE.md: formatting tweaks and examples showing fuzz:runs usage, seeds, run counts, and --targets to limit environments
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(62740d9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/62740d99e40e625ed716728cdc265d57a5ae6767)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Add schema metadata & normalize lint/editor configs
+
+🧹 [chore] .vscode: add VS Code JSON schemas for editor autocompletion & validation
+ - Add "$schema": "vscode://schemas/extensions" to .vscode/extensions.json ✅
+ - Add "$schema": "vscode://schemas/settings/workspace" to .vscode/settings.json ✅
+
+🧹 [chore] config/linting: ensure schemas and locale for linters
+ - Add "$schema": "https://raw.githubusercontent.com/anchore/grype/refs/heads/main/schema/grype/db/blob/json/schema-latest.json" to config/linting/.grype.yaml 🔍
+ - Add locale: en_US.UTF-8 to config/linting/.yamllint for consistent parsing 🌐
+
+🧹 [chore] config/linting/.taplo.toml: formatting & schema normalization
+ - Insert/normalize [schema] block (enabled + url), tighten eslint-disable to only toml/key-spacing, and normalize include array spacing 🧾
+
+📝 [docs] docs/docusaurus/stylelint.config.mjs: add JSDoc typedefs
+ - Add typedef JSDoc comments for stylelint types to improve IDE typing and documentation 📚
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1b3756c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1b3756cfb32482f0f99dd33fcae17ccd57cedb6e)
+
+
+- 🧹 [chore] Normalize tooling/config metadata, tighten CI/build steps, and add jscpd leveldb store
+
+👷 [ci] Use deterministic installs for mutation testing
+ - 🔧 Replace `npm install --force` → `npm ci` in Stryker workflow for reproducible installs before mutation testing
+
+🔧 [build] Harden Flatpak build script & safety checks
+ - 🛡 Consolidate many build-commands into a single `set -e` script block to fail fast and improve logging
+ - 📁 Ensure app dirs, copy/permissions, wrapper script, desktop/metainfo/icons installation and desktop validation are robust
+ - ♻️ Trim/normalize file operations and add final validation/reporting steps
+
+🧹 [chore] Add schema hints, editor metadata & tidy IDE configs
+ - ✨ Add name/description front-matter to Copilot instruction files (.github/copilot-instructions*.md)
+ - 🧾 Add/standardize $schema / yaml-language-server comments across dependabot, markdown-link-check, grype, yamllint and other configs
+ - 🛠 Add $schema to .vscode launch & tasks, and add unwantedRecommendations to .vscode/extensions.json
+
+🧹 [chore] Linting & formatter config improvements
+ - 🧹 Reformat and enrich .taplo.toml (column_width, newline_at_eof, compact_inline_tables, rule blocks) for consistent formatting
+ - 🧹 Tidy .htmlhintrc ordering and update biome.json to use latest schema
+ - 🔁 Enhance config/linting/jscpd.json (moved keys, ignoreCase, maxLines, reporters, reportersOptions badge, silent/store options)
+
+🧹 [chore] Add centralized markdown ignore
+ - 📁 Add config/linting/.markdownlintignore to centralize markdown ignore patterns
+
+🧹 [chore] Expand test tsconfigs to include strict tests
+ - ✅ Add ../../tests/strictTests/** entries to testing tsconfigs (electron + shared) so strict test suites are included in builds
+
+🧹 [chore] Add @jscpd/leveldb-store & refresh lockfile
+ - ➕ Add @jscpd/leveldb-store to package.json devDependencies and include corresponding leveldb-related packages in package-lock.json
+ - 🏷 Remove empty optionalDependencies and add legacy bundleDependencies key for packaging compatibility
+
+🎨 [style] Minor typing & formatting polish
+ - 🧾 Add JSDoc typedef + typed export in commitlint.config.mjs and a small formatting polish in eslint.config.mjs
+ - 🔍 Minor whitespace/order fixes in .storybook tsconfig and ActionLint workflow
+
+ - 💡 Overall: configuration hygiene, schema metadata and reproducible CI/build behaviour; no functional app source changes.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a7ddf28)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a7ddf2829b7718c550fd676e0a44b94c4f555886)
+
+
+- 🧹 [chore] [dependency] Update dev dependencies & regenerate lockfile
+ - 🔼 Updated package.json and package-lock.json with multiple dependency bumps and nested resolutions.
+ - 📌 Notable upgrades: type-fest 5.1.0→5.2.0, @biomejs/biome 2.3.2→2.3.3, @eslint/js 9.39.0→9.39.1, eslint 9.39.0→9.39.1, storybook/* 10.0.2→10.0.3, @typescript-eslint/* 8.46.2→8.46.3, typescript-eslint 8.46.2→8.46.3, knip 5.67.0→5.67.1, package-json-validator 0.31.0→0.32.1, type-fest 5.1.0→5.2.0, and many nested entries.
+ - 🧾 Regenerated lockfile to reflect resolved versions and optional/platform-specific packages.
+
+👷 [ci] Switch Stryker workflow to npm install --force
+ - 🔁 Replace `npm ci` with `npm install --force` in .github/workflows/stryker-mutation-testing.yml.
+ - ⚠️ Motivation: make CI installs more resilient to lockfile/platform/optional-dep mismatches on the runner (avoid spurious install failures) so mutation testing can proceed reliably.
+ - ✅ No changes to Stryker reporting/upload/commenting steps; only the install step was adjusted.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f80a892)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f80a89241d6a30e5e3305d48f13cf390c8d564aa)
+
+
+- 🧹 [chore] Update deps & lockfiles, adjust bundling/lint rules, add schema, clarify Continue prompt
+
+🔧 [build] [dependency] Update key devDependencies & tooling 🛠️
+ - eslint: ^9.38.0 → ^9.39.0 🔼
+ - @eslint-react/eslint-plugin: ^2.2.4 → ^2.3.1 🔼
+ - @eslint/js: ^9.38.0 → ^9.39.0 🔼
+ - @fast-check/vitest: ^0.2.2 → ^0.2.3 🔼
+ - @types/node: ^24.9.2 → ^24.10.0 🔼
+ - eslint-plugin-playwright: ^2.2.2 → ^2.3.0 🔼
+ - eslint-plugin-react-dom: ^2.2.4 → ^2.3.1 🔼
+ - eslint-plugin-react-hooks-extra: ^2.2.4 → ^2.3.2-beta.1 🔼
+ - eslint-plugin-react-naming-convention: ^2.2.4 → ^2.3.1 🔼
+ - eslint-plugin-react-web-api: ^2.2.4 → ^2.3.1 🔼
+ - globals: ^16.4.0 → ^16.5.0, globals-vitest: ^3.2.4 → ^4.0.6 🔼
+ - knip: ^5.66.4 → ^5.67.0, typedoc-plugin-dt-links: ^2.0.26 → ^2.0.27 🔼
+
+🧹 [chore] Refresh & align package-lock.json + package metadata 🔁
+ - regenerate lockfile entries to match bumped deps and nested package upgrades 🔄
+ - mark node-sqlite3-wasm as bundled/included in lockfile (bundleDependencies / inBundle: true) 📦
+ - remove stray empty "bundleDependencies": [] from package.json (cleanup) 🧹
+
+🛠️ [fix] Relax package-json linting for bundled deps ⚙️
+ - set require-bundledDependencies → "off" in .npmpackagejsonlintrc.json to avoid enforcing bundling as an error ✅
+
+📝 [docs] Add schema & normalize docs package metadata 🗂️
+ - add "$schema": "https://www.schemastore.org/package.json" to docs/docusaurus/package.json for editor/validation 🌐
+ - update docs/docusaurus/package-lock.json: version → 1.0.0 and normalize Docusaurus deps to caret ranges (^3.9.2) for consistency 📚
+
+📝 [docs] Clarify continuation prompt location ✍️
+ - update .github/prompts/Continue.prompt.md to explicitly state that TODO.md lives at the repository root 🗒️
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7eff54b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7eff54b098b2aa93ce5d1980e320dab1596c0dbe)
+
+
+- Update changelogs for v17.9.0 [skip ci] [`(b18d34f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b18d34f86308efc0454844552cd71f9b9a072d24)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Strip per-prompt tool lists and normalize prompt front-matter
+
+ - 🧹 [chore] Remove verbose `tools:` arrays from many .github/prompts/*.prompt.md to reduce duplication and narrow declared automation surface
+ - 📝 [docs] Add and standardize front-matter fields (name, argument-hint) and reorder metadata for consistent prompt formatting
+ - 👷 [ci] Reorder BeastMode agent tools in .github/agents/BeastMode.agent.md to group integrations (Tavily, deepwiki, vscode-mcp) before runCommands/runTasks for clearer organization
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c4f48f1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c4f48f13c7c846a9b96494d33dfb5c07287af32f)
+
+
+- 👷 [ci] Refine BeastMode automation prompts, add TODO workflows, add wiki schema, and tweak configs
+ - 📝 [docs] Add .github/prompts/Add-ToDo.prompt.md — detailed TODO creation workflow and storage guidance (TODO.md)
+ - 📝 [docs] Add .github/prompts/Continue.prompt.md — continuation checklist for resuming and completing TODO items
+ - 👷 [ci] Update .github/agents/BeastMode.agent.md — split ToDo flow: reference Add-ToDo and new Continue prompts, adjust prompts/labels
+ - 📝 [docs] Clarify scope in several prompts (Consistency-Check and Generate-100%* files) by inserting a generic note about usage and scope
+ - 🧹 [chore] Add config/schemas/devin-wiki.schema.json and reference it from .devin/wiki.json to enable JSON-schema validation for the wiki
+ - 🔧 [build] Update vite.config.ts to exclude "**/assets/**" from scanning to avoid processing static asset folders
+ - 📝 [docs] Minor header doc tweak in eslint.config.mjs (add @see link for schema reference)
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(81704ce)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/81704ce76ad0450656b9faa21014cf01b6a3da0d)
+
+
+- 👷 [ci] Add YAML/JSON schema hints to workflows and tooling configs
+ - Insert yaml-language-server $schema comments into: .codecov.yml, .mega-linter.yml, flatpak-build.yml, and .github/workflows/typos.yml
+ - Move/split workflow schema comment in .github/workflows/scorecards.yml and add explicit "$schema" property to mermaid.config.json for editor validation
+
+📝 [docs] Expand JSDoc typedefs and add schema references for tooling configs
+ - Add/expand typedef blocks and @see schema refs in: postcss.config.mjs, stylelint.config.mjs, tailwind.config.mjs, stryker.config.mjs, and .remarkrc.mjs
+ - Tweak stylelint.config.mjs: convert @type → @typedef, add detailed typedefs and refine the eslint-disable comment for clearer intent
+
+🧹 [chore] Minor normalization and header cleanup
+ - Reorder/normalize tsdoc.json keys (move reportUnsupportedHtmlElements)
+ - Comment out top-of-file 'name:' entries in workflow header comments (osv-scanner, scorecards) to keep header docs consistent
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9469594)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9469594433e77f8d70bd91ac844cef6eb3fb5a7a)
+
+
+- 👷 [ci] Annotate GitHub Actions workflows with YAML schema hints
+ - Insert "# yaml-language-server: $schema=..." headers across many .github/workflows/*.yml to enable editor schema validation and improve IDE diagnostics
+ - Normalize placement of the schema comments for consistent linting and completion behavior
+
+🧹 [chore] Harden Dependabot configuration
+ - Set open-pull-requests-limit: 5 to cap concurrent PRs from Dependabot
+ - Enable rebase-strategy: auto for applicable update jobs and include "scope" in generated commit messages
+ - Turn on enable-beta-ecosystems to allow beta ecosystem updates where configured
+
+🧹 [chore] Add YAML schema hint to FUNDING.yml
+ - Add yaml-language-server schema comment to improve editor tooling for repository funding config
+
+📝 [docs] Expand internal dev wiki (.devin/wiki.json) repo_notes with project overview and onboarding guidance
+ - Add concise summaries of app architecture, directory layout (main/electron, renderer/src, shared), IPC/contracts, monitoring engine, supported monitor types, persistence, testing toolchain, and build/distribution notes
+ - Provide targeted guidance to help contributors locate core components, understand cross-process boundaries, and get started with development and testing
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7d06561)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7d06561aee8fd8cdd145e1f9c3b37d9112221cf8)
+
+
+- 👷 [ci] Centralize lint scripts, normalize .yamllint new-lines, and tidy Playwright workflow comment
+
+ - 🧹 [chore] Replace inline npmPkgJsonLint/yamllint invocations with npm-run wrappers in package.json
+   - Invoke lint:packagelintrc and lint:yaml from lint:all variants to centralize package/yaml linting and improve reuse
+ - 🧹 [chore] Update lint:package to call lint:packagelintrc instead of running npmPkgJsonLint inline
+ - 🧹 [chore] Adjust lint:yaml invocation order and add a completion echo for clearer CI output
+ - 🧹 [chore] Normalize config/linting/.yamllint new-lines to "platform" (instead of "dos") and add minor formatting cleanup
+ - 👷 [ci] Minor comment wrap in .github/workflows/playwright.yml for readability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a08175f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a08175f96c775041a19666886ebac609a12446f6)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Add AllOtherRoot TS project and tighten TypeScript / tooling configs
+
+ - 🔧 [build] Add config/testing/tsconfig.AllOtherRoot.json to centralize "other" root references and enable a consolidated tsc check; add package.json script check:other:all to run it
+ - 🔧 [build] Expand config/testing/tsconfig.configs.json includes to cover vitest, storybook and vite config files so tooling/config scripts are type-checked
+ - 🔧 [build] Include linting config patterns in config/testing/tsconfig.js.json and ensure config/testing/tsconfig.scripts.json declares rootDir for correct script resolution
+ - 🔧 [build] Fix declarationDir in config/testing/tsconfig.test.json to point at .cache/builds/test/test/types (corrects emitted type output path)
+ - 🚜 [refactor] Reduce repetitive // @ts-expect-error noise in eslint.config.mjs and replace with clearer, targeted comments where types are known to be mismatched
+ - 🔧 [build] Harden root tsconfig.json: enable composite, adjust compiler flags, add excludes for temp/.cache/.coverage/storybook/storybook-static/out, tighten includes to src only, and add watchOptions to ignore noisy directories and improve watcher performance
+ - 🔧 [build] Update vite.config.ts coverage excludes to omit shared/out/temp/.cache/.storybook/.coverage/storybook-static to avoid tooling/cache folders polluting coverage
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(eb4d9b5)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/eb4d9b52abcbbde27a8215e671bd17ef3f23e80b)
+
+
+- 🔧 [build] Sync lockfile and bump dev/test dependencies
+ - Update docs/docusaurus/package-lock.json and root package-lock.json to align with current package.json (version -> 17.9.0)
+ - Upgrade test tooling and dev deps: Vitest and related @vitest/* packages 4.0.5 -> 4.0.6
+ - [dependency] Update jsdom 27.1.0, cssstyle to 5.3.2, @electron/notarize to 3.1.1 and refresh resolved/integrity entries
+ - Add @acemir/cssom and remove rrweb-cssom where applicable; refresh lockfile metadata and engine constraints
+
+🛠️ [fix] Update WASM artifact reference
+ - assets/.wasm-version updated from b2b295ae -> 53123fb8 to match new build artifact
+
+🧹 [chore] Add license metadata to docs lockfile
+ - Insert "license": "UnLicense" into docs/docusaurus/package-lock.json
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8db9a50)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8db9a502bfdf56ea9d2763eee7be3f5f71c10cf2)
+
+
+- 🔧 [build] [dependency] Update Storybook 10.0.2 and update Storybook-related packages
+ - Upgrade @storybook packages and shims to 10.0.2 and update package-lock entries / integrity hashes
+ - Affects: @storybook/addon-a11y, @storybook/addon-docs, @storybook/addon-links, @storybook/addon-themes, @storybook/addon-vitest, @storybook/builder-vite, @storybook/react, @storybook/react-vite, csf-plugin, react-dom-shim, etc.
+
+🧹 [chore] Upgrade testing/linting/tooling deps
+ - @vitest/eslint-plugin -> 1.4.0
+ - eslint-plugin-package-json -> 0.59.1 (and validate-npm-package-name -> 7.0.0 with updated node engine range)
+ - node-abi -> 4.17.0
+ - typedoc-plugin-external-package-links -> 0.2.0
+
+🧹 [chore] Sync lockfiles and mark docs peers
+ - Apply package-lock.json updates across repo to reflect bumped devDependencies
+ - Add "peer": true flags across docs/docusaurus/package-lock.json for multiple Docusaurus plugins/themes to reflect peerDependencies and keep lockfile consistent
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1985086)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/19850867b5a8f8396b7508aa8b03564361a3e227)
 
 
 
