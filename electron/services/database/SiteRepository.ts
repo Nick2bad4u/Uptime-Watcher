@@ -1,6 +1,5 @@
 /**
- * Repository for site data persistence and management operations using the
- * repository pattern.
+ * Module documentation for the site persistence repository.
  *
  * @remarks
  * Provides comprehensive CRUD operations for site data with transaction
@@ -44,8 +43,6 @@
  *     // Both operations committed together
  * });
  * ```
- *
- * @packageDocumentation
  */
 import type { SiteRow as DatabaseSiteRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
@@ -77,6 +74,13 @@ export interface SiteRepositoryDependencies {
     databaseService: DatabaseService;
 }
 
+/**
+ * Property subset required when upserting a site record.
+ *
+ * @remarks
+ * Used to restrict the fields accepted by {@link SiteRepository.upsert} and
+ * related transactional helpers to the values persisted by the database.
+ */
 type SiteRowUpsertFields = "identifier" | "monitoring" | "name";
 
 /**
@@ -131,6 +135,8 @@ const SITE_QUERIES = {
 } as const;
 
 /**
+ * Repository for managing site data persistence.
+ *
  * @remarks
  * Handles all CRUD operations for sites in the database using the repository
  * pattern. All mutations are wrapped in transactions for consistency and error
@@ -138,7 +144,6 @@ const SITE_QUERIES = {
  * status.
  *
  * @public
- * Repository for managing site data persistence.
  */
 export class SiteRepository {
     /** @internal */
@@ -164,7 +169,7 @@ export class SiteRepository {
      *
      * @returns A promise that resolves when all sites are inserted.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async bulkInsert(sites: SiteRow[]): Promise<void> {
         if (sites.length === 0) {
@@ -197,7 +202,7 @@ export class SiteRepository {
      * @returns Promise resolving to `true` if the site was deleted, `false` if
      *   not found.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async delete(identifier: string): Promise<boolean> {
         return withDatabaseOperation(
@@ -226,7 +231,7 @@ export class SiteRepository {
      *
      * @returns Promise that resolves when all sites are deleted.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async deleteAll(): Promise<void> {
         return withDatabaseOperation(
@@ -253,7 +258,7 @@ export class SiteRepository {
      * @returns Promise resolving to `true` if the site exists, `false`
      *   otherwise.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async exists(identifier: string): Promise<boolean> {
         return this.runSiteReadOperation(
@@ -277,7 +282,7 @@ export class SiteRepository {
      *
      * @returns Promise resolving to an array of all site data.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async exportAll(): Promise<SiteRow[]> {
         return this.runAllSitesOperation("site-export-all");
@@ -298,7 +303,7 @@ export class SiteRepository {
      *
      * @returns Promise resolving to an array of all site data.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async findAll(): Promise<SiteRow[]> {
         return this.runAllSitesOperation("find-all-sites");
@@ -318,7 +323,7 @@ export class SiteRepository {
      * @returns Promise resolving to site data if found, or `undefined` if not
      *   found.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async findByIdentifier(
         identifier: string
@@ -351,7 +356,7 @@ export class SiteRepository {
      *
      * @returns Promise that resolves when the operation completes.
      *
-     * @throws If the database operation fails.
+     * @throws Error When the database operation fails.
      */
     public async upsert(
         site: Pick<SiteRow, SiteRowUpsertFields>
@@ -375,6 +380,8 @@ export class SiteRepository {
      * @param operationName - Identifier used for logging and metrics.
      *
      * @returns Promise resolving to all sites currently persisted.
+     *
+     * @throws Error When the underlying database operation fails.
      */
     private async runAllSitesOperation(
         operationName: string
@@ -388,9 +395,15 @@ export class SiteRepository {
      * Executes a readonly site repository operation inside the shared
      * operational hook with consistent logging metadata.
      *
+     * @typeParam TResult - Result type produced by the handler.
+     *
      * @param operationName - Identifier used for logging/metrics.
      * @param handler - Function executed with an active database connection.
      * @param metadata - Optional metadata to include in operational logging.
+     *
+     * @returns The value produced by the supplied handler.
+     *
+     * @throws Error When the underlying database operation fails.
      */
     private async runSiteReadOperation<TResult>(
         operationName: string,
@@ -412,7 +425,14 @@ export class SiteRepository {
      * Create a transaction-scoped adapter exposing encapsulated write
      * operations.
      *
+     * @remarks
+     * The returned adapter must only be used with the provided transaction
+     * connection and is not safe to retain once the transaction has been
+     * committed or rolled back.
+     *
      * @param db - Active transaction database connection.
+     *
+     * @returns A transaction-aware adapter exposing write helpers.
      */
     public createTransactionAdapter(
         db: Database
@@ -469,9 +489,7 @@ export class SiteRepository {
      * @param db - Database connection (must be within active transaction).
      * @param sites - Array of site data to insert.
      *
-     * @returns Void
-     *
-     * @throws {@link Error} When database operations fail.
+     * @throws Error When the underlying SQLite driver reports a failure.
      */
     private bulkInsertInternal(db: Database, sites: SiteRow[]): void {
         if (sites.length === 0) {
@@ -512,7 +530,7 @@ export class SiteRepository {
      *
      * @param db - Database connection (must be within active transaction).
      *
-     * @returns Void
+     * @throws Error When the underlying SQLite driver reports a failure.
      */
     private deleteAllInternal(db: Database): void {
         db.run(SITE_QUERIES.DELETE_ALL);
@@ -532,7 +550,7 @@ export class SiteRepository {
      *
      * @returns `true` if the site was deleted, `false` if not found.
      *
-     * @throws {@link Error} When database operations fail.
+     * @throws Error When database operations fail.
      */
     private deleteInternal(db: Database, identifier: string): boolean {
         try {
@@ -567,6 +585,8 @@ export class SiteRepository {
      * @param db - The database connection (must be within an active
      *   transaction).
      * @param site - Site data to create or update.
+     *
+     * @throws Error When the underlying SQLite driver reports a failure.
      */
     private upsertInternal(
         db: Database,
@@ -620,6 +640,8 @@ export class SiteRepository {
      * @param identifier - Site identifier to look up.
      *
      * @returns Site data if found; otherwise undefined.
+     *
+     * @throws Error When database access fails.
      */
     private findByIdentifierInternal(
         db: Database,
