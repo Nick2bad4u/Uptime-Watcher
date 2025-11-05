@@ -433,6 +433,18 @@ describe("Electron Types", () => {
             );
 
             const update: StatusUpdate = {
+                monitor: {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-update",
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 0,
+                    status: "down",
+                    timeout: 30_000,
+                    type: "http",
+                },
                 site: {
                     identifier: "update-site",
                     name: "Update Site",
@@ -477,6 +489,18 @@ describe("Electron Types", () => {
             );
 
             const update: StatusUpdate = {
+                monitor: {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-new",
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 0,
+                    status: "down",
+                    timeout: 30_000,
+                    type: "http",
+                },
                 site: {
                     identifier: "new-site",
                     monitors: [],
@@ -646,6 +670,7 @@ describe("Electron Types", () => {
                 identifier: "status-update-site",
                 monitors: [
                     {
+                        activeOperations: [],
                         id: "test-monitor",
                         type: "http",
                         status: "up",
@@ -661,7 +686,14 @@ describe("Electron Types", () => {
                 name: "",
             };
 
+            const [monitor] = site.monitors;
+
+            if (!monitor) {
+                throw new Error("Expected test monitor to exist");
+            }
+
             const update: StatusUpdate = {
+                monitor,
                 site,
                 previousStatus: "pending",
                 monitorId: "",

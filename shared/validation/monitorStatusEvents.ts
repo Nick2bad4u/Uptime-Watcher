@@ -67,11 +67,7 @@ export const isMonitorStatusChangedEventData = (
         return false;
     }
 
-    if (monitor !== undefined && !isUnknownRecord(monitor)) {
-        return false;
-    }
-
-    if (site !== undefined && !isUnknownRecord(site)) {
+    if (!isUnknownRecord(monitor) || !isUnknownRecord(site)) {
         return false;
     }
 
@@ -92,12 +88,4 @@ export const isEnrichedMonitorStatusChangedEventData = (
 ): payload is MonitorStatusChangedEventData & {
     monitor: Record<string, unknown>;
     site: Record<string, unknown>;
-} => {
-    if (!isMonitorStatusChangedEventData(payload)) {
-        return false;
-    }
-
-    const { monitor, site } = payload;
-
-    return isUnknownRecord(monitor) && isUnknownRecord(site);
-};
+} => isMonitorStatusChangedEventData(payload);

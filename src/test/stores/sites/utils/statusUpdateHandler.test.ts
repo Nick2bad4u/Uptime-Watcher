@@ -1153,16 +1153,19 @@ describe("StatusUpdateHandler", () => {
             await statusChangedCallback(event);
 
             // Should have called onUpdate callback
-            expect(mockOnUpdate).toHaveBeenCalledWith({
-                monitorId: event.monitorId,
-                previousStatus: event.previousStatus,
-                site: expect.objectContaining({
-                    identifier: "site1",
-                }),
-                siteIdentifier: event.siteIdentifier,
-                status: event.status,
-                timestamp: expect.any(String),
-            });
+            expect(mockOnUpdate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    monitor: event.monitor,
+                    monitorId: event.monitorId,
+                    previousStatus: event.previousStatus,
+                    site: expect.objectContaining({
+                        identifier: "site1",
+                    }),
+                    siteIdentifier: event.siteIdentifier,
+                    status: event.status,
+                    timestamp: expect.any(String),
+                })
+            );
         });
 
         it("should trigger full sync when monitoring starts", async ({

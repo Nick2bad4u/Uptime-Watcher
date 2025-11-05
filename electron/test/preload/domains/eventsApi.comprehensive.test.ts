@@ -366,9 +366,16 @@ describe("Events Domain API", () => {
 
         it("should call callback with status update data", () => {
             const callback = vi.fn();
+            const monitor = createMonitorFixture({ id: "test-monitor" });
+            const site = createSiteFixture({
+                identifier: "test-site",
+                monitors: [monitor],
+            });
             const mockEventData: MonitorStatusChangedEventData = {
-                siteIdentifier: "test-site",
-                monitorId: "test-monitor",
+                monitor,
+                monitorId: monitor.id,
+                site,
+                siteIdentifier: site.identifier,
                 status: "up",
                 timestamp: new Date().toISOString(),
             };
@@ -848,53 +855,83 @@ describe("Events Domain API", () => {
             ] as const;
             const MIN_ISO_TIMESTAMP_MS = -8_640_000_000_000_000 + 1;
             const MAX_ISO_TIMESTAMP_MS = 8_640_000_000_000_000 - 1;
-            const siteRecordArbitrary = fc
-                .record({
-                    identifier: fc.string({ minLength: 1 }),
-                    name: fc.option(fc.string({ minLength: 1 }), {
-                        nil: undefined,
-                    }),
-                })
-                .map((value) => ({ ...value }));
-            const monitorRecordArbitrary = fc
+            const monitorFixtureArbitrary = fc
                 .record({
                     id: fc.string({ minLength: 1 }),
-                    status: fc.option(fc.constantFrom(...statusValues), {
-                        nil: undefined,
-                    }),
-                })
-                .map((value) => ({ ...value }));
-            const statusUpdateArbitrary = fc
-                .record({
-                    details: fc.option(fc.string(), { nil: undefined }),
-                    monitor: fc.option(monitorRecordArbitrary, {
-                        nil: undefined,
-                    }),
-                    monitorId: fc.string({ minLength: 1 }),
-                    previousStatus: fc.option(
-                        fc.constantFrom(...statusValues),
-                        {
-                            nil: undefined,
-                        }
-                    ),
-                    responseTime: fc.option(fc.nat({ max: 10_000 }), {
-                        nil: undefined,
-                    }),
-                    site: fc.option(siteRecordArbitrary, { nil: undefined }),
-                    siteIdentifier: fc.string({ minLength: 1 }),
+                    monitoring: fc.boolean(),
+                    responseTime: fc.nat({ max: 10_000 }),
                     status: fc.constantFrom(...statusValues),
-                    timestamp: fc.date().map((date) => {
-                        const time = date.getTime();
-                        const normalizedTime = Number.isNaN(time)
-                            ? 0
-                            : Math.max(
-                                  MIN_ISO_TIMESTAMP_MS,
-                                  Math.min(MAX_ISO_TIMESTAMP_MS, time)
-                              );
-                        return new Date(normalizedTime).toISOString();
-                    }),
                 })
-                .map((eventData) => eventData as MonitorStatusChangedEventData);
+                .map((overrides) =>
+                    createMonitorFixture({
+                        id: overrides.id,
+                        monitoring: overrides.monitoring,
+                        responseTime: overrides.responseTime,
+                        status: overrides.status,
+                    })
+                );
+
+            const siteOverrideArbitrary = fc.record({
+                identifier: fc.string({ minLength: 1 }),
+                monitoring: fc.boolean(),
+                name: fc.option(fc.string({ minLength: 1 }), {
+                    nil: undefined,
+                }),
+            });
+
+            const statusUpdateArbitrary = fc
+                .tuple(
+                    monitorFixtureArbitrary,
+                    siteOverrideArbitrary,
+                    fc.option(fc.string(), { nil: undefined }),
+                    fc.option(fc.constantFrom(...statusValues), {
+                        nil: undefined,
+                    }),
+                    fc.option(fc.nat({ max: 10_000 }), {
+                        nil: undefined,
+                    }),
+                    fc.constantFrom(...statusValues),
+                    fc.date()
+                )
+                .map(
+                    ([
+                        monitor,
+                        siteOverrides,
+                        details,
+                        previousStatus,
+                        responseTime,
+                        status,
+                        timestampValue,
+                    ]) => {
+                        const normalizedTime = (() => {
+                            const time = timestampValue.getTime();
+                            if (Number.isNaN(time)) {
+                                return 0;
+                            }
+                            return Math.max(
+                                MIN_ISO_TIMESTAMP_MS,
+                                Math.min(MAX_ISO_TIMESTAMP_MS, time)
+                            );
+                        })();
+
+                        const site = createSiteFixture({
+                            ...siteOverrides,
+                            monitors: [monitor],
+                        });
+
+                        return {
+                            details,
+                            monitor,
+                            monitorId: monitor.id,
+                            previousStatus,
+                            responseTime,
+                            site,
+                            siteIdentifier: site.identifier,
+                            status,
+                            timestamp: new Date(normalizedTime).toISOString(),
+                        } satisfies MonitorStatusChangedEventData;
+                    }
+                );
 
             fc.assert(
                 fc.property(statusUpdateArbitrary, (eventData) => {

@@ -42,6 +42,19 @@ const mockMonitorManager = {
     setupSiteForMonitoring: vi.fn(() => Promise.resolve()),
     checkSiteManually: vi.fn(() =>
         Promise.resolve({
+            monitor: {
+                activeOperations: [],
+                checkInterval: 60_000,
+                history: [],
+                id: "test-monitor",
+                monitoring: true,
+                responseTime: 123,
+                retryAttempts: 0,
+                status: "up",
+                timeout: 30_000,
+                type: "http",
+                url: "https://example.com",
+            },
             siteIdentifier: "test-site",
             monitorId: "test-monitor",
             status: "up",
@@ -49,8 +62,22 @@ const mockMonitorManager = {
             site: {
                 identifier: "test-site",
                 name: "Test Site",
-                monitors: [],
                 monitoring: true,
+                monitors: [
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "test-monitor",
+                        monitoring: true,
+                        responseTime: 123,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 30_000,
+                        type: "http",
+                        url: "https://example.com",
+                    },
+                ],
             },
         } as StatusUpdate)
     ),
@@ -1681,7 +1708,7 @@ describe(UptimeOrchestrator, () => {
             );
         });
 
-        it("should handle monitor started events", async ({
+        it("should skip monitoring:started broadcast for scoped operations", async ({
             task,
             annotate,
         }) => {
@@ -1699,6 +1726,7 @@ describe(UptimeOrchestrator, () => {
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:started", {
                 identifier: "test-site",
+                monitorId: "monitor-1",
                 operation: "started",
                 timestamp: Date.now(),
             });
@@ -1706,12 +1734,16 @@ describe(UptimeOrchestrator, () => {
             // Wait for async processing
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
-            expect(emitTypedSpy).toHaveBeenCalledWith(
+            expect(mockSiteManager.getSitesFromCache).not.toHaveBeenCalled();
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
                 "monitoring:started",
+                expect.anything()
+            );
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
                 expect.objectContaining({
-                    monitorCount: 2, // Two monitors from mock site
-                    siteCount: 1,
+                    identifier: "test-site",
+                    type: "site",
                 })
             );
         });
@@ -1735,6 +1767,13 @@ describe(UptimeOrchestrator, () => {
 
             await new Promise((resolve) => setTimeout(resolve, 10));
 
+            expect(mockSiteManager.getSitesFromCache).toHaveBeenCalled();
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "monitoring:started",
+                expect.objectContaining({
+                    siteCount: expect.any(Number),
+                })
+            );
             expect(emitTypedSpy).toHaveBeenCalledWith(
                 "cache:invalidated",
                 expect.objectContaining({
@@ -1761,7 +1800,7 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:started", {
-                identifier: "test-site",
+                identifier: "all",
                 operation: "started",
                 timestamp: Date.now(),
             });
@@ -1928,12 +1967,12 @@ describe(UptimeOrchestrator, () => {
 
             const monitorId = siteFromCache.monitors[0]?.id ?? "monitor-1";
 
-            const manualResult: StatusUpdate = {
+            const manualResult = {
                 monitorId,
                 siteIdentifier: siteFromCache.identifier,
                 status: "up",
                 timestamp: new Date("2024-02-01T00:00:00.000Z").toISOString(),
-            };
+            } as unknown as StatusUpdate;
 
             orchestrator.emitTyped("internal:monitor:manual-check-completed", {
                 identifier: siteFromCache.identifier,
@@ -1963,7 +2002,7 @@ describe(UptimeOrchestrator, () => {
             );
         });
 
-        it("should handle monitor stopped events when monitoring is active", async ({
+        it("should emit monitoring:stopped for global operations", async ({
             task,
             annotate,
         }) => {
@@ -1976,7 +2015,7 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:stopped", {
-                identifier: "test-site",
+                identifier: "all",
                 operation: "stopped",
                 reason: "user",
                 timestamp: Date.now(),
@@ -1991,6 +2030,43 @@ describe(UptimeOrchestrator, () => {
                 expect.objectContaining({
                     activeMonitors: 5,
                     reason: "user",
+                })
+            );
+        });
+
+        it("should skip monitoring:stopped broadcast for scoped operations", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: UptimeOrchestrator", "component");
+            await annotate("Category: Core", "category");
+            await annotate("Type: Monitoring", "type");
+
+            const emitTypedSpy = vi.spyOn(orchestrator, "emitTyped");
+
+            orchestrator.emitTyped("internal:monitor:stopped", {
+                identifier: "test-site",
+                monitorId: "monitor-1",
+                operation: "stopped",
+                reason: "user",
+                timestamp: Date.now(),
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            expect(
+                mockMonitorManager.getActiveMonitorCount
+            ).not.toHaveBeenCalled();
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
+                "monitoring:stopped",
+                expect.anything()
+            );
+            expect(emitTypedSpy).toHaveBeenCalledWith(
+                "cache:invalidated",
+                expect.objectContaining({
+                    identifier: "test-site",
+                    type: "site",
                 })
             );
         });
@@ -2024,7 +2100,7 @@ describe(UptimeOrchestrator, () => {
             );
         });
 
-        it("should handle monitor stopped events when monitoring is inactive", async ({
+        it("should emit monitoring:stopped with zero active monitors for global operations", async ({
             task,
             annotate,
         }) => {
@@ -2040,7 +2116,7 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:stopped", {
-                identifier: "test-site",
+                identifier: "all",
                 operation: "stopped",
                 reason: "user",
                 timestamp: Date.now(),
@@ -2076,7 +2152,7 @@ describe(UptimeOrchestrator, () => {
 
             // Emit internal monitor event
             orchestrator.emitTyped("internal:monitor:stopped", {
-                identifier: "test-site",
+                identifier: "all",
                 operation: "stopped",
                 reason: "user",
                 timestamp: Date.now(),

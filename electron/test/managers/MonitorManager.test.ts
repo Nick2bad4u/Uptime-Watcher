@@ -17,6 +17,7 @@
 
 import { MonitorManager } from "../../managers/MonitorManager";
 import { vi, describe, beforeEach, it, expect } from "vitest";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 describe(MonitorManager, () => {
     let manager: MonitorManager;
@@ -171,18 +172,32 @@ describe(MonitorManager, () => {
             "purpose"
         );
 
-        const mockSite = {
+        const monitor: Monitor = {
+            activeOperations: [],
+            checkInterval: 60_000,
+            history: [],
+            id: "monitor-1",
+            monitoring: true,
+            responseTime: 100,
+            retryAttempts: 0,
+            status: "pending",
+            timeout: 30_000,
+            type: "http",
+            url: "https://test.com",
+        };
+
+        const mockSite: Site = {
             identifier: "site-1",
             name: "Test Site",
             monitoring: true,
-            monitors: [
-                { id: "monitor-1", type: "http", url: "https://test.com" },
-            ],
+            monitors: [monitor],
         };
 
-        const mockStatusUpdate = {
-            siteIdentifier: "site-1",
+        const mockStatusUpdate: StatusUpdate = {
+            monitor,
             monitorId: "monitor-1",
+            site: mockSite,
+            siteIdentifier: "site-1",
             status: "up",
             timestamp: new Date().toISOString(),
         };

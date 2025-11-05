@@ -331,8 +331,8 @@ export class ApplicationService {
 
         // Handle monitor status changes with typed events
         orchestrator.onTyped("monitor:status-changed", (data) => {
-            const monitorIdentifier = data.monitor?.id ?? data.monitorId;
-            const siteIdentifier = data.site?.identifier ?? data.siteIdentifier;
+            const monitorIdentifier = data.monitor.id;
+            const siteIdentifier = data.site.identifier;
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS,

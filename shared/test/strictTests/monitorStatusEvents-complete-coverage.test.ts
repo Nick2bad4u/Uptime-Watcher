@@ -12,9 +12,17 @@ import {
 
 const createBasePayload = () => ({
     details: "Status updated",
+    monitor: {
+        id: "monitor-1",
+        status: STATUS_KIND.UP,
+    },
     monitorId: "monitor-1",
     previousStatus: STATUS_KIND.DOWN,
     responseTime: 250,
+    site: {
+        identifier: "site-1",
+        name: "Example Site",
+    },
     siteIdentifier: "site-1",
     status: STATUS_KIND.UP,
     timestamp: new Date().toISOString(),
@@ -93,17 +101,15 @@ describe(isEnrichedMonitorStatusChangedEventData, () => {
         };
 
         expect(isEnrichedMonitorStatusChangedEventData(payload)).toBeTruthy();
+
+        const { site: _site, ...withoutSite } = createBasePayload();
+        const { monitor: _monitor, ...withoutMonitor } = createBasePayload();
+
         expect(
-            isEnrichedMonitorStatusChangedEventData({
-                ...createBasePayload(),
-                monitor: { id: "monitor-1" },
-            })
+            isEnrichedMonitorStatusChangedEventData(withoutSite)
         ).toBeFalsy();
         expect(
-            isEnrichedMonitorStatusChangedEventData({
-                ...createBasePayload(),
-                site: { identifier: "site-1" },
-            })
+            isEnrichedMonitorStatusChangedEventData(withoutMonitor)
         ).toBeFalsy();
     });
 });

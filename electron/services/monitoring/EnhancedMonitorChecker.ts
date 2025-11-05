@@ -792,19 +792,6 @@ export class EnhancedMonitorChecker {
             // result)
             await this.saveHistoryEntry(monitor, checkResult);
 
-            const statusUpdateBase: StatusUpdate = {
-                details:
-                    serviceResult.details ??
-                    (serviceResult.status === "up"
-                        ? "Monitor is responding"
-                        : "Monitor is not responding"),
-                monitorId: monitor.id,
-                previousStatus: monitor.status,
-                siteIdentifier: site.identifier,
-                status: finalStatus, // Use final status (might be "paused")
-                timestamp: checkResult.timestamp.toISOString(),
-            };
-
             // Update monitor directly (bypass operation correlation for manual
             // checks) For manual checks on paused monitors, don't update the
             // status
@@ -817,6 +804,29 @@ export class EnhancedMonitorChecker {
             if (!(isManualCheck && monitor.status === "paused")) {
                 updateData.status = serviceResult.status;
             }
+
+            const fallbackMonitor: Monitor = {
+                ...monitor,
+                lastChecked: checkResult.timestamp,
+                responseTime: serviceResult.responseTime,
+                status: updateData.status ?? monitor.status,
+            };
+
+            const statusUpdateBase: StatusUpdate = {
+                details:
+                    serviceResult.details ??
+                    (serviceResult.status === "up"
+                        ? "Monitor is responding"
+                        : "Monitor is not responding"),
+                monitor: fallbackMonitor,
+                monitorId: monitor.id,
+                previousStatus: monitor.status,
+                responseTime: serviceResult.responseTime,
+                site,
+                siteIdentifier: site.identifier,
+                status: finalStatus, // Use final status (might be "paused")
+                timestamp: checkResult.timestamp.toISOString(),
+            };
 
             await this.config.monitorRepository.update(monitor.id, updateData);
 
@@ -843,8 +853,6 @@ export class EnhancedMonitorChecker {
             const statusUpdate: StatusUpdate = {
                 ...statusUpdateBase,
                 monitor: freshMonitorWithHistory,
-                responseTime: serviceResult.responseTime,
-                site,
             };
 
             // Emit proper typed events like the traditional monitoring system

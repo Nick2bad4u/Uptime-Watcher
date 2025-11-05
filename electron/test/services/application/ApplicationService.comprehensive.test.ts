@@ -6,7 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ApplicationService } from "../../../services/application/ApplicationService";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import type { StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 // Mock Electron app
 vi.mock("electron", () => ({
@@ -1036,11 +1036,34 @@ describe(ApplicationService, () => {
                         (call) => call[0] === "monitor:check-completed"
                     )?.[1];
 
+                const monitor: Monitor = {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                };
+
+                const site: Site = {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [monitor],
+                    name: "Test Site",
+                };
+
                 const eventData = {
                     checkType: "manual" as const,
                     monitorId: "monitor-1",
                     result: {
+                        monitor,
                         monitorId: "monitor-1",
+                        site,
                         siteIdentifier: "site-1",
                         status: "up",
                         timestamp: "2023-01-01T00:00:00Z",
@@ -1076,11 +1099,34 @@ describe(ApplicationService, () => {
                         (call) => call[0] === "monitor:check-completed"
                     )?.[1];
 
+                const monitor: Monitor = {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                };
+
+                const site: Site = {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [monitor],
+                    name: "Test Site",
+                };
+
                 const eventData = {
                     checkType: "manual" as const,
                     monitorId: "monitor-1",
                     result: {
+                        monitor,
                         monitorId: "monitor-1",
+                        site,
                         siteIdentifier: "site-1",
                         status: "up",
                         timestamp: "2023-01-01T00:00:00Z",

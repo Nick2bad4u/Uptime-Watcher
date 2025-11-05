@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { monitoringApi } from "../../../preload/domains/monitoringApi";
-import type { Monitor, StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
 
 vi.mock("electron", () => ({
@@ -147,9 +147,30 @@ describe("monitoringApi", () => {
     });
 
     it("returns latest status updates", async () => {
+        const monitor: Monitor = {
+            checkInterval: 60_000,
+            history: [],
+            id: "monitor-1",
+            monitoring: true,
+            responseTime: 123,
+            retryAttempts: 0,
+            status: "up",
+            timeout: 30_000,
+            type: "http",
+        };
+
+        const site: Site = {
+            identifier: "site-1",
+            monitoring: true,
+            monitors: [monitor],
+            name: "Test Site",
+        };
+
         const update: StatusUpdate = {
+            monitor,
             monitorId: "monitor-1",
             status: "up",
+            site,
             siteIdentifier: "site-1",
             timestamp: new Date().toISOString(),
         };
