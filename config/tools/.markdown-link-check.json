@@ -1,5 +1,4 @@
 {
-    "$schema": "https://www.schemastore.org/markdown-link-check.json",
     "aliveStatusCodes": [
         200,
         206,
@@ -50,6 +49,7 @@
         }
     ],
     "projectBaseUrl": "https://nick2bad4u.github.io/Uptime-Watcher/",
+    "replacementPatterns": [],
     "retryCount": 3,
     "retryOn429": true,
     "timeout": "20s"

@@ -12,15 +12,15 @@ charset=utf-8
 end_of_line=lf
 insert_final_newline=true
 trim_trailing_whitespace=true
-indent_style=tab
+indent_style=spaces
 indent_size=4
 
 # === SOURCE CODE ===
 # TypeScript and JavaScript files
 [*.{ts,tsx,js,jsx,mjs,cjs}]
-indent_style=tab
+indent_style=spaces
 indent_size=4
-max_line_length=100
+max_line_length=160
 
 # === JSON AND CONFIGURATION ===
 # JSON files (use spaces for better readability)
@@ -48,12 +48,12 @@ indent_size=2
 indent_style=space
 indent_size=2
 trim_trailing_whitespace=false
-max_line_length=100
+max_line_length=1000
 
 # === STYLES ===
 # CSS and related files
 [*.{css,scss,sass,less}]
-indent_style=tab
+indent_style=spaces
 indent_size=2
 
 # === HTML ===
@@ -95,23 +95,23 @@ indent_size=2
 
 # ESLint configuration
 [eslint.config.*]
-indent_style=tab
+indent_style=spaces
 indent_size=4
 
 # === BUILD TOOLS ===
 # Vite configuration
 [vite.config.*]
-indent_style=tab
+indent_style=spaces
 indent_size=4
 
 # Vitest configuration
 [vitest*.config.*]
-indent_style=tab
+indent_style=spaces
 indent_size=4
 
 # Playwright configuration
 [playwright.config.*]
-indent_style=tab
+indent_style=spaces
 indent_size=4
 
 # === IGNORE FILES ===

@@ -50,15 +50,16 @@ config-variables:
 # Enhanced security and performance patterns for 2025
 paths:
     # Build workflows - comprehensive patterns for Electron applications
-    ".github/workflows/Build.yml":
+    ".github/workflows/Build.{yml,yaml}":
         ignore:
             # Shell script patterns - allow advanced shell features for build scripts
             # Warning about Unused Patch Number - Intented for now
-            - "shellcheck reported issue in this script: SC2034:warning"
-    ".github/workflows/summary.yml":
+            # Match SC2034 (or any SC2034 message) — allow nothing or any trailing text after the colon
+            - "^shellcheck reported issue in this script: SC2034:.*"
+    ".github/workflows/summary.{yml,yaml}":
         ignore:
-            # Warning about Unused Patch Number - Intented for now
-            - "unknown permission scope"
+            # Match unknown permission scope "SOMETHING" (matches any scope name inside quotes)
+            - '^unknown permission scope "[^"]+".*'
 # Configuration for self-hosted runner environments
 # Supports modern GitHub-hosted and enterprise self-hosted runners
 self-hosted-runner:

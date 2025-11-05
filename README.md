@@ -52,7 +52,7 @@
 
 ## What is Uptime Watcher?
 
-Uptime Watcher is a desktop application built with modern web technologies that provides **monitoring capabilities** for websites, APIs, servers, and network services. Unlike most monitoring tools, there's **no cloud dependency** or command-line interface required. You can monitor everything with ease from a GUI.
+Uptime Watcher is a desktop application built with modern web technologies that provides __monitoring capabilities__ for websites, APIs, servers, and network services. Unlike most monitoring tools, there's __no cloud dependency__ or command-line interface required. You can monitor everything with ease from a GUI.
 
 ## ✨ Key features
 
@@ -69,33 +69,33 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 ## Core capabilities
 
-- **🎯 Multi-Service Monitoring**: Fourteen built-in monitor types covering HTTP variants (status, headers, JSON fields, keywords, latency), DNS, SSL certificates, TCP ports, ICMP ping, CDN edge drift, replication lag, heartbeat endpoints, and WebSocket keepalive health
-- **⚡ Real-Time Updates**: Live status changes with sub-second responsiveness
-- **📈 Performance Analytics**: Response time tracking with trend analysis
-- **📜 Historical Data**: Comprehensive uptime history with SQLite storage
-- **⚙️ Flexible Configuration**: Customizable check intervals from 30 seconds to 30 minutes
-- **💾 Data Persistence**: Local SQLite database with backup/restore functionality
-- **🔁 Retention Sync**: Renderer settings stay aligned with orchestrator/database changes via `settings:history-limit-updated`
-- **⚡ Instant Manual Checks**: Optimistic status updates immediately after manual monitor checks resolve
+* __🎯 Multi-Service Monitoring__: Fourteen built-in monitor types covering HTTP variants (status, headers, JSON fields, keywords, latency), DNS, SSL certificates, TCP ports, ICMP ping, CDN edge drift, replication lag, heartbeat endpoints, and WebSocket keepalive health
+* __⚡ Real-Time Updates__: Live status changes with sub-second responsiveness
+* __📈 Performance Analytics__: Response time tracking with trend analysis
+* __📜 Historical Data__: Comprehensive uptime history with SQLite storage
+* __⚙️ Flexible Configuration__: Customizable check intervals from 30 seconds to 30 minutes
+* __💾 Data Persistence__: Local SQLite database with backup/restore functionality
+* __🔁 Retention Sync__: Renderer settings stay aligned with orchestrator/database changes via `settings:history-limit-updated`
+* __⚡ Instant Manual Checks__: Optimistic status updates immediately after manual monitor checks resolve
 
 ## Monitor types
 
 | Category           | Monitor                     | Primary objective                              | Highlights                                                                 |
 | ------------------ | --------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
-| HTTP Availability  | **HTTP (Website/API)**      | Measure general availability and response time | Handles redirects, captures response code, records latency                 |
-| HTTP Validation    | **HTTP Status Code**        | Enforce an exact response status               | Marks monitor degraded/down when status deviates from expectation          |
-| HTTP Content       | **HTTP Header Match**       | Validate specific response headers             | Case-insensitive comparisons with retry-aware checks                       |
-| HTTP Content       | **HTTP Keyword Match**      | Ensure body contains a keyword                 | Case-insensitive substring search for rapid regressions                    |
-| HTTP Content       | **HTTP JSON Match**         | Inspect JSON payload fields                    | JSON path extraction with typed comparison                                 |
-| HTTP Performance   | **HTTP Latency Threshold**  | Detect slow responses                          | Flags degraded when latency exceeds configured threshold                   |
-| Transport          | **Port (Host/Port)**        | Verify TCP connectivity                        | Connection handshake timing with configurable ports                        |
-| Transport          | **Ping (Host)**             | Check reachability                             | ICMP ping with latency sampling and packet loss handling                   |
-| Network Services   | **DNS (Domain Resolution)** | Resolve DNS records                            | Supports A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY |
-| Security           | **SSL Certificate**         | Track TLS validity                             | Warns on expiry windows and handshake anomalies                            |
-| Edge Delivery      | **CDN Edge Consistency**    | Compare edge vs origin responses               | Detects drift in status/content across edge nodes                          |
-| Data Platforms     | **Replication Lag**         | Monitor replica freshness                      | Compares timestamps between primary and replica endpoints                  |
-| Application Health | **Server Heartbeat**        | Validate custom heartbeat payloads             | Status/timestamp drift analysis with JSON path extraction                  |
-| Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsiveness                | Ping/pong watchdog for stalled connections                                 |
+| HTTP Availability  | __HTTP (Website/API)__      | Measure general availability and response time | Handles redirects, captures response code, records latency                 |
+| HTTP Validation    | __HTTP Status Code__        | Enforce an exact response status               | Marks monitor degraded/down when status deviates from expectation          |
+| HTTP Content       | __HTTP Header Match__       | Validate specific response headers             | Case-insensitive comparisons with retry-aware checks                       |
+| HTTP Content       | __HTTP Keyword Match__      | Ensure body contains a keyword                 | Case-insensitive substring search for rapid regressions                    |
+| HTTP Content       | __HTTP JSON Match__         | Inspect JSON payload fields                    | JSON path extraction with typed comparison                                 |
+| HTTP Performance   | __HTTP Latency Threshold__  | Detect slow responses                          | Flags degraded when latency exceeds configured threshold                   |
+| Transport          | __Port (Host/Port)__        | Verify TCP connectivity                        | Connection handshake timing with configurable ports                        |
+| Transport          | __Ping (Host)__             | Check reachability                             | ICMP ping with latency sampling and packet loss handling                   |
+| Network Services   | __DNS (Domain Resolution)__ | Resolve DNS records                            | Supports A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY |
+| Security           | __SSL Certificate__         | Track TLS validity                             | Warns on expiry windows and handshake anomalies                            |
+| Edge Delivery      | __CDN Edge Consistency__    | Compare edge vs origin responses               | Detects drift in status/content across edge nodes                          |
+| Data Platforms     | __Replication Lag__         | Monitor replica freshness                      | Compares timestamps between primary and replica endpoints                  |
+| Application Health | __Server Heartbeat__        | Validate custom heartbeat payloads             | Status/timestamp drift analysis with JSON path extraction                  |
+| Realtime Channels  | __WebSocket Keepalive__     | Ensure WebSocket responsiveness                | Ping/pong watchdog for stalled connections                                 |
 
 ## 🛠️ Technology stack
 
@@ -148,18 +148,18 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 ## 🚀 Quick start
 
-### **Installation**
+### __Installation__
 
-#### **Option 1: Download release (Recommended)**
+#### __Option 1: Download release (Recommended)__
 
 ```bash
 # Download the latest release from GitHub
 # Available for Windows, macOS, and Linux
 ```
 
-**👉 [Download Latest Release](https://github.com/Nick2bad4u/Uptime-Watcher/releases/latest)**
+__👉 [Download Latest Release](https://github.com/Nick2bad4u/Uptime-Watcher/releases/latest)__
 
-#### **Option 2: Build from source**
+#### __Option 2: Build from source__
 
 ```bash
 # Clone the repository
@@ -179,18 +179,18 @@ npm run electron-dev               # Append flags if needed: npm run electron-de
 
 ### Key interface components:
 
-- 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status across all 14 monitor types
-- ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP variants, TCP ports, DNS, ping, SSL certificates, CDN edge checks, replication lag, heartbeat validation, and WebSocket keepalive
-- 📈 <strong>Historical Analytics</strong>: Response time graphs and uptime statistics for every monitored endpoint
-- 🔔 <strong>Notification System</strong>: Customizable desktop alerts for status changes across all monitor types
+* 📊 <strong>Main Dashboard</strong>: Real-time monitoring overview with service status across all 14 monitor types
+* ⚙️ <strong>Monitor Configuration</strong>: Easy setup for HTTP variants, TCP ports, DNS, ping, SSL certificates, CDN edge checks, replication lag, heartbeat validation, and WebSocket keepalive
+* 📈 <strong>Historical Analytics</strong>: Response time graphs and uptime statistics for every monitored endpoint
+* 🔔 <strong>Notification System</strong>: Customizable desktop alerts for status changes across all monitor types
 
 </div>
 
----
+***
 
 ## 👨‍💻 Development
 
-### **Development setup**
+### __Development setup__
 
 ```bash
 # Start Vite dev server only
@@ -209,7 +209,7 @@ npm run build
 npm run dist
 ```
 
-### **Development prerequisites**
+### __Development prerequisites__
 
 <div align="center">
 
@@ -227,30 +227,30 @@ npm run dist
 
 For practical guidance on configuring monitors and writing tests, see our comprehensive testing documentation:
 
-- [Testing Documentation](./docs/Testing/) - Includes fuzzing coverage, Playwright guides, and testing best practices
+* [Testing Documentation](./docs/Testing/) - Includes fuzzing coverage, Playwright guides, and testing best practices
 
 ### Fuzzing and property-based tests
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST_CHECK_FUZZING_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
+* Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST\_CHECK\_FUZZING\_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
 
 ### End-to-end testing with Playwright
 
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
-- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
+* Playwright Testing Guide → [docs/Testing/PLAYWRIGHT\_TESTING\_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
 
 ### IPC automation workflow
 
-- `npm run generate:ipc` – Regenerates preload bridge typings and the channel inventory.
-- `npm run check:ipc` – Validates that generated artifacts are in sync; this command runs in CI.
+* `npm run generate:ipc` – Regenerates preload bridge typings and the channel inventory.
+* `npm run check:ipc` – Validates that generated artifacts are in sync; this command runs in CI.
 
 Need deeper guidance? See the [IPC Automation Workflow](./docs/Guides/IPC_AUTOMATION_WORKFLOW.md) guide for examples, troubleshooting, and CI integration tips.
 
 ## Architectural principles
 
-The application follows a **service-oriented architecture** with clear separation of concerns:
+The application follows a __service-oriented architecture__ with clear separation of concerns:
 
 ### System architecture overview
 
@@ -320,44 +320,44 @@ HTTP Family • DNS • SSL • Ping • Port • CDN • Replication • Heartb
     click SQLite "docs/Architecture/ADRs/ADR-001-Repository-Pattern.md" "Review repository pattern"
 ```
 
-### **🔧 Core components**
+### __🔧 Core components__
 
-- **🖥️ Main Process (Electron)**: Service container with dependency injection
-- **🎨 Renderer Process (React)**: Component-based UI with Zustand state management
-- **🔗 IPC Communication**: Type-safe communication via contextBridge
-- **🗃️ Database Layer**: Repository pattern with SQLite and transaction safety
-- **📡 Event System**: TypedEventBus for cross-service communication
-- **📊 Monitoring System**: Enhanced monitoring with operation correlation
+* __🖥️ Main Process (Electron)__: Service container with dependency injection
+* __🎨 Renderer Process (React)__: Component-based UI with Zustand state management
+* __🔗 IPC Communication__: Type-safe communication via contextBridge
+* __🗃️ Database Layer__: Repository pattern with SQLite and transaction safety
+* __📡 Event System__: TypedEventBus for cross-service communication
+* __📊 Monitoring System__: Enhanced monitoring with operation correlation
 
-### **🎯 Key design features**
+### __🎯 Key design features__
 
-- **🏗️ Service-Oriented Architecture**: Modular, testable service design
-- **🔒 Type Safety**: Strict TypeScript with comprehensive interfaces
-- **📊 Enhanced Monitoring**: Race condition prevention and operation correlation
-- **🗃️ Repository Pattern**: Transactional database operations
-- **🎯 Event-Driven**: Reactive communication between services
+* __🏗️ Service-Oriented Architecture__: Modular, testable service design
+* __🔒 Type Safety__: Strict TypeScript with comprehensive interfaces
+* __📊 Enhanced Monitoring__: Race condition prevention and operation correlation
+* __🗃️ Repository Pattern__: Transactional database operations
+* __🎯 Event-Driven__: Reactive communication between services
 
 ## 🤝 Contributing
 
 We welcome contributions from the community! Here's how you can help:
 
-### **🎯 Ways to contribute**
+### __🎯 Ways to contribute__
 
-- 🐛 **Bug Reports**: Found an issue? [Open an issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
-- 💡 **Feature Requests**: Have an idea? [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
-- 🔧 **Code Contributions**: Submit pull requests with improvements
-- 📚 **Documentation**: Help improve our docs and guides
-- 🧪 **Testing**: Help test new features and report issues
+* 🐛 __Bug Reports__: Found an issue? [Open an issue](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
+* 💡 __Feature Requests__: Have an idea? [Start a discussion](https://github.com/Nick2bad4u/Uptime-Watcher/issues/new)
+* 🔧 __Code Contributions__: Submit pull requests with improvements
+* 📚 __Documentation__: Help improve our docs and guides
+* 🧪 __Testing__: Help test new features and report issues
 
-### **📋 Development guidelines**
+### __📋 Development guidelines__
 
-1. **Fork the Repository** and create a feature branch
-2. **Follow Code Standards** (TypeScript, ESLint, Prettier)
-3. **Write Tests** for new functionality
-4. **Update Documentation** for any user-facing changes
-5. **Submit a Pull Request** with a clear description
+1. __Fork the Repository__ and create a feature branch
+2. __Follow Code Standards__ (TypeScript, ESLint, Prettier)
+3. __Write Tests__ for new functionality
+4. __Update Documentation__ for any user-facing changes
+5. __Submit a Pull Request__ with a clear description
 
----
+***
 
 ## 📄 License
 
@@ -369,13 +369,13 @@ We welcome contributions from the community! Here's how you can help:
 
 <em>You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, without any restrictions. Credit is appreciated but not required.</em></div>
 
----
+***
 
 ## Get help
 
 [![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
----
+***
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 

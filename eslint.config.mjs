@@ -306,6 +306,7 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             "uptime-watcher/no-deprecated-exports": "error",
+            "uptime-watcher/prefer-app-alias": "error",
         },
     },
     importX.flatConfigs.typescript,
@@ -680,6 +681,7 @@ export default /** @type {EslintConfig} */ [
             "package-json/require-types": "off", // Not needed for Electron applications
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
+            "package-json/scripts-name-casing": "warn",
             "package-json/sort-collections": "warn",
             "package-json/unique-dependencies": "warn",
             "package-json/valid-author": "warn",
@@ -1362,6 +1364,7 @@ export default /** @type {EslintConfig} */ [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
+            "@eslint-react/jsx-dollar": "warn",
             "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
@@ -2755,6 +2758,7 @@ export default /** @type {EslintConfig} */ [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
+            "@eslint-react/jsx-dollar": "warn",
             "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
@@ -4317,6 +4321,7 @@ export default /** @type {EslintConfig} */ [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
+            "@eslint-react/jsx-dollar": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
             "@eslint-react/jsx-shorthand-boolean": "warn",
@@ -5707,6 +5712,7 @@ export default /** @type {EslintConfig} */ [
             /* Hooks extra subplugin */
             "@eslint-react/hooks-extra/no-direct-set-state-in-use-effect":
                 "warn",
+            "@eslint-react/jsx-dollar": "warn",
             "@eslint-react/jsx-key-before-spread": "warn",
             "@eslint-react/jsx-no-iife": "warn",
             "@eslint-react/jsx-no-undef": "warn",
