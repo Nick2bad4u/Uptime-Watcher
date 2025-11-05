@@ -85,7 +85,7 @@ __Transformation Highlights:__
   backend processes the confirmation event.
 * 🛠️ Established an automated IPC artifact generator:
   * `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and the
-    canonical inventory in `docs/Architecture/generated/ipc-channel-inventory.md`.
+    canonical inventory in `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`.
   * `npm run check:ipc` enforces documentation parity during CI runs.
 * 📓 Updated the development patterns guide to codify the new synchronization
   responsibilities for settings and manual checks.

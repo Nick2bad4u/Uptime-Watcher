@@ -72,3 +72,9 @@ This targeted hydration removes unnecessary full-table reads and guarantees rend
 * [ ] Propagate monitoring start/stop rejections, logging before rethrowing.
 * [ ] When adding background hydration paths, emit both `sites:state-synchronized` and `internal:site:cache-updated`.
 * [ ] Update this document when the orchestration flow or event contracts change.
+
+## Current Implementation Audit (2025-11-04)
+
+* Reviewed `electron/utils/database/SiteRepositoryService.ts` to confirm `SiteLoadingOrchestrator` continues to await `MonitoringConfig` hooks and emits the documented events on success and failure.
+* Verified `electron/managers/SiteManager.ts` still funnels mutations through `SiteWriterService` and publishes `internal:site:*` plus `sites:state-synchronized` events after cache swaps.
+* Cross-checked integration coverage in `electron/test/utils/database/SiteRepositoryService.comprehensive.test.ts` to ensure deterministic sequencing and cache replacement remain enforced by automated tests.

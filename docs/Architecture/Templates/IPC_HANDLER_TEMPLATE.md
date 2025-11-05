@@ -657,6 +657,12 @@ Follow these naming patterns:
 * __UTILITY operations__: `domain:validate-data`, `domain:export-data`
 * __EVENTS__: `domain:event-name` (past tense for completed events)
 
+## Current Implementation Audit (2025-11-04)
+
+* Audited `electron/services/ipc/IpcService.ts` and domain handler modules to confirm they still follow this template, including validator wiring and logging.
+* Verified `electron/services/ipc/utils.ts` continues to provide `registerStandardizedIpcHandler` with duplicate-handler protection and consistent error envelopes.
+* Checked renderer preload integration in `electron/preload/domains/*.ts` to ensure new handlers surface through type-safe bridges that mirror the template guidance.
+
 ## Error Handling
 
 All handlers automatically get:

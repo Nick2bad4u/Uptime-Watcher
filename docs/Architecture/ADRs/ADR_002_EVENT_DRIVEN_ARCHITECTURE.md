@@ -347,6 +347,12 @@ All communication follows this pattern:
 * Database operations emit lifecycle events
 * Error handling emits failure events
 
+### Current Implementation Audit (2025-11-04)
+
+* Inspected `electron/events/TypedEventBus.ts` to confirm middleware, correlation metadata, and type-safe emit/on helpers remain the single event backbone.
+* Verified `electron/services/ipc/utils.ts` uses `registerStandardizedIpcHandler` to forward events and rejects duplicate registrations, matching the standardized gateway described here.
+* Checked `electron/preload/domains/eventsApi.ts` and `src/services/events/EventsService.ts` to ensure renderer subscriptions still traverse the preload bridge with validated cleanup handlers.
+
 ## Related ADRs
 
 * [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)

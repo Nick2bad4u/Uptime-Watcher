@@ -27,7 +27,7 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 | Manual checks          | `check-site-now` *(renderer abstraction: `MonitoringService.checkSiteNow`)* | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
 | Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
 
-> 🔗 Authoritative reference: `docs/Architecture/generated/ipc-channel-inventory.md` (auto-generated; do __not__ edit manually).
+> 🔗 Authoritative reference: `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (auto-generated; do __not__ edit manually).
 
 ### Channel Normalization Checklist
 
@@ -114,7 +114,7 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 ## 6. Tooling & Automation
 
 * __Drift detection__: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI. See the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide for full instructions.
-* __Artifact regeneration__: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/ipc-channel-inventory.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
+* __Artifact regeneration__: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
 * __Benchmarks__: When tweaking event payloads, run `npm run bench:tsnode` to ensure typed event bus throughput remains acceptable.
 
 ***

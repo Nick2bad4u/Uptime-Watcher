@@ -211,7 +211,7 @@ renderer state.
   `npm run generate:ipc` whenever event contracts change and gate CI with
   `npm run check:ipc` to detect drift between code and docs.
 * The authoritative channel catalogue lives in
-  `docs/Architecture/generated/ipc-channel-inventory.md`. Do not hand-edit the
+  `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the
   table; update the schema and regenerate instead.
 
 ### 4. Event Forwarding Protocol
@@ -638,6 +638,12 @@ All IPC communication follows this protocol:
 * Type-safe preload API exposure
 * Consistent validation and error handling
 * Automatic event forwarding
+
+### Current Implementation Audit (2025-11-04)
+
+* Audited `electron/services/ipc/IpcService.ts` and `electron/services/ipc/utils.ts` to confirm `registerStandardizedIpcHandler` still guards against duplicate handlers and wraps responses with validation metadata.
+* Reviewed `electron/preload/domains` bridges (notably `eventsApi.ts` and `sitesApi.ts`) to ensure contextBridge exposure matches the documented security boundary.
+* Verified renderer helpers in `src/services/ipc` continue to consume the shared `@shared/types/ipc` contracts, preserving the type integrity described in this ADR.
 
 ## Related ADRs
 

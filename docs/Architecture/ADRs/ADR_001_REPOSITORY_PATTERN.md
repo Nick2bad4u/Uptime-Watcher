@@ -431,6 +431,12 @@ All repository classes implement this pattern:
 * `HistoryRepository`
 * `SettingsRepository`
 
+### Current Implementation Audit (2025-11-04)
+
+* Verified `electron/services/database/SiteRepository.ts`, `MonitorRepository.ts`, `HistoryRepository.ts`, and `SettingsRepository.ts` all expose public async APIs that wrap `executeTransaction()` and delegate to `_Internal` helpers.
+* Confirmed `withDatabaseOperation` usage throughout the repositories to capture retries, logging, and event emission.
+* Checked `electron/utils/database/SiteRepositoryService.ts` to ensure cache swaps still happen only after successful commits, maintaining the atomic update guarantees described above.
+
 ## Related ADRs
 
 * [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)

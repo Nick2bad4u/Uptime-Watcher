@@ -309,7 +309,7 @@ const docContent = `${docLines.join("\n")}\n`;
 const eventsBridgePath = path.resolve(rootDir, "shared/types/eventsBridge.ts");
 const docPath = path.resolve(
     rootDir,
-    "docs/Architecture/generated/ipc-channel-inventory.md"
+    "docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md"
 );
 
 const normalizeForComparison = (content: string): string =>

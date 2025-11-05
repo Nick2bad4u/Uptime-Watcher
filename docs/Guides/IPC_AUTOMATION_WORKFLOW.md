@@ -31,7 +31,7 @@ npm run check:ipc      # Verifies generated artifacts match committed output
 * Parses shared IPC definitions with `ts-morph`.
 * Emits:
   * `shared/types/eventsBridge.ts` Reconciled bridge typings (listeners, emitters, payloads).
-  * `docs/Architecture/generated/ipc-channel-inventory.md` Human-readable channel catalog.
+  * `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` Human-readable channel catalog.
   * Snapshot hashes embedded in generator comments to speed up drift detection.
 * Applies project formatting via Prettier.
 * Should be executed whenever channel names, payloads, or invoke handlers change.
@@ -54,7 +54,7 @@ npm run check:ipc      # Verifies generated artifacts match committed output
    ```bash
    npm run generate:ipc
    ```
-3. __Review diffs__ in `shared/types/eventsBridge.ts` and `docs/Architecture/generated/ipc-channel-inventory.md`.
+3. __Review diffs__ in `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`.
 4. __Commit all changed files__ together with the source modification.
 5. __Validate__ locally:
    ```bash

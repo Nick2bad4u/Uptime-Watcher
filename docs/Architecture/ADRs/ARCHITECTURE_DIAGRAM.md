@@ -165,3 +165,9 @@ mindmap
 5. __Error Propagation__ follows a consistent path with context added at orchestrator level
 6. __Service Container__ provides dependency injection for all backend services
 7. __Repositories__ handle all database operations with transaction support
+
+## Current Implementation Audit (2025-11-04)
+
+* Validated the backend orchestration flow against `electron/UptimeOrchestrator.ts` and `electron/managers/*` to ensure the diagram still reflects the coordination between orchestrator, managers, and repositories.
+* Checked `electron/services/ipc/IpcService.ts` and preload bridges under `electron/preload/domains/` to confirm the IPC boundary annotations remain accurate.
+* Reviewed renderer wiring in `src/stores` and `src/services` to verify the state/action pathways shown in the diagram continue to mirror production code.

@@ -638,6 +638,12 @@ All frontend state follows these patterns:
 * ✅ `useUIStore` - Simple store using direct create() pattern
 * ✅ `useMonitorTypesStore` - Focused store using direct create() pattern
 
+### Current Implementation Audit (2025-11-04)
+
+* Confirmed modular composition helpers in `src/stores/sites/modules/` remain the backbone of `useSitesStore`, with persistent slices configured via `persist` as documented.
+* Reviewed `src/stores/error/useErrorStore.ts`, `src/stores/updates/useUpdatesStore.ts`, and `src/stores/settings/useSettingsStore.ts` to verify continued use of the direct `create()` pattern with readonly state contracts.
+* Checked `src/stores/utils/storeErrorHandling.ts` and `logStoreAction.ts` to ensure action logging and error propagation still align with the guidance above.
+
 ## Related ADRs
 
 * [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)

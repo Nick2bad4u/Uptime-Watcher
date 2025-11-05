@@ -8,22 +8,26 @@ This directory contains comprehensive architectural documentation for the Uptime
 docs/Architecture/
 ├── README.md                     # This file
 ├── ADRs/                        # Architecture Decision Records
-│   ├── ADR-001-Repository-Pattern.md
-│   ├── ADR-002-Event-Driven-Architecture.md
-│   ├── ADR-003-Error-Handling-Strategy.md
-│   ├── ADR-004-Frontend-State-Management.md
-│   └── ADR-005-IPC-Communication-Protocol.md
+│   ├── ADR_001_REPOSITORY_PATTERN.md
+│   ├── ADR_002_EVENT_DRIVEN_ARCHITECTURE.md
+│   ├── ADR_003_ERROR_HANDLING_STRATEGY.md
+│   ├── ADR_004_FRONTEND_STATE_MANAGEMENT.md
+│   ├── ADR_005_IPC_COMMUNICATION_PROTOCOL.md
+│   └── ADR_006_STANDARDIZED_CACHE_CONFIGURATION.md
+├── generated/                   # Auto-generated reference artifacts
+│   └── IPC_CHANNEL_INVENTORY.md
 ├── Patterns/                    # Development patterns guide
-│   ├── Development-Patterns-Guide.md
+│   ├── COMPONENT_PROPS_STANDARDS.md
+│   ├── DEVELOPMENT_PATTERNS_GUIDE.md
 │   └── site-loading-orchestration.md
 ├── Templates/                   # Code templates for common patterns
-│   ├── Repository-Template.md
-│   ├── Zustand-Store-Template.md
-│   └── IPC-Handler-Template.md
-├── UsageGuides/                 # Onboarding & compliance guidance
-│   ├── Compliance-Checklists.md
+│   ├── IPC_HANDLER_TEMPLATE.md
+│   ├── REPOSITORY_TEMPLATE.md
+│   ├── REPOSITORY_TEMPLATE_CLEAN.md
+│   └── ZUSTAND_STORE_TEMPLATE.md
+├── UsageGuides/                 # Onboarding & navigation guidance
 │   └── Using-This-Documentation.md
-└── tsdoc-standards.md           # Documentation standards
+└── TSDOC_STANDARDS.md           # Documentation standards
 ```
 
 ### Architecture documentation map
@@ -40,25 +44,29 @@ flowchart TD
     Docs --> Templates["Templates"]
     Docs --> Standards["Standards"]
     Docs --> UsageGuides["Usage Guides"]
+    Docs --> Generated["Generated Artifacts"]
 
     ADRs --> ADR1["ADR-001 Repository Pattern"]
     ADRs --> ADR2["ADR-002 Event-Driven Architecture"]
     ADRs --> ADR3["ADR-003 Error Handling Strategy"]
     ADRs --> ADR4["ADR-004 Frontend State Management"]
     ADRs --> ADR5["ADR-005 IPC Protocol"]
+    ADRs --> ADR6["ADR-006 Standardized Cache Configuration"]
 
     Patterns --> PatternGuide["Development Patterns Guide"]
+    Patterns --> ComponentProps["Component Props Standards"]
     Patterns --> SiteLoading["Site Loading & Monitoring"]
     Templates --> RepoTemplate["Repository Template"]
+    Templates --> RepoTemplateClean["Repository Template (Clean)"]
     Templates --> StoreTemplate["Zustand Store Template"]
     Templates --> IPCTemplate["IPC Handler Template"]
     Standards --> TsdocStandards["TSDoc Standards"]
     UsageGuides --> QuickStart["Using This Documentation"]
-    UsageGuides --> Compliance["Compliance Checklists"]
+    Generated --> IPCInventory["IPC Channel Inventory"]
 
     class Docs hub;
-    class ADRs,Patterns,Templates,Standards,Onboarding section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,PatternGuide,SiteLoading,RepoTemplate,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,Compliance file;
+    class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,PatternGuide,ComponentProps,SiteLoading,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)
@@ -123,6 +131,15 @@ Comprehensive guide to all established patterns in the codebase:
 * __IPC Communication__ - Electron IPC patterns and type safety
 * __Testing Patterns__ - Consistent testing approaches across layers
 
+### [Component Props Standards](./Patterns/COMPONENT_PROPS_STANDARDS.md)
+
+Detailed prop authoring standards for React components:
+
+* __Interface Naming__ - `Properties` suffix for all prop interfaces
+* __Readonly Props__ - Enforce immutability to avoid side effects
+* __Event Handling__ - Normalised handler signatures and accessibility defaults
+* __Compliance Checklist__ - Quick validation before code review
+
 ### [Site Loading & Monitoring Orchestration](./Patterns/site-loading-orchestration.md)
 
 End-to-end walkthrough of the main-process site loading pipeline:
@@ -175,6 +192,12 @@ Standardized documentation patterns for inline code examples:
 * Error handling documentation
 * IPC communication documentation
 * Code example categories and validation checklist
+
+## 🧾 Generated Artifacts
+
+### [IPC Channel Inventory](./generated/IPC_CHANNEL_INVENTORY.md)
+
+Auto-generated reference documenting the authoritative list of IPC channels exposed via the preload bridge. Regenerate via `npm run generate:ipc` and keep this file in sync by running `npm run check:ipc` (also enforced in CI).
 
 ## 🎯 Using This Documentation
 
@@ -233,6 +256,12 @@ Standardized documentation patterns for inline code examples:
 * ✅ All repositories implement dual-method pattern
 * ✅ All mutations use `executeTransaction()`
 * ✅ All operations use `withDatabaseOperation()`
+
+## Current Documentation Audit (2025-11-04)
+
+* Verified directory listings against the live tree to ensure all paths, filenames, and cross-links (ADRs, patterns, templates, usage guides, generated artifacts) remain accurate.
+* Click-tested intra-document links (mermaid references, pattern sections, and generated inventory) to confirm they resolve to existing files.
+* Confirmed automation references (`npm run generate:ipc`, `npm run check:ipc`, `npm run docs:check-links`) still exist in `package.json` and CI scripts, ensuring the maintenance guidance is actionable.
 
 ### Event System
 

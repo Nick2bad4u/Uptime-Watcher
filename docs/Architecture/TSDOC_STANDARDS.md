@@ -99,14 +99,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * });
  * ```
  *
- * @public
- */
-````
-
-#### Repository Methods
-
-````typescript
-/**
+ * #### Repository Methods
+ *
+ * ```typescript
+ * /**
  * Creates a new [ENTITY] in the database.
  *
  * @remarks
@@ -152,6 +148,7 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * @public
  *
  * @see {@link createInternal} for transaction-context usage
+ * ```
  */
 ````
 
