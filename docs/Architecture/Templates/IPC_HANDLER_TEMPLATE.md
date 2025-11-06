@@ -635,41 +635,41 @@ describe("Example IPC Handlers", () => {
 
 When creating new IPC handlers:
 
-* [ ] Create handler registration function in domain-specific file
-* [ ] Create comprehensive validation functions
-* [ ] Add handlers to main IpcService initialization
-* [ ] Update preload API with new methods
-* [ ] Add TypeScript type definitions
-* [ ] Create comprehensive tests
-* [ ] Update documentation with examples
-* [ ] Test error handling paths
-* [ ] Verify type safety works end-to-end
-* [ ] Add logging for debugging
+- [ ] Create handler registration function in domain-specific file
+- [ ] Create comprehensive validation functions
+- [ ] Add handlers to main IpcService initialization
+- [ ] Update preload API with new methods
+- [ ] Add TypeScript type definitions
+- [ ] Create comprehensive tests
+- [ ] Update documentation with examples
+- [ ] Test error handling paths
+- [ ] Verify type safety works end-to-end
+- [ ] Add logging for debugging
 
 ## Channel Naming Convention
 
 Follow these naming patterns:
 
-* __GET operations__: `domain:get-all`, `domain:get-by-id`
-* __CREATE operations__: `domain:create`, `domain:bulk-create`
-* __UPDATE operations__: `domain:update`, `domain:bulk-update`
-* __DELETE operations__: `domain:delete`, `domain:delete-all`
-* __UTILITY operations__: `domain:validate-data`, `domain:export-data`
-* __EVENTS__: `domain:event-name` (past tense for completed events)
+- **GET operations**: `domain:get-all`, `domain:get-by-id`
+- **CREATE operations**: `domain:create`, `domain:bulk-create`
+- **UPDATE operations**: `domain:update`, `domain:bulk-update`
+- **DELETE operations**: `domain:delete`, `domain:delete-all`
+- **UTILITY operations**: `domain:validate-data`, `domain:export-data`
+- **EVENTS**: `domain:event-name` (past tense for completed events)
 
 ## Current Implementation Audit (2025-11-04)
 
-* Audited `electron/services/ipc/IpcService.ts` and domain handler modules to confirm they still follow this template, including validator wiring and logging.
-* Verified `electron/services/ipc/utils.ts` continues to provide `registerStandardizedIpcHandler` with duplicate-handler protection and consistent error envelopes.
-* Checked renderer preload integration in `electron/preload/domains/*.ts` to ensure new handlers surface through type-safe bridges that mirror the template guidance.
+- Audited `electron/services/ipc/IpcService.ts` and domain handler modules to confirm they still follow this template, including validator wiring and logging.
+- Verified `electron/services/ipc/utils.ts` continues to provide `registerStandardizedIpcHandler` with duplicate-handler protection and consistent error envelopes.
+- Checked renderer preload integration in `electron/preload/domains/*.ts` to ensure new handlers surface through type-safe bridges that mirror the template guidance.
 
 ## Error Handling
 
 All handlers automatically get:
 
-* Parameter validation
-* Error logging
-* Consistent error response format
-* Type-safe error handling
+- Parameter validation
+- Error logging
+- Consistent error response format
+- Type-safe error handling
 
 The `registerStandardizedIpcHandler` method handles these concerns automatically.

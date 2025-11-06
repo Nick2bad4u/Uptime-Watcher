@@ -1457,9 +1457,12 @@ describe("StatusUpdateHandler", () => {
 
             // Create a site with a monitor that has existing history
             const baseTimestamp = Date.parse("2023-01-01T00:00:00Z");
-            const existingHistory = [0, 1, 2].map((offsetHours) => {
-                const status: MonitorStatus =
-                    offsetHours === 1 ? "down" : "up";
+            const existingHistory = [
+                0,
+                1,
+                2,
+            ].map((offsetHours) => {
+                const status: MonitorStatus = offsetHours === 1 ? "down" : "up";
 
                 return {
                     timestamp: baseTimestamp + offsetHours * 3_600_000,

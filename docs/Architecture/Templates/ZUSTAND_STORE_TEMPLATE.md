@@ -1,6 +1,6 @@
 # Zustand Store Template
 
-> __Note:__ Replace `ExampleService` with your domain-specific renderer service
+> **Note:** Replace `ExampleService` with your domain-specific renderer service
 > implementation under `src/services`. The snippets below assume such a facade
 > exists to encapsulate all preload bridge access.
 
@@ -12,9 +12,9 @@ For stores with straightforward state that don't require modular composition:
 
 ## Current Implementation Audit (2025-11-04)
 
-* Confirmed current stores in `src/stores` (error, updates, settings, ui, monitorTypes) still follow the direct-create or modular composition approaches illustrated here.
-* Verified renderer services under `src/services` continue to expose typed facades consumed by the templates' async actions.
-* Checked utility helpers (`src/stores/utils/storeErrorHandling.ts`, `src/stores/utils/index.ts`) to ensure logging and error propagation remain consistent with the documented patterns.
+- Confirmed current stores in `src/stores` (error, updates, settings, ui, monitorTypes) still follow the direct-create or modular composition approaches illustrated here.
+- Verified renderer services under `src/services` continue to expose typed facades consumed by the templates' async actions.
+- Checked utility helpers (`src/stores/utils/storeErrorHandling.ts`, `src/stores/utils/index.ts`) to ensure logging and error propagation remain consistent with the documented patterns.
 
 ````typescript
 /**
@@ -669,12 +669,12 @@ describe("useExampleStore", () => {
 
 When using this template:
 
-* [ ] Replace `Example` with your domain name
-* [ ] Update state interface with your specific properties
-* [ ] Add your specific actions and their implementations
-* [ ] Configure persistence settings if needed
-* [ ] Update TSDoc comments with domain-specific information
-* [ ] Add any domain-specific computed values
-* [ ] Create corresponding test file
-* [ ] Add IPC integration for backend communication
-* [ ] Consider if modular composition is needed for complex state
+- [ ] Replace `Example` with your domain name
+- [ ] Update state interface with your specific properties
+- [ ] Add your specific actions and their implementations
+- [ ] Configure persistence settings if needed
+- [ ] Update TSDoc comments with domain-specific information
+- [ ] Add any domain-specific computed values
+- [ ] Create corresponding test file
+- [ ] Add IPC integration for backend communication
+- [ ] Consider if modular composition is needed for complex state

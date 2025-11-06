@@ -2,21 +2,21 @@
 
 ## Status
 
-__Accepted__ - Adopted across all frontend state management
+**Accepted** - Adopted across all frontend state management
 
 ## Context
 
 The frontend needed a state management solution that would:
 
-* Provide type safety for all state operations
-* Enable modular, composable store architecture
-* Support selective persistence of user preferences
-* Integrate seamlessly with React components
-* Avoid the complexity of Redux while maintaining predictable state updates
+- Provide type safety for all state operations
+- Enable modular, composable store architecture
+- Support selective persistence of user preferences
+- Integrate seamlessly with React components
+- Avoid the complexity of Redux while maintaining predictable state updates
 
 ## Decision
 
-We will use __Zustand__ as our primary state management library with specific architectural patterns:
+We will use **Zustand** as our primary state management library with specific architectural patterns:
 
 ### 1. Store Architecture Patterns
 
@@ -75,24 +75,24 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 
 ### Store Pattern Decision Criteria
 
-__Use Direct Create Pattern when:__
+**Use Direct Create Pattern when:**
 
-* Single responsibility/domain (e.g., error handling, settings, UI state)
-* Simple state structure (typically <200 lines)
-* Limited cross-cutting concerns
-* Straightforward action implementations
+- Single responsibility/domain (e.g., error handling, settings, UI state)
+- Simple state structure (typically <200 lines)
+- Limited cross-cutting concerns
+- Straightforward action implementations
 
-__Use Modular Composition Pattern when:__
+**Use Modular Composition Pattern when:**
 
-* Multiple interconnected domains (e.g., sites + monitors + history)
-* Complex business logic requiring separation of concerns
-* Extensive operations requiring dependency injection
-* Large stores that would benefit from module separation (typically >300 lines)
+- Multiple interconnected domains (e.g., sites + monitors + history)
+- Complex business logic requiring separation of concerns
+- Extensive operations requiring dependency injection
+- Large stores that would benefit from module separation (typically >300 lines)
 
-__Examples by Pattern:__
+**Examples by Pattern:**
 
-* __Direct Pattern__: `useErrorStore`, `useUpdatesStore`, `useSettingsStore`, `useUIStore`
-* __Modular Pattern__: `useSitesStore` (manages sites, monitors, sync, operations)
+- **Direct Pattern**: `useErrorStore`, `useUpdatesStore`, `useSettingsStore`, `useUIStore`
+- **Modular Pattern**: `useSitesStore` (manages sites, monitors, sync, operations)
 
 ### 2. Typed Store Interfaces
 
@@ -558,18 +558,18 @@ describe("useSitesStore", () => {
 
 ### Positive
 
-* __Type safety__ - Compile-time checking prevents runtime errors
-* __Modularity__ - Large stores broken into focused, testable modules
-* __Performance__ - Efficient updates and selective subscriptions
-* __Persistence__ - User preferences maintained across sessions
-* __Integration__ - Seamless integration with error handling and IPC
-* __Developer experience__ - Simple API with powerful capabilities
+- **Type safety** - Compile-time checking prevents runtime errors
+- **Modularity** - Large stores broken into focused, testable modules
+- **Performance** - Efficient updates and selective subscriptions
+- **Persistence** - User preferences maintained across sessions
+- **Integration** - Seamless integration with error handling and IPC
+- **Developer experience** - Simple API with powerful capabilities
 
 ### Negative
 
-* __Learning curve__ - Developers need to understand Zustand patterns
-* __Boilerplate__ - Module composition requires more initial setup
-* __Complexity__ - Async operations and error handling add complexity
+- **Learning curve** - Developers need to understand Zustand patterns
+- **Boilerplate** - Module composition requires more initial setup
+- **Complexity** - Async operations and error handling add complexity
 
 ## Implementation Guidelines
 
@@ -619,32 +619,32 @@ Always wrap async operations with error handling utilities.
 
 All frontend state follows these patterns:
 
-* __Type-safe store interfaces__ for all stores
-* __Consistent action logging__ with `logStoreAction`
-* __Pattern selection based on complexity__:
-  * Direct create() pattern for simple stores
-  * Modular composition for complex stores
-* __Selective persistence__ for user preferences
-* __Integration with error handling system__
+- **Type-safe store interfaces** for all stores
+- **Consistent action logging** with `logStoreAction`
+- **Pattern selection based on complexity**:
+  - Direct create() pattern for simple stores
+  - Modular composition for complex stores
+- **Selective persistence** for user preferences
+- **Integration with error handling system**
 
 ## Store Pattern Examples
 
 ### Current Implementation Compliance:
 
-* ✅ `useSitesStore` - Complex store using modular composition
-* ✅ `useErrorStore` - Simple store using direct create() pattern
-* ✅ `useUpdatesStore` - Simple store using direct create() pattern
-* ✅ `useSettingsStore` - Simple store using direct create() pattern
-* ✅ `useUIStore` - Simple store using direct create() pattern
-* ✅ `useMonitorTypesStore` - Focused store using direct create() pattern
+- ✅ `useSitesStore` - Complex store using modular composition
+- ✅ `useErrorStore` - Simple store using direct create() pattern
+- ✅ `useUpdatesStore` - Simple store using direct create() pattern
+- ✅ `useSettingsStore` - Simple store using direct create() pattern
+- ✅ `useUIStore` - Simple store using direct create() pattern
+- ✅ `useMonitorTypesStore` - Focused store using direct create() pattern
 
 ### Current Implementation Audit (2025-11-04)
 
-* Confirmed modular composition helpers in `src/stores/sites/modules/` remain the backbone of `useSitesStore`, with persistent slices configured via `persist` as documented.
-* Reviewed `src/stores/error/useErrorStore.ts`, `src/stores/updates/useUpdatesStore.ts`, and `src/stores/settings/useSettingsStore.ts` to verify continued use of the direct `create()` pattern with readonly state contracts.
-* Checked `src/stores/utils/storeErrorHandling.ts` and `logStoreAction.ts` to ensure action logging and error propagation still align with the guidance above.
+- Confirmed modular composition helpers in `src/stores/sites/modules/` remain the backbone of `useSitesStore`, with persistent slices configured via `persist` as documented.
+- Reviewed `src/stores/error/useErrorStore.ts`, `src/stores/updates/useUpdatesStore.ts`, and `src/stores/settings/useSettingsStore.ts` to verify continued use of the direct `create()` pattern with readonly state contracts.
+- Checked `src/stores/utils/storeErrorHandling.ts` and `logStoreAction.ts` to ensure action logging and error propagation still align with the guidance above.
 
 ## Related ADRs
 
-* [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
-* [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+- [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)

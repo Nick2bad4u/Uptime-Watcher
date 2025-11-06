@@ -1,6 +1,6 @@
-# 🎭 __Using the Codegen Template with Recorded Tests__
+# 🎭 **Using the Codegen Template with Recorded Tests**
 
-## __🚀 Quick Start (Recommended)__
+## **🚀 Quick Start (Recommended)**
 
 Use the built-in helper scripts that automatically apply your `codegen-template.mjs` transforms:
 
@@ -14,9 +14,9 @@ npm run playwright:record               # Full Electron recording with inspector
 npm run playwright:codegen-electron     # Alternative Electron recording
 ```
 
-## __🔧 Manual Workflow__
+## **🔧 Manual Workflow**
 
-### __Step 1: Record Your Test__
+### **Step 1: Record Your Test**
 
 ```bash
 # Start development server (if not using Electron)
@@ -26,7 +26,7 @@ npm run dev
 npx playwright codegen http://localhost:5173 --output=my-new-test.spec.ts
 ```
 
-### __Step 2: Apply Template Transformations__
+### **Step 2: Apply Template Transformations**
 
 ```bash
 # Transform the recorded test with your template
@@ -35,16 +35,16 @@ npm run playwright:transform my-new-test.spec.ts
 
 This automatically converts:
 
-* ❌ `page.getByRole("button")` → ✅ `page.getByRole("button")`
-* ❌ `page.getByRole("[data-testid=submit]")` → ✅ `page.getByTestId("submit")`
-* ❌ `test("Click button")` → ✅ `test("should click button")`
-* ❌ Raw test structure → ✅ Proper `describe` blocks
+- ❌ `page.getByRole("button")` → ✅ `page.getByRole("button")`
+- ❌ `page.getByRole("[data-testid=submit]")` → ✅ `page.getByTestId("submit")`
+- ❌ `test("Click button")` → ✅ `test("should click button")`
+- ❌ Raw test structure → ✅ Proper `describe` blocks
 
-## __🎯 What Your Template Does__
+## **🎯 What Your Template Does**
 
 Your `codegen-template.mjs` automatically transforms generated code for:
 
-### __🔍 Semantic Locators__
+### **🔍 Semantic Locators**
 
 ```typescript
 // Before (raw CSS selectors)
@@ -58,7 +58,7 @@ page.getByRole("textbox");
 page.getByTestId("login-form");
 ```
 
-### __📝 Better Test Structure__
+### **📝 Better Test Structure**
 
 ```typescript
 // Before (basic structure)
@@ -74,16 +74,16 @@ test.describe("Login functionality", () => {
 });
 ```
 
-### __🛡️ Lint Compliance__
+### **🛡️ Lint Compliance**
 
-* Removes problematic `networkidle` usage
-* Adds proper TypeScript imports
-* Adds TODO comments for problematic selectors
-* Follows project coding standards
+- Removes problematic `networkidle` usage
+- Adds proper TypeScript imports
+- Adds TODO comments for problematic selectors
+- Follows project coding standards
 
-## __💡 Advanced Usage__
+## **💡 Advanced Usage**
 
-### __Transform Multiple Files__
+### **Transform Multiple Files**
 
 ```bash
 # Transform all recorded tests in a directory
@@ -92,22 +92,22 @@ for file in playwright/recorded-tests/*.spec.ts; do
 done
 ```
 
-### __Custom Output Location__
+### **Custom Output Location**
 
 ```bash
 npm run playwright:transform input-test.spec.ts output-test.spec.ts
 ```
 
-### __Integration with Your Development Workflow__
+### **Integration with Your Development Workflow**
 
-1. __Record tests__ using the helper scripts
-2. __Review generated code__ - it's already optimized!
-3. __Add custom assertions__ as needed
-4. __Run tests__ with `npm run playwright`
+1. **Record tests** using the helper scripts
+2. **Review generated code** - it's already optimized!
+3. **Add custom assertions** as needed
+4. **Run tests** with `npm run playwright`
 
-## __� Screenshot Best Practices__
+## **� Screenshot Best Practices**
 
-### __Use Screenshot Helpers__
+### **Use Screenshot Helpers**
 
 ```typescript
 import { takeScreenshot, debugScreenshot } from "../helpers/screenshot";
@@ -117,7 +117,7 @@ await takeScreenshot(page, "login-form");
 await debugScreenshot(window, "after-modal-open");
 ```
 
-### __Manual Screenshots (if needed)__
+### **Manual Screenshots (if needed)**
 
 Always use proper paths for screenshots:
 
@@ -132,13 +132,13 @@ await page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot
 await page.screenshot({ path: "my-screenshot.png" });
 ````
 
-## __�🚨 Troubleshooting__
+## **�🚨 Troubleshooting**
 
-### __If transforms aren't applied automatically:__
+### **If transforms aren't applied automatically:**
 
 Check that `playwright/codegen-template.mjs` exists and the `scripts/codegen.mjs` can load it.
 
-### __If Electron recording doesn't work:__
+### **If Electron recording doesn't work:**
 
 ```bash
 # Ensure app is built first
@@ -148,14 +148,14 @@ npm run build
 npm run playwright:record
 ```
 
-### __If you need to debug generated tests:__
+### **If you need to debug generated tests:**
 
 ```bash
 # Run tests in debug mode
 npm run playwright:debug
 ```
 
-## __📖 Example Workflow__
+## **📖 Example Workflow**
 
 ```bash
 # 1. Start recording session

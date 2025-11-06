@@ -1,10 +1,10 @@
 # Renderer Integration Guide
 
-> __Audience__: Teams integrating custom renderer extensions, white-label shells, or third-party dashboards with Uptime Watcher 17.4.0 and later.
+> **Audience**: Teams integrating custom renderer extensions, white-label shells, or third-party dashboards with Uptime Watcher 17.4.0 and later.
 >
-> __Scope__: Highlights the IPC/event contract updates delivered on 2025-10-26, including channel normalization, optimistic manual-check feedback, and history-limit synchronization.
+> **Scope**: Highlights the IPC/event contract updates delivered on 2025-10-26, including channel normalization, optimistic manual-check feedback, and history-limit synchronization.
 
-***
+---
 
 ## 1. Executive Summary
 
@@ -17,26 +17,26 @@ Uptime Watcher now exposes a fully normalized renderer event contract that keeps
 
 Skipping these steps results in stale settings panels, missing toast notifications, and documentation drift that will now fail CI.
 
-***
+---
 
 ## 2. Canonical IPC & Event Channels
 
 | Concern                | Invoke Channel(s)                                                           | Renderer Event(s)                             | Notes                                                                                                                   |
 | ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`               | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.             |
-| Manual checks          | `check-site-now` *(renderer abstraction: `MonitoringService.checkSiteNow`)* | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
+| Manual checks          | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
 | Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
 
-> 🔗 Authoritative reference: `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (auto-generated; do __not__ edit manually).
+> 🔗 Authoritative reference: `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (auto-generated; do **not** edit manually).
 
 ### Channel Normalization Checklist
 
-* ✅ Replace older `domain:action` invoke strings (e.g. `settings:updateHistoryLimit`) with hyphenated, verb-first channels.
-* ✅ Update preload wrappers to forward the normalized channel names.
-* ✅ Regenerate bridge/doc artifacts after schema changes: `npm run generate:ipc`.
-* ✅ Run `npm run check:ipc` in CI/PR validation.
+- ✅ Replace older `domain:action` invoke strings (e.g. `settings:updateHistoryLimit`) with hyphenated, verb-first channels.
+- ✅ Update preload wrappers to forward the normalized channel names.
+- ✅ Regenerate bridge/doc artifacts after schema changes: `npm run generate:ipc`.
+- ✅ Run `npm run check:ipc` in CI/PR validation.
 
-***
+---
 
 ## 3. Manual Check Flow Enhancements
 
@@ -44,15 +44,15 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 `MonitoringService.checkSiteNow(siteIdentifier, monitorId)` now resolves with an enriched `StatusUpdate` when the backend completes the check synchronously. The renderer must:
 
-1. __Apply the optimistic snapshot__ immediately via `applyStatusUpdateSnapshot` (already wired in `createSiteMonitoringActions`).
-2. __Log telemetry__ using `logStoreAction("SitesStore", "checkSiteNow", …)` to preserve parity with event-driven updates.
-3. __Avoid duplicate mutations__ when the `monitor:status-changed`/`monitor:check-completed` events arrive. The shared reducer is idempotent, so double-application is safe.
+1. **Apply the optimistic snapshot** immediately via `applyStatusUpdateSnapshot` (already wired in `createSiteMonitoringActions`).
+2. **Log telemetry** using `logStoreAction("SitesStore", "checkSiteNow", …)` to preserve parity with event-driven updates.
+3. **Avoid duplicate mutations** when the `monitor:status-changed`/`monitor:check-completed` events arrive. The shared reducer is idempotent, so double-application is safe.
 
 ### 3.2 Event Reconciliation
 
-* `monitor:check-completed` always emits after the manual check finishes.
-* Payload shape: `{ checkType: "manual" | "scheduled", monitorId, siteIdentifier, result: StatusUpdate, timestamp }`.
-* When the payload lacks `site` or `monitor` snapshots, the orchestrator hydrates them from caches before emission. Renderer logic should trust this payload as authoritative.
+- `monitor:check-completed` always emits after the manual check finishes.
+- Payload shape: `{ checkType: "manual" | "scheduled", monitorId, siteIdentifier, result: StatusUpdate, timestamp }`.
+- When the payload lacks `site` or `monitor` snapshots, the orchestrator hydrates them from caches before emission. Renderer logic should trust this payload as authoritative.
 
 ### 3.3 Testing Guidance
 
@@ -62,7 +62,7 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 | Orchestrator   | `vitest run electron/test/UptimeOrchestrator.test.ts -t "manual-check"`    | Ensures rebroadcast carries enriched payload.                |
 | E2E            | `npm run test:playwright`                                                  | Confirms UI feedback is instant during manual health checks. |
 
-***
+---
 
 ## 4. History Limit Synchronization
 
@@ -77,47 +77,47 @@ interface HistoryLimitUpdatedEventData {
 }
 ```
 
-* The orchestrator tracks `previousLimit` internally to surface meaningful diffs.
-* Renderer stores guard against redundant writes: if the incoming `limit` matches the existing value, the callback no-ops.
-* Documentation and telemetry should reference the renderer channel `settings:history-limit-updated` (not the internal `internal:database:history-limit-updated`).
+- The orchestrator tracks `previousLimit` internally to surface meaningful diffs.
+- Renderer stores guard against redundant writes: if the incoming `limit` matches the existing value, the callback no-ops.
+- Documentation and telemetry should reference the renderer channel `settings:history-limit-updated` (not the internal `internal:database:history-limit-updated`).
 
 ### 4.2 Renderer Integration Steps
 
-1. __Subscribe once__: `await EventsService.onHistoryLimitUpdated(callback);` is invoked during `SettingsStore.initializeSettings` and guarded against duplicate subscriptions.
-2. __Persist fallback__: On initialization failures, default settings are still applied; the subscription is retried.
-3. __Update derived UI__: Refresh retention-related toggles, tooltips, and charts in the callback to avoid stale views.
-4. __Document behavior__: Surface the dual-source nature (UI vs. imports) in release notes and admin guides to set expectations.
+1. **Subscribe once**: `await EventsService.onHistoryLimitUpdated(callback);` is invoked during `SettingsStore.initializeSettings` and guarded against duplicate subscriptions.
+2. **Persist fallback**: On initialization failures, default settings are still applied; the subscription is retried.
+3. **Update derived UI**: Refresh retention-related toggles, tooltips, and charts in the callback to avoid stale views.
+4. **Document behavior**: Surface the dual-source nature (UI vs. imports) in release notes and admin guides to set expectations.
 
 ### 4.3 Validation Playbook
 
-* Run `vitest run electron/test/UptimeOrchestrator.test.ts -t "history limit"` to confirm event forwarding.
-* Execute `vitest run src/test/stores/settings/useSettingsStore.comprehensive.test.ts -t "history limit"` to ensure the store updates correctly.
-* Confirm Storybook stories (e.g. `Settings.stories.tsx`) respond to mocked broadcasts by launching `npm run storybook` with `setMockHistoryLimit` helpers.
+- Run `vitest run electron/test/UptimeOrchestrator.test.ts -t "history limit"` to confirm event forwarding.
+- Execute `vitest run src/test/stores/settings/useSettingsStore.comprehensive.test.ts -t "history limit"` to ensure the store updates correctly.
+- Confirm Storybook stories (e.g. `Settings.stories.tsx`) respond to mocked broadcasts by launching `npm run storybook` with `setMockHistoryLimit` helpers.
 
-***
+---
 
 ## 5. Migration Checklist
 
 | Task                                                            | Status | Notes                                                                   |
 | --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
-| Normalize all invoke channels and preload bridges               | ✅      | Run `npm run generate:ipc` after refactors.                             |
-| Update renderer services (`EventsService`, `MonitoringService`) | ✅      | Ensure new listeners return cleanup functions.                          |
-| Wire optimistic manual-check handling into stores               | ✅      | Verify `createSiteMonitoringActions` is in use.                         |
-| Handle `settings:history-limit-updated` in all settings views   | ✅      | Remember to invalidate cached retention copy in Redux/Zustand wrappers. |
-| Add CI drift detection (`npm run check:ipc`)                    | ✅      | Integrate into lint/test workflows.                                     |
-| Update product docs & release notes                             | ✅      | Reference this guide and the changelog entry.                           |
+| Normalize all invoke channels and preload bridges               | ✅     | Run `npm run generate:ipc` after refactors.                             |
+| Update renderer services (`EventsService`, `MonitoringService`) | ✅     | Ensure new listeners return cleanup functions.                          |
+| Wire optimistic manual-check handling into stores               | ✅     | Verify `createSiteMonitoringActions` is in use.                         |
+| Handle `settings:history-limit-updated` in all settings views   | ✅     | Remember to invalidate cached retention copy in Redux/Zustand wrappers. |
+| Add CI drift detection (`npm run check:ipc`)                    | ✅     | Integrate into lint/test workflows.                                     |
+| Update product docs & release notes                             | ✅     | Reference this guide and the changelog entry.                           |
 
 Mark each item off during integration reviews. Pull requests must demonstrate automation via CI logs and include targeted tests when modifying IPC contracts.
 
-***
+---
 
 ## 6. Tooling & Automation
 
-* __Drift detection__: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI. See the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide for full instructions.
-* __Artifact regeneration__: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
-* __Benchmarks__: When tweaking event payloads, run `npm run bench:tsnode` to ensure typed event bus throughput remains acceptable.
+- **Drift detection**: `npm run check:ipc` compares generated artifacts with the canonical schema. Required in CI. See the [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md) guide for full instructions.
+- **Artifact regeneration**: `npm run generate:ipc` refreshes `shared/types/eventsBridge.ts` and `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (documented in [IPC Automation Workflow](./IPC_AUTOMATION_WORKFLOW.md)).
+- **Benchmarks**: When tweaking event payloads, run `npm run bench:tsnode` to ensure typed event bus throughput remains acceptable.
 
-***
+---
 
 ## 7. Appendix: Reference Implementations
 
@@ -132,6 +132,6 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 
 Consult these modules when extending or troubleshooting integrations.
 
-***
+---
 
 Need help? Drop issues or questions in `#uptime-watcher-dev` with links to failing CI runs (`check:ipc`) or include manual-check telemetry samples for faster triage.

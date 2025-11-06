@@ -2,21 +2,21 @@
 
 ## Status
 
-__Accepted__ - Standardized protocol for all Electron IPC communication
+**Accepted** - Standardized protocol for all Electron IPC communication
 
 ## Context
 
 The Electron application required a robust, type-safe communication protocol between the main process and renderer process. The solution needed to:
 
-* Provide type safety for all IPC communications
-* Handle validation and error responses consistently
-* Support cleanup and resource management
-* Enable easy testing through mocking
-* Maintain security through contextBridge isolation
+- Provide type safety for all IPC communications
+- Handle validation and error responses consistently
+- Support cleanup and resource management
+- Enable easy testing through mocking
+- Maintain security through contextBridge isolation
 
 ## Decision
 
-We will implement a __standardized IPC communication protocol__ using Electron's contextBridge with consistent patterns for all communication.
+We will implement a **standardized IPC communication protocol** using Electron's contextBridge with consistent patterns for all communication.
 
 ### IPC Security Architecture Overview
 
@@ -198,19 +198,19 @@ renderer state.
 
 #### 2025-10-26 Contract Update
 
-* Added the `settings:history-limit-updated` renderer broadcast to surface
+- Added the `settings:history-limit-updated` renderer broadcast to surface
   persistence changes originating from imports, orchestrator migrations, or
-  database maintenance. Renderer consumers __must__ subscribe via
+  database maintenance. Renderer consumers **must** subscribe via
   `EventsService.onHistoryLimitUpdated` to keep the settings store in sync even
   when the local UI did not initiate the change. The payload includes both the
   new limit and the previously observed value so clients can display contextual
   messaging.
-* Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel
+- Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel
   inventory documentation are now generated from the canonical
   `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run
   `npm run generate:ipc` whenever event contracts change and gate CI with
   `npm run check:ipc` to detect drift between code and docs.
-* The authoritative channel catalogue lives in
+- The authoritative channel catalogue lives in
   `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the
   table; update the schema and regenerate instead.
 
@@ -514,20 +514,20 @@ mindmap
 
 ### Invoke channel format: verb-first hyphen-case
 
-* __Sites__: `add-site`, `get-sites`, `remove-site`, `update-site`
-* __Monitoring__: `start-monitoring`, `stop-monitoring`, `start-monitoring-for-site`, `check-site-now`
-* __Settings__: `get-history-limit`, `update-history-limit`, `reset-settings`
-* __System/Data__: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
-* __System/Data__: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
-* __Diagnostics__: `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`
-* __Events__: Continue using domain-prefixed, past-tense identifiers (e.g., `monitor:status-changed`, `sites:added`).
+- **Sites**: `add-site`, `get-sites`, `remove-site`, `update-site`
+- **Monitoring**: `start-monitoring`, `stop-monitoring`, `start-monitoring-for-site`, `check-site-now`
+- **Settings**: `get-history-limit`, `update-history-limit`, `reset-settings`
+- **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
+- **System/Data**: `download-sqlite-backup`, `export-data`, `import-data`, `open-external`
+- **Diagnostics**: `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`
+- **Events**: Continue using domain-prefixed, past-tense identifiers (e.g., `monitor:status-changed`, `sites:added`).
 
 ### Consistency Rules
 
-1. __Verb-first actions__ - Begin each invoke channel with an imperative verb (`add-`, `get-`, `start-`).
-2. __Hyphenated resources__ - Append the resource or scope using hyphenated nouns (`-site`, `-monitor`, `-history-limit`).
-3. __Namespace by bridge object__ - Renderer services scope channels by API surface (`electronAPI.sites`, `electronAPI.monitoring`) rather than embedding domains in the identifier.
-4. __Event naming__ - Retain `domain:event-name` with past-tense actions for broadcast events to distinguish them from invoke channels.
+1. **Verb-first actions** - Begin each invoke channel with an imperative verb (`add-`, `get-`, `start-`).
+2. **Hyphenated resources** - Append the resource or scope using hyphenated nouns (`-site`, `-monitor`, `-history-limit`).
+3. **Namespace by bridge object** - Renderer services scope channels by API surface (`electronAPI.sites`, `electronAPI.monitoring`) rather than embedding domains in the identifier.
+4. **Event naming** - Retain `domain:event-name` with past-tense actions for broadcast events to distinguish them from invoke channels.
 
 ## Security Considerations
 
@@ -594,18 +594,18 @@ describe("Sites IPC Handlers", () => {
 
 ### Positive
 
-* __Type safety__ - Compile-time checking for all IPC communications
-* __Consistent patterns__ - Standardized registration and handling
-* __Error handling__ - Uniform error responses and logging
-* __Testability__ - Easy mocking and testing of IPC operations
-* __Security__ - Proper isolation through contextBridge
-* __Maintainability__ - Domain-specific organization
+- **Type safety** - Compile-time checking for all IPC communications
+- **Consistent patterns** - Standardized registration and handling
+- **Error handling** - Uniform error responses and logging
+- **Testability** - Easy mocking and testing of IPC operations
+- **Security** - Proper isolation through contextBridge
+- **Maintainability** - Domain-specific organization
 
 ### Negative
 
-* __Boilerplate__ - Requires validation functions and type definitions
-* __Complexity__ - Additional abstraction layer over raw IPC
-* __Learning curve__ - Developers need to understand IPC patterns
+- **Boilerplate** - Requires validation functions and type definitions
+- **Complexity** - Additional abstraction layer over raw IPC
+- **Learning curve** - Developers need to understand IPC patterns
 
 ## Implementation Requirements
 
@@ -633,20 +633,20 @@ Event listeners must return cleanup functions.
 
 All IPC communication follows this protocol:
 
-* Centralized registration through IpcService
-* Domain-specific handler grouping
-* Type-safe preload API exposure
-* Consistent validation and error handling
-* Automatic event forwarding
+- Centralized registration through IpcService
+- Domain-specific handler grouping
+- Type-safe preload API exposure
+- Consistent validation and error handling
+- Automatic event forwarding
 
 ### Current Implementation Audit (2025-11-04)
 
-* Audited `electron/services/ipc/IpcService.ts` and `electron/services/ipc/utils.ts` to confirm `registerStandardizedIpcHandler` still guards against duplicate handlers and wraps responses with validation metadata.
-* Reviewed `electron/preload/domains` bridges (notably `eventsApi.ts` and `sitesApi.ts`) to ensure contextBridge exposure matches the documented security boundary.
-* Verified renderer helpers in `src/services/ipc` continue to consume the shared `@shared/types/ipc` contracts, preserving the type integrity described in this ADR.
+- Audited `electron/services/ipc/IpcService.ts` and `electron/services/ipc/utils.ts` to confirm `registerStandardizedIpcHandler` still guards against duplicate handlers and wraps responses with validation metadata.
+- Reviewed `electron/preload/domains` bridges (notably `eventsApi.ts` and `sitesApi.ts`) to ensure contextBridge exposure matches the documented security boundary.
+- Verified renderer helpers in `src/services/ipc` continue to consume the shared `@shared/types/ipc` contracts, preserving the type integrity described in this ADR.
 
 ## Related ADRs
 
-* [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
-* [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
-* [ADR-004: Frontend State Management](./ADR_004_FRONTEND_STATE_MANAGEMENT.md)
+- [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+- [ADR-004: Frontend State Management](./ADR_004_FRONTEND_STATE_MANAGEMENT.md)

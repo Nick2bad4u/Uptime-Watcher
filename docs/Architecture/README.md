@@ -75,48 +75,48 @@ ADRs document the key architectural decisions made during development, their con
 
 ### [ADR-001: Repository Pattern](./ADRs/ADR_001_REPOSITORY_PATTERN.md)
 
-__Status: Accepted__ - Establishes the repository pattern for all database access
+**Status: Accepted** - Establishes the repository pattern for all database access
 
-* Dual method pattern (public async + internal sync)
-* Transaction safety with `executeTransaction()`
-* Consistent error handling and event emission
-* All repositories follow this pattern: `SiteRepository`, `MonitorRepository`, `HistoryRepository`, `SettingsRepository`
+- Dual method pattern (public async + internal sync)
+- Transaction safety with `executeTransaction()`
+- Consistent error handling and event emission
+- All repositories follow this pattern: `SiteRepository`, `MonitorRepository`, `HistoryRepository`, `SettingsRepository`
 
 ### [ADR-002: Event-Driven Architecture](./ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
 
-__Status: Accepted__ - Core communication mechanism using TypedEventBus
+**Status: Accepted** - Core communication mechanism using TypedEventBus
 
-* Type-safe event system with compile-time checking
-* Automatic metadata injection (correlation IDs, timestamps)
-* Domain-based event naming (`domain:action`)
-* IPC event forwarding for frontend integration
+- Type-safe event system with compile-time checking
+- Automatic metadata injection (correlation IDs, timestamps)
+- Domain-based event naming (`domain:action`)
+- IPC event forwarding for frontend integration
 
 ### [ADR-003: Error Handling Strategy](./ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)
 
-__Status: Accepted__ - Multi-layered error handling across all application layers
+**Status: Accepted** - Multi-layered error handling across all application layers
 
-* Shared `withErrorHandling()` utility with frontend/backend overloads
-* `withDatabaseOperation()` for retry logic and database operations
-* Error preservation principles maintaining stack traces
-* Safe store operations preventing cascading failures
+- Shared `withErrorHandling()` utility with frontend/backend overloads
+- `withDatabaseOperation()` for retry logic and database operations
+- Error preservation principles maintaining stack traces
+- Safe store operations preventing cascading failures
 
 ### [ADR-004: Frontend State Management](./ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)
 
-__Status: Accepted__ - Zustand-based state management with modular composition
+**Status: Accepted** - Zustand-based state management with modular composition
 
-* Type-safe store interfaces with comprehensive TypeScript
-* Modular composition for complex stores
-* Selective persistence for user preferences
-* Integration with error handling and IPC systems
+- Type-safe store interfaces with comprehensive TypeScript
+- Modular composition for complex stores
+- Selective persistence for user preferences
+- Integration with error handling and IPC systems
 
 ### [ADR-005: IPC Communication Protocol](./ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md)
 
-__Status: Accepted__ - Standardized Electron IPC communication
+**Status: Accepted** - Standardized Electron IPC communication
 
-* Centralized IPC service with domain-specific handlers
-* Type-safe preload API with contextBridge isolation
-* Consistent validation and error handling
-* Event forwarding protocol for real-time updates
+- Centralized IPC service with domain-specific handlers
+- Type-safe preload API with contextBridge isolation
+- Consistent validation and error handling
+- Event forwarding protocol for real-time updates
 
 ## 📋 Development Patterns
 
@@ -124,30 +124,30 @@ __Status: Accepted__ - Standardized Electron IPC communication
 
 Comprehensive guide to all established patterns in the codebase:
 
-* __Repository Pattern__ - Database access with transaction safety
-* __Event-Driven Communication__ - TypedEventBus usage and event naming
-* __Error Handling Patterns__ - Multi-layered error handling strategies
-* __Frontend State Management__ - Zustand stores and modular composition
-* __IPC Communication__ - Electron IPC patterns and type safety
-* __Testing Patterns__ - Consistent testing approaches across layers
+- **Repository Pattern** - Database access with transaction safety
+- **Event-Driven Communication** - TypedEventBus usage and event naming
+- **Error Handling Patterns** - Multi-layered error handling strategies
+- **Frontend State Management** - Zustand stores and modular composition
+- **IPC Communication** - Electron IPC patterns and type safety
+- **Testing Patterns** - Consistent testing approaches across layers
 
 ### [Component Props Standards](./Patterns/COMPONENT_PROPS_STANDARDS.md)
 
 Detailed prop authoring standards for React components:
 
-* __Interface Naming__ - `Properties` suffix for all prop interfaces
-* __Readonly Props__ - Enforce immutability to avoid side effects
-* __Event Handling__ - Normalised handler signatures and accessibility defaults
-* __Compliance Checklist__ - Quick validation before code review
+- **Interface Naming** - `Properties` suffix for all prop interfaces
+- **Readonly Props** - Enforce immutability to avoid side effects
+- **Event Handling** - Normalised handler signatures and accessibility defaults
+- **Compliance Checklist** - Quick validation before code review
 
 ### [Site Loading & Monitoring Orchestration](./Patterns/site-loading-orchestration.md)
 
 End-to-end walkthrough of the main-process site loading pipeline:
 
-* `DatabaseManager` startup and cache replacement flow
-* `SiteLoadingOrchestrator` responsibilities and metrics
-* Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
-* Renderer synchronization (`sites:state-synchronized`) and background hydration logic
+- `DatabaseManager` startup and cache replacement flow
+- `SiteLoadingOrchestrator` responsibilities and metrics
+- Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
+- Renderer synchronization (`sites:state-synchronized`) and background hydration logic
 
 ## 🛠️ Code Templates
 
@@ -157,28 +157,28 @@ Ready-to-use templates for implementing common patterns:
 
 Complete template for creating new repository classes:
 
-* Full TypeScript implementation with dual methods
-* Query constants and dependency injection
-* Comprehensive TSDoc documentation
-* Test template and integration checklist
+- Full TypeScript implementation with dual methods
+- Query constants and dependency injection
+- Comprehensive TSDoc documentation
+- Test template and integration checklist
 
 ### [Zustand Store Template](./Templates/ZUSTAND_STORE_TEMPLATE.md)
 
 Templates for both simple and complex Zustand stores:
 
-* Simple store pattern for straightforward state
-* Complex store with modular composition
-* Module templates for focused functionality
-* Testing patterns and error integration
+- Simple store pattern for straightforward state
+- Complex store with modular composition
+- Module templates for focused functionality
+- Testing patterns and error integration
 
 ### [IPC Handler Template](./Templates/IPC_HANDLER_TEMPLATE.md)
 
 Complete IPC communication implementation:
 
-* Handler registration with validation
-* Preload API extensions
-* Type definitions and error handling
-* Test templates and naming conventions
+- Handler registration with validation
+- Preload API extensions
+- Type definitions and error handling
+- Test templates and naming conventions
 
 ## 📚 Documentation Standards
 
@@ -186,12 +186,12 @@ Complete IPC communication implementation:
 
 Standardized documentation patterns for inline code examples:
 
-* Repository pattern documentation examples
-* Event system documentation standards
-* Frontend store documentation patterns
-* Error handling documentation
-* IPC communication documentation
-* Code example categories and validation checklist
+- Repository pattern documentation examples
+- Event system documentation standards
+- Frontend store documentation patterns
+- Error handling documentation
+- IPC communication documentation
+- Code example categories and validation checklist
 
 ## 🧾 Generated Artifacts
 
@@ -203,111 +203,111 @@ Auto-generated reference documenting the authoritative list of IPC channels expo
 
 ### For New Developers
 
-1. __Start with ADRs__ - Understand the architectural decisions and their context
-2. __Read the Patterns Guide__ - Learn the established patterns and conventions
-3. __Use Templates__ - Implement new features using the provided templates
-4. __Follow TSDoc Standards__ - Document your code using the established patterns
+1. **Start with ADRs** - Understand the architectural decisions and their context
+2. **Read the Patterns Guide** - Learn the established patterns and conventions
+3. **Use Templates** - Implement new features using the provided templates
+4. **Follow TSDoc Standards** - Document your code using the established patterns
 
 ### For Existing Developers
 
-1. __Reference ADRs__ - When making architectural changes, consult existing decisions
-2. __Update Patterns__ - If you discover new patterns, document them in the guide
-3. __Improve Templates__ - Update templates based on learnings and improvements
-4. __Maintain Standards__ - Follow and improve the documentation standards
+1. **Reference ADRs** - When making architectural changes, consult existing decisions
+2. **Update Patterns** - If you discover new patterns, document them in the guide
+3. **Improve Templates** - Update templates based on learnings and improvements
+4. **Maintain Standards** - Follow and improve the documentation standards
 
 ### For Code Reviews
 
-1. __Check Pattern Compliance__ - Ensure new code follows established patterns
-2. __Verify Documentation__ - Check that TSDoc follows the standards
-3. __Validate Architecture__ - Ensure changes align with ADR decisions
-4. __Template Usage__ - Verify that new repositories/stores/handlers use templates
+1. **Check Pattern Compliance** - Ensure new code follows established patterns
+2. **Verify Documentation** - Check that TSDoc follows the standards
+3. **Validate Architecture** - Ensure changes align with ADR decisions
+4. **Template Usage** - Verify that new repositories/stores/handlers use templates
 
 ## 🔄 Maintenance Guidelines
 
 ### When to Update ADRs
 
-* __Status Changes__ - Mark ADRs as superseded when patterns evolve
-* __New Decisions__ - Create new ADRs for significant architectural changes
-* __Context Updates__ - Update context and consequences as understanding improves
+- **Status Changes** - Mark ADRs as superseded when patterns evolve
+- **New Decisions** - Create new ADRs for significant architectural changes
+- **Context Updates** - Update context and consequences as understanding improves
 
 ### Pattern Evolution
 
-* __Document New Patterns__ - Add emerging patterns to the guide
-* __Update Templates__ - Evolve templates based on best practices
-* __Maintain Consistency__ - Ensure all patterns work together harmoniously
+- **Document New Patterns** - Add emerging patterns to the guide
+- **Update Templates** - Evolve templates based on best practices
+- **Maintain Consistency** - Ensure all patterns work together harmoniously
 
 ### Documentation Quality
 
-* __Regular Reviews__ - Periodically review and update documentation
-* __Example Accuracy__ - Ensure code examples remain current and accurate
-* __Cross-References__ - Maintain links between related documents
+- **Regular Reviews** - Periodically review and update documentation
+- **Example Accuracy** - Ensure code examples remain current and accurate
+- **Cross-References** - Maintain links between related documents
 
 ### Automation & Review Cadence
 
-* __Link Validation__ - `npm run docs:check-links` verifies internal Markdown links and runs on every `lint:ci`
-* __Quarterly Sync__ - Architecture documentation reviewed during the first week of each quarter; action items tracked in `TODO.md`
-* __CI Enforcement__ - Documentation checks block merges alongside linting and IPC analysis to prevent drift
+- **Link Validation** - `npm run docs:check-links` verifies internal Markdown links and runs on every `lint:ci`
+- **Quarterly Sync** - Architecture documentation reviewed during the first week of each quarter; action items tracked in `TODO.md`
+- **CI Enforcement** - Documentation checks block merges alongside linting and IPC analysis to prevent drift
 
 ## 📊 Compliance Tracking
 
 ### Repository Pattern
 
-* ✅ All database access uses repository pattern
-* ✅ All repositories implement dual-method pattern
-* ✅ All mutations use `executeTransaction()`
-* ✅ All operations use `withDatabaseOperation()`
+- ✅ All database access uses repository pattern
+- ✅ All repositories implement dual-method pattern
+- ✅ All mutations use `executeTransaction()`
+- ✅ All operations use `withDatabaseOperation()`
 
 ## Current Documentation Audit (2025-11-04)
 
-* Verified directory listings against the live tree to ensure all paths, filenames, and cross-links (ADRs, patterns, templates, usage guides, generated artifacts) remain accurate.
-* Click-tested intra-document links (mermaid references, pattern sections, and generated inventory) to confirm they resolve to existing files.
-* Confirmed automation references (`npm run generate:ipc`, `npm run check:ipc`, `npm run docs:check-links`) still exist in `package.json` and CI scripts, ensuring the maintenance guidance is actionable.
+- Verified directory listings against the live tree to ensure all paths, filenames, and cross-links (ADRs, patterns, templates, usage guides, generated artifacts) remain accurate.
+- Click-tested intra-document links (mermaid references, pattern sections, and generated inventory) to confirm they resolve to existing files.
+- Confirmed automation references (`npm run generate:ipc`, `npm run check:ipc`, `npm run docs:check-links`) still exist in `package.json` and CI scripts, ensuring the maintenance guidance is actionable.
 
 ### Event System
 
-* ✅ All communication uses TypedEventBus
-* ✅ All events follow naming conventions
-* ✅ All events include proper metadata
-* ✅ IPC events are automatically forwarded
+- ✅ All communication uses TypedEventBus
+- ✅ All events follow naming conventions
+- ✅ All events include proper metadata
+- ✅ IPC events are automatically forwarded
 
 ### Error Handling
 
-* ✅ All layers use appropriate error handling utilities
-* ✅ All errors preserve original context
-* ✅ All operations emit appropriate events
-* ✅ Frontend stores use safe operations
+- ✅ All layers use appropriate error handling utilities
+- ✅ All errors preserve original context
+- ✅ All operations emit appropriate events
+- ✅ Frontend stores use safe operations
 
 ### Frontend State
 
-* ✅ All stores use TypeScript interfaces
-* ✅ Complex stores use modular composition
-* ✅ Persistence is selective and purposeful
-* ✅ Actions include consistent logging
+- ✅ All stores use TypeScript interfaces
+- ✅ Complex stores use modular composition
+- ✅ Persistence is selective and purposeful
+- ✅ Actions include consistent logging
 
 ### IPC Communication
 
-* ✅ All handlers use standardized registration
-* ✅ All parameters are validated
-* ✅ All channels follow naming conventions
-* ✅ Preload API is type-safe
+- ✅ All handlers use standardized registration
+- ✅ All parameters are validated
+- ✅ All channels follow naming conventions
+- ✅ Preload API is type-safe
 
 ## 🚀 Quick Start
 
 To implement a new feature:
 
-1. __Identify the pattern__ - Determine which architectural pattern applies
-2. __Use the template__ - Start with the appropriate template
-3. __Follow the standards__ - Use TSDoc standards for documentation
-4. __Test thoroughly__ - Use testing patterns from the guide
-5. __Review compliance__ - Ensure the implementation follows all relevant ADRs
+1. **Identify the pattern** - Determine which architectural pattern applies
+2. **Use the template** - Start with the appropriate template
+3. **Follow the standards** - Use TSDoc standards for documentation
+4. **Test thoroughly** - Use testing patterns from the guide
+5. **Review compliance** - Ensure the implementation follows all relevant ADRs
 
 ## 📞 Support
 
 For questions about architectural patterns or documentation:
 
-1. __Check the ADRs__ - Look for existing decisions
-2. __Review the patterns guide__ - Find established conventions
-3. __Use the templates__ - Adapt templates to your needs
-4. __Follow the standards__ - Use TSDoc standards for consistency
+1. **Check the ADRs** - Look for existing decisions
+2. **Review the patterns guide** - Find established conventions
+3. **Use the templates** - Adapt templates to your needs
+4. **Follow the standards** - Use TSDoc standards for consistency
 
 This documentation represents the living architectural knowledge of the Uptime-Watcher project. It should be updated as the architecture evolves and new patterns emerge.

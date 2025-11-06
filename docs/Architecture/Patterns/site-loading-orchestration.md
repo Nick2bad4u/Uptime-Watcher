@@ -1,14 +1,14 @@
 # Site Loading & Monitoring Orchestration
 
-This guide documents how the __Site Loading Orchestrator__ and its collaborating services coordinate database hydration, cache synchronization, and monitoring bootstrap inside the Electron main process.
+This guide documents how the **Site Loading Orchestrator** and its collaborating services coordinate database hydration, cache synchronization, and monitoring bootstrap inside the Electron main process.
 
 ## Overview
 
 The loading pipeline is split across three collaborators:
 
-1. __`DatabaseManager`__ – owns startup, persistence commands, and global history-limit state.
-2. __`SiteLoadingOrchestrator`__ – wraps `SiteRepositoryService` to populate caches and surface metrics.
-3. __`SiteManager`__ – exposes mutation APIs and long-lived in-memory cache used by renderer stores.
+1. **`DatabaseManager`** – owns startup, persistence commands, and global history-limit state.
+2. **`SiteLoadingOrchestrator`** – wraps `SiteRepositoryService` to populate caches and surface metrics.
+3. **`SiteManager`** – exposes mutation APIs and long-lived in-memory cache used by renderer stores.
 
 A shared `MonitoringConfig` object links these layers and guarantees that asynchronous side effects (history-limit updates, monitoring start/stop, cache synchronization) complete in a deterministic order.
 
@@ -32,7 +32,7 @@ sequenceDiagram
 
 ## MonitoringConfig Contract
 
-`MonitoringConfig` is passed from `DatabaseManager` into repository helpers and mutators. All methods are now __async__ and MUST be awaited by callers:
+`MonitoringConfig` is passed from `DatabaseManager` into repository helpers and mutators. All methods are now **async** and MUST be awaited by callers:
 
 | Method                                   | Responsibility                                                             | Failure behaviour                                                            |
 | ---------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -46,35 +46,35 @@ These semantics enforce the guarantees described in ADR-003 (Error Handling Stra
 ## History-Limit Sequencing
 
 1. `SiteRepositoryService.applyHistoryLimitSetting` reads the persisted limit.
-2. The service __awaits__ `monitoringConfig.setHistoryLimit`, ensuring:
-   * `DatabaseManager` updates its in-memory limit immediately.
-   * `HistoryLimitCoordinator` broadcasts deterministic `settings:history-limit-updated` events before cache synchronization continues.
+2. The service **awaits** `monitoringConfig.setHistoryLimit`, ensuring:
+   - `DatabaseManager` updates its in-memory limit immediately.
+   - `HistoryLimitCoordinator` broadcasts deterministic `settings:history-limit-updated` events before cache synchronization continues.
 3. Any rejection halts loading and surfaces rich error logs in both `SiteManager` and `DatabaseManager`.
 
 ## Cache Synchronization & Background Hydration
 
-* Initial loads replace the entire `StandardizedCache` and emit `sites:state-synchronized` with a sanitized snapshot.
-* `SiteManager.loadSiteInBackground` now hydrates a single site via `getSiteFromDatabase(identifier)`:
-  * On success, it updates the cache, emits `STATE_SYNC_ACTION.UPDATE` through `emitSitesStateSynchronized`, and publishes `internal:site:cache-updated` for cross-process observers.
-  * When the site is missing or hydration fails, it emits `internal:site:cache-miss` to trigger fallback flows.
+- Initial loads replace the entire `StandardizedCache` and emit `sites:state-synchronized` with a sanitized snapshot.
+- `SiteManager.loadSiteInBackground` now hydrates a single site via `getSiteFromDatabase(identifier)`:
+  - On success, it updates the cache, emits `STATE_SYNC_ACTION.UPDATE` through `emitSitesStateSynchronized`, and publishes `internal:site:cache-updated` for cross-process observers.
+  - When the site is missing or hydration fails, it emits `internal:site:cache-miss` to trigger fallback flows.
 
 This targeted hydration removes unnecessary full-table reads and guarantees renderer stores converge without manual resync requests.
 
 ## Operational Invariants
 
-* Every cache mutation that hits the database must call `emitSitesStateSynchronized` so renderer stores receive delta payloads.
-* Monitoring-related event emissions (`start-/stop-monitoring-requested`) may __not__ be swallowed; upstream orchestrators rely on propagated rejections for retries/backoff.
-* History-limit changes are transactional: the in-memory value, persisted setting, and pruning logic run in a single `withDatabaseOperation` invocation.
+- Every cache mutation that hits the database must call `emitSitesStateSynchronized` so renderer stores receive delta payloads.
+- Monitoring-related event emissions (`start-/stop-monitoring-requested`) may **not** be swallowed; upstream orchestrators rely on propagated rejections for retries/backoff.
+- History-limit changes are transactional: the in-memory value, persisted setting, and pruning logic run in a single `withDatabaseOperation` invocation.
 
 ## Implementation Checklist
 
-* [ ] Await `MonitoringConfig.setHistoryLimit` in any new loader or mutation.
-* [ ] Propagate monitoring start/stop rejections, logging before rethrowing.
-* [ ] When adding background hydration paths, emit both `sites:state-synchronized` and `internal:site:cache-updated`.
-* [ ] Update this document when the orchestration flow or event contracts change.
+- [ ] Await `MonitoringConfig.setHistoryLimit` in any new loader or mutation.
+- [ ] Propagate monitoring start/stop rejections, logging before rethrowing.
+- [ ] When adding background hydration paths, emit both `sites:state-synchronized` and `internal:site:cache-updated`.
+- [ ] Update this document when the orchestration flow or event contracts change.
 
 ## Current Implementation Audit (2025-11-04)
 
-* Reviewed `electron/utils/database/SiteRepositoryService.ts` to confirm `SiteLoadingOrchestrator` continues to await `MonitoringConfig` hooks and emits the documented events on success and failure.
-* Verified `electron/managers/SiteManager.ts` still funnels mutations through `SiteWriterService` and publishes `internal:site:*` plus `sites:state-synchronized` events after cache swaps.
-* Cross-checked integration coverage in `electron/test/utils/database/SiteRepositoryService.comprehensive.test.ts` to ensure deterministic sequencing and cache replacement remain enforced by automated tests.
+- Reviewed `electron/utils/database/SiteRepositoryService.ts` to confirm `SiteLoadingOrchestrator` continues to await `MonitoringConfig` hooks and emits the documented events on success and failure.
+- Verified `electron/managers/SiteManager.ts` still funnels mutations through `SiteWriterService` and publishes `internal:site:*` plus `sites:state-synchronized` events after cache swaps.
+- Cross-checked integration coverage in `electron/test/utils/database/SiteRepositoryService.comprehensive.test.ts` to ensure deterministic sequencing and cache replacement remain enforced by automated tests.

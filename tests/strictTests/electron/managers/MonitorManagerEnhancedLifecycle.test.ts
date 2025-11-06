@@ -1,8 +1,8 @@
 /**
  * High-precision unit tests for the enhanced monitoring lifecycle helpers.
  *
- * These tests exercise the orchestration logic that powers the enhanced
- * monitor lifecycle flows, ensuring we capture successes, skips, failures, and
+ * These tests exercise the orchestration logic that powers the enhanced monitor
+ * lifecycle flows, ensuring we capture successes, skips, failures, and
  * recursive site-level behaviours without touching real services.
  */
 
@@ -63,7 +63,10 @@ function createSite(
     } satisfies Site;
 }
 
-type LoggerMock = Record<"debug" | "info" | "warn" | "error", ReturnType<typeof vi.fn>>;
+type LoggerMock = Record<
+    "debug" | "info" | "warn" | "error",
+    ReturnType<typeof vi.fn>
+>;
 
 interface LifecycleTestHarness {
     readonly config: EnhancedLifecycleConfig;
@@ -138,7 +141,8 @@ function createLifecycleHarness(sites: Site[]): LifecycleTestHarness {
     );
 
     const services = {
-        checker: checkerSpies as unknown as EnhancedMonitoringServices["checker"],
+        checker:
+            checkerSpies as unknown as EnhancedMonitoringServices["checker"],
         operationRegistry: {},
         statusUpdateService: {},
         timeoutManager: {},
@@ -219,17 +223,14 @@ describe("monitorManagerEnhancedLifecycle", () => {
             const failingMonitor = createMonitor({ id: "monitor-fail" });
             const errorMonitor = createMonitor({ id: "monitor-error" });
 
-            const site = createSite(
-                "beta",
-                [
-                    successfulMonitor,
-                    undefined,
-                    missingIdMonitor,
-                    invalidIntervalMonitor,
-                    failingMonitor,
-                    errorMonitor,
-                ]
-            );
+            const site = createSite("beta", [
+                successfulMonitor,
+                undefined,
+                missingIdMonitor,
+                invalidIntervalMonitor,
+                failingMonitor,
+                errorMonitor,
+            ]);
 
             const harness = createLifecycleHarness([site]);
 
@@ -288,17 +289,14 @@ describe("monitorManagerEnhancedLifecycle", () => {
         });
 
         it("reports inactivity when no monitors qualify for startup", async () => {
-            const site = createSite(
-                "gamma",
-                [
-                    undefined,
-                    createMonitor({ id: "", monitoring: false }),
-                    createMonitor({
-                        checkInterval: Number.NaN,
-                        id: "invalid-interval",
-                    }),
-                ]
-            );
+            const site = createSite("gamma", [
+                undefined,
+                createMonitor({ id: "", monitoring: false }),
+                createMonitor({
+                    checkInterval: Number.NaN,
+                    id: "invalid-interval",
+                }),
+            ]);
 
             const harness = createLifecycleHarness([site]);
 
@@ -330,7 +328,10 @@ describe("monitorManagerEnhancedLifecycle", () => {
     describe(stopAllMonitoringEnhancedFlow, () => {
         it("coordinates partial failures while ensuring stopAll executes", async () => {
             const undefinedSlot = undefined;
-            const missingIdMonitor = createMonitor({ id: "", monitoring: true });
+            const missingIdMonitor = createMonitor({
+                id: "",
+                monitoring: true,
+            });
             const inactiveMonitor = createMonitor({
                 id: "monitor-inactive",
                 monitoring: false,
@@ -686,7 +687,11 @@ describe("monitorManagerEnhancedLifecycle", () => {
             const m1 = createMonitor({ id: "m1", monitoring: true });
             const m2 = createMonitor({ id: "m2", monitoring: true });
             const m3 = createMonitor({ id: "m3", monitoring: false });
-            const site = createSite("pi", [m1, m2, m3]);
+            const site = createSite("pi", [
+                m1,
+                m2,
+                m3,
+            ]);
             const harness = createLifecycleHarness([site]);
 
             harness.checker.stopMonitoring

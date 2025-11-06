@@ -395,7 +395,10 @@ describe("ServiceContainer - Working Tests", () => {
             payload: unknown
         ): unknown => {
             const { stripEventMetadata } = container as unknown as {
-                stripEventMetadata: (eventName: string, payload: unknown) => unknown;
+                stripEventMetadata: (
+                    eventName: string,
+                    payload: unknown
+                ) => unknown;
             };
 
             return stripEventMetadata.call(container, eventName, payload);
@@ -460,7 +463,8 @@ describe("ServiceContainer - Working Tests", () => {
 
             const metadataSymbols = Object.getOwnPropertySymbols(sanitized);
             const originalMetaSymbol = metadataSymbols.find(
-                (symbol) => symbol.description === "typed-event-bus:original-meta"
+                (symbol) =>
+                    symbol.description === "typed-event-bus:original-meta"
             );
 
             expect(originalMetaSymbol).toBeDefined();
@@ -544,7 +548,8 @@ describe("ServiceContainer - Working Tests", () => {
 
             const metadataSymbols = Object.getOwnPropertySymbols(sanitized);
             const originalMetaSymbol = metadataSymbols.find(
-                (symbol) => symbol.description === "typed-event-bus:original-meta"
+                (symbol) =>
+                    symbol.description === "typed-event-bus:original-meta"
             );
 
             expect(originalMetaSymbol).toBeDefined();

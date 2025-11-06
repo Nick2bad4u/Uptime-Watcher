@@ -21,12 +21,12 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 ### Core Principles
 
-* __Domain-Specific State__: Use Zustand stores for domain-specific state management, avoid global state
-* __Repository Pattern__: All database operations use repositories with transaction wrapping
-* __Event-Driven Updates__: Communication between UI and backend via events and IPC
-* __Service Layer__: Managers orchestrate business logic and event flows
-* __Type Safety__: Strict TypeScript with proper interfaces for all IPC messages and event payloads
-* __Validation Consistency__: Use centralized validation utilities across frontend and backend
+- **Domain-Specific State**: Use Zustand stores for domain-specific state management, avoid global state
+- **Repository Pattern**: All database operations use repositories with transaction wrapping
+- **Event-Driven Updates**: Communication between UI and backend via events and IPC
+- **Service Layer**: Managers orchestrate business logic and event flows
+- **Type Safety**: Strict TypeScript with proper interfaces for all IPC messages and event payloads
+- **Validation Consistency**: Use centralized validation utilities across frontend and backend
 
 ### Key Layers
 
@@ -52,7 +52,7 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 
 ### Frontend Validation Standards
 
-__Always use the shared validation schemas for consistent behavior:__
+**Always use the shared validation schemas for consistent behavior:**
 
 ```typescript
 // ✅ Good: Use shared validation schemas
@@ -77,12 +77,12 @@ const validateSiteForm = (formData: FormData) => {
 };
 ```
 
-__Benefits of Shared Validation:__
+**Benefits of Shared Validation:**
 
-* ✅ __Consistent validation__ between frontend and backend
-* ✅ __Well-tested__ validation using Zod and validator.js
-* ✅ __Type-safe__ with automatic TypeScript type inference
-* ✅ __Security-focused__ validation patterns
+- ✅ **Consistent validation** between frontend and backend
+- ✅ **Well-tested** validation using Zod and validator.js
+- ✅ **Type-safe** with automatic TypeScript type inference
+- ✅ **Security-focused** validation patterns
 
 ### Real-time Validation Patterns
 
@@ -128,38 +128,38 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
 Before implementing any UI feature:
 
-1. __Understand the Full Context__: Read existing code to understand patterns and flows
-2. __Identify Components__: Break down the feature into smaller, focused components
-3. __Map Data Flow__: Trace how data will flow from backend to UI and back
-4. __Check Existing Patterns__: Look for similar implementations to follow established patterns
-5. __Plan State Management__: Determine which stores need updates and what new state is required
+1. **Understand the Full Context**: Read existing code to understand patterns and flows
+2. **Identify Components**: Break down the feature into smaller, focused components
+3. **Map Data Flow**: Trace how data will flow from backend to UI and back
+4. **Check Existing Patterns**: Look for similar implementations to follow established patterns
+5. **Plan State Management**: Determine which stores need updates and what new state is required
 
 ### 2. Implementation Order
 
 Always follow this order to minimize breaking changes:
 
-1. __Backend Integration__: Ensure all needed backend services and store actions exist
-2. __State Management__: Add state to appropriate Zustand stores
-3. __Hooks Layer__: Create or extend custom hooks for business logic
-4. __Components__: Implement UI components from innermost to outermost
-5. __Integration__: Wire up components with state and event handlers
-6. __Testing__: Verify functionality and run all tests
+1. **Backend Integration**: Ensure all needed backend services and store actions exist
+2. **State Management**: Add state to appropriate Zustand stores
+3. **Hooks Layer**: Create or extend custom hooks for business logic
+4. **Components**: Implement UI components from innermost to outermost
+5. **Integration**: Wire up components with state and event handlers
+6. **Testing**: Verify functionality and run all tests
 
 ### 3. Code Review Checklist
 
-* [ ] Follows established architectural patterns
-* [ ] No direct state mutations
-* [ ] Proper error handling with logging
-* [ ] Event handlers include `stopPropagation()` where needed
-* [ ] TypeScript interfaces for all props and return types
-* [ ] TSDoc documentation following base tag guidelines
-* [ ] Tests pass and new functionality is covered
+- [ ] Follows established architectural patterns
+- [ ] No direct state mutations
+- [ ] Proper error handling with logging
+- [ ] Event handlers include `stopPropagation()` where needed
+- [ ] TypeScript interfaces for all props and return types
+- [ ] TSDoc documentation following base tag guidelines
+- [ ] Tests pass and new functionality is covered
 
 ## Component Creation Guidelines
 
 ### Component Structure
 
-__Current Implementation Pattern:__
+**Current Implementation Pattern:**
 
 ````tsx
 // Import standardized prop types for consistency
@@ -314,16 +314,16 @@ export interface ComplexComponentProperties {
 
 ### Key Guidelines for Current Implementation
 
-* __Functional Components__: Use functional components with hooks (no React.memo unless performance issues)
-* __Specific Interfaces__: Create specific prop interfaces rather than extending large base types
-* __Readonly Properties__: Mark all props as readonly for immutability
-* __Proper Event Typing__: Use specific React event types rather than generic handlers
-* __JSX.Element Return__: Use `JSX.Element` as return type for clarity
-* __Named Functions in useEffect__: Use named functions in useEffect for better debugging
-* __Event handler naming__: Use `handle` prefix for internal handlers
-* __Stop event propagation__: Add `event?.stopPropagation()` in button click handlers within cards
-* __Accessibility__: Include `data-testid` attributes using component identifier
-* __Import standardized types__: Import types from `@shared/types/componentProps` when available
+- **Functional Components**: Use functional components with hooks (no React.memo unless performance issues)
+- **Specific Interfaces**: Create specific prop interfaces rather than extending large base types
+- **Readonly Properties**: Mark all props as readonly for immutability
+- **Proper Event Typing**: Use specific React event types rather than generic handlers
+- **JSX.Element Return**: Use `JSX.Element` as return type for clarity
+- **Named Functions in useEffect**: Use named functions in useEffect for better debugging
+- **Event handler naming**: Use `handle` prefix for internal handlers
+- **Stop event propagation**: Add `event?.stopPropagation()` in button click handlers within cards
+- **Accessibility**: Include `data-testid` attributes using component identifier
+- **Import standardized types**: Import types from `@shared/types/componentProps` when available
 
 ## Component Props Standards
 
@@ -383,7 +383,7 @@ const handleSubmit = useCallback(
 
 ### Current Store Architecture
 
-The application uses __Zustand__ for state management with two main patterns:
+The application uses **Zustand** for state management with two main patterns:
 
 #### Pattern 1: Direct Create (Simple Stores)
 
@@ -485,25 +485,25 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 
 #### Current Store Examples by Pattern
 
-__Direct Pattern Stores:__
+**Direct Pattern Stores:**
 
-* `useUIStore` - Modal states, tab selections, user preferences
-* `useErrorStore` - Error handling and loading states
-* `useUpdatesStore` - Application update management
-* `useSettingsStore` - Configuration and user settings
+- `useUIStore` - Modal states, tab selections, user preferences
+- `useErrorStore` - Error handling and loading states
+- `useUpdatesStore` - Application update management
+- `useSettingsStore` - Configuration and user settings
 
-__Modular Pattern Stores:__
+**Modular Pattern Stores:**
 
-* `useSitesStore` - Sites, monitors, operations, synchronization
+- `useSitesStore` - Sites, monitors, operations, synchronization
 
 ### Store Module Structure
 
 Each store module has clear responsibilities:
 
-* __State Module__ (`useSitesState`): Core state management and data manipulation
-* __Operations Module__ (`useSiteOperations`): CRUD operations for entities
-* __Monitoring Module__ (`useSiteMonitoring`): Monitoring lifecycle and status management
-* __Sync Module__ (`useSiteSync`): Backend synchronization and data consistency
+- **State Module** (`useSitesState`): Core state management and data manipulation
+- **Operations Module** (`useSiteOperations`): CRUD operations for entities
+- **Monitoring Module** (`useSiteMonitoring`): Monitoring lifecycle and status management
+- **Sync Module** (`useSiteSync`): Backend synchronization and data consistency
 
 ### Error Handling in Stores
 
@@ -572,10 +572,10 @@ export const useDomainStore = create<DomainStore>()(
 
 ### State Partitioning Rules
 
-* __Persist User Preferences__: Settings, theme choices, tab selections
-* __Don't Persist Transient State__: Modal visibility, loading states, selected items
-* __Domain Boundaries__: Keep related state in the same store
-* __Loading States__: Use centralized error store for operation loading states
+- **Persist User Preferences**: Settings, theme choices, tab selections
+- **Don't Persist Transient State**: Modal visibility, loading states, selected items
+- **Domain Boundaries**: Keep related state in the same store
+- **Loading States**: Use centralized error store for operation loading states
 
 ## Event Handling
 
@@ -700,11 +700,11 @@ export const MyModal = React.memo(function MyModal() {
 
 ### Modal Best Practices
 
-* __Glass Effect__: Use `backdrop-blur-sm bg-black bg-opacity-30` for modern glass overlay
-* __Escape Key__: Always implement global escape key handling
-* __Backdrop Clicks__: Close modal when clicking outside content area
-* __Focus Management__: Consider focus trapping for accessibility
-* __Z-Index__: Use consistent z-index values (50 for standard modals, 1000 for overlay modals)
+- **Glass Effect**: Use `backdrop-blur-sm bg-black bg-opacity-30` for modern glass overlay
+- **Escape Key**: Always implement global escape key handling
+- **Backdrop Clicks**: Close modal when clicking outside content area
+- **Focus Management**: Consider focus trapping for accessibility
+- **Z-Index**: Use consistent z-index values (50 for standard modals, 1000 for overlay modals)
 
 ## Reusable Components
 
@@ -712,10 +712,10 @@ export const MyModal = React.memo(function MyModal() {
 
 Extract components when:
 
-* Same UI pattern is used in 2+ places
-* Component has complex logic that can be isolated
-* Component provides a specific, reusable behavior
-* Different contexts need slightly different configurations
+- Same UI pattern is used in 2+ places
+- Component has complex logic that can be isolated
+- Component provides a specific, reusable behavior
+- Different contexts need slightly different configurations
 
 ### Reusable Component Pattern
 
@@ -809,7 +809,7 @@ const handleStartMonitoring = useCallback<EventHandlers.ClickHandler>(
 
 ### Current Testing Approach
 
-The application uses __Vitest__ for unit testing with comprehensive mocking strategies:
+The application uses **Vitest** for unit testing with comprehensive mocking strategies:
 
 #### Component Testing
 
@@ -950,39 +950,39 @@ Follow the base tag guidelines in `docs/TSDoc/`:
 
 /\*\*
 
-* Brief component description.
-*
-* @remarks
-* Detailed explanation of component behavior, patterns used, and any important
-* implementation details.
-*
-* @example
-*
-* /\`\`\`tsx
-* <Component prop="value" />;
-* /\`\`\`
-*
-* @param props - Component props
-*
-* @returns JSX element description
-*
-* @public
+- Brief component description.
+-
+- @remarks
+- Detailed explanation of component behavior, patterns used, and any important
+- implementation details.
+-
+- @example
+-
+- /\`\`\`tsx
+- <Component prop="value" />;
+- /\`\`\`
+-
+- @param props - Component props
+-
+- @returns JSX element description
+-
+- @public
   \*/
 
 ### Code Comments
 
-* __Why, not what__: Explain the reasoning behind complex logic
-* __Business context__: Explain domain-specific requirements
-* __Gotchas__: Document any non-obvious behavior or workarounds
-* __TODO items__: Mark areas that need future improvement
+- **Why, not what**: Explain the reasoning behind complex logic
+- **Business context**: Explain domain-specific requirements
+- **Gotchas**: Document any non-obvious behavior or workarounds
+- **TODO items**: Mark areas that need future improvement
 
 ## Common Pitfalls
 
 ### 1. Event Propagation
 
-__Problem__: Button clicks in cards trigger card click handlers
+**Problem**: Button clicks in cards trigger card click handlers
 
-__Solution__: Always use `event?.stopPropagation()` in button handlers
+**Solution**: Always use `event?.stopPropagation()` in button handlers
 
 ```tsx
 // Wrong
@@ -997,9 +997,9 @@ onClick={(event) => {
 
 ### 2. State Mutations
 
-__Problem__: Directly mutating store state
+**Problem**: Directly mutating store state
 
-__Solution__: Always use store actions
+**Solution**: Always use store actions
 
 ```tsx
 // Wrong
@@ -1011,9 +1011,9 @@ updateSiteName(siteIdentifier, "New Name");
 
 ### 3. Prop Drilling
 
-__Problem__: Passing props through many component levels
+**Problem**: Passing props through many component levels
 
-__Solution__: Use appropriate stores or context, or compose with hooks
+**Solution**: Use appropriate stores or context, or compose with hooks
 
 ```tsx
 // Wrong: Passing through multiple levels
@@ -1030,9 +1030,9 @@ const Component = () => {
 
 ### 4. Missing Dependencies
 
-__Problem__: useCallback/useEffect missing dependencies
+**Problem**: useCallback/useEffect missing dependencies
 
-__Solution__: Always include all dependencies, use ESLint rules
+**Solution**: Always include all dependencies, use ESLint rules
 
 ```tsx
 // Wrong
@@ -1048,9 +1048,9 @@ const handler = useCallback(() => {
 
 ### 5. Improper Error Handling
 
-__Problem__: Errors not properly caught and logged
+**Problem**: Errors not properly caught and logged
 
-__Solution__: Use withErrorHandling and centralized logger
+**Solution**: Use withErrorHandling and centralized logger
 
 ```tsx
 // Wrong
@@ -1073,7 +1073,7 @@ try {
 
 ### Current EventsService Architecture
 
-The application uses __EventsService__ abstraction for backend event integration:
+The application uses **EventsService** abstraction for backend event integration:
 
 ```text
 Backend Services → TypedEventBus → IPC → EventsService → React Components
@@ -1166,14 +1166,14 @@ useMount(
 
 ### Common Event System Issues
 
-__❌ Wrong Event Names__
+**❌ Wrong Event Names**
 
 ```typescript
 // Wrong - event doesn't exist in UptimeEvents
 eventEmitter.emit("statusUpdate", data);
 ```
 
-__✅ Correct Event Names__
+**✅ Correct Event Names**
 
 ```typescript
 // Right - use defined events
@@ -1187,7 +1187,7 @@ await eventEmitter.emitTyped("monitor:status-changed", {
 });
 ```
 
-__❌ Disconnected Event Buses__
+**❌ Disconnected Event Buses**
 
 ```typescript
 // Wrong - using separate event bus that doesn't forward to main
@@ -1195,7 +1195,7 @@ const separateEventBus = new TypedEventBus("MyService");
 separateEventBus.emit("monitor:up", data); // Never reaches frontend
 ```
 
-__✅ Connected Event System__
+**✅ Connected Event System**
 
 ```typescript
 // Right - use manager event bus with forwarding setup
@@ -1205,15 +1205,15 @@ __✅ Connected Event System__
 
 ### Event Debugging Checklist
 
-1. __Backend Events__: Are events being emitted with correct names?
-2. __Event Forwarding__: Is ServiceContainer.setupEventForwarding() including your events?
-3. __IPC Registration__: Is ApplicationService listening and forwarding events?
-4. __Frontend Handlers__: Are components properly subscribing to events?
-5. __Event Payloads__: Do event data structures match interface definitions?
+1. **Backend Events**: Are events being emitted with correct names?
+2. **Event Forwarding**: Is ServiceContainer.setupEventForwarding() including your events?
+3. **IPC Registration**: Is ApplicationService listening and forwarding events?
+4. **Frontend Handlers**: Are components properly subscribing to events?
+5. **Event Payloads**: Do event data structures match interface definitions?
 
 ### Integration with Existing Systems
 
-__❌ Reinventing Services__
+**❌ Reinventing Services**
 
 ```typescript
 // Wrong - creating new placeholder implementations
@@ -1223,7 +1223,7 @@ private performPortCheck(): Promise<boolean> {
 }
 ```
 
-__✅ Using Existing Services__
+**✅ Using Existing Services**
 
 ```typescript
 // Right - leverage existing monitor services
@@ -1236,14 +1236,14 @@ private async performTypeSpecificCheck(monitor: Monitor): Promise<boolean> {
 
 ### Code Quality and Security Guidelines
 
-__❌ Magic Numbers__
+**❌ Magic Numbers**
 
 ```typescript
 // Wrong - hardcoded values
 const timeoutMs = (monitor.timeout || 30) * 1000 + 5000;
 ```
 
-__✅ Named Constants__
+**✅ Named Constants**
 
 ```typescript
 // Right - use defined constants
@@ -1257,14 +1257,14 @@ const timeoutMs =
  MONITOR_TIMEOUT_BUFFER_MS;
 ```
 
-__❌ Performance Issues in Validation__
+**❌ Performance Issues in Validation**
 
 ```typescript
 // Wrong - every() doesn't short-circuit optimally
 return array.every((item) => typeof item === "string");
 ```
 
-__✅ Optimized Validation__
+**✅ Optimized Validation**
 
 ```typescript
 // Right - early return for better performance
@@ -1274,14 +1274,14 @@ for (const item of array) {
 return true;
 ```
 
-__❌ Unsafe JSON Parsing__
+**❌ Unsafe JSON Parsing**
 
 ```typescript
 // Wrong - no content validation
 const data = JSON.parse(dbValue);
 ```
 
-__✅ Secure JSON Parsing with Validation__
+**✅ Secure JSON Parsing with Validation**
 
 ```typescript
 // Right - validate parsed content structure and safety
@@ -1310,26 +1310,26 @@ This guide provides comprehensive guidelines for UI development in the Uptime Wa
 
 ### Core Development Principles
 
-1. __Follow Current Architecture__: Use functional components with hooks, Zustand stores, and EventsService integration
-2. __Plan Before Implementing__: Understand data flows and integration points before writing code
-3. __Use Specific Types__: Create focused prop interfaces rather than extending large base types
-4. __Implement Proper Event Handling__: Include `event?.stopPropagation()` and proper error boundaries
-5. __Write Comprehensive Tests__: Include component, integration, and store testing with proper mocking
+1. **Follow Current Architecture**: Use functional components with hooks, Zustand stores, and EventsService integration
+2. **Plan Before Implementing**: Understand data flows and integration points before writing code
+3. **Use Specific Types**: Create focused prop interfaces rather than extending large base types
+4. **Implement Proper Event Handling**: Include `event?.stopPropagation()` and proper error boundaries
+5. **Write Comprehensive Tests**: Include component, integration, and store testing with proper mocking
 
 ### Current Implementation Standards
 
-6. __Component Structure__: Use `JSX.Element` return types, named functions in useEffect, and proper cleanup patterns
-7. __Store Patterns__: Choose between direct create (simple stores) and modular composition (complex stores) appropriately
-8. __Event Integration__: Use EventsService abstraction for backend communication and cache synchronization
-9. __Type Safety__: Use readonly props, specific React event types, and avoid `any` or `unknown`
-10. __Testing Strategy__: Use Vitest with comprehensive mocking and proper store state management
+6. **Component Structure**: Use `JSX.Element` return types, named functions in useEffect, and proper cleanup patterns
+7. **Store Patterns**: Choose between direct create (simple stores) and modular composition (complex stores) appropriately
+8. **Event Integration**: Use EventsService abstraction for backend communication and cache synchronization
+9. **Type Safety**: Use readonly props, specific React event types, and avoid `any` or `unknown`
+10. **Testing Strategy**: Use Vitest with comprehensive mocking and proper store state management
 
 ### Quality Assurance
 
-* __Code Review__: Verify implementation follows established patterns before submission
-* __Performance__: Use proper dependency arrays in useCallback and useEffect
-* __Accessibility__: Include data-testid attributes and proper keyboard navigation
-* __Security__: Validate all inputs and use secure JSON parsing patterns
-* __Documentation__: Maintain TSDoc comments following project guidelines
+- **Code Review**: Verify implementation follows established patterns before submission
+- **Performance**: Use proper dependency arrays in useCallback and useEffect
+- **Accessibility**: Include data-testid attributes and proper keyboard navigation
+- **Security**: Validate all inputs and use secure JSON parsing patterns
+- **Documentation**: Maintain TSDoc comments following project guidelines
 
 By following these practices, we ensure a consistent, maintainable, and scalable codebase that reflects the current architectural patterns and provides excellent developer experience.

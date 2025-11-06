@@ -46,7 +46,8 @@ describe("deleteSiteWithAdapters", () => {
     });
 
     it("returns metadata while reusing preloaded monitors", async () => {
-        const { adapter: monitorAdapter, mocks: monitorMocks } = createMonitorAdapter();
+        const { adapter: monitorAdapter, mocks: monitorMocks } =
+            createMonitorAdapter();
         const { adapter: siteAdapter, mocks: siteMocks } = createSiteAdapter();
         const { deleteSiteWithAdapters } = await import(modulePath);
         const preloadedMonitors = [
@@ -65,7 +66,9 @@ describe("deleteSiteWithAdapters", () => {
             monitorCount: preloadedMonitors.length,
             siteDeleted: true,
         });
-        expect(monitorMocks.deleteBySiteIdentifier).toHaveBeenCalledExactlyOnceWith("site-123");
+        expect(
+            monitorMocks.deleteBySiteIdentifier
+        ).toHaveBeenCalledExactlyOnceWith("site-123");
         expect(monitorMocks.findBySiteIdentifier).not.toHaveBeenCalled();
         expect(siteMocks.delete).toHaveBeenCalledWith("site-123");
     });
@@ -91,7 +94,9 @@ describe("deleteSiteWithAdapters", () => {
             siteAdapter: siteAdapter as unknown,
         });
 
-        expect(monitorMocks.findBySiteIdentifier).toHaveBeenCalledExactlyOnceWith("site-789");
+        expect(
+            monitorMocks.findBySiteIdentifier
+        ).toHaveBeenCalledExactlyOnceWith("site-789");
         expect(result).toStrictEqual({
             monitorCount: monitors.length,
             siteDeleted: false,
@@ -107,7 +112,9 @@ describe("deleteSiteWithAdapters", () => {
                 }),
             });
         const { adapter: siteAdapter, mocks: siteMocks } = createSiteAdapter();
-        const { deleteSiteWithAdapters, SiteDeletionError } = await import(modulePath);
+        const { deleteSiteWithAdapters, SiteDeletionError } = await import(
+            modulePath
+        );
 
         let capturedError: InstanceType<typeof SiteDeletionError> | null = null;
         try {
@@ -118,7 +125,9 @@ describe("deleteSiteWithAdapters", () => {
                 siteAdapter: siteAdapter as unknown,
             });
         } catch (error) {
-            const deletionError = error as InstanceType<typeof SiteDeletionError>;
+            const deletionError = error as InstanceType<
+                typeof SiteDeletionError
+            >;
 
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(failure);
@@ -147,7 +156,9 @@ describe("deleteSiteWithAdapters", () => {
             }),
         });
         const { adapter: siteAdapter } = createSiteAdapter();
-        const { deleteSiteWithAdapters, SiteDeletionError } = await import(modulePath);
+        const { deleteSiteWithAdapters, SiteDeletionError } = await import(
+            modulePath
+        );
 
         let capturedError: InstanceType<typeof SiteDeletionError> | null = null;
         try {
@@ -158,9 +169,13 @@ describe("deleteSiteWithAdapters", () => {
                 siteAdapter: siteAdapter as unknown,
             });
 
-            expect.fail("Expected site deletion to throw when monitor removal fails");
+            expect.fail(
+                "Expected site deletion to throw when monitor removal fails"
+            );
         } catch (error) {
-            const deletionError = error as InstanceType<typeof SiteDeletionError>;
+            const deletionError = error as InstanceType<
+                typeof SiteDeletionError
+            >;
 
             expect(deletionError.stage).toBe("monitors");
             expect(deletionError.cause).toBe(normalized);
