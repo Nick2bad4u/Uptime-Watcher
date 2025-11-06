@@ -7,6 +7,7 @@
  * database operations.
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { app } from "electron";
 import { Database } from "node-sqlite3-wasm";
@@ -15,6 +16,7 @@ import * as path from "node:path";
 
 import { DB_FILE_NAME } from "../../constants";
 import { logger } from "../../utils/logger";
+import { cleanupDatabaseLockArtifacts } from "./utils/databaseLockRecovery";
 import { createDatabaseSchema } from "./utils/databaseSchema";
 
 /**
@@ -31,6 +33,12 @@ const DATABASE_SERVICE_QUERIES = {
     COMMIT: "COMMIT",
     ROLLBACK: "ROLLBACK",
 } as const;
+
+/** Maximum number of initialization attempts when recovering from lock errors. */
+const DATABASE_INITIALIZATION_MAX_ATTEMPTS = 3;
+
+/** Busy timeout (in milliseconds) applied to the SQLite connection. */
+const DATABASE_BUSY_TIMEOUT_MS = 5000;
 
 /**
  * @remarks
@@ -235,10 +243,9 @@ export class DatabaseService {
                 this.db = undefined;
                 logger.info(LOG_TEMPLATES.services.DATABASE_CONNECTION_CLOSED);
             } catch (error) {
-                logger.error(
-                    LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-                    error
-                );
+                logger.error(LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED, {
+                    error: ensureError(error),
+                });
                 throw error;
             }
         }
@@ -311,21 +318,165 @@ export class DatabaseService {
             return this.db;
         }
 
+        const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
+        logger.info(`[DatabaseService] Initializing SQLite DB at: ${dbPath}`);
+
+        for (
+            let attempt = 1;
+            attempt <= DATABASE_INITIALIZATION_MAX_ATTEMPTS;
+            attempt++
+        ) {
+            try {
+                this.db = new Database(dbPath);
+                this.applyConnectionPragmas(this.db);
+
+                createDatabaseSchema(this.db);
+
+                logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
+                return this.db;
+            } catch (error) {
+                if (
+                    this.isDatabaseLockedError(error) &&
+                    attempt < DATABASE_INITIALIZATION_MAX_ATTEMPTS
+                ) {
+                    this.handleDatabaseLockedError(dbPath, attempt, error);
+                } else {
+                    this.closeDatabaseSilently();
+                    logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, {
+                        error: ensureError(error),
+                    });
+                    throw error;
+                }
+            }
+        }
+
+        throw new Error(
+            "Database initialization failed after lock recovery attempts."
+        );
+    }
+
+    /**
+     * Applies connection-level pragmas to improve SQLite resiliency.
+     *
+     * @param db - The active SQLite database connection.
+     */
+    private applyConnectionPragmas(db: Database): void {
         try {
-            const dbPath = path.join(app.getPath("userData"), DB_FILE_NAME);
-            logger.info(
-                `[DatabaseService] Initializing SQLite DB at: ${dbPath}`
-            );
-
-            this.db = new Database(dbPath);
-
-            createDatabaseSchema(this.db);
-
-            logger.info(LOG_TEMPLATES.services.DATABASE_INITIALIZED);
-            return this.db;
+            db.run(`PRAGMA busy_timeout = ${DATABASE_BUSY_TIMEOUT_MS}`);
         } catch (error) {
-            logger.error(LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED, error);
-            throw error;
+            logger.warn(
+                LOG_TEMPLATES.warnings.DATABASE_BUSY_TIMEOUT_PRAGMA_FAILED,
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        }
+
+        try {
+            db.run("PRAGMA foreign_keys = ON");
+        } catch (error) {
+            logger.warn(
+                LOG_TEMPLATES.warnings.DATABASE_FOREIGN_KEYS_PRAGMA_FAILED,
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        }
+    }
+
+    /**
+     * Determines whether the provided error represents a locked database.
+     *
+     * @param error - Error thrown during SQLite operations.
+     *
+     * @returns `true` when the error indicates an outstanding lock.
+     */
+    private isDatabaseLockedError(error: unknown): boolean {
+        const normalized = ensureError(error);
+        const message = normalized.message.toLowerCase();
+
+        return (
+            message.includes("database is locked") ||
+            message.includes("sqlite_busy") ||
+            message.includes("sqlite_locked")
+        );
+    }
+
+    /**
+     * Handles lock-related initialization failures by relocating stale lock
+     * artifacts and preparing for a retry.
+     *
+     * @param dbPath - Absolute path to the SQLite database file.
+     * @param attempt - Current initialization attempt number.
+     * @param error - The original lock error.
+     */
+    private handleDatabaseLockedError(
+        dbPath: string,
+        attempt: number,
+        error: unknown
+    ): void {
+        const normalizedError = ensureError(error);
+        logger.warn(LOG_TEMPLATES.warnings.DATABASE_LOCK_DETECTED, {
+            attempt,
+            message: normalizedError.message,
+        });
+
+        this.closeDatabaseSilently();
+
+        const cleanupResult = cleanupDatabaseLockArtifacts(dbPath);
+
+        if (cleanupResult.relocated.length > 0) {
+            logger.info(
+                LOG_TEMPLATES.services.DATABASE_LOCK_RECOVERY_RELOCATED,
+                {
+                    count: cleanupResult.relocated.length,
+                    relocated: cleanupResult.relocated,
+                }
+            );
+        } else {
+            logger.info(
+                LOG_TEMPLATES.services.DATABASE_LOCK_RECOVERY_NO_ARTIFACTS,
+                {
+                    attempt,
+                }
+            );
+        }
+
+        if (cleanupResult.missing.length > 0) {
+            logger.debug(
+                LOG_TEMPLATES.debug.DATABASE_LOCK_RECOVERY_MISSING_ARTIFACTS,
+                {
+                    missing: cleanupResult.missing,
+                }
+            );
+        }
+
+        if (cleanupResult.failed.length > 0) {
+            logger.warn(LOG_TEMPLATES.warnings.DATABASE_LOCK_RECOVERY_FAILED, {
+                failed: cleanupResult.failed,
+            });
+        }
+    }
+
+    /**
+     * Closes the active database connection without propagating errors.
+     */
+    private closeDatabaseSilently(): void {
+        if (!this.db) {
+            return;
+        }
+
+        try {
+            this.db.close();
+        } catch (error) {
+            logger.warn(
+                LOG_TEMPLATES.warnings.DATABASE_CLOSE_DURING_FAILURE_FAILED,
+                {
+                    message: ensureError(error).message,
+                }
+            );
+        } finally {
+            this.db = undefined;
         }
     }
 }

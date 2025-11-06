@@ -82,6 +82,7 @@ const {
         getIpcService: vi.fn(() => mockIpcService),
         getAutoUpdaterService: vi.fn(() => mockAutoUpdaterService),
         getWindowService: vi.fn(() => mockWindowService),
+        getDatabaseService: vi.fn(() => ({ close: vi.fn() })),
         cleanup: vi.fn(),
     };
 

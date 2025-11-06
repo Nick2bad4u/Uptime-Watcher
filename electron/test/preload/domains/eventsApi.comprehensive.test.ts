@@ -915,16 +915,20 @@ describe("Events Domain API", () => {
                         })();
 
                         const site = createSiteFixture({
-                            ...siteOverrides,
+                            identifier: siteOverrides.identifier,
+                            monitoring: siteOverrides.monitoring,
+                            ...(siteOverrides.name === undefined
+                                ? {}
+                                : { name: siteOverrides.name }),
                             monitors: [monitor],
                         });
 
                         return {
-                            details,
+                            details: details ?? "",
                             monitor,
                             monitorId: monitor.id,
-                            previousStatus,
-                            responseTime,
+                            previousStatus: previousStatus ?? status,
+                            responseTime: responseTime ?? 0,
                             site,
                             siteIdentifier: site.identifier,
                             status,

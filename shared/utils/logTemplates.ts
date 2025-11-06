@@ -96,6 +96,14 @@ export const SERVICE_LOGS = {
     /** Database initialized successfully */
     DATABASE_INITIALIZED: "[DatabaseService] Database initialized successfully",
 
+    /** Database recovery performed without finding artifacts */
+    DATABASE_LOCK_RECOVERY_NO_ARTIFACTS:
+        "[DatabaseService] No stale lock artifacts detected during recovery attempt {attempt}",
+
+    /** Database recovered by relocating stale lock artifacts */
+    DATABASE_LOCK_RECOVERY_RELOCATED:
+        "[DatabaseService] Relocated {count} stale lock artifact(s) blocking initialization",
+
     /** Database monitor validation initialized */
     DATABASE_MONITOR_VALIDATION_INITIALIZED:
         "[DatabaseSchema] Monitor type validation initialized",
@@ -200,6 +208,9 @@ export const DEBUG_LOGS = {
     BACKGROUND_LOAD_START:
         "[SiteManager] Loading site in background: {identifier}",
 
+    /** Database recovery details */
+    DATABASE_LOCK_RECOVERY_MISSING_ARTIFACTS:
+        "[DatabaseService] Lock recovery missing artifacts {missing}",
     /** Event bus operations */
     EVENT_BUS_CLEARED:
         "[TypedEventBus:{busId}] Cleared {count} middleware functions",
@@ -215,6 +226,7 @@ export const DEBUG_LOGS = {
         "[TypedEventBus:{busId}] Removed listener(s) for '{eventName}'",
     EVENT_BUS_MIDDLEWARE_REMOVED:
         "[TypedEventBus:{busId}] Removed middleware (remaining: {count})",
+
     EVENT_BUS_ONE_TIME_LISTENER:
         "[TypedEventBus:{busId}] Registered one-time listener for '{eventName}'",
 
@@ -301,6 +313,8 @@ export const ERROR_LOGS = {
 
     /** Database errors */
     DATABASE_BACKUP_FAILED: "[DatabaseBackup] Failed to create database backup",
+    DATABASE_CLOSE_FAILED:
+        "[DatabaseService] Failed to close database connection",
     DATABASE_INDEXES_FAILED: "[DatabaseSchema] Failed to create indexes",
     DATABASE_SCHEMA_FAILED: "[DatabaseSchema] Failed to create database schema",
     DATABASE_TABLES_FAILED: "[DatabaseSchema] Failed to create tables",
@@ -354,6 +368,16 @@ export const WARNING_LOGS = {
     APPLICATION_MONITOR_DOWN:
         "[ApplicationService] Monitor failure detected - forwarding to renderer",
 
+    DATABASE_BUSY_TIMEOUT_PRAGMA_FAILED:
+        "[DatabaseService] Failed to apply PRAGMA busy_timeout",
+    DATABASE_CLOSE_DURING_FAILURE_FAILED:
+        "[DatabaseService] Failed to close database connection during recovery cleanup",
+    DATABASE_FOREIGN_KEYS_PRAGMA_FAILED:
+        "[DatabaseService] Failed to enable PRAGMA foreign_keys",
+    DATABASE_LOCK_DETECTED:
+        "[DatabaseService] Database locked during initialization (attempt {attempt})",
+    DATABASE_LOCK_RECOVERY_FAILED:
+        "[DatabaseService] Failed to relocate some stale lock artifacts",
     /** Database warnings */
     DATABASE_MONITOR_VALIDATION_CONTINUE:
         "[DatabaseSchema] Continuing without monitor type validation",

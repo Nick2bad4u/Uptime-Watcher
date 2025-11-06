@@ -70,6 +70,12 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 expect(SERVICE_LOGS.DATABASE_INITIALIZED).toContain(
                     "[DatabaseService]"
                 );
+                expect(SERVICE_LOGS.DATABASE_LOCK_RECOVERY_RELOCATED).toContain(
+                    "[DatabaseService]"
+                );
+                expect(
+                    SERVICE_LOGS.DATABASE_LOCK_RECOVERY_NO_ARTIFACTS
+                ).toContain("[DatabaseService]");
                 expect(SERVICE_LOGS.DATABASE_SCHEMA_CREATED).toContain(
                     "[DatabaseSchema]"
                 );
@@ -185,6 +191,12 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 );
             });
 
+            it("should contain database recovery debug templates", () => {
+                expect(
+                    DEBUG_LOGS.DATABASE_LOCK_RECOVERY_MISSING_ARTIFACTS
+                ).toContain("[DatabaseService]");
+            });
+
             it("should contain monitor lifecycle templates", () => {
                 expect(DEBUG_LOGS.MONITOR_AUTO_STARTED).toContain(
                     "[MonitorManager]"
@@ -282,6 +294,9 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 expect(ERROR_LOGS.DATABASE_VALIDATION_SETUP_FAILED).toContain(
                     "[DatabaseSchema]"
                 );
+                expect(ERROR_LOGS.DATABASE_CLOSE_FAILED).toContain(
+                    "[DatabaseService]"
+                );
             });
 
             it("should contain event bus error templates", () => {
@@ -360,6 +375,21 @@ describe("logTemplates.ts - Comprehensive Coverage", () => {
                 expect(
                     WARNING_LOGS.DATABASE_MONITOR_VALIDATION_MISSING
                 ).toContain("[DatabaseSchema]");
+                expect(
+                    WARNING_LOGS.DATABASE_BUSY_TIMEOUT_PRAGMA_FAILED
+                ).toContain("[DatabaseService]");
+                expect(
+                    WARNING_LOGS.DATABASE_FOREIGN_KEYS_PRAGMA_FAILED
+                ).toContain("[DatabaseService]");
+                expect(WARNING_LOGS.DATABASE_LOCK_DETECTED).toContain(
+                    "[DatabaseService]"
+                );
+                expect(WARNING_LOGS.DATABASE_LOCK_RECOVERY_FAILED).toContain(
+                    "[DatabaseService]"
+                );
+                expect(
+                    WARNING_LOGS.DATABASE_CLOSE_DURING_FAILURE_FAILED
+                ).toContain("[DatabaseService]");
             });
 
             it("should contain history warning templates", () => {
