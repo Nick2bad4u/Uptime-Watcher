@@ -7,8 +7,6 @@
  * data integrity. Validation constraints are synchronized with the UI constants
  * defined in `@shared/constants`. All validation logic is centralized here for
  * consistency and maintainability.
- *
- * @packageDocumentation
  */
 
 import type {
@@ -45,6 +43,14 @@ import * as z from "zod";
 
 import { isValidHost, isValidPort } from "./validatorUtils";
 
+/**
+ * Ordered tuple of valid {@link StatusHistoryStatus} values for historical
+ * monitor records.
+ *
+ * @remarks
+ * The tuple shape enables `z.enum` to infer literal types while ensuring
+ * exhaustive coverage for the status history domain model.
+ */
 const statusHistoryEnumValues: [StatusHistoryStatus, ...StatusHistoryStatus[]] =
     [
         STATUS_KIND.UP,
@@ -52,6 +58,14 @@ const statusHistoryEnumValues: [StatusHistoryStatus, ...StatusHistoryStatus[]] =
         STATUS_KIND.DEGRADED,
     ];
 
+/**
+ * Ordered tuple of all {@link MonitorStatus} variants supported by monitor
+ * schemas.
+ *
+ * @remarks
+ * The order matches the user-facing status hierarchy so that validation and UI
+ * rendering remain in sync.
+ */
 const monitorStatusEnumValues: [MonitorStatus, ...MonitorStatus[]] = [
     STATUS_KIND.DEGRADED,
     STATUS_KIND.DOWN,
@@ -61,16 +75,12 @@ const monitorStatusEnumValues: [MonitorStatus, ...MonitorStatus[]] = [
 ];
 
 /**
- * Result object returned by validation functions.
- *
- * @remarks
- * Contains the validated data (if successful), errors, warnings, and metadata.
- */
-// Import from unified validation system
-
-/**
  * Reusable host validation schema for monitors. Eliminates duplication between
  * port and ping monitor schemas.
+ *
+ * @remarks
+ * Delegates to {@link isValidHost} so that hostnames, IPv4/IPv6 literals, and
+ * `localhost` are all accepted consistently across monitor types.
  */
 const hostValidationSchema = z
     .string()
@@ -185,6 +195,10 @@ export const baseMonitorSchema: BaseMonitorSchemaType = z
 
 /**
  * Reusable HTTP URL validation schema for multiple monitor types.
+ *
+ * @remarks
+ * Validates using {@link validator.isURL} with strict HTTP/HTTPS requirements to
+ * prevent protocol-relative, underscored, or credential-bearing URLs.
  */
 const httpUrlSchema = z.string().refine(
     (val) =>
@@ -205,6 +219,10 @@ const httpUrlSchema = z.string().refine(
 
 /**
  * Reusable WebSocket URL validation schema for multiple monitor types.
+ *
+ * @remarks
+ * Restricts URLs to `ws://` or `wss://` protocols and leverages
+ * {@link validator.isURL} for RFC-compliant validation.
  */
 const websocketUrlSchema = z.string().refine(
     (val) =>
@@ -222,6 +240,13 @@ const websocketUrlSchema = z.string().refine(
     "Must be a valid WebSocket URL (ws:// or wss://)"
 );
 
+/**
+ * RFC 7230 token characters permitted within HTTP header names.
+ *
+ * @remarks
+ * {@link isValidHeaderName} relies on this set when evaluating user-provided
+ * header keys for HTTP header monitors.
+ */
 const ALLOWED_HEADER_SYMBOLS = new Set<string>([
     "!",
     "#",
@@ -240,6 +265,14 @@ const ALLOWED_HEADER_SYMBOLS = new Set<string>([
     "~",
 ]);
 
+/**
+ * Determines whether a header name complies with HTTP token syntax.
+ *
+ * @param value - Candidate header name to evaluate.
+ *
+ * @returns `true` when the name contains only valid token characters; otherwise
+ *   `false`.
+ */
 const isValidHeaderName = (value: string): boolean => {
     if (value.length === 0 || value.length > 256) {
         return false;
@@ -269,6 +302,12 @@ const isValidHeaderName = (value: string): boolean => {
     });
 };
 
+/**
+ * Shared schema enforcing {@link isValidHeaderName} constraints.
+ *
+ * @remarks
+ * Used by monitors that inspect HTTP response headers.
+ */
 const httpHeaderNameSchema = z
     .string()
     .min(1, "Header name is required")
@@ -278,6 +317,9 @@ const httpHeaderNameSchema = z
             "Header name must use valid HTTP token characters (letters, digits, and !#$%&'*+.^_`|~-)",
     });
 
+/**
+ * Shared schema constraining monitored header values.
+ */
 const httpHeaderValueSchema = z
     .string()
     .min(1, "Expected header value is required")
@@ -285,6 +327,15 @@ const httpHeaderValueSchema = z
     .refine((value) => value.trim().length > 0, {
         message: "Expected header value is required",
     });
+
+/**
+ * Validates whether a string represents a simple dot-notation JSON path.
+ *
+ * @param value - JSON path candidate supplied by the user.
+ *
+ * @returns `true` when the path is non-empty, contains no spaces, and does not
+ *   use double dots; otherwise `false`.
+ */
 const isValidJsonPath = (value: string): boolean => {
     const trimmed = value.trim();
 
@@ -297,6 +348,9 @@ const isValidJsonPath = (value: string): boolean => {
         .every((segment) => segment.length > 0 && !segment.includes(" "));
 };
 
+/**
+ * Shared schema validating JSON path configuration fields.
+ */
 const jsonPathSchema = z
     .string()
     .min(1, "JSON path is required")
@@ -306,6 +360,14 @@ const jsonPathSchema = z
             "JSON path must use dot notation without spaces or empty segments",
     });
 
+/**
+ * Checks whether a dot-separated string is syntactically valid.
+ *
+ * @param value - Monitor configuration value expressed using dot notation.
+ *
+ * @returns `true` when the path is non-empty, has no empty segments, and does
+ *   not contain double dots; otherwise `false`.
+ */
 const isValidDotPath = (value: string): boolean => {
     const trimmed = value.trim();
     if (trimmed.length === 0 || trimmed.includes("..")) {
@@ -315,6 +377,13 @@ const isValidDotPath = (value: string): boolean => {
     return trimmed.split(".").every((segment) => segment.length > 0);
 };
 
+/**
+ * Creates a dot-notation schema with a contextualized validation message.
+ *
+ * @param fieldLabel - Friendly field label inserted into validation errors.
+ *
+ * @returns A {@link z.ZodString} enforcing dot-notation rules for the field.
+ */
 const createDotPathSchema = (fieldLabel: string): z.ZodString =>
     z
         .string()
@@ -324,6 +393,13 @@ const createDotPathSchema = (fieldLabel: string): z.ZodString =>
             message: `${fieldLabel} must use dot notation without spaces or empty segments`,
         });
 
+/**
+ * Schema verifying newline- or comma-separated lists of edge endpoint URLs.
+ *
+ * @remarks
+ * Ensures each entry is a valid HTTP or HTTPS URL and that at least one value
+ * is present after trimming.
+ */
 const edgeLocationListSchema = z
     .string()
     .min(1, "At least one edge endpoint is required")
@@ -675,6 +751,13 @@ export const siteSchema: SiteSchemaType = z
     })
     .strict();
 
+/**
+ * Schema ensuring that timestamp fields contain ISO 8601 date strings.
+ *
+ * @remarks
+ * Uses {@link Date.parse} for validation, mirroring the parsing strategy used
+ * throughout the application when interpreting status update timestamps.
+ */
 const isoTimestampSchema: z.ZodType<string> = z
     .string()
     .refine(
@@ -696,6 +779,12 @@ type StatusUpdateSchema = z.ZodObject<{
     timestamp: z.ZodType<string>;
 }>;
 
+/**
+ * Constructs the canonical {@link StatusUpdate} validation schema.
+ *
+ * @returns A strict {@link z.ZodObject} that models the full status update
+ *   payload exchanged between renderer and orchestrator layers.
+ */
 const createStatusUpdateSchema = (): StatusUpdateSchema =>
     z
         .object({
@@ -715,10 +804,18 @@ const createStatusUpdateSchema = (): StatusUpdateSchema =>
 
 /**
  * Zod schema validating canonical status update payloads.
+ *
+ * @remarks
+ * Generated via {@link createStatusUpdateSchema} to keep type inference in sync
+ * with the runtime schema definition.
  */
 export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
     createStatusUpdateSchema();
 
+/**
+ * Compile-time assertion verifying {@link statusUpdateSchema} alignment with the
+ * {@link StatusUpdate} TypeScript interface.
+ */
 export type StatusUpdateSchemaConformanceCheck =
     z.infer<typeof statusUpdateSchema> extends StatusUpdate
         ? StatusUpdate extends z.infer<typeof statusUpdateSchema>
@@ -884,15 +981,17 @@ export type Site = z.infer<typeof siteSchema>;
 // ../types/validation
 
 /**
- * Gets the appropriate Zod schema for a monitor type.
+ * Retrieves the Zod schema associated with a monitor type.
  *
  * @remarks
  * Uses the central schema registry for dynamic schema lookup. Returns
- * `undefined` if the type is not recognized.
+ * `undefined` when the provided discriminator is not part of
+ * {@link monitorSchemas}.
  *
- * @param type - The monitor type string (any supported monitor type).
+ * @param type - Monitor discriminator such as `http`, `port`, or `ssl`.
  *
- * @returns The Zod schema for the monitor type, or `undefined` if unknown.
+ * @returns The schema registered for the monitor type, or `undefined` if
+ *   unknown.
  */
 function getMonitorSchema(
     type: string
@@ -906,17 +1005,18 @@ function getMonitorSchema(
  * Validates a specific field using the appropriate monitor schema.
  *
  * @remarks
- * Internal helper that creates a test object and validates the specific field.
- * Throws if the field is not recognized for the given monitor type.
+ * Internal helper that constructs a transient object containing only the field
+ * under test. Falls back to {@link baseMonitorSchema} for shared fields and
+ * throws when the field does not exist for the selected monitor type.
  *
- * @param type - The monitor type string ("http" or "port").
- * @param fieldName - The name of the field to validate.
- * @param value - The value of the field to validate.
+ * @param type - Monitor discriminator key from {@link monitorSchemas}.
+ * @param fieldName - Name of the field to validate.
+ * @param value - Value provided for the field.
  *
  * @returns An object containing the validated field.
  *
  * @throws Error If the field name is unknown for the monitor type.
- * @throws {@link z.ZodError} If validation fails.
+ * @throws {@link z.ZodError} If validation fails for the supplied value.
  */
 function validateFieldWithSchema(
     type: string,
@@ -961,9 +1061,10 @@ function validateFieldWithSchema(
  * Validates monitor data using the appropriate Zod schema.
  *
  * @remarks
- * Selects the schema based on monitor type ("http" or "port"). Returns a
- * {@link ValidationResult} with success status, validated data, errors, and
- * warnings.
+ * Selects the schema based on the monitor discriminator and produces a
+ * {@link ValidationResult} containing success state, validated data, and any
+ * accumulated errors or warnings. Optional fields that are omitted are reported
+ * as warnings instead of hard validation failures.
  *
  * @example
  *
@@ -981,12 +1082,11 @@ function validateFieldWithSchema(
  * }
  * ```
  *
- * @param type - The monitor type string ("http" or "port").
+ * @param type - Monitor discriminator key from {@link monitorSchemas}.
  * @param data - The monitor data to validate.
  *
- * @returns The validation result object.
- *
- * @throws {@link z.ZodError} If validation fails and is not handled internally.
+ * @returns The validation result object summarizing success state, data,
+ *   errors, and warnings.
  */
 export function validateMonitorData(
     type: string,
@@ -1060,15 +1160,15 @@ export function validateMonitorData(
  *
  * @remarks
  * Useful for real-time validation during form input. Only validates the
- * specified field.
+ * specified field and mirrors the logic used by {@link validateMonitorData} for
+ * warnings and metadata.
  *
- * @param type - The monitor type string ("http" or "port").
- * @param fieldName - The name of the field to validate.
- * @param value - The value of the field to validate.
+ * @param type - Monitor discriminator key from {@link monitorSchemas}.
+ * @param fieldName - Name of the field to validate.
+ * @param value - Value provided for the field.
  *
  * @returns The validation result object for the field.
  *
- * @throws {@link z.ZodError} If validation fails and is not handled internally.
  * @throws Error If the field name is unknown for the given monitor type.
  */
 export function validateMonitorField(
@@ -1134,14 +1234,13 @@ export function validateMonitorField(
  * Validates site data using the shared Zod schema.
  *
  * @remarks
- * Validates the complete site structure, including all monitors. Ensures data
- * integrity for site operations.
+ * Validates the complete site structure, including every monitor. Metadata in
+ * the {@link ValidationResult} mirrors key site attributes such as monitor count
+ * and identifier.
  *
  * @param data - The site data to validate.
  *
  * @returns The validation result object for the site.
- *
- * @throws {@link z.ZodError} If validation fails and is not handled internally.
  */
 export function validateSiteData(data: unknown): ValidationResult {
     try {

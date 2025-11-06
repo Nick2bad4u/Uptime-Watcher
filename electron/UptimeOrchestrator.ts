@@ -603,10 +603,9 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                const monitorFromPayload =
-                    (result as Partial<StatusUpdate>).monitor;
-                const siteFromPayload =
-                    (result as Partial<StatusUpdate>).site;
+                const monitorFromPayload = (result as Partial<StatusUpdate>)
+                    .monitor;
+                const siteFromPayload = (result as Partial<StatusUpdate>).site;
 
                 const siteFromCache =
                     this.siteManager.getSiteFromCache(siteIdentifier);
@@ -629,8 +628,7 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     );
                 }
 
-                const canonicalMonitor =
-                    monitorFromPayload ?? monitorFromCache;
+                const canonicalMonitor = monitorFromPayload ?? monitorFromCache;
 
                 if (!canonicalMonitor) {
                     logger.warn(

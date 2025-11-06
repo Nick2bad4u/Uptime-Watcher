@@ -3,7 +3,17 @@
  */
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
 import React from "react";
+
+type MockThemedTextProps = React.HTMLAttributes<HTMLSpanElement> & {
+    readonly size?: string;
+    readonly variant?: string;
+};
+
+type MockThemedInputProps = InputHTMLAttributes<HTMLInputElement>;
+
+type MockThemedSelectProps = SelectHTMLAttributes<HTMLSelectElement>;
 
 // Mock the themed components
 vi.mock("../../theme", () => ({
@@ -16,7 +26,13 @@ vi.mock("../../theme", () => ({
             },
         },
     }),
-    ThemedText: ({ children, className, size, variant, ...props }: any) => (
+    ThemedText: ({
+        children,
+        className,
+        size,
+        variant,
+        ...props
+    }: React.PropsWithChildren<MockThemedTextProps>) => (
         <span
             className={`themed-text ${className ?? ""} size-${size ?? "base"} variant-${variant ?? "primary"}`}
             {...props}
@@ -24,10 +40,14 @@ vi.mock("../../theme", () => ({
             {children}
         </span>
     ),
-    ThemedInput: ({ className, ...props }: any) => (
+    ThemedInput: ({ className, ...props }: MockThemedInputProps) => (
         <input className={`themed-input ${className ?? ""}`} {...props} />
     ),
-    ThemedSelect: ({ children, className, ...props }: any) => (
+    ThemedSelect: ({
+        children,
+        className,
+        ...props
+    }: React.PropsWithChildren<MockThemedSelectProps>) => (
         <select className={`themed-select ${className ?? ""}`} {...props}>
             {children}
         </select>
@@ -68,7 +88,7 @@ const TestFormField = ({
     return (
         <div>
             <label htmlFor={id}>
-                <span className="themed-text">{label}</span>
+                <span>{label}</span>
             </label>
             <input
                 id={id}
@@ -78,13 +98,13 @@ const TestFormField = ({
             {children}
             {error && (
                 <div id={`${id}-error`}>
-                    <span className="themed-text">{error}</span>
+                    <span>{error}</span>
                 </div>
             )}
             {helpText &&
                 !error && ( // Line 79 coverage
                     <div id={`${id}-help`}>
-                        <span className="themed-text">{helpText}</span>
+                        <span>{helpText}</span>
                     </div>
                 )}
         </div>
