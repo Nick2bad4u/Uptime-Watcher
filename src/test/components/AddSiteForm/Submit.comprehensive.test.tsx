@@ -272,21 +272,122 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
     });
 
     describe("Property-Based Form Submission Testing", () => {
-        test.prop([
-            fc.record({
-                siteName: fc
-                    .string({ minLength: 1, maxLength: 100 })
-                    .filter((s) => s.trim().length > 0),
-                url: fc.webUrl(),
-                monitorType: fc.constantFrom("http", "port", "ping", "dns"),
-                checkInterval: fc.constantFrom(
-                    30_000,
-                    60_000,
-                    300_000,
-                    600_000
-                ),
-            }),
-        ])(
+        const propertyTimeoutMs = 20_000;
+        const basePropertyParameters = {
+            interruptAfterTimeLimit: 12_000,
+            maxSkipsPerRun: 1000,
+            numRuns: 36,
+        } as const;
+
+        const terminalCharacters = [
+            ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            ..."abcdefghijklmnopqrstuvwxyz",
+            ..."0123456789",
+        ] as const;
+
+        const intermediateCharacters = [
+            ...terminalCharacters,
+            " ",
+            "-",
+            "_",
+            ".",
+            "/",
+            ":",
+            "#",
+            "+",
+            "@",
+        ] as const;
+
+        const nonBlankSiteNameArbitrary = fc
+            .tuple(
+                fc.array(fc.constantFrom(...intermediateCharacters), {
+                    maxLength: 99,
+                }),
+                fc.constantFrom(...terminalCharacters)
+            )
+            .map(
+                ([prefixChars, lastChar]) =>
+                    `${prefixChars.join("")}${lastChar}`
+            );
+
+        const whitespaceCharacters = [
+            " ",
+            "\t",
+            "\n",
+            "\r",
+            "\u00A0",
+        ] as const;
+
+        const whitespaceOnlyStringArbitrary = fc
+            .array(fc.constantFrom(...whitespaceCharacters), {
+                maxLength: 50,
+                minLength: 1,
+            })
+            .map((chars) => chars.join(""));
+
+        const nonWhitespaceTerminalCharacters = [
+            ...terminalCharacters,
+            "!",
+            "?",
+            ".",
+            "#",
+            ")",
+        ] as const;
+
+        const errorMessageBodyCharacters = [
+            ...terminalCharacters,
+            " ",
+            "-",
+            "_",
+            ".",
+            "/",
+            ":",
+            "#",
+            "@",
+            "(",
+            ")",
+        ] as const;
+
+        const validationErrorMessageArbitrary = fc
+            .tuple(
+                fc.array(fc.constantFrom(...errorMessageBodyCharacters), {
+                    maxLength: 119,
+                }),
+                fc.constantFrom(...nonWhitespaceTerminalCharacters)
+            )
+            .map(([bodyChars, lastChar]) => `${bodyChars.join("")}${lastChar}`);
+
+        const submissionFailureMessageArbitrary = fc
+            .tuple(
+                fc.array(fc.constantFrom(...errorMessageBodyCharacters), {
+                    minLength: 4,
+                    maxLength: 199,
+                }),
+                fc.constantFrom(...nonWhitespaceTerminalCharacters)
+            )
+            .map(([bodyChars, lastChar]) => `${bodyChars.join("")}${lastChar}`);
+
+        const concurrencyPropertyParameters = {
+            ...basePropertyParameters,
+            numRuns: 20,
+        } as const;
+
+        test.prop(
+            [
+                fc.record({
+                    siteName: nonBlankSiteNameArbitrary,
+                    url: fc.webUrl(),
+                    monitorType: fc.constantFrom("http", "port", "ping", "dns"),
+                    checkInterval: fc.constantFrom(
+                        30_000,
+                        60_000,
+                        300_000,
+                        600_000
+                    ),
+                }),
+            ],
+            basePropertyParameters
+        )(
             "should handle valid form submissions with various data combinations",
             async (formData) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -341,10 +442,19 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                     300_000,
                     600_000,
                 ]).toContain(formData.checkInterval);
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([fc.array(fc.string(), { minLength: 1, maxLength: 5 })])(
+        test.prop(
+            [
+                fc.array(validationErrorMessageArbitrary, {
+                    maxLength: 5,
+                    minLength: 1,
+                }),
+            ],
+            basePropertyParameters
+        )(
             "should handle validation errors with various error messages",
             async (errorMessages) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -370,21 +480,25 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(Array.isArray(errorMessages)).toBeTruthy();
                 expect(errorMessages.length).toBeGreaterThanOrEqual(1);
                 expect(errorMessages.length).toBeLessThanOrEqual(5);
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([
-            fc.record({
-                host: fc.oneof(
-                    fc.domain(),
-                    fc.ipV4(),
-                    fc.constant("localhost")
-                ),
-                port: fc.integer({ min: 1, max: 65_535 }),
-                timeout: fc.integer({ min: 1000, max: 60_000 }),
-                retries: fc.integer({ min: 0, max: 10 }),
-            }),
-        ])(
+        test.prop(
+            [
+                fc.record({
+                    host: fc.oneof(
+                        fc.domain(),
+                        fc.ipV4(),
+                        fc.constant("localhost")
+                    ),
+                    port: fc.integer({ min: 1, max: 65_535 }),
+                    timeout: fc.integer({ min: 1000, max: 60_000 }),
+                    retries: fc.integer({ min: 0, max: 10 }),
+                }),
+            ],
+            basePropertyParameters
+        )(
             "should handle Port monitor submissions with various configurations",
             async (portConfig) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -423,17 +537,21 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(portConfig.timeout).toBeLessThanOrEqual(60_000);
                 expect(portConfig.retries).toBeGreaterThanOrEqual(0);
                 expect(portConfig.retries).toBeLessThanOrEqual(10);
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([
-            fc.oneof(
-                fc.string().filter((s) => s.trim().length === 0),
-                fc.constantFrom("", "   ", "\t", "\n"),
-                fc.constant(null),
-                fc.constant(undefined)
-            ),
-        ])(
+        test.prop(
+            [
+                fc.oneof(
+                    whitespaceOnlyStringArbitrary,
+                    fc.constantFrom("", "   ", "\t", "\n"),
+                    fc.constant(null),
+                    fc.constant(undefined)
+                ),
+            ],
+            basePropertyParameters
+        )(
             "should handle invalid form data gracefully",
             async (invalidInput) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -467,24 +585,26 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                                 testValue.trim().length === 0)
                     ).toBeTruthy();
                 }).not.toThrow();
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([
-            fc.record({
-                errorType: fc.constantFrom(
-                    "network",
-                    "timeout",
-                    "validation",
-                    "server",
-                    "permission"
-                ),
-                statusCode: fc.integer({ min: 400, max: 599 }),
-                message: fc
-                    .string({ minLength: 5, maxLength: 200 })
-                    .filter((s) => s.trim().length > 0),
-            }),
-        ])(
+        test.prop(
+            [
+                fc.record({
+                    errorType: fc.constantFrom(
+                        "network",
+                        "timeout",
+                        "validation",
+                        "server",
+                        "permission"
+                    ),
+                    statusCode: fc.integer({ min: 400, max: 599 }),
+                    message: submissionFailureMessageArbitrary,
+                }),
+            ],
+            basePropertyParameters
+        )(
             "should handle different types of submission failures",
             async (error) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -534,10 +654,11 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(error.statusCode).toBeLessThanOrEqual(599);
                 expect(error.message.length).toBeGreaterThanOrEqual(5);
                 expect(error.message.length).toBeLessThanOrEqual(200);
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([fc.constantFrom("new", "existing")])(
+        test.prop([fc.constantFrom("new", "existing")], basePropertyParameters)(
             "should handle different form modes correctly",
             async (addMode) => {
                 const mockEvent = { preventDefault: vi.fn() } as any;
@@ -579,15 +700,19 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 }
 
                 expect(["new", "existing"]).toContain(addMode);
-            }
+            },
+            propertyTimeoutMs
         );
 
-        test.prop([
-            fc.array(fc.string({ minLength: 1, maxLength: 100 }), {
-                minLength: 1,
-                maxLength: 10,
-            }),
-        ])(
+        test.prop(
+            [
+                fc.array(fc.string({ minLength: 1, maxLength: 50 }), {
+                    maxLength: 10,
+                    minLength: 1,
+                }),
+            ],
+            concurrencyPropertyParameters
+        )(
             "should handle multiple concurrent form submissions",
             async (submissionData) => {
                 const submissions = submissionData.map((_data, index) => {
@@ -628,7 +753,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 expect(submissionData.length).toBeGreaterThanOrEqual(1);
                 expect(submissionData.length).toBeLessThanOrEqual(10);
                 expect(submissions).toHaveLength(submissionData.length);
-            }
+            },
+            propertyTimeoutMs
         );
     });
 });

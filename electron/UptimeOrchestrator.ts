@@ -560,63 +560,34 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                let enrichedResult = result;
+                const { monitor: monitorFromPayload, site: siteFromPayload } =
+                    result;
 
-                let currentSite: Site | undefined = enrichedResult.site;
-                let currentMonitor: Monitor | undefined =
-                    enrichedResult.monitor;
+                const siteFromCache =
+                    this.siteManager.getSiteFromCache(siteIdentifier);
 
-                if (!currentSite || !currentMonitor) {
-                    const site =
-                        this.siteManager.getSiteFromCache(siteIdentifier);
-
-                    if (site) {
-                        currentSite = site;
-                        const monitor = site.monitors.find(
-                            (candidate) => candidate.id === monitorId
-                        );
-
-                        if (monitor) {
-                            currentMonitor = monitor;
-                            enrichedResult = {
-                                ...enrichedResult,
-                                monitor,
-                                site,
-                            };
-                        } else {
-                            enrichedResult = {
-                                ...enrichedResult,
-                                site,
-                            };
-                            logger.warn(
-                                "[UptimeOrchestrator] Manual check completion had no monitor snapshot; populated from cache without monitor match",
-                                { monitorId, siteIdentifier }
-                            );
-                        }
-                    } else {
-                        logger.warn(
-                            "[UptimeOrchestrator] Manual check completion received but site missing from cache",
-                            { monitorId, siteIdentifier }
-                        );
-                    }
-                }
-
-                if (!currentSite || !currentMonitor) {
-                    logger.error(
-                        "[UptimeOrchestrator] Skipping manual check completion broadcast due to missing site or monitor context",
-                        {
-                            identifier,
-                            monitorId,
-                            siteIdentifier,
-                        }
+                if (!siteFromCache) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion received but site missing from cache",
+                        { monitorId, siteIdentifier }
                     );
-                    return;
                 }
 
-                enrichedResult = {
-                    ...enrichedResult,
-                    monitor: currentMonitor,
-                    site: currentSite,
+                const monitorFromCache = siteFromCache?.monitors.find(
+                    (candidate) => candidate.id === monitorId
+                );
+
+                if (siteFromCache && !monitorFromCache) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion had no monitor snapshot in cache; using payload context",
+                        { monitorId, siteIdentifier }
+                    );
+                }
+
+                const enrichedResult: StatusUpdate = {
+                    ...result,
+                    monitor: monitorFromCache ?? monitorFromPayload,
+                    site: siteFromCache ?? siteFromPayload,
                 };
 
                 const payload = {

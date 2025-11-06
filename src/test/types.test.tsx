@@ -14,6 +14,19 @@ import type {
 } from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
 
+const createTestMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
+    ...overrides,
+    checkInterval: overrides.checkInterval ?? 60_000,
+    history: overrides.history ?? [],
+    id: overrides.id ?? "test-monitor-id",
+    monitoring: overrides.monitoring ?? true,
+    responseTime: overrides.responseTime ?? 0,
+    retryAttempts: overrides.retryAttempts ?? 0,
+    status: overrides.status ?? "up",
+    timeout: overrides.timeout ?? 30_000,
+    type: overrides.type ?? "http",
+});
+
 describe("Types Module", () => {
     describe("Type Definitions", () => {
         it("should export UpdateStatus type", ({ task, annotate }) => {
@@ -385,15 +398,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "update-site",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -419,15 +434,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "new-site",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -457,16 +474,18 @@ describe("Types Module", () => {
                 "down",
                 "pending",
             ];
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             for (const status of statuses) {
                 const statusUpdate: StatusUpdate = {
-                    monitorId: "test-monitor-id",
+                    monitor,
+                    monitorId: monitor.id,
                     status: "up",
                     siteIdentifier: site.identifier,
                     timestamp: new Date().toISOString(),
@@ -730,15 +749,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Update", "type");
 
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const update: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -821,14 +842,16 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Update", "type");
 
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
             const minimalUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),

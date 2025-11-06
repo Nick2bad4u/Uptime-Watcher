@@ -309,10 +309,25 @@ describe("SiteStatus utilities fuzzing tests", () => {
             const site = { monitors };
             const runningCount = monitors.filter((m) => m.monitoring).length;
             const result = getSiteStatusDescription(site as SiteForStatus);
+            const displayStatus = getSiteDisplayStatus(site as SiteForStatus);
 
-            if (runningCount < monitors.length) {
+            if (displayStatus === "mixed" || displayStatus === "paused") {
                 expect(result).toContain(`${runningCount}/${monitors.length}`);
+
+                return;
             }
+
+            if (displayStatus === "unknown") {
+                if (monitors.length === 0) {
+                    expect(result).toBe("No monitors configured");
+                } else {
+                    expect(result).toBe("Unknown status");
+                }
+
+                return;
+            }
+
+            expect(result).toContain(`All ${monitors.length} monitors`);
         });
 
         it("should return specific message for no monitors", () => {
