@@ -10,8 +10,7 @@ import type { ZodError } from "zod";
 
 import type { Site } from "../types";
 
-import { siteSchema } from "./schemas";
-
+import { siteSchema, statusUpdateSchema } from "./schemas";
 /**
  * Validates an unknown payload against the canonical {@link Site} schema.
  *
@@ -24,6 +23,17 @@ export type SiteSnapshotParseResult = ReturnType<typeof siteSchema.safeParse>;
 
 export const validateSiteSnapshot = (value: unknown): SiteSnapshotParseResult =>
     siteSchema.safeParse(value);
+
+/**
+ * Validates an unknown payload against the canonical {@link StatusUpdate}
+ * schema.
+ */
+export type StatusUpdateParseResult = ReturnType<
+    typeof statusUpdateSchema.safeParse
+>;
+
+export const validateStatusUpdate = (value: unknown): StatusUpdateParseResult =>
+    statusUpdateSchema.safeParse(value);
 
 /**
  * Describes a validation failure for an individual site snapshot.

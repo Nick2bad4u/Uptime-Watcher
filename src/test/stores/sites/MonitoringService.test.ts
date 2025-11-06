@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
+    StatusUpdate,
 } from "@shared/types";
 
 import { MonitoringService } from "../../../services/MonitoringService";
@@ -68,6 +69,7 @@ const createStopSummary = (
 
 const mockElectronAPI = {
     monitoring: {
+        checkSiteNow: vi.fn().mockResolvedValue(undefined),
         startMonitoring: vi.fn().mockResolvedValue(createStartSummary()),
         startMonitoringForMonitor: vi.fn().mockResolvedValue(true),
         startMonitoringForSite: vi.fn().mockResolvedValue(true),
@@ -81,6 +83,43 @@ Object.defineProperty(globalThis, "electronAPI", {
     value: mockElectronAPI,
     writable: true,
 });
+
+const createMonitorFixture = () => ({
+    activeOperations: [],
+    checkInterval: 60_000,
+    history: [],
+    host: "1.1.1.1",
+    id: "monitor-123",
+    lastChecked: new Date(),
+    monitoring: true,
+    responseTime: 120,
+    retryAttempts: 0,
+    status: "up" as const,
+    timeout: 10_000,
+    type: "ping" as const,
+});
+
+const createStatusUpdateFixture = (): StatusUpdate => {
+    const monitor = createMonitorFixture();
+    const site = {
+        identifier: "site-abc",
+        monitoring: true,
+        monitors: [createMonitorFixture()],
+        name: "Example Site",
+    };
+
+    return {
+        details: "Manual verification completed",
+        monitor,
+        monitorId: monitor.id,
+        previousStatus: "down",
+        responseTime: monitor.responseTime,
+        site,
+        siteIdentifier: site.identifier,
+        status: monitor.status,
+        timestamp: new Date().toISOString(),
+    };
+};
 
 describe("MonitoringService", () => {
     beforeEach(() => {
@@ -97,6 +136,73 @@ describe("MonitoringService", () => {
                     reason: "ElectronAPI not available",
                 });
             }
+        });
+    });
+
+    describe("checkSiteNow", () => {
+        it("should return validated status updates", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Monitoring", "category");
+            await annotate("Type: Validation", "type");
+
+            const statusUpdate = createStatusUpdateFixture();
+
+            mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce(
+                statusUpdate
+            );
+
+            const result = await MonitoringService.checkSiteNow(
+                statusUpdate.siteIdentifier,
+                statusUpdate.monitorId
+            );
+
+            expect(result).toEqual(statusUpdate);
+        });
+
+        it("should return undefined when backend returns no status update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Monitoring", "category");
+            await annotate("Type: Validation", "type");
+
+            mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce(
+                undefined
+            );
+
+            const result = await MonitoringService.checkSiteNow(
+                "site-abc",
+                "monitor-123"
+            );
+
+            expect(result).toBeUndefined();
+        });
+
+        it("should throw when backend returns an invalid status update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: MonitoringService", "component");
+            await annotate("Category: Monitoring", "category");
+            await annotate("Type: Error Handling", "type");
+
+            mockElectronAPI.monitoring.checkSiteNow.mockResolvedValueOnce({
+                monitorId: "monitor-123",
+                siteIdentifier: "site-abc",
+                status: "up",
+                timestamp: new Date().toISOString(),
+            });
+
+            await expect(
+                MonitoringService.checkSiteNow("site-abc", "monitor-123")
+            ).rejects.toThrow("checkSiteNow returned an invalid status update");
         });
     });
 

@@ -143,6 +143,49 @@ const determineMonitoringScope = (
     return "site";
 };
 
+function mergeMonitorSnapshots(
+    canonicalMonitor: Monitor,
+    cachedMonitor?: Monitor
+): Monitor {
+    if (!cachedMonitor) {
+        return canonicalMonitor;
+    }
+
+    const cachedPartial = cachedMonitor as Partial<Monitor>;
+    let mergedHistory = canonicalMonitor.history;
+
+    if (Array.isArray(cachedPartial.history)) {
+        mergedHistory = cachedPartial.history;
+    }
+
+    return {
+        ...canonicalMonitor,
+        ...cachedPartial,
+        history: mergedHistory,
+    } satisfies Monitor;
+}
+
+function mergeSiteSnapshots(canonicalSite: Site, cachedSite?: Site): Site {
+    if (!cachedSite) {
+        return canonicalSite;
+    }
+
+    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
+        mergeMonitorSnapshots(
+            canonicalMonitor,
+            cachedSite.monitors.find(
+                (candidate) => candidate.id === canonicalMonitor.id
+            )
+        )
+    );
+
+    return {
+        ...canonicalSite,
+        monitoring: cachedSite.monitoring,
+        monitors,
+    } satisfies Site;
+}
+
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Database manager for all data persistence operations.
@@ -560,8 +603,10 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                const { monitor: monitorFromPayload, site: siteFromPayload } =
-                    result;
+                const monitorFromPayload =
+                    (result as Partial<StatusUpdate>).monitor;
+                const siteFromPayload =
+                    (result as Partial<StatusUpdate>).site;
 
                 const siteFromCache =
                     this.siteManager.getSiteFromCache(siteIdentifier);
@@ -584,10 +629,43 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     );
                 }
 
+                const canonicalMonitor =
+                    monitorFromPayload ?? monitorFromCache;
+
+                if (!canonicalMonitor) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion missing monitor context after validation",
+                        { monitorId, siteIdentifier }
+                    );
+
+                    return;
+                }
+
+                const canonicalSite = siteFromPayload ?? siteFromCache;
+
+                if (!canonicalSite) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion missing site context after validation",
+                        { monitorId, siteIdentifier }
+                    );
+
+                    return;
+                }
+
+                const enrichedMonitor = mergeMonitorSnapshots(
+                    canonicalMonitor,
+                    monitorFromCache
+                );
+
+                const enrichedSite = mergeSiteSnapshots(
+                    canonicalSite,
+                    siteFromCache
+                );
+
                 const enrichedResult: StatusUpdate = {
                     ...result,
-                    monitor: monitorFromCache ?? monitorFromPayload,
-                    site: siteFromCache ?? siteFromPayload,
+                    monitor: enrichedMonitor,
+                    site: enrichedSite,
                 };
 
                 const payload = {

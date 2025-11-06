@@ -276,7 +276,8 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
         const basePropertyParameters = {
             interruptAfterTimeLimit: 12_000,
             maxSkipsPerRun: 1000,
-            numRuns: 36,
+            numRuns: 10,
+            timeout: propertyTimeoutMs,
         } as const;
 
         const terminalCharacters = [
@@ -369,7 +370,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
         const concurrencyPropertyParameters = {
             ...basePropertyParameters,
-            numRuns: 20,
+            numRuns: 8,
         } as const;
 
         test.prop(

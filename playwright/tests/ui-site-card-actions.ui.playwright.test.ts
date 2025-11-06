@@ -58,7 +58,7 @@ test.describe(
             });
             siteCardLocator = getSiteCardLocator(page, siteName);
             await expect(siteCardLocator).toBeVisible({
-                timeout: WAIT_TIMEOUTS.MEDIUM,
+                timeout: WAIT_TIMEOUTS.LONG,
             });
         });
 

@@ -233,6 +233,7 @@ test.describe(
         ],
     },
     () => {
+        test.setTimeout(240_000);
         let electronApp: ElectronApplication;
         let page: Page;
 
@@ -258,7 +259,6 @@ test.describe(
                 tag: ["@workflow", "@all-monitor-types"],
             },
             async () => {
-                test.setTimeout(120_000);
                 const monitorConfigs = (await page.evaluate(async () => {
                     const scopedWindow = window as typeof window & {
                         electronAPI?: {

@@ -1456,43 +1456,32 @@ describe("StatusUpdateHandler", () => {
             await manager.subscribe();
 
             // Create a site with a monitor that has existing history
-            const existingHistory = [
-                {
-                    timestamp: "2023-01-01T00:00:00Z",
-                    status: "up" as const,
-                    responseTime: 150,
-                },
-                {
-                    timestamp: "2023-01-01T01:00:00Z",
-                    status: "down" as const,
-                    responseTime: null,
-                },
-                {
-                    timestamp: "2023-01-01T02:00:00Z",
-                    status: "up" as const,
-                    responseTime: 200,
-                },
-            ];
+            const baseTimestamp = Date.parse("2023-01-01T00:00:00Z");
+            const existingHistory = [0, 1, 2].map((offsetHours) => {
+                const status: MonitorStatus =
+                    offsetHours === 1 ? "down" : "up";
+
+                return {
+                    timestamp: baseTimestamp + offsetHours * 3_600_000,
+                    status,
+                    responseTime:
+                        offsetHours === 1 ? -1 : 150 + offsetHours * 25,
+                };
+            });
+
+            const [baseMonitor] = createMockSite("site1", "monitor1").monitors;
 
             const siteWithHistory = {
                 ...createMockSite("site1", "monitor1"),
                 monitors: [
                     {
-                        id: "monitor1",
-                        type: "http" as const,
-                        status: "up" as const,
+                        ...baseMonitor,
+                        history: existingHistory,
                         monitoring: true,
-                        checkInterval: 60_000,
-                        lastChecked: new Date(),
                         responseTime: 100,
                         retryAttempts: 3,
+                        status: "up" as const,
                         timeout: 30_000,
-                        history: existingHistory,
-                        url: "https://example-site1.com",
-                        name: "Monitor 1",
-                        config: {},
-                        createdAt: "2023-01-01T00:00:00Z",
-                        updatedAt: "2023-01-01T00:00:00Z",
                     },
                 ],
             };
@@ -1506,23 +1495,24 @@ describe("StatusUpdateHandler", () => {
                 status: "down" as const,
                 previousStatus: "up" as const,
                 monitor: {
-                    id: "monitor1",
-                    type: "http" as const,
-                    status: "down" as const,
+                    ...baseMonitor,
+                    history: [],
                     monitoring: false,
-                    checkInterval: 60_000,
-                    lastChecked: new Date(),
-                    responseTime: null,
-                    retryAttempts: 3,
-                    timeout: 30_000,
-                    history: [], // Empty history - this is the key test condition
-                    url: "https://example-site1.com",
-                    name: "Monitor 1",
-                    config: {},
-                    createdAt: "2023-01-01T00:00:00Z",
-                    updatedAt: "2023-01-01T00:00:00Z",
+                    responseTime: -1,
+                    status: "down" as const,
                 },
-                site: siteWithHistory,
+                site: {
+                    ...siteWithHistory,
+                    monitors: [
+                        {
+                            ...baseMonitor,
+                            history: [],
+                            monitoring: false,
+                            responseTime: -1,
+                            status: "down" as const,
+                        },
+                    ],
+                },
                 timestamp: new Date().toISOString(),
             };
 

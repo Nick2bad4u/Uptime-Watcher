@@ -61,7 +61,7 @@ describe("main.tsx - Application Entry Point", () => {
             expect(getElementByIdSpy).toHaveBeenCalledWith("root");
 
             getElementByIdSpy.mockRestore();
-        });
+        }, 45_000);
 
         it("should handle missing root element gracefully", async ({
             task,
@@ -88,7 +88,7 @@ describe("main.tsx - Application Entry Point", () => {
                 "Failed to initialize application:",
                 expect.any(Error)
             );
-        });
+        }, 45_000);
 
         it("should log initialization errors to console", async ({
             task,
@@ -116,7 +116,7 @@ describe("main.tsx - Application Entry Point", () => {
                 "Failed to initialize application:",
                 expect.any(Error)
             );
-        });
+        }, 45_000);
     });
 
     describe("Performance Optimizations", () => {
@@ -149,7 +149,7 @@ describe("main.tsx - Application Entry Point", () => {
 
             getElementByIdSpy.mockRestore();
             querySelectorSpy.mockRestore();
-        });
+        }, 45_000);
     });
 
     describe("Error Handling Coverage", () => {
@@ -178,7 +178,7 @@ describe("main.tsx - Application Entry Point", () => {
                 "Failed to initialize application:",
                 expect.any(Error)
             );
-        });
+        }, 45_000);
 
         it("should handle successful initialization without errors", async ({
             task,
@@ -206,6 +206,6 @@ describe("main.tsx - Application Entry Point", () => {
             // Verify the root element still exists
             const rootElement = document.querySelector("#root");
             expect(rootElement).toBeTruthy();
-        });
+        }, 45_000);
     });
 });

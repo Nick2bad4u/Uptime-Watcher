@@ -10,10 +10,30 @@
 
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
 
-import { isMonitorStatus } from "@shared/types";
+import { validateStatusUpdate } from "./guards";
 
 const isUnknownRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null;
+
+const stripEventMetadata = (
+    value: Record<string, unknown>
+): Record<string, unknown> => {
+    if (!Reflect.has(value, "_meta") && !Reflect.has(value, "_originalMeta")) {
+        return value;
+    }
+
+    const sanitizedRecord = { ...value };
+
+    if (Reflect.has(sanitizedRecord, "_meta")) {
+        Reflect.deleteProperty(sanitizedRecord, "_meta");
+    }
+
+    if (Reflect.has(sanitizedRecord, "_originalMeta")) {
+        Reflect.deleteProperty(sanitizedRecord, "_originalMeta");
+    }
+
+    return sanitizedRecord;
+};
 
 /**
  * Type guard that validates the base monitor status changed event payload.
@@ -30,48 +50,10 @@ export const isMonitorStatusChangedEventData = (
         return false;
     }
 
-    const {
-        details,
-        monitor,
-        monitorId,
-        previousStatus,
-        responseTime,
-        site,
-        siteIdentifier,
-        status,
-        timestamp,
-    } = payload;
+    const sanitizedCandidate = stripEventMetadata(payload);
+    const validationResult = validateStatusUpdate(sanitizedCandidate);
 
-    if (
-        typeof monitorId !== "string" ||
-        typeof siteIdentifier !== "string" ||
-        typeof status !== "string" ||
-        !isMonitorStatus(status) ||
-        typeof timestamp !== "string"
-    ) {
-        return false;
-    }
-
-    if (details !== undefined && typeof details !== "string") {
-        return false;
-    }
-
-    if (
-        previousStatus !== undefined &&
-        (typeof previousStatus !== "string" || !isMonitorStatus(previousStatus))
-    ) {
-        return false;
-    }
-
-    if (responseTime !== undefined && typeof responseTime !== "number") {
-        return false;
-    }
-
-    if (!isUnknownRecord(monitor) || !isUnknownRecord(site)) {
-        return false;
-    }
-
-    return true;
+    return validationResult.success;
 };
 
 /**

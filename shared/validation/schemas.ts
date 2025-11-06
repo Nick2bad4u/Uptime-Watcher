@@ -11,7 +11,11 @@
  * @packageDocumentation
  */
 
-import type { MonitorStatus, StatusHistoryStatus } from "@shared/types";
+import type {
+    MonitorStatus,
+    StatusHistoryStatus,
+    StatusUpdate,
+} from "@shared/types";
 import type {
     BaseMonitorSchemaType,
     CdnEdgeConsistencyMonitorSchemaType,
@@ -670,6 +674,57 @@ export const siteSchema: SiteSchemaType = z
             .max(200, "Site name too long"),
     })
     .strict();
+
+const isoTimestampSchema: z.ZodType<string> = z
+    .string()
+    .refine(
+        (value) => !Number.isNaN(Date.parse(value)),
+        "Timestamp must be a valid ISO 8601 string"
+    );
+
+type MonitorStatusEnumSchema = z.ZodType<MonitorStatus>;
+
+type StatusUpdateSchema = z.ZodObject<{
+    details: z.ZodOptional<z.ZodString>;
+    monitor: MonitorSchemaType;
+    monitorId: z.ZodString;
+    previousStatus: z.ZodOptional<MonitorStatusEnumSchema>;
+    responseTime: z.ZodOptional<z.ZodNumber>;
+    site: SiteSchemaType;
+    siteIdentifier: z.ZodString;
+    status: MonitorStatusEnumSchema;
+    timestamp: z.ZodType<string>;
+}>;
+
+const createStatusUpdateSchema = (): StatusUpdateSchema =>
+    z
+        .object({
+            details: z.string().optional(),
+            monitor: monitorSchema,
+            monitorId: z.string().min(1, "Monitor identifier is required"),
+            previousStatus: z.enum(monitorStatusEnumValues).optional(),
+            responseTime: z.number().optional(),
+            site: siteSchema,
+            siteIdentifier: z
+                .string()
+                .min(1, "Site identifier is required for status updates"),
+            status: z.enum(monitorStatusEnumValues),
+            timestamp: isoTimestampSchema,
+        })
+        .strict();
+
+/**
+ * Zod schema validating canonical status update payloads.
+ */
+export const statusUpdateSchema: ReturnType<typeof createStatusUpdateSchema> =
+    createStatusUpdateSchema();
+
+export type StatusUpdateSchemaConformanceCheck =
+    z.infer<typeof statusUpdateSchema> extends StatusUpdate
+        ? StatusUpdate extends z.infer<typeof statusUpdateSchema>
+            ? true
+            : never
+        : never;
 
 /**
  * Interface for monitor schemas by type.

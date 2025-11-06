@@ -3041,10 +3041,19 @@ describe("Comprehensive Database Operations Fuzzing", () => {
                     const systemOverloaded = systemStability < 0.3;
 
                     // Performance degradation
-                    const overallDegradation =
-                        pressureFactor * 0.5 +
-                        userFactor * 0.3 +
-                        loadFactor * 0.2;
+                    const normalizedPressureFactor = Math.min(
+                        pressureFactor,
+                        2
+                    );
+                    const normalizedUserFactor = Math.min(userFactor, 2);
+                    const normalizedLoadFactor = Math.min(loadFactor, 2);
+
+                    const degradationEstimate =
+                        normalizedPressureFactor * 0.5 +
+                        normalizedUserFactor * 0.3 +
+                        normalizedLoadFactor * 0.2;
+
+                    const overallDegradation = Math.min(degradationEstimate, 2);
 
                     const completedOperations = systemOverloaded
                         ? Math.floor(ops.length * 0.7)
