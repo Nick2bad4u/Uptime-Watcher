@@ -24,7 +24,7 @@
 #     3. Dependency Review:
 #        - Uses the 'actions/dependency-review-action' (version v4.5.0) to perform a dependency review.
 
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: "Dependency Review"
 on: [pull_request]
 

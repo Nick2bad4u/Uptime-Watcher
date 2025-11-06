@@ -1,7 +1,7 @@
 # VSCode Version Matrix - GitHub Action
 # Retrieves Electron, Node, and Chromium versions for a given VSCode version
 
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: VSCode Version Matrix
 
 on:

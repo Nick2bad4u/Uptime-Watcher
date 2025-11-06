@@ -2,7 +2,7 @@
 # It performs scans on pull requests, merge groups, scheduled events, and pushes to the main branch.
 #
 # Workflow
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 # name: OSV-Scanner
 #
 # Triggers:
