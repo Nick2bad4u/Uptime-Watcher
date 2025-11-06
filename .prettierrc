@@ -12,6 +12,7 @@
     "insertPragma": false,
     "cursorOffset": -1,
     "jsdocCapitalizeDescription": true,
+    "parser": "typescript",
     "jsdocCommentLineStrategy": "keep",
     "jsdocDescriptionTag": false,
     "jsdocDescriptionWithDot": false,
