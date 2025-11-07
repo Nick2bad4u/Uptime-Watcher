@@ -7,14 +7,43 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[6aecdbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)...
+[6aecdbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6aecdbd448df65bde76b32248727a91da1553394...6aecdbd448df65bde76b32248727a91da1553394))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.2.0 [`(6aecdbd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)
+
+
+
+
+
+
+## [18.2.0] - 2025-11-07
+
+
 [[9c862ec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)...
-[9c862ec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9c862ec3cfb54f4167f7f43c29cf73cffe072b32...9c862ec3cfb54f4167f7f43c29cf73cffe072b32))
+[606c309](https://github.com/Nick2bad4u/Uptime-Watcher/commit/606c309ae5b84e74ac72d71ecddda8966efa8823)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9c862ec3cfb54f4167f7f43c29cf73cffe072b32...606c309ae5b84e74ac72d71ecddda8966efa8823))
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 18.1.0 [`(9c862ec)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)
+
+
+
+### 🛠️ Other Changes
+
+- Update package.json [`(606c309)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/606c309ae5b84e74ac72d71ecddda8966efa8823)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v18.1.0 [skip ci] [`(74f4165)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/74f4165109d7a085d683e0866157cf1f9bfd2b6c)
 
 
 
