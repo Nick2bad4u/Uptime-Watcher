@@ -7,14 +7,369 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[d6fd43c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)...
-[d6fd43c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d...d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d))
+[[9c862ec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)...
+[9c862ec](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/9c862ec3cfb54f4167f7f43c29cf73cffe072b32...9c862ec3cfb54f4167f7f43c29cf73cffe072b32))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 18.1.0 [`(9c862ec)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9c862ec3cfb54f4167f7f43c29cf73cffe072b32)
+
+
+
+
+
+
+## [18.1.0] - 2025-11-07
+
+
+[[d6fd43c](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)...
+[aa84ce6](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aa84ce6d957aa9daa1ac300fa99f3ec538739f65)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d...aa84ce6d957aa9daa1ac300fa99f3ec538739f65))
+
+
+### ✨ Features
+
+- ✨ [feat] Add canonical StatusUpdate schema and rich validation helpers
+ - 📌 Add createStatusUpdateSchema(), statusUpdateSchema, and compile-time conformance check to model the canonical StatusUpdate payload
+ - 🔍 Add isoTimestampSchema for ISO 8601 timestamp validation used across status updates
+ - 🧩 Add JSON-path and dot-path validators (isValidJsonPath, jsonPathSchema, isValidDotPath, createDotPathSchema) and edgeLocationListSchema
+ - 🏷 Add HTTP header token validation (ALLOWED_HEADER_SYMBOLS, isValidHeaderName) and shared header schemas (httpHeaderNameSchema, httpHeaderValueSchema)
+ - 🧾 Improve JSDoc and introduce literal-tuple enums (statusHistoryEnumValues, monitorStatusEnumValues) to preserve precise typing and docs
+
+🔧 [build] [dependency] Update bundled node-sqlite3-wasm and update WASM asset
+ - 📦 Upgrade node-sqlite3-wasm to ^0.8.51 in package.json and regenerate lockfile entries
+ - 🗂 Replace bundled node-sqlite3-wasm.wasm and update assets/.wasm-version to the new hash
+
+🧹 [chore] Upgrade dependencies and refresh lockfile
+ - ⬆️ [dependency] Update many dev/runtime deps (biome, cspell suite, storybook, tailwindcss, vite, vite-plugin-mcp, msw, magic-string, knip, globals-vitest, etc.) and align transitive upgrades (ajv, ajv-formats, json-schema-traverse)
+ - 🔒 Normalize license strings and lockfile metadata where applicable
+
+🚜 [refactor] Harden DOM test environment and runtime mocks
+ - 🧰 Replace minimal mocks with typed, behaviorful IntersectionObserver and ResizeObserver implementations to improve component visibility & resize testing
+ - ⏱ Implement robust requestIdleCallback / cancelIdleCallback with timer tracking to avoid leaks during tests
+ - 📁 Provide realistic File and FileReader mocks (readAsText/readAsDataURL/readAsArrayBuffer/readAsBinaryString, readyState, events, slice) for reliable upload tests
+ - ⛑ Stubs for performance.now, URL, getComputedStyle and other globals improved for deterministic tests
+
+🧪 [test] Strengthen FormFields uncovered tests and typings
+ - ✅ Add explicit React input/select attribute typings and typed themed component mocks
+ - 🎯 Simplify TestFormField markup to exercise aria-describedby edge cases deterministically
+
+⚡ [perf] Minor formatting and whitespace cleanup
+ - 🧾 Tidy line-wrapping in electron/UptimeOrchestrator.ts (no functional change)
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(51ff449)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/51ff44979c23ece25c39a4127168b5a10311b0d9)
+
+
+- ✨ [feat] Add DB lock artifact recovery and harden DatabaseService initialization
+
+🛠️ [fix] DatabaseService:
+ - Add ensureError and structured error logging for close/initialization failures
+ - Introduce DATABASE_INITIALIZATION_MAX_ATTEMPTS and DATABASE_BUSY_TIMEOUT_MS and apply PRAGMA busy_timeout / foreign_keys
+ - Implement retry loop that detects locked DB errors, closes connection silently, invokes lock-artifact cleanup, and retries initialization
+ - Add helpers: applyConnectionPragmas, isDatabaseLockedError, handleDatabaseLockedError, closeDatabaseSilently
+
+✨ [feat] New util: electron/services/database/utils/databaseLockRecovery.ts
+ - Implement generateLockArtifactCandidates, listExistingLockArtifacts and cleanupDatabaseLockArtifacts
+ - Safe path normalization, quarantined relocation to stale-lock-artifacts, UUID-based unique names and detailed cleanup result (relocated/missing/failed)
+
+🛠️ [fix] ApplicationService:
+ - Add hasCloseFunction type guard and attempt to call service.close() for DatabaseService entries when present
+ - Use structured logging ({ error: ... }) and ensureError when reporting cleanup errors
+
+🧹 [chore] Logging/templates:
+ - Add new SERVICE/DEBUG/WARNING/ERROR templates for DB recovery, PRAGMA failures, close/recovery outcomes and lock-detection diagnostics
+
+🧪 [test] Tests:
+ - Add tests for databaseLockRecovery utilities and DatabaseService initialization recovery
+ - Update DatabaseService, ApplicationService and logTemplates tests and mocks to reflect new behaviors and assertions
+
+🧹 [chore] Config:
+ - Permit "UNLICENSED" in .npmpackagejsonlintrc valid license values
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(47cd163)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/47cd1638d0b46e644558ed76091dbd56b255b9b4)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Refactor GitHub Actions Build workflow to consolidate output handling
+ - Streamlined output handling in version bumping step by combining echo statements into a single block.
+
+🧪 [test] Enhance IPC utils tests for improved timing accuracy
+ - Updated tests to use `vi.spyOn` for precise timing measurement.
+ - Ensured mock handlers are called correctly and duration is accurately asserted.
+
+🧪 [test] Implement soft cleanup timeout in Playwright tests
+ - Added `runWithSoftTimeout` function to manage cleanup actions with a timeout.
+ - Ensured cleanup actions for pages and Electron applications are handled gracefully.
+
+🛠️ [fix] Update mockElectronAPI to include isLoaded mock
+ - Added `isLoaded` mock to `mockElectronAPI` for better test coverage.
+
+🧹 [chore] Clean up Stryker configuration by removing unnecessary ignores
+ - Removed ignored patterns for config/testing directory and JSON files to simplify configuration.
+
+🧹 [chore] Simplify Vitest Stryker configuration
+ - Merged base Vitest config with Stryker-specific overrides for cleaner setup.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aa84ce6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aa84ce6d957aa9daa1ac300fa99f3ec538739f65)
+
+
+- 🛠️ [fix] Enforce canonical StatusUpdate schema, hydrate cached snapshots, and harden monitoring validation
+
+✨ [feat] Add canonical StatusUpdate Zod schema
+ - 🧾 Create isoTimestampSchema to validate ISO 8601 timestamps
+ - 🧩 Compose statusUpdateSchema (monitor + site + required fields) and export it
+ - 🔎 Add a type-level conformance check to ensure schema matches shared StatusUpdate type
+
+🛠️ [fix] Centralize validation and sanitize incoming event payloads
+ - 🔗 Import statusUpdateSchema into shared guards and expose validateStatusUpdate(...) for reuse
+ - 🧼 Add stripEventMetadata(...) to monitorStatusEvents to remove _meta/_originalMeta before validation
+ - ✅ Replace ad-hoc property checks with zod validation results for clearer, consistent guards
+
+🛠️ [fix] Harden MonitoringService.checkSiteNow and normalize IPC responses
+ - 🧯 Validate raw IPC result using validateStatusUpdate; log ZodError details and metadata on failure
+ - 💥 Throw a descriptive error with cause when backend returns an invalid status update
+ - ♻️ Normalize/return a strict StatusUpdate object (include optional details/previousStatus/responseTime only when present)
+ - 🛠️ Add helpers: resolveIdentifier(...) and logInvalidStatusUpdateAndThrow(...) to centralize error handling
+
+🛠️ [fix] Merge cached snapshots into manual check completion flows
+ - 🧩 Add mergeMonitorSnapshots(...) and mergeSiteSnapshots(...) in UptimeOrchestrator to hydrate canonical payloads with cached snapshots
+ - 🔁 Prefer canonical (payload) monitor/site as source-of-truth but reuse cached monitor.history and cached site.monitoring where appropriate
+ - ⚠️ Add defensive warnings and early returns when monitor or site context is missing after validation
+
+🧪 [test] Align tests & stabilize suites for stricter validation and runtime flakiness
+ - ⚙️ MonitoringService tests: add StatusUpdate fixtures and exercises for valid, undefined, and invalid IPC responses
+ - 🧾 strictTests: update monitorStatusEvents-complete-coverage to produce full Monitor/Site snapshots that satisfy new schema
+ - 🧪 types.test: switch to MONITOR_STATUS / STATUS_HISTORY_VALUES constants and strengthen checkSiteNow mock payloads
+ - 🧰 statusUpdateHandler.test: canonicalize monitor fixtures, use baseMonitor helper and numeric timestamps to simplify expectations
+ - 🧭 Playwright tests: increase describe/test timeouts, replace brittle interactions (click) with keyboard press where appropriate, and raise WAIT_TIMEOUTS for stability
+ - ⚡ database fuzzing: clamp/normalize pressure/user/load factors before degradation math to bound results
+
+🧹 [chore] Misc test/time tuning and runtime refinements
+ - 🔧 Reduce iteration counts and expose timeouts in long-running property tests to improve CI reliability
+ - 🧼 Remove duplicated/verbose annotations in unit tests to simplify output
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(79cd1db)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/79cd1dbc347b6f3e260ed32dfb3b91ebb076a237)
+
+
+- 🛠️ [fix] Normalize manual check completion payloads: prefer cache snapshots, fall back to payload
+
+🛠️ [fix] UptimeOrchestrator: merge cache & payload context for manual check completions
+ - ✅ Destructure incoming StatusUpdate (monitor/site) and resolve site from siteManager cache.
+ - ✅ Prefer monitor/site snapshots from cache when present; fall back to payload snapshots when missing.
+ - ⚠️ Replace hard abort-on-missing behavior with warnings so broadcasts are not dropped; always build an enriched StatusUpdate (monitor + site) for downstream consumers.
+
+🛠️ [fix] Storybook electron API mock: include monitor snapshot in checkSiteNow
+ - ✅ Create monitorSnapshot = clone(resultingMonitor ?? monitor) and return it as `monitor`.
+ - ✅ Use monitorSnapshot.status as the authoritative status in the returned payload (avoid stale previousStatus fallback).
+
+🧪 [test] Align test fixtures & fast-check runs to the enriched StatusUpdate contract
+ - ✅ src/test/setup.ts: import Monitor type and update mockElectronAPI.monitoring.checkSiteNow to return a typed monitor snapshot and include it inside site.monitors.
+ - ✅ src/test/types.test.tsx: add createTestMonitor helper and update Site/StatusUpdate fixtures to contain monitor snapshots and monitorId for stronger typing.
+ - ✅ shared/test/fuzzing/siteStatus.fuzz.test.ts: update getSiteStatusDescription assertions to derive expectations from getSiteDisplayStatus and explicitly handle "unknown", "paused", and "mixed" cases.
+ - ✅ src/test/components/AddSiteForm/Submit.comprehensive.test.tsx: harden property-based tests — introduce richer arbitraries (non-blank names, whitespace-only inputs, structured error messages), add base/concurrency fast-check parameters, and apply per-test timeouts to improve CI stability.
+
+ - ✳️ Overall: converge runtime, storybook and test mocks on a single, enriched StatusUpdate shape so manual check broadcasts are consistent, resilient, and type-safe.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3b2ee4b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b2ee4b20ea0a836f3850b608a09a2d8b7126d71)
+
+
+- 🛠️ [fix] Enforce enriched StatusUpdate payloads and make monitoring broadcasts scope-aware
+
+🛠️ [fix] UptimeOrchestrator: add determineMonitoringScope and emit monitoring events only for global ("all") operations
+ - 🔎 Skip "monitoring:started"/"monitoring:stopped" broadcasts for scoped (site/monitor) operations to avoid redundant renderer updates
+ - 📨 Attach forwarded metadata for global broadcasts and preserve cache invalidation semantics for scoped ops
+
+🛠️ [fix] UptimeOrchestrator: harden manual check completion handling
+ - 🔧 Populate missing site/monitor from cache when possible; warn if monitor cannot be matched
+ - ⛔ Abort manual-check broadcasts if site or monitor context remains missing; ensure enrichedResult contains confirmed monitor & site
+
+🛠️ [fix] EnhancedMonitorChecker: include full monitor & site context in emitted StatusUpdate payloads
+ - 🧩 Build fallback monitor snapshot (lastChecked, responseTime, status) and include monitor + site in status update bases before persistence and event emission
+
+🚜 [refactor] Shared contract & validation tightening
+ - 📐 Make StatusUpdate.monitor and StatusUpdate.site required (shared/types.ts) — BREAKING: consumers must provide full monitor & site objects
+ - ✅ Simplify/adjust validation guards to reflect required enriched payloads
+
+🛠️ [fix] Consumers & utilities: adopt enriched payload shape
+ - ⚙️ ApplicationService, statusUpdateHandler and test/mock setup now read direct monitor/site properties and forward rich context
+
+🧪 [test] Update tests & fixtures to match new contract and behavior
+ - 🔁 Refresh UptimeOrchestrator, MonitorManager, preload, monitoringApi, ApplicationService and related tests to include monitor/site fixtures and assert scoped vs global broadcast behavior
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a4994b6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a4994b6a04135dfc1923f6ecd12443b2c5f772e1)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 3 updates (#99) [`(4754939)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/475493992e4ba7de842fc3e7529b8aca715ec325)
+
+
 - [dependency] Update version 18.0.0 [`(d6fd43c)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d6fd43ca9285b1d98773c5c3b7a747ebc05a1f6d)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Harmonize Markdown/style across docs + lint/test tidying
+
+🔧 [build] Update HTMLHint lint config
+ - 🧾 config/linting/.htmlhintrc: reorder and normalize rules, set attr-sorted/attr-value/whitespace/tags-check consistently to match repo conventions ✅
+ - 🔍 Purpose: stabilize HTMLHint behavior so CI/docs generation obey standardized attribute/quote/whitespace rules
+
+🧹 [chore] Project-wide documentation formatting & housekeeping
+ - ✨ Normalize emphasis and heading styles: convert legacy __underscore__ emphasis and mixed HTML tags to consistent Markdown (**bold**, _italics_) across README.md, SECURITY.md, SUPPORT.md and many docs files ✅
+ - 🧭 Standardize lists & separators: replace ad-hoc "***" separators with canonical "---", unify bullet/list styles and numbered list formats across docs/Architecture, docs/Guides, docs/Testing, and templates ✅
+ - 📚 Convert many ADRs, Architecture notes, Patterns, Guides, Templates, and Docusaurus pages to consistent prose and markup (examples: docs/Architecture/ADRs/*, docs/Architecture/Patterns/*, docs/Guides/*) — improves readability and generator compatibility
+ - 🧾 README/table polish: update Monitor types table (use consistent bolding for monitor names, tidy descriptions) and quick-start links for clarity
+
+🎨 [style] Docusaurus & frontmatter adjustments
+ - 📝 docs/docusaurus/src/pages/markdown-page.md: switch frontmatter separators from '***' → '---' to ensure valid YAML frontmatter and Docusaurus compatibility
+ - 🔁 Small presentation tweaks in Docusaurus-generated pages and ESLint-inspector documentation for consistent headings/points
+
+🧪 [test] Lint-driven test & TypeScript formatting fixes (non-functional)
+ - 🛠 Reflow/format test sources to satisfy lint/type checks: adjust line breaks, trailing commas, multi-line arrays, import string wrapping, and typed callback formatting across numerous test files (examples: tests/strictTests/electron/**, src/test/**, electron/test/**) ✅
+ - 🧹 Remove/clean stray markup in tests (example: removed stray backticks/closing fences in Settings.input-fuzzing.test.tsx) and tighten a few assertions for readability
+ - 🔎 Minor logic-preserving refactors in tests: break long expressions into multi-line forms and normalize Object.hasOwn checks to a single-line style for consistency (e.g. src/test/constants-theme-100-coverage.test.ts)
+ - 🧾 Update test helper imports/paths formatting (small path string wrapping changes to avoid horizontal line noise in diffs)
+
+🧰 [chore] Tooling / docs automation notes
+ - 🔁 IPC/Docs references: many IPC and automation workflow guides were clarified (IPC_AUTOMATION_WORKFLOW.md, RENDERER_INTEGRATION_GUIDE.md, API docs, generation-first guidance) to reflect canonical channel generation and check:ipc/generate:ipc workflow
+ - 🧭 Emphasized event contract (settings:history-limit-updated) and optimistic manual-check behavior across renderer docs for implementer clarity
+
+⚠️ [note] Scope & impact
+ - 🧪 Most edits are documentation, formatting and test-style only — no production behavior changes intended
+ - 🔒 The only configuration-level change that affects behavior is the HTMLHint rule reordering (linting/CI outcome); runtime logic and feature behavior remain unchanged
+ - ✅ Purpose: pass linters, improve documentation consistency, and reduce future CI/drift failures
+
+🧹 [chore] Miscellaneous micro-cleanups
+ - 🧷 Tidy small helper/test files (ServiceContainer.working.test.ts, pingRetry.test.ts, monitor lifecycle tests, site deletion tests) — purely stylistic or readability improvements
+ - 🧾 Consistently apply TSDoc/markdown conventions in many templates and examples for better generated docs and editor UX
+
+Summary: an extensive docs & style sweep plus targeted lint/test format fixes to standardize repository documentation, stabilize HTML/MD authoring conventions, and bring tests into consistent formatting to reduce CI noise and improve maintainability. 🎯✨
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(fa85e4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/fa85e4e38dc1f6393e106d08c6e7900304705edf)
+
+
+- 📝 [docs] Refine and standardize JSDoc and type annotations in SiteRepository.ts
+
+📝 - 📄 Expand and rework module-level documentation; remove obsolete @packageDocumentation
+📝 - 🔁 Promote and document SiteRowUpsertFields earlier for clearer upsert typing
+📝 - ✅ Standardize @throws wording across public and private APIs and add missing @throws annotations
+📝 - ➕ Add/move @returns, @typeParam and @remarks for read helpers and transaction adapter
+📝 - 🧹 Minor wording/formatting cleanups; no runtime or behavioral changes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9f38268)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9f38268c7db68e1d342f585aa943adaf8e0720ab)
+
+
+- 📝 [docs] Add implementation-audit snapshots and unify IPC inventory artifact
+
+🛠️ [fix] Standardize generated IPC inventory filename → IPC_CHANNEL_INVENTORY.md
+ - 🔁 Update generator to emit docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md (scripts/generate-ipc-artifacts.mts)
+ - 📝 Replace references across docs/guides to the canonical artifact (IPC_AUTOMATION_WORKFLOW.md, RENDERER_INTEGRATION_GUIDE.md, TECHNOLOGY_EVOLUTION.md, ADR_005, README.md, etc.)
+ - ➕ Add generated artifact at docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md
+
+📝 [docs] Add "Current Implementation Audit (2025-11-04)" snapshots across architecture docs, patterns, and templates
+ - ✅ Capture verification of live code (repositories, TypedEventBus, IPC handlers/utilities, preload bridges, cache config, Zustand stores, error/operational hooks)
+ - 📁 Files updated include: ADR_001..ADR_006, ARCHITECTURE_DIAGRAM.md, COMPONENT_PROPS_STANDARDS.md, DEVELOPMENT_PATTERNS_GUIDE.md, site-loading-orchestration.md, Templates/* (IPC_HANDLER_TEMPLATE.md, REPOSITORY_TEMPLATE*.md, ZUSTAND_STORE_TEMPLATE.md), Using-This-Documentation.md and others
+
+🧹 [chore] Normalize docs index & file naming in docs/Architecture/README.md
+ - 🔤 Switch ADR/template listings to underscore/UPPERCASE conventions, add "Generated Artifacts" section, and refresh diagram/mapping nodes to reflect renamed files
+
+🛠️ [fix] Miscellaneous doc & formatting fixes
+ - 🧾 TSDOC_STANDARDS.md: adjust code-fence/Repository Methods formatting
+ - ✏️ Minor phrasing, link and lint-rule notes updated in Using-This-Documentation.md and related guides
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d175e8f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d175e8f375680302ceffb8f9174f766e30321a40)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Normalize configs, docs, tooling and CI outputs
+
+ - 👷 [ci] Expose bump-version outputs in Build workflow (write new_version and patch to GITHUB_OUTPUT) so downstream steps can reliably consume them
+ - 🧹 [chore] .editorconfig — convert tabs → spaces across scopes, harmonize indent sizes and increase max_line_length for source (160) and markdown (1000) for better formatting tolerance
+ - 🛠️ [fix] eslint.config.mjs — enable additional lint rules to enforce project conventions: uptime-watcher/prefer-app-alias, package-json/scripts-name-casing, @eslint-react/jsx-dollar
+ - ✨ [feat] mermaid.config.json — overhaul diagram configuration (larger fonts, paddings, useMaxWidth, improved axis/chart/kanban/quadrant/radar settings and other layout tweaks) to produce clearer diagrams
+ - 🧹 [chore] Tooling config updates:
+   - 🧹 [chore] config/tools/.markdown-link-check.json — remove $schema entry and ensure replacementPatterns is present
+   - 🧹 [chore] config/tools/lychee.toml — normalize array formatting, reorder fallback_extensions, tidy accept/exclude lists and add common URL excludes
+   - 🧹 [chore] .lycheeignore — append common URL patterns to ignore list
+ - 📝 [docs] README.md — standardize markdown (replace mixed HTML/bold with consistent emphasis, convert feature tables/lists to readable bullet lists, add separators) for improved readability
+ - 📝 [docs] SECURITY.md — normalize list bullets and emphasis for consistent documentation style
+ - 📝 [docs] .github/ISSUE_TEMPLATE — standardize schema to GitHub Issue Forms (schemastore issue-forms.json) for bug_report, custom_issue and add missing schema to feature_request
+ - 🧹 [chore] .cspell.json — remove redundant "json" reporter to reduce output noise
+ - 🧹 [chore] .github/FUNDING.yml — sanitize custom funding placeholder (use example URL)
+ - 🧹 [chore] .github/agents/BeastMode.agent.md — reorder/standardize tools list for consistency
+ - 🧹 [chore] config/linting/ActionLintConfig.yaml — support .{yml,yaml} globs and tighten ignore regexes for shellcheck/permission warnings
+ - 🧹 [chore] package.json — normalize license field to "UNLICENSED"
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d63ea4e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d63ea4e6c9582ea3ecc2002d1042ddfc9b56e235)
+
+
+- 🧹 [chore] Relax npm-package-json-lint rule for optionalDependencies
+ - 🛠️ Update .npmpackagejsonlintrc.json: set "require-optionalDependencies" from "error" → "off" to avoid spurious lint failures when optionalDependencies are intentionally absent
+
+📝 [docs] [dependency] Update README & SECURITY metadata to v18.0.0 and normalize formatting
+ - 📌 README.md: update version badge to 18.0.0; bump Electron → v39.0.0, React → v19.2.0, Vite → 7.1+; normalize emphasis to **, tidy lists/HRs, and update "Last updated" to November 2025
+ - 🔒 SECURITY.md: normalize emphasis/spacing and update dependency table to current majors (electron ^39.0.0, electron-builder ^26.0.12, electron-updater ^6.6.2, node-sqlite3-wasm ^0.8.50, react ^19.2.0, typescript ^5.9.3, vite ^7.1.12, tailwindcss ^4.1.16)
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9a5523e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9a5523e24c1aa38b421cd31132425dc537ebc4be)
+
+
+- 🧹 [chore] [dependency] Update deps, update lockfile to 18.0.0, remove duplicate bundleDependencies, and refine cleanup handler docs
+
+📝 [docs] Refine JSDoc for cleanup handlers
+ - Reworded module description and function remarks in src/services/utils/cleanupHandlers.ts.
+ - Clarified CleanupValidationContext and CleanupResolutionHandlers semantics, added remarks about zero-arg cleanup functions and error forwarding.
+ - Removed @public tags and minor doc cleanups. No runtime logic changes.
+
+🧹 [chore] Upgrade dependencies and devDependencies (highlights)
+ - axios -> ^1.13.2; @eslint/css -> ^0.14.1; @eslint/json -> ^0.14.0; @eslint/markdown -> ^7.5.1
+ - @html-eslint/* -> ^0.47.1; Storybook addons/core -> ^10.0.4; vitest & @vitest/* -> ^4.0.7
+ - eslint-plugin-package-json -> ^0.63.0; eslint-plugin-storybook -> ^10.0.4; storybook -> ^10.0.4
+ - es-html-parser -> 0.3.1; @humanwhocodes/momoa -> 3.3.10; plus assorted minor/patch bumps across lockfile.
+
+🔧 [build] Update package-lock.json
+ - [dependency] Updateed package-lock package version 17.9.0 → 18.0.0 and refreshed resolved/integrity entries to reflect upgraded packages for reproducible installs.
+
+🧹 [chore] Tidy package metadata & lint config
+ - Removed stray/duplicate "bundleDependencies" entry from package.json and removed "bundleDependencies" from .npmpackagejsonlintrc.json property-order.
+ - Preserved canonical "bundledDependencies" (node-sqlite3-wasm) where applicable.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6a71ccc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6a71ccc6fc26d2233b40fe6491fac270821adb43)
+
+
+- Update changelogs for v18.0.0 [skip ci] [`(14d3267)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/14d326700b52df548a4c46e0538871431175141b)
+
+
+
+### 👷 CI/CD
+
+- 👷 [ci] Normalize tsconfig $schema URLs to canonical schemastore.org
+
+ - 👷 🔁 Replace non-canonical/short schemastore URLs with the canonical https://www.schemastore.org/tsconfig.json across repository configs
+ - 👷 📂 Files updated: .storybook/tsconfig.json, storybook/tsconfig.json, storybook/tsconfig.eslint.json, docs/docusaurus/tsconfig.json, docs/docusaurus/tsconfig.eslint.json, docs/docusaurus/tsconfig.typedoc.json, src/test/tsconfig.json
+ - 👷 🛠️ Normalize pre-commit jsonschema hook args in config/tools/.pre-commit-config.yaml to reference the canonical schemastore URL for consistent schema validation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d188f63)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d188f63d65b58c2fab7112ac4879c5d2fcecb730)
+
+
+- 👷 [ci] Normalize yaml-language-server schema URLs to schemastore.org in GitHub Actions workflows
+
+🧹 [chore] Replace legacy schema host in workflow headers
+ - Replaced occurrences of "https://json.schemastore.org/github-workflow.json" with "https://www.schemastore.org/github-workflow.json" in the yaml-language-server $schema comments.
+ - Updated headers across many .github/workflows/*.yml files (e.g. ActionLint.yml, Build.yml, codeql.yml, codecov.yml, Playwright.yml, sonarcloud.yml, deploy-docusaurus.yml, and others).
+
+📝 [docs] Clarify intent and impact
+ - Purely a canonicalization / linting metadata change — no behavioral or runtime changes to workflows.
+ - Purpose: use the canonical schemastore.org host to avoid redirects and ensure consistent YAML-language-server validation across editors/CI.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a113ceb)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a113ceb4d0eaf551f0e8784427d6824dfa470ca0)
 
 
 
