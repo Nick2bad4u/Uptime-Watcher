@@ -36,8 +36,6 @@
   ],
   "type": "commonjs",
   "main": "dist/main.js",
-  "directories": {},
-  "files": [],
   "scripts": {
     "ai:context": "npm run context",
     "analyze:ipc": "tsx scripts/analyze-ipc-channels.ts",
