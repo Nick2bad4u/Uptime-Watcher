@@ -251,8 +251,7 @@ import sharedContractInterfaceGuard from "./config/linting/rules/shared-contract
 const require = createRequire(import.meta.url);
 const ROOT_DIR = import.meta.dirname;
 
-// @ts-ignore
-if (!process.env.RECHECK_JAR) {
+if (!process.env["RECHECK_JAR"]) {
     const resolvedRecheckJarPath = (() => {
         try {
             return require.resolve("recheck-jar/recheck.jar");
@@ -265,12 +264,10 @@ if (!process.env.RECHECK_JAR) {
     })();
 
     if (resolvedRecheckJarPath) {
-        // @ts-ignore
-        process.env.RECHECK_JAR = path.normalize(resolvedRecheckJarPath);
+        process.env["RECHECK_JAR"] = path.normalize(resolvedRecheckJarPath);
     }
 }
 export default /** @type {EslintConfig} */ [
-    // @ts-ignore
     gitignore({
         name: "Global .gitignore Rules",
         root: true,
@@ -1164,8 +1161,8 @@ export default /** @type {EslintConfig} */ [
             // TypeScript rules
             ...css.configs.recommended.rules,
             ...pluginUndefinedCss.configs["with-tailwind"].rules,
-            // @ts-ignore
-            ...pluginBetterTailwindcss.configs.correctness.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...pluginBetterTailwindcss.configs["correctness"].rules,
             "better-tailwindcss/enforce-consistent-class-order": "warn",
             "better-tailwindcss/enforce-consistent-important-position": "warn",
             "better-tailwindcss/enforce-consistent-line-wrapping": "off",
@@ -1263,10 +1260,6 @@ export default /** @type {EslintConfig} */ [
         },
         name: "Docusaurus - docs/docusaurus/**/*.{TS,TSX,MJS,CJS,JS,JSX,MTS,CTS}",
         plugins: {
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
             "@docusaurus": pluginDocusaurus,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -1352,24 +1345,17 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript backend rules
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
+
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
@@ -2643,10 +2629,6 @@ export default /** @type {EslintConfig} */ [
         },
         name: "TypeScript Frontend - src/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -2747,24 +2729,17 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript rules
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
+
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -2803,8 +2778,8 @@ export default /** @type {EslintConfig} */ [
             ...pluginReactHookForm.configs.recommended.rules,
             ...reactPerfPlugin.configs.all.rules,
             ...etc.configs.recommended.rules,
-            // @ts-ignore
-            ...pluginBetterTailwindcss.configs.correctness.rules,
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...pluginBetterTailwindcss.configs["correctness"].rules,
             "@arthurgeron/react-usememo/require-memo": "off",
             "@arthurgeron/react-usememo/require-usememo": "error",
             "@arthurgeron/react-usememo/require-usememo-children": "off",
@@ -4235,10 +4210,6 @@ export default /** @type {EslintConfig} */ [
         },
         name: "Electron Backend -  - electron/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
             "@eslint-react/hooks-extra": eslintReactHooksExtra,
@@ -4325,24 +4296,17 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript Backend (Electron) Rules
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
+
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
@@ -5614,10 +5578,6 @@ export default /** @type {EslintConfig} */ [
         },
         name: "TypeScript Shared - shared/**/*.{TS,TSX,MTS,CTS,MJS,JS,JSX,CJS}",
         plugins: {
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
             "@arthurgeron/react-usememo": pluginUseMemo2,
             "@eslint-react": eslintReact,
             "@eslint-react/dom": eslintReactDom,
@@ -5716,24 +5676,16 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript rules
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
-            // @ts-ignore
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...reactRefresh.configs.vite.rules,
             ...importX.flatConfigs.recommended.rules,
@@ -7274,18 +7226,15 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -7505,18 +7454,15 @@ export default /** @type {EslintConfig} */ [
         rules: {
             // Test Files Backend Rules (Electron Tests)
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -7735,18 +7681,15 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
@@ -7943,18 +7886,15 @@ export default /** @type {EslintConfig} */ [
         rules: {
             // Benchmark Files Rules
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...vitest.configs.recommended.rules,
             ...pluginComments.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
@@ -8186,20 +8126,17 @@ export default /** @type {EslintConfig} */ [
         rules: {
             // TypeScript Config Files Rules
             // TypeScript backend rules
-            // @ts-ignore
+
             ...js.configs.all.rules,
-            // @ts-ignore
-            ...tseslint.configs.recommendedTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.recommended.rules,
-            // @ts-ignore
-            ...tseslint.configs.strictTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.strict.rules,
-            // @ts-ignore
-            ...tseslint.configs.stylisticTypeChecked,
-            // @ts-ignore
-            ...tseslint.configs.stylistic.rules,
+            ...tseslint.configs["recommendedTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["recommended"].rules,
+            ...tseslint.configs["strictTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["strict"].rules,
+            ...tseslint.configs["stylisticTypeChecked"],
+            // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
+            ...tseslint.configs["stylistic"].rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
             ...importX.flatConfigs.electron.rules,
@@ -8896,7 +8833,6 @@ export default /** @type {EslintConfig} */ [
             "write-good-comments": pluginWriteGood,
         },
         rules: {
-            // @ts-ignore
             ...js.configs.all.rules,
             ...pluginRegexp.configs["flat/all"].rules,
             ...importX.flatConfigs.recommended.rules,
