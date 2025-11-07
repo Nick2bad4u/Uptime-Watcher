@@ -60,7 +60,7 @@ Renderer (React + Zustand)
 - **Persistence** (Persist dynamic fields and history)
   - Responsibility: Persist dynamic fields and history
   - Touch These Files: `electron/services/database/utils/dynamicSchema.ts`<br>`electron/services/database/utils/monitorMapper.ts`<br>`electron/services/database/MonitorRepository.ts`<br>`shared/types/database.ts`<br>`electron/test/fuzzing/databaseSchema.*.test.ts`
-  - Notes: Confirm dynamic columns map to snake_case SQL fields, round-trip correctly, and keep TypeScript facades/mappers in sync.
+  - Notes: Confirm dynamic columns map to snake\_case SQL fields, round-trip correctly, and keep TypeScript facades/mappers in sync.
 - **Renderer** (Collect config, validate, display)
   - Responsibility: Collect config, validate, display
   - Touch These Files: `src/types/monitorFormData.ts`<br>`src/types/monitor-forms.ts`<br>`src/utils/monitorValidation.ts`<br>`src/stores/sites/utils/monitorOperations.ts`<br>`src/stores/monitor/useMonitorTypesStore.ts`<br>`src/components/SiteDetails/useAddSiteForm.ts`<br>`src/components/AddSiteForm/AddSiteForm.tsx`<br>`src/components/AddSiteForm/DynamicMonitorFields.tsx`<br>`src/components/AddSiteForm/Submit.tsx`<br>`src/components/Dashboard/SiteCard/components/MonitorSelector.tsx`<br>`src/components/SiteDetails/MonitoringStatusDisplay.tsx`<br>`src/utils/monitorTitleFormatters.ts`<br>`src/test/branch-coverage-optimization.test.tsx`<br>`src/constants.ts`<br>`src/utils/fallbacks.ts`<br>`src/test/constants.test.ts`<br>`src/test/constants-theme-100-coverage.test.ts`<br>`src/test/*` (renderer suites and fuzzers)

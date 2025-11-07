@@ -397,14 +397,14 @@ npm run electron -- --log-debug
 
 ### Architecture Understanding
 
-- [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) - AI assistant guide
+- [`docs/Guides/AI_CONTEXT.md`](./AI_CONTEXT.md) - AI assistant guide
 - [`docs/Architecture/ADRs/`](../Architecture/ADRs/) - Architectural decisions
 - [`docs/Architecture/Patterns/`](../Architecture/Patterns/) - Development patterns
 
 ### Implementation Guides
 
 - [`docs/Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md`](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)
-- [`docs/Guides/ui-feature-development-guide.md`](./ui-feature-development-guide.md)
+- [`docs/Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md`](./UI_FEATURE_DEVELOPMENT_GUIDE.md)
 - [`docs/Architecture/Templates/`](../Architecture/Templates/) - Code templates
 
 ### Code Standards
@@ -415,14 +415,14 @@ npm run electron -- --log-debug
 
 ### For New Contributors
 
-1. **Read**: [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for project understanding
+1. **Read**: [`docs/Guides/AI_CONTEXT.md`](./AI_CONTEXT.md) for project understanding
 2. **Explore**: Run the application and explore existing features
 3. **Practice**: Try adding a simple feature following the patterns
 4. **Ask**: Check documentation first, then ask questions
 
 ### For AI Assistants
 
-1. **Context**: Load [`docs/Guides/AI-CONTEXT.md`](./AI-CONTEXT.md) for comprehensive context
+1. **Context**: Load [`docs/Guides/AI_CONTEXT.md`](./AI_CONTEXT.md) for comprehensive context
 2. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
 3. **Examples**: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
 

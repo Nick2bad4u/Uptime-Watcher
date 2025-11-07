@@ -360,6 +360,6 @@ Place test files next to the code they test with `.test.ts` or `.test.tsx` exten
 
 ### Related Documentation
 
-- [Testing Methodology - React Components](./testing-methodology-react-components.md) - Detailed React testing patterns
-- [Error Handling Guide](./error-handling-guide.md) - Error handling patterns and testing
-- [Event System Guide](./event-system-guide.md) - Event testing and debugging
+- [Testing Methodology - React Components](./TESTING_METHODOLOGY_REACT_COMPONENTS.md) - Detailed React testing patterns
+- [Error Handling Guide](./ERROR_HANDLING_GUIDE.md) - Error handling patterns and testing
+- [Event System Guide](./EVENT_SYSTEM_GUIDE.md) - Event testing and debugging

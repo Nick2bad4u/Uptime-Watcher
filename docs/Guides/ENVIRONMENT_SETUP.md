@@ -531,4 +531,4 @@ sudo apt-get install -y nodejs
 
 ---
 
-🎉 **You're all set!** Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md) for next steps.
+🎉 **You're all set!** Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER_QUICK_START.md) for next steps.

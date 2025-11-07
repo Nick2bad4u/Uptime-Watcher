@@ -233,13 +233,13 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST_CHECK_FUZZING_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
+- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST\_CHECK\_FUZZING\_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
 
 ### End-to-end testing with Playwright
 
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
-- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
+- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT\_TESTING\_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
 
 ### IPC automation workflow
 

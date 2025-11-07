@@ -732,7 +732,7 @@ logger.error("Event processing failed", {
 
 ## Related Documentation
 
-- [API Documentation](./api-documentation.md) - Comprehensive IPC API reference
-- [Developer Quick Start](./DEVELOPER-QUICK-START.md) - Architecture overview with event system integration
-- [Error Handling Guide](./error-handling-guide.md) - Error handling patterns with events
-- [Testing Methodology](./testing-methodology-react-components.md) - Testing patterns including event testing
+- [API Documentation](./API_DOCUMENTATION.md) - Comprehensive IPC API reference
+- [Developer Quick Start](./DEVELOPER_QUICK_START.md) - Architecture overview with event system integration
+- [Error Handling Guide](./ERROR_HANDLING_GUIDE.md) - Error handling patterns with events
+- [Testing Methodology](./TESTING_METHODOLOGY_REACT_COMPONENTS.md) - Testing patterns including event testing

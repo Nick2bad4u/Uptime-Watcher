@@ -9,12 +9,12 @@
 ```text
 docs/
 ├── 📋 Essential Documentation
-│   ├── AI-CONTEXT.md                 # AI assistant onboarding
-│   ├── DEVELOPER-QUICK-START.md      # Fast developer setup
-│   ├── API-DOCUMENTATION.md          # API and IPC reference
+│   ├── AI_CONTEXT.md                 # AI assistant onboarding
+│   ├── DEVELOPER_QUICK_START.md      # Fast developer setup
+│   ├── API_DOCUMENTATION.md          # API and IPC reference
 │   ├── TROUBLESHOOTING.md            # Debug and fix issues
-│   ├── ENVIRONMENT-SETUP.md          # Complete environment guide
-│   └── TECHNOLOGY-EVOLUTION.md       # Migration history
+│   ├── ENVIRONMENT_SETUP.md          # Complete environment guide
+│   └── TECHNOLOGY_EVOLUTION.md       # Migration history
 │
 ├── 🏗️ Architecture/                  # Current architecture docs
 │   ├── ADRs/                         # Architecture decisions
@@ -23,10 +23,10 @@ docs/
 │
 ├── 📖 Guides/                        # Implementation guides
 │   ├── NEW_MONITOR_TYPE_IMPLEMENTATION.md
-│   ├── UI-Feature-Development-Guide.md
+│   ├── UI_FEATURE_DEVELOPMENT_GUIDE.md
 │   ├── TESTING.md
-│   ├── Monitoring-Race-Condition-Solution-Plan.md
-│   └── Fallback-System-Usage-Analysis.md
+│   ├── MONITORING_RACE_CONDITION_SOLUTION_PLAN.md
+│   └── FALLBACK_SYSTEM_USAGE_ANALYSIS.md
 │
 ├── 📁 Archive/                       # Historical materials
 │   ├── Historical-Analysis/          # Analysis documents
@@ -39,7 +39,7 @@ docs/
     ├── TSDoc/                        # Documentation standards
     ├── docusaurus/                   # Generated documentation
     ├── assets/                       # Images and resources
-    └── DOCUMENTATION-INDEX.md        # Navigation hub
+    └── DOCUMENTATION_INDEX.md        # Navigation hub
 ```
 
 ### 🚮 **Archived Materials**
@@ -100,21 +100,21 @@ Moved **30+ historical documents** to organized archive:
 
 ### 🎯 **For New Users**
 
-1. **[AI-CONTEXT.md](./AI-CONTEXT.md)** - AI assistant fast onboarding
-2. **[DEVELOPER-QUICK-START.md](./DEVELOPER-QUICK-START.md)** - Developer setup
-3. **[ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md)** - Complete environment guide
+1. **[AI_CONTEXT.md](./AI_CONTEXT.md)** - AI assistant fast onboarding
+2. **[DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md)** - Developer setup
+3. **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment guide
 
 ### 🛠️ **For Development**
 
-1. **[API-DOCUMENTATION.md](./API-DOCUMENTATION.md)** - IPC and API reference
+1. **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - IPC and API reference
 2. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Debug and fix issues
-3. **[Architecture/](./Architecture/)** - Patterns, ADRs, templates
-4. **[Guides/](./Guides/)** - Implementation guides
+3. **[Architecture/](../Architecture/)** - Patterns, ADRs, templates
+4. **[Guides/](../Guides/)** - Implementation guides
 
 ### 📖 **For Understanding**
 
-1. **[TECHNOLOGY-EVOLUTION.md](./TECHNOLOGY-EVOLUTION.md)** - How we got here
-2. **[DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md)** - Complete navigation
+1. **[TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)** - How we got here
+2. **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** - Complete navigation
 
 ## 🔮 **Going Forward**
 

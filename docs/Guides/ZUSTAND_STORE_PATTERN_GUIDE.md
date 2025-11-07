@@ -437,6 +437,6 @@ const useMonolithicStore = create((set) => ({
 ## Related Documentation
 
 - [ADR-004: Frontend State Management](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)
-- [UI Feature Development Guide](./ui-feature-development-guide.md)
-- [Developer Quick Start Guide](./DEVELOPER-QUICK-START.md)
-- [API Documentation](./api-documentation.md)
+- [UI Feature Development Guide](./UI_FEATURE_DEVELOPMENT_GUIDE.md)
+- [Developer Quick Start Guide](./DEVELOPER_QUICK_START.md)
+- [API Documentation](./API_DOCUMENTATION.md)

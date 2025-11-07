@@ -317,10 +317,10 @@ Watch console for warmup effectiveness and transform times.
 
 ## 📚 Related Resources
 
-- [Environment Setup Guide](./environment-setup.md) - Development environment configuration
-- [Testing Guide](./testing.md) - Test configuration and performance
-- [Troubleshooting Guide](./troubleshooting.md) - Performance debugging
-- [Type-Fest Patterns](./type-fest-patterns.md) - TypeScript optimization patterns
+- [Environment Setup Guide](./ENVIRONMENT_SETUP.md) - Development environment configuration
+- [Testing Guide](./TESTING.md) - Test configuration and performance
+- [Troubleshooting Guide](./TROUBLESHOOTING.md) - Performance debugging
+- [Type-Fest Patterns](./TYPE_FEST_PATTERNS.md) - TypeScript optimization patterns
 
 ## 🎯 Quick Reference
 

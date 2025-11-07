@@ -6,13 +6,13 @@
 
 ### Getting started
 
-- **[Developer Quick Start](./DEVELOPER-QUICK-START.md)** - Get up and running in minutes
-- **[Environment Setup](./ENVIRONMENT-SETUP.md)** - Complete development environment configuration
-- **[AI Context Guide](./AI-CONTEXT.md)** - Essential context for AI assistants
+- **[Developer Quick Start](./DEVELOPER_QUICK_START.md)** - Get up and running in minutes
+- **[Environment Setup](./ENVIRONMENT_SETUP.md)** - Complete development environment configuration
+- **[AI Context Guide](./AI_CONTEXT.md)** - Essential context for AI assistants
 
 ### Core documentation
 
-- **[API Documentation](./API-DOCUMENTATION.md)** - IPC interfaces and communication patterns
+- **[API Documentation](./API_DOCUMENTATION.md)** - IPC interfaces and communication patterns
 - **[Troubleshooting Guide](./TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Testing Guide](../Guides/TESTING.md)** - Testing setup and practices
 
@@ -24,14 +24,14 @@ Essential documentation for developers and contributors:
 
 | Document                                               | Purpose                         | Audience                      |
 | ------------------------------------------------------ | ------------------------------- | ----------------------------- |
-| [AI-CONTEXT.md](./AI-CONTEXT.md)                       | Quick AI onboarding             | AI Assistants, New Developers |
-| [DEVELOPER-QUICK-START.md](./DEVELOPER-QUICK-START.md) | Fast developer setup            | New Contributors              |
-| [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md)         | Complete environment guide      | Developers                    |
-| [API-DOCUMENTATION.md](./API-DOCUMENTATION.md)         | IPC and API reference           | Frontend/Backend Developers   |
+| [AI_CONTEXT.md](./AI_CONTEXT.md)                       | Quick AI onboarding             | AI Assistants, New Developers |
+| [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors              |
+| [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)         | Complete environment guide      | Developers                    |
+| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)         | IPC and API reference           | Frontend/Backend Developers   |
 | [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)             | Debug and fix issues            | All Developers                |
-| [TECHNOLOGY-EVOLUTION.md](./TECHNOLOGY-EVOLUTION.md)   | Migration history and rationale | Architects, Contributors      |
-| [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md)     | This index document             | All Users                     |
-| [ORGANIZATION-SUMMARY.md](./ORGANIZATION-SUMMARY.md)   | Documentation cleanup summary   | Maintainers                   |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)   | Migration history and rationale | Architects, Contributors      |
+| [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)     | This index document             | All Users                     |
+| [ORGANIZATION_SUMMARY.md](./ORGANIZATION_SUMMARY.md)   | Documentation cleanup summary   | Maintainers                   |
 
 ### 🏗️ Architecture (`/docs/Architecture/`)
 
@@ -41,26 +41,26 @@ System design, patterns, and architectural decisions:
 
 | Document                                                                                            | Decision                 | Status      |
 | --------------------------------------------------------------------------------------------------- | ------------------------ | ----------- |
-| [ADR-001-Repository-Pattern.md](../Architecture/ADRs/ADR-001-Repository-Pattern.md)                 | Database access pattern  | ✅ Accepted |
-| [ADR-002-Event-Driven-Architecture.md](../Architecture/ADRs/ADR-002-Event-Driven-Architecture.md)   | Event system design      | ✅ Accepted |
-| [ADR-003-Error-Handling-Strategy.md](../Architecture/ADRs/ADR-003-Error-Handling-Strategy.md)       | Error handling approach  | ✅ Accepted |
-| [ADR-004-Frontend-State-Management.md](../Architecture/ADRs/ADR-004-Frontend-State-Management.md)   | Zustand state management | ✅ Accepted |
-| [ADR-005-IPC-Communication-Protocol.md](../Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md) | IPC communication design | ✅ Accepted |
+| [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                 | Database access pattern  | ✅ Accepted |
+| [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)   | Event system design      | ✅ Accepted |
+| [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)       | Error handling approach  | ✅ Accepted |
+| [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)   | Zustand state management | ✅ Accepted |
+| [ADR_005_IPC_COMMUNICATION_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) | IPC communication design | ✅ Accepted |
 
 #### Patterns & standards
 
 | Document                                                                                | Purpose                  | Use When                      |
 | --------------------------------------------------------------------------------------- | ------------------------ | ----------------------------- |
-| [Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) | Coding patterns overview | Understanding system patterns |
-| [tsdoc-standards.md](../Architecture/tsdoc-standards.md)                                | Documentation standards  | Writing code documentation    |
+| [DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns |
+| [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                | Documentation standards  | Writing code documentation    |
 
 #### Templates
 
 | Template                                                                         | Purpose                     | Use When                     |
 | -------------------------------------------------------------------------------- | --------------------------- | ---------------------------- |
-| [Repository-Template.md](../Architecture/Templates/Repository-Template.md)       | Database repository pattern | Adding new data repositories |
-| [IPC-Handler-Template.md](../Architecture/Templates/IPC-Handler-Template.md)     | IPC communication pattern   | Adding new IPC endpoints     |
-| [Zustand-Store-Template.md](../Architecture/Templates/Zustand-Store-Template.md) | Frontend state management   | Creating new Zustand stores  |
+| [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md)       | Database repository pattern | Adding new data repositories |
+| [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md)     | IPC communication pattern   | Adding new IPC endpoints     |
+| [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) | Frontend state management   | Creating new Zustand stores  |
 
 ### 📖 Implementation Guides (`/docs/Guides/`)
 
@@ -68,9 +68,9 @@ Step-by-step implementation instructions:
 
 | Guide                                                                              | Purpose                     | Complexity      |
 | ---------------------------------------------------------------------------------- | --------------------------- | --------------- |
-| [Renderer-Integration-Guide.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)           | Renderer/IPC integration    | 🟡 Intermediate |
+| [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)           | Renderer/IPC integration    | 🟡 Intermediate |
 | [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) | Adding monitor types        | 🟡 Intermediate |
-| [UI-Feature-Development-Guide.md](../Guides/UI-Feature-Development-Guide.md)       | Frontend development        | 🟡 Intermediate |
+| [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)       | Frontend development        | 🟡 Intermediate |
 | [TESTING.md](../Guides/TESTING.md)                                                 | Testing setup and practices | 🟢 Beginner     |
 
 ### 📝 Historical & Learning (`/docs/`)
@@ -79,15 +79,15 @@ Relevant historical context and lessons learned:
 
 | Document                                                                                           | Purpose                     | Relevance                          |
 | -------------------------------------------------------------------------------------------------- | --------------------------- | ---------------------------------- |
-| [TECHNOLOGY-EVOLUTION.md](./TECHNOLOGY-EVOLUTION.md)                                               | Complete migration history  | Understanding current architecture |
-| [Fallback-System-Usage-Analysis.md](../Guides/Fallback-System-Usage-Analysis.md)                   | Migration completion status | Historical context                 |
-| [Monitoring-Race-Condition-Solution-Plan.md](../Guides/Monitoring-Race-Condition-Solution-Plan.md) | Race condition prevention   | Architecture understanding         |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)                                               | Complete migration history  | Understanding current architecture |
+| [FALLBACK_SYSTEM_USAGE_ANALYSIS.md](../Guides/FALLBACK_SYSTEM_USAGE_ANALYSIS.md)                   | Migration completion status | Historical context                 |
+| [MONITORING_RACE_CONDITION_SOLUTION_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Race condition prevention   | Architecture understanding         |
 
 ## 🎯 Documentation by Role
 
 ### 🤖 AI Assistants
 
-**Start Here**: [AI-CONTEXT.md](./AI-CONTEXT.md)
+**Start Here**: [AI_CONTEXT.md](./AI_CONTEXT.md)
 
 - Complete project overview and patterns
 - Common development tasks
@@ -95,13 +95,13 @@ Relevant historical context and lessons learned:
 
 **Follow Up**:
 
-- [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - Interface reference
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interface reference
 - [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
 - [Architecture/Templates/](../Architecture/Templates/) - Code templates
 
 ### 👨‍💻 New Developers
 
-**Start Here**: [DEVELOPER-QUICK-START.md](./DEVELOPER-QUICK-START.md)
+**Start Here**: [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md)
 
 - Fast setup and orientation
 - Common development tasks
@@ -109,27 +109,27 @@ Relevant historical context and lessons learned:
 
 **Next Steps**:
 
-- [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) - Complete environment
-- [Architecture/Patterns/Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) - Coding patterns
+- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Complete environment
+- [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Coding patterns
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - When things go wrong
 
 ### 🏗️ Backend Developers
 
 **Focus Areas**:
 
-- [ADR-001-Repository-Pattern.md](../Architecture/ADRs/ADR-001-Repository-Pattern.md) - Database patterns
-- [ADR-002-Event-Driven-Architecture.md](../Architecture/ADRs/ADR-002-Event-Driven-Architecture.md) - Event system
-- [Repository-Template.md](../Architecture/Templates/Repository-Template.md) - Repository implementation
-- [IPC-Handler-Template.md](../Architecture/Templates/IPC-Handler-Template.md) - IPC communication
+- [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Database patterns
+- [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
+- [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Repository implementation
+- [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC communication
 
 ### 🎨 Frontend Developers
 
 **Focus Areas**:
 
-- [ADR-004-Frontend-State-Management.md](../Architecture/ADRs/ADR-004-Frontend-State-Management.md) - State management
-- [UI-Feature-Development-Guide.md](../Guides/UI-Feature-Development-Guide.md) - Component development
-- [Zustand-Store-Template.md](../Architecture/Templates/Zustand-Store-Template.md) - Store creation
-- [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - IPC interfaces
+- [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
+- [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - Component development
+- [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store creation
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - IPC interfaces
 
 ### 🧪 QA/Testing
 
@@ -137,55 +137,55 @@ Relevant historical context and lessons learned:
 
 - [TESTING.md](../Guides/TESTING.md) - Testing setup and practices
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Common issues
-- [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) - Environment configuration
+- [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment configuration
 
 ### 📐 Architects/Tech Leads
 
 **Focus Areas**:
 
 - [Architecture/ADRs/](../Architecture/ADRs/) - All architectural decisions
-- [Architecture/Patterns/Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) - System patterns
+- [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - System patterns
 - Historical documents for evolution understanding
 
 ## 🔍 Documentation by Topic
 
 ### 🗃️ Database & Persistence
 
-- [ADR-001-Repository-Pattern.md](../Architecture/ADRs/ADR-001-Repository-Pattern.md) - Repository pattern design
-- [Repository-Template.md](../Architecture/Templates/Repository-Template.md) - Implementation template
+- [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) - Repository pattern design
+- [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) - Implementation template
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md#database-issues) - Database troubleshooting
 
 ### 🔗 Communication & Events
 
-- [ADR-002-Event-Driven-Architecture.md](../Architecture/ADRs/ADR-002-Event-Driven-Architecture.md) - Event system
-- [ADR-005-IPC-Communication-Protocol.md](../Architecture/ADRs/ADR-005-IPC-Communication-Protocol.md) - IPC design
-- [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - Communication interfaces
+- [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) - Event system
+- [ADR_005_IPC_COMMUNICATION_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) - IPC design
+- [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Communication interfaces
 - [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md) - Renderer IPC integration
-- [IPC-Handler-Template.md](../Architecture/Templates/IPC-Handler-Template.md) - IPC implementation
+- [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) - IPC implementation
 
 ### 🎨 Frontend & UI
 
-- [ADR-004-Frontend-State-Management.md](../Architecture/ADRs/ADR-004-Frontend-State-Management.md) - State management
-- [UI-Feature-Development-Guide.md](../Guides/UI-Feature-Development-Guide.md) - UI development
-- [Zustand-Store-Template.md](../Architecture/Templates/Zustand-Store-Template.md) - Store patterns
+- [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) - State management
+- [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) - UI development
+- [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) - Store patterns
 
 ### 🔍 Monitoring & Performance
 
 - [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) - Monitor types
-- [Monitoring-Race-Condition-Solution-Plan.md](../Guides/Monitoring-Race-Condition-Solution-Plan.md) - Race condition prevention
+- [MONITORING_RACE_CONDITION_SOLUTION_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) - Race condition prevention
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Performance tips
 
 ### ⚠️ Error Handling & Debugging
 
-- [ADR-003-Error-Handling-Strategy.md](../Architecture/ADRs/ADR-003-Error-Handling-Strategy.md) - Error strategy
+- [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md) - Error strategy
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Debug guide
-- [ENVIRONMENT-SETUP.md](../Guides/ENVIRONMENT-SETUP.md) - Debug tools
+- [ENVIRONMENT_SETUP.md](../Guides/ENVIRONMENT_SETUP.md) - Debug tools
 
 ## 📋 Documentation Maintenance
 
 ### 📝 Contributing to Documentation
 
-1. **Follow TSDoc Standards**: Use [tsdoc-standards.md](../Architecture/tsdoc-standards.md)
+1. **Follow TSDoc Standards**: Use [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)
 2. **Update Index**: Add new documents to this index
 3. **Cross-Reference**: Link related documents
 4. **Keep Current**: Update outdated information
@@ -210,29 +210,29 @@ Track documentation health:
 
 ### 📚 Complete Onboarding (New Team Member)
 
-1. [AI-CONTEXT.md](./AI-CONTEXT.md) - Project overview
-2. [DEVELOPER-QUICK-START.md](./DEVELOPER-QUICK-START.md) - Setup
-3. [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) - Environment
+1. [AI_CONTEXT.md](./AI_CONTEXT.md) - Project overview
+2. [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) - Setup
+3. [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
 4. [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
-5. [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - Interfaces
+5. [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
 
 ### ⚡ Quick Start (Experienced Developer)
 
-1. [AI-CONTEXT.md](./AI-CONTEXT.md) - Architecture overview
-2. [DEVELOPER-QUICK-START.md](./DEVELOPER-QUICK-START.md) - Setup
-3. [Architecture/Patterns/Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) - Patterns
+1. [AI_CONTEXT.md](./AI_CONTEXT.md) - Architecture overview
+2. [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) - Setup
+3. [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Patterns
 
 ### 🐛 Debugging Focus
 
 1. [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Issues and solutions
-2. [ENVIRONMENT-SETUP.md](./ENVIRONMENT-SETUP.md) - Debug tools
-3. [API-DOCUMENTATION.md](./API-DOCUMENTATION.md) - Error patterns
+2. [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) - Debug tools
+3. [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Error patterns
 
 ### 🏗️ Architecture Deep Dive
 
 1. [Architecture/ADRs/](../Architecture/ADRs/) - All decisions
 2. Historical documents for evolution context
-3. [Architecture/Patterns/Development-Patterns-Guide.md](../Architecture/Patterns/Development-Patterns-Guide.md) - Implementation patterns
+3. [Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Implementation patterns
 
 ---
 

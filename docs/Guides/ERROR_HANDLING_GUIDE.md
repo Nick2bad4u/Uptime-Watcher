@@ -916,10 +916,10 @@ By following these patterns and practices, developers can ensure robust error ha
 
 ## 📚 Related Resources
 
-- [Event System Guide](./event-system-guide.md) - TypedEventBus error propagation patterns
-- [Zustand Store Pattern Guide](./zustand-store-pattern-guide.md) - Store composition and error isolation
-- [Testing Guide](./testing.md) - Error scenario testing approaches
-- [Troubleshooting Guide](./troubleshooting.md) - Error debugging and resolution
+- [Event System Guide](./EVENT_SYSTEM_GUIDE.md) - TypedEventBus error propagation patterns
+- [Zustand Store Pattern Guide](./ZUSTAND_STORE_PATTERN_GUIDE.md) - Store composition and error isolation
+- [Testing Guide](./TESTING.md) - Error scenario testing approaches
+- [Troubleshooting Guide](./TROUBLESHOOTING.md) - Error debugging and resolution
 - [Architecture ADRs](../Architecture/ADRs/) - Error handling strategy decisions
 
 ## 🎯 Quick Reference
