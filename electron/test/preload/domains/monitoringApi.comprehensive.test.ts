@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { monitoringApi } from "../../../preload/domains/monitoringApi";
+import { MONITORING_CHANNELS } from "@shared/types/preload";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
-import type { ValidationResult } from "@shared/types/validation";
 
 vi.mock("electron", () => ({
     ipcRenderer: {
@@ -16,56 +16,6 @@ describe("monitoringApi", () => {
         vi.clearAllMocks();
     });
 
-    it("formats monitor detail strings", async () => {
-        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
-            success: true,
-            data: "HTTP: status ok",
-        });
-
-        const result = await monitoringApi.formatMonitorDetail(
-            "http",
-            "status ok"
-        );
-
-        expect(result).toBe("HTTP: status ok");
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "format-monitor-detail",
-            "http",
-            "status ok"
-        );
-    });
-
-    it("formats monitor title suffix", async () => {
-        const monitor: Monitor = {
-            checkInterval: 60_000,
-            history: [],
-            id: "m-1",
-            monitoring: true,
-            responseTime: 0,
-            retryAttempts: 0,
-            status: "up",
-            timeout: 30_000,
-            type: "http",
-        };
-
-        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
-            success: true,
-            data: "(HTTP)",
-        });
-
-        const result = await monitoringApi.formatMonitorTitleSuffix(
-            "http",
-            monitor
-        );
-
-        expect(result).toBe("(HTTP)");
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "format-monitor-title-suffix",
-            "http",
-            monitor
-        );
-    });
-
     it("starts monitoring for a site", async () => {
         vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
             success: true,
@@ -75,7 +25,7 @@ describe("monitoringApi", () => {
         await monitoringApi.startMonitoringForSite("site-1");
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "start-monitoring-for-site",
+            MONITORING_CHANNELS.startMonitoringForSite,
             "site-1"
         );
     });
@@ -89,7 +39,7 @@ describe("monitoringApi", () => {
         await monitoringApi.startMonitoringForMonitor("site-1", "monitor-1");
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "start-monitoring-for-monitor",
+            MONITORING_CHANNELS.startMonitoringForMonitor,
             "site-1",
             "monitor-1"
         );
@@ -104,7 +54,7 @@ describe("monitoringApi", () => {
         await monitoringApi.stopMonitoringForSite("site-1");
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "stop-monitoring-for-site",
+            MONITORING_CHANNELS.stopMonitoringForSite,
             "site-1"
         );
     });
@@ -118,31 +68,9 @@ describe("monitoringApi", () => {
         await monitoringApi.stopMonitoringForMonitor("site-1", "monitor-1");
 
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "stop-monitoring-for-monitor",
+            MONITORING_CHANNELS.stopMonitoringForMonitor,
             "site-1",
             "monitor-1"
-        );
-    });
-
-    it("validates monitor data structures", async () => {
-        const validation: ValidationResult = {
-            success: true,
-            errors: [],
-            warnings: [],
-        };
-
-        vi.mocked(ipcRenderer.invoke).mockResolvedValueOnce({
-            success: true,
-            data: validation,
-        });
-
-        const result = await monitoringApi.validateMonitorData("http", {});
-
-        expect(result).toEqual(validation);
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "validate-monitor-data",
-            "http",
-            {}
         );
     });
 
@@ -184,7 +112,7 @@ describe("monitoringApi", () => {
 
         expect(result).toEqual(update);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "check-site-now",
+            MONITORING_CHANNELS.checkSiteNow,
             "site-1",
             "monitor-1"
         );

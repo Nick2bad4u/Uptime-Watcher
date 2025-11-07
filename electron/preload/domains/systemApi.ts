@@ -12,7 +12,10 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { SystemDomainBridge } from "@shared/types/preload";
+import {
+    SYSTEM_CHANNELS,
+    type SystemDomainBridge,
+} from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
@@ -36,7 +39,7 @@ export const systemApi: SystemApiInterface = {
      *
      * @returns Promise resolving to true if URL was opened successfully
      */
-    openExternal: createTypedInvoker("open-external"),
+    openExternal: createTypedInvoker(SYSTEM_CHANNELS.openExternal),
 
     /**
      * Quits the application and installs a pending update
@@ -46,7 +49,7 @@ export const systemApi: SystemApiInterface = {
      * downloaded update. This is typically called after the user confirms they
      * want to install an available update.
      */
-    quitAndInstall: createTypedInvoker("quit-and-install"),
+    quitAndInstall: createTypedInvoker(SYSTEM_CHANNELS.quitAndInstall),
 } as const;
 
 /**

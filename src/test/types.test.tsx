@@ -545,6 +545,21 @@ describe("Types Module", () => {
                             name: "Updated",
                         } as Site),
                 },
+                monitorTypes: {
+                    formatMonitorDetail: () =>
+                        Promise.resolve("Formatted detail"),
+                    formatMonitorTitleSuffix: () =>
+                        Promise.resolve(" (suffix)"),
+                    getMonitorTypes: () => Promise.resolve({}),
+                    validateMonitorData: () =>
+                        Promise.resolve({
+                            data: {},
+                            errors: [],
+                            metadata: {},
+                            success: true,
+                            warnings: [],
+                        }),
+                },
                 system: {
                     quitAndInstall: () => Promise.resolve(true),
                 },
@@ -563,12 +578,6 @@ describe("Types Module", () => {
             expect(typeof mockAPI.events.removeAllListeners).toBe("function");
 
             expect(typeof mockAPI.monitoring.startMonitoring).toBe("function");
-            expect(typeof mockAPI.monitoring.formatMonitorDetail).toBe(
-                "function"
-            );
-            expect(typeof mockAPI.monitoring.formatMonitorTitleSuffix).toBe(
-                "function"
-            );
             expect(typeof mockAPI.monitoring.stopMonitoring).toBe("function");
             expect(typeof mockAPI.monitoring.startMonitoringForMonitor).toBe(
                 "function"
@@ -582,10 +591,20 @@ describe("Types Module", () => {
             expect(typeof mockAPI.monitoring.stopMonitoringForSite).toBe(
                 "function"
             );
-            expect(typeof mockAPI.monitoring.validateMonitorData).toBe(
+            expect(typeof mockAPI.monitoring.checkSiteNow).toBe("function");
+
+            expect(typeof mockAPI.monitorTypes.formatMonitorDetail).toBe(
                 "function"
             );
-            expect(typeof mockAPI.monitoring.checkSiteNow).toBe("function");
+            expect(typeof mockAPI.monitorTypes.formatMonitorTitleSuffix).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitorTypes.getMonitorTypes).toBe(
+                "function"
+            );
+            expect(typeof mockAPI.monitorTypes.validateMonitorData).toBe(
+                "function"
+            );
 
             expect(typeof mockAPI.settings.getHistoryLimit).toBe("function");
             expect(typeof mockAPI.settings.updateHistoryLimit).toBe("function");

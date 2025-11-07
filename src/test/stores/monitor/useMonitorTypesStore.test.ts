@@ -55,8 +55,6 @@ const mockElectronAPI = {
                 ],
             },
         ] as MonitorTypeConfig[]),
-    },
-    monitoring: {
         validateMonitorData: vi.fn().mockResolvedValue({
             success: true,
             errors: [],
@@ -65,6 +63,7 @@ const mockElectronAPI = {
         formatMonitorDetail: vi.fn().mockResolvedValue("Formatted detail"),
         formatMonitorTitleSuffix: vi.fn().mockResolvedValue(" (formatted)"),
     },
+    monitoring: {},
 };
 
 // Mock the global window object
@@ -202,7 +201,7 @@ describe(useMonitorTypesStore, () => {
             metadata: {},
         };
 
-        mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+        mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
             mockValidationResult
         );
 
@@ -225,7 +224,7 @@ describe(useMonitorTypesStore, () => {
         await annotate("Category: Store", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
+        mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
             "Formatted detail"
         );
 
@@ -261,7 +260,7 @@ describe(useMonitorTypesStore, () => {
             url: "https://example.com",
         };
 
-        mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
+        mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
             "(https://example.com)"
         );
 
@@ -303,7 +302,7 @@ describe(useMonitorTypesStore, () => {
         await annotate("Type: Error Handling", "type");
 
         // Simulate service error handling by throwing error (service now re-throws)
-        mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
+        mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
             new Error("Formatting failed")
         );
 
@@ -338,7 +337,7 @@ describe(useMonitorTypesStore, () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockValidationResult
             );
 
@@ -377,7 +376,7 @@ describe(useMonitorTypesStore, () => {
                 metadata: {},
             } satisfies ValidationResult;
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockValidationFailureData
             );
 
@@ -411,7 +410,7 @@ describe(useMonitorTypesStore, () => {
             await annotate("Type: IPC Response Handling", "type");
 
             // Mock service error handling by throwing error (service now re-throws)
-            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
                 new Error("Backend unavailable")
             );
 

@@ -62,13 +62,12 @@ vi.mock("../../../types/ipc", () => ({
 // Mock ElectronAPI
 const mockElectronAPI = {
     monitorTypes: {
-        getMonitorTypes: vi.fn(),
-    },
-    monitoring: {
         validateMonitorData: vi.fn(),
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
+        getMonitorTypes: vi.fn(),
     },
+    monitoring: {},
 };
 
 // Properly mock window.electronAPI
@@ -198,7 +197,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             const { result } = renderHook(() => useMonitorTypesStore());
 
             // Test formatMonitorDetail with API error - should throw
-            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
                 new Error("API error")
             );
 
@@ -211,7 +210,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             });
 
             // Test formatMonitorTitleSuffix with API error - should throw
-            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockRejectedValue(
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockRejectedValue(
                 new Error("API error")
             );
 
@@ -662,7 +661,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: { timestamp: Date.now(), version: "1.0" },
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValueOnce(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
                 completeValidationData
             );
 
@@ -690,7 +689,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 // Missing warnings and metadata
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValueOnce(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
                 minimalValidationData
             );
 
@@ -720,7 +719,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValueOnce(nullValidationResult);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
+                nullValidationResult
+            );
 
             // Mock safeExtractIpcData to return the validation result
             originalSafeExtractIpcData.mockReturnValueOnce(nullValidationResult);
@@ -769,7 +770,9 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 },
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValueOnce(complexValidationResult);
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce(
+                complexValidationResult
+            );
 
             // Clear the default mock and set specific behavior for this test
             originalSafeExtractIpcData.mockReset();
@@ -848,7 +851,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockValidationResult
             );
 
@@ -879,7 +882,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             originalLogStoreAction.mockClear();
 
             // Test formatMonitorDetail logging
-            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValueOnce(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValueOnce(
                 "formatted"
             );
             originalSafeExtractIpcData.mockReturnValueOnce("formatted");
@@ -904,7 +907,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             );
 
             // Test formatMonitorTitleSuffix logging
-            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValueOnce(
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValueOnce(
                 "suffix"
             );
             originalSafeExtractIpcData.mockReturnValueOnce("suffix");
@@ -952,7 +955,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             ];
 
             for (const edgeType of edgeCaseTypes) {
-                mockElectronAPI.monitoring.validateMonitorData.mockResolvedValueOnce({
+                mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValueOnce({
                     success: false,
                     data: null,
                     errors: ["Type validation failed"],
@@ -1173,7 +1176,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
 
             // Test permission errors
             await act(async () => {
-                mockElectronAPI.monitoring.validateMonitorData.mockImplementation(async () => {
+                mockElectronAPI.monitorTypes.validateMonitorData.mockImplementation(async () => {
                     throw "Permission denied";
                 });
                 try {
@@ -1186,7 +1189,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(result.current.lastError).toBe("Permission denied");
 
             // Test service unavailable errors
-            mockElectronAPI.monitoring.formatMonitorDetail.mockImplementation(async () => {
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockImplementation(async () => {
                 throw "Service unavailable";
             });
 
@@ -1201,7 +1204,7 @@ describe("useMonitorTypesStore - 100% Coverage", () => {
             expect(result.current.lastError).toBe("Service unavailable");
 
             // Test corrupted response errors
-            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockImplementation(async () => {
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockImplementation(async () => {
                 throw "Corrupted response";
             });
 

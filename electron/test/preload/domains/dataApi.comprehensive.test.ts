@@ -11,6 +11,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { IpcResponse } from "../../../preload/core/bridgeFactory";
 import { dataApi } from "../../../preload/domains/dataApi";
+import { DATA_CHANNELS } from "@shared/types/preload";
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
 
 const ipcRenderer = vi.hoisted(() => ({
@@ -65,7 +66,7 @@ describe("dataApi", () => {
             const result = await dataApi.downloadSqliteBackup();
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                "download-sqlite-backup"
+                DATA_CHANNELS.downloadSqliteBackup
             );
             expect(result).toStrictEqual(expected);
         });
@@ -94,7 +95,9 @@ describe("dataApi", () => {
 
             const result = await dataApi.exportData();
 
-            expect(ipcRenderer.invoke).toHaveBeenCalledWith("export-data");
+            expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+                DATA_CHANNELS.exportData
+            );
             expect(result).toBe(exportBlob);
         });
 
@@ -121,7 +124,7 @@ describe("dataApi", () => {
             const result = await dataApi.importData(payload);
 
             expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-                "import-data",
+                DATA_CHANNELS.importData,
                 payload
             );
             expect(result).toBeTruthy();

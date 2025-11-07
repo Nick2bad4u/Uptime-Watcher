@@ -27,13 +27,10 @@ const { ensureInitialized, wrap } = ((): ReturnType<
             bridgeContracts: [
                 {
                     domain: "monitorTypes",
-                    methods: ["getMonitorTypes"],
-                },
-                {
-                    domain: "monitoring",
                     methods: [
                         "formatMonitorDetail",
                         "formatMonitorTitleSuffix",
+                        "getMonitorTypes",
                         "validateMonitorData",
                     ],
                 },
@@ -93,7 +90,7 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
     formatMonitorDetail: wrap(
         "formatMonitorDetail",
         async (api, type: string, details: string) =>
-            api.monitoring.formatMonitorDetail(type, details)
+            api.monitorTypes.formatMonitorDetail(type, details)
     ),
 
     /**
@@ -119,7 +116,7 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
     formatMonitorTitleSuffix: wrap(
         "formatMonitorTitleSuffix",
         async (api, type: string, monitor: Monitor) =>
-            api.monitoring.formatMonitorTitleSuffix(type, monitor)
+            api.monitorTypes.formatMonitorTitleSuffix(type, monitor)
     ),
 
     /**
@@ -188,6 +185,6 @@ export const MonitorTypesService: MonitorTypesServiceContract = {
     validateMonitorData: wrap(
         "validateMonitorData",
         async (api, type: string, data: unknown): Promise<ValidationResult> =>
-            api.monitoring.validateMonitorData(type, data)
+            api.monitorTypes.validateMonitorData(type, data)
     ),
 };

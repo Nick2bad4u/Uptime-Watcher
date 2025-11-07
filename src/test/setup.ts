@@ -3,7 +3,7 @@
  * components.
  */
 
-import { vi, type MockInstance } from "vitest";
+import { beforeEach, vi, type MockInstance } from "vitest";
 import "@testing-library/jest-dom";
 import fc from "fast-check";
 import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
@@ -130,6 +130,16 @@ fc.configureGlobal({
     // Replace reporter if you want custom behavior:
     // reporter: jsonReporter,
     // asyncReporter: async (runDetails) => { /* async reporting */ },
+});
+
+let windowOpenSpy: MockInstance | undefined;
+
+if (typeof window !== "undefined" && typeof window.open === "function") {
+    windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+}
+
+beforeEach(() => {
+    windowOpenSpy?.mockClear();
 });
 
 /**

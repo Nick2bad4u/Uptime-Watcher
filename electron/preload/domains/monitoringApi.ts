@@ -13,7 +13,10 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { MonitoringDomainBridge } from "@shared/types/preload";
+import {
+    MONITORING_CHANNELS,
+    type MonitoringDomainBridge,
+} from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
@@ -33,24 +36,6 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
      *   when no update is available
      */
     checkSiteNow: MonitoringDomainBridge["checkSiteNow"];
-
-    /**
-     * Formats monitor detail information for display
-     *
-     * @param monitorData - Monitor data to format
-     *
-     * @returns Promise resolving to formatted detail string
-     */
-    formatMonitorDetail: MonitoringDomainBridge["formatMonitorDetail"];
-
-    /**
-     * Formats monitor title suffix for display
-     *
-     * @param monitorData - Monitor data to format
-     *
-     * @returns Promise resolving to formatted title suffix
-     */
-    formatMonitorTitleSuffix: MonitoringDomainBridge["formatMonitorTitleSuffix"];
 
     /**
      * Starts the global monitoring system
@@ -105,16 +90,6 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
      * @returns Promise resolving to true if monitoring stopped successfully
      */
     stopMonitoringForSite: MonitoringDomainBridge["stopMonitoringForSite"];
-
-    /**
-     * Validates monitor configuration data
-     *
-     * @param monitorType - Type of monitor to validate
-     * @param monitorData - Monitor configuration data
-     *
-     * @returns Promise resolving to validation result
-     */
-    validateMonitorData: MonitoringDomainBridge["validateMonitorData"];
 }
 
 /**
@@ -126,25 +101,7 @@ export const monitoringApi: MonitoringApiInterface = {
     /**
      * Performs an immediate check for a specific monitor
      */
-    checkSiteNow: createTypedInvoker("check-site-now"),
-
-    /**
-     * Formats monitor detail information for display
-     *
-     * @param monitorData - Monitor data to format
-     *
-     * @returns Promise resolving to formatted detail string
-     */
-    formatMonitorDetail: createTypedInvoker("format-monitor-detail"),
-
-    /**
-     * Formats monitor title suffix for display
-     *
-     * @param monitorData - Monitor data to format
-     *
-     * @returns Promise resolving to formatted title suffix
-     */
-    formatMonitorTitleSuffix: createTypedInvoker("format-monitor-title-suffix"),
+    checkSiteNow: createTypedInvoker(MONITORING_CHANNELS.checkSiteNow),
 
     /**
      * Starts the global monitoring system
@@ -152,7 +109,7 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    startMonitoring: createTypedInvoker("start-monitoring"),
+    startMonitoring: createTypedInvoker(MONITORING_CHANNELS.startMonitoring),
 
     /**
      * Starts monitoring for a specific monitor within a site
@@ -163,7 +120,7 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to true if monitoring started successfully
      */
     startMonitoringForMonitor: createTypedInvoker(
-        "start-monitoring-for-monitor"
+        MONITORING_CHANNELS.startMonitoringForMonitor
     ),
 
     /**
@@ -173,7 +130,9 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
-    startMonitoringForSite: createTypedInvoker("start-monitoring-for-site"),
+    startMonitoringForSite: createTypedInvoker(
+        MONITORING_CHANNELS.startMonitoringForSite
+    ),
 
     /**
      * Stops the global monitoring system
@@ -181,7 +140,7 @@ export const monitoringApi: MonitoringApiInterface = {
      * @returns Promise resolving to the lifecycle summary emitted by the
      *   backend.
      */
-    stopMonitoring: createTypedInvoker("stop-monitoring"),
+    stopMonitoring: createTypedInvoker(MONITORING_CHANNELS.stopMonitoring),
 
     /**
      * Stops monitoring for a specific monitor within a site
@@ -191,7 +150,9 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForMonitor: createTypedInvoker("stop-monitoring-for-monitor"),
+    stopMonitoringForMonitor: createTypedInvoker(
+        MONITORING_CHANNELS.stopMonitoringForMonitor
+    ),
 
     /**
      * Stops monitoring for all monitors belonging to a specific site
@@ -200,17 +161,9 @@ export const monitoringApi: MonitoringApiInterface = {
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
-    stopMonitoringForSite: createTypedInvoker("stop-monitoring-for-site"),
-
-    /**
-     * Validates monitor configuration data
-     *
-     * @param monitorType - Type of monitor to validate
-     * @param monitorData - Monitor configuration data
-     *
-     * @returns Promise resolving to validation result
-     */
-    validateMonitorData: createTypedInvoker("validate-monitor-data"),
+    stopMonitoringForSite: createTypedInvoker(
+        MONITORING_CHANNELS.stopMonitoringForSite
+    ),
 } as const;
 
 /**

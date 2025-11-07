@@ -14,7 +14,7 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { DataDomainBridge } from "@shared/types/preload";
+import { DATA_CHANNELS, type DataDomainBridge } from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
@@ -59,14 +59,16 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to backup buffer data
      */
-    downloadSqliteBackup: createTypedInvoker("download-sqlite-backup"),
+    downloadSqliteBackup: createTypedInvoker(
+        DATA_CHANNELS.downloadSqliteBackup
+    ),
 
     /**
      * Exports all application data to a JSON string
      *
      * @returns Promise resolving to exported data as JSON string
      */
-    exportData: createTypedInvoker("export-data"),
+    exportData: createTypedInvoker(DATA_CHANNELS.exportData),
 
     /**
      * Imports application data from a JSON string
@@ -75,7 +77,7 @@ export const dataApi: DataApiInterface = {
      *
      * @returns Promise resolving to a boolean success flag
      */
-    importData: createTypedInvoker("import-data"),
+    importData: createTypedInvoker(DATA_CHANNELS.importData),
 } as const;
 
 /**

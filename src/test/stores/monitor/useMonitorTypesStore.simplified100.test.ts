@@ -42,12 +42,11 @@ vi.mock("../../../types/ipc", () => ({
 const mockElectronAPI = {
     monitorTypes: {
         getMonitorTypes: vi.fn(),
-    },
-    monitoring: {
         validateMonitorData: vi.fn(),
         formatMonitorDetail: vi.fn(),
         formatMonitorTitleSuffix: vi.fn(),
     },
+    monitoring: {},
 };
 
 // Mock window.electronAPI
@@ -242,7 +241,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockValidationResult
             );
 
@@ -269,7 +268,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 // Missing warnings and metadata
             } satisfies ValidationResult;
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 mockResult
             );
 
@@ -291,7 +290,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle validation errors", async () => {
             const testError = new Error("Validation service unavailable");
-            mockElectronAPI.monitoring.validateMonitorData.mockRejectedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockRejectedValue(
                 testError
             );
 
@@ -314,7 +313,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
     describe("Formatting Operations", () => {
         it("should format monitor details successfully", async () => {
             const formattedDetail = "Formatted detail text";
-            mockElectronAPI.monitoring.formatMonitorDetail.mockResolvedValue(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockResolvedValue(
                 formattedDetail
             );
             mockSafeExtractIpcData.mockReturnValue(formattedDetail);
@@ -334,7 +333,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle format detail errors", async () => {
             const testError = new Error("Format service error");
-            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
                 testError
             );
 
@@ -353,7 +352,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should format monitor title suffix", async () => {
             const suffix = " - example.com";
-            mockElectronAPI.monitoring.formatMonitorTitleSuffix.mockResolvedValue(
+            mockElectronAPI.monitorTypes.formatMonitorTitleSuffix.mockResolvedValue(
                 suffix
             );
             mockSafeExtractIpcData.mockReturnValue(suffix);
@@ -376,7 +375,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
 
         it("should handle fallback values for formatting", async () => {
             // Mock rejection to test error propagation
-            mockElectronAPI.monitoring.formatMonitorDetail.mockRejectedValue(
+            mockElectronAPI.monitorTypes.formatMonitorDetail.mockRejectedValue(
                 new Error("Formatting failed")
             );
 
@@ -564,7 +563,7 @@ describe("useMonitorTypesStore - 100% Coverage Simplified", () => {
                 metadata: {},
             };
 
-            mockElectronAPI.monitoring.validateMonitorData.mockResolvedValue(
+            mockElectronAPI.monitorTypes.validateMonitorData.mockResolvedValue(
                 expectedValidationResult
             );
 

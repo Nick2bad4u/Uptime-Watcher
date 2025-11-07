@@ -314,12 +314,6 @@ const mockElectronAPI: ElectronAPI = {
                 return statusUpdate;
             }
         ),
-        formatMonitorDetail: vi.fn<
-            ElectronAPI["monitoring"]["formatMonitorDetail"]
-        >(async (_monitorType, details) => details),
-        formatMonitorTitleSuffix: vi.fn<
-            ElectronAPI["monitoring"]["formatMonitorTitleSuffix"]
-        >(async (monitorType, monitor) => `${monitor.id}-${monitorType}`),
         startMonitoring: vi.fn<ElectronAPI["monitoring"]["startMonitoring"]>(
             async () => startSummaryMock
         ),
@@ -338,8 +332,20 @@ const mockElectronAPI: ElectronAPI = {
         stopMonitoringForSite: vi.fn<
             ElectronAPI["monitoring"]["stopMonitoringForSite"]
         >(async () => true),
+    },
+
+    monitorTypes: {
+        formatMonitorDetail: vi.fn<
+            ElectronAPI["monitorTypes"]["formatMonitorDetail"]
+        >(async (_monitorType, details) => details),
+        formatMonitorTitleSuffix: vi.fn<
+            ElectronAPI["monitorTypes"]["formatMonitorTitleSuffix"]
+        >(async (monitorType, monitor) => `${monitor.id}-${monitorType}`),
+        getMonitorTypes: vi.fn<ElectronAPI["monitorTypes"]["getMonitorTypes"]>(
+            async () => []
+        ),
         validateMonitorData: vi.fn<
-            ElectronAPI["monitoring"]["validateMonitorData"]
+            ElectronAPI["monitorTypes"]["validateMonitorData"]
         >(
             async (monitorType, monitorData) =>
                 ({
@@ -349,12 +355,6 @@ const mockElectronAPI: ElectronAPI = {
                     success: true,
                     warnings: [],
                 }) satisfies ValidationResult
-        ),
-    },
-
-    monitorTypes: {
-        getMonitorTypes: vi.fn<ElectronAPI["monitorTypes"]["getMonitorTypes"]>(
-            async () => []
         ),
     },
 

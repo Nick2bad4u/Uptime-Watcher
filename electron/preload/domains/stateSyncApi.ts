@@ -11,9 +11,10 @@
  * @packageDocumentation
  */
 
-import type {
-    StateSyncApiSurface,
-    StateSyncDomainBridge,
+import {
+    STATE_SYNC_CHANNELS,
+    type StateSyncApiSurface,
+    type StateSyncDomainBridge,
 } from "@shared/types/preload";
 
 import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
@@ -76,7 +77,7 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to current sync status information
      */
-    getSyncStatus: createTypedInvoker("get-sync-status"),
+    getSyncStatus: createTypedInvoker(STATE_SYNC_CHANNELS.getSyncStatus),
 
     /**
      * Subscribe to state synchronization events
@@ -127,7 +128,7 @@ export const stateSyncApi: StateSyncApiInterface = {
      *
      * @returns Promise resolving to synchronized site data
      */
-    requestFullSync: createTypedInvoker("request-full-sync"),
+    requestFullSync: createTypedInvoker(STATE_SYNC_CHANNELS.requestFullSync),
 } as const;
 
 /**

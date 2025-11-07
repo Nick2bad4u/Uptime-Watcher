@@ -12,7 +12,10 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { MonitorTypesDomainBridge } from "@shared/types/preload";
+import {
+    MONITOR_TYPES_CHANNELS,
+    type MonitorTypesDomainBridge,
+} from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
@@ -23,11 +26,23 @@ import { createTypedInvoker } from "../core/bridgeFactory";
  */
 export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
     /**
+     * Formats monitor detail information for display.
+     */
+    formatMonitorDetail: MonitorTypesDomainBridge["formatMonitorDetail"];
+    /**
+     * Formats monitor title suffix for display.
+     */
+    formatMonitorTitleSuffix: MonitorTypesDomainBridge["formatMonitorTitleSuffix"];
+    /**
      * Gets all available monitor types and their configurations
      *
      * @returns Promise resolving to monitor types registry
      */
     getMonitorTypes: MonitorTypesDomainBridge["getMonitorTypes"];
+    /**
+     * Validates monitor configuration data.
+     */
+    validateMonitorData: MonitorTypesDomainBridge["validateMonitorData"];
 }
 
 /**
@@ -37,11 +52,32 @@ export interface MonitorTypesApiInterface extends MonitorTypesDomainBridge {
  */
 export const monitorTypesApi: MonitorTypesApiInterface = {
     /**
+     * Formats monitor detail information for display.
+     */
+    formatMonitorDetail: createTypedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorDetail
+    ),
+
+    /**
+     * Formats monitor title suffix for display.
+     */
+    formatMonitorTitleSuffix: createTypedInvoker(
+        MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix
+    ),
+
+    /**
      * Gets all available monitor types and their configurations
      *
      * @returns Promise resolving to monitor types registry
      */
-    getMonitorTypes: createTypedInvoker("get-monitor-types"),
+    getMonitorTypes: createTypedInvoker(MONITOR_TYPES_CHANNELS.getMonitorTypes),
+
+    /**
+     * Validates monitor configuration data.
+     */
+    validateMonitorData: createTypedInvoker(
+        MONITOR_TYPES_CHANNELS.validateMonitorData
+    ),
 } as const;
 
 /**

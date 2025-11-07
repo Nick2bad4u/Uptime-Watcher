@@ -47,28 +47,30 @@ const WithFormatFailure = ({
 }: {
     readonly children: ReactNode;
 }): JSX.Element => {
-    type FormatMonitorDetail = ElectronAPI["monitoring"]["formatMonitorDetail"];
+    type FormatMonitorDetail =
+        ElectronAPI["monitorTypes"]["formatMonitorDetail"];
 
     const originalRef = useRef<FormatMonitorDetail | null>(null);
 
     useMount(
         () => {
-            const monitoring = window.electronAPI.monitoring as unknown as {
+            const monitorTypes = window.electronAPI.monitorTypes as unknown as {
                 formatMonitorDetail: FormatMonitorDetail;
             };
 
-            originalRef.current = monitoring.formatMonitorDetail;
-            monitoring.formatMonitorDetail = async (): Promise<never> => {
+            originalRef.current = monitorTypes.formatMonitorDetail;
+            monitorTypes.formatMonitorDetail = async (): Promise<never> => {
                 throw new Error("Simulated formatting failure");
             };
         },
         () => {
             if (originalRef.current) {
-                const monitoring = window.electronAPI.monitoring as unknown as {
+                const monitorTypes = window.electronAPI
+                    .monitorTypes as unknown as {
                     formatMonitorDetail: FormatMonitorDetail;
                 };
 
-                monitoring.formatMonitorDetail = originalRef.current;
+                monitorTypes.formatMonitorDetail = originalRef.current;
             }
         }
     );

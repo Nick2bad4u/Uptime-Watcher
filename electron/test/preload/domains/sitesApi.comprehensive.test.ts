@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { sitesApi } from "../../../preload/domains/sitesApi";
+import { SITES_CHANNELS } from "@shared/types/preload";
 import type { Site } from "@shared/types";
 
 vi.mock("electron", () => ({
@@ -31,7 +32,10 @@ describe("sitesApi", () => {
         const result = await sitesApi.addSite(baseSite);
 
         expect(result).toEqual(baseSite);
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("add-site", baseSite);
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SITES_CHANNELS.addSite,
+            baseSite
+        );
     });
 
     it("retrieves all sites", async () => {
@@ -43,7 +47,9 @@ describe("sitesApi", () => {
         const result = await sitesApi.getSites();
 
         expect(result).toEqual([baseSite]);
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("get-sites");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SITES_CHANNELS.getSites
+        );
     });
 
     it("removes a site by identifier", async () => {
@@ -56,7 +62,7 @@ describe("sitesApi", () => {
 
         expect(result).toEqual(baseSite);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "remove-site",
+            SITES_CHANNELS.removeSite,
             baseSite.identifier
         );
     });
@@ -74,7 +80,7 @@ describe("sitesApi", () => {
 
         expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "remove-monitor",
+            SITES_CHANNELS.removeMonitor,
             baseSite.identifier,
             "monitor-1"
         );
@@ -93,7 +99,7 @@ describe("sitesApi", () => {
 
         expect(result).toEqual(updated);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "update-site",
+            SITES_CHANNELS.updateSite,
             baseSite.identifier,
             { name: "Updated" }
         );
@@ -108,7 +114,9 @@ describe("sitesApi", () => {
         const result = await sitesApi.deleteAllSites();
 
         expect(result).toBe(4);
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("delete-all-sites");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SITES_CHANNELS.deleteAllSites
+        );
     });
 
     it("throws when an IPC call fails", async () => {

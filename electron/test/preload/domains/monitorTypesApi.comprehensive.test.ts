@@ -27,7 +27,10 @@ import {
     monitorTypesApi,
     type MonitorTypesApiInterface,
 } from "../../../preload/domains/monitorTypesApi";
+import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
+import type { Monitor } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { ValidationResult } from "@shared/types/validation";
 
 // Helper functions for IPC response format
 const createIpcResponse = <T>(data: T) => ({ success: true, data });
@@ -46,7 +49,12 @@ describe("Monitor Types Domain API", () => {
 
     describe("API Structure Validation", () => {
         it("should expose all required monitor types methods", () => {
-            const expectedMethods = ["getMonitorTypes"];
+            const expectedMethods = [
+                "formatMonitorDetail",
+                "formatMonitorTitleSuffix",
+                "getMonitorTypes",
+                "validateMonitorData",
+            ];
 
             for (const method of expectedMethods) {
                 expect(api).toHaveProperty(method);
@@ -56,6 +64,79 @@ describe("Monitor Types Domain API", () => {
 
         it("should reference the same monitorTypesApi instance", () => {
             expect(api).toBe(monitorTypesApi);
+        });
+    });
+
+    describe("formatMonitorDetail", () => {
+        it("should call IPC with correct channel and return formatted detail", async () => {
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("HTTP: status ok")
+            );
+
+            const result = await api.formatMonitorDetail("http", "status ok");
+
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+                "http",
+                "status ok"
+            );
+            expect(result).toBe("HTTP: status ok");
+        });
+    });
+
+    describe("formatMonitorTitleSuffix", () => {
+        it("should call IPC with correct channel and return formatted suffix", async () => {
+            const monitor: Monitor = {
+                checkInterval: 60_000,
+                history: [],
+                id: "monitor-1",
+                monitoring: true,
+                responseTime: 0,
+                retryAttempts: 0,
+                status: "up",
+                timeout: 30_000,
+                type: "http",
+            };
+
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse("(HTTP)")
+            );
+
+            const result = await api.formatMonitorTitleSuffix("http", monitor);
+
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
+                "http",
+                monitor
+            );
+            expect(result).toBe("(HTTP)");
+        });
+    });
+
+    describe("validateMonitorData", () => {
+        it("should call IPC with correct channel and return validation result", async () => {
+            const validationResult: ValidationResult = {
+                success: true,
+                errors: [],
+                warnings: [],
+            };
+
+            mockIpcRenderer.invoke.mockResolvedValue(
+                createIpcResponse(validationResult)
+            );
+
+            const result = await api.validateMonitorData("http", {
+                url: "https://example.com",
+            });
+
+            expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
+                MONITOR_TYPES_CHANNELS.validateMonitorData,
+                "http",
+                {
+                    url: "https://example.com",
+                }
+            );
+            expect(result).toEqual(validationResult);
         });
     });
 
@@ -87,7 +168,7 @@ describe("Monitor Types Domain API", () => {
             const result = await api.getMonitorTypes();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "get-monitor-types"
+                MONITOR_TYPES_CHANNELS.getMonitorTypes
             );
             expect(result).toEqual(mockMonitorTypes);
         });

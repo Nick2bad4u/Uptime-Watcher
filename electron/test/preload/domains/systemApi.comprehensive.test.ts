@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { systemApi } from "../../../preload/domains/systemApi";
+import { SYSTEM_CHANNELS } from "@shared/types/preload";
 
 vi.mock("electron", () => ({
     ipcRenderer: {
@@ -27,7 +28,7 @@ describe("systemApi", () => {
 
         expect(result).toBeTruthy();
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "open-external",
+            SYSTEM_CHANNELS.openExternal,
             "https://example.com"
         );
     });
@@ -59,7 +60,7 @@ describe("systemApi", () => {
                     };
                 }
 
-                if (channel === "quit-and-install") {
+                if (channel === SYSTEM_CHANNELS.quitAndInstall) {
                     return {
                         success: true,
                         data: true,
@@ -74,6 +75,8 @@ describe("systemApi", () => {
         const result = await systemApi.quitAndInstall();
 
         expect(result).toBeTruthy();
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("quit-and-install");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SYSTEM_CHANNELS.quitAndInstall
+        );
     });
 });

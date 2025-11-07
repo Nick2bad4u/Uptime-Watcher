@@ -22,6 +22,7 @@ import {
     stateSyncApi,
     type StateSyncApiInterface,
 } from "../../../preload/domains/stateSyncApi";
+import { STATE_SYNC_CHANNELS } from "@shared/types/preload";
 import type { Site } from "@shared/types";
 import type { StateSyncEventData } from "@shared/types/events";
 import type {
@@ -119,7 +120,7 @@ describe("State Sync Domain API", () => {
             const result = await api.getSyncStatus();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "get-sync-status"
+                STATE_SYNC_CHANNELS.getSyncStatus
             );
             expect(result).toEqual(mockStatus);
             expect(typeof result.siteCount).toBe("number");
@@ -203,7 +204,7 @@ describe("State Sync Domain API", () => {
             const result = await api.requestFullSync();
 
             expect(mockIpcRenderer.invoke).toHaveBeenCalledWith(
-                "request-full-sync"
+                STATE_SYNC_CHANNELS.requestFullSync
             );
             expect(result).toEqual(mockResult);
             expect(Array.isArray(result.sites)).toBeTruthy();

@@ -268,24 +268,45 @@ await MonitoringService.stopMonitoringForSite(siteIdentifier);
 
 #### `validateMonitorData(type: string, data: unknown): Promise<ValidationResult>`
 
-Validates monitor configuration against type-specific schemas.
+Validates monitor configuration against type-specific schemas. The returned
+{@link ValidationResult} mirrors the shared contract used across the
+application (`success`, `errors`, `warnings`, optional `data`/`metadata`).
 
 ```typescript
 const validation = await MonitorTypesService.validateMonitorData("http", {
  url: "https://example.com",
  timeout: 5000,
 });
-// Returns: { isValid: boolean, errors?: string[] }
+
+if (!validation.success) {
+ validation.errors.forEach((message) => notifyUser(message));
+}
 ```
 
 #### `formatMonitorDetail(type: string, detail: string): Promise<string>`
 
 Applies monitor-specific formatting to detail strings in the renderer UI.
 
+```typescript
+const formatted = await MonitorTypesService.formatMonitorDetail(
+ "http",
+ "status ok"
+);
+// e.g. "HTTP • status ok"
+```
+
 #### `formatMonitorTitleSuffix(type: string, monitor: Monitor): Promise<string>`
 
 Returns a human-friendly suffix for monitor titles (e.g., HTTP method or host
 name).
+
+```typescript
+const suffix = await MonitorTypesService.formatMonitorTitleSuffix(
+ "http",
+ monitor
+);
+// e.g. "(GET)"
+```
 
 ### Data API (`DataService`)
 
@@ -336,7 +357,11 @@ await handleSQLiteBackupDownload(async () => backup);
 
 ### Monitor Types API (`MonitorTypesService`)
 
-> Primary entry point: `src/services/MonitorTypesService`. Internally this wraps `window.electronAPI.monitorTypes`.
+> Primary entry point: `src/services/MonitorTypesService`. Internally this
+> delegates exclusively to `window.electronAPI.monitorTypes`, keeping
+> lifecycle controls within the `monitoring` domain. This aligns with ADR-005
+> by routing all monitor metadata helpers (registry lookup, formatting, and
+> validation) through the dedicated monitor-types bridge.
 
 #### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 

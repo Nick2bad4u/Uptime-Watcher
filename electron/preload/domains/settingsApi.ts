@@ -11,7 +11,10 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { SettingsDomainBridge } from "@shared/types/preload";
+import {
+    SETTINGS_CHANNELS,
+    type SettingsDomainBridge,
+} from "@shared/types/preload";
 
 import { createTypedInvoker, createVoidInvoker } from "../core/bridgeFactory";
 
@@ -56,14 +59,14 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the current history limit in days
      */
-    getHistoryLimit: createTypedInvoker("get-history-limit"),
+    getHistoryLimit: createTypedInvoker(SETTINGS_CHANNELS.getHistoryLimit),
 
     /**
      * Resets all persisted application settings to their defaults
      *
      * @returns Promise that resolves when the reset completes
      */
-    resetSettings: createVoidInvoker("reset-settings"),
+    resetSettings: createVoidInvoker(SETTINGS_CHANNELS.resetSettings),
 
     /**
      * Updates the history retention limit
@@ -72,7 +75,9 @@ export const settingsApi: SettingsApiInterface = {
      *
      * @returns Promise resolving to the updated history limit value
      */
-    updateHistoryLimit: createTypedInvoker("update-history-limit"),
+    updateHistoryLimit: createTypedInvoker(
+        SETTINGS_CHANNELS.updateHistoryLimit
+    ),
 } as const;
 
 /**

@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ipcRenderer } from "electron";
 
 import { settingsApi } from "../../../preload/domains/settingsApi";
+import { SETTINGS_CHANNELS } from "@shared/types/preload";
 
 vi.mock("electron", () => ({
     ipcRenderer: {
@@ -24,7 +25,7 @@ describe("settingsApi", () => {
 
         expect(result).toBe(365);
         expect(ipcRenderer.invoke).toHaveBeenCalledWith(
-            "update-history-limit",
+            SETTINGS_CHANNELS.updateHistoryLimit,
             365
         );
     });
@@ -38,7 +39,9 @@ describe("settingsApi", () => {
         const result = await settingsApi.getHistoryLimit();
 
         expect(result).toBe(120);
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("get-history-limit");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SETTINGS_CHANNELS.getHistoryLimit
+        );
     });
 
     it("resets settings via IPC", async () => {
@@ -47,7 +50,9 @@ describe("settingsApi", () => {
         });
 
         await expect(settingsApi.resetSettings()).resolves.toBeUndefined();
-        expect(ipcRenderer.invoke).toHaveBeenCalledWith("reset-settings");
+        expect(ipcRenderer.invoke).toHaveBeenCalledWith(
+            SETTINGS_CHANNELS.resetSettings
+        );
     });
 
     it("throws when IPC returns failure", async () => {

@@ -12,7 +12,7 @@
 
 /* eslint-disable ex/no-unhandled -- Domain APIs are thin wrappers that don't handle exceptions */
 
-import type { SitesDomainBridge } from "@shared/types/preload";
+import { SITES_CHANNELS, type SitesDomainBridge } from "@shared/types/preload";
 
 import { createTypedInvoker } from "../core/bridgeFactory";
 
@@ -89,21 +89,21 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the created site
      */
-    addSite: createTypedInvoker("add-site"),
+    addSite: createTypedInvoker(SITES_CHANNELS.addSite),
 
     /**
      * Deletes all sites (dangerous operation)
      *
      * @returns Promise resolving to the number of removed sites
      */
-    deleteAllSites: createTypedInvoker("delete-all-sites"),
+    deleteAllSites: createTypedInvoker(SITES_CHANNELS.deleteAllSites),
 
     /**
      * Retrieves all sites from the database
      *
      * @returns Promise resolving to array of all sites
      */
-    getSites: createTypedInvoker("get-sites"),
+    getSites: createTypedInvoker(SITES_CHANNELS.getSites),
 
     /**
      * Removes a monitor from a site
@@ -114,7 +114,7 @@ export const sitesApi: SitesApiInterface = {
      * @returns Promise resolving to the updated site snapshot emitted by the
      *   backend after removal
      */
-    removeMonitor: createTypedInvoker("remove-monitor"),
+    removeMonitor: createTypedInvoker(SITES_CHANNELS.removeMonitor),
 
     /**
      * Removes a site from monitoring
@@ -123,7 +123,7 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to a boolean indicating removal success
      */
-    removeSite: createTypedInvoker("remove-site"),
+    removeSite: createTypedInvoker(SITES_CHANNELS.removeSite),
 
     /**
      * Updates an existing site's configuration.
@@ -133,7 +133,7 @@ export const sitesApi: SitesApiInterface = {
      *
      * @returns Promise resolving to the updated site.
      */
-    updateSite: createTypedInvoker("update-site"),
+    updateSite: createTypedInvoker(SITES_CHANNELS.updateSite),
 } as const;
 
 /**
