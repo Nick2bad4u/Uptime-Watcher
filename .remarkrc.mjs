@@ -72,6 +72,7 @@ const remarkConfig = {
         "remark-preset-lint-consistent", // Consistency rules
         "remark-preset-lint-markdown-style-guide", // Enforce common style guide
         // Additional quality plugins that we have installed
+        "remark-lint-correct-media-syntax", // Catch mismatched media/link syntax
         ["remark-lint-final-newline", true], // Ensure final newline
         ["remark-lint-no-tabs", true], // Prevent tab characters
         ["remark-lint-hard-break-spaces", true], // Enforce proper line breaks
@@ -81,7 +82,24 @@ const remarkConfig = {
         ["remark-lint-no-duplicate-definitions", true], // Prevent duplicate link definitions
         ["remark-lint-definition-spacing", true], // Enforce spacing in link definitions
         ["remark-lint-table-pipe-alignment", true], // Enforce table pipe alignment
-        ["remark-lint-list-item-bullet-indent", "true"], // Consistent single-space indent for list items
+        ["remark-lint-list-item-bullet-indent", true], // Prevent list markers from being indented
+        "remark-lint-list-item-content-indent", // Keep list item content aligned with the first child
+        [
+            "remark-lint-checkbox-character-style",
+            {
+                checked: "x",
+                unchecked: " ",
+            },
+        ], // Normalize task list checkbox characters
+        ["remark-lint-code-block-style", "fenced"], // Prefer fenced code blocks
+        ["remark-lint-fenced-code-marker", "`"], // Use backticks for fenced code blocks
+        ["remark-lint-heading-style", "atx"], // Enforce ATX-style headings without closing hashes
+        ["remark-lint-rule-style", "***"], // Standardize thematic breaks to match Prettier output
+        "remark-lint-no-shell-dollars", // Avoid $ prefixes on every shell command line
+        "remark-lint-no-shortcut-reference-image", // Require full reference-style images
+        "remark-lint-no-shortcut-reference-link", // Require full reference-style links
+        "remark-lint-no-table-indentation", // Prevent tables from being indented
+        "remark-lint-table-pipes", // Require opening/closing pipes on GFM tables
         // Allow project naming conventions
         ["remark-lint-no-file-name-irregular-characters", /[^-._\dA-Za-z]/], // Allow underscores in filenames
         ["remark-lint-no-file-name-mixed-case", true], // Allow mixed case in filenames
@@ -101,6 +119,8 @@ const remarkConfig = {
         ["remark-lint-no-literal-urls", false], // Allow bare URLs for now
         ["remark-lint-no-heading-punctuation", /[!,.;]/u], // Allow punctuation in headings
         ["remark-lint-table-cell-padding", false], // Require padded table cells
+        "remark-lint-no-duplicate-defined-urls", // Prevent duplicate definitions that share URLs
+        "remark-lint-no-empty-url", // Guard against empty link targets
         // TEMPORARILY DISABLED: This plugin can hang on network requests with many files
         // ['remark-lint-no-dead-urls', {
         //     skipUrlPatterns: [
@@ -153,6 +173,7 @@ const remarkConfig = {
         // MDX-specific rules (only apply to MDX files)
         ["remark-lint-mdx-jsx-quote-style", '"'], // Use double quotes in JSX
         ["remark-lint-mdx-jsx-self-close", true], // Enforce self-closing tags
+        "remark-lint-mdx-jsx-unique-attribute-name", // Avoid duplicate attribute names in MDX elements
         ["remark-lint-no-undefined-references", false], // Allow undefined references in MDX
 
         // Prettier integration for consistent formatting

@@ -16,7 +16,10 @@ import { logger } from "../../services/logger";
 import { MonitoringService } from "../../services/MonitoringService";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
-import { applyStatusUpdateSnapshot } from "./utils/statusUpdateHandler";
+import {
+    applyStatusUpdateSnapshot,
+    type StatusUpdateSnapshotPayload,
+} from "./utils/statusUpdateHandler";
 
 /**
  * Site monitoring actions interface for managing monitoring operations.
@@ -60,7 +63,10 @@ export interface SiteMonitoringDependencies {
      * Defaults to {@link applyStatusUpdateSnapshot}. Override for testing to
      * inspect inputs without mutating state.
      */
-    applyStatusUpdate?: (sites: Site[], update: StatusUpdate) => Site[];
+    applyStatusUpdate?: (
+        sites: Site[],
+        update: StatusUpdateSnapshotPayload
+    ) => Site[];
     /** Reads current sites from the store for optimistic updates */
     getSites: () => Site[];
     /** Monitoring service abstraction */

@@ -295,7 +295,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     if (isDevelopment()) {
                         const timestamp = new Date().toLocaleTimeString();
                         logger.debug(
-                            `[${timestamp}] Status update received for site: ${update.site?.identifier ?? update.siteIdentifier}`
+                            `[${timestamp}] Status update received for site: ${update.site.identifier}`
                         );
                     }
                 }

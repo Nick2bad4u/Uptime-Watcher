@@ -1,3 +1,5 @@
+/* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Config file */
+/* eslint-disable n/no-unpublished-import -- Stylelint config file, dev dependency allowed */
 /**
  * Comprehensive Stylelint configuration for the Uptime Watcher project.
  *

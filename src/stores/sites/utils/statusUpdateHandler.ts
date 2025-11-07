@@ -40,6 +40,20 @@ type MonitorStatusChangedEvent = MonitorStatusChangedEventData & {
 };
 
 /**
+ * Minimal status update payload needed to perform an optimistic site merge.
+ *
+ * @remarks
+ * Represents the subset of {@link StatusUpdate} fields consumed by
+ * {@link applyStatusUpdateSnapshot}. Site and monitor snapshots are optional to
+ * accommodate legacy IPC payloads that lacked enriched data, while still
+ * allowing current callers to provide the full structure.
+ */
+export type StatusUpdateSnapshotPayload = Partial<
+    Omit<StatusUpdate, "monitorId" | "siteIdentifier" | "status" | "timestamp">
+> &
+    Pick<StatusUpdate, "monitorId" | "siteIdentifier" | "status" | "timestamp">;
+
+/**
  * Configuration options for status update handler operations.
  *
  * @remarks
@@ -143,7 +157,7 @@ function mergeMonitorStatusChange(
  */
 export const applyStatusUpdateSnapshot = (
     sites: Site[],
-    statusUpdate: StatusUpdate
+    statusUpdate: StatusUpdateSnapshotPayload
 ): Site[] => {
     if (!statusUpdate.site || !statusUpdate.monitor) {
         if (isDevelopment()) {
@@ -164,10 +178,12 @@ export const applyStatusUpdateSnapshot = (
         ? new Date(parsedTimestamp).toISOString()
         : new Date().toISOString();
 
+    const { monitor, site } = statusUpdate;
+
     const event: MonitorStatusChangedEvent = {
         ...statusUpdate,
-        monitor: statusUpdate.monitor,
-        site: statusUpdate.site,
+        monitor,
+        site,
         timestamp,
     };
 

@@ -2,9 +2,12 @@
     "$schema": "https://www.schemastore.org/jsconfig.json",
     "compilerOptions": {
         "allowJs": true,
+        "alwaysStrict": true,
+        "checkJs": true,
         "composite": true,
         "incremental": true,
         "isolatedDeclarations": false,
+        "maxNodeModuleJsDepth": 0,
         "outDir": ".cache/builds/jsconfig",
         "paths": {
             "@app/*": [
@@ -20,7 +23,18 @@
                 "shared/*"
             ]
         },
+        "resolveJsonModule": false,
         "tsBuildInfoFile": "./.cache/tsconfig.jsconfig.tsbuildinfo"
     },
-    "extends": "./tsconfig.json"
+    "extends": "./tsconfig.json",
+    "include": [
+        "**/*.js",
+        "**/*.mjs",
+        "**/*.cjs",
+        "**/*.jsx",
+        "*.js",
+        "*.mjs",
+        "*.cjs",
+        "*.jsx"
+    ]
 }

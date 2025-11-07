@@ -309,7 +309,7 @@ Usually caused by:
 If tests suddenly stop working:
 
 1. **Check Electron launch method** - ensure using `args: ["."]`
-2. **Verify NODE\_ENV** - should inherit from environment
+2. **Verify NODE_ENV** - should inherit from environment
 3. **Confirm build exists** - run `npm run build`
 4. **Test manually** - try `node scripts/codegen.mjs --electron`
 5. **Check dev server** - ensure it starts when needed

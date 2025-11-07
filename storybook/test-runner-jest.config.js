@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-require-imports, import-x/no-commonjs, import-x/unambiguous, sonarjs/no-require-or-define, unicorn/prefer-module -- Storybook test runner loads CommonJS config files
+// eslint-disable-next-line @typescript-eslint/no-require-imports, import-x/no-commonjs, import-x/unambiguous, sonarjs/no-require-or-define, unicorn/prefer-module, n/no-unpublished-require -- Storybook test runner loads CommonJS config files
 const { getJestConfig } = require("@storybook/test-runner");
 
 /**
