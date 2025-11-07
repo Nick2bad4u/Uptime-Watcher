@@ -34,12 +34,14 @@ import requireSnippets from "./config/linting/remark/require-snippets.mjs";
  * @property {boolean} [yaml] - Handle frontmatter in markdown files
  * @property {boolean} [commonmark] - Enable commonmark compliance
  * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features
+ * @property {"*" | "+" | "-"} [bullet] - Preferred unordered list marker
  * @property {"tab" | "one" | "mixed"} [listItemIndent] - List item indentation
  *   style
  * @property {"*" | "_"} [emphasis] - Character to use for emphasis
  * @property {"*" | "_"} [strong] - Character to use for strong emphasis
  * @property {boolean} [fences] - Use fenced code blocks
  * @property {"`" | "~"} [fence] - Character to use for fences
+ * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic breaks
  * @property {"ordered"} [style] - List style preference
  * @property {boolean} [referenceLinks] - Use reference-style links
  * @property {boolean} [incrementListMarker] - Increment ordered list markers
@@ -59,10 +61,6 @@ import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 /** @typedef {"one" | "ordered" | "single"} OrderedListMarkerValue */
 /** @typedef {{ allowExtensionless?: boolean; extensions?: string[] }} FileExtensionOptions */
 
-/** @type {RemarkConfig} */
-
-/** @typedef {RemarkConfig} */
-
 const remarkConfig = {
     // Core plugins for GitHub Flavored Markdown and formatting integration
     plugins: [
@@ -78,7 +76,12 @@ const remarkConfig = {
         ["remark-lint-no-tabs", true], // Prevent tab characters
         ["remark-lint-hard-break-spaces", true], // Enforce proper line breaks
         ["remark-lint-ordered-list-marker-value", "ordered"], // Enforce incremental numbering (1, 2, 3, etc.)
-
+        ["remark-lint-no-multiple-toplevel-headings", false], // more than one top-level heading per file
+        ["remark-lint-no-consecutive-blank-lines", true], // Prevent multiple blank lines
+        ["remark-lint-no-duplicate-definitions", true], // Prevent duplicate link definitions
+        ["remark-lint-definition-spacing", true], // Enforce spacing in link definitions
+        ["remark-lint-table-pipe-alignment", true], // Enforce table pipe alignment
+        ["remark-lint-list-item-bullet-indent", "true"], // Consistent single-space indent for list items
         // Allow project naming conventions
         ["remark-lint-no-file-name-irregular-characters", /[^-._\dA-Za-z]/], // Allow underscores in filenames
         ["remark-lint-no-file-name-mixed-case", true], // Allow mixed case in filenames
@@ -93,8 +96,11 @@ const remarkConfig = {
         ["remark-lint-heading-capitalization", false], // Enforce consistent heading capitalization
         ["remark-lint-list-item-spacing", true], // More lenient about list spacing
         ["remark-lint-emphasis-marker", "consistent"], // Allow both * and _
+        ["remark-lint-strong-marker", "*"], // Prefer double asterisk for strong emphasis
+        ["remark-lint-unordered-list-marker-style", "-"], // Prefer hyphen list markers to match Prettier
         ["remark-lint-no-literal-urls", false], // Allow bare URLs for now
         ["remark-lint-no-heading-punctuation", /[!,.;]/u], // Allow punctuation in headings
+        ["remark-lint-table-cell-padding", false], // Require padded table cells
         // TEMPORARILY DISABLED: This plugin can hang on network requests with many files
         // ['remark-lint-no-dead-urls', {
         //     skipUrlPatterns: [
@@ -154,10 +160,10 @@ const remarkConfig = {
     ],
 
     // Settings for processing
+    // Settings for processing
     settings: {
         // Handle frontmatter in markdown files
         yaml: true,
-
         // Enable commonmark compliance
         commonmark: false,
 
@@ -165,19 +171,28 @@ const remarkConfig = {
         gfm: true,
 
         // Formatting preferences (will be overridden by Prettier)
+        bullet: "-", // Ensure unordered lists use hyphen markers like Prettier
         listItemIndent: "one", // Use consistent single-space indent for lists
-        emphasis: "*",
-        strong: "_",
+        emphasis: "_",
+        strong: "*",
+        thematicBreak: "***",
         fences: true,
         fence: "`",
         style: "ordered", // This works with remark-lint-ordered-list-marker-value
-
+        quote: '"',
+        rule: "-",
+        ruleRepetition: 3,
+        ruleSpaces: false,
+        setext: false,
+        closeAtx: false, // Do not require closing # for atx headings
+        resourceLink: false, // Disable resource link style
         // Link reference style
         referenceLinks: false,
+        tightDefinitions: true,
 
         // Code block style
         incrementListMarker: true,
     },
 };
 
-export default /** @type {RemarkConfig} */ remarkConfig;
+export default remarkConfig;

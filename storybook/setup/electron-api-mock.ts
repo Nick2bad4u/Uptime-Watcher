@@ -234,14 +234,6 @@ const electronAPIMockDefinition = {
                 timestamp,
             };
         },
-        formatMonitorDetail: async (
-            monitorType: string,
-            details: string
-        ): Promise<string> => `${monitorType}: ${details}`,
-        formatMonitorTitleSuffix: async (
-            monitorType: string,
-            monitor: Site["monitors"][number]
-        ): Promise<string> => `${monitor.id} · ${monitorType}`,
         removeMonitor: async (
             siteIdentifier: string,
             monitorId: string
@@ -383,6 +375,18 @@ const electronAPIMockDefinition = {
             }));
             return true;
         },
+    },
+    monitorTypes: {
+        formatMonitorDetail: async (
+            monitorType: string,
+            details: string
+        ): Promise<string> => `${monitorType}: ${details}`,
+        formatMonitorTitleSuffix: async (
+            monitorType: string,
+            monitor: Site["monitors"][number]
+        ): Promise<string> => `${monitor.id} · ${monitorType}`,
+        getMonitorTypes: async (): Promise<MonitorTypeConfig[]> =>
+            clone(mockState.monitorTypes),
         validateMonitorData: async (
             monitorType: string,
             monitorData: unknown
@@ -393,10 +397,6 @@ const electronAPIMockDefinition = {
             success: true,
             warnings: [],
         }),
-    },
-    monitorTypes: {
-        getMonitorTypes: async (): Promise<MonitorTypeConfig[]> =>
-            clone(mockState.monitorTypes),
     },
     settings: {
         getHistoryLimit: async (): Promise<number> => mockState.historyLimit,

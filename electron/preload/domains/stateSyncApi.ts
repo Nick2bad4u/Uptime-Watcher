@@ -11,17 +11,16 @@
  * @packageDocumentation
  */
 
-import {
-    STATE_SYNC_CHANNELS,
-    type StateSyncApiSurface,
-    type StateSyncDomainBridge,
-} from "@shared/types/preload";
-
 import { RENDERER_EVENT_CHANNELS } from "@shared/ipc/rendererEvents";
 import {
     safeParseStateSyncEventData,
     type StateSyncEventData,
 } from "@shared/types/events";
+import {
+    STATE_SYNC_CHANNELS,
+    type StateSyncApiSurface,
+    type StateSyncDomainBridge,
+} from "@shared/types/preload";
 
 import { createEventManager, createTypedInvoker } from "../core/bridgeFactory";
 import {

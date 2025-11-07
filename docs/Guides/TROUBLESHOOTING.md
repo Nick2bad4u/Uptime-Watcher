@@ -1,4 +1,4 @@
-# 🔧 Troubl&#x65;**&#x53;olutions**:
+# 🔧 Troubleshooting Guide
 
 ```bash
 # Copy WASM file to dist
