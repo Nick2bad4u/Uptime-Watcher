@@ -237,6 +237,47 @@ test.describe(
         let electronApp: ElectronApplication;
         let page: Page;
 
+        // Playwright limits afterEach hooks to ~120s; keep our soft cleanup budget comfortably below that ceiling.
+        const SOFT_CLEANUP_TIMEOUT_MS = Math.ceil(
+            WAIT_TIMEOUTS.APP_INITIALIZATION * 1.5
+        );
+
+        async function runWithSoftTimeout(
+            label: string,
+            action: () => Promise<void>,
+            timeoutMs: number
+        ): Promise<void> {
+            let timeoutHandle: NodeJS.Timeout | undefined;
+
+            const completion = action()
+                .then<"completed">(() => "completed")
+                .catch((error) => {
+                    console.warn(
+                        `[Playwright] ${label} failed during cleanup`,
+                        error
+                    );
+                    return "failed";
+                });
+
+            void completion;
+
+            const timeoutOutcome = new Promise<"timeout">((resolve) => {
+                timeoutHandle = setTimeout(() => resolve("timeout"), timeoutMs);
+            });
+
+            const outcome = await Promise.race([completion, timeoutOutcome]);
+
+            if (timeoutHandle) {
+                clearTimeout(timeoutHandle);
+            }
+
+            if (outcome === "timeout") {
+                console.warn(
+                    `[Playwright] ${label} exceeded ${timeoutMs}ms; continuing without waiting for completion`
+                );
+            }
+        }
+
         test.beforeEach(async () => {
             electronApp = await launchElectronApp();
             tagElectronAppCoverage(electronApp, "ui-monitor-types");
@@ -245,12 +286,34 @@ test.describe(
         });
 
         test.afterEach(async () => {
-            if (page) {
-                await removeAllSites(page).catch(() => undefined);
-            }
-            if (electronApp) {
-                await electronApp.close();
-            }
+            const pageReference = page as Page | undefined;
+            const electronReference = electronApp as
+                | ElectronApplication
+                | undefined;
+
+            await runWithSoftTimeout(
+                "removeAllSites cleanup",
+                async () => {
+                    if (!pageReference || pageReference.isClosed()) {
+                        return;
+                    }
+
+                    await removeAllSites(pageReference);
+                },
+                SOFT_CLEANUP_TIMEOUT_MS
+            );
+
+            await runWithSoftTimeout(
+                "Electron application close",
+                async () => {
+                    if (!electronReference) {
+                        return;
+                    }
+
+                    await electronReference.close();
+                },
+                SOFT_CLEANUP_TIMEOUT_MS
+            );
         });
 
         test(

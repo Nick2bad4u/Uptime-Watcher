@@ -77,12 +77,10 @@ jobs:
                     NEW_VERSION="$((MAJOR + 1)).0.0"
                   fi
                   jq --arg v "$NEW_VERSION" '.version = $v' package.json > tmp.json && mv tmp.json package.json
-                  echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-
-                  # Expose outputs so later steps can use them (prevents "appears unused" warnings)
-                  # This makes patch and new_version available as step outputs:
-                  echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
-                  echo "patch=$PATCH" >> "$GITHUB_OUTPUT"
+                  {
+                    echo "new_version=$NEW_VERSION"
+                    echo "patch=$PATCH"
+                  } >> "$GITHUB_OUTPUT"
 
             - name: Create new Tag for new version of app
               id: tag_version

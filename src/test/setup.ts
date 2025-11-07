@@ -337,6 +337,7 @@ const mockElectronAPI: {
         formatHttpStatus: AnyMock;
     };
     monitorTypes: {
+        isLoaded: AnyMock;
         formatMonitorDetail: AnyMock;
         formatMonitorTitleSuffix: AnyMock;
         getMonitorTypes: AnyMock;
@@ -468,6 +469,7 @@ const mockElectronAPI: {
         formatHttpStatus: vi.fn().mockReturnValue("up"),
     },
     monitorTypes: {
+        isLoaded: vi.fn().mockResolvedValue(true),
         formatMonitorDetail: vi.fn().mockResolvedValue("Mock formatted detail"),
         formatMonitorTitleSuffix: vi
             .fn()
