@@ -171,6 +171,7 @@ if (!isQuiet && outputFormat === "text") {
 }
 
 // Validate that ROOT_DIR contains all TARGET_DIRS before proceeding
+/** @type {string[]} */
 const validTargetDirs = [];
 for (const dir of targetDirs) {
     const absPath = path.join(ROOT_DIR, dir);
@@ -403,7 +404,7 @@ async function main() {
         }
 
         const emptyDirs = await findEmptyDirs(absTarget);
-        results[target] = emptyDirs;
+        /** @type {any} */ (results)[target] = emptyDirs;
 
         if (emptyDirs.length > 0) {
             if (!isQuiet && outputFormat === "text") {

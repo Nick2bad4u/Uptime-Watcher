@@ -90,14 +90,15 @@ function addDocToDefinitions(text, config) {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (!line) continue;
         const match = line.match(
             /^(?<indent>\s*)(?:export\s+)?(?<kind>interface|class|type)\s+(?<name>\w+)/
         );
         if (!match) continue;
 
-        const indent = match.groups?.indent ?? "";
-        const kind = match.groups?.kind ?? "interface";
-        const name = match.groups?.name ?? "";
+        const indent = match.groups?.["indent"] ?? "";
+        const kind = match.groups?.["kind"] ?? "interface";
+        const name = match.groups?.["name"] ?? "";
         const prevLine = lines[i - 1]?.trim();
 
         if (prevLine && prevLine.startsWith("/**")) {
@@ -131,11 +132,12 @@ function addDocToFunctions(text, config) {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (!line) continue;
         const match = line.match(/^(?<indent>\s*)function\s+(?<name>\w+)\s*\(/);
         if (!match) continue;
 
-        const indent = match.groups?.indent ?? "";
-        const name = match.groups?.name ?? "";
+        const indent = match.groups?.["indent"] ?? "";
+        const name = match.groups?.["name"] ?? "";
         const prevLine = lines[i - 1]?.trim();
 
         if (prevLine && prevLine.startsWith("/**")) {

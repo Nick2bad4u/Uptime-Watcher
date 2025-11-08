@@ -33,16 +33,13 @@ childProcess.on("exit", (code, signal) => {
     if (typeof code === "number") {
         if (code === 1 && allowEmpty) {
             process.exit(0);
-            return;
         }
 
         process.exit(code);
-        return;
     }
 
     if (signal) {
         process.kill(process.pid, signal);
-        return;
     }
 
     process.exit(0);

@@ -224,9 +224,10 @@ function main() {
         const testStructures = [];
         testFiles.forEach((filePath) => {
             const structure = extractTestNames(filePath);
+            const structCast = /** @type {any} */ (structure);
             if (
-                structure &&
-                (structure.describes.length > 0 || structure.tests.length > 0)
+                (structCast["describes"]?.length ?? 0) > 0 ||
+                (structCast["tests"]?.length ?? 0) > 0
             ) {
                 testStructures.push(structure);
             }
@@ -237,14 +238,14 @@ function main() {
         console.log(output);
 
         // Summary
-        const totalDescribes = testStructures.reduce(
-            (sum, s) => sum + s.describes.length,
-            0
-        );
-        const totalTests = testStructures.reduce(
-            (sum, s) => sum + s.tests.length,
-            0
-        );
+        const totalDescribes = testStructures.reduce((sum, s) => {
+            const sCast = /** @type {any} */ (s);
+            return sum + (sCast["describes"]?.length ?? 0);
+        }, 0);
+        const totalTests = testStructures.reduce((sum, s) => {
+            const sCast = /** @type {any} */ (s);
+            return sum + (sCast["tests"]?.length ?? 0);
+        }, 0);
 
         console.log(`\n--- Summary ---`);
         console.log(`Files processed: ${testStructures.length}`);

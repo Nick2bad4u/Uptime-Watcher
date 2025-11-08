@@ -200,11 +200,14 @@ function buildCodegenCommand(target, options) {
 function runCodegen(cmd) {
     console.log(`🎬 Running: ${cmd.join(" ")}`);
 
-    const codegen = spawn(cmd[0], cmd.slice(1), {
+    const codegen = spawn(cmd[0] ?? "npx", cmd.slice(1), {
         stdio: "inherit",
         shell: process.platform === "win32",
     });
 
+    /**
+     * @param {number | null} code
+     */
     codegen.on("close", (code) => {
         if (code === 0) {
             console.log("✅ Codegen completed successfully!");
@@ -300,7 +303,12 @@ async function main() {
         } else {
             console.log("🌐 Using development server mode...");
             const target = await startDevServer();
-            const cmd = buildCodegenCommand(target, options);
+            /** @type {{ viewport?: string; output?: string }} */
+            const cmdOptions = { viewport: options.viewport };
+            if (options.output) {
+                cmdOptions.output = options.output;
+            }
+            const cmd = buildCodegenCommand(target, cmdOptions);
             runCodegen(cmd);
             console.log(
                 "\n💡 Post-processing tip: If you save generated tests with --output,"

@@ -211,7 +211,7 @@ function parseArguments() {
 
     for (let i = 0; i < args.length; i++) {
         /** @type {string} */
-        const arg = args[i];
+        const arg = args[i] ?? "";
         /** @type {string | undefined} */
         const nextArg = args[i + 1];
 
@@ -220,7 +220,6 @@ function parseArguments() {
             case "-h":
                 showHelp();
                 process.exit(0);
-                break;
             case "--cache":
                 config.enableCache = true;
                 break;
@@ -833,8 +832,8 @@ async function downloadSequential(
     const results = [];
 
     for (let i = 0; i < tasks.length; i++) {
-        /** @type {DownloadTask} */
         const task = tasks[i];
+        if (!task) continue;
         logger.progress(i + 1, tasks.length, task.page);
 
         /** @type {DownloadResult} */
@@ -1089,7 +1088,7 @@ function getOutputPath(page, config, paths) {
 
 // Execute main function if this is the main module
 /** @type {string} */
-const templateArgvPath = path.resolve(process.argv[1]);
+const templateArgvPath = path.resolve(process.argv[1] ?? ".");
 /** @type {string} */
 const templateMetaPath = fileURLToPath(import.meta.url);
 if (templateMetaPath === templateArgvPath) {

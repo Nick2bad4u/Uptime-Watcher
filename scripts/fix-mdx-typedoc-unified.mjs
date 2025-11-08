@@ -16,9 +16,10 @@ const DOCS_DIR = "docs/docusaurus/docs";
  */
 function fixFile(filePath) {
     let content = readFileSync(filePath, "utf8");
-    let changed = false;
+    const originalContent = content;
 
     // Find code block ranges so we don't touch content inside them
+    /** @type {[number, number][]} */
     const codeBlocks = [];
     const codeBlockRegex = /```[\w-]*[\S\s]*?```/g;
     let match;
@@ -31,7 +32,6 @@ function fixFile(filePath) {
         for (const [start, end] of codeBlocks) {
             if (offset >= start && offset < end) return m;
         }
-        changed = true;
         return `\`${p1}\``;
     });
 
@@ -40,11 +40,10 @@ function fixFile(filePath) {
         for (const [start, end] of codeBlocks) {
             if (offset >= start && offset < end) return m;
         }
-        changed = true;
         return `\`${p1}\``;
     });
 
-    if (changed) {
+    if (content !== originalContent) {
         const tempFilePath = `${filePath}.tmp`;
         writeFileSync(tempFilePath, content, "utf8");
         renameSync(tempFilePath, filePath);

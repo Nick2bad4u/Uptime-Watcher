@@ -17,7 +17,7 @@ const DOCS_DIR =
  */
 function fixFile(filePath) {
     let content = readFileSync(filePath, "utf8");
-    let changed = false;
+    const originalContent = content;
 
     // Find code block ranges so we don't touch content inside them
     /**
@@ -33,22 +33,32 @@ function fixFile(filePath) {
     // Replace {anything} outside code blocks
     content = content.replaceAll(/{(?<temp1>[^}]+)}/g, (m, p1, offset) => {
         for (const [start, end] of codeBlocks) {
-            if (offset >= start && offset < end) return m;
+            if (
+                start !== undefined &&
+                end !== undefined &&
+                offset >= start &&
+                offset < end
+            )
+                return m;
         }
-        changed = true;
         return `\`${p1}\``;
     });
 
     // Replace <anything> outside code blocks
     content = content.replaceAll(/<(?<temp1>[^\n>]+)>/g, (m, p1, offset) => {
         for (const [start, end] of codeBlocks) {
-            if (offset >= start && offset < end) return m;
+            if (
+                start !== undefined &&
+                end !== undefined &&
+                offset >= start &&
+                offset < end
+            )
+                return m;
         }
-        changed = true;
         return `\`${p1}\``;
     });
 
-    if (changed) {
+    if (content !== originalContent) {
         const tempFilePath = `${filePath}.tmp`;
         writeFileSync(tempFilePath, content, "utf8");
         renameSync(tempFilePath, filePath);

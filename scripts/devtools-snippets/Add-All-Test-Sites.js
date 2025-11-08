@@ -329,7 +329,9 @@
         try {
             // @ts-expect-error -- For use after application is running
             await window.electronAPI.sites.addSite(site);
-            console.log(`✅ Added: ${site.name} (${site.monitors[0].type})`);
+            console.log(
+                `✅ Added: ${site.name} (${site.monitors[0]?.type ?? "unknown"})`
+            );
             successCount++;
         } catch (error) {
             console.error(`❌ Failed to add ${site.name}:`, error);

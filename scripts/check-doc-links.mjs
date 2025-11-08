@@ -121,7 +121,9 @@ function isAnchor(link) {
  */
 function normalizeLink(link) {
     const [pathPart] = link.split("#");
+    if (!pathPart) return "";
     const [cleanPath] = pathPart.split("?");
+    if (!cleanPath) return "";
     return cleanPath.trim();
 }
 
@@ -188,7 +190,9 @@ async function checkFile(markdownPath, issues) {
             continue;
         }
 
-        await validateLink(markdownPath, link, issues);
+        if (link) {
+            await validateLink(markdownPath, link, issues);
+        }
     }
 }
 

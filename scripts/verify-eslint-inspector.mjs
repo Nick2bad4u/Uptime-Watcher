@@ -85,7 +85,10 @@ async function verifyConfigFile(filePath) {
 
         return { valid: true, content: "File exists and is readable" };
     } catch (error) {
-        return { valid: false, error: error.message };
+        return {
+            valid: false,
+            error: error instanceof Error ? error.message : String(error),
+        };
     }
 }
 
@@ -182,7 +185,9 @@ async function verifyESLintInspectorDeployment() {
         console.log(`   ✅ Build script exists: ${buildScriptPath}`);
         checkResults.push({ name: "Build Script", passed: true });
     } catch (error) {
-        console.log(`   ❌ Build script missing: ${error.message}`);
+        console.log(
+            `   ❌ Build script missing: ${error instanceof Error ? error.message : String(error)}`
+        );
         allChecksPassed = false;
         checkResults.push({ name: "Build Script", passed: false });
     }

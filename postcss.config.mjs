@@ -48,7 +48,7 @@
  * @typedef {import("postcss").Message} Message
  */
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env["NODE_ENV"] === "production";
 const enableDuplicateSelectorCombine =
     process.env["ENABLE_POSTCSS_DUPLICATE_COMBINE"] === "true";
 const enableMediaQuerySort =

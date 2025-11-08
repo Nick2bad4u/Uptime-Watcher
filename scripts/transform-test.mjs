@@ -27,7 +27,9 @@ try {
     const transformedCode = applyLintCompliantTransforms(originalCode);
 
     console.log(`📝 Writing transformed test: ${outputFile}`);
-    writeFileSync(outputFile, transformedCode);
+    if (outputFile) {
+        writeFileSync(outputFile, transformedCode);
+    }
 
     console.log("✅ Test transformation completed!");
     console.log("\n🎯 Transformations applied:");

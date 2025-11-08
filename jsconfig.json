@@ -5,6 +5,7 @@
         "alwaysStrict": true,
         "checkJs": true,
         "composite": true,
+        "erasableSyntaxOnly": false,
         "incremental": true,
         "isolatedDeclarations": false,
         "maxNodeModuleJsDepth": 0,
@@ -24,8 +25,25 @@
             ]
         },
         "resolveJsonModule": false,
+        "skipDefaultLibCheck": true,
+        "skipLibCheck": true,
         "tsBuildInfoFile": "./.cache/tsconfig.jsconfig.tsbuildinfo"
     },
+    "exclude": [
+        "node_modules",
+        "node_modules/**",
+        "**/node_modules/**",
+        "dist",
+        "dist/**",
+        "coverage",
+        ".cache",
+        "docs/docusaurus/build/**",
+        "docs/docusaurus/.docusaurus/**",
+        "docs/docusaurus/static/**",
+        "docs/docusaurus/docs/**",
+        "temp/**",
+        "storybook-static/**"
+    ],
     "extends": "./tsconfig.json",
     "include": [
         "**/*.js",
@@ -35,6 +53,7 @@
         "*.js",
         "*.mjs",
         "*.cjs",
-        "*.jsx"
+        "*.jsx",
+        "storybook/test-runner-jest.config.js"
     ]
 }

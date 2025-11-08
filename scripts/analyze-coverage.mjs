@@ -51,7 +51,7 @@ const coverageData = JSON.parse(
 const DEFAULTS = {
     coverageRelativePath: path.join("coverage", "coverage-final.json"),
     projectRoot: path.resolve(import.meta.dirname, ".."),
-    fileDisplayLimit: Number(process.env.COVERAGE_FILE_LIMIT) || 15,
+    fileDisplayLimit: Number(process.env["COVERAGE_FILE_LIMIT"]) || 15,
     minFileColumnWidth: 30,
     numericColumnWidth: 20,
     truncateFilePath: 80, // Max characters in File column; longer paths will be ellipsized

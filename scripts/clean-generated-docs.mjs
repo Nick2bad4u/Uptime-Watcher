@@ -128,7 +128,9 @@ const main = async () => {
         ]);
     }
 
-    const removalTargets = new Map(removalEntries);
+    const removalTargets = new Map(
+        /** @type {[string, string][]} */ (removalEntries)
+    );
 
     const removed = await removeGeneratedTargets(removalTargets);
 
