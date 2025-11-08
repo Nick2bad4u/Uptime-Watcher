@@ -25,6 +25,8 @@
         "name-type": "error",
         "no-absolute-version-dependencies": "error",
         "no-absolute-version-devDependencies": "error",
+        "no-caret-version-dependencies": "off",
+        "no-caret-version-devDependencies": "off",
         "no-restricted-dependencies": [
             "error",
             [
@@ -49,9 +51,18 @@
                 "gulping-npm-package-json-lint"
             ]
         ],
+        "no-tilde-version-dependencies": "error",
+        "no-tilde-version-devDependencies": "error",
         "optionalDependencies-type": "error",
         "os-type": "error",
         "peerDependencies-type": "error",
+        "prefer-absolute-version-dependencies": "off",
+        "prefer-absolute-version-devDependencies": "off",
+        "prefer-alphabetical-bundledDependencies": "error",
+        "prefer-alphabetical-dependencies": "error",
+        "prefer-alphabetical-devDependencies": "error",
+        "prefer-alphabetical-optionalDependencies": "error",
+        "prefer-alphabetical-peerDependencies": "error",
         "prefer-caret-version-dependencies": "error",
         "prefer-caret-version-devDependencies": [
             "error",
@@ -62,6 +73,8 @@
             }
         ],
         "prefer-no-engineStrict": "error",
+        "prefer-no-version-zero-dependencies": "off",
+        "prefer-no-version-zero-devDependencies": "off",
         "prefer-property-order": [
             "error",
             [
@@ -105,6 +118,8 @@
                 "readme"
             ]
         ],
+        "prefer-tilde-version-dependencies": "off",
+        "prefer-tilde-version-devDependencies": "off",
         "preferGlobal-type": "error",
         "private-type": "error",
         "repository-type": "error",
@@ -147,6 +162,7 @@
                 "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://nick2bad4u.github.io/Uptime-Watcher/)"
             ]
         ],
+        "valid-values-engines": "off",
         "valid-values-license": [
             "error",
             [
@@ -156,6 +172,7 @@
                 "UNLICENSED"
             ]
         ],
+        "valid-values-name-scope": "off",
         "valid-values-private": [
             "error",
             [
@@ -163,6 +180,7 @@
                 true
             ]
         ],
+        "valid-values-publishConfig": "off",
         "version-format": "error",
         "version-type": "error"
     }
