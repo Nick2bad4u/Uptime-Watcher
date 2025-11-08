@@ -181,7 +181,6 @@ const remarkConfig = {
     ],
 
     // Settings for processing
-    // Settings for processing
     settings: {
         // Handle frontmatter in markdown files
         yaml: true,

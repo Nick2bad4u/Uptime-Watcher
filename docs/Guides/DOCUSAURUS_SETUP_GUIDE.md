@@ -114,7 +114,6 @@ Key TypeDoc settings:
  "projectDocuments": [
   "../../docs/Architecture/**/*.md",
   "../../docs/Guides/**/*.md",
-  "../../docs/Packages/**/*.md",
   "../../docs/TSDoc/**/*.md",
   "../../docs/*.md"
  ]
