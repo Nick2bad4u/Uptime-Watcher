@@ -16,6 +16,15 @@ import type {
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 import type { UnknownRecord } from "type-fest";
 
+import {
+    DATA_CHANNELS,
+    MONITORING_CHANNELS,
+    MONITOR_TYPES_CHANNELS,
+    SETTINGS_CHANNELS,
+    SITES_CHANNELS,
+    STATE_SYNC_CHANNELS,
+    SYSTEM_CHANNELS,
+} from "@shared/types/preload";
 import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
@@ -675,7 +684,7 @@ export class IpcService {
     private setupDataHandlers(): void {
         // Export data handler (no parameters)
         registerStandardizedIpcHandler(
-            "export-data",
+            DATA_CHANNELS.exportData,
             async () => this.uptimeOrchestrator.exportData(),
             DataHandlerValidators.exportData,
             this.registeredIpcHandlers
@@ -684,7 +693,7 @@ export class IpcService {
         // Import data handler with validation
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All IPC handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
-            "import-data",
+            DATA_CHANNELS.importData,
             async (...args: unknown[]) =>
                 this.uptimeOrchestrator.importData(args[0] as string),
             DataHandlerValidators.importData,
@@ -694,7 +703,7 @@ export class IpcService {
 
         // Download SQLite backup handler (no parameters)
         registerStandardizedIpcHandler(
-            "download-sqlite-backup",
+            DATA_CHANNELS.downloadSqliteBackup,
             async () => {
                 const result = await this.uptimeOrchestrator.downloadBackup();
                 // Convert Buffer to ArrayBuffer for frontend compatibility
@@ -724,7 +733,7 @@ export class IpcService {
         // Update history limit handler with validation
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All settings handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
-            "update-history-limit",
+            SETTINGS_CHANNELS.updateHistoryLimit,
             async (...args: unknown[]) => {
                 await this.uptimeOrchestrator.setHistoryLimit(
                     args[0] as number
@@ -737,7 +746,7 @@ export class IpcService {
 
         // Get history limit handler (no parameters)
         registerStandardizedIpcHandler(
-            "get-history-limit",
+            SETTINGS_CHANNELS.getHistoryLimit,
             () => this.uptimeOrchestrator.getHistoryLimit(),
             SettingsHandlerValidators.getHistoryLimit,
             this.registeredIpcHandlers
@@ -745,7 +754,7 @@ export class IpcService {
 
         // Reset settings handler (no parameters)
         registerStandardizedIpcHandler(
-            "reset-settings",
+            SETTINGS_CHANNELS.resetSettings,
             async () => this.uptimeOrchestrator.resetSettings(),
             SettingsHandlerValidators.resetSettings,
             this.registeredIpcHandlers
@@ -768,7 +777,7 @@ export class IpcService {
     private setupMonitoringHandlers(): void {
         // Start monitoring globally (no parameters)
         registerStandardizedIpcHandler(
-            "start-monitoring",
+            MONITORING_CHANNELS.startMonitoring,
             async () => this.uptimeOrchestrator.startMonitoring(),
             MonitoringHandlerValidators.startMonitoring,
             this.registeredIpcHandlers
@@ -776,7 +785,7 @@ export class IpcService {
 
         // Stop monitoring globally (no parameters)
         registerStandardizedIpcHandler(
-            "stop-monitoring",
+            MONITORING_CHANNELS.stopMonitoring,
             async () => this.uptimeOrchestrator.stopMonitoring(),
             MonitoringHandlerValidators.stopMonitoring,
             this.registeredIpcHandlers
@@ -785,7 +794,7 @@ export class IpcService {
         // Start monitoring for all monitors within a specific site
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All monitoring handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
-            "start-monitoring-for-site",
+            MONITORING_CHANNELS.startMonitoringForSite,
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 return this.uptimeOrchestrator.startMonitoringForSite(
@@ -798,7 +807,7 @@ export class IpcService {
 
         // Start monitoring for specific monitor within a site
         registerStandardizedIpcHandler(
-            "start-monitoring-for-monitor",
+            MONITORING_CHANNELS.startMonitoringForMonitor,
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string;
@@ -813,7 +822,7 @@ export class IpcService {
 
         // Stop monitoring for specific site/monitor
         registerStandardizedIpcHandler(
-            "stop-monitoring-for-site",
+            MONITORING_CHANNELS.stopMonitoringForSite,
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 return this.uptimeOrchestrator.stopMonitoringForSite(
@@ -826,7 +835,7 @@ export class IpcService {
 
         // Stop monitoring for specific monitor within a site
         registerStandardizedIpcHandler(
-            "stop-monitoring-for-monitor",
+            MONITORING_CHANNELS.stopMonitoringForMonitor,
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string;
@@ -841,7 +850,7 @@ export class IpcService {
 
         // Check site manually with validation
         registerStandardizedIpcHandler(
-            "check-site-now",
+            MONITORING_CHANNELS.checkSiteNow,
             async (...args: unknown[]) => {
                 const identifier = args[0] as string;
                 const monitorId = args[1] as string;
@@ -885,7 +894,7 @@ export class IpcService {
     private setupMonitorTypeHandlers(): void {
         // Get monitor types handler (no parameters)
         registerStandardizedIpcHandler(
-            "get-monitor-types",
+            MONITOR_TYPES_CHANNELS.getMonitorTypes,
             () => {
                 // Get all monitor type configs and serialize them safely for
                 // IPC
@@ -901,7 +910,7 @@ export class IpcService {
         // Format monitor detail handler with validation
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All monitor type handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
-            "format-monitor-detail",
+            MONITOR_TYPES_CHANNELS.formatMonitorDetail,
             (...args: unknown[]) => {
                 const monitorType = args[0] as string;
                 const details = args[1] as string;
@@ -927,7 +936,7 @@ export class IpcService {
 
         // Format monitor title suffix handler with validation
         registerStandardizedIpcHandler(
-            "format-monitor-title-suffix",
+            MONITOR_TYPES_CHANNELS.formatMonitorTitleSuffix,
             (...args: unknown[]) => {
                 const monitorType = args[0] as string;
                 const monitor = args[1] as Monitor;
@@ -953,7 +962,7 @@ export class IpcService {
 
         // Validate monitor data handler with special validation response format
         registerStandardizedIpcHandler(
-            "validate-monitor-data",
+            MONITOR_TYPES_CHANNELS.validateMonitorData,
             (...args: unknown[]) => {
                 const [monitorType, data] = args as [string, unknown];
 
@@ -990,7 +999,7 @@ export class IpcService {
         // Add site handler with validation
         /* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- All site handler arguments are validated by their respective validators before type assertion */
         registerStandardizedIpcHandler(
-            "add-site",
+            SITES_CHANNELS.addSite,
             async (...args: unknown[]) =>
                 this.uptimeOrchestrator.addSite(args[0] as Site),
             SiteHandlerValidators.addSite,
@@ -999,7 +1008,7 @@ export class IpcService {
 
         // Delete all sites handler (no parameters)
         registerStandardizedIpcHandler(
-            "delete-all-sites",
+            SITES_CHANNELS.deleteAllSites,
             async () => {
                 logger.info("delete-all-sites IPC handler called");
                 const result = await this.uptimeOrchestrator.deleteAllSites();
@@ -1014,7 +1023,7 @@ export class IpcService {
 
         // Remove site handler with validation
         registerStandardizedIpcHandler(
-            "remove-site",
+            SITES_CHANNELS.removeSite,
             async (...args: unknown[]) =>
                 this.uptimeOrchestrator.removeSite(args[0] as string),
             SiteHandlerValidators.removeSite,
@@ -1023,7 +1032,7 @@ export class IpcService {
 
         // Get sites handler (no parameters)
         registerStandardizedIpcHandler(
-            "get-sites",
+            SITES_CHANNELS.getSites,
             async () => {
                 const sites = await this.uptimeOrchestrator.getSites();
                 const snapshot = deriveSiteSnapshot(sites);
@@ -1056,7 +1065,7 @@ export class IpcService {
 
         // Update site handler with validation
         registerStandardizedIpcHandler(
-            "update-site",
+            SITES_CHANNELS.updateSite,
             async (...args: unknown[]) =>
                 this.uptimeOrchestrator.updateSite(
                     args[0] as string,
@@ -1068,7 +1077,7 @@ export class IpcService {
 
         // Remove monitor handler with validation
         registerStandardizedIpcHandler(
-            "remove-monitor",
+            SITES_CHANNELS.removeMonitor,
             async (...args: unknown[]) =>
                 this.uptimeOrchestrator.removeMonitor(
                     args[0] as string,
@@ -1095,7 +1104,7 @@ export class IpcService {
     private setupStateSyncHandlers(): void {
         // Request full sync handler (no parameters)
         registerStandardizedIpcHandler(
-            "request-full-sync",
+            STATE_SYNC_CHANNELS.requestFullSync,
             async () => {
                 // Get all sites and send to frontend
                 const sites = await this.uptimeOrchestrator.getSites();
@@ -1136,7 +1145,7 @@ export class IpcService {
 
         // Get sync status handler (no parameters)
         registerStandardizedIpcHandler(
-            "get-sync-status",
+            STATE_SYNC_CHANNELS.getSyncStatus,
             () => {
                 const siteCount = this.uptimeOrchestrator.getCachedSiteCount();
                 const summary: StateSyncStatusSummary = {
@@ -1168,7 +1177,7 @@ export class IpcService {
     private setupSystemHandlers(): void {
         // External URL handler with validation
         registerStandardizedIpcHandler(
-            "open-external",
+            SYSTEM_CHANNELS.openExternal,
             async (...args: unknown[]) => {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- URL parameter type validated by SystemHandlerValidators.openExternal
                 const url = args[0] as string;
@@ -1180,7 +1189,7 @@ export class IpcService {
         );
 
         registerStandardizedIpcHandler(
-            "quit-and-install",
+            SYSTEM_CHANNELS.quitAndInstall,
             () => {
                 logger.info(LOG_TEMPLATES.services.UPDATER_QUIT_INSTALL);
                 this.autoUpdaterService.quitAndInstall();

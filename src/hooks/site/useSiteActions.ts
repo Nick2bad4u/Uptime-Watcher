@@ -13,6 +13,7 @@ import type { Monitor, Site } from "@shared/types";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { useCallback } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import { logger } from "../../services/logger";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
@@ -103,8 +104,22 @@ export function useSiteActions(
         startSiteMonitorMonitoring,
         stopSiteMonitoring,
         stopSiteMonitorMonitoring,
-    } = useSitesStore();
-    const { selectSite, setShowSiteDetails } = useUIStore();
+    } = useSitesStore(
+        useShallow((state) => ({
+            checkSiteNow: state.checkSiteNow,
+            setSelectedMonitorId: state.setSelectedMonitorId,
+            startSiteMonitoring: state.startSiteMonitoring,
+            startSiteMonitorMonitoring: state.startSiteMonitorMonitoring,
+            stopSiteMonitoring: state.stopSiteMonitoring,
+            stopSiteMonitorMonitoring: state.stopSiteMonitorMonitoring,
+        }))
+    );
+    const { selectSite, setShowSiteDetails } = useUIStore(
+        useShallow((state) => ({
+            selectSite: state.selectSite,
+            setShowSiteDetails: state.setShowSiteDetails,
+        }))
+    );
 
     // Start monitoring the site with proper logging
     const handleStartMonitoring = useCallback(() => {

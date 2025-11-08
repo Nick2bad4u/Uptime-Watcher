@@ -152,6 +152,8 @@ const mockSitesStoreState = {
     unsubscribeFromStatusUpdates: vi.fn(),
     getSelectedMonitorId: vi.fn().mockReturnValue("monitor-1"),
     setSelectedMonitorId: vi.fn(),
+    retryStatusSubscription: vi.fn().mockResolvedValue(undefined),
+    statusSubscriptionSummary: undefined,
 };
 
 const mockErrorStoreState = {

@@ -52,6 +52,15 @@ import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
 import { useSitesStore } from "../../stores/sites/useSitesStore";
+type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
+
+const selectDownloadSqliteBackup = (
+    state: SitesStoreState
+): SitesStoreState["downloadSqliteBackup"] => state.downloadSqliteBackup;
+
+const selectFullResyncSites = (
+    state: SitesStoreState
+): SitesStoreState["fullResyncSites"] => state.fullResyncSites;
 import { StatusIndicator } from "../../theme/components/StatusIndicator";
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
@@ -176,7 +185,25 @@ export const Settings = ({
     const { clearError, isLoading, lastError, setError } = useErrorStore();
     const { persistHistoryLimit, resetSettings, settings, updateSettings } =
         useSettingsStore();
-    const { downloadSqliteBackup, fullResyncSites } = useSitesStore();
+    const downloadSelection = useSitesStore(
+        selectDownloadSqliteBackup as unknown as (
+            state: SitesStoreState
+        ) => SitesStoreState["downloadSqliteBackup"] | SitesStoreState
+    );
+    const downloadSqliteBackup =
+        typeof downloadSelection === "function"
+            ? downloadSelection
+            : (downloadSelection as SitesStoreState).downloadSqliteBackup;
+
+    const resyncSelection = useSitesStore(
+        selectFullResyncSites as unknown as (
+            state: SitesStoreState
+        ) => SitesStoreState["fullResyncSites"] | SitesStoreState
+    );
+    const fullResyncSites =
+        typeof resyncSelection === "function"
+            ? resyncSelection
+            : (resyncSelection as SitesStoreState).fullResyncSites;
     const requestConfirmation = useConfirmDialog();
 
     const { availableThemes, isDark, setTheme } = useTheme();

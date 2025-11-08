@@ -6,6 +6,39 @@ import ts from "typescript";
 const { readFileSync } =
     await vi.importActual<typeof import("node:fs")>("node:fs");
 
+const preloadChannels = await vi.importActual<
+    typeof import("@shared/types/preload")
+>("@shared/types/preload");
+
+const toStringRecord = (map: unknown): Record<string, string> => {
+    if (!map || typeof map !== "object") {
+        return {};
+    }
+
+    const entries = Object.entries(map as Record<string, unknown>);
+    const result: Record<string, string> = {};
+
+    for (const [key, value] of entries) {
+        if (typeof value === "string") {
+            result[key] = value;
+        }
+    }
+
+    return result;
+};
+
+const CHANNEL_MAPS: Record<string, Record<string, string>> = {
+    DATA_CHANNELS: toStringRecord(preloadChannels.DATA_CHANNELS),
+    MONITORING_CHANNELS: toStringRecord(preloadChannels.MONITORING_CHANNELS),
+    MONITOR_TYPES_CHANNELS: toStringRecord(
+        preloadChannels.MONITOR_TYPES_CHANNELS
+    ),
+    SETTINGS_CHANNELS: toStringRecord(preloadChannels.SETTINGS_CHANNELS),
+    SITES_CHANNELS: toStringRecord(preloadChannels.SITES_CHANNELS),
+    STATE_SYNC_CHANNELS: toStringRecord(preloadChannels.STATE_SYNC_CHANNELS),
+    SYSTEM_CHANNELS: toStringRecord(preloadChannels.SYSTEM_CHANNELS),
+};
+
 /**
  * Extracts invoke channel identifiers declared in the shared IPC contract map.
  *
@@ -88,15 +121,64 @@ function extractRegisteredChannelNames(): Set<string> {
         "IpcService.ts"
     );
     const source = readFileSync(ipcServicePath, "utf8");
-    const channelRegex =
-        /registerStandardizedIpcHandler\s*\(\s*["'](?<channel>[^"']+)["']/gu;
+    const sourceFile = ts.createSourceFile(
+        ipcServicePath,
+        source,
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS
+    );
+
     const channels = new Set<string>();
-    let match: RegExpExecArray | null;
-    while ((match = channelRegex.exec(source)) !== null) {
-        const channelName = match.groups?.["channel"];
-        if (channelName) {
-            channels.add(channelName);
+
+    const resolveChannelName = (
+        expression: ts.Expression
+    ): string | undefined => {
+        if (ts.isStringLiteral(expression)) {
+            return expression.text;
         }
-    }
+
+        if (ts.isNoSubstitutionTemplateLiteral(expression)) {
+            return expression.text;
+        }
+
+        if (ts.isPropertyAccessExpression(expression)) {
+            const objectExpression = expression.expression;
+            const propertyName = expression.name.text;
+
+            if (ts.isIdentifier(objectExpression)) {
+                const channelMap = CHANNEL_MAPS[objectExpression.text];
+                const resolved = channelMap?.[propertyName];
+                if (typeof resolved === "string") {
+                    return resolved;
+                }
+            }
+        }
+
+        return undefined;
+    };
+
+    const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node)) {
+            const callee = node.expression;
+
+            if (
+                ts.isIdentifier(callee) &&
+                callee.text === "registerStandardizedIpcHandler"
+            ) {
+                const [channelArgument] = node.arguments;
+                if (channelArgument) {
+                    const channelName = resolveChannelName(channelArgument);
+                    if (channelName) {
+                        channels.add(channelName);
+                    }
+                }
+            }
+        }
+
+        ts.forEachChild(node, visit);
+    };
+
+    visit(sourceFile);
     return channels;
 }

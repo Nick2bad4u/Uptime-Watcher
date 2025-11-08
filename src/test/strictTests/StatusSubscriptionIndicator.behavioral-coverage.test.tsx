@@ -132,12 +132,31 @@ const siteStoreState = vi.hoisted(() => ({
     summary: undefined as StatusUpdateSubscriptionSummary | undefined,
 }));
 
-vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => ({
-        retryStatusSubscription: siteStoreState.retryStatusSubscription,
-        statusSubscriptionSummary: siteStoreState.summary,
-    }),
+const createSiteStoreSnapshot = vi.hoisted(() => () => ({
+    retryStatusSubscription: siteStoreState.retryStatusSubscription,
+    statusSubscriptionSummary: siteStoreState.summary,
 }));
+
+vi.mock("../../stores/sites/useSitesStore", () => {
+    const useSitesStoreMock = Object.assign(
+        <Selection,>(
+            selector?: (
+                state: ReturnType<typeof createSiteStoreSnapshot>
+            ) => Selection,
+            _equality?: (a: Selection, b: Selection) => boolean
+        ): Selection | ReturnType<typeof createSiteStoreSnapshot> => {
+            const snapshot = createSiteStoreSnapshot();
+            return typeof selector === "function"
+                ? selector(snapshot)
+                : snapshot;
+        },
+        {
+            getState: createSiteStoreSnapshot,
+        }
+    );
+
+    return { useSitesStore: useSitesStoreMock };
+});
 
 import { StatusSubscriptionIndicator } from "../../components/Header/StatusSubscriptionIndicator";
 

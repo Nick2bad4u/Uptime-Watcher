@@ -24,14 +24,44 @@ import {
 
 const RefreshIconComponent = AppIcons.actions.refresh;
 
+type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
+
+const selectRetryStatusSubscription = (
+    state: SitesStoreState
+): SitesStoreState["retryStatusSubscription"] => state.retryStatusSubscription;
+
+const selectStatusSubscriptionSummary = (
+    state: SitesStoreState
+): SitesStoreState["statusSubscriptionSummary"] =>
+    state.statusSubscriptionSummary;
+
 /**
  * Renders realtime subscription health summary with retry controls.
  *
  * @returns JSX element containing status visuals and retry actions.
  */
 export const StatusSubscriptionIndicator = (): JSX.Element => {
-    const { retryStatusSubscription, statusSubscriptionSummary: summary } =
-        useSitesStore();
+    const retrySelection = useSitesStore(
+        selectRetryStatusSubscription as unknown as (
+            state: SitesStoreState
+        ) => SitesStoreState["retryStatusSubscription"] | SitesStoreState
+    );
+    const retryStatusSubscription =
+        typeof retrySelection === "function"
+            ? retrySelection
+            : (retrySelection as SitesStoreState).retryStatusSubscription;
+
+    const summarySelection = useSitesStore(
+        selectStatusSubscriptionSummary as unknown as (
+            state: SitesStoreState
+        ) => SitesStoreState["statusSubscriptionSummary"] | SitesStoreState
+    );
+    const summary =
+        summarySelection &&
+        typeof summarySelection === "object" &&
+        "statusSubscriptionSummary" in summarySelection
+            ? (summarySelection as SitesStoreState).statusSubscriptionSummary
+            : (summarySelection as StatusUpdateSubscriptionSummary | undefined);
 
     const [isRetrying, setIsRetrying] = useState(false);
     const [lastAttempt, setLastAttempt] =

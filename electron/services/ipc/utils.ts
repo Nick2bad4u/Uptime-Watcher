@@ -10,6 +10,7 @@ import {
     isNonEmptyString,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { ipcMain } from "electron";
 
 import type {
@@ -21,9 +22,9 @@ import type {
 import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 
-const HIGH_FREQUENCY_OPERATIONS = new Set([
-    "format-monitor-detail",
-    "get-monitor-types",
+const HIGH_FREQUENCY_OPERATIONS = new Set<string>([
+    MONITOR_TYPES_CHANNELS.formatMonitorDetail,
+    MONITOR_TYPES_CHANNELS.getMonitorTypes,
 ]);
 
 interface HandlerExecutionFailure {

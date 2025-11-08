@@ -5,6 +5,7 @@
  * when no sites have been added. Applies theme-aware styling with dividers.
  */
 
+import type { Site } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { useCallback, useMemo } from "react";
@@ -27,6 +28,10 @@ import { SiteTableView } from "./SiteTableView";
 import "./SiteList.css";
 
 const SitesIcon = AppIcons.metrics.monitor;
+
+type SitesStoreState = ReturnType<typeof useSitesStore.getState>;
+
+const selectSites = (state: SitesStoreState): readonly Site[] => state.sites;
 
 type UiStoreState = ReturnType<typeof useUIStore.getState>;
 
@@ -68,7 +73,14 @@ const selectSetSiteCardPresentation = (
  * @returns JSX.Element containing the site list or empty state
  */
 export const SiteList = (): JSX.Element => {
-    const { sites } = useSitesStore();
+    const sitesSelection = useSitesStore(
+        selectSites as unknown as (
+            state: SitesStoreState
+        ) => readonly Site[] | SitesStoreState
+    );
+    const sites = Array.isArray(sitesSelection)
+        ? sitesSelection
+        : (sitesSelection as SitesStoreState).sites;
     const layout = useUIStore(selectSiteListLayout);
     const setLayout = useUIStore(selectSetSiteListLayout);
     const cardPresentation = useUIStore(selectSiteCardPresentation);
