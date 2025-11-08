@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/configuration/global-settings.md">Moved Permanently</a>.

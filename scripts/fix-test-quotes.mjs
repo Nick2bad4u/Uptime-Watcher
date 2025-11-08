@@ -23,6 +23,10 @@ const options = {
     help: args.includes("--help") || args.includes("-h"),
 };
 
+/**
+ * @param {string} longForm
+ * @param {string} shortForm
+ */
 function getArgValue(longForm, shortForm) {
     const index = args.findIndex(
         (arg) => arg === longForm || arg === shortForm

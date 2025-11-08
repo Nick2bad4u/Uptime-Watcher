@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/advanced/fake-data.md">Moved Permanently</a>.

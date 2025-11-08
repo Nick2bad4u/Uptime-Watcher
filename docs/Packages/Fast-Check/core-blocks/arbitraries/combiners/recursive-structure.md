@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/arbitraries/combiners/recursive-structure.md">Moved Permanently</a>.

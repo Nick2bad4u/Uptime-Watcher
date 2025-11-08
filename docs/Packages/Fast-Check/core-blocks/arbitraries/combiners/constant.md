@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/arbitraries/combiners/constant.md">Moved Permanently</a>.

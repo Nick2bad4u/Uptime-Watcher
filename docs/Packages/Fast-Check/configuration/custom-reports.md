@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/configuration/custom-reports.md">Moved Permanently</a>.

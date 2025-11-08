@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/tutorials/quick-start/our-first-property-based-test.md">Moved Permanently</a>.

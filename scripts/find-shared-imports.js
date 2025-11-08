@@ -38,6 +38,9 @@ const CONFIG = {
  * @param {string | string[]} extensions
  */
 function getFilesRecursively(dir, extensions) {
+    /**
+     * @type {string[]}
+     */
     const files = [];
 
     /**

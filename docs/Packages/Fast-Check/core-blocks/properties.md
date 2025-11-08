@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/core-blocks/properties.md">Moved Permanently</a>.

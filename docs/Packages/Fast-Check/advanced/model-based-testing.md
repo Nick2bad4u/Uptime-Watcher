@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/advanced/model-based-testing.md">Moved Permanently</a>.

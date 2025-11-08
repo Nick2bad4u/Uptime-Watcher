@@ -1,1 +1,0 @@
-<a href="/dubzzz/fast-check/tree/main/website/docs/introduction/getting-started.md">Moved Permanently</a>.

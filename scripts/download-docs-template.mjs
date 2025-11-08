@@ -40,8 +40,6 @@ import { fileURLToPath } from "url";
 /** @typedef {import("https")} https */
 
 const execFileAsync = promisify(execFile);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /* ==================== TYPE DEFINITIONS ==================== */
 
@@ -340,7 +338,8 @@ class Logger {
      */
     constructor(verbose = false) {
         /** @type {boolean} */
-        this.verbose = verbose || process.env.DOC_DOWNLOADER_VERBOSE === "true";
+        this.verbose =
+            verbose || process.env["DOC_DOWNLOADER_VERBOSE"] === "true";
         /** @type {number} */
         this.startTime = Date.now();
     }
@@ -434,10 +433,10 @@ async function initialize() {
     // Setup paths
     /** @type {string} */
     let outputDir;
-    if (process.env.DOCS_OUTPUT_DIR) {
-        outputDir = path.isAbsolute(process.env.DOCS_OUTPUT_DIR)
-            ? process.env.DOCS_OUTPUT_DIR
-            : path.resolve(process.cwd(), process.env.DOCS_OUTPUT_DIR);
+    if (process.env["DOCS_OUTPUT_DIR"]) {
+        outputDir = path.isAbsolute(process.env["DOCS_OUTPUT_DIR"])
+            ? process.env["DOCS_OUTPUT_DIR"]
+            : path.resolve(process.cwd(), process.env["DOCS_OUTPUT_DIR"]);
     } else {
         outputDir = path.join(process.cwd(), ...config.subdirs, config.docName);
     }
@@ -449,7 +448,8 @@ async function initialize() {
         logFile: path.join(outputDir, `${config.docName}-Download-Log.md`),
         hashesFile: path.join(outputDir, `${config.docName}-Hashes.json`),
         cacheDir:
-            process.env.DOC_DOWNLOADER_CACHE || path.join(outputDir, ".cache"),
+            process.env["DOC_DOWNLOADER_CACHE"] ||
+            path.join(outputDir, ".cache"),
     };
 
     // Ensure directories exist
@@ -684,12 +684,12 @@ async function isPandocAvailable(logger) {
  * @param {DownloadTask} task - Download task
  * @param {DownloadConfig} config - Configuration
  * @param {Logger} logger - Logger instance
- * @param {Paths} paths - Path configuration
+ * @param {Paths} _paths - Path configuration
  * @param {HashRecord} previousHashes - Previous file hashes
  *
  * @returns {Promise<DownloadResult>} Download result
  */
-async function downloadFile(task, config, logger, paths, previousHashes) {
+async function downloadFile(task, config, logger, _paths, previousHashes) {
     const { page, url, outputPath } = task;
 
     if (config.enableCache && !config.force && fsSync.existsSync(outputPath)) {
@@ -1060,7 +1060,7 @@ async function main() {
         console.error(
             `❌ Application failed: ${error instanceof Error ? error.message : String(error)}`
         );
-        if (process.env.DOC_DOWNLOADER_VERBOSE) {
+        if (process.env["DOC_DOWNLOADER_VERBOSE"]) {
             console.error(error instanceof Error ? error.stack : error);
         }
         process.exit(1);
