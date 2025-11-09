@@ -14,16 +14,16 @@ vi.mock("../../../services/monitoring/utils/portRetry", () => ({
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
     validateMonitorHostAndPort: vi.fn(),
-    extractMonitorConfig: vi.fn(),
+    createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
 }));
 
 import { PortMonitor } from "../../../services/monitoring/PortMonitor";
 import { performPortCheckWithRetry } from "../../../services/monitoring/utils/portRetry";
 import {
-    validateMonitorHostAndPort,
-    extractMonitorConfig,
+    createMonitorConfig,
     createMonitorErrorResult,
+    validateMonitorHostAndPort,
 } from "../../../services/monitoring/shared/monitorServiceHelpers";
 
 describe("PortMonitor Coverage Tests", () => {
@@ -62,9 +62,10 @@ describe("PortMonitor Coverage Tests", () => {
         // Set up default mock behaviors
         vi.mocked(performPortCheckWithRetry).mockResolvedValue(successResult);
         vi.mocked(validateMonitorHostAndPort).mockReturnValue(null); // No validation error
-        vi.mocked(extractMonitorConfig).mockReturnValue({
+        vi.mocked(createMonitorConfig).mockReturnValue({
             retryAttempts: 3,
             timeout: 5000,
+            checkInterval: 30_000,
         });
         vi.mocked(createMonitorErrorResult).mockReturnValue(errorResult);
 
@@ -370,9 +371,9 @@ describe("PortMonitor Coverage Tests", () => {
             expect(vi.mocked(validateMonitorHostAndPort)).toHaveBeenCalledWith(
                 validPortMonitor
             );
-            expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
+            expect(vi.mocked(createMonitorConfig)).toHaveBeenCalledWith(
                 validPortMonitor,
-                10_000
+                expect.objectContaining({ timeout: 10_000 })
             );
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
@@ -548,16 +549,17 @@ describe("PortMonitor Coverage Tests", () => {
                 retryAttempts: 5,
             };
 
-            vi.mocked(extractMonitorConfig).mockReturnValue({
+            vi.mocked(createMonitorConfig).mockReturnValue({
                 retryAttempts: 5,
                 timeout: 8000,
+                checkInterval: 30_000,
             });
 
             await portMonitor.check(monitorWithCustomConfig);
 
-            expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
+            expect(vi.mocked(createMonitorConfig)).toHaveBeenCalledWith(
                 monitorWithCustomConfig,
-                10_000
+                expect.objectContaining({ timeout: 10_000 })
             );
             expect(vi.mocked(performPortCheckWithRetry)).toHaveBeenCalledWith(
                 "example.com",
@@ -673,9 +675,9 @@ describe("PortMonitor Coverage Tests", () => {
                 monitorWithoutTimeout as Site["monitors"][0]
             );
 
-            expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
+            expect(vi.mocked(createMonitorConfig)).toHaveBeenCalledWith(
                 monitorWithoutTimeout,
-                10_000
+                expect.objectContaining({ timeout: 10_000 })
             );
         });
 
@@ -704,9 +706,9 @@ describe("PortMonitor Coverage Tests", () => {
 
             await customTimeoutMonitor.check(validPortMonitor);
 
-            expect(vi.mocked(extractMonitorConfig)).toHaveBeenCalledWith(
+            expect(vi.mocked(createMonitorConfig)).toHaveBeenCalledWith(
                 validPortMonitor,
-                10_000
+                expect.objectContaining({ timeout: 10_000 })
             );
         });
     });

@@ -26,8 +26,8 @@ import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
     parseMonitorUrlList,
 } from "./shared/monitorServiceHelpers";
 import { createHttpClient } from "./utils/httpClient";
@@ -80,10 +80,9 @@ export class CdnEdgeConsistencyMonitor implements IMonitorService {
         const baselineUrl = monitor.baselineUrl?.trim() ?? "";
         const edgeEndpoints = parseMonitorUrlList(monitor.edgeLocations ?? "");
 
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
 
         try {
             return await withOperationalHooks(

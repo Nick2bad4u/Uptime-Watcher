@@ -54,6 +54,9 @@ import {
 } from "@shared/utils/logTemplates";
 import { app } from "electron";
 
+import type { UptimeEvents } from "../../events/eventTypes";
+
+import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
@@ -83,6 +86,9 @@ export class ApplicationService {
      * @internal
      */
     private readonly serviceContainer: ServiceContainer;
+
+    /** Tracks orchestrator subscriptions for deterministic cleanup. */
+    private readonly scopedSubscriptions = new ScopedSubscriptionManager();
 
     /**
      * Named event handler for app ready event.
@@ -160,6 +166,16 @@ export class ApplicationService {
 
             // Remove application event listeners
             this.removeApplicationEventListeners();
+
+            this.scopedSubscriptions.clearAll({
+                onError: (error) => {
+                    logger.error(
+                        "[ApplicationService] Failed to dispose event subscription",
+                        { error: ensureError(error) }
+                    );
+                },
+                suppressErrors: true,
+            });
 
             // Cleanup IPC handlers
             // NOTE: Currently synchronous, but designed to be
@@ -369,7 +385,10 @@ export class ApplicationService {
             this.serviceContainer.getNotificationService();
 
         // Handle monitor status changes with typed events
-        orchestrator.onTyped("monitor:status-changed", (data) => {
+        this.scopedSubscriptions.onTyped<
+            UptimeEvents,
+            "monitor:status-changed"
+        >(orchestrator, "monitor:status-changed", (data) => {
             const monitorIdentifier = data.monitor.id;
             const siteIdentifier = data.site.identifier;
             try {
@@ -398,56 +417,75 @@ export class ApplicationService {
         });
 
         // Handle monitor up events
-        orchestrator.onTyped("monitor:up", (data) => {
-            try {
-                logger.info(
-                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
-                    {
-                        monitorId: data.monitor.id,
-                        siteIdentifier: data.site.identifier,
-                        siteName: data.site.name,
-                    }
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "monitor:up">(
+            orchestrator,
+            "monitor:up",
+            (data) => {
+                try {
+                    logger.info(
+                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_UP,
+                        {
+                            monitorId: data.monitor.id,
+                            siteIdentifier: data.site.identifier,
+                            siteName: data.site.name,
+                        }
+                    );
 
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.MONITOR_UP,
-                    data
-                );
-                notificationService.notifyMonitorUp(data.site, data.monitor.id);
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_UP_ERROR,
-                    ensureError(error)
-                );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.MONITOR_UP,
+                        data
+                    );
+                    notificationService.notifyMonitorUp(
+                        data.site,
+                        data.monitor.id
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_MONITOR_UP_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
         // Handle monitor down events
-        orchestrator.onTyped("monitor:down", (data) => {
-            try {
-                logger.warn(LOG_TEMPLATES.warnings.APPLICATION_MONITOR_DOWN, {
-                    monitorId: data.monitor.id,
-                    siteIdentifier: data.site.identifier,
-                    siteName: data.site.name,
-                });
+        this.scopedSubscriptions.onTyped<UptimeEvents, "monitor:down">(
+            orchestrator,
+            "monitor:down",
+            (data) => {
+                try {
+                    logger.warn(
+                        LOG_TEMPLATES.warnings.APPLICATION_MONITOR_DOWN,
+                        {
+                            monitorId: data.monitor.id,
+                            siteIdentifier: data.site.identifier,
+                            siteName: data.site.name,
+                        }
+                    );
 
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
-                    data
-                );
-                notificationService.notifyMonitorDown(
-                    data.site,
-                    data.monitor.id
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_MONITOR_DOWN_ERROR,
-                    ensureError(error)
-                );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.MONITOR_DOWN,
+                        data
+                    );
+                    notificationService.notifyMonitorDown(
+                        data.site,
+                        data.monitor.id
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_MONITOR_DOWN_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("monitor:check-completed", (data) => {
+        this.scopedSubscriptions.onTyped<
+            UptimeEvents,
+            "monitor:check-completed"
+        >(orchestrator, "monitor:check-completed", (data) => {
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug
@@ -471,7 +509,10 @@ export class ApplicationService {
             }
         });
 
-        orchestrator.onTyped("settings:history-limit-updated", (data) => {
+        this.scopedSubscriptions.onTyped<
+            UptimeEvents,
+            "settings:history-limit-updated"
+        >(orchestrator, "settings:history-limit-updated", (data) => {
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug
@@ -496,121 +537,151 @@ export class ApplicationService {
         });
 
         // Handle system errors
-        orchestrator.onTyped("system:error", (data) => {
-            logger.error(
-                interpolateLogTemplate(
-                    LOG_TEMPLATES.errors.APPLICATION_SYSTEM_ERROR,
-                    { context: data.context }
-                ),
-                data.error
-            );
-        });
+        this.scopedSubscriptions.onTyped<UptimeEvents, "system:error">(
+            orchestrator,
+            "system:error",
+            (data) => {
+                logger.error(
+                    interpolateLogTemplate(
+                        LOG_TEMPLATES.errors.APPLICATION_SYSTEM_ERROR,
+                        { context: data.context }
+                    ),
+                    data.error
+                );
+            }
+        );
 
         // Forward monitoring start/stop events to renderer
-        orchestrator.onTyped("monitoring:started", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug
-                        .APPLICATION_FORWARDING_MONITORING_STARTED,
-                    data
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
-                    data
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors
-                        .APPLICATION_FORWARD_MONITORING_STARTED_ERROR,
-                    ensureError(error)
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "monitoring:started">(
+            orchestrator,
+            "monitoring:started",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug
+                            .APPLICATION_FORWARDING_MONITORING_STARTED,
+                        data
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.MONITORING_STARTED,
+                        data
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_MONITORING_STARTED_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("monitoring:stopped", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug
-                        .APPLICATION_FORWARDING_MONITORING_STOPPED,
-                    data
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
-                    data
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors
-                        .APPLICATION_FORWARD_MONITORING_STOPPED_ERROR,
-                    ensureError(error)
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "monitoring:stopped">(
+            orchestrator,
+            "monitoring:stopped",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug
+                            .APPLICATION_FORWARDING_MONITORING_STOPPED,
+                        data
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.MONITORING_STOPPED,
+                        data
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_MONITORING_STOPPED_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("site:added", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_ADDED,
-                    {
-                        identifier: data.site.identifier,
-                        source: data.source,
-                    }
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.SITE_ADDED,
-                    data
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_ADDED_ERROR,
-                    ensureError(error)
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "site:added">(
+            orchestrator,
+            "site:added",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_ADDED,
+                        {
+                            identifier: data.site.identifier,
+                            source: data.source,
+                        }
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.SITE_ADDED,
+                        data
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_SITE_ADDED_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("site:removed", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_REMOVED,
-                    {
-                        cascade: data.cascade,
-                        siteIdentifier: data.siteIdentifier,
-                    }
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.SITE_REMOVED,
-                    data
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_REMOVED_ERROR,
-                    ensureError(error)
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "site:removed">(
+            orchestrator,
+            "site:removed",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_REMOVED,
+                        {
+                            cascade: data.cascade,
+                            siteIdentifier: data.siteIdentifier,
+                        }
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.SITE_REMOVED,
+                        data
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_SITE_REMOVED_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("site:updated", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
-                    {
-                        identifier: data.site.identifier,
-                        updatedFields: data.updatedFields.join(", "),
-                    }
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.SITE_UPDATED,
-                    data
-                );
-            } catch (error: unknown) {
-                logger.error(
-                    LOG_TEMPLATES.errors.APPLICATION_FORWARD_SITE_UPDATED_ERROR,
-                    ensureError(error)
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "site:updated">(
+            orchestrator,
+            "site:updated",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug.APPLICATION_FORWARDING_SITE_UPDATED,
+                        {
+                            identifier: data.site.identifier,
+                            updatedFields: data.updatedFields.join(", "),
+                        }
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.SITE_UPDATED,
+                        data
+                    );
+                } catch (error: unknown) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_SITE_UPDATED_ERROR,
+                        ensureError(error)
+                    );
+                }
             }
-        });
+        );
 
-        orchestrator.onTyped("sites:state-synchronized", (data) => {
+        this.scopedSubscriptions.onTyped<
+            UptimeEvents,
+            "sites:state-synchronized"
+        >(orchestrator, "sites:state-synchronized", (data) => {
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_STATE_SYNC,
@@ -631,28 +702,32 @@ export class ApplicationService {
         });
 
         // Handle cache invalidation events
-        orchestrator.onTyped("cache:invalidated", (data) => {
-            try {
-                logger.debug(
-                    LOG_TEMPLATES.debug
-                        .APPLICATION_FORWARDING_CACHE_INVALIDATION,
-                    {
-                        identifier: data.identifier,
-                        reason: data.reason,
-                        type: data.type,
-                    }
-                );
-                rendererBridge.sendToRenderers(
-                    RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
-                    data
-                );
-            } catch (error) {
-                logger.error(
-                    LOG_TEMPLATES.errors
-                        .APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR,
-                    error
-                );
+        this.scopedSubscriptions.onTyped<UptimeEvents, "cache:invalidated">(
+            orchestrator,
+            "cache:invalidated",
+            (data) => {
+                try {
+                    logger.debug(
+                        LOG_TEMPLATES.debug
+                            .APPLICATION_FORWARDING_CACHE_INVALIDATION,
+                        {
+                            identifier: data.identifier,
+                            reason: data.reason,
+                            type: data.type,
+                        }
+                    );
+                    rendererBridge.sendToRenderers(
+                        RENDERER_EVENT_CHANNELS.CACHE_INVALIDATED,
+                        data
+                    );
+                } catch (error) {
+                    logger.error(
+                        LOG_TEMPLATES.errors
+                            .APPLICATION_FORWARD_CACHE_INVALIDATION_ERROR,
+                        error
+                    );
+                }
             }
-        });
+        );
     }
 }

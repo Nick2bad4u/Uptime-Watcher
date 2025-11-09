@@ -50,9 +50,11 @@ import type {
 } from "./types";
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
+import { DEFAULT_RETRY_ATTEMPTS } from "./constants";
+import { createMonitorConfig } from "./createMonitorConfig";
+// Type guard utilities are available but PingMonitor retains explicit check here
 import {
     createMonitorErrorResult,
-    extractMonitorConfig,
     validateMonitorHost,
 } from "./shared/monitorServiceHelpers";
 import { performPingCheckWithRetry } from "./utils/pingRetry";
@@ -144,7 +146,7 @@ export class PingMonitor implements IMonitorService {
      *   missing host)
      *
      * @see {@link validateMonitorHost} - Host validation utility
-     * @see {@link extractMonitorConfig} - Timeout and retry extraction utility
+     * @see {@link createMonitorConfig} - Timeout and retry normalization utility
      * @see {@link performPingCheckWithRetry} - Core ping functionality
      */
     public async check(
@@ -166,11 +168,11 @@ export class PingMonitor implements IMonitorService {
             return createMonitorErrorResult("Monitor missing valid host", 0);
         }
 
-        // Use type-safe utility functions instead of type assertions
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout
-        );
+        // Normalize effective config (timeout, retryAttempts, interval)
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            retryAttempts: DEFAULT_RETRY_ATTEMPTS,
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
 
         return performPingCheckWithRetry(monitor.host, timeout, retryAttempts);
     }

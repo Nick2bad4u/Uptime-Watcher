@@ -7,6 +7,7 @@
  * state management.
  */
 
+import type { StatusUpdate } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -294,10 +295,26 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     // Optional callback for additional processing if needed
                     if (isDevelopment()) {
                         const timestamp = new Date().toLocaleTimeString();
-                        let resolvedIdentifier = update.site.identifier.trim();
+
+                        // Be resilient to undefined site or identifier
+                        const {
+                            site: rawSite,
+                            siteIdentifier: rawSiteIdentifier,
+                        } = update as Partial<StatusUpdate>;
+
+                        const siteIdentifierFromSite =
+                            typeof rawSite?.identifier === "string"
+                                ? rawSite.identifier.trim()
+                                : "";
+                        const siteIdentifierFromEvent =
+                            typeof rawSiteIdentifier === "string"
+                                ? rawSiteIdentifier.trim()
+                                : "";
+
+                        let resolvedIdentifier = siteIdentifierFromSite;
 
                         if (resolvedIdentifier.length === 0) {
-                            resolvedIdentifier = update.siteIdentifier.trim();
+                            resolvedIdentifier = siteIdentifierFromEvent;
                         }
 
                         if (resolvedIdentifier.length === 0) {

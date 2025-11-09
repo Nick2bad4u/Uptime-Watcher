@@ -35,8 +35,8 @@ import { handleCheckError, isCancellationError } from "../utils/errorHandling";
 import { createHttpClient } from "../utils/httpClient";
 import { getSharedHttpRateLimiter } from "../utils/httpRateLimiter";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
 
@@ -161,9 +161,11 @@ export function createHttpMonitorService<
                 return createMonitorErrorResult(urlValidationError, 0);
             }
 
-            const { retryAttempts, timeout } = extractMonitorConfig(
+            const { retryAttempts, timeout } = createMonitorConfig(
                 typedMonitor,
-                this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+                {
+                    timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+                }
             );
 
             const url = typedMonitor.url ?? "";

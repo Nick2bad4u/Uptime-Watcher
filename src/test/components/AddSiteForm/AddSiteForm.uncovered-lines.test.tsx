@@ -59,8 +59,14 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_uncovered__ = useSitesStoreMock;
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_uncovered__?.(
+            selector,
+            equality
+        ),
 }));
 
 const resetSitesStoreState = (): void => {

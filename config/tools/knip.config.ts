@@ -42,6 +42,7 @@ const knipConfig: KnipConfig = {
         "docusaurus",
         "eslint-find-rules",
         "gh",
+        "hint",
         "git-cz",
         "grype",
         "jq",

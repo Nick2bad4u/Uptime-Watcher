@@ -220,6 +220,17 @@ describe("IpcService - Comprehensive Coverage", () => {
             isMonitoring: false,
             alreadyInactive: false,
         };
+        const offMock = vi.fn(
+            (eventName: string, handler: (data: any) => void) => {
+                if (
+                    eventName === "sites:state-synchronized" &&
+                    handler === stateSyncListener
+                ) {
+                    stateSyncListener = undefined;
+                }
+            }
+        );
+
         mockUptimeOrchestrator = {
             addSite: vi.fn().mockResolvedValue(true),
             removeSite: vi.fn().mockResolvedValue(true),
@@ -261,14 +272,8 @@ describe("IpcService - Comprehensive Coverage", () => {
                     return undefined;
                 }
             ),
-            off: vi.fn((eventName: string, handler: (data: any) => void) => {
-                if (
-                    eventName === "sites:state-synchronized" &&
-                    handler === stateSyncListener
-                ) {
-                    stateSyncListener = undefined;
-                }
-            }),
+            off: offMock,
+            offTyped: offMock,
         } as unknown as UptimeOrchestrator;
 
         mockAutoUpdaterService = {

@@ -11,8 +11,8 @@ import { HttpStatusMonitor } from "../../../services/monitoring/HttpStatusMonito
 
 const {
     axiosGetMock,
+    createMonitorConfigMock,
     createMonitorErrorResultMock,
-    extractMonitorConfigMock,
     handleCheckErrorMock,
     scheduleMock,
     validateMonitorUrlMock,
@@ -22,8 +22,8 @@ const {
         async (_url: string, operation: () => Promise<MonitorCheckResult>) =>
             operation()
     );
+    const createMonitorConfig = vi.fn();
     const createMonitorErrorResult = vi.fn();
-    const extractMonitorConfig = vi.fn();
     const validateMonitorUrl = vi.fn();
     const handleCheckError = vi.fn();
     const axiosGet = vi.fn();
@@ -33,8 +33,8 @@ const {
 
     return {
         axiosGetMock: axiosGet,
+        createMonitorConfigMock: createMonitorConfig,
         createMonitorErrorResultMock: createMonitorErrorResult,
-        extractMonitorConfigMock: extractMonitorConfig,
         handleCheckErrorMock: handleCheckError,
         scheduleMock: schedule,
         validateMonitorUrlMock: validateMonitorUrl,
@@ -70,8 +70,8 @@ vi.mock("../../../utils/operationalHooks", () => ({
 }));
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
+    createMonitorConfig: createMonitorConfigMock,
     createMonitorErrorResult: createMonitorErrorResultMock,
-    extractMonitorConfig: extractMonitorConfigMock,
     validateMonitorUrl: validateMonitorUrlMock,
 }));
 
@@ -114,7 +114,7 @@ describe(HttpStatusMonitor, () => {
             responseTime: 0,
             status: "down",
         });
-        extractMonitorConfigMock.mockReturnValue({
+        createMonitorConfigMock.mockReturnValue({
             retryAttempts: 0,
             timeout: 5000,
         });

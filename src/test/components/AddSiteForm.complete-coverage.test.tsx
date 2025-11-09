@@ -15,6 +15,7 @@ const createDefaultSites = (): Site[] => [
     createMockSite({ identifier: "site-2", name: "Test Site 2" }),
 ];
 
+// Create store mocks normally, and bridge them through a global reference
 const sitesStoreState = createSitesStoreMock({
     addMonitorToSite: vi.fn(),
     createSite: vi.fn(),
@@ -23,8 +24,13 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+// Expose the mock via global so the hoisted mock factory can access it lazily
+
+(globalThis as any).__useSitesStoreMock__ = useSitesStoreMock;
+
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock__?.(selector, equality),
 }));
 
 const resetSitesStoreState = (): void => {

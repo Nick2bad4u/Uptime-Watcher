@@ -23,8 +23,8 @@ import { isDev } from "../../electronUtils";
 import { logger } from "../../utils/logger";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
     validateMonitorHostAndPort,
 } from "./shared/monitorServiceHelpers";
 
@@ -54,10 +54,9 @@ export class SslMonitor implements IMonitorService {
             return createMonitorErrorResult(validationError, 0);
         }
 
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout
-        );
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
         const host = (monitor.host ?? "").trim();
         const port = monitor.port ?? 443;
         const warningThreshold = this.getWarningThreshold(

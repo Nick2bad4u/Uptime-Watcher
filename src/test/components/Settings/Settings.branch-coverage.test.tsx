@@ -38,16 +38,14 @@ const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
 
 const createDefaultFullResync = () => vi.fn(async () => undefined);
 
-const sitesStoreState = vi.hoisted(() =>
-    createSitesStoreMock({
-        downloadSqliteBackup: createDefaultDownloadBackup(),
-        fullResyncSites: createDefaultFullResync(),
-    })
-) as MutableSitesStore;
+const sitesStoreState = createSitesStoreMock({
+    downloadSqliteBackup: createDefaultDownloadBackup(),
+    fullResyncSites: createDefaultFullResync(),
+}) as MutableSitesStore;
 
-const useSitesStoreMock = vi.hoisted(() =>
-    createSelectorHookMock(sitesStoreState)
-);
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
+(globalThis as any).__useSitesStoreMock_settingsBranch__ = useSitesStoreMock;
 
 const resetSitesStoreState = (): void => {
     updateSitesStoreMock(sitesStoreState, {
@@ -57,7 +55,11 @@ const resetSitesStoreState = (): void => {
 };
 
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_settingsBranch__?.(
+            selector,
+            equality
+        ),
 }));
 
 vi.mock("../../../theme/useTheme");

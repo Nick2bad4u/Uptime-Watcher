@@ -16,14 +16,21 @@ import {
 } from "../../../utils/createSitesStoreMock";
 
 // Mock the stores and theme
+// Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
     sites: [],
 });
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_siteList__ = useSitesStoreMock;
+
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_siteList__?.(
+            selector,
+            equality
+        ),
 }));
 
 vi.mock("../../../../theme/useTheme", () => ({

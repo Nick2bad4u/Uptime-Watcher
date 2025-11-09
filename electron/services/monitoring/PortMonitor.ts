@@ -42,8 +42,8 @@ import type {
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
     validateMonitorHostAndPort,
 } from "./shared/monitorServiceHelpers";
 import { performPortCheckWithRetry } from "./utils/portRetry";
@@ -110,10 +110,9 @@ export class PortMonitor implements IMonitorService {
         }
 
         // Use type-safe utility functions instead of type assertions
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout
-        );
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
 
         return performPortCheckWithRetry(
             monitor.host,

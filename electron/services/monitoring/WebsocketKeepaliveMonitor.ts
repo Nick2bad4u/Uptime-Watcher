@@ -25,8 +25,8 @@ import type {
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import { withOperationalHooks } from "../../utils/operationalHooks";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
 } from "./shared/monitorServiceHelpers";
 
 const DEFAULT_PONG_TIMEOUT_MS = 1500;
@@ -63,10 +63,9 @@ export class WebsocketKeepaliveMonitor implements IMonitorService {
         }
 
         const maxPongDelayMs = this.resolveMaxPongDelay(monitor);
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
-        );
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
 
         try {
             return await withOperationalHooks(

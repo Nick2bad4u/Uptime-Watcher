@@ -47,8 +47,8 @@ vi.mock("../../../utils/operationalHooks", () => ({
 }));
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
+    createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
-    extractMonitorConfig: vi.fn(),
     validateMonitorUrl: vi.fn(),
 }));
 
@@ -395,7 +395,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+            const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
                 )
@@ -405,9 +405,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
 
             validateMonitorUrl.mockReturnValue(null);
-            extractMonitorConfig.mockReturnValue({
+            createMonitorConfig.mockReturnValue({
                 timeout: 8000,
                 retryAttempts: 2,
+                checkInterval: 60_000,
             });
 
             const mockResult: MonitorCheckResult = {
@@ -433,7 +434,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
 
             const result = await httpMonitor.check(monitor);
 
-            expect(extractMonitorConfig).toHaveBeenCalledWith(monitor, 5000);
+            expect(createMonitorConfig).toHaveBeenCalledWith(
+                monitor,
+                expect.objectContaining({ timeout: 5000 })
+            );
             expect(mockWithHooks).toHaveBeenCalled();
             expect(result).toEqual(mockResult);
         });
@@ -444,7 +448,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+            const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
                 )
@@ -457,9 +461,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
 
             validateMonitorUrl.mockReturnValue(null);
-            extractMonitorConfig.mockReturnValue({
+            createMonitorConfig.mockReturnValue({
                 timeout: 5000,
                 retryAttempts: 3,
+                checkInterval: 60_000,
             });
 
             const error = new Error("Network error");
@@ -724,7 +729,7 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Business Logic", "type");
 
-            const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+            const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
                 await import(
                     "../../../services/monitoring/shared/monitorServiceHelpers"
                 )
@@ -739,9 +744,10 @@ describe("HttpMonitor - Comprehensive Coverage", () => {
             );
 
             validateMonitorUrl.mockReturnValue(null);
-            extractMonitorConfig.mockReturnValue({
+            createMonitorConfig.mockReturnValue({
                 timeout: 10_000,
                 retryAttempts: 1,
+                checkInterval: 60_000,
             });
 
             const mockResponse: AxiosResponse = {

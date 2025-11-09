@@ -9,8 +9,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Site } from "@shared/types";
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
+    createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
-    extractMonitorConfig: vi.fn(),
     validateMonitorHostAndPort: vi.fn(),
 }));
 
@@ -27,8 +27,8 @@ import type { PeerCertificate } from "node:tls";
 
 import { SslMonitor } from "../../../services/monitoring/SslMonitor";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
     validateMonitorHostAndPort,
 } from "../../../services/monitoring/shared/monitorServiceHelpers";
 
@@ -142,9 +142,10 @@ describe("SslMonitor service", () => {
         } as Site["monitors"][0];
 
         vi.mocked(validateMonitorHostAndPort).mockReturnValue(null);
-        vi.mocked(extractMonitorConfig).mockReturnValue({
+        vi.mocked(createMonitorConfig).mockReturnValue({
             retryAttempts: 0,
             timeout: 5000,
+            checkInterval: 30_000,
         });
         vi.mocked(createMonitorErrorResult).mockImplementation(
             (message: string, responseTime = 0) => ({

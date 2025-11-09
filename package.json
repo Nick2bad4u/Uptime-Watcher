@@ -353,8 +353,6 @@
     "playwright:transform": "node scripts/transform-test.mjs",
     "playwright:ui": "playwright test --config playwright.config.ts --ui",
     "prebuild:off": "npm run lint && npm run type-check",
-    "prestart:old": "npm run prebuild:off",
-    "pretest:old": "npm run prebuild:off",
     "preview": "vite preview",
     "profile": "vite --profile",
     "profile:debug": "vite --profile --debug",
@@ -537,7 +535,10 @@
     "updateDeps": "npx ncu -i --install never && npx ncu -i --install never --packageFile docs/docusaurus/package.json && npm install --force && cd docs/docusaurus && npm install --force",
     "updateNode": "winget update OpenJS.NodeJS",
     "validate:components": "node scripts/validate-components.mjs",
-    "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs"
+    "verify:storybook-tsconfig": "node ./scripts/verify-storybook-tsconfig.mjs",
+    "webhint": "hint http://localhost:3000 --config .hintrc",
+    "webhint:3000": "npm run webhint",
+    "webhint:5173": "hint http://localhost:5173 --config .hintrc"
   },
   "config": {},
   "eslintConfig": {
@@ -1091,6 +1092,9 @@
     "react-scan": "^0.4.3"
   },
   "bundledDependencies": [
+    "node-sqlite3-wasm"
+  ],
+  "bundleDependencies": [
     "node-sqlite3-wasm"
   ],
   "packageManager": "npm@11.6.2",

@@ -20,8 +20,8 @@ import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { createHttpClient } from "../utils/httpClient";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
 } from "./monitorServiceHelpers";
 
 /**
@@ -134,9 +134,11 @@ export function createRemoteMonitorService<
                 return createMonitorErrorResult(configuration.message, 0);
             }
 
-            const { retryAttempts, timeout } = extractMonitorConfig(
+            const { retryAttempts, timeout } = createMonitorConfig(
                 typedMonitor,
-                this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT
+                {
+                    timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+                }
             );
 
             const operationName = behavior.getOperationName(

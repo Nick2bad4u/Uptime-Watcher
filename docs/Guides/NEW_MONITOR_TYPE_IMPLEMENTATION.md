@@ -112,7 +112,7 @@ Run the shared unit tests before moving on: `npm run test:shared`.
 
 1. Create the service class
    - Add `electron/services/monitoring/<NewMonitor>.ts` implementing `IMonitorService` from `electron/services/monitoring/types.ts`.
-   - Reuse helpers like `validateMonitorHostAndPort` and `extractMonitorConfig` from `electron/services/monitoring/shared/monitorServiceHelpers.ts`, and wrap retries with `withOperationalHooks` from `electron/utils/operationalHooks.ts` to match shared behaviour. When you do, pick an explicit `failureLogLevel` that reflects whether failures are expected to represent external downtime (`warn` is usually right) or internal faults (keep the default `error`).
+   - Reuse helpers like `validateMonitorHostAndPort` and `createMonitorConfig` from `electron/services/monitoring/shared/monitorServiceHelpers.ts`, and wrap retries with `withOperationalHooks` from `electron/utils/operationalHooks.ts` to match shared behaviour. When you do, pick an explicit `failureLogLevel` that reflects whether failures are expected to represent external downtime (`warn` is usually right) or internal faults (keep the default `error`).
 2. Write unit tests
    - Mirror `electron/test/services/monitoring/SslMonitor.test.ts`. Cover success, degraded thresholds, failure states, timeouts, and invalid configurations.
 3. Register the monitor type
@@ -306,10 +306,9 @@ export class NewMonitor implements IMonitorService {
    return createMonitorErrorResult(validationError, 0);
   }
 
-  const { retryAttempts, timeout } = extractMonitorConfig(
-   monitor,
-   this.config.timeout
-  );
+  const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+   timeout: this.config.timeout,
+  });
 
   return withOperationalHooks(
    () => this.performCheckOnce(monitor, timeout, signal),

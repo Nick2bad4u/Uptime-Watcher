@@ -32,7 +32,6 @@ interface Invocation<TProps extends Record<string, unknown>> {
 const {
     themeState,
     uiStoreState,
-    sitesStoreState,
     tableViewInvocations,
     compactCardInvocations,
     cardInvocations,
@@ -46,7 +45,6 @@ const {
         siteCardPresentation: "grid" as SiteCardPresentation,
         setSiteCardPresentation: vi.fn(),
     } as UiStoreState,
-    sitesStoreState: createSitesStoreMock({ sites: [] }),
     tableViewInvocations: [] as Invocation<{ sites: Site[] }>[],
     compactCardInvocations: [] as Invocation<{ site: Site }>[],
     cardInvocations: [] as Invocation<{
@@ -61,6 +59,9 @@ const {
     }>[],
     iconInvocations: [] as Invocation<Record<string, unknown>>[],
 }));
+
+// Create sites store state outside hoisted block to avoid import timing issues
+const sitesStoreState = createSitesStoreMock({ sites: [] });
 
 const useUIStoreMock = vi.hoisted(() => {
     const mockedHook = ((selector: (state: UiStoreState) => unknown) =>
@@ -81,8 +82,14 @@ vi.mock("../../../../stores/ui/useUiStore", () => ({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_siteListLayout__ = useSitesStoreMock;
+
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_siteListLayout__?.(
+            selector,
+            equality
+        ),
 }));
 
 vi.mock("../../../../theme/useTheme", () => ({

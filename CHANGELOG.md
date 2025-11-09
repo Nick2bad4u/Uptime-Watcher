@@ -17,6 +17,11 @@ All notable changes to this project will be documented in this file.
 - [dependency] Update version 18.2.0 [`(6aecdbd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)
 
 
+### 🛠️ Other Changes
+
+- Remove legacy `prestart:old` / `pretest:old` scripts and update monitor configuration docs to reference `createMonitorConfig`.
+
+
 
 
 

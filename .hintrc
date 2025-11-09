@@ -1,58 +1,129 @@
 {
-    "extends": [
-        "development"
-    ],
-    "language": "en-US",
-    "parsers": [
-        "axe",
-        "html",
-        "http-header",
-        "manifest",
-        "meta-viewport",
-        "sri",
-        "typescript-config",
-        "babel-config",
-        "webpack-config"
-    ],
-    "severityThreshold": "default",
-    "connector": "local",
     "browserslist": [
-        "electron >= 28.0.0",
+        "electron >= 34.0.0",
         "defaults",
         "not ie 11",
         "not firefox <= 115",
         "not ios_saf <= 15.8"
+    ],
+    "connector": {
+        "name": "local",
+        "options": {
+            "ignoreHTTPSErrors": false,
+            "pattern": [
+                "**",
+                "!.git/**",
+                "!node_modules/**",
+                "!**/*.map",
+                "!**/dist/**",
+                "!**/build/**",
+                "!**/out/**",
+                "!**/.coverage/**",
+                "!**/coverage/**",
+                "!**/.cache/**",
+                "!**/cache/**",
+                "!**/.stryker-tmp/**",
+                "!**/stryker-tmp/**"
+            ],
+            "waitFor": 10000
+        }
+    },
+    "extends": [
+        "accessibility",
+        "development",
+        "web-recommended"
     ],
     "formatters": [
         "stylish",
         "summary"
     ],
     "hints": {
-        "no-inline-styles": "off",
+        "apple-touch-icons": "error",
+        "axe/color": [
+            "error",
+            {
+                "color-contrast": "warning"
+            }
+        ],
         "axe/forms": [
             "default",
             {
-                "select-name": "off"
+                "html-has-lang": "warning",
+                "select-name": "warning"
             }
         ],
-        "typescript-config/is-valid": "off",
+        "axe/keyboard": [
+            "error",
+            {
+                "tabindex": "error"
+            }
+        ],
+        "babel-config/is-valid": "error",
+        "button-type": "error",
+        "compat-api/css": "off",
+        "compat-api/html": "off",
+        "content-type": "error",
+        "create-element-svg": "error",
+        "css-prefix-order": "error",
+        "detect-css-reflows/composite": "hint",
+        "detect-css-reflows/layout": "hint",
+        "detect-css-reflows/paint": "hint",
+        "disown-opener": "error",
+        "doctype": "error",
+        "highest-available-document-mode": "error",
+        "html-checker": "error",
+        "http-cache": "error",
+        "http-compression": "error",
+        "https-only": "error",
+        "leading-dot-classlist": "error",
+        "manifest-app-name": "warning",
+        "manifest-exists": "warning",
+        "manifest-file-extension": "error",
+        "manifest-is-valid": "error",
+        "meta-charset-utf-8": "error",
+        "meta-theme-color": "error",
+        "meta-viewport": "warning",
+        "minified-js": "off",
+        "no-bom": "error",
+        "no-broken-links": "error",
+        "no-disallowed-headers": "error",
+        "no-friendly-error-pages": "error",
+        "no-html-only-headers": "error",
+        "no-http-redirects": [
+            "error",
+            {
+                "max-html-redirects": 1,
+                "max-resource-redirects": 3
+            }
+        ],
+        "no-inline-styles": "off",
+        "no-p3p": "error",
+        "no-protocol-relative-urls": "error",
+        "no-vulnerable-javascript-libraries": "error",
+        "performance-budget": "error",
+        "scoped-svg-styles": "error",
+        "sri": "warning",
+        "ssllabs": "error",
+        "strict-transport-security": "error",
+        "stylesheet-limits": "error",
+        "typescript-config/import-helpers": "warning",
+        "typescript-config/is-valid": "hint",
         "typescript-config/no-comments": "warning",
         "typescript-config/strict": "error",
-        "babel-config/is-valid": "error",
-        "webpack-config/is-valid": "error",
-        "manifest-exists": "off",
-        "manifest-app-name": "off",
-        "meta-viewport": "warning",
-        "no-vulnerable-javascript-libraries": "error",
-        "no-protocol-relative-urls": "error",
-        "sri": "warning",
-        "x-content-type-options": "error",
+        "typescript-config/target": [
+            "error",
+            {
+                "minTarget": "ES2020"
+            }
+        ],
         "validate-set-cookie-header": "error",
-        "highest-available-document-mode": "error",
-        "disown-opener": "error",
-        "button-type": "error",
-        "leading-dot-classlist": "error",
-        "create-element-svg": "error"
+        "webpack-config/config-exists": "off",
+        "webpack-config/is-installed": "off",
+        "webpack-config/is-valid": "off",
+        "webpack-config/module-esnext-typescript": "off",
+        "webpack-config/modules-false-babel": "off",
+        "webpack-config/no-devtool-in-prod": "off",
+        "x-content-type-options": "error"
     },
     "hintsTimeout": 30000,
     "ignoredUrls": [
@@ -62,5 +133,21 @@
                 "*"
             ]
         }
-    ]
+    ],
+    "language": "en-US",
+    "parsers": [
+        "html",
+        "typescript-config",
+        "babel-config",
+        "webpack-config",
+        "css",
+        "javascript",
+        "jsx",
+        "less",
+        "manifest",
+        "package-json",
+        "sass",
+        "typescript"
+    ],
+    "severityThreshold": "default"
 }

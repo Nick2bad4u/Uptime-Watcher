@@ -42,8 +42,8 @@ vi.mock("../../../utils/operationalHooks", () => ({
 }));
 
 vi.mock("../../../services/monitoring/shared/monitorServiceHelpers", () => ({
+    createMonitorConfig: vi.fn(),
     createMonitorErrorResult: vi.fn(),
-    extractMonitorConfig: vi.fn(),
     validateMonitorUrl: vi.fn(),
 }));
 
@@ -80,15 +80,16 @@ describe("HttpMonitor Active Counter Assignment Operations", () => {
         );
         createHttpClient.mockReturnValue(mockAxiosInstance);
 
-        const { validateMonitorUrl, extractMonitorConfig } = vi.mocked(
+        const { createMonitorConfig, validateMonitorUrl } = vi.mocked(
             await import(
                 "../../../services/monitoring/shared/monitorServiceHelpers"
             )
         );
         validateMonitorUrl.mockReturnValue(null);
-        extractMonitorConfig.mockReturnValue({
+        createMonitorConfig.mockReturnValue({
             timeout: 5000,
             retryAttempts: 3,
+            checkInterval: 60_000,
         });
 
         httpMonitor = new HttpMonitor();

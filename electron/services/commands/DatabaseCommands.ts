@@ -92,6 +92,57 @@ export interface IDatabaseCommand<TResult = void> {
  *
  * @public
  */
+export interface DatabaseCommandContext {
+    cache: StandardizedCache<Site>;
+    eventEmitter: TypedEventBus<UptimeEvents>;
+    serviceFactory: DatabaseServiceFactory;
+}
+
+function isDatabaseCommandContext(
+    value: unknown
+): value is DatabaseCommandContext {
+    if (value === null || typeof value !== "object") {
+        return false;
+    }
+
+    return (
+        "serviceFactory" in value && "eventEmitter" in value && "cache" in value
+    );
+}
+
+function resolveDatabaseCommandContext(
+    value: DatabaseCommandContext | DatabaseServiceFactory,
+    eventEmitter?: TypedEventBus<UptimeEvents>,
+    cache?: StandardizedCache<Site>
+): DatabaseCommandContext {
+    if (isDatabaseCommandContext(value)) {
+        return value;
+    }
+
+    if (!eventEmitter || !cache) {
+        throw new TypeError(
+            "DatabaseCommand requires eventEmitter and cache when a context object is not provided."
+        );
+    }
+
+    return {
+        cache,
+        eventEmitter,
+        serviceFactory: value,
+    };
+}
+
+function isImportContext(
+    value: unknown
+): value is DatabaseCommandContext & { data: string } {
+    if (!isDatabaseCommandContext(value)) {
+        return false;
+    }
+
+    const data: unknown = Reflect.get(value, "data");
+    return typeof data === "string";
+}
+
 export abstract class DatabaseCommand<TResult = void>
     implements IDatabaseCommand<TResult>
 {
@@ -157,10 +208,19 @@ export abstract class DatabaseCommand<TResult = void>
         serviceFactory: DatabaseServiceFactory,
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>
+    );
+
+    public constructor(context: DatabaseCommandContext);
+
+    public constructor(
+        a: DatabaseCommandContext | DatabaseServiceFactory,
+        b?: TypedEventBus<UptimeEvents>,
+        c?: StandardizedCache<Site>
     ) {
-        this.serviceFactory = serviceFactory;
-        this.eventEmitter = eventEmitter;
-        this.cache = cache;
+        const context = resolveDatabaseCommandContext(a, b, c);
+        this.serviceFactory = context.serviceFactory;
+        this.eventEmitter = context.eventEmitter;
+        this.cache = context.cache;
     }
 
     public abstract execute(): Promise<TResult>;
@@ -531,9 +591,36 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         eventEmitter: TypedEventBus<UptimeEvents>,
         cache: StandardizedCache<Site>,
         data: string
+    );
+
+    public constructor(context: DatabaseCommandContext & { data: string });
+
+    public constructor(
+        a: (DatabaseCommandContext & { data: string }) | DatabaseServiceFactory,
+        b?: TypedEventBus<UptimeEvents>,
+        c?: StandardizedCache<Site>,
+        d?: string
     ) {
-        super(serviceFactory, eventEmitter, cache);
-        this.data = data;
+        if (isImportContext(a)) {
+            super(a);
+            this.data = a.data;
+            return;
+        }
+
+        if (!b || !c) {
+            throw new TypeError(
+                "ImportApplicationDataCommand requires eventEmitter and cache when constructed without a context object."
+            );
+        }
+
+        if (typeof d !== "string") {
+            throw new TypeError(
+                "ImportApplicationDataCommand requires data to be provided when constructed without a context object."
+            );
+        }
+
+        super(a, b, c);
+        this.data = d;
     }
 
     public getDescription(): string {

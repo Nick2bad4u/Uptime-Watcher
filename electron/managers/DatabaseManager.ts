@@ -236,11 +236,11 @@ export class DatabaseManager {
         /** The generated filename for the backup file */
         fileName: string;
     }> {
-        const command = new DownloadBackupCommand(
-            this.serviceFactory,
-            this.eventEmitter,
-            this.siteCache
-        );
+        const command = new DownloadBackupCommand({
+            cache: this.siteCache,
+            eventEmitter: this.eventEmitter,
+            serviceFactory: this.serviceFactory,
+        });
         return this.commandExecutor.execute(command);
     }
 
@@ -263,11 +263,11 @@ export class DatabaseManager {
      * @throws Error if database access or data serialization fails.
      */
     public async exportData(): Promise<string> {
-        const command = new ExportDataCommand(
-            this.serviceFactory,
-            this.eventEmitter,
-            this.siteCache
-        );
+        const command = new ExportDataCommand({
+            cache: this.siteCache,
+            eventEmitter: this.eventEmitter,
+            serviceFactory: this.serviceFactory,
+        });
         return this.commandExecutor.execute(command);
     }
 
@@ -287,12 +287,12 @@ export class DatabaseManager {
         try {
             await withErrorHandling(
                 async () => {
-                    const command = new ImportDataCommand(
-                        this.serviceFactory,
-                        this.eventEmitter,
-                        this.siteCache,
-                        data
-                    );
+                    const command = new ImportDataCommand({
+                        cache: this.siteCache,
+                        data,
+                        eventEmitter: this.eventEmitter,
+                        serviceFactory: this.serviceFactory,
+                    });
                     await this.commandExecutor.execute(command);
                     await this.emitSitesCacheUpdateRequested();
                 },

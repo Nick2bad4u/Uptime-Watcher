@@ -7,6 +7,7 @@
  * and validation.
  */
 import type { Monitor, MonitorFieldDefinition, Site } from "@shared/types";
+import type { EventMetadata } from "@shared/types/events";
 import type { PreloadGuardDiagnosticsReport } from "@shared/types/ipc";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
 import type {
@@ -27,6 +28,7 @@ import {
     SYSTEM_CHANNELS,
 } from "@shared/types/preload";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
+import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
 import { validateMonitorData } from "@shared/validation/schemas";
@@ -36,6 +38,7 @@ import type { UptimeEvents } from "../../events/eventTypes";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
+import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
 import { diagnosticsLogger, logger } from "../../utils/logger";
 import {
     getAllMonitorTypeConfigs,
@@ -447,6 +450,9 @@ export class IpcService {
      */
     private readonly registeredIpcHandlers = new Set<string>();
 
+    /** Manages orchestrator listener lifetimes for teardown safety. */
+    private readonly scopedSubscriptions = new ScopedSubscriptionManager();
+
     /**
      * Core orchestrator for monitoring operations.
      *
@@ -463,7 +469,9 @@ export class IpcService {
     private stateSyncListenerRegistered = false;
 
     private readonly handleStateSyncStatusUpdate = (
-        data: UptimeEvents["sites:state-synchronized"]
+        data: UptimeEvents["sites:state-synchronized"] & {
+            _meta: EventMetadata;
+        }
     ): void => {
         this.updateStateSyncStatus(data.sites, data.source, data.timestamp);
     };
@@ -531,13 +539,17 @@ export class IpcService {
 
         this.registeredIpcHandlers.clear();
 
-        if (this.stateSyncListenerRegistered) {
-            this.uptimeOrchestrator.off(
-                "sites:state-synchronized",
-                this.handleStateSyncStatusUpdate
-            );
-            this.stateSyncListenerRegistered = false;
-        }
+        this.scopedSubscriptions.clearAll({
+            onError: (error) => {
+                logger.error(
+                    "[IpcService] Failed to dispose event subscription",
+                    { error: ensureError(error) }
+                );
+            },
+            suppressErrors: true,
+        });
+
+        this.stateSyncListenerRegistered = false;
     }
 
     /**
@@ -589,7 +601,11 @@ export class IpcService {
             return;
         }
 
-        this.uptimeOrchestrator.onTyped(
+        this.scopedSubscriptions.onTyped<
+            UptimeEvents,
+            "sites:state-synchronized"
+        >(
+            this.uptimeOrchestrator,
             "sites:state-synchronized",
             this.handleStateSyncStatusUpdate
         );

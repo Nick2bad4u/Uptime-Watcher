@@ -18,12 +18,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DynamicMonitorFieldsProperties } from "../../components/AddSiteForm/DynamicMonitorFields";
 import type { SelectFieldProperties } from "../../components/AddSiteForm/SelectField";
 import type { UseAddSiteFormReturn } from "../../components/SiteDetails/useAddSiteForm";
+import type { SelectorHookMock } from "../utils/createSelectorHookMock";
 import { createSelectorHookMock } from "../utils/createSelectorHookMock";
 import { createMockSite } from "../utils/mockFactories";
 import {
     createSitesStoreMock,
     updateSitesStoreMock,
 } from "../utils/createSitesStoreMock";
+import type { SitesStore } from "../utils/createSitesStoreMock";
 
 const handleSubmitMock = vi.fn();
 
@@ -66,10 +68,17 @@ const sitesStoreState = createSitesStoreMock({
     sites: createDefaultSites(),
 });
 
-const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+const useSitesStoreMock: SelectorHookMock<SitesStore> =
+    createSelectorHookMock(sitesStoreState);
 
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    get useSitesStore() {
+        if (!useSitesStoreMock) {
+            throw new Error("useSitesStoreMock accessed before initialization");
+        }
+
+        return useSitesStoreMock;
+    },
 }));
 
 const useErrorStoreMock = vi.fn();

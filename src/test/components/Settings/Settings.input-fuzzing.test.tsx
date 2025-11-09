@@ -154,6 +154,7 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     })),
 }));
 
+// Standard creation bridged through global to avoid early hoist errors
 const sitesStoreState = createSitesStoreMock({
     downloadSqliteBackup: mockDownloadSqliteBackup,
     fullResyncSites: mockfullResyncSites,
@@ -161,8 +162,14 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_settingsFuzz__ = useSitesStoreMock;
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_settingsFuzz__?.(
+            selector,
+            equality
+        ),
 }));
 
 const resetSitesStoreState = (): void => {

@@ -57,6 +57,7 @@ vi.mock("../../stores/error/useErrorStore", () => ({
     }),
 }));
 
+// Standard (non-hoisted) creation bridged through global to avoid early access
 const sitesStoreState = createSitesStoreMock({
     addMonitorToSite: vi.fn(),
     createSite: vi.fn(),
@@ -65,8 +66,11 @@ const sitesStoreState = createSitesStoreMock({
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_basic__ = useSitesStoreMock;
+
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_basic__?.(selector, equality),
 }));
 
 const resetSitesStoreState = (): void => {

@@ -5,15 +5,18 @@
 
 import type { Monitor } from "@shared/types";
 
+import type { NormalizedMonitorConfig as NormalizedMonitorConfigType } from "../createMonitorConfig";
 import type { MonitorCheckResult } from "../types";
 
-import {
-    getMonitorRetryAttempts,
-    getMonitorTimeout,
-} from "../utils/monitorTypeGuards";
+import { createMonitorConfig as createMonitorConfigFactory } from "../createMonitorConfig";
 
-export const DEFAULT_REQUEST_TIMEOUT = 5000;
-export const DEFAULT_RETRY_ATTEMPTS = 3;
+export function createMonitorConfig(
+    partial: Partial<Monitor>,
+    defaults: Partial<NormalizedMonitorConfigType> = {}
+): NormalizedMonitorConfigType {
+    return createMonitorConfigFactory(partial, defaults);
+}
+export type NormalizedMonitorConfig = NormalizedMonitorConfigType;
 
 /**
  * Create a standardized error result for monitor health checks
@@ -32,30 +35,6 @@ export function createMonitorErrorResult(
         responseTime,
         status: "down",
     };
-}
-
-/**
- * Extract common monitor configuration values (timeout and retry attempts)
- *
- * @param monitor - Monitor configuration
- * @param configTimeout - Default timeout from monitor config
- *
- * @returns Object containing timeout and retry attempts
- */
-export function extractMonitorConfig(
-    monitor: Monitor,
-    configTimeout?: number
-): { retryAttempts: number; timeout: number } {
-    const timeout = getMonitorTimeout(
-        monitor,
-        configTimeout ?? DEFAULT_REQUEST_TIMEOUT
-    );
-    const retryAttempts = getMonitorRetryAttempts(
-        monitor,
-        DEFAULT_RETRY_ATTEMPTS
-    );
-
-    return { retryAttempts, timeout };
 }
 
 /**

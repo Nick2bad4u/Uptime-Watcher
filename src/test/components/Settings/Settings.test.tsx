@@ -33,15 +33,22 @@ const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
 
 const createDefaultFullResync = () => vi.fn(async () => undefined);
 
+// Standard creation bridged through global to avoid hoist-time import errors
 const sitesStoreState = createSitesStoreMock({
-    downloadSqliteBackup: createDefaultDownloadBackup(),
-    fullResyncSites: createDefaultFullResync(),
+    downloadSqliteBackup: vi.fn(async () => undefined),
+    fullResyncSites: vi.fn(async () => undefined),
 });
 
 const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
+(globalThis as any).__useSitesStoreMock_settings__ = useSitesStoreMock;
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: useSitesStoreMock,
+    useSitesStore: (selector?: any, equality?: any) =>
+        (globalThis as any).__useSitesStoreMock_settings__?.(
+            selector,
+            equality
+        ),
 }));
 
 const resetSitesStoreState = (): void => {

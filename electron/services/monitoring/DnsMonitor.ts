@@ -68,8 +68,8 @@ import type {
 
 import { DEFAULT_REQUEST_TIMEOUT } from "../../constants";
 import {
+    createMonitorConfig,
     createMonitorErrorResult,
-    extractMonitorConfig,
 } from "./shared/monitorServiceHelpers";
 
 /**
@@ -160,7 +160,7 @@ export class DnsMonitor implements IMonitorService {
      *   missing hostname)
      *
      * @see {@link validateMonitorHost} - Host validation utility
-     * @see {@link extractMonitorConfig} - Config extraction utility
+     * @see {@link createMonitorConfig} - Config normalization utility
      * @see {@link performDnsCheckWithRetry} - Core DNS functionality
      */
     public async check(
@@ -186,10 +186,9 @@ export class DnsMonitor implements IMonitorService {
         }
 
         // Use type-safe utility functions to extract configuration
-        const { retryAttempts, timeout } = extractMonitorConfig(
-            monitor,
-            this.config.timeout
-        );
+        const { retryAttempts, timeout } = createMonitorConfig(monitor, {
+            timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
+        });
 
         return this.performDnsCheckWithRetry(
             monitor.host,
