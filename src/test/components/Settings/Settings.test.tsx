@@ -13,6 +13,11 @@ import {
 } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../utils/createSitesStoreMock";
 import type { ThemeName } from "../../../theme/types";
 
 // Mock all dependencies
@@ -24,9 +29,27 @@ vi.mock("../../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(),
 }));
 
+const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
+
+const createDefaultFullResync = () => vi.fn(async () => undefined);
+
+const sitesStoreState = createSitesStoreMock({
+    downloadSqliteBackup: createDefaultDownloadBackup(),
+    fullResyncSites: createDefaultFullResync(),
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(),
+    useSitesStore: useSitesStoreMock,
 }));
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
+        downloadSqliteBackup: createDefaultDownloadBackup(),
+        fullResyncSites: createDefaultFullResync(),
+    });
+};
 
 vi.mock("../../../theme/useTheme", () => ({
     useTheme: vi.fn(),
@@ -58,13 +81,11 @@ vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
 import { Settings } from "../../../components/Settings/Settings";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
 
 // Get mocked functions
 const mockUseErrorStore = vi.mocked(useErrorStore);
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
-const mockUseSitesStore = vi.mocked(useSitesStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseThemeClasses = vi.mocked(useThemeClasses);
 
@@ -95,18 +116,7 @@ describe("Settings Component", () => {
         syncSettings: vi.fn(),
     };
 
-    const mockSitesStore = {
-        downloadSqliteBackup: vi.fn().mockResolvedValue({
-            buffer: new ArrayBuffer(8),
-            fileName: "backup.db",
-            metadata: {
-                createdAt: 0,
-                originalPath: "/tmp/backup.db",
-                sizeBytes: 8,
-            },
-        }),
-        fullResyncSites: vi.fn().mockResolvedValue(undefined),
-    };
+    const mockSitesStore = sitesStoreState;
 
     const mockTheme = {
         currentTheme: {
@@ -176,9 +186,11 @@ describe("Settings Component", () => {
         vi.clearAllMocks();
         confirmMock.mockReset();
 
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
+
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseSettingsStore.mockReturnValue(mockSettingsStore);
-        mockUseSitesStore.mockReturnValue(mockSitesStore);
         mockUseTheme.mockReturnValue(mockTheme as any);
         mockUseThemeClasses.mockReturnValue({
             getBackgroundClass: vi

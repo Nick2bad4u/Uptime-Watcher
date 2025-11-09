@@ -14,11 +14,6 @@
  *
  * ```
  *             mockSettingsState = extremeSettings as AppSettings;
- *
- *             expect(() => {
- *                 render(<Settings onClose={mockOnClose} />);
- *             }).not.toThrow();
- *
  *             // Component should still render with defensive programming
  *             expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
  *
@@ -33,31 +28,6 @@
  *
  * ```
  *             mockSettingsState = settings;
- *
- *             expect(() => {
- *                 render(<Settings onClose={mockOnClose} />);
- *             }).not.toThrow();
- *
- *             // Verify settings modal renders
- *             expect(screen.getByRole("heading", { name: "Settings" })).toBeInTheDocument();
- *
- *         }
- *     );omponent handles:
- * ```
- *
- * - Theme selection and system preferences
- * - History limit configuration with validation
- * - Notification and sound preferences
- * - Auto-start and tray behavior settings
- * - Data import/export operations )( "should handle settings reset with
- *   confirmation", async (confirmReset) => { // Manual DOM cleanup for
- *   property-based testing iterations document.body.innerHTML = '<div
- *   id="vitest-test-root"></div>'; vi.clearAllMocks();
- *
- *   ```
- *             (window.confirm as any).mockReturnValue(confirmReset);
- *
- *   render(<Settings onClose={mockOnClose} />);
  *
  *   const resetButton = screen.getByRole("button", { name: /reset everything/i });
  *   fireEvent.click(resetButton);
@@ -93,6 +63,11 @@ import type { AppSettings } from "../../../stores/types";
 import type { ThemeName } from "../../../theme/types";
 import { Settings } from "../../../components/Settings/Settings";
 import { sanitizeDomProps } from "../../utils/domPropSanitizer";
+import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../utils/createSitesStoreMock";
 
 // Mock state for settings store
 let mockSettingsState: AppSettings = {
@@ -107,11 +82,6 @@ let mockSettingsState: AppSettings = {
 // Mock state for other stores
 let mockErrorState = {
     error: null as string | null,
-    isLoading: false,
-};
-
-let mockSitesState = {
-    sites: [],
     isLoading: false,
 };
 
@@ -154,15 +124,7 @@ const mockfullResyncSites = vi.fn(async () => {
     // Simulate sync operation
 });
 
-const mockDownloadSqliteBackup = vi.fn(async () => ({
-    buffer: new ArrayBuffer(32),
-    fileName: "uptime-watcher-backup.db",
-    metadata: {
-        createdAt: Date.now(),
-        originalPath: "C:/tmp/uptime-watcher.db",
-        sizeBytes: 32,
-    },
-}));
+const mockDownloadSqliteBackup = vi.fn(async () => undefined);
 
 const mockOnClose = vi.fn();
 const confirmMock = vi.fn();
@@ -192,14 +154,23 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     })),
 }));
 
+const sitesStoreState = createSitesStoreMock({
+    downloadSqliteBackup: mockDownloadSqliteBackup,
+    fullResyncSites: mockfullResyncSites,
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        sites: mockSitesState.sites,
-        isLoading: mockSitesState.isLoading,
-        fullResyncSites: mockfullResyncSites,
-        downloadSqliteBackup: mockDownloadSqliteBackup,
-    })),
+    useSitesStore: useSitesStoreMock,
 }));
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
+        downloadSqliteBackup: mockDownloadSqliteBackup,
+        fullResyncSites: mockfullResyncSites,
+    });
+};
 
 vi.mock("../../../theme/useTheme", () => ({
     useTheme: vi.fn(() => ({
@@ -285,7 +256,6 @@ vi.mock("../../../theme/components/ThemedButton", () => ({
                     className={className}
                     onClick={onClick}
                     disabled={disabled}
-                    data-testid="themed-button"
                     {...safeProps}
                 >
                     {children}
@@ -440,6 +410,10 @@ describe("Settings Component - Property-Based Fuzzing", () => {
         vi.clearAllMocks();
         confirmMock.mockReset();
         confirmMock.mockResolvedValue(true);
+        mockDownloadSqliteBackup.mockReset();
+        mockfullResyncSites.mockReset();
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
 
         // Reset mock state
         mockSettingsState = {
@@ -453,11 +427,6 @@ describe("Settings Component - Property-Based Fuzzing", () => {
 
         mockErrorState = {
             error: null,
-            isLoading: false,
-        };
-
-        mockSitesState = {
-            sites: [],
             isLoading: false,
         };
     });

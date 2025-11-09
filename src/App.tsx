@@ -294,10 +294,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     // Optional callback for additional processing if needed
                     if (isDevelopment()) {
                         const timestamp = new Date().toLocaleTimeString();
-                        const resolvedIdentifier =
-                            update.site?.identifier ??
-                            update.siteIdentifier ??
-                            "unknown-site";
+                        let resolvedIdentifier = update.site.identifier.trim();
+
+                        if (resolvedIdentifier.length === 0) {
+                            resolvedIdentifier = update.siteIdentifier.trim();
+                        }
+
+                        if (resolvedIdentifier.length === 0) {
+                            resolvedIdentifier = "unknown-site";
+                        }
 
                         logger.debug(
                             `[${timestamp}] Status update received for site: ${resolvedIdentifier}`

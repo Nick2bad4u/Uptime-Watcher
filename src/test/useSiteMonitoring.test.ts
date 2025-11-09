@@ -4,6 +4,11 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { act } from "@testing-library/react";
+import { createSelectorHookMock } from "./utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "./utils/createSitesStoreMock";
 
 // Mock the monitoring service first
 const mockMonitoringService = {
@@ -38,24 +43,44 @@ Object.defineProperty(globalThis, "electronAPI", {
     writable: true,
 });
 
-// Mock the sites store with monitoring functions
-const mockSitesStore = {
-    startSiteMonitoring: vi.fn().mockResolvedValue(true),
-    stopSiteMonitoring: vi.fn().mockResolvedValue(true),
-    startSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
-    stopSiteMonitorMonitoring: vi.fn().mockResolvedValue(true),
-    sites: new Map(),
-    loading: false,
-    error: null,
-};
+const startSiteMonitoringMock = vi.fn(async () => undefined);
+const stopSiteMonitoringMock = vi.fn(async () => undefined);
+const startSiteMonitorMonitoringMock = vi.fn(async () => undefined);
+const stopSiteMonitorMonitoringMock = vi.fn(async () => undefined);
 
-vi.mock("../stores", () => ({
-    useSitesStore: () => mockSitesStore,
+const mockSitesStore = createSitesStoreMock({
+    startSiteMonitoring: startSiteMonitoringMock,
+    stopSiteMonitoring: stopSiteMonitoringMock,
+    startSiteMonitorMonitoring: startSiteMonitorMonitoringMock,
+    stopSiteMonitorMonitoring: stopSiteMonitorMonitoringMock,
+    sites: [],
+});
+
+const useSitesStoreMock = createSelectorHookMock(mockSitesStore);
+
+vi.mock("../stores/sites/useSitesStore", () => ({
+    useSitesStore: useSitesStoreMock,
 }));
+
+const resetSitesStoreMocks = (): void => {
+    startSiteMonitoringMock.mockReset();
+    stopSiteMonitoringMock.mockReset();
+    startSiteMonitorMonitoringMock.mockReset();
+    stopSiteMonitorMonitoringMock.mockReset();
+    updateSitesStoreMock(mockSitesStore, {
+        startSiteMonitoring: startSiteMonitoringMock,
+        stopSiteMonitoring: stopSiteMonitoringMock,
+        startSiteMonitorMonitoring: startSiteMonitorMonitoringMock,
+        stopSiteMonitorMonitoring: stopSiteMonitorMonitoringMock,
+        sites: [],
+    });
+};
 
 describe("useSitesStore - Site Monitoring Functions", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        resetSitesStoreMocks();
+        useSitesStoreMock.mockClear();
     });
 
     it("should start site monitoring successfully", async ({
@@ -67,15 +92,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.startSiteMonitoring.mockResolvedValueOnce(true);
+        startSiteMonitoringMock.mockResolvedValueOnce(undefined);
 
         await act(async () => {
             await mockSitesStore.startSiteMonitoring("test-site-id");
         });
 
-        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith(
-            "test-site-id"
-        );
+        expect(startSiteMonitoringMock).toHaveBeenCalledWith("test-site-id");
     });
 
     it("should handle errors in start site monitoring", async ({
@@ -88,19 +111,15 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to start monitoring");
-        mockSitesStore.startSiteMonitoring.mockRejectedValueOnce(error);
+        startSiteMonitoringMock.mockRejectedValueOnce(error);
 
         await act(async () => {
-            try {
-                await mockSitesStore.startSiteMonitoring("test-site-id");
-            } catch (error: unknown) {
-                expect(error).toBeInstanceOf(Error);
-            }
+            await expect(
+                mockSitesStore.startSiteMonitoring("test-site-id")
+            ).rejects.toBeInstanceOf(Error);
         });
 
-        expect(mockSitesStore.startSiteMonitoring).toHaveBeenCalledWith(
-            "test-site-id"
-        );
+        expect(startSiteMonitoringMock).toHaveBeenCalledWith("test-site-id");
     });
 
     it("should stop site monitoring successfully", async ({
@@ -112,15 +131,13 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.stopSiteMonitoring.mockResolvedValueOnce(true);
+        stopSiteMonitoringMock.mockResolvedValueOnce(undefined);
 
         await act(async () => {
             await mockSitesStore.stopSiteMonitoring("test-site-id");
         });
 
-        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith(
-            "test-site-id"
-        );
+        expect(stopSiteMonitoringMock).toHaveBeenCalledWith("test-site-id");
     });
 
     it("should handle errors in stop site monitoring", async ({
@@ -133,19 +150,15 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to stop monitoring");
-        mockSitesStore.stopSiteMonitoring.mockRejectedValueOnce(error);
+        stopSiteMonitoringMock.mockRejectedValueOnce(error);
 
         await act(async () => {
-            try {
-                await mockSitesStore.stopSiteMonitoring("test-site-id");
-            } catch (error: unknown) {
-                expect(error).toBeInstanceOf(Error);
-            }
+            await expect(
+                mockSitesStore.stopSiteMonitoring("test-site-id")
+            ).rejects.toBeInstanceOf(Error);
         });
 
-        expect(mockSitesStore.stopSiteMonitoring).toHaveBeenCalledWith(
-            "test-site-id"
-        );
+        expect(stopSiteMonitoringMock).toHaveBeenCalledWith("test-site-id");
     });
 
     it("should start site monitor monitoring successfully", async ({
@@ -157,7 +170,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.startSiteMonitorMonitoring.mockResolvedValueOnce(true);
+        startSiteMonitorMonitoringMock.mockResolvedValueOnce(undefined);
 
         await act(async () => {
             await mockSitesStore.startSiteMonitorMonitoring(
@@ -166,7 +179,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             );
         });
 
-        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
+        expect(startSiteMonitorMonitoringMock).toHaveBeenCalledWith(
             "test-site-id",
             "test-monitor-id"
         );
@@ -182,20 +195,18 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to start monitor monitoring");
-        mockSitesStore.startSiteMonitorMonitoring.mockRejectedValueOnce(error);
+        startSiteMonitorMonitoringMock.mockRejectedValueOnce(error);
 
         await act(async () => {
-            try {
-                await mockSitesStore.startSiteMonitorMonitoring(
+            await expect(
+                mockSitesStore.startSiteMonitorMonitoring(
                     "test-site-id",
                     "test-monitor-id"
-                );
-            } catch (error: unknown) {
-                expect(error).toBeInstanceOf(Error);
-            }
+                )
+            ).rejects.toBeInstanceOf(Error);
         });
 
-        expect(mockSitesStore.startSiteMonitorMonitoring).toHaveBeenCalledWith(
+        expect(startSiteMonitorMonitoringMock).toHaveBeenCalledWith(
             "test-site-id",
             "test-monitor-id"
         );
@@ -210,7 +221,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Category: Core", "category");
         await annotate("Type: Monitoring", "type");
 
-        mockSitesStore.stopSiteMonitorMonitoring.mockResolvedValueOnce(true);
+        stopSiteMonitorMonitoringMock.mockResolvedValueOnce(undefined);
 
         await act(async () => {
             await mockSitesStore.stopSiteMonitorMonitoring(
@@ -219,7 +230,7 @@ describe("useSitesStore - Site Monitoring Functions", () => {
             );
         });
 
-        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
+        expect(stopSiteMonitorMonitoringMock).toHaveBeenCalledWith(
             "test-site-id",
             "test-monitor-id"
         );
@@ -235,20 +246,18 @@ describe("useSitesStore - Site Monitoring Functions", () => {
         await annotate("Type: Error Handling", "type");
 
         const error = new Error("Failed to stop monitor monitoring");
-        mockSitesStore.stopSiteMonitorMonitoring.mockRejectedValueOnce(error);
+        stopSiteMonitorMonitoringMock.mockRejectedValueOnce(error);
 
         await act(async () => {
-            try {
-                await mockSitesStore.stopSiteMonitorMonitoring(
+            await expect(
+                mockSitesStore.stopSiteMonitorMonitoring(
                     "test-site-id",
                     "test-monitor-id"
-                );
-            } catch (error: unknown) {
-                expect(error).toBeInstanceOf(Error);
-            }
+                )
+            ).rejects.toBeInstanceOf(Error);
         });
 
-        expect(mockSitesStore.stopSiteMonitorMonitoring).toHaveBeenCalledWith(
+        expect(stopSiteMonitorMonitoringMock).toHaveBeenCalledWith(
             "test-site-id",
             "test-monitor-id"
         );

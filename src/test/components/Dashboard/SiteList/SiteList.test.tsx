@@ -9,10 +9,21 @@ import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
 import type { Site } from "@shared/types";
 import type { ThemeName } from "../../../../theme/types";
 import { createMockSite } from "../../../utils/mockFactories";
+import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../../utils/createSitesStoreMock";
 
 // Mock the stores and theme
+const sitesStoreState = createSitesStoreMock({
+    sites: [],
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(),
+    useSitesStore: useSitesStoreMock,
 }));
 
 vi.mock("../../../../theme/useTheme", () => ({
@@ -34,12 +45,24 @@ vi.mock("../../../../components/Dashboard/SiteList/EmptyState", () => ({
     )),
 }));
 
-const mockUseSitesStore = vi.mocked(
-    await import("../../../../stores/sites/useSitesStore")
-).useSitesStore;
+const mockUseSitesStore = useSitesStoreMock;
 const mockUseTheme = vi.mocked(
     await import("../../../../theme/useTheme")
 ).useTheme;
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, { sites: [] });
+};
+
+const setSitesSnapshot = (sites: Site[] | undefined): void => {
+    updateSitesStoreMock(sitesStoreState, {
+        sites: (sites ?? []) as Site[],
+    });
+    if (sites === undefined) {
+        (sitesStoreState as Record<string, unknown>)["sites"] =
+            undefined as unknown as Site[];
+    }
+};
 
 // Helper to create mock theme return
 const createMockTheme = (isDark = false) => ({
@@ -119,6 +142,8 @@ describe(SiteList, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
     });
 
     describe("Empty State Rendering", () => {
@@ -137,7 +162,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -163,7 +188,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -191,7 +216,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -219,7 +244,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -248,7 +273,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -274,8 +299,8 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            const singleSite = [mockSites[0]];
-            mockUseSitesStore.mockReturnValue({ sites: singleSite });
+            const singleSite: Site[] = [mockSites[0]!];
+            setSitesSnapshot(singleSite);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -303,7 +328,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -325,7 +350,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -350,8 +375,13 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            const mockStore = { sites: mockSites, otherProperty: "test" };
-            mockUseSitesStore.mockReturnValue(mockStore);
+            const mockStore = {
+                sites: Array.from(mockSites),
+                otherProperty: "test",
+            };
+            setSitesSnapshot(mockStore.sites);
+            (sitesStoreState as Record<string, unknown>)["otherProperty"] =
+                mockStore.otherProperty;
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -380,7 +410,7 @@ describe(SiteList, () => {
                 ...createMockTheme(true),
                 otherProperty: "test",
             };
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(mockTheme);
 
             // Act
@@ -408,7 +438,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -449,7 +479,7 @@ describe(SiteList, () => {
                     monitoring: mockSites[1]!.monitoring,
                 }),
             ];
-            mockUseSitesStore.mockReturnValue({ sites: specialSites });
+            setSitesSnapshot(specialSites);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -478,7 +508,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -503,7 +533,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
             // Act
@@ -531,7 +561,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -553,7 +583,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -578,7 +608,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: undefined as any });
+            setSitesSnapshot(undefined);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act & Assert
@@ -600,7 +630,7 @@ describe(SiteList, () => {
             const malformedSites = [
                 { identifier: "site-1" }, // Missing required properties
             ] as Site[];
-            mockUseSitesStore.mockReturnValue({ sites: malformedSites });
+            setSitesSnapshot(malformedSites);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -626,8 +656,8 @@ describe(SiteList, () => {
                 ...mockSites[0],
                 identifier: `site-${i}`,
                 name: `Site ${i}`,
-            }));
-            mockUseSitesStore.mockReturnValue({ sites: manySites });
+            })) as Site[];
+            setSitesSnapshot(manySites);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -655,7 +685,7 @@ describe(SiteList, () => {
             annotate("Type: Business Logic", "type");
 
             // Arrange
-            mockUseSitesStore.mockReturnValue({ sites: mockSites });
+            setSitesSnapshot(Array.from(mockSites));
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act
@@ -687,7 +717,7 @@ describe(SiteList, () => {
                 "../../../../components/Dashboard/SiteList/EmptyState"
             );
             const mockEmptyStateMocked = vi.mocked(mockEmptyState);
-            mockUseSitesStore.mockReturnValue({ sites: [] });
+            setSitesSnapshot([] as Site[]);
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
             // Act

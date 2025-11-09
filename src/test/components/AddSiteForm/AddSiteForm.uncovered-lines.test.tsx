@@ -1,8 +1,16 @@
+import type { Site } from "@shared/types";
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
+
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
+import { createMockSite } from "../../utils/mockFactories";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../utils/createSitesStoreMock";
 
 // Mock logger service with inline functions
 vi.mock("../../../services/logger", () => ({
@@ -30,26 +38,38 @@ import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
 // Mock stores and hooks with proper setup to trigger specific conditions
-vi.mock("../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => ({
-        sites: [
-            {
-                identifier: "site-1",
-                name: "Test Site 1",
-                url: "https://example.com",
-                monitors: [],
-            },
-            {
-                identifier: "site-2",
-                name: "Test Site 2",
-                url: "https://example2.com",
-                monitors: [],
-            },
-        ],
-        addSite: vi.fn(),
-        addMonitorToSite: vi.fn(),
+const createDefaultSites = (): Site[] => [
+    createMockSite({
+        identifier: "site-1",
+        monitors: [],
+        name: "Test Site 1",
     }),
+    createMockSite({
+        identifier: "site-2",
+        monitors: [],
+        name: "Test Site 2",
+    }),
+];
+
+const sitesStoreState = createSitesStoreMock({
+    addMonitorToSite: vi.fn(),
+    addSite: vi.fn(),
+    sites: createDefaultSites(),
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
+vi.mock("../../../stores/sites/useSitesStore", () => ({
+    useSitesStore: useSitesStoreMock,
 }));
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
+        addMonitorToSite: vi.fn(),
+        addSite: vi.fn(),
+        sites: createDefaultSites(),
+    });
+};
 
 vi.mock("../../../stores/monitor/useMonitorTypesStore", () => ({
     useMonitorTypesStore: () => ({
@@ -278,6 +298,8 @@ describe("AddSiteForm Uncovered Lines Coverage", () => {
         vi.mocked(logger.error).mockClear();
         vi.mocked(handleSubmit).mockClear();
         consoleErrorSpy.mockClear();
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
     });
 
     it("should cover error logging when invalid monitor type is set", async ({

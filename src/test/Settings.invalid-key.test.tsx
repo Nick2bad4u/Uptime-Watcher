@@ -80,6 +80,16 @@ const mockUseStore = {
     updateSettings: mockUpdateSettings,
 };
 
+const selectorAwareUseSitesStore = vi.fn(
+    (
+        selector?: (state: UnknownRecord) => unknown,
+        _equalityFn?: (a: unknown, b: unknown) => boolean
+    ) =>
+        (typeof selector === "function"
+            ? selector(mockUseStore as UnknownRecord)
+            : mockUseStore) as unknown
+);
+
 // Mock the theme hook
 const mockUseTheme = {
     availableThemes: [
@@ -267,7 +277,7 @@ vi.mock("../theme/components", () => ({
 vi.mock("../stores", () => ({
     useErrorStore: () => mockUseStore,
     useSettingsStore: () => mockUseStore,
-    useSitesStore: () => mockUseStore,
+    useSitesStore: selectorAwareUseSitesStore,
 }));
 
 // Mock the theme hook

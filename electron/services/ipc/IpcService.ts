@@ -16,16 +16,16 @@ import type {
 import type { DuplicateSiteIdentifier } from "@shared/validation/siteIntegrity";
 import type { UnknownRecord } from "type-fest";
 
+import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import {
     DATA_CHANNELS,
-    MONITORING_CHANNELS,
     MONITOR_TYPES_CHANNELS,
+    MONITORING_CHANNELS,
     SETTINGS_CHANNELS,
     SITES_CHANNELS,
     STATE_SYNC_CHANNELS,
     SYSTEM_CHANNELS,
 } from "@shared/types/preload";
-import { isMonitorTypeConfig } from "@shared/types/monitorTypes";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";

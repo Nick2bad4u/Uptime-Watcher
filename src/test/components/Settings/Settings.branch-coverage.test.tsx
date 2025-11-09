@@ -21,13 +21,45 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Settings } from "../../../components/Settings/Settings";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
-import { useSitesStore } from "../../../stores/sites/useSitesStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
+import { createSelectorHookMock } from "../../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../utils/createSitesStoreMock";
+
+type MutableSitesStore = ReturnType<typeof createSitesStoreMock>;
 
 // Mock all dependencies
 vi.mock("../../../stores/error/useErrorStore");
 vi.mock("../../../stores/settings/useSettingsStore");
-vi.mock("../../../stores/sites/useSitesStore");
+
+const createDefaultDownloadBackup = () => vi.fn(async () => undefined);
+
+const createDefaultFullResync = () => vi.fn(async () => undefined);
+
+const sitesStoreState = vi.hoisted(() =>
+    createSitesStoreMock({
+        downloadSqliteBackup: createDefaultDownloadBackup(),
+        fullResyncSites: createDefaultFullResync(),
+    })
+) as MutableSitesStore;
+
+const useSitesStoreMock = vi.hoisted(() =>
+    createSelectorHookMock(sitesStoreState)
+);
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
+        downloadSqliteBackup: createDefaultDownloadBackup(),
+        fullResyncSites: createDefaultFullResync(),
+    });
+};
+
+vi.mock("../../../stores/sites/useSitesStore", () => ({
+    useSitesStore: useSitesStoreMock,
+}));
+
 vi.mock("../../../theme/useTheme");
 vi.mock("../../../services/logger");
 vi.mock("../../../hooks/useDelayedButtonLoading");
@@ -54,39 +86,33 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
 }));
 
 describe("Settings - Branch Coverage Tests", () => {
-    // Mock store implementations
+    const setSitesStoreState = (
+        overrides: Partial<typeof sitesStoreState>
+    ): void => {
+        Object.assign(sitesStoreState, overrides);
+    };
+
     const mockErrorStore = {
         clearError: vi.fn(),
         isLoading: false,
-        lastError: null,
+        lastError: null as string | null,
         setError: vi.fn(),
+        setLoading: vi.fn(),
     };
 
     const mockSettingsStore = {
-        resetSettings: vi.fn(),
+        persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
+        resetSettings: vi.fn().mockResolvedValue(undefined),
         settings: {
             autoStart: false,
-            historyLimit: 100,
+            historyLimit: 1000,
             minimizeToTray: false,
             notifications: true,
             soundAlerts: false,
             theme: "light",
         },
-        persistHistoryLimit: vi.fn(),
+        syncSettings: vi.fn(),
         updateSettings: vi.fn(),
-    };
-
-    const mockSitesStore = {
-        downloadSqliteBackup: vi.fn().mockResolvedValue({
-            buffer: new ArrayBuffer(8),
-            fileName: "backup.db",
-            metadata: {
-                createdAt: 0,
-                originalPath: "/tmp/backup.db",
-                sizeBytes: 8,
-            },
-        }),
-        fullResyncSites: vi.fn(),
     };
 
     const mockTheme = {
@@ -162,11 +188,33 @@ describe("Settings - Branch Coverage Tests", () => {
     beforeEach(() => {
         // Reset all mocks
         vi.clearAllMocks();
+        resetSitesStoreState();
+        useSitesStoreMock.mockClear();
+
+        mockErrorStore.clearError = vi.fn();
+        mockErrorStore.setError = vi.fn();
+        mockErrorStore.setLoading = vi.fn();
+        mockErrorStore.isLoading = false;
+        mockErrorStore.lastError = null;
+
+        mockSettingsStore.updateSettings = vi.fn();
+        mockSettingsStore.persistHistoryLimit = vi
+            .fn()
+            .mockResolvedValue(undefined);
+        mockSettingsStore.resetSettings = vi.fn().mockResolvedValue(undefined);
+        mockSettingsStore.syncSettings = vi.fn();
+        mockSettingsStore.settings = {
+            autoStart: false,
+            historyLimit: 1000,
+            minimizeToTray: false,
+            notifications: true,
+            soundAlerts: false,
+            theme: "light",
+        };
 
         // Setup default mock implementations
         vi.mocked(useErrorStore).mockReturnValue(mockErrorStore);
         vi.mocked(useSettingsStore).mockReturnValue(mockSettingsStore);
-        vi.mocked(useSitesStore).mockReturnValue(mockSitesStore);
         vi.mocked(useTheme).mockReturnValue(mockTheme);
         vi.mocked(useThemeClasses).mockReturnValue({
             getBackgroundClass: vi
@@ -251,8 +299,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Error Handling", "type");
 
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 fullResyncSites: vi.fn().mockResolvedValue(undefined),
             });
 
@@ -438,8 +485,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Error Handling", "type");
 
             const syncError = new Error("Sync failed");
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 fullResyncSites: vi.fn().mockRejectedValue(syncError),
             });
 
@@ -472,8 +518,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Error Handling", "type");
 
             const backupError = new Error("Backup failed");
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 downloadSqliteBackup: vi.fn().mockRejectedValue(backupError),
             });
 
@@ -672,8 +717,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Error Handling", "type");
 
             const errorWithMessage = { message: "Detailed error message" };
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 fullResyncSites: vi.fn().mockRejectedValue(errorWithMessage),
             });
 
@@ -706,8 +750,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Error Handling", "type");
 
             const errorWithoutMessage = { code: "ERROR_CODE" };
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 downloadSqliteBackup: vi
                     .fn()
                     .mockRejectedValue(errorWithoutMessage),
@@ -742,8 +785,7 @@ describe("Settings - Branch Coverage Tests", () => {
             annotate("Type: Error Handling", "type");
 
             const primitiveError = "Simple string error";
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 fullResyncSites: vi.fn().mockRejectedValue(primitiveError),
             });
 
@@ -869,8 +911,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const user = userEvent.setup();
             const mockFullSync = vi.fn().mockResolvedValue(undefined);
 
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 fullResyncSites: mockFullSync,
             });
 
@@ -903,8 +944,7 @@ describe("Settings - Branch Coverage Tests", () => {
             const user = userEvent.setup();
             const mockDownloadBackup = vi.fn().mockResolvedValue(undefined);
 
-            vi.mocked(useSitesStore).mockReturnValue({
-                ...mockSitesStore,
+            setSitesStoreState({
                 downloadSqliteBackup: mockDownloadBackup,
             });
 

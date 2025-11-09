@@ -105,20 +105,31 @@ export function useSiteActions(
         stopSiteMonitoring,
         stopSiteMonitorMonitoring,
     } = useSitesStore(
-        useShallow((state) => ({
-            checkSiteNow: state.checkSiteNow,
-            setSelectedMonitorId: state.setSelectedMonitorId,
-            startSiteMonitoring: state.startSiteMonitoring,
-            startSiteMonitorMonitoring: state.startSiteMonitorMonitoring,
-            stopSiteMonitoring: state.stopSiteMonitoring,
-            stopSiteMonitorMonitoring: state.stopSiteMonitorMonitoring,
-        }))
+        useShallow(
+            useCallback(
+                (state) => ({
+                    checkSiteNow: state.checkSiteNow,
+                    setSelectedMonitorId: state.setSelectedMonitorId,
+                    startSiteMonitoring: state.startSiteMonitoring,
+                    startSiteMonitorMonitoring:
+                        state.startSiteMonitorMonitoring,
+                    stopSiteMonitoring: state.stopSiteMonitoring,
+                    stopSiteMonitorMonitoring: state.stopSiteMonitorMonitoring,
+                }),
+                []
+            )
+        )
     );
     const { selectSite, setShowSiteDetails } = useUIStore(
-        useShallow((state) => ({
-            selectSite: state.selectSite,
-            setShowSiteDetails: state.setShowSiteDetails,
-        }))
+        useShallow(
+            useCallback(
+                (state) => ({
+                    selectSite: state.selectSite,
+                    setShowSiteDetails: state.setShowSiteDetails,
+                }),
+                []
+            )
+        )
     );
 
     // Start monitoring the site with proper logging

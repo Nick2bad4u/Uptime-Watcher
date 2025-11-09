@@ -46,6 +46,7 @@ ignore: |
     .codecov.yml
     config/tools/.pre-commit-config.yaml
     docs/docusaurus/docs/documents/docs/Packages/**
+    **/.stryker-tmp/**
 
 rules:
     # Enable anchor rules for better YAML structure

@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+
 import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
+import { createSelectorHookMock } from "../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../utils/createSitesStoreMock";
 
 // Mock the hooks
 vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
@@ -51,13 +57,25 @@ vi.mock("../../stores/error/useErrorStore", () => ({
     }),
 }));
 
+const sitesStoreState = createSitesStoreMock({
+    addMonitorToSite: vi.fn(),
+    createSite: vi.fn(),
+    sites: [],
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => ({
+    useSitesStore: useSitesStoreMock,
+}));
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
         addMonitorToSite: vi.fn(),
         createSite: vi.fn(),
         sites: [],
-    }),
-}));
+    });
+};
 
 // Mock other hooks
 vi.mock("../../hooks/useDelayedButtonLoading", () => ({
@@ -77,6 +95,8 @@ vi.mock("../../hooks/useDynamicHelpText", () => ({
 describe("AddSiteForm Component", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
     });
 
     it("should render the form with basic elements", ({ task, annotate }) => {

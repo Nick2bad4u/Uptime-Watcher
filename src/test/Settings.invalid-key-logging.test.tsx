@@ -43,10 +43,22 @@ vi.mock("../stores/settings/useSettingsStore", () => ({
 }));
 
 // Mock other dependencies
+const mockSitesStore = {
+    persistHistoryLimit: vi.fn(),
+};
+
+const selectorAwareUseSitesStore = vi.fn(
+    (
+        selector?: (state: typeof mockSitesStore) => unknown,
+        _equalityFn?: (a: unknown, b: unknown) => boolean
+    ) =>
+        (typeof selector === "function"
+            ? selector(mockSitesStore)
+            : mockSitesStore) as unknown
+);
+
 vi.mock("../stores/sites/useSitesStore", () => ({
-    useSitesStore: vi.fn(() => ({
-        persistHistoryLimit: vi.fn(),
-    })),
+    useSitesStore: selectorAwareUseSitesStore,
 }));
 
 describe("Settings - Invalid Key Logging", () => {

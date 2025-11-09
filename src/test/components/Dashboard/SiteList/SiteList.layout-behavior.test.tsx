@@ -12,6 +12,11 @@ import type {
     SiteCardPresentation,
     SiteListLayoutMode,
 } from "../../../../stores/ui/types";
+import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../../../utils/createSitesStoreMock";
 
 interface UiStoreState {
     siteListLayout: SiteListLayoutMode;
@@ -27,7 +32,7 @@ interface Invocation<TProps extends Record<string, unknown>> {
 const {
     themeState,
     uiStoreState,
-    sitesState,
+    sitesStoreState,
     tableViewInvocations,
     compactCardInvocations,
     cardInvocations,
@@ -41,7 +46,7 @@ const {
         siteCardPresentation: "grid" as SiteCardPresentation,
         setSiteCardPresentation: vi.fn(),
     } as UiStoreState,
-    sitesState: { sites: [] as Site[] },
+    sitesStoreState: createSitesStoreMock({ sites: [] }),
     tableViewInvocations: [] as Invocation<{ sites: Site[] }>[],
     compactCardInvocations: [] as Invocation<{ site: Site }>[],
     cardInvocations: [] as Invocation<{
@@ -74,8 +79,10 @@ vi.mock("../../../../stores/ui/useUiStore", () => ({
     useUIStore: useUIStoreMock,
 }));
 
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => sitesState,
+    useSitesStore: useSitesStoreMock,
 }));
 
 vi.mock("../../../../theme/useTheme", () => ({
@@ -173,7 +180,8 @@ beforeEach(() => {
     uiStoreState.siteCardPresentation = "grid";
     uiStoreState.setSiteListLayout.mockReset();
     uiStoreState.setSiteCardPresentation.mockReset();
-    sitesState.sites = [];
+    updateSitesStoreMock(sitesStoreState, { sites: [] });
+    useSitesStoreMock.mockClear();
     tableViewInvocations.length = 0;
     compactCardInvocations.length = 0;
     cardInvocations.length = 0;
@@ -190,7 +198,7 @@ describe("SiteList layout behavior", () => {
 
     it("renders the table view and wires layout callbacks", () => {
         const sampleSites = [createSite("alpha"), createSite("beta")];
-        sitesState.sites = sampleSites;
+        updateSitesStoreMock(sitesStoreState, { sites: sampleSites });
         uiStoreState.siteListLayout = "list";
 
         render(<SiteList />);
@@ -207,7 +215,7 @@ describe("SiteList layout behavior", () => {
 
     it("renders stacked and grid presentations with dark mode styling", () => {
         const sampleSites = [createSite("gamma"), createSite("delta")];
-        sitesState.sites = sampleSites;
+        updateSitesStoreMock(sitesStoreState, { sites: sampleSites });
         uiStoreState.siteListLayout = "card-large";
         uiStoreState.siteCardPresentation = "stacked";
         themeState.isDark = true;
@@ -243,7 +251,7 @@ describe("SiteList layout behavior", () => {
 
     it("renders compact cards when compact layout is chosen", () => {
         const sampleSites = [createSite("epsilon")];
-        sitesState.sites = sampleSites;
+        updateSitesStoreMock(sitesStoreState, { sites: sampleSites });
         uiStoreState.siteListLayout = "card-compact";
 
         render(<SiteList />);

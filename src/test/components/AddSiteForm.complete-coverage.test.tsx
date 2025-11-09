@@ -1,18 +1,39 @@
+import type { Site } from "@shared/types";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
 
-// Mock the stores
+import { AddSiteForm } from "../../components/AddSiteForm/AddSiteForm";
+import { createSelectorHookMock } from "../utils/createSelectorHookMock";
+import { createMockSite } from "../utils/mockFactories";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../utils/createSitesStoreMock";
+
+const createDefaultSites = (): Site[] => [
+    createMockSite({ identifier: "site-1", name: "Test Site 1" }),
+    createMockSite({ identifier: "site-2", name: "Test Site 2" }),
+];
+
+const sitesStoreState = createSitesStoreMock({
+    addMonitorToSite: vi.fn(),
+    createSite: vi.fn(),
+    sites: createDefaultSites(),
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
+
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => ({
-        sites: [
-            { identifier: "site1", name: "Test Site 1" },
-            { identifier: "site2", name: "Test Site 2" },
-        ],
+    useSitesStore: useSitesStoreMock,
+}));
+
+const resetSitesStoreState = (): void => {
+    updateSitesStoreMock(sitesStoreState, {
         addMonitorToSite: vi.fn(),
         createSite: vi.fn(),
-    }),
-}));
+        sites: createDefaultSites(),
+    });
+};
 
 vi.mock("../../stores/error/useErrorStore", () => ({
     useErrorStore: () => ({
@@ -101,6 +122,8 @@ vi.mock("../../hooks/useDynamicHelpText", () => ({
 describe("AddSiteForm Component", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        useSitesStoreMock.mockClear();
+        resetSitesStoreState();
     });
 
     it("should render the form with basic elements", ({ task, annotate }) => {

@@ -73,14 +73,7 @@ const selectSetSiteCardPresentation = (
  * @returns JSX.Element containing the site list or empty state
  */
 export const SiteList = (): JSX.Element => {
-    const sitesSelection = useSitesStore(
-        selectSites as unknown as (
-            state: SitesStoreState
-        ) => readonly Site[] | SitesStoreState
-    );
-    const sites = Array.isArray(sitesSelection)
-        ? sitesSelection
-        : (sitesSelection as SitesStoreState).sites;
+    const sites = useSitesStore(selectSites);
     const layout = useUIStore(selectSiteListLayout);
     const setLayout = useUIStore(selectSetSiteListLayout);
     const cardPresentation = useUIStore(selectSiteCardPresentation);

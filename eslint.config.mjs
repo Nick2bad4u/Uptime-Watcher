@@ -7239,6 +7239,7 @@ export default /** @type {EslintConfig} */ [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -7288,6 +7289,7 @@ export default /** @type {EslintConfig} */ [
             "new-cap": "off", // Allow new-cap for class constructors
             "nitpick/no-redundant-vars": "off", // Allow redundant vars in tests
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
+            "no-barrel-files/no-barrel-files": "off", // Allow barrel files in tests for convenience
             "no-console": "off",
             "no-duplicate-imports": "off", // Allow duplicate imports for test setups
             "no-inline-comments": "off",
@@ -7466,6 +7468,7 @@ export default /** @type {EslintConfig} */ [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
+
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7514,6 +7517,7 @@ export default /** @type {EslintConfig} */ [
             "max-statements": "off",
             "new-cap": "off", // Allow new-cap for class constructors
             "no-await-in-loop": "off", // Allow await in loops for sequential operations
+            "no-barrel-files/no-barrel-files": "off", // Allow barrel files in tests for convenience
             "no-console": "off",
             "no-duplicate-imports": "off", // Allow duplicate imports for test setups
             "no-inline-comments": "off",
@@ -7694,6 +7698,7 @@ export default /** @type {EslintConfig} */ [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
+
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7731,6 +7736,7 @@ export default /** @type {EslintConfig} */ [
             ],
             "max-params": "off",
             "max-statements": "off",
+            "no-barrel-files/no-barrel-files": "off", // Allow barrel files in tests for convenience
             "no-console": "off",
             "no-inline-comments": "off",
             "no-magic-numbers": "off",
@@ -9128,6 +9134,7 @@ export default /** @type {EslintConfig} */ [
         rules: {
             ...vitest.configs.all.rules,
             "@jcoreio/implicit-dependencies/no-implicit": "off",
+            "no-barrel-files/no-barrel-files": "off", // Allow barrel files in tests for convenience
             "testing-library/consistent-data-testid": [
                 "warn",
                 {

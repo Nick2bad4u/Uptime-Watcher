@@ -6,11 +6,11 @@
 
 import type { UnknownRecord } from "type-fest";
 
+import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import {
     isNonEmptyString,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
-import { MONITOR_TYPES_CHANNELS } from "@shared/types/preload";
 import { ipcMain } from "electron";
 
 import type {

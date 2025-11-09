@@ -4,6 +4,7 @@
  */
 
 import type { HTMLAttributes, ReactNode } from "react";
+import type { Site } from "@shared/types";
 
 import {
     fireEvent,
@@ -17,6 +18,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DynamicMonitorFieldsProperties } from "../../components/AddSiteForm/DynamicMonitorFields";
 import type { SelectFieldProperties } from "../../components/AddSiteForm/SelectField";
 import type { UseAddSiteFormReturn } from "../../components/SiteDetails/useAddSiteForm";
+import { createSelectorHookMock } from "../utils/createSelectorHookMock";
+import { createMockSite } from "../utils/mockFactories";
+import {
+    createSitesStoreMock,
+    updateSitesStoreMock,
+} from "../utils/createSitesStoreMock";
 
 const handleSubmitMock = vi.fn();
 
@@ -45,10 +52,24 @@ vi.mock("../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: () => useAddSiteFormMock(),
 }));
 
-const useSitesStoreMock = vi.fn();
+const createDefaultSites = (): Site[] => [
+    createMockSite({
+        identifier: "site-1",
+        monitors: [],
+        name: "Behavioural Test Site 1",
+    }),
+];
+
+const sitesStoreState = createSitesStoreMock({
+    addMonitorToSite: vi.fn(),
+    createSite: vi.fn(),
+    sites: createDefaultSites(),
+});
+
+const useSitesStoreMock = createSelectorHookMock(sitesStoreState);
 
 vi.mock("../../stores/sites/useSitesStore", () => ({
-    useSitesStore: () => useSitesStoreMock(),
+    useSitesStore: useSitesStoreMock,
 }));
 
 const useErrorStoreMock = vi.fn();
@@ -358,20 +379,21 @@ describe("AddSiteForm behavioral coverage", () => {
         errorAlertProps = undefined;
 
         useAddSiteFormMock.mockImplementation(() => createFormState());
-        useSitesStoreMock.mockReturnValue({
+        useSitesStoreMock.mockClear();
+        updateSitesStoreMock(sitesStoreState, {
             addMonitorToSite: vi.fn(),
             createSite: vi.fn(),
             sites: [
-                {
+                createMockSite({
                     identifier: "site-1",
                     monitors: [],
                     name: "Primary",
-                },
-                {
+                }),
+                createMockSite({
                     identifier: "site-2",
                     monitors: [],
                     name: "Secondary",
-                },
+                }),
             ],
         });
         useErrorStoreMock.mockReturnValue({
