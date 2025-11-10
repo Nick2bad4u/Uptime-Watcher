@@ -143,6 +143,7 @@
             "**/.vagrant/**"
         ],
         "useDefaultPatterns": true,
+        "useDotIgnore": true,
         "useGitignore": true
     },
     "include": [
@@ -176,17 +177,23 @@
         "files": true,
         "git": {
             "includeDiffs": false,
+            "includeLogs": false,
+            "includeLogsCount": 0,
             "sortByChanges": true,
             "sortByChangesMaxCommits": 200
         },
         "headerText": "Uptime Watcher - Electron Desktop Application for Website Monitoring",
         "includeEmptyDirectories": false,
+        "includeFullDirectoryStructure": false,
+        "instructionFilePath": ".github/copilot-instructions.md",
         "parsableStyle": false,
         "removeComments": false,
         "removeEmptyLines": true,
         "showLineNumbers": false,
         "style": "xml",
-        "topFilesLength": 10
+        "tokenCountTree": false,
+        "topFilesLength": 10,
+        "truncateBase64": false
     },
     "security": {
         "enableSecurityCheck": true

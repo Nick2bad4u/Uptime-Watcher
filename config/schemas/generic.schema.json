@@ -1,0 +1,63 @@
+{
+    "$comment": "This is a permissive schema for cliff.toml and lychee.toml configuration files. It defines some common properties but allows any additional properties to accommodate various configurations.",
+    "$id": "https://github.com/nick2bad4u/uptime-watcher/blob/main/config/schemas/generic.schema.json",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalItems": true,
+    "additionalProperties": true,
+    "const": false,
+    "contains": true,
+    "contentEncoding": "utf-8",
+    "contentMediaType": "application/toml",
+    "description": "Permissive JSON Schema for cliff.toml / lychee.toml — allows common fields and any additional properties.",
+    "else": true,
+    "exclusiveMaximum": 0,
+    "exclusiveMinimum": 0,
+    "fileMatch": [
+        "cliff.toml",
+        "**/cliff.toml",
+        "lychee.toml",
+        "**/lychee.toml"
+    ],
+    "format": "toml",
+    "maxItems": 0,
+    "maxLength": 0,
+    "maxProperties": 0,
+    "maximum": 0,
+    "minItems": 0,
+    "minLength": 0,
+    "minProperties": 0,
+    "minimum": 0,
+    "not": false,
+    "properties": {
+        "changelog": {
+            "description": "Changelog information (kept permissive)",
+            "type": [
+                "array",
+                "object",
+                "string"
+            ]
+        },
+        "description": {
+            "type": "string"
+        },
+        "git": {
+            "description": "Git metadata (kept permissive)",
+            "type": [
+                "object",
+                "string"
+            ]
+        },
+        "name": {
+            "type": "string"
+        },
+        "version": {
+            "type": "string"
+        }
+    },
+    "propertyNames": true,
+    "readOnly": false,
+    "then": true,
+    "title": "cliff.toml / lychee TOML (permissive)",
+    "type": "object",
+    "uniqueItems": false
+}

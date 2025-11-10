@@ -2,7 +2,12 @@
 
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
-
+name = "lychee"
+description = "Configuration file for lychee link checker."
+version = "1.0.0"
+git = "LycheeOrg/Lychee"
+changelog = "https://github.com/LycheeOrg/Lychee/blob/master/README.md"
+"$schema" = "../schemas/generic.schema.json"
 verbose = "info"
 
 # Don't show interactive progress bar while checking links.
