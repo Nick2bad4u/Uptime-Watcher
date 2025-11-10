@@ -32,11 +32,7 @@ function getTrimmedKeyword(value: unknown): null | string {
  */
 type HttpKeywordMonitorConfig = Monitor & { type: "http-keyword" };
 
-const behavior: HttpMonitorBehavior<
-    "http-keyword",
-    HttpKeywordMonitorConfig,
-    { keyword: string }
-> = {
+const behavior: HttpMonitorBehavior<"http-keyword", { keyword: string }> = {
     evaluateResponse: ({ context, response, responseTime }) => {
         const body =
             typeof response.data === "string"
@@ -87,11 +83,7 @@ const HttpKeywordMonitorBase: new (
     config?: MonitorConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () =>
-        createHttpMonitorService<
-            "http-keyword",
-            HttpKeywordMonitorConfig,
-            { keyword: string }
-        >(behavior),
+        createHttpMonitorService<"http-keyword", { keyword: string }>(behavior),
     "HttpKeywordMonitor"
 );
 

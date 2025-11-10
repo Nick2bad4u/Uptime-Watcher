@@ -35,11 +35,7 @@ function getThreshold(value: unknown): null | number {
  */
 type HttpLatencyMonitorConfig = Monitor & { type: "http-latency" };
 
-const behavior: HttpMonitorBehavior<
-    "http-latency",
-    HttpLatencyMonitorConfig,
-    { threshold: number }
-> = {
+const behavior: HttpMonitorBehavior<"http-latency", { threshold: number }> = {
     evaluateResponse: ({ context, responseTime }) => {
         if (responseTime <= context.threshold) {
             return {
@@ -82,11 +78,9 @@ const HttpLatencyMonitorBase: new (
     config?: MonitorConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () =>
-        createHttpMonitorService<
-            "http-latency",
-            HttpLatencyMonitorConfig,
-            { threshold: number }
-        >(behavior),
+        createHttpMonitorService<"http-latency", { threshold: number }>(
+            behavior
+        ),
     "HttpLatencyMonitor"
 );
 

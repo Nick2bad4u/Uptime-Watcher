@@ -40,6 +40,7 @@
  * @public
  */
 
+import { convertError } from "@shared/utils/errorHandling";
 import { useCallback, useState } from "react";
 
 import { FALLBACK_MONITOR_TYPE_OPTIONS } from "../constants";
@@ -91,17 +92,18 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             const monitorOptions = await getMonitorTypeOptions();
             setOptions(monitorOptions);
         } catch (loadError) {
+            const { error: normalizedError, wasError } =
+                convertError(loadError);
+            const trimmedMessage = normalizedError.message.trim();
             const errorMessage =
-                loadError instanceof Error
-                    ? loadError.message
+                wasError && trimmedMessage.length > 0
+                    ? normalizedError.message
                     : "Failed to load monitor types";
             const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
             setError(contextualError);
             logger.error(
                 "Failed to load monitor types from backend",
-                loadError instanceof Error
-                    ? loadError
-                    : new Error(String(loadError))
+                normalizedError
             );
             // Use centralized fallback options to ensure consistency
             setOptions(Array.from(FALLBACK_MONITOR_TYPE_OPTIONS));

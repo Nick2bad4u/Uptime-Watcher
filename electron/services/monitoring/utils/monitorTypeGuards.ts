@@ -15,6 +15,11 @@ import {
     isValidUrl,
 } from "@shared/validation/validatorUtils";
 
+import {
+    createMonitorConfig,
+    type NormalizedMonitorConfig,
+} from "../createMonitorConfig";
+
 /**
  * Type guard to safely check if a monitor has valid retry attempts.
  *
@@ -50,36 +55,20 @@ export function hasValidTimeout(
 }
 
 /**
- * Safely extracts retry attempts from monitor configuration.
+ * Normalize monitor configuration and surface timeout, retry attempts, and
+ * check interval values using the shared factory.
  *
- * @param monitor - The monitor configuration
- * @param defaultRetryAttempts - Default retry attempts to use if monitor
- *   doesn't have them
+ * @param monitor - Monitor configuration containing optional overrides.
+ * @param defaults - Optional fallback values typically provided by the calling
+ *   service.
  *
- * @returns The retry attempts value to use
+ * @returns Fully normalized monitor configuration with invariant guarantees.
  */
-export function getMonitorRetryAttempts(
+export function extractMonitorConfig(
     monitor: Site["monitors"][0],
-    defaultRetryAttempts: number
-): number {
-    return hasValidRetryAttempts(monitor)
-        ? monitor.retryAttempts
-        : defaultRetryAttempts;
-}
-
-/**
- * Safely extracts timeout value from monitor configuration.
- *
- * @param monitor - The monitor configuration
- * @param defaultTimeout - Default timeout to use if monitor doesn't have one
- *
- * @returns The timeout value to use
- */
-export function getMonitorTimeout(
-    monitor: Site["monitors"][0],
-    defaultTimeout: number
-): number {
-    return hasValidTimeout(monitor) ? monitor.timeout : defaultTimeout;
+    defaults: Partial<NormalizedMonitorConfig> = {}
+): NormalizedMonitorConfig {
+    return createMonitorConfig(monitor, defaults);
 }
 
 /**

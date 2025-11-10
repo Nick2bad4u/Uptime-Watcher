@@ -92,7 +92,6 @@ type HttpHeaderMonitorConfig = Monitor & { type: "http-header" };
 
 const behavior: HttpMonitorBehavior<
     "http-header",
-    HttpHeaderMonitorConfig,
     { expectedValue: string; headerName: string }
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
@@ -169,7 +168,6 @@ const HttpHeaderMonitorBase: new (
     () =>
         createHttpMonitorService<
             "http-header",
-            HttpHeaderMonitorConfig,
             { expectedValue: string; headerName: string }
         >(behavior),
     "HttpHeaderMonitor"

@@ -16,6 +16,7 @@ import type {
     MonitoringStopSummary,
     Site,
 } from "@shared/types";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 import type { MonitorRow } from "@shared/types/database";
 import type { Database } from "node-sqlite3-wasm";
 
@@ -33,6 +34,7 @@ import type {
 } from "../../../services/database/SiteRepository";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import type { MonitoringConfig } from "../../../utils/database/interfaces";
+import { DEFAULT_REQUEST_TIMEOUT } from "../../../constants";
 
 // Helper function to create complete Monitor objects
 const createCompleteMonitor = (
@@ -218,13 +220,24 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(
                 mockMonitorRepository.createTransactionAdapter
             ).toHaveBeenCalledWith(mockDb);
-            expect(siteAdapter.upsert).toHaveBeenCalledWith(siteData);
+            const upsertMock = siteAdapter.upsert as MockedFunction<
+                SiteRepositoryTransactionAdapter["upsert"]
+            >;
+            const upsertCall = upsertMock.mock.calls[0]?.[0] as Site;
+
+            expect(upsertCall.identifier).toBe(siteData.identifier);
+            expect(upsertCall.monitors).toHaveLength(siteData.monitors.length);
             expect(monitorAdapter.deleteBySiteIdentifier).toHaveBeenCalledWith(
                 siteData.identifier
             );
             expect(monitorAdapter.create).toHaveBeenCalledWith(
                 siteData.identifier,
-                siteData.monitors[0]!
+                expect.objectContaining({
+                    checkInterval: siteData.monitors[0]!.checkInterval,
+                    retryAttempts: siteData.monitors[0]!.retryAttempts,
+                    timeout: siteData.monitors[0]!.timeout,
+                    type: siteData.monitors[0]!.type,
+                })
             );
             expect(result.monitors[0]!.id).toBe("new-monitor-id");
             expect(mockLogger.info).toHaveBeenCalledWith(
@@ -266,6 +279,51 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitors).toHaveLength(2);
             expect(result.monitors[0]!.id).toBe("new-monitor-id");
             expect(result.monitors[1]!.id).toBe("new-monitor-id");
+        });
+
+        it("should clamp monitor checkInterval below minimum during creation", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Normalization", "type");
+
+            const belowMinimum = Math.max(
+                1,
+                MIN_MONITOR_CHECK_INTERVAL_MS - 5000
+            );
+            const siteData = {
+                ...mockSite,
+                monitors: [
+                    createCompleteMonitor({
+                        id: "",
+                        checkInterval: belowMinimum,
+                    }),
+                ],
+            };
+
+            await siteWriterService.createSite(siteData);
+
+            expect(monitorAdapter.create).toHaveBeenCalledWith(
+                siteData.identifier,
+                expect.objectContaining({
+                    checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                })
+            );
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[SiteWriterService] Monitor checkInterval below minimum; clamping to shared floor",
+                expect.objectContaining({
+                    minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
+                    monitorId: "<new-monitor>",
+                    originalInterval: belowMinimum,
+                    siteIdentifier: siteData.identifier,
+                })
+            );
         });
 
         it("should handle site creation with empty monitors array", async ({
@@ -571,6 +629,72 @@ describe("SiteWriterService Coverage Tests", () => {
             expect(result.monitoring).toBeTruthy();
         });
 
+        it("should normalize invalid monitor configuration during update", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate(
+                "Component: SiteWriterService-coverage",
+                "component"
+            );
+            await annotate("Category: Utility", "category");
+            await annotate("Type: Normalization", "type");
+
+            const updates: Partial<Site> = {
+                monitors: [
+                    {
+                        ...createCompleteMonitor({ id: "monitor-1" }),
+                        checkInterval: 10,
+                        retryAttempts: -5,
+                        timeout: 0,
+                    },
+                ],
+            };
+
+            await siteWriterService.updateSite(
+                mockSitesCache,
+                "test-site",
+                updates
+            );
+
+            expect(monitorAdapter.update).toHaveBeenCalledWith(
+                "monitor-1",
+                expect.objectContaining({
+                    checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+                    retryAttempts: mockSite.monitors[0]!.retryAttempts,
+                    timeout: DEFAULT_REQUEST_TIMEOUT,
+                })
+            );
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[SiteWriterService] Monitor checkInterval below minimum; clamping to shared floor",
+                expect.objectContaining({
+                    monitorId: "monitor-1",
+                    originalInterval: 10,
+                    siteIdentifier: "test-site",
+                })
+            );
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[SiteWriterService] Monitor retryAttempts invalid; defaulting to non-negative floor",
+                expect.objectContaining({
+                    monitorId: "monitor-1",
+                    originalRetryAttempts: -5,
+                    siteIdentifier: "test-site",
+                })
+            );
+
+            expect(mockLogger.warn).toHaveBeenCalledWith(
+                "[SiteWriterService] Monitor timeout invalid; defaulting to fallback",
+                expect.objectContaining({
+                    monitorId: "monitor-1",
+                    originalTimeout: 0,
+                    siteIdentifier: "test-site",
+                })
+            );
+        });
+
         it("should create new monitors when updating", async ({
             task,
             annotate,
@@ -605,7 +729,14 @@ describe("SiteWriterService Coverage Tests", () => {
             ).toHaveBeenCalledWith(mockDb);
             expect(monitorAdapter.create).toHaveBeenCalledWith(
                 "test-site",
-                newMonitor
+                expect.objectContaining({
+                    checkInterval: newMonitor.checkInterval,
+                    host: newMonitor.host,
+                    port: newMonitor.port,
+                    retryAttempts: newMonitor.retryAttempts,
+                    timeout: newMonitor.timeout,
+                    type: newMonitor.type,
+                })
             );
         });
 
@@ -1204,7 +1335,12 @@ describe("SiteWriterService Coverage Tests", () => {
             ).toHaveBeenCalledWith(mockDb);
             expect(monitorAdapter.create).toHaveBeenCalledWith(
                 "test-site",
-                orphanedMonitor
+                expect.objectContaining({
+                    checkInterval: orphanedMonitor.checkInterval,
+                    retryAttempts: orphanedMonitor.retryAttempts,
+                    timeout: orphanedMonitor.timeout,
+                    type: orphanedMonitor.type,
+                })
             );
             expect(mockLogger.debug).toHaveBeenCalledWith(
                 "Created new monitor new-monitor-id for site test-site (ID not found)"

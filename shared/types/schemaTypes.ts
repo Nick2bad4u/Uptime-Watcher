@@ -64,7 +64,7 @@ type DnsRecordEnum = z.ZodEnum<{
  *
  * @public
  */
-export type BaseMonitorSchemaType = z.ZodObject<{
+interface BaseMonitorSchemaShape {
     activeOperations: ActiveOperationsArray;
     checkInterval: z.ZodNumber;
     history: HistoryArray;
@@ -75,6 +75,16 @@ export type BaseMonitorSchemaType = z.ZodObject<{
     retryAttempts: z.ZodNumber;
     status: MonitorStatusEnum;
     timeout: z.ZodNumber;
+}
+
+type MonitorSchemaShape<TAdditional extends z.ZodRawShape> =
+    BaseMonitorSchemaShape & TAdditional;
+
+type MonitorSchema<TAdditional extends z.ZodRawShape> = z.ZodObject<
+    MonitorSchemaShape<TAdditional>
+>;
+
+export type BaseMonitorSchemaType = MonitorSchema<{
     type: MonitorTypeEnum;
 }>;
 
@@ -83,17 +93,7 @@ export type BaseMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
+export type HttpMonitorSchemaType = MonitorSchema<{
     type: z.ZodLiteral<"http">;
     url: z.ZodString;
 }>;
@@ -103,19 +103,9 @@ export type HttpMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpHeaderMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
+export type HttpHeaderMonitorSchemaType = MonitorSchema<{
     expectedHeaderValue: z.ZodString;
     headerName: z.ZodString;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-header">;
     url: z.ZodString;
 }>;
@@ -125,19 +115,9 @@ export type HttpHeaderMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpJsonMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
+export type HttpJsonMonitorSchemaType = MonitorSchema<{
     expectedJsonValue: z.ZodString;
-    history: HistoryArray;
-    id: z.ZodString;
     jsonPath: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-json">;
     url: z.ZodString;
 }>;
@@ -147,18 +127,8 @@ export type HttpJsonMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpKeywordMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
+export type HttpKeywordMonitorSchemaType = MonitorSchema<{
     bodyKeyword: z.ZodString;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-keyword">;
     url: z.ZodString;
 }>;
@@ -168,18 +138,8 @@ export type HttpKeywordMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpLatencyMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
+export type HttpLatencyMonitorSchemaType = MonitorSchema<{
     maxResponseTime: z.ZodNumber;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-latency">;
     url: z.ZodString;
 }>;
@@ -189,18 +149,8 @@ export type HttpLatencyMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type HttpStatusMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
+export type HttpStatusMonitorSchemaType = MonitorSchema<{
     expectedStatusCode: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"http-status">;
     url: z.ZodString;
 }>;
@@ -210,19 +160,9 @@ export type HttpStatusMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type PortMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
+export type PortMonitorSchemaType = MonitorSchema<{
     host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
     port: z.ZodNumber;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"port">;
 }>;
 
@@ -231,21 +171,11 @@ export type PortMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type ReplicationMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
+export type ReplicationMonitorSchemaType = MonitorSchema<{
     maxReplicationLagSeconds: z.ZodNumber;
-    monitoring: z.ZodBoolean;
     primaryStatusUrl: z.ZodString;
     replicaStatusUrl: z.ZodString;
     replicationTimestampField: z.ZodString;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"replication">;
 }>;
 
@@ -254,18 +184,8 @@ export type ReplicationMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type PingMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
+export type PingMonitorSchemaType = MonitorSchema<{
     host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"ping">;
 }>;
 
@@ -274,20 +194,10 @@ export type PingMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type DnsMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
+export type DnsMonitorSchemaType = MonitorSchema<{
     expectedValue: z.ZodOptional<z.ZodString>;
-    history: HistoryArray;
     host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
     recordType: DnsRecordEnum;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"dns">;
 }>;
 
@@ -296,20 +206,10 @@ export type DnsMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type SslMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
+export type SslMonitorSchemaType = MonitorSchema<{
     certificateWarningDays: z.ZodNumber;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
     host: z.ZodString;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
     port: z.ZodNumber;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"ssl">;
 }>;
 
@@ -318,19 +218,9 @@ export type SslMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type CdnEdgeConsistencyMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
+export type CdnEdgeConsistencyMonitorSchemaType = MonitorSchema<{
     baselineUrl: z.ZodString;
-    checkInterval: z.ZodNumber;
     edgeLocations: z.ZodString;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"cdn-edge-consistency">;
 }>;
 
@@ -339,21 +229,11 @@ export type CdnEdgeConsistencyMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type ServerHeartbeatMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
+export type ServerHeartbeatMonitorSchemaType = MonitorSchema<{
     heartbeatExpectedStatus: z.ZodString;
     heartbeatMaxDriftSeconds: z.ZodNumber;
     heartbeatStatusField: z.ZodString;
     heartbeatTimestampField: z.ZodString;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"server-heartbeat">;
     url: z.ZodString;
 }>;
@@ -363,18 +243,8 @@ export type ServerHeartbeatMonitorSchemaType = z.ZodObject<{
  *
  * @public
  */
-export type WebsocketKeepaliveMonitorSchemaType = z.ZodObject<{
-    activeOperations: ActiveOperationsArray;
-    checkInterval: z.ZodNumber;
-    history: HistoryArray;
-    id: z.ZodString;
-    lastChecked: z.ZodOptional<z.ZodDate>;
+export type WebsocketKeepaliveMonitorSchemaType = MonitorSchema<{
     maxPongDelayMs: z.ZodNumber;
-    monitoring: z.ZodBoolean;
-    responseTime: z.ZodNumber;
-    retryAttempts: z.ZodNumber;
-    status: MonitorStatusEnum;
-    timeout: z.ZodNumber;
     type: z.ZodLiteral<"websocket-keepalive">;
     url: z.ZodString;
 }>;

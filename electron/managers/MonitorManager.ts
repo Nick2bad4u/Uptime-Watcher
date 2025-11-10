@@ -274,14 +274,7 @@ export class MonitorManager {
      */
     public async startMonitoring(): Promise<MonitoringStartSummary> {
         const summary = await this.startAllMonitoringEnhanced(
-            {
-                databaseService: this.dependencies.databaseService,
-                eventEmitter: this.eventEmitter,
-                logger,
-                monitorRepository: this.dependencies.repositories.monitor,
-                monitorScheduler: this.monitorScheduler,
-                sites: this.dependencies.getSitesCache(),
-            },
+            this.createEnhancedLifecycleConfig(),
             this.isMonitoring
         );
 
@@ -339,40 +332,15 @@ export class MonitorManager {
         // Proceed with enhanced monitoring lifecycle which handles
         // operation cleanup
         const result = await this.startMonitoringForSiteEnhanced(
-            {
-                databaseService: this.dependencies.databaseService,
-                eventEmitter: this.eventEmitter,
-                logger,
-                monitorRepository: this.dependencies.repositories.monitor,
-                monitorScheduler: this.monitorScheduler,
-                sites: this.dependencies.getSitesCache(),
-            },
+            this.createEnhancedLifecycleConfig(),
             identifier,
             monitorId,
-            // Create a proper recursive handler that avoids infinite loops
-            async (recursiveId: string, recursiveMonitorId?: string) => {
-                // Only recurse if it's a different site/monitor combination
-                if (
-                    recursiveId !== identifier ||
-                    recursiveMonitorId !== monitorId
-                ) {
-                    return this.startMonitoringForSite(
-                        recursiveId,
-                        recursiveMonitorId
-                    );
-                }
-                // Prevent infinite recursion by using direct scheduler call
-                logger.warn(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
-                        {
-                            identifier,
-                            monitorId: monitorId ?? "all",
-                        }
-                    )
-                );
-                return false;
-            }
+            this.createMonitorActionDelegate(
+                identifier,
+                monitorId,
+                (recursiveId, recursiveMonitorId) =>
+                    this.startMonitoringForSite(recursiveId, recursiveMonitorId)
+            )
         );
 
         if (result) {
@@ -394,14 +362,9 @@ export class MonitorManager {
      * @returns Breakdown of attempted and successful stops.
      */
     public async stopMonitoring(): Promise<MonitoringStopSummary> {
-        const summary = await this.stopAllMonitoringEnhanced({
-            databaseService: this.dependencies.databaseService,
-            eventEmitter: this.eventEmitter,
-            logger,
-            monitorRepository: this.dependencies.repositories.monitor,
-            monitorScheduler: this.monitorScheduler,
-            sites: this.dependencies.getSitesCache(),
-        });
+        const summary = await this.stopAllMonitoringEnhanced(
+            this.createEnhancedLifecycleConfig()
+        );
 
         this.isMonitoring = summary.isMonitoring;
 
@@ -454,40 +417,15 @@ export class MonitorManager {
         // Proceed with enhanced monitoring lifecycle which handles
         // operation cleanup
         const result = await this.stopMonitoringForSiteEnhanced(
-            {
-                databaseService: this.dependencies.databaseService,
-                eventEmitter: this.eventEmitter,
-                logger,
-                monitorRepository: this.dependencies.repositories.monitor,
-                monitorScheduler: this.monitorScheduler,
-                sites: this.dependencies.getSitesCache(),
-            },
+            this.createEnhancedLifecycleConfig(),
             identifier,
             monitorId,
-            // Create a proper recursive handler that avoids infinite loops
-            async (recursiveId: string, recursiveMonitorId?: string) => {
-                // Only recurse if it's a different site/monitor combination
-                if (
-                    recursiveId !== identifier ||
-                    recursiveMonitorId !== monitorId
-                ) {
-                    return this.stopMonitoringForSite(
-                        recursiveId,
-                        recursiveMonitorId
-                    );
-                }
-                // Prevent infinite recursion by using direct scheduler call
-                logger.warn(
-                    interpolateLogTemplate(
-                        LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
-                        {
-                            identifier,
-                            monitorId: monitorId ?? "all",
-                        }
-                    )
-                );
-                return false;
-            }
+            this.createMonitorActionDelegate(
+                identifier,
+                monitorId,
+                (recursiveId, recursiveMonitorId) =>
+                    this.stopMonitoringForSite(recursiveId, recursiveMonitorId)
+            )
         );
 
         if (result) {
@@ -955,6 +893,61 @@ export class MonitorManager {
             "monitor:status-changed",
             statusUpdate
         );
+    }
+
+    /**
+     * Builds the enhanced lifecycle configuration used by monitoring helpers.
+     *
+     * @returns Immutable configuration snapshot for lifecycle flows.
+     */
+    private createEnhancedLifecycleConfig(): EnhancedLifecycleConfig {
+        return {
+            databaseService: this.dependencies.databaseService,
+            eventEmitter: this.eventEmitter,
+            logger,
+            monitorRepository: this.dependencies.repositories.monitor,
+            monitorScheduler: this.monitorScheduler,
+            sites: this.dependencies.getSitesCache(),
+        } satisfies EnhancedLifecycleConfig;
+    }
+
+    /**
+     * Produces a recursion-safe delegate for nested monitor operations.
+     *
+     * @param identifier - Site identifier initiating the action.
+     * @param monitorId - Optional monitor identifier initiating the action.
+     * @param action - Callback invoked when recursion targets a different
+     *   monitor.
+     *
+     * @returns Delegate guarding against infinite recursion.
+     */
+    private createMonitorActionDelegate(
+        identifier: string,
+        monitorId: string | undefined,
+        action: (
+            siteIdentifier: string,
+            monitorIdentifier?: string
+        ) => Promise<boolean>
+    ): MonitorActionDelegate {
+        return async (recursiveId, recursiveMonitorId) => {
+            if (
+                recursiveId !== identifier ||
+                recursiveMonitorId !== monitorId
+            ) {
+                return action(recursiveId, recursiveMonitorId);
+            }
+
+            logger.warn(
+                interpolateLogTemplate(
+                    LOG_TEMPLATES.warnings.RECURSIVE_CALL_PREVENTED,
+                    {
+                        identifier,
+                        monitorId: monitorId ?? "all",
+                    }
+                )
+            );
+            return false;
+        };
     }
 
     /**

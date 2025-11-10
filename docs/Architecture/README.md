@@ -19,7 +19,7 @@ docs/Architecture/
 ├── Patterns/                    # Development patterns guide
 │   ├── COMPONENT_PROPS_STANDARDS.md
 │   ├── DEVELOPMENT_PATTERNS_GUIDE.md
-│   └── site-loading-orchestration.md
+│   └── SITE_LOADING_ORCHESTRATION.md
 ├── Templates/                   # Code templates for common patterns
 │   ├── IPC_HANDLER_TEMPLATE.md
 │   ├── REPOSITORY_TEMPLATE.md
@@ -140,7 +140,7 @@ Detailed prop authoring standards for React components:
 - **Event Handling** - Normalised handler signatures and accessibility defaults
 - **Compliance Checklist** - Quick validation before code review
 
-### [Site Loading & Monitoring Orchestration](./Patterns/site-loading-orchestration.md)
+### [Site Loading & Monitoring Orchestration](./Patterns/SITE_LOADING_ORCHESTRATION.md)
 
 End-to-end walkthrough of the main-process site loading pipeline:
 

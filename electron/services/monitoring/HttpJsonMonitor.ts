@@ -144,7 +144,6 @@ type HttpJsonMonitorConfig = Monitor & { type: "http-json" };
 
 const behavior: HttpMonitorBehavior<
     "http-json",
-    HttpJsonMonitorConfig,
     { expectedValue: string; jsonPath: string }
 > = {
     evaluateResponse: ({ context, response, responseTime }) => {
@@ -230,7 +229,6 @@ const HttpJsonMonitorBase: new (
     () =>
         createHttpMonitorService<
             "http-json",
-            HttpJsonMonitorConfig,
             { expectedValue: string; jsonPath: string }
         >(behavior),
     "HttpJsonMonitor"

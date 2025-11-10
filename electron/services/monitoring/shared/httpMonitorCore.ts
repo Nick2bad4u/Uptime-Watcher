@@ -35,7 +35,11 @@ import { handleCheckError, isCancellationError } from "../utils/errorHandling";
 import { createHttpClient } from "../utils/httpClient";
 import { getSharedHttpRateLimiter } from "../utils/httpRateLimiter";
 import {
-    createMonitorConfig,
+    deriveMonitorTiming,
+    ensureMonitorType,
+    type MonitorByType,
+} from "./monitorCoreHelpers";
+import {
     createMonitorErrorResult,
     validateMonitorUrl,
 } from "./monitorServiceHelpers";
@@ -59,19 +63,6 @@ declare module "axios" {
 /**
  * Narrowed monitor type helper keyed by monitor "type" literal.
  */
-type MonitorByType<TType extends Site["monitors"][number]["type"]> =
-    Site["monitors"][number] & { type: TType };
-
-/**
- * Type guard that narrows a monitor instance to the provided monitor type.
- */
-function isMonitorOfType<TType extends Site["monitors"][number]["type"]>(
-    monitor: Site["monitors"][number],
-    type: TType
-): monitor is MonitorByType<TType> {
-    return monitor.type === type;
-}
-
 /**
  * Result returned by monitor-specific validation logic.
  */
@@ -88,13 +79,12 @@ export type HttpMonitorServiceInstance = IMonitorService & {
  */
 export interface HttpMonitorBehavior<
     TType extends Site["monitors"][number]["type"],
-    TMonitor extends MonitorByType<TType>,
     TContext,
 > {
     /** Maps a successful HTTP response onto a monitor check result. */
     readonly evaluateResponse: (args: {
         context: TContext;
-        monitor: TMonitor;
+        monitor: MonitorByType<TType>;
         response: AxiosResponse;
         responseTime: number;
     }) => MonitorCheckResult | Promise<MonitorCheckResult>;
@@ -109,7 +99,7 @@ export interface HttpMonitorBehavior<
      * a pre-built error result when validation fails.
      */
     readonly validateMonitorSpecifics: (
-        monitor: TMonitor
+        monitor: MonitorByType<TType>
     ) => MonitorValidationResult<TContext>;
 }
 
@@ -118,16 +108,15 @@ export interface HttpMonitorBehavior<
  */
 export function createHttpMonitorService<
     TType extends Site["monitors"][number]["type"],
-    TMonitor extends MonitorByType<TType>,
     TContext,
 >(
-    behavior: HttpMonitorBehavior<TType, TMonitor, TContext>
+    behavior: HttpMonitorBehavior<TType, TContext>
 ): new (config?: MonitorConfig) => HttpMonitorServiceInstance {
     const rateLimiter = getSharedHttpRateLimiter();
 
     interface SingleCheckParams {
         context: TContext;
-        monitor: TMonitor;
+        monitor: MonitorByType<TType>;
         signal?: AbortSignal;
         timeout: number;
         url: string;
@@ -142,14 +131,12 @@ export function createHttpMonitorService<
             monitor: Site["monitors"][0],
             signal?: AbortSignal
         ): Promise<MonitorCheckResult> {
-            if (!isMonitorOfType(monitor, behavior.type)) {
-                throw new Error(
-                    `${behavior.scope} cannot handle monitor type: ${monitor.type}`
-                );
-            }
+            const typedMonitor = ensureMonitorType(
+                monitor,
+                behavior.type,
+                behavior.scope
+            );
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Narrowed through isMonitorOfType guard
-            const typedMonitor = monitor as TMonitor;
             const validation = behavior.validateMonitorSpecifics(typedMonitor);
 
             if (validation.kind === "error") {
@@ -161,11 +148,9 @@ export function createHttpMonitorService<
                 return createMonitorErrorResult(urlValidationError, 0);
             }
 
-            const { retryAttempts, timeout } = createMonitorConfig(
+            const { retryAttempts, timeout } = deriveMonitorTiming(
                 typedMonitor,
-                {
-                    timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-                }
+                this.config
             );
 
             const url = typedMonitor.url ?? "";
@@ -180,7 +165,7 @@ export function createHttpMonitorService<
             } satisfies {
                 context: TContext;
                 maxRetries: number;
-                monitor: TMonitor;
+                monitor: MonitorByType<TType>;
                 signal?: AbortSignal;
                 timeout: number;
                 url: string;
@@ -194,7 +179,7 @@ export function createHttpMonitorService<
         private async performCheckWithRetry(params: {
             context: TContext;
             maxRetries: number;
-            monitor: TMonitor;
+            monitor: MonitorByType<TType>;
             signal?: AbortSignal;
             timeout: number;
             url: string;
@@ -218,7 +203,7 @@ export function createHttpMonitorService<
                     url,
                 } satisfies {
                     context: TContext;
-                    monitor: TMonitor;
+                    monitor: MonitorByType<TType>;
                     signal?: AbortSignal;
                     timeout: number;
                     url: string;

@@ -112,6 +112,55 @@ async function getConfig(
 }
 
 /**
+ * Executes a monitor UI helper operation with standardized error handling.
+ *
+ * @typeParam T - Result type returned by the operation.
+ *
+ * @param description - Context string used for logging and error messaging.
+ * @param fallback - Value returned when the operation fails.
+ * @param operation - Callback encapsulating the operation logic.
+ *
+ * @returns Result of the operation or the fallback value on failure.
+ */
+async function runMonitorUiOperation<T>(
+    description: string,
+    fallback: T,
+    operation: () => Promise<T>
+): Promise<T> {
+    return withUtilityErrorHandling(operation, description, fallback);
+}
+
+/**
+ * Reads a derived value from a monitor type configuration with shared guards.
+ *
+ * @typeParam T - Result type returned by the selector.
+ *
+ * @param monitorType - Monitor type whose configuration is required.
+ * @param description - Context string used for logging and error messaging.
+ * @param fallback - Value returned when extraction fails.
+ * @param selector - Selector applied to the configuration object.
+ * @param signal - Optional abort signal for cancellation.
+ *
+ * @returns Result produced by the selector or the fallback value on failure.
+ */
+async function readMonitorUiConfigValue<T>(
+    monitorType: MonitorType,
+    description: string,
+    fallback: T,
+    selector: (config: MonitorTypeConfig | undefined) => Promise<T> | T,
+    signal?: AbortSignal
+): Promise<T> {
+    return runMonitorUiOperation(description, fallback, async () => {
+        if (signal?.aborted) {
+            throw new Error("Operation aborted");
+        }
+
+        const config = await getConfig(monitorType, signal);
+        return selector(config);
+    });
+}
+
+/**
  * Clears the configuration cache.
  *
  * @remarks
@@ -155,13 +204,11 @@ export function getDefaultMonitorId(monitorIds: readonly string[]): string {
 export async function supportsAdvancedAnalytics(
     monitorType: MonitorType
 ): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return config?.uiConfig?.supportsAdvancedAnalytics ?? false;
-        },
+    return readMonitorUiConfigValue(
+        monitorType,
         `Check advanced analytics support for ${monitorType}`,
-        false
+        false,
+        (config) => config?.uiConfig?.supportsAdvancedAnalytics ?? false
     );
 }
 
@@ -177,13 +224,11 @@ export async function supportsAdvancedAnalytics(
 export async function supportsResponseTime(
     monitorType: MonitorType
 ): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return config?.uiConfig?.supportsResponseTime ?? false;
-        },
+    return readMonitorUiConfigValue(
+        monitorType,
         `Check response time support for ${monitorType}`,
-        false
+        false,
+        (config) => config?.uiConfig?.supportsResponseTime ?? false
     );
 }
 
@@ -258,15 +303,13 @@ export async function formatMonitorDetail(
     monitorType: MonitorType,
     details: string
 ): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            // Use store method instead of direct IPC call
-            const store = useMonitorTypesStore.getState();
-
-            return store.formatMonitorDetail(monitorType, details);
-        },
+    return runMonitorUiOperation(
         `Format monitor detail for ${monitorType}`,
-        details
+        details,
+        async () => {
+            const store = useMonitorTypesStore.getState();
+            return store.formatMonitorDetail(monitorType, details);
+        }
     );
 }
 
@@ -296,15 +339,13 @@ export async function formatMonitorTitleSuffix(
     monitorType: MonitorType,
     monitor: Monitor
 ): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            // Use store method instead of direct IPC call
-            const store = useMonitorTypesStore.getState();
-
-            return store.formatMonitorTitleSuffix(monitorType, monitor);
-        },
+    return runMonitorUiOperation(
         `Format monitor title suffix for ${monitorType}`,
-        ""
+        "",
+        async () => {
+            const store = useMonitorTypesStore.getState();
+            return store.formatMonitorTitleSuffix(monitorType, monitor);
+        }
     );
 }
 
@@ -320,16 +361,13 @@ export async function formatMonitorTitleSuffix(
 export async function getAnalyticsLabel(
     monitorType: MonitorType
 ): Promise<string> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return (
-                config?.uiConfig?.detailFormats?.analyticsLabel ??
-                `${monitorType.toUpperCase()} Response Time`
-            );
-        },
+    const fallbackLabel = `${monitorType.toUpperCase()} Response Time`;
+    return readMonitorUiConfigValue(
+        monitorType,
         `Get analytics label for ${monitorType}`,
-        `${monitorType.toUpperCase()} Response Time`
+        fallbackLabel,
+        (config) =>
+            config?.uiConfig?.detailFormats?.analyticsLabel ?? fallbackLabel
     );
 }
 
@@ -347,17 +385,12 @@ export async function getMonitorHelpTexts(
     monitorType: MonitorType,
     signal?: AbortSignal
 ): Promise<MonitorHelpTexts> {
-    return withUtilityErrorHandling(
-        async () => {
-            if (signal?.aborted) {
-                throw new Error("Operation aborted");
-            }
-
-            const config = await getConfig(monitorType, signal);
-            return config?.uiConfig?.helpTexts ?? {};
-        },
+    return readMonitorUiConfigValue(
+        monitorType,
         `Get help texts for ${monitorType}`,
-        {}
+        {},
+        (config) => config?.uiConfig?.helpTexts ?? {},
+        signal
     );
 }
 
@@ -374,7 +407,9 @@ export async function getMonitorHelpTexts(
 export async function getTypesWithFeature(
     feature: "advancedAnalytics" | "responseTime"
 ): Promise<MonitorType[]> {
-    return withUtilityErrorHandling(
+    return runMonitorUiOperation(
+        `Get types with feature ${feature}`,
+        [],
         async () => {
             const allTypes = await getAvailableMonitorTypes();
             const supportedTypes: MonitorType[] = [];
@@ -391,9 +426,7 @@ export async function getTypesWithFeature(
             }
 
             return supportedTypes;
-        },
-        `Get types with feature ${feature}`,
-        []
+        }
     );
 }
 
@@ -409,12 +442,10 @@ export async function getTypesWithFeature(
 export async function shouldShowUrl(
     monitorType: MonitorType
 ): Promise<boolean> {
-    return withUtilityErrorHandling(
-        async () => {
-            const config = await getConfig(monitorType);
-            return config?.uiConfig?.display?.showUrl ?? false;
-        },
+    return readMonitorUiConfigValue(
+        monitorType,
         `Check URL display for ${monitorType}`,
-        false
+        false,
+        (config) => config?.uiConfig?.display?.showUrl ?? false
     );
 }

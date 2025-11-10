@@ -13,15 +13,24 @@
 import type { Monitor, Site } from "@shared/types";
 import type { Logger } from "@shared/utils/logger/interfaces";
 
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+
 import type { DatabaseService } from "../../services/database/DatabaseService";
 import type {
     MonitorRepository,
     MonitorRepositoryTransactionAdapter,
 } from "../../services/database/MonitorRepository";
-import type { SiteRepository } from "../../services/database/SiteRepository";
+import type {
+    SiteRepository,
+    SiteRepositoryTransactionAdapter,
+} from "../../services/database/SiteRepository";
 import type { StandardizedCache } from "../cache/StandardizedCache";
 import type { MonitoringConfig, SiteWritingConfig } from "./interfaces";
 
+import {
+    createMonitorConfig,
+    type NormalizedMonitorConfig,
+} from "../../services/monitoring/createMonitorConfig";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteNotFoundError } from "./interfaces";
 import { deleteSiteWithAdapters } from "./siteDeletion";
@@ -40,6 +49,37 @@ export class SiteWriterService {
         monitor: MonitorRepository;
         site: SiteRepository;
     };
+
+    /**
+     * Execute a database transaction with site and monitor repository adapters.
+     *
+     * @remarks
+     * Centralizes transaction adapter creation so higher-level operations reuse
+     * identical wiring. This guarantees consistent adapter lifetimes and keeps
+     * transactional codepaths focused on domain behavior instead of setup
+     * boilerplate.
+     *
+     * @typeParam T - Result returned by the transactional operation.
+     *
+     * @param operation - Callback invoked with repository adapters scoped to
+     *   the active transaction.
+     *
+     * @returns Result from the provided operation.
+     */
+    private async withSiteMonitorTransaction<T>(
+        operation: (adapters: {
+            monitorTx: MonitorRepositoryTransactionAdapter;
+            siteTx: SiteRepositoryTransactionAdapter;
+        }) => Promise<T> | T
+    ): Promise<T> {
+        return this.databaseService.executeTransaction(async (db) => {
+            const siteTx = this.repositories.site.createTransactionAdapter(db);
+            const monitorTx =
+                this.repositories.monitor.createTransactionAdapter(db);
+
+            return operation({ monitorTx, siteTx });
+        });
+    }
 
     /**
      * Create a new site in the database with its monitors. Pure data operation
@@ -95,31 +135,34 @@ export class SiteWriterService {
                     `Creating new site in database: ${siteData.identifier}`
                 );
 
+                const normalizedMonitors = this.normalizeMonitorsForPersistence(
+                    siteData.monitors,
+                    {
+                        siteIdentifier: siteData.identifier,
+                    }
+                );
+
                 const site: Site = {
                     ...siteData,
+                    monitors: normalizedMonitors,
                 };
 
                 // Use executeTransaction for atomic multi-step operation
-                await this.databaseService.executeTransaction((db) => {
-                    const siteTx =
-                        this.repositories.site.createTransactionAdapter(db);
-                    const monitorTx =
-                        this.repositories.monitor.createTransactionAdapter(db);
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        siteTx.upsert(site);
 
-                    siteTx.upsert(site);
+                        monitorTx.deleteBySiteIdentifier(site.identifier);
 
-                    monitorTx.deleteBySiteIdentifier(site.identifier);
-
-                    for (const monitor of site.monitors) {
-                        const newId = monitorTx.create(
-                            site.identifier,
-                            monitor
-                        );
-                        monitor.id = newId;
+                        for (const monitor of site.monitors) {
+                            const newId = monitorTx.create(
+                                site.identifier,
+                                monitor
+                            );
+                            monitor.id = newId;
+                        }
                     }
-
-                    return Promise.resolve();
-                });
+                );
 
                 this.logger.info(
                     `Site created successfully in database: ${site.identifier} (${site.name || "unnamed"})`
@@ -183,23 +226,14 @@ export class SiteWriterService {
                 this.logger.info(`Removing site: ${identifier}`);
 
                 // Use executeTransaction for atomic multi-table deletion and capture result
-                const deletionResult =
-                    await this.databaseService.executeTransaction((db) => {
-                        const siteTx =
-                            this.repositories.site.createTransactionAdapter(db);
-                        const monitorTx =
-                            this.repositories.monitor.createTransactionAdapter(
-                                db
-                            );
-
-                        const result = deleteSiteWithAdapters({
+                const deletionResult = await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) =>
+                        deleteSiteWithAdapters({
                             identifier,
                             monitorAdapter: monitorTx,
                             siteAdapter: siteTx,
-                        });
-
-                        return Promise.resolve(result);
-                    });
+                        })
+                );
 
                 // Only remove from cache if database deletion was successful
                 let removed = false;
@@ -269,16 +303,12 @@ export class SiteWriterService {
 
         return withDatabaseOperation(
             async () => {
-                await this.databaseService.executeTransaction((db) => {
-                    const siteTx =
-                        this.repositories.site.createTransactionAdapter(db);
-                    const monitorTx =
-                        this.repositories.monitor.createTransactionAdapter(db);
-
-                    monitorTx.deleteAll();
-                    siteTx.deleteAll();
-                    return Promise.resolve();
-                });
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        monitorTx.deleteAll();
+                        siteTx.deleteAll();
+                    }
+                );
 
                 sitesCache.clear();
 
@@ -416,31 +446,33 @@ export class SiteWriterService {
                 const site = this.validateSiteExists(sitesCache, identifier);
 
                 // Create updated site object without updating cache yet
+                const normalizedMonitors = updates.monitors
+                    ? this.normalizeMonitorsForPersistence(updates.monitors, {
+                          existingMonitors: site.monitors,
+                          siteIdentifier: identifier,
+                      })
+                    : site.monitors;
+
                 const updatedSite: Site = {
                     ...site,
                     ...updates,
-                    monitors: updates.monitors ?? site.monitors,
+                    monitors: normalizedMonitors,
                 };
 
                 // Use executeTransaction for atomic multi-step operation
-                await this.databaseService.executeTransaction((db) => {
-                    const siteTx =
-                        this.repositories.site.createTransactionAdapter(db);
-                    const monitorTx =
-                        this.repositories.monitor.createTransactionAdapter(db);
+                await this.withSiteMonitorTransaction(
+                    ({ monitorTx, siteTx }) => {
+                        siteTx.upsert(updatedSite);
 
-                    siteTx.upsert(updatedSite);
-
-                    if (updates.monitors) {
-                        this.updateMonitorsPreservingHistory(
-                            monitorTx,
-                            identifier,
-                            updates.monitors
-                        );
+                        if (updates.monitors) {
+                            this.updateMonitorsPreservingHistory(
+                                monitorTx,
+                                identifier,
+                                normalizedMonitors
+                            );
+                        }
                     }
-
-                    return Promise.resolve();
-                });
+                );
 
                 // Update cache only after successful transaction
                 sitesCache.set(identifier, updatedSite);
@@ -550,6 +582,149 @@ export class SiteWriterService {
         }
 
         return updateData;
+    }
+
+    private normalizeMonitorsForPersistence(
+        monitors: Site["monitors"],
+        options: {
+            existingMonitors?: Site["monitors"];
+            siteIdentifier: string;
+        }
+    ): Site["monitors"] {
+        if (!Array.isArray(monitors) || monitors.length === 0) {
+            return [];
+        }
+
+        const existingMap = new Map<string, Monitor>(
+            (options.existingMonitors ?? [])
+                .filter((monitor): monitor is Monitor & { id: string } =>
+                    Boolean(monitor.id)
+                )
+                .map((monitor) => [monitor.id, monitor])
+        );
+
+        return monitors.map((monitor) =>
+            this.normalizeMonitorConfiguration(
+                monitor,
+                monitor.id ? existingMap.get(monitor.id) : undefined,
+                options.siteIdentifier
+            )
+        );
+    }
+
+    private normalizeMonitorConfiguration(
+        monitor: Monitor,
+        existingMonitor: Monitor | undefined,
+        siteIdentifier: string
+    ): Monitor {
+        const defaults: Partial<NormalizedMonitorConfig> = {};
+
+        if (
+            existingMonitor?.checkInterval !== undefined &&
+            Number.isFinite(existingMonitor.checkInterval)
+        ) {
+            defaults.checkInterval = existingMonitor.checkInterval;
+        }
+
+        if (
+            existingMonitor?.retryAttempts !== undefined &&
+            Number.isFinite(existingMonitor.retryAttempts)
+        ) {
+            defaults.retryAttempts = existingMonitor.retryAttempts;
+        }
+
+        if (
+            existingMonitor?.timeout !== undefined &&
+            Number.isFinite(existingMonitor.timeout)
+        ) {
+            defaults.timeout = existingMonitor.timeout;
+        }
+
+        const normalizedConfig = createMonitorConfig(monitor, defaults);
+
+        const normalizedMonitor: Monitor = {
+            ...monitor,
+            checkInterval: normalizedConfig.checkInterval,
+            retryAttempts: normalizedConfig.retryAttempts,
+            timeout: normalizedConfig.timeout,
+        };
+
+        this.logMonitorNormalization(
+            monitor,
+            normalizedMonitor,
+            siteIdentifier
+        );
+
+        return normalizedMonitor;
+    }
+
+    private logMonitorNormalization(
+        original: Monitor,
+        normalized: Monitor,
+        siteIdentifier: string
+    ): void {
+        const monitorId = original.id || "<new-monitor>";
+
+        const originalInterval = original.checkInterval;
+        if (originalInterval !== normalized.checkInterval) {
+            if (
+                typeof originalInterval !== "number" ||
+                !Number.isFinite(originalInterval) ||
+                originalInterval <= 0
+            ) {
+                this.logger.warn(
+                    "[SiteWriterService] Monitor missing valid checkInterval; defaulting to minimum",
+                    {
+                        monitorId,
+                        siteIdentifier,
+                    }
+                );
+            } else if (originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS) {
+                this.logger.warn(
+                    "[SiteWriterService] Monitor checkInterval below minimum; clamping to shared floor",
+                    {
+                        minimum: MIN_MONITOR_CHECK_INTERVAL_MS,
+                        monitorId,
+                        originalInterval,
+                        siteIdentifier,
+                    }
+                );
+            }
+        }
+
+        if (
+            normalized.retryAttempts !== original.retryAttempts &&
+            (typeof original.retryAttempts !== "number" ||
+                !Number.isFinite(original.retryAttempts) ||
+                original.retryAttempts < 0)
+        ) {
+            this.logger.warn(
+                "[SiteWriterService] Monitor retryAttempts invalid; defaulting to non-negative floor",
+                {
+                    monitorId,
+                    normalizedRetryAttempts: normalized.retryAttempts,
+                    originalRetryAttempts: original.retryAttempts,
+                    siteIdentifier,
+                }
+            );
+        }
+
+        if (
+            normalized.timeout !== original.timeout &&
+            (typeof original.timeout !== "number" ||
+                !Number.isFinite(original.timeout) ||
+                original.timeout <= 0)
+        ) {
+            this.logger.warn(
+                "[SiteWriterService] Monitor timeout invalid; defaulting to fallback",
+                {
+                    monitorId,
+                    normalizedTimeout: normalized.timeout,
+                    originalTimeout: original.timeout,
+                    siteIdentifier,
+                }
+            );
+        }
     }
 
     /**

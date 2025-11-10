@@ -20,23 +20,15 @@ import { logger } from "../../../utils/logger";
 import { withOperationalHooks } from "../../../utils/operationalHooks";
 import { createHttpClient } from "../utils/httpClient";
 import {
-    createMonitorConfig,
-    createMonitorErrorResult,
-} from "./monitorServiceHelpers";
+    deriveMonitorTiming,
+    ensureMonitorType,
+    type MonitorByType,
+} from "./monitorCoreHelpers";
+import { createMonitorErrorResult } from "./monitorServiceHelpers";
 
 /**
  * Narrowed monitor type helper keyed by monitor "type" literal.
  */
-type MonitorByType<TType extends Site["monitors"][number]["type"]> =
-    Site["monitors"][number] & { type: TType };
-
-function isMonitorOfType<TType extends Site["monitors"][number]["type"]>(
-    monitor: Site["monitors"][number],
-    type: TType
-): monitor is MonitorByType<TType> {
-    return monitor.type === type;
-}
-
 function createInvalidJsonError(url: string, error: unknown): Error {
     const normalized = ensureError(error);
     normalized.message = `Invalid JSON response from ${url}: ${normalized.message}`;
@@ -118,13 +110,11 @@ export function createRemoteMonitorService<
             monitor: Site["monitors"][0],
             signal?: AbortSignal
         ): Promise<MonitorCheckResult> {
-            if (!isMonitorOfType(monitor, behavior.type)) {
-                throw new Error(
-                    `${behavior.scope} cannot handle monitor type: ${monitor.type}`
-                );
-            }
-
-            const typedMonitor = monitor;
+            const typedMonitor = ensureMonitorType(
+                monitor,
+                behavior.type,
+                behavior.scope
+            );
             const configuration = behavior.resolveConfiguration(
                 typedMonitor,
                 this.config
@@ -134,11 +124,9 @@ export function createRemoteMonitorService<
                 return createMonitorErrorResult(configuration.message, 0);
             }
 
-            const { retryAttempts, timeout } = createMonitorConfig(
+            const { retryAttempts, timeout } = deriveMonitorTiming(
                 typedMonitor,
-                {
-                    timeout: this.config.timeout ?? DEFAULT_REQUEST_TIMEOUT,
-                }
+                this.config
             );
 
             const operationName = behavior.getOperationName(

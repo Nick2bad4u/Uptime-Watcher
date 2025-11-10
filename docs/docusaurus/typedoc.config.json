@@ -206,8 +206,8 @@
             "TypedEventBus.emitTyped": "#",
             "ValidationResult": "#",
             "VersionManager": "#",
-            "getMonitorRetryAttempts": "#",
-            "getMonitorTimeout": "#",
+            "createMonitorConfig": "#",
+            "extractMonitorConfig": "#",
             "getMonitorTypeConfig": "#",
             "hasValidHost": "#",
             "validateMonitorHost": "#"

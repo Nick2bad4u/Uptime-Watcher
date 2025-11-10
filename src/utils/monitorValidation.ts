@@ -100,6 +100,30 @@ export function createMonitorObject(
 }
 
 /**
+ * Executes a monitor validation helper with standardized error handling.
+ *
+ * @typeParam TResult - Result produced by the validation operation.
+ *
+ * @param description - Context string describing the operation for logging.
+ * @param fallback - Value returned when the validation operation fails.
+ * @param operation - Callback encapsulating the validation logic.
+ *
+ * @returns Result of the validation operation or the fallback when errors
+ *   occur.
+ */
+async function runMonitorValidationOperation<TResult>(
+    description: string,
+    fallback: TResult,
+    operation: () => Promise<TResult> | TResult
+): Promise<TResult> {
+    return withUtilityErrorHandling(
+        async () => operation(),
+        description,
+        fallback
+    );
+}
+
+/**
  * Validate monitor data using backend registry.
  *
  * @param type - Monitor type.
@@ -113,18 +137,17 @@ export async function validateMonitorData(
     type: MonitorType,
     data: Partial<MonitorFormData>
 ): Promise<ValidationResult> {
-    return withUtilityErrorHandling(
-        async () => {
-            // Use store method instead of direct IPC call
-            const store = useMonitorTypesStore.getState();
-            return store.validateMonitorData(type, data);
-        },
+    return runMonitorValidationOperation(
         "Monitor data validation",
         {
             errors: ["Validation failed - unable to connect to backend"],
             metadata: {},
             success: false,
             warnings: [],
+        },
+        async () => {
+            const store = useMonitorTypesStore.getState();
+            return store.validateMonitorData(type, data);
         }
     );
 }
@@ -144,22 +167,20 @@ export async function validateMonitorDataClientSide(
     type: MonitorType,
     data: Partial<MonitorFormData>
 ): Promise<ValidationResult> {
-    return withUtilityErrorHandling(
-        () => {
-            // Use shared validation directly on client-side
-            const result = sharedValidateMonitorData(type, data);
-
-            return Promise.resolve({
-                errors: result.errors,
-                success: result.success,
-                warnings: result.warnings ?? [],
-            });
-        },
+    return runMonitorValidationOperation(
         "Client-side monitor data validation",
         {
             errors: ["Client-side validation failed"],
             success: false,
             warnings: [],
+        },
+        () => {
+            const result = sharedValidateMonitorData(type, data);
+            return {
+                errors: result.errors,
+                success: result.success,
+                warnings: result.warnings ?? [],
+            };
         }
     );
 }
@@ -180,22 +201,26 @@ export async function validateMonitorFieldEnhanced(
     fieldName: string,
     value: unknown
 ): Promise<EnhancedValidationResult> {
-    return withUtilityErrorHandling(
+    return runMonitorValidationOperation(
+        "Enhanced field validation",
+        {
+            errors: [`Failed to validate field: ${fieldName}`],
+            fieldName,
+            success: false,
+            validationType: "field" as const,
+            warnings: [],
+        },
         async () => {
-            // Use the shared validation for consistent results
             const data: UnknownRecord = {
                 [fieldName]: value,
                 type,
             };
             const result = await validateMonitorData(type, data);
 
-            // Filter errors to include only field-specific ones
             const filteredErrors = result.errors.filter((error) =>
                 error.toLowerCase().includes(fieldName.toLowerCase())
             );
 
-            // If we had errors but filtering removed them all, and validation failed,
-            // return a field-specific error message
             const finalErrors =
                 result.errors.length > 0 &&
                 filteredErrors.length === 0 &&
@@ -213,14 +238,6 @@ export async function validateMonitorFieldEnhanced(
                         warning.toLowerCase().includes(fieldName.toLowerCase())
                     ) ?? [],
             };
-        },
-        "Enhanced field validation",
-        {
-            errors: [`Failed to validate field: ${fieldName}`],
-            fieldName,
-            success: false,
-            validationType: "field" as const,
-            warnings: [],
         }
     );
 }
@@ -241,18 +258,17 @@ export async function validateMonitorField(
     fieldName: string,
     value: unknown
 ): Promise<readonly string[]> {
-    return withUtilityErrorHandling(
+    return runMonitorValidationOperation(
+        "Field validation",
+        [`Failed to validate field: ${fieldName}`],
         async () => {
-            // Use the enhanced validation for better error handling
             const result = await validateMonitorFieldEnhanced(
                 type,
                 fieldName,
                 value
             );
             return result.errors;
-        },
-        "Field validation",
-        [`Failed to validate field: ${fieldName}`]
+        }
     );
 }
 
@@ -273,24 +289,22 @@ export async function validateMonitorFieldClientSide(
     fieldName: string,
     value: unknown
 ): Promise<ValidationResult> {
-    return withUtilityErrorHandling(
-        () => {
-            // Use shared field validation for immediate feedback
-            const result = sharedValidateMonitorField(type, fieldName, value);
-
-            return Promise.resolve({
-                errors: result.errors,
-                metadata: result.metadata ?? {},
-                success: result.success,
-                warnings: result.warnings ?? [],
-            });
-        },
+    return runMonitorValidationOperation(
         `Client-side field validation for ${fieldName}`,
         {
             errors: [`Failed to validate ${fieldName} on client-side`],
             metadata: {},
             success: false,
             warnings: [],
+        },
+        () => {
+            const result = sharedValidateMonitorField(type, fieldName, value);
+            return {
+                errors: result.errors,
+                metadata: result.metadata ?? {},
+                success: result.success,
+                warnings: result.warnings ?? [],
+            };
         }
     );
 }
@@ -837,21 +851,20 @@ export async function validateMonitorFormData(
     type: MonitorType,
     data: Partial<MonitorFormData>
 ): Promise<ValidationResult> {
-    return withUtilityErrorHandling(
-        () => {
-            const errors = validateMonitorFormDataByType(type, data);
-
-            return Promise.resolve({
-                errors,
-                success: errors.length === 0,
-                warnings: [],
-            });
-        },
+    return runMonitorValidationOperation(
         "Form data validation",
         {
             errors: ["Form validation failed"],
             success: false,
             warnings: [],
+        },
+        () => {
+            const errors = validateMonitorFormDataByType(type, data);
+            return {
+                errors,
+                success: errors.length === 0,
+                warnings: [],
+            };
         }
     );
 }

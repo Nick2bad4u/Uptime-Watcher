@@ -246,6 +246,23 @@ export function createSuccessResponse<T>(
     return response;
 }
 
+function createResponseFromExecution<T>(
+    channelName: string,
+    execution: HandlerExecutionResult<T>
+): IpcResponse<T> {
+    if (execution.outcome === "success") {
+        return createSuccessResponse(execution.value, {
+            duration: execution.duration,
+            handler: channelName,
+        });
+    }
+
+    return createErrorResponse<T>(execution.errorMessage, {
+        duration: execution.duration,
+        handler: channelName,
+    });
+}
+
 /**
  * Creates a standardized validation response for backward compatibility.
  *
@@ -302,18 +319,7 @@ export async function withIpcHandler<T>(
     handler: () => Promise<T> | T
 ): Promise<IpcResponse<T>> {
     const execution = await executeIpcHandler(channelName, handler);
-
-    if (execution.outcome === "success") {
-        return createSuccessResponse(execution.value, {
-            duration: execution.duration,
-            handler: channelName,
-        });
-    }
-
-    return createErrorResponse<T>(execution.errorMessage, {
-        duration: execution.duration,
-        handler: channelName,
-    });
+    return createResponseFromExecution(channelName, execution);
 }
 
 /**
@@ -368,18 +374,7 @@ export async function withIpcHandlerValidation<T>(
         () => handler(...params),
         { paramCount: params.length }
     );
-
-    if (execution.outcome === "success") {
-        return createSuccessResponse(execution.value, {
-            duration: execution.duration,
-            handler: channelName,
-        });
-    }
-
-    return createErrorResponse<T>(execution.errorMessage, {
-        duration: execution.duration,
-        handler: channelName,
-    });
+    return createResponseFromExecution(channelName, execution);
 }
 
 /**

@@ -709,6 +709,7 @@
     "@secretlint/secretlint-rule-pattern": "^11.2.5",
     "@secretlint/secretlint-rule-preset-recommend": "^11.2.5",
     "@secretlint/secretlint-rule-secp256k1-privatekey": "^11.2.5",
+    "@snyk/protect": "^1.1300.2",
     "@storybook/addon-a11y": "^10.0.6",
     "@storybook/addon-coverage": "^2.0.0",
     "@storybook/addon-designs": "^11.0.1",

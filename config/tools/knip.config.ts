@@ -83,6 +83,7 @@ const knipConfig: KnipConfig = {
         "@microsoft/eslint-formatter-sarif",
         "@microsoft/tsdoc-config",
         "@modelcontextprotocol/server-sequential-thinking",
+        "@snyk/protect",
         "@putout/eslint",
         "@putout/eslint-flat",
         "@secretlint/secretlint-rule-no-dotenv",

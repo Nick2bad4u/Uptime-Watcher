@@ -27,8 +27,7 @@ vi.mock("../../../../../shared/validation/validatorUtils", () => ({
 
 // Import after mocks are set up
 import {
-    getMonitorRetryAttempts,
-    getMonitorTimeout,
+    extractMonitorConfig,
     hasValidHost,
     hasValidPort,
     hasValidRetryAttempts,
@@ -41,6 +40,7 @@ import {
     isValidFQDN,
     isValidUrl,
 } from "@shared/validation/validatorUtils";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
 
 describe("Monitor Type Guards", () => {
     beforeEach(() => {
@@ -71,285 +71,152 @@ describe("Monitor Type Guards", () => {
         ...overrides,
     });
 
-    describe(getMonitorRetryAttempts, () => {
-        it("should return monitor's retry attempts when valid", async ({
+    describe(extractMonitorConfig, () => {
+        it("should return monitor overrides when valid", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitor = createTestMonitor({ retryAttempts: 5 });
-
-            const result = getMonitorRetryAttempts(monitor, 3);
-
-            expect(result).toBe(5);
-        });
-
-        it("should return default retry attempts when monitor doesn't have them", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitor = createTestMonitor(); // no retryAttempts property
-
-            const result = getMonitorRetryAttempts(monitor, 3);
-
-            expect(result).toBe(3);
-        });
-
-        it("should return default retry attempts when monitor has invalid retry attempts", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
-
-            const monitor = createTestMonitor({ retryAttempts: -1 });
-
-            const result = getMonitorRetryAttempts(monitor, 3);
-
-            expect(result).toBe(3);
-        });
-
-        it("should return default retry attempts when retryAttempts is not a number", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Normalization", "type");
 
             const monitor = createTestMonitor({
-                retryAttempts: "invalid" as any,
+                checkInterval: 90_000,
+                retryAttempts: 7,
+                timeout: 12_000,
             });
 
-            const result = getMonitorRetryAttempts(monitor, 2);
+            const result = extractMonitorConfig(monitor, {
+                checkInterval: 30_000,
+                retryAttempts: 2,
+                timeout: 5000,
+            });
 
-            expect(result).toBe(2);
+            expect(result).toEqual({
+                checkInterval: 90_000,
+                retryAttempts: 7,
+                timeout: 12_000,
+            });
         });
 
-        it("should handle zero retry attempts correctly", async ({
+        it("should apply defaults and clamp invalid monitor values", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ retryAttempts: 0 });
-
-            const result = getMonitorRetryAttempts(monitor, 3);
-
-            expect(result).toBe(0);
-        });
-
-        it("should handle large retry attempts correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ retryAttempts: 100 });
-
-            const result = getMonitorRetryAttempts(monitor, 3);
-
-            expect(result).toBe(100);
-        });
-
-        it("should handle undefined retryAttempts property", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Normalization", "type");
 
             const monitor = createTestMonitor({
-                retryAttempts: undefined as any,
+                checkInterval: 0,
+                retryAttempts: -3,
+                timeout: -100,
             });
 
-            const result = getMonitorRetryAttempts(monitor, 5);
+            const result = extractMonitorConfig(monitor, {
+                checkInterval: 45_000,
+                retryAttempts: 5,
+                timeout: 8000,
+            });
 
-            expect(result).toBe(5);
+            expect(result).toEqual({
+                checkInterval: 45_000,
+                retryAttempts: 5,
+                timeout: 8000,
+            });
         });
 
-        it("should handle null retryAttempts property", async ({
+        it("should coerce string inputs and enforce minimum interval", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
+            await annotate("Type: Normalization", "type");
 
-            const monitor = createTestMonitor({ retryAttempts: null as any });
+            const monitor = createTestMonitor({
+                checkInterval: "2000" as any,
+                retryAttempts: "6" as any,
+                timeout: "7500" as any,
+            });
 
-            const result = getMonitorRetryAttempts(monitor, 4);
+            const result = extractMonitorConfig(monitor, {});
 
-            expect(result).toBe(4);
+            expect(result.checkInterval).toBe(MIN_MONITOR_CHECK_INTERVAL_MS);
+            expect(result.retryAttempts).toBe(6);
+            expect(result.timeout).toBe(7500);
         });
-    });
 
-    describe(getMonitorTimeout, () => {
-        it("should return monitor's timeout when valid", async ({
+        it("should preserve zero retry attempts and minimal positive timeout", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+            await annotate("Type: Normalization", "type");
 
-            const monitor = createTestMonitor({ timeout: 5000 });
+            const monitor = createTestMonitor({
+                retryAttempts: 0,
+                timeout: 1,
+            });
 
-            const result = getMonitorTimeout(monitor, 3000);
+            const result = extractMonitorConfig(monitor, {
+                retryAttempts: 5,
+                timeout: 4000,
+            });
 
-            expect(result).toBe(5000);
+            expect(result.retryAttempts).toBe(0);
+            expect(result.timeout).toBe(1);
         });
 
-        it("should return default timeout when monitor doesn't have one", async ({
+        it("should fall back to defaults when monitor values are missing or null", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+            await annotate("Type: Normalization", "type");
 
-            // Create a monitor without a timeout property
-            const { timeout, ...monitorWithoutTimeout } = createTestMonitor();
-            const monitor = monitorWithoutTimeout as Site["monitors"][0];
+            const monitor = createTestMonitor({
+                checkInterval: undefined as any,
+                retryAttempts: null as any,
+                timeout: undefined as any,
+            });
 
-            const result = getMonitorTimeout(monitor, 3000);
+            const result = extractMonitorConfig(monitor, {
+                checkInterval: 120_000,
+                retryAttempts: 4,
+                timeout: 9000,
+            });
 
-            expect(result).toBe(3000);
+            expect(result.checkInterval).toBe(120_000);
+            expect(result.retryAttempts).toBe(4);
+            expect(result.timeout).toBe(9000);
         });
 
-        it("should return default timeout when monitor has invalid timeout", async ({
+        it("should truncate fractional numeric inputs", async ({
             task,
             annotate,
         }) => {
             await annotate(`Testing: ${task.name}`, "functional");
             await annotate("Component: monitorTypeGuards", "component");
             await annotate("Category: Service", "category");
-            await annotate("Type: Monitoring", "type");
+            await annotate("Type: Normalization", "type");
 
-            const monitor = createTestMonitor({ timeout: 0 });
+            const monitor = createTestMonitor({
+                retryAttempts: 2.9,
+                timeout: 1450.75,
+            });
 
-            const result = getMonitorTimeout(monitor, 3000);
+            const result = extractMonitorConfig(monitor, {});
 
-            expect(result).toBe(3000);
-        });
-
-        it("should return default timeout when timeout is negative", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: -1000 });
-
-            const result = getMonitorTimeout(monitor, 3000);
-
-            expect(result).toBe(3000);
-        });
-
-        it("should return default timeout when timeout is not a number", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: "invalid" as any });
-
-            const result = getMonitorTimeout(monitor, 2000);
-
-            expect(result).toBe(2000);
-        });
-
-        it("should handle very small positive timeout correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: 1 });
-
-            const result = getMonitorTimeout(monitor, 3000);
-
-            expect(result).toBe(1);
-        });
-
-        it("should handle large timeout values correctly", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: 60_000 });
-
-            const result = getMonitorTimeout(monitor, 3000);
-
-            expect(result).toBe(60_000);
-        });
-
-        it("should handle undefined timeout property", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: undefined as any });
-
-            const result = getMonitorTimeout(monitor, 5000);
-
-            expect(result).toBe(5000);
-        });
-
-        it("should handle null timeout property", async ({
-            task,
-            annotate,
-        }) => {
-            await annotate(`Testing: ${task.name}`, "functional");
-            await annotate("Component: monitorTypeGuards", "component");
-            await annotate("Category: Service", "category");
-            await annotate("Type: Business Logic", "type");
-
-            const monitor = createTestMonitor({ timeout: null as any });
-
-            const result = getMonitorTimeout(monitor, 4000);
-
-            expect(result).toBe(4000);
+            expect(result.retryAttempts).toBe(2);
+            expect(result.timeout).toBe(1450);
         });
     });
 

@@ -40,6 +40,7 @@
 
 import type { MonitorType } from "@shared/types";
 
+import { convertError } from "@shared/utils/errorHandling";
 import { useEffect, useMemo, useState } from "react";
 
 import { logger } from "../services/logger";
@@ -112,16 +113,15 @@ export function useDynamicHelpText(
                         return;
                     }
 
-                    logger.warn(
-                        "Failed to load help texts",
-                        caughtError instanceof Error
-                            ? caughtError
-                            : new Error(String(caughtError))
-                    );
+                    const { error: normalizedError, wasError } =
+                        convertError(caughtError);
+                    const trimmedMessage = normalizedError.message.trim();
+
+                    logger.warn("Failed to load help texts", normalizedError);
 
                     const errorMessage =
-                        caughtError instanceof Error
-                            ? caughtError.message
+                        wasError && trimmedMessage.length > 0
+                            ? normalizedError.message
                             : "Help text unavailable";
                     setError(errorMessage);
                     setHelpTexts({

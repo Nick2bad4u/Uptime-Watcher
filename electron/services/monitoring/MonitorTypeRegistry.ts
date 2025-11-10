@@ -314,8 +314,71 @@ export function registerMonitorType(config: BaseMonitorConfig): void {
     monitorTypes.set(config.type, config);
 }
 
+type HttpMonitorUiOverrides = Partial<
+    NonNullable<BaseMonitorConfig["uiConfig"]>
+>;
+
+function createUrlSuffixResolver(type: string): (monitor: Monitor) => string {
+    return (monitor: Monitor) => {
+        const hasMatchingType = monitor.type === type;
+        const urlValue = monitor.url;
+
+        if (!hasMatchingType || typeof urlValue !== "string") {
+            return "";
+        }
+
+        return urlValue.length > 0 ? ` (${urlValue})` : "";
+    };
+}
+
+function createHttpMonitorUiConfig(
+    type: string,
+    overrides: HttpMonitorUiOverrides = {}
+): NonNullable<BaseMonitorConfig["uiConfig"]> {
+    const {
+        detailFormats,
+        display,
+        formatDetail,
+        formatTitleSuffix,
+        helpTexts,
+        supportsAdvancedAnalytics,
+        supportsResponseTime,
+    } = overrides;
+
+    return {
+        ...(detailFormats ? { detailFormats } : {}),
+        display: {
+            showAdvancedMetrics: true,
+            showUrl: true,
+            ...display,
+        },
+        ...(formatDetail ? { formatDetail } : {}),
+        formatTitleSuffix: formatTitleSuffix ?? createUrlSuffixResolver(type),
+        ...(helpTexts ? { helpTexts } : {}),
+        ...(supportsAdvancedAnalytics === undefined
+            ? {}
+            : { supportsAdvancedAnalytics }),
+        ...(supportsResponseTime === undefined ? {} : { supportsResponseTime }),
+    };
+}
+
+interface HttpMonitorRegistration extends Omit<BaseMonitorConfig, "uiConfig"> {
+    readonly uiOverrides?: HttpMonitorUiOverrides;
+}
+
+function registerHttpMonitorDefinition(
+    definition: HttpMonitorRegistration
+): void {
+    const { uiOverrides, ...rest } = definition;
+
+    registerMonitorType({
+        ...rest,
+        uiConfig: createHttpMonitorUiConfig(definition.type, uiOverrides),
+    });
+}
+
 // Register existing monitor types with their field definitions and schemas
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Monitors HTTP/HTTPS endpoints for availability and response time",
     displayName: "HTTP (Website/API)",
@@ -331,22 +394,12 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpMonitor(),
     type: "http",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             analyticsLabel: "HTTP Response Time",
             historyDetail: (details: string) => `Response Code: ${details}`,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => `Response Code: ${details}`,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "http") {
-                return monitor.url ? ` (${monitor.url})` : "";
-            }
-            return "";
-        },
         helpTexts: {
             primary: "Enter the full URL including http:// or https://",
             secondary:
@@ -359,7 +412,7 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Validates that an HTTP/HTTPS response includes a specific header value.",
     displayName: "HTTP Header Match",
@@ -393,17 +446,11 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpHeaderMonitor(),
     type: "http-header",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             historyDetail: (details: string) => details,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => details,
-        formatTitleSuffix: (monitor: Monitor) =>
-            monitor.url ? ` (${monitor.url})` : "",
         helpTexts: {
             primary:
                 "Provide the response header name and expected value to monitor.",
@@ -417,7 +464,7 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Monitors HTTP/HTTPS endpoints and ensures the response body contains a required keyword.",
     displayName: "HTTP Keyword Match",
@@ -442,22 +489,12 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpKeywordMonitor(),
     type: "http-keyword",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             analyticsLabel: "HTTP Keyword Response Time",
             historyDetail: (details: string) => `Keyword Check: ${details}`,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => details,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "http-keyword") {
-                return monitor.url ? ` (${monitor.url})` : "";
-            }
-            return "";
-        },
         helpTexts: {
             primary: "Enter the keyword to look for in the response body",
             secondary:
@@ -471,7 +508,7 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Validates JSON responses from HTTP/HTTPS endpoints by comparing values at specific paths.",
     displayName: "HTTP JSON Match",
@@ -505,17 +542,11 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpJsonMonitor(),
     type: "http-json",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             historyDetail: (details: string) => details,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => details,
-        formatTitleSuffix: (monitor: Monitor) =>
-            monitor.url ? ` (${monitor.url})` : "",
         helpTexts: {
             primary:
                 "Provide the JSON path and expected value to validate in the response body.",
@@ -529,7 +560,7 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Monitors HTTP/HTTPS endpoints and verifies the response status code matches the expected value.",
     displayName: "HTTP Status Code",
@@ -555,22 +586,12 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpStatusMonitor(),
     type: "http-status",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             analyticsLabel: "HTTP Status Response Time",
             historyDetail: (details: string) => `Status Check: ${details}`,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => details,
-        formatTitleSuffix: (monitor: Monitor) => {
-            if (monitor.type === "http-status") {
-                return monitor.url ? ` (${monitor.url})` : "";
-            }
-            return "";
-        },
         helpTexts: {
             primary: "Enter the expected HTTP status code for this endpoint",
             secondary:
@@ -584,7 +605,7 @@ registerMonitorType({
     version: "1.0.0",
 });
 
-registerMonitorType({
+registerHttpMonitorDefinition({
     description:
         "Tracks HTTP/HTTPS response times and warns when latency exceeds a configurable threshold.",
     displayName: "HTTP Latency Threshold",
@@ -609,17 +630,11 @@ registerMonitorType({
     ],
     serviceFactory: () => new HttpLatencyMonitor(),
     type: "http-latency",
-    uiConfig: {
+    uiOverrides: {
         detailFormats: {
             historyDetail: (details: string) => details,
         },
-        display: {
-            showAdvancedMetrics: true,
-            showUrl: true,
-        },
         formatDetail: (details: string) => details,
-        formatTitleSuffix: (monitor: Monitor) =>
-            monitor.url ? ` (${monitor.url})` : "",
         helpTexts: {
             primary:
                 "Set the response time threshold that should trigger a degraded status.",

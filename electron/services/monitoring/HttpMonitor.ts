@@ -5,8 +5,6 @@
 
 /* eslint-disable ex/no-unhandled -- Monitor factory construction is deterministic and safe */
 
-import type { Monitor } from "@shared/types";
-
 import type { MonitorConfig } from "./types";
 
 import {
@@ -17,14 +15,7 @@ import {
 import { buildMonitorFactory } from "./shared/monitorFactoryUtils";
 import { determineMonitorStatus } from "./utils/httpStatusUtils";
 
-/**
- * Runtime configuration contract for basic HTTP monitor instances.
- *
- * @internal
- */
-type HttpMonitorConfig = Monitor & { type: "http" };
-
-const behavior: HttpMonitorBehavior<"http", HttpMonitorConfig, undefined> = {
+const behavior: HttpMonitorBehavior<"http", undefined> = {
     evaluateResponse: ({ response, responseTime }) => {
         const status = determineMonitorStatus(response.status);
 
@@ -47,10 +38,7 @@ const behavior: HttpMonitorBehavior<"http", HttpMonitorConfig, undefined> = {
 const HttpMonitorBase: new (
     config?: MonitorConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
-    () =>
-        createHttpMonitorService<"http", HttpMonitorConfig, undefined>(
-            behavior
-        ),
+    () => createHttpMonitorService<"http", undefined>(behavior),
     "HttpMonitor"
 );
 

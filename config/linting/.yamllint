@@ -133,9 +133,8 @@ rules:
     # File ending requirements
     new-line-at-end-of-file: enable
 
-    # New lines configuration
-    new-lines:
-        type: platform
+    # New lines configuration (allow platform defaults)
+    new-lines: disable
 
     # Disable truthy for flexibility with CI/CD configs
     truthy: disable

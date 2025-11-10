@@ -59,6 +59,51 @@ export function formatDuration(ms: number): string {
     return `${seconds}s`;
 }
 
+interface DurationUnitDefinition {
+    readonly divisor: number;
+    readonly suffix: string;
+    readonly threshold: number;
+}
+
+function formatRoundedDuration(
+    milliseconds: number,
+    units: readonly DurationUnitDefinition[]
+): string {
+    const fallbackUnit = units.at(-1);
+
+    if (!fallbackUnit) {
+        throw new Error(
+            "formatRoundedDuration requires at least one unit definition"
+        );
+    }
+
+    for (const { divisor, suffix, threshold } of units) {
+        if (milliseconds < threshold) {
+            return `${Math.round(milliseconds / divisor)}${suffix}`;
+        }
+    }
+
+    return `${Math.round(milliseconds / fallbackUnit.divisor)}${fallbackUnit.suffix}`;
+}
+
+const SHORT_DURATION_UNITS: readonly DurationUnitDefinition[] = [
+    {
+        divisor: 1000,
+        suffix: "s",
+        threshold: 60_000,
+    },
+    {
+        divisor: 60_000,
+        suffix: "m",
+        threshold: 3_600_000,
+    },
+    {
+        divisor: 3_600_000,
+        suffix: "h",
+        threshold: Number.POSITIVE_INFINITY,
+    },
+] as const satisfies readonly DurationUnitDefinition[];
+
 /**
  * Formats timestamp as a full localized date/time string.
  *
@@ -106,13 +151,7 @@ export function formatFullTimestamp(timestamp: number): string {
  * @public
  */
 export function formatIntervalDuration(milliseconds: number): string {
-    if (milliseconds < 60_000) {
-        return `${Math.round(milliseconds / 1000)}s`;
-    }
-    if (milliseconds < 3_600_000) {
-        return `${Math.round(milliseconds / 60_000)}m`;
-    }
-    return `${Math.round(milliseconds / 3_600_000)}h`;
+    return formatRoundedDuration(milliseconds, SHORT_DURATION_UNITS);
 }
 
 /**
@@ -181,13 +220,7 @@ export function formatResponseDuration(milliseconds: number): string {
     if (milliseconds < 1000) {
         return `${milliseconds}ms`;
     }
-    if (milliseconds < 60_000) {
-        return `${Math.round(milliseconds / 1000)}s`;
-    }
-    if (milliseconds < 3_600_000) {
-        return `${Math.round(milliseconds / 60_000)}m`;
-    }
-    return `${Math.round(milliseconds / 3_600_000)}h`;
+    return formatRoundedDuration(milliseconds, SHORT_DURATION_UNITS);
 }
 
 /**

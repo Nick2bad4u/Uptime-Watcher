@@ -23,62 +23,57 @@ import { createMonitorErrorResult } from "./shared/monitorServiceHelpers";
  */
 type HttpStatusMonitorConfig = Monitor & { type: "http-status" };
 
-const behavior: HttpMonitorBehavior<
-    "http-status",
-    HttpStatusMonitorConfig,
-    { expectedStatus: number }
-> = {
-    evaluateResponse: ({ context, response, responseTime }) => {
-        if (response.status === context.expectedStatus) {
+const behavior: HttpMonitorBehavior<"http-status", { expectedStatus: number }> =
+    {
+        evaluateResponse: ({ context, response, responseTime }) => {
+            if (response.status === context.expectedStatus) {
+                return {
+                    details: `HTTP ${response.status}`,
+                    responseTime,
+                    status: "up",
+                };
+            }
+
             return {
-                details: `HTTP ${response.status}`,
+                details: `Expected ${context.expectedStatus}, received ${response.status}`,
                 responseTime,
-                status: "up",
+                status: "degraded",
             };
-        }
+        },
+        operationLabel: "HTTP status check",
+        scope: "HttpStatusMonitor",
+        type: "http-status",
+        validateMonitorSpecifics: (monitor: HttpStatusMonitorConfig) => {
+            const expectedStatus = Number(monitor.expectedStatusCode);
 
-        return {
-            details: `Expected ${context.expectedStatus}, received ${response.status}`,
-            responseTime,
-            status: "degraded",
-        };
-    },
-    operationLabel: "HTTP status check",
-    scope: "HttpStatusMonitor",
-    type: "http-status",
-    validateMonitorSpecifics: (monitor: HttpStatusMonitorConfig) => {
-        const expectedStatus = Number(monitor.expectedStatusCode);
+            if (
+                !Number.isInteger(expectedStatus) ||
+                expectedStatus < 100 ||
+                expectedStatus > 599
+            ) {
+                return {
+                    kind: "error",
+                    result: createMonitorErrorResult(
+                        "Monitor missing or invalid expected status code",
+                        0
+                    ),
+                };
+            }
 
-        if (
-            !Number.isInteger(expectedStatus) ||
-            expectedStatus < 100 ||
-            expectedStatus > 599
-        ) {
             return {
-                kind: "error",
-                result: createMonitorErrorResult(
-                    "Monitor missing or invalid expected status code",
-                    0
-                ),
+                context: { expectedStatus },
+                kind: "context",
             };
-        }
-
-        return {
-            context: { expectedStatus },
-            kind: "context",
-        };
-    },
-};
+        },
+    };
 
 const HttpStatusMonitorBase: new (
     config?: MonitorConfig
 ) => HttpMonitorServiceInstance = buildMonitorFactory(
     () =>
-        createHttpMonitorService<
-            "http-status",
-            HttpStatusMonitorConfig,
-            { expectedStatus: number }
-        >(behavior),
+        createHttpMonitorService<"http-status", { expectedStatus: number }>(
+            behavior
+        ),
     "HttpStatusMonitor"
 );
 

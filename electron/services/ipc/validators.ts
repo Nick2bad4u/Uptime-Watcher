@@ -87,17 +87,39 @@ interface SystemHandlerValidatorsInterface {
     verifyIpcHandler: IpcParameterValidator;
 }
 
-/**
- * Helper function to create validators for handlers expecting no parameters.
- *
- * @returns A validator function that ensures no parameters are passed
- */
-function validateNoParams(params: unknown[]): null | string[] {
-    return params.length === 0 ? null : ["No parameters expected"];
+type ParameterValueValidator = (value: unknown) => null | string;
+
+function createParamValidator(
+    expectedCount: number,
+    validators: readonly ParameterValueValidator[] = []
+): IpcParameterValidator {
+    let countMessage = "No parameters expected";
+
+    if (expectedCount !== 0) {
+        const suffix = expectedCount === 1 ? "" : "s";
+        countMessage = `Expected exactly ${expectedCount} parameter${suffix}`;
+    }
+
+    return (params: unknown[]): null | string[] => {
+        const errors: string[] = [];
+
+        if (params.length !== expectedCount) {
+            errors.push(countMessage);
+        }
+
+        validators.forEach((validate, index) => {
+            const error = validate(params[index]);
+            if (error) {
+                errors.push(error);
+            }
+        });
+
+        return errors.length > 0 ? errors : null;
+    };
 }
 
 function createNoParamsValidator(): IpcParameterValidator {
-    return validateNoParams;
+    return createParamValidator(0);
 }
 
 /**
@@ -108,20 +130,13 @@ function createNoParamsValidator(): IpcParameterValidator {
  * @returns A validator function that validates a single number parameter
  */
 function createSingleNumberValidator(paramName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
-
-        const error = IpcValidators.requiredNumber(params[0], paramName);
-        if (error) {
-            errors.push(error);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(1, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredNumber(value, paramName),
+    ]);
 }
 
 /**
@@ -132,20 +147,13 @@ function createSingleNumberValidator(paramName: string): IpcParameterValidator {
  * @returns A validator function that validates a single object parameter
  */
 function createSingleObjectValidator(paramName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
-
-        const error = IpcValidators.requiredObject(params[0], paramName);
-        if (error) {
-            errors.push(error);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(1, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredObject(value, paramName),
+    ]);
 }
 
 function validatePreloadGuardReport(params: unknown[]): null | string[] {
@@ -230,20 +238,13 @@ function createPreloadGuardReportValidator(): IpcParameterValidator {
  * @returns A validator function that validates a single string parameter
  */
 function createSingleStringValidator(paramName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
-
-        const error = IpcValidators.requiredString(params[0], paramName);
-        if (error) {
-            errors.push(error);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(1, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, paramName),
+    ]);
 }
 
 /**
@@ -255,20 +256,13 @@ function createSingleStringValidator(paramName: string): IpcParameterValidator {
  * @returns A validator function that validates a single URL parameter
  */
 function createSingleUrlValidator(paramName: string): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 1) {
-            errors.push("Expected exactly 1 parameter");
-        }
-
-        const error = IpcValidators.requiredUrl(params[0], paramName);
-        if (error) {
-            errors.push(error);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(1, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredUrl(value, paramName),
+    ]);
 }
 
 /**
@@ -283,31 +277,18 @@ function createStringObjectValidator(
     stringParamName: string,
     objectParamName: string
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 2) {
-            errors.push("Expected exactly 2 parameters");
-        }
-
-        const stringError = IpcValidators.requiredString(
-            params[0],
-            stringParamName
-        );
-        if (stringError) {
-            errors.push(stringError);
-        }
-
-        const objectError = IpcValidators.requiredObject(
-            params[1],
-            objectParamName
-        );
-        if (objectError) {
-            errors.push(objectError);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(2, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, stringParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredObject(value, objectParamName),
+    ]);
 }
 
 /**
@@ -321,25 +302,14 @@ function createStringObjectValidator(
 function createStringWithUnvalidatedSecondValidator(
     firstParamName: string
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 2) {
-            errors.push("Expected exactly 2 parameters");
-        }
-
-        const firstError = IpcValidators.requiredString(
-            params[0],
-            firstParamName
-        );
-        if (firstError) {
-            errors.push(firstError);
-        }
-
-        // Second parameter intentionally not validated (can be any type)
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(2, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, firstParamName),
+        (): null => null,
+    ]);
 }
 
 /**
@@ -355,31 +325,18 @@ function createTwoStringValidator(
     firstParamName: string,
     secondParamName: string
 ): IpcParameterValidator {
-    return (params: unknown[]): null | string[] => {
-        const errors: string[] = [];
-
-        if (params.length !== 2) {
-            errors.push("Expected exactly 2 parameters");
-        }
-
-        const firstError = IpcValidators.requiredString(
-            params[0],
-            firstParamName
-        );
-        if (firstError) {
-            errors.push(firstError);
-        }
-
-        const secondError = IpcValidators.requiredString(
-            params[1],
-            secondParamName
-        );
-        if (secondError) {
-            errors.push(secondError);
-        }
-
-        return errors.length > 0 ? errors : null;
-    };
+    return createParamValidator(2, [
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, firstParamName),
+        (
+            value
+        ):
+            | null
+            | string => IpcValidators.requiredString(value, secondParamName),
+    ]);
 }
 
 /**

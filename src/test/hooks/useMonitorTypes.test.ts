@@ -735,7 +735,12 @@ describe("useMonitorTypes Hook", () => {
             });
 
             // Hook transforms error into a contextual string message
-            const expectedMessage = `Monitor types loading failed: ${testError.message}. Using fallback options.`;
+            const trimmedMessage = testError.message.trim();
+            const fallbackMessage =
+                trimmedMessage.length > 0
+                    ? trimmedMessage
+                    : "Failed to load monitor types";
+            const expectedMessage = `Monitor types loading failed: ${fallbackMessage}. Using fallback options.`;
             expect(result.current.error).toBe(expectedMessage);
             expect(result.current.options).toEqual(
                 FALLBACK_MONITOR_TYPE_OPTIONS

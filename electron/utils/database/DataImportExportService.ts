@@ -24,10 +24,20 @@ import type {
     HistoryRepository,
     HistoryRepositoryTransactionAdapter,
 } from "../../services/database/HistoryRepository";
-import type { MonitorRepository } from "../../services/database/MonitorRepository";
-import type { SettingsRepository } from "../../services/database/SettingsRepository";
-import type { SiteRepository } from "../../services/database/SiteRepository";
+import type {
+    MonitorRepository,
+    MonitorRepositoryTransactionAdapter,
+} from "../../services/database/MonitorRepository";
+import type {
+    SettingsRepository,
+    SettingsRepositoryTransactionAdapter,
+} from "../../services/database/SettingsRepository";
+import type {
+    SiteRepository,
+    SiteRepositoryTransactionAdapter,
+} from "../../services/database/SiteRepository";
 
+import { createMonitorConfig } from "../../services/monitoring/createMonitorConfig";
 import { withDatabaseOperation } from "../operationalHooks";
 import { SiteLoadingError } from "./interfaces";
 
@@ -175,50 +185,43 @@ export class DataImportExportService {
         return withDatabaseOperation(
             async () => {
                 // Use executeTransaction for atomic multi-table operation
-                await this.databaseService.executeTransaction(async (db) => {
-                    const siteTransactionAdapter =
-                        this.repositories.site.createTransactionAdapter(db);
-                    const monitorTransactionAdapter =
-                        this.repositories.monitor.createTransactionAdapter(db);
-                    const historyTransactionAdapter =
-                        this.repositories.history.createTransactionAdapter(db);
-                    const settingsTransactionAdapter =
-                        this.repositories.settings.createTransactionAdapter(db);
+                await this.withImportTransactionAdapters(
+                    async ({ historyTx, monitorTx, settingsTx, siteTx }) => {
+                        siteTx.deleteAll();
+                        settingsTx.deleteAll();
+                        monitorTx.deleteAll();
+                        historyTx.deleteAll();
 
-                    siteTransactionAdapter.deleteAll();
-                    settingsTransactionAdapter.deleteAll();
-                    monitorTransactionAdapter.deleteAll();
-                    historyTransactionAdapter.deleteAll();
+                        // Import sites using bulk insert
+                        const siteRows = normalizedSites.map((site) => {
+                            const monitoring = site.monitoring ?? true;
 
-                    // Import sites using bulk insert
-                    const siteRows = normalizedSites.map((site) => {
-                        const monitoring = site.monitoring ?? true;
+                            const row: {
+                                identifier: string;
+                                monitoring: boolean;
+                                name?: string;
+                            } = {
+                                identifier: site.identifier,
+                                monitoring,
+                            };
 
-                        const row: {
-                            identifier: string;
-                            monitoring: boolean;
-                            name?: string;
-                        } = {
-                            identifier: site.identifier,
-                            monitoring,
-                        };
+                            if (site.name) {
+                                row.name = site.name;
+                            }
 
-                        if (site.name) {
-                            row.name = site.name;
-                        }
+                            return row;
+                        });
+                        siteTx.bulkInsert(siteRows);
 
-                        return row;
-                    });
-                    siteTransactionAdapter.bulkInsert(siteRows);
+                        // Import monitors and history
+                        await this.importMonitorsWithHistory(
+                            historyTx,
+                            normalizedSites
+                        );
 
-                    // Import monitors and history
-                    await this.importMonitorsWithHistory(
-                        historyTransactionAdapter,
-                        normalizedSites
-                    );
-
-                    settingsTransactionAdapter.bulkInsert(safeSettings);
-                });
+                        settingsTx.bulkInsert(safeSettings);
+                    }
+                );
 
                 this.logger.info(
                     `Successfully imported ${normalizedSites.length} sites and ${Object.keys(safeSettings).length} settings`
@@ -325,6 +328,37 @@ export class DataImportExportService {
     }
 
     /**
+     * Executes a database transaction with import-specific repository adapters.
+     *
+     * @typeParam T - Result returned by the transactional operation.
+     *
+     * @param operation - Callback executed with adapters scoped to the active
+     *   transaction.
+     *
+     * @returns Result produced by the provided operation.
+     */
+    private async withImportTransactionAdapters<T>(
+        operation: (adapters: {
+            historyTx: HistoryRepositoryTransactionAdapter;
+            monitorTx: MonitorRepositoryTransactionAdapter;
+            settingsTx: SettingsRepositoryTransactionAdapter;
+            siteTx: SiteRepositoryTransactionAdapter;
+        }) => Promise<T> | T
+    ): Promise<T> {
+        return this.databaseService.executeTransaction(async (db) => {
+            const siteTx = this.repositories.site.createTransactionAdapter(db);
+            const monitorTx =
+                this.repositories.monitor.createTransactionAdapter(db);
+            const historyTx =
+                this.repositories.history.createTransactionAdapter(db);
+            const settingsTx =
+                this.repositories.settings.createTransactionAdapter(db);
+
+            return operation({ historyTx, monitorTx, settingsTx, siteTx });
+        });
+    }
+
+    /**
      * Returns a normalized copy of the imported site ensuring required fields
      * adhere to runtime constraints.
      */
@@ -354,18 +388,25 @@ export class DataImportExportService {
         siteIdentifier: string,
         monitor: Site["monitors"][0]
     ): Site["monitors"][0] {
+        const normalizedConfig = createMonitorConfig(monitor, {
+            checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS,
+        });
+
         const normalizedMonitor: Site["monitors"][0] = {
             ...monitor,
+            checkInterval: normalizedConfig.checkInterval,
         };
 
-        const originalInterval = normalizedMonitor.checkInterval;
-
-        const isValidInterval =
+        const originalInterval = monitor.checkInterval;
+        const hasValidInterval =
             typeof originalInterval === "number" &&
             Number.isFinite(originalInterval) &&
             originalInterval > 0;
 
-        if (!isValidInterval) {
+        if (
+            !hasValidInterval &&
+            originalInterval !== normalizedMonitor.checkInterval
+        ) {
             this.logger.warn(
                 "[DataImportExportService] Imported monitor missing valid checkInterval; defaulting to minimum",
                 {
@@ -373,11 +414,13 @@ export class DataImportExportService {
                     siteIdentifier,
                 }
             );
-            normalizedMonitor.checkInterval = MIN_MONITOR_CHECK_INTERVAL_MS;
-            return normalizedMonitor;
-        }
-
-        if (originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS) {
+        } else if (
+            typeof originalInterval === "number" &&
+            Number.isFinite(originalInterval) &&
+            originalInterval > 0 &&
+            originalInterval < MIN_MONITOR_CHECK_INTERVAL_MS &&
+            originalInterval !== normalizedMonitor.checkInterval
+        ) {
             this.logger.warn(
                 "[DataImportExportService] Imported monitor checkInterval below minimum; clamping to shared floor",
                 {
@@ -387,12 +430,7 @@ export class DataImportExportService {
                     siteIdentifier,
                 }
             );
-            normalizedMonitor.checkInterval = MIN_MONITOR_CHECK_INTERVAL_MS;
-            return normalizedMonitor;
         }
-
-        // Normalize to whole milliseconds while preserving values above the minimum.
-        normalizedMonitor.checkInterval = Math.floor(originalInterval);
 
         return normalizedMonitor;
     }
