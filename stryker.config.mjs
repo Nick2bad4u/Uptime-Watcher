@@ -81,8 +81,6 @@ const config = {
         "**/node_modules/**",
         "**/package-lock.json",
         "**/release/**",
-        "**/config/testing/**", // Ignore config directory
-        "**/config/**/*.json", // Ignore config JSON files
         "CHANGELOG.md",
         "coverage-report.json",
         "Coverage/",

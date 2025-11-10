@@ -2,7 +2,8 @@
  * Exhaustive coverage for monitor status event validation guards.
  */
 
-import { STATUS_KIND } from "@shared/types";
+import { STATUS_KIND, type Monitor, type Site } from "@shared/types";
+import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -10,15 +11,42 @@ import {
     isMonitorStatusChangedEventData,
 } from "@shared/validation/monitorStatusEvents";
 
-const createBasePayload = () => ({
-    details: "Status updated",
-    monitorId: "monitor-1",
-    previousStatus: STATUS_KIND.DOWN,
-    responseTime: 250,
-    siteIdentifier: "site-1",
+const createMonitorSnapshot = (): Monitor => ({
+    checkInterval: 60_000,
+    history: [],
+    id: "monitor-1",
+    monitoring: true,
+    responseTime: 120,
+    retryAttempts: 0,
     status: STATUS_KIND.UP,
-    timestamp: new Date().toISOString(),
+    timeout: 30_000,
+    type: "http",
+    url: "https://example.com",
 });
+
+const createSiteSnapshot = (monitor: Monitor): Site => ({
+    identifier: "site-1",
+    monitoring: true,
+    monitors: [monitor],
+    name: "Example Site",
+});
+
+const createBasePayload = () => {
+    const monitor = createMonitorSnapshot();
+    const site = createSiteSnapshot(monitor);
+
+    return {
+        details: "Status updated",
+        monitor,
+        monitorId: monitor.id,
+        previousStatus: STATUS_KIND.DOWN,
+        responseTime: 250,
+        site,
+        siteIdentifier: site.identifier,
+        status: STATUS_KIND.UP,
+        timestamp: new Date().toISOString(),
+    } satisfies MonitorStatusChangedEventData;
+};
 
 describe(isMonitorStatusChangedEventData, () => {
     it("rejects non-object payloads", () => {
@@ -86,24 +114,18 @@ describe(isMonitorStatusChangedEventData, () => {
 
 describe(isEnrichedMonitorStatusChangedEventData, () => {
     it("requires both monitor and site records", () => {
-        const payload = {
-            ...createBasePayload(),
-            monitor: { id: "monitor-1" },
-            site: { identifier: "site-1" },
-        };
+        const payload = createBasePayload();
 
         expect(isEnrichedMonitorStatusChangedEventData(payload)).toBeTruthy();
+
+        const { site: _site, ...withoutSite } = createBasePayload();
+        const { monitor: _monitor, ...withoutMonitor } = createBasePayload();
+
         expect(
-            isEnrichedMonitorStatusChangedEventData({
-                ...createBasePayload(),
-                monitor: { id: "monitor-1" },
-            })
+            isEnrichedMonitorStatusChangedEventData(withoutSite)
         ).toBeFalsy();
         expect(
-            isEnrichedMonitorStatusChangedEventData({
-                ...createBasePayload(),
-                site: { identifier: "site-1" },
-            })
+            isEnrichedMonitorStatusChangedEventData(withoutMonitor)
         ).toBeFalsy();
     });
 });

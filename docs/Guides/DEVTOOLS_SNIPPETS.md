@@ -5,12 +5,12 @@ This document contains useful Chrome DevTools snippets for testing the Uptime Wa
 ## How to Use These Snippets
 
 1. Open Chrome DevTools (F12 or Right-click → Inspect)
-2. Go to the __Sources__ tab
-3. Click on __Snippets__ in the left sidebar (you may need to click the `>>` menu to find it)
-4. Click __+ New snippet__
+2. Go to the **Sources** tab
+3. Click on **Snippets** in the left sidebar (you may need to click the `>>` menu to find it)
+4. Click **+ New snippet**
 5. Give it a name (e.g., "Add Test Sites" or "Remove All Sites")
 6. Paste the code from below
-7. Right-click the snippet and select __Run__ (or press Ctrl+Enter / Cmd+Enter)
+7. Right-click the snippet and select **Run** (or press Ctrl+Enter / Cmd+Enter)
 
 ## Snippet 1: Add Test Sites (One of Each Monitor Type)
 
@@ -356,7 +356,7 @@ This snippet adds one site for each supported monitor type with realistic test c
 
 ## Snippet 2: Remove All Sites
 
-This snippet removes all sites from the application. __Use with caution!__
+This snippet removes all sites from the application. **Use with caution!**
 
 ```javascript
 /**
@@ -539,17 +539,17 @@ View all currently configured sites in the console.
 
 ## Tips
 
-* __Run snippets while the app is open__: Make sure the Uptime Watcher application is running and you have DevTools open on the renderer window
-* __Check console output__: All snippets provide detailed console output about what they're doing
-* __Timestamps__: The "Add Test Sites" snippets use timestamps to ensure unique identifiers
-* __Monitoring is disabled__: All test sites are created with `monitoring: false` to prevent automatic checks from starting immediately
-* __Test safely__: Use "Add Minimal Test Sites" for quick testing, and save the full suite for comprehensive testing
+- **Run snippets while the app is open**: Make sure the Uptime Watcher application is running and you have DevTools open on the renderer window
+- **Check console output**: All snippets provide detailed console output about what they're doing
+- **Timestamps**: The "Add Test Sites" snippets use timestamps to ensure unique identifiers
+- **Monitoring is disabled**: All test sites are created with `monitoring: false` to prevent automatic checks from starting immediately
+- **Test safely**: Use "Add Minimal Test Sites" for quick testing, and save the full suite for comprehensive testing
 
 ## Troubleshooting
 
 If the snippets don't work:
 
-1. Make sure you're in the __renderer process__ (main app window), not the main process
+1. Make sure you're in the **renderer process** (main app window), not the main process
 2. Check that `window.electronAPI` is available by typing it in the console
 3. Verify the application is fully loaded before running snippets
 4. Check the console for error messages that explain what went wrong

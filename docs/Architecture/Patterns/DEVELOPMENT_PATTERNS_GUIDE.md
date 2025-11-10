@@ -102,12 +102,12 @@ All database access uses the Repository Pattern with comprehensive transaction h
 
 ### Key Characteristics
 
-* __Dual methods__: Public async methods create transactions, internal sync methods work within existing transactions
-* __Enhanced transaction safety__: All mutations wrapped in `executeTransaction()` with automatic rollback
-* __Advanced operational hooks__: Use `withDatabaseOperation()` for retry logic, event emission, and monitoring
-* __Dependency injection__: Constructor-based dependency injection for testability
-* __Race condition immunity__: Synchronous database operations (node-sqlite3-wasm) eliminate race conditions
-* __Memory management__: Proper resource cleanup and connection management
+- **Dual methods**: Public async methods create transactions, internal sync methods work within existing transactions
+- **Enhanced transaction safety**: All mutations wrapped in `executeTransaction()` with automatic rollback
+- **Advanced operational hooks**: Use `withDatabaseOperation()` for retry logic, event emission, and monitoring
+- **Dependency injection**: Constructor-based dependency injection for testability
+- **Race condition immunity**: Synchronous database operations (node-sqlite3-wasm) eliminate race conditions
+- **Memory management**: Proper resource cleanup and connection management
 
 ### Repository Implementation Template
 
@@ -159,12 +159,12 @@ export class ExampleRepository {
 
 ### Repository Usage Guidelines
 
-* ✅ Use dual methods for operations that might be called within transactions
-* ✅ Wrap all mutations in `withDatabaseOperation()`
-* ✅ Include descriptive operation names for debugging
-* ✅ Use query constants to prevent SQL duplication
-* ❌ Don't bypass the repository pattern for direct database access
-* ❌ Don't create transactions within internal methods
+- ✅ Use dual methods for operations that might be called within transactions
+- ✅ Wrap all mutations in `withDatabaseOperation()`
+- ✅ Include descriptive operation names for debugging
+- ✅ Use query constants to prevent SQL duplication
+- ❌ Don't bypass the repository pattern for direct database access
+- ❌ Don't create transactions within internal methods
 
 ## Event-Driven Communication
 
@@ -174,25 +174,25 @@ The application uses a TypedEventBus for decoupled communication between compone
 
 ### Event Naming Convention
 
-* __Format__: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
-* __Domain__: Major category (sites, monitors, database, system)
-* __Action__: Specific action in past tense for completed events
-* __Consistency__: Use kebab-case for multi-word actions
+- **Format**: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
+- **Domain**: Major category (sites, monitors, database, system)
+- **Action**: Specific action in past tense for completed events
+- **Consistency**: Use kebab-case for multi-word actions
 
 ### Settings Retention Synchronization
 
 The database retention policy is surfaced to renderers through the
 `settings:history-limit-updated` broadcast. The orchestrator tracks the last
-observed limit so the payload always includes both the __new__ limit and the
-__previous__ limit, enabling toast messaging and audit logs to explain why the
+observed limit so the payload always includes both the **new** limit and the
+**previous** limit, enabling toast messaging and audit logs to explain why the
 value changed.
 
-* Subscribe via `EventsService.onHistoryLimitUpdated` inside the settings store.
-* Only mutate state if the incoming limit differs from the current store value
+- Subscribe via `EventsService.onHistoryLimitUpdated` inside the settings store.
+- Only mutate state if the incoming limit differs from the current store value
   (the service already implements this guard).
-* Treat backend-originated changes (imports, CLI migrations) the same as UI
+- Treat backend-originated changes (imports, CLI migrations) the same as UI
   mutations—there is no special casing in the renderer.
-* The renderer callback runs inside the store module; avoid calling the IPC
+- The renderer callback runs inside the store module; avoid calling the IPC
   service from within the handler to prevent feedback loops.
 
 ### Event-Driven Implementation Template
@@ -222,11 +222,11 @@ selectedSiteIdentifier: undefined,
 
 ### Shared Utility Guidelines
 
-* ✅ Import directly from the feature module (e.g., `@shared/utils/errorHandling`, `@shared/utils/logTemplates`)
-* ✅ Prefer named exports and avoid default exports for utilities
-* ✅ Keep renderer and Electron imports symmetrical to ensure identical logic paths
-* ❌ Do not re-export `@shared/utils` helpers from new barrels
-* ❌ Do not rely on relative `../../utils` hops inside shared code
+- ✅ Import directly from the feature module (e.g., `@shared/utils/errorHandling`, `@shared/utils/logTemplates`)
+- ✅ Prefer named exports and avoid default exports for utilities
+- ✅ Keep renderer and Electron imports symmetrical to ensure identical logic paths
+- ❌ Do not re-export `@shared/utils` helpers from new barrels
+- ❌ Do not rely on relative `../../utils` hops inside shared code
 
 ### Shared Utility Example
 
@@ -249,12 +249,12 @@ Logging across main and renderer processes uses structured prefixes and reusable
 
 ### Logging Guidelines
 
-* ✅ Use `LOG_TEMPLATES` when available to standardize message structure
-* ✅ Include contextual metadata objects instead of string concatenation
-* ✅ Preserve correlation IDs and site identifiers in log payloads
-* ✅ Prefer logger instances created via `createLogger` for new domains (supply uppercase prefix)
-* ❌ Do not log raw errors without using `buildErrorLogArguments`; surfaces stack traces improperly
-* ❌ Do not invent ad-hoc prefixes or bypass shared logger helpers
+- ✅ Use `LOG_TEMPLATES` when available to standardize message structure
+- ✅ Include contextual metadata objects instead of string concatenation
+- ✅ Preserve correlation IDs and site identifiers in log payloads
+- ✅ Prefer logger instances created via `createLogger` for new domains (supply uppercase prefix)
+- ❌ Do not log raw errors without using `buildErrorLogArguments`; surfaces stack traces improperly
+- ❌ Do not invent ad-hoc prefixes or bypass shared logger helpers
 
 ### Logging Example
 
@@ -308,12 +308,12 @@ eventBus.onTyped("domain:action-completed", (data) => {
 
 ### Event-Driven Usage Guidelines
 
-* ✅ Use typed events with proper interfaces
-* ✅ Include timestamps in all events
-* ✅ Emit both success and failure events for operations
-* ✅ Use correlation IDs for request tracing
-* ❌ Don't emit events for every minor operation
-* ❌ Don't include sensitive data in event payloads
+- ✅ Use typed events with proper interfaces
+- ✅ Include timestamps in all events
+- ✅ Emit both success and failure events for operations
+- ✅ Use correlation IDs for request tracing
+- ❌ Don't emit events for every minor operation
+- ❌ Don't include sensitive data in event payloads
 
 ## Error Handling Patterns
 
@@ -408,12 +408,12 @@ try {
 
 ### Error Handling Usage Guidelines
 
-* ✅ Always re-throw errors after handling (logging/state management)
-* ✅ Use appropriate error handling utility for the context
-* ✅ Include correlation IDs for request tracing
-* ✅ Emit failure events for monitoring
-* ❌ Don't swallow errors without proper handling
-* ❌ Don't lose original error context and stack traces
+- ✅ Always re-throw errors after handling (logging/state management)
+- ✅ Use appropriate error handling utility for the context
+- ✅ Include correlation IDs for request tracing
+- ✅ Emit failure events for monitoring
+- ❌ Don't swallow errors without proper handling
+- ❌ Don't lose original error context and stack traces
 
 ## Frontend State Management
 
@@ -566,18 +566,18 @@ export function SiteTitle({ title }: { title: string }): JSX.Element {
 }
 ```
 
-> __CSS alignment:__ Pair the hook with the shared marquee utility classes in
+> **CSS alignment:** Pair the hook with the shared marquee utility classes in
 > `tailwind.config.mjs` (`animate-marquee` / `marquee-pause-on-hover`) to ensure
 > consistent animation speed and pause-on-hover behavior.
 
 ### State Management Usage Guidelines
 
-* ✅ Use modular composition for complex stores
-* ✅ Include action logging for debugging
-* ✅ Integrate with error handling utilities
-* ✅ Use selective persistence for user preferences
-* ❌ Don't mutate state directly
-* ❌ Don't persist transient UI state
+- ✅ Use modular composition for complex stores
+- ✅ Include action logging for debugging
+- ✅ Integrate with error handling utilities
+- ✅ Use selective persistence for user preferences
+- ❌ Don't mutate state directly
+- ❌ Don't persist transient UI state
 
 ### Manual Monitoring Check Optimistic Updates
 
@@ -586,11 +586,11 @@ the backend. `createSiteMonitoringActions.checkSiteNow` applies the update via
 `applyStatusUpdateSnapshot`, providing instant UI feedback without waiting for
 the follow-up event broadcast.
 
-* The optimistic reducer reuses the same merge logic as the
+- The optimistic reducer reuses the same merge logic as the
   `StatusUpdateManager`, guaranteeing consistency with live event handling.
-* If the payload is incomplete (missing a monitor or site snapshot), the helper
+- If the payload is incomplete (missing a monitor or site snapshot), the helper
   no-ops and logs a debug message—callers do not need additional guards.
-* Always update store state through the injected `setSites` action so that
+- Always update store state through the injected `setSites` action so that
   derived selectors and persistence continue to work as expected.
 
 ## IPC Communication
@@ -599,7 +599,7 @@ the follow-up event broadcast.
 
 Standardized IPC protocol using contextBridge with type safety, validation, and consistent error handling.
 
-> __Generation-first workflow:__ The preload bridge and channel documentation
+> **Generation-first workflow:** The preload bridge and channel documentation
 > are generated from the canonical schema. Update the schema (typically
 > `RendererEventPayloadMap`/`IpcInvokeChannelMap`) and re-run
 > `npm run generate:ipc`; CI enforces drift detection via `npm run check:ipc`.
@@ -669,27 +669,27 @@ declare global {
 
 #### Sites domain contract highlights
 
-* `remove-monitor` __must__ resolve to the persisted `Site` snapshot provided by
+- `remove-monitor` **must** resolve to the persisted `Site` snapshot provided by
   the orchestrator. Treat the payload as authoritative and feed it directly
   into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
-* Cross-check the canonical implementation in
+- Cross-check the canonical implementation in
   [`SiteService.removeMonitor`](../../../src/services/SiteService.ts),
   which demonstrates validating the persisted snapshot with
   `validateSiteSnapshot` before mutating store state.
-* Avoid reconstructing monitor arrays in the renderer. Any transformation risks
+- Avoid reconstructing monitor arrays in the renderer. Any transformation risks
   diverging from the validated schema maintained in
   [`@shared/validation/schemas`](../../../shared/validation/schemas.ts).
-* Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and
+- Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and
   optimistic update guidance.
 
 ### IPC Communication Usage Guidelines
 
-* ✅ Use domain-specific grouping for handlers
-* ✅ Include validation for all parameterized operations
-* ✅ Return cleanup functions for event listeners
-* ✅ Use consistent invoke channel naming (verb-first hyphenated) and retain domain-prefixed event names (`domain:event`)
-* ❌ Don't expose Node.js APIs directly to renderer
-* ❌ Don't bypass validation for any parameters
+- ✅ Use domain-specific grouping for handlers
+- ✅ Include validation for all parameterized operations
+- ✅ Return cleanup functions for event listeners
+- ✅ Use consistent invoke channel naming (verb-first hyphenated) and retain domain-prefixed event names (`domain:event`)
+- ❌ Don't expose Node.js APIs directly to renderer
+- ❌ Don't bypass validation for any parameters
 
 ## Testing Patterns
 
@@ -767,12 +767,12 @@ describe("ExampleRepository", () => {
 
 ### Testing Usage Guidelines
 
-* ✅ Reset state in beforeEach for store tests
-* ✅ Use act() for state updates in React tests
-* ✅ Mock dependencies consistently
-* ✅ Test both success and error paths
-* ❌ Don't test implementation details
-* ❌ Don't share state between test cases
+- ✅ Reset state in beforeEach for store tests
+- ✅ Use act() for state updates in React tests
+- ✅ Mock dependencies consistently
+- ✅ Test both success and error paths
+- ❌ Don't test implementation details
+- ❌ Don't share state between test cases
 
 ## Standardized Cache Configuration
 
@@ -782,11 +782,11 @@ All caching in the application uses standardized configurations to ensure consis
 
 ### Cache Configuration Key Characteristics
 
-* __Centralized configuration__: All cache settings defined in `shared/constants/cacheConfig.ts`
-* __Domain-specific configs__: Separate configurations for SITES, MONITORS, SETTINGS, VALIDATION, and TEMPORARY caches
-* __Consistent TTL values__: Standardized expiration times based on data freshness requirements
-* __Standardized naming__: Consistent cache naming patterns with helper functions
-* __Type safety__: Full TypeScript support with proper interfaces
+- **Centralized configuration**: All cache settings defined in `shared/constants/cacheConfig.ts`
+- **Domain-specific configs**: Separate configurations for SITES, MONITORS, SETTINGS, VALIDATION, and TEMPORARY caches
+- **Consistent TTL values**: Standardized expiration times based on data freshness requirements
+- **Standardized naming**: Consistent cache naming patterns with helper functions
+- **Type safety**: Full TypeScript support with proper interfaces
 
 ### Configuration Structure
 
@@ -811,11 +811,11 @@ const tempCache = new StandardizedCache<Site>({
 
 | Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled |
 | -------------- | ------ | -------- | -------------------------- | ------------- |
-| __SITES__      | 10 min | 500      | Site management operations | ✓             |
-| __MONITORS__   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
-| __SETTINGS__   | 30 min | 100      | Application configuration  | ✓             |
-| __VALIDATION__ | 5 min  | 200      | Validation result caching  | ✓             |
-| __TEMPORARY__  | 5 min  | 1000     | Short-term operations      | ✗             |
+| **SITES**      | 10 min | 500      | Site management operations | ✓             |
+| **MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
+| **SETTINGS**   | 30 min | 100      | Application configuration  | ✓             |
+| **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
+| **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
 
 ### Cache Configuration Implementation Template
 
@@ -846,46 +846,46 @@ export class ExampleManager {
 
 ### Cache Configuration Usage Guidelines
 
-* ✅ Always use `CACHE_CONFIG` constants instead of hardcoded values
-* ✅ Use `CACHE_NAMES` functions for consistent naming
-* ✅ Choose the appropriate cache type based on data characteristics
-* ✅ Include `eventEmitter` for cache event integration
-* ✅ Use temporary caches for short-lived operations
-* ❌ Don't hardcode TTL values or cache sizes
-* ❌ Don't create caches without following naming conventions
-* ❌ Don't bypass standardized configurations for production code
+- ✅ Always use `CACHE_CONFIG` constants instead of hardcoded values
+- ✅ Use `CACHE_NAMES` functions for consistent naming
+- ✅ Choose the appropriate cache type based on data characteristics
+- ✅ Include `eventEmitter` for cache event integration
+- ✅ Use temporary caches for short-lived operations
+- ❌ Don't hardcode TTL values or cache sizes
+- ❌ Don't create caches without following naming conventions
+- ❌ Don't bypass standardized configurations for production code
 
 ### Cache Selection Guide
 
-__Use SITES config when:__
+**Use SITES config when:**
 
-* Caching site-related data that changes moderately
-* Need balance between freshness and performance
-* Expected volume is moderate (< 500 items)
+- Caching site-related data that changes moderately
+- Need balance between freshness and performance
+- Expected volume is moderate (< 500 items)
 
-__Use MONITORS config when:__
+**Use MONITORS config when:**
 
-* Caching real-time monitoring data
-* Need shorter expiration for accuracy
-* Expected high volume (< 1000 items)
+- Caching real-time monitoring data
+- Need shorter expiration for accuracy
+- Expected high volume (< 1000 items)
 
-__Use SETTINGS config when:__
+**Use SETTINGS config when:**
 
-* Caching configuration values
-* Data changes infrequently
-* Small dataset size (< 100 items)
+- Caching configuration values
+- Data changes infrequently
+- Small dataset size (< 100 items)
 
-__Use VALIDATION config when:__
+**Use VALIDATION config when:**
 
-* Caching validation results
-* Need to balance accuracy with performance
-* Moderate dataset size (< 200 items)
+- Caching validation results
+- Need to balance accuracy with performance
+- Moderate dataset size (< 200 items)
 
-__Use TEMPORARY config when:__
+**Use TEMPORARY config when:**
 
-* Short-lived operations (import, export, sync)
-* Performance is critical (stats disabled)
-* Large buffer needed (< 1000 items)
+- Short-lived operations (import, export, sync)
+- Performance is critical (stats disabled)
+- Large buffer needed (< 1000 items)
 
 ## Memory Management
 
@@ -1019,12 +1019,12 @@ class StandardizedCache<T> {
 
 ### Memory Management Usage Guidelines
 
-* ✅ Always provide cleanup functions for event listeners
-* ✅ Clear timeouts and intervals on component unmount
-* ✅ Implement proper service shutdown procedures
-* ✅ Use Map/Set for complex cleanup tracking
-* ❌ Don't rely on garbage collection for critical resources
-* ❌ Don't forget to call cleanup functions in error paths
+- ✅ Always provide cleanup functions for event listeners
+- ✅ Clear timeouts and intervals on component unmount
+- ✅ Implement proper service shutdown procedures
+- ✅ Use Map/Set for complex cleanup tracking
+- ❌ Don't rely on garbage collection for critical resources
+- ❌ Don't forget to call cleanup functions in error paths
 
 ## Race Condition Prevention
 
@@ -1185,12 +1185,12 @@ class OperationQueue {
 
 ### Race Condition Prevention Usage Guidelines
 
-* ✅ Use operation correlation for async operations that can be cancelled
-* ✅ Implement atomic state updates for cache management
-* ✅ Validate operation state before applying changes
-* ✅ Use operation queues for critical sections
-* ❌ Don't rely on timing for synchronization
-* ❌ Don't ignore cancellation flags in long-running operations
+- ✅ Use operation correlation for async operations that can be cancelled
+- ✅ Implement atomic state updates for cache management
+- ✅ Validate operation state before applying changes
+- ✅ Use operation queues for critical sections
+- ❌ Don't rely on timing for synchronization
+- ❌ Don't ignore cancellation flags in long-running operations
 
 ## Site Mutation Pipeline
 
@@ -1198,12 +1198,12 @@ class OperationQueue {
 
 The site mutation pipeline enforces a strict layering contract that keeps the database, in-memory caches, and monitoring orchestration in sync. Every write follows the same sequence:
 
-1. __SiteManager__ receives a domain command (add/update/remove) and extracts a __mutable snapshot__ via `getSiteSnapshotForMutation()`. The helper guarantees the caller works on a cloned structure so cache entries remain immutable.
-2. __Domain invariants__ are enforced before touching persistent storage. Examples include preventing removal of the final monitor, validating monitor schemas, and re-running `validateSite()` with the proposed changes.
-3. __SiteWriterService__ performs the actual mutation through `updateSite` / `createSite` / `deleteSite`. All write operations are wrapped in `DatabaseService.executeTransaction()` and reuse shared helpers such as `updateMonitorsPreservingHistory()` to keep history tables intact.
-4. __Repository layer__ executes the SQL statements. Internal synchronous methods (`*_Internal`) are the only functions allowed to call `Database#run` / `Database#all` directly.
-5. __Cache synchronization__ happens inside `SiteWriterService`, which updates the `StandardizedCache` instance that backs `SiteManager`. Only sanitized copies are stored to avoid accidental mutations.
-6. __Event emission__ completes the cycle: `SiteManager` publishes `internal:site:*` and `sites:state-synchronized` events so the renderer, orchestrator, and automation hooks receive consistent updates.
+1. **SiteManager** receives a domain command (add/update/remove) and extracts a **mutable snapshot** via `getSiteSnapshotForMutation()`. The helper guarantees the caller works on a cloned structure so cache entries remain immutable.
+2. **Domain invariants** are enforced before touching persistent storage. Examples include preventing removal of the final monitor, validating monitor schemas, and re-running `validateSite()` with the proposed changes.
+3. **SiteWriterService** performs the actual mutation through `updateSite` / `createSite` / `deleteSite`. All write operations are wrapped in `DatabaseService.executeTransaction()` and reuse shared helpers such as `updateMonitorsPreservingHistory()` to keep history tables intact.
+4. **Repository layer** executes the SQL statements. Internal synchronous methods (`*_Internal`) are the only functions allowed to call `Database#run` / `Database#all` directly.
+5. **Cache synchronization** happens inside `SiteWriterService`, which updates the `StandardizedCache` instance that backs `SiteManager`. Only sanitized copies are stored to avoid accidental mutations.
+6. **Event emission** completes the cycle: `SiteManager` publishes `internal:site:*` and `sites:state-synchronized` events so the renderer, orchestrator, and automation hooks receive consistent updates.
 
 ```mermaid
 sequenceDiagram
@@ -1228,41 +1228,47 @@ sequenceDiagram
 
 ### Layer Responsibilities
 
-* __SiteManager__
-  * Protects domain invariants (e.g., cannot remove the final monitor from a site).
-  * Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
-  * Emits fully populated events with timestamps and updated field metadata.
-* __SiteWriterService__
-  * Owns transactional boundaries via `DatabaseService.executeTransaction`.
-  * Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
-  * Writes sanitized copies into the shared `StandardizedCache` instance.
-* __Repositories__
-  * Contain only synchronous `*_Internal` helpers that assume an active transaction.
-  * Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
+- **SiteManager**
+  - Protects domain invariants (e.g., cannot remove the final monitor from a site).
+  - Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
+  - Emits fully populated events with timestamps and updated field metadata.
+- **SiteWriterService**
+  - Owns transactional boundaries via `DatabaseService.executeTransaction`.
+  - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
+  - Writes sanitized copies into the shared `StandardizedCache` instance.
+- **Repositories**
+  - Contain only synchronous `*_Internal` helpers that assume an active transaction.
+  - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
 
 ### Invariant Checklist
 
-* ✅ Every mutation must pass through `SiteWriterService`; bypassing it forfeits transactional hooks and cache consistency.
-* ✅ Never allow a site to reach zero monitors; throw `ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST` instead.
-* ✅ Run `validateSite()` with the candidate payload before invoking the writer to catch schema drift early.
-* ✅ Emit both `internal:site:*` and `sites:state-synchronized` events after successful commits to keep the renderer caches aligned.
-* ✅ Update unit and comprehensive tests whenever the pipeline changes to cover transaction outcomes and event emission.
+- ✅ Every mutation must pass through `SiteWriterService`; bypassing it forfeits transactional hooks and cache consistency.
+- ✅ Never allow a site to reach zero monitors; throw `ERROR_CATALOG.monitors.CANNOT_REMOVE_LAST` instead.
+- ✅ Run `validateSite()` with the candidate payload before invoking the writer to catch schema drift early.
+- ✅ Emit both `internal:site:*` and `sites:state-synchronized` events after successful commits to keep the renderer caches aligned.
+- ✅ Update unit and comprehensive tests whenever the pipeline changes to cover transaction outcomes and event emission.
 
 ### Usage Guidelines
 
-* ✅ Fetch mutable data via `getSiteSnapshotForMutation()` or a repository call and immediately clone it before applying changes.
-* ✅ Limit direct repository usage to read-only helpers; prefer the writer for any mutation, even if it appears trivial.
-* ✅ When adding new mutations, extend `SiteWriterService` first, then point `SiteManager` to the new method.
-* ❌ Do not mutate objects retrieved from `sitesCache` in place; always build new structures and let the writer persist them.
-* ❌ Do not emit success events before the transaction commits; let the writer finish and emit only after the cache is updated.
+- ✅ Fetch mutable data via `getSiteSnapshotForMutation()` or a repository call and immediately clone it before applying changes.
+- ✅ Limit direct repository usage to read-only helpers; prefer the writer for any mutation, even if it appears trivial.
+- ✅ When adding new mutations, extend `SiteWriterService` first, then point `SiteManager` to the new method.
+- ❌ Do not mutate objects retrieved from `sitesCache` in place; always build new structures and let the writer persist them.
+- ❌ Do not emit success events before the transaction commits; let the writer finish and emit only after the cache is updated.
 
 ## Best Practices Summary
 
-1. __Consistency__: Follow established patterns rather than creating new ones
-2. __Type Safety__: Use TypeScript interfaces for all data structures
-3. __Error Handling__: Always preserve original errors and provide appropriate fallbacks
-4. __Testing__: Write comprehensive tests following established patterns
-5. __Documentation__: Include TSDoc comments with examples
-6. __Logging__: Use consistent logging with correlation IDs
-7. __Events__: Emit events for significant state changes
-8. __Validation__: Validate all external inputs and IPC parameters
+1. **Consistency**: Follow established patterns rather than creating new ones
+2. **Type Safety**: Use TypeScript interfaces for all data structures
+3. **Error Handling**: Always preserve original errors and provide appropriate fallbacks
+4. **Testing**: Write comprehensive tests following established patterns
+5. **Documentation**: Include TSDoc comments with examples
+6. **Logging**: Use consistent logging with correlation IDs
+7. **Events**: Emit events for significant state changes
+8. **Validation**: Validate all external inputs and IPC parameters
+
+## Current Implementation Audit (2025-11-04)
+
+- Verified each referenced pattern against current modules: repositories (`electron/services/database/*.ts`), event system (`electron/events/TypedEventBus.ts`), error handling (`shared/utils/errorHandling.ts`), and IPC service (`electron/services/ipc/IpcService.ts`).
+- Confirmed frontend guidance matches active stores and services under `src/stores` and `src/services`, including modular composition and action logging utilities.
+- Cross-checked testing practices with `tests/strictTests`, `shared/test/strictTests`, and renderer test suites to ensure property-based and strict coverage workflows remain in place.

@@ -10,6 +10,7 @@ import { resolveFastCheckEnvOverrides } from "@shared/test/utils/fastCheckEnv";
 import type {
     MonitoringStartSummary,
     MonitoringStopSummary,
+    Monitor,
     StatusUpdate,
 } from "@shared/types";
 import type { ValidationResult } from "@shared/types/validation";
@@ -336,6 +337,7 @@ const mockElectronAPI: {
         formatHttpStatus: AnyMock;
     };
     monitorTypes: {
+        isLoaded: AnyMock;
         formatMonitorDetail: AnyMock;
         formatMonitorTitleSuffix: AnyMock;
         getMonitorTypes: AnyMock;
@@ -418,20 +420,37 @@ const mockElectronAPI: {
         removeAllListeners: vi.fn(),
     },
     monitoring: {
-        checkSiteNow: vi.fn().mockResolvedValue({
-            details: "Manual check completed",
-            monitorId: "monitor-1",
-            previousStatus: "up",
-            site: {
-                identifier: "site-1",
-                monitoring: true,
-                monitors: [],
-                name: "Test Site",
-            },
-            siteIdentifier: "site-1",
-            status: "up",
-            timestamp: new Date().toISOString(),
-        } satisfies StatusUpdate),
+        checkSiteNow: vi.fn().mockResolvedValue(
+            (() => {
+                const monitorSnapshot: Monitor = {
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 0,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                };
+
+                return {
+                    details: "Manual check completed",
+                    monitor: monitorSnapshot,
+                    monitorId: "monitor-1",
+                    previousStatus: "up",
+                    site: {
+                        identifier: "site-1",
+                        monitoring: true,
+                        monitors: [monitorSnapshot],
+                        name: "Test Site",
+                    },
+                    siteIdentifier: "site-1",
+                    status: "up",
+                    timestamp: new Date().toISOString(),
+                } satisfies StatusUpdate;
+            })()
+        ),
         removeMonitor: vi.fn().mockResolvedValue({
             identifier: "test-site",
             monitoring: true,
@@ -450,6 +469,7 @@ const mockElectronAPI: {
         formatHttpStatus: vi.fn().mockReturnValue("up"),
     },
     monitorTypes: {
+        isLoaded: vi.fn().mockResolvedValue(true),
         formatMonitorDetail: vi.fn().mockResolvedValue("Mock formatted detail"),
         formatMonitorTitleSuffix: vi
             .fn()

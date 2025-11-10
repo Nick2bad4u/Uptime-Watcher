@@ -150,7 +150,10 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await triggerButton.scrollIntoViewIfNeeded();
-                await triggerButton.click();
+                await triggerButton.focus();
+                await triggerButton.press("Enter", {
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");
                 await expect(siteDetailsModal).toBeVisible({

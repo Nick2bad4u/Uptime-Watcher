@@ -2,22 +2,22 @@
 
 ## Status
 
-__Accepted__ - Core communication mechanism with advanced middleware and memory management
+**Accepted** - Core communication mechanism with advanced middleware and memory management
 
 ## Context
 
 The application needed a way to decouple components and enable reactive communication between:
 
-* Backend services and frontend UI
-* Different services within the backend
-* Multiple UI components reacting to state changes
-* Cross-cutting concerns like logging, monitoring, and error handling
+- Backend services and frontend UI
+- Different services within the backend
+- Multiple UI components reacting to state changes
+- Cross-cutting concerns like logging, monitoring, and error handling
 
 Traditional direct method calls would create tight coupling, make the system difficult to extend and test, and provide no mechanism for monitoring or debugging inter-component communication.
 
 ## Decision
 
-We will use an __Event-Driven Architecture__ based on a custom `TypedEventBus` with the following characteristics:
+We will use an **Event-Driven Architecture** based on a custom `TypedEventBus` with the following characteristics:
 
 ### Event propagation overview
 
@@ -81,16 +81,16 @@ await eventBus.emitTyped("sites:added", {
 
 ### 2. Advanced Metadata and Correlation
 
-* __Unique correlation IDs__ for request tracing across system boundaries
-* __Automatic timestamps__ for event ordering and debugging
-* __Bus identification__ for multi-bus architectures
-* __Event metadata__ enrichment for comprehensive monitoring
+- **Unique correlation IDs** for request tracing across system boundaries
+- **Automatic timestamps** for event ordering and debugging
+- **Bus identification** for multi-bus architectures
+- **Event metadata** enrichment for comprehensive monitoring
 
 ### 3. Consistent Event Naming
 
-* __Domain-based naming__: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
-* __Hierarchical structure__: Major category followed by specific action
-* __Past tense verbs__ for completed actions
+- **Domain-based naming**: `domain:action` (e.g., `sites:added`, `monitor:status-changed`)
+- **Hierarchical structure**: Major category followed by specific action
+- **Past tense verbs** for completed actions
 
 ### 4. Production-Ready Middleware Support
 
@@ -155,10 +155,10 @@ useEffect(() => {
 
 ### 6. Advanced Memory Management
 
-* __Max listeners__: Configurable limit (default: 50) prevents memory leaks
-* __Automatic cleanup__: All event listeners provide cleanup functions
-* __Middleware limits__: Configurable middleware chain size (default: 20)
-* __Event validation__: Type-safe event structures prevent runtime errors
+- **Max listeners**: Configurable limit (default: 50) prevents memory leaks
+- **Automatic cleanup**: All event listeners provide cleanup functions
+- **Middleware limits**: Configurable middleware chain size (default: 20)
+- **Event validation**: Type-safe event structures prevent runtime errors
 
 ## Architecture Flow
 
@@ -172,139 +172,139 @@ Other Backend Services (via event listeners)
 
 ### 1. Site Events
 
-__Public Events:__
+**Public Events:**
 
-* `site:added` - When a site is successfully added
-* `site:updated` - When site properties are modified
-* `site:removed` - When a site is deleted
-* `sites:state-synchronized` - When frontend and backend state are synchronized
+- `site:added` - When a site is successfully added
+- `site:updated` - When site properties are modified
+- `site:removed` - When a site is deleted
+- `sites:state-synchronized` - When frontend and backend state are synchronized
 
-*Historical note*: the former `site:cache-updated` and `site:cache-miss`
+_Historical note_: the former `site:cache-updated` and `site:cache-miss`
 topics were retired in favor of the internal namespace. Cache telemetry now
 flows exclusively through those internal channels and the orchestrator
 converts them into the canonical `cache:invalidated` broadcast when the
 renderer must react.
 
-__Internal Events:__
+**Internal Events:**
 
-* `internal:site:added` - Internal site creation events
-* `internal:site:updated` - Internal site modification events
-* `internal:site:removed` - Internal site deletion events
-* `internal:site:cache-updated` - Internal cache management
-* `internal:site:cache-miss` - Internal cache lookup miss telemetry
-* `internal:site:start-monitoring-requested` - Internal monitoring control
-* `internal:site:stop-monitoring-requested` - Internal monitoring control
-* `internal:site:restart-monitoring-requested` - Internal monitoring control
-* `internal:site:restart-monitoring-response` - Internal monitoring responses
-* `internal:site:is-monitoring-active-requested` - Internal status queries
-* `internal:site:is-monitoring-active-response` - Internal status responses
+- `internal:site:added` - Internal site creation events
+- `internal:site:updated` - Internal site modification events
+- `internal:site:removed` - Internal site deletion events
+- `internal:site:cache-updated` - Internal cache management
+- `internal:site:cache-miss` - Internal cache lookup miss telemetry
+- `internal:site:start-monitoring-requested` - Internal monitoring control
+- `internal:site:stop-monitoring-requested` - Internal monitoring control
+- `internal:site:restart-monitoring-requested` - Internal monitoring control
+- `internal:site:restart-monitoring-response` - Internal monitoring responses
+- `internal:site:is-monitoring-active-requested` - Internal status queries
+- `internal:site:is-monitoring-active-response` - Internal status responses
 
-> __Emission flow:__ `SiteManager` emits only `internal:site:*` topics. The
+> **Emission flow:** `SiteManager` emits only `internal:site:*` topics. The
 > `UptimeOrchestrator` enriches those payloads and rebroadcasts any
 > renderer-facing `site:*` events, translating cache telemetry into the
 > canonical `cache:invalidated` pipeline when appropriate.
 
 ### 2. Monitor Events
 
-__Public Events:__
+**Public Events:**
 
-* `monitor:added` - When a monitor is created
-* `monitor:removed` - When a monitor is deleted
-* `monitor:status-changed` - When monitor status changes
-* `monitor:up` - When monitor detects service is online
-* `monitor:down` - When monitor detects service is offline
-* `monitor:check-completed` - When a health check finishes
+- `monitor:added` - When a monitor is created
+- `monitor:removed` - When a monitor is deleted
+- `monitor:status-changed` - When monitor status changes
+- `monitor:up` - When monitor detects service is online
+- `monitor:down` - When monitor detects service is offline
+- `monitor:check-completed` - When a health check finishes
 
-__Internal Events:__
+**Internal Events:**
 
-* `internal:monitor:started` - Internal monitor activation
-* `internal:monitor:stopped` - Internal monitor deactivation
-* `internal:monitor:all-started` - When all monitors are activated
-* `internal:monitor:all-stopped` - When all monitors are deactivated
-* `internal:monitor:manual-check-completed` - Manual check results
+- `internal:monitor:started` - Internal monitor activation
+- `internal:monitor:stopped` - Internal monitor deactivation
+- `internal:monitor:all-started` - When all monitors are activated
+- `internal:monitor:all-stopped` - When all monitors are deactivated
+- `internal:monitor:manual-check-completed` - Manual check results
 
-> __Emission flow:__ `MonitorManager` raises `internal:monitor:*` events for
+> **Emission flow:** `MonitorManager` raises `internal:monitor:*` events for
 > lifecycle transitions and continues to emit high-frequency telemetry such as
 > `monitor:status-changed` directly. The `UptimeOrchestrator` translates the
 > lifecycle events into `monitoring:*` plus the canonical `cache:invalidated`
 > broadcasts (using `{ type: "all" }` for global transitions).
 
-* `internal:monitor:site-setup-completed` - Site monitor setup completion
+- `internal:monitor:site-setup-completed` - Site monitor setup completion
 
 ### 3. Database Events
 
-* `database:transaction-completed` - When database transactions finish
-* `database:error` - When database operations fail
-* `database:success` - When database operations succeed
-* `database:retry` - When database operations are retried
-* `database:backup-created` - When database backups are created
+- `database:transaction-completed` - When database transactions finish
+- `database:error` - When database operations fail
+- `database:success` - When database operations succeed
+- `database:retry` - When database operations are retried
+- `database:backup-created` - When database backups are created
 
-__Internal Database Events:__
+**Internal Database Events:**
 
-* `internal:database:initialized` - Database initialization completion
-* `internal:database:data-exported` - Data export completion
-* `internal:database:data-imported` - Data import completion
-* `internal:database:backup-downloaded` - Backup download completion
-* `internal:database:history-limit-updated` - History retention changes
-* `internal:database:sites-refreshed` - Site data refresh
-* `internal:database:get-sites-from-cache-requested` - Cache requests
-* `internal:database:get-sites-from-cache-response` - Cache responses
-* `internal:database:update-sites-cache-requested` - Cache update requests
+- `internal:database:initialized` - Database initialization completion
+- `internal:database:data-exported` - Data export completion
+- `internal:database:data-imported` - Data import completion
+- `internal:database:backup-downloaded` - Backup download completion
+- `internal:database:history-limit-updated` - History retention changes
+- `internal:database:sites-refreshed` - Site data refresh
+- `internal:database:get-sites-from-cache-requested` - Cache requests
+- `internal:database:get-sites-from-cache-response` - Cache responses
+- `internal:database:update-sites-cache-requested` - Cache update requests
 
 ### 4. System Events
 
-* `monitoring:started` - When monitoring system starts
-* `monitoring:stopped` - When monitoring system stops
-* `system:startup` - Application startup
-* `system:shutdown` - Application shutdown
-* `system:error` - System-level errors
+- `monitoring:started` - When monitoring system starts
+- `monitoring:stopped` - When monitoring system stops
+- `system:startup` - Application startup
+- `system:shutdown` - Application shutdown
+- `system:error` - System-level errors
 
 ### 5. Performance and Configuration Events
 
-* `performance:metric` - Performance measurements
-* `performance:warning` - Performance threshold alerts
-* `config:changed` - Configuration changes
-* `cache:invalidated` - Cache invalidation events
+- `performance:metric` - Performance measurements
+- `performance:warning` - Performance threshold alerts
+- `config:changed` - Configuration changes
+- `cache:invalidated` - Cache invalidation events
 
 ## Consequences
 
 ### Positive
 
-* __Decoupled architecture__ - Components don't need direct references
-* __Enhanced type safety__ - Compile-time checking prevents runtime errors
-* __Extensibility__ - Easy to add new event listeners without modifying emitters
-* __Advanced debugging__ - Correlation IDs and metadata enable comprehensive request tracing
-* __Superior testability__ - Easy to mock and verify event emissions
-* __Memory safety__ - Automatic cleanup and configurable limits prevent leaks
-* __Production monitoring__ - Middleware enables comprehensive observability
-* __Cross-cutting concerns__ - Logging, validation, and rate limiting handled declaratively
+- **Decoupled architecture** - Components don't need direct references
+- **Enhanced type safety** - Compile-time checking prevents runtime errors
+- **Extensibility** - Easy to add new event listeners without modifying emitters
+- **Advanced debugging** - Correlation IDs and metadata enable comprehensive request tracing
+- **Superior testability** - Easy to mock and verify event emissions
+- **Memory safety** - Automatic cleanup and configurable limits prevent leaks
+- **Production monitoring** - Middleware enables comprehensive observability
+- **Cross-cutting concerns** - Logging, validation, and rate limiting handled declaratively
 
 ### Negative
 
-* __Initial complexity__ - Indirect flow can be harder to follow initially
-* __Minimal performance overhead__ - Event processing adds negligible latency
-* __Learning curve__ - Developers need to understand event-driven patterns
-* __Debugging complexity__ - Async event flows require correlation tracking
+- **Initial complexity** - Indirect flow can be harder to follow initially
+- **Minimal performance overhead** - Event processing adds negligible latency
+- **Learning curve** - Developers need to understand event-driven patterns
+- **Debugging complexity** - Async event flows require correlation tracking
 
 ## Quality Assurance
 
 ### Memory Management
 
-* __Automatic cleanup__: All event listeners return cleanup functions
-* __Configurable limits__: Max listeners and middleware prevent resource exhaustion
-* __Leak prevention__: Proper cleanup in component unmount lifecycle
+- **Automatic cleanup**: All event listeners return cleanup functions
+- **Configurable limits**: Max listeners and middleware prevent resource exhaustion
+- **Leak prevention**: Proper cleanup in component unmount lifecycle
 
 ### Error Handling
 
-* __Middleware isolation__: Errors in one middleware don't affect others
-* __Event validation__: Type-safe structures prevent runtime errors
-* __Error propagation__: Failed events don't crash the event bus
+- **Middleware isolation**: Errors in one middleware don't affect others
+- **Event validation**: Type-safe structures prevent runtime errors
+- **Error propagation**: Failed events don't crash the event bus
 
 ### Performance
 
-* __Rate limiting__: Middleware prevents event flooding
-* __Efficient forwarding__: IPC events use optimized serialization
-* __Minimal overhead__: Event processing designed for production use
+- **Rate limiting**: Middleware prevents event flooding
+- **Efficient forwarding**: IPC events use optimized serialization
+- **Minimal overhead**: Event processing designed for production use
 
 ## Implementation Requirements
 
@@ -342,13 +342,19 @@ private async forwardEventToRenderer(eventName: string, data: unknown) {
 
 All communication follows this pattern:
 
-* Service layer emits domain events
-* UI components listen to events via IPC
-* Database operations emit lifecycle events
-* Error handling emits failure events
+- Service layer emits domain events
+- UI components listen to events via IPC
+- Database operations emit lifecycle events
+- Error handling emits failure events
+
+### Current Implementation Audit (2025-11-04)
+
+- Inspected `electron/events/TypedEventBus.ts` to confirm middleware, correlation metadata, and type-safe emit/on helpers remain the single event backbone.
+- Verified `electron/services/ipc/utils.ts` uses `registerStandardizedIpcHandler` to forward events and rejects duplicate registrations, matching the standardized gateway described here.
+- Checked `electron/preload/domains/eventsApi.ts` and `src/services/events/EventsService.ts` to ensure renderer subscriptions still traverse the preload bridge with validated cleanup handlers.
 
 ## Related ADRs
 
-* [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
-* [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
-* [ADR-004: Frontend State Management](./ADR_004_FRONTEND_STATE_MANAGEMENT.md)
+- [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
+- [ADR-003: Error Handling Strategy](./ADR_003_ERROR_HANDLING_STRATEGY.md)
+- [ADR-004: Frontend State Management](./ADR_004_FRONTEND_STATE_MANAGEMENT.md)

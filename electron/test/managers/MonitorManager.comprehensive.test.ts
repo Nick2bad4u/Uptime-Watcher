@@ -348,9 +348,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
             );
 
             const mockStatusUpdate: StatusUpdate = {
+                monitor: mockMonitor,
                 siteIdentifier: "site-1",
                 monitorId: "monitor-1",
                 status: "up",
+                site: mockSite,
                 timestamp: new Date().toISOString(),
             };
 
@@ -387,9 +389,11 @@ describe("MonitorManager - Comprehensive Coverage", () => {
 
         it("should handle manual check without monitor ID", async () => {
             const mockStatusUpdate: StatusUpdate = {
+                monitor: mockMonitor,
                 siteIdentifier: "site-1",
                 monitorId: "monitor-1",
                 status: "up",
+                site: mockSite,
                 timestamp: new Date().toISOString(),
             };
 

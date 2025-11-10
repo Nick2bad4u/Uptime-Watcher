@@ -12,6 +12,13 @@ import EventEmitter from "node:events";
 // Set max listeners to prevent memory leak warnings in tests
 const MAX_LISTENERS = 200; // Higher threshold for test environment
 
+const idleRequestTimers = new Map<number, ReturnType<typeof setTimeout>>();
+let idleRequestIdentifier = 0;
+
+const NOOP_INTERSECTION_OBSERVER_CALLBACK: IntersectionObserverCallback = () =>
+    undefined;
+const NOOP_RESIZE_OBSERVER_CALLBACK: ResizeObserverCallback = () => undefined;
+
 // Set default max listeners for all EventEmitter instances
 EventEmitter.defaultMaxListeners = MAX_LISTENERS;
 
@@ -81,43 +88,126 @@ beforeAll(() => {
     });
 
     // Mock IntersectionObserver for component visibility testing
-    globalThis.IntersectionObserver = class MockIntersectionObserver {
-        root = null;
-        rootMargin = "";
-        thresholds = [];
+    globalThis.IntersectionObserver = class MockIntersectionObserver
+        implements IntersectionObserver
+    {
+        private readonly callback: IntersectionObserverCallback;
 
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-        takeRecords() {
+        public readonly root: Element | Document | null;
+
+        public readonly rootMargin: string;
+
+        public readonly thresholds: readonly number[];
+
+        public constructor(
+            callback: IntersectionObserverCallback = NOOP_INTERSECTION_OBSERVER_CALLBACK,
+            options: IntersectionObserverInit = {}
+        ) {
+            this.callback = callback;
+            this.root = options.root ?? null;
+            this.rootMargin = options.rootMargin ?? "";
+            const threshold = options.threshold;
+            if (Array.isArray(threshold)) {
+                this.thresholds = Object.freeze(Array.from(threshold));
+            } else if (typeof threshold === "number") {
+                this.thresholds = Object.freeze([threshold]);
+            } else {
+                this.thresholds = Object.freeze([]);
+            }
+        }
+
+        public disconnect(): void {
+            // no-op
+        }
+
+        public observe(target: Element): void {
+            this.callback(
+                [
+                    {
+                        boundingClientRect: target.getBoundingClientRect(),
+                        intersectionRatio: 0,
+                        intersectionRect: target.getBoundingClientRect(),
+                        isIntersecting: false,
+                        rootBounds: null,
+                        target,
+                        time: performance.now(),
+                    },
+                ],
+                this
+            );
+        }
+
+        public takeRecords(): IntersectionObserverEntry[] {
             return [];
         }
-    } as any;
+
+        public unobserve(_target: Element): void {
+            // no-op
+        }
+    } as unknown as typeof IntersectionObserver;
 
     // Mock ResizeObserver for responsive component testing
-    globalThis.ResizeObserver = class MockResizeObserver {
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-    } as any;
+    globalThis.ResizeObserver = class MockResizeObserver
+        implements ResizeObserver
+    {
+        private readonly callback: ResizeObserverCallback;
+
+        public constructor(
+            callback: ResizeObserverCallback = NOOP_RESIZE_OBSERVER_CALLBACK
+        ) {
+            this.callback = callback;
+        }
+
+        public disconnect(): void {
+            // no-op
+        }
+
+        public observe(
+            target: Element,
+            _options?: ResizeObserverOptions
+        ): void {
+            this.callback(
+                [
+                    {
+                        borderBoxSize: [],
+                        contentBoxSize: [],
+                        contentRect: target.getBoundingClientRect(),
+                        devicePixelContentBoxSize: [],
+                        target,
+                    },
+                ],
+                this
+            );
+        }
+
+        public unobserve(_target: Element): void {
+            // no-op
+        }
+    } as unknown as typeof ResizeObserver;
 
     // Mock requestIdleCallback for performance testing
     globalThis.requestIdleCallback = (
         callback: IdleRequestCallback
     ): number => {
-        const id = setTimeout(
-            () =>
-                callback({
-                    didTimeout: false,
-                    timeRemaining: () => 50,
-                }),
-            1
-        );
-        return id as unknown as number;
+        const handle = setTimeout(() => {
+            callback({
+                didTimeout: false,
+                timeRemaining: () => 50,
+            });
+        }, 1);
+
+        idleRequestIdentifier += 1;
+        const identifier = idleRequestIdentifier;
+        idleRequestTimers.set(identifier, handle);
+        return identifier;
     };
 
     globalThis.cancelIdleCallback = (id: number): void => {
-        clearTimeout(id as unknown as number);
+        const handle = idleRequestTimers.get(id);
+        if (handle) {
+            clearTimeout(handle);
+            idleRequestTimers.delete(id);
+        }
     };
 
     // Mock getComputedStyle for CSS-dependent tests
@@ -155,36 +245,150 @@ beforeAll(() => {
     globalThis.URL.revokeObjectURL = vi.fn();
 
     // Mock File and FileReader for file upload testing
-    globalThis.File = class MockFile {
-        public readonly chunks: any[];
+    globalThis.File = class MockFile extends Blob implements File {
+        public readonly lastModified: number;
 
         public readonly name: string;
 
-        public readonly options: any;
+        public readonly webkitRelativePath = "";
 
-        public constructor(chunks: any[], name: string, options: any = {}) {
-            this.chunks = chunks;
-            this.name = name;
-            this.options = options;
-        }
-        get size() {
-            return this.chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-        }
-        get type() {
-            return this.options.type || "";
-        }
-        get lastModified() {
-            return this.options.lastModified || Date.now();
-        }
-    } as any;
+        public readonly [Symbol.toStringTag] = "File";
 
-    globalThis.FileReader = class MockFileReader {
-        readAsDataURL = vi.fn();
-        readAsText = vi.fn();
-        result = "";
-        onload = null;
-        onerror = null;
-    } as any;
+        public constructor(
+            fileBits: BlobPart[],
+            fileName: string,
+            options: FilePropertyBag = {}
+        ) {
+            super(fileBits, options);
+            this.name = fileName;
+            this.lastModified = options.lastModified ?? Date.now();
+        }
+
+        public override slice(
+            start?: number,
+            end?: number,
+            contentType?: string
+        ): File {
+            const blobSlice = super.slice(start, end, contentType);
+            return new MockFile([blobSlice], this.name, {
+                lastModified: this.lastModified,
+                type: contentType ?? this.type,
+            });
+        }
+    } as unknown as typeof File;
+
+    globalThis.FileReader = class MockFileReader
+        extends EventTarget
+        implements FileReader
+    {
+        public static readonly EMPTY = 0 as const;
+        public static readonly LOADING = 1 as const;
+        public static readonly DONE = 2 as const;
+
+        public readonly EMPTY = MockFileReader.EMPTY;
+        public readonly LOADING = MockFileReader.LOADING;
+        public readonly DONE = MockFileReader.DONE;
+
+        public error: DOMException | null = null;
+
+        public onabort: FileReader["onabort"] = null;
+
+        public onerror: FileReader["onerror"] = null;
+
+        public onload: FileReader["onload"] = null;
+
+        public onloadend: FileReader["onloadend"] = null;
+
+        public onloadstart: FileReader["onloadstart"] = null;
+
+        public onprogress: FileReader["onprogress"] = null;
+
+        public readyState: FileReader["readyState"] = MockFileReader.EMPTY;
+
+        public result: string | ArrayBuffer | null = null;
+
+        public abort: FileReader["abort"] = vi.fn(() => {
+            this.readyState = MockFileReader.DONE;
+            this.emitProgressEvent("abort");
+            this.emitProgressEvent("loadend");
+        });
+
+        public readonly readAsArrayBuffer: FileReader["readAsArrayBuffer"] =
+            vi.fn(async (blob: Blob) => {
+                this.readyState = MockFileReader.LOADING;
+                this.emitProgressEvent("loadstart");
+                const arrayBuffer = await blob.arrayBuffer();
+                this.result = arrayBuffer;
+                this.readyState = MockFileReader.DONE;
+                this.emitProgressEvent("load");
+                this.emitProgressEvent("loadend");
+            });
+
+        public readonly readAsBinaryString: FileReader["readAsBinaryString"] =
+            vi.fn(async (blob: Blob) => {
+                this.readyState = MockFileReader.LOADING;
+                this.emitProgressEvent("loadstart");
+                const arrayBuffer = await blob.arrayBuffer();
+                const view = new Uint8Array(arrayBuffer);
+                this.result = String.fromCodePoint(...view);
+                this.readyState = MockFileReader.DONE;
+                this.emitProgressEvent("load");
+                this.emitProgressEvent("loadend");
+            });
+
+        public readonly readAsDataURL: FileReader["readAsDataURL"] = vi.fn(
+            async (blob: Blob) => {
+                this.readyState = MockFileReader.LOADING;
+                this.emitProgressEvent("loadstart");
+                const buffer = await blob.arrayBuffer();
+                const base64 = Buffer.from(buffer).toString("base64");
+                this.result = `data:${blob.type || "application/octet-stream"};base64,${base64}`;
+                this.readyState = MockFileReader.DONE;
+                this.emitProgressEvent("load");
+                this.emitProgressEvent("loadend");
+            }
+        );
+
+        public readonly readAsText: FileReader["readAsText"] = vi.fn(
+            async (blob: Blob, encoding = "utf8") => {
+                this.readyState = MockFileReader.LOADING;
+                this.emitProgressEvent("loadstart");
+                const buffer = await blob.arrayBuffer();
+                this.result = new TextDecoder(encoding).decode(buffer);
+                this.readyState = MockFileReader.DONE;
+                this.emitProgressEvent("load");
+                this.emitProgressEvent("loadend");
+            }
+        );
+
+        private emitProgressEvent(
+            type: "abort" | "load" | "loadend" | "loadstart"
+        ): void {
+            const event = new ProgressEvent(type);
+            switch (type) {
+                case "abort": {
+                    this.onabort?.(event as ProgressEvent<FileReader>);
+                    break;
+                }
+                case "load": {
+                    this.onload?.(event as ProgressEvent<FileReader>);
+                    break;
+                }
+                case "loadend": {
+                    this.onloadend?.(event as ProgressEvent<FileReader>);
+                    break;
+                }
+                case "loadstart": {
+                    this.onloadstart?.(event as ProgressEvent<FileReader>);
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            this.dispatchEvent(event);
+        }
+    } as unknown as typeof FileReader;
 
     // Mock performance.now for timing tests
     globalThis.performance.now = vi.fn(() => Date.now());

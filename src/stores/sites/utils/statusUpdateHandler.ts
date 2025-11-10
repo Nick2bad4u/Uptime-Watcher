@@ -332,6 +332,7 @@ export class StatusUpdateManager {
             // Call optional update callback
             if (this.onUpdate && updatedSite) {
                 const statusUpdate: StatusUpdate = {
+                    monitor: event.monitor,
                     monitorId: event.monitorId,
                     site: updatedSite,
                     siteIdentifier: event.siteIdentifier,
@@ -345,6 +346,10 @@ export class StatusUpdateManager {
 
                 if (event.previousStatus !== undefined) {
                     statusUpdate.previousStatus = event.previousStatus;
+                }
+
+                if (event.responseTime !== undefined) {
+                    statusUpdate.responseTime = event.responseTime;
                 }
 
                 this.onUpdate(statusUpdate);

@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const utilsPath = "../../../../../../shared/utils/errorHandling";
-const modulePath = "../../../../../../electron/services/monitoring/shared/monitorFactoryUtils";
+const modulePath =
+    "../../../../../../electron/services/monitoring/shared/monitorFactoryUtils";
 
 describe("monitorFactoryUtils.buildMonitorFactory", () => {
     beforeEach(() => {

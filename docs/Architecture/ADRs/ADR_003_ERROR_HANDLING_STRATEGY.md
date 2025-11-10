@@ -2,23 +2,23 @@
 
 ## Status
 
-__Accepted__ - Implemented across all layers with production-grade resilience and monitoring
+**Accepted** - Implemented across all layers with production-grade resilience and monitoring
 
 ## Context
 
 A robust error handling strategy was needed to:
 
-* Prevent cascading failures and system crashes
-* Provide consistent error reporting and user feedback
-* Enable comprehensive debugging and monitoring
-* Maintain application stability under error conditions
-* Preserve error context and stack traces for troubleshooting
-* Support production monitoring and alerting
-* Handle race conditions and concurrent operation failures
+- Prevent cascading failures and system crashes
+- Provide consistent error reporting and user feedback
+- Enable comprehensive debugging and monitoring
+- Maintain application stability under error conditions
+- Preserve error context and stack traces for troubleshooting
+- Support production monitoring and alerting
+- Handle race conditions and concurrent operation failures
 
 ## Decision
 
-We will implement a __comprehensive multi-layered error handling strategy__ with shared utilities, consistent patterns, and production-grade resilience across frontend and backend.
+We will implement a **comprehensive multi-layered error handling strategy** with shared utilities, consistent patterns, and production-grade resilience across frontend and backend.
 
 ### 1. Enhanced Shared Error Handling Utility
 
@@ -55,12 +55,12 @@ await withUtilityErrorHandling(
 
 All database operations use `withDatabaseOperation()` which provides:
 
-* __Exponential backoff retry logic__ with jitter
-* __Event emission__ for operation lifecycle and monitoring
-* __Consistent error handling__ across all database operations
-* __Performance monitoring__ and comprehensive logging
-* __Correlation tracking__ for distributed debugging
-* __Circuit breaker pattern__ for failing operations
+- **Exponential backoff retry logic** with jitter
+- **Event emission** for operation lifecycle and monitoring
+- **Consistent error handling** across all database operations
+- **Performance monitoring** and comprehensive logging
+- **Correlation tracking** for distributed debugging
+- **Circuit breaker pattern** for failing operations
 
 ```typescript
 return withDatabaseOperation(
@@ -87,10 +87,10 @@ function safeStoreOperation(storeOperation: () => void, operationName: string) {
 
 All error handling utilities preserve original errors:
 
-* __Stack traces__ are maintained
-* __Error types__ are preserved
-* __Error properties__ remain intact
-* __Re-throwing__ after logging/handling
+- **Stack traces** are maintained
+- **Error types** are preserved
+- **Error properties** remain intact
+- **Re-throwing** after logging/handling
 
 ## Error Handling Layers
 
@@ -306,31 +306,31 @@ flowchart TD
 
 ### 1. Database Errors
 
-* __Transaction rollback__ on failure
-* __Retry logic__ for transient failures
-* __Event emission__ for monitoring
-* __Structured logging__ with operation context
+- **Transaction rollback** on failure
+- **Retry logic** for transient failures
+- **Event emission** for monitoring
+- **Structured logging** with operation context
 
 ### 2. Network Errors
 
-* __Timeout handling__ with configurable limits
-* __Retry strategies__ based on error type
-* __Fallback mechanisms__ for offline scenarios
-* __Connection state tracking__
+- **Timeout handling** with configurable limits
+- **Retry strategies** based on error type
+- **Fallback mechanisms** for offline scenarios
+- **Connection state tracking**
 
 ### 3. Validation Errors
 
-* __Type-safe validation__ at boundaries
-* __User-friendly error messages__
-* __Field-specific error reporting__
-* __Prevention of invalid state propagation__
+- **Type-safe validation** at boundaries
+- **User-friendly error messages**
+- **Field-specific error reporting**
+- **Prevention of invalid state propagation**
 
 ### 4. UI Errors
 
-* __Error boundaries__ for component isolation
-* __Graceful degradation__ with fallback UI
-* __User notification__ without technical details
-* __State recovery__ mechanisms
+- **Error boundaries** for component isolation
+- **Graceful degradation** with fallback UI
+- **User notification** without technical details
+- **State recovery** mechanisms
 
 ## Monitoring and Observability
 
@@ -517,41 +517,41 @@ try {
 
 ### Positive
 
-* __Enhanced system stability__ - Errors don't cascade or crash the application
-* __Superior debugging capability__ - Rich error context and correlation tracking
-* __Optimal user experience__ - Graceful error handling with appropriate messaging
-* __Comprehensive monitoring__ - Error tracking, metrics, and observability
-* __Excellent maintainability__ - Consistent error handling patterns across all layers
-* __Memory safety__ - Proper resource cleanup and leak prevention
-* __Race condition immunity__ - Operation correlation prevents state corruption
-* __Production readiness__ - Circuit breakers and retry mechanisms
+- **Enhanced system stability** - Errors don't cascade or crash the application
+- **Superior debugging capability** - Rich error context and correlation tracking
+- **Optimal user experience** - Graceful error handling with appropriate messaging
+- **Comprehensive monitoring** - Error tracking, metrics, and observability
+- **Excellent maintainability** - Consistent error handling patterns across all layers
+- **Memory safety** - Proper resource cleanup and leak prevention
+- **Race condition immunity** - Operation correlation prevents state corruption
+- **Production readiness** - Circuit breakers and retry mechanisms
 
 ### Negative
 
-* __Moderate complexity increase__ - Multiple error handling layers require understanding
-* __Minimal performance overhead__ - Error handling adds negligible processing time
-* __Learning curve__ - Developers need to understand comprehensive error handling patterns
-* __Debugging complexity__ - Rich error context requires proper tooling to interpret
+- **Moderate complexity increase** - Multiple error handling layers require understanding
+- **Minimal performance overhead** - Error handling adds negligible processing time
+- **Learning curve** - Developers need to understand comprehensive error handling patterns
+- **Debugging complexity** - Rich error context requires proper tooling to interpret
 
 ## Quality Assurance
 
 ### Memory Management
 
-* __Automatic cleanup__: All error handlers ensure resource cleanup
-* __Event listener management__: Cleanup functions prevent memory leaks
-* __Resource disposal__: Failed operations properly dispose of allocated resources
+- **Automatic cleanup**: All error handlers ensure resource cleanup
+- **Event listener management**: Cleanup functions prevent memory leaks
+- **Resource disposal**: Failed operations properly dispose of allocated resources
 
 ### Concurrency Safety
 
-* __Operation correlation__: Prevents race conditions in async operations
-* __State validation__: Operations validate state before making changes
-* __Atomic operations__: Critical sections use proper synchronization
+- **Operation correlation**: Prevents race conditions in async operations
+- **State validation**: Operations validate state before making changes
+- **Atomic operations**: Critical sections use proper synchronization
 
 ### Production Monitoring
 
-* __Error classification__: Errors categorized by severity and type
-* __Metric collection__: Performance and failure metrics for alerting
-* __Distributed tracing__: Correlation IDs enable cross-service debugging
+- **Error classification**: Errors categorized by severity and type
+- **Metric collection**: Performance and failure metrics for alerting
+- **Distributed tracing**: Correlation IDs enable cross-service debugging
 
 ## Implementation Guidelines
 
@@ -576,10 +576,10 @@ try {
 
 ### 2. Use Appropriate Error Handling Level
 
-* __Utilities__: `withUtilityErrorHandling()`
-* __Database__: `withDatabaseOperation()`
-* __Frontend__: `withErrorHandling()` with store
-* __Backend__: `withErrorHandling()` with logger
+- **Utilities**: `withUtilityErrorHandling()`
+- **Database**: `withDatabaseOperation()`
+- **Frontend**: `withErrorHandling()` with store
+- **Backend**: `withErrorHandling()` with logger
 
 ### 3. Emit Events for Failures
 
@@ -589,13 +589,19 @@ All significant operations should emit failure events for monitoring.
 
 All layers implement this error handling strategy:
 
-* Repository operations use `withDatabaseOperation()`
-* Frontend operations use `withErrorHandling()` with stores
-* Utilities provide fallback mechanisms
-* Services emit error events
+- Repository operations use `withDatabaseOperation()`
+- Frontend operations use `withErrorHandling()` with stores
+- Utilities provide fallback mechanisms
+- Services emit error events
+
+### Current Implementation Audit (2025-11-04)
+
+- Reviewed `shared/utils/errorHandling.ts` to confirm `withErrorHandling`, `withUtilityErrorHandling`, and `ensureError` remain the shared entry points consumed across renderer and Electron tests.
+- Validated `electron/utils/operationalHooks.ts` still wraps database and long-running operations with retry backoff and structured logging.
+- Confirmed renderer cleanup helpers in `src/services/utils/cleanupHandlers.ts` propagate bridge failures through the documented error-handling flow, aligning with the @remarks guidance above.
 
 ## Related ADRs
 
-* [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
-* [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
-* [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)
+- [ADR-001: Repository Pattern](./ADR_001_REPOSITORY_PATTERN.md)
+- [ADR-002: Event-Driven Architecture](./ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)
+- [ADR-005: IPC Communication Protocol](./ADR_005_IPC_COMMUNICATION_PROTOCOL.md)

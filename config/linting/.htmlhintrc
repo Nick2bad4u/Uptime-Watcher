@@ -1,17 +1,16 @@
 {
     "$schema": "https://www.schemastore.org/htmlhint.json",
-    "attr-sorted": false,
-    "attr-value-single-quotes": false,
-    "attr-whitespace": false,
-    "tags-check": true,
     "alt-require": true,
     "attr-lowercase": true,
     "attr-no-duplication": true,
     "attr-no-unnecessary-whitespace": true,
+    "attr-sorted": false,
     "attr-unsafe-chars": true,
     "attr-value-double-quotes": true,
     "attr-value-no-duplication": true,
     "attr-value-not-empty": false,
+    "attr-value-single-quotes": false,
+    "attr-whitespace": false,
     "button-type-require": true,
     "doctype-first": true,
     "doctype-html5": true,
@@ -39,5 +38,6 @@
     "tag-self-close": true,
     "tagname-lowercase": true,
     "tagname-specialchars": true,
+    "tags-check": true,
     "title-require": true
 }

@@ -1247,21 +1247,29 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Business Logic", "type");
 
-                const delay = 50;
-                const mockHandler = vi.fn().mockImplementation(async () => {
-                    await new Promise((resolve) => setTimeout(resolve, delay));
-                    return "delayed result";
-                });
+                const expectedDuration = 50;
+                const startTime = 10_000;
+                const endTime = startTime + expectedDuration;
+                const nowSpy = vi.spyOn(Date, "now");
+                const mockHandler = vi.fn().mockResolvedValue("delayed result");
 
-                const result = await withIpcHandler(
-                    "timing-channel",
-                    mockHandler
-                );
+                try {
+                    nowSpy
+                        .mockReturnValueOnce(startTime)
+                        .mockReturnValueOnce(endTime);
 
-                expect(result.metadata?.["duration"]).toBeGreaterThanOrEqual(
-                    delay - 10
-                );
-                expect(result.metadata?.["duration"]).toBeLessThan(delay + 100);
+                    const result = await withIpcHandler(
+                        "timing-channel",
+                        mockHandler
+                    );
+
+                    expect(mockHandler).toHaveBeenCalledTimes(1);
+                    expect(result.metadata?.["duration"]).toBe(
+                        expectedDuration
+                    );
+                } finally {
+                    nowSpy.mockRestore();
+                }
             });
         });
 
@@ -1426,23 +1434,33 @@ describe("IPC Utils - Comprehensive Coverage", () => {
                 await annotate("Category: Service", "category");
                 await annotate("Type: Validation", "type");
 
-                const delay = 30;
-                const mockHandler = vi.fn().mockImplementation(async () => {
-                    await new Promise((resolve) => setTimeout(resolve, delay));
-                    return "timed result";
-                });
+                const expectedDuration = 30;
+                const startTime = 20_000;
+                const endTime = startTime + expectedDuration;
+                const nowSpy = vi.spyOn(Date, "now");
+                const mockHandler = vi.fn().mockResolvedValue("timed result");
                 const mockValidator = vi.fn().mockReturnValue(null);
 
-                const result = await withIpcHandlerValidation(
-                    "timed-validated-channel",
-                    mockHandler,
-                    mockValidator,
-                    []
-                );
+                try {
+                    nowSpy
+                        .mockReturnValueOnce(startTime)
+                        .mockReturnValueOnce(endTime);
 
-                expect(result.metadata?.["duration"]).toBeGreaterThanOrEqual(
-                    delay - 10
-                );
+                    const result = await withIpcHandlerValidation(
+                        "timed-validated-channel",
+                        mockHandler,
+                        mockValidator,
+                        []
+                    );
+
+                    expect(mockHandler).toHaveBeenCalledTimes(1);
+                    expect(mockValidator).toHaveBeenCalledWith([]);
+                    expect(result.metadata?.["duration"]).toBe(
+                        expectedDuration
+                    );
+                } finally {
+                    nowSpy.mockRestore();
+                }
             });
         });
 

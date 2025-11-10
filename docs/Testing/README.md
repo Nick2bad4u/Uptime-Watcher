@@ -21,10 +21,10 @@ docs/Testing/
 
 The Uptime Watcher application uses a comprehensive testing strategy with multiple frameworks:
 
-* __Vitest__ - Unit and integration testing
-* __Playwright__ - End-to-end and Electron testing
-* __Fast-check__ - Property-based testing and fuzzing
-* __Coverage analysis__ - Comprehensive code coverage tracking
+- **Vitest** - Unit and integration testing
+- **Playwright** - End-to-end and Electron testing
+- **Fast-check** - Property-based testing and fuzzing
+- **Coverage analysis** - Comprehensive code coverage tracking
 
 ### Test pipeline overview
 
@@ -52,9 +52,9 @@ flowchart LR
 
 For new developers getting started with testing:
 
-1. __[Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md)__ - Complete E2E testing setup
-2. __[Headless testing](./HEADLESS_TESTING.md)__ - Running tests without UI
-3. __[Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)__ - Configuring test output
+1. **[Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md)** - Complete E2E testing setup
+2. **[Headless testing](./HEADLESS_TESTING.md)** - Running tests without UI
+3. **[Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)** - Configuring test output
 
 ## 📖 Testing guides
 
@@ -105,56 +105,56 @@ npm run bench
 
 ### Testing different components
 
-* __Frontend tests__ - React component testing with Vitest
-* __Electron tests__ - Main process and IPC testing
-* __Shared module tests__ - Utility and service testing
-* __E2E tests__ - Full application workflow testing with Playwright
+- **Frontend tests** - React component testing with Vitest
+- **Electron tests** - Main process and IPC testing
+- **Shared module tests** - Utility and service testing
+- **E2E tests** - Full application workflow testing with Playwright
 
 ## 🔧 Test configuration
 
 Test configuration files are located in the project root:
 
-* `vitest.config.ts` - Main Vitest configuration
-* `vitest.electron.config.ts` - Electron-specific test configuration
-* `vitest.shared.config.ts` - Shared module test configuration
-* `playwright.config.ts` - Playwright E2E test configuration
+- `vitest.config.ts` - Main Vitest configuration
+- `vitest.electron.config.ts` - Electron-specific test configuration
+- `vitest.shared.config.ts` - Shared module test configuration
+- `playwright.config.ts` - Playwright E2E test configuration
 
 ## 🎯 Testing best practices
 
 ### Unit testing
 
-* Test individual functions and components in isolation
-* Use mocking for external dependencies
-* Aim for high code coverage on critical paths
-* Follow AAA pattern (Arrange, Act, Assert)
+- Test individual functions and components in isolation
+- Use mocking for external dependencies
+- Aim for high code coverage on critical paths
+- Follow AAA pattern (Arrange, Act, Assert)
 
 ### Integration testing
 
-* Test component interactions and data flows
-* Verify IPC communication between processes
-* Test database operations and state management
-* Use real services where possible, mock external APIs
+- Test component interactions and data flows
+- Verify IPC communication between processes
+- Test database operations and state management
+- Use real services where possible, mock external APIs
 
 ### End-to-end testing
 
-* Test complete user workflows
-* Verify UI behavior and user interactions
-* Test across different operating systems
-* Use Playwright for cross-browser compatibility
+- Test complete user workflows
+- Verify UI behavior and user interactions
+- Test across different operating systems
+- Use Playwright for cross-browser compatibility
 
 ### Property-based testing
 
-* Use fast-check for testing invariants
-* Generate random inputs to find edge cases
-* Focus on critical algorithms and data processing
-* Supplement unit tests with property-based tests
+- Use fast-check for testing invariants
+- Generate random inputs to find edge cases
+- Focus on critical algorithms and data processing
+- Supplement unit tests with property-based tests
 
 ## 🗂️ Navigation
 
-* __[Main documentation](../../README.md)__ - Project overview and setup
-* __[Architecture documentation](../Architecture/README.md)__ - System design and patterns
-* __[Guides documentation](../Guides/README.md)__ - Development guides and tutorials
-* __[TSDoc documentation](../TSDoc/README.md)__ - Code documentation standards
+- **[Main documentation](../../README.md)** - Project overview and setup
+- **[Architecture documentation](../Architecture/README.md)** - System design and patterns
+- **[Guides documentation](../Guides/README.md)** - Development guides and tutorials
+- **[TSDoc documentation](../TSDoc/README.md)** - Code documentation standards
 
 ## 📝 Contributing to testing
 

@@ -1,7 +1,7 @@
 # This workflow scans distributable files in release-dist/ with VirusTotal after every push to main or manual dispatch.
 # It uses the crazy-max/ghaction-virustotal action and your provided API key (should be stored as a secret in production).
 
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: VirusTotal Scan
 
 on:

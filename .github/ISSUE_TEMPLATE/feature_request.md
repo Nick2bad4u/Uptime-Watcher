@@ -4,6 +4,7 @@ about: Suggest an idea for Uptime Watcher
 title: "Feature request title"
 labels: enhancement
 assignees: Nick2bad4u
+schema: https://www.schemastore.org/github-issue-forms.json
 ---
 
 ## 💡 Feature Description

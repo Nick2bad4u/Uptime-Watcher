@@ -84,12 +84,12 @@ repos:
 
             id: check-github-workflows
             name: "🐙 github-actions · Validate workflow files"
-          - args: ["--schemafile", "https://json.schemastore.org/package.json"]
+          - args: ["--schemafile", "https://www.schemastore.org/tsconfig.json"]
 
             files: "^package\\.json$"
             id: check-jsonschema
             name: "✅ config · Validate package.json"
-          - args: ["--schemafile", "https://json.schemastore.org/tsconfig.json"]
+          - args: ["--schemafile", "https://www.schemastore.org/package.json"]
 
             files: "^tsconfig.*\\.json$"
             id: check-jsonschema

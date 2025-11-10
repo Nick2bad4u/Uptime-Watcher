@@ -358,10 +358,7 @@ describe("Constants and Configuration 100% Coverage", () => {
 
             const end = performance.now();
 
-            const isCoverageRun = Object.hasOwn(
-                globalThis,
-                "__coverage__"
-            );
+            const isCoverageRun = Object.hasOwn(globalThis, "__coverage__");
 
             const thresholdMs = isCoverageRun ? 25 : 10;
 

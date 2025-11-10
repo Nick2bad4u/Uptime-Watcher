@@ -1,35 +1,40 @@
 /**
- * Utilities for validating cleanup handlers returned by preload-managed
+ * Utility helpers for validating cleanup handlers returned by preload-managed
  * subscriptions.
  *
  * @remarks
- * Renderer services frequently subscribe to IPC-driven event streams exposed by
- * the preload bridge. These subscriptions are expected to return cleanup
- * functions but in practice may yield unexpected values when bridges are
- * misconfigured or when channel contracts drift. The helpers in this module
- * enforce consistent validation and error handling across services while
- * allowing each caller to customize diagnostics.
- *
- * @packageDocumentation
+ * Renderer services frequently subscribe to IPC-backed event streams exposed by
+ * the preload bridge. Those subscriptions are expected to return cleanup
+ * functions, yet they occasionally produce unexpected values when bridges are
+ * misconfigured or when contracts drift. The helpers in this module normalise
+ * the returned values and centralise error handling while still allowing
+ * callers to supply service-specific diagnostics.
  */
 
 /**
  * Context supplied when a preload subscription returns an invalid cleanup
- * value.
+ * candidate.
  *
- * @public
+ * @remarks
+ * The {@link CleanupResolutionHandlers.handleInvalidCleanup} hook receives this
+ * structure whenever the preload bridge fails to return a callable cleanup
+ * function.
  */
 export interface CleanupValidationContext {
-    /** Type reported by {@link typeof} for the cleanup candidate. */
+    /** Type reported by the `typeof` operator for the cleanup candidate. */
     readonly actualType: string;
     /** Raw value returned by the preload bridge. */
     readonly cleanupCandidate: unknown;
 }
 
 /**
- * Callback contract used when validating cleanup handlers.
+ * Callback contract used when validating cleanup handlers returned from the
+ * preload bridge.
  *
- * @public
+ * @remarks
+ * Services provide implementations for these hooks so they can capture
+ * diagnostics and supply fallbacks that preserve their public contract even
+ * when the bridge misbehaves.
  */
 export interface CleanupResolutionHandlers {
     /**
@@ -49,6 +54,11 @@ export interface CleanupResolutionHandlers {
 /**
  * Determines whether a candidate value is a callable cleanup function.
  *
+ * @remarks
+ * Cleanups are expected to be zero-argument functions. Any other type is
+ * treated as invalid so callers can build an error path that preserves the
+ * service contract.
+ *
  * @param candidate - Value produced by the preload bridge.
  *
  * @returns `true` when the candidate is a zero-argument function.
@@ -59,6 +69,13 @@ const isCleanupFunction = (candidate: unknown): candidate is () => void =>
 /**
  * Normalizes a cleanup candidate into a callable cleanup function.
  *
+ * @remarks
+ * When the preload bridge returns something other than a function the
+ * {@link CleanupResolutionHandlers.handleInvalidCleanup} hook decides how to
+ * proceed. Otherwise the returned function is wrapped so any cleanup failure is
+ * forwarded to {@link CleanupResolutionHandlers.handleCleanupError} without
+ * breaking the caller's control flow.
+ *
  * @param cleanupCandidate - Value produced by the preload bridge when
  *   registering a subscription.
  * @param handlers - Hooks used to react to invalid cleanup values or cleanup
@@ -66,8 +83,6 @@ const isCleanupFunction = (candidate: unknown): candidate is () => void =>
  *
  * @returns A cleanup function that is safe for callers to invoke regardless of
  *   the original cleanup candidate shape.
- *
- * @public
  */
 export const resolveCleanupHandler = (
     cleanupCandidate: unknown,
@@ -94,13 +109,17 @@ export const resolveCleanupHandler = (
 /**
  * Registers a subscription and validates the resulting cleanup handler.
  *
+ * @remarks
+ * The helper awaits the subscription result, passes it through
+ * {@link resolveCleanupHandler}, and returns the normalised cleanup callback.
+ * Services use this to guarantee symmetrical setup and teardown even when the
+ * preload bridge returns incorrect values.
+ *
  * @param register - Function invoking the preload subscription and returning
- *   the cleanup candidate (or a promise thereof).
+ *   the cleanup candidate or a promise for one.
  * @param handlers - Hooks for invalid cleanup values and cleanup failures.
  *
  * @returns Promise resolving to a normalized cleanup function.
- *
- * @public
  */
 export const subscribeWithValidatedCleanup = async (
     register: () => unknown,

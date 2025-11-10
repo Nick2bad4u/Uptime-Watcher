@@ -77,7 +77,7 @@
  * @see {@link TypedEventBus} for event system implementation
  */
 
-/* eslint max-lines: ["error", { "max": 2000 }] -- Main orchestrator module */
+/* eslint max-lines: ["error", { "max": 2100 }] -- Main orchestrator module */
 
 import type {
     Monitor,
@@ -125,6 +125,66 @@ import { diagnosticsLogger, logger } from "./utils/logger";
 
 /** Logical event bus identifier applied to forwarded renderer events. */
 const ORCHESTRATOR_BUS_ID = "UptimeOrchestrator" as const;
+
+type MonitoringOperationScope = "global" | "monitor" | "site";
+
+const determineMonitoringScope = (
+    identifier: string,
+    monitorId?: string
+): MonitoringOperationScope => {
+    if (identifier === "all") {
+        return "global";
+    }
+
+    if (typeof monitorId === "string" && monitorId.length > 0) {
+        return "monitor";
+    }
+
+    return "site";
+};
+
+function mergeMonitorSnapshots(
+    canonicalMonitor: Monitor,
+    cachedMonitor?: Monitor
+): Monitor {
+    if (!cachedMonitor) {
+        return canonicalMonitor;
+    }
+
+    const cachedPartial = cachedMonitor as Partial<Monitor>;
+    let mergedHistory = canonicalMonitor.history;
+
+    if (Array.isArray(cachedPartial.history)) {
+        mergedHistory = cachedPartial.history;
+    }
+
+    return {
+        ...canonicalMonitor,
+        ...cachedPartial,
+        history: mergedHistory,
+    } satisfies Monitor;
+}
+
+function mergeSiteSnapshots(canonicalSite: Site, cachedSite?: Site): Site {
+    if (!cachedSite) {
+        return canonicalSite;
+    }
+
+    const monitors = canonicalSite.monitors.map((canonicalMonitor) =>
+        mergeMonitorSnapshots(
+            canonicalMonitor,
+            cachedSite.monitors.find(
+                (candidate) => candidate.id === canonicalMonitor.id
+            )
+        )
+    );
+
+    return {
+        ...canonicalSite,
+        monitoring: cachedSite.monitoring,
+        monitors,
+    } satisfies Site;
+}
 
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
@@ -352,38 +412,47 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     ): void => {
         void (async (): Promise<void> => {
             try {
-                const sites = this.siteManager.getSitesFromCache();
-                const { identifier, summary } = eventData;
+                const { identifier, monitorId, summary } = eventData;
+                const scope = determineMonitoringScope(identifier, monitorId);
 
-                const siteCount = summary?.siteCount ?? sites.length;
-                const monitorCount =
-                    summary?.succeeded ??
-                    sites.reduce(
-                        (total: number, site: Site) =>
-                            total + site.monitors.length,
-                        0
+                if (scope === "global") {
+                    const sites = this.siteManager.getSitesFromCache();
+
+                    const siteCount = summary?.siteCount ?? sites.length;
+                    const monitorCount =
+                        summary?.succeeded ??
+                        sites.reduce(
+                            (total: number, site: Site) =>
+                                total + site.monitors.length,
+                            0
+                        );
+
+                    const payloadBase = {
+                        monitorCount,
+                        siteCount,
+                        timestamp: Date.now(),
+                    };
+
+                    const payload: UptimeEvents["monitoring:started"] = summary
+                        ? { ...payloadBase, summary }
+                        : payloadBase;
+
+                    attachForwardedMetadata({
+                        busId: ORCHESTRATOR_BUS_ID,
+                        forwardedEvent: "monitoring:started",
+                        payload,
+                        source: eventData,
+                    });
+
+                    await this.emitTyped("monitoring:started", payload);
+                } else {
+                    logger.debug(
+                        "[UptimeOrchestrator] Skipping monitoring:started broadcast for scoped operation",
+                        { identifier, monitorId, scope }
                     );
+                }
 
-                const payloadBase = {
-                    monitorCount,
-                    siteCount,
-                    timestamp: Date.now(),
-                };
-
-                const payload: UptimeEvents["monitoring:started"] = summary
-                    ? { ...payloadBase, summary }
-                    : payloadBase;
-
-                attachForwardedMetadata({
-                    busId: ORCHESTRATOR_BUS_ID,
-                    forwardedEvent: "monitoring:started",
-                    payload,
-                    source: eventData,
-                });
-
-                await this.emitTyped("monitoring:started", payload);
-
-                const invalidationType = identifier === "all" ? "all" : "site";
+                const invalidationType = scope === "global" ? "all" : "site";
 
                 // Emit cache invalidation to trigger frontend state refresh
                 const cacheInvalidationPayload = {
@@ -434,36 +503,44 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     ): void => {
         void (async (): Promise<void> => {
             try {
-                // Always get the actual active monitor count from scheduler
-                // instead of relying on global monitoring state flag
-                const activeMonitors =
-                    this.monitorManager.getActiveMonitorCount();
+                const { identifier, monitorId, reason, summary } = eventData;
+                const scope = determineMonitoringScope(identifier, monitorId);
 
-                const { identifier, reason, summary } = eventData;
+                if (scope === "global") {
+                    // Always get the actual active monitor count from scheduler
+                    // instead of relying on global monitoring state flag
+                    const activeMonitors =
+                        this.monitorManager.getActiveMonitorCount();
 
-                const stopPayloadBase = {
-                    activeMonitors,
-                    reason,
-                    timestamp: Date.now(),
-                };
+                    const stopPayloadBase = {
+                        activeMonitors,
+                        reason,
+                        timestamp: Date.now(),
+                    };
 
-                const payload: UptimeEvents["monitoring:stopped"] = summary
-                    ? {
-                          ...stopPayloadBase,
-                          summary,
-                      }
-                    : stopPayloadBase;
+                    const payload: UptimeEvents["monitoring:stopped"] = summary
+                        ? {
+                              ...stopPayloadBase,
+                              summary,
+                          }
+                        : stopPayloadBase;
 
-                attachForwardedMetadata({
-                    busId: ORCHESTRATOR_BUS_ID,
-                    forwardedEvent: "monitoring:stopped",
-                    payload,
-                    source: eventData,
-                });
+                    attachForwardedMetadata({
+                        busId: ORCHESTRATOR_BUS_ID,
+                        forwardedEvent: "monitoring:stopped",
+                        payload,
+                        source: eventData,
+                    });
 
-                await this.emitTyped("monitoring:stopped", payload);
+                    await this.emitTyped("monitoring:stopped", payload);
+                } else {
+                    logger.debug(
+                        "[UptimeOrchestrator] Skipping monitoring:stopped broadcast for scoped operation",
+                        { identifier, monitorId, scope }
+                    );
+                }
 
-                const invalidationType = identifier === "all" ? "all" : "site";
+                const invalidationType = scope === "global" ? "all" : "site";
 
                 // Emit cache invalidation to trigger frontend state refresh
                 const cacheInvalidationPayload = {
@@ -526,35 +603,68 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                     return;
                 }
 
-                let enrichedResult = result;
+                const monitorFromPayload = (result as Partial<StatusUpdate>)
+                    .monitor;
+                const siteFromPayload = (result as Partial<StatusUpdate>).site;
 
-                if (!enrichedResult.site || !enrichedResult.monitor) {
-                    const site =
-                        this.siteManager.getSiteFromCache(siteIdentifier);
+                const siteFromCache =
+                    this.siteManager.getSiteFromCache(siteIdentifier);
 
-                    if (site) {
-                        const monitor = site.monitors.find(
-                            (candidate) => candidate.id === monitorId
-                        );
-                        enrichedResult = {
-                            ...enrichedResult,
-                            site,
-                            ...(monitor ? { monitor } : {}),
-                        };
-
-                        if (!monitor) {
-                            logger.warn(
-                                "[UptimeOrchestrator] Manual check completion had no monitor snapshot; populated from cache without monitor match",
-                                { monitorId, siteIdentifier }
-                            );
-                        }
-                    } else {
-                        logger.warn(
-                            "[UptimeOrchestrator] Manual check completion received but site missing from cache",
-                            { monitorId, siteIdentifier }
-                        );
-                    }
+                if (!siteFromCache) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion received but site missing from cache",
+                        { monitorId, siteIdentifier }
+                    );
                 }
+
+                const monitorFromCache = siteFromCache?.monitors.find(
+                    (candidate) => candidate.id === monitorId
+                );
+
+                if (siteFromCache && !monitorFromCache) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion had no monitor snapshot in cache; using payload context",
+                        { monitorId, siteIdentifier }
+                    );
+                }
+
+                const canonicalMonitor = monitorFromPayload ?? monitorFromCache;
+
+                if (!canonicalMonitor) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion missing monitor context after validation",
+                        { monitorId, siteIdentifier }
+                    );
+
+                    return;
+                }
+
+                const canonicalSite = siteFromPayload ?? siteFromCache;
+
+                if (!canonicalSite) {
+                    logger.warn(
+                        "[UptimeOrchestrator] Manual check completion missing site context after validation",
+                        { monitorId, siteIdentifier }
+                    );
+
+                    return;
+                }
+
+                const enrichedMonitor = mergeMonitorSnapshots(
+                    canonicalMonitor,
+                    monitorFromCache
+                );
+
+                const enrichedSite = mergeSiteSnapshots(
+                    canonicalSite,
+                    siteFromCache
+                );
+
+                const enrichedResult: StatusUpdate = {
+                    ...result,
+                    monitor: enrichedMonitor,
+                    site: enrichedSite,
+                };
 
                 const payload = {
                     checkType: "manual" as const,

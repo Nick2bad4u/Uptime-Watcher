@@ -5,6 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
+import { MONITOR_STATUS, STATUS_HISTORY_VALUES } from "@shared/types";
 import type {
     MonitorType,
     Monitor,
@@ -14,14 +15,22 @@ import type {
 } from "@shared/types";
 import type { UpdateStatus } from "../stores/types";
 
+const createTestMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
+    ...overrides,
+    checkInterval: overrides.checkInterval ?? 60_000,
+    history: overrides.history ?? [],
+    id: overrides.id ?? "test-monitor-id",
+    monitoring: overrides.monitoring ?? true,
+    responseTime: overrides.responseTime ?? 0,
+    retryAttempts: overrides.retryAttempts ?? 0,
+    status: overrides.status ?? "up",
+    timeout: overrides.timeout ?? 30_000,
+    type: overrides.type ?? "http",
+});
+
 describe("Types Module", () => {
     describe("Type Definitions", () => {
         it("should export UpdateStatus type", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Export Operation", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -48,11 +57,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Export Operation", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Export Operation", "type");
-
             const monitorTypes: MonitorType[] = ["http", "port"] as const;
 
             for (const type of monitorTypes) {
@@ -63,11 +67,6 @@ describe("Types Module", () => {
 
     describe("Monitor Interface", () => {
         it("should create valid Monitor object", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -109,11 +108,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             const monitor: Monitor = {
                 id: "http-monitor",
                 type: "http",
@@ -135,11 +129,6 @@ describe("Types Module", () => {
         });
 
         it("should create valid Port Monitor", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -173,16 +162,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
-            const statuses: ("up" | "down" | "pending")[] = [
-                "up",
-                "down",
-                "pending",
-            ];
+            const statuses = Object.values(MONITOR_STATUS);
 
             for (const status of statuses) {
                 const monitor: Monitor = {
@@ -209,11 +189,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             const site: Site = {
                 identifier: "site-123",
                 name: "Test Site",
@@ -231,11 +206,6 @@ describe("Types Module", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -286,11 +256,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             const site: Site = {
                 identifier: "minimal-site",
                 monitors: [],
@@ -307,11 +272,6 @@ describe("Types Module", () => {
 
     describe("StatusHistory Interface", () => {
         it("should create valid StatusHistory object", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -334,14 +294,7 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
-            const statuses: ("up" | "down")[] = ["up", "down"] as const;
-
-            for (const status of statuses) {
+            for (const status of STATUS_HISTORY_VALUES) {
                 const history: StatusHistory = {
                     timestamp: Date.now(),
                     status,
@@ -353,11 +306,6 @@ describe("Types Module", () => {
         });
 
         it("should handle zero response time", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -380,20 +328,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "update-site",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -414,20 +359,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Constructor", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Constructor", "type");
-
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "new-site",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const statusUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -447,26 +389,19 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
-            const statuses: ("up" | "down" | "pending")[] = [
-                "up",
-                "down",
-                "pending",
-            ];
+            const statuses = Object.values(MONITOR_STATUS);
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             for (const status of statuses) {
                 const statusUpdate: StatusUpdate = {
-                    monitorId: "test-monitor-id",
+                    monitor,
+                    monitorId: monitor.id,
                     status: "up",
                     siteIdentifier: site.identifier,
                     timestamp: new Date().toISOString(),
@@ -484,11 +419,6 @@ describe("Types Module", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -541,11 +471,34 @@ describe("Types Module", () => {
                     checkSiteNow: () =>
                         Promise.resolve({
                             details: "Manual check completed",
+                            monitor: {
+                                checkInterval: 60_000,
+                                history: [],
+                                id: "monitor-1",
+                                monitoring: true,
+                                responseTime: 0,
+                                retryAttempts: 0,
+                                status: "up",
+                                timeout: 30_000,
+                                type: "http",
+                            },
                             monitorId: "monitor-1",
                             previousStatus: "up",
                             site: {
                                 identifier: "checked-id",
-                                monitors: [],
+                                monitors: [
+                                    {
+                                        checkInterval: 60_000,
+                                        history: [],
+                                        id: "monitor-1",
+                                        monitoring: true,
+                                        responseTime: 0,
+                                        retryAttempts: 0,
+                                        status: "up",
+                                        timeout: 30_000,
+                                        type: "http",
+                                    },
+                                ],
                                 monitoring: true,
                                 name: "Checked",
                             },
@@ -657,11 +610,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Monitoring", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Monitoring", "type");
-
             const monitor: Monitor = {
                 id: "test",
                 type: "http",
@@ -688,11 +636,6 @@ describe("Types Module", () => {
             task,
             annotate,
         }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -725,20 +668,17 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Update", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Update", "type");
-
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
 
             const update: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),
@@ -751,11 +691,6 @@ describe("Types Module", () => {
 
     describe("Optional Fields", () => {
         it("should handle optional Monitor fields", ({ task, annotate }) => {
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Monitoring", "type");
-
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: types", "component");
             annotate("Category: Core", "category");
@@ -791,11 +726,6 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Business Logic", "type");
-
             const minimalSite: Site = {
                 identifier: "minimal",
                 monitors: [],
@@ -816,19 +746,16 @@ describe("Types Module", () => {
             annotate("Category: Core", "category");
             annotate("Type: Data Update", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: types", "component");
-            annotate("Category: Core", "category");
-            annotate("Type: Data Update", "type");
-
+            const monitor = createTestMonitor();
             const site: Site = {
                 identifier: "test",
-                monitors: [],
+                monitors: [monitor],
                 name: "",
                 monitoring: false,
             };
             const minimalUpdate: StatusUpdate = {
-                monitorId: "test-monitor-id",
+                monitor,
+                monitorId: monitor.id,
                 status: "up",
                 siteIdentifier: site.identifier,
                 timestamp: new Date().toISOString(),

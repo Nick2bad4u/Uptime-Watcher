@@ -4,7 +4,7 @@ about: Create a report to help us improve Uptime Watcher
 title: "Brief description"
 labels: bug
 assignees: Nick2bad4u
-schema: https://www.schemastore.org/github-issue-templates/bug-report.md
+schema: https://www.schemastore.org/github-issue-forms.json
 ---
 
 ## 🐛 Bug Description

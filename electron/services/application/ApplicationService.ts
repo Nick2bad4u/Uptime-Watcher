@@ -57,6 +57,23 @@ import { app } from "electron";
 import { logger } from "../../utils/logger";
 import { ServiceContainer } from "../ServiceContainer";
 
+/**
+ * Type guard that verifies whether a service-like object exposes a callable
+ * {@link close} method suitable for lifecycle cleanup.
+ *
+ * @param candidate - Arbitrary value to inspect.
+ *
+ * @returns `true` when the value is an object containing a function-valued
+ *   `close` property.
+ */
+const hasCloseFunction = (
+    candidate: unknown
+): candidate is { close: () => void } =>
+    typeof candidate === "object" &&
+    candidate !== null &&
+    "close" in candidate &&
+    typeof (candidate as { close?: unknown }).close === "function";
+
 export class ApplicationService {
     /**
      * The container for all application services.
@@ -164,9 +181,31 @@ export class ApplicationService {
             // future-compatible with async closure
             this.serviceContainer.getWindowService().closeMainWindow();
 
+            const databaseServiceEntry = services.find(
+                ({ name }) => name === "DatabaseService"
+            );
+
+            if (databaseServiceEntry) {
+                const serviceCandidate = databaseServiceEntry.service;
+
+                try {
+                    if (hasCloseFunction(serviceCandidate)) {
+                        serviceCandidate.close();
+                    } else {
+                        this.serviceContainer.getDatabaseService().close();
+                    }
+                } catch (error) {
+                    logger.error(LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED, {
+                        error: ensureError(error),
+                    });
+                }
+            }
+
             logger.info(LOG_TEMPLATES.services.APPLICATION_CLEANUP_COMPLETE);
         } catch (error) {
-            logger.error(LOG_TEMPLATES.errors.APPLICATION_CLEANUP_ERROR, error);
+            logger.error(LOG_TEMPLATES.errors.APPLICATION_CLEANUP_ERROR, {
+                error: ensureError(error),
+            });
             // Re-throw errors after logging (project standard)
             throw error;
         }
@@ -331,8 +370,8 @@ export class ApplicationService {
 
         // Handle monitor status changes with typed events
         orchestrator.onTyped("monitor:status-changed", (data) => {
-            const monitorIdentifier = data.monitor?.id ?? data.monitorId;
-            const siteIdentifier = data.site?.identifier ?? data.siteIdentifier;
+            const monitorIdentifier = data.monitor.id;
+            const siteIdentifier = data.site.identifier;
             try {
                 logger.debug(
                     LOG_TEMPLATES.debug.APPLICATION_FORWARDING_MONITOR_STATUS,

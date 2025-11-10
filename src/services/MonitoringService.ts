@@ -40,8 +40,13 @@ import type {
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+import type { ZodError } from "zod";
 
 import { ensureError } from "@shared/utils/errorHandling";
+import {
+    type StatusUpdateParseResult,
+    validateStatusUpdate,
+} from "@shared/validation/guards";
 
 import { logger } from "./logger";
 import { getIpcServiceHelpers } from "./utils/createIpcServiceHelpers";
@@ -70,6 +75,41 @@ const { ensureInitialized, wrap } = ((): ReturnType<
         throw ensureError(error);
     }
 })();
+
+const resolveIdentifier = (candidate: unknown, fallback: string): string => {
+    if (typeof candidate === "string" && candidate.trim().length > 0) {
+        return candidate;
+    }
+
+    return fallback;
+};
+
+const logInvalidStatusUpdateAndThrow = (
+    error: ZodError,
+    metadata: Record<string, unknown>
+): never => {
+    logger.error(
+        "[MonitoringService] Invalid status update returned after checkSiteNow",
+        error,
+        {
+            ...metadata,
+            issues: error.issues,
+        }
+    );
+
+    const { monitorId, siteIdentifier } = metadata;
+    const resolvedMonitorId = resolveIdentifier(monitorId, "unknown");
+    const resolvedSiteIdentifier = resolveIdentifier(siteIdentifier, "unknown");
+    throw new Error(
+        `checkSiteNow returned an invalid status update for monitor ${resolvedMonitorId} of site ${resolvedSiteIdentifier}`,
+        { cause: error }
+    );
+};
+
+const isStatusUpdateValidationFailure = (
+    result: StatusUpdateParseResult
+): result is Extract<StatusUpdateParseResult, { success: false }> =>
+    !result.success;
 
 interface MonitoringServiceContract {
     checkSiteNow: (
@@ -118,8 +158,49 @@ export const MonitoringService: MonitoringServiceContract = {
             api,
             siteIdentifier: string,
             monitorId: string
-        ): Promise<StatusUpdate | undefined> =>
-            api.monitoring.checkSiteNow(siteIdentifier, monitorId)
+        ): Promise<StatusUpdate | undefined> => {
+            const rawStatusUpdate = await api.monitoring.checkSiteNow(
+                siteIdentifier,
+                monitorId
+            );
+
+            if (rawStatusUpdate === undefined) {
+                return undefined;
+            }
+
+            const validationResult = validateStatusUpdate(rawStatusUpdate);
+
+            if (isStatusUpdateValidationFailure(validationResult)) {
+                return logInvalidStatusUpdateAndThrow(validationResult.error, {
+                    monitorId,
+                    siteIdentifier,
+                });
+            }
+
+            const { data } = validationResult;
+            const normalizedUpdate: StatusUpdate = {
+                monitor: data.monitor,
+                monitorId: data.monitorId,
+                site: data.site,
+                siteIdentifier: data.siteIdentifier,
+                status: data.status,
+                timestamp: data.timestamp,
+            };
+
+            if (data.details !== undefined) {
+                normalizedUpdate.details = data.details;
+            }
+
+            if (data.previousStatus !== undefined) {
+                normalizedUpdate.previousStatus = data.previousStatus;
+            }
+
+            if (data.responseTime !== undefined) {
+                normalizedUpdate.responseTime = data.responseTime;
+            }
+
+            return normalizedUpdate;
+        }
     ),
     /**
      * Ensures the preload bridge is ready before invoking monitoring APIs.

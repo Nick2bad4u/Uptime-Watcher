@@ -93,7 +93,6 @@
                 "peerDependencies",
                 "optionalDependencies",
                 "bundledDependencies",
-                "bundleDependencies",
                 "packageManager",
                 "engines",
                 "os",
@@ -129,7 +128,7 @@
         "require-man": "off",
         "require-module": "off",
         "require-name": "error",
-        "require-optionalDependencies": "error",
+        "require-optionalDependencies": "off",
         "require-os": "error",
         "require-peerDependencies": "error",
         "require-preferGlobal": "error",
@@ -153,7 +152,8 @@
             [
                 "MIT",
                 "Unlicense",
-                "UnLicense"
+                "UnLicense",
+                "UNLICENSED"
             ]
         ],
         "valid-values-private": [

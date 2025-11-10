@@ -1,24 +1,24 @@
 # Component Props Standards
 
-## 📋 __Overview__
+## 📋 **Overview**
 
 This document establishes standardized prop patterns for React components in the Uptime Watcher application to ensure consistency, maintainability, and improved developer experience.
 
-## 🎯 __Standardization Goals__
+## 🎯 **Standardization Goals**
 
-* __Consistency__: Uniform prop patterns across all components
-* __Type Safety__: Strong TypeScript typing with predictable interfaces
-* __Accessibility__: Built-in accessibility support through standardized props
-* __Developer Experience__: Predictable API patterns and clear documentation
-* __Maintainability__: Easier refactoring and component composition
+- **Consistency**: Uniform prop patterns across all components
+- **Type Safety**: Strong TypeScript typing with predictable interfaces
+- **Accessibility**: Built-in accessibility support through standardized props
+- **Developer Experience**: Predictable API patterns and clear documentation
+- **Maintainability**: Easier refactoring and component composition
 
-***
+---
 
-## 🏗️ __Core Prop Patterns__
+## 🏗️ **Core Prop Patterns**
 
-### __1. Interface Naming Convention__
+### **1. Interface Naming Convention**
 
-__Standard__: Use `Properties` suffix for all component prop interfaces
+**Standard**: Use `Properties` suffix for all component prop interfaces
 
 ```typescript
 // ✅ Correct
@@ -32,17 +32,17 @@ export interface ButtonProps {
 }
 ```
 
-__Rationale__:
+**Rationale**:
 
-* Consistency with existing codebase patterns
-* Clearer distinction from React's built-in `Props` types
-* Better alignment with TypeScript conventions
+- Consistency with existing codebase patterns
+- Clearer distinction from React's built-in `Props` types
+- Better alignment with TypeScript conventions
 
-***
+---
 
-### __2. Property Mutability__
+### **2. Property Mutability**
 
-__Standard__: All props should be `readonly` to prevent accidental mutations
+**Standard**: All props should be `readonly` to prevent accidental mutations
 
 ```typescript
 // ✅ Correct
@@ -60,19 +60,19 @@ export interface ComponentProperties {
 }
 ```
 
-__Rationale__:
+**Rationale**:
 
-* Prevents accidental mutations of props
-* Encourages immutable data patterns
-* Better TypeScript safety
+- Prevents accidental mutations of props
+- Encourages immutable data patterns
+- Better TypeScript safety
 
-***
+---
 
-### __3. Event Handler Patterns__
+### **3. Event Handler Patterns**
 
-#### __Click Events__
+#### **Click Events**
 
-__Standard__: Use simple function signatures for click handlers unless event object is needed
+**Standard**: Use simple function signatures for click handlers unless event object is needed
 
 ```typescript
 // ✅ Preferred (simple actions)
@@ -91,9 +91,9 @@ export interface BadButtonProperties {
 }
 ```
 
-#### __Change Events__
+#### **Change Events**
 
-__Standard__: Use value-based handlers for form components, event-based for low-level components
+**Standard**: Use value-based handlers for form components, event-based for low-level components
 
 ```typescript
 // ✅ Form Components (high-level, value-focused)
@@ -107,9 +107,9 @@ export interface ThemedInputProperties {
 }
 ```
 
-#### __Submit Events__
+#### **Submit Events**
 
-__Standard__: Always include event object for form submissions
+**Standard**: Always include event object for form submissions
 
 ```typescript
 // ✅ Correct
@@ -118,11 +118,11 @@ export interface FormProperties {
 }
 ```
 
-***
+---
 
-### __4. Common Prop Categories__
+### **4. Common Prop Categories**
 
-#### __Core Props__ (Present in most components)
+#### **Core Props** (Present in most components)
 
 ```typescript
 export interface CoreComponentProperties {
@@ -135,7 +135,7 @@ export interface CoreComponentProperties {
 }
 ```
 
-#### __Accessibility Props__
+#### **Accessibility Props**
 
 ```typescript
 export interface AccessibilityProperties {
@@ -150,7 +150,7 @@ export interface AccessibilityProperties {
 }
 ```
 
-#### __Form Props__
+#### **Form Props**
 
 ```typescript
 export interface FormFieldBaseProperties {
@@ -167,7 +167,7 @@ export interface FormFieldBaseProperties {
 }
 ```
 
-#### __Styling Props__
+#### **Styling Props**
 
 ```typescript
 export interface StylingProperties {
@@ -180,7 +180,7 @@ export interface StylingProperties {
 }
 ```
 
-#### __State Props__
+#### **State Props**
 
 ```typescript
 export interface StateProperties {
@@ -193,13 +193,13 @@ export interface StateProperties {
 }
 ```
 
-***
+---
 
-## 📏 __Size and Variant Standards__
+## 📏 **Size and Variant Standards**
 
-### __Size Options__
+### **Size Options**
 
-__Standard sizes__: `"xs" | "sm" | "md" | "lg" | "xl"`
+**Standard sizes**: `"xs" | "sm" | "md" | "lg" | "xl"`
 
 ```typescript
 // ✅ Standard size variants
@@ -210,9 +210,9 @@ export interface SizedComponentProperties {
 // Default: "md"
 ```
 
-### __Visual Variants__
+### **Visual Variants**
 
-__Standard variants__: `"primary" | "secondary" | "danger" | "success" | "warning" | "ghost"`
+**Standard variants**: `"primary" | "secondary" | "danger" | "success" | "warning" | "ghost"`
 
 ```typescript
 // ✅ Standard visual variants
@@ -229,13 +229,13 @@ export interface VariantComponentProperties {
 // Default: "primary"
 ```
 
-***
+---
 
-## 🧩 __Composition Patterns__
+## 🧩 **Composition Patterns**
 
-### __Prop Interface Composition__
+### **Prop Interface Composition**
 
-__Standard__: Compose interfaces using intersection types rather than extension
+**Standard**: Compose interfaces using intersection types rather than extension
 
 ```typescript
 // ✅ Preferred (composition)
@@ -258,9 +258,9 @@ export type ButtonProperties = CoreComponentProperties &
  };
 ```
 
-### __Icon Integration__
+### **Icon Integration**
 
-__Standard__: Consistent icon prop patterns across components
+**Standard**: Consistent icon prop patterns across components
 
 ```typescript
 export interface IconComponentProperties {
@@ -273,13 +273,13 @@ export interface IconComponentProperties {
 }
 ```
 
-***
+---
 
-## 📝 __Documentation Standards__
+## 📝 **Documentation Standards**
 
-### __Property Documentation__
+### **Property Documentation**
 
-__Standard__: Use TSDoc comments with clear descriptions
+**Standard**: Use TSDoc comments with clear descriptions
 
 ````typescript
 export interface ComponentProperties {
@@ -307,9 +307,9 @@ export interface ComponentProperties {
 }
 ````
 
-### __Component Documentation__
+### **Component Documentation**
 
-__Standard__: Include comprehensive examples and usage patterns
+**Standard**: Include comprehensive examples and usage patterns
 
 ````typescript
 /**
@@ -341,11 +341,11 @@ __Standard__: Include comprehensive examples and usage patterns
  */
 ````
 
-***
+---
 
-## 🎨 __Implementation Templates__
+## 🎨 **Implementation Templates**
 
-### __Basic Component Template__
+### **Basic Component Template**
 
 ````typescript
 
@@ -406,7 +406,7 @@ ComponentName.displayName = "ComponentName";
 export default ComponentName;
 ````
 
-### __Form Component Template__
+### **Form Component Template**
 
 ```typescript
 /**
@@ -475,53 +475,53 @@ FormComponent.displayName = "FormComponent";
 export default FormComponent;
 ```
 
-***
+---
 
-## ✅ __Compliance Checklist__
+## ✅ **Compliance Checklist**
 
-### __Interface Design__
+### **Interface Design**
 
-* [ ] Uses `Properties` suffix for prop interfaces
-* [ ] All props marked as `readonly`
-* [ ] Proper TSDoc documentation for all props
-* [ ] Consistent event handler signatures
-* [ ] Appropriate use of optional vs required props
+- [ ] Uses `Properties` suffix for prop interfaces
+- [ ] All props marked as `readonly`
+- [ ] Proper TSDoc documentation for all props
+- [ ] Consistent event handler signatures
+- [ ] Appropriate use of optional vs required props
 
-### __Event Handlers__
+### **Event Handlers**
 
-* [ ] Simple `() => void` for basic actions
-* [ ] Event object included when needed
-* [ ] Consistent naming (onClick, onChange, onSubmit)
-* [ ] Value-based handlers for form components
+- [ ] Simple `() => void` for basic actions
+- [ ] Event object included when needed
+- [ ] Consistent naming (onClick, onChange, onSubmit)
+- [ ] Value-based handlers for form components
 
-### __Accessibility__
+### **Accessibility**
 
-* [ ] Appropriate ARIA props included
-* [ ] Screen reader considerations
-* [ ] Keyboard navigation support
-* [ ] Focus management
+- [ ] Appropriate ARIA props included
+- [ ] Screen reader considerations
+- [ ] Keyboard navigation support
+- [ ] Focus management
 
-### __Documentation__
+### **Documentation**
 
-* [ ] Component purpose clearly documented
-* [ ] Usage examples provided
-* [ ] Props documented with descriptions
-* [ ] Default values specified
+- [ ] Component purpose clearly documented
+- [ ] Usage examples provided
+- [ ] Props documented with descriptions
+- [ ] Default values specified
 
-### __Type Safety__
+### **Type Safety**
 
-* [ ] Strong TypeScript typing
-* [ ] No `any` types used
-* [ ] Proper generic constraints
-* [ ] Interface composition over inheritance
+- [ ] Strong TypeScript typing
+- [ ] No `any` types used
+- [ ] Proper generic constraints
+- [ ] Interface composition over inheritance
 
-***
+---
 
-## 🔧 __Migration Guide__
+## 🔧 **Migration Guide**
 
-### __Updating Existing Components__
+### **Updating Existing Components**
 
-1. __Interface Naming__:
+1. **Interface Naming**:
 
    ```typescript
    // Before
@@ -535,7 +535,7 @@ export default FormComponent;
    }
    ```
 
-2. __Event Handlers__:
+2. **Event Handlers**:
 
    ```typescript
    // Before
@@ -547,7 +547,7 @@ export default FormComponent;
    readonly onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
    ```
 
-3. __Property Mutability__:
+3. **Property Mutability**:
 
    ```typescript
    // Before
@@ -563,15 +563,23 @@ export default FormComponent;
    }
    ```
 
-***
+---
 
-## 📚 __Related Documentation__
+## 📚 **Related Documentation**
 
-* [UI Feature Development Guide](../../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)
-* [Development Patterns Guide](./DEVELOPMENT_PATTERNS_GUIDE.md)
-* [Compliance Checklists](../UsageGuides/Compliance-Checklists.md)
-* [TSDoc Standards](../TSDOC_STANDARDS.md)
+- [UI Feature Development Guide](../../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)
+- [Development Patterns Guide](./DEVELOPMENT_PATTERNS_GUIDE.md)
+- [Using This Documentation](../UsageGuides/Using-This-Documentation.md)
+- [TSDoc Standards](../TSDOC_STANDARDS.md)
 
-***
+---
 
-*This document should be reviewed and updated as new patterns emerge or requirements change. All new components must follow these standards for consistency.*
+## Current Implementation Audit (2025-11-04)
+
+- Surveyed component modules under `src/components/` (e.g., `FormControls`, `MonitorList`, `SiteDetails`) to confirm prop interfaces follow the `Properties` suffix and readonly members highlighted above.
+- Checked shared UI utilities in `src/utils/react` to ensure handler helpers continue to expose strongly typed callbacks without leaking DOM event types unnecessarily.
+- Verified lint rules (`.eslintrc` flat config and `eslint-plugin-react-naming-convention`) still enforce the naming and mutability guarantees described in this standard.
+
+---
+
+_This document should be reviewed and updated as new patterns emerge or requirements change. All new components must follow these standards for consistency._

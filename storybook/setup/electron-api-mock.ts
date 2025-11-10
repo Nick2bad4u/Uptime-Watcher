@@ -221,14 +221,16 @@ const electronAPIMockDefinition = {
             const resultingMonitor = updatedSite.monitors.find(
                 (candidate) => candidate.id === monitorId
             );
+            const monitorSnapshot = clone(resultingMonitor ?? monitor);
 
             return {
                 details: `Manual check completed for monitor '${monitorId}'.`,
+                monitor: monitorSnapshot,
                 monitorId,
                 previousStatus,
                 site: clone(updatedSite),
                 siteIdentifier,
-                status: resultingMonitor?.status ?? previousStatus,
+                status: monitorSnapshot.status,
                 timestamp,
             };
         },

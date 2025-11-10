@@ -6,7 +6,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ApplicationService } from "../../../services/application/ApplicationService";
 import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
-import type { StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 // Mock Electron app
 vi.mock("electron", () => ({
@@ -114,25 +114,6 @@ vi.mock("../../../../shared/utils/logTemplates", () => ({
     },
 }));
 
-// Mock ServiceContainer
-vi.mock("../../../services/ServiceContainer", () => ({
-    ServiceContainer: {
-        getInstance: vi.fn(),
-        initialize: vi.fn(),
-        getInitializedServices: vi.fn(() => [
-            { name: "IpcService" },
-            { name: "WindowService" },
-            { name: "DatabaseService" },
-        ]),
-        getIpcService: vi.fn(),
-        getUptimeOrchestrator: vi.fn(),
-        getWindowService: vi.fn(),
-        getRendererEventBridge: vi.fn(),
-        getAutoUpdaterService: vi.fn(),
-        getNotificationService: vi.fn(),
-    },
-}));
-
 // Create mock service instances
 const mockIpcService = {
     cleanup: vi.fn(),
@@ -142,6 +123,10 @@ const mockUptimeOrchestrator = {
     stopMonitoring: vi.fn(),
     onTyped: vi.fn(),
     removeAllListeners: vi.fn(),
+};
+
+const mockDatabaseService = {
+    close: vi.fn(),
 };
 
 const mockWindowService = {
@@ -166,6 +151,26 @@ const mockNotificationService = {
     notifyMonitorDown: vi.fn(),
 };
 
+// Mock ServiceContainer
+vi.mock("../../../services/ServiceContainer", () => ({
+    ServiceContainer: {
+        getInstance: vi.fn(),
+        initialize: vi.fn(),
+        getInitializedServices: vi.fn(() => [
+            { name: "IpcService", service: mockIpcService },
+            { name: "WindowService", service: mockWindowService },
+            { name: "DatabaseService", service: mockDatabaseService },
+        ]),
+        getIpcService: vi.fn(() => mockIpcService),
+        getUptimeOrchestrator: vi.fn(() => mockUptimeOrchestrator),
+        getWindowService: vi.fn(() => mockWindowService),
+        getRendererEventBridge: vi.fn(() => mockRendererEventBridge),
+        getAutoUpdaterService: vi.fn(() => mockAutoUpdaterService),
+        getNotificationService: vi.fn(() => mockNotificationService),
+        getDatabaseService: vi.fn(() => mockDatabaseService),
+    },
+}));
+
 describe(ApplicationService, () => {
     let applicationService: ApplicationService;
     let mockApp: any;
@@ -181,6 +186,7 @@ describe(ApplicationService, () => {
 
         mockIpcService.cleanup.mockReset();
         mockWindowService.closeMainWindow.mockReset();
+        mockDatabaseService.close.mockReset();
 
         // Get the mocked ServiceContainer reference
         const serviceContainerModule = await import(
@@ -211,6 +217,9 @@ describe(ApplicationService, () => {
         );
         mockServiceContainer.getNotificationService.mockReturnValue(
             mockNotificationService
+        );
+        mockServiceContainer.getDatabaseService.mockReturnValue(
+            mockDatabaseService
         );
 
         // Mock process platform
@@ -488,6 +497,7 @@ describe(ApplicationService, () => {
                 1
             );
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
             expect(mockLogger.info).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_COMPLETE"
             );
@@ -522,7 +532,7 @@ describe(ApplicationService, () => {
 
             expect(mockLogger.error).toHaveBeenCalledWith(
                 "APPLICATION_CLEANUP_ERROR",
-                error
+                expect.objectContaining({ error })
             );
         });
 
@@ -627,6 +637,7 @@ describe(ApplicationService, () => {
                 1
             );
             expect(mockWindowService.closeMainWindow).toHaveBeenCalledTimes(1);
+            expect(mockDatabaseService.close).toHaveBeenCalledTimes(1);
         });
     });
     describe("App Event Handlers", () => {
@@ -1036,11 +1047,34 @@ describe(ApplicationService, () => {
                         (call) => call[0] === "monitor:check-completed"
                     )?.[1];
 
+                const monitor: Monitor = {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                };
+
+                const site: Site = {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [monitor],
+                    name: "Test Site",
+                };
+
                 const eventData = {
                     checkType: "manual" as const,
                     monitorId: "monitor-1",
                     result: {
+                        monitor,
                         monitorId: "monitor-1",
+                        site,
                         siteIdentifier: "site-1",
                         status: "up",
                         timestamp: "2023-01-01T00:00:00Z",
@@ -1076,11 +1110,34 @@ describe(ApplicationService, () => {
                         (call) => call[0] === "monitor:check-completed"
                     )?.[1];
 
+                const monitor: Monitor = {
+                    activeOperations: [],
+                    checkInterval: 60_000,
+                    history: [],
+                    id: "monitor-1",
+                    monitoring: true,
+                    responseTime: 200,
+                    retryAttempts: 0,
+                    status: "up",
+                    timeout: 30_000,
+                    type: "http",
+                    url: "https://example.com",
+                };
+
+                const site: Site = {
+                    identifier: "site-1",
+                    monitoring: true,
+                    monitors: [monitor],
+                    name: "Test Site",
+                };
+
                 const eventData = {
                     checkType: "manual" as const,
                     monitorId: "monitor-1",
                     result: {
+                        monitor,
                         monitorId: "monitor-1",
+                        site,
                         siteIdentifier: "site-1",
                         status: "up",
                         timestamp: "2023-01-01T00:00:00Z",

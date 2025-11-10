@@ -1,6 +1,6 @@
-# 🎭 __Playwright Codegen Setup Guide for Uptime-Watcher__
+# 🎭 **Playwright Codegen Setup Guide for Uptime-Watcher**
 
-## � __Quick Start with Helper Script__
+## � **Quick Start with Helper Script**
 
 We've included a helper script to make codegen easier:
 
@@ -20,14 +20,14 @@ node scripts/codegen.mjs --help
 
 Helper Script:
 
-* ✅ Starts the development server
-* ✅ Handles proper codegen command setup
-* ✅ Provides clear next steps
-* ✅ Works with both dev server and Electron modes
+- ✅ Starts the development server
+- ✅ Handles proper codegen command setup
+- ✅ Provides clear next steps
+- ✅ Works with both dev server and Electron modes
 
-## 📋 __Manual Setup__
+## 📋 **Manual Setup**
 
-### __1. Basic Codegen Command__
+### **1. Basic Codegen Command**
 
 ```bash
 # Generate tests for web apps
@@ -40,7 +40,7 @@ npx playwright codegen https://example.com
 npx playwright codegen --browser=chromium
 ```
 
-### __2. Electron App Codegen (Your Use Case)__
+### **2. Electron App Codegen (Your Use Case)**
 
 Since Uptime-Watcher is an Electron app, you need to use a special approach:
 
@@ -52,9 +52,9 @@ npm run build
 npx playwright codegen --target=electron path/to/your/electron/app
 ```
 
-## 🚀 __Step-by-Step Setup for Uptime-Watcher__
+## 🚀 **Step-by-Step Setup for Uptime-Watcher**
 
-### __Step 1: Prepare Your App__
+### **Step 1: Prepare Your App**
 
 ```bash
 # Build the Electron app first
@@ -64,7 +64,7 @@ npm run build
 ls dist/
 ```
 
-### __Step 2: Start Codegen with Electron__
+### **Step 2: Start Codegen with Electron**
 
 ```bash
 # Option A: Direct Electron codegen (if supported)
@@ -75,7 +75,7 @@ npm run dev &  # Start dev server in background
 npx playwright codegen http://localhost:5173  # Use the dev server URL
 ```
 
-### __Step 3: Alternative - Manual Test Creation__
+### **Step 3: Alternative - Manual Test Creation**
 
 If direct Electron codegen doesn't work perfectly, create tests manually with this pattern:
 
@@ -117,9 +117,9 @@ test.describe("My Generated Tests", () => {
 });
 ```
 
-## 🛠 __Codegen Best Practices for Your Project__
+## 🛠 **Codegen Best Practices for Your Project**
 
-### __1. Test File Naming Convention__
+### **1. Test File Naming Convention**
 
 Based on your project structure, name your generated tests:
 
@@ -131,7 +131,7 @@ playwright/tests/
 └── renderer-process.my-feature.playwright.test.ts # For renderer tests
 ```
 
-### __2. Project-Specific Configuration__
+### **2. Project-Specific Configuration**
 
 Add these to your generated tests to match your project patterns:
 
@@ -151,7 +151,7 @@ test.describe(
 );
 ```
 
-### __3. Common Selectors for Your App__
+### **3. Common Selectors for Your App**
 
 When using codegen, these are the key selectors that work in your app:
 
@@ -179,21 +179,21 @@ When using codegen, these are the key selectors that work in your app:
 ".themed-status-indicator";
 ```
 
-## 📝 __Advanced Codegen Techniques__
+## 📝 **Advanced Codegen Techniques**
 
-### __1. Generate Tests with Custom Viewport__
+### **1. Generate Tests with Custom Viewport**
 
 ```bash
 npx playwright codegen --viewport-size=1280,720 http://localhost:5173
 ```
 
-### __2. Generate Tests with Device Emulation__
+### **2. Generate Tests with Device Emulation**
 
 ```bash
 npx playwright codegen --device="Desktop Chrome" http://localhost:5173
 ```
 
-### __3. Generate Tests with Specific Output__
+### **3. Generate Tests with Specific Output**
 
 ```bash
 # Save generated test to specific file
@@ -203,27 +203,27 @@ npx playwright codegen --target=javascript --output=my-test.js http://localhost:
 npx playwright codegen --target=typescript --output=my-test.ts http://localhost:5173
 ```
 
-## 🎯 __Workflow for Creating Tests__
+## 🎯 **Workflow for Creating Tests**
 
-### __Complete Workflow:__
+### **Complete Workflow:**
 
-1. __Start your app in development mode:__
+1. **Start your app in development mode:**
 
 ```bash
   npm run dev
 ```
 
-2. __Open codegen:__
+2. **Open codegen:**
 
    ```bash
    npx playwright codegen http://localhost:5173
    ```
 
-3. __Record your interactions__ in the Playwright Inspector
+3. **Record your interactions** in the Playwright Inspector
 
-4. __Copy the generated code__
+4. **Copy the generated code**
 
-5. __Adapt it to your Electron test pattern:__
+5. **Adapt it to your Electron test pattern:**
 
    ```typescript
    // Replace browser.newPage() with Electron launch pattern
@@ -234,18 +234,18 @@ npx playwright codegen --target=typescript --output=my-test.ts http://localhost:
    const window = await electronApp.firstWindow();
    ```
 
-6. __Add proper test metadata__ (tags, annotations)
+6. **Add proper test metadata** (tags, annotations)
 
-7. __Add to appropriate test file__ based on naming convention
+7. **Add to appropriate test file** based on naming convention
 
-8. __Run and verify:__
+8. **Run and verify:**
    ```bash
    npx playwright test your-new-test.ts
    ```
 
-## 🧪 __Testing Different Scenarios__
+## 🧪 **Testing Different Scenarios**
 
-### __UI Component Testing:__
+### **UI Component Testing:**
 
 ```bash
 # Start app and navigate to specific component
@@ -254,7 +254,7 @@ npx playwright codegen http://localhost:5173
 # Record interactions with specific UI components
 ```
 
-### __E2E Workflow Testing:__
+### **E2E Workflow Testing:**
 
 ```bash
 # Record complete user workflows
@@ -262,7 +262,7 @@ npx playwright codegen http://localhost:5173
 # Record: Add site → Monitor → View results → Settings
 ```
 
-### __Error State Testing:__
+### **Error State Testing:**
 
 ```bash
 # Record error scenarios
@@ -270,22 +270,22 @@ npx playwright codegen http://localhost:5173
 # Record: Invalid inputs → Error messages → Recovery
 ```
 
-## 🔧 __Troubleshooting Codegen__
+## 🔧 **Troubleshooting Codegen**
 
-### __Common Issues:__
+### **Common Issues:**
 
-1. __Electron app not launching in codegen:__
-   * Use development server instead: `npm run dev` + `npx playwright codegen http://localhost:5173`
+1. **Electron app not launching in codegen:**
+   - Use development server instead: `npm run dev` + `npx playwright codegen http://localhost:5173`
 
-2. __Generated selectors not working:__
-   * Check the actual DOM structure in your app
-   * Use the selectors that work in your existing tests
+2. **Generated selectors not working:**
+   - Check the actual DOM structure in your app
+   - Use the selectors that work in your existing tests
 
-3. __TypeScript errors in generated code:__
-   * Make sure to adapt the generated code to your Electron test pattern
-   * Use proper imports and types
+3. **TypeScript errors in generated code:**
+   - Make sure to adapt the generated code to your Electron test pattern
+   - Use proper imports and types
 
-### __Debug Generated Tests:__
+### **Debug Generated Tests:**
 
 ```bash
 # Run with debug mode
@@ -295,17 +295,17 @@ npx playwright test --debug your-test.ts
 npx playwright test --ui your-test.ts
 ```
 
-## 📚 __Next Steps__
+## 📚 **Next Steps**
 
 After generating tests:
 
-1. __Organize__ them into appropriate test files
-2. __Add proper metadata__ (tags, annotations)
-3. __Add them to CI/CD__ pipeline
-4. __Review and refactor__ for maintainability
-5. __Add accessibility checks__ where needed
+1. **Organize** them into appropriate test files
+2. **Add proper metadata** (tags, annotations)
+3. **Add them to CI/CD** pipeline
+4. **Review and refactor** for maintainability
+5. **Add accessibility checks** where needed
 
-## 🎉 __Example Generated Test (Adapted)__
+## 🎉 **Example Generated Test (Adapted)**
 
 Here's what a completed generated test might look like:
 
@@ -350,6 +350,6 @@ test.describe(
 
 This gives you a complete setup for using Playwright codegen with your Uptime-Watcher Electron application! 🎭✨
 
-## 📚 __Related Documentation__
+## 📚 **Related Documentation**
 
-* [Complete Playwright Testing Guide](./PLAYWRIGHT_TESTING_GUIDE.md) - Comprehensive testing setup, troubleshooting, and best practices
+- [Complete Playwright Testing Guide](./PLAYWRIGHT_TESTING_GUIDE.md) - Comprehensive testing setup, troubleshooting, and best practices

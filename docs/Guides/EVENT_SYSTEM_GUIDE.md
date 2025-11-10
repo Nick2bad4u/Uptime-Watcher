@@ -4,16 +4,16 @@ This guide provides comprehensive documentation for the TypedEventBus-based even
 
 ## Table of Contents
 
-* [Architecture Overview](#architecture-overview)
-* [TypedEventBus Implementation](#typedeventbus-implementation)
-* [Event Types and Contracts](#event-types-and-contracts)
-* [EventsService Integration](#eventsservice-integration)
-* [Frontend Event Handling](#frontend-event-handling)
-* [Middleware System](#middleware-system)
-* [Event Metadata](#event-metadata)
-* [Best Practices](#best-practices)
-* [Testing Events](#testing-events)
-* [Debugging and Diagnostics](#debugging-and-diagnostics)
+- [Architecture Overview](#architecture-overview)
+- [TypedEventBus Implementation](#typedeventbus-implementation)
+- [Event Types and Contracts](#event-types-and-contracts)
+- [EventsService Integration](#eventsservice-integration)
+- [Frontend Event Handling](#frontend-event-handling)
+- [Middleware System](#middleware-system)
+- [Event Metadata](#event-metadata)
+- [Best Practices](#best-practices)
+- [Testing Events](#testing-events)
+- [Debugging and Diagnostics](#debugging-and-diagnostics)
 
 ## Architecture Overview
 
@@ -28,12 +28,12 @@ graph LR
 
 ### Key Components
 
-1. __TypedEventBus__: Core event emission and listening with type safety
-2. __EventsService__: Frontend abstraction for monitor/cache/update events via IPC
-3. __StateSyncService__: Dedicated state synchronization surface (status, full-sync, event stream)
-4. __Event Contracts__: Shared type definitions in `@shared/types/events`
-5. __Automatic Metadata__: Correlation IDs, timestamps, and debugging info
-6. __Middleware System__: Cross-cutting concerns like logging and validation
+1. **TypedEventBus**: Core event emission and listening with type safety
+2. **EventsService**: Frontend abstraction for monitor/cache/update events via IPC
+3. **StateSyncService**: Dedicated state synchronization surface (status, full-sync, event stream)
+4. **Event Contracts**: Shared type definitions in `@shared/types/events`
+5. **Automatic Metadata**: Correlation IDs, timestamps, and debugging info
+6. **Middleware System**: Cross-cutting concerns like logging and validation
 
 ## TypedEventBus Implementation
 
@@ -708,31 +708,31 @@ logger.error("Event processing failed", {
 
 ### Common Issues and Solutions
 
-__Issue__: Events not reaching listeners
+**Issue**: Events not reaching listeners
 
-* __Check__: Ensure event names match exactly (case-sensitive)
-* __Check__: Verify listener registration before emission
-* __Check__: Check for middleware errors that prevent emission
+- **Check**: Ensure event names match exactly (case-sensitive)
+- **Check**: Verify listener registration before emission
+- **Check**: Check for middleware errors that prevent emission
 
-__Issue__: Memory leaks from event listeners
+**Issue**: Memory leaks from event listeners
 
-* __Solution__: Always call cleanup functions returned by event registration
-* __Solution__: Use `AbortController` for automatic cleanup
+- **Solution**: Always call cleanup functions returned by event registration
+- **Solution**: Use `AbortController` for automatic cleanup
 
-__Issue__: Type errors with event data
+**Issue**: Type errors with event data
 
-* __Check__: Ensure event contracts in `@shared/types/events` are up to date
-* __Check__: Verify event data matches the defined interface exactly
+- **Check**: Ensure event contracts in `@shared/types/events` are up to date
+- **Check**: Verify event data matches the defined interface exactly
 
-__Issue__: Events not crossing IPC boundary
+**Issue**: Events not crossing IPC boundary
 
-* __Check__: Ensure EventsService is properly initialized
-* __Check__: Verify `EventsService.initialize()` resolves (renderer services available)
-* __Check__: Check preload script for proper API exposure
+- **Check**: Ensure EventsService is properly initialized
+- **Check**: Verify `EventsService.initialize()` resolves (renderer services available)
+- **Check**: Check preload script for proper API exposure
 
 ## Related Documentation
 
-* [API Documentation](./api-documentation.md) - Comprehensive IPC API reference
-* [Developer Quick Start](./DEVELOPER-QUICK-START.md) - Architecture overview with event system integration
-* [Error Handling Guide](./error-handling-guide.md) - Error handling patterns with events
-* [Testing Methodology](./testing-methodology-react-components.md) - Testing patterns including event testing
+- [API Documentation](./api-documentation.md) - Comprehensive IPC API reference
+- [Developer Quick Start](./DEVELOPER-QUICK-START.md) - Architecture overview with event system integration
+- [Error Handling Guide](./error-handling-guide.md) - Error handling patterns with events
+- [Testing Methodology](./testing-methodology-react-components.md) - Testing patterns including event testing

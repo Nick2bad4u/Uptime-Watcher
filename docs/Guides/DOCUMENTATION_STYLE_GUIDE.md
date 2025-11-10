@@ -8,31 +8,31 @@ This guide establishes consistent formatting and content standards for all Markd
 
 All documentation files should follow consistent naming patterns:
 
-__Root-level files__: Use UPPERCASE for important project files
+**Root-level files**: Use UPPERCASE for important project files
 
-* `README.md` - Project overview and getting started
-* `CONTRIBUTING.md` - Contribution guidelines
-* `CHANGELOG.md` - Version history and changes
-* `SECURITY.md` - Security policies and reporting
-* `LICENSE` - Project license
+- `README.md` - Project overview and getting started
+- `CONTRIBUTING.md` - Contribution guidelines
+- `CHANGELOG.md` - Version history and changes
+- `SECURITY.md` - Security policies and reporting
+- `LICENSE` - Project license
 
-__Documentation files__: Use lowercase kebab-case for all other documentation
+**Documentation files**: Use lowercase kebab-case for all other documentation
 
-* `documentation-style-guide.md` (this file)
-* `api-documentation.md`
-* `DEVELOPER-QUICK-START.md`
-* `testing-methodology-react-components.md`
+- `documentation-style-guide.md` (this file)
+- `api-documentation.md`
+- `DEVELOPER-QUICK-START.md`
+- `testing-methodology-react-components.md`
 
-__Subdirectory files__: Use lowercase kebab-case throughout
+**Subdirectory files**: Use lowercase kebab-case throughout
 
-* `docs/TSDoc/tsdoc-home.md`
-* `docs/Testing/playwright-testing-guide.md`
-* `docs/Guides/environment-setup.md`
-* `.github/prompts/generate-test-coverage.prompt.md`
+- `docs/TSDoc/tsdoc-home.md`
+- `docs/Testing/playwright-testing-guide.md`
+- `docs/Guides/environment-setup.md`
+- `.github/prompts/generate-test-coverage.prompt.md`
 
 ### Examples
 
-✅ __Good examples:__
+✅ **Good examples:**
 
 ```text
 README.md
@@ -42,7 +42,7 @@ docs/Testing/fast-check-fuzzing-coverage.md
 .github/prompts/performance-tests.prompt.md
 ```
 
-❌ __Poor examples:__
+❌ **Poor examples:**
 
 ```text
 Read_Me.md
@@ -54,11 +54,11 @@ docs/Testing/FAST_CHECK_FUZZING_COVERAGE.md
 
 ### Multi-word handling
 
-* Separate words with hyphens (kebab-case)
-* Keep acronyms together when they form a single concept
-* Break up long compound words for readability
+- Separate words with hyphens (kebab-case)
+- Keep acronyms together when they form a single concept
+- Break up long compound words for readability
 
-✅ __Good multi-word examples:__
+✅ **Good multi-word examples:**
 
 ```text
 playwright-testing-guide.md
@@ -71,9 +71,9 @@ circuit-breaker-implementation-plan.md
 
 ### Headers
 
-* Use __sentence case__ for headers (not title case)
-* Include descriptive emoji prefix for main sections (optional but encouraged)
-* Use proper heading hierarchy (H1 for title, H2 for main sections, etc.)
+- Use **sentence case** for headers (not title case)
+- Include descriptive emoji prefix for main sections (optional but encouraged)
+- Use proper heading hierarchy (H1 for title, H2 for main sections, etc.)
 
 ```markdown
 # 📊 Main document title
@@ -87,10 +87,10 @@ circuit-breaker-implementation-plan.md
 
 ### Badges and Shields
 
-* Group related badges logically
-* Use consistent style (`flat` or `flat-square`)
-* Align badges in center for README files
-* Include alt text for accessibility
+- Group related badges logically
+- Use consistent style (`flat` or `flat-square`)
+- Align badges in center for README files
+- Include alt text for accessibility
 
 ```markdown
 <div align="center">
@@ -107,9 +107,9 @@ circuit-breaker-implementation-plan.md
 
 ### Tables
 
-* Use proper table formatting with clear headers
-* Align columns consistently
-* Include descriptive content in cells
+- Use proper table formatting with clear headers
+- Align columns consistently
+- Include descriptive content in cells
 
 ```markdown
 | Feature    | Description                   | Status |
@@ -121,9 +121,9 @@ circuit-breaker-implementation-plan.md
 
 ### Code Blocks
 
-* Always specify language for syntax highlighting
-* Use descriptive comments
-* Include full file paths when relevant
+- Always specify language for syntax highlighting
+- Use descriptive comments
+- Include full file paths when relevant
 
 ````markdown
 ```typescript
@@ -138,9 +138,9 @@ export class HttpMonitor implements IMonitorService {
 
 ### Lists
 
-* Use consistent bullet style (- for unordered, 1. for ordered)
-* Add empty lines between complex list items
-* Use proper indentation for nested items
+- Use consistent bullet style (- for unordered, 1. for ordered)
+- Add empty lines between complex list items
+- Use proper indentation for nested items
 
 ```markdown
 - **Feature name**: Brief description
@@ -154,10 +154,10 @@ export class HttpMonitor implements IMonitorService {
 
 ### Emphasis and Formatting
 
-* Use __bold__ for important terms, features, or actions
-* Use *italics* for emphasis or technical terms
-* Use `inline code` for file names, commands, and code snippets
-* Use > blockquotes for important notes or warnings
+- Use **bold** for important terms, features, or actions
+- Use _italics_ for emphasis or technical terms
+- Use `inline code` for file names, commands, and code snippets
+- Use > blockquotes for important notes or warnings
 
 ```markdown
 **Important**: Always use `npm install` before running the development server.
@@ -169,9 +169,9 @@ The `package.json` file contains all _dependencies_ and **scripts**.
 
 ### Links
 
-* Use descriptive link text (not "click here")
-* Include relative paths for internal documentation
-* Use absolute URLs for external resources
+- Use descriptive link text (not "click here")
+- Include relative paths for internal documentation
+- Use absolute URLs for external resources
 
 ```markdown
 See the [environment setup guide](./environment-setup.md) for setup instructions.
@@ -181,10 +181,10 @@ Learn more about [TypeScript](https://www.typescriptlang.org/) documentation.
 
 ### Images and Assets
 
-* Include descriptive alt text
-* Use relative paths for project assets
-* Center important images
-* Include captions when helpful
+- Include descriptive alt text
+- Use relative paths for project assets
+- Center important images
+- Include captions when helpful
 
 ```markdown
 <div align="center">
@@ -197,34 +197,34 @@ Learn more about [TypeScript](https://www.typescriptlang.org/) documentation.
 
 ### Document Structure
 
-1. __Title__ - Clear, descriptive H1 header
-2. __Introduction__ - Brief overview of the document purpose
-3. __Table of Contents__ - For longer documents (optional)
-4. __Main Content__ - Organized with logical section headers
-5. __Examples__ - Practical code samples and use cases
-6. __Related Links__ - References to other documentation
+1. **Title** - Clear, descriptive H1 header
+2. **Introduction** - Brief overview of the document purpose
+3. **Table of Contents** - For longer documents (optional)
+4. **Main Content** - Organized with logical section headers
+5. **Examples** - Practical code samples and use cases
+6. **Related Links** - References to other documentation
 
 ### Language Guidelines
 
-* Use clear, concise language
-* Write in present tense
-* Use active voice when possible
-* Avoid jargon unless necessary (define when used)
-* Be consistent with technical terminology
+- Use clear, concise language
+- Write in present tense
+- Use active voice when possible
+- Avoid jargon unless necessary (define when used)
+- Be consistent with technical terminology
 
 ### Code Documentation
 
-* Include complete, working examples
-* Add comments explaining complex logic
-* Show both basic and advanced usage patterns
-* Include error handling examples
+- Include complete, working examples
+- Add comments explaining complex logic
+- Show both basic and advanced usage patterns
+- Include error handling examples
 
 ### Technical Accuracy
 
-* Keep version numbers current
-* Update dependencies and requirements
-* Test all code examples
-* Verify links are working
+- Keep version numbers current
+- Update dependencies and requirements
+- Test all code examples
+- Verify links are working
 
 ## 🎯 Document Types
 
@@ -294,9 +294,9 @@ const result = methodName(value);
 ````
 `````
 
-__Throws:__
+**Throws:**
 
-* `ErrorType`: When this error occurs
+- `ErrorType`: When this error occurs
 
 ````text
 
@@ -362,36 +362,36 @@ How this decision is implemented in the codebase.
 
 Use markdownlint with these rules:
 
-* MD013: Line length maximum 100 characters (configurable)
-* MD033: Allow inline HTML for badges and layout
-* MD041: Require H1 as first header
+- MD013: Line length maximum 100 characters (configurable)
+- MD033: Allow inline HTML for badges and layout
+- MD041: Require H1 as first header
 
 ### Link Checking
 
-* Verify all internal links work
-* Check external links periodically
-* Use relative paths for internal documentation
+- Verify all internal links work
+- Check external links periodically
+- Use relative paths for internal documentation
 
 ### Automated Checks
 
 Include in CI pipeline:
 
-* Markdown linting
-* Link validation
-* Spell checking
-* Format consistency
+- Markdown linting
+- Link validation
+- Spell checking
+- Format consistency
 
 ## 📚 Examples
 
 ### Good Examples
 
-✅ __Clear, descriptive headers:__
+✅ **Clear, descriptive headers:**
 
 ```markdown
 ## Setting up the development environment
 ```
 
-✅ __Proper code block formatting:__
+✅ **Proper code block formatting:**
 
 ````markdown
 ```bash
@@ -403,7 +403,7 @@ npm run dev
 ```
 ````
 
-✅ __Informative table:__
+✅ **Informative table:**
 
 ```markdown
 | Monitor Type | Port | Protocol | Timeout |
@@ -414,13 +414,13 @@ npm run dev
 
 ### Poor Examples
 
-❌ __Vague headers:__
+❌ **Vague headers:**
 
 ```markdown
 ## Setup
 ```
 
-❌ __Code without language:__
+❌ **Code without language:**
 
 ````markdown
 ```
@@ -428,7 +428,7 @@ npm install
 ```
 ````
 
-❌ __Incomplete table:__
+❌ **Incomplete table:**
 
 ```markdown
 | Type | Info      |
@@ -442,43 +442,43 @@ npm install
 
 Use emojis consistently for document sections:
 
-* 📊 Analytics, dashboards, data
-* 🚀 Getting started, quick start
-* ✨ Features, new capabilities
-* 🛠️ Tools, configuration, technical setup
-* 📋 Lists, requirements, checklists
-* 🎯 Goals, objectives, targets
-* 🔧 Maintenance, fixes, troubleshooting
-* 📖 Documentation, guides, references
-* 🤝 Contributing, community
-* 📄 Legal, licenses, policies
+- 📊 Analytics, dashboards, data
+- 🚀 Getting started, quick start
+- ✨ Features, new capabilities
+- 🛠️ Tools, configuration, technical setup
+- 📋 Lists, requirements, checklists
+- 🎯 Goals, objectives, targets
+- 🔧 Maintenance, fixes, troubleshooting
+- 📖 Documentation, guides, references
+- 🤝 Contributing, community
+- 📄 Legal, licenses, policies
 
 ### Color Coding
 
 Use consistent status indicators:
 
-* ✅ Completed, working, available
-* 🚧 In progress, under development
-* ❌ Broken, deprecated, unavailable
-* ⚠️ Warning, important note
-* 💡 Tip, suggestion, best practice
-* 🔍 Research, investigation needed
+- ✅ Completed, working, available
+- 🚧 In progress, under development
+- ❌ Broken, deprecated, unavailable
+- ⚠️ Warning, important note
+- 💡 Tip, suggestion, best practice
+- 🔍 Research, investigation needed
 
 ## 📊 Maintenance
 
 ### Regular Updates
 
-* Review quarterly for accuracy
-* Update version numbers with releases
-* Refresh screenshots and examples
-* Verify all links and references
+- Review quarterly for accuracy
+- Update version numbers with releases
+- Refresh screenshots and examples
+- Verify all links and references
 
 ### Version Control
 
-* Use meaningful commit messages for documentation changes
-* Tag documentation versions with releases
-* Maintain changelog for major documentation updates
+- Use meaningful commit messages for documentation changes
+- Tag documentation versions with releases
+- Maintain changelog for major documentation updates
 
-***
+---
 
 This style guide should be followed for all new documentation and existing documentation should be gradually updated to match these standards.

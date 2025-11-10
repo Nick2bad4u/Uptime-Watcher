@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import type { StatusUpdate } from "@shared/types";
+import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 describe("Electron Preload Script", () => {
     let mockContextBridge: { exposeInMainWorld: ReturnType<typeof vi.fn> };
@@ -15,6 +15,7 @@ describe("Electron Preload Script", () => {
         removeAllListeners: ReturnType<typeof vi.fn>;
         send: ReturnType<typeof vi.fn>;
     };
+    let mockSite: Site;
 
     // Helper function to safely get exposed API
     const getExposedAPI = () => {
@@ -34,7 +35,7 @@ describe("Electron Preload Script", () => {
         };
 
         // Mock site object for testing
-        const mockSite = {
+        mockSite = {
             identifier: "test-site",
             name: "Test Site",
             monitoring: false,
@@ -52,7 +53,7 @@ describe("Electron Preload Script", () => {
                     history: [],
                 },
             ],
-        };
+        } as Site;
 
         mockIpcRenderer = {
             invoke: vi.fn((channel: string) => {
@@ -1185,13 +1186,21 @@ describe("Electron Preload Script", () => {
                 const listener = listenerCall![1];
 
                 // Simulate IPC event
-                const testData = {
-                    monitorId: "test-monitor",
-                    siteIdentifier: "test-site",
-                    status: "up",
+                const monitor = mockSite.monitors[0] as Monitor | undefined;
+
+                if (!monitor) {
+                    throw new Error("Expected mock monitor to be defined");
+                }
+
+                const testData: StatusUpdate = {
+                    monitor,
+                    monitorId: monitor.id,
                     previousStatus: "down",
+                    site: mockSite,
+                    siteIdentifier: mockSite.identifier,
+                    status: "up",
                     timestamp: new Date().toISOString(),
-                } satisfies StatusUpdate;
+                };
                 listener(null, testData);
 
                 expect(callback).toHaveBeenCalledWith(testData);

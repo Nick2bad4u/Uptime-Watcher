@@ -1,4 +1,4 @@
-***
+---
 
 ## title: Markdown page example
 

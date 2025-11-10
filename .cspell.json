@@ -229,8 +229,7 @@
     ],
     "readonly": false,
     "reporters": [
-        "default",
-        "json"
+        "default"
     ],
     "suggestWords": [],
     "suggestionNumChanges": 3,

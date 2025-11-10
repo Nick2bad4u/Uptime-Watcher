@@ -12,18 +12,23 @@ vi.mock("electron", () => ({
     },
 }));
 
-vi.mock("node-sqlite3-wasm", () => ({
-    Database: vi.fn(() => ({
-        exec: vi.fn(),
-        close: vi.fn(),
-        prepare: vi.fn(() => ({
+vi.mock("node-sqlite3-wasm", () => {
+    const Database = vi.fn(function Database(this: unknown) {
+        return {
+            exec: vi.fn(),
+            close: vi.fn(),
             run: vi.fn(),
-            get: vi.fn(),
-            all: vi.fn(),
-            finalize: vi.fn(),
-        })),
-    })),
-}));
+            prepare: vi.fn(() => ({
+                run: vi.fn(),
+                get: vi.fn(),
+                all: vi.fn(),
+                finalize: vi.fn(),
+            })),
+        };
+    });
+
+    return { Database };
+});
 
 vi.mock("../../utils/logger", () => ({
     logger: {
@@ -44,15 +49,38 @@ vi.mock("./utils/databaseSchema", () => ({
     createDatabaseSchema: vi.fn(),
 }));
 
-vi.mock("node:path", () => ({
-    join: vi.fn((...args: string[]) => args.join("/")),
-    resolve: vi.fn((...args: string[]) => args.join("/")),
-    dirname: vi.fn(
-        (target: string) =>
-            target.replaceAll("\\", "/").split("/").slice(0, -1).join("/") ||
-            "."
-    ),
+vi.mock("./utils/databaseLockRecovery", () => ({
+    cleanupDatabaseLockArtifacts: vi.fn(() => ({
+        failed: [],
+        missing: [],
+        relocated: [],
+    })),
 }));
+
+vi.mock("node:path", () => {
+    const pathMock = {
+        join: vi.fn((...args: string[]) => args.join("/")),
+        resolve: vi.fn((...args: string[]) => args.join("/")),
+        dirname: vi.fn(
+            (target: string) =>
+                target
+                    .replaceAll("\\", "/")
+                    .split("/")
+                    .slice(0, -1)
+                    .join("/") || "."
+        ),
+        sep: "/",
+        basename: vi.fn(
+            (target: string) =>
+                target.replaceAll("\\", "/").split("/").pop() ?? ""
+        ),
+    };
+
+    return {
+        ...pathMock,
+        default: pathMock,
+    };
+});
 
 describe("DatabaseService Coverage Tests", () => {
     beforeEach(() => {
@@ -110,6 +138,40 @@ describe("DatabaseService Coverage Tests", () => {
             // Database might not be initialized in test environment
             expect(error).toBeInstanceOf(Error);
         }
+    });
+    it("should recover from locked database errors during initialization", async () => {
+        const { DatabaseService } = await import(
+            "../../../services/database/DatabaseService"
+        );
+        const schemaModule = await import(
+            "../../../services/database/utils/databaseSchema"
+        );
+        const recoveryModule = await import(
+            "../../../services/database/utils/databaseLockRecovery"
+        );
+
+        const createDatabaseSchemaSpy = vi.spyOn(
+            schemaModule,
+            "createDatabaseSchema"
+        );
+        const cleanupLockArtifactsSpy = vi.spyOn(
+            recoveryModule,
+            "cleanupDatabaseLockArtifacts"
+        );
+
+        const lockedError = new Error("SQLITE_BUSY: database is locked");
+        createDatabaseSchemaSpy.mockImplementationOnce(() => {
+            throw lockedError;
+        });
+        createDatabaseSchemaSpy.mockImplementationOnce(() => undefined);
+
+        const instance = DatabaseService.getInstance();
+        instance.close();
+
+        expect(() => instance.initialize()).not.toThrow();
+        expect(createDatabaseSchemaSpy).toHaveBeenCalledTimes(2);
+        expect(cleanupLockArtifactsSpy).toHaveBeenCalledTimes(1);
+        instance.close();
     });
     it("should handle transaction operations", async () => {
         const { DatabaseService } = await import(

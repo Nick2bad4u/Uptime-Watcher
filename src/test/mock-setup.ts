@@ -302,6 +302,7 @@ const mockElectronAPI: ElectronAPI = {
 
                 const statusUpdate: StatusUpdate = {
                     details: `Manual check run for monitor '${monitorId}'.`,
+                    monitor: updatedMonitor ?? monitor,
                     monitorId,
                     previousStatus,
                     site: updatedSite,

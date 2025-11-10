@@ -4,7 +4,7 @@
 # and upload the results as artifacts and to GitHub's code scanning dashboard.
 #
 # Workflow
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 # name: Scorecard supply-chain security
 #
 # Triggers:

@@ -171,7 +171,7 @@ describe("databaseService strict coverage", () => {
 
         expect(logger.error).toHaveBeenCalledWith(
             LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-            expect.any(Error)
+            expect.objectContaining({ error: expect.any(Error) })
         );
         expect(createDatabaseSchemaMock).not.toHaveBeenCalled();
     });
@@ -221,8 +221,8 @@ describe("databaseService strict coverage", () => {
         const logger = getLoggerMock();
 
         expect(logger.error).toHaveBeenCalledWith(
-            LOG_TEMPLATES.errors.DATABASE_SCHEMA_FAILED,
-            closeError
+            LOG_TEMPLATES.errors.DATABASE_CLOSE_FAILED,
+            expect.objectContaining({ error: closeError })
         );
     });
 
@@ -237,6 +237,7 @@ describe("databaseService strict coverage", () => {
 
         const [db] = databaseInstances;
         db!.inTransaction = true;
+        db!.run.mockClear();
 
         const operation = vi.fn(async () => "nested result");
         const result = await service.executeTransaction(operation);

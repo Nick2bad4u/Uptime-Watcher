@@ -99,14 +99,10 @@ This document standardizes inline code examples and TSDoc patterns across the Up
  * });
  * ```
  *
- * @public
- */
-````
-
-#### Repository Methods
-
-````typescript
-/**
+ * #### Repository Methods
+ *
+ * ```typescript
+ * /**
  * Creates a new [ENTITY] in the database.
  *
  * @remarks
@@ -627,41 +623,41 @@ Show complex scenarios and integration patterns:
 
 ### Standard Tags
 
-* `@param` - Parameter description
-* `@returns` - Return value description
-* `@throws` - Exception conditions
-* `@example` - Code examples (always use)
-* `@remarks` - Detailed implementation notes
-* `@see` - Cross-references to related items
-* `@since` - Version when feature was added
-* `@deprecated` - Mark obsolete APIs
+- `@param` - Parameter description
+- `@returns` - Return value description
+- `@throws` - Exception conditions
+- `@example` - Code examples (always use)
+- `@remarks` - Detailed implementation notes
+- `@see` - Cross-references to related items
+- `@since` - Version when feature was added
+- `@deprecated` - Mark obsolete APIs
 
 ### Visibility Tags
 
-* `@public` - Public API (exported)
-* `@internal` - Internal implementation (not exported)
-* `@readonly` - Read-only property
-* `@override` - Method overrides parent
+- `@public` - Public API (exported)
+- `@internal` - Internal implementation (not exported)
+- `@readonly` - Read-only property
+- `@override` - Method overrides parent
 
 ### Custom Tags (Project-Specific)
 
-* `@typeParam` - Generic type parameter description
-* `@template` - Alternative to @typeParam
+- `@typeParam` - Generic type parameter description
+- `@template` - Alternative to @typeParam
 
 ## Validation Checklist
 
 When documenting code, ensure:
 
-* [ ] Brief description is clear and specific
-* [ ] `@remarks` explains the "why" and important behaviors
-* [ ] All parameters are documented with types and constraints
-* [ ] Return value is clearly described
-* [ ] Error conditions are documented with `@throws`
-* [ ] At least one `@example` showing basic usage
-* [ ] Complex scenarios have additional examples
-* [ ] Error handling patterns are demonstrated
-* [ ] Related functions are cross-referenced with `@see`
-* [ ] Visibility tags (`@public`, `@internal`) are used appropriately
-* [ ] Examples use realistic data and variable names
-* [ ] Code examples are syntactically correct TypeScript
-* [ ] Examples follow the established patterns from the codebase
+- [ ] Brief description is clear and specific
+- [ ] `@remarks` explains the "why" and important behaviors
+- [ ] All parameters are documented with types and constraints
+- [ ] Return value is clearly described
+- [ ] Error conditions are documented with `@throws`
+- [ ] At least one `@example` showing basic usage
+- [ ] Complex scenarios have additional examples
+- [ ] Error handling patterns are demonstrated
+- [ ] Related functions are cross-referenced with `@see`
+- [ ] Visibility tags (`@public`, `@internal`) are used appropriately
+- [ ] Examples use realistic data and variable names
+- [ ] Code examples are syntactically correct TypeScript
+- [ ] Examples follow the established patterns from the codebase

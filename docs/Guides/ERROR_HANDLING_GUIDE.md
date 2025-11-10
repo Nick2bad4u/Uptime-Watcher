@@ -6,13 +6,13 @@ Comprehensive error handling patterns and practices in the Uptime Watcher applic
 
 ## Current Error Handling Architecture
 
-The application uses a __multi-layered error handling approach__ with:
+The application uses a **multi-layered error handling approach** with:
 
-* __Centralized Error Store__: `useErrorStore` for global and store-specific error management
-* __Shared Error Utilities__: `withErrorHandling()` for consistent async operation error handling
-* __Event System Integration__: Error propagation through TypedEventBus
-* __Type-Safe Error Conversion__: Enhanced error handling with type information
-* __Operation-Specific Loading States__: Fine-grained loading feedback
+- **Centralized Error Store**: `useErrorStore` for global and store-specific error management
+- **Shared Error Utilities**: `withErrorHandling()` for consistent async operation error handling
+- **Event System Integration**: Error propagation through TypedEventBus
+- **Type-Safe Error Conversion**: Enhanced error handling with type information
+- **Operation-Specific Loading States**: Fine-grained loading feedback
 
 ## Table of Contents
 
@@ -141,10 +141,10 @@ interface ErrorStore {
 
 ### Key Features
 
-1. __Error Isolation__: Store-specific errors don't interfere with each other
-2. __Operation Loading__: Fine-grained loading states for individual operations
-3. __Selective Clearing__: `clearAllErrors()` clears only error states, preserving loading states
-4. __Type Safety__: Full TypeScript support with proper error typing
+1. **Error Isolation**: Store-specific errors don't interfere with each other
+2. **Operation Loading**: Fine-grained loading states for individual operations
+3. **Selective Clearing**: `clearAllErrors()` clears only error states, preserving loading states
+4. **Type Safety**: Full TypeScript support with proper error typing
 
 ## Shared Error Handling Utilities
 
@@ -801,10 +801,10 @@ describe("Store Error Handling", () => {
 
 ### 1. Error Handling Hierarchy
 
-* __Local Component Errors__: Handle UI-specific errors locally
-* __Store-Specific Errors__: Use domain isolation for business logic errors
-* __Global Errors__: Reserve for application-wide critical errors
-* __Operation Errors__: Use operation-specific loading and error states
+- **Local Component Errors**: Handle UI-specific errors locally
+- **Store-Specific Errors**: Use domain isolation for business logic errors
+- **Global Errors**: Reserve for application-wide critical errors
+- **Operation Errors**: Use operation-specific loading and error states
 
 ### 2. Consistent Error Patterns
 
@@ -895,42 +895,42 @@ const FeatureComponent = () => {
 
 ### 5. Testing Error Scenarios
 
-* __Test both success and error paths__
-* __Verify error state management__
-* __Test error recovery mechanisms__
-* __Validate error logging calls__
-* __Test error boundaries and fallbacks__
+- **Test both success and error paths**
+- **Verify error state management**
+- **Test error recovery mechanisms**
+- **Validate error logging calls**
+- **Test error boundaries and fallbacks**
 
 ## Summary
 
 The Uptime Watcher application implements a comprehensive, multi-layered error handling system that provides:
 
-1. __Centralized Management__: Global error store with domain isolation
-2. __Consistent Patterns__: Shared utilities for uniform error handling
-3. __Type Safety__: Enhanced error conversion and type information
-4. __Event Integration__: Error propagation through the TypedEventBus
-5. __User Experience__: Graceful degradation and recovery mechanisms
-6. __Developer Experience__: Comprehensive logging and debugging information
+1. **Centralized Management**: Global error store with domain isolation
+2. **Consistent Patterns**: Shared utilities for uniform error handling
+3. **Type Safety**: Enhanced error conversion and type information
+4. **Event Integration**: Error propagation through the TypedEventBus
+5. **User Experience**: Graceful degradation and recovery mechanisms
+6. **Developer Experience**: Comprehensive logging and debugging information
 
 By following these patterns and practices, developers can ensure robust error handling that provides excellent user experience while maintaining system reliability and debuggability.
 
 ## 📚 Related Resources
 
-* [Event System Guide](./event-system-guide.md) - TypedEventBus error propagation patterns
-* [Zustand Store Pattern Guide](./zustand-store-pattern-guide.md) - Store composition and error isolation
-* [Testing Guide](./testing.md) - Error scenario testing approaches
-* [Troubleshooting Guide](./troubleshooting.md) - Error debugging and resolution
-* [Architecture ADRs](../Architecture/ADRs/) - Error handling strategy decisions
+- [Event System Guide](./event-system-guide.md) - TypedEventBus error propagation patterns
+- [Zustand Store Pattern Guide](./zustand-store-pattern-guide.md) - Store composition and error isolation
+- [Testing Guide](./testing.md) - Error scenario testing approaches
+- [Troubleshooting Guide](./troubleshooting.md) - Error debugging and resolution
+- [Architecture ADRs](../Architecture/ADRs/) - Error handling strategy decisions
 
 ## 🎯 Quick Reference
 
 ### Key Files
 
-* `shared/utils/errorHandling.ts` - Core error handling utilities
-* `src/stores/error/useErrorStore.ts` - Centralized error store
-* `src/stores/utils/storeErrorHandling.ts` - Store error handler factory
-* `shared/validation/schemas.ts` - Validation error handling
-* `src/components/ErrorBoundary.tsx` - React error boundaries
+- `shared/utils/errorHandling.ts` - Core error handling utilities
+- `src/stores/error/useErrorStore.ts` - Centralized error store
+- `src/stores/utils/storeErrorHandling.ts` - Store error handler factory
+- `shared/validation/schemas.ts` - Validation error handling
+- `src/components/ErrorBoundary.tsx` - React error boundaries
 
 ### Essential Imports
 

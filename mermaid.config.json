@@ -1,6 +1,15 @@
 {
-    "$schema": "https://mermaid.js.org/schemas/config.schema.json",
+    "altFontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    "architecture": {
+        "fontSize": 16,
+        "iconSize": 80,
+        "padding": 40,
+        "useMaxWidth": true
+    },
     "arrowMarkerAbsolute": false,
+    "block": {
+        "padding": 8
+    },
     "c4": {
         "boundaryFontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
         "boundaryFontSize": 14,
@@ -129,10 +138,10 @@
         "htmlLabels": false,
         "padding": 5,
         "textHeight": 10,
-        "titleTopMargin": 25
+        "titleTopMargin": 25,
+        "useMaxWidth": true
     },
     "darkMode": true,
-    "description": "Comprehensive Mermaid configuration with latest features for Uptime-Watcher project",
     "deterministicIDSeed": "uptime-watcher",
     "deterministicIds": true,
     "elk": {
@@ -159,27 +168,31 @@
         "nodeSpacing": 50,
         "padding": 15,
         "rankSpacing": 50,
+        "subGraphTitleMargin": {
+            "bottom": 0,
+            "top": 0
+        },
+        "titleTopMargin": 25,
         "useMaxWidth": true,
         "wrappingWidth": 200
     },
     "fontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
     "fontSize": 14,
+    "forceLegacyMathML": false,
     "gantt": {
+        "axisFormat": "%Y-%m-%d",
         "barHeight": 20,
-        "fontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
         "fontSize": 11,
         "gridLineStartPadding": 35,
+        "leftPadding": 75,
         "numberSectionStyles": 4,
+        "rightPadding": 75,
         "sectionFontSize": 24,
-        "titleTopMargin": 25
-    },
-    "git": {
-        "arrowMarkerAbsolute": false,
-        "mainBranchName": "main",
-        "mainBranchOrder": 0,
-        "rotateCommitLabel": true,
-        "showBranches": true,
-        "showCommitLabel": true
+        "titleTopMargin": 25,
+        "topAxis": false,
+        "topPadding": 50,
+        "useMaxWidth": true,
+        "weekday": "sunday"
     },
     "gitGraph": {
         "arrowMarkerAbsolute": false,
@@ -187,7 +200,8 @@
         "mainBranchOrder": 0,
         "rotateCommitLabel": true,
         "showBranches": true,
-        "showCommitLabel": true
+        "showCommitLabel": true,
+        "titleTopMargin": 25
     },
     "handDrawnSeed": 0,
     "htmlLabels": true,
@@ -228,15 +242,26 @@
         "taskFontSize": 14,
         "taskMargin": 50,
         "textPlacement": "fo",
+        "titleColor": "#f9fafb",
+        "titleFontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+        "titleFontSize": "4ex",
         "useMaxWidth": true,
         "width": 150
     },
+    "kanban": {
+        "padding": 8,
+        "sectionWidth": 200,
+        "ticketBaseUrl": ""
+    },
     "layout": "dagre",
+    "legacyMathML": false,
     "logLevel": "warn",
     "look": "handDrawn",
+    "markdownAutoWrap": true,
     "maxEdges": 500,
     "maxTextSize": 50000,
     "mindmap": {
+        "layoutAlgorithm": "cose-bilkent",
         "maxNodeWidth": 200,
         "padding": 10,
         "useMaxWidth": true
@@ -252,6 +277,38 @@
     "pie": {
         "textPosition": 0.75,
         "useMaxWidth": true
+    },
+    "quadrantChart": {
+        "chartHeight": 500,
+        "chartWidth": 500,
+        "pointLabelFontSize": 12,
+        "pointRadius": 5,
+        "pointTextPadding": 5,
+        "quadrantExternalBorderStrokeWidth": 2,
+        "quadrantInternalBorderStrokeWidth": 1,
+        "quadrantLabelFontSize": 16,
+        "quadrantPadding": 10,
+        "quadrantTextTopPadding": 5,
+        "titleFontSize": 20,
+        "titlePadding": 10,
+        "useMaxWidth": true,
+        "xAxisLabelFontSize": 16,
+        "xAxisLabelPadding": 5,
+        "xAxisPosition": "top",
+        "yAxisLabelFontSize": 16,
+        "yAxisLabelPadding": 5,
+        "yAxisPosition": "left"
+    },
+    "radar": {
+        "axisLabelFactor": 1.05,
+        "axisScaleFactor": 1,
+        "curveTension": 0.17,
+        "height": 600,
+        "marginBottom": 50,
+        "marginLeft": 50,
+        "marginRight": 50,
+        "marginTop": 50,
+        "width": 600
     },
     "requirement": {
         "fontSize": 14,
@@ -272,6 +329,7 @@
         "prefix": "",
         "showValues": true,
         "suffix": "",
+        "useMaxWidth": false,
         "width": 600
     },
     "secure": [
@@ -282,6 +340,7 @@
     ],
     "securityLevel": "strict",
     "sequence": {
+        "activationWidth": 10,
         "actorFontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
         "actorFontSize": 14,
         "actorFontWeight": 400,
@@ -291,6 +350,7 @@
         "boxTextMargin": 5,
         "diagramMarginX": 50,
         "diagramMarginY": 10,
+        "forceMenus": false,
         "height": 65,
         "labelBoxHeight": 20,
         "labelBoxWidth": 50,
@@ -330,7 +390,8 @@
         "sizeUnit": 5,
         "textHeight": 10,
         "titleShift": -15,
-        "titleTopMargin": 25
+        "titleTopMargin": 25,
+        "useMaxWidth": true
     },
     "suppressErrorRendering": false,
     "theme": "dark",
@@ -383,41 +444,51 @@
         "bottomMarginAdj": 1,
         "boxMargin": 10,
         "boxTextMargin": 5,
-        "cScale0": "#1f2937",
-        "cScale1": "#374151",
-        "cScale2": "#4b5563",
         "diagramMarginX": 50,
         "diagramMarginY": 10,
-        "fontFamily": "CodeNewRoman Nerd Font Mono, MesloLGS Nerd Font, SauceCodePro NFM, ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-        "fontSize": 11,
-        "gridLineStartPadding": 35,
         "height": 50,
         "leftMargin": 150,
         "messageAlign": "center",
         "messageMargin": 35,
         "noteMargin": 10,
-        "numberSectionStyles": 4,
-        "padding": 5,
         "rightAngles": false,
-        "sectionFontSize": 24,
         "useMaxWidth": true,
         "width": 150
     },
-    "useMaxWidth": true,
     "wrap": true,
     "xyChart": {
-        "axisLabelFontSize": 14,
-        "axisLabelPadding": 10,
         "chartOrientation": "vertical",
         "height": 500,
-        "plotColorPalette": "#3b82f6,#ef4444,#22c55e,#f59e0b,#8b5cf6,#06b6d4,#ec4899,#84cc16,#f97316,#6366f1",
+        "plotReservedSpacePercent": 50,
         "showTitle": true,
-        "tickLabelFontSize": 11,
-        "tickLength": 5,
-        "tickPadding": 5,
-        "tickWidth": 2,
         "titleFontSize": 20,
         "titlePadding": 10,
-        "width": 700
+        "width": 700,
+        "xAxis": {
+            "axisLineWidth": 2,
+            "labelFontSize": 14,
+            "labelPadding": 5,
+            "showAxisLine": true,
+            "showLabel": true,
+            "showTick": true,
+            "showTitle": true,
+            "tickLength": 5,
+            "tickWidth": 2,
+            "titleFontSize": 16,
+            "titlePadding": 5
+        },
+        "yAxis": {
+            "axisLineWidth": 2,
+            "labelFontSize": 14,
+            "labelPadding": 5,
+            "showAxisLine": true,
+            "showLabel": true,
+            "showTick": true,
+            "showTitle": true,
+            "tickLength": 5,
+            "tickWidth": 2,
+            "titleFontSize": 16,
+            "titlePadding": 5
+        }
     }
 }

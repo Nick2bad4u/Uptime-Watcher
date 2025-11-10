@@ -26,10 +26,10 @@
 | `remove-site`                      | Handles `remove-site` invocations.                      | `[identifier: string]`                         | `boolean`                        |
 | `request-full-sync`                | Handles `request-full-sync` invocations.                | `[]`                                           | `StateSyncFullSyncResult`        |
 | `reset-settings`                   | Handles `reset-settings` invocations.                   | `[]`                                           | `undefined`                      |
-| `start-monitoring`                 | Handles `start-monitoring` invocations.                 | `[]`                                           | `boolean`                        |
+| `start-monitoring`                 | Handles `start-monitoring` invocations.                 | `[]`                                           | `MonitoringStartSummary`         |
 | `start-monitoring-for-monitor`     | Handles `start-monitoring-for-monitor` invocations.     | `[siteIdentifier: string, monitorId: string]`  | `boolean`                        |
 | `start-monitoring-for-site`        | Handles `start-monitoring-for-site` invocations.        | `[siteIdentifier: string]`                     | `boolean`                        |
-| `stop-monitoring`                  | Handles `stop-monitoring` invocations.                  | `[]`                                           | `boolean`                        |
+| `stop-monitoring`                  | Handles `stop-monitoring` invocations.                  | `[]`                                           | `MonitoringStopSummary`          |
 | `stop-monitoring-for-monitor`      | Handles `stop-monitoring-for-monitor` invocations.      | `[siteIdentifier: string, monitorId: string]`  | `boolean`                        |
 | `stop-monitoring-for-site`         | Handles `stop-monitoring-for-site` invocations.         | `[siteIdentifier: string]`                     | `boolean`                        |
 | `update-history-limit`             | Handles `update-history-limit` invocations.             | `[limitDays: number]`                          | `number`                         |

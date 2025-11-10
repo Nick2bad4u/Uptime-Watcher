@@ -41,64 +41,97 @@ describe("pingRetry utilities", () => {
         }));
 
         vi.doMock("../../../../../../electron/utils/operationalHooks", () => ({
-            withOperationalHooks: vi.fn(async (operation: () => Promise<unknown>) => operation()),
+            withOperationalHooks: vi.fn(
+                async (operation: () => Promise<unknown>) => operation()
+            ),
         }));
 
-        vi.doMock("../../../../../../electron/services/monitoring/utils/nativeConnectivity", () => ({
-            checkConnectivity: vi.fn(() => Promise.resolve(MOCK_RESULT)),
-            checkHttpConnectivity: vi.fn(() => Promise.resolve(MOCK_RESULT)),
-        }));
+        vi.doMock(
+            "../../../../../../electron/services/monitoring/utils/nativeConnectivity",
+            () => ({
+                checkConnectivity: vi.fn(() => Promise.resolve(MOCK_RESULT)),
+                checkHttpConnectivity: vi.fn(() =>
+                    Promise.resolve(MOCK_RESULT)
+                ),
+            })
+        );
 
-        vi.doMock("../../../../../../electron/services/monitoring/utils/pingErrorHandling", () => ({
-            handlePingCheckError: vi.fn((error: unknown, context: unknown) => ({
-                error,
-                context,
-                status: "down" as const,
-            })),
-        }));
+        vi.doMock(
+            "../../../../../../electron/services/monitoring/utils/pingErrorHandling",
+            () => ({
+                handlePingCheckError: vi.fn(
+                    (error: unknown, context: unknown) => ({
+                        error,
+                        context,
+                        status: "down" as const,
+                    })
+                ),
+            })
+        );
     });
 
     it("routes HTTP URLs through checkHttpConnectivity", async () => {
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performSinglePingCheck } = module;
 
-        const result = await performSinglePingCheck("https://api.example.com", 1000);
+        const result = await performSinglePingCheck(
+            "https://api.example.com",
+            1000
+        );
 
         const connectivity = vi.mocked(
-            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+            await import(
+                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
+            )
         );
 
         expect(connectivity.checkHttpConnectivity).toHaveBeenCalledTimes(1);
-        expect(connectivity.checkHttpConnectivity).toHaveBeenCalledWith("https://api.example.com", 1000);
+        expect(connectivity.checkHttpConnectivity).toHaveBeenCalledWith(
+            "https://api.example.com",
+            1000
+        );
         expect(connectivity.checkConnectivity).not.toHaveBeenCalled();
         expect(result).toEqual(MOCK_RESULT);
     });
 
     it("routes non-HTTP hosts through checkConnectivity", async () => {
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performSinglePingCheck } = module;
 
         const result = await performSinglePingCheck("example.com", 2500);
 
         const connectivity = vi.mocked(
-            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+            await import(
+                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
+            )
         );
 
-        expect(connectivity.checkConnectivity).toHaveBeenCalledWith("example.com", {
-            retries: 0,
-            timeout: 2500,
-        });
+        expect(connectivity.checkConnectivity).toHaveBeenCalledWith(
+            "example.com",
+            {
+                retries: 0,
+                timeout: 2500,
+            }
+        );
         expect(connectivity.checkHttpConnectivity).not.toHaveBeenCalled();
         expect(result).toEqual(MOCK_RESULT);
     });
 
     it("wraps connectivity failures with a descriptive error", async () => {
         const connectivity = vi.mocked(
-            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+            await import(
+                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
+            )
         );
         connectivity.checkConnectivity.mockRejectedValueOnce(MOCK_ERROR);
 
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performSinglePingCheck } = module;
 
         await expect(performSinglePingCheck("unlucky", 10)).rejects.toThrow(
@@ -111,9 +144,13 @@ describe("pingRetry utilities", () => {
             await import("../../../../../../electron/utils/operationalHooks")
         );
         const connectivity = vi.mocked(
-            await import("../../../../../../electron/services/monitoring/utils/nativeConnectivity")
+            await import(
+                "../../../../../../electron/services/monitoring/utils/nativeConnectivity"
+            )
         );
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performPingCheckWithRetry } = module;
 
         connectivity.checkConnectivity.mockImplementationOnce(async () => ({
@@ -142,19 +179,26 @@ describe("pingRetry utilities", () => {
         const { isDev } = vi.mocked(
             await import("../../../../../../electron/electronUtils")
         );
-        const { logger } = await import("../../../../../../electron/utils/logger");
+        const { logger } = await import(
+            "../../../../../../electron/utils/logger"
+        );
         isDev.mockReturnValueOnce(true);
 
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performPingCheckWithRetry } = module;
 
         await performPingCheckWithRetry("dev.example", 500, 1);
 
-        expect(logger.debug).toHaveBeenCalledWith("Starting connectivity check with retry", {
-            host: "dev.example",
-            maxRetries: 1,
-            timeout: 500,
-        });
+        expect(logger.debug).toHaveBeenCalledWith(
+            "Starting connectivity check with retry",
+            {
+                host: "dev.example",
+                maxRetries: 1,
+                timeout: 500,
+            }
+        );
     });
 
     it("returns standardized failures when operational hooks throw", async () => {
@@ -166,16 +210,25 @@ describe("pingRetry utilities", () => {
         );
         hooks.withOperationalHooks.mockRejectedValueOnce(MOCK_ERROR);
 
-        const module = await import("../../../../../../electron/services/monitoring/utils/pingRetry");
+        const module = await import(
+            "../../../../../../electron/services/monitoring/utils/pingRetry"
+        );
         const { performPingCheckWithRetry } = module;
 
-        const outcome = await performPingCheckWithRetry("faulty.example", 750, 3);
+        const outcome = await performPingCheckWithRetry(
+            "faulty.example",
+            750,
+            3
+        );
 
-        expect(errorHandling.handlePingCheckError).toHaveBeenCalledWith(MOCK_ERROR, {
-            host: "faulty.example",
-            maxRetries: 3,
-            timeout: 750,
-        });
+        expect(errorHandling.handlePingCheckError).toHaveBeenCalledWith(
+            MOCK_ERROR,
+            {
+                host: "faulty.example",
+                maxRetries: 3,
+                timeout: 750,
+            }
+        );
         expect(outcome).toEqual({
             context: {
                 host: "faulty.example",

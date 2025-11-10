@@ -13,7 +13,7 @@
 #     - Checkout: Uses the actions/checkout action to check out the repository.
 #     - ActionLint: Uses the devops-actions/actionlint action to lint the workflow files.
 #       - Continues on error and sets the ID to action-lint.
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 name: ActionLint
 concurrency:
     group: actionlint-${{ github.ref }}
