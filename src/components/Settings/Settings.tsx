@@ -78,14 +78,20 @@ const selectFullResyncSites = (
 /**
  * Allowed settings keys that can be updated
  */
-const ALLOWED_SETTINGS_KEYS = new Set<keyof AppSettings>([
+const ALLOWED_SETTINGS_KEY_LIST = [
     "autoStart",
     "historyLimit",
+    "inAppAlertsEnabled",
+    "inAppAlertsSoundEnabled",
     "minimizeToTray",
-    "notifications",
-    "soundAlerts",
+    "systemNotificationsEnabled",
+    "systemNotificationsSoundEnabled",
     "theme",
-]);
+] as const satisfies ReadonlyArray<keyof AppSettings>;
+
+const ALLOWED_SETTINGS_KEY_STRINGS = new Set(
+    ALLOWED_SETTINGS_KEY_LIST.map(String)
+);
 
 /**
  * Props for the Settings component
@@ -198,18 +204,60 @@ export const Settings = ({
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
 
-    const handleSettingChange = useCallback(
-        (key: keyof typeof settings, value: unknown) => {
-            if (!ALLOWED_SETTINGS_KEYS.has(key)) {
-                logger.warn("Attempted to update invalid settings key", key);
-                return;
+    const applySettingChanges = useCallback(
+        (
+            changes: Partial<AppSettings>,
+            options?: { forceKeys?: Array<keyof AppSettings> }
+        ) => {
+            const updateEntries: Array<
+                [keyof AppSettings, AppSettings[keyof AppSettings]]
+            > = [];
+            const forcedKeys = new Set(options?.forceKeys);
+
+            for (const key of ALLOWED_SETTINGS_KEY_LIST) {
+                if (Object.hasOwn(changes, key)) {
+                    const nextValue = changes[key];
+                    if (nextValue !== undefined) {
+                        const previousValue = settings[key];
+                        if (
+                            previousValue !== nextValue ||
+                            forcedKeys.has(key)
+                        ) {
+                            const typedValue = nextValue;
+                            updateEntries.push([key, typedValue]);
+                            logger.user.settingsChange(
+                                key,
+                                previousValue,
+                                nextValue
+                            );
+                        }
+                    }
+                }
             }
 
-            const oldValue = settings[key];
-            updateSettings({ [key]: value });
-            logger.user.settingsChange(key, oldValue, value);
+            for (const rawKey of Object.keys(changes)) {
+                if (!ALLOWED_SETTINGS_KEY_STRINGS.has(rawKey)) {
+                    logger.warn(
+                        "Attempted to update invalid settings key",
+                        rawKey
+                    );
+                }
+            }
+
+            if (updateEntries.length > 0) {
+                updateSettings(
+                    Object.fromEntries(updateEntries) as Partial<AppSettings>
+                );
+            }
         },
         [settings, updateSettings]
+    );
+
+    const handleSettingChange = useCallback(
+        <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+            applySettingChanges({ [key]: value });
+        },
+        [applySettingChanges]
     );
 
     const handleHistoryLimitChange = useCallback(
@@ -279,18 +327,70 @@ export const Settings = ({
         [handleHistoryLimitChange]
     );
 
-    const handleNotificationsChange = useCallback(
+    const handleInAppAlertsChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            handleSettingChange("notifications", event.target.checked);
+            const enabled = event.target.checked;
+            const updates: Partial<AppSettings> = {
+                inAppAlertsEnabled: enabled,
+            };
+
+            if (!enabled) {
+                updates.inAppAlertsSoundEnabled = false;
+                applySettingChanges(updates, {
+                    forceKeys: ["inAppAlertsSoundEnabled"],
+                });
+                return;
+            }
+
+            applySettingChanges(updates);
         },
-        [handleSettingChange]
+        [applySettingChanges]
     );
 
-    const handleSoundAlertsChange = useCallback(
+    const handleInAppAlertSoundChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            handleSettingChange("soundAlerts", event.target.checked);
+            if (!settings.inAppAlertsEnabled) {
+                return;
+            }
+
+            applySettingChanges({
+                inAppAlertsSoundEnabled: event.target.checked,
+            });
         },
-        [handleSettingChange]
+        [applySettingChanges, settings.inAppAlertsEnabled]
+    );
+
+    const handleSystemNotificationsChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            const enabled = event.target.checked;
+            const updates: Partial<AppSettings> = {
+                systemNotificationsEnabled: enabled,
+            };
+
+            if (!enabled) {
+                updates.systemNotificationsSoundEnabled = false;
+                applySettingChanges(updates, {
+                    forceKeys: ["systemNotificationsSoundEnabled"],
+                });
+                return;
+            }
+
+            applySettingChanges(updates);
+        },
+        [applySettingChanges]
+    );
+
+    const handleSystemNotificationSoundChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            if (!settings.systemNotificationsEnabled) {
+                return;
+            }
+
+            applySettingChanges({
+                systemNotificationsSoundEnabled: event.target.checked,
+            });
+        },
+        [applySettingChanges, settings.systemNotificationsEnabled]
     );
 
     const handleAutoStartChange = useCallback(
@@ -314,35 +414,69 @@ export const Settings = ({
         [handleThemeChange]
     );
 
-    const notificationsControl = useMemo(
+    const inAppAlertsControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Enable desktop notifications"
-                checked={settings.notifications}
+                aria-label="Enable in-app alerts"
+                checked={settings.inAppAlertsEnabled}
                 disabled={isLoading}
-                onChange={handleNotificationsChange}
+                onChange={handleInAppAlertsChange}
             />
         ),
         [
-            handleNotificationsChange,
+            handleInAppAlertsChange,
             isLoading,
-            settings.notifications,
+            settings.inAppAlertsEnabled,
         ]
     );
 
-    const soundAlertsControl = useMemo(
+    const inAppAlertSoundControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Enable sound alerts"
-                checked={settings.soundAlerts}
-                disabled={isLoading}
-                onChange={handleSoundAlertsChange}
+                aria-label="Play sound for in-app alerts"
+                checked={settings.inAppAlertsSoundEnabled}
+                disabled={isLoading || !settings.inAppAlertsEnabled}
+                onChange={handleInAppAlertSoundChange}
             />
         ),
         [
-            handleSoundAlertsChange,
+            handleInAppAlertSoundChange,
             isLoading,
-            settings.soundAlerts,
+            settings.inAppAlertsEnabled,
+            settings.inAppAlertsSoundEnabled,
+        ]
+    );
+
+    const systemNotificationsControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Enable system notifications"
+                checked={settings.systemNotificationsEnabled}
+                disabled={isLoading}
+                onChange={handleSystemNotificationsChange}
+            />
+        ),
+        [
+            handleSystemNotificationsChange,
+            isLoading,
+            settings.systemNotificationsEnabled,
+        ]
+    );
+
+    const systemNotificationSoundControl = useMemo(
+        () => (
+            <ThemedCheckbox
+                aria-label="Play sound for system notifications"
+                checked={settings.systemNotificationsSoundEnabled}
+                disabled={isLoading || !settings.systemNotificationsEnabled}
+                onChange={handleSystemNotificationSoundChange}
+            />
+        ),
+        [
+            handleSystemNotificationSoundChange,
+            isLoading,
+            settings.systemNotificationsEnabled,
+            settings.systemNotificationsSoundEnabled,
         ]
     );
 
@@ -612,14 +746,24 @@ export const Settings = ({
                             children: (
                                 <div className="settings-toggle-stack">
                                     <SettingItem
-                                        control={notificationsControl}
-                                        description="Show desktop alerts whenever a site changes status."
-                                        title="Desktop notifications"
+                                        control={inAppAlertsControl}
+                                        description="Show toast notifications within the app when monitors change state."
+                                        title="In-app alerts"
                                     />
                                     <SettingItem
-                                        control={soundAlertsControl}
-                                        description="Play an audible chime alongside desktop alerts."
-                                        title="Sound alerts"
+                                        control={inAppAlertSoundControl}
+                                        description="Play a sound when in-app alerts are displayed."
+                                        title="In-app alert sound"
+                                    />
+                                    <SettingItem
+                                        control={systemNotificationsControl}
+                                        description="Trigger operating system notifications for status changes."
+                                        title="System notifications"
+                                    />
+                                    <SettingItem
+                                        control={systemNotificationSoundControl}
+                                        description="Play a sound when system notifications are shown."
+                                        title="System notification sound"
                                     />
                                 </div>
                             ),

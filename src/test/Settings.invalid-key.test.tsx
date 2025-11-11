@@ -72,8 +72,10 @@ const mockUseStore = {
         autoStart: false,
         historyLimit: 100,
         minimizeToTray: true,
-        notifications: true,
-        soundAlerts: false,
+        inAppAlertsEnabled: true,
+        inAppAlertsSoundEnabled: true,
+        systemNotificationsEnabled: true,
+        systemNotificationsSoundEnabled: true,
         theme: "dark" as ThemeName,
     },
     persistHistoryLimit: vi.fn().mockResolvedValue(undefined),
@@ -410,7 +412,7 @@ describe("Settings Component - Invalid Key Coverage", () => {
         await act(async () => {
             const allowedKeys = createAllowedSettingsKeySet();
 
-            const validKey = "notifications";
+            const validKey = "systemNotificationsEnabled";
 
             // Simulate the logic from handleSettingChange with valid key
             if (
@@ -437,10 +439,10 @@ describe("Settings Component - Invalid Key Coverage", () => {
 
         // Verify updateSettings WAS called for valid key
         expect(mockUpdateSettings).toHaveBeenCalledWith({
-            notifications: false,
+            systemNotificationsEnabled: false,
         });
         expect(logger.user.settingsChange).toHaveBeenCalledWith(
-            "notifications",
+            "systemNotificationsEnabled",
             true,
             false
         );

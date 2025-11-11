@@ -19,7 +19,10 @@
  * ```typescript
  * // Basic settings usage
  * const { settings, updateSettings } = useSettingsStore();
- * updateSettings({ theme: "dark", notifications: true });
+ * updateSettings({
+ *     theme: "dark",
+ *     systemNotificationsEnabled: true,
+ * });
  *
  * // History limit with backend sync
  * const { persistHistoryLimit } = useSettingsStore();

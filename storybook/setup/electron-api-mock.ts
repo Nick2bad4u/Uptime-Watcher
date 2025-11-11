@@ -398,6 +398,11 @@ const electronAPIMockDefinition = {
             warnings: [],
         }),
     },
+    notifications: {
+        updatePreferences: async (): Promise<void> => {
+            /* Storybook mock: no-op */
+        },
+    },
     settings: {
         getHistoryLimit: async (): Promise<number> => mockState.historyLimit,
         resetSettings: async (): Promise<void> => {

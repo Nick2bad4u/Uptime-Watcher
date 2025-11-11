@@ -301,7 +301,11 @@ describe("DataService", () => {
                     id: i,
                     siteIdentifier: i % 1000,
                 })),
-                settings: { theme: "dark", notifications: true },
+                settings: {
+                    theme: "dark",
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: false,
+                },
             });
             mockElectronAPI.data.exportData.mockResolvedValue(largeData);
 
@@ -400,10 +404,10 @@ describe("DataService", () => {
                 ],
                 settings: {
                     theme: "light",
-                    notifications: {
-                        email: true,
-                        desktop: false,
-                    },
+                    inAppAlertsEnabled: true,
+                    inAppAlertsSoundEnabled: false,
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: false,
                 },
             });
             mockElectronAPI.data.importData.mockResolvedValue(true);

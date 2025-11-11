@@ -39,7 +39,7 @@
  * await settingsRepo.setSettings({
  *     historyLimit: 1000,
  *     checkInterval: 60000,
- *     enableNotifications: true,
+ *     systemNotificationsEnabled: true,
  * });
  * ```
  *

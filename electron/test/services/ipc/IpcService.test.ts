@@ -11,6 +11,10 @@ import {
 } from "../../../services/ipc/diagnosticsMetrics";
 
 // Use vi.hoisted to fix hoisting issues with mocks
+const mockNotificationService = {
+    updateConfig: vi.fn(),
+};
+
 const {
     mockUptimeOrchestrator,
     mockAutoUpdaterService,
@@ -150,6 +154,7 @@ vi.mock("./", () => ({
     SettingsHandlerValidators: {},
     MonitoringHandlerValidators: {},
     MonitorTypeHandlerValidators: {},
+    NotificationHandlerValidators: {},
     SiteHandlerValidators: {},
     StateSyncHandlerValidators: {},
 }));
@@ -160,9 +165,11 @@ describe(IpcService, () => {
     beforeEach(() => {
         vi.clearAllMocks();
         resetDiagnosticsMetrics();
+        mockNotificationService.updateConfig.mockReset();
         ipcService = new IpcService(
             mockUptimeOrchestrator as any,
-            mockAutoUpdaterService as any
+            mockAutoUpdaterService as any,
+            mockNotificationService as any
         );
     });
     afterEach(() => {
@@ -313,6 +320,31 @@ describe(IpcService, () => {
             expect(handleCalls).toContain("get-monitor-types");
             expect(handleCalls).toContain("format-monitor-detail");
             expect(handleCalls).toContain("format-monitor-title-suffix");
+        });
+        it("should setup notification handlers", async ({ task, annotate }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: IpcService", "component");
+
+            ipcService.setupHandlers();
+
+            const notificationHandlerEntry = mockIpcMain.handle.mock.calls.find(
+                ([channel]) => channel === "update-notification-preferences"
+            );
+
+            expect(notificationHandlerEntry).toBeDefined();
+
+            const handler = notificationHandlerEntry?.[1];
+            expect(typeof handler).toBe("function");
+
+            await (handler as any)(undefined, {
+                systemNotificationsEnabled: false,
+                systemNotificationsSoundEnabled: true,
+            });
+
+            expect(mockNotificationService.updateConfig).toHaveBeenCalledWith({
+                enabled: false,
+                playSound: true,
+            });
         });
         it("should setup data handlers", async ({ task, annotate }) => {
             await annotate(`Testing: ${task.name}`, "functional");

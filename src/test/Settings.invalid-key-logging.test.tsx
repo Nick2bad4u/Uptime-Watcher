@@ -29,10 +29,12 @@ vi.mock("../stores/settings/useSettingsStore", () => ({
             historyLimit: 100,
             logLevel: "info",
             minimizeToTray: false,
-            notifications: true,
+            inAppAlertsEnabled: true,
+            inAppAlertsSoundEnabled: true,
+            systemNotificationsEnabled: true,
+            systemNotificationsSoundEnabled: true,
             port: 8080,
             retryAttempts: 3,
-            soundAlerts: true,
             startMinimized: false,
             stayAlive: true,
             theme: "dark",
@@ -86,7 +88,10 @@ describe("Settings - Invalid Key Logging", () => {
                 theme: string;
                 autoStart: boolean;
                 autoUpdate: boolean;
-                notifications: boolean;
+                inAppAlertsEnabled: boolean;
+                inAppAlertsSoundEnabled: boolean;
+                systemNotificationsEnabled: boolean;
+                systemNotificationsSoundEnabled: boolean;
                 port: number;
                 retryAttempts: number;
                 timeout: number;
@@ -94,16 +99,17 @@ describe("Settings - Invalid Key Logging", () => {
                 startMinimized: boolean;
                 stayAlive: boolean;
                 logLevel: string;
-                soundAlerts: boolean;
                 historyLimit: number;
             }
 
             const allowedKeys = new Set<keyof SettingsType>([
-                "notifications",
+                "systemNotificationsEnabled",
+                "systemNotificationsSoundEnabled",
+                "inAppAlertsEnabled",
+                "inAppAlertsSoundEnabled",
                 "autoStart",
                 "minimizeToTray",
                 "theme",
-                "soundAlerts",
                 "historyLimit",
             ]);
 

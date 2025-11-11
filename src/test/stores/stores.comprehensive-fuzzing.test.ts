@@ -28,8 +28,10 @@ const arbitraryPartialSettings = fc.record({
     autoStart: fc.option(fc.boolean()),
     historyLimit: fc.option(fc.integer({ min: 100, max: 10_000 })),
     minimizeToTray: fc.option(fc.boolean()),
-    notifications: fc.option(fc.boolean()),
-    soundAlerts: fc.option(fc.boolean()),
+    inAppAlertsEnabled: fc.option(fc.boolean()),
+    inAppAlertsSoundEnabled: fc.option(fc.boolean()),
+    systemNotificationsEnabled: fc.option(fc.boolean()),
+    systemNotificationsSoundEnabled: fc.option(fc.boolean()),
 });
 
 describe("Stores Comprehensive Fuzzing", () => {

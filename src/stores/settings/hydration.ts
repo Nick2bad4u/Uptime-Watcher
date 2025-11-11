@@ -5,7 +5,12 @@ import { logger } from "../../services/logger";
  * Utilities for synchronizing the settings store after persistence hydration.
  */
 import { SettingsService } from "../../services/SettingsService";
-import { defaultSettings } from "./state";
+import { defaultSettings, normalizeAppSettings } from "./state";
+
+const hasOwn = <T extends object>(
+    target: T,
+    property: keyof T | string
+): boolean => Object.hasOwn(target, property);
 
 // Store timer reference for cleanup capability
 // eslint-disable-next-line eslint-plugin-toplevel/no-toplevel-let -- Mutable state required for timer management
@@ -22,13 +27,31 @@ export const syncSettingsAfterRehydration = (
     }
 
     const { settings } = state;
+    const normalizedSettings = normalizeAppSettings(settings);
+
+    const requiresNormalization =
+        !hasOwn(settings, "inAppAlertsEnabled") ||
+        !hasOwn(settings, "inAppAlertsSoundEnabled") ||
+        !hasOwn(settings, "systemNotificationsEnabled") ||
+        !hasOwn(settings, "systemNotificationsSoundEnabled");
+
+    if (requiresNormalization) {
+        state.updateSettings(normalizedSettings);
+    }
+
     const matchesDefaults =
-        settings.autoStart === defaultSettings.autoStart &&
-        settings.historyLimit === defaultSettings.historyLimit &&
-        settings.minimizeToTray === defaultSettings.minimizeToTray &&
-        settings.notifications === defaultSettings.notifications &&
-        settings.soundAlerts === defaultSettings.soundAlerts &&
-        settings.theme === defaultSettings.theme;
+        normalizedSettings.autoStart === defaultSettings.autoStart &&
+        normalizedSettings.historyLimit === defaultSettings.historyLimit &&
+        normalizedSettings.inAppAlertsEnabled ===
+            defaultSettings.inAppAlertsEnabled &&
+        normalizedSettings.inAppAlertsSoundEnabled ===
+            defaultSettings.inAppAlertsSoundEnabled &&
+        normalizedSettings.minimizeToTray === defaultSettings.minimizeToTray &&
+        normalizedSettings.systemNotificationsEnabled ===
+            defaultSettings.systemNotificationsEnabled &&
+        normalizedSettings.systemNotificationsSoundEnabled ===
+            defaultSettings.systemNotificationsSoundEnabled &&
+        normalizedSettings.theme === defaultSettings.theme;
 
     if (matchesDefaults) {
         return;

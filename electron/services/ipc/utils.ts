@@ -120,6 +120,21 @@ export const IpcValidators = {
     },
 
     /**
+     * Validates a required boolean parameter.
+     *
+     * @param value - Value to validate
+     * @param paramName - Parameter name for error messages
+     *
+     * @returns Error message or null if valid
+     */
+    requiredBoolean: (value: unknown, paramName: string): null | string => {
+        if (typeof value !== "boolean") {
+            return `${paramName} must be a boolean`;
+        }
+        return null;
+    },
+
+    /**
      * Validates a required number parameter.
      *
      * @param value - Value to validate

@@ -11,6 +11,7 @@ import { isDevelopment, isProduction } from "@shared/utils/environment";
 import { App } from "../App";
 import { logger } from "../services/logger";
 import { useErrorStore } from "../stores/error/useErrorStore";
+import { defaultSettings } from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
@@ -78,6 +79,13 @@ vi.mock("../components/common/ErrorAlert/ErrorAlert", () => ({
     ErrorAlert: () => <div data-testid="error-alert">Error Alert</div>,
 }));
 
+vi.mock("../services/NotificationPreferenceService", () => ({
+    NotificationPreferenceService: {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        updatePreferences: vi.fn().mockResolvedValue(undefined),
+    },
+}));
+
 // Mock stores
 vi.mock("../stores/error/useErrorStore");
 vi.mock("../stores/settings/useSettingsStore");
@@ -91,6 +99,10 @@ const originalMatchMedia = globalThis.matchMedia;
 describe("App Development Logging Coverage", () => {
     let mockSettingsStoreState: {
         initializeSettings: ReturnType<typeof vi.fn>;
+        resetSettings: ReturnType<typeof vi.fn>;
+        settings: typeof defaultSettings;
+        updateSetting: ReturnType<typeof vi.fn>;
+        updateSettings: ReturnType<typeof vi.fn>;
     };
     let mockSitesStoreState: {
         initializeSites: ReturnType<typeof vi.fn>;
@@ -154,6 +166,10 @@ describe("App Development Logging Coverage", () => {
 
         mockSettingsStoreState = {
             initializeSettings: vi.fn().mockResolvedValue(undefined),
+            resetSettings: vi.fn(),
+            settings: { ...defaultSettings },
+            updateSetting: vi.fn(),
+            updateSettings: vi.fn(),
         };
 
         vi.mocked(useSettingsStore).mockImplementation(((

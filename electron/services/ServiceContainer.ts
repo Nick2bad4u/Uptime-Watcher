@@ -629,7 +629,12 @@ export class ServiceContainer {
         if (!this.ipcService) {
             const orchestrator = this.getUptimeOrchestrator();
             const updater = this.getAutoUpdaterService();
-            this.ipcService = new IpcService(orchestrator, updater);
+            const notificationService = this.getNotificationService();
+            this.ipcService = new IpcService(
+                orchestrator,
+                updater,
+                notificationService
+            );
             if (this.config.enableDebugLogging) {
                 logger.debug(
                     "[ServiceContainer] Created IpcService with dependencies"

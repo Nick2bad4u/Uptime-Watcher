@@ -83,7 +83,7 @@ class MockSettingsRepository {
                 category: "appearance",
             },
             {
-                key: "app.notifications",
+                key: "app.systemNotificationsEnabled",
                 value: "true",
                 type: "boolean",
                 category: "notifications",

@@ -91,8 +91,10 @@ interface SettingsState {
     settings: {
         theme: "light" | "dark" | "system";
         autoStart: boolean;
-        notifications: boolean;
-        soundAlerts: boolean;
+        inAppAlertsEnabled: boolean;
+        inAppAlertsSoundEnabled: boolean;
+        systemNotificationsEnabled: boolean;
+        systemNotificationsSoundEnabled: boolean;
         minimizeToTray: boolean;
         historyLimit: number;
     };
@@ -110,8 +112,10 @@ function createSettingsStore(): StoreApi<SettingsState & SettingsActions> {
     const defaultSettings = {
         theme: "system" as const,
         autoStart: false,
-        notifications: true,
-        soundAlerts: false,
+        inAppAlertsEnabled: true,
+        inAppAlertsSoundEnabled: false,
+        systemNotificationsEnabled: true,
+        systemNotificationsSoundEnabled: false,
         minimizeToTray: true,
         historyLimit: 500,
     };
@@ -289,7 +293,9 @@ describe("State Management Performance - Real Zustand Patterns", () => {
 
             // Multiple setting updates
             store.getState().updateSettings({ theme: "dark" });
-            store.getState().updateSettings({ notifications: false });
+            store
+                .getState()
+                .updateSettings({ systemNotificationsEnabled: false });
             store.getState().updateSettings({ autoStart: true });
             store.getState().updateSettings({ historyLimit: 1000 });
         });
@@ -299,9 +305,11 @@ describe("State Management Performance - Real Zustand Patterns", () => {
 
             store.getState().updateSettings({
                 theme: "dark",
-                notifications: false,
+                systemNotificationsEnabled: false,
                 autoStart: true,
-                soundAlerts: true,
+                systemNotificationsSoundEnabled: true,
+                inAppAlertsEnabled: false,
+                inAppAlertsSoundEnabled: false,
                 minimizeToTray: false,
                 historyLimit: 1000,
             });
@@ -311,9 +319,10 @@ describe("State Management Performance - Real Zustand Patterns", () => {
             const store = createSettingsStore();
 
             // Make some changes then reset
-            store
-                .getState()
-                .updateSettings({ theme: "dark", notifications: false });
+            store.getState().updateSettings({
+                theme: "dark",
+                systemNotificationsEnabled: false,
+            });
             store.getState().resetSettings();
         });
 

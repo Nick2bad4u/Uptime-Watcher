@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { Site, StatusUpdate } from "@shared/types";
+import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateHandler";
 
 import {
     createSiteMonitoringActions,
@@ -71,7 +72,7 @@ describe("useSiteMonitoring edge cases", () => {
     let getSites: Mock<() => Site[]>;
     let setSites: Mock<(sites: Site[]) => void>;
     let applyStatusUpdate: Mock<
-        (sites: Site[], update: StatusUpdate) => Site[]
+        (sites: Site[], update: StatusUpdateSnapshotPayload) => Site[]
     >;
 
     beforeEach(() => {

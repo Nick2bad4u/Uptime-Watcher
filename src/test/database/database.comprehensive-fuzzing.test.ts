@@ -60,8 +60,10 @@ const arbitrarySettings = fc.record({
     autoStart: arbitraryBoolean,
     historyLimit: arbitraryInteger,
     minimizeToTray: arbitraryBoolean,
-    notifications: arbitraryBoolean,
-    soundAlerts: arbitraryBoolean,
+    inAppAlertsEnabled: arbitraryBoolean,
+    inAppAlertsSoundEnabled: arbitraryBoolean,
+    systemNotificationsEnabled: arbitraryBoolean,
+    systemNotificationsSoundEnabled: arbitraryBoolean,
 });
 
 describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
@@ -308,8 +310,14 @@ describe("Database & Repository - 100% Fast-Check Fuzzing Coverage", () => {
                 expect(typeof settings.autoStart).toBe("boolean");
                 expect(typeof settings.historyLimit).toBe("number");
                 expect(typeof settings.minimizeToTray).toBe("boolean");
-                expect(typeof settings.notifications).toBe("boolean");
-                expect(typeof settings.soundAlerts).toBe("boolean");
+                expect(typeof settings.inAppAlertsEnabled).toBe("boolean");
+                expect(typeof settings.inAppAlertsSoundEnabled).toBe("boolean");
+                expect(typeof settings.systemNotificationsEnabled).toBe(
+                    "boolean"
+                );
+                expect(typeof settings.systemNotificationsSoundEnabled).toBe(
+                    "boolean"
+                );
                 expect(settings.historyLimit).toBeGreaterThan(0);
             }
         );

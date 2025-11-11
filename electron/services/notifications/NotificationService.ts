@@ -22,6 +22,10 @@ import { logger } from "../../utils/logger";
  * @public
  */
 export interface NotificationConfig {
+    /** Whether system notifications are enabled globally */
+    enabled: boolean;
+    /** Whether system notifications should play sound when supported */
+    playSound: boolean;
     /** Whether to show notifications when monitors go down */
     showDownAlerts: boolean;
     /** Whether to show notifications when monitors come back up */
@@ -42,7 +46,47 @@ export interface NotificationServiceDependencies {
      * Optional configuration for notification behavior. Defaults to enabled
      * alerts.
      */
-    config?: NotificationConfig;
+    config?: Partial<NotificationConfig>;
+}
+const DEFAULT_NOTIFICATION_CONFIG: NotificationConfig = {
+    enabled: true,
+    playSound: false,
+    showDownAlerts: true,
+    showUpAlerts: true,
+};
+
+function normalizeConfig(
+    overrides?: Partial<NotificationConfig>
+): NotificationConfig {
+    if (!overrides) {
+        return { ...DEFAULT_NOTIFICATION_CONFIG };
+    }
+
+    return {
+        enabled: overrides.enabled ?? DEFAULT_NOTIFICATION_CONFIG.enabled,
+        playSound: overrides.playSound ?? DEFAULT_NOTIFICATION_CONFIG.playSound,
+        showDownAlerts:
+            overrides.showDownAlerts ??
+            DEFAULT_NOTIFICATION_CONFIG.showDownAlerts,
+        showUpAlerts:
+            overrides.showUpAlerts ?? DEFAULT_NOTIFICATION_CONFIG.showUpAlerts,
+    } satisfies NotificationConfig;
+}
+
+function mergeConfig(
+    current: NotificationConfig,
+    updates?: Partial<NotificationConfig>
+): NotificationConfig {
+    if (!updates) {
+        return current;
+    }
+
+    return {
+        enabled: updates.enabled ?? current.enabled,
+        playSound: updates.playSound ?? current.playSound,
+        showDownAlerts: updates.showDownAlerts ?? current.showDownAlerts,
+        showUpAlerts: updates.showUpAlerts ?? current.showUpAlerts,
+    } satisfies NotificationConfig;
 }
 
 /**
@@ -116,10 +160,7 @@ export class NotificationService {
      * @param dependencies - Dependencies containing optional configuration
      */
     public constructor(dependencies: NotificationServiceDependencies = {}) {
-        this.config = dependencies.config ?? {
-            showDownAlerts: true,
-            showUpAlerts: true,
-        };
+        this.config = normalizeConfig(dependencies.config);
     }
 
     /**
@@ -174,7 +215,16 @@ export class NotificationService {
      * @param monitorId - ID of the specific monitor that went down
      */
     public notifyMonitorDown(site: Site, monitorId: string): void {
-        if (!this.config.showDownAlerts) return;
+        if (!this.config.enabled || !this.config.showDownAlerts) {
+            logger.debug(
+                "[NotificationService] Skipping down alert; notifications disabled",
+                {
+                    enabled: this.config.enabled,
+                    showDownAlerts: this.config.showDownAlerts,
+                }
+            );
+            return;
+        }
 
         // Validate monitor ID
         if (!monitorId) {
@@ -203,6 +253,7 @@ export class NotificationService {
         if (Notification.isSupported()) {
             new Notification({
                 body: `${site.name} (${monitorType}) is currently down!`,
+                silent: !this.config.playSound,
                 title: "Monitor Down Alert",
                 urgency: "critical",
             }).show();
@@ -239,7 +290,16 @@ export class NotificationService {
      * @param monitorId - ID of the specific monitor that was restored
      */
     public notifyMonitorUp(site: Site, monitorId: string): void {
-        if (!this.config.showUpAlerts) return;
+        if (!this.config.enabled || !this.config.showUpAlerts) {
+            logger.debug(
+                "[NotificationService] Skipping up alert; notifications disabled",
+                {
+                    enabled: this.config.enabled,
+                    showUpAlerts: this.config.showUpAlerts,
+                }
+            );
+            return;
+        }
 
         // Validate monitor ID
         if (!monitorId) {
@@ -268,6 +328,7 @@ export class NotificationService {
         if (Notification.isSupported()) {
             new Notification({
                 body: `${site.name} (${monitorType}) is back online!`,
+                silent: !this.config.playSound,
                 title: "Monitor Restored",
                 urgency: "normal",
             }).show();
@@ -310,10 +371,7 @@ export class NotificationService {
      * @param config - Partial configuration object with settings to update
      */
     public updateConfig(config: Partial<NotificationConfig>): void {
-        this.config = {
-            ...this.config,
-            ...config,
-        };
+        this.config = mergeConfig(this.config, config);
         logger.debug(
             "[NotificationService] Configuration updated",
             this.config

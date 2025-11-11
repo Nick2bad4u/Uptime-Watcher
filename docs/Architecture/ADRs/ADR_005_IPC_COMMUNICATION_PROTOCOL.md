@@ -580,8 +580,15 @@ describe("Sites IPC Handlers", () => {
   const mockUpdaterService = {
    quitAndInstall: vi.fn(),
   } as unknown as AutoUpdaterService;
+  const mockNotificationService = {
+   updateConfig: vi.fn(),
+  } as unknown as NotificationService;
 
-  const ipcService = new IpcService(mockOrchestrator, mockUpdaterService);
+  const ipcService = new IpcService(
+   mockOrchestrator,
+   mockUpdaterService,
+   mockNotificationService
+  );
   ipcService.setupHandlers();
 
   const result = await ipcRenderer.invoke("add-site", siteData);

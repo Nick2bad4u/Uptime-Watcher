@@ -12,6 +12,7 @@ import { ipcMain, type IpcMainInvokeEvent, type IpcMainEvent } from "electron";
 import { IpcService } from "../../../services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../services/updater/AutoUpdaterService";
+import type { NotificationService } from "../../../services/notifications/NotificationService";
 import type {
     Monitor,
     MonitoringStartSummary,
@@ -143,6 +144,7 @@ describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
     let mockAutoUpdaterService: AutoUpdaterService;
+    let mockNotificationService: NotificationService;
     let mockIpcEvent: IpcMainInvokeEvent;
     let mockMainEvent: IpcMainEvent;
 
@@ -280,9 +282,16 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
+        const notificationServiceMock = {
+            updateConfig: vi.fn(),
+        };
+        mockNotificationService =
+            notificationServiceMock as unknown as NotificationService;
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
-            mockAutoUpdaterService
+            mockAutoUpdaterService,
+            mockNotificationService
         );
     });
 
@@ -365,6 +374,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("get-history-limit");
             expect(registeredChannels).toContain("reset-settings");
             expect(registeredChannels).toContain("download-sqlite-backup");
+
+            // Notification handlers
+            expect(registeredChannels).toContain(
+                "update-notification-preferences"
+            );
 
             // System handlers
             expect(registeredChannels).toContain("quit-and-install");

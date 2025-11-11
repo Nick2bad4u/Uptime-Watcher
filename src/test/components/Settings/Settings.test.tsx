@@ -110,10 +110,10 @@ describe("Settings Component", () => {
     const mockSettingsStore = {
         settings: {
             historyLimit: 1000,
-            notifications: {
-                enabled: true,
-                sound: true,
-            },
+            inAppAlertsEnabled: true,
+            inAppAlertsSoundEnabled: true,
+            systemNotificationsEnabled: true,
+            systemNotificationsSoundEnabled: true,
             theme: "light" as const,
         },
         updateSetting: vi.fn(),

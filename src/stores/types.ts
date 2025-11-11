@@ -21,12 +21,16 @@ export interface AppSettings {
     autoStart: boolean;
     /** Maximum number of history records to keep per monitor */
     historyLimit: number;
+    /** Enable in-app status alerts rendered inside the UI shell */
+    inAppAlertsEnabled: boolean;
+    /** Play an audible chime when in-app alerts are shown */
+    inAppAlertsSoundEnabled: boolean;
     /** Minimize to system tray instead of closing the application */
     minimizeToTray: boolean;
-    /** Enable desktop notifications for status changes */
-    notifications: boolean;
-    /** Enable sound alerts for status changes */
-    soundAlerts: boolean;
+    /** Enable operating-system notifications for status changes */
+    systemNotificationsEnabled: boolean;
+    /** Allow operating-system notifications to play sounds when supported */
+    systemNotificationsSoundEnabled: boolean;
     /** Current theme name (light, dark, etc.) */
     theme: ThemeName;
 }

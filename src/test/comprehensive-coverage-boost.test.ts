@@ -449,7 +449,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
             // Test Settings.tsx uncovered lines (85-92,105,133-134,150-151,264-281,332-349)
             const mockSettingsState = {
                 theme: "system",
-                notifications: true,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: false,
                 autoStart: false,
                 historyLimit: 1000,
                 isLoading: false,
@@ -464,7 +467,10 @@ describe("Comprehensive Coverage Boost Tests", () => {
 
             const resetSettings = () => ({
                 theme: "system",
-                notifications: true,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: false,
                 autoStart: false,
                 historyLimit: 500,
                 isLoading: false,

@@ -18,6 +18,7 @@ import React from "react";
 import { isDevelopment } from "@shared/utils/environment";
 
 import { App } from "../App";
+import { defaultSettings } from "../stores/settings/state";
 
 // Mock all the stores
 vi.mock("../stores/updates/useUpdatesStore");
@@ -28,6 +29,12 @@ vi.mock("../stores/monitor/useMonitorTypesStore");
 vi.mock("../stores/ui/useUiStore");
 vi.mock("../theme/useTheme");
 vi.mock("@shared/utils/environment");
+vi.mock("../services/NotificationPreferenceService", () => ({
+    NotificationPreferenceService: {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        updatePreferences: vi.fn().mockResolvedValue(undefined),
+    },
+}));
 
 // Mock setupCacheSync globally
 vi.mock("../utils/cacheSync", () => ({
@@ -199,9 +206,10 @@ const mockUIStoreState = {
 
 const mockSettingsStoreState = {
     initializeSettings: vi.fn().mockResolvedValue(undefined),
-    settings: {},
-    updateSetting: vi.fn(),
     resetSettings: vi.fn(),
+    settings: { ...defaultSettings },
+    updateSetting: vi.fn(),
+    updateSettings: vi.fn(),
 };
 
 const mockThemeState = {
@@ -479,10 +487,21 @@ describe("App Additional Coverage Tests", () => {
 
         Object.assign(mockSettingsStoreState, {
             initializeSettings: initializeSettingsMock,
-            settings: {},
-            updateSetting: vi.fn(),
             resetSettings: vi.fn(),
+            settings: { ...defaultSettings },
+            updateSetting: vi.fn(),
+            updateSettings: vi.fn(),
         });
+
+        mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (
+                      selector as (
+                          state: typeof mockSettingsStoreState
+                      ) => unknown
+                  )(mockSettingsStoreState)
+                : mockSettingsStoreState
+        );
 
         Object.assign(mockThemeState, {
             isDark: false,
@@ -1164,6 +1183,10 @@ describe("App Additional Coverage Tests", () => {
 
         (mockUseSettingsStore as any).getState = vi.fn().mockReturnValue({
             initializeSettings: initializeSettingsMock,
+            resetSettings: vi.fn(),
+            settings: { ...defaultSettings },
+            updateSetting: vi.fn(),
+            updateSettings: vi.fn(),
         });
 
         render(<App />);

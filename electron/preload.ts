@@ -21,6 +21,7 @@ import { dataApi } from "./preload/domains/dataApi";
 import { createEventsApi } from "./preload/domains/eventsApi";
 import { monitoringApi } from "./preload/domains/monitoringApi";
 import { monitorTypesApi } from "./preload/domains/monitorTypesApi";
+import { notificationsApi } from "./preload/domains/notificationsApi";
 import { settingsApi } from "./preload/domains/settingsApi";
 import { sitesApi } from "./preload/domains/sitesApi";
 import { stateSyncApi } from "./preload/domains/stateSyncApi";
@@ -74,6 +75,7 @@ const electronAPI: ElectronAPI = {
     events: createEventsApi(),
     monitoring: monitoringApi,
     monitorTypes: monitorTypesApi,
+    notifications: notificationsApi,
     settings: settingsApi,
     sites: sitesApi,
     stateSync: stateSyncApi,

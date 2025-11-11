@@ -16,7 +16,7 @@ import { useErrorStore } from "../error/useErrorStore";
 import { logStoreAction } from "../utils";
 import { createStoreErrorHandler } from "../utils/storeErrorHandling";
 import {
-    defaultSettings,
+    normalizeAppSettings,
     type SettingsStoreGetter,
     type SettingsStoreSetter,
 } from "./state";
@@ -91,10 +91,10 @@ export const createSettingsOperationsSlice = (
                     );
 
                     setState({
-                        settings: {
+                        settings: normalizeAppSettings({
                             ...currentSettings,
                             historyLimit: event.limit,
-                        },
+                        }),
                     });
                 }
             );
@@ -127,11 +127,10 @@ export const createSettingsOperationsSlice = (
                         const historyLimit =
                             await SettingsService.getHistoryLimit();
                         const currentSettings = getState().settings;
-                        const updatedSettings = {
-                            ...defaultSettings,
+                        const updatedSettings = normalizeAppSettings({
                             ...currentSettings,
                             historyLimit,
-                        };
+                        });
 
                         setState({ settings: updatedSettings });
 
@@ -155,10 +154,9 @@ export const createSettingsOperationsSlice = (
                 return result;
             } catch (error) {
                 const currentSettings = getState().settings;
-                const fallbackSettings = {
-                    ...defaultSettings,
+                const fallbackSettings = normalizeAppSettings({
                     ...currentSettings,
-                };
+                });
 
                 setState({ settings: fallbackSettings });
 
@@ -249,10 +247,9 @@ export const createSettingsOperationsSlice = (
                         await SettingsService.getHistoryLimit();
 
                     setState({
-                        settings: {
-                            ...defaultSettings,
+                        settings: normalizeAppSettings({
                             historyLimit,
-                        },
+                        }),
                     });
 
                     await ensureHistoryLimitSubscription();
@@ -280,10 +277,10 @@ export const createSettingsOperationsSlice = (
                     const historyLimit =
                         await SettingsService.getHistoryLimit();
                     const currentSettings = getState().settings;
-                    const updatedSettings = {
+                    const updatedSettings = normalizeAppSettings({
                         ...currentSettings,
                         historyLimit,
-                    };
+                    });
 
                     setState({ settings: updatedSettings });
 

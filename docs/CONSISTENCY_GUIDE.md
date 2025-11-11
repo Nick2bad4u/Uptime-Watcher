@@ -153,7 +153,7 @@ Services should be properly integrated with the ServiceContainer:
 public getNotificationService(): NotificationService {
     if (!this.notificationService) {
         this.notificationService = new NotificationService({
-            config: this.getConfig().notifications,
+            config: this.getConfig().notificationPreferences,
             logger: this.getLogger()
         });
     }

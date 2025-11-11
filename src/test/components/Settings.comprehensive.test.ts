@@ -39,8 +39,10 @@ describe("Settings Component Coverage Tests", () => {
                 "autoStart",
                 "historyLimit",
                 "minimizeToTray",
-                "notifications",
-                "soundAlerts",
+                "inAppAlertsEnabled",
+                "inAppAlertsSoundEnabled",
+                "systemNotificationsEnabled",
+                "systemNotificationsSoundEnabled",
                 "theme",
             ]);
 
@@ -48,8 +50,10 @@ describe("Settings Component Coverage Tests", () => {
                 "autoStart",
                 "historyLimit",
                 "minimizeToTray",
-                "notifications",
-                "soundAlerts",
+                "inAppAlertsEnabled",
+                "inAppAlertsSoundEnabled",
+                "systemNotificationsEnabled",
+                "systemNotificationsSoundEnabled",
                 "theme",
             ];
 
@@ -113,8 +117,10 @@ describe("Settings Component Coverage Tests", () => {
                     autoStart: false,
                     historyLimit: 100,
                     minimizeToTray: true,
-                    notifications: true,
-                    soundAlerts: false,
+                    inAppAlertsEnabled: true,
+                    inAppAlertsSoundEnabled: false,
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: false,
                     theme: "system" as const,
                 },
                 persistHistoryLimit: vi.fn(),
@@ -277,8 +283,10 @@ describe("Settings Component Coverage Tests", () => {
                 "autoStart",
                 "historyLimit",
                 "minimizeToTray",
-                "notifications",
-                "soundAlerts",
+                "inAppAlertsEnabled",
+                "inAppAlertsSoundEnabled",
+                "systemNotificationsEnabled",
+                "systemNotificationsSoundEnabled",
                 "theme",
             ]);
 
@@ -292,7 +300,9 @@ describe("Settings Component Coverage Tests", () => {
             // Test valid keys
             expect(handleSettingChange("autoStart", true)).toBeTruthy();
             expect(handleSettingChange("theme", "dark")).toBeTruthy();
-            expect(handleSettingChange("notifications", false)).toBeTruthy();
+            expect(
+                handleSettingChange("systemNotificationsEnabled", false)
+            ).toBeTruthy();
 
             // Test invalid keys
             expect(handleSettingChange("invalidKey", "value")).toBeFalsy();
@@ -312,7 +322,11 @@ describe("Settings Component Coverage Tests", () => {
                 { key: "autoStart", value: true, type: "boolean" },
                 { key: "historyLimit", value: 100, type: "number" },
                 { key: "theme", value: "dark", type: "string" },
-                { key: "notifications", value: false, type: "boolean" },
+                {
+                    key: "systemNotificationsEnabled",
+                    value: false,
+                    type: "boolean",
+                },
             ];
 
             for (const { key, value, type } of testValues) {
@@ -630,16 +644,24 @@ describe("Settings Component Coverage Tests", () => {
                 autoStart: false,
                 historyLimit: 100,
                 minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
                 theme: "system" as const,
             };
 
             expect(typeof appSettings.autoStart).toBe("boolean");
             expect(typeof appSettings.historyLimit).toBe("number");
             expect(typeof appSettings.minimizeToTray).toBe("boolean");
-            expect(typeof appSettings.notifications).toBe("boolean");
-            expect(typeof appSettings.soundAlerts).toBe("boolean");
+            expect(typeof appSettings.inAppAlertsEnabled).toBe("boolean");
+            expect(typeof appSettings.inAppAlertsSoundEnabled).toBe("boolean");
+            expect(typeof appSettings.systemNotificationsEnabled).toBe(
+                "boolean"
+            );
+            expect(typeof appSettings.systemNotificationsSoundEnabled).toBe(
+                "boolean"
+            );
             expect(typeof appSettings.theme).toBe("string");
         });
     });
@@ -678,7 +700,7 @@ describe("Settings Component Coverage Tests", () => {
             const features = [
                 "Theme selection (light/dark/system)",
                 "History retention limits (25-unlimited records)",
-                "Desktop notifications (on/off)",
+                "System notifications (on/off)",
                 "Sound alerts (on/off)",
                 "Auto-start with system (on/off)",
                 "Minimize to system tray (on/off)",
@@ -748,7 +770,7 @@ describe("Settings Component Coverage Tests", () => {
 
             const settingChanges = [
                 { key: "theme", value: "dark" },
-                { key: "notifications", value: false },
+                { key: "systemNotificationsEnabled", value: false },
                 { key: "autoStart", value: true },
             ];
 

@@ -6,6 +6,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { test, fc } from "@fast-check/vitest";
 import type { ElectronAPI } from "../../../types";
+import type { AppSettings } from "../../../stores/types";
+import {
+    defaultSettings,
+    normalizeAppSettings,
+} from "../../../stores/settings/state";
 
 // Mock the bridge readiness helper to avoid polling delays in tests
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -116,6 +121,10 @@ if ((globalThis as any).window?.electronAPI) {
     });
 }
 
+const createSettings = (
+    overrides: Partial<AppSettings> = {}
+): AppSettings => normalizeAppSettings({ ...defaultSettings, ...overrides });
+
 describe(useSettingsStore, () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -183,14 +192,7 @@ describe(useSettingsStore, () => {
 
         // Also manually reset to default settings to ensure clean state
         act(() => {
-            result.current.updateSettings({
-                autoStart: false,
-                historyLimit: 500, // DEFAULT_HISTORY_LIMIT from constants
-                minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
-                theme: "system",
-            });
+            result.current.updateSettings(defaultSettings);
         });
     });
 
@@ -211,14 +213,7 @@ describe(useSettingsStore, () => {
                 result.current.updateSettings({});
             });
 
-            expect(result.current.settings).toEqual({
-                autoStart: false,
-                historyLimit: 500,
-                minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
-                theme: "system",
-            });
+            expect(result.current.settings).toEqual(defaultSettings);
         });
     });
 
@@ -234,12 +229,14 @@ describe(useSettingsStore, () => {
             act(() => {
                 result.current.updateSettings({
                     theme: "dark",
-                    notifications: false,
+                    systemNotificationsEnabled: true,
                 });
             });
 
             expect(result.current.settings.theme).toBe("dark");
-            expect(result.current.settings.notifications).toBeFalsy();
+            expect(
+                result.current.settings.systemNotificationsEnabled
+            ).toBeTruthy();
             expect(result.current.settings.historyLimit).toBe(500); // Unchanged - using correct DEFAULT_HISTORY_LIMIT
         });
 
@@ -256,7 +253,9 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBeTruthy(); // Unchanged
+            expect(
+                result.current.settings.systemNotificationsEnabled
+            ).toBe(defaultSettings.systemNotificationsEnabled);
         });
 
         it("should handle reset to defaults", async ({ task, annotate }) => {
@@ -271,7 +270,7 @@ describe(useSettingsStore, () => {
             act(() => {
                 result.current.updateSettings({
                     theme: "dark",
-                    notifications: false,
+                    systemNotificationsEnabled: true,
                 });
             });
 
@@ -284,12 +283,7 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings).toEqual({
-                autoStart: false,
-                historyLimit: 500, // DEFAULT_HISTORY_LIMIT is 500
-                minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
-                theme: "system",
+                ...defaultSettings,
             });
         });
     });
@@ -866,19 +860,22 @@ describe(useSettingsStore, () => {
             act(() => {
                 result.current.updateSettings({
                     theme: "dark",
-                    notifications: false,
                     historyLimit: 500,
+                    inAppAlertsEnabled: true,
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: true,
                 });
             });
 
-            expect(result.current.settings).toEqual({
-                autoStart: false,
-                historyLimit: 500,
-                minimizeToTray: true,
-                notifications: false,
-                soundAlerts: false,
-                theme: "dark",
-            });
+            expect(result.current.settings).toEqual(
+                createSettings({
+                    historyLimit: 500,
+                    inAppAlertsEnabled: true,
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: true,
+                    theme: "dark",
+                })
+            );
         });
 
         it("should handle partial settings updates", async ({
@@ -894,14 +891,7 @@ describe(useSettingsStore, () => {
 
             // Reset to defaults first by manually setting default values
             act(() => {
-                result.current.updateSettings({
-                    autoStart: false,
-                    historyLimit: 500, // Explicit default value
-                    minimizeToTray: true,
-                    notifications: true,
-                    soundAlerts: false,
-                    theme: "system",
-                });
+                result.current.updateSettings(defaultSettings);
             });
 
             // Now test partial update
@@ -910,7 +900,9 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(result.current.settings.notifications).toBeTruthy(); // Unchanged
+            expect(
+                result.current.settings.systemNotificationsEnabled
+            ).toBe(defaultSettings.systemNotificationsEnabled);
             expect(result.current.settings.historyLimit).toBe(500); // Default value
         });
     });
@@ -921,9 +913,11 @@ describe(useSettingsStore, () => {
                 theme: fc.constantFrom("light", "dark", "system"),
                 autoStart: fc.boolean(),
                 minimizeToTray: fc.boolean(),
-                notifications: fc.boolean(),
-                soundAlerts: fc.boolean(),
                 historyLimit: fc.integer({ min: 100, max: 10_000 }),
+                inAppAlertsEnabled: fc.boolean(),
+                inAppAlertsSoundEnabled: fc.boolean(),
+                systemNotificationsEnabled: fc.boolean(),
+                systemNotificationsSoundEnabled: fc.boolean(),
             }),
         ])(
             "should handle various settings configurations correctly",
@@ -941,15 +935,21 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.minimizeToTray).toBe(
                     testSettings.minimizeToTray
                 );
-                expect(result.current.settings.notifications).toBe(
-                    testSettings.notifications
-                );
-                expect(result.current.settings.soundAlerts).toBe(
-                    testSettings.soundAlerts
-                );
                 expect(result.current.settings.historyLimit).toBe(
                     testSettings.historyLimit
                 );
+                expect(result.current.settings.inAppAlertsEnabled).toBe(
+                    testSettings.inAppAlertsEnabled
+                );
+                expect(
+                    result.current.settings.inAppAlertsSoundEnabled
+                ).toBe(testSettings.inAppAlertsSoundEnabled);
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(testSettings.systemNotificationsEnabled);
+                expect(
+                    result.current.settings.systemNotificationsSoundEnabled
+                ).toBe(testSettings.systemNotificationsSoundEnabled);
 
                 // Verify setting value constraints
                 expect([
@@ -959,8 +959,16 @@ describe(useSettingsStore, () => {
                 ]).toContain(testSettings.theme);
                 expect(typeof testSettings.autoStart).toBe("boolean");
                 expect(typeof testSettings.minimizeToTray).toBe("boolean");
-                expect(typeof testSettings.notifications).toBe("boolean");
-                expect(typeof testSettings.soundAlerts).toBe("boolean");
+                expect(typeof testSettings.inAppAlertsEnabled).toBe("boolean");
+                expect(
+                    typeof testSettings.inAppAlertsSoundEnabled
+                ).toBe("boolean");
+                expect(
+                    typeof testSettings.systemNotificationsEnabled
+                ).toBe("boolean");
+                expect(
+                    typeof testSettings.systemNotificationsSoundEnabled
+                ).toBe("boolean");
                 expect(testSettings.historyLimit).toBeGreaterThanOrEqual(100);
                 expect(testSettings.historyLimit).toBeLessThanOrEqual(10_000);
             }
@@ -968,21 +976,42 @@ describe(useSettingsStore, () => {
 
         test.prop([
             fc.array(
-                fc.record({
-                    setting: fc.constantFrom(
-                        "theme",
-                        "autoStart",
-                        "minimizeToTray",
-                        "notifications",
-                        "soundAlerts",
-                        "historyLimit"
-                    ),
-                    value: fc.oneof(
-                        fc.constantFrom("light", "dark", "system"),
-                        fc.boolean(),
-                        fc.integer({ min: 50, max: 20_000 })
-                    ),
-                }),
+                fc.oneof(
+                    fc.record({
+                        setting: fc.constant("theme"),
+                        value: fc.constantFrom("light", "dark", "system"),
+                    }),
+                    fc.record({
+                        setting: fc.constant("autoStart"),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant("minimizeToTray"),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant("inAppAlertsEnabled"),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant("inAppAlertsSoundEnabled"),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant("systemNotificationsEnabled"),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant(
+                            "systemNotificationsSoundEnabled"
+                        ),
+                        value: fc.boolean(),
+                    }),
+                    fc.record({
+                        setting: fc.constant("historyLimit"),
+                        value: fc.integer({ min: 50, max: 20_000 }),
+                    })
+                ),
                 { minLength: 1, maxLength: 6 }
             ),
         ])(
@@ -1020,8 +1049,10 @@ describe(useSettingsStore, () => {
                         "theme",
                         "autoStart",
                         "minimizeToTray",
-                        "notifications",
-                        "soundAlerts",
+                        "inAppAlertsEnabled",
+                        "inAppAlertsSoundEnabled",
+                        "systemNotificationsEnabled",
+                        "systemNotificationsSoundEnabled",
                         "historyLimit",
                     ]).toContain(update.setting);
                 }
@@ -1037,8 +1068,10 @@ describe(useSettingsStore, () => {
                 const booleanSettings = [
                     "autoStart",
                     "minimizeToTray",
-                    "notifications",
-                    "soundAlerts",
+                    "inAppAlertsEnabled",
+                    "inAppAlertsSoundEnabled",
+                    "systemNotificationsEnabled",
+                    "systemNotificationsSoundEnabled",
                 ];
 
                 for (const settingName of booleanSettings) {
@@ -1089,8 +1122,12 @@ describe(useSettingsStore, () => {
                     autoStart: fc.boolean(),
                 }),
                 fc.record({
-                    notifications: fc.boolean(),
-                    soundAlerts: fc.boolean(),
+                    inAppAlertsEnabled: fc.boolean(),
+                    inAppAlertsSoundEnabled: fc.boolean(),
+                }),
+                fc.record({
+                    systemNotificationsEnabled: fc.boolean(),
+                    systemNotificationsSoundEnabled: fc.boolean(),
                     historyLimit: fc.integer({ min: 1, max: 5000 }),
                 }),
                 fc.record({
@@ -1143,14 +1180,16 @@ describe(useSettingsStore, () => {
 
                     act(() => {
                         result.current.updateSettings({
-                            notifications: newValue,
+                            systemNotificationsEnabled: newValue,
                         });
                     });
                 }
 
                 // Final state should match the last update
                 const expectedFinalValue = updates.at(-1);
-                expect(result.current.settings.notifications).toBe(
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(
                     expectedFinalValue
                 );
 
@@ -1165,8 +1204,11 @@ describe(useSettingsStore, () => {
             fc.record({
                 validSettings: fc.record({
                     theme: fc.constantFrom("light", "dark", "system"),
-                    notifications: fc.boolean(),
                     historyLimit: fc.integer({ min: 100, max: 5000 }),
+                    inAppAlertsEnabled: fc.boolean(),
+                    inAppAlertsSoundEnabled: fc.boolean(),
+                    systemNotificationsEnabled: fc.boolean(),
+                    systemNotificationsSoundEnabled: fc.boolean(),
                 }),
                 invalidAttempts: fc.array(
                     fc.record({
@@ -1192,9 +1234,18 @@ describe(useSettingsStore, () => {
                 });
 
                 expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.notifications).toBe(
-                    validSettings.notifications
+                expect(result.current.settings.inAppAlertsEnabled).toBe(
+                    validSettings.inAppAlertsEnabled
                 );
+                expect(
+                    result.current.settings.inAppAlertsSoundEnabled
+                ).toBe(validSettings.inAppAlertsSoundEnabled);
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(validSettings.systemNotificationsEnabled);
+                expect(
+                    result.current.settings.systemNotificationsSoundEnabled
+                ).toBe(validSettings.systemNotificationsSoundEnabled);
                 expect(result.current.settings.historyLimit).toBe(
                     validSettings.historyLimit
                 );
@@ -1213,9 +1264,18 @@ describe(useSettingsStore, () => {
 
                 // Valid settings should still be intact
                 expect(result.current.settings.theme).toBe(validSettings.theme);
-                expect(result.current.settings.notifications).toBe(
-                    validSettings.notifications
+                expect(result.current.settings.inAppAlertsEnabled).toBe(
+                    validSettings.inAppAlertsEnabled
                 );
+                expect(
+                    result.current.settings.inAppAlertsSoundEnabled
+                ).toBe(validSettings.inAppAlertsSoundEnabled);
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(validSettings.systemNotificationsEnabled);
+                expect(
+                    result.current.settings.systemNotificationsSoundEnabled
+                ).toBe(validSettings.systemNotificationsSoundEnabled);
                 expect(result.current.settings.historyLimit).toBe(
                     validSettings.historyLimit
                 );
@@ -1259,7 +1319,7 @@ describe(useSettingsStore, () => {
                     fc.record({
                         theme: fc.constantFrom("light"),
                         autoStart: fc.boolean(),
-                        notifications: fc.boolean(),
+                        systemNotificationsEnabled: fc.boolean(),
                     }),
                     fc.record({
                         theme: fc.constantFrom("dark", "system"),
@@ -1284,9 +1344,9 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.autoStart).toBe(
                     settingsA.autoStart
                 );
-                expect(result.current.settings.notifications).toBe(
-                    settingsA.notifications
-                );
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(settingsA.systemNotificationsEnabled);
 
                 // Apply overlapping second set
                 act(() => {
@@ -1299,9 +1359,9 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.autoStart).toBe(
                     settingsA.autoStart
                 );
-                expect(result.current.settings.notifications).toBe(
-                    settingsA.notifications
-                );
+                expect(
+                    result.current.settings.systemNotificationsEnabled
+                ).toBe(settingsA.systemNotificationsEnabled);
                 // New fields from settingsB should be set
                 expect(result.current.settings.minimizeToTray).toBe(
                     settingsB.minimizeToTray

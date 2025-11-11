@@ -43,11 +43,13 @@ describe("Settings Component - Coverage Tests", () => {
 
         // Test the specific logic that was missing coverage
         const allowedKeys = [
-            "notifications",
+            "systemNotificationsEnabled",
+            "systemNotificationsSoundEnabled",
+            "inAppAlertsEnabled",
+            "inAppAlertsSoundEnabled",
             "autoStart",
             "minimizeToTray",
             "theme",
-            "soundAlerts",
             "historyLimit",
         ];
         const invalidKey = "invalidKey";
@@ -79,11 +81,13 @@ describe("Settings Component - Coverage Tests", () => {
         annotate("Type: Business Logic", "type");
 
         const allowedKeys = [
-            "notifications",
+            "systemNotificationsEnabled",
+            "systemNotificationsSoundEnabled",
+            "inAppAlertsEnabled",
+            "inAppAlertsSoundEnabled",
             "autoStart",
             "minimizeToTray",
             "theme",
-            "soundAlerts",
             "historyLimit",
         ];
         const validKey = "theme";
@@ -109,11 +113,13 @@ describe("Settings Component - Coverage Tests", () => {
         annotate("Type: Business Logic", "type");
 
         const allowedKeys = [
-            "notifications",
+            "systemNotificationsEnabled",
+            "systemNotificationsSoundEnabled",
+            "inAppAlertsEnabled",
+            "inAppAlertsSoundEnabled",
             "autoStart",
             "minimizeToTray",
             "theme",
-            "soundAlerts",
             "historyLimit",
         ];
 

@@ -156,6 +156,36 @@ export type MonitorTypesDomainBridge = DomainBridge<
 >;
 
 /**
+ * Mapping from notification domain methods to IPC channels.
+ *
+ * @internal
+ */
+interface NotificationsChannelMap {
+    readonly updatePreferences: "update-notification-preferences";
+}
+
+const NOTIFICATION_CHANNELS_DEFINITION: NotificationsChannelMap = {
+    updatePreferences: "update-notification-preferences",
+};
+
+/**
+ * Strongly typed channel mapping for notification preference IPC interactions.
+ *
+ * @public
+ */
+export const NOTIFICATION_CHANNELS: NotificationsChannelMap =
+    NOTIFICATION_CHANNELS_DEFINITION;
+
+/**
+ * Renderer-facing preload bridge for notification preference IPC interactions.
+ *
+ * @public
+ */
+export type NotificationsDomainBridge = DomainBridge<
+    typeof NOTIFICATION_CHANNELS
+>;
+
+/**
  * Mapping from settings domain methods to IPC channels.
  *
  * @internal
@@ -307,6 +337,7 @@ export interface ElectronBridgeApi<
     readonly events: TEventsApi;
     readonly monitoring: MonitoringDomainBridge;
     readonly monitorTypes: MonitorTypesDomainBridge;
+    readonly notifications: NotificationsDomainBridge;
     readonly settings: SettingsDomainBridge;
     readonly sites: SitesDomainBridge;
     readonly stateSync: StateSyncApiSurface;

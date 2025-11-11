@@ -110,7 +110,10 @@ const arbitrarySettingsData = fc.record({
     minimizeToTray: fc.boolean(),
     theme: fc.constantFrom("light", "dark", "system"),
     checkInterval: fc.integer({ min: 30_000, max: 3_600_000 }),
-    notifications: fc.boolean(),
+    inAppAlertsEnabled: fc.boolean(),
+    inAppAlertsSoundEnabled: fc.boolean(),
+    systemNotificationsEnabled: fc.boolean(),
+    systemNotificationsSoundEnabled: fc.boolean(),
     historyLimit: fc.integer({ min: 100, max: 10_000 }),
 });
 

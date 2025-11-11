@@ -109,8 +109,10 @@ describe("Settings - Branch Coverage Tests", () => {
             autoStart: false,
             historyLimit: 1000,
             minimizeToTray: false,
-            notifications: true,
-            soundAlerts: false,
+            inAppAlertsEnabled: true,
+            inAppAlertsSoundEnabled: false,
+            systemNotificationsEnabled: true,
+            systemNotificationsSoundEnabled: false,
             theme: "light",
         },
         syncSettings: vi.fn(),
@@ -209,8 +211,10 @@ describe("Settings - Branch Coverage Tests", () => {
             autoStart: false,
             historyLimit: 1000,
             minimizeToTray: false,
-            notifications: true,
-            soundAlerts: false,
+            inAppAlertsEnabled: true,
+            inAppAlertsSoundEnabled: false,
+            systemNotificationsEnabled: true,
+            systemNotificationsSoundEnabled: false,
             theme: "light",
         };
 
@@ -365,14 +369,16 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             const notificationsCheckbox = screen.getByLabelText(
-                "Enable desktop notifications"
+                "Enable system notifications"
             );
             fireEvent.click(notificationsCheckbox);
 
-            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
-                // Inverted from initial true
-                notifications: false,
-            });
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    systemNotificationsEnabled: false,
+                    systemNotificationsSoundEnabled: false,
+                })
+            );
         });
 
         it("should reject invalid settings keys and warn", ({
@@ -392,7 +398,7 @@ describe("Settings - Branch Coverage Tests", () => {
             render(<Settings onClose={mockOnClose} />);
 
             const soundAlertsCheckbox = screen.getByLabelText(
-                "Enable sound alerts"
+                "Play sound for system notifications"
             );
             fireEvent.click(soundAlertsCheckbox);
 
@@ -429,7 +435,7 @@ describe("Settings - Branch Coverage Tests", () => {
                 )
             ).toBeDisabled();
             expect(
-                screen.getByLabelText("Enable desktop notifications")
+                screen.getByLabelText("Enable system notifications")
             ).toBeDisabled();
             expect(
                 screen.getByRole("button", { name: /refresh history/i })
@@ -463,7 +469,7 @@ describe("Settings - Branch Coverage Tests", () => {
                 )
             ).not.toBeDisabled();
             expect(
-                screen.getByLabelText("Enable desktop notifications")
+                screen.getByLabelText("Enable system notifications")
             ).not.toBeDisabled();
             expect(
                 screen.getByRole("button", { name: /refresh history/i })
@@ -837,12 +843,20 @@ describe("Settings - Branch Coverage Tests", () => {
                 minimizeToTray: true,
             });
 
-            const soundAlertsCheckbox = screen.getByLabelText(
-                "Enable sound alerts"
+            const systemSoundCheckbox = screen.getByLabelText(
+                "Play sound for system notifications"
             );
-            fireEvent.click(soundAlertsCheckbox);
+            fireEvent.click(systemSoundCheckbox);
             expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
-                soundAlerts: true,
+                systemNotificationsSoundEnabled: true,
+            });
+
+            const inAppSoundCheckbox = screen.getByLabelText(
+                "Play sound for in-app alerts"
+            );
+            fireEvent.click(inAppSoundCheckbox);
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
+                inAppAlertsSoundEnabled: true,
             });
         });
 

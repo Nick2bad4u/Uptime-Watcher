@@ -261,7 +261,13 @@ const mockElectronAPI: ElectronAPI = {
             () => undefined
         ),
     },
-
+    notifications: {
+        updatePreferences: vi.fn<
+            ElectronAPI["notifications"]["updatePreferences"]
+        >(async () => {
+            /* noop */
+        }),
+    },
     monitoring: {
         checkSiteNow: vi.fn<ElectronAPI["monitoring"]["checkSiteNow"]>(
             async (siteIdentifier, monitorId) => {

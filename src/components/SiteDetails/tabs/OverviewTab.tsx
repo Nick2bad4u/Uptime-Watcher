@@ -7,6 +7,7 @@ import type { Monitor } from "@shared/types";
 import type { ChangeEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { useCallback, useMemo } from "react";
 import { FaListOl } from "react-icons/fa";
 import {
@@ -33,6 +34,28 @@ import { getIntervalLabel } from "../../../utils/time";
 
 const RefreshIcon = AppIcons.actions.refresh;
 const RemoveIcon = AppIcons.actions.remove;
+
+const formatIntervalOption = (
+    intervalOption: number | { label?: string; value: number }
+): { label: string; value: number } => {
+    const value =
+        typeof intervalOption === "number"
+            ? intervalOption
+            : intervalOption.value;
+
+    try {
+        const label = getIntervalLabel(intervalOption);
+        return { label, value };
+    } catch (error) {
+        const ensuredError = ensureError(error);
+        logger.warn("Failed to format interval option", {
+            error: ensuredError,
+            intervalOption,
+        });
+        const fallbackLabel = getIntervalLabel(value);
+        return { label: fallbackLabel, value };
+    }
+};
 
 /**
  * Props for the OverviewTab component.
@@ -334,12 +357,9 @@ export const OverviewTab = ({
                             onChange={handleIntervalChange}
                             value={localCheckInterval}
                         >
-                            {CHECK_INTERVALS.map((interval) => {
-                                const value =
-                                    typeof interval === "number"
-                                        ? interval
-                                        : interval.value;
-                                const label = getIntervalLabel(interval);
+                            {CHECK_INTERVALS.map((intervalOption) => {
+                                const { label, value } =
+                                    formatIntervalOption(intervalOption);
                                 return (
                                     <option key={value} value={value}>
                                         {label}

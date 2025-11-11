@@ -183,8 +183,7 @@ const mockElectronAPI = {
         }),
     },
     notifications: {
-        subscribeToStatusUpdates: vi.fn(),
-        unsubscribeFromStatusUpdates: vi.fn(),
+        updatePreferences: vi.fn(),
     },
 };
 

@@ -7,6 +7,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 import type { AppSettings } from "../stores/types";
 
+import {
+    defaultSettings,
+    normalizeAppSettings,
+} from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -79,9 +83,11 @@ describe(useSettingsStore, () => {
             settings: {
                 autoStart: false,
                 historyLimit: 100,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
                 minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
+                systemNotificationsEnabled: false,
+                systemNotificationsSoundEnabled: false,
                 theme: "system",
             },
         });
@@ -105,9 +111,11 @@ describe(useSettingsStore, () => {
             expect(state.settings).toEqual({
                 autoStart: false,
                 historyLimit: 100,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
                 minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
+                systemNotificationsEnabled: false,
+                systemNotificationsSoundEnabled: false,
                 theme: "system",
             });
         });
@@ -119,16 +127,20 @@ describe(useSettingsStore, () => {
             await annotate("Type: Data Update", "type");
 
             const updates: Partial<AppSettings> = {
-                notifications: false,
-                soundAlerts: true,
+                inAppAlertsEnabled: false,
+                inAppAlertsSoundEnabled: true,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
                 theme: "dark",
             };
 
             useSettingsStore.getState().updateSettings(updates);
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBeFalsy();
-            expect(state.settings.soundAlerts).toBeTruthy();
+            expect(state.settings.inAppAlertsEnabled).toBeFalsy();
+            expect(state.settings.inAppAlertsSoundEnabled).toBeTruthy();
+            expect(state.settings.systemNotificationsEnabled).toBeTruthy();
+            expect(state.settings.systemNotificationsSoundEnabled).toBeTruthy();
             expect(state.settings.theme).toBe("dark");
             expect(state.settings.autoStart).toBeFalsy(); // Unchanged
         });
@@ -148,8 +160,10 @@ describe(useSettingsStore, () => {
 
             // First modify settings
             useSettingsStore.getState().updateSettings({
-                notifications: false,
-                soundAlerts: true,
+                inAppAlertsEnabled: false,
+                inAppAlertsSoundEnabled: true,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
                 theme: "dark",
             });
 
@@ -160,9 +174,11 @@ describe(useSettingsStore, () => {
             expect(state.settings).toEqual({
                 autoStart: false,
                 historyLimit: 100,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
                 minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
+                systemNotificationsEnabled: false,
+                systemNotificationsSoundEnabled: false,
                 theme: "system",
             });
         });
@@ -262,7 +278,7 @@ describe(useSettingsStore, () => {
             expect(state.settings.minimizeToTray).toBeFalsy();
         });
 
-        it("should update notifications via updateSettings", async ({
+        it("should update systemNotificationsEnabled via updateSettings", async ({
             task,
             annotate,
         }) => {
@@ -273,13 +289,13 @@ describe(useSettingsStore, () => {
 
             useSettingsStore
                 .getState()
-                .updateSettings({ notifications: false });
+                .updateSettings({ systemNotificationsEnabled: false });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.systemNotificationsEnabled).toBeFalsy();
         });
 
-        it("should update soundAlerts via updateSettings", async ({
+        it("should update systemNotificationsSoundEnabled via updateSettings", async ({
             task,
             annotate,
         }) => {
@@ -288,10 +304,13 @@ describe(useSettingsStore, () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Data Update", "type");
 
-            useSettingsStore.getState().updateSettings({ soundAlerts: true });
+            useSettingsStore.getState().updateSettings({
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
+            });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.soundAlerts).toBeTruthy();
+            expect(state.settings.systemNotificationsSoundEnabled).toBeTruthy();
         });
 
         it("should update theme via updateSettings", async ({
@@ -364,7 +383,7 @@ describe(useSettingsStore, () => {
             const originalSettings = useSettingsStore.getState().settings;
 
             useSettingsStore.getState().updateSettings({
-                notifications: false,
+                systemNotificationsEnabled: false,
                 theme: "dark",
             });
 
@@ -372,7 +391,7 @@ describe(useSettingsStore, () => {
             // Here we just verify the state was updated
             const state = useSettingsStore.getState();
             expect(state.settings.theme).toBe("dark");
-            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.systemNotificationsEnabled).toBeFalsy();
             expect(state.settings.autoStart).toBe(originalSettings.autoStart);
         });
     });
@@ -386,12 +405,12 @@ describe(useSettingsStore, () => {
 
             const originalSettings = useSettingsStore.getState().settings;
 
-            useSettingsStore.getState().updateSettings({
-                notifications: false,
-            });
+            useSettingsStore
+                .getState()
+                .updateSettings({ systemNotificationsEnabled: false });
 
             const state = useSettingsStore.getState();
-            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.systemNotificationsEnabled).toBeFalsy();
             // All other settings should remain unchanged
             expect(state.settings.autoStart).toBe(originalSettings.autoStart);
             expect(state.settings.historyLimit).toBe(
@@ -400,8 +419,8 @@ describe(useSettingsStore, () => {
             expect(state.settings.minimizeToTray).toBe(
                 originalSettings.minimizeToTray
             );
-            expect(state.settings.soundAlerts).toBe(
-                originalSettings.soundAlerts
+            expect(state.settings.systemNotificationsSoundEnabled).toBe(
+                originalSettings.systemNotificationsSoundEnabled
             );
             expect(state.settings.theme).toBe(originalSettings.theme);
         });
@@ -496,12 +515,12 @@ describe(useSettingsStore, () => {
             useSettingsStore.getState().updateSettings({ autoStart: true });
             useSettingsStore
                 .getState()
-                .updateSettings({ notifications: false });
+                .updateSettings({ systemNotificationsEnabled: false });
             useSettingsStore.getState().updateSettings({ theme: "dark" });
 
             const state = useSettingsStore.getState();
             expect(state.settings.autoStart).toBeTruthy();
-            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.systemNotificationsEnabled).toBeFalsy();
             expect(state.settings.theme).toBe("dark");
         });
 
@@ -514,13 +533,13 @@ describe(useSettingsStore, () => {
             const store = useSettingsStore.getState();
 
             store.updateSettings({ autoStart: true });
-            store.updateSettings({ notifications: false });
+            store.updateSettings({ systemNotificationsEnabled: false });
             store.updateSettings({ theme: "light" });
             store.updateSettings({ historyLimit: 200 });
 
             const state = useSettingsStore.getState();
             expect(state.settings.autoStart).toBeTruthy();
-            expect(state.settings.notifications).toBeFalsy();
+            expect(state.settings.systemNotificationsEnabled).toBeFalsy();
             expect(state.settings.theme).toBe("light");
             expect(state.settings.historyLimit).toBe(200);
         });
@@ -573,25 +592,80 @@ describe(useSettingsStore, () => {
                 useSettingsStore.getState().settings.minimizeToTray
             ).toBeFalsy();
 
-            // Test notifications
-            store.updateSettings({ notifications: true });
+            // Test system notifications
+            store.updateSettings({ systemNotificationsEnabled: true });
             expect(
-                useSettingsStore.getState().settings.notifications
+                useSettingsStore.getState().settings.systemNotificationsEnabled
             ).toBeTruthy();
-            store.updateSettings({ notifications: false });
+            store.updateSettings({ systemNotificationsEnabled: false });
             expect(
-                useSettingsStore.getState().settings.notifications
+                useSettingsStore.getState().settings.systemNotificationsEnabled
             ).toBeFalsy();
 
-            // Test soundAlerts
-            store.updateSettings({ soundAlerts: true });
+            // Test in-app alerts toggle
+            store.updateSettings({ inAppAlertsEnabled: false });
             expect(
-                useSettingsStore.getState().settings.soundAlerts
-            ).toBeTruthy();
-            store.updateSettings({ soundAlerts: false });
-            expect(
-                useSettingsStore.getState().settings.soundAlerts
+                useSettingsStore.getState().settings.inAppAlertsEnabled
             ).toBeFalsy();
+            store.updateSettings({ inAppAlertsEnabled: true });
+            expect(
+                useSettingsStore.getState().settings.inAppAlertsEnabled
+            ).toBeTruthy();
+
+            // Test system notification sounds
+            store.updateSettings({
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
+            });
+            expect(
+                useSettingsStore.getState().settings
+                    .systemNotificationsSoundEnabled
+            ).toBeTruthy();
+            store.updateSettings({ systemNotificationsSoundEnabled: false });
+            expect(
+                useSettingsStore.getState().settings
+                    .systemNotificationsSoundEnabled
+            ).toBeFalsy();
+
+            // Test in-app alert sounds
+            store.updateSettings({ inAppAlertsSoundEnabled: true });
+            expect(
+                useSettingsStore.getState().settings.inAppAlertsSoundEnabled
+            ).toBeTruthy();
+            store.updateSettings({ inAppAlertsSoundEnabled: false });
+            expect(
+                useSettingsStore.getState().settings.inAppAlertsSoundEnabled
+            ).toBeFalsy();
+        });
+    });
+
+    describe("normalizeAppSettings migration", () => {
+        it("maps legacy notifications flag to system notification toggle", () => {
+            const normalized = normalizeAppSettings({ notifications: true });
+
+            expect(normalized.systemNotificationsEnabled).toBeTruthy();
+            expect(normalized.inAppAlertsEnabled).toBe(
+                defaultSettings.inAppAlertsEnabled
+            );
+        });
+
+        it("propagates legacy soundAlerts flag to both sound toggles", () => {
+            const normalized = normalizeAppSettings({ soundAlerts: true });
+
+            expect(normalized.inAppAlertsSoundEnabled).toBeTruthy();
+            expect(normalized.systemNotificationsSoundEnabled).toBeTruthy();
+        });
+
+        it("respects explicit overrides when migrating legacy fields", () => {
+            const normalized = normalizeAppSettings({
+                notifications: false,
+                soundAlerts: true,
+                systemNotificationsEnabled: true,
+            });
+
+            expect(normalized.systemNotificationsEnabled).toBeTruthy();
+            expect(normalized.inAppAlertsSoundEnabled).toBeTruthy();
+            expect(normalized.systemNotificationsSoundEnabled).toBeTruthy();
         });
     });
 });

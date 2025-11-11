@@ -77,6 +77,8 @@ describe(NotificationService, () => {
             const config = service.getConfig();
 
             expect(config).toEqual({
+                enabled: true,
+                playSound: false,
                 showDownAlerts: true,
                 showUpAlerts: true,
             });
@@ -89,6 +91,8 @@ describe(NotificationService, () => {
             await annotate("Component: types", "component");
 
             const customConfig: NotificationConfig = {
+                enabled: false,
+                playSound: true,
                 showDownAlerts: false,
                 showUpAlerts: true,
             };
@@ -131,10 +135,41 @@ describe(NotificationService, () => {
 
             expect(Notification).toHaveBeenCalledWith({
                 body: "Example Site (http) is currently down!",
+                silent: true,
                 title: "Monitor Down Alert",
                 urgency: "critical",
             });
             expect(mockNotification.show).toHaveBeenCalled();
+        });
+        it("should not show notification when system notifications are disabled", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
+            notificationService.updateConfig({ enabled: false });
+            notificationService.notifyMonitorDown(mockSite, "monitor-1");
+
+            expect(Notification).not.toHaveBeenCalled();
+            expect(mockNotification.show).not.toHaveBeenCalled();
+        });
+        it("should enable sound when playSound is true", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: types", "component");
+
+            notificationService.updateConfig({ playSound: true });
+            notificationService.notifyMonitorDown(mockSite, "monitor-1");
+
+            expect(Notification).toHaveBeenCalledWith({
+                body: "Example Site (http) is currently down!",
+                silent: false,
+                title: "Monitor Down Alert",
+                urgency: "critical",
+            });
         });
         it("should not show notification when down alerts are disabled", async ({
             task,
@@ -228,6 +263,7 @@ describe(NotificationService, () => {
 
             expect(Notification).toHaveBeenCalledWith({
                 body: "Example Site (http) is back online!",
+                silent: true,
                 title: "Monitor Restored",
                 urgency: "normal",
             });
@@ -290,6 +326,8 @@ describe(NotificationService, () => {
 
             const config = notificationService.getConfig();
             expect(config).toEqual({
+                enabled: true,
+                playSound: false,
                 showDownAlerts: false,
                 showUpAlerts: true,
             });
@@ -302,11 +340,15 @@ describe(NotificationService, () => {
             await annotate("Component: types", "component");
 
             notificationService.updateConfig({
+                enabled: false,
+                playSound: true,
                 showDownAlerts: false,
                 showUpAlerts: false,
             });
             const config = notificationService.getConfig();
             expect(config).toEqual({
+                enabled: false,
+                playSound: true,
                 showDownAlerts: false,
                 showUpAlerts: false,
             });

@@ -16,6 +16,7 @@ import type {
     StatusUpdate,
 } from "@shared/types";
 import type { MonitorTypeConfig } from "@shared/types/monitorTypes";
+import type { NotificationPreferenceUpdate } from "@shared/types/notifications";
 import type {
     StateSyncFullSyncResult,
     StateSyncStatusSummary,
@@ -228,6 +229,10 @@ export interface IpcInvokeChannelMap {
     "update-history-limit": {
         params: readonly [limitDays: number];
         result: number;
+    };
+    "update-notification-preferences": {
+        params: readonly [preferences: NotificationPreferenceUpdate];
+        result: undefined;
     };
     "update-site": {
         params: readonly [identifier: string, updates: Partial<Site>];

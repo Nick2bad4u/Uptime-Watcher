@@ -24,6 +24,7 @@ export type ElectronBridgeDomain =
     | "events"
     | "monitoring"
     | "monitorTypes"
+    | "notifications"
     | "settings"
     | "sites"
     | "stateSync"

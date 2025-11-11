@@ -12,6 +12,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
+import { isRecord } from "@shared/utils/typeHelpers";
 import {
     memo,
     type NamedExoticComponent,
@@ -25,6 +26,11 @@ import {
 import type { StatusUpdateSubscriptionSummary } from "./stores/sites/baseTypes";
 
 import { AddSiteModal } from "./components/AddSiteForm/AddSiteModal";
+import {
+    enqueueAlertFromStatusUpdate,
+    synchronizeNotificationPreferences,
+} from "./components/Alerts/alertCoordinator";
+import { StatusAlertToaster } from "./components/Alerts/StatusAlertToaster";
 import { ConfirmDialog } from "./components/common/ConfirmDialog/ConfirmDialog";
 import { ErrorAlert } from "./components/common/ErrorAlert/ErrorAlert";
 import { DashboardOverview } from "./components/Dashboard/Overview/DashboardOverview";
@@ -41,6 +47,7 @@ import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import { logger } from "./services/logger";
+import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
 import { ErrorBoundary } from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
@@ -70,6 +77,69 @@ const UI_MESSAGES = {
 } as const;
 
 const SIDEBAR_COLLAPSE_MEDIA_QUERY = "(max-width: 1280px)";
+
+const warnMissingImplementation = (message: string): void => {
+    if (isDevelopment()) {
+        logger.warn(message);
+    }
+};
+
+const resolveStatusUpdateSiteIdentifier = (update: StatusUpdate): string => {
+    const siteCandidate = isRecord(update) ? update.site : undefined;
+    let siteIdentifierFromSite = "";
+
+    if (isRecord(siteCandidate)) {
+        const identifierCandidate = siteCandidate.identifier;
+        if (typeof identifierCandidate === "string") {
+            const trimmedIdentifier = identifierCandidate.trim();
+            if (trimmedIdentifier.length > 0) {
+                siteIdentifierFromSite = trimmedIdentifier;
+            }
+        }
+    }
+
+    if (siteIdentifierFromSite.length > 0) {
+        return siteIdentifierFromSite;
+    }
+
+    const siteIdentifierFromEvent = update.siteIdentifier.trim();
+    if (siteIdentifierFromEvent.length > 0) {
+        return siteIdentifierFromEvent;
+    }
+
+    return "unknown-site";
+};
+
+const logStatusUpdateDebugInfo = (update: StatusUpdate): void => {
+    if (!isDevelopment()) {
+        return;
+    }
+
+    const timestamp = new Date().toLocaleTimeString();
+    const resolvedIdentifier = resolveStatusUpdateSiteIdentifier(update);
+
+    logger.debug(
+        `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
+    );
+};
+
+const reportSubscriptionDiagnostics = (
+    summary: StatusUpdateSubscriptionSummary | undefined
+): void => {
+    if (!summary) {
+        logger.warn("Status update subscription resolved without diagnostics");
+        return;
+    }
+
+    if (summary.success) {
+        return;
+    }
+
+    logger.warn("Status update subscription encountered issues", {
+        errors: summary.errors,
+        listenersAttached: summary.listenersAttached,
+    });
+};
 
 /**
  * Main application component that serves as the root of the Uptime Watcher app.
@@ -113,6 +183,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Sites store
     // Settings store - store is initialized via the initialization effect below
     // Store subscription happens automatically when store is accessed
+    const systemNotificationPreferences = useSettingsStore(
+        useCallback(
+            (state) => ({
+                soundEnabled: state.settings.systemNotificationsSoundEnabled,
+                systemEnabled: state.settings.systemNotificationsEnabled,
+            }),
+            []
+        )
+    );
 
     // UI store
     const {
@@ -254,17 +333,28 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         const initializeSettings = settingsStore?.initializeSettings;
         if (typeof initializeSettings === "function") {
             await initializeSettings.call(settingsStore);
-        } else if (isDevelopment()) {
-            logger.warn(
+        } else {
+            warnMissingImplementation(
                 "Settings store missing initializeSettings implementation during app bootstrap"
             );
         }
 
+        try {
+            await NotificationPreferenceService.initialize();
+        } catch (error) {
+            logger.warn(
+                "Failed to initialize notification preference bridge",
+                error instanceof Error ? error : new Error(String(error))
+            );
+        }
+
+        await synchronizeNotificationPreferences();
+
         const initializeSites = sitesStore?.initializeSites;
         if (typeof initializeSites === "function") {
             await initializeSites.call(sitesStore);
-        } else if (isDevelopment()) {
-            logger.warn(
+        } else {
+            warnMissingImplementation(
                 "Sites store missing initializeSites implementation during app bootstrap"
             );
         }
@@ -280,8 +370,8 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
         if (typeof subscribeToSyncEvents === "function") {
             syncEventsCleanupRef.current = subscribeToSyncEvents();
-        } else if (isDevelopment()) {
-            logger.warn(
+        } else {
+            warnMissingImplementation(
                 "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
             );
         }
@@ -291,55 +381,15 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
         if (typeof subscribeToStatusUpdates === "function") {
             const subscriptionResult = (await subscribeToStatusUpdates(
-                (update) => {
-                    // Optional callback for additional processing if needed
-                    if (isDevelopment()) {
-                        const timestamp = new Date().toLocaleTimeString();
-
-                        // Be resilient to undefined site or identifier
-                        const {
-                            site: rawSite,
-                            siteIdentifier: rawSiteIdentifier,
-                        } = update as Partial<StatusUpdate>;
-
-                        const siteIdentifierFromSite =
-                            typeof rawSite?.identifier === "string"
-                                ? rawSite.identifier.trim()
-                                : "";
-                        const siteIdentifierFromEvent =
-                            typeof rawSiteIdentifier === "string"
-                                ? rawSiteIdentifier.trim()
-                                : "";
-
-                        let resolvedIdentifier = siteIdentifierFromSite;
-
-                        if (resolvedIdentifier.length === 0) {
-                            resolvedIdentifier = siteIdentifierFromEvent;
-                        }
-
-                        if (resolvedIdentifier.length === 0) {
-                            resolvedIdentifier = "unknown-site";
-                        }
-
-                        logger.debug(
-                            `[${timestamp}] Status update received for site: ${resolvedIdentifier}`
-                        );
-                    }
+                (update: StatusUpdate) => {
+                    enqueueAlertFromStatusUpdate(update);
+                    logStatusUpdateDebugInfo(update);
                 }
             )) as StatusUpdateSubscriptionSummary | undefined;
 
-            if (!subscriptionResult) {
-                logger.warn(
-                    "Status update subscription resolved without diagnostics"
-                );
-            } else if (!subscriptionResult.success) {
-                logger.warn("Status update subscription encountered issues", {
-                    errors: subscriptionResult.errors,
-                    listenersAttached: subscriptionResult.listenersAttached,
-                });
-            }
-        } else if (isDevelopment()) {
-            logger.warn(
+            reportSubscriptionDiagnostics(subscriptionResult);
+        } else {
+            warnMissingImplementation(
                 "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
             );
         }
@@ -385,6 +435,16 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     }, []);
 
     useMount(initializeApp, cleanupApp);
+
+    useEffect(
+        function syncNotificationPreferencesEffect(): void {
+            void synchronizeNotificationPreferences();
+        },
+        [
+            systemNotificationPreferences.soundEnabled,
+            systemNotificationPreferences.systemEnabled,
+        ]
+    );
 
     // Focus-based state synchronization (disabled by default for performance)
     // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
@@ -741,6 +801,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                     toggleSidebar={toggleSidebar}
                 >
                     <ConfirmDialog />
+                    <StatusAlertToaster />
                     <div
                         className={`app-shell ${isDark ? "app-shell--dark" : "app-shell--light"} ${isSidebarOpen ? "app-shell--sidebar-open" : "app-shell--sidebar-closed"}`}
                         data-testid="app-container"

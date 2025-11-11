@@ -12,6 +12,8 @@
  * @see {@link IpcParameterValidator}
  */
 
+import { isRecord } from "@shared/utils/typeHelpers";
+
 import type { IpcParameterValidator } from "./types";
 
 import { IpcValidators } from "./utils";
@@ -55,6 +57,13 @@ interface MonitorTypeHandlerValidatorsInterface {
     formatMonitorTitleSuffix: IpcParameterValidator;
     getMonitorTypes: IpcParameterValidator;
     validateMonitorData: IpcParameterValidator;
+}
+
+/**
+ * Interface for notification handler validators.
+ */
+interface NotificationHandlerValidatorsInterface {
+    updatePreferences: IpcParameterValidator;
 }
 
 /**
@@ -227,6 +236,48 @@ function validatePreloadGuardReport(params: unknown[]): null | string[] {
 
 function createPreloadGuardReportValidator(): IpcParameterValidator {
     return validatePreloadGuardReport;
+}
+
+function validateNotificationPreferences(params: unknown[]): null | string[] {
+    const errors: string[] = [];
+
+    if (params.length !== 1) {
+        errors.push("Expected exactly 1 parameter");
+    }
+
+    const [preferences] = params;
+    const objectError = IpcValidators.requiredObject(
+        preferences,
+        "preferences"
+    );
+
+    if (objectError) {
+        errors.push(objectError);
+        return errors.length > 0 ? errors : null;
+    }
+
+    if (!isRecord(preferences)) {
+        errors.push("Notification preferences payload must be an object");
+        return errors;
+    }
+
+    const enabledError = IpcValidators.requiredBoolean(
+        preferences["systemNotificationsEnabled"],
+        "systemNotificationsEnabled"
+    );
+    if (enabledError) {
+        errors.push(enabledError);
+    }
+
+    const soundError = IpcValidators.requiredBoolean(
+        preferences["systemNotificationsSoundEnabled"],
+        "systemNotificationsSoundEnabled"
+    );
+    if (soundError) {
+        errors.push(soundError);
+    }
+
+    return errors.length > 0 ? errors : null;
 }
 
 /**
@@ -591,6 +642,19 @@ export const MonitorTypeHandlerValidators: MonitorTypeHandlerValidatorsInterface
          */
         validateMonitorData:
             createStringWithUnvalidatedSecondValidator("monitorType"),
+    } as const;
+
+/**
+ * Parameter validators for notification preference IPC handlers.
+ *
+ * @remarks
+ * Ensures the renderer supplies a well-formed preference payload.
+ *
+ * @public
+ */
+export const NotificationHandlerValidators: NotificationHandlerValidatorsInterface =
+    {
+        updatePreferences: validateNotificationPreferences,
     } as const;
 
 /**

@@ -13,6 +13,7 @@ import type { IpcMainInvokeEvent, IpcMainEvent } from "electron";
 import { IpcService } from "../../../electron/services/ipc/IpcService";
 import type { UptimeOrchestrator } from "../../../electron/UptimeOrchestrator";
 import type { AutoUpdaterService } from "../../../electron/services/updater/AutoUpdaterService";
+import type { NotificationService } from "../../../electron/services/notifications/NotificationService";
 import { STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import {
     BASE_MONITOR_TYPES,
@@ -154,6 +155,7 @@ describe("IpcService - Comprehensive Coverage", () => {
     let ipcService: IpcService;
     let mockUptimeOrchestrator: UptimeOrchestrator;
     let mockAutoUpdaterService: AutoUpdaterService;
+    let mockNotificationService: NotificationService;
     let mockIpcEvent: IpcMainInvokeEvent;
     let mockMainEvent: IpcMainEvent;
 
@@ -269,9 +271,16 @@ describe("IpcService - Comprehensive Coverage", () => {
             quitAndInstall: vi.fn(),
         } as unknown as AutoUpdaterService;
 
+        const notificationServiceMock = {
+            updateConfig: vi.fn(),
+        };
+        mockNotificationService =
+            notificationServiceMock as unknown as NotificationService;
+
         ipcService = new IpcService(
             mockUptimeOrchestrator,
-            mockAutoUpdaterService
+            mockAutoUpdaterService,
+            mockNotificationService
         );
     });
 
@@ -356,6 +365,11 @@ describe("IpcService - Comprehensive Coverage", () => {
             expect(registeredChannels).toContain("update-history-limit");
             expect(registeredChannels).toContain("get-history-limit");
             expect(registeredChannels).toContain("reset-settings");
+
+            // Notification handlers
+            expect(registeredChannels).toContain(
+                "update-notification-preferences"
+            );
 
             // System handlers
             expect(registeredChannels).toContain("quit-and-install");

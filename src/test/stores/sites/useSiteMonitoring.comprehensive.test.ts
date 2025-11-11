@@ -7,6 +7,7 @@ import { describe, expect, it, vi, beforeEach, type Mock } from "vitest";
 
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import type { Site, StatusUpdate } from "@shared/types";
+import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock electron API
@@ -49,7 +50,7 @@ describe("useSiteMonitoring", () => {
     let mockGetSites: Mock<() => Site[]>;
     let mockSetSites: Mock<(sites: Site[]) => void>;
     let mockApplyStatusUpdate: Mock<
-        (sites: Site[], update: StatusUpdate) => Site[]
+        (sites: Site[], update: StatusUpdateSnapshotPayload) => Site[]
     >;
 
     beforeEach(() => {
@@ -60,7 +61,7 @@ describe("useSiteMonitoring", () => {
             currentSites = sites;
         });
         mockApplyStatusUpdate = createMockFunction<
-            (sites: Site[], update: StatusUpdate) => Site[]
+            (sites: Site[], update: StatusUpdateSnapshotPayload) => Site[]
         >((sites) => {
             currentSites = sites;
             return currentSites;

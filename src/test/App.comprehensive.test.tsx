@@ -11,6 +11,7 @@ import "@testing-library/jest-dom";
 
 import { App } from "../App";
 import { useErrorStore } from "../stores/error/useErrorStore";
+import { defaultSettings } from "../stores/settings/state";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
@@ -86,6 +87,12 @@ vi.mock("../stores/sites/useSitesStore");
 vi.mock("../stores/ui/useUiStore");
 vi.mock("../stores/updates/useUpdatesStore");
 vi.mock("../theme/useTheme");
+vi.mock("../services/NotificationPreferenceService", () => ({
+    NotificationPreferenceService: {
+        initialize: vi.fn().mockResolvedValue(undefined),
+        updatePreferences: vi.fn().mockResolvedValue(undefined),
+    },
+}));
 
 const mockUseErrorStore = vi.mocked(useErrorStore);
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
@@ -119,8 +126,13 @@ describe("App Component - Comprehensive Coverage", () => {
 
     const defaultSettingsStore = {
         initializeSettings: vi.fn().mockResolvedValue(undefined),
+        resetSettings: vi.fn(),
+        settings: { ...defaultSettings },
+        updateSetting: vi.fn(),
+        updateSettings: vi.fn(),
         getState: vi.fn(),
     };
+    defaultSettingsStore.getState.mockReturnValue(defaultSettingsStore);
 
     const defaultSitesStore = {
         sites: [] as any[],
@@ -232,7 +244,13 @@ describe("App Component - Comprehensive Coverage", () => {
 
         // Reset all mocks to default state
         mockUseErrorStore.mockImplementation(() => defaultErrorStore);
-        mockUseSettingsStore.mockImplementation(() => defaultSettingsStore);
+        mockUseSettingsStore.mockImplementation((selector?: unknown) =>
+            typeof selector === "function"
+                ? (selector as (state: typeof defaultSettingsStore) => unknown)(
+                      defaultSettingsStore
+                  )
+                : defaultSettingsStore
+        );
         mockUseSitesStore.mockImplementation((selector: any) =>
             typeof selector === "function"
                 ? selector(defaultSitesStore)

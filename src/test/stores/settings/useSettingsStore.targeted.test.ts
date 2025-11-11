@@ -107,8 +107,10 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 autoStart: false,
                 historyLimit: 100,
                 minimizeToTray: true,
-                notifications: true,
-                soundAlerts: false,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: false,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: false,
                 theme: "system",
             },
         });
@@ -320,8 +322,10 @@ describe("useSettingsStore - Targeted Coverage", () => {
                 autoStart: true,
                 historyLimit: 100,
                 minimizeToTray: false,
-                notifications: false,
-                soundAlerts: true,
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: true,
+                systemNotificationsEnabled: true,
+                systemNotificationsSoundEnabled: true,
                 theme: "dark" as const,
             };
 

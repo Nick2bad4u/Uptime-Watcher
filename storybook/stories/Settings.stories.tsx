@@ -73,9 +73,11 @@ const withSettingsEnvironment: Decorator = (StoryComponent, context) => {
                     ...state.settings,
                     autoStart: true,
                     historyLimit: DEFAULT_HISTORY_LIMIT,
+                    inAppAlertsEnabled: true,
+                    inAppAlertsSoundEnabled: false,
                     minimizeToTray: true,
-                    notifications: true,
-                    soundAlerts: false,
+                    systemNotificationsEnabled: true,
+                    systemNotificationsSoundEnabled: false,
                     theme: isDark ? "dark" : "light",
                 },
             }));

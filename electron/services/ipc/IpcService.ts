@@ -22,6 +22,7 @@ import {
     DATA_CHANNELS,
     MONITOR_TYPES_CHANNELS,
     MONITORING_CHANNELS,
+    NOTIFICATION_CHANNELS,
     SETTINGS_CHANNELS,
     SITES_CHANNELS,
     STATE_SYNC_CHANNELS,
@@ -31,11 +32,13 @@ import { STATE_SYNC_ACTION, STATE_SYNC_SOURCE } from "@shared/types/stateSync";
 import { ensureError } from "@shared/utils/errorHandling";
 import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
 import { deriveSiteSnapshot } from "@shared/utils/siteSnapshots";
+import { isRecord } from "@shared/utils/typeHelpers";
 import { validateMonitorData } from "@shared/validation/schemas";
 import { ipcMain, shell } from "electron";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { UptimeOrchestrator } from "../../UptimeOrchestrator";
+import type { NotificationService } from "../notifications/NotificationService";
 import type { AutoUpdaterService } from "../updater/AutoUpdaterService";
 
 import { ScopedSubscriptionManager } from "../../events/ScopedSubscriptionManager";
@@ -57,11 +60,75 @@ import {
     DataHandlerValidators,
     MonitoringHandlerValidators,
     MonitorTypeHandlerValidators,
+    NotificationHandlerValidators,
     SettingsHandlerValidators,
     SiteHandlerValidators,
     StateSyncHandlerValidators,
     SystemHandlerValidators,
 } from "./validators";
+
+const UPDATE_NOTIFICATION_PREFERENCES_CHANNEL =
+    "update-notification-preferences";
+
+const environment = process.env["NODE_ENV"];
+const notificationChannelCandidate = Reflect.get(
+    NOTIFICATION_CHANNELS,
+    "updatePreferences"
+);
+
+if (typeof notificationChannelCandidate !== "string") {
+    throw new TypeError(
+        "Notification channel constant is not a string at build time"
+    );
+}
+
+const registeredNotificationChannel = notificationChannelCandidate;
+const notificationChannelMismatchDetected =
+    registeredNotificationChannel.localeCompare(
+        UPDATE_NOTIFICATION_PREFERENCES_CHANNEL
+    ) !== 0;
+
+if (environment !== "production" && notificationChannelMismatchDetected) {
+    throw new Error("Notification channel mapping mismatch detected");
+}
+
+interface NormalizedNotificationPreferences {
+    enabled: boolean;
+    playSound: boolean;
+}
+
+const normalizeNotificationPreferenceUpdate = (
+    candidate: unknown
+): NormalizedNotificationPreferences => {
+    if (!isRecord(candidate)) {
+        throw new TypeError(
+            "Invalid notification preference payload received via IPC"
+        );
+    }
+
+    const systemNotificationsEnabledValue = Reflect.get(
+        candidate,
+        "systemNotificationsEnabled"
+    );
+    const systemNotificationsSoundEnabledValue = Reflect.get(
+        candidate,
+        "systemNotificationsSoundEnabled"
+    );
+
+    if (
+        typeof systemNotificationsEnabledValue !== "boolean" ||
+        typeof systemNotificationsSoundEnabledValue !== "boolean"
+    ) {
+        throw new TypeError(
+            "Invalid notification preference payload received via IPC"
+        );
+    }
+
+    return {
+        enabled: systemNotificationsEnabledValue,
+        playSound: systemNotificationsSoundEnabledValue,
+    } satisfies NormalizedNotificationPreferences;
+};
 
 type BaseMonitorUiConfig = ReturnType<
     typeof getAllMonitorTypeConfigs
@@ -468,6 +535,8 @@ export class IpcService {
     /** Tracks whether the state sync listener has been registered. */
     private stateSyncListenerRegistered = false;
 
+    private readonly notificationService: NotificationService;
+
     private readonly handleStateSyncStatusUpdate = (
         data: UptimeEvents["sites:state-synchronized"] & {
             _meta: EventMetadata;
@@ -503,10 +572,12 @@ export class IpcService {
      */
     public constructor(
         uptimeOrchestrator: UptimeOrchestrator,
-        autoUpdaterService: AutoUpdaterService
+        autoUpdaterService: AutoUpdaterService,
+        notificationService: NotificationService
     ) {
         this.uptimeOrchestrator = uptimeOrchestrator;
         this.autoUpdaterService = autoUpdaterService;
+        this.notificationService = notificationService;
         this.stateSyncStatus = {
             lastSyncAt: null,
             siteCount: 0,
@@ -568,8 +639,9 @@ export class IpcService {
      * 2. Monitoring control handlers
      * 3. Monitor type configuration handlers
      * 4. Data management handlers
-     * 5. System operation handlers
-     * 6. State synchronization handlers
+     * 5. Notification preference handlers
+     * 6. System operation handlers
+     * 7. State synchronization handlers
      *
      * @example
      *
@@ -590,6 +662,7 @@ export class IpcService {
         this.setupMonitorTypeHandlers();
         this.setupDataHandlers();
         this.setupSettingsHandlers();
+        this.setupNotificationHandlers();
         this.setupSystemHandlers();
         this.setupStateSyncHandlers();
         this.setupDiagnosticsHandlers();
@@ -776,6 +849,24 @@ export class IpcService {
             this.registeredIpcHandlers
         );
         /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after validated IPC argument type conversion */
+    }
+
+    /**
+     * Registers IPC handlers for notification preference updates.
+     */
+    private setupNotificationHandlers(): void {
+        registerStandardizedIpcHandler(
+            UPDATE_NOTIFICATION_PREFERENCES_CHANNEL,
+            (...args: [unknown]) => {
+                const [payload] = args;
+                const preferences =
+                    normalizeNotificationPreferenceUpdate(payload);
+
+                this.notificationService.updateConfig(preferences);
+            },
+            NotificationHandlerValidators.updatePreferences,
+            this.registeredIpcHandlers
+        );
     }
 
     /**

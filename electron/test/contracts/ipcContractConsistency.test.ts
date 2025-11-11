@@ -131,6 +131,32 @@ function extractRegisteredChannelNames(): Set<string> {
 
     const channels = new Set<string>();
 
+    const stringConstants = new Map<string, string>();
+
+    const registerStringConstants = (node: ts.Node): void => {
+        if (ts.isVariableStatement(node)) {
+            for (const declaration of node.declarationList.declarations) {
+                if (
+                    ts.isIdentifier(declaration.name) &&
+                    declaration.initializer &&
+                    (ts.isStringLiteral(declaration.initializer) ||
+                        ts.isNoSubstitutionTemplateLiteral(
+                            declaration.initializer
+                        ))
+                ) {
+                    stringConstants.set(
+                        declaration.name.text,
+                        declaration.initializer.text
+                    );
+                }
+            }
+        }
+
+        ts.forEachChild(node, registerStringConstants);
+    };
+
+    registerStringConstants(sourceFile);
+
     const resolveChannelName = (
         expression: ts.Expression
     ): string | undefined => {
@@ -152,6 +178,13 @@ function extractRegisteredChannelNames(): Set<string> {
                 if (typeof resolved === "string") {
                     return resolved;
                 }
+            }
+        }
+
+        if (ts.isIdentifier(expression)) {
+            const resolved = stringConstants.get(expression.text);
+            if (resolved) {
+                return resolved;
             }
         }
 
