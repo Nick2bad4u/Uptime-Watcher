@@ -2,13 +2,21 @@
  * Tests for the status alert toast components.
  */
 
+import type { StatusUpdate } from "@shared/types";
+import { STATUS_KIND } from "@shared/types";
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+    enqueueAlertFromStatusUpdate,
+    resetAlertToneInvoker,
+} from "../../../components/Alerts/alertCoordinator";
 import { StatusAlertToast } from "../../../components/Alerts/StatusAlertToast";
 import { StatusAlertToaster } from "../../../components/Alerts/StatusAlertToaster";
 import type { StatusAlert } from "../../../stores/alerts/useAlertStore";
 import { useAlertStore } from "../../../stores/alerts/useAlertStore";
+import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { defaultSettings } from "../../../stores/settings/state";
 
 const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     id: overrides.id ?? "alert-1",
@@ -22,6 +30,46 @@ const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
         ? {}
         : { previousStatus: overrides.previousStatus }),
 });
+
+const createStatusUpdate = (
+    overrides: Partial<StatusUpdate> = {}
+): StatusUpdate => {
+    const monitorId = overrides.monitorId ?? "monitor-1";
+    const siteIdentifier = overrides.siteIdentifier ?? "site-1";
+    const timestamp =
+        "timestamp" in overrides
+            ? overrides.timestamp
+            : new Date().toISOString();
+
+    return {
+        details: overrides.details ?? "",
+        monitor: {
+            activeOperations: [],
+            checkInterval: 60_000,
+            history: [],
+            id: monitorId,
+            monitoring: true,
+            responseTime: overrides.monitor?.responseTime ?? 320,
+            retryAttempts: 0,
+            status: overrides.monitor?.status ?? STATUS_KIND.DOWN,
+            timeout: 10_000,
+            type: overrides.monitor?.type ?? "http",
+            url: overrides.monitor?.url ?? "https://example.com",
+        },
+        monitorId,
+        previousStatus: overrides.previousStatus ?? STATUS_KIND.UP,
+        responseTime: overrides.responseTime ?? 320,
+        site: {
+            identifier: siteIdentifier,
+            monitoring: true,
+            monitors: [],
+            name: overrides.site?.name ?? "Example Site",
+        },
+        siteIdentifier,
+        status: overrides.status ?? STATUS_KIND.DOWN,
+        timestamp,
+    } satisfies StatusUpdate;
+};
 
 describe(StatusAlertToast, () => {
     beforeEach(() => {
@@ -60,10 +108,18 @@ describe(StatusAlertToast, () => {
 });
 
 describe(StatusAlertToaster, () => {
+    beforeEach(() => {
+        useSettingsStore.setState({
+            settings: { ...defaultSettings },
+        });
+        resetAlertToneInvoker();
+    });
+
     afterEach(() => {
         act(() => {
             useAlertStore.setState({ alerts: [] });
         });
+        resetAlertToneInvoker();
     });
 
     it("returns null when no alerts are queued", () => {
@@ -80,5 +136,37 @@ describe(StatusAlertToaster, () => {
 
         render(<StatusAlertToaster />);
         expect(screen.getAllByRole("status")).toHaveLength(2);
+    });
+
+    it("renders alerts produced from status updates when in-app alerts are enabled", () => {
+        act(() => {
+            enqueueAlertFromStatusUpdate(createStatusUpdate());
+        });
+
+        render(<StatusAlertToaster />);
+
+        expect(
+            screen.getByRole("status", {
+                name: /down for http/i,
+            })
+        ).toBeInTheDocument();
+        expect(screen.getByText(/example site/i)).toBeInTheDocument();
+    });
+
+    it("does not enqueue alerts when in-app alerts are disabled", () => {
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsEnabled: false,
+            },
+        }));
+
+        act(() => {
+            enqueueAlertFromStatusUpdate(createStatusUpdate());
+        });
+
+        render(<StatusAlertToaster />);
+
+        expect(screen.queryByRole("status")).toBeNull();
     });
 });

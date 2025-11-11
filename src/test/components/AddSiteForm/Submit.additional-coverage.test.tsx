@@ -3,11 +3,19 @@
  * Targeting specific lines: 109-122, 176, 298-307, 422
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    type MockedFunction,
+} from "vitest";
 import "@testing-library/jest-dom";
 import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
 import type { Logger } from "../../../services/logger";
+import type { ValidationResult } from "@shared/types/validation";
 
 // Mock the validation functions
 vi.mock("../../../utils/monitorValidation", () => ({
@@ -102,8 +110,49 @@ const createMockLogger = (): Logger =>
         warn: vi.fn(),
     }) as unknown as Logger;
 
-beforeEach(() => {
+type MonitorValidationModule =
+    typeof import("../../../utils/monitorValidation");
+
+interface ValidationModuleMock {
+    createMonitorObject: MockedFunction<
+        MonitorValidationModule["createMonitorObject"]
+    >;
+    validateMonitorFormData: MockedFunction<
+        MonitorValidationModule["validateMonitorFormData"]
+    >;
+    validateMonitorFieldClientSide: MockedFunction<
+        MonitorValidationModule["validateMonitorFieldClientSide"]
+    >;
+}
+
+let validationModule: ValidationModuleMock;
+
+const validationSuccessResult: ValidationResult = {
+    success: true,
+    errors: [],
+    warnings: [],
+};
+
+const applyValidationResult = (result: ValidationResult): void => {
+    validationModule.validateMonitorFormData.mockImplementation(async () => result);
+};
+
+const applyFieldValidationResult = (result: ValidationResult): void => {
+    validationModule.validateMonitorFieldClientSide.mockImplementation(
+        async () => result
+    );
+};
+
+beforeEach(async () => {
     vi.clearAllMocks();
+    validationModule = (await import(
+        "../../../utils/monitorValidation"
+    )) as unknown as ValidationModuleMock;
+    validationModule.validateMonitorFormData.mockReset();
+    validationModule.validateMonitorFieldClientSide.mockReset();
+    validationModule.createMonitorObject.mockReset();
+    applyValidationResult(validationSuccessResult);
+    applyFieldValidationResult(validationSuccessResult);
 });
 
 describe("Submit.tsx - Additional Coverage Tests", () => {
@@ -156,18 +205,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 host: "example.com",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
-            vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 
@@ -195,18 +234,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 port: "80",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
-            vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 
@@ -232,14 +261,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 monitorType: "unknown" as any,
             });
 
-            const { validateMonitorFormData } = await import(
-                "../../../utils/monitorValidation"
-            );
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
 
             // Expect this to throw an error
             await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
@@ -269,18 +291,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 selectedExistingSite: "", // Empty string should trigger validation error
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
-            vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 
@@ -312,18 +324,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 host: "example.com",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
-            vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 
@@ -353,18 +355,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 port: "80",
             });
 
-            const { validateMonitorFormData, validateMonitorFieldClientSide } =
-                await import("../../../utils/monitorValidation");
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
-            vi.mocked(validateMonitorFieldClientSide).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
+            applyFieldValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 
@@ -392,14 +384,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 monitorType: "unsupported" as any,
             });
 
-            const { validateMonitorFormData } = await import(
-                "../../../utils/monitorValidation"
-            );
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
 
             // Expect this to throw an error for unsupported monitor type
             await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
@@ -428,14 +413,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
                 createSite: vi.fn().mockResolvedValue(undefined), // Returns undefined
             });
 
-            const { validateMonitorFormData } = await import(
-                "../../../utils/monitorValidation"
-            );
-            vi.mocked(validateMonitorFormData).mockResolvedValue({
-                success: true,
-                errors: [],
-                warnings: [],
-            });
+            applyValidationResult(validationSuccessResult);
 
             await handleSubmit(mockEvent, properties);
 

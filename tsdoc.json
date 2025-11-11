@@ -1,9 +1,55 @@
 {
     "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
     "extends": [
-        "typedoc/tsdoc.json"
+        "./node_modules/typedoc/tsdoc.json"
     ],
-    "noStandardTags": false,
+    "noStandardTags": true,
     "supportForTags": {},
-    "tagDefinitions": []
+    "tagDefinitions": [
+        {
+            "allowMultiple": false,
+            "syntaxKind": "block",
+            "tagName": "@remarks"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@returns"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@param"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "inline",
+            "tagName": "@link"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@example"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@public"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@packageDocumentation"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@internal"
+        },
+        {
+            "allowMultiple": false,
+            "syntaxKind": "block",
+            "tagName": "@defaultValue"
+        }
+    ]
 }

@@ -130,4 +130,27 @@ describe("alertCoordinator", () => {
             systemNotificationsSoundEnabled: false,
         });
     });
+
+    it("sends updated notification preferences when toggles change", async () => {
+        const { NotificationPreferenceService } = await import(
+            "../../../services/NotificationPreferenceService"
+        );
+
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                systemNotificationsEnabled: false,
+                systemNotificationsSoundEnabled: true,
+            },
+        }));
+
+        await alertCoordinator.synchronizeNotificationPreferences();
+
+        expect(
+            NotificationPreferenceService.updatePreferences
+        ).toHaveBeenCalledWith({
+            systemNotificationsEnabled: false,
+            systemNotificationsSoundEnabled: true,
+        });
+    });
 });

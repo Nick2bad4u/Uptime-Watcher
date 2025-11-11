@@ -8074,7 +8074,7 @@ export default /** @type {EslintConfig} */ [
                 },
                 ecmaVersion: "latest",
                 jsDocParsingMode: "all",
-                project: "config/testing/tsconfig.configs.json",
+                // Disabled because using project service: project: "config/testing/tsconfig.configs.json",
                 projectService: {
                     allowDefaultProject: [
                         "*.js",

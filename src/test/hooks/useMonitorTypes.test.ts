@@ -652,14 +652,12 @@ describe("useMonitorTypes Hook", () => {
                 expect(result.current.isLoading).toBeFalsy();
             });
 
-            let refreshPromise: Promise<void> | undefined;
-            act(() => {
+            let refreshPromise!: Promise<void>;
+            await act(async () => {
                 refreshPromise = result.current.refresh();
+                await refreshPromise;
             });
             expect(refreshPromise).toBeInstanceOf(Promise);
-            if (refreshPromise) {
-                await refreshPromise;
-            }
         });
     });
 

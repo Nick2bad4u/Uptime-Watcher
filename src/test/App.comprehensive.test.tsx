@@ -270,6 +270,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
         // Reset mutable store state between tests
         defaultSitesStore.sites = [];
+        defaultSettingsStore.settings = { ...defaultSettings };
         Object.assign(defaultUIStore, {
             setShowAddSiteModal: vi.fn(),
             setShowSettings: vi.fn(),

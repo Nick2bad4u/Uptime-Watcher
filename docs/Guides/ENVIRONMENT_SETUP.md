@@ -188,7 +188,15 @@ VITE_APP_VERSION=$npm_package_version
 DATABASE_PATH=./data/uptime-watcher.db
 
 # Notification settings (optional)
-NOTIFICATIONS_ENABLED=true
+#
+# These defaults are baked into the renderer settings store. Use the in-app
+# Settings → Notifications panel to adjust them:
+# - In-app alerts are enabled by default with sound disabled.
+# - System notifications (macOS, Windows, Linux) ship disabled by default with
+#   sound disabled.
+# Nothing needs to be set here unless you are scripting migrations or seeding
+# profiles. The notification toggles persist automatically via the settings
+# service.
 ```
 
 ### 3. Database Setup

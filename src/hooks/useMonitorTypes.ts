@@ -97,7 +97,7 @@ export function useMonitorTypes(): UseMonitorTypesResult {
             const trimmedMessage = normalizedError.message.trim();
             const errorMessage =
                 wasError && trimmedMessage.length > 0
-                    ? normalizedError.message
+                    ? trimmedMessage
                     : "Failed to load monitor types";
             const contextualError = `Monitor types loading failed: ${errorMessage}. Using fallback options.`;
             setError(contextualError);
