@@ -1,7 +1,6 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This page contains multiple unrelated eslint rules that cannot be properly paired */
 /* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
 
-/* eslint-disable @typescript-eslint/dot-notation -- Required for strict TypeScript configuration and dynamic property access */
 /* eslint-disable deprecation/deprecation -- Using older APIs that remain required for compatibility */
 /* eslint-disable etc/no-deprecated -- Older code patterns needed for Docusaurus compatibility */
 /* eslint-disable sonarjs/deprecation -- SonarJS deprecation warnings are acceptable in documentation context */

@@ -23,6 +23,36 @@
         },
         {
             "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@throws"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@see"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "block",
+            "tagName": "@privateRemarks"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@readonly"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@beta"
+        },
+        {
+            "allowMultiple": true,
+            "syntaxKind": "modifier",
+            "tagName": "@typeParam"
+        },
+        {
+            "allowMultiple": true,
             "syntaxKind": "inline",
             "tagName": "@link"
         },

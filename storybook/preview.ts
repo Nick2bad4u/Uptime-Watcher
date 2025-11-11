@@ -7,7 +7,7 @@ import { useMount } from "@app/hooks/useMount";
 import { themeManager } from "@app/theme/ThemeManager";
 import { withThemeByClassName } from "@storybook/addon-themes";
 import { initialize, mswLoader } from "msw-storybook-addon";
-import { useEffect } from "react";
+import { createElement, useEffect } from "react";
 import { themes } from "storybook/theming";
 import { INITIAL_VIEWPORTS } from "storybook/viewport";
 
@@ -179,29 +179,33 @@ const STORYBOOK_VIEWPORTS = {
 >;
 
 const withApplicationProviders: Decorator = (storyFn, context) => {
-    const fallbackTheme = determineSystemFallbackTheme();
-    const storyTheme = resolveStoryTheme(
-        extractThemeFromGlobals(context.globals),
-        fallbackTheme
-    );
+    const ApplicationProvidersDecorator = (): ReturnType<Decorator> => {
+        const fallbackTheme = determineSystemFallbackTheme();
+        const storyTheme = resolveStoryTheme(
+            extractThemeFromGlobals(context.globals),
+            fallbackTheme
+        );
 
-    useMount(initializeElectronMocks);
+        useMount(initializeElectronMocks);
 
-    useEffect(
-        function applyStoryTheme() {
-            const resolvedTheme = themeManager.getTheme(storyTheme);
-            themeManager.applyTheme(resolvedTheme);
-        },
-        [storyTheme]
-    );
+        useEffect(
+            function applyStoryTheme() {
+                const resolvedTheme = themeManager.getTheme(storyTheme);
+                themeManager.applyTheme(resolvedTheme);
+            },
+            [storyTheme]
+        );
 
-    return storyFn({
-        ...context,
-        globals: {
-            ...context.globals,
-            theme: storyTheme,
-        },
-    });
+        return storyFn({
+            ...context,
+            globals: {
+                ...context.globals,
+                theme: storyTheme,
+            },
+        });
+    };
+
+    return createElement(ApplicationProvidersDecorator);
 };
 
 const mswInitializeOptions: Parameters<typeof initialize>[0] = {

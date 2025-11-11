@@ -24,16 +24,16 @@ export const StatusAlertToaster = (): JSX.Element | null => {
     const alerts = useAlertStore(selectAlerts);
     const dismissAlert = useAlertStore(selectDismissAlert);
 
-    if (alerts.length === 0) {
-        return null;
-    }
-
     const handleDismiss = useCallback(
         (id: string): void => {
             dismissAlert(id);
         },
         [dismissAlert]
     );
+
+    if (alerts.length === 0) {
+        return null;
+    }
 
     return (
         <aside

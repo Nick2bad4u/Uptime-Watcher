@@ -1,5 +1,4 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
-/* eslint-disable @typescript-eslint/dot-notation -- Using bracket notation for dynamic GitHub API property access */
 
 import type { ReactNode } from "react";
 import Link from "@docusaurus/Link";

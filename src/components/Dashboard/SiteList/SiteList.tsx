@@ -79,9 +79,6 @@ export const SiteList = (): JSX.Element => {
     const cardPresentation = useUIStore(selectSiteCardPresentation);
     const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
     const { isDark } = useTheme();
-    if (sites.length === 0) {
-        return <EmptyState />;
-    }
 
     const handleLayoutChange = useCallback(
         (mode: SiteListLayoutMode) => {
@@ -117,6 +114,10 @@ export const SiteList = (): JSX.Element => {
         isDark,
         layout,
     ]);
+
+    if (sites.length === 0) {
+        return <EmptyState />;
+    }
 
     return (
         <div className="site-list" data-testid="site-list">

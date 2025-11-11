@@ -526,7 +526,6 @@ const config: Config = {
         ],
     ],
 
-    // eslint-disable-next-line storybook/no-title-property-in-meta -- Docusaurus site configuration requires a title field
     title: "Uptime Watcher",
 
     trailingSlash: false,

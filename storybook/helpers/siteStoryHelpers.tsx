@@ -3,8 +3,10 @@ import type { Decorator } from "@storybook/react";
 
 import { useSitesStore } from "@app/stores/sites/useSitesStore";
 import { useUIStore } from "@app/stores/ui/useUiStore";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect } from "react";
 import { action } from "storybook/actions";
+
+/* eslint-disable perfectionist/sort-jsx-props -- Conflicting layered configs trigger circular fixes in this Storybook helper; prop order is intentional for clarity. */
 
 const DEFAULT_HISTORY_LENGTH = 6;
 const RESPONSE_INCREMENT = 25;
@@ -55,7 +57,7 @@ export const createMockSite = (overrides: Partial<Site> = {}): Site => {
             createMockMonitor({
                 id: `${identifier}-ping`,
                 monitoring: false,
-                responseTime: 240,
+                // Removed unused no-op cleanup helper
                 status: "degraded",
                 type: "ping",
             }),
@@ -169,34 +171,58 @@ export const setupSiteStoryEnvironment = (
     };
 };
 
+type StoryDecoratorParams = Parameters<Decorator>;
+type StoryDecoratorComponent = StoryDecoratorParams[0];
+type StoryDecoratorContext = StoryDecoratorParams[1];
+
+interface SiteDecoratorProps {
+    readonly context: StoryDecoratorContext;
+    readonly getSites: (context: {
+        args: Record<string, unknown>;
+    }) => readonly Site[];
+    readonly StoryComponent: StoryDecoratorComponent;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components -- Internal component accompanying utility exports within Storybook helpers.
+const SiteStoryDecorator = ({
+    context,
+    getSites,
+    StoryComponent,
+}: SiteDecoratorProps): ReturnType<Decorator> => {
+    useEffect(
+        function handleSiteEnvironment(): () => void {
+            const sitesForStory = getSites(context);
+
+            if (sitesForStory.length === 0) {
+                return (): void => {};
+            }
+
+            const cleanup = setupSiteStoryEnvironment(sitesForStory);
+
+            return (): void => {
+                cleanup();
+            };
+        },
+        [context, getSites]
+    );
+
+    return <StoryComponent />;
+};
+
 export const createSiteDecorator = (
     getSites: (context: { args: Record<string, unknown> }) => readonly Site[]
-): Decorator => {
+): Decorator =>
     function decorateSiteStore(
-        StoryComponent: Parameters<Decorator>[0],
-        context: Parameters<Decorator>[1]
+        StoryComponent: StoryDecoratorComponent,
+        context: StoryDecoratorContext
     ): ReturnType<Decorator> {
-        const cleanupRef = useRef<(() => void) | null>(null);
-        const sites = useMemo(() => getSites(context), [context]);
-
-        useEffect(
-            function syncSiteEnvironment(): () => void {
-                if (sites.length === 0) {
-                    return () => {};
-                }
-
-                cleanupRef.current = setupSiteStoryEnvironment(sites);
-
-                return () => {
-                    cleanupRef.current?.();
-                    cleanupRef.current = null;
-                };
-            },
-            [sites]
+        return (
+            <SiteStoryDecorator
+                StoryComponent={StoryComponent}
+                context={context}
+                getSites={getSites}
+            />
         );
+    };
 
-        return <StoryComponent />;
-    }
-
-    return decorateSiteStore;
-};
+/* eslint-enable perfectionist/sort-jsx-props -- Prop ordering exceptions end here; resume default sorting enforcement. */

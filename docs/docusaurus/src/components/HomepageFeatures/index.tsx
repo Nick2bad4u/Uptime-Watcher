@@ -1,6 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- This file contains multiple unrelated eslint rules that cannot be properly paired */
 /* eslint-disable tailwind/no-custom-classname -- Using Docusaurus CSS classes, not Tailwind */
-/* eslint-disable @typescript-eslint/dot-notation -- Using bracket notation for dynamic property access in feature descriptions */
 
 import Heading from "@theme/Heading";
 import type { CSSProperties, FC, ReactNode } from "react";

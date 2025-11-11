@@ -8053,7 +8053,7 @@ export default /** @type {EslintConfig} */ [
             "**/*.config.**.*.{ts,tsx,mts,cts}",
             "config/testing/utils/**/*.ts",
         ],
-        ignores: [],
+        ignores: ["docs/docusaurus/docusaurus.config.ts"],
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -9309,6 +9309,7 @@ export default /** @type {EslintConfig} */ [
             "@eslint-react/debug/is-from-react": "off", // Debugging not needed
             "@eslint-react/debug/jsx": "off", // Debugging not needed
             "@eslint-react/debug/react-hooks": "off", // Debugging not needed
+            "@typescript-eslint/dot-notation": "off", // Deprecated
             "@typescript-eslint/no-empty-interface": "off", // Deprecated
             "@typescript-eslint/no-loss-of-precision": "off", // Deprecated
             "@typescript-eslint/no-type-aliases": "off", // Deprecated
