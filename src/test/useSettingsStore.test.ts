@@ -11,6 +11,7 @@ import {
     defaultSettings,
     normalizeAppSettings,
 } from "../stores/settings/state";
+import fc from "fast-check";
 import { useSettingsStore } from "../stores/settings/useSettingsStore";
 
 const mockWaitForElectronBridge = vi.hoisted(() => vi.fn());
@@ -85,6 +86,7 @@ describe(useSettingsStore, () => {
                 historyLimit: 100,
                 inAppAlertsEnabled: true,
                 inAppAlertsSoundEnabled: false,
+                inAppAlertVolume: 1,
                 minimizeToTray: true,
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
@@ -113,6 +115,7 @@ describe(useSettingsStore, () => {
                 historyLimit: 100,
                 inAppAlertsEnabled: true,
                 inAppAlertsSoundEnabled: false,
+                inAppAlertVolume: 1,
                 minimizeToTray: true,
                 systemNotificationsEnabled: false,
                 systemNotificationsSoundEnabled: false,
@@ -174,6 +177,7 @@ describe(useSettingsStore, () => {
             expect(state.settings).toEqual({
                 autoStart: false,
                 historyLimit: 100,
+                inAppAlertVolume: 1,
                 inAppAlertsEnabled: true,
                 inAppAlertsSoundEnabled: false,
                 minimizeToTray: true,
@@ -484,6 +488,21 @@ describe(useSettingsStore, () => {
             expect(state.settings.historyLimit).toBe(0);
         });
 
+        it("normalizes arbitrary persisted volume values into the safe interval", () => {
+            fc.assert(
+                fc.property(fc.anything(), (rawValue) => {
+                    const normalized = normalizeAppSettings({
+                        inAppAlertVolume: rawValue as unknown as number,
+                    });
+
+                    expect(normalized.inAppAlertVolume).toBeGreaterThanOrEqual(
+                        0
+                    );
+                    expect(normalized.inAppAlertVolume).toBeLessThanOrEqual(1);
+                })
+            );
+        });
+
         it("should handle very large historyLimit", async ({
             task,
             annotate,
@@ -666,6 +685,17 @@ describe(useSettingsStore, () => {
             expect(normalized.systemNotificationsEnabled).toBeTruthy();
             expect(normalized.inAppAlertsSoundEnabled).toBeTruthy();
             expect(normalized.systemNotificationsSoundEnabled).toBeTruthy();
+        });
+        it("should clamp persisted in-app alert volume values", () => {
+            const loud = normalizeAppSettings({ inAppAlertVolume: 2 });
+            const muted = normalizeAppSettings({ inAppAlertVolume: -0.5 });
+            const stringValue = normalizeAppSettings({
+                inAppAlertVolume: "0.25" as unknown as number,
+            });
+
+            expect(loud.inAppAlertVolume).toBe(1);
+            expect(muted.inAppAlertVolume).toBe(0);
+            expect(stringValue.inAppAlertVolume).toBeCloseTo(0.25, 5);
         });
     });
 });

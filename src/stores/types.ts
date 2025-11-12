@@ -25,6 +25,8 @@ export interface AppSettings {
     inAppAlertsEnabled: boolean;
     /** Play an audible chime when in-app alerts are shown */
     inAppAlertsSoundEnabled: boolean;
+    /** Volume multiplier for in-app alert tones, clamped between 0 and 1 */
+    inAppAlertVolume: number;
     /** Minimize to system tray instead of closing the application */
     minimizeToTray: boolean;
     /** Enable operating-system notifications for status changes */

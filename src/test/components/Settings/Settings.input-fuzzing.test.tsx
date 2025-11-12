@@ -40,6 +40,7 @@ const {
         historyLimit: 1000,
         inAppAlertsEnabled: true,
         inAppAlertsSoundEnabled: false,
+        inAppAlertVolume: 1,
         minimizeToTray: true,
         systemNotificationsEnabled: false,
         systemNotificationsSoundEnabled: false,
@@ -205,11 +206,27 @@ vi.mock("../../../theme/useTheme", () => ({
         isDark: storeState.settings.theme === "dark",
         setTheme: mocks.setTheme,
         theme: {
-            colors: {},
+            colors: {
+                primary: {
+                    500: "#2563eb",
+                },
+            },
             isDark: storeState.settings.theme === "dark",
             name: storeState.settings.theme,
         },
     }),
+    useThemeValue: (
+        selector: (theme: {
+            colors: { primary: Record<number, string> };
+        }) => unknown
+    ) =>
+        selector({
+            colors: {
+                primary: {
+                    500: "#2563eb",
+                },
+            },
+        }),
 }));
 
 vi.mock("../../../services/logger", () => ({
@@ -353,6 +370,7 @@ vi.mock("../../../utils/icons", () => {
 });
 
 vi.mock("../../../constants", () => ({
+    ARIA_LABEL: "aria-label",
     DEFAULT_HISTORY_LIMIT: 1000,
     HISTORY_LIMIT_OPTIONS: [
         { label: "25 records", value: 25 },
@@ -363,6 +381,7 @@ vi.mock("../../../constants", () => ({
         { label: "5000 records", value: 5000 },
         { label: "Unlimited", value: -1 },
     ],
+    TRANSITION_ALL: "all 0.2s ease-in-out",
 }));
 
 type TestingRenderResult = ReturnType<typeof render>;

@@ -5,6 +5,7 @@
 
 import "@testing-library/jest-dom";
 import {
+    act,
     fireEvent,
     render,
     screen,
@@ -58,10 +59,49 @@ const resetSitesStoreState = (): void => {
     });
 };
 
-vi.mock("../../../theme/useTheme", () => ({
-    useTheme: vi.fn(),
-    useThemeClasses: vi.fn(),
-}));
+const defaultThemeForSelectors = {
+    currentTheme: {
+        colors: {
+            primary: {
+                500: "#2563eb",
+                base: "#2563eb",
+            },
+        },
+        isDark: false,
+        name: "light",
+    },
+};
+
+const themeState: { current: Record<string, unknown> } = {
+    current: defaultThemeForSelectors,
+};
+
+vi.mock("../../../theme/useTheme", () => {
+    const useThemeMock = vi.fn(() => themeState.current);
+    const useThemeClassesMock = vi.fn(() => ({
+        join: vi.fn((...classes: readonly string[]) =>
+            classes.filter(Boolean).join(" ")
+        ),
+        cx: vi.fn((...classes: readonly string[]) =>
+            classes.filter(Boolean).join(" ")
+        ),
+    }));
+    const useThemeValueMock = vi.fn(
+        (selector: (theme: Record<string, unknown>) => unknown) =>
+            selector(
+                (themeState.current["currentTheme"] ?? {}) as Record<
+                    string,
+                    unknown
+                >
+            )
+    );
+
+    return {
+        useTheme: useThemeMock,
+        useThemeClasses: useThemeClassesMock,
+        useThemeValue: useThemeValueMock,
+    };
+});
 
 vi.mock("../../../services/logger", () => ({
     logger: {
@@ -79,6 +119,13 @@ vi.mock("../../../utils/errorHandling", () => ({
         error instanceof Error ? error : new Error(String(error))
     ),
 }));
+
+vi.mock("../../../hooks/usePrefersReducedMotion", () => ({
+    usePrefersReducedMotion: () => false,
+}));
+vi.mock("../../../components/Alerts/alertCoordinator", () => ({
+    playInAppAlertTone: vi.fn().mockResolvedValue(undefined),
+}));
 const confirmMock = vi.fn();
 vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
     useConfirmDialog: () => confirmMock,
@@ -86,6 +133,7 @@ vi.mock("../../../hooks/ui/useConfirmDialog", () => ({
 
 // Import after mocks
 import { Settings } from "../../../components/Settings/Settings";
+import { playInAppAlertTone } from "../../../components/Alerts/alertCoordinator";
 import { useErrorStore } from "../../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
 import { useTheme, useThemeClasses } from "../../../theme/useTheme";
@@ -95,6 +143,7 @@ const mockUseErrorStore = vi.mocked(useErrorStore);
 const mockUseSettingsStore = vi.mocked(useSettingsStore);
 const mockUseTheme = vi.mocked(useTheme);
 const mockUseThemeClasses = vi.mocked(useThemeClasses);
+const mockPlayInAppAlertTone = vi.mocked(playInAppAlertTone);
 
 describe("Settings Component", () => {
     const mockOnClose = vi.fn();
@@ -112,6 +161,7 @@ describe("Settings Component", () => {
             historyLimit: 1000,
             inAppAlertsEnabled: true,
             inAppAlertsSoundEnabled: true,
+            inAppAlertVolume: 1,
             systemNotificationsEnabled: true,
             systemNotificationsSoundEnabled: true,
             theme: "light" as const,
@@ -130,8 +180,14 @@ describe("Settings Component", () => {
             name: "light" as ThemeName,
             isDark: false,
             colors: {
-                primary: "#000",
-                secondary: "#333",
+                primary: {
+                    500: "#000",
+                    base: "#000",
+                },
+                secondary: {
+                    500: "#333",
+                    base: "#333",
+                },
                 background: "#fff",
                 text: "#000",
                 error: "#ff0000",
@@ -190,15 +246,20 @@ describe("Settings Component", () => {
     };
 
     beforeEach(() => {
+        vi.useRealTimers();
         vi.clearAllMocks();
         confirmMock.mockReset();
 
         useSitesStoreMock.mockClear();
         resetSitesStoreState();
 
+        mockSettingsStore.settings.inAppAlertsSoundEnabled = true;
+        mockSettingsStore.settings.inAppAlertVolume = 1;
+
         mockUseErrorStore.mockReturnValue(mockErrorStore);
         mockUseSettingsStore.mockReturnValue(mockSettingsStore);
-        mockUseTheme.mockReturnValue(mockTheme as any);
+        themeState.current = mockTheme as Record<string, unknown>;
+        mockUseTheme.mockReturnValue(themeState.current as any);
         mockUseThemeClasses.mockReturnValue({
             getBackgroundClass: vi
                 .fn()
@@ -498,8 +559,15 @@ describe("Settings Component", () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        const darkTheme = { ...mockTheme, isDark: true };
-        mockUseTheme.mockReturnValue(darkTheme as any);
+        const darkTheme = {
+            ...mockTheme,
+            currentTheme: {
+                ...mockTheme.currentTheme,
+                isDark: true,
+            },
+        };
+        themeState.current = darkTheme as Record<string, unknown>;
+        mockUseTheme.mockReturnValue(themeState.current as any);
 
         render(<Settings onClose={mockOnClose} />);
 
@@ -534,5 +602,38 @@ describe("Settings Component", () => {
 
         // Should not throw errors
         expect(true).toBeTruthy();
+    });
+
+    it("previews the alert tone when the volume slider changes", async () => {
+        vi.useFakeTimers();
+        mockPlayInAppAlertTone.mockClear();
+
+        try {
+            render(<Settings onClose={mockOnClose} />);
+
+            const slider = screen.getByLabelText("In-app alert volume");
+            fireEvent.change(slider, { target: { value: "40" } });
+
+            expect(mockSettingsStore.updateSettings).toHaveBeenCalledWith({
+                inAppAlertVolume: 0.4,
+            });
+
+            await act(async () => {
+                await vi.advanceTimersByTimeAsync(200);
+            });
+
+            expect(mockPlayInAppAlertTone).toHaveBeenCalled();
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("disables the alert volume slider when sound alerts are disabled", () => {
+        mockSettingsStore.settings.inAppAlertsSoundEnabled = false;
+
+        render(<Settings onClose={mockOnClose} />);
+
+        const slider = screen.getByLabelText("In-app alert volume");
+        expect(slider).toBeDisabled();
     });
 });

@@ -74,6 +74,7 @@ const mockUseStore = {
         minimizeToTray: true,
         inAppAlertsEnabled: true,
         inAppAlertsSoundEnabled: true,
+        inAppAlertVolume: 1,
         systemNotificationsEnabled: true,
         systemNotificationsSoundEnabled: true,
         theme: "dark" as ThemeName,
@@ -292,6 +293,18 @@ vi.mock("../theme/useTheme", () => ({
         getSurfaceClass: vi.fn(),
         getTextClass: vi.fn(),
     }),
+    useThemeValue: (
+        selector: (theme: {
+            colors: { primary: Record<number, string> };
+        }) => unknown
+    ) =>
+        selector({
+            colors: {
+                primary: {
+                    500: "#2563eb",
+                },
+            },
+        }),
 }));
 
 const confirmMock = vi.fn();

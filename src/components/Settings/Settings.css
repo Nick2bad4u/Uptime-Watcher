@@ -263,6 +263,30 @@
     line-height: 1.375;
 }
 
+.settings-alert-volume-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.settings-alert-volume-control__row {
+    align-items: center;
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: space-between;
+}
+
+.settings-alert-volume-control__value {
+    font-variant-numeric: tabular-nums;
+    min-inline-size: 2.5rem;
+    text-align: end;
+}
+
+.settings-alert-volume-control__note {
+    color: var(--color-text-tertiary);
+    line-height: 1.4;
+}
+
 .settings-theme-preview {
     display: inline-flex;
     align-items: center;

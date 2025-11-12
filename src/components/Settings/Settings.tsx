@@ -40,7 +40,7 @@ import type { JSX } from "react/jsx-runtime";
 
 import { ensureError } from "@shared/utils/errorHandling";
 import { safeInteger } from "@shared/validation/validatorUtils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { AppSettings } from "../../stores/types";
 import type { ThemeName } from "../../theme/types";
@@ -48,6 +48,7 @@ import type { ThemeName } from "../../theme/types";
 import { DEFAULT_HISTORY_LIMIT, HISTORY_LIMIT_OPTIONS } from "../../constants";
 import { useConfirmDialog } from "../../hooks/ui/useConfirmDialog";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { logger } from "../../services/logger";
 import { useErrorStore } from "../../stores/error/useErrorStore";
 import { useSettingsStore } from "../../stores/settings/useSettingsStore";
@@ -57,9 +58,11 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedCheckbox } from "../../theme/components/ThemedCheckbox";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
+import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
+import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { SettingItem } from "../shared/SettingItem";
@@ -83,6 +86,7 @@ const ALLOWED_SETTINGS_KEY_LIST = [
     "historyLimit",
     "inAppAlertsEnabled",
     "inAppAlertsSoundEnabled",
+    "inAppAlertVolume",
     "minimizeToTray",
     "systemNotificationsEnabled",
     "systemNotificationsSoundEnabled",
@@ -204,6 +208,92 @@ export const Settings = ({
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
 
+    const {
+        autoStart,
+        historyLimit: currentHistoryLimit,
+        inAppAlertsEnabled,
+        inAppAlertsSoundEnabled,
+        inAppAlertVolume,
+        minimizeToTray,
+        systemNotificationsEnabled,
+        systemNotificationsSoundEnabled,
+        theme: currentThemeName,
+    } = settings;
+    const prefersReducedMotion = usePrefersReducedMotion();
+
+    const volumePreviewTimeoutRef = useRef<number | undefined>(undefined);
+    const pendingVolumeRef = useRef(inAppAlertVolume);
+
+    const clearVolumePreviewTimeout = useCallback((): void => {
+        if (volumePreviewTimeoutRef.current !== undefined) {
+            window.clearTimeout(volumePreviewTimeoutRef.current);
+            volumePreviewTimeoutRef.current = undefined;
+        }
+    }, []);
+
+    const scheduleVolumePreview = useCallback(
+        (volume: number) => {
+            if (!inAppAlertsSoundEnabled) {
+                return;
+            }
+
+            if (prefersReducedMotion) {
+                clearVolumePreviewTimeout();
+                pendingVolumeRef.current = volume;
+                return;
+            }
+
+            const previousVolume = pendingVolumeRef.current;
+            const volumeDelta = Math.abs(volume - previousVolume);
+
+            if (volumeDelta < 0.005) {
+                return;
+            }
+
+            pendingVolumeRef.current = volume;
+            clearVolumePreviewTimeout();
+
+            if (volume <= 0) {
+                return;
+            }
+
+            volumePreviewTimeoutRef.current = window.setTimeout(() => {
+                volumePreviewTimeoutRef.current = undefined;
+                void playInAppAlertTone();
+            }, 180);
+        },
+        [
+            clearVolumePreviewTimeout,
+            inAppAlertsSoundEnabled,
+            prefersReducedMotion,
+        ]
+    );
+
+    useEffect(
+        function syncPendingVolumeWithState(): void {
+            pendingVolumeRef.current = inAppAlertVolume;
+        },
+        [inAppAlertVolume]
+    );
+
+    useEffect(
+        function stopPreviewWhenSoundDisabled(): void {
+            if (!inAppAlertsSoundEnabled) {
+                clearVolumePreviewTimeout();
+            }
+        },
+        [clearVolumePreviewTimeout, inAppAlertsSoundEnabled]
+    );
+
+    useEffect(
+        function cleanupVolumePreviewOnUnmount(): () => void {
+            return () => {
+                clearVolumePreviewTimeout();
+            };
+        },
+        [clearVolumePreviewTimeout]
+    );
+
     const applySettingChanges = useCallback(
         (
             changes: Partial<AppSettings>,
@@ -266,7 +356,7 @@ export const Settings = ({
                 // Get the actual primitive value from settings using safe
                 // conversion
                 const oldLimit = safeInteger(
-                    settings.historyLimit,
+                    currentHistoryLimit,
                     DEFAULT_HISTORY_LIMIT,
                     1,
                     50_000
@@ -284,7 +374,7 @@ export const Settings = ({
                 // Error is already handled by the store action
             }
         },
-        [persistHistoryLimit, settings.historyLimit]
+        [currentHistoryLimit, persistHistoryLimit]
     );
     const handleReset = useCallback(async () => {
         const confirmed = await requestConfirmation({
@@ -311,12 +401,12 @@ export const Settings = ({
 
     const handleThemeChange = useCallback(
         (themeName: string) => {
-            const oldTheme = settings.theme;
+            const oldTheme = currentThemeName;
             // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Theme name validation from known theme options
             setTheme(themeName as ThemeName);
             logger.user.settingsChange("theme", oldTheme, themeName);
         },
-        [setTheme, settings.theme]
+        [currentThemeName, setTheme]
     );
 
     // Memoized event handlers to prevent unnecessary re-renders
@@ -349,7 +439,7 @@ export const Settings = ({
 
     const handleInAppAlertSoundChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            if (!settings.inAppAlertsEnabled) {
+            if (!inAppAlertsEnabled) {
                 return;
             }
 
@@ -357,8 +447,69 @@ export const Settings = ({
                 inAppAlertsSoundEnabled: event.target.checked,
             });
         },
-        [applySettingChanges, settings.inAppAlertsEnabled]
+        [applySettingChanges, inAppAlertsEnabled]
     );
+
+    const handleInAppAlertVolumeChange = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            if (!inAppAlertsEnabled || !inAppAlertsSoundEnabled) {
+                return;
+            }
+
+            const sliderValue = Number(event.target.value);
+
+            if (Number.isNaN(sliderValue)) {
+                return;
+            }
+
+            const normalizedVolume = Math.min(
+                Math.max(sliderValue / 100, 0),
+                1
+            );
+
+            applySettingChanges({
+                inAppAlertVolume: normalizedVolume,
+            });
+
+            if (prefersReducedMotion) {
+                pendingVolumeRef.current = normalizedVolume;
+                clearVolumePreviewTimeout();
+                return;
+            }
+
+            scheduleVolumePreview(normalizedVolume);
+        },
+        [
+            applySettingChanges,
+            clearVolumePreviewTimeout,
+            inAppAlertsEnabled,
+            inAppAlertsSoundEnabled,
+            prefersReducedMotion,
+            scheduleVolumePreview,
+        ]
+    );
+
+    const handleInAppAlertPreviewClick = useCallback(() => {
+        if (!inAppAlertsEnabled || !inAppAlertsSoundEnabled) {
+            return;
+        }
+
+        clearVolumePreviewTimeout();
+
+        const normalizedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
+
+        if (normalizedVolume <= 0) {
+            return;
+        }
+
+        pendingVolumeRef.current = normalizedVolume;
+        void playInAppAlertTone();
+    }, [
+        clearVolumePreviewTimeout,
+        inAppAlertsEnabled,
+        inAppAlertsSoundEnabled,
+        inAppAlertVolume,
+    ]);
 
     const handleSystemNotificationsChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
@@ -382,7 +533,7 @@ export const Settings = ({
 
     const handleSystemNotificationSoundChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            if (!settings.systemNotificationsEnabled) {
+            if (!systemNotificationsEnabled) {
                 return;
             }
 
@@ -390,7 +541,7 @@ export const Settings = ({
                 systemNotificationsSoundEnabled: event.target.checked,
             });
         },
-        [applySettingChanges, settings.systemNotificationsEnabled]
+        [applySettingChanges, systemNotificationsEnabled]
     );
 
     const handleAutoStartChange = useCallback(
@@ -414,19 +565,26 @@ export const Settings = ({
         [handleThemeChange]
     );
 
+    const sliderDisabled =
+        isLoading || !inAppAlertsEnabled || !inAppAlertsSoundEnabled;
+    const clampedVolume = Math.min(Math.max(inAppAlertVolume, 0), 1);
+    const volumePercent = Math.round(clampedVolume * 100);
+    const automaticPreviewSuppressed = prefersReducedMotion;
+    const isVolumeSilent = clampedVolume <= 0;
+
     const inAppAlertsControl = useMemo(
         () => (
             <ThemedCheckbox
                 aria-label="Enable in-app alerts"
-                checked={settings.inAppAlertsEnabled}
+                checked={inAppAlertsEnabled}
                 disabled={isLoading}
                 onChange={handleInAppAlertsChange}
             />
         ),
         [
             handleInAppAlertsChange,
+            inAppAlertsEnabled,
             isLoading,
-            settings.inAppAlertsEnabled,
         ]
     );
 
@@ -434,16 +592,68 @@ export const Settings = ({
         () => (
             <ThemedCheckbox
                 aria-label="Play sound for in-app alerts"
-                checked={settings.inAppAlertsSoundEnabled}
-                disabled={isLoading || !settings.inAppAlertsEnabled}
+                checked={inAppAlertsSoundEnabled}
+                disabled={isLoading || !inAppAlertsEnabled}
                 onChange={handleInAppAlertSoundChange}
             />
         ),
         [
             handleInAppAlertSoundChange,
+            inAppAlertsEnabled,
+            inAppAlertsSoundEnabled,
             isLoading,
-            settings.inAppAlertsEnabled,
-            settings.inAppAlertsSoundEnabled,
+        ]
+    );
+
+    const inAppAlertVolumeControl = useMemo(
+        () => (
+            <div className="settings-alert-volume-control">
+                <ThemedSlider
+                    aria-label="In-app alert volume"
+                    aria-valuetext={`${volumePercent}%`}
+                    disabled={sliderDisabled}
+                    max={100}
+                    min={0}
+                    onChange={handleInAppAlertVolumeChange}
+                    step={1}
+                    value={volumePercent}
+                />
+                <div className="settings-alert-volume-control__row">
+                    <ThemedText
+                        className="settings-alert-volume-control__value"
+                        size="sm"
+                        variant="secondary"
+                    >
+                        {volumePercent}%
+                    </ThemedText>
+                    <ThemedButton
+                        disabled={sliderDisabled || isVolumeSilent}
+                        onClick={handleInAppAlertPreviewClick}
+                        size="xs"
+                        variant="secondary"
+                    >
+                        Preview tone
+                    </ThemedButton>
+                </div>
+                {automaticPreviewSuppressed ? (
+                    <ThemedText
+                        className="settings-alert-volume-control__note"
+                        size="xs"
+                        variant="tertiary"
+                    >
+                        Automatic previews are disabled to respect your
+                        reduced-motion preference.
+                    </ThemedText>
+                ) : null}
+            </div>
+        ),
+        [
+            automaticPreviewSuppressed,
+            handleInAppAlertPreviewClick,
+            handleInAppAlertVolumeChange,
+            isVolumeSilent,
+            sliderDisabled,
+            volumePercent,
         ]
     );
 
@@ -451,7 +661,7 @@ export const Settings = ({
         () => (
             <ThemedCheckbox
                 aria-label="Enable system notifications"
-                checked={settings.systemNotificationsEnabled}
+                checked={systemNotificationsEnabled}
                 disabled={isLoading}
                 onChange={handleSystemNotificationsChange}
             />
@@ -459,7 +669,7 @@ export const Settings = ({
         [
             handleSystemNotificationsChange,
             isLoading,
-            settings.systemNotificationsEnabled,
+            systemNotificationsEnabled,
         ]
     );
 
@@ -467,16 +677,16 @@ export const Settings = ({
         () => (
             <ThemedCheckbox
                 aria-label="Play sound for system notifications"
-                checked={settings.systemNotificationsSoundEnabled}
-                disabled={isLoading || !settings.systemNotificationsEnabled}
+                checked={systemNotificationsSoundEnabled}
+                disabled={isLoading || !systemNotificationsEnabled}
                 onChange={handleSystemNotificationSoundChange}
             />
         ),
         [
             handleSystemNotificationSoundChange,
             isLoading,
-            settings.systemNotificationsEnabled,
-            settings.systemNotificationsSoundEnabled,
+            systemNotificationsEnabled,
+            systemNotificationsSoundEnabled,
         ]
     );
 
@@ -484,15 +694,15 @@ export const Settings = ({
         () => (
             <ThemedCheckbox
                 aria-label="Launch Uptime Watcher automatically at login"
-                checked={settings.autoStart}
+                checked={autoStart}
                 disabled={isLoading}
                 onChange={handleAutoStartChange}
             />
         ),
         [
+            autoStart,
             handleAutoStartChange,
             isLoading,
-            settings.autoStart,
         ]
     );
 
@@ -500,7 +710,7 @@ export const Settings = ({
         () => (
             <ThemedCheckbox
                 aria-label="Minimize Uptime Watcher to the system tray"
-                checked={settings.minimizeToTray}
+                checked={minimizeToTray}
                 disabled={isLoading}
                 onChange={handleMinimizeToTrayChange}
             />
@@ -508,7 +718,7 @@ export const Settings = ({
         [
             handleMinimizeToTrayChange,
             isLoading,
-            settings.minimizeToTray,
+            minimizeToTray,
         ]
     );
 
@@ -714,7 +924,7 @@ export const Settings = ({
                                         onChange={
                                             handleHistoryLimitSelectChange
                                         }
-                                        value={settings.historyLimit}
+                                        value={currentHistoryLimit}
                                     >
                                         {HISTORY_LIMIT_OPTIONS.map((option) => (
                                             <option
@@ -756,6 +966,15 @@ export const Settings = ({
                                         title="In-app alert sound"
                                     />
                                     <SettingItem
+                                        control={inAppAlertVolumeControl}
+                                        description="Fine-tune how loud the in-app alert tone plays."
+                                        disabled={
+                                            !inAppAlertsEnabled ||
+                                            !inAppAlertsSoundEnabled
+                                        }
+                                        title="In-app alert volume"
+                                    />
+                                    <SettingItem
                                         control={systemNotificationsControl}
                                         description="Trigger operating system notifications for status changes."
                                         title="System notifications"
@@ -790,7 +1009,7 @@ export const Settings = ({
                                             aria-label="Select application theme"
                                             disabled={isLoading}
                                             onChange={handleThemeSelectChange}
-                                            value={settings.theme}
+                                            value={currentThemeName}
                                         >
                                             {availableThemes.map((theme) => (
                                                 <option

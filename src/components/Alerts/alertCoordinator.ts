@@ -15,6 +15,37 @@ const audioContextRef: { current: AudioContext | null } = {
     current: null,
 };
 
+const ALERT_TONE_MIN_GAIN = 0.0001;
+const ALERT_TONE_MAX_GAIN = 0.08;
+
+/**
+ * Normalizes the renderer-managed volume preference into the inclusive range
+ * `[0, 1]`.
+ *
+ * @param candidate - Persisted volume value.
+ *
+ * @returns Sanitized volume multiplier used when scheduling gain envelopes.
+ */
+const resolveAlertVolume = (candidate: unknown): number => {
+    if (typeof candidate !== "number" || Number.isNaN(candidate)) {
+        return 1;
+    }
+
+    if (!Number.isFinite(candidate)) {
+        return 1;
+    }
+
+    if (candidate <= 0) {
+        return 0;
+    }
+
+    if (candidate >= 1) {
+        return 1;
+    }
+
+    return candidate;
+};
+
 const ensureAudioContext = (): AudioContext | null => {
     if (audioContextRef.current && audioContextRef.current.state !== "closed") {
         return audioContextRef.current;
@@ -48,6 +79,14 @@ export async function playInAppAlertTone(): Promise<void> {
         return;
     }
 
+    const { settings } = useSettingsStore.getState();
+    const normalizedVolume = resolveAlertVolume(settings.inAppAlertVolume);
+
+    if (normalizedVolume === 0) {
+        logger.debug("In-app alert volume is muted; skipping alert tone");
+        return;
+    }
+
     const activeContext = audioContext;
 
     if (activeContext.state === "suspended") {
@@ -68,13 +107,19 @@ export async function playInAppAlertTone(): Promise<void> {
     oscillator.type = "triangle";
     oscillator.frequency.setValueAtTime(880, activeContext.currentTime);
 
-    gainNode.gain.setValueAtTime(0.0001, activeContext.currentTime);
+    const startGain = ALERT_TONE_MIN_GAIN;
+    const peakGain = Math.max(
+        ALERT_TONE_MIN_GAIN,
+        ALERT_TONE_MAX_GAIN * normalizedVolume
+    );
+
+    gainNode.gain.setValueAtTime(startGain, activeContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(
-        0.08,
+        peakGain,
         activeContext.currentTime + 0.02
     );
     gainNode.gain.exponentialRampToValueAtTime(
-        0.0001,
+        ALERT_TONE_MIN_GAIN,
         activeContext.currentTime + 0.32
     );
 
@@ -122,6 +167,25 @@ export const resetAlertToneInvoker = (): void => {
 };
 
 /**
+ * Resets the cached audio context used for alert tone playback.
+ *
+ * @internal
+ */
+export const resetAlertAudioContextForTesting = async (): Promise<void> => {
+    const context = audioContextRef.current;
+
+    audioContextRef.current = null;
+
+    if (context && typeof context.close === "function") {
+        try {
+            await context.close();
+        } catch (error: unknown) {
+            logger.debug("Failed to close alert audio context", error);
+        }
+    }
+};
+
+/**
  * Helper to enqueue alerts when settings permit in-app notifications.
  *
  * @param update - Status update payload from the sites store.
@@ -139,8 +203,14 @@ export const enqueueAlertFromStatusUpdate = (
     const alert = alertStore.enqueueAlert(mapStatusUpdateToAlert(update));
     logger.debug("Enqueued in-app status alert", { alertId: alert.id });
 
-    if (settings.inAppAlertsSoundEnabled) {
+    const normalizedVolume = resolveAlertVolume(settings.inAppAlertVolume);
+
+    if (settings.inAppAlertsSoundEnabled && normalizedVolume > 0) {
         void alertToneInvokerRef.current();
+    } else if (settings.inAppAlertsSoundEnabled) {
+        logger.debug(
+            "Skipping alert tone playback because the volume is muted"
+        );
     }
 
     if (alertStore.alerts.length === MAX_ALERT_QUEUE_LENGTH) {

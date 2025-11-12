@@ -1,5 +1,7 @@
 import type { StoreApi } from "zustand";
 
+import { safeNumberConversion } from "@shared/utils/safeConversions";
+
 /**
  * Basic state slice for the settings store.
  *
@@ -14,6 +16,7 @@ import { DEFAULT_HISTORY_LIMIT } from "../../constants";
 import { logStoreAction } from "../utils";
 
 const DEFAULT_SETTINGS_HISTORY_LIMIT = DEFAULT_HISTORY_LIMIT;
+const DEFAULT_IN_APP_ALERT_VOLUME = 1;
 
 interface LegacySettingsSnapshot {
     /** Legacy desktop notification toggle persisted before alert split */
@@ -30,10 +33,48 @@ export const defaultSettings: AppSettings = {
     historyLimit: DEFAULT_SETTINGS_HISTORY_LIMIT,
     inAppAlertsEnabled: true,
     inAppAlertsSoundEnabled: false,
+    inAppAlertVolume: DEFAULT_IN_APP_ALERT_VOLUME,
     minimizeToTray: true,
     systemNotificationsEnabled: false,
     systemNotificationsSoundEnabled: false,
     theme: "system",
+};
+
+/**
+ * Normalizes the in-app alert volume slider value.
+ *
+ * @remarks
+ * Ensures persisted values remain within the inclusive range [0, 1] while
+ * defaulting to {@link DEFAULT_IN_APP_ALERT_VOLUME} when the candidate cannot be
+ * represented as a finite number.
+ *
+ * @param value - Candidate volume value to sanitize.
+ * @param fallback - Fallback volume applied when the candidate is invalid.
+ *
+ * @returns Sanitized volume within `[0, 1]`.
+ */
+const clampInAppAlertVolume = (
+    value: unknown,
+    fallback: number = DEFAULT_IN_APP_ALERT_VOLUME
+): number => {
+    const sanitizedFallback = Number.isFinite(fallback)
+        ? fallback
+        : DEFAULT_IN_APP_ALERT_VOLUME;
+    const numeric = safeNumberConversion(value, sanitizedFallback);
+
+    if (!Number.isFinite(numeric)) {
+        return sanitizedFallback;
+    }
+
+    if (numeric <= 0) {
+        return 0;
+    }
+
+    if (numeric >= 1) {
+        return 1;
+    }
+
+    return numeric;
 };
 
 /**
@@ -59,6 +100,11 @@ export const normalizeAppSettings = (
         ...defaultSettings,
         ...rest,
     } as AppSettings;
+
+    merged.inAppAlertVolume = clampInAppAlertVolume(
+        rest.inAppAlertVolume,
+        merged.inAppAlertVolume
+    );
 
     const hasExplicitSystemNotificationOverride = Object.hasOwn(
         rest,

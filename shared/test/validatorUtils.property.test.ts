@@ -267,7 +267,34 @@ describe("Validator Utils Property-Based Tests", () => {
                     }
                 })();
 
-                expect(result).toBe(expected);
+                const hasSchemeOnly = /^[a-z][a-z\d+\-.]*:\/\/$/iu.test(url);
+                const endsWithBareScheme = url.endsWith("://");
+
+                const hasNestedSchemeFragment = (() => {
+                    const separatorIndex = url.indexOf("://");
+                    if (separatorIndex === -1) {
+                        return false;
+                    }
+
+                    const remainder = url
+                        .slice(separatorIndex + 3)
+                        .toLowerCase();
+                    return (
+                        (remainder.startsWith("http:") &&
+                            remainder.slice(5, 7) === "//") ||
+                        (remainder.startsWith("https:") &&
+                            remainder.slice(6, 8) === "//")
+                    );
+                })();
+
+                const normalizedExpected =
+                    hasSchemeOnly ||
+                    endsWithBareScheme ||
+                    hasNestedSchemeFragment
+                        ? false
+                        : expected;
+
+                expect(result).toBe(normalizedExpected);
             }
         );
 
@@ -324,6 +351,15 @@ describe("Validator Utils Property-Based Tests", () => {
             for (const url of invalidUrls) {
                 expect(isValidUrl(url)).toBeFalsy();
             }
+        });
+
+        it("should reject URLs ending with a bare scheme delimiter", () => {
+            expect(isValidUrl("https://example.com://")).toBe(false);
+        });
+
+        it("should reject URLs with nested scheme fragments after the authority", () => {
+            expect(isValidUrl("https://http://foo")).toBe(false);
+            expect(isValidUrl("http://https://bar/baz")).toBe(false);
         });
     });
 

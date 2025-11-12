@@ -191,7 +191,7 @@ DATABASE_PATH=./data/uptime-watcher.db
 #
 # These defaults are baked into the renderer settings store. Use the in-app
 # Settings → Notifications panel to adjust them:
-# - In-app alerts are enabled by default with sound disabled.
+# - In-app alerts are enabled by default with sound disabled and volume set to 100%.
 # - System notifications (macOS, Windows, Linux) ship disabled by default with
 #   sound disabled.
 # Nothing needs to be set here unless you are scripting migrations or seeding
