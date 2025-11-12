@@ -121,9 +121,8 @@ if ((globalThis as any).window?.electronAPI) {
     });
 }
 
-const createSettings = (
-    overrides: Partial<AppSettings> = {}
-): AppSettings => normalizeAppSettings({ ...defaultSettings, ...overrides });
+const createSettings = (overrides: Partial<AppSettings> = {}): AppSettings =>
+    normalizeAppSettings({ ...defaultSettings, ...overrides });
 
 describe(useSettingsStore, () => {
     beforeEach(() => {
@@ -253,9 +252,9 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(
-                result.current.settings.systemNotificationsEnabled
-            ).toBe(defaultSettings.systemNotificationsEnabled);
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                defaultSettings.systemNotificationsEnabled
+            );
         });
 
         it("should handle reset to defaults", async ({ task, annotate }) => {
@@ -900,9 +899,9 @@ describe(useSettingsStore, () => {
             });
 
             expect(result.current.settings.theme).toBe("light");
-            expect(
-                result.current.settings.systemNotificationsEnabled
-            ).toBe(defaultSettings.systemNotificationsEnabled);
+            expect(result.current.settings.systemNotificationsEnabled).toBe(
+                defaultSettings.systemNotificationsEnabled
+            );
             expect(result.current.settings.historyLimit).toBe(500); // Default value
         });
     });
@@ -941,12 +940,12 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.inAppAlertsEnabled).toBe(
                     testSettings.inAppAlertsEnabled
                 );
-                expect(
-                    result.current.settings.inAppAlertsSoundEnabled
-                ).toBe(testSettings.inAppAlertsSoundEnabled);
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(testSettings.systemNotificationsEnabled);
+                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                    testSettings.inAppAlertsSoundEnabled
+                );
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
+                    testSettings.systemNotificationsEnabled
+                );
                 expect(
                     result.current.settings.systemNotificationsSoundEnabled
                 ).toBe(testSettings.systemNotificationsSoundEnabled);
@@ -960,12 +959,12 @@ describe(useSettingsStore, () => {
                 expect(typeof testSettings.autoStart).toBe("boolean");
                 expect(typeof testSettings.minimizeToTray).toBe("boolean");
                 expect(typeof testSettings.inAppAlertsEnabled).toBe("boolean");
-                expect(
-                    typeof testSettings.inAppAlertsSoundEnabled
-                ).toBe("boolean");
-                expect(
-                    typeof testSettings.systemNotificationsEnabled
-                ).toBe("boolean");
+                expect(typeof testSettings.inAppAlertsSoundEnabled).toBe(
+                    "boolean"
+                );
+                expect(typeof testSettings.systemNotificationsEnabled).toBe(
+                    "boolean"
+                );
                 expect(
                     typeof testSettings.systemNotificationsSoundEnabled
                 ).toBe("boolean");
@@ -1002,9 +1001,7 @@ describe(useSettingsStore, () => {
                         value: fc.boolean(),
                     }),
                     fc.record({
-                        setting: fc.constant(
-                            "systemNotificationsSoundEnabled"
-                        ),
+                        setting: fc.constant("systemNotificationsSoundEnabled"),
                         value: fc.boolean(),
                     }),
                     fc.record({
@@ -1187,9 +1184,7 @@ describe(useSettingsStore, () => {
 
                 // Final state should match the last update
                 const expectedFinalValue = updates.at(-1);
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
                     expectedFinalValue
                 );
 
@@ -1237,12 +1232,12 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.inAppAlertsEnabled).toBe(
                     validSettings.inAppAlertsEnabled
                 );
-                expect(
-                    result.current.settings.inAppAlertsSoundEnabled
-                ).toBe(validSettings.inAppAlertsSoundEnabled);
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(validSettings.systemNotificationsEnabled);
+                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                    validSettings.inAppAlertsSoundEnabled
+                );
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
+                    validSettings.systemNotificationsEnabled
+                );
                 expect(
                     result.current.settings.systemNotificationsSoundEnabled
                 ).toBe(validSettings.systemNotificationsSoundEnabled);
@@ -1267,12 +1262,12 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.inAppAlertsEnabled).toBe(
                     validSettings.inAppAlertsEnabled
                 );
-                expect(
-                    result.current.settings.inAppAlertsSoundEnabled
-                ).toBe(validSettings.inAppAlertsSoundEnabled);
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(validSettings.systemNotificationsEnabled);
+                expect(result.current.settings.inAppAlertsSoundEnabled).toBe(
+                    validSettings.inAppAlertsSoundEnabled
+                );
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
+                    validSettings.systemNotificationsEnabled
+                );
                 expect(
                     result.current.settings.systemNotificationsSoundEnabled
                 ).toBe(validSettings.systemNotificationsSoundEnabled);
@@ -1344,9 +1339,9 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.autoStart).toBe(
                     settingsA.autoStart
                 );
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(settingsA.systemNotificationsEnabled);
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
+                    settingsA.systemNotificationsEnabled
+                );
 
                 // Apply overlapping second set
                 act(() => {
@@ -1359,9 +1354,9 @@ describe(useSettingsStore, () => {
                 expect(result.current.settings.autoStart).toBe(
                     settingsA.autoStart
                 );
-                expect(
-                    result.current.settings.systemNotificationsEnabled
-                ).toBe(settingsA.systemNotificationsEnabled);
+                expect(result.current.settings.systemNotificationsEnabled).toBe(
+                    settingsA.systemNotificationsEnabled
+                );
                 // New fields from settingsB should be set
                 expect(result.current.settings.minimizeToTray).toBe(
                     settingsB.minimizeToTray

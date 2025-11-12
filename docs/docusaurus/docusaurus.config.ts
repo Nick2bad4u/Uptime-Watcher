@@ -3,6 +3,8 @@
 import type * as Preset from "@docusaurus/preset-classic";
 import type { Config } from "@docusaurus/types";
 
+import { fileURLToPath } from "node:url";
+
 import { themes as prismThemes } from "prism-react-renderer";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -41,10 +43,14 @@ const socialCardImage = new URL(
     `${siteUrl}${baseUrl}`
 ).toString();
 
+const modernEnhancementsClientModule = fileURLToPath(
+    new URL("src/js/modernEnhancements.ts", import.meta.url)
+);
+
 const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl,
-    clientModules: [require.resolve("./src/js/modernEnhancements.ts")],
+    clientModules: [modernEnhancementsClientModule],
 
     deploymentBranch: "gh-pages",
 
@@ -504,12 +510,10 @@ const config: Config = {
         },
     } satisfies Preset.ThemeConfig,
     themes: [
-        // eslint-disable-next-line n/no-missing-require -- False Positive since CI has it installed
-        require.resolve("@docusaurus/theme-live-codeblock"),
-        // eslint-disable-next-line n/no-missing-require -- False Positive since CI has it installed
-        require.resolve("@docusaurus/theme-mermaid"),
+        "@docusaurus/theme-live-codeblock",
+        "@docusaurus/theme-mermaid",
         [
-            require.resolve("@easyops-cn/docusaurus-search-local"),
+            "@easyops-cn/docusaurus-search-local",
             {
                 blogDir: "blog",
                 blogRouteBasePath: "blog",

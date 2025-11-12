@@ -134,7 +134,9 @@ const validationSuccessResult: ValidationResult = {
 };
 
 const applyValidationResult = (result: ValidationResult): void => {
-    validationModule.validateMonitorFormData.mockImplementation(async () => result);
+    validationModule.validateMonitorFormData.mockImplementation(
+        async () => result
+    );
 };
 
 const applyFieldValidationResult = (result: ValidationResult): void => {
