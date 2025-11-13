@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <component type="desktop-application">
   <id>io.github.uptimewatcher</id>
   <metadata_license>MIT</metadata_license>
@@ -7,8 +7,8 @@
   <summary>Monitor website uptime and performance</summary>
   <description>
     <p>
-      Uptime Watcher is a desktop application for monitoring website uptime 
-      and performance. Track multiple websites, get notifications when sites go down, 
+      Uptime Watcher is a desktop application for monitoring website uptime
+      and performance. Track multiple websites, get notifications when sites go down,
       and view detailed analytics and response time charts.
     </p>
     <p>Features:</p>

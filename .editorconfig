@@ -9,44 +9,51 @@ root=true
 # Apply to all files
 [*]
 charset=utf-8
+# Line ending file format (Unix, DOS, Mac)
+# The values are case insensitive. They will be lowercased by the core library.
+# NOTE: if you want to use native line endings between different operating systems
+#   it is better not to set this option and leave that task to the VCS! In the future
+#   we might add a value like native for this scenario (cf #226).
+# @see https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties#end_of_line
 end_of_line=lf
 insert_final_newline=true
 trim_trailing_whitespace=true
 indent_style=spaces
 indent_size=4
+tab_width=4
 
 # === SOURCE CODE ===
 # TypeScript and JavaScript files
 [*.{ts,tsx,js,jsx,mjs,cjs}]
 indent_style=spaces
 indent_size=4
-max_line_length=160
+max_line_length=80
 
 # === JSON AND CONFIGURATION ===
 # JSON files (use spaces for better readability)
 [*.{json,jsonc}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # Package files
 [package*.json]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # TypeScript configuration
 [tsconfig*.json]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === YAML FILES ===
 [*.{yml,yaml}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === MARKDOWN ===
 [*.md]
 indent_style=space
-indent_size=2
+indent_size=4
 trim_trailing_whitespace=false
 max_line_length=1000
 
@@ -54,22 +61,22 @@ max_line_length=1000
 # CSS and related files
 [*.{css,scss,sass,less}]
 indent_style=spaces
-indent_size=2
+indent_size=4
 
 # === HTML ===
 [*.{html,htm}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === XML ===
 [*.{xml,svg}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === SHELL SCRIPTS ===
 [*.{sh,bash,zsh,fish}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === POWERSHELL ===
 [*.{ps1,psm1,psd1}]
@@ -79,19 +86,19 @@ indent_size=4
 # === BATCH FILES ===
 [*.{bat,cmd}]
 indent_style=space
-indent_size=2
+indent_size=4
 end_of_line=crlf
 
 # === CONFIGURATION FILES ===
 # Various config files
 [*.{toml,ini}]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # Prettier configuration
 [.prettierrc*]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # ESLint configuration
 [eslint.config.*]
@@ -117,18 +124,18 @@ indent_size=4
 # === IGNORE FILES ===
 [.*ignore]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === GITHUB FILES ===
 [.github/**]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # === SPECIAL FILES ===
 # Changelog
 [CHANGELOG.md]
 indent_style=space
-indent_size=2
+indent_size=4
 
 # License
 [LICENSE*]
@@ -137,4 +144,4 @@ trim_trailing_whitespace=false
 # Environment files
 [.env*]
 indent_style=space
-indent_size=2
+indent_size=4

@@ -7,16 +7,20 @@
     "cursorOffset": -1,
     "embeddedLanguageFormatting": "auto",
     "endOfLine": "auto",
+    "escapeNonLatin1": false,
     "experimentalOperatorPosition": "end",
     "experimentalTernaries": false,
     "htmlWhitespaceSensitivity": "css",
+    "iniSpaceAroundEquals": true,
     "insertPragma": false,
     "jsdocCapitalizeDescription": true,
     "jsdocCommentLineStrategy": "keep",
     "jsdocDescriptionTag": false,
     "jsdocDescriptionWithDot": false,
     "jsdocKeepUnParseAbleExampleIndent": true,
+    "jsdocLineWrappingStyle": "greedy",
     "jsdocPreferCodeFences": true,
+    "jsdocPrintWidth": 80,
     "jsdocSeparateReturnsFromParam": true,
     "jsdocSeparateTagGroups": true,
     "jsdocSpaces": 1,
@@ -24,6 +28,7 @@
     "jsonRecursiveSort": false,
     "jsonSortOrder": "{\"*\": \"numeric\"}",
     "jsxSingleQuote": false,
+    "keySeparator": " = ",
     "language": "sqlite",
     "multilineArraysWrapThreshold": 2,
     "objectWrap": "preserve",
@@ -31,8 +36,8 @@
         {
             "files": "*.css",
             "options": {
-                "printWidth": 80,
-                "multilineArraysWrapThreshold": 1
+                "multilineArraysWrapThreshold": 1,
+                "printWidth": 80
             }
         },
         {
@@ -65,11 +70,24 @@
             }
         },
         {
+            "files": "*.xml",
+            "options": {
+                "plugins": [
+                    "@prettier/plugin-xml"
+                ],
+                "printWidth": 140,
+                "xmlQuoteAttributes": "double",
+                "xmlSelfClosingSpace": true,
+                "xmlSortAttributesByKey": false,
+                "xmlWhitespaceSensitivity": "preserve"
+            }
+        },
+        {
             "files": "*.html",
             "options": {
+                "htmlWhitespaceSensitivity": "strict",
                 "printWidth": 80,
-                "singleAttributePerLine": true,
-                "htmlWhitespaceSensitivity": "strict"
+                "singleAttributePerLine": true
             }
         },
         {
@@ -81,22 +99,22 @@
         {
             "files": "*.md",
             "options": {
-                "tabWidth": 1,
                 "plugins": [
                     "prettier-plugin-sort-json",
                     "prettier-plugin-jsdoc"
-                ]
+                ],
+                "tabWidth": 1
             }
         },
         {
             "files": "*.mdx",
             "options": {
-                "tabWidth": 2,
-                "printWidth": 100,
                 "plugins": [
                     "prettier-plugin-sort-json",
                     "prettier-plugin-jsdoc"
-                ]
+                ],
+                "printWidth": 100,
+                "tabWidth": 2
             }
         },
         {
@@ -143,8 +161,11 @@
     "tabWidth": 4,
     "tailwindFunctions": [
         "clsx",
-        "cva"
+        "cva",
+        "tw"
     ],
+    "tailwindPreserveDuplicates": false,
+    "tailwindPreserveWhitespace": false,
     "tailwindStylesheet": "./src/index.css",
     "trailingComma": "es5",
     "tsdoc": true,

@@ -696,6 +696,7 @@
     "@microsoft/tsdoc-config": "^0.18.0",
     "@modelcontextprotocol/server-sequential-thinking": "^2025.7.1",
     "@playwright/test": "^1.56.1",
+    "@prettier/plugin-xml": "^3.4.2",
     "@putout/eslint": "^4.1.0",
     "@putout/eslint-flat": "^3.0.2",
     "@react-scan/vite-plugin-react-scan": "^0.1.8",
