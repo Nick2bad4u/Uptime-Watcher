@@ -236,6 +236,22 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
     }),
 }));
 
+/**
+ * Ensure mount-time effects are flushed by wrapping render in act.
+ */
+let activeRenderCleanup: (() => void) | null = null;
+
+const renderForm = async (): Promise<void> => {
+    activeRenderCleanup?.();
+    const view = render(<AddSiteForm />);
+    activeRenderCleanup = () => {
+        view.unmount();
+    };
+    await waitFor(() => {
+        expect(screen.getByRole("form")).toBeInTheDocument();
+    });
+};
+
 vi.mock("../../../components/AddSiteForm/TextField", () => ({
     TextField: vi.fn(({ label, onChange, value, id }) => {
         const handleChange = (e: any) => {
@@ -434,14 +450,9 @@ describe("AddSiteForm User Input Fuzzing", () => {
     });
 
     afterEach(() => {
-        // Cleanup after each test to prevent DOM accumulation - cleanup() is automatic
-        vi.clearAllMocks();
-        vi.clearAllTimers();
-        document.body.innerHTML = "";
-    });
-
-    afterEach(() => {
         // Aggressive cleanup to prevent hanging afterEach
+        activeRenderCleanup?.();
+        activeRenderCleanup = null;
         vi.clearAllMocks();
         vi.clearAllTimers();
 
@@ -477,7 +488,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             "should handle realistic site name inputs safely",
             async (siteName) => {
                 const user = userEvent.setup();
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Switch to "new" mode to show site name field
                 const newRadios = screen.getAllByDisplayValue("new");
@@ -536,7 +547,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             "should handle empty and whitespace site names appropriately",
             async (emptyName) => {
                 const user = userEvent.setup();
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Switch to "new" mode
                 const newRadios = screen.getAllByDisplayValue("new");
@@ -596,7 +607,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             "should safely handle potentially malicious site name inputs",
             async (maliciousName) => {
                 const user = userEvent.setup();
-                render(<AddSiteForm />);
+                await renderForm();
 
                 const newRadios = screen.getAllByDisplayValue("new");
                 const newRadio = newRadios[0]!;
@@ -674,7 +685,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             // Pre-set the mock state to HTTP to avoid DOM interaction
             mockState.monitorType = "http";
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // URL input should be available immediately with HTTP monitor type
             const urlInputs = screen.getAllByLabelText(/url/i);
@@ -713,7 +724,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             // Pre-set mock state to avoid DOM queries
             mockState.monitorType = "http";
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Use faster query method with timeout
             const urlInput = await waitFor(
@@ -765,7 +776,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 // Set the mock state to port type before rendering - no DOM interaction needed
                 mockState.monitorType = "port";
 
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify host input is available
                 const hostInputs = screen.getAllByLabelText(/host/i);
@@ -801,7 +812,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 // Set the mock state to port type before rendering to avoid state changes
                 mockState.monitorType = "port";
 
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Use faster query with proper timeout
                 const hostInput = await waitFor(
@@ -834,7 +845,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             // Pre-set the mock state to port type before rendering - no DOM interaction needed
             mockState.monitorType = "port";
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Port input should be available immediately
             const portInputs = screen.getAllByLabelText(/port/i);
@@ -871,7 +882,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 // Set the mock state to port type before rendering
                 mockState.monitorType = "port";
 
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Port input should be available immediately
                 const portInputs = screen.getAllByLabelText(/port/i);
@@ -917,7 +928,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             "should handle edge case form submissions without crashing",
             async (formData) => {
                 const user = userEvent.setup();
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Should not crash during form interaction
                 expect(async () => {

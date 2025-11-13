@@ -35,7 +35,15 @@ export const syncSettingsAfterRehydration = (
         !hasOwn(settings, "systemNotificationsEnabled") ||
         !hasOwn(settings, "systemNotificationsSoundEnabled");
 
+    logger.info("[SettingsHydration] sync invoked", {
+        matchesDefaults: undefined,
+        requiresNormalization,
+    });
+
     if (requiresNormalization) {
+        logger.info("[SettingsHydration] applying normalization update", {
+            normalizedSettings,
+        });
         state.updateSettings(normalizedSettings);
     }
 
@@ -53,6 +61,10 @@ export const syncSettingsAfterRehydration = (
             defaultSettings.systemNotificationsSoundEnabled &&
         normalizedSettings.theme === defaultSettings.theme;
 
+    logger.info("[SettingsHydration] post-normalization status", {
+        matchesDefaults,
+    });
+
     if (matchesDefaults) {
         return;
     }
@@ -65,12 +77,23 @@ export const syncSettingsAfterRehydration = (
     settingsSyncTimer = setTimeout(() => {
         void (async (): Promise<void> => {
             try {
+                logger.info(
+                    "[SettingsHydration] fetching history limit for sync"
+                );
                 const historyLimit = await SettingsService.getHistoryLimit();
+                logger.info(
+                    "[SettingsHydration] applying backend history limit",
+                    { historyLimit }
+                );
                 state.updateSettings({ historyLimit });
             } catch (error) {
                 logger.warn(
                     "Failed to sync settings after rehydration:",
                     error instanceof Error ? error : new Error(String(error))
+                );
+                logger.info(
+                    "[SettingsHydration] applying fallback history limit",
+                    { historyLimit: defaultSettings.historyLimit }
                 );
                 state.updateSettings({
                     historyLimit: defaultSettings.historyLimit,

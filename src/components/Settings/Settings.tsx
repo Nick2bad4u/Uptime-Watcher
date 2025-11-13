@@ -533,15 +533,11 @@ export const Settings = ({
 
     const handleSystemNotificationSoundChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => {
-            if (!systemNotificationsEnabled) {
-                return;
-            }
-
             applySettingChanges({
                 systemNotificationsSoundEnabled: event.target.checked,
             });
         },
-        [applySettingChanges, systemNotificationsEnabled]
+        [applySettingChanges]
     );
 
     const handleAutoStartChange = useCallback(
@@ -660,7 +656,7 @@ export const Settings = ({
     const systemNotificationsControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Enable system notifications"
+                aria-label="Enable desktop notifications"
                 checked={systemNotificationsEnabled}
                 disabled={isLoading}
                 onChange={handleSystemNotificationsChange}
@@ -676,16 +672,15 @@ export const Settings = ({
     const systemNotificationSoundControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Play sound for system notifications"
+                aria-label="Enable sound alerts"
                 checked={systemNotificationsSoundEnabled}
-                disabled={isLoading || !systemNotificationsEnabled}
+                disabled={isLoading}
                 onChange={handleSystemNotificationSoundChange}
             />
         ),
         [
             handleSystemNotificationSoundChange,
             isLoading,
-            systemNotificationsEnabled,
             systemNotificationsSoundEnabled,
         ]
     );

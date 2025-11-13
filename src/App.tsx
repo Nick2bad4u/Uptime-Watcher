@@ -11,6 +11,7 @@ import type { StatusUpdate } from "@shared/types";
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
+import { ensureError } from "@shared/utils/errorHandling";
 import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
 import { isRecord } from "@shared/utils/typeHelpers";
 import {
@@ -48,6 +49,7 @@ import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
 import { logger } from "./services/logger";
 import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
+import { useAlertStore } from "./stores/alerts/useAlertStore";
 import { ErrorBoundary } from "./stores/error/ErrorBoundary";
 import { useErrorStore } from "./stores/error/useErrorStore";
 import { useSettingsStore } from "./stores/settings/useSettingsStore";
@@ -183,12 +185,12 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     // Sites store
     // Settings store - store is initialized via the initialization effect below
     // Store subscription happens automatically when store is accessed
-    const systemNotificationPreferences = useSettingsStore(
+    const systemNotificationsEnabled = useSettingsStore(
+        useCallback((state) => state.settings.systemNotificationsEnabled, [])
+    );
+    const systemNotificationsSoundEnabled = useSettingsStore(
         useCallback(
-            (state) => ({
-                soundEnabled: state.settings.systemNotificationsSoundEnabled,
-                systemEnabled: state.settings.systemNotificationsEnabled,
-            }),
+            (state) => state.settings.systemNotificationsSoundEnabled,
             []
         )
     );
@@ -240,6 +242,36 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const cacheSyncCleanupRef = useRef<(() => void) | null>(null);
     const syncEventsCleanupRef = useRef<(() => void) | null>(null);
     const sidebarMediaQueryRef = useRef<MediaQueryList | null>(null);
+    const settingsSubscriptionRef = useRef<(() => void) | null>(null);
+    const debugSubscriptionsRef = useRef<Array<() => void>>([]);
+    const settingsUpdateCountRef = useRef(0);
+    const sitesUpdateCountRef = useRef(0);
+    const uiUpdateCountRef = useRef(0);
+    const errorUpdateCountRef = useRef(0);
+    const updatesUpdateCountRef = useRef(0);
+    const alertsUpdateCountRef = useRef(0);
+    const subscribeToSettingsStore = useCallback((): void => {
+        settingsSubscriptionRef.current = useSettingsStore.subscribe(
+            (state) => {
+                settingsUpdateCountRef.current += 1;
+                logger.info("[App:debug] settings store update", {
+                    count: settingsUpdateCountRef.current,
+                    historyLimit: state.settings.historyLimit,
+                    systemNotificationsEnabled:
+                        state.settings.systemNotificationsEnabled,
+                    systemNotificationsSoundEnabled:
+                        state.settings.systemNotificationsSoundEnabled,
+                });
+            }
+        );
+    }, []);
+
+    const cleanupSettingsStoreSubscription = useCallback((): void => {
+        settingsSubscriptionRef.current?.();
+        settingsSubscriptionRef.current = null;
+    }, []);
+
+    useMount(subscribeToSettingsStore, cleanupSettingsStoreSubscription);
 
     const persistSidebarPreference = useCallback(
         (nextOpen: boolean): void => {
@@ -312,6 +344,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
      * @throws Error When store initialization fails
      */
     const initializeApp = useCallback(async () => {
+        logger.debug("[App:init] initializeApp invoked");
         if (isProduction()) {
             logger.app.started();
         }
@@ -332,7 +365,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         // Initialize stores sequentially to avoid state conflicts during startup
         const initializeSettings = settingsStore?.initializeSettings;
         if (typeof initializeSettings === "function") {
+            logger.debug("[App:init] invoking settings initialize");
             await initializeSettings.call(settingsStore);
+            logger.debug("[App:init] settings initialized");
         } else {
             warnMissingImplementation(
                 "Settings store missing initializeSettings implementation during app bootstrap"
@@ -340,6 +375,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         }
 
         try {
+            logger.debug(
+                "[App:init] initializing notification preference bridge"
+            );
             await NotificationPreferenceService.initialize();
         } catch (error) {
             logger.warn(
@@ -348,11 +386,19 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             );
         }
 
+        logger.debug(
+            "[App:init] running initial notification preference synchronization"
+        );
         await synchronizeNotificationPreferences();
+        logger.debug(
+            "[App:init] initial notification preference synchronization completed"
+        );
 
         const initializeSites = sitesStore?.initializeSites;
         if (typeof initializeSites === "function") {
+            logger.debug("[App:init] invoking sites initialize");
             await initializeSites.call(sitesStore);
+            logger.debug("[App:init] sites initialized");
         } else {
             warnMissingImplementation(
                 "Sites store missing initializeSites implementation during app bootstrap"
@@ -361,15 +407,19 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
         // Set up cache synchronization with backend and store cleanup
         // function
+        logger.debug("[App:init] setting up cache synchronization");
         // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
         const cacheSyncCleanup = setupCacheSync();
+        logger.debug("[App:init] cache synchronization enabled");
         cacheSyncCleanupRef.current = cacheSyncCleanup;
 
         // Subscribe to state sync events
         const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
 
         if (typeof subscribeToSyncEvents === "function") {
+            logger.debug("[App:init] subscribing to sync events");
             syncEventsCleanupRef.current = subscribeToSyncEvents();
+            logger.debug("[App:init] sync events subscription established");
         } else {
             warnMissingImplementation(
                 "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
@@ -380,6 +430,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
 
         if (typeof subscribeToStatusUpdates === "function") {
+            logger.debug("[App:init] subscribing to status updates");
             const subscriptionResult = (await subscribeToStatusUpdates(
                 (update: StatusUpdate) => {
                     enqueueAlertFromStatusUpdate(update);
@@ -388,6 +439,7 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             )) as StatusUpdateSubscriptionSummary | undefined;
 
             reportSubscriptionDiagnostics(subscriptionResult);
+            logger.debug("[App:init] status updates subscription completed");
         } else {
             warnMissingImplementation(
                 "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
@@ -395,7 +447,18 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         }
 
         // Mark initialization as complete to enable loading overlay for future operations
+        logger.debug(
+            "[App:init] initialization pipeline finished, marking initialized"
+        );
         setIsInitialized(true);
+        logger.info("[App:init] store update counts after initialization", {
+            alertUpdates: alertsUpdateCountRef.current,
+            errorUpdates: errorUpdateCountRef.current,
+            settingsUpdates: settingsUpdateCountRef.current,
+            siteUpdates: sitesUpdateCountRef.current,
+            uiUpdates: uiUpdateCountRef.current,
+            updatesStoreUpdates: updatesUpdateCountRef.current,
+        });
     }, []);
 
     /**
@@ -436,14 +499,132 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
 
     useMount(initializeApp, cleanupApp);
 
+    const subscribeToDebugStores = useCallback((): void => {
+        const nextSubscriptions: Array<() => void> = [];
+
+        const isUnsubscribeContainer = (
+            candidate: unknown
+        ): candidate is { unsubscribe: () => void } => {
+            if (!isRecord(candidate)) {
+                return false;
+            }
+
+            const unsubscribe = candidate["unsubscribe"];
+            return typeof unsubscribe === "function";
+        };
+
+        const registerSubscription = (
+            unsubscribeCandidate: unknown,
+            storeIdentifier: string
+        ): void => {
+            if (typeof unsubscribeCandidate === "function") {
+                const candidate = unsubscribeCandidate as () => void;
+                nextSubscriptions.push(candidate);
+                return;
+            }
+
+            if (isUnsubscribeContainer(unsubscribeCandidate)) {
+                const unsubscribe = unsubscribeCandidate["unsubscribe"];
+                nextSubscriptions.push(() => {
+                    unsubscribe.call(unsubscribeCandidate);
+                });
+                return;
+            }
+
+            logger.warn(
+                "[App:debug] store subscribe did not return a callable unsubscribe",
+                {
+                    storeIdentifier,
+                    type: typeof unsubscribeCandidate,
+                }
+            );
+        };
+
+        const sitesUnsubscribe = useSitesStore.subscribe((state) => {
+            sitesUpdateCountRef.current += 1;
+            logger.info("[App:debug] sites store update", {
+                count: sitesUpdateCountRef.current,
+                siteCount: state.sites.length,
+            });
+        });
+        registerSubscription(sitesUnsubscribe, "sites");
+
+        const uiUnsubscribe = useUIStore.subscribe((state) => {
+            uiUpdateCountRef.current += 1;
+            logger.info("[App:debug] ui store update", {
+                count: uiUpdateCountRef.current,
+                showAddSiteModal: state.showAddSiteModal,
+                showSettings: state.showSettings,
+                showSiteDetails: state.showSiteDetails,
+            });
+        });
+        registerSubscription(uiUnsubscribe, "ui");
+
+        const errorUnsubscribe = useErrorStore.subscribe((state) => {
+            errorUpdateCountRef.current += 1;
+            logger.info("[App:debug] error store update", {
+                count: errorUpdateCountRef.current,
+                isLoading: state.isLoading,
+                lastError: state.lastError,
+            });
+        });
+        registerSubscription(errorUnsubscribe, "error");
+
+        const updatesUnsubscribe = useUpdatesStore.subscribe((state) => {
+            updatesUpdateCountRef.current += 1;
+            logger.info("[App:debug] updates store update", {
+                count: updatesUpdateCountRef.current,
+                updateError: state.updateError,
+                updateStatus: state.updateStatus,
+            });
+        });
+        registerSubscription(updatesUnsubscribe, "updates");
+
+        const alertsUnsubscribe = useAlertStore.subscribe((state) => {
+            alertsUpdateCountRef.current += 1;
+            logger.info("[App:debug] alerts store update", {
+                alertCount: state.alerts.length,
+                count: alertsUpdateCountRef.current,
+            });
+        });
+        registerSubscription(alertsUnsubscribe, "alerts");
+
+        debugSubscriptionsRef.current = nextSubscriptions;
+    }, []);
+
+    const cleanupDebugStoreSubscriptions = useCallback((): void => {
+        debugSubscriptionsRef.current.forEach((unsubscribe, index) => {
+            if (typeof unsubscribe !== "function") {
+                logger.warn(
+                    "[App:debug] encountered a non-function during debug subscription cleanup",
+                    { index, type: typeof unsubscribe }
+                );
+                return;
+            }
+
+            try {
+                unsubscribe();
+            } catch (error) {
+                logger.error(
+                    "[App:debug] failed to unsubscribe from store",
+                    ensureError(error)
+                );
+            }
+        });
+        debugSubscriptionsRef.current = [];
+    }, []);
+
+    useMount(subscribeToDebugStores, cleanupDebugStoreSubscriptions);
+
     useEffect(
         function syncNotificationPreferencesEffect(): void {
+            logger.debug("[App:syncNotifEffect] triggered", {
+                soundEnabled: systemNotificationsSoundEnabled,
+                systemEnabled: systemNotificationsEnabled,
+            });
             void synchronizeNotificationPreferences();
         },
-        [
-            systemNotificationPreferences.soundEnabled,
-            systemNotificationPreferences.systemEnabled,
-        ]
+        [systemNotificationsEnabled, systemNotificationsSoundEnabled]
     );
 
     // Focus-based state synchronization (disabled by default for performance)

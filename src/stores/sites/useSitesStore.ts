@@ -74,9 +74,11 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create state actions
         const stateActions = createSitesStateActions(
             (updater) => {
-                set((storeState) => updater(storeState as SitesState));
+                set((storeState) =>
+                    updater(storeState as unknown as SitesState)
+                );
             },
-            () => get() as SitesState
+            () => get() as unknown as SitesState
         );
 
         // Shared getSites function - eliminates duplication and improves
@@ -94,8 +96,14 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
 
         // Create monitoring actions
         const monitoringActions = createSiteMonitoringActions({
+            clearOptimisticMonitoringLocks:
+                stateActions.clearOptimisticMonitoringLocks,
             getSites,
+            getOptimisticMonitoringLocks: () =>
+                (get() as unknown as SitesState).optimisticMonitoringLocks,
             monitoringService: MonitoringService,
+            registerMonitoringLock:
+                stateActions.registerOptimisticMonitoringLock,
             setSites: stateActions.setSites,
         });
 

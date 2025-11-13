@@ -172,29 +172,35 @@ export async function waitForAppInitialization(
     // Wait for DOM content to load
     await page.waitForLoadState("domcontentloaded");
 
-    // Wait for the React root element to be visible
-    await page
-        .getByTestId("app-root")
-        .waitFor({ state: "visible", timeout })
+    const appContainer = page.getByTestId("app-container");
+
+    await appContainer
+        .waitFor({ state: "attached", timeout })
         .catch(() => undefined);
 
-    // Wait for the React app to mount and render content
+    await expect(appContainer).toBeVisible({ timeout });
+
+    // Wait for the core dashboard region to render either the list or empty state
     await page.waitForFunction(
         () => {
-            const root = document.querySelector('[data-testid="app-root"]');
-            if (!root) {
+            const container = document.querySelector(
+                '[data-testid="app-container"]'
+            );
+            if (!container) {
                 return false;
             }
 
-            return (root.textContent ?? "").trim().length > 0;
+            const hasSiteList = Boolean(
+                container.querySelector('[data-testid="site-list"]')
+            );
+            const hasEmptyState = Boolean(
+                container.querySelector('[data-testid="empty-state"]')
+            );
+
+            return hasSiteList || hasEmptyState;
         },
         { timeout }
     );
-
-    // Wait for the app container to be visible
-    await expect(page.getByTestId("app-container")).toBeVisible({
-        timeout,
-    });
 
     // Additional wait for React hydration and state initialization
     await page.waitForFunction(() => document.readyState === "complete", {
@@ -258,15 +264,24 @@ export async function removeAllSites(page: Page): Promise<void> {
  *
  * @remarks
  * Clears both local and session storage to discard any persisted Zustand store
- * snapshots before reloading the renderer window. After the reload completes,
- * the helper invokes {@link removeAllSites} to guarantee that the dashboard
- * starts without any persisted site records unless the tests are running with
- * an isolated userData directory (where the database is already empty).
+ * snapshots before refreshing the renderer context. When the tests reuse the
+ * real Electron profile (the environment variable `PLAYWRIGHT_USER_DATA_DIR` is
+ * not set) the helper reloads the window and removes any persisted sites to
+ * guarantee an empty dashboard.
+ *
+ * For the default Playwright flow—where the Electron helper provisions an
+ * isolated userData directory per run—the helper now avoids forcing a reload.
+ * Reloading in headless Electron intermittently closes the window before the
+ * renderer is ready, so the helper simply waits for the application to finish
+ * bootstrapping after clearing storage.
  *
  * @param page - The Playwright page bound to the primary renderer window.
  */
 export async function resetApplicationState(page: Page): Promise<void> {
     await page.waitForLoadState("domcontentloaded");
+
+    const usingIsolatedUserData =
+        typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] === "string";
 
     await page.evaluate(() => {
         try {
@@ -288,13 +303,18 @@ export async function resetApplicationState(page: Page): Promise<void> {
         }
     });
 
-    await page.reload({ waitUntil: "domcontentloaded" });
-    if (typeof process.env["PLAYWRIGHT_USER_DATA_DIR"] !== "string") {
+    if (page.isClosed()) {
+        return;
+    }
+
+    if (!usingIsolatedUserData) {
+        await page.reload({ waitUntil: "domcontentloaded" });
         await removeAllSites(page);
         return;
     }
 
     await waitForAppInitialization(page);
+    await ensureCleanUIState(page).catch(() => undefined);
 }
 
 /**
@@ -405,7 +425,11 @@ export async function createSiteViaModal(
     const expectedSiteCount = existingSiteCount + 1;
     let siteCountMatched = false;
     try {
-        await waitForMonitorCount(page, expectedSiteCount, WAIT_TIMEOUTS.LONG);
+        await waitForMonitorCount(
+            page,
+            expectedSiteCount,
+            WAIT_TIMEOUTS.MEDIUM
+        );
         siteCountMatched = true;
     } catch (error) {
         console.warn(
@@ -690,7 +714,7 @@ export async function openSiteDetails(
     await page
         .getByRole("dialog", { name: "Site details" })
         .getByText("Site Actions", { exact: true })
-        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.LONG })
+        .waitFor({ state: "visible", timeout: WAIT_TIMEOUTS.SHORT })
         .catch(() => undefined);
 }
 

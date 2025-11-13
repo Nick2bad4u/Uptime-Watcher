@@ -14,6 +14,22 @@ import type {
 } from "../types";
 
 /**
+ * Generates a stable monitor identifier matching the expected test format.
+ *
+ * @returns Monitor identifier in the form `test-monitor-XXXXXXXXX` where X is
+ *   lowercase alphanumeric.
+ */
+const generateMonitorIdentifier = (): string => {
+    const randomSegment = Math.random().toString(36).slice(2);
+    const normalizedSegment =
+        randomSegment.length >= 9
+            ? randomSegment.slice(0, 9)
+            : randomSegment.padEnd(9, "0");
+
+    return `test-monitor-${normalizedSegment}`;
+};
+
+/**
  * Creates a complete Monitor object with all required properties filled.
  *
  * @example
@@ -34,7 +50,7 @@ export const createValidMonitor = (
     checkInterval: 30_000,
     history: [],
     host: "example.com",
-    id: `test-monitor-${Math.random().toString(36).slice(2, 11)}`,
+    id: generateMonitorIdentifier(),
     lastChecked: new Date(),
     monitoring: true,
     port: 80,

@@ -9,10 +9,6 @@
     inset-inline-end: var(--spacing-3xl, 2.5rem);
     max-inline-size: 90vi;
     pointer-events: none;
-
-    & output {
-        pointer-events: auto;
-    }
 }
 
 .status-alert {
@@ -27,6 +23,7 @@
     color: var(--color-text-primary, #0f172a);
     gap: var(--spacing-md, 1rem);
     grid-template-columns: auto 1fr auto;
+    pointer-events: none;
 
     @media (prefers-color-scheme: light) {
         background-color: var(--color-surface-light, rgb(255 255 255 / 96%));
@@ -101,6 +98,7 @@
     color: inherit;
     inline-size: 1.75rem;
     transition: transform 150ms ease;
+    pointer-events: auto;
 
     @media screen and (prefers-reduced-motion: reduce) {
         display: flex;
@@ -114,6 +112,7 @@
         color: inherit;
         inline-size: 1.75rem;
         transition: none;
+        pointer-events: auto;
     }
 
     &:focus-visible,

@@ -20,6 +20,7 @@ import type {
     StatusUpdateSubscriptionSummary,
     StatusUpdateUnsubscribeResult,
 } from "./baseTypes";
+import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
 
 /**
  * Sites store actions interface for managing site operations.
@@ -175,6 +176,8 @@ export interface SitesActions {
 export interface SitesState {
     /** Most recent backend synchronization delta summary. */
     lastSyncDelta: SiteSyncDelta | undefined;
+    /** Active optimistic monitoring locks keyed by site and monitor identifier. */
+    optimisticMonitoringLocks: Record<string, OptimisticMonitoringLock>;
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */

@@ -2,8 +2,8 @@
  * Basic tests for AddSiteForm component
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi, afterEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import React from "react";
 
@@ -121,8 +121,28 @@ vi.mock("../../../theme/components", () => ({
 // Import the component under test
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
+let activeRenderCleanup: (() => void) | null = null;
+
+const renderForm = async (): Promise<void> => {
+    activeRenderCleanup?.();
+    const view = render(<AddSiteForm />);
+    activeRenderCleanup = () => {
+        view.unmount();
+    };
+    await waitFor(() => {
+        expect(
+            screen.getByRole("button", { name: /add/i })
+        ).toBeInTheDocument();
+    });
+};
+
 describe(AddSiteForm, () => {
-    it("should render without crashing", ({ task, annotate }) => {
+    afterEach(() => {
+        activeRenderCleanup?.();
+        activeRenderCleanup = null;
+    });
+
+    it("should render without crashing", async ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: AddSiteForm", "component");
         annotate("Category: Component", "category");
@@ -133,14 +153,14 @@ describe(AddSiteForm, () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        render(<AddSiteForm />);
+        await renderForm();
         // Check for the submit button which is definitely in the DOM
         expect(
             screen.getByRole("button", { name: "Add Monitor" })
         ).toBeInTheDocument();
     });
 
-    it("should render form elements", ({ task, annotate }) => {
+    it("should render form elements", async ({ task, annotate }) => {
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: AddSiteForm", "component");
         annotate("Category: Component", "category");
@@ -151,7 +171,7 @@ describe(AddSiteForm, () => {
         annotate("Category: Component", "category");
         annotate("Type: Business Logic", "type");
 
-        render(<AddSiteForm />);
+        await renderForm();
         expect(screen.getByRole("radiogroup")).toBeInTheDocument();
         expect(
             screen.getByTestId("dynamic-monitor-fields")

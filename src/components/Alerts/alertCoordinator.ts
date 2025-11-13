@@ -228,12 +228,20 @@ export const enqueueAlertFromStatusUpdate = (
 export const synchronizeNotificationPreferences = async (): Promise<void> => {
     const { settings } = useSettingsStore.getState();
 
+    logger.debug("[AlertCoordinator] synchronizing notification preferences", {
+        soundEnabled: settings.systemNotificationsSoundEnabled,
+        systemEnabled: settings.systemNotificationsEnabled,
+    });
+
     try {
         await NotificationPreferenceService.updatePreferences({
             systemNotificationsEnabled: settings.systemNotificationsEnabled,
             systemNotificationsSoundEnabled:
                 settings.systemNotificationsSoundEnabled,
         });
+        logger.debug(
+            "[AlertCoordinator] notification preferences synchronized"
+        );
     } catch (error) {
         logger.error(
             "Failed to synchronize notification preferences",

@@ -169,6 +169,8 @@ const config: PlaywrightTestConfig = defineConfig({
 
     // Timeout and retry configuration
     timeout: 20 * 1000, // 20 seconds per test
+    workerTeardownTimeout: 60 * 1000, // Gracefully allow Electron more time to close between tests
+    workerProcessExitTimeout: 60 * 1000, // Extend process shutdown window for Electron workers
 
     // TypeScript configuration
     /**

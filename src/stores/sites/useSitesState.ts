@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site } from "@shared/types";
 import type { SiteSyncDelta } from "@shared/types/stateSync";
 import type { Simplify } from "type-fest";
 
@@ -16,6 +16,10 @@ import {
 } from "@shared/validation/siteIntegrity";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+import {
+    buildMonitoringLockKey,
+    type OptimisticMonitoringLock,
+} from "./utils/optimisticMonitoringLock";
 
 import { logger } from "../../services/logger";
 import { logStoreAction } from "../utils";
@@ -32,6 +36,9 @@ import { logStoreAction } from "../utils";
 export interface SitesState {
     /** Most recent synchronization delta captured from state sync events. */
     lastSyncDelta: SiteSyncDelta | undefined;
+    /** Active optimistic monitoring locks for monitors keyed by site and monitor
+id. */
+    optimisticMonitoringLocks: Record<string, OptimisticMonitoringLock>;
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
     /** Currently selected site identifier */
@@ -52,6 +59,11 @@ export interface SitesState {
  * @public
  */
 export interface SitesStateActions {
+    /** Clear optimistic monitoring locks for the provided monitors. */
+    clearOptimisticMonitoringLocks: (
+        siteIdentifier: string,
+        monitorIds: readonly string[]
+    ) => void;
     /** Add a site to the store */
     addSite: (site: Site) => void;
     /** Get selected monitor ID for a site */
@@ -60,6 +72,13 @@ export interface SitesStateActions {
     getSelectedSite: () => Site | undefined;
     /** Record the latest site synchronization delta */
     recordSiteSyncDelta: (delta: SiteSyncDelta | undefined) => void;
+    /** Register optimistic monitoring locks for monitors. */
+    registerOptimisticMonitoringLock: (
+        siteIdentifier: string,
+        monitorIds: readonly string[],
+        monitoring: boolean,
+        durationMs: number
+    ) => void;
     /** Remove a site from the store */
     removeSite: (identifier: string) => void;
     /** Select a site for focused operations and UI display */
@@ -100,6 +119,29 @@ export const createSitesStateActions = (
     set: (function_: (state: SitesState) => Partial<SitesState>) => void,
     get: () => SitesState
 ): SitesStateActions => ({
+    clearOptimisticMonitoringLocks: (
+        siteIdentifier: string,
+        monitorIds: readonly string[]
+    ): void => {
+        if (monitorIds.length === 0) {
+            return;
+        }
+
+        set((state) => {
+            const currentLocks = { ...state.optimisticMonitoringLocks };
+            let changed = false;
+
+            for (const monitorId of monitorIds) {
+                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+                if (currentLocks[key] !== undefined) {
+                    delete currentLocks[key];
+                    changed = true;
+                }
+            }
+
+            return changed ? { optimisticMonitoringLocks: currentLocks } : {};
+        });
+    },
     addSite: (site: Site): void => {
         logStoreAction("SitesStore", "addSite", { site });
         set((state) => ({ sites: [...state.sites, site] }));
@@ -126,6 +168,62 @@ export const createSitesStateActions = (
             updatedCount: delta?.updatedSites.length ?? 0,
         });
         set(() => ({ lastSyncDelta: delta }));
+    },
+    registerOptimisticMonitoringLock: (
+        siteIdentifier: string,
+        monitorIds: readonly string[],
+        monitoring: boolean,
+        durationMs: number
+    ): void => {
+        if (monitorIds.length === 0) {
+            return;
+        }
+
+        const expiresAt = Date.now() + Math.max(durationMs, 0);
+
+        set((state) => {
+            const optimisticMonitoringLocks = {
+                ...state.optimisticMonitoringLocks,
+            };
+
+            for (const monitorId of monitorIds) {
+                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+                optimisticMonitoringLocks[key] = {
+                    expiresAt,
+                    monitoring,
+                } satisfies OptimisticMonitoringLock;
+            }
+
+            return { optimisticMonitoringLocks };
+        });
+
+        if (durationMs > 0) {
+            globalThis.setTimeout(() => {
+                const now = Date.now();
+                set((state) => {
+                    const currentLocks = {
+                        ...state.optimisticMonitoringLocks,
+                    };
+                    let changed = false;
+
+                    for (const monitorId of monitorIds) {
+                        const key = buildMonitoringLockKey(
+                            siteIdentifier,
+                            monitorId
+                        );
+                        const lock = currentLocks[key];
+                        if (lock && lock.expiresAt <= now) {
+                            delete currentLocks[key];
+                            changed = true;
+                        }
+                    }
+
+                    return changed
+                        ? { optimisticMonitoringLocks: currentLocks }
+                        : {};
+                });
+            }, durationMs + 25);
+        }
     },
     removeSite: (identifier: string): void => {
         logStoreAction("SitesStore", "removeSite", { identifier });
@@ -194,9 +292,64 @@ export const createSitesStateActions = (
 
         logStoreAction("SitesStore", "setSites", { count: sites.length });
 
+        const locks = get().optimisticMonitoringLocks;
+        const lockEntries = Object.entries(locks);
+
+        const now = Date.now();
+        const expiredLockKeys: string[] = [];
+        let sitesMutated = false;
+
+        const normalizedSites =
+            lockEntries.length === 0
+                ? sites
+                : sites.map((site) => {
+                      let siteMutated = false;
+
+                      const normalizedMonitors = site.monitors.map(
+                          (monitor) => {
+                              const lockKey = buildMonitoringLockKey(
+                                  site.identifier,
+                                  monitor.id
+                              );
+                              const lock = locks[lockKey];
+
+                              if (!lock) {
+                                  return monitor;
+                              }
+
+                              if (lock.expiresAt <= now) {
+                                  expiredLockKeys.push(lockKey);
+                                  return monitor;
+                              }
+
+                              if (monitor.monitoring === lock.monitoring) {
+                                  return monitor;
+                              }
+
+                              siteMutated = true;
+                              return {
+                                  ...monitor,
+                                  monitoring: lock.monitoring,
+                              } satisfies Monitor;
+                          }
+                      );
+
+                      if (!siteMutated) {
+                          return site;
+                      }
+
+                      sitesMutated = true;
+                      return {
+                          ...site,
+                          monitors: normalizedMonitors,
+                      } satisfies Site;
+                  });
+
+        const sitesForState = sitesMutated ? normalizedSites : sites;
+
         set((state) => {
             const validIdentifiers = new Set(
-                sites.map((site) => site.identifier)
+                sitesForState.map((site) => site.identifier)
             );
 
             const nextSelectedSiteIdentifier =
@@ -206,7 +359,7 @@ export const createSitesStateActions = (
                     : undefined;
 
             const siteLookup = new Map(
-                sites.map((site) => [site.identifier, site] as const)
+                sitesForState.map((site) => [site.identifier, site] as const)
             );
 
             const nextSelectedMonitorIds: Record<string, string> = {};
@@ -228,10 +381,21 @@ export const createSitesStateActions = (
                 }
             }
 
+            let optimisticMonitoringLocks = state.optimisticMonitoringLocks;
+            if (expiredLockKeys.length > 0) {
+                optimisticMonitoringLocks = {
+                    ...optimisticMonitoringLocks,
+                };
+                for (const key of expiredLockKeys) {
+                    delete optimisticMonitoringLocks[key];
+                }
+            }
+
             return {
+                optimisticMonitoringLocks,
                 selectedMonitorIds: nextSelectedMonitorIds,
                 selectedSiteIdentifier: nextSelectedSiteIdentifier,
-                sites,
+                sites: sitesForState,
             };
         });
     },
@@ -255,6 +419,7 @@ export const createSitesStateActions = (
  */
 export const initialSitesState: SitesState = {
     lastSyncDelta: undefined,
+    optimisticMonitoringLocks: {},
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],

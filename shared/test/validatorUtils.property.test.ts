@@ -354,12 +354,12 @@ describe("Validator Utils Property-Based Tests", () => {
         });
 
         it("should reject URLs ending with a bare scheme delimiter", () => {
-            expect(isValidUrl("https://example.com://")).toBe(false);
+            expect(isValidUrl("https://example.com://")).toBeFalsy();
         });
 
         it("should reject URLs with nested scheme fragments after the authority", () => {
-            expect(isValidUrl("https://http://foo")).toBe(false);
-            expect(isValidUrl("http://https://bar/baz")).toBe(false);
+            expect(isValidUrl("https://http://foo")).toBeFalsy();
+            expect(isValidUrl("http://https://bar/baz")).toBeFalsy();
         });
     });
 

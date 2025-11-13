@@ -3,31 +3,14 @@
  * component behavior and interface structure
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import {
-    describe,
-    expect,
-    it,
-    vi,
-    beforeEach,
-    beforeAll,
-    afterAll,
-} from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test, fc } from "@fast-check/vitest";
 
-import {
-    suppressReactActWarnings,
-    restoreConsoleError,
-} from "../../setup/react-act-suppression";
+// Ensure the hook is mocked correctly instead of suppressing React warnings.
 
-// Use vi.doMock for better mock handling
-vi.doMock("../../../components/SiteDetails/useAddSiteForm", () => {
-    const mockUseAddSiteForm = vi.fn();
-    return {
-        useAddSiteForm: mockUseAddSiteForm,
-    };
-});
+// No-op: we use hoisted vi.fn() + vi.mock below to ensure our mock is sensitive to hoisting
 
 // Mock the useAddSiteForm hook using vi.hoisted - keeping as backup
 const mockUseAddSiteForm = vi.hoisted(() => vi.fn());
@@ -38,15 +21,27 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
 
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
+/**
+ * Render helper that ensures any asynchronous React updates triggered by
+ * mount-time effects are flushed inside act().
+ */
+let activeRenderCleanup: (() => void) | null = null;
+
+const renderForm = async (): Promise<void> => {
+    activeRenderCleanup?.();
+    const view = render(<AddSiteForm />);
+    activeRenderCleanup = () => {
+        view.unmount();
+    };
+    // Ensure any mount-time effects have run
+    await waitFor(() => {
+        expect(screen.getByRole("form")).toBeInTheDocument();
+    });
+};
+
 // Suppress React act() warnings for this test suite since vi.mock() fails to intercept hook calls
 // but the real hook implementation uses proper useEffect patterns
-beforeAll(() => {
-    suppressReactActWarnings();
-});
-
-afterAll(() => {
-    restoreConsoleError();
-});
+// no beforeAll / afterAll hook - warnings should not be necessary with proper mocks
 
 // Mock stores
 vi.mock("../../../stores/useErrorStore", () => ({
@@ -246,8 +241,13 @@ describe("AddSiteForm Comprehensive Tests", () => {
         mockUseAddSiteForm.mockReturnValue(mockFormHook);
     });
 
+    afterEach(() => {
+        activeRenderCleanup?.();
+        activeRenderCleanup = null;
+    });
+
     describe("Initial Render - New Mode", () => {
-        it("renders all required fields for new site mode", ({
+        it("renders all required fields for new site mode", async ({
             task,
             annotate,
         }) => {
@@ -261,7 +261,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Mode selector
             expect(screen.getByRole("radiogroup")).toBeInTheDocument();
@@ -293,7 +293,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("displays site identifier in new mode", ({ task, annotate }) => {
+        it("displays site identifier in new mode", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -304,13 +307,16 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(screen.getByText("Site Identifier:")).toBeInTheDocument();
             expect(screen.getByText("test-site-id")).toBeInTheDocument();
         });
 
-        it("renders HTTP monitor fields by default", ({ task, annotate }) => {
+        it("renders HTTP monitor fields by default", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -321,7 +327,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Monitoring", "type");
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(
                 screen.getByRole("textbox", { name: /url/i })
@@ -349,7 +355,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const existingModeRadio = screen.getByRole("radio", {
                 name: /add to existing site/i,
@@ -359,7 +365,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             expect(mockFormHook.setAddMode).toHaveBeenCalledWith("existing");
         });
 
-        it("renders existing site mode fields", ({ task, annotate }) => {
+        it("renders existing site mode fields", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -373,7 +379,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.addMode = "existing";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Should have site selector instead of site name
             expect(
@@ -407,7 +413,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const nameInput = screen.getByRole("textbox", {
                 name: /site name/i,
@@ -438,7 +444,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const monitorTypeSelect = screen.getByRole("combobox", {
                 name: /monitor type/i,
@@ -464,7 +470,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const checkIntervalSelect = screen.getByRole("combobox", {
                 name: /check interval/i,
@@ -476,7 +482,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Monitor Type Specific Fields", () => {
-        it("renders HTTP monitor fields", ({ task, annotate }) => {
+        it("renders HTTP monitor fields", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -490,7 +496,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.monitorType = "http";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(
                 screen.getByRole("textbox", { name: /url/i })
@@ -500,7 +506,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             ).toBeInTheDocument();
         });
 
-        it("renders port monitor fields", ({ task, annotate }) => {
+        it("renders port monitor fields", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -514,7 +520,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.monitorType = "port";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(
                 screen.getByRole("textbox", { name: /host/i })
@@ -526,7 +532,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Form Validation", () => {
-        it("shows add button as enabled when form is valid", ({
+        it("shows add button as enabled when form is valid", async ({
             task,
             annotate,
         }) => {
@@ -543,13 +549,16 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.isFormValid = vi.fn(() => true);
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const addButton = screen.getByRole("button", { name: /add site/i });
             expect(addButton).not.toBeDisabled();
         });
 
-        it("displays error alert when form has error", ({ task, annotate }) => {
+        it("displays error alert when form has error", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -563,12 +572,12 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.formError = "Invalid URL format";
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(screen.getByText("Invalid URL format")).toBeInTheDocument();
         });
 
-        it("does not display error alert when form has no error", ({
+        it("does not display error alert when form has no error", async ({
             task,
             annotate,
         }) => {
@@ -585,7 +594,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             mockFormHook.formError = undefined;
             vi.mocked(useAddSiteForm).mockReturnValue(mockFormHook);
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             expect(screen.queryByRole("alert")).not.toBeInTheDocument();
         });
@@ -608,7 +617,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             const nameInput = screen.getByRole("textbox", {
                 name: /site name/i,
@@ -625,7 +634,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Accessibility", () => {
-        it("has proper ARIA labels", ({ task, annotate }) => {
+        it("has proper ARIA labels", async ({ task, annotate }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -636,7 +645,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
             annotate("Category: Component", "category");
             annotate("Type: Business Logic", "type");
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Check for proper ARIA labels - match the actual rendered text
             expect(
@@ -663,7 +672,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
 
             const user = userEvent.setup();
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Get elements to test navigation between
             const nameInput = screen.getByRole("textbox", {
@@ -684,7 +693,10 @@ describe("AddSiteForm Comprehensive Tests", () => {
     });
 
     describe("Performance", () => {
-        it("does not cause unnecessary re-renders", ({ task, annotate }) => {
+        it("does not cause unnecessary re-renders", async ({
+            task,
+            annotate,
+        }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: AddSiteForm.realistic", "component");
             annotate("Category: Component", "category");
@@ -747,7 +759,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 timeout: 30_000,
             }
         )("should handle realistic site configurations", async (config) => {
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Verify realistic input characteristics
             expect(config.siteName.trim().length).toBeGreaterThan(0);
@@ -801,7 +813,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 const siteName = `${scenario.company} ${scenario.service} (${scenario.environment})`;
                 const url = `https://${scenario.service.toLowerCase()}.${scenario.company.toLowerCase()}.com`;
 
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify corporate scenario characteristics
                 expect([
@@ -854,7 +866,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )("should handle regional service configurations", async (config) => {
             const regionalUrl = `${config.protocol}://service-${config.region}.example.com:${config.port}`;
 
-            render(<AddSiteForm />);
+            await renderForm();
 
             // Verify regional config characteristics
             expect([
@@ -892,7 +904,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )(
             "should handle multiple monitoring configurations",
             async (monitorConfigs) => {
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify multiple configurations
                 expect(Array.isArray(monitorConfigs)).toBeTruthy();
@@ -946,7 +958,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )(
             "should handle different user personas and scenarios",
             async (persona) => {
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify persona characteristics
                 expect([
@@ -1001,7 +1013,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )(
             "should handle international and scheduling scenarios",
             async (schedule) => {
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify international characteristics
                 const validTimeZones = [
@@ -1069,7 +1081,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )(
             "should handle different website categories and features",
             async (website) => {
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify website category characteristics
                 expect([
@@ -1148,7 +1160,7 @@ describe("AddSiteForm Comprehensive Tests", () => {
         )(
             "should handle business context and compliance requirements",
             async (business) => {
-                render(<AddSiteForm />);
+                await renderForm();
 
                 // Verify business characteristics
                 expect([

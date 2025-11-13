@@ -147,6 +147,9 @@ class ErrorBoundaryBase extends Component<
         errorInfo: ErrorInfo
     ): void {
         logger.error("Store Error Boundary caught an error", error);
+        logger.error("Store Error Boundary component stack", {
+            componentStack: errorInfo.componentStack,
+        });
 
         // eslint-disable-next-line react/no-set-state -- Required for error boundary functionality
         this.setState({
