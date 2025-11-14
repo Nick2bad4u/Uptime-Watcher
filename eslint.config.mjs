@@ -127,7 +127,6 @@ import pluginPreferArrow from "eslint-plugin-prefer-arrow";
 import pluginPrettier from "eslint-plugin-prettier";
 // @ts-expect-error -- No Types for this Package
 import pluginPromise from "eslint-plugin-promise";
-// eslint-disable-next-line depend/ban-dependencies -- Recommended one sucks
 import pluginReact from "eslint-plugin-react";
 import reactCompiler from "eslint-plugin-react-compiler";
 import eslintReactDom from "eslint-plugin-react-dom";
@@ -1919,7 +1918,15 @@ export default /** @type {EslintConfig} */ [
                 "error",
                 "all",
             ],
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: [
@@ -3234,7 +3241,15 @@ export default /** @type {EslintConfig} */ [
                 "error",
                 "all",
             ],
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: [
@@ -4879,7 +4894,15 @@ export default /** @type {EslintConfig} */ [
                 "error",
                 "all",
             ],
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: [
@@ -6207,7 +6230,15 @@ export default /** @type {EslintConfig} */ [
                 "error",
                 "all",
             ],
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "deprecation/deprecation": "error",
             "dot-notation": "off",
             eqeqeq: [
@@ -8265,7 +8296,15 @@ export default /** @type {EslintConfig} */ [
             "class-methods-use-this": "off",
             complexity: "off",
             "default-case": "off",
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "dot-notation": "off",
             "ex/might-throw": "off",
             "ex/no-unhandled": "warn",
@@ -8868,7 +8907,15 @@ export default /** @type {EslintConfig} */ [
                 },
             ],
             "class-methods-use-this": "off",
-            "depend/ban-dependencies": "error",
+            "depend/ban-dependencies": [
+                "warn",
+                {
+                    allowed: [
+                        "eslint-plugin-react",
+                        "axios",
+                    ],
+                },
+            ],
             "dot-notation": "off",
             "func-style": "off",
             "id-length": "off",

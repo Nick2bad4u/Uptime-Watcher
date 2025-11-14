@@ -181,6 +181,8 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "chartjs-adapter-date-fns",
     "chartjs-plugin-zoom",
     "electron-log/renderer",
+    "expect-type",
+    "fast-deep-equal",
     "msw-storybook-addon",
     "react",
     "react-chartjs-2",
@@ -203,6 +205,7 @@ export const storybookOptimizeDepsInclude: readonly string[] = Object.freeze([
     "storybook/viewport",
     "validator",
     "zustand",
+    "zustand/react/shallow",
     "zustand/middleware",
     "zod",
 ]);

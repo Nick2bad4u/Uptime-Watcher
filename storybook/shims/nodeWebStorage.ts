@@ -53,6 +53,53 @@ const isStorageLike = (candidate: MaybeStorage): candidate is StorageLike => {
     );
 };
 
+const LOCAL_STORAGE_INITIALIZATION_ERROR =
+    "Cannot initialize local storage without a `--localstorage-file` path";
+
+const removePropertyIfConfigurable = (
+    target: object,
+    propertyKey: PropertyKey
+): void => {
+    const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
+    if (!descriptor || descriptor.configurable !== false) {
+        Reflect.deleteProperty(target, propertyKey);
+    }
+};
+
+const readStorageCandidate = (
+    target: object,
+    name: StorageName
+): MaybeStorage => {
+    try {
+        return Reflect.get(target, name) as MaybeStorage;
+    } catch (error: unknown) {
+        if (
+            error instanceof Error &&
+            error.message.includes(LOCAL_STORAGE_INITIALIZATION_ERROR)
+        ) {
+            removePropertyIfConfigurable(target, name);
+            return undefined;
+        }
+
+        throw error;
+    }
+};
+
+const defineStorageProperty = (
+    target: object,
+    name: StorageName,
+    storage: StorageLike
+): void => {
+    const descriptor: PropertyDescriptor = {
+        configurable: true,
+        enumerable: true,
+        value: storage,
+        writable: false,
+    };
+
+    Reflect.defineProperty(target, name, descriptor);
+};
+
 /**
  * In-memory implementation of the Web Storage API used to backfill Node
  * environments.
@@ -115,28 +162,21 @@ const installStorage = (name: StorageName): void => {
         return;
     }
 
-    const existing = Reflect.get(globalThis, name) as MaybeStorage;
+    const existing = readStorageCandidate(globalThis, name);
     if (isStorageLike(existing)) {
         return;
     }
 
     const storage = new MemoryStorage();
 
-    const descriptor: PropertyDescriptor = {
-        configurable: true,
-        enumerable: true,
-        value: storage,
-        writable: false,
-    };
-
-    Reflect.defineProperty(globalThis, name, descriptor);
+    defineStorageProperty(globalThis, name, storage);
 
     const windowCandidate = Reflect.get(globalThis, "window");
     // eslint-disable-next-line sonarjs/different-types-comparison, @typescript-eslint/no-unnecessary-condition -- null check is required for DOM Storage parity
     if (typeof windowCandidate === "object" && windowCandidate !== null) {
-        const maybeStorage = Reflect.get(windowCandidate, name) as MaybeStorage;
+        const maybeStorage = readStorageCandidate(windowCandidate, name);
         if (!isStorageLike(maybeStorage)) {
-            Reflect.defineProperty(windowCandidate, name, descriptor);
+            defineStorageProperty(windowCandidate, name, storage);
         }
     }
 };

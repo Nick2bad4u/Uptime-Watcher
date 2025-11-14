@@ -2,7 +2,7 @@
 name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
-tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'runCommands/getTerminalOutput', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'Tavily-Remote-MCP/tavily_extract', 'Tavily-Remote-MCP/tavily_search', 'deepwiki/*', 'memory/*', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'memory', 'ms-vscode.vscode-websearchforcopilot/websearch', 'todos', 'runSubagent', 'runTests']
+tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'search/fileSearch', 'search/textSearch', 'search/listDirectory', 'search/readFile', 'search/codebase', 'Tavily-Remote-MCP/*', 'deepwiki/*', 'memory/*', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'runCommands/getTerminalOutput', 'runCommands/runInTerminal', 'runTasks/runTask', 'runTasks/getTaskOutput', 'usages', 'problems', 'changes', 'testFailure', 'fetch', 'memory', 'todos', 'runSubagent', 'runTests']
 handoffs:
  - label: Consistency
    agent: BeastMode

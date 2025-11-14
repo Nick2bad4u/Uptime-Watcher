@@ -333,6 +333,25 @@ export default defineConfig(({ mode }) => {
                     vite: {
                         build: {
                             outDir: "dist",
+                            rollupOptions: {
+                                // Externalize all dependencies in main process to prevent bundling
+                                // Node modules, native modules, and Electron internals
+                                external: [
+                                    "electron",
+                                    "electron-updater",
+                                    "electron-log",
+                                    /^node:.*/, // All node: protocol imports
+                                    "bufferutil",
+                                    "utf-8-validate",
+                                    "ws",
+                                    "axios",
+                                    "form-data",
+                                    "lodash",
+                                    "lodash-es",
+                                    "es-set-tostringtag",
+                                    "get-intrinsic",
+                                ],
+                            },
                             sourcemap: true, // Enable sourcemaps for main process
                             target: VITE_BUILD_TARGET, // Ensure CSS Modules compatibility
                         },

@@ -258,7 +258,8 @@
     text-transform: uppercase;
 }
 
-.settings-field__helper {
+.settings-field__helper,
+.settings-alert-volume-control__note {
     color: var(--color-text-tertiary);
     line-height: 1.375;
 }
@@ -280,11 +281,6 @@
     font-variant-numeric: tabular-nums;
     min-inline-size: 2.5rem;
     text-align: end;
-}
-
-.settings-alert-volume-control__note {
-    color: var(--color-text-tertiary);
-    line-height: 1.375;
 }
 
 .settings-theme-preview {

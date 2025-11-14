@@ -6,6 +6,7 @@
  */
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import { playwright } from "@vitest/browser-playwright";
 import path from "node:path";
 import {
     defineConfig,
@@ -62,7 +63,7 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                         browser: "chromium",
                     },
                 ],
-                provider: "playwright" as any, // Cast: Vitest browser provider typings lag behind Storybook plugin support.
+                provider: playwright(),
             },
             // Cast: Coverage V8 typings omit several runtime-supported flags used by Storybook.
             coverage: {
@@ -91,7 +92,6 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                     classNameStrategy: "stable",
                 },
             },
-            environment: "browser",
             globals: true,
             isolate: true,
             name: {
