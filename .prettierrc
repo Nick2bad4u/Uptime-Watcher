@@ -101,7 +101,10 @@
             "options": {
                 "plugins": [
                     "prettier-plugin-sort-json",
-                    "prettier-plugin-jsdoc"
+                    "prettier-plugin-multiline-arrays",
+                    "prettier-plugin-jsdoc",
+                    "prettier-markdown-table",
+                    "prettier-plugin-merge"
                 ],
                 "tabWidth": 1
             }
@@ -115,6 +118,16 @@
                 ],
                 "printWidth": 100,
                 "tabWidth": 2
+            }
+        },
+        {
+            "files": "*.toml",
+            "options": {
+                "plugins": [
+                    "prettier-plugin-toml"
+                ],
+                "printWidth": 120,
+                "tabWidth": 4
             }
         },
         {
@@ -132,14 +145,27 @@
                 "cache.test.ts"
             ],
             "options": {
+                "alignComments": true,
+                "alignEntries": true,
+                "allowedBlankLines": 1,
+                "arrayAutoCollapse": false,
+                "arrayAutoExpand": true,
+                "compactArrays": false,
+                "compactEntries": false,
+                "compactInlineTables": false,
+                "indentEntries": true,
+                "indentTables": true,
                 "plugins": [
                     "prettier-plugin-multiline-arrays",
                     "prettier-plugin-jsdoc"
-                ]
+                ],
+                "reorderKeys": true
             }
         }
     ],
     "plugins": [
+        "@softonus/prettier-plugin-duplicate-remover",
+        "prettier-plugin-sh",
         "prettier-plugin-packagejson",
         "prettier-plugin-properties",
         "prettier-plugin-ini",

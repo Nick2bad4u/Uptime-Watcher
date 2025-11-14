@@ -107,6 +107,7 @@ export const createSitesStoreMock = (
         updateMonitorTimeout: asyncVoid(),
         updateSiteCheckInterval: asyncVoid(),
         lastSyncDelta: undefined,
+        optimisticMonitoringLocks: {},
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
         sites: [],

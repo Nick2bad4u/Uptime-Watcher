@@ -12,6 +12,8 @@ import type { Monitor, Site, StatusUpdate } from "@shared/types";
 
 import { ensureError, withErrorHandling } from "@shared/utils/errorHandling";
 
+import type { OptimisticMonitoringLock } from "./utils/optimisticMonitoringLock";
+
 import { logger } from "../../services/logger";
 import { MonitoringService } from "../../services/MonitoringService";
 import { logStoreAction } from "../utils";
@@ -56,11 +58,6 @@ export interface SiteMonitoringActions {
  * @public
  */
 export interface SiteMonitoringDependencies {
-    /** Clears optimistic monitoring locks for the provided monitors. */
-    clearOptimisticMonitoringLocks?: (
-        siteIdentifier: string,
-        monitorIds: readonly string[]
-    ) => void;
     /**
      * Applies status update snapshots to the current sites collection.
      *
@@ -72,6 +69,16 @@ export interface SiteMonitoringDependencies {
         sites: Site[],
         update: StatusUpdateSnapshotPayload
     ) => Site[];
+    /** Clears optimistic monitoring locks for the provided monitors. */
+    clearOptimisticMonitoringLocks?: (
+        siteIdentifier: string,
+        monitorIds: readonly string[]
+    ) => void;
+    /** Snapshot accessor for current optimistic monitoring locks. */
+    getOptimisticMonitoringLocks?: () => Record<
+        string,
+        OptimisticMonitoringLock
+    >;
     /** Reads current sites from the store for optimistic updates */
     getSites: () => Site[];
     /** Monitoring service abstraction */
@@ -96,16 +103,53 @@ export interface SiteMonitoringDependencies {
 
 const defaultMonitoringDependencies: SiteMonitoringDependencies = Object.freeze(
     {
-        clearOptimisticMonitoringLocks: () => undefined,
         applyStatusUpdate: applyStatusUpdateSnapshot,
+        clearOptimisticMonitoringLocks: () => {},
+        getOptimisticMonitoringLocks: () => ({}),
         getSites: (): Site[] => [],
         monitoringService: MonitoringService,
-        registerMonitoringLock: () => undefined,
+        registerMonitoringLock: () => {},
         setSites: (): void => undefined,
     }
 );
 
-const OPTIMISTIC_MONITORING_HOLD_MS = 1_500;
+const OPTIMISTIC_MONITORING_HOLD_MS = 1500;
+const OPTIMISTIC_MONITORING_DELAY_MS = 50;
+
+const noop = (): void => {};
+
+const noopClearOptimisticLocks: NonNullable<
+    SiteMonitoringDependencies["clearOptimisticMonitoringLocks"]
+> = () => {};
+
+const noopRegisterMonitoringLock: NonNullable<
+    SiteMonitoringDependencies["registerMonitoringLock"]
+> = () => {};
+
+type MonitoringActionName =
+    | "startSiteMonitoring"
+    | "startSiteMonitorMonitoring"
+    | "stopSiteMonitoring"
+    | "stopSiteMonitorMonitoring";
+
+const buildMonitoringLogPayload = (
+    siteIdentifier: string,
+    monitorId: string | undefined,
+    base: Record<string, unknown>
+): Record<string, unknown> => {
+    if (monitorId === undefined) {
+        return {
+            siteIdentifier,
+            ...base,
+        } satisfies Record<string, unknown>;
+    }
+
+    return {
+        monitorId,
+        siteIdentifier,
+        ...base,
+    } satisfies Record<string, unknown>;
+};
 
 /**
  * Creates site monitoring actions for managing monitoring lifecycle operations.
@@ -122,14 +166,11 @@ const OPTIMISTIC_MONITORING_HOLD_MS = 1_500;
 export const createSiteMonitoringActions = (
     deps: SiteMonitoringDependencies = defaultMonitoringDependencies
 ): SiteMonitoringActions => {
-    const {
-        applyStatusUpdate,
-        clearOptimisticMonitoringLocks = () => undefined,
-        getSites,
-        monitoringService,
-        registerMonitoringLock = () => undefined,
-        setSites,
-    } = deps;
+    const { applyStatusUpdate, getSites, monitoringService, setSites } = deps;
+    const clearOptimisticMonitoringLocks =
+        deps.clearOptimisticMonitoringLocks ?? noopClearOptimisticLocks;
+    const registerMonitoringLock =
+        deps.registerMonitoringLock ?? noopRegisterMonitoringLock;
     const safeApplyStatusUpdate =
         applyStatusUpdate ?? applyStatusUpdateSnapshot;
     const applyOptimisticUpdate = (statusUpdate: StatusUpdate): void => {
@@ -170,53 +211,69 @@ export const createSiteMonitoringActions = (
             readonly snapshotForRollback?: boolean;
         } = {}
     ): { readonly revert: () => void } => {
-        const previousSites = snapshotForRollback
+        const previousSites: Site[] | undefined = snapshotForRollback
             ? structuredClone(getSites())
             : undefined;
 
         let applied = false;
         const updatedMonitorIds = new Set<string>();
 
+        const updateSiteForOptimism = (
+            site: Site
+        ): {
+            readonly changed: boolean;
+            readonly site: Site;
+        } => {
+            if (site.identifier !== siteIdentifier) {
+                return { changed: false, site };
+            }
+
+            let monitorStateChanged = false;
+            const updatedMonitors: Monitor[] = [];
+
+            for (const monitor of site.monitors) {
+                const shouldUpdate =
+                    monitorId === undefined || monitor.id === monitorId;
+
+                if (!shouldUpdate || monitor.monitoring === monitoring) {
+                    updatedMonitors.push(monitor);
+                } else {
+                    monitorStateChanged = true;
+                    updatedMonitorIds.add(monitor.id);
+                    updatedMonitors.push({
+                        ...monitor,
+                        monitoring,
+                    });
+                }
+            }
+
+            if (!monitorStateChanged) {
+                return { changed: false, site };
+            }
+
+            return {
+                changed: true,
+                site: {
+                    ...site,
+                    monitors: updatedMonitors,
+                },
+            };
+        };
+
         const executeUpdate = (): void => {
             try {
                 const currentSites = getSites();
                 let siteUpdated = false;
+                const updatedSites: Site[] = [];
 
-                const updatedSites = currentSites.map((site) => {
-                    if (site.identifier !== siteIdentifier) {
-                        return site;
+                for (const site of currentSites) {
+                    const { changed, site: normalizedSite } =
+                        updateSiteForOptimism(site);
+                    if (changed) {
+                        siteUpdated = true;
                     }
-
-                    let monitorStateChanged = false;
-                    const updatedMonitors = site.monitors.map((monitor) => {
-                        const shouldUpdate =
-                            monitorId === undefined || monitor.id === monitorId;
-
-                        if (
-                            !shouldUpdate ||
-                            monitor.monitoring === monitoring
-                        ) {
-                            return monitor;
-                        }
-
-                        monitorStateChanged = true;
-                        updatedMonitorIds.add(monitor.id);
-                        return {
-                            ...monitor,
-                            monitoring,
-                        } satisfies Monitor;
-                    });
-
-                    if (!monitorStateChanged) {
-                        return site;
-                    }
-
-                    siteUpdated = true;
-                    return {
-                        ...site,
-                        monitors: updatedMonitors,
-                    } satisfies Site;
-                });
+                    updatedSites.push(normalizedSite);
+                }
 
                 if (!siteUpdated) {
                     return;
@@ -257,10 +314,10 @@ export const createSiteMonitoringActions = (
             }
         };
 
-        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        let timeoutId: null | ReturnType<typeof setTimeout> = null;
         if (delayMs > 0) {
             timeoutId = globalThis.setTimeout(() => {
-                timeoutId = undefined;
+                timeoutId = null;
                 executeUpdate();
             }, delayMs);
         } else {
@@ -268,9 +325,9 @@ export const createSiteMonitoringActions = (
         }
 
         const revert = (): void => {
-            if (timeoutId !== undefined) {
+            if (timeoutId !== null) {
                 globalThis.clearTimeout(timeoutId);
-                timeoutId = undefined;
+                timeoutId = null;
             }
 
             if (!applied) {
@@ -282,13 +339,60 @@ export const createSiteMonitoringActions = (
                 clearOptimisticMonitoringLocks(siteIdentifier, monitorIds);
             }
 
-            if (snapshotForRollback && previousSites) {
+            if (previousSites) {
                 setSites(previousSites);
-                return;
             }
         };
 
         return { revert };
+    };
+
+    const executeMonitoringOperation = async (
+        actionName: MonitoringActionName,
+        siteIdentifier: string,
+        monitoring: boolean,
+        operation: () => Promise<void>,
+        monitorId?: string
+    ): Promise<void> => {
+        let revertOptimistic: () => void = noop;
+
+        try {
+            const { revert } = applyOptimisticMonitoringState(
+                siteIdentifier,
+                monitoring,
+                monitorId,
+                {
+                    delayMs: OPTIMISTIC_MONITORING_DELAY_MS,
+                    snapshotForRollback: true,
+                }
+            );
+            revertOptimistic = revert;
+
+            await operation();
+
+            logStoreAction(
+                "SitesStore",
+                actionName,
+                buildMonitoringLogPayload(siteIdentifier, monitorId, {
+                    status: "success",
+                    success: true,
+                })
+            );
+            // StatusUpdateManager will propagate the authoritative update
+        } catch (error) {
+            revertOptimistic();
+            const normalizedError = ensureError(error);
+            logStoreAction(
+                "SitesStore",
+                actionName,
+                buildMonitoringLogPayload(siteIdentifier, monitorId, {
+                    error: normalizedError.message,
+                    status: "failure",
+                    success: false,
+                })
+            );
+            throw error;
+        }
     };
 
     return {
@@ -344,43 +448,16 @@ export const createSiteMonitoringActions = (
             });
 
             await withErrorHandling(
-                async () => {
-                    let revertOptimistic: () => void = () => undefined;
-                    try {
-                        const { revert } = applyOptimisticMonitoringState(
-                            siteIdentifier,
-                            true,
-                            undefined,
-                            {
-                                delayMs: 50,
-                                snapshotForRollback: true,
-                            }
-                        );
-                        revertOptimistic = revert;
-
-                        await monitoringService.startMonitoringForSite(
-                            siteIdentifier
-                        );
-
-                        revertOptimistic = () => undefined;
-
-                        logStoreAction("SitesStore", "startSiteMonitoring", {
-                            siteIdentifier,
-                            status: "success",
-                            success: true,
-                        });
-                        // No need for manual sync - StatusUpdateManager will update UI via events
-                    } catch (error) {
-                        revertOptimistic();
-                        const normalizedError = ensureError(error);
-                        logStoreAction("SitesStore", "startSiteMonitoring", {
-                            error: normalizedError.message,
-                            siteIdentifier,
-                            status: "failure",
-                            success: false,
-                        });
-                        throw error;
-                    }
+                async (): Promise<void> => {
+                    await executeMonitoringOperation(
+                        "startSiteMonitoring",
+                        siteIdentifier,
+                        true,
+                        () =>
+                            monitoringService.startMonitoringForSite(
+                                siteIdentifier
+                            )
+                    );
                 },
                 createStoreErrorHandler(
                     "sites-monitoring",
@@ -399,54 +476,18 @@ export const createSiteMonitoringActions = (
             });
 
             await withErrorHandling(
-                async () => {
-                    let revertOptimistic: () => void = () => undefined;
-                    try {
-                        const { revert } = applyOptimisticMonitoringState(
-                            siteIdentifier,
-                            true,
-                            monitorId,
-                            {
-                                delayMs: 50,
-                                snapshotForRollback: true,
-                            }
-                        );
-                        revertOptimistic = revert;
-
-                        await monitoringService.startMonitoringForMonitor(
-                            siteIdentifier,
-                            monitorId
-                        );
-
-                        revertOptimistic = () => undefined;
-
-                        logStoreAction(
-                            "SitesStore",
-                            "startSiteMonitorMonitoring",
-                            {
-                                monitorId,
+                async (): Promise<void> => {
+                    await executeMonitoringOperation(
+                        "startSiteMonitorMonitoring",
+                        siteIdentifier,
+                        true,
+                        () =>
+                            monitoringService.startMonitoringForMonitor(
                                 siteIdentifier,
-                                status: "success",
-                                success: true,
-                            }
-                        );
-                        // No need for manual sync - StatusUpdateManager will update UI via events
-                    } catch (error) {
-                        revertOptimistic();
-                        const normalizedError = ensureError(error);
-                        logStoreAction(
-                            "SitesStore",
-                            "startSiteMonitorMonitoring",
-                            {
-                                error: normalizedError.message,
-                                monitorId,
-                                siteIdentifier,
-                                status: "failure",
-                                success: false,
-                            }
-                        );
-                        throw error;
-                    }
+                                monitorId
+                            ),
+                        monitorId
+                    );
                 },
                 createStoreErrorHandler(
                     "sites-monitoring",
@@ -461,43 +502,16 @@ export const createSiteMonitoringActions = (
             });
 
             await withErrorHandling(
-                async () => {
-                    let revertOptimistic: () => void = () => undefined;
-                    try {
-                        const { revert } = applyOptimisticMonitoringState(
-                            siteIdentifier,
-                            false,
-                            undefined,
-                            {
-                                delayMs: 50,
-                                snapshotForRollback: true,
-                            }
-                        );
-                        revertOptimistic = revert;
-
-                        await monitoringService.stopMonitoringForSite(
-                            siteIdentifier
-                        );
-
-                        revertOptimistic = () => undefined;
-
-                        logStoreAction("SitesStore", "stopSiteMonitoring", {
-                            siteIdentifier,
-                            status: "success",
-                            success: true,
-                        });
-                        // No need for manual sync - StatusUpdateManager will update UI via events
-                    } catch (error) {
-                        revertOptimistic();
-                        const normalizedError = ensureError(error);
-                        logStoreAction("SitesStore", "stopSiteMonitoring", {
-                            error: normalizedError.message,
-                            siteIdentifier,
-                            status: "failure",
-                            success: false,
-                        });
-                        throw error;
-                    }
+                async (): Promise<void> => {
+                    await executeMonitoringOperation(
+                        "stopSiteMonitoring",
+                        siteIdentifier,
+                        false,
+                        () =>
+                            monitoringService.stopMonitoringForSite(
+                                siteIdentifier
+                            )
+                    );
                 },
                 createStoreErrorHandler(
                     "sites-monitoring",
@@ -516,54 +530,18 @@ export const createSiteMonitoringActions = (
             });
 
             await withErrorHandling(
-                async () => {
-                    let revertOptimistic: () => void = () => undefined;
-                    try {
-                        const { revert } = applyOptimisticMonitoringState(
-                            siteIdentifier,
-                            false,
-                            monitorId,
-                            {
-                                delayMs: 50,
-                                snapshotForRollback: true,
-                            }
-                        );
-                        revertOptimistic = revert;
-
-                        await monitoringService.stopMonitoringForMonitor(
-                            siteIdentifier,
-                            monitorId
-                        );
-
-                        revertOptimistic = () => undefined;
-
-                        logStoreAction(
-                            "SitesStore",
-                            "stopSiteMonitorMonitoring",
-                            {
-                                monitorId,
+                async (): Promise<void> => {
+                    await executeMonitoringOperation(
+                        "stopSiteMonitorMonitoring",
+                        siteIdentifier,
+                        false,
+                        () =>
+                            monitoringService.stopMonitoringForMonitor(
                                 siteIdentifier,
-                                status: "success",
-                                success: true,
-                            }
-                        );
-                        // No need for manual sync - StatusUpdateManager will update UI via events
-                    } catch (error) {
-                        revertOptimistic();
-                        const normalizedError = ensureError(error);
-                        logStoreAction(
-                            "SitesStore",
-                            "stopSiteMonitorMonitoring",
-                            {
-                                error: normalizedError.message,
-                                monitorId,
-                                siteIdentifier,
-                                status: "failure",
-                                success: false,
-                            }
-                        );
-                        throw error;
-                    }
+                                monitorId
+                            ),
+                        monitorId
+                    );
                 },
                 createStoreErrorHandler(
                     "sites-monitoring",

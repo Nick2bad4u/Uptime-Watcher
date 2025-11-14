@@ -41,6 +41,7 @@ describe("useSitesState", () => {
     const cloneSite = (site: Site): Site => structuredClone(site);
     const createState = (overrides: Partial<SitesState> = {}): SitesState => ({
         lastSyncDelta: undefined,
+        optimisticMonitoringLocks: {},
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
         sites: [],
@@ -106,11 +107,12 @@ describe("useSitesState", () => {
             );
 
             expect(initialSitesState).toEqual({
+                lastSyncDelta: undefined,
+                optimisticMonitoringLocks: {},
                 selectedMonitorIds: {},
                 selectedSiteIdentifier: undefined,
                 sites: [],
                 statusSubscriptionSummary: undefined,
-                lastSyncDelta: undefined,
             });
         });
     });
@@ -157,6 +159,7 @@ describe("useSitesState", () => {
                     })
                 );
                 expect(result).toEqual({
+                    optimisticMonitoringLocks: {},
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,
                     sites: newSites,
@@ -230,6 +233,7 @@ describe("useSitesState", () => {
                 );
 
                 expect(result).toEqual({
+                    optimisticMonitoringLocks: {},
                     selectedMonitorIds: { "site-c": "mon-c1" },
                     selectedSiteIdentifier: undefined,
                     sites: newSites,
@@ -337,6 +341,7 @@ describe("useSitesState", () => {
 
             if (setFunction) {
                 const result = setFunction({
+                    optimisticMonitoringLocks: {},
                     lastSyncDelta: undefined,
                     selectedMonitorIds: {},
                     selectedSiteIdentifier: undefined,

@@ -502,6 +502,10 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
     const subscribeToDebugStores = useCallback((): void => {
         const nextSubscriptions: Array<() => void> = [];
 
+        const isCleanupFunction = (
+            candidate: unknown
+        ): candidate is () => void => typeof candidate === "function";
+
         const isUnsubscribeContainer = (
             candidate: unknown
         ): candidate is { unsubscribe: () => void } => {
@@ -509,7 +513,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
                 return false;
             }
 
-            const unsubscribe = candidate["unsubscribe"];
+            const { unsubscribe } = candidate as {
+                unsubscribe?: unknown;
+            };
             return typeof unsubscribe === "function";
         };
 
@@ -517,14 +523,13 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             unsubscribeCandidate: unknown,
             storeIdentifier: string
         ): void => {
-            if (typeof unsubscribeCandidate === "function") {
-                const candidate = unsubscribeCandidate as () => void;
-                nextSubscriptions.push(candidate);
+            if (isCleanupFunction(unsubscribeCandidate)) {
+                nextSubscriptions.push(unsubscribeCandidate);
                 return;
             }
 
             if (isUnsubscribeContainer(unsubscribeCandidate)) {
-                const unsubscribe = unsubscribeCandidate["unsubscribe"];
+                const { unsubscribe } = unsubscribeCandidate;
                 nextSubscriptions.push(() => {
                     unsubscribe.call(unsubscribeCandidate);
                 });

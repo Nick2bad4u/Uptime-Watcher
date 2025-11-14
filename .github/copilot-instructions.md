@@ -59,5 +59,11 @@ description: "Instructions for the extremely capable TypeScript AI coding assist
 - When lint, type-check, or test tasks fail, capture and summarize the output, fix the underlying issue, rerun the task, and proceed only after it passes (or explain why it cannot yet be resolved).
 - Remove temporary artifacts such as command output files immediately after their contents have been reviewed and summarized.
 - Before finishing a task, close or update any related TODO entries so the repository never accumulates stale items.
+- Treat the following recurring build/test warnings as informational unless they change behavior: PostCSS plugins missing the `from` option, Rollup/Vite chunk-size warnings from the production bundles, Electron's CSP dev-mode warning, and Codecov's presigned URL fetch failures when running locally. When summarizing build logs, call out that these warnings are pre-approved noise so reviewers know they were intentionally ignored.
+  - PostCSS plugins missing the `from` option during Vite builds
+  - Rollup/Vite chunk-size warnings for large bundles
+  - Electron dev-mode CSP warnings referencing `unsafe-eval`
+  - Codecov `get-pre-signed-url` failures when running locally
+
   </coding>
   </instructions>

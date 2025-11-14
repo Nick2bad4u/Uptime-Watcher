@@ -23,7 +23,7 @@ import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
 
 /**
  * Render helper that ensures any asynchronous React updates triggered by
- * mount-time effects are flushed inside act().
+ * mount-time effects have settled before assertions run.
  */
 let activeRenderCleanup: (() => void) | null = null;
 
@@ -39,7 +39,7 @@ const renderForm = async (): Promise<void> => {
     });
 };
 
-// Suppress React act() warnings for this test suite since vi.mock() fails to intercept hook calls
+// Suppress React warnings for this test suite since vi.mock() fails to intercept hook calls
 // but the real hook implementation uses proper useEffect patterns
 // no beforeAll / afterAll hook - warnings should not be necessary with proper mocks
 
@@ -714,9 +714,11 @@ describe("AddSiteForm Comprehensive Tests", () => {
                 return <AddSiteForm />;
             };
 
-            render(<TestComponent />);
+            const view = render(<TestComponent />);
 
             expect(renderCount).toHaveBeenCalledTimes(1);
+
+            view.unmount();
         });
     });
 

@@ -656,7 +656,7 @@ export const Settings = ({
     const systemNotificationsControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Enable desktop notifications"
+                aria-label="Enable system notifications"
                 checked={systemNotificationsEnabled}
                 disabled={isLoading}
                 onChange={handleSystemNotificationsChange}
@@ -672,15 +672,16 @@ export const Settings = ({
     const systemNotificationSoundControl = useMemo(
         () => (
             <ThemedCheckbox
-                aria-label="Enable sound alerts"
+                aria-label="Play sound for system notifications"
                 checked={systemNotificationsSoundEnabled}
-                disabled={isLoading}
+                disabled={isLoading || !systemNotificationsEnabled}
                 onChange={handleSystemNotificationSoundChange}
             />
         ),
         [
             handleSystemNotificationSoundChange,
             isLoading,
+            systemNotificationsEnabled,
             systemNotificationsSoundEnabled,
         ]
     );

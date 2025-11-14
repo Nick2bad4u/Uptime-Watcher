@@ -16,13 +16,23 @@ import {
 } from "@shared/validation/siteIntegrity";
 
 import type { StatusUpdateSubscriptionSummary } from "./baseTypes";
+
+import { logger } from "../../services/logger";
+import { logStoreAction } from "../utils";
 import {
     buildMonitoringLockKey,
     type OptimisticMonitoringLock,
 } from "./utils/optimisticMonitoringLock";
 
-import { logger } from "../../services/logger";
-import { logStoreAction } from "../utils";
+const lockExpiryTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+const cancelLockExpiryTimer = (key: string): void => {
+    const timerId = lockExpiryTimers.get(key);
+    if (timerId !== undefined) {
+        globalThis.clearTimeout(timerId);
+        lockExpiryTimers.delete(key);
+    }
+};
 
 /**
  * Sites state interface for managing site data and selection.
@@ -36,8 +46,10 @@ import { logStoreAction } from "../utils";
 export interface SitesState {
     /** Most recent synchronization delta captured from state sync events. */
     lastSyncDelta: SiteSyncDelta | undefined;
-    /** Active optimistic monitoring locks for monitors keyed by site and monitor
-id. */
+    /**
+     * Active optimistic monitoring locks for monitors keyed by site and monitor
+     * id.
+     */
     optimisticMonitoringLocks: Record<string, OptimisticMonitoringLock>;
     /** Selected monitor IDs per site (UI state, not persisted) */
     selectedMonitorIds: Record<string, string>;
@@ -59,13 +71,18 @@ id. */
  * @public
  */
 export interface SitesStateActions {
+    /** Add a site to the store */
+    addSite: (site: Site) => void;
     /** Clear optimistic monitoring locks for the provided monitors. */
     clearOptimisticMonitoringLocks: (
         siteIdentifier: string,
         monitorIds: readonly string[]
     ) => void;
-    /** Add a site to the store */
-    addSite: (site: Site) => void;
+    /** Returns a snapshot of the current optimistic monitoring locks */
+    getOptimisticMonitoringLocks: () => Record<
+        string,
+        OptimisticMonitoringLock
+    >;
     /** Get selected monitor ID for a site */
     getSelectedMonitorId: (siteIdentifier: string) => string | undefined;
     /** Get the currently selected site */
@@ -118,195 +135,224 @@ export type SitesStateStore = Simplify<SitesState & SitesStateActions>;
 export const createSitesStateActions = (
     set: (function_: (state: SitesState) => Partial<SitesState>) => void,
     get: () => SitesState
-): SitesStateActions => ({
-    clearOptimisticMonitoringLocks: (
+): SitesStateActions => {
+    const scheduleLockExpiry = (
         siteIdentifier: string,
-        monitorIds: readonly string[]
-    ): void => {
-        if (monitorIds.length === 0) {
-            return;
-        }
-
-        set((state) => {
-            const currentLocks = { ...state.optimisticMonitoringLocks };
-            let changed = false;
-
-            for (const monitorId of monitorIds) {
-                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
-                if (currentLocks[key] !== undefined) {
-                    delete currentLocks[key];
-                    changed = true;
-                }
-            }
-
-            return changed ? { optimisticMonitoringLocks: currentLocks } : {};
-        });
-    },
-    addSite: (site: Site): void => {
-        logStoreAction("SitesStore", "addSite", { site });
-        set((state) => ({ sites: [...state.sites, site] }));
-    },
-    getSelectedMonitorId: (siteIdentifier: string): string | undefined => {
-        const ids = get().selectedMonitorIds;
-
-        return ids[siteIdentifier];
-    },
-    getSelectedSite: (): Site | undefined => {
-        const { selectedSiteIdentifier, sites } = get();
-        if (!selectedSiteIdentifier) {
-            return undefined;
-        }
-        return (
-            sites.find((site) => site.identifier === selectedSiteIdentifier) ??
-            undefined
-        );
-    },
-    recordSiteSyncDelta: (delta: SiteSyncDelta | undefined): void => {
-        logStoreAction("SitesStore", "recordSiteSyncDelta", {
-            addedCount: delta?.addedSites.length ?? 0,
-            removedCount: delta?.removedSiteIdentifiers.length ?? 0,
-            updatedCount: delta?.updatedSites.length ?? 0,
-        });
-        set(() => ({ lastSyncDelta: delta }));
-    },
-    registerOptimisticMonitoringLock: (
-        siteIdentifier: string,
-        monitorIds: readonly string[],
-        monitoring: boolean,
+        monitorId: string,
         durationMs: number
     ): void => {
-        if (monitorIds.length === 0) {
-            return;
-        }
+        const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+        cancelLockExpiryTimer(key);
 
-        const expiresAt = Date.now() + Math.max(durationMs, 0);
+        const timeoutId = globalThis.setTimeout(() => {
+            lockExpiryTimers.delete(key);
+            const now = Date.now();
+            set((state) => {
+                const lock = state.optimisticMonitoringLocks[key];
+                if (!lock || lock.expiresAt > now) {
+                    return {};
+                }
 
-        set((state) => {
-            const optimisticMonitoringLocks = {
-                ...state.optimisticMonitoringLocks,
-            };
+                const nextLocks = {
+                    ...state.optimisticMonitoringLocks,
+                };
+                const removed = Reflect.deleteProperty(nextLocks, key);
+                return removed ? { optimisticMonitoringLocks: nextLocks } : {};
+            });
+        }, durationMs + 25);
 
-            for (const monitorId of monitorIds) {
-                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
-                optimisticMonitoringLocks[key] = {
-                    expiresAt,
-                    monitoring,
-                } satisfies OptimisticMonitoringLock;
+        lockExpiryTimers.set(key, timeoutId);
+    };
+
+    return {
+        addSite: (site: Site): void => {
+            logStoreAction("SitesStore", "addSite", { site });
+            set((state) => ({ sites: [...state.sites, site] }));
+        },
+        clearOptimisticMonitoringLocks: (
+            siteIdentifier: string,
+            monitorIds: readonly string[]
+        ): void => {
+            if (monitorIds.length === 0) {
+                return;
             }
 
-            return { optimisticMonitoringLocks };
-        });
+            set((state) => {
+                const currentLocks = { ...state.optimisticMonitoringLocks };
+                let changed = false;
 
-        if (durationMs > 0) {
-            globalThis.setTimeout(() => {
-                const now = Date.now();
-                set((state) => {
-                    const currentLocks = {
-                        ...state.optimisticMonitoringLocks,
-                    };
-                    let changed = false;
-
-                    for (const monitorId of monitorIds) {
-                        const key = buildMonitoringLockKey(
-                            siteIdentifier,
-                            monitorId
+                for (const monitorId of monitorIds) {
+                    const key = buildMonitoringLockKey(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    if (currentLocks[key] !== undefined) {
+                        const removed = Reflect.deleteProperty(
+                            currentLocks,
+                            key
                         );
-                        const lock = currentLocks[key];
-                        if (lock && lock.expiresAt <= now) {
-                            delete currentLocks[key];
+                        if (removed) {
+                            cancelLockExpiryTimer(key);
                             changed = true;
                         }
                     }
+                }
 
-                    return changed
-                        ? { optimisticMonitoringLocks: currentLocks }
-                        : {};
-                });
-            }, durationMs + 25);
-        }
-    },
-    removeSite: (identifier: string): void => {
-        logStoreAction("SitesStore", "removeSite", { identifier });
-        set((state) => {
-            // Remove the monitor selection for the removed site
-            const currentMonitorIds = state.selectedMonitorIds;
+                return changed
+                    ? { optimisticMonitoringLocks: currentLocks }
+                    : {};
+            });
+        },
+        getOptimisticMonitoringLocks: () => ({
+            ...get().optimisticMonitoringLocks,
+        }),
+        getSelectedMonitorId: (siteIdentifier: string): string | undefined => {
+            const ids = get().selectedMonitorIds;
 
-            // Filter out the monitor selection for the removed site
-            const remainingMonitorIds = Object.fromEntries(
-                Object.entries(currentMonitorIds).filter(
-                    ([key]) => key !== identifier
-                )
+            return ids[siteIdentifier];
+        },
+        getSelectedSite: (): Site | undefined => {
+            const { selectedSiteIdentifier, sites } = get();
+            if (!selectedSiteIdentifier) {
+                return undefined;
+            }
+            return (
+                sites.find(
+                    (site) => site.identifier === selectedSiteIdentifier
+                ) ?? undefined
             );
-            return {
-                selectedMonitorIds: remainingMonitorIds,
-                selectedSiteIdentifier:
-                    state.selectedSiteIdentifier === identifier
-                        ? undefined
-                        : state.selectedSiteIdentifier,
-                sites: state.sites.filter(
-                    (site) => site.identifier !== identifier
-                ),
-            };
-        });
-    },
-    selectSite: (site: Site | undefined): void => {
-        logStoreAction("SitesStore", "selectSite", { site });
-        set(() => ({
-            selectedSiteIdentifier: site ? site.identifier : undefined,
-        }));
-    },
-    setSelectedMonitorId: (siteIdentifier: string, monitorId: string): void => {
-        logStoreAction("SitesStore", "setSelectedMonitorId", {
-            monitorId,
-            siteIdentifier,
-        });
-        set((state) => ({
-            selectedMonitorIds: {
-                ...state.selectedMonitorIds,
-                [siteIdentifier]: monitorId,
-            },
-        }));
-    },
-    setSites: (sites: Site[]): void => {
-        try {
-            ensureUniqueSiteIdentifiers(sites, "SitesStore.setSites");
-        } catch (error: unknown) {
-            if (error instanceof DuplicateSiteIdentifierError) {
-                logger.error(
-                    "Duplicate site identifiers detected while replacing sites state",
-                    {
-                        duplicates: error.duplicates,
-                        siteCount: sites.length,
-                    }
-                );
-                throw error;
+        },
+        recordSiteSyncDelta: (delta: SiteSyncDelta | undefined): void => {
+            logStoreAction("SitesStore", "recordSiteSyncDelta", {
+                addedCount: delta?.addedSites.length ?? 0,
+                removedCount: delta?.removedSiteIdentifiers.length ?? 0,
+                updatedCount: delta?.updatedSites.length ?? 0,
+            });
+            set(() => ({ lastSyncDelta: delta }));
+        },
+        registerOptimisticMonitoringLock: (
+            siteIdentifier: string,
+            monitorIds: readonly string[],
+            monitoring: boolean,
+            durationMs: number
+        ): void => {
+            if (monitorIds.length === 0) {
+                return;
             }
 
-            const normalizedError = ensureError(error);
-            logger.error(
-                "Unexpected error while validating sites before state replacement",
-                normalizedError
-            );
-            throw normalizedError;
-        }
+            const expiresAt = Date.now() + Math.max(durationMs, 0);
 
-        logStoreAction("SitesStore", "setSites", { count: sites.length });
+            set((state) => {
+                const optimisticMonitoringLocks = {
+                    ...state.optimisticMonitoringLocks,
+                };
 
-        const locks = get().optimisticMonitoringLocks;
-        const lockEntries = Object.entries(locks);
+                for (const monitorId of monitorIds) {
+                    const key = buildMonitoringLockKey(
+                        siteIdentifier,
+                        monitorId
+                    );
+                    optimisticMonitoringLocks[key] = {
+                        expiresAt,
+                        monitoring,
+                    } satisfies OptimisticMonitoringLock;
+                }
 
-        const now = Date.now();
-        const expiredLockKeys: string[] = [];
-        let sitesMutated = false;
+                return { optimisticMonitoringLocks };
+            });
 
-        const normalizedSites =
-            lockEntries.length === 0
-                ? sites
-                : sites.map((site) => {
-                      let siteMutated = false;
+            for (const monitorId of monitorIds) {
+                const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+                if (durationMs > 0) {
+                    scheduleLockExpiry(siteIdentifier, monitorId, durationMs);
+                } else {
+                    cancelLockExpiryTimer(key);
+                }
+            }
+        },
+        removeSite: (identifier: string): void => {
+            logStoreAction("SitesStore", "removeSite", { identifier });
+            set((state) => {
+                const currentMonitorIds = state.selectedMonitorIds;
 
-                      const normalizedMonitors = site.monitors.map(
-                          (monitor) => {
+                const remainingMonitorIds = Object.fromEntries(
+                    Object.entries(currentMonitorIds).filter(
+                        ([key]) => key !== identifier
+                    )
+                );
+                return {
+                    selectedMonitorIds: remainingMonitorIds,
+                    selectedSiteIdentifier:
+                        state.selectedSiteIdentifier === identifier
+                            ? undefined
+                            : state.selectedSiteIdentifier,
+                    sites: state.sites.filter(
+                        (site) => site.identifier !== identifier
+                    ),
+                };
+            });
+        },
+        selectSite: (site: Site | undefined): void => {
+            logStoreAction("SitesStore", "selectSite", { site });
+            set(() => ({
+                selectedSiteIdentifier: site ? site.identifier : undefined,
+            }));
+        },
+        setSelectedMonitorId: (
+            siteIdentifier: string,
+            monitorId: string
+        ): void => {
+            logStoreAction("SitesStore", "setSelectedMonitorId", {
+                monitorId,
+                siteIdentifier,
+            });
+            set((state) => ({
+                selectedMonitorIds: {
+                    ...state.selectedMonitorIds,
+                    [siteIdentifier]: monitorId,
+                },
+            }));
+        },
+        setSites: (sites: Site[]): void => {
+            try {
+                ensureUniqueSiteIdentifiers(sites, "SitesStore.setSites");
+            } catch (error: unknown) {
+                if (error instanceof DuplicateSiteIdentifierError) {
+                    logger.error(
+                        "Duplicate site identifiers detected while replacing sites state",
+                        {
+                            duplicates: error.duplicates,
+                            siteCount: sites.length,
+                        }
+                    );
+                    throw error;
+                }
+
+                const normalizedError = ensureError(error);
+                logger.error(
+                    "Unexpected error while validating sites before state replacement",
+                    normalizedError
+                );
+                throw normalizedError;
+            }
+
+            logStoreAction("SitesStore", "setSites", { count: sites.length });
+
+            const locks = get().optimisticMonitoringLocks;
+            const lockEntries = Object.entries(locks);
+
+            const now = Date.now();
+            const expiredLockKeys: string[] = [];
+            let mutatedSiteCount = 0;
+
+            const normalizedSites =
+                lockEntries.length === 0
+                    ? sites
+                    : sites.map((site) => {
+                          let siteMutated = false;
+                          const normalizedMonitors: Monitor[] = [];
+
+                          for (const monitor of site.monitors) {
                               const lockKey = buildMonitoringLockKey(
                                   site.identifier,
                                   monitor.id
@@ -314,102 +360,108 @@ export const createSitesStateActions = (
                               const lock = locks[lockKey];
 
                               if (!lock) {
-                                  return monitor;
-                              }
-
-                              if (lock.expiresAt <= now) {
+                                  normalizedMonitors.push(monitor);
+                              } else if (lock.expiresAt <= now) {
                                   expiredLockKeys.push(lockKey);
-                                  return monitor;
+                                  normalizedMonitors.push(monitor);
+                              } else if (
+                                  monitor.monitoring === lock.monitoring
+                              ) {
+                                  normalizedMonitors.push(monitor);
+                              } else {
+                                  siteMutated = true;
+                                  normalizedMonitors.push({
+                                      ...monitor,
+                                      monitoring: lock.monitoring,
+                                  });
                               }
-
-                              if (monitor.monitoring === lock.monitoring) {
-                                  return monitor;
-                              }
-
-                              siteMutated = true;
-                              return {
-                                  ...monitor,
-                                  monitoring: lock.monitoring,
-                              } satisfies Monitor;
                           }
-                      );
 
-                      if (!siteMutated) {
-                          return site;
-                      }
+                          if (!siteMutated) {
+                              return site;
+                          }
 
-                      sitesMutated = true;
-                      return {
-                          ...site,
-                          monitors: normalizedMonitors,
-                      } satisfies Site;
-                  });
+                          mutatedSiteCount += 1;
+                          return {
+                              ...site,
+                              monitors: normalizedMonitors,
+                          } satisfies Site;
+                      });
 
-        const sitesForState = sitesMutated ? normalizedSites : sites;
+            let sitesForState = sites;
+            if (mutatedSiteCount > 0) {
+                sitesForState = normalizedSites;
+            }
 
-        set((state) => {
-            const validIdentifiers = new Set(
-                sitesForState.map((site) => site.identifier)
-            );
+            set((state) => {
+                const validIdentifiers = new Set(
+                    sitesForState.map((site) => site.identifier)
+                );
 
-            const nextSelectedSiteIdentifier =
-                state.selectedSiteIdentifier !== undefined &&
-                validIdentifiers.has(state.selectedSiteIdentifier)
-                    ? state.selectedSiteIdentifier
-                    : undefined;
+                const nextSelectedSiteIdentifier =
+                    state.selectedSiteIdentifier !== undefined &&
+                    validIdentifiers.has(state.selectedSiteIdentifier)
+                        ? state.selectedSiteIdentifier
+                        : undefined;
 
-            const siteLookup = new Map(
-                sitesForState.map((site) => [site.identifier, site] as const)
-            );
+                const siteLookup = new Map(
+                    sitesForState.map(
+                        (site) => [site.identifier, site] as const
+                    )
+                );
 
-            const nextSelectedMonitorIds: Record<string, string> = {};
-            for (const [siteId, monitorId] of Object.entries(
-                state.selectedMonitorIds
-            )) {
-                if (validIdentifiers.has(siteId)) {
-                    const candidateSite = siteLookup.get(siteId);
-
-                    if (candidateSite) {
-                        const monitorExists = candidateSite.monitors.some(
-                            (monitor) => monitor.id === monitorId
-                        );
-
-                        if (monitorExists) {
+                const nextSelectedMonitorIds: Record<string, string> = {};
+                for (const [siteId, monitorId] of Object.entries(
+                    state.selectedMonitorIds
+                )) {
+                    if (validIdentifiers.has(siteId)) {
+                        const candidateSite = siteLookup.get(siteId);
+                        if (
+                            candidateSite?.monitors.some(
+                                (monitor) => monitor.id === monitorId
+                            )
+                        ) {
                             nextSelectedMonitorIds[siteId] = monitorId;
                         }
                     }
                 }
-            }
 
-            let optimisticMonitoringLocks = state.optimisticMonitoringLocks;
-            if (expiredLockKeys.length > 0) {
-                optimisticMonitoringLocks = {
-                    ...optimisticMonitoringLocks,
-                };
-                for (const key of expiredLockKeys) {
-                    delete optimisticMonitoringLocks[key];
+                let { optimisticMonitoringLocks } = state;
+                if (expiredLockKeys.length > 0) {
+                    optimisticMonitoringLocks = {
+                        ...optimisticMonitoringLocks,
+                    };
+                    for (const key of expiredLockKeys) {
+                        const removed = Reflect.deleteProperty(
+                            optimisticMonitoringLocks,
+                            key
+                        );
+                        if (removed) {
+                            cancelLockExpiryTimer(key);
+                        }
+                    }
                 }
-            }
 
-            return {
-                optimisticMonitoringLocks,
-                selectedMonitorIds: nextSelectedMonitorIds,
-                selectedSiteIdentifier: nextSelectedSiteIdentifier,
-                sites: sitesForState,
-            };
-        });
-    },
-    setStatusSubscriptionSummary: (
-        summary: StatusUpdateSubscriptionSummary | undefined
-    ): void => {
-        logStoreAction("SitesStore", "setStatusSubscriptionSummary", {
-            expectedListeners: summary?.expectedListeners,
-            listenersAttached: summary?.listenersAttached,
-            success: summary?.success,
-        });
-        set(() => ({ statusSubscriptionSummary: summary }));
-    },
-});
+                return {
+                    optimisticMonitoringLocks,
+                    selectedMonitorIds: nextSelectedMonitorIds,
+                    selectedSiteIdentifier: nextSelectedSiteIdentifier,
+                    sites: sitesForState,
+                };
+            });
+        },
+        setStatusSubscriptionSummary: (
+            summary: StatusUpdateSubscriptionSummary | undefined
+        ): void => {
+            logStoreAction("SitesStore", "setStatusSubscriptionSummary", {
+                expectedListeners: summary?.expectedListeners,
+                listenersAttached: summary?.listenersAttached,
+                success: summary?.success,
+            });
+            set(() => ({ statusSubscriptionSummary: summary }));
+        },
+    };
+};
 
 /**
  * Initial state for the sites store. Provides default values for all state

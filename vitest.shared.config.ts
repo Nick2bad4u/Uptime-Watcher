@@ -199,6 +199,7 @@ const vitestConfig = defineConfig({
                 ), // 16 threads on local, 1 thread on CI by default
                 minThreads: 1, // Ensure at least one thread
                 singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
+                startupTimeout: 120_000, // Allow slower Windows environments to finish spinning up worker threads
                 useAtomics: true,
             },
         },

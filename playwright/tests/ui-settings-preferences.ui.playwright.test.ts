@@ -196,9 +196,12 @@ test.describe(
 
                 await toggleCheckboxAndRevert(
                     page,
-                    "Enable desktop notifications"
+                    "Enable system notifications"
                 );
-                await toggleCheckboxAndRevert(page, "Enable sound alerts");
+                await toggleCheckboxAndRevert(
+                    page,
+                    "Play sound for in-app alerts"
+                );
                 await toggleCheckboxAndRevert(
                     page,
                     "Launch Uptime Watcher automatically at login"

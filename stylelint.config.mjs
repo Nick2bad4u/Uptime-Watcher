@@ -102,6 +102,16 @@ const config = defineConfig({
     allowEmptyInput: false,
 
     /**
+     * Enables caching of lint results to improve performance on subsequent
+     * runs.
+     *
+     * @defaultValue true
+     *
+     * @see {@link https://stylelint.io/user-guide/configure/#cache | cache Documentation}
+     */
+    cache: true,
+
+    /**
      * Default severity level for all rules that don't specify their own
      * severity.
      *
@@ -602,6 +612,10 @@ const config = defineConfig({
         "a11y/no-spread-text": true,
         "a11y/no-text-align-justify": true,
         "a11y/selector-pseudo-class-focus": true,
+        // Color rules
+        "alpha-value-notation": ["percentage", { exceptProperties: ["0"] }],
+        "annotation-no-unknown": true,
+
         /**
          * Core Stylelint built-in rules for standard CSS validation.
          *
@@ -614,55 +628,111 @@ const config = defineConfig({
          */
         // Stylelint built in rules
         "at-rule-allowed-list": null,
-
+        "at-rule-descriptor-no-unknown": true,
+        "at-rule-descriptor-value-no-unknown": true,
         "at-rule-disallowed-list": null,
+        "at-rule-empty-line-before": [
+            "always",
+            {
+                ignore: [
+                    "after-comment",
+                    "first-nested",
+                    "blockless-after-same-name-blockless",
+                    "inside-block",
+                    "blockless-after-blockless",
+                    "after-comment",
+                ],
+            },
+        ],
+
+        "at-rule-no-deprecated": true,
         // Disable unknown at-rules to prevent conflicts with modern CSS features and build tools
         "at-rule-no-unknown": null,
+        "at-rule-no-vendor-prefix": true,
+        "at-rule-prelude-no-invalid": true,
         "at-rule-property-required-list": null,
-        // Color rules
+        "block-no-empty": true,
+        "block-no-redundant-nested-style-rules": true,
+        "color-function-alias-notation": null,
         "color-function-notation": "modern",
         "color-hex-alpha": null,
+        "color-hex-length": "long",
         "color-named": "never",
         "color-no-hex": null,
         "color-no-invalid-hex": true, // Disallow invalid hex colors like #xyz or #1234567 (verified working)
+        "comment-empty-line-before": null,
+        "comment-no-empty": true,
         "comment-pattern": null,
+        "comment-whitespace-inside": "always",
         "comment-word-disallowed-list": null,
         // CSS Tools Rules (@csstools/postcss-plugins)
         "csstools/media-use-custom-media": null,
-
         // CSS nesting and tools
         "csstools/use-nesting": "always",
         "csstools/value-no-unknown-custom-properties": null,
+        "custom-property-no-missing-var-function": true,
+        "declaration-block-no-duplicate-custom-properties": true,
+        "declaration-block-no-duplicate-properties": true,
+        "declaration-block-no-redundant-longhand-properties": true,
+        "declaration-block-no-shorthand-property-overrides": true,
+        "declaration-block-single-line-max-declarations": 1,
+        "declaration-empty-line-before": null,
         // Stylelint built in rules
         // Declaration rules
         "declaration-no-important": true,
-
         "declaration-property-max-values": null,
         "declaration-property-unit-allowed-list": null,
         "declaration-property-unit-disallowed-list": null,
         "declaration-property-value-allowed-list": null,
         "declaration-property-value-disallowed-list": null,
-        "declaration-property-value-no-unknown": true,
+        "declaration-property-value-keyword-no-deprecated": true,
+        "declaration-property-value-no-unknown": null,
+        "font-family-name-quotes": "always-where-recommended",
+        "font-family-no-duplicate-names": true,
+        "font-family-no-missing-generic-family-keyword": true,
         // Font rules
         "font-weight-notation": "numeric",
         "function-allowed-list": null,
+        "function-calc-no-unspaced-operator": true,
         "function-disallowed-list": null,
         // Function rules (security and best practices)
         "function-linear-gradient-no-nonstandard-direction": true,
+        "function-no-unknown": true,
         "function-url-no-scheme-relative": true,
+        "function-url-quotes": "always",
         "function-url-scheme-allowed-list": null,
         "function-url-scheme-disallowed-list": null,
+
         // Color gamut validation
         "gamut/color-no-out-gamut-range": true,
+        "hue-degree-notation": "number",
+        "keyframe-block-no-duplicate-selectors": true,
+
+        "keyframe-declaration-no-important": true,
         // Length rules
         "length-zero-no-unit": true, // Disallow units for zero lengths (0px -> 0) (verified working)
+        "lightness-notation": "percentage",
         // Layout and structure
         "max-nesting-depth": 4,
         // Media query rules
         "media-feature-name-allowed-list": null,
         "media-feature-name-disallowed-list": null,
+        "media-feature-name-no-unknown": true,
+        "media-feature-name-no-vendor-prefix": null,
         "media-feature-name-unit-allowed-list": null,
         "media-feature-name-value-allowed-list": null,
+        "media-feature-name-value-no-unknown": null,
+        "media-query-no-invalid": null,
+        "media-type-no-deprecated": true,
+        "named-grid-areas-no-invalid": true,
+        "nesting-selector-no-missing-scoping-root": true,
+        "no-duplicate-at-import-rules": true,
+        "no-duplicate-selectors": true,
+        "no-empty-source": true,
+        "no-invalid-double-slash-comments": true,
+        "no-invalid-position-at-import-rule": true,
+        "no-invalid-position-declaration": true,
+        "no-irregular-whitespace": true,
         // No unknown rules
         "no-unknown-animations": true,
         "no-unknown-custom-media": null,
@@ -698,7 +768,6 @@ const config = defineConfig({
                 ],
             },
         ],
-
         /**
          * Performance optimization rules for animations and high-impact
          * properties.
@@ -883,18 +952,12 @@ const config = defineConfig({
          */
         "plugin/use-logical-units": [true, { severity: "warning" }],
         "prettier/prettier": true,
-
-        /**
-         * Prettier integration for code formatting.
-         *
-         * @remarks
-         * Enables Prettier formatting rules within Stylelint to ensure
-         * consistent code style. Prettier handles most formatting concerns.
-         */
-        // Prettier integration
-
         "property-allowed-list": null,
         "property-disallowed-list": null,
+        "property-no-deprecated": true,
+
+        "property-no-unknown": true,
+        "rule-empty-line-before": null,
         "rule-nesting-at-rule-required-list": null,
         "rule-selector-property-disallowed-list": null,
         /**
@@ -909,7 +972,6 @@ const config = defineConfig({
          */
         // Scale rules (stylelint-scales)
         "scale-unlimited/declaration-strict-value": null,
-
         "scales/alpha-values": null,
         "scales/border-widths": null,
         /**
@@ -995,11 +1057,22 @@ const config = defineConfig({
             1.75,
             2,
         ],
+
+        /**
+         * Prettier integration for code formatting.
+         *
+         * @remarks
+         * Enables Prettier formatting rules within Stylelint to ensure
+         * consistent code style. Prettier handles most formatting concerns.
+         */
+        // Prettier integration
+
         "scales/radii": null,
         "scales/sizes": null,
         "scales/space": null,
         "scales/word-spacings": null,
         "scales/z-indices": null,
+
         /**
          * SCSS (Sass) specific linting rules.
          *
@@ -1012,7 +1085,6 @@ const config = defineConfig({
          */
         // SCSS specific rules (stylelint-scss)
         "scss/at-each-key-value-single-line": true,
-
         "scss/at-function-named-arguments": "always",
         "scss/at-import-partial-extension-allowed-list": null,
         "scss/at-import-partial-extension-disallowed-list": null,
@@ -1024,6 +1096,7 @@ const config = defineConfig({
         "scss/at-use-no-unnamespaced": true,
         "scss/block-no-redundant-nesting": true,
         "scss/comment-no-loud": null,
+
         "scss/declaration-nested-properties": null,
         "scss/declaration-property-value-no-unknown": true,
         "scss/dimension-no-non-numeric-values": true,
@@ -1049,9 +1122,11 @@ const config = defineConfig({
         "scss/selector-nest-combinators": null,
         "scss/selector-no-redundant-nesting-selector": null,
         "scss/selector-no-union-class-name": true,
+        "selector-anb-no-unmatchable": true,
         "selector-attribute-name-disallowed-list": null,
         "selector-attribute-operator-allowed-list": null,
         "selector-attribute-operator-disallowed-list": null,
+        "selector-attribute-quotes": "always",
         /**
          * Rule to enforce consistent class selector patterns.
          *
@@ -1077,10 +1152,18 @@ const config = defineConfig({
         "selector-max-universal": null,
         "selector-nested-pattern": null,
         "selector-no-qualifying-type": null,
+        "selector-not-notation": "complex",
         "selector-pseudo-class-allowed-list": null,
         "selector-pseudo-class-disallowed-list": null,
+        "selector-pseudo-class-no-unknown": true,
         "selector-pseudo-element-allowed-list": null,
+        "selector-pseudo-element-colon-notation": "double",
         "selector-pseudo-element-disallowed-list": null,
+        "selector-pseudo-element-no-unknown": true,
+        "selector-type-no-unknown": true,
+        "shorthand-property-no-redundant-values": true,
+        "string-no-newline": true,
+        "syntax-string-no-invalid": true,
         // Time rules
         /**
          * Minimum animation/transition duration.
@@ -1095,6 +1178,7 @@ const config = defineConfig({
         "time-min-milliseconds": 100, // Minimum 100ms for animations/transitions (performance) (verified working)
         "unit-allowed-list": null,
         "unit-disallowed-list": null,
+        "unit-no-unknown": true,
     },
     // Validate: true, -- Disabled: not real config option only CLI flag
 });

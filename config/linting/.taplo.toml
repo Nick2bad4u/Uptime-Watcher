@@ -1,4 +1,6 @@
-# eslint-disable toml/key-spacing -- Schema doesnt like it
+# eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Needed for alignment
+# eslint-disable toml/key-spacing -- Needed for alignment
+
 # ~/.taplo.toml
 # yaml-language-server: $schema=https://www.schemastore.org/taplo.json
 [schema]
@@ -70,4 +72,3 @@
     [rule.formatting]
         # Prettier tabWidth: 1
         indent_string = " "
-        # eslint-enable toml/key-spacing  -- Schema doesnt like it

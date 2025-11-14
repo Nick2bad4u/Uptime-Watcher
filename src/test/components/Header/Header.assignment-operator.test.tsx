@@ -160,6 +160,7 @@ const createMockSitesStoreState = (sites: Site[]): SitesStore => {
         updateMonitorRetryAttempts: vi.fn(async () => {}),
         updateMonitorTimeout: vi.fn(async () => {}),
         updateSiteCheckInterval: vi.fn(async () => {}),
+        optimisticMonitoringLocks: {},
         selectedMonitorIds: {},
         selectedSiteIdentifier: undefined,
         lastSyncDelta: undefined,

@@ -923,6 +923,7 @@ export default defineConfig(({ mode }) => {
                     ), // 16 threads on local, 1 thread on CI by default
                     minThreads: 1, // Ensure at least one thread
                     singleThread: Boolean(process.env["CI"]), // Enable single-threading in CI
+                    startupTimeout: 120_000, // Vitest default (10s) is too aggressive on Windows with >700 suites
                     useAtomics: true,
                 },
             },

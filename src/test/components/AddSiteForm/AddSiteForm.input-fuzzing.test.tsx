@@ -25,7 +25,7 @@
 
 import { describe, expect, vi, beforeEach, afterEach } from "vitest";
 import { test as fcTest, fc } from "@fast-check/vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import type { MonitorType, Site } from "@shared/types";
@@ -250,6 +250,23 @@ const renderForm = async (): Promise<void> => {
     await waitFor(() => {
         expect(screen.getByRole("form")).toBeInTheDocument();
     });
+};
+
+/**
+ * Updates an input element's value while allowing Testing Library to internally
+ * manage React's act() behavior during fast-check runs.
+ */
+const commitInputValue = async (
+    element: Element | null,
+    value: string
+): Promise<void> => {
+    if (!(element instanceof HTMLInputElement)) {
+        return;
+    }
+
+    element.value = value;
+
+    fireEvent.input(element, { target: { value } });
 };
 
 vi.mock("../../../components/AddSiteForm/TextField", () => ({
@@ -502,11 +519,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Test input handling
                 await user.clear(siteNameInput);
-                // Use faster direct assignment instead of slow typing
-                (siteNameInput as HTMLInputElement).value = siteName;
-                siteNameInput.dispatchEvent(
-                    new Event("input", { bubbles: true })
-                );
+                await commitInputValue(siteNameInput, siteName);
 
                 // Verify input was accepted (no crash or rejection)
                 expect(siteNameInput).toHaveValue(siteName);
@@ -557,10 +570,8 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 const siteNameInputs = screen.getAllByLabelText(/site name/i);
                 const siteNameInput = siteNameInputs[0]!;
 
-                // Clear and set value using fireEvent for more control
-                fireEvent.change(siteNameInput, {
-                    target: { value: emptyName },
-                });
+                // Clear and set value using act-aware helper for more control
+                await commitInputValue(siteNameInput, emptyName);
 
                 // HTML input elements may normalize whitespace, but we primarily care that:
                 // 1. The component doesn't crash
@@ -693,8 +704,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             expect(urlInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
-            (urlInput as HTMLInputElement).value = validUrl;
-            urlInput.dispatchEvent(new Event("input", { bubbles: true }));
+            await commitInputValue(urlInput, validUrl);
 
             // Should accept valid URLs
             expect(urlInput).toHaveValue(validUrl);
@@ -740,8 +750,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
             // Should not crash when entering dangerous URLs
             // Use direct DOM manipulation for speed
-            (urlInput as HTMLInputElement).value = dangerousUrl;
-            urlInput.dispatchEvent(new Event("input", { bubbles: true }));
+            await commitInputValue(urlInput, dangerousUrl);
 
             // URL should be entered (validation happens on submit)
             expect(urlInput).toHaveValue(dangerousUrl);
@@ -784,8 +793,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 expect(hostInput).toBeInTheDocument();
 
                 // Use direct DOM manipulation instead of userEvent for speed
-                (hostInput as HTMLInputElement).value = validHost;
-                hostInput.dispatchEvent(new Event("input", { bubbles: true }));
+                await commitInputValue(hostInput, validHost);
 
                 expect(hostInput).toHaveValue(validHost);
             }
@@ -828,8 +836,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
 
                 // Should not crash - use direct DOM manipulation for speed
                 const limitedHost = maliciousHost.slice(0, 50); // Limit to reasonable length
-                (hostInput as HTMLInputElement).value = limitedHost;
-                hostInput.dispatchEvent(new Event("input", { bubbles: true }));
+                await commitInputValue(hostInput, limitedHost);
 
                 // Verify the input was set without crashing
                 expect(hostInput).toBeInTheDocument();
@@ -853,8 +860,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
             expect(portInput).toBeInTheDocument();
 
             // Use direct DOM manipulation instead of userEvent for speed
-            (portInput as HTMLInputElement).value = validPort.toString();
-            portInput.dispatchEvent(new Event("input", { bubbles: true }));
+            await commitInputValue(portInput, validPort.toString());
 
             expect(portInput).toHaveValue(validPort);
         });
@@ -890,17 +896,9 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 expect(portInput).toBeInTheDocument();
 
                 // Should not crash on invalid input while simulating user entry
-                expect(() => {
-                    (portInput as HTMLInputElement).value = "";
-                    portInput.dispatchEvent(
-                        new Event("input", { bubbles: true })
-                    );
-
-                    (portInput as HTMLInputElement).value =
-                        invalidPort.toString();
-                    portInput.dispatchEvent(
-                        new Event("input", { bubbles: true })
-                    );
+                await expect(async () => {
+                    await commitInputValue(portInput, "");
+                    await commitInputValue(portInput, invalidPort.toString());
                 }).not.toThrow();
 
                 // Input should be handled gracefully (validation happens on submit)
@@ -931,7 +929,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                 await renderForm();
 
                 // Should not crash during form interaction
-                expect(async () => {
+                await expect(async () => {
                     // Set mode - use query to handle missing elements
                     const modeRadios = screen.queryAllByDisplayValue(
                         formData.mode
@@ -962,10 +960,9 @@ describe("AddSiteForm User Input Fuzzing", () => {
                                 0,
                                 50
                             );
-                            (siteNameInput as HTMLInputElement).value =
-                                limitedSiteName;
-                            siteNameInput.dispatchEvent(
-                                new Event("input", { bubbles: true })
+                            await commitInputValue(
+                                siteNameInput,
+                                limitedSiteName
                             );
                         }
                     }
@@ -979,10 +976,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                             await user.clear(urlInput);
                             // Use faster direct assignment
                             const limitedUrl = formData.url.slice(0, 100);
-                            (urlInput as HTMLInputElement).value = limitedUrl;
-                            urlInput.dispatchEvent(
-                                new Event("input", { bubbles: true })
-                            );
+                            await commitInputValue(urlInput, limitedUrl);
                         }
                     }
 
@@ -998,10 +992,7 @@ describe("AddSiteForm User Input Fuzzing", () => {
                             await user.clear(hostInput);
                             // Use faster direct assignment
                             const limitedHost = formData.host.slice(0, 50);
-                            (hostInput as HTMLInputElement).value = limitedHost;
-                            hostInput.dispatchEvent(
-                                new Event("input", { bubbles: true })
-                            );
+                            await commitInputValue(hostInput, limitedHost);
                         }
 
                         if (formData.monitorType === "port") {
@@ -1013,10 +1004,9 @@ describe("AddSiteForm User Input Fuzzing", () => {
                             if (portInput) {
                                 await user.clear(portInput);
                                 // Use faster direct assignment
-                                (portInput as HTMLInputElement).value =
-                                    formData.port;
-                                portInput.dispatchEvent(
-                                    new Event("input", { bubbles: true })
+                                await commitInputValue(
+                                    portInput,
+                                    formData.port
                                 );
                             }
                         }

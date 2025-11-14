@@ -135,6 +135,7 @@ const createMockSitesStore = (
     updateMonitorRetryAttempts: async () => {},
     updateMonitorTimeout: async () => {},
     updateSiteCheckInterval: async () => {},
+    optimisticMonitoringLocks: {},
     selectedMonitorIds: {},
     selectedSiteIdentifier: undefined,
     sites: [],

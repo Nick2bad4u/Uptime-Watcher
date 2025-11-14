@@ -569,6 +569,7 @@ describe("useSiteSync", () => {
             );
 
             const state: typeof initialSitesState = {
+                optimisticMonitoringLocks: {},
                 selectedMonitorIds: {
                     "site-1": "site-1-monitor",
                 },

@@ -46,11 +46,7 @@ import { MonitoringService } from "../../services/MonitoringService";
 import { SiteService } from "../../services/SiteService";
 import { createSiteMonitoringActions } from "./useSiteMonitoring";
 import { createSiteOperationsActions } from "./useSiteOperations";
-import {
-    createSitesStateActions,
-    initialSitesState,
-    type SitesState,
-} from "./useSitesState";
+import { createSitesStateActions, initialSitesState } from "./useSitesState";
 import { createSiteSyncActions } from "./useSiteSync";
 
 /**
@@ -74,11 +70,9 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         // Create state actions
         const stateActions = createSitesStateActions(
             (updater) => {
-                set((storeState) =>
-                    updater(storeState as unknown as SitesState)
-                );
+                set((storeState) => updater(storeState));
             },
-            () => get() as unknown as SitesState
+            () => get()
         );
 
         // Shared getSites function - eliminates duplication and improves
@@ -98,9 +92,9 @@ export const useSitesStore: UseBoundStore<StoreApi<SitesStore>> =
         const monitoringActions = createSiteMonitoringActions({
             clearOptimisticMonitoringLocks:
                 stateActions.clearOptimisticMonitoringLocks,
+            getOptimisticMonitoringLocks:
+                stateActions.getOptimisticMonitoringLocks,
             getSites,
-            getOptimisticMonitoringLocks: () =>
-                (get() as unknown as SitesState).optimisticMonitoringLocks,
             monitoringService: MonitoringService,
             registerMonitoringLock:
                 stateActions.registerOptimisticMonitoringLock,
