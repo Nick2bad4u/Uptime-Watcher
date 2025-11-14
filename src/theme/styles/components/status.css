@@ -150,7 +150,7 @@
     border-radius: 999px;
     background: radial-gradient(
         circle at 30% 28%,
-        color-mix(in srgb, var(--status-indicator-color) 65%, #fff 35%),
+        color-mix(in srgb, var(--status-indicator-color) 65%, #ffffff 35%),
         var(--status-indicator-color)
     );
     block-size: var(--status-indicator-size);
@@ -190,7 +190,7 @@
     border-radius: 999px;
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--status-indicator-color) 58%, #fff 24%),
+        color-mix(in srgb, var(--status-indicator-color) 58%, #ffffff 24%),
         var(--status-indicator-color)
     );
     block-size: var(--status-indicator-size);
@@ -199,7 +199,7 @@
             color-mix(in srgb, var(--status-indicator-color) 20%, transparent),
         0 20px 32px
             color-mix(in srgb, var(--status-indicator-color) 32%, transparent);
-    color: color-mix(in srgb, var(--status-indicator-color) 68%, #fff 32%);
+    color: color-mix(in srgb, var(--status-indicator-color) 68%, #ffffff 32%);
     inline-size: var(--status-indicator-size);
     transition:
         transform var(--transition-fast),

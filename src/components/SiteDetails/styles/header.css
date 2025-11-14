@@ -269,7 +269,7 @@
         color-mix(in srgb, var(--color-primary-500) 6%, transparent)
     );
     block-size: 2rem;
-    color: color-mix(in srgb, var(--color-primary-200) 80%, #fff 20%);
+    color: color-mix(in srgb, var(--color-primary-200) 80%, #ffffff 20%);
     cursor: pointer;
     inline-size: 2rem;
     transition:
@@ -287,7 +287,7 @@
         );
         box-shadow: 0 12px 26px
             color-mix(in srgb, var(--color-primary-500) 24%, transparent);
-        color: color-mix(in srgb, var(--color-primary-200) 60%, #fff 40%);
+        color: color-mix(in srgb, var(--color-primary-200) 60%, #ffffff 40%);
         transform: translateY(-1px);
     }
 

@@ -270,10 +270,10 @@
 }
 
 .settings-alert-volume-control__row {
-    align-items: center;
     display: flex;
-    gap: var(--spacing-sm);
+    align-items: center;
     justify-content: space-between;
+    gap: var(--spacing-sm);
 }
 
 .settings-alert-volume-control__value {
@@ -284,7 +284,7 @@
 
 .settings-alert-volume-control__note {
     color: var(--color-text-tertiary);
-    line-height: 1.4;
+    line-height: 1.375;
 }
 
 .settings-theme-preview {

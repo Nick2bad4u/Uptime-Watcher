@@ -613,7 +613,7 @@ const config = defineConfig({
         "a11y/no-text-align-justify": true,
         "a11y/selector-pseudo-class-focus": true,
         // Color rules
-        "alpha-value-notation": ["percentage", { exceptProperties: ["0"] }],
+        "alpha-value-notation": null,
         "annotation-no-unknown": true,
 
         /**
@@ -672,7 +672,12 @@ const config = defineConfig({
         "csstools/value-no-unknown-custom-properties": null,
         "custom-property-no-missing-var-function": true,
         "declaration-block-no-duplicate-custom-properties": true,
-        "declaration-block-no-duplicate-properties": true,
+        "declaration-block-no-duplicate-properties": [
+            true,
+            {
+                ignore: ["consecutive-duplicates-with-different-syntaxes"],
+            },
+        ],
         "declaration-block-no-redundant-longhand-properties": true,
         "declaration-block-no-shorthand-property-overrides": true,
         "declaration-block-single-line-max-declarations": 1,
@@ -697,23 +702,27 @@ const config = defineConfig({
         "function-disallowed-list": null,
         // Function rules (security and best practices)
         "function-linear-gradient-no-nonstandard-direction": true,
+        "function-name-case": "lower",
         "function-no-unknown": true,
         "function-url-no-scheme-relative": true,
         "function-url-quotes": "always",
         "function-url-scheme-allowed-list": null,
         "function-url-scheme-disallowed-list": null,
-
         // Color gamut validation
         "gamut/color-no-out-gamut-range": true,
-        "hue-degree-notation": "number",
+        "hue-degree-notation": "angle",
+        "import-notation": "string",
         "keyframe-block-no-duplicate-selectors": true,
-
         "keyframe-declaration-no-important": true,
+        "keyframe-selector-notation":
+            "percentage-unless-within-keyword-only-block",
+
         // Length rules
         "length-zero-no-unit": true, // Disallow units for zero lengths (0px -> 0) (verified working)
         "lightness-notation": "percentage",
         // Layout and structure
         "max-nesting-depth": 4,
+
         // Media query rules
         "media-feature-name-allowed-list": null,
         "media-feature-name-disallowed-list": null,
@@ -722,10 +731,12 @@ const config = defineConfig({
         "media-feature-name-unit-allowed-list": null,
         "media-feature-name-value-allowed-list": null,
         "media-feature-name-value-no-unknown": null,
+        "media-feature-range-notation": "context",
         "media-query-no-invalid": null,
         "media-type-no-deprecated": true,
         "named-grid-areas-no-invalid": true,
         "nesting-selector-no-missing-scoping-root": true,
+        "no-descending-specificity": true,
         "no-duplicate-at-import-rules": true,
         "no-duplicate-selectors": true,
         "no-empty-source": true,
@@ -737,6 +748,7 @@ const config = defineConfig({
         "no-unknown-animations": true,
         "no-unknown-custom-media": null,
         "no-unknown-custom-properties": null,
+        "number-max-precision": 15,
         // Taken care of Prettier
         "order/order": null,
         "order/properties-alphabetical-order": null,
@@ -955,8 +967,8 @@ const config = defineConfig({
         "property-allowed-list": null,
         "property-disallowed-list": null,
         "property-no-deprecated": true,
-
         "property-no-unknown": true,
+
         "rule-empty-line-before": null,
         "rule-nesting-at-rule-required-list": null,
         "rule-selector-property-disallowed-list": null,
@@ -1057,6 +1069,7 @@ const config = defineConfig({
             1.75,
             2,
         ],
+        "scales/radii": null,
 
         /**
          * Prettier integration for code formatting.
@@ -1067,12 +1080,10 @@ const config = defineConfig({
          */
         // Prettier integration
 
-        "scales/radii": null,
         "scales/sizes": null,
         "scales/space": null,
         "scales/word-spacings": null,
         "scales/z-indices": null,
-
         /**
          * SCSS (Sass) specific linting rules.
          *
@@ -1085,6 +1096,7 @@ const config = defineConfig({
          */
         // SCSS specific rules (stylelint-scss)
         "scss/at-each-key-value-single-line": true,
+
         "scss/at-function-named-arguments": "always",
         "scss/at-import-partial-extension-allowed-list": null,
         "scss/at-import-partial-extension-disallowed-list": null,
@@ -1096,8 +1108,8 @@ const config = defineConfig({
         "scss/at-use-no-unnamespaced": true,
         "scss/block-no-redundant-nesting": true,
         "scss/comment-no-loud": null,
-
         "scss/declaration-nested-properties": null,
+
         "scss/declaration-property-value-no-unknown": true,
         "scss/dimension-no-non-numeric-values": true,
         "scss/dollar-variable-colon-newline-after": "always",
@@ -1179,6 +1191,7 @@ const config = defineConfig({
         "unit-allowed-list": null,
         "unit-disallowed-list": null,
         "unit-no-unknown": true,
+        "value-keyword-case": "lower",
     },
     // Validate: true, -- Disabled: not real config option only CLI flag
 });

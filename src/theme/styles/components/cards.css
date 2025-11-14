@@ -847,7 +847,7 @@
     padding: 0.15rem 0.5rem;
     border-radius: 9999px;
     background: color-mix(in srgb, var(--color-primary-500) 16%, transparent);
-    color: color-mix(in srgb, var(--color-primary-500) 72%, #fff 28%);
+    color: color-mix(in srgb, var(--color-primary-500) 72%, #ffffff 28%);
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;

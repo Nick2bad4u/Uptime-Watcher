@@ -380,7 +380,7 @@
     padding: 2px 6px;
     border-radius: 10px;
     background: var(--ifm-color-primary);
-    color: #fff;
+    color: #ffffff;
     content: attr(data-badge);
     font-size: 16px; /* Accessible font size - minimum 16px for readability */
     font-weight: 600;
@@ -1193,7 +1193,7 @@ h3 {
 }
 
 .footer__title {
-    color: #fff;
+    color: #ffffff;
     font-size: 1.1rem;
     font-weight: 700;
     margin-block-end: 1rem;
@@ -1299,7 +1299,7 @@ h3 {
 
 .footer__copyright {
     border-block-start: 1px solid var(--color-neutral-dark);
-    color: #888;
+    color: #888888;
     font-size: 0.9rem;
     font-style: italic;
     margin-block-start: 2rem;
@@ -1980,7 +1980,7 @@ h3 {
 }
 
 [class*="collapseSidebarButtonIcon_kv0_"] > g {
-    fill: #fff;
+    fill: #ffffff;
     stroke: var(--ifm-color-primary-darkest);
 }
 
@@ -2845,7 +2845,7 @@ html {
         var(--ifm-color-primary),
         var(--ifm-color-primary-light)
     );
-    color: color-mix(in srgb, #27e34f 90%, #fff);
+    color: color-mix(in srgb, #27e34f 90%, #ffffff);
     text-shadow: 0 1px 3px rgb(0 0 0 / 30%);
 }
 
@@ -3082,7 +3082,7 @@ html {
             padding: 0.5rem 1rem;
             border-radius: 8px;
             background: rgb(0 0 0 / 90%);
-            color: #fff;
+            color: #ffffff;
             content: attr(data-tooltip);
             font-size: 0.875rem;
             inset-block-end: 100%;
@@ -3101,7 +3101,7 @@ html {
         padding: 0.5rem 1rem;
         border-radius: 8px;
         background: rgb(0 0 0 / 90%);
-        color: #fff;
+        color: #ffffff;
         content: attr(data-tooltip);
         font-size: 0.875rem;
         inset-block-end: 100%;
@@ -3265,14 +3265,14 @@ html {
     --ifm-color-primary-lighter: #6ee7b7;
     --ifm-color-primary-lightest: #a7f3d0;
     --ifm-color-primary-rgb: 16, 185, 129;
-    --ifm-font-color-base: #222;
+    --ifm-font-color-base: #222222;
     --glass-backdrop: rgb(255 255 255 / 70%);
     --glass-border: rgb(0 0 0 / 8%);
     /* End of intentional overrides */
 
     & body {
         background: #f4f4f4;
-        color: #222;
+        color: #222222;
     }
 
     & .glass-card,
@@ -3280,7 +3280,7 @@ html {
     & .glass-effect {
         border: 1px solid #e0e0e0;
         background: rgb(255 255 255 / 85%);
-        color: #222;
+        color: #222222;
     }
 
     & .navbar {
@@ -3294,7 +3294,7 @@ html {
 
     & .prism-code {
         background: #f8f8f8 !important;
-        color: #222 !important;
+        color: #222222 !important;
     }
 }
 
@@ -3592,9 +3592,9 @@ html {
             z-index: 1000;
             padding: 8px 12px;
             border-radius: 8px;
-            background: linear-gradient(135deg, #333, #555);
+            background: linear-gradient(135deg, #333333, #555555);
             box-shadow: 0 4px 20px rgb(0 0 0 / 15%);
-            color: #fff;
+            color: #ffffff;
             content: attr(data-tooltip-enhanced);
             font-size: 0.85rem;
             inset-block-end: 100%;
@@ -3612,9 +3612,9 @@ html {
         z-index: 1000;
         padding: 8px 12px;
         border-radius: 8px;
-        background: linear-gradient(135deg, #333, #555);
+        background: linear-gradient(135deg, #333333, #555555);
         box-shadow: 0 4px 20px rgb(0 0 0 / 15%);
-        color: #fff;
+        color: #ffffff;
         content: attr(data-tooltip-enhanced);
         font-size: 0.85rem;
         inset-block-end: 100%;
@@ -3630,7 +3630,7 @@ html {
         &::after {
             position: absolute;
             border: 6px solid transparent;
-            border-block-start-color: #333;
+            border-block-start-color: #333333;
             content: "";
             inset-block-end: 100%;
             inset-inline-start: 50%;
@@ -3644,7 +3644,7 @@ html {
     &::after {
         position: absolute;
         border: 6px solid transparent;
-        border-block-start-color: #333;
+        border-block-start-color: #333333;
         content: "";
         inset-block-end: 100%;
         inset-inline-start: 50%;
@@ -3773,9 +3773,9 @@ html {
     .glass-card,
     .neon-glow,
     .gradient-text-flow {
-        background: #fff !important;
+        background: #ffffff !important;
         box-shadow: none !important;
-        color: #000 !important;
+        color: #000000 !important;
         filter: none !important;
     }
 }

@@ -371,7 +371,7 @@
 
 [data-theme="light"] .featureCard {
     border: 1px solid #e0e0e0;
-    background: linear-gradient(145deg, #fff, #f0f0f0);
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
 
     &:hover,
     &:focus {

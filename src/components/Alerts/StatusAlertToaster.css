@@ -97,8 +97,8 @@
     block-size: 1.75rem;
     color: inherit;
     inline-size: 1.75rem;
-    transition: transform 150ms ease;
     pointer-events: auto;
+    transition: transform 150ms ease;
 
     @media screen and (prefers-reduced-motion: reduce) {
         display: flex;
@@ -111,8 +111,8 @@
         block-size: 1.75rem;
         color: inherit;
         inline-size: 1.75rem;
-        transition: none;
         pointer-events: auto;
+        transition: none;
     }
 
     &:focus-visible,

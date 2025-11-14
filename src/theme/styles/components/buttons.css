@@ -104,7 +104,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-primary-500) 18%,
-        #fff 82%
+        #ffffff 82%
     );
 
     border-color: color-mix(in srgb, var(--color-primary-500) 55%, transparent);
@@ -130,7 +130,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-success) 25%,
-        #fff 75%
+        #ffffff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-success) 55%, transparent);
@@ -141,7 +141,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-warning) 25%,
-        #fff 75%
+        #ffffff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
@@ -152,7 +152,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-error) 25%,
-        #fff 75%
+        #ffffff 75%
     );
 
     border-color: color-mix(in srgb, var(--color-error) 55%, transparent);
@@ -167,7 +167,7 @@
     --themed-button-foreground: color-mix(
         in srgb,
         var(--color-text-secondary) 88%,
-        #fff 12%
+        #ffffff 12%
     );
 
     border-color: color-mix(

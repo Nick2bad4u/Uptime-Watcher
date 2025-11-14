@@ -149,7 +149,7 @@
 
 .modal-shell__subtitle {
     margin: 0;
-    color: color-mix(in srgb, var(--color-text-secondary) 88%, #fff 12%);
+    color: color-mix(in srgb, var(--color-text-secondary) 88%, #ffffff 12%);
     font-size: 1rem;
     max-inline-size: 46ch;
 }
@@ -175,7 +175,7 @@
     block-size: 2.5rem;
     box-shadow: 0 16px 36px
         color-mix(in srgb, var(--modal-accent) 28%, transparent);
-    color: color-mix(in srgb, var(--modal-accent) 72%, #fff 28%);
+    color: color-mix(in srgb, var(--modal-accent) 72%, #ffffff 28%);
     cursor: pointer;
     inline-size: 2.5rem;
     transition:
