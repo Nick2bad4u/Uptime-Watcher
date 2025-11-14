@@ -1,14 +1,16 @@
 # ############################  Display  #############################
+# eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- unneeded
+# eslint-disable toml/key-spacing -- unneeded
 
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
-name = "lychee"
+name        = "lychee"
 description = "Configuration file for lychee link checker."
-version = "1.0.0"
-git = "LycheeOrg/Lychee"
-changelog = "https://github.com/LycheeOrg/Lychee/blob/master/README.md"
-"$schema" = "../schemas/generic.schema.json"
-verbose = "info"
+version     = "1.0.0"
+git         = "LycheeOrg/Lychee"
+changelog   = "https://github.com/LycheeOrg/Lychee/blob/master/README.md"
+"$schema"   = "file:///c:/Users/Nick/Dropbox/PC%20(2)/Documents/GitHub/Uptime-Watcher/config/schemas/generic.schema.json"
+verbose     = "info"
 
 # Don't show interactive progress bar while checking links.
 no_progress = false

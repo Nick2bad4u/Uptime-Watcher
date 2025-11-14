@@ -7,7 +7,7 @@
 # Configuration options are organized into tables and keys.
 # See documentation for more information on available options.
 
-"$schema"   = "../schemas/generic.schema.json"
+"$schema"   = "file:///c:/Users/Nick/Dropbox/PC%20(2)/Documents/GitHub/Uptime-Watcher/config/schemas/generic.schema.json"
 description = "Configuration file for git-cliff to generate changelogs based on conventional commits."
 name        = "Uptime-Watcher Changelog Configuration"
 version     = "1.0.0"
