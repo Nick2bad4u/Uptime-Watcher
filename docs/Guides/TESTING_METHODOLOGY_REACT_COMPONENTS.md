@@ -94,49 +94,45 @@ describe("useSitesStore", () => {
 
 ```typescript
 // Testing components with store integration
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ThemeProvider } from '../theme/components/ThemeProvider';
-import { MyComponent } from './MyComponent';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { ThemeProvider } from "../theme/components/ThemeProvider";
+import { MyComponent } from "./MyComponent";
 
 const renderWithProviders = (component: React.ReactElement) => {
-  return render(
-    <ThemeProvider>
-      {component}
-    </ThemeProvider>
-  );
+ return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
-describe('MyComponent Integration', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe("MyComponent Integration", () => {
+ beforeEach(() => {
+  vi.clearAllMocks();
+ });
+
+ it("handles user interactions correctly", async () => {
+  renderWithProviders(<MyComponent siteName="test-site" />);
+
+  const actionButton = screen.getByTestId("action-button-test-site");
+  fireEvent.click(actionButton);
+
+  await waitFor(() => {
+   expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
+    expect.objectContaining({ name: "test-site" })
+   );
   });
+ });
 
-  it('handles user interactions correctly', async () => {
-    renderWithProviders(<MyComponent siteName="test-site" />);
+ it("prevents event propagation correctly", () => {
+  const mockParentClick = vi.fn();
 
-    const actionButton = screen.getByTestId('action-button-test-site');
-    fireEvent.click(actionButton);
+  render(
+   <div onClick={mockParentClick} data-testid="parent">
+    <MyComponent siteName="test-site" />
+   </div>
+  );
 
-    await waitFor(() => {
-      expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'test-site' })
-      );
-    });
-  });
+  fireEvent.click(screen.getByTestId("action-button-test-site"));
 
-  it('prevents event propagation correctly', () => {
-    const mockParentClick = vi.fn();
-
-    render(
-      <div onClick={mockParentClick} data-testid="parent">
-        <MyComponent siteName="test-site" />
-      </div>
-    );
-
-    fireEvent.click(screen.getByTestId('action-button-test-site'));
-
-    expect(mockParentClick).not.toHaveBeenCalled();
-  });
+  expect(mockParentClick).not.toHaveBeenCalled();
+ });
 });
 ```
 
@@ -182,47 +178,47 @@ describe("Event Integration", () => {
 
 ```typescript
 // Testing current validation patterns with Zod schemas
-import { httpMonitorSchema } from '@shared/validation/schemas';
+import { httpMonitorSchema } from "@shared/validation/schemas";
 
-describe('Form Validation', () => {
-  it('validates form data with shared schemas', async () => {
-    render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
+describe("Form Validation", () => {
+ it("validates form data with shared schemas", async () => {
+  render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
 
-    // Fill form with invalid data
-    fireEvent.change(screen.getByLabelText(/site name/i), {
-      target: { value: '' }, // Empty name should fail validation
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /add site/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/site name is required/i)).toBeInTheDocument();
-    });
+  // Fill form with invalid data
+  fireEvent.change(screen.getByLabelText(/site name/i), {
+   target: { value: "" }, // Empty name should fail validation
   });
 
-  it('handles successful validation', async () => {
-    render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
+  fireEvent.click(screen.getByRole("button", { name: /add site/i }));
 
-    // Fill form with valid data
-    fireEvent.change(screen.getByLabelText(/site name/i), {
-      target: { value: 'Test Site' },
-    });
-
-    fireEvent.change(screen.getByLabelText(/url/i), {
-      target: { value: 'https://example.com' },
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /add site/i }));
-
-    await waitFor(() => {
-      expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'Test Site',
-          url: 'https://example.com',
-        })
-      );
-    });
+  await waitFor(() => {
+   expect(screen.getByText(/site name is required/i)).toBeInTheDocument();
   });
+ });
+
+ it("handles successful validation", async () => {
+  render(<AddSiteForm isVisible={true} onClose={mockOnClose} />);
+
+  // Fill form with valid data
+  fireEvent.change(screen.getByLabelText(/site name/i), {
+   target: { value: "Test Site" },
+  });
+
+  fireEvent.change(screen.getByLabelText(/url/i), {
+   target: { value: "https://example.com" },
+  });
+
+  fireEvent.click(screen.getByRole("button", { name: /add site/i }));
+
+  await waitFor(() => {
+   expect(mockElectronAPI.sites.addSite).toHaveBeenCalledWith(
+    expect.objectContaining({
+     name: "Test Site",
+     url: "https://example.com",
+    })
+   );
+  });
+ });
 });
 ```
 
@@ -230,32 +226,32 @@ describe('Form Validation', () => {
 
 ```typescript
 // Testing modal interactions and UI state
-describe('Modal Interactions', () => {
-  it('handles escape key modal closure', () => {
-    render(<MyModal />);
+describe("Modal Interactions", () => {
+ it("handles escape key modal closure", () => {
+  render(<MyModal />);
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+  fireEvent.keyDown(document, { key: "Escape" });
 
-    expect(mockOnClose).toHaveBeenCalled();
-  });
+  expect(mockOnClose).toHaveBeenCalled();
+ });
 
-  it('handles backdrop click closure', () => {
-    render(<MyModal />);
+ it("handles backdrop click closure", () => {
+  render(<MyModal />);
 
-    const backdrop = screen.getByRole('button', { name: '' }); // Backdrop with role="button"
-    fireEvent.click(backdrop);
+  const backdrop = screen.getByRole("button", { name: "" }); // Backdrop with role="button"
+  fireEvent.click(backdrop);
 
-    expect(mockOnClose).toHaveBeenCalled();
-  });
+  expect(mockOnClose).toHaveBeenCalled();
+ });
 
-  it('prevents content click from closing modal', () => {
-    render(<MyModal />);
+ it("prevents content click from closing modal", () => {
+  render(<MyModal />);
 
-    const content = screen.getByTestId('modal-content');
-    fireEvent.click(content);
+  const content = screen.getByTestId("modal-content");
+  fireEvent.click(content);
 
-    expect(mockOnClose).not.toHaveBeenCalled();
-  });
+  expect(mockOnClose).not.toHaveBeenCalled();
+ });
 });
 ```
 
@@ -272,8 +268,17 @@ export default defineConfig({
   globals: true,
   coverage: {
    provider: "v8",
-   reporter: ["text", "json", "html"],
-   exclude: ["node_modules/", "src/test/", "**/*.d.ts", "**/*.config.*"],
+   reporter: [
+    "text",
+    "json",
+    "html",
+   ],
+   exclude: [
+    "node_modules/",
+    "src/test/",
+    "**/*.d.ts",
+    "**/*.config.*",
+   ],
   },
  },
 });
@@ -323,63 +328,63 @@ vi.mock("../services/logger", () => ({
 ### Component Test Template
 
 ```typescript
-describe('ComponentName', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe("ComponentName", () => {
+ beforeEach(() => {
+  vi.clearAllMocks();
+ });
+
+ describe("Rendering", () => {
+  it("renders without errors", () => {
+   render(<ComponentName siteName="test-site" />);
+   expect(screen.getByTestId("component-test-site")).toBeInTheDocument();
   });
 
-  describe('Rendering', () => {
-    it('renders without errors', () => {
-      render(<ComponentName siteName="test-site" />);
-      expect(screen.getByTestId('component-test-site')).toBeInTheDocument();
-    });
+  it("renders with correct props", () => {
+   render(<ComponentName siteName="test-site" variant="primary" />);
+   expect(screen.getByTestId("component-test-site")).toHaveClass("primary");
+  });
+ });
 
-    it('renders with correct props', () => {
-      render(<ComponentName siteName="test-site" variant="primary" />);
-      expect(screen.getByTestId('component-test-site')).toHaveClass('primary');
-    });
+ describe("Interactions", () => {
+  it("handles click events correctly", () => {
+   const mockOnAction = vi.fn();
+   render(<ComponentName siteName="test-site" onAction={mockOnAction} />);
+
+   fireEvent.click(screen.getByRole("button"));
+
+   expect(mockOnAction).toHaveBeenCalledTimes(1);
   });
 
-  describe('Interactions', () => {
-    it('handles click events correctly', () => {
-      const mockOnAction = vi.fn();
-      render(<ComponentName siteName="test-site" onAction={mockOnAction} />);
+  it("prevents event propagation", () => {
+   const mockParentClick = vi.fn();
 
-      fireEvent.click(screen.getByRole('button'));
+   render(
+    <div onClick={mockParentClick}>
+     <ComponentName siteName="test-site" />
+    </div>
+   );
 
-      expect(mockOnAction).toHaveBeenCalledTimes(1);
-    });
+   fireEvent.click(screen.getByRole("button"));
 
-    it('prevents event propagation', () => {
-      const mockParentClick = vi.fn();
-
-      render(
-        <div onClick={mockParentClick}>
-          <ComponentName siteName="test-site" />
-        </div>
-      );
-
-      fireEvent.click(screen.getByRole('button'));
-
-      expect(mockParentClick).not.toHaveBeenCalled();
-    });
+   expect(mockParentClick).not.toHaveBeenCalled();
   });
+ });
 
-  describe('Error Handling', () => {
-    it('handles API errors gracefully', async () => {
-      mockElectronAPI.sites.addSite.mockRejectedValueOnce(new Error('API Error'));
+ describe("Error Handling", () => {
+  it("handles API errors gracefully", async () => {
+   mockElectronAPI.sites.addSite.mockRejectedValueOnce(new Error("API Error"));
 
-      render(<ComponentName siteName="test-site" />);
-      fireEvent.click(screen.getByRole('button'));
+   render(<ComponentName siteName="test-site" />);
+   fireEvent.click(screen.getByRole("button"));
 
-      await waitFor(() => {
-        expect(logger.error).toHaveBeenCalledWith(
-          expect.stringContaining('API Error'),
-          expect.any(Error)
-        );
-      });
-    });
+   await waitFor(() => {
+    expect(logger.error).toHaveBeenCalledWith(
+     expect.stringContaining("API Error"),
+     expect.any(Error)
+    );
+   });
   });
+ });
 });
 ```
 
@@ -508,20 +513,20 @@ describe("useMount", () => {
 
 ```typescript
 // ErrorBoundary testing
-describe('ErrorBoundary', () => {
-  it('catches and displays errors', () => {
-    const ThrowError = () => {
-      throw new Error('Test error');
-    };
+describe("ErrorBoundary", () => {
+ it("catches and displays errors", () => {
+  const ThrowError = () => {
+   throw new Error("Test error");
+  };
 
-    render(
-      <ErrorBoundary>
-        <ThrowError />
-      </ErrorBoundary>
-    );
+  render(
+   <ErrorBoundary>
+    <ThrowError />
+   </ErrorBoundary>
+  );
 
-    expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
-  });
+  expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
+ });
 });
 ```
 

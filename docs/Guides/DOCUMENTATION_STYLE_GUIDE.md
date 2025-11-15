@@ -112,11 +112,11 @@ circuit-breaker-implementation-plan.md
 - Include descriptive content in cells
 
 ```markdown
-| Feature    | Description                   | Status |
-| ---------- | ----------------------------- | ------ |
-| Monitoring | Real-time uptime tracking     | ✅     |
-| Alerts     | Desktop notifications         | ✅     |
-| Analytics  | Historical data visualization | 🚧     |
+| Feature | Description | Status |
+| --- | --- | --- |
+| Monitoring | Real-time uptime tracking | ✅ |
+| Alerts | Desktop notifications | ✅ |
+| Analytics | Historical data visualization | 🚧 |
 ```
 
 ### Code Blocks
@@ -286,9 +286,10 @@ Description of what the method does.
 **Example:**
 
 ````typescript
-// Usage example
-const result = methodName(value);
-```typescript
+
+
+
+// Usage exampleconst result = methodName(value);```typescript
 // Usage example
 const result = methodName(value);
 ````
@@ -407,9 +408,9 @@ npm run dev
 
 ```markdown
 | Monitor Type | Port | Protocol | Timeout |
-| ------------ | ---- | -------- | ------- |
-| HTTP         | 80   | TCP      | 30s     |
-| HTTPS        | 443  | TCP      | 30s     |
+| --- | --- | --- | --- |
+| HTTP | 80 | TCP | 30s |
+| HTTPS | 443 | TCP | 30s |
 ```
 
 ### Poor Examples
@@ -431,8 +432,8 @@ npm install
 ❌ **Incomplete table:**
 
 ```markdown
-| Type | Info      |
-| ---- | --------- |
+| Type | Info |
+| --- | --- |
 | HTTP | web stuff |
 ```
 

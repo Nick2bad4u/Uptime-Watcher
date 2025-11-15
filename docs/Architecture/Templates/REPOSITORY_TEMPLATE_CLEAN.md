@@ -19,6 +19,7 @@ Repository classes manage data persistence using the dual-method pattern:
 ## Template Structure
 
 ````typescript
+
 import { Database } from "node-sqlite3-wasm";
 import { logger } from "@shared/utils/logger";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
@@ -120,7 +121,11 @@ export class ExampleRepository {
   * @param data - The entity data to create.
   */
  public createInternal(db: Database, data: ExampleRow): void {
-  db.run(EXAMPLE_QUERIES.INSERT, [data.id, data.name, data.createdAt]);
+  db.run(EXAMPLE_QUERIES.INSERT, [
+   data.id,
+   data.name,
+   data.createdAt,
+  ]);
   logger.debug(`[ExampleRepository] Created entity: ${data.id}`);
  }
 
@@ -346,7 +351,11 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([record.id, record.name, record.createdAt]);
+    stmt.run([
+     record.id,
+     record.name,
+     record.createdAt,
+    ]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} entity records (internal)`
@@ -427,7 +436,11 @@ describe("ExampleRepository", () => {
    expect(mockDatabaseService.executeTransaction).toHaveBeenCalled();
    expect(mockDatabase.run).toHaveBeenCalledWith(
     expect.stringContaining("INSERT"),
-    [data.id, data.name, data.createdAt]
+    [
+     data.id,
+     data.name,
+     data.createdAt,
+    ]
    );
   });
  });

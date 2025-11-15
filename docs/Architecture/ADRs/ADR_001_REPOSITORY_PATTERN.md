@@ -59,6 +59,7 @@ stateDiagram-v2
 ### 3. Consistent Structure
 
 ````typescript
+
 import { Database } from "node-sqlite3-wasm";
 import type { Logger } from "@shared/utils/logger/interfaces";
 import { withDatabaseOperation } from "@electron/utils/operationalHooks";
@@ -194,7 +195,11 @@ export class ExampleRepository {
 
   try {
    for (const record of records) {
-    stmt.run([record.id, record.name, record.createdAt]);
+    stmt.run([
+     record.id,
+     record.name,
+     record.createdAt,
+    ]);
    }
    logger.debug(
     `[ExampleRepository] Bulk inserted ${records.length} records (internal)`

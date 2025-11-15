@@ -67,12 +67,12 @@ npm run check:ipc      # Verifies generated artifacts match committed output
 
 ## 4. Troubleshooting
 
-| Symptom                                            | Cause                               | Fix                                                                              |
-| -------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------- |
-| `npm run check:ipc` fails on CI                    | Generated artifacts are stale       | Run `npm run generate:ipc`, commit the updated files, rerun checks               |
-| Generator exits with `Cannot find module ts-morph` | Dependencies missing/outdated       | Run `npm install` (generator relies on dev dependencies)                         |
-| Prettier formatting differs                        | Local Prettier version mismatched   | Run `npm run format` or ensure Prettier matches repo configuration               |
-| New channel missing from docs                      | Schema not exported or wrong naming | Confirm additions to `RendererEventPayloadMap`/channel enums and rerun generator |
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| `npm run check:ipc` fails on CI | Generated artifacts are stale | Run `npm run generate:ipc`, commit the updated files, rerun checks |
+| Generator exits with `Cannot find module ts-morph` | Dependencies missing/outdated | Run `npm install` (generator relies on dev dependencies) |
+| Prettier formatting differs | Local Prettier version mismatched | Run `npm run format` or ensure Prettier matches repo configuration |
+| New channel missing from docs | Schema not exported or wrong naming | Confirm additions to `RendererEventPayloadMap`/channel enums and rerun generator |
 
 ---
 

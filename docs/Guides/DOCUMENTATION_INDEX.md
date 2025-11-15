@@ -22,16 +22,16 @@
 
 Essential documentation for developers and contributors:
 
-| Document                                               | Purpose                         | Audience                      |
-| ------------------------------------------------------ | ------------------------------- | ----------------------------- |
-| [AI_CONTEXT.md](./AI_CONTEXT.md)                       | Quick AI onboarding             | AI Assistants, New Developers |
-| [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors              |
-| [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)         | Complete environment guide      | Developers                    |
-| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)         | IPC and API reference           | Frontend/Backend Developers   |
-| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)             | Debug and fix issues            | All Developers                |
-| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)   | Migration history and rationale | Architects, Contributors      |
-| [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)     | This index document             | All Users                     |
-| [ORGANIZATION_SUMMARY.md](./ORGANIZATION_SUMMARY.md)   | Documentation cleanup summary   | Maintainers                   |
+| Document | Purpose | Audience |
+| --- | --- | --- |
+| [AI_CONTEXT.md](./AI_CONTEXT.md) | Quick AI onboarding | AI Assistants, New Developers |
+| [DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup | New Contributors |
+| [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) | Complete environment guide | Developers |
+| [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) | IPC and API reference | Frontend/Backend Developers |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) | Debug and fix issues | All Developers |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md) | Migration history and rationale | Architects, Contributors |
+| [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) | This index document | All Users |
+| [ORGANIZATION_SUMMARY.md](./ORGANIZATION_SUMMARY.md) | Documentation cleanup summary | Maintainers |
 
 ### 🏗️ Architecture (`/docs/Architecture/`)
 
@@ -39,49 +39,49 @@ System design, patterns, and architectural decisions:
 
 #### ADRs (Architecture Decision Records)
 
-| Document                                                                                            | Decision                 | Status      |
-| --------------------------------------------------------------------------------------------------- | ------------------------ | ----------- |
-| [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md)                 | Database access pattern  | ✅ Accepted |
-| [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md)   | Event system design      | ✅ Accepted |
-| [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md)       | Error handling approach  | ✅ Accepted |
-| [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md)   | Zustand state management | ✅ Accepted |
+| Document | Decision | Status |
+| --- | --- | --- |
+| [ADR_001_REPOSITORY_PATTERN.md](../Architecture/ADRs/ADR_001_REPOSITORY_PATTERN.md) | Database access pattern | ✅ Accepted |
+| [ADR_002_EVENT_DRIVEN_ARCHITECTURE.md](../Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md) | Event system design | ✅ Accepted |
+| [ADR_003_ERROR_HANDLING_STRATEGY.md](../Architecture/ADRs/ADR_003_ERROR_HANDLING_STRATEGY.md) | Error handling approach | ✅ Accepted |
+| [ADR_004_FRONTEND_STATE_MANAGEMENT.md](../Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md) | Zustand state management | ✅ Accepted |
 | [ADR_005_IPC_COMMUNICATION_PROTOCOL.md](../Architecture/ADRs/ADR_005_IPC_COMMUNICATION_PROTOCOL.md) | IPC communication design | ✅ Accepted |
 
 #### Patterns & standards
 
-| Document                                                                                | Purpose                  | Use When                      |
-| --------------------------------------------------------------------------------------- | ------------------------ | ----------------------------- |
+| Document | Purpose | Use When |
+| --- | --- | --- |
 | [DEVELOPMENT_PATTERNS_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) | Coding patterns overview | Understanding system patterns |
-| [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md)                                | Documentation standards  | Writing code documentation    |
+| [TSDOC_STANDARDS.md](../Architecture/TSDOC_STANDARDS.md) | Documentation standards | Writing code documentation |
 
 #### Templates
 
-| Template                                                                         | Purpose                     | Use When                     |
-| -------------------------------------------------------------------------------- | --------------------------- | ---------------------------- |
-| [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md)       | Database repository pattern | Adding new data repositories |
-| [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md)     | IPC communication pattern   | Adding new IPC endpoints     |
-| [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) | Frontend state management   | Creating new Zustand stores  |
+| Template | Purpose | Use When |
+| --- | --- | --- |
+| [REPOSITORY_TEMPLATE.md](../Architecture/Templates/REPOSITORY_TEMPLATE.md) | Database repository pattern | Adding new data repositories |
+| [IPC_HANDLER_TEMPLATE.md](../Architecture/Templates/IPC_HANDLER_TEMPLATE.md) | IPC communication pattern | Adding new IPC endpoints |
+| [ZUSTAND_STORE_TEMPLATE.md](../Architecture/Templates/ZUSTAND_STORE_TEMPLATE.md) | Frontend state management | Creating new Zustand stores |
 
 ### 📖 Implementation Guides (`/docs/Guides/`)
 
 Step-by-step implementation instructions:
 
-| Guide                                                                              | Purpose                     | Complexity      |
-| ---------------------------------------------------------------------------------- | --------------------------- | --------------- |
-| [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md)           | Renderer/IPC integration    | 🟡 Intermediate |
-| [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) | Adding monitor types        | 🟡 Intermediate |
-| [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md)       | Frontend development        | 🟡 Intermediate |
-| [TESTING.md](../Guides/TESTING.md)                                                 | Testing setup and practices | 🟢 Beginner     |
+| Guide | Purpose | Complexity |
+| --- | --- | --- |
+| [RENDERER_INTEGRATION_GUIDE.md](../Guides/RENDERER_INTEGRATION_GUIDE.md) | Renderer/IPC integration | 🟡 Intermediate |
+| [NEW_MONITOR_TYPE_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) | Adding monitor types | 🟡 Intermediate |
+| [UI_FEATURE_DEVELOPMENT_GUIDE.md](../Guides/UI_FEATURE_DEVELOPMENT_GUIDE.md) | Frontend development | 🟡 Intermediate |
+| [TESTING.md](../Guides/TESTING.md) | Testing setup and practices | 🟢 Beginner |
 
 ### 📝 Historical & Learning (`/docs/`)
 
 Relevant historical context and lessons learned:
 
-| Document                                                                                           | Purpose                     | Relevance                          |
-| -------------------------------------------------------------------------------------------------- | --------------------------- | ---------------------------------- |
-| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)                                               | Complete migration history  | Understanding current architecture |
-| [FALLBACK_SYSTEM_USAGE_ANALYSIS.md](../Guides/FALLBACK_SYSTEM_USAGE_ANALYSIS.md)                   | Migration completion status | Historical context                 |
-| [MONITORING_RACE_CONDITION_SOLUTION_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Race condition prevention   | Architecture understanding         |
+| Document | Purpose | Relevance |
+| --- | --- | --- |
+| [TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md) | Complete migration history | Understanding current architecture |
+| [FALLBACK_SYSTEM_USAGE_ANALYSIS.md](../Guides/FALLBACK_SYSTEM_USAGE_ANALYSIS.md) | Migration completion status | Historical context |
+| [MONITORING_RACE_CONDITION_SOLUTION_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Race condition prevention | Architecture understanding |
 
 ## 🎯 Documentation by Role
 

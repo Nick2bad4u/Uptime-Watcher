@@ -34,22 +34,29 @@ interface StorageLike {
 const isFunction = (value: unknown): value is (...args: never[]) => unknown =>
     typeof value === "function";
 
+const isMaybeStorageCandidate = (
+    candidate: unknown
+): candidate is MaybeStorage =>
+    candidate === null ||
+    candidate === undefined ||
+    typeof candidate === "object";
+
 /**
  * Checks whether an arbitrary value implements the minimal storage contract we
  * rely on.
  */
-const isStorageLike = (candidate: MaybeStorage): candidate is StorageLike => {
+const isStorageLike = (candidate: unknown): candidate is StorageLike => {
     if (!candidate || typeof candidate !== "object") {
         return false;
     }
 
     return (
-        typeof candidate.length === "number" &&
-        isFunction(candidate.clear) &&
-        isFunction(candidate.getItem) &&
-        isFunction(candidate.key) &&
-        isFunction(candidate.removeItem) &&
-        isFunction(candidate.setItem)
+        typeof (Reflect.get(candidate, "length") as unknown) === "number" &&
+        isFunction(Reflect.get(candidate, "clear") as unknown) &&
+        isFunction(Reflect.get(candidate, "getItem") as unknown) &&
+        isFunction(Reflect.get(candidate, "key") as unknown) &&
+        isFunction(Reflect.get(candidate, "removeItem") as unknown) &&
+        isFunction(Reflect.get(candidate, "setItem") as unknown)
     );
 };
 
@@ -61,7 +68,7 @@ const removePropertyIfConfigurable = (
     propertyKey: PropertyKey
 ): void => {
     const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
-    if (!descriptor || descriptor.configurable !== false) {
+    if (descriptor?.configurable !== false) {
         Reflect.deleteProperty(target, propertyKey);
     }
 };
@@ -71,7 +78,12 @@ const readStorageCandidate = (
     name: StorageName
 ): MaybeStorage => {
     try {
-        return Reflect.get(target, name) as MaybeStorage;
+        const candidate: unknown = Reflect.get(target, name);
+        if (isMaybeStorageCandidate(candidate)) {
+            return candidate;
+        }
+
+        return undefined;
     } catch (error: unknown) {
         if (
             error instanceof Error &&

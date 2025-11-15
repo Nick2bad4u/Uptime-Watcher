@@ -4,13 +4,13 @@ The application enforces data quality through a layered validation pipeline. Eac
 
 ## Layer Overview
 
-| Layer                         | Entry Points                                              | Responsibilities                                                                                                                                         | Tooling                                                                |
-| ----------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| UI / Renderer                 | React components, form hooks                              | Basic UX guards (required fields, formatting hints). Never trusts its own input—server-side validation still runs.                                       | React Hook Form, client-side helpers                                   |
-| Preload Bridge & IPC Schema   | `electron/preload` APIs, `registerStandardizedIpcHandler` | Type- and shape-level validation for incoming IPC payloads before they reach the main process. Rejects malformed or unexpected input early.              | Zod schemas in `@shared/validation`, custom validators in `IpcService` |
-| Managers (Domain Logic)       | `SiteManager`, `MonitorManager`, `DatabaseManager`        | Business rule validation: cross-entity invariants, referential checks, domain-specific constraints. Must assume shape-level validation already happened. | Dedicated domain validators, helper utilities (e.g., `validateSite`)   |
-| Repositories & Database Layer | `electron/services/database`                              | Enforce persistence invariants: unique constraints, transactional safety, data normalization. Never trust upstream layers to have done the right thing.  | sqlite constraints, repository helpers, transactions                   |
-| Background Services           | Monitoring scheduler, notification pipelines              | Runtime guardrails (e.g., dropping invalid schedules, retry logic). Should surface issues to managers via structured errors.                             | Domain services, telemetry hooks                                       |
+| Layer | Entry Points | Responsibilities | Tooling |
+| --- | --- | --- | --- |
+| UI / Renderer | React components, form hooks | Basic UX guards (required fields, formatting hints). Never trusts its own input—server-side validation still runs. | React Hook Form, client-side helpers |
+| Preload Bridge & IPC Schema | `electron/preload` APIs, `registerStandardizedIpcHandler` | Type- and shape-level validation for incoming IPC payloads before they reach the main process. Rejects malformed or unexpected input early. | Zod schemas in `@shared/validation`, custom validators in `IpcService` |
+| Managers (Domain Logic) | `SiteManager`, `MonitorManager`, `DatabaseManager` | Business rule validation: cross-entity invariants, referential checks, domain-specific constraints. Must assume shape-level validation already happened. | Dedicated domain validators, helper utilities (e.g., `validateSite`) |
+| Repositories & Database Layer | `electron/services/database` | Enforce persistence invariants: unique constraints, transactional safety, data normalization. Never trust upstream layers to have done the right thing. | sqlite constraints, repository helpers, transactions |
+| Background Services | Monitoring scheduler, notification pipelines | Runtime guardrails (e.g., dropping invalid schedules, retry logic). Should surface issues to managers via structured errors. | Domain services, telemetry hooks |
 
 ## Principles
 

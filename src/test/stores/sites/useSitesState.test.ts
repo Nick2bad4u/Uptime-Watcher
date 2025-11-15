@@ -13,6 +13,7 @@ import {
     initialSitesState,
     type SitesState,
 } from "../../../stores/sites/useSitesState";
+import { buildMonitoringLockKey } from "../../../stores/sites/utils/optimisticMonitoringLock";
 import { createMockFunction } from "../../utils/mockFactories";
 
 // Mock logging
@@ -48,6 +49,17 @@ describe("useSitesState", () => {
         statusSubscriptionSummary: undefined,
         ...overrides,
     });
+
+    const ensureDefined = <T>(
+        value: T | null | undefined,
+        message: string
+    ): T => {
+        if (value === null || value === undefined) {
+            throw new Error(message);
+        }
+
+        return value;
+    };
 
     beforeEach(() => {
         mockSet = createMockFunction();
@@ -308,6 +320,121 @@ describe("useSitesState", () => {
                 })
             );
             expect(mockSet).not.toHaveBeenCalled();
+        });
+
+        it("should normalize monitors using optimistic locks and prune expired entries", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: State Normalization", "type");
+
+            const monitoredSite: Site = {
+                identifier: "site-with-locks",
+                monitors: [
+                    {
+                        checkInterval: 60,
+                        history: [],
+                        id: "mon-active",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 30,
+                        type: "http",
+                    },
+                    {
+                        checkInterval: 60,
+                        history: [],
+                        id: "mon-expired",
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "pending",
+                        timeout: 30,
+                        type: "http",
+                    },
+                ],
+                monitoring: true,
+                name: "Locked Site",
+            };
+
+            const activeKey = buildMonitoringLockKey(
+                monitoredSite.identifier,
+                "mon-active"
+            );
+            const expiredKey = buildMonitoringLockKey(
+                monitoredSite.identifier,
+                "mon-expired"
+            );
+
+            const now = Date.now();
+            const lockState = {
+                [activeKey]: {
+                    expiresAt: now + 5000,
+                    monitoring: false,
+                },
+                [expiredKey]: {
+                    expiresAt: now - 100,
+                    monitoring: true,
+                },
+            } satisfies SitesState["optimisticMonitoringLocks"];
+
+            mockGet.mockReturnValue(
+                createState({
+                    optimisticMonitoringLocks: lockState,
+                    selectedMonitorIds: {
+                        [monitoredSite.identifier]: "mon-active",
+                    },
+                    selectedSiteIdentifier: monitoredSite.identifier,
+                    sites: [monitoredSite],
+                })
+            );
+
+            stateActions.setSites([monitoredSite]);
+
+            const setFunction = mockSet.mock.calls.pop()?.[0];
+            expect(setFunction).toBeDefined();
+
+            if (setFunction) {
+                const result = setFunction(
+                    createState({
+                        optimisticMonitoringLocks: lockState,
+                        selectedMonitorIds: {
+                            [monitoredSite.identifier]: "mon-active",
+                        },
+                        selectedSiteIdentifier: monitoredSite.identifier,
+                        sites: [monitoredSite],
+                    })
+                );
+
+                const sites = ensureDefined(
+                    result.sites,
+                    "Expected sites array after normalizing optimistic locks"
+                );
+                const optimisticMonitoringLocks = ensureDefined(
+                    result.optimisticMonitoringLocks,
+                    "Expected optimistic monitoring locks to be defined"
+                );
+
+                const normalizedSite = sites[0];
+                expect(
+                    normalizedSite?.monitors.find(
+                        (monitor) => monitor.id === "mon-active"
+                    )?.monitoring
+                ).toBeFalsy();
+                expect(optimisticMonitoringLocks[expiredKey]).toBeUndefined();
+                expect(optimisticMonitoringLocks[activeKey]).toEqual({
+                    expiresAt: lockState[activeKey]?.expiresAt,
+                    monitoring: false,
+                });
+                expect(result.selectedMonitorIds).toEqual({
+                    [monitoredSite.identifier]: "mon-active",
+                });
+                expect(result.selectedSiteIdentifier).toBe(
+                    monitoredSite.identifier
+                );
+            }
         });
     });
 
@@ -952,6 +1079,192 @@ describe("useSitesState", () => {
                 });
                 expect(originalIds).not.toHaveProperty("test-site");
             }
+        });
+    });
+
+    describe("registerOptimisticMonitoringLock", () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+            vi.setSystemTime(new Date("2025-01-01T00:00:00.000Z"));
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+            mockSet.mockClear();
+        });
+
+        it("should register locks and schedule expiry cleanup", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Timer Cleanup", "type");
+
+            const siteIdentifier = "site-lock";
+            const monitorId = "monitor-lock";
+            const key = buildMonitoringLockKey(siteIdentifier, monitorId);
+            const durationMs = 2000;
+            const expectedExpiresAt = Date.now() + durationMs;
+
+            stateActions.registerOptimisticMonitoringLock(
+                siteIdentifier,
+                [monitorId],
+                false,
+                durationMs
+            );
+
+            const registerSetFunction = mockSet.mock.calls.pop()?.[0];
+            expect(registerSetFunction).toBeDefined();
+
+            if (registerSetFunction) {
+                const registerResult = registerSetFunction(createState());
+                expect(registerResult).toEqual({
+                    optimisticMonitoringLocks: {
+                        [key]: {
+                            expiresAt: expectedExpiresAt,
+                            monitoring: false,
+                        },
+                    },
+                });
+            }
+
+            mockSet.mockClear();
+            vi.advanceTimersByTime(durationMs + 30);
+
+            const cleanupSetFunction = mockSet.mock.calls.pop()?.[0];
+            expect(cleanupSetFunction).toBeDefined();
+
+            if (cleanupSetFunction) {
+                const cleanupResult = cleanupSetFunction(
+                    createState({
+                        optimisticMonitoringLocks: {
+                            [key]: {
+                                expiresAt: expectedExpiresAt,
+                                monitoring: false,
+                            },
+                        },
+                    })
+                );
+
+                expect(cleanupResult).toEqual({
+                    optimisticMonitoringLocks: {},
+                });
+            }
+        });
+
+        it("should avoid scheduling expirations when duration is zero", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Timer Bypass", "type");
+
+            const setTimeoutSpy = vi.spyOn(globalThis, "setTimeout");
+
+            stateActions.registerOptimisticMonitoringLock(
+                "site-zero",
+                ["mon-zero"],
+                true,
+                0
+            );
+
+            expect(setTimeoutSpy).not.toHaveBeenCalled();
+            setTimeoutSpy.mockRestore();
+        });
+    });
+
+    describe("clearOptimisticMonitoringLocks", () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+            vi.setSystemTime(new Date("2025-01-02T00:00:00.000Z"));
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+            mockSet.mockClear();
+        });
+
+        it("should skip updates when no monitor identifiers are supplied", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Early Return", "type");
+
+            stateActions.clearOptimisticMonitoringLocks("site-none", []);
+            expect(mockSet).not.toHaveBeenCalled();
+        });
+
+        it("should remove locks and cancel timers for matching monitors", async ({
+            annotate,
+        }) => {
+            await annotate("Component: useSitesState", "component");
+            await annotate("Category: Optimistic Locks", "category");
+            await annotate("Type: Lock Removal", "type");
+
+            const siteIdentifier = "site-with-locks";
+            const remainingMonitorId = "mon-keep";
+            const removedMonitorId = "mon-drop";
+            const durationMs = 3000;
+
+            stateActions.registerOptimisticMonitoringLock(
+                siteIdentifier,
+                [removedMonitorId, remainingMonitorId],
+                true,
+                durationMs
+            );
+
+            const registerSetFunction = mockSet.mock.calls.pop()?.[0];
+            expect(registerSetFunction).toBeDefined();
+
+            const lockSnapshot: SitesState["optimisticMonitoringLocks"] =
+                registerSetFunction
+                    ? ensureDefined(
+                          registerSetFunction(createState())
+                              .optimisticMonitoringLocks,
+                          "Expected optimistic lock snapshot to be defined"
+                      )
+                    : {};
+
+            mockSet.mockClear();
+            const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
+
+            stateActions.clearOptimisticMonitoringLocks(siteIdentifier, [
+                removedMonitorId,
+                "mon-missing",
+            ]);
+
+            const clearSetFunction = mockSet.mock.calls.pop()?.[0];
+            expect(clearSetFunction).toBeDefined();
+
+            if (clearSetFunction) {
+                const clearResult = clearSetFunction(
+                    createState({ optimisticMonitoringLocks: lockSnapshot })
+                );
+
+                expect(clearResult).toEqual({
+                    optimisticMonitoringLocks: {
+                        [buildMonitoringLockKey(
+                            siteIdentifier,
+                            remainingMonitorId
+                        )]:
+                            lockSnapshot[
+                                buildMonitoringLockKey(
+                                    siteIdentifier,
+                                    remainingMonitorId
+                                )
+                            ],
+                    },
+                });
+            }
+
+            expect(clearTimeoutSpy).toHaveBeenCalledTimes(1);
+
+            mockSet.mockClear();
+            stateActions.clearOptimisticMonitoringLocks(siteIdentifier, [
+                remainingMonitorId,
+            ]);
+            clearTimeoutSpy.mockRestore();
         });
     });
 });

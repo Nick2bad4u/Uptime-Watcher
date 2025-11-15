@@ -139,7 +139,11 @@ Add these to your generated tests to match your project patterns:
 test.describe(
  "My Feature Tests",
  {
-  tag: ["@ui", "@my-feature", "@generated"],
+  tag: [
+   "@ui",
+   "@my-feature",
+   "@generated",
+  ],
   annotation: {
    type: "category",
    description: "Generated tests for my feature",
@@ -316,7 +320,11 @@ import path from "node:path";
 test.describe(
  "Add Site Workflow - Generated",
  {
-  tag: ["@e2e", "@generated", "@add-site"],
+  tag: [
+   "@e2e",
+   "@generated",
+   "@add-site",
+  ],
   annotation: {
    type: "workflow",
    description: "Generated test for adding a new site",

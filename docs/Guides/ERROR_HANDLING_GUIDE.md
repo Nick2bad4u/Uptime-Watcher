@@ -75,36 +75,38 @@ const handleSiteCreation = async () => {
 ```typescript
 // Prevent error cross-contamination between different stores/domains
 const handleMultipleOperations = async () => {
-  const errorStore = useErrorStore.getState();
+ const errorStore = useErrorStore.getState();
 
-  try {
-    // Site operation error won't affect settings operations
-    await SiteService.addSite(siteData);
-  } catch (error) {
-    errorStore.setStoreError('sites', 'Failed to create site');
-    // Settings operations can still succeed
-  }
+ try {
+  // Site operation error won't affect settings operations
+  await SiteService.addSite(siteData);
+ } catch (error) {
+  errorStore.setStoreError("sites", "Failed to create site");
+  // Settings operations can still succeed
+ }
 
-  try {
-    // Independent error handling
-    await SettingsService.updateHistoryLimit(settings.historyLimit);
-  } catch (error) {
-    errorStore.setStoreError('settings', 'Failed to update settings');
-    // Sites operations remain unaffected
-  }
+ try {
+  // Independent error handling
+  await SettingsService.updateHistoryLimit(settings.historyLimit);
+ } catch (error) {
+  errorStore.setStoreError("settings", "Failed to update settings");
+  // Sites operations remain unaffected
+ }
 };
 
 // Component usage with store-specific errors
 const MyComponent = () => {
-  const sitesError = useErrorStore(state => state.getStoreError('sites'));
-  const settingsError = useErrorStore(state => state.getStoreError('settings'));
+ const sitesError = useErrorStore((state) => state.getStoreError("sites"));
+ const settingsError = useErrorStore((state) =>
+  state.getStoreError("settings")
+ );
 
-  return (
-    <div>
-      {sitesError && <ErrorAlert message={sitesError} domain="sites" />}
-      {settingsError && <ErrorAlert message={settingsError} domain="settings" />}
-    </div>
-  );
+ return (
+  <div>
+   {sitesError && <ErrorAlert message={sitesError} domain="sites" />}
+   {settingsError && <ErrorAlert message={settingsError} domain="settings" />}
+  </div>
+ );
 };
 ```
 
@@ -346,37 +348,42 @@ export const createSiteOperationsActions = (
 ```typescript
 // Error handling in React components
 const MyComponent = () => {
-  const [localError, setLocalError] = useState<string | null>(null);
-  const globalError = useErrorStore(state => state.lastError);
-  const sitesError = useErrorStore(state => state.getStoreError('sites'));
-  const isLoading = useErrorStore(state => state.getOperationLoading('createSite'));
+ const [localError, setLocalError] = useState<string | null>(null);
+ const globalError = useErrorStore((state) => state.lastError);
+ const sitesError = useErrorStore((state) => state.getStoreError("sites"));
+ const isLoading = useErrorStore((state) =>
+  state.getOperationLoading("createSite")
+ );
 
-  const handleAction = useCallback(async () => {
-    try {
-      setLocalError(null); // Clear local error state
-      await performAction();
-    } catch (error) {
-      // Handle component-specific errors locally
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setLocalError(errorMessage);
+ const handleAction = useCallback(async () => {
+  try {
+   setLocalError(null); // Clear local error state
+   await performAction();
+  } catch (error) {
+   // Handle component-specific errors locally
+   const errorMessage =
+    error instanceof Error ? error.message : "Unknown error";
+   setLocalError(errorMessage);
 
-      // Also log to centralized logger
-      logger.error('Component action failed:', ensureError(error));
-    }
-  }, []);
+   // Also log to centralized logger
+   logger.error("Component action failed:", ensureError(error));
+  }
+ }, []);
 
-  return (
-    <div>
-      {/* Display errors with priority: local > domain-specific > global */}
-      {localError && <ErrorAlert message={localError} />}
-      {!localError && sitesError && <ErrorAlert message={sitesError} />}
-      {!localError && !sitesError && globalError && <ErrorAlert message={globalError} />}
+ return (
+  <div>
+   {/* Display errors with priority: local > domain-specific > global */}
+   {localError && <ErrorAlert message={localError} />}
+   {!localError && sitesError && <ErrorAlert message={sitesError} />}
+   {!localError && !sitesError && globalError && (
+    <ErrorAlert message={globalError} />
+   )}
 
-      <button onClick={handleAction} disabled={isLoading}>
-        {isLoading ? 'Processing...' : 'Perform Action'}
-      </button>
-    </div>
-  );
+   <button onClick={handleAction} disabled={isLoading}>
+    {isLoading ? "Processing..." : "Perform Action"}
+   </button>
+  </div>
+ );
 };
 ```
 
@@ -601,41 +608,47 @@ export const useMonitorEventIntegration = () => {
 
 ```typescript
 // Error boundary for React components
-import { ErrorBoundary } from '../stores/error/ErrorBoundary';
+import { ErrorBoundary } from "../stores/error/ErrorBoundary";
 
 // App-level error boundary
 export const App = () => {
-  return (
-    <ErrorBoundary>
-      <ThemeProvider>
-        <MainContent />
-      </ThemeProvider>
-    </ErrorBoundary>
-  );
+ return (
+  <ErrorBoundary>
+   <ThemeProvider>
+    <MainContent />
+   </ThemeProvider>
+  </ErrorBoundary>
+ );
 };
 
 // Component-specific error boundaries
 export const SiteDetails = ({ siteIdentifier }: { siteIdentifier: string }) => {
-  return (
-  <ErrorBoundary fallback={<SiteDetailsErrorFallback siteIdentifier={siteIdentifier} />}>
-    <SiteDetailsContent siteIdentifier={siteIdentifier} />
-    </ErrorBoundary>
-  );
+ return (
+  <ErrorBoundary
+   fallback={<SiteDetailsErrorFallback siteIdentifier={siteIdentifier} />}
+  >
+   <SiteDetailsContent siteIdentifier={siteIdentifier} />
+  </ErrorBoundary>
+ );
 };
 
 // Error fallback components
-const SiteDetailsErrorFallback = ({ siteIdentifier }: { siteIdentifier: string }) => {
-  const handleRetry = () => {
-    window.location.reload();
-  };
+const SiteDetailsErrorFallback = ({
+ siteIdentifier,
+}: {
+ siteIdentifier: string;
+}) => {
+ const handleRetry = () => {
+  window.location.reload();
+ };
 
-  return (
-    <div className="error-fallback">
-      <h2>Unable to load site details</h2>
-  <p>An error occurred while loading details for site {siteIdentifier}</p>
-      <button onClick={handleRetry}>Retry</button>
-    </div>
-  );
+ return (
+  <div className="error-fallback">
+   <h2>Unable to load site details</h2>
+   <p>An error occurred while loading details for site {siteIdentifier}</p>
+   <button onClick={handleRetry}>Retry</button>
+  </div>
+ );
 };
 ```
 
@@ -725,49 +738,49 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
 ```typescript
 // Testing error handling in components
-describe('Component Error Handling', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe("Component Error Handling", () => {
+ beforeEach(() => {
+  vi.clearAllMocks();
+ });
+
+ it("handles API errors gracefully", async () => {
+  const mockError = new Error("API connection failed");
+  mockElectronAPI.sites.addSite.mockRejectedValueOnce(mockError);
+
+  render(<AddSiteForm />);
+
+  fireEvent.click(screen.getByRole("button", { name: /add site/i }));
+
+  await waitFor(() => {
+   expect(screen.getByText(/api connection failed/i)).toBeInTheDocument();
   });
 
-  it('handles API errors gracefully', async () => {
-    const mockError = new Error('API connection failed');
-    mockElectronAPI.sites.addSite.mockRejectedValueOnce(mockError);
+  expect(logger.error).toHaveBeenCalledWith(
+   expect.stringContaining("failed"),
+   mockError
+  );
+ });
 
-    render(<AddSiteForm />);
+ it("recovers from errors correctly", async () => {
+  const mockError = new Error("Temporary error");
+  mockElectronAPI.sites.addSite
+   .mockRejectedValueOnce(mockError)
+   .mockResolvedValueOnce({ id: "1", name: "Test Site" });
 
-    fireEvent.click(screen.getByRole('button', { name: /add site/i }));
+  render(<AddSiteForm />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/api connection failed/i)).toBeInTheDocument();
-    });
-
-    expect(logger.error).toHaveBeenCalledWith(
-      expect.stringContaining('failed'),
-      mockError
-    );
+  // First attempt fails
+  fireEvent.click(screen.getByRole("button", { name: /add site/i }));
+  await waitFor(() => {
+   expect(screen.getByText(/temporary error/i)).toBeInTheDocument();
   });
 
-  it('recovers from errors correctly', async () => {
-    const mockError = new Error('Temporary error');
-    mockElectronAPI.sites.addSite
-      .mockRejectedValueOnce(mockError)
-      .mockResolvedValueOnce({ id: '1', name: 'Test Site' });
-
-    render(<AddSiteForm />);
-
-    // First attempt fails
-    fireEvent.click(screen.getByRole('button', { name: /add site/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/temporary error/i)).toBeInTheDocument();
-    });
-
-    // Second attempt succeeds
-    fireEvent.click(screen.getByRole('button', { name: /add site/i }));
-    await waitFor(() => {
-      expect(screen.queryByText(/temporary error/i)).not.toBeInTheDocument();
-    });
+  // Second attempt succeeds
+  fireEvent.click(screen.getByRole("button", { name: /add site/i }));
+  await waitFor(() => {
+   expect(screen.queryByText(/temporary error/i)).not.toBeInTheDocument();
   });
+ });
 });
 ```
 
@@ -869,27 +882,30 @@ try {
 
 ```typescript
 // ✅ Good: Error recovery with user actions
-const RecoverableErrorComponent = ({ error, onRetry }: {
-  error: string;
-  onRetry: () => void;
+const RecoverableErrorComponent = ({
+ error,
+ onRetry,
+}: {
+ error: string;
+ onRetry: () => void;
 }) => {
-  return (
-    <div className="error-alert">
-      <p>{error}</p>
-      <button onClick={onRetry}>Try Again</button>
-    </div>
-  );
+ return (
+  <div className="error-alert">
+   <p>{error}</p>
+   <button onClick={onRetry}>Try Again</button>
+  </div>
+ );
 };
 
 // ✅ Good: Graceful degradation
 const FeatureComponent = () => {
-  const [hasError, setHasError] = useState(false);
+ const [hasError, setHasError] = useState(false);
 
-  if (hasError) {
-    return <FallbackComponent />;
-  }
+ if (hasError) {
+  return <FallbackComponent />;
+ }
 
-  return <MainFeature onError={() => setHasError(true)} />;
+ return <MainFeature onError={() => setHasError(true)} />;
 };
 ```
 

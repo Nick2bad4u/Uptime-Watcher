@@ -380,6 +380,304 @@ describe("monitorTitleFormatters", () => {
             });
         });
 
+        describe("URL-driven monitor types", () => {
+            const urlBasedMonitorTypes = [
+                "http-header",
+                "http-json",
+                "http-keyword",
+                "http-latency",
+                "http-status",
+                "server-heartbeat",
+                "websocket-keepalive",
+            ] as const;
+
+            for (const monitorType of urlBasedMonitorTypes) {
+                it(`should include url suffix for ${monitorType} monitors`, async ({
+                    task,
+                    annotate,
+                }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: monitorTitleFormatters",
+                        "component"
+                    );
+                    await annotate("Category: Utility", "category");
+                    await annotate("Type: Monitoring", "type");
+
+                    const monitor = createMockMonitor({
+                        type: monitorType,
+                        url: "https://status.example.com",
+                    });
+
+                    const result = formatTitleSuffix(monitor);
+
+                    expect(result).toBe(" (https://status.example.com)");
+                });
+
+                it(`should return empty suffix for ${monitorType} monitors without url`, async ({
+                    task,
+                    annotate,
+                }) => {
+                    await annotate(`Testing: ${task.name}`, "functional");
+                    await annotate(
+                        "Component: monitorTitleFormatters",
+                        "component"
+                    );
+                    await annotate("Category: Utility", "category");
+                    await annotate("Type: Monitoring", "type");
+
+                    const monitor = createMockMonitor({ type: monitorType });
+
+                    const result = formatTitleSuffix(monitor);
+
+                    expect(result).toBe("");
+                });
+            }
+        });
+
+        describe("CDN edge consistency monitor type", () => {
+            it("should prefer baselineUrl when available", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "cdn-edge-consistency",
+                    baselineUrl: "https://edge.primary.example.com",
+                    replicaStatusUrl: "https://edge.backup.example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (https://edge.primary.example.com)");
+            });
+
+            it("should fall back to replicaStatusUrl when baseline missing", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "cdn-edge-consistency",
+                    replicaStatusUrl: "https://edge.backup.example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (https://edge.backup.example.com)");
+            });
+
+            it("should return empty suffix when no urls are provided", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "cdn-edge-consistency",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+        });
+
+        describe("Replication monitor type", () => {
+            it("should prefer primaryStatusUrl when available", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "replication",
+                    primaryStatusUrl: "https://primary.replica.example.com",
+                    replicaStatusUrl: "https://replica.example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (https://primary.replica.example.com)");
+            });
+
+            it("should fall back to replicaStatusUrl", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "replication",
+                    replicaStatusUrl: "https://replica.example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (https://replica.example.com)");
+            });
+
+            it("should default to empty suffix when neither url is present", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({ type: "replication" });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+        });
+
+        describe("SSL monitor type", () => {
+            it("should include port when host and port are provided", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "ssl",
+                    host: "secure.example.com",
+                    port: 443,
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (secure.example.com:443)");
+            });
+
+            it("should include host without port when port missing", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "ssl",
+                    host: "secure.example.com",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (secure.example.com)");
+            });
+
+            it("should return empty suffix when host missing", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({ type: "ssl" });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+        });
+
+        describe("Ping monitor type", () => {
+            it("should include host when provided", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({
+                    type: "ping",
+                    host: "api.internal",
+                });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe(" (api.internal)");
+            });
+
+            it("should return empty suffix when host missing", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate(
+                    "Component: monitorTitleFormatters",
+                    "component"
+                );
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor = createMockMonitor({ type: "ping" });
+
+                const result = formatTitleSuffix(monitor);
+
+                expect(result).toBe("");
+            });
+        });
+
         describe("DNS monitor type", () => {
             it("should return formatted recordType host suffix for DNS monitor with both host and recordType", async ({
                 task,

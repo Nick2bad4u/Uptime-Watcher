@@ -340,7 +340,7 @@ export default defineConfig(({ mode }) => {
                                     "electron",
                                     "electron-updater",
                                     "electron-log",
-                                    /^node:.*/, // All node: protocol imports
+                                    /^node:.*/u, // All node: protocol imports
                                     "bufferutil",
                                     "utf-8-validate",
                                     "ws",
@@ -783,6 +783,11 @@ export default defineConfig(({ mode }) => {
                 exclude: [
                     "**/*.config.*",
                     "**/*.d.ts",
+                    // CSS modules are transformed into JS stubs but contain no executable logic.
+                    "**/*.css",
+                    "**/*.scss",
+                    "**/*.sass",
+                    "**/*.less",
                     "**/assets/**", // Exclude any assets folder anywhere
                     "**/dist/**", // Exclude any dist folder anywhere
                     "**/docs/**", // Exclude documentation files

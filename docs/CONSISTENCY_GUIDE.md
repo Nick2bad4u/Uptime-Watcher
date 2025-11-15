@@ -187,6 +187,7 @@ export class HttpMonitor implements IMonitorService {
 Use comprehensive TSDoc comments following the project standards:
 
 ````typescript
+
 /**
  * Performs HTTP health check for monitoring endpoints.
  *
@@ -215,6 +216,7 @@ Use comprehensive TSDoc comments following the project standards:
 **Always use logger in JSDoc examples**, never console:
 
 ````typescript
+
 // ✅ Correct - JSDoc with logger
 /**
  * @example

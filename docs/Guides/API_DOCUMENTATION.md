@@ -707,65 +707,61 @@ import { SiteService } from "../services/SiteService";
 import { useSitesStore } from "../stores/useSitesStore";
 
 function SiteManager() {
-  const {
-    sites,
-    addSite,
-    updateSite,
-    removeSite,
-    startMonitoring,
-    isLoading
-  } = useSitesStore();
+ const { sites, addSite, updateSite, removeSite, startMonitoring, isLoading } =
+  useSitesStore();
 
-  // Optimistic updates with error handling
-  const handleCreateSite = async (siteData: SiteCreationData) => {
-    try {
-      // Optimistic update to UI
-      const optimisticSite = {
-        ...siteData,
-        identifier: "temp-identifier",
-      };
-      addSite(optimisticSite);
+ // Optimistic updates with error handling
+ const handleCreateSite = async (siteData: SiteCreationData) => {
+  try {
+   // Optimistic update to UI
+   const optimisticSite = {
+    ...siteData,
+    identifier: "temp-identifier",
+   };
+   addSite(optimisticSite);
 
-      // Call backend
-      const newSite = await SiteService.addSite(siteData);
+   // Call backend
+   const newSite = await SiteService.addSite(siteData);
 
-      // Replace optimistic entry with real data
-      updateSite("temp-identifier", newSite);
-    } catch (error) {
-      // Rollback optimistic update
-      removeSite("temp-identifier");
-      console.error("Failed to create site:", error);
-    }
-  };
+   // Replace optimistic entry with real data
+   updateSite("temp-identifier", newSite);
+  } catch (error) {
+   // Rollback optimistic update
+   removeSite("temp-identifier");
+   console.error("Failed to create site:", error);
+  }
+ };
 
-  return (
-    <div>
-      {sites.map((site) => (
-        <SiteCard
-          key={site.identifier}
-          site={site}
-          onStartMonitoring={() =>
-            startMonitoring(site.identifier)
-          }
-        />
-      ))}
-    </div>
-  );
+ return (
+  <div>
+   {sites.map((site) => (
+    <SiteCard
+     key={site.identifier}
+     site={site}
+     onStartMonitoring={() => startMonitoring(site.identifier)}
+    />
+   ))}
+  </div>
+ );
 }
 ```
 
 ### Store Integration with Event Listeners
 
 ````typescript
-import { SiteService } from "../services/SiteService";
-import { StateSyncService } from "../services/StateSyncService";
 
-// Zustand store with comprehensive IPC and event integration
-export const useSitesStore = create<SitesStore>()((set, get) => ({
- sites: [],
- isLoading: false,
- lastSyncTime: null,
 
+
+
+
+
+
+
+
+
+
+
+import { SiteService } from "../services/SiteService";import { StateSyncService } from "../services/StateSyncService";// Zustand store with comprehensive IPC and event integrationexport const useSitesStore = create<SitesStore>()((set, get) => ({ sites: [], isLoading: false, lastSyncTime: null,
  // State actions
  setSites: (sites: Site[]) => set({ sites }),
  addSite: (site: Site) =>
@@ -1030,22 +1026,22 @@ type MonitorConfig =
  | WebsocketKeepaliveMonitorConfig;
 ```
 
-| Monitor type (`type` field) | Configuration interface           | Key fields                                                                                                      |
-| --------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `http`                      | `HttpMonitorConfig`               | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody`                                 |
-| `http-status`               | `HttpStatusMonitorConfig`         | `url`, `expectedStatusCode`                                                                                     |
-| `http-header`               | `HttpHeaderMonitorConfig`         | `url`, `headerName`, `expectedHeaderValue`                                                                      |
-| `http-keyword`              | `HttpKeywordMonitorConfig`        | `url`, `bodyKeyword`                                                                                            |
-| `http-json`                 | `HttpJsonMonitorConfig`           | `url`, `jsonPath`, `expectedJsonValue`                                                                          |
-| `http-latency`              | `HttpLatencyMonitorConfig`        | `url`, `maxResponseTime`                                                                                        |
-| `ping`                      | `PingMonitorConfig`               | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss`                                                   |
-| `port`                      | `PortMonitorConfig`               | `host`, `port`, optional `protocol.expectedResponse`/`useTls`                                                   |
-| `dns`                       | `Monitor` domain fields           | `host`, `recordType`, optional `expectedValue`                                                                  |
-| `ssl`                       | `SslMonitorConfig`                | `host`, `port`, `certificateWarningDays`                                                                        |
-| `cdn-edge-consistency`      | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list)                                                |
-| `replication`               | `ReplicationMonitorConfig`        | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds`                 |
-| `server-heartbeat`          | `ServerHeartbeatMonitorConfig`    | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
-| `websocket-keepalive`       | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs`                                                                                         |
+| Monitor type (`type` field) | Configuration interface | Key fields |
+| --- | --- | --- |
+| `http` | `HttpMonitorConfig` | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody` |
+| `http-status` | `HttpStatusMonitorConfig` | `url`, `expectedStatusCode` |
+| `http-header` | `HttpHeaderMonitorConfig` | `url`, `headerName`, `expectedHeaderValue` |
+| `http-keyword` | `HttpKeywordMonitorConfig` | `url`, `bodyKeyword` |
+| `http-json` | `HttpJsonMonitorConfig` | `url`, `jsonPath`, `expectedJsonValue` |
+| `http-latency` | `HttpLatencyMonitorConfig` | `url`, `maxResponseTime` |
+| `ping` | `PingMonitorConfig` | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss` |
+| `port` | `PortMonitorConfig` | `host`, `port`, optional `protocol.expectedResponse`/`useTls` |
+| `dns` | `Monitor` domain fields | `host`, `recordType`, optional `expectedValue` |
+| `ssl` | `SslMonitorConfig` | `host`, `port`, `certificateWarningDays` |
+| `cdn-edge-consistency` | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list) |
+| `replication` | `ReplicationMonitorConfig` | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds` |
+| `server-heartbeat` | `ServerHeartbeatMonitorConfig` | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
+| `websocket-keepalive` | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs` |
 
 All configuration interfaces also inherit scheduling, retry, and timeout controls from `BaseMonitorConfig`, ensuring consistent behaviour across the monitoring pipeline.
 

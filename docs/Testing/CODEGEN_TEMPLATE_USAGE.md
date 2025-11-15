@@ -122,9 +122,10 @@ await debugScreenshot(window, "after-modal-open");
 Always use proper paths for screenshots:
 
 ````typescript
-Always use proper paths for screenshots:
 
-```typescript
+
+
+Always use proper paths for screenshots:```typescript
 // ✅ Good - saves to playwright test-results directory
 await page.screenshot({ path: "playwright/test-results/screenshots/my-screenshot.png" });
 

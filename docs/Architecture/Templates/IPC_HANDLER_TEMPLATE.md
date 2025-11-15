@@ -15,6 +15,7 @@ electron/services/ipc/
 ## Handler Implementation Template
 
 ````typescript
+
 /**
  * IPC handlers for [DOMAIN] operations.
  *
@@ -170,6 +171,7 @@ export function registerExampleHandlers(
 Add validation functions to `validators.ts` or import them from `../validation/exampleValidation.ts`:
 
 ````typescript
+
 /**
  * Validation functions for [DOMAIN] IPC operations.
  *

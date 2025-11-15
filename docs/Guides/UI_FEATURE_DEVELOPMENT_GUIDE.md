@@ -162,6 +162,7 @@ Always follow this order to minimize breaking changes:
 **Current Implementation Pattern:**
 
 ````tsx
+
 // Import standardized prop types for consistency
 import type {
  ComponentSize,
@@ -218,7 +219,11 @@ export const MyComponent = ({
    if (disabled || isLoading) return;
    onAction?.(event);
   },
-  [onAction, disabled, isLoading]
+  [
+   onAction,
+   disabled,
+   isLoading,
+  ]
  );
 
  const handleChange = useCallback(
@@ -589,7 +594,11 @@ const handleButtonClick = useCallback(
   if (disabled || isLoading) return;
   onAction?.();
  },
- [onAction, disabled, isLoading]
+ [
+  onAction,
+  disabled,
+  isLoading,
+ ]
 );
 
 // Input change handling
@@ -759,7 +768,11 @@ export const ReusableButton = React.memo(function ReusableButton({
    if (isDisabled || isLoading) return;
    onClick?.(event);
   },
-  [onClick, isDisabled, isLoading]
+  [
+   onClick,
+   isDisabled,
+   isLoading,
+  ]
  );
 
  return (
@@ -815,38 +828,38 @@ The application uses **Vitest** for unit testing with comprehensive mocking stra
 
 ```typescript
 // Component render and interaction testing
-import { render, screen, fireEvent } from '@testing-library/react';
-import { vi } from 'vitest';
-import { MyComponent } from './MyComponent';
+import { render, screen, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
+import { MyComponent } from "./MyComponent";
 
-describe('MyComponent', () => {
-  it('renders without errors', () => {
-    render(<MyComponent siteName="test-site" />);
-    expect(screen.getByTestId('my-component-test-site')).toBeInTheDocument();
-  });
+describe("MyComponent", () => {
+ it("renders without errors", () => {
+  render(<MyComponent siteName="test-site" />);
+  expect(screen.getByTestId("my-component-test-site")).toBeInTheDocument();
+ });
 
-  it('handles click events correctly', () => {
-    const mockOnAction = vi.fn();
-    render(<MyComponent siteName="test-site" onAction={mockOnAction} />);
+ it("handles click events correctly", () => {
+  const mockOnAction = vi.fn();
+  render(<MyComponent siteName="test-site" onAction={mockOnAction} />);
 
-    fireEvent.click(screen.getByRole('button'));
-    expect(mockOnAction).toHaveBeenCalledTimes(1);
-  });
+  fireEvent.click(screen.getByRole("button"));
+  expect(mockOnAction).toHaveBeenCalledTimes(1);
+ });
 
-  it('prevents event propagation', () => {
-    const mockOnAction = vi.fn();
-    const mockParentClick = vi.fn();
+ it("prevents event propagation", () => {
+  const mockOnAction = vi.fn();
+  const mockParentClick = vi.fn();
 
-    render(
-      <div onClick={mockParentClick}>
-        <MyComponent siteName="test-site" onAction={mockOnAction} />
-      </div>
-    );
+  render(
+   <div onClick={mockParentClick}>
+    <MyComponent siteName="test-site" onAction={mockOnAction} />
+   </div>
+  );
 
-    fireEvent.click(screen.getByRole('button'));
-    expect(mockOnAction).toHaveBeenCalledTimes(1);
-    expect(mockParentClick).not.toHaveBeenCalled();
-  });
+  fireEvent.click(screen.getByRole("button"));
+  expect(mockOnAction).toHaveBeenCalledTimes(1);
+  expect(mockParentClick).not.toHaveBeenCalled();
+ });
 });
 ```
 
@@ -914,31 +927,27 @@ Object.defineProperty(window, "electronAPI", {
 
 ```typescript
 // Testing component integration with stores
-import { render, screen, waitFor } from '@testing-library/react';
-import { ThemeProvider } from '../theme/components/ThemeProvider';
-import { MyIntegratedComponent } from './MyIntegratedComponent';
+import { render, screen, waitFor } from "@testing-library/react";
+import { ThemeProvider } from "../theme/components/ThemeProvider";
+import { MyIntegratedComponent } from "./MyIntegratedComponent";
 
 const renderWithProviders = (component: React.ReactElement) => {
-  return render(
-    <ThemeProvider>
-      {component}
-    </ThemeProvider>
-  );
+ return render(<ThemeProvider>{component}</ThemeProvider>);
 };
 
-describe('MyIntegratedComponent Integration', () => {
-  it('updates UI when store changes', async () => {
-    renderWithProviders(<MyIntegratedComponent />);
+describe("MyIntegratedComponent Integration", () => {
+ it("updates UI when store changes", async () => {
+  renderWithProviders(<MyIntegratedComponent />);
 
-    // Trigger store update
-    act(() => {
-      useSitesStore.getState().addSite(mockSite);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Test Site')).toBeInTheDocument();
-    });
+  // Trigger store update
+  act(() => {
+   useSitesStore.getState().addSite(mockSite);
   });
+
+  await waitFor(() => {
+   expect(screen.getByText("Test Site")).toBeInTheDocument();
+  });
+ });
 });
 ```
 

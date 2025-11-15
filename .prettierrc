@@ -55,7 +55,10 @@
         {
             "files": "tsconfig.*",
             "options": {
+                "jsonRecursiveSort": false,
+                "jsonSortOrder": "{\"*\": \"numeric\"}",
                 "plugins": [
+                    "prettier-plugin-sort-json",
                     "prettier-plugin-jsdoc",
                     "prettier-plugin-multiline-arrays",
                     "@awmottaz/prettier-plugin-void-html",

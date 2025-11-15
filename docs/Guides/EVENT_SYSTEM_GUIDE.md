@@ -97,7 +97,14 @@ await bus.emitTyped("user:data", { name: "John", age: 30 });
 // Listener receives: { name: 'John', age: 30, _meta: {...} }
 
 // Array events
-await bus.emitTyped("batch:data", [1, 2, 3]);
+await bus.emitTyped(
+ "batch:data",
+ [
+  1,
+  2,
+  3,
+ ]
+);
 // Listener receives: [1, 2, 3] with non-enumerable _meta property
 
 // Primitive events
@@ -227,56 +234,61 @@ const cleanup = () => {
 ### React Component Integration
 
 ```typescript
-import { useEffect, useState } from 'react';
-import { EventsService } from '@/services/EventsService';
-import type { MonitorUpEventData, MonitorDownEventData } from '@shared/types/events';
+import { useEffect, useState } from "react";
+import { EventsService } from "@/services/EventsService";
+import type {
+ MonitorUpEventData,
+ MonitorDownEventData,
+} from "@shared/types/events";
 
 interface MonitorStatusProps {
-  monitorId: string;
+ monitorId: string;
 }
 
 export const MonitorStatus: React.FC<MonitorStatusProps> = ({ monitorId }) => {
-  const [status, setStatus] = useState<'up' | 'down' | 'unknown'>('unknown');
-  const [lastUpdate, setLastUpdate] = useState<number | null>(null);
+ const [status, setStatus] = useState<"up" | "down" | "unknown">("unknown");
+ const [lastUpdate, setLastUpdate] = useState<number | null>(null);
 
-  useEffect(() => {
-    const cleanupFunctions: (() => void)[] = [];
+ useEffect(() => {
+  const cleanupFunctions: (() => void)[] = [];
 
-    const setupEventListeners = async () => {
-      // Monitor up events
-      cleanupFunctions.push(
-        await EventsService.onMonitorUp((data: MonitorUpEventData) => {
-          if (data.monitorId === monitorId) {
-            setStatus('up');
-            setLastUpdate(data.timestamp);
-          }
-        })
-      );
+  const setupEventListeners = async () => {
+   // Monitor up events
+   cleanupFunctions.push(
+    await EventsService.onMonitorUp((data: MonitorUpEventData) => {
+     if (data.monitorId === monitorId) {
+      setStatus("up");
+      setLastUpdate(data.timestamp);
+     }
+    })
+   );
 
-      // Monitor down events
-      cleanupFunctions.push(
-        await EventsService.onMonitorDown((data: MonitorDownEventData) => {
-          if (data.monitorId === monitorId) {
-            setStatus('down');
-            setLastUpdate(data.timestamp);
-          }
-        })
-      );
-    };
+   // Monitor down events
+   cleanupFunctions.push(
+    await EventsService.onMonitorDown((data: MonitorDownEventData) => {
+     if (data.monitorId === monitorId) {
+      setStatus("down");
+      setLastUpdate(data.timestamp);
+     }
+    })
+   );
+  };
 
-    setupEventListeners().catch(console.error);
+  setupEventListeners().catch(console.error);
 
-    return () => {
-      cleanupFunctions.forEach(fn => fn());
-    };
-  }, [monitorId]);
+  return () => {
+   cleanupFunctions.forEach((fn) => fn());
+  };
+ }, [monitorId]);
 
-  return (
-    <div className={`monitor-status ${status}`}>
-      <span>Status: {status}</span>
-      {lastUpdate && <span>Last update: {new Date(lastUpdate).toLocaleString()}</span>}
-    </div>
-  );
+ return (
+  <div className={`monitor-status ${status}`}>
+   <span>Status: {status}</span>
+   {lastUpdate && (
+    <span>Last update: {new Date(lastUpdate).toLocaleString()}</span>
+   )}
+  </div>
+ );
 };
 ```
 

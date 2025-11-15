@@ -2,7 +2,13 @@
  * @file Additional comprehensive test coverage for App component
  */
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+    act,
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {
     beforeEach,
@@ -1110,7 +1116,9 @@ describe("App Additional Coverage Tests", () => {
 
         // We need to mock a theme toggle button being clicked.
         // Since this would typically be in the Header component, we'll simulate the call
-        toggleThemeMock();
+        await act(async () => {
+            toggleThemeMock();
+        });
 
         expect(toggleThemeMock).toHaveBeenCalled();
     });

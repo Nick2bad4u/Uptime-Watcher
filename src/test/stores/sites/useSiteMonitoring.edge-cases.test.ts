@@ -165,4 +165,241 @@ describe("useSiteMonitoring edge cases", () => {
         );
         expect(setSites).not.toHaveBeenCalled();
     });
+
+    it("applies optimistic monitoring updates for site-wide operations", async () => {
+        vi.useFakeTimers();
+        try {
+            const site: Site = {
+                identifier: "site-optimistic",
+                monitoring: false,
+                monitors: [
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-one",
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 10_000,
+                        type: "http",
+                        url: "https://example.com",
+                    },
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-two",
+                        monitoring: false,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 10_000,
+                        type: "http",
+                        url: "https://status.example.com",
+                    },
+                ],
+                name: "Optimistic Site",
+            } satisfies Site;
+
+            let currentSites: Site[] = [structuredClone(site)];
+            const getSites = vi.fn(() => currentSites);
+            const setSites = vi.fn((sites: Site[]) => {
+                currentSites = sites;
+            });
+            const registerMonitoringLock = vi.fn();
+            const clearOptimisticMonitoringLocks = vi.fn();
+
+            monitoringService.startMonitoringForSite.mockResolvedValueOnce(
+                undefined
+            );
+
+            const actions = createSiteMonitoringActions({
+                applyStatusUpdate,
+                clearOptimisticMonitoringLocks,
+                getSites,
+                monitoringService,
+                registerMonitoringLock,
+                setSites,
+            });
+
+            const pending = actions.startSiteMonitoring(site.identifier);
+            await vi.advanceTimersByTimeAsync(75);
+
+            expect(setSites).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({
+                        identifier: site.identifier,
+                        monitors: expect.arrayContaining([
+                            expect.objectContaining({
+                                id: "monitor-one",
+                                monitoring: true,
+                            }),
+                            expect.objectContaining({
+                                id: "monitor-two",
+                                monitoring: true,
+                            }),
+                        ]),
+                    }),
+                ])
+            );
+
+            await pending;
+
+            expect(registerMonitoringLock).toHaveBeenCalledWith(
+                site.identifier,
+                expect.arrayContaining(["monitor-one", "monitor-two"]),
+                true,
+                expect.any(Number)
+            );
+            expect(clearOptimisticMonitoringLocks).not.toHaveBeenCalled();
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("reverts optimistic updates and clears locks when the service fails", async () => {
+        vi.useFakeTimers();
+        try {
+            const site: Site = {
+                identifier: "site-revert",
+                monitoring: true,
+                monitors: [
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-revert",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 10_000,
+                        type: "http",
+                        url: "https://monitor.example.com",
+                    },
+                ],
+                name: "Revert Site",
+            } satisfies Site;
+
+            let currentSites: Site[] = [structuredClone(site)];
+            const getSites = vi.fn(() => currentSites);
+            const setSites = vi.fn((sites: Site[]) => {
+                currentSites = sites;
+            });
+            const registerMonitoringLock = vi.fn();
+            const clearOptimisticMonitoringLocks = vi.fn();
+
+            const failure = new Error("stop failed");
+            monitoringService.stopMonitoringForMonitor.mockRejectedValueOnce(
+                failure
+            );
+
+            const actions = createSiteMonitoringActions({
+                applyStatusUpdate,
+                clearOptimisticMonitoringLocks,
+                getSites,
+                monitoringService,
+                registerMonitoringLock,
+                setSites,
+            });
+
+            const pending = actions.stopSiteMonitorMonitoring(
+                site.identifier,
+                "monitor-revert"
+            );
+
+            await vi.advanceTimersByTimeAsync(75);
+
+            await expect(pending).rejects.toThrow(failure);
+
+            expect(registerMonitoringLock).toHaveBeenCalledWith(
+                site.identifier,
+                ["monitor-revert"],
+                false,
+                expect.any(Number)
+            );
+            expect(clearOptimisticMonitoringLocks).toHaveBeenCalledWith(
+                site.identifier,
+                ["monitor-revert"]
+            );
+            expect(setSites).toHaveBeenCalledTimes(2);
+            expect(
+                currentSites[0]?.monitors.find(
+                    (monitor) => monitor.id === "monitor-revert"
+                )?.monitoring
+            ).toBeTruthy();
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it("applies optimistic updates for individual monitor operations", async () => {
+        vi.useFakeTimers();
+        try {
+            const site: Site = {
+                identifier: "site-individual",
+                monitoring: true,
+                monitors: [
+                    {
+                        activeOperations: [],
+                        checkInterval: 60_000,
+                        history: [],
+                        id: "monitor-individual",
+                        monitoring: true,
+                        responseTime: 0,
+                        retryAttempts: 0,
+                        status: "up",
+                        timeout: 10_000,
+                        type: "http",
+                        url: "https://monitor.example.com",
+                    },
+                ],
+                name: "Individual Monitor",
+            } satisfies Site;
+
+            let currentSites: Site[] = [structuredClone(site)];
+            const getSites = vi.fn(() => currentSites);
+            const setSites = vi.fn((sites: Site[]) => {
+                currentSites = sites;
+            });
+
+            const registerMonitoringLock = vi.fn();
+
+            monitoringService.stopMonitoringForMonitor.mockResolvedValueOnce(
+                undefined
+            );
+
+            const actions = createSiteMonitoringActions({
+                applyStatusUpdate,
+                getSites,
+                monitoringService,
+                registerMonitoringLock,
+                setSites,
+            });
+
+            const pending = actions.stopSiteMonitorMonitoring(
+                site.identifier,
+                "monitor-individual"
+            );
+
+            await vi.advanceTimersByTimeAsync(75);
+            await pending;
+
+            expect(
+                currentSites[0]?.monitors.find(
+                    (monitor) => monitor.id === "monitor-individual"
+                )?.monitoring
+            ).toBeFalsy();
+            expect(registerMonitoringLock).toHaveBeenCalledWith(
+                site.identifier,
+                ["monitor-individual"],
+                false,
+                expect.any(Number)
+            );
+        } finally {
+            vi.useRealTimers();
+        }
+    });
 });

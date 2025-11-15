@@ -140,20 +140,18 @@ import { SiteCard } from "../SiteCard";
 import { SiteService } from "src/services/SiteService";
 
 describe("SiteCard", () => {
-  it("should handle site deletion", async () => {
-    const removeSpy = vi
-      .spyOn(SiteService, "removeSite")
-      .mockResolvedValue(true);
+ it("should handle site deletion", async () => {
+  const removeSpy = vi.spyOn(SiteService, "removeSite").mockResolvedValue(true);
 
-    render(<SiteCard site={mockSite} />);
+  render(<SiteCard site={mockSite} />);
 
-    const deleteButton = screen.getByRole("button", { name: /delete/i });
-    fireEvent.click(deleteButton);
+  const deleteButton = screen.getByRole("button", { name: /delete/i });
+  fireEvent.click(deleteButton);
 
-    await waitFor(() => {
-      expect(removeSpy).toHaveBeenCalledWith(mockSite.id);
-    });
+  await waitFor(() => {
+   expect(removeSpy).toHaveBeenCalledWith(mockSite.id);
   });
+ });
 });
 ```
 
