@@ -300,13 +300,13 @@ flowchart LR
     class SitesProps,MonitorsProps,SettingsProps,ValidationProps,TemporaryProps properties
 ```
 
-| Cache Type | TTL | Max Size | Stats | Use Case |
-| --- | --- | --- | --- | --- |
-| SITES | 10 min | 500 | ✓ | Site management operations |
-| MONITORS | 5 min | 1000 | ✓ | Real-time monitoring data |
-| SETTINGS | 30 min | 100 | ✓ | Application configuration |
-| VALIDATION | 5 min | 200 | ✓ | Validation result caching |
-| TEMPORARY | 5 min | 1000 | ✗ | Short-term operations |
+| Cache Type | TTL    | Max Size | Stats | Use Case                   |
+| ---------- | ------ | -------- | ----- | -------------------------- |
+| SITES      | 10 min | 500      | ✓     | Site management operations |
+| MONITORS   | 5 min  | 1000     | ✓     | Real-time monitoring data  |
+| SETTINGS   | 30 min | 100      | ✓     | Application configuration  |
+| VALIDATION | 5 min  | 200      | ✓     | Validation result caching  |
+| TEMPORARY  | 5 min  | 1000     | ✗     | Short-term operations      |
 
 ## Related ADRs
 

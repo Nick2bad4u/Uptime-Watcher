@@ -15,6 +15,11 @@ docs/docusaurus/build/
 docs/docusaurus/.docusaurus/
 docs/packages/
 docs/TSDoc/
+docs/Guides/
+
+# MD and MDX files since we use Remark Lint and other tools for those
+**/*.md
+**/*.mdx
 
 # Ignore Change Logs
 **/CHANGELOG.md
@@ -37,7 +42,6 @@ package.json
 
 # Ignore Sonar properties (not compatible with prettier-ini parser)
 sonar-project.properties
-*.mdx
 
 # Prettier fails on this for some reason
 useMonitorTypesStore.100percent.test.ts

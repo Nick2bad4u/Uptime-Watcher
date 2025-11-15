@@ -100,21 +100,21 @@ Moved **30+ historical documents** to organized archive:
 
 ### 🎯 **For New Users**
 
-1. **[AI_CONTEXT.md](./AI_CONTEXT.md)** - AI assistant fast onboarding
-2. **[DEVELOPER_QUICK_START.md](./DEVELOPER_QUICK_START.md)** - Developer setup
-3. **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment guide
+1. **[AI\_CONTEXT.md](./AI_CONTEXT.md)** - AI assistant fast onboarding
+2. **[DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)** - Developer setup
+3. **[ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment guide
 
 ### 🛠️ **For Development**
 
-1. **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - IPC and API reference
+1. **[API\_DOCUMENTATION.md](./API_DOCUMENTATION.md)** - IPC and API reference
 2. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Debug and fix issues
 3. **[Architecture/](../Architecture/)** - Patterns, ADRs, templates
 4. **[Guides/](../Guides/)** - Implementation guides
 
 ### 📖 **For Understanding**
 
-1. **[TECHNOLOGY_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)** - How we got here
-2. **[DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** - Complete navigation
+1. **[TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)** - How we got here
+2. **[DOCUMENTATION\_INDEX.md](./DOCUMENTATION_INDEX.md)** - Complete navigation
 
 ## 🔮 **Going Forward**
 

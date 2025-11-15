@@ -809,13 +809,13 @@ const tempCache = new StandardizedCache<Site>({
 
 ### Cache Type Guidelines
 
-| Cache Type | TTL | Max Size | Use Case | Stats Enabled |
-| --- | --- | --- | --- | --- |
-| **SITES** | 10 min | 500 | Site management operations | ✓ |
-| **MONITORS** | 5 min | 1000 | Real-time monitoring data | ✓ |
-| **SETTINGS** | 30 min | 100 | Application configuration | ✓ |
-| **VALIDATION** | 5 min | 200 | Validation result caching | ✓ |
-| **TEMPORARY** | 5 min | 1000 | Short-term operations | ✗ |
+| Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled |
+| -------------- | ------ | -------- | -------------------------- | ------------- |
+| **SITES**      | 10 min | 500      | Site management operations | ✓             |
+| **MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
+| **SETTINGS**   | 30 min | 100      | Application configuration  | ✓             |
+| **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
+| **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
 
 ### Cache Configuration Implementation Template
 

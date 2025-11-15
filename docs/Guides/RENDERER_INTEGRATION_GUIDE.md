@@ -21,11 +21,11 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ## 2. Canonical IPC & Event Channels
 
-| Concern | Invoke Channel(s) | Renderer Event(s) | Notes |
-| --- | --- | --- | --- |
-| Settings retention | `get-history-limit`, `update-history-limit`, `reset-settings` | `settings:history-limit-updated` | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics. |
-| Manual checks | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed` | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
-| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard` | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative. |
+| Concern                | Invoke Channel(s)                                                           | Renderer Event(s)                             | Notes                                                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Settings retention     | `get-history-limit`, `update-history-limit`, `reset-settings`               | `settings:history-limit-updated`              | `update-history-limit` returns the canonical limit value; broadcast includes `previousLimit` for analytics.             |
+| Manual checks          | `check-site-now` _(renderer abstraction: `MonitoringService.checkSiteNow`)_ | `monitor:check-completed`                     | Event payload delivers enriched snapshots (site + monitor) so the renderer can reconcile history graphs and audit logs. |
+| Diagnostics & Metadata | `diagnostics-verify-ipc-handler`, `diagnostics-report-preload-guard`        | `cache:invalidated`, `state-sync-event`, etc. | No renames since 17.4.0, but keep generated inventory authoritative.                                                    |
 
 > 🔗 Authoritative reference: `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md` (auto-generated; do **not** edit manually).
 
@@ -56,11 +56,11 @@ Skipping these steps results in stale settings panels, missing toast notificatio
 
 ### 3.3 Testing Guidance
 
-| Test Suite | Command | Purpose |
-| --- | --- | --- |
-| Renderer store | `vitest run src/test/stores/sites/useSiteMonitoring.comprehensive.test.ts` | Validates optimistic update path. |
-| Orchestrator | `vitest run electron/test/UptimeOrchestrator.test.ts -t "manual-check"` | Ensures rebroadcast carries enriched payload. |
-| E2E | `npm run test:playwright` | Confirms UI feedback is instant during manual health checks. |
+| Test Suite     | Command                                                                    | Purpose                                                      |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Renderer store | `vitest run src/test/stores/sites/useSiteMonitoring.comprehensive.test.ts` | Validates optimistic update path.                            |
+| Orchestrator   | `vitest run electron/test/UptimeOrchestrator.test.ts -t "manual-check"`    | Ensures rebroadcast carries enriched payload.                |
+| E2E            | `npm run test:playwright`                                                  | Confirms UI feedback is instant during manual health checks. |
 
 ---
 
@@ -98,14 +98,14 @@ interface HistoryLimitUpdatedEventData {
 
 ## 5. Migration Checklist
 
-| Task | Status | Notes |
-| --- | --- | --- |
-| Normalize all invoke channels and preload bridges | ✅ | Run `npm run generate:ipc` after refactors. |
-| Update renderer services (`EventsService`, `MonitoringService`) | ✅ | Ensure new listeners return cleanup functions. |
-| Wire optimistic manual-check handling into stores | ✅ | Verify `createSiteMonitoringActions` is in use. |
-| Handle `settings:history-limit-updated` in all settings views | ✅ | Remember to invalidate cached retention copy in Redux/Zustand wrappers. |
-| Add CI drift detection (`npm run check:ipc`) | ✅ | Integrate into lint/test workflows. |
-| Update product docs & release notes | ✅ | Reference this guide and the changelog entry. |
+| Task                                                            | Status | Notes                                                                   |
+| --------------------------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| Normalize all invoke channels and preload bridges               | ✅      | Run `npm run generate:ipc` after refactors.                             |
+| Update renderer services (`EventsService`, `MonitoringService`) | ✅      | Ensure new listeners return cleanup functions.                          |
+| Wire optimistic manual-check handling into stores               | ✅      | Verify `createSiteMonitoringActions` is in use.                         |
+| Handle `settings:history-limit-updated` in all settings views   | ✅      | Remember to invalidate cached retention copy in Redux/Zustand wrappers. |
+| Add CI drift detection (`npm run check:ipc`)                    | ✅      | Integrate into lint/test workflows.                                     |
+| Update product docs & release notes                             | ✅      | Reference this guide and the changelog entry.                           |
 
 Mark each item off during integration reviews. Pull requests must demonstrate automation via CI logs and include targeted tests when modifying IPC contracts.
 
@@ -121,14 +121,14 @@ Mark each item off during integration reviews. Pull requests must demonstrate au
 
 ## 7. Appendix: Reference Implementations
 
-| Component | File | Responsibility |
-| --- | --- | --- |
-| Orchestrator forwarding | `electron/UptimeOrchestrator.ts` | Rebroadcasts `monitor:check-completed` and `settings:history-limit-updated` with enrichment. |
-| Application bridge | `electron/services/application/ApplicationService.ts` | Pipes orchestrator output to `RendererEventBridge`. |
-| Preload guard | `electron/preload/domains/eventsApi.ts` | Validates renderer payloads and reports guard failures. |
-| Renderer subscription | `src/services/EventsService.ts` | Provides typed listener helpers with automatic initialization. |
-| Settings store | `src/stores/settings/operations.ts` | Applies history-limit updates and handles subscription lifecycle. |
-| Sites monitoring store | `src/stores/sites/useSiteMonitoring.ts` | Applies optimistic manual-check snapshots. |
+| Component               | File                                                  | Responsibility                                                                               |
+| ----------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Orchestrator forwarding | `electron/UptimeOrchestrator.ts`                      | Rebroadcasts `monitor:check-completed` and `settings:history-limit-updated` with enrichment. |
+| Application bridge      | `electron/services/application/ApplicationService.ts` | Pipes orchestrator output to `RendererEventBridge`.                                          |
+| Preload guard           | `electron/preload/domains/eventsApi.ts`               | Validates renderer payloads and reports guard failures.                                      |
+| Renderer subscription   | `src/services/EventsService.ts`                       | Provides typed listener helpers with automatic initialization.                               |
+| Settings store          | `src/stores/settings/operations.ts`                   | Applies history-limit updates and handles subscription lifecycle.                            |
+| Sites monitoring store  | `src/stores/sites/useSiteMonitoring.ts`               | Applies optimistic manual-check snapshots.                                                   |
 
 Consult these modules when extending or troubleshooting integrations.
 

@@ -4,53 +4,53 @@
 
 ## Invoke Channels
 
-| Channel | Description | Parameters | Result |
-| --- | --- | --- | --- |
-| `add-site` | Handles `add-site` invocations. | `[site: Site]` | `Site` |
-| `check-site-now` | Handles `check-site-now` invocations. | `[siteIdentifier: string, monitorId: string]` | `StatusUpdate \| undefined` |
-| `delete-all-sites` | Handles `delete-all-sites` invocations. | `[]` | `number` |
-| `diagnostics-report-preload-guard` | Handles `diagnostics-report-preload-guard` invocations. | `[report: PreloadGuardDiagnosticsReport]` | `undefined` |
-| `diagnostics-verify-ipc-handler` | Handles `diagnostics-verify-ipc-handler` invocations. | `[channel: string]` | `IpcHandlerVerificationResult` |
-| `download-sqlite-backup` | Handles `download-sqlite-backup` invocations. | `[]` | `SerializedDatabaseBackupResult` |
-| `export-data` | Handles `export-data` invocations. | `[]` | `string` |
-| `format-monitor-detail` | Handles `format-monitor-detail` invocations. | `[monitorType: string, details: string]` | `string` |
-| `format-monitor-title-suffix` | Handles `format-monitor-title-suffix` invocations. | `[monitorType: string, monitor: Monitor]` | `string` |
-| `get-history-limit` | Handles `get-history-limit` invocations. | `[]` | `number` |
-| `get-monitor-types` | Handles `get-monitor-types` invocations. | `[]` | `MonitorTypeConfig[]` |
-| `get-sites` | Handles `get-sites` invocations. | `[]` | `Site[]` |
-| `get-sync-status` | Handles `get-sync-status` invocations. | `[]` | `StateSyncStatusSummary` |
-| `import-data` | Handles `import-data` invocations. | `[data: string]` | `boolean` |
-| `open-external` | Handles `open-external` invocations. | `[url: string]` | `boolean` |
-| `quit-and-install` | Handles `quit-and-install` invocations. | `[]` | `boolean` |
-| `remove-monitor` | Handles `remove-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `Site` |
-| `remove-site` | Handles `remove-site` invocations. | `[identifier: string]` | `boolean` |
-| `request-full-sync` | Handles `request-full-sync` invocations. | `[]` | `StateSyncFullSyncResult` |
-| `reset-settings` | Handles `reset-settings` invocations. | `[]` | `undefined` |
-| `start-monitoring` | Handles `start-monitoring` invocations. | `[]` | `MonitoringStartSummary` |
-| `start-monitoring-for-monitor` | Handles `start-monitoring-for-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `boolean` |
-| `start-monitoring-for-site` | Handles `start-monitoring-for-site` invocations. | `[siteIdentifier: string]` | `boolean` |
-| `stop-monitoring` | Handles `stop-monitoring` invocations. | `[]` | `MonitoringStopSummary` |
-| `stop-monitoring-for-monitor` | Handles `stop-monitoring-for-monitor` invocations. | `[siteIdentifier: string, monitorId: string]` | `boolean` |
-| `stop-monitoring-for-site` | Handles `stop-monitoring-for-site` invocations. | `[siteIdentifier: string]` | `boolean` |
-| `update-history-limit` | Handles `update-history-limit` invocations. | `[limitDays: number]` | `number` |
-| `update-site` | Handles `update-site` invocations. | `[identifier: string, updates: Partial<Site>]` | `Site` |
-| `validate-monitor-data` | Handles `validate-monitor-data` invocations. | `[monitorType: string, data: unknown]` | `ValidationResult` |
+| Channel                            | Description                                             | Parameters                                     | Result                           |
+| ---------------------------------- | ------------------------------------------------------- | ---------------------------------------------- | -------------------------------- |
+| `add-site`                         | Handles `add-site` invocations.                         | `[site: Site]`                                 | `Site`                           |
+| `check-site-now`                   | Handles `check-site-now` invocations.                   | `[siteIdentifier: string, monitorId: string]`  | `StatusUpdate \| undefined`      |
+| `delete-all-sites`                 | Handles `delete-all-sites` invocations.                 | `[]`                                           | `number`                         |
+| `diagnostics-report-preload-guard` | Handles `diagnostics-report-preload-guard` invocations. | `[report: PreloadGuardDiagnosticsReport]`      | `undefined`                      |
+| `diagnostics-verify-ipc-handler`   | Handles `diagnostics-verify-ipc-handler` invocations.   | `[channel: string]`                            | `IpcHandlerVerificationResult`   |
+| `download-sqlite-backup`           | Handles `download-sqlite-backup` invocations.           | `[]`                                           | `SerializedDatabaseBackupResult` |
+| `export-data`                      | Handles `export-data` invocations.                      | `[]`                                           | `string`                         |
+| `format-monitor-detail`            | Handles `format-monitor-detail` invocations.            | `[monitorType: string, details: string]`       | `string`                         |
+| `format-monitor-title-suffix`      | Handles `format-monitor-title-suffix` invocations.      | `[monitorType: string, monitor: Monitor]`      | `string`                         |
+| `get-history-limit`                | Handles `get-history-limit` invocations.                | `[]`                                           | `number`                         |
+| `get-monitor-types`                | Handles `get-monitor-types` invocations.                | `[]`                                           | `MonitorTypeConfig[]`            |
+| `get-sites`                        | Handles `get-sites` invocations.                        | `[]`                                           | `Site[]`                         |
+| `get-sync-status`                  | Handles `get-sync-status` invocations.                  | `[]`                                           | `StateSyncStatusSummary`         |
+| `import-data`                      | Handles `import-data` invocations.                      | `[data: string]`                               | `boolean`                        |
+| `open-external`                    | Handles `open-external` invocations.                    | `[url: string]`                                | `boolean`                        |
+| `quit-and-install`                 | Handles `quit-and-install` invocations.                 | `[]`                                           | `boolean`                        |
+| `remove-monitor`                   | Handles `remove-monitor` invocations.                   | `[siteIdentifier: string, monitorId: string]`  | `Site`                           |
+| `remove-site`                      | Handles `remove-site` invocations.                      | `[identifier: string]`                         | `boolean`                        |
+| `request-full-sync`                | Handles `request-full-sync` invocations.                | `[]`                                           | `StateSyncFullSyncResult`        |
+| `reset-settings`                   | Handles `reset-settings` invocations.                   | `[]`                                           | `undefined`                      |
+| `start-monitoring`                 | Handles `start-monitoring` invocations.                 | `[]`                                           | `MonitoringStartSummary`         |
+| `start-monitoring-for-monitor`     | Handles `start-monitoring-for-monitor` invocations.     | `[siteIdentifier: string, monitorId: string]`  | `boolean`                        |
+| `start-monitoring-for-site`        | Handles `start-monitoring-for-site` invocations.        | `[siteIdentifier: string]`                     | `boolean`                        |
+| `stop-monitoring`                  | Handles `stop-monitoring` invocations.                  | `[]`                                           | `MonitoringStopSummary`          |
+| `stop-monitoring-for-monitor`      | Handles `stop-monitoring-for-monitor` invocations.      | `[siteIdentifier: string, monitorId: string]`  | `boolean`                        |
+| `stop-monitoring-for-site`         | Handles `stop-monitoring-for-site` invocations.         | `[siteIdentifier: string]`                     | `boolean`                        |
+| `update-history-limit`             | Handles `update-history-limit` invocations.             | `[limitDays: number]`                          | `number`                         |
+| `update-site`                      | Handles `update-site` invocations.                      | `[identifier: string, updates: Partial<Site>]` | `Site`                           |
+| `validate-monitor-data`            | Handles `validate-monitor-data` invocations.            | `[monitorType: string, data: unknown]`         | `ValidationResult`               |
 
 ## Renderer Event Channels
 
-| Channel | Description | Payload Type |
-| --- | --- | --- |
-| `cache:invalidated` | Payload for cache invalidation notifications. | `RendererEventPayloadMap["cache:invalidated"]` |
-| `settings:history-limit-updated` | Payload for database history retention updates. | `RendererEventPayloadMap["settings:history-limit-updated"]` |
-| `monitor:check-completed` | Payload for monitor check completion events. | `RendererEventPayloadMap["monitor:check-completed"]` |
-| `monitor:down` | Payload for monitor down events. | `RendererEventPayloadMap["monitor:down"]` |
-| `monitoring:started` | Payload for monitoring started events. | `RendererEventPayloadMap["monitoring:started"]` |
-| `monitoring:stopped` | Payload for monitoring stopped events. | `RendererEventPayloadMap["monitoring:stopped"]` |
-| `monitor:status-changed` | Payload for monitor status change events. | `RendererEventPayloadMap["monitor:status-changed"]` |
-| `monitor:up` | Payload for monitor up events. | `RendererEventPayloadMap["monitor:up"]` |
-| `site:added` | Payload for site added events. | `RendererEventPayloadMap["site:added"]` |
-| `site:removed` | Payload for site removed events. | `RendererEventPayloadMap["site:removed"]` |
-| `site:updated` | Payload for site updated events. | `RendererEventPayloadMap["site:updated"]` |
-| `state-sync-event` | Payload for full state synchronisation broadcasts. | `RendererEventPayloadMap["state-sync-event"]` |
-| `test-event` | Payload for development/test events. | `RendererEventPayloadMap["test-event"]` |
-| `update-status` | Payload for auto-updater status notifications. | `RendererEventPayloadMap["update-status"]` |
+| Channel                          | Description                                        | Payload Type                                                |
+| -------------------------------- | -------------------------------------------------- | ----------------------------------------------------------- |
+| `cache:invalidated`              | Payload for cache invalidation notifications.      | `RendererEventPayloadMap["cache:invalidated"]`              |
+| `settings:history-limit-updated` | Payload for database history retention updates.    | `RendererEventPayloadMap["settings:history-limit-updated"]` |
+| `monitor:check-completed`        | Payload for monitor check completion events.       | `RendererEventPayloadMap["monitor:check-completed"]`        |
+| `monitor:down`                   | Payload for monitor down events.                   | `RendererEventPayloadMap["monitor:down"]`                   |
+| `monitoring:started`             | Payload for monitoring started events.             | `RendererEventPayloadMap["monitoring:started"]`             |
+| `monitoring:stopped`             | Payload for monitoring stopped events.             | `RendererEventPayloadMap["monitoring:stopped"]`             |
+| `monitor:status-changed`         | Payload for monitor status change events.          | `RendererEventPayloadMap["monitor:status-changed"]`         |
+| `monitor:up`                     | Payload for monitor up events.                     | `RendererEventPayloadMap["monitor:up"]`                     |
+| `site:added`                     | Payload for site added events.                     | `RendererEventPayloadMap["site:added"]`                     |
+| `site:removed`                   | Payload for site removed events.                   | `RendererEventPayloadMap["site:removed"]`                   |
+| `site:updated`                   | Payload for site updated events.                   | `RendererEventPayloadMap["site:updated"]`                   |
+| `state-sync-event`               | Payload for full state synchronisation broadcasts. | `RendererEventPayloadMap["state-sync-event"]`               |
+| `test-event`                     | Payload for development/test events.               | `RendererEventPayloadMap["test-event"]`                     |
+| `update-status`                  | Payload for auto-updater status notifications.     | `RendererEventPayloadMap["update-status"]`                  |

@@ -34,12 +34,12 @@ sequenceDiagram
 
 `MonitoringConfig` is passed from `DatabaseManager` into repository helpers and mutators. All methods are now **async** and MUST be awaited by callers:
 
-| Method | Responsibility | Failure behaviour |
-| --- | --- | --- |
-| `setHistoryLimit(limit)` | Updates in-memory limit and emits `settings:history-limit-updated`. | Propagates rejections so repository loaders halt when the event bus fails. |
-| `setupNewMonitors(site, ids)` | Configures freshly persisted monitors via `MonitorManager`. | Bubbles rejections to the originating mutation (add/update site). |
+| Method                                   | Responsibility                                                             | Failure behaviour                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `setHistoryLimit(limit)`                 | Updates in-memory limit and emits `settings:history-limit-updated`.        | Propagates rejections so repository loaders halt when the event bus fails.   |
+| `setupNewMonitors(site, ids)`            | Configures freshly persisted monitors via `MonitorManager`.                | Bubbles rejections to the originating mutation (add/update site).            |
 | `startMonitoring(identifier, monitorId)` | Requests monitoring start through typed events after forcing a cache sync. | Logs and rethrows when the event bus rejects to avoid silent watch failures. |
-| `stopMonitoring(identifier, monitorId)` | Requests monitoring stop and surfaces event failures. | Logs and rethrows. |
+| `stopMonitoring(identifier, monitorId)`  | Requests monitoring stop and surfaces event failures.                      | Logs and rethrows.                                                           |
 
 These semantics enforce the guarantees described in ADR-003 (Error Handling Strategy): no monitoring transition can be silently skipped, and renderer state is only updated after auxiliary work completes.
 

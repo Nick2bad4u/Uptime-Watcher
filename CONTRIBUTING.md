@@ -46,16 +46,16 @@ Thank you for considering contributing to Uptime Watcher! This document provides
 
 ### Development Scripts
 
-| Script | Purpose | Description |
-| --- | --- | --- |
-| `npm run dev` | Development | Start Vite dev server for frontend development |
-| `npm run electron-dev` | Full App | Launch complete application (Vite + Electron) |
-| `npm run electron` | Electron | Launch Electron shell (requires Vite running) |
-| `npm run build` | Production | Build application for production |
-| `npm run test` | Testing | Run all test suites (unit, integration, E2E) |
-| `npm run lint` | Code Quality | Check code formatting and style |
-| `npm run lint:fix` | Code Quality | Automatically fix linting issues |
-| `npm run type-check:all` | Type Safety | Verify TypeScript types across all modules |
+| Script                   | Purpose      | Description                                    |
+| ------------------------ | ------------ | ---------------------------------------------- |
+| `npm run dev`            | Development  | Start Vite dev server for frontend development |
+| `npm run electron-dev`   | Full App     | Launch complete application (Vite + Electron)  |
+| `npm run electron`       | Electron     | Launch Electron shell (requires Vite running)  |
+| `npm run build`          | Production   | Build application for production               |
+| `npm run test`           | Testing      | Run all test suites (unit, integration, E2E)   |
+| `npm run lint`           | Code Quality | Check code formatting and style                |
+| `npm run lint:fix`       | Code Quality | Automatically fix linting issues               |
+| `npm run type-check:all` | Type Safety  | Verify TypeScript types across all modules     |
 
 ### Architecture Standards
 
@@ -202,22 +202,22 @@ Use the feature request template and include:
 
 ### Available Scripts
 
-| Category | Script | Description |
-| --- | --- | --- |
-| **Development** | `npm run dev` | Start Vite dev server |
-|  | `npm run electron` | Launch Electron shell (requires Vite dev server) |
-|  | `npm run electron-dev` | Start dev server + Electron concurrently |
-|  | `npm run start-both` | Alias for `electron-dev` |
-| **Building** | `npm run build` | Build for production |
-|  | `npm run clean` | Clean all build artifacts |
-| **Code Quality** | `npm run lint` | Run ESLint checks |
-|  | `npm run lint:fix` | Fix ESLint issues automatically |
-|  | `npm run format` | Format code with Prettier |
-|  | `npm run type-check:all` | TypeScript type checking |
+| Category          | Script                     | Description                                                       |
+| ----------------- | -------------------------- | ----------------------------------------------------------------- |
+| **Development**   | `npm run dev`              | Start Vite dev server                                             |
+|                   | `npm run electron`         | Launch Electron shell (requires Vite dev server)                  |
+|                   | `npm run electron-dev`     | Start dev server + Electron concurrently                          |
+|                   | `npm run start-both`       | Alias for `electron-dev`                                          |
+| **Building**      | `npm run build`            | Build for production                                              |
+|                   | `npm run clean`            | Clean all build artifacts                                         |
+| **Code Quality**  | `npm run lint`             | Run ESLint checks                                                 |
+|                   | `npm run lint:fix`         | Fix ESLint issues automatically                                   |
+|                   | `npm run format`           | Format code with Prettier                                         |
+|                   | `npm run type-check:all`   | TypeScript type checking                                          |
 | **Documentation** | `npm run docs:check-links` | Validate internal documentation links (Architecture & Docusaurus) |
-| **Testing** | `npm run test` | Run all test suites |
-|  | `npm run test:coverage` | Generate coverage reports |
-|  | `npm run test:electron` | Run Electron-specific tests |
+| **Testing**       | `npm run test`             | Run all test suites                                               |
+|                   | `npm run test:coverage`    | Generate coverage reports                                         |
+|                   | `npm run test:electron`    | Run Electron-specific tests                                       |
 
 ### Testing Requirements
 

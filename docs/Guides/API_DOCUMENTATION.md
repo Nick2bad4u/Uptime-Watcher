@@ -6,189 +6,188 @@
 
 Uptime Watcher uses type-safe IPC (Inter-Process Communication) between the Electron main process and React renderer, along with an event-driven architecture for internal communication.
 
-## 🔌 IPC Communication
+### Store Integration with Event Listeners (Zustand example)
 
-### Access Pattern
+````typescript
+import { create } from "zustand";
+import { useEffect } from "react";
+import { SiteService } from "../services/SiteService";
+import { StateSyncService } from "../services/StateSyncService";
 
-Renderer code should consume the typed service layer under `src/services` rather than calling `window.electronAPI` directly. These helpers wait for the preload bridge, apply validation, and centralize error reporting.
+// Zustand store with comprehensive IPC and event integration
+export const useSitesStore = create<SitesStore>()((set, get) => ({
+  sites: [],
+  isLoading: false,
+  lastSyncTime: null,
 
-```typescript
-import { SiteService } from "src/services/SiteService";
-import { MonitoringService } from "src/services/MonitoringService";
-import { StateSyncService } from "src/services/StateSyncService";
+  // State actions
+  setSites: (sites: Site[]) => set({ sites }),
+  addSite: (site: Site) =>
+    set((state) => ({
+      sites: [...state.sites, site],
+    })),
 
-const sites = await SiteService.getSites();
-const createdSite = await SiteService.addSite(siteData);
-const startSummary = await MonitoringService.startMonitoring();
-if (startSummary.isMonitoring) {
- console.info(
-  `Activated ${startSummary.succeeded}/${startSummary.attempted} monitors`
- );
-}
-const syncResult = await StateSyncService.requestFullSync();
-```
-
-> ℹ️ **Low-level bridge**: The examples below describe the underlying `window.electronAPI` contract for completeness. New renderer code must route through the service modules shown above to preserve telemetry, validation, and compatibility guarantees.
-
-### Domain-Based API Organization
-
-The `window.electronAPI` is organized into focused domains:
-
-```typescript
-import type { ElectronBridgeApi } from "@shared/types/preload";
-
-import type { EventsApi } from "./preload/domains/eventsApi";
-import type { SystemApi } from "./preload/domains/systemApi";
-
-import { dataApi } from "./preload/domains/dataApi";
-import { createEventsApi } from "./preload/domains/eventsApi";
-import { monitoringApi } from "./preload/domains/monitoringApi";
-import { monitorTypesApi } from "./preload/domains/monitorTypesApi";
-import { settingsApi } from "./preload/domains/settingsApi";
-import { sitesApi } from "./preload/domains/sitesApi";
-import { stateSyncApi } from "./preload/domains/stateSyncApi";
-import { systemApi } from "./preload/domains/systemApi";
-
-type ElectronAPI = ElectronBridgeApi<EventsApi, SystemApi>;
-
-const electronAPI: ElectronAPI = {
- data: dataApi,
- events: createEventsApi(),
- monitoring: monitoringApi,
- monitorTypes: monitorTypesApi,
- settings: settingsApi,
- sites: sitesApi,
- stateSync: stateSyncApi,
- system: systemApi,
-};
-```
-
-### Type Safety and Validation
-
-All IPC calls are fully typed with TypeScript interfaces and validated at the IPC boundary:
-
-```typescript
-// Backend: IPC handler with validation
-registerStandardizedIpcHandler(
-  "add-site",
-  async (site: Site): Promise<Site> => {
-    return await this.uptimeOrchestrator.addSite(site);
+  // Operations actions
+  fetchSites: async () => {
+    set({ isLoading: true });
+    try {
+      const sites = await SiteService.getSites();
+      set({ sites, lastSyncTime: Date.now() });
+    } catch (error) {
+      console.error("Failed to fetch sites:", error);
+    } finally {
+      set({ isLoading: false });
+    }
   },
-  // Validation function ensures type safety
-  SiteHandlerValidators.addSite
-);
 
-// Frontend: Type-safe calls with automatic inference
-const newSite: Site = await SiteService.addSite({
-  name: "Example Site",
-  url: "https://example.com",
-  monitors: [...]
-});
-```
+  createSite: async (siteData: SiteCreationData) => {
+    const newSite = await SiteService.addSite(siteData);
+    // Don't manually add - event listener will handle it
+    ### Store Integration with Event Listeners
 
-## 🗂️ IPC API Reference
+    ```typescript
+    import { create } from "zustand";
+    import { useEffect } from "react";
+    import { SiteService } from "../services/SiteService";
+    import { StateSyncService } from "../services/StateSyncService";
 
-### Sites API (`SiteService`)
+    // Zustand store with comprehensive IPC and event integration
+    export const useSitesStore = create<SitesStore>()((set, get) => ({
+      sites: [],
+      isLoading: false,
+      lastSyncTime: null,
 
-> Primary entry point: `src/services/SiteService`. Under the hood this wraps `window.electronAPI.sites`.
+      // State actions
+      setSites: (sites: Site[]) => set({ sites }),
+      addSite: (site: Site) => set((state) => ({ sites: [...state.sites, site] })),
 
-#### `getSites(): Promise<Site[]>`
+      // Operations actions
+      fetchSites: async () => {
+        set({ isLoading: true });
+        try {
+          const sites = await SiteService.getSites();
+          set({ sites, lastSyncTime: Date.now() });
+        } catch (error) {
+          console.error("Failed to fetch sites:", error);
+        } finally {
+          set({ isLoading: false });
+        }
+      },
 
-Retrieves all configured sites with their monitors.
+      createSite: async (siteData: SiteCreationData) => {
+        const newSite = await SiteService.addSite(siteData);
+        // Don't manually add - event listener will handle it
+        return newSite;
+      },
 
-```typescript
-const sites = await SiteService.getSites();
-// Returns: Site[] with complete monitor configurations
-```
+      // Event-driven sync (called by event listeners)
+      syncFromBackend: async () => {
+        const { sites } = await StateSyncService.requestFullSync();
+        set({ sites, lastSyncTime: Date.now() });
+      },
+    }));
 
-#### `addSite(site: Site): Promise<Site>`
+    // Setup event listeners (typically in root component or hook)
+    export const useSiteEventListeners = () => {
+      const syncFromBackend = useSitesStore((state) => state.syncFromBackend);
 
-Creates a new site (and its monitors) using the transactional repository
-pipeline. The backend emits a `site:added` renderer event upon success.
+      useEffect(() => {
+        let disposed = false;
 
-```typescript
-const newSite = await SiteService.addSite({
- identifier: "site-001",
- name: "My Website",
- url: "https://mywebsite.com",
- description: "Production website monitoring",
- monitoring: true,
- monitors: [
-  {
-   id: "monitor-001",
-   type: "http",
-   monitoring: true,
-   config: {
-    url: "https://mywebsite.com",
-    method: "GET",
-    timeout: 10000,
-    checkInterval: 30000,
-    retryAttempts: 3,
-   },
-  },
- ],
-});
-```
+        const setup = async () => {
+          const cleanup = await StateSyncService.onStateSyncEvent((event) => {
+            if (disposed) {
+              return;
+            }
 
-#### `updateSite(identifier: string, updates: Partial<Site>): Promise<Site>`
+            switch (event.action) {
+              case "bulk-sync":
+                syncFromBackend();
+                break;
+              case "update":
+              case "delete":
+                useSitesStore.getState().setSites(event.sites);
+                break;
+            }
+          });
 
-Updates an existing site and/or its monitors. The backend broadcasts
-`site:updated` with the new snapshot and list of changed fields.
+          return cleanup;
+        };
 
-```typescript
-const updatedSite = await SiteService.updateSite(siteIdentifier, {
- name: "New Site Name",
- description: "Updated description",
-});
-```
+        const subscriptionPromise = setup();
 
-#### `removeSite(identifier: string): Promise<boolean>`
+        return () => {
+          disposed = true;
+          subscriptionPromise.then((cleanup) => cleanup?.()).catch(console.error);
+        };
+      }, [syncFromBackend]);
+    };
+    ```
 
-Deletes a site together with its monitors and history. Returns `true` on
-success and emits a `site:removed` event once cleanup is complete.
+    ### Site lifecycle subscriptions via `EventsService`
 
-```typescript
-const removed = await SiteService.removeSite(siteIdentifier);
-if (removed) {
- console.info(`Site ${siteIdentifier} removed`);
-}
-```
+    The renderer now exposes dedicated helpers for site lifecycle events. Using the
+    service keeps cleanup logic consistent with other IPC subscriptions and avoids
+    directly referencing `window.electronAPI` throughout the UI layer.
 
-#### `removeMonitor(siteIdentifier: string, monitorId: string): Promise<Site>`
+    ```typescript
+    import { useEffect } from "react";
 
-Removes a single monitor from a site and returns the updated site snapshot.
+    import { EventsService } from "../services/EventsService";
+    import { useSitesStore } from "../stores/useSitesStore";
 
-```typescript
-const updatedSite = await SiteService.removeMonitor(siteIdentifier, monitorId);
-```
+    export function useSiteLifecycleEvents(): void {
+      const addSite = useSitesStore((state) => state.addSite);
+      const updateSite = useSitesStore((state) => state.updateSite);
+      const removeSite = useSitesStore((state) => state.removeSite);
 
-#### `deleteAllSites(): Promise<number>`
+      useEffect(() => {
+        const disposers: Array<() => void> = [];
+        let cancelled = false;
 
-Dangerous operation intended for test utilities. Removes every site in the
-database and returns the number of deleted records. Use with extreme caution.
+        void EventsService.initialize()
+          .then(async () => {
+            if (cancelled) {
+              return;
+            }
 
-### Monitoring API (`MonitoringService`)
+            disposers.push(
+              await EventsService.onSiteAdded(({ site }) => {
+                addSite(site);
+              }),
+              await EventsService.onSiteUpdated(({ site }) => {
+                updateSite(site.identifier, site);
+              }),
+              await EventsService.onSiteRemoved(({ siteIdentifier }) => {
+                removeSite(siteIdentifier);
+              })
+            );
+          })
+          .catch((error) => {
+            console.error("Failed to subscribe to site events", error);
+          });
 
-> Primary entry point: `src/services/MonitoringService`. Internally this interacts with `window.electronAPI.monitoring`.
-
-#### `checkSiteNow(siteIdentifier: string, monitorId: string): Promise<StatusUpdate | undefined>`
-
-Performs a manual health check for a specific monitor and returns the most
-recent `StatusUpdate` when available.
-
-```typescript
-const result = await MonitoringService.checkSiteNow(siteIdentifier, monitorId);
+        return () => {
+          cancelled = true;
+          disposers.splice(0).forEach((dispose) => {
+            try {
+              dispose();
+            } catch (error) {
+              console.error("Failed to dispose site event handler", error);
+            }
+          });
+        };
+      }, [addSite, updateSite, removeSite]);
+    }
+    ```
 if (result) {
  console.log(`Manual check completed at ${new Date(result.timestamp)}`);
 }
-```
+````
 
 #### `startMonitoring(): Promise<MonitoringStartSummary>`
 
-Starts monitoring for every configured site. Resolves to a
-`MonitoringStartSummary` describing how many monitors were attempted, how many
-succeeded, and whether any partial failures occurred. The summary is also
-attached to the `monitoring:started` renderer event.
+Starts monitoring for every configured site. Resolves to a `MonitoringStartSummary` describing how many monitors were attempted, how many succeeded, and whether any partial failures occurred. The summary is also attached to the `monitoring:started` renderer event.
 
 ```typescript
 const summary = await MonitoringService.startMonitoring();
@@ -208,10 +207,7 @@ if (summary.partialFailures) {
 
 #### `stopMonitoring(): Promise<MonitoringStopSummary>`
 
-Stops all active monitors. Resolves to a `MonitoringStopSummary` detailing how
-many monitors were stopped, which ones (if any) remained active, and whether
-the system was already inactive. The summary is mirrored to the
-`monitoring:stopped` renderer event.
+Stops all active monitors. Resolves to a `MonitoringStopSummary` detailing how many monitors were stopped, which ones (if any) remained active, and whether the system was already inactive. The summary is mirrored to the `monitoring:stopped` renderer event.
 
 ```typescript
 const summary = await MonitoringService.stopMonitoring();
@@ -232,8 +228,7 @@ if (summary.partialFailures) {
 
 #### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
 
-Starts monitoring for a specific monitor belonging to the given site. Emits the
-standard monitoring lifecycle and cache invalidation events when successful.
+Starts monitoring for a specific monitor belonging to the given site. Emits the standard monitoring lifecycle and cache invalidation events when successful.
 
 ```typescript
 await MonitoringService.startMonitoringForMonitor(
@@ -268,9 +263,7 @@ await MonitoringService.stopMonitoringForSite(siteIdentifier);
 
 #### `validateMonitorData(type: string, data: unknown): Promise<ValidationResult>`
 
-Validates monitor configuration against type-specific schemas. The returned
-{@link ValidationResult} mirrors the shared contract used across the
-application (`success`, `errors`, `warnings`, optional `data`/`metadata`).
+Validates monitor configuration against type-specific schemas. The returned {@link ValidationResult} mirrors the shared contract used across the application (`success`, `errors`, `warnings`, optional `data`/`metadata`).
 
 ```typescript
 const validation = await MonitorTypesService.validateMonitorData("http", {
@@ -297,8 +290,7 @@ const formatted = await MonitorTypesService.formatMonitorDetail(
 
 #### `formatMonitorTitleSuffix(type: string, monitor: Monitor): Promise<string>`
 
-Returns a human-friendly suffix for monitor titles (e.g., HTTP method or host
-name).
+Returns a human-friendly suffix for monitor titles (e.g., HTTP method or host name).
 
 ```typescript
 const suffix = await MonitorTypesService.formatMonitorTitleSuffix(
@@ -314,8 +306,7 @@ const suffix = await MonitorTypesService.formatMonitorTitleSuffix(
 
 #### `exportData(): Promise<string>`
 
-Exports the full application dataset (sites, monitors, history snapshots, and
-settings) as a JSON string.
+Exports the full application dataset (sites, monitors, history snapshots, and settings) as a JSON string.
 
 ```typescript
 const payload = await DataService.exportData();
@@ -324,8 +315,7 @@ const snapshot = JSON.parse(payload);
 
 #### `importData(serialized: string): Promise<boolean>`
 
-Imports a previously exported dataset. The argument must be the raw JSON string
-produced by `exportData()`.
+Imports a previously exported dataset. The argument must be the raw JSON string produced by `exportData()`.
 
 ```typescript
 const success = await DataService.importData(payload);
@@ -336,9 +326,7 @@ if (!success) {
 
 #### `downloadSqliteBackup(): Promise<SerializedDatabaseBackupResult>`
 
-Generates a SQLite database backup and returns a transferable payload
-containing the binary buffer, file metadata, and the suggested download file
-name.
+Generates a SQLite database backup and returns a transferable payload containing the binary buffer, file metadata, and the suggested download file name.
 
 ```typescript
 import type { SerializedDatabaseBackupResult } from "@shared/types/ipc";
@@ -350,23 +338,15 @@ await handleSQLiteBackupDownload(async () => backup);
 // Downloads `backup.fileName` using the ArrayBuffer payload.
 ```
 
-> The renderer receives an `ArrayBuffer`, ensuring compatibility with browser
-> APIs without leaking Node.js `Buffer` instances. Additional metadata (size,
-> creation timestamp, and original on-disk location) can be used for analytics
-> or audit logging.
+> The renderer receives an `ArrayBuffer`, ensuring compatibility with browser APIs without leaking Node.js `Buffer` instances. Additional metadata (size, creation timestamp, and original on-disk location) can be used for analytics or audit logging.
 
 ### Monitor Types API (`MonitorTypesService`)
 
-> Primary entry point: `src/services/MonitorTypesService`. Internally this
-> delegates exclusively to `window.electronAPI.monitorTypes`, keeping
-> lifecycle controls within the `monitoring` domain. This aligns with ADR-005
-> by routing all monitor metadata helpers (registry lookup, formatting, and
-> validation) through the dedicated monitor-types bridge.
+> Primary entry point: `src/services/MonitorTypesService`. Internally this delegates exclusively to `window.electronAPI.monitorTypes`, keeping lifecycle controls within the `monitoring` domain. This aligns with ADR-005 by routing all monitor metadata helpers (registry lookup, formatting, and validation) through the dedicated monitor-types bridge.
 
 #### `getMonitorTypes(): Promise<MonitorTypeConfig[]>`
 
-Retrieves the full registry of available monitor types, including validation
-metadata and editor hints.
+Retrieves the full registry of available monitor types, including validation metadata and editor hints.
 
 ```typescript
 const monitorTypes = await MonitorTypesService.getMonitorTypes();
@@ -387,8 +367,7 @@ const limit = await SettingsService.getHistoryLimit();
 
 #### `resetSettings(): Promise<void>`
 
-Restores application settings to their factory defaults while leaving domain
-state untouched (sites, monitors, and history remain intact).
+Restores application settings to their factory defaults while leaving domain state untouched (sites, monitors, and history remain intact).
 
 ```typescript
 await SettingsService.resetSettings();
@@ -442,13 +421,9 @@ const cleanup = await StateSyncService.onStateSyncEvent((event) => {
 
 #### `openExternal(url: string): Promise<boolean>`
 
-Opens HTTP(S) URLs in the user's default external browser. The call resolves
-to `true` when Electron successfully delegates the navigation request.
+Opens HTTP(S) URLs in the user's default external browser. The call resolves to `true` when Electron successfully delegates the navigation request.
 
-> **Recommendation:** Access this capability through the renderer
-> `SystemService` (`@app/services/SystemService`) rather than using the raw
-> preload bridge. The service enforces URL validation, logging, and consistent
-> error reporting.
+> **Recommendation:** Access this capability through the renderer `SystemService` (`@app/services/SystemService`) rather than using the raw preload bridge. The service enforces URL validation, logging, and consistent error reporting.
 
 ```typescript
 import { SystemService } from "@app/services/SystemService";
@@ -456,9 +431,7 @@ import { SystemService } from "@app/services/SystemService";
 await SystemService.openExternal("https://example.com/docs");
 ```
 
-Only `http://` and `https://` URLs are permitted. Supplying another scheme
-(`ftp://`, `file://`, `javascript:`, etc.) results in a synchronous `TypeError`
-and the navigation request is blocked before reaching the main process.
+Only `http://` and `https://` URLs are permitted. Supplying another scheme (`ftp://`, `file://`, `javascript:`, etc.) results in a synchronous `TypeError` and the navigation request is blocked before reaching the main process.
 
 ## 🎭 Event System & Real-time Updates
 
@@ -588,10 +561,7 @@ export class SiteManager {
 }
 ```
 
-The `UptimeOrchestrator` listens for these internal events and re-broadcasts
-sanitized `site:*` topics (for example, `site:added`, `site:updated`) after
-stripping metadata. This keeps managers isolated from renderer-facing payloads
-while preserving a clear layering contract.
+The `UptimeOrchestrator` listens for these internal events and re-broadcasts sanitized `site:*` topics (for example, `site:added`, `site:updated`) after stripping metadata. This keeps managers isolated from renderer-facing payloads while preserving a clear layering contract.
 
 ## 🎭 Event System
 
@@ -632,12 +602,7 @@ interface UptimeEvents {
 }
 ```
 
-> **Historical note:** Prior to the bridge refactor, managers emitted
-> `site:cache-miss` and `site:cache-updated`. These topics have been fully
-> removed from the public API—cache telemetry now flows exclusively through the
-> internal equivalents (`internal:site:cache-miss` /
-> `internal:site:cache-updated`), and the orchestrator emits `cache:invalidated`
-> when the renderer must react.
+> **Historical note:** Prior to the bridge refactor, managers emitted `site:cache-miss` and `site:cache-updated`. These topics have been fully removed from the public API--cache telemetry now flows exclusively through the internal equivalents (`internal:site:cache-miss` / `internal:site:cache-updated`), and the orchestrator emits `cache:invalidated` when the renderer must react.
 
 #### Monitor Events
 
@@ -666,9 +631,7 @@ interface UptimeEvents {
 }
 ```
 
-Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate`
-payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`,
-and ISO-8601 `timestamp` values alongside populated `monitor` and `site` context.
+Monitor lifecycle events (`monitor:down`/`monitor:up`) reuse the shared `StatusUpdate` payload, so every downstream consumer sees the canonical `siteIdentifier`, `monitorId`, and ISO-8601 `timestamp` values alongside populated `monitor` and `site` context.
 
 #### Application Events
 
@@ -748,20 +711,16 @@ function SiteManager() {
 
 ### Store Integration with Event Listeners
 
-````typescript
-
-
-
-
-
-
-
-
-
-
-
-
-import { SiteService } from "../services/SiteService";import { StateSyncService } from "../services/StateSyncService";// Zustand store with comprehensive IPC and event integrationexport const useSitesStore = create<SitesStore>()((set, get) => ({ sites: [], isLoading: false, lastSyncTime: null,
+```typescript
+import { create } from "zustand";
+import { useEffect } from "react";
+import { SiteService } from "../services/SiteService";
+import { StateSyncService } from "../services/StateSyncService";
+// Zustand store with comprehensive IPC and event integration
+export const useSitesStore = create<SitesStore>()((set, get) => ({
+  sites: [],
+  isLoading: false,
+  lastSyncTime: null,
  // State actions
  setSites: (sites: Site[]) => set({ sites }),
  addSite: (site: Site) =>
@@ -810,63 +769,6 @@ export const useSiteEventListeners = () => {
      }
 
      switch (event.action) {
-
-    ### Site lifecycle subscriptions via `EventsService`
-
-    The renderer now exposes dedicated helpers for site lifecycle events. Using the
-    service keeps cleanup logic consistent with other IPC subscriptions and avoids
-    directly referencing `window.electronAPI` throughout the UI layer.
-
-    ```typescript
-    import { useEffect } from "react";
-
-    import { EventsService } from "../services/EventsService";
-    import { useSitesStore } from "../stores/useSitesStore";
-
-    export function useSiteLifecycleEvents(): void {
-      const addSite = useSitesStore((state) => state.addSite);
-      const updateSite = useSitesStore((state) => state.updateSite);
-      const removeSite = useSitesStore((state) => state.removeSite);
-
-      useEffect(() => {
-        const disposers: Array<() => void> = [];
-        let cancelled = false;
-
-        void EventsService.initialize()
-          .then(async () => {
-            if (cancelled) {
-              return;
-            }
-
-            disposers.push(
-              await EventsService.onSiteAdded(({ site }) => {
-                addSite(site);
-              }),
-              await EventsService.onSiteUpdated(({ site }) => {
-                updateSite(site.identifier, site);
-              }),
-              await EventsService.onSiteRemoved(({ siteIdentifier }) => {
-                removeSite(siteIdentifier);
-              })
-            );
-          })
-          .catch((error) => {
-            console.error("Failed to subscribe to site events", error);
-          });
-
-        return () => {
-          cancelled = true;
-          disposers.splice(0).forEach((dispose) => {
-            try {
-              dispose();
-            } catch (error) {
-              console.error("Failed to dispose site event handler", error);
-            }
-          });
-        };
-      }, [addSite, updateSite, removeSite]);
-    }
-    ```
       case "bulk-sync":
        syncFromBackend();
        break;
@@ -889,7 +791,7 @@ export const useSiteEventListeners = () => {
   };
  }, [syncFromBackend]);
 };
-````
+```
 
 ### Custom Hooks for IPC Operations
 
@@ -1026,22 +928,22 @@ type MonitorConfig =
  | WebsocketKeepaliveMonitorConfig;
 ```
 
-| Monitor type (`type` field) | Configuration interface | Key fields |
-| --- | --- | --- |
-| `http` | `HttpMonitorConfig` | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody` |
-| `http-status` | `HttpStatusMonitorConfig` | `url`, `expectedStatusCode` |
-| `http-header` | `HttpHeaderMonitorConfig` | `url`, `headerName`, `expectedHeaderValue` |
-| `http-keyword` | `HttpKeywordMonitorConfig` | `url`, `bodyKeyword` |
-| `http-json` | `HttpJsonMonitorConfig` | `url`, `jsonPath`, `expectedJsonValue` |
-| `http-latency` | `HttpLatencyMonitorConfig` | `url`, `maxResponseTime` |
-| `ping` | `PingMonitorConfig` | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss` |
-| `port` | `PortMonitorConfig` | `host`, `port`, optional `protocol.expectedResponse`/`useTls` |
-| `dns` | `Monitor` domain fields | `host`, `recordType`, optional `expectedValue` |
-| `ssl` | `SslMonitorConfig` | `host`, `port`, `certificateWarningDays` |
-| `cdn-edge-consistency` | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list) |
-| `replication` | `ReplicationMonitorConfig` | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds` |
-| `server-heartbeat` | `ServerHeartbeatMonitorConfig` | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
-| `websocket-keepalive` | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs` |
+| Monitor type (`type` field) | Configuration interface           | Key fields                                                                                                      |
+| --------------------------- | --------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `http`                      | `HttpMonitorConfig`               | `url`, `method`, `expectedStatusCodes`, optional `auth`/`headers`/`requestBody`                                 |
+| `http-status`               | `HttpStatusMonitorConfig`         | `url`, `expectedStatusCode`                                                                                     |
+| `http-header`               | `HttpHeaderMonitorConfig`         | `url`, `headerName`, `expectedHeaderValue`                                                                      |
+| `http-keyword`              | `HttpKeywordMonitorConfig`        | `url`, `bodyKeyword`                                                                                            |
+| `http-json`                 | `HttpJsonMonitorConfig`           | `url`, `jsonPath`, `expectedJsonValue`                                                                          |
+| `http-latency`              | `HttpLatencyMonitorConfig`        | `url`, `maxResponseTime`                                                                                        |
+| `ping`                      | `PingMonitorConfig`               | `host`, `packetCount`, `packetSize`, optional `maxPacketLoss`                                                   |
+| `port`                      | `PortMonitorConfig`               | `host`, `port`, optional `protocol.expectedResponse`/`useTls`                                                   |
+| `dns`                       | `Monitor` domain fields           | `host`, `recordType`, optional `expectedValue`                                                                  |
+| `ssl`                       | `SslMonitorConfig`                | `host`, `port`, `certificateWarningDays`                                                                        |
+| `cdn-edge-consistency`      | `CdnEdgeConsistencyMonitorConfig` | `baselineUrl`, `edgeLocations` (newline or comma separated list)                                                |
+| `replication`               | `ReplicationMonitorConfig`        | `primaryStatusUrl`, `replicaStatusUrl`, `replicationTimestampField`, `maxReplicationLagSeconds`                 |
+| `server-heartbeat`          | `ServerHeartbeatMonitorConfig`    | `url`, `heartbeatStatusField`, `heartbeatExpectedStatus`, `heartbeatTimestampField`, `heartbeatMaxDriftSeconds` |
+| `websocket-keepalive`       | `WebsocketKeepaliveMonitorConfig` | `url`, `maxPongDelayMs`                                                                                         |
 
 All configuration interfaces also inherit scheduling, retry, and timeout controls from `BaseMonitorConfig`, ensuring consistent behaviour across the monitoring pipeline.
 
