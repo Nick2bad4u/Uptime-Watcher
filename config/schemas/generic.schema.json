@@ -1,6 +1,6 @@
 {
     "$comment": "This is a permissive schema for cliff.toml and lychee.toml configuration files. It defines some common properties but allows any additional properties to accommodate various configurations.",
-    "$id": "https://github.com/nick2bad4u/uptime-watcher/blob/main/config/schemas/generic.schema.json",
+    "$id": "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "additionalProperties": true,
     "description": "Permissive JSON Schema for cliff.toml / lychee.toml — allows common fields and any additional properties.",

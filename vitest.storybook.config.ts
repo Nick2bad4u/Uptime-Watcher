@@ -92,7 +92,6 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
                     classNameStrategy: "stable",
                 },
             },
-            environment: "browser",
             globals: true,
             isolate: true,
             name: {

@@ -18,6 +18,12 @@ const storybookTestPatterns = [
 const testPathIgnorePatterns = [
     ...(baseConfig.testPathIgnorePatterns ?? []),
     String.raw`[\\/]\.cache[\\/]`,
+    String.raw`[\\/]\.stryker-tmp[\\/]`,
+    String.raw`[\\/]node_modules[\\/]`,
+    String.raw`[\\/]dist[\\/]`,
+    String.raw`[\\/]build[\\/]`,
+    String.raw`[\\/]coverage[\\/]`,
+    String.raw`[\\/]storybook-static[\\/]`,
 ];
 
 delete baseConfig.testMatch;

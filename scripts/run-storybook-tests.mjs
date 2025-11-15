@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
+import { existsSync, mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
 const cliEntryPoint = path.resolve(
@@ -20,14 +22,39 @@ if (allowEmpty) {
     runnerArguments.splice(allowEmptyIndex, 1);
 }
 
-const childProcess = spawn(
-    process.execPath,
-    [cliEntryPoint, ...runnerArguments],
-    {
-        shell: false,
-        stdio: "inherit",
-    }
+const localStorageDir = path.join(tmpdir(), "uptime-watcher", "storybook");
+const localStorageFile = path.join(
+    localStorageDir,
+    "test-runner-localstorage.json"
 );
+
+if (!existsSync(localStorageDir)) {
+    mkdirSync(localStorageDir, { recursive: true });
+}
+
+const nodeArguments = [cliEntryPoint, ...runnerArguments];
+
+const existingNodeOptions = process.env["NODE_OPTIONS"] ?? "";
+const escapedLocalStoragePath = localStorageFile.replaceAll("\\", "\\\\");
+const localStorageOption = `--localstorage-file=${escapedLocalStoragePath}`;
+const hasLocalStorageOption = existingNodeOptions.includes(
+    "--localstorage-file"
+);
+
+const mergedNodeOptions = hasLocalStorageOption
+    ? existingNodeOptions
+    : [existingNodeOptions, localStorageOption]
+          .filter((value) => value.trim().length > 0)
+          .join(" ");
+
+const childProcess = spawn(process.execPath, nodeArguments, {
+    env: {
+        ...process.env,
+        NODE_OPTIONS: mergedNodeOptions,
+    },
+    shell: false,
+    stdio: "inherit",
+});
 
 childProcess.on("exit", (code, signal) => {
     if (typeof code === "number") {

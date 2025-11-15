@@ -813,6 +813,98 @@ describe("Fallback Utilities", () => {
             });
         });
 
+        describe("Specialized monitor types", () => {
+            it("should use baseline URL for CDN edge consistency monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor: Monitor = {
+                    id: "cdn-1",
+                    type: "cdn-edge-consistency",
+                    baselineUrl: "https://baseline.edge.example.com",
+                } as unknown as Monitor;
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "Site Fallback"
+                );
+                expect(result).toBe("https://baseline.edge.example.com");
+            });
+
+            it("should append DNS record type when available", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor: Monitor = {
+                    id: "dns-1",
+                    type: "dns",
+                    host: "example.com",
+                    recordType: "AAAA",
+                } as unknown as Monitor;
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "Site Fallback"
+                );
+                expect(result).toBe("example.com (AAAA)");
+            });
+
+            it("should prefer primary status URL for replication monitors", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor: Monitor = {
+                    id: "replication-1",
+                    type: "replication",
+                    primaryStatusUrl: "https://primary.status",
+                    replicaStatusUrl: "https://replica.status",
+                } as unknown as Monitor;
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "Site Fallback"
+                );
+                expect(result).toBe("https://primary.status");
+            });
+
+            it("should fall back to replica status URL when primary is missing", async ({
+                task,
+                annotate,
+            }) => {
+                await annotate(`Testing: ${task.name}`, "functional");
+                await annotate("Component: fallbacks", "component");
+                await annotate("Category: Utility", "category");
+                await annotate("Type: Monitoring", "type");
+
+                const monitor: Monitor = {
+                    id: "replication-2",
+                    type: "replication",
+                    replicaStatusUrl: "https://replica-only.status",
+                } as unknown as Monitor;
+
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    "Site Fallback"
+                );
+                expect(result).toBe("https://replica-only.status");
+            });
+        });
+
         describe("Generic identifier fallback", () => {
             it("should use URL from generic identifier when type generator fails", async ({
                 task,

@@ -26,8 +26,14 @@ export type TitleSuffixFormatter = (monitor: Monitor) => string;
  */
 const titleSuffixFormatters: Record<string, TitleSuffixFormatter> = {
     "cdn-edge-consistency": (monitor: Monitor) => {
-        const { baselineUrl } = monitor;
-        return baselineUrl ? ` (${baselineUrl})` : "";
+        const { baselineUrl, replicaStatusUrl } = monitor;
+        if (baselineUrl) {
+            return ` (${baselineUrl})`;
+        }
+        if (replicaStatusUrl) {
+            return ` (${replicaStatusUrl})`;
+        }
+        return "";
     },
     dns: (monitor: Monitor) => {
         const { host, recordType } = monitor;
