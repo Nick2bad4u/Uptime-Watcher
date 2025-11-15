@@ -1,6 +1,6 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 
-import config from "../storybook/main";
+import config from "../storybook/main.ts";
 
 const addons = Array.from(
     // eslint-disable-next-line perfectionist/sort-sets -- keep sorted

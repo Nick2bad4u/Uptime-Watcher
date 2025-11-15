@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Solution plan and status report for eliminating monitoring state race conditions via operation correlation and enhanced monitoring."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Monitoring State Race Condition Solution Plan"
+description: "Documents the problem scenario, implemented operation correlation system, timeout management, and verification steps for resolving monitoring race conditions."
+category: "guide"
+keywords:
+    - "uptime-watcher"
+    - "monitoring"
+    - "race-conditions"
+    - "operations"
+    - "architecture"
+misc:
+    doc_category: "Guides"
+    source: "Uptime-Watcher docs"
+---
+
 # Monitoring State Race Condition Solution Plan
 
 ## ✅ SOLUTION FULLY IMPLEMENTED

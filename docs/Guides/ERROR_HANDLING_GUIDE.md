@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Error Handling Guide"
+description: "Documents the centralized error store, withErrorHandling utilities, validation error handling, and best practices for propagating and testing errors across the app."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "error-handling"
+  - "zustand"
+  - "validation"
+  - "testing"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Error Handling Guide
 
 ## Overview
@@ -195,7 +215,7 @@ const processMonitorData = async (data: MonitorData) => {
 For consistent store error handling patterns, use the `createStoreErrorHandler` factory:
 
 ```typescript
-import { createStoreErrorHandler } from "@src/stores/utils/storeErrorHandling";
+import { createStoreErrorHandler } from "@app/stores/utils/storeErrorHandling";
 
 // Simplified store error handling
 await withErrorHandling(
@@ -812,14 +832,14 @@ describe("Store Error Handling", () => {
 
 ## Best Practices
 
-### 1. Error Handling Hierarchy
+### 1\. Error Handling Hierarchy
 
 - **Local Component Errors**: Handle UI-specific errors locally
 - **Store-Specific Errors**: Use domain isolation for business logic errors
 - **Global Errors**: Reserve for application-wide critical errors
 - **Operation Errors**: Use operation-specific loading and error states
 
-### 2. Consistent Error Patterns
+### 2\. Consistent Error Patterns
 
 ```typescript
 // ✅ Good: Consistent error handling
@@ -853,7 +873,7 @@ const handleOperation = async () => {
 };
 ```
 
-### 3. Error Logging Standards
+### 3\. Error Logging Standards
 
 ```typescript
 // ✅ Good: Comprehensive error logging
@@ -878,7 +898,7 @@ try {
 }
 ```
 
-### 4. Error Recovery Patterns
+### 4\. Error Recovery Patterns
 
 ```typescript
 // ✅ Good: Error recovery with user actions
@@ -909,7 +929,7 @@ const FeatureComponent = () => {
 };
 ```
 
-### 5. Testing Error Scenarios
+### 5\. Testing Error Scenarios
 
 - **Test both success and error paths**
 - **Verify error state management**
@@ -946,7 +966,7 @@ By following these patterns and practices, developers can ensure robust error ha
 - `src/stores/error/useErrorStore.ts` - Centralized error store
 - `src/stores/utils/storeErrorHandling.ts` - Store error handler factory
 - `shared/validation/schemas.ts` - Validation error handling
-- `src/components/ErrorBoundary.tsx` - React error boundaries
+- `src/stores/error/ErrorBoundary.tsx` - React error boundaries
 
 ### Essential Imports
 
@@ -959,9 +979,9 @@ import {
 } from "@shared/utils/errorHandling";
 
 // Store error management
-import { useErrorStore } from "@src/stores/error/useErrorStore";
-import { createStoreErrorHandler } from "@src/stores/utils/storeErrorHandling";
+import { useErrorStore } from "@app/stores/error/useErrorStore";
+import { createStoreErrorHandler } from "@app/stores/utils/storeErrorHandling";
 
 // Event system integration
-import { EventsService } from "@src/services/EventsService";
+import { EventsService } from "@app/services/EventsService";
 ```

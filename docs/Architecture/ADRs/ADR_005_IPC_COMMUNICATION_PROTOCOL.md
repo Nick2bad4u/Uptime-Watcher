@@ -87,7 +87,7 @@ graph TB
     class ChannelValidation,TypeSafety,ParameterSanitization,ErrorSanitization security
 ```
 
-### 1. Centralized IPC Service
+### 1\. Centralized IPC Service
 
 All IPC handlers are registered through a central `IpcService`:
 
@@ -128,33 +128,48 @@ export class IpcService {
 }
 ```
 
-### 2. Domain-Specific Handler Groups
+> **Implementation note:** The production implementation reuses the shared helper in `electron/services/ipc/utils.ts`. That module exposes `registerStandardizedIpcHandler` and `createValidationResponse`, so every handler registration in `IpcService` passes the channel name, async handler, validator, and the shared `registeredIpcHandlers` set. The helper takes care of duplicate registration checks, timing diagnostics, and consistent logging.
+
+### 2\. Domain-Specific Handler Groups
 
 IPC handlers are organized by domain with consistent validation:
 
 ```typescript
-private registerSitesHandlers(deps: IpcServiceDependencies): void {
-    this.registerStandardizedIpcHandler(
-        'get-sites',
-        async () => deps.siteManager.getAllSites(),
-        // No parameters to validate
+import { SITES_CHANNELS } from "@shared/types/preload";
+import { registerStandardizedIpcHandler } from "electron/services/ipc/utils";
+import { SiteHandlerValidators } from "electron/services/ipc/validators";
+
+private setupSiteHandlers(): void {
+    registerStandardizedIpcHandler(
+        SITES_CHANNELS.addSite,
+        async (...args: unknown[]) =>
+            this.uptimeOrchestrator.addSite(args[0] as Site),
+        SiteHandlerValidators.addSite,
+        this.registeredIpcHandlers
     );
 
-    this.registerStandardizedIpcHandler(
-        'add-site',
-        async (params) => deps.siteManager.addSite(params),
-        isSiteCreationData
+    registerStandardizedIpcHandler(
+        SITES_CHANNELS.removeSite,
+        async (...args: unknown[]) =>
+            this.uptimeOrchestrator.removeSite(args[0] as string),
+        SiteHandlerValidators.removeSite,
+        this.registeredIpcHandlers
     );
 
-    this.registerStandardizedIpcHandler(
-        'remove-site',
-        async (params) => deps.siteManager.removeSite(params.identifier),
-        isIdentifierParams
+    registerStandardizedIpcHandler(
+        SITES_CHANNELS.getSites,
+        async () => this.uptimeOrchestrator.getSites(),
+        SiteHandlerValidators.getSites,
+        this.registeredIpcHandlers
     );
+
+    // ...additional site/monitor operations, each wired through the same helper
 }
 ```
 
-### 3. Type-Safe Preload API
+Validators live in `electron/services/ipc/validators.ts` and, in turn, rely on the shared schema guards under `@shared/validation/*`. Keeping validation logic centralized prevents drift between IPC contracts and renderer-side TypeScript definitions.
+
+### 3\. Type-Safe Preload API
 
 The preload script exposes a type-safe API to the renderer:
 
@@ -184,37 +199,15 @@ contextBridge.exposeInMainWorld("electronAPI", electronAPI);
 
 #### 2025-10-21 Contract Update
 
-The `remove-monitor` invoke channel now returns the persisted `Site` snapshot
-emitted by the main process. The generated preload bridge mirrors this
-contract (`sitesApi.removeMonitor(): Promise<Site>`), allowing the renderer to
-reconcile state without performing ad-hoc reconstruction. Always apply the
-returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and
-avoid synthesizing partial results locally. This keeps optimistic updates
-aligned with the authoritative orchestrator payload and matches the guidance in
-`docs/TSDoc/stores/sites.md`. For a canonical implementation, reference
-[`SiteService.removeMonitor`](../../src/services/SiteService.ts),
-which validates the persisted snapshot with the shared guards before updating
-renderer state.
+The `remove-monitor` invoke channel now returns the persisted `Site` snapshot emitted by the main process. The generated preload bridge mirrors this contract (`sitesApi.removeMonitor(): Promise<Site>`), allowing the renderer to reconcile state without performing ad-hoc reconstruction. Always apply the returned entity via `SiteService.removeMonitor` ➔ `applySavedSiteToStore` and avoid synthesizing partial results locally. This keeps optimistic updates aligned with the authoritative orchestrator payload and matches the guidance in `docs/TSDoc/stores/sites.md`. For a canonical implementation, reference [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which validates the persisted snapshot with the shared guards before updating renderer state.
 
 #### 2025-10-26 Contract Update
 
-- Added the `settings:history-limit-updated` renderer broadcast to surface
-  persistence changes originating from imports, orchestrator migrations, or
-  database maintenance. Renderer consumers **must** subscribe via
-  `EventsService.onHistoryLimitUpdated` to keep the settings store in sync even
-  when the local UI did not initiate the change. The payload includes both the
-  new limit and the previously observed value so clients can display contextual
-  messaging.
-- Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel
-  inventory documentation are now generated from the canonical
-  `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run
-  `npm run generate:ipc` whenever event contracts change and gate CI with
-  `npm run check:ipc` to detect drift between code and docs.
-- The authoritative channel catalogue lives in
-  `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the
-  table; update the schema and regenerate instead.
+- Added the `settings:history-limit-updated` renderer broadcast to surface persistence changes originating from imports, orchestrator migrations, or database maintenance. Renderer consumers **must** subscribe via `EventsService.onHistoryLimitUpdated` to keep the settings store in sync even when the local UI did not initiate the change. The payload includes both the new limit and the previously observed value so clients can display contextual messaging.
+- Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel inventory documentation are now generated from the canonical `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run `npm run generate:ipc` whenever event contracts change and gate CI with `npm run check:ipc` to detect drift between code and docs.
+- The authoritative channel catalogue lives in `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the table; update the schema and regenerate instead.
 
-### 4. Event Forwarding Protocol
+### 4\. Event Forwarding Protocol
 
 Backend events are automatically forwarded to the frontend:
 
@@ -231,7 +224,7 @@ await this.eventBus.emitTyped('monitor:status-changed', eventData);
 // → Automatically sent to renderer via IPC
 ```
 
-### 5. Validation and Error Handling
+### 5\. Validation and Error Handling
 
 All IPC operations include validation and consistent error handling:
 
@@ -393,7 +386,7 @@ flowchart TD
     class ChannelActive success;
 ```
 
-### 1. Request-Response Pattern
+### 1\. Request-Response Pattern
 
 Standard async operations use the request-response pattern:
 
@@ -410,7 +403,7 @@ async (params: SiteCreationData) => {
 };
 ```
 
-### 2. Event Broadcasting Pattern
+### 2\. Event Broadcasting Pattern
 
 State changes are broadcast as events:
 
@@ -426,7 +419,7 @@ const cleanup = await EventsService.onSiteAdded((data) => {
 });
 ```
 
-### 3. Cleanup Pattern
+### 3\. Cleanup Pattern
 
 Event listeners return cleanup functions:
 
@@ -531,21 +524,21 @@ mindmap
 
 ## Security Considerations
 
-### 1. ContextBridge Isolation
+### 1\. ContextBridge Isolation
 
 All IPC communication goes through contextBridge - no direct Node.js access in renderer.
 
-### 2. Parameter Validation
+### 2\. Parameter Validation
 
 All parameters are validated before processing to prevent injection attacks.
 
-### 3. Error Sanitization
+### 3\. Error Sanitization
 
 Error messages are sanitized before sending to renderer to prevent information leakage.
 
 ## Testing Strategy
 
-### 1. Mock ElectronAPI
+### 1\. Mock ElectronAPI
 
 Global mock for testing:
 
@@ -567,7 +560,7 @@ Object.defineProperty(window, "electronAPI", {
 });
 ```
 
-### 2. Handler Testing
+### 2\. Handler Testing
 
 IPC handlers are tested by mocking dependencies:
 
@@ -616,23 +609,23 @@ describe("Sites IPC Handlers", () => {
 
 ## Implementation Requirements
 
-### 1. Handler Registration
+### 1\. Handler Registration
 
 All IPC handlers must be registered through `IpcService.registerStandardizedIpcHandler()`.
 
-### 2. Type Definitions
+### 2\. Type Definitions
 
 All IPC operations must have corresponding TypeScript interfaces.
 
-### 3. Validation Functions
+### 3\. Validation Functions
 
 All parameterized operations must include validation functions.
 
-### 4. Error Handling
+### 4\. Error Handling
 
 All handlers must use try-catch with proper error logging.
 
-### 5. Cleanup Support
+### 5\. Cleanup Support
 
 Event listeners must return cleanup functions.
 

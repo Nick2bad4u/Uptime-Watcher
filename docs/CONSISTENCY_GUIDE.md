@@ -1,3 +1,26 @@
+---
+ai_note: Updated by AI on 2025-11-15 to add metadata.
+summary: >-
+  Architectural patterns, conventions, and standards for consistency across the
+  Uptime Watcher codebase.
+creation_date: unknown
+last_modified_date: '2025-11-15'
+author: Nick2bad4u
+title: Uptime Watcher Consistency Guide
+description: >-
+  High-level consistency guide covering error handling, logging, dependency
+  injection, documentation, TypeScript, and testing conventions for the
+  Uptime-Watcher project.
+keywords:
+  - uptime-watcher
+  - consistency
+  - architecture
+  - standards
+misc:
+  doc_category: Architecture
+  source: Uptime-Watcher docs
+---
+
 # Uptime Watcher Consistency Guide
 
 This document outlines the architectural patterns, conventions, and standards for maintaining consistency across the Uptime Watcher codebase.
@@ -14,7 +37,7 @@ This document outlines the architectural patterns, conventions, and standards fo
 
 ## Error Handling Standards
 
-### 1. Use withErrorHandling for All Service Operations
+### 1\. Use withErrorHandling for All Service Operations
 
 **Pattern**: All service methods that can fail should use the standardized `withErrorHandling()` utility.
 
@@ -45,7 +68,7 @@ public async migrateData(): Promise<void> {
 - `electron/services/window/WindowService.ts`
 - All service classes in `electron/services/`
 
-### 2. Error Context and Correlation
+### 2\. Error Context and Correlation
 
 Always provide meaningful error context and use correlation IDs for tracking:
 
@@ -60,7 +83,7 @@ return withErrorHandling(async () => {
 
 ## Logging Patterns
 
-### 1. Use logger Instead of console
+### 1\. Use logger Instead of console
 
 **Pattern**: Always use the structured logger from `@electron/utils/logger`.
 
@@ -77,7 +100,7 @@ console.log("Service started");
 console.error("Failed to connect");
 ```
 
-### 2. Structured Logging
+### 2\. Structured Logging
 
 Use structured logging with context objects:
 
@@ -94,7 +117,7 @@ logger.info("Monitor check completed", {
 logger.info(`Monitor ${monitor.id} status: ${result.status}`);
 ```
 
-### 3. Log Templates
+### 3\. Log Templates
 
 Use log templates from `@shared/utils/logTemplates` for consistency:
 
@@ -115,7 +138,7 @@ logger.debug(
 
 ## Dependency Injection
 
-### 1. Standardized Dependency Interfaces
+### 1\. Standardized Dependency Interfaces
 
 **Pattern**: Services should use standardized dependency injection with clear interfaces.
 
@@ -144,7 +167,7 @@ export class NotificationService {
 }
 ```
 
-### 2. Service Container Integration
+### 2\. Service Container Integration
 
 Services should be properly integrated with the ServiceContainer:
 
@@ -161,7 +184,7 @@ public getNotificationService(): NotificationService {
 }
 ```
 
-### 3. Configuration Patterns
+### 3\. Configuration Patterns
 
 Monitor services should use config defaults appropriately:
 
@@ -182,12 +205,11 @@ export class HttpMonitor implements IMonitorService {
 
 ## Code Documentation
 
-### 1. JSDoc Standards
+### 1\. JSDoc Standards
 
 Use comprehensive TSDoc comments following the project standards:
 
 ````typescript
-
 /**
  * Performs HTTP health check for monitoring endpoints.
  *
@@ -211,12 +233,11 @@ Use comprehensive TSDoc comments following the project standards:
  */
 ````
 
-### 2. Logger in Examples
+### 2\. Logger in Examples
 
 **Always use logger in JSDoc examples**, never console:
 
 ````typescript
-
 // ✅ Correct - JSDoc with logger
 /**
  * @example
@@ -240,7 +261,7 @@ Use comprehensive TSDoc comments following the project standards:
 
 ## Architectural Patterns
 
-### 1. Repository Pattern
+### 1\. Repository Pattern
 
 Database access should use the repository pattern:
 
@@ -266,7 +287,7 @@ export class SiteManager {
 }
 ```
 
-### 2. Event System
+### 2\. Event System
 
 Use the TypedEventBus for inter-service communication:
 
@@ -285,7 +306,7 @@ eventBus.subscribe("monitor:status-changed", (event) => {
 });
 ```
 
-### 3. Service Layer Separation
+### 3\. Service Layer Separation
 
 Maintain clear separation between services:
 
@@ -296,7 +317,7 @@ Maintain clear separation between services:
 
 ## TypeScript Standards
 
-### 1. Strict Type Safety
+### 1\. Strict Type Safety
 
 - Never use `any` or `unknown` without explicit justification
 - Use proper type guards and assertions
@@ -312,7 +333,7 @@ function isValidMonitor(monitor: unknown): monitor is Site["monitors"][0] {
 const monitor = data as Site["monitors"][0];
 ```
 
-### 2. Interface Design
+### 2\. Interface Design
 
 Design interfaces for extensibility and clarity:
 
@@ -328,7 +349,7 @@ interface MonitorServiceDependencies {
 constructor(config?: MonitorConfig, logger?: Logger, client?: AxiosInstance)
 ```
 
-### 3. Shared Contract Interfaces
+### 3\. Shared Contract Interfaces
 
 - Canonical DTOs live in the `shared` package. Do **not** redeclare interfaces such as `MonitorTypeOption`; import them from `@shared/types/monitorTypes`.
 - Favor re-exporting shared contracts from feature modules (e.g. `src/constants.ts`) instead of introducing renderer-only clones.
@@ -337,7 +358,7 @@ constructor(config?: MonitorConfig, logger?: Logger, client?: AxiosInstance)
 
 ## Testing Conventions
 
-### 1. Test Structure
+### 1\. Test Structure
 
 Follow the AAA pattern (Arrange, Act, Assert):
 
@@ -358,7 +379,7 @@ describe("HttpMonitor", () => {
 });
 ```
 
-### 2. Mock Consistency
+### 2\. Mock Consistency
 
 Use consistent mocking patterns:
 

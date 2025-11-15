@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Decision guide for choosing between direct create and modular composition patterns for Zustand stores in Uptime Watcher."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Zustand Store Pattern Decision Guide"
+description: "Explains when to use simple direct stores versus modular composition, with real examples, anti-patterns, and best practices for store organization."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "zustand"
+  - "state-management"
+  - "patterns"
+  - "stores"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Zustand Store Pattern Decision Guide
 
 This guide helps developers choose the appropriate Zustand store pattern based on store complexity and requirements, reflecting the current modular composition architecture.

@@ -1,3 +1,22 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Central reference for AI assistants working with the Uptime-Watcher codebase, including context regeneration steps and key docs."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "AI Context Guide"
+description: "Guide for AI assistants explaining how to use the curated context bundle, which documents to read first, and how to work effectively on the Uptime-Watcher project."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "ai-assistant"
+  - "context"
+  - "documentation"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # AI Context Guide
 
 > Centralized reference for AI assistants collaborating on the Uptime Watcher codebase. Use this page to understand the project setup, regenerate the latest context bundle, and locate related documentation quickly.

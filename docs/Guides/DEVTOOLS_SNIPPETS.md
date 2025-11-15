@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Chrome DevTools snippets for adding, listing, and removing test sites in the Uptime Watcher renderer."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Chrome DevTools Snippets for Testing"
+description: "Collection of Chrome DevTools snippets that exercise the Uptime Watcher renderer API for quickly seeding or cleaning test data."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "devtools"
+  - "snippets"
+  - "testing"
+  - "sites"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Chrome DevTools Snippets for Testing
 
 This document contains useful Chrome DevTools snippets for testing the Uptime Watcher application.

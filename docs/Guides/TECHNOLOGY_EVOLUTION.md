@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Chronological guide to Uptime Watcher's architectural evolution, migrations, and key technical decisions."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Technology Evolution Guide"
+description: "Covers the progression from early prototypes through major migrations such as LowDB to SQLite, React Context to Zustand, and simple events to a typed event-driven architecture."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "architecture"
+  - "evolution"
+  - "migrations"
+  - "history"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 ## 🔄 Technology Evolution Guide
 
 > **Migration History**: Understanding how Uptime Watcher evolved to its current sophisticated architecture.

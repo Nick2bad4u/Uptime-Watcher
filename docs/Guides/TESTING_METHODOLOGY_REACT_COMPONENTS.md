@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Testing methodology and patterns for React components in Uptime Watcher using Vitest and React Testing Library."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "React Component Testing Methodology"
+description: "Provides patterns, examples, and best practices for component, store, event, and form validation testing with Vitest and React Testing Library."
+category: "guide"
+keywords:
+    - "uptime-watcher"
+    - "react"
+    - "testing"
+    - "vitest"
+    - "rtl"
+misc:
+    doc_category: "Guides"
+    source: "Uptime-Watcher docs"
+---
+
 # React Component Testing Methodology
 
 ## Overview

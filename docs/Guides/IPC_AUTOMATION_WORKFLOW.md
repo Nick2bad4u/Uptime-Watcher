@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Workflow for generating, validating, and documenting IPC channels and preload bridges from shared TypeScript schemas."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "IPC Automation Workflow"
+description: "Explains the generation-first IPC workflow, including source-of-truth schemas, generator scripts, CI checks, and contributor guidelines for Uptime Watcher."
+category: "guide"
+keywords:
+   - "uptime-watcher"
+   - "ipc"
+   - "automation"
+   - "codegen"
+   - "ci"
+misc:
+   doc_category: "Guides"
+   source: "Uptime-Watcher docs"
+---
+
 # IPC Automation Workflow
 
 > **Last updated**: 2025-10-26 \

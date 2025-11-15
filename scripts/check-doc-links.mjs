@@ -16,7 +16,8 @@ const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 const DOCS_DIRECTORIES = [
     "docs/Architecture",
-    "docs/docusaurus/docs",
+    "docs/Guides",
+    "docs/Testing",
     "docs/docusaurus/src/pages",
 ];
 const IGNORED_DIRECTORIES = new Set([

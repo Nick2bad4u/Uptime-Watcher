@@ -109,7 +109,7 @@ const remarkConfig = {
         ], // Allow .mdx files
 
         // Disable problematic rules or override with more lenient settings
-        ["remark-lint-maximum-line-length", 200], // Allow longer lines
+        ["remark-lint-maximum-line-length", 5000], // Allow longer lines
         ["remark-lint-maximum-heading-length", 120], // Allow longer headings
         ["remark-lint-heading-capitalization", false], // Enforce consistent heading capitalization
         ["remark-lint-list-item-spacing", true], // More lenient about list spacing

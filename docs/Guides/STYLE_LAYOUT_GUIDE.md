@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Guide to shared styling primitives and layout conventions used in the Uptime Watcher renderer UI."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Style & Layout Guide"
+description: "Documents design tokens, modal composition, buttons, card layouts, CSS authoring guidelines, and stylesheet structure for consistent UI styling."
+category: "guide"
+keywords:
+	- "uptime-watcher"
+	- "styling"
+	- "layout"
+	- "ui"
+	- "css"
+misc:
+	doc_category: "Guides"
+	source: "Uptime-Watcher docs"
+---
+
 # Style & Layout Guide
 
 This guide documents the shared styling primitives that keep the renderer consistent. Follow these practices whenever you add screens, modals, or high-level layout primitives.

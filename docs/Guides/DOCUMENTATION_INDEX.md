@@ -1,3 +1,22 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Navigation hub and master index for all Uptime Watcher documentation, organized by topic and audience."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Documentation Index"
+description: "Central index of Uptime Watcher documentation, listing guides, architecture docs, ADRs, and role-based reading paths."
+category: "guide"
+keywords:
+	- "uptime-watcher"
+	- "documentation"
+	- "index"
+	- "navigation"
+misc:
+	doc_category: "Guides"
+	source: "Uptime-Watcher docs"
+---
+
 # 📚 Documentation Index
 
 > **Navigation Hub**: Complete guide to all Uptime Watcher documentation with quick links and descriptions.

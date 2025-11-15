@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Type-fest Integration Patterns"
+description: "Outlines when and how to use type-fest helpers such as UnknownRecord, LiteralUnion, Simplify, SetOptional, CamelCase, ReadonlyDeep, and PartialDeep for safer TypeScript."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "type-fest"
+  - "typescript"
+  - "types"
+  - "patterns"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Type-fest Integration Patterns
 
 This document provides comprehensive patterns for integrating type-fest utilities consistently across the Uptime-Watcher codebase. These patterns ensure type safety, better developer experience, and maintainable code.
@@ -159,7 +179,7 @@ const style = getStyle(variant);
 
 ### Real-World Usage
 
-In `src/theme/components/types.ts`, all theme component types now use LiteralUnion:
+When you need extensible theme definitions (for example in `src/theme/components/types.ts`), component types **can** use `LiteralUnion` to allow custom values while preserving autocomplete:
 
 ```typescript
 // Provides autocomplete but allows custom values
@@ -594,7 +614,7 @@ function createTestState(
 
 ## Implementation Guidelines
 
-### 1. Import Management
+### 1\. Import Management
 
 - Import only needed type-fest utilities
 - Use `import type` for type-only imports
@@ -612,7 +632,7 @@ import type {
 } from "type-fest";
 ```
 
-### 2. File Enhancement Order
+### 2\. File Enhancement Order
 
 1. Add type-fest imports
 2. Apply UnknownRecord replacements
@@ -623,13 +643,13 @@ import type {
 7. Apply PartialDeep in test utilities
 8. Use CamelCase for string transformations
 
-### 3. Documentation Requirements
+### 3\. Documentation Requirements
 
 - Update TSDoc comments when types change
 - Add examples showing enhanced autocomplete
 - Document benefits of type-fest usage
 
-### 4. Testing Strategy
+### 4\. Testing Strategy
 
 - Run TypeScript type checking after each enhancement
 - Verify no compilation errors
@@ -647,7 +667,10 @@ import type {
 ### During Implementation
 
 - [ ] Type-fest imports added correctly
-- [ ] All Record\<string, unknown> replaced with UnknownRecord
+- [ ] All Record\
+
+  <string, unknown=""> replaced with UnknownRecord</string,>
+
 - [ ] String literal unions enhanced with LiteralUnion
 - [ ] Complex unions simplified with Simplify
 - [ ] Optional parameters optimized with SetOptional
@@ -667,7 +690,10 @@ import type {
 ### Global Consistency
 
 - [ ] Pattern applied consistently across similar files
-- [ ] No remaining Record\<string, unknown> instances
+- [ ] No remaining Record\
+
+  <string, unknown=""> instances</string,>
+
 - [ ] All eligible string unions use LiteralUnion
 - [ ] Complex unions use Simplify where beneficial
 - [ ] Optional parameters use SetOptional appropriately

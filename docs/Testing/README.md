@@ -1,3 +1,25 @@
+---
+ai_note: Updated by AI on 2025-11-15 to add metadata.
+summary: >-
+  Index of testing documentation, guides, and best practices for the Uptime
+  Watcher application.
+creation_date: unknown
+last_modified_date: '2025-11-15'
+author: Nick2bad4u
+title: Testing documentation
+description: >-
+  Top-level overview of the testing documentation, including unit, integration,
+  E2E, and fuzzing strategies used in the Uptime-Watcher project.
+keywords:
+  - uptime-watcher
+  - testing
+  - vitest
+  - playwright
+misc:
+  doc_category: Testing
+  source: Uptime-Watcher docs
+---
+
 # Testing documentation
 
 This directory contains comprehensive testing guides, best practices, and methodology documentation for the Uptime Watcher application.
@@ -9,7 +31,7 @@ docs/Testing/
 ├── README.md                              # This file
 ├── CODEGEN-BEST-PRACTICES.md             # Code generation best practices
 ├── CODEGEN_TEMPLATE_USAGE.md             # Template usage for test generation
-├── FAST-CHECK-FUZZING-COVERAGE.md       # Property-based testing with fast-check
+├── FAST_CHECK_FUZZING_GUIDE.md          # Property-based testing with fast-check
 ├── HEADLESS_TESTING.md                   # Headless test execution strategies
 ├── PLAYWRIGHT_CODEGEN_GUIDE.md          # Playwright test generation workflows
 ├── PLAYWRIGHT_TESTING_GUIDE.md          # Comprehensive Playwright testing guide
@@ -60,44 +82,51 @@ For new developers getting started with testing:
 
 ### Playwright testing
 
-| Guide                                                     | Description                              | Use case                    |
-| --------------------------------------------------------- | ---------------------------------------- | --------------------------- |
-| [Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md) | Comprehensive Playwright setup and usage | E2E and Electron testing    |
-| [Playwright codegen guide](./PLAYWRIGHT_CODEGEN_GUIDE.md) | Test generation workflows and automation | Creating new test cases     |
-| [Headless testing](./HEADLESS_TESTING.md)                 | Running tests without UI in CI/CD        | Automated testing pipelines |
+Guide                                                     | Description                              | Use case
+--------------------------------------------------------- | ---------------------------------------- | ---------------------------
+[Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md) | Comprehensive Playwright setup and usage | E2E and Electron testing
+[Playwright codegen guide](./PLAYWRIGHT_CODEGEN_GUIDE.md) | Test generation workflows and automation | Creating new test cases
+[Headless testing](./HEADLESS_TESTING.md)                 | Running tests without UI in CI/CD        | Automated testing pipelines
 
 ### Code generation and templates
 
-| Guide                                                 | Description                                   | Use case                     |
-| ----------------------------------------------------- | --------------------------------------------- | ---------------------------- |
-| [Codegen best practices](./CODEGEN-BEST-PRACTICES.md) | Guidelines for effective code generation      | Test maintenance and quality |
-| [Template usage](./CODEGEN_TEMPLATE_USAGE.md)         | Using templates for consistent test structure | Standardizing test patterns  |
+Guide                                                 | Description                                   | Use case
+----------------------------------------------------- | --------------------------------------------- | ----------------------------
+[Codegen best practices](./CODEGEN_BEST_PRACTICES.md) | Guidelines for effective code generation      | Test maintenance and quality
+[Template usage](./CODEGEN_TEMPLATE_USAGE.md)         | Using templates for consistent test structure | Standardizing test patterns
 
 ### Advanced testing techniques
 
-| Guide                                                        | Description                                   | Use case                           |
-| ------------------------------------------------------------ | --------------------------------------------- | ---------------------------------- |
-| [Fast-check fuzzing coverage](./FAST-CHECK-FUZZING-GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs        |
-| [Zero coverage audit](./ZERO_COVERAGE_AUDIT.md)              | Isolate tests that no longer execute code     | Pruning stale specs safely         |
-| [Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)            | Configuring test output and debugging         | Test debugging and CI optimization |
+Guide                                                        | Description                                   | Use case
+------------------------------------------------------------ | --------------------------------------------- | ----------------------------------
+[Fast-check fuzzing coverage](./FAST_CHECK_FUZZING_GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs
+[Zero coverage audit](./ZERO_COVERAGE_AUDIT.md)              | Isolate tests that no longer execute code     | Pruning stale specs safely
+[Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)            | Configuring test output and debugging         | Test debugging and CI optimization
 
 ## 🏃‍♂️ Running tests
 
 ### Available test commands
 
 ```bash
-# Run all tests
-npm run test
+# Renderer/React tests (alias)
+npm run test            # Renderer tests via vitest.config.ts
+npm run test:frontend   # Explicit renderer alias
 
 # Run Electron-specific tests
 npm run test:electron
 
+# Shared module tests
+npm run test:shared
+
 # Run tests with coverage
 npm run test:coverage
 npm run test:electron:coverage
-
-# Run shared module tests with coverage
 npm run test:shared:coverage
+
+# Playwright / E2E suites
+npm run test:playwright
+npm run test:e2e
+npm run test:playwright:coverage
 
 # Run performance benchmarks
 npm run bench
@@ -160,7 +189,7 @@ Test configuration files are located in the project root:
 
 When adding new tests or testing documentation:
 
-1. Follow the [documentation style guide](../DOCUMENTATION_STYLE_GUIDE.md)
+1. Follow the [documentation style guide](../Guides/DOCUMENTATION_STYLE_GUIDE.md)
 2. Update this README to include new testing guides
 3. Ensure tests follow established patterns and conventions
 4. Add appropriate coverage for new features

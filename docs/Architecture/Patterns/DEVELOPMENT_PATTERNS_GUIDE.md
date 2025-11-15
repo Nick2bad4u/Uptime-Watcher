@@ -181,24 +181,17 @@ The application uses a TypedEventBus for decoupled communication between compone
 
 ### Settings Retention Synchronization
 
-The database retention policy is surfaced to renderers through the
-`settings:history-limit-updated` broadcast. The orchestrator tracks the last
-observed limit so the payload always includes both the **new** limit and the
-**previous** limit, enabling toast messaging and audit logs to explain why the
-value changed.
+The database retention policy is surfaced to renderers through the `settings:history-limit-updated` broadcast. The orchestrator tracks the last observed limit so the payload always includes both the **new** limit and the **previous** limit, enabling toast messaging and audit logs to explain why the value changed.
 
 - Subscribe via `EventsService.onHistoryLimitUpdated` inside the settings store.
-- Only mutate state if the incoming limit differs from the current store value
-  (the service already implements this guard).
-- Treat backend-originated changes (imports, CLI migrations) the same as UI
-  mutations—there is no special casing in the renderer.
-- The renderer callback runs inside the store module; avoid calling the IPC
-  service from within the handler to prevent feedback loops.
+- Only mutate state if the incoming limit differs from the current store value (the service already implements this guard).
+- Treat backend-originated changes (imports, CLI migrations) the same as UI mutations--there is no special casing in the renderer.
+- The renderer callback runs inside the store module; avoid calling the IPC service from within the handler to prevent feedback loops.
 
 ### Event-Driven Implementation Template
 
 ```typescript
-// 1. Define event interfaces
+// 1\. Define event interfaces
 interface DomainEvents extends Record<string, unknown> {
  "domain:action-completed": {
   entityId: string;
@@ -218,7 +211,6 @@ interface DomainEvents extends Record<string, unknown> {
 ### Shared Utility Import Overview
 
 All consumers must import helpers from explicit module paths under `@shared/utils/*`. Barrel imports are disallowed to keep dependency graphs predictable and prevent circular references across Electron, renderer, and shared packages.
-selectedSiteIdentifier: undefined,
 
 ### Shared Utility Guidelines
 
@@ -260,18 +252,22 @@ Logging across main and renderer processes uses structured prefixes and reusable
 
 ```typescript
 import { logger } from "electron/utils/logger";
-import { LOG_TEMPLATES } from "@shared/utils/logTemplates";
+import {
+ createTemplateLogger,
+ LOG_TEMPLATES,
+} from "@shared/utils/logTemplates";
 
-export function recordMissingHandler(channel: string): void {
- logger.error(LOG_TEMPLATES.ipc.MISSING_HANDLER, undefined, {
-  channel,
-  timestamp: Date.now(),
+const templateLogger = createTemplateLogger(logger);
+
+export function recordSiteCacheBootstrap(count: number): void {
+ templateLogger.info(LOG_TEMPLATES.services.SITE_MANAGER_INITIALIZED, {
+  count,
  });
 }
 ```
 
 ```typescript
-// 2. Emit events in services
+// 2\. Emit events in services
 export class ExampleService {
  constructor(private readonly eventBus: TypedEventBus<UptimeEvents>) {}
 
@@ -298,7 +294,7 @@ export class ExampleService {
  }
 }
 
-// 3. Listen to events
+// 3\. Listen to events
 eventBus.onTyped("domain:action-completed", (data) => {
  // data is properly typed and includes _meta
  console.log(`Action completed for ${data.entityId} at ${data.timestamp}`);
@@ -468,7 +464,7 @@ export const useSimpleStore = create<SimpleStore>()((set, get) => ({
 ### Complex Store with Modules
 
 ```typescript
-// 1. Define module interfaces
+// 1\. Define module interfaces
 interface StateModule {
  sites: Site[];
  selectedSiteIdentifier?: string;
@@ -481,7 +477,7 @@ interface OperationsModule {
  deleteSite: (id: string) => Promise<void>;
 }
 
-// 2. Create module implementations
+// 2\. Create module implementations
 export function createStateModule(
  set: SetFunction,
  get: GetFunction
@@ -504,7 +500,7 @@ export function createStateModule(
  };
 }
 
-// 3. Compose in main store
+// 3\. Compose in main store
 export interface SitesStore extends StateModule, OperationsModule {}
 
 export const useSitesStore = create<SitesStore>()((set, get) => {
@@ -543,9 +539,7 @@ export const useUIStore = create<UIStore>()(
 
 ### Overflow Marquee Hook
 
-Use `useOverflowMarquee` when headline or metric text may exceed its container.
-The hook measures horizontal overflow, re-checks on resize, and returns
-`isOverflowing` so components can apply marquee animations only when needed.
+Use `useOverflowMarquee` when headline or metric text may exceed its container. The hook measures horizontal overflow, re-checks on resize, and returns `isOverflowing` so components can apply marquee animations only when needed.
 
 ```tsx
 import clsx from "clsx";
@@ -566,9 +560,7 @@ export function SiteTitle({ title }: { title: string }): JSX.Element {
 }
 ```
 
-> **CSS alignment:** Pair the hook with the shared marquee utility classes in
-> `tailwind.config.mjs` (`animate-marquee` / `marquee-pause-on-hover`) to ensure
-> consistent animation speed and pause-on-hover behavior.
+> **CSS alignment:** Pair the hook with the shared marquee utility classes in `tailwind.config.mjs` (`animate-marquee` / `marquee-pause-on-hover`) to ensure consistent animation speed and pause-on-hover behavior.
 
 ### State Management Usage Guidelines
 
@@ -581,17 +573,11 @@ export function SiteTitle({ title }: { title: string }): JSX.Element {
 
 ### Manual Monitoring Check Optimistic Updates
 
-Manual health checks now return the authoritative `StatusUpdate` payload from
-the backend. `createSiteMonitoringActions.checkSiteNow` applies the update via
-`applyStatusUpdateSnapshot`, providing instant UI feedback without waiting for
-the follow-up event broadcast.
+Manual health checks now return the authoritative `StatusUpdate` payload from the backend. `createSiteMonitoringActions.checkSiteNow` applies the update via `applyStatusUpdateSnapshot`, providing instant UI feedback without waiting for the follow-up event broadcast.
 
-- The optimistic reducer reuses the same merge logic as the
-  `StatusUpdateManager`, guaranteeing consistency with live event handling.
-- If the payload is incomplete (missing a monitor or site snapshot), the helper
-  no-ops and logs a debug message—callers do not need additional guards.
-- Always update store state through the injected `setSites` action so that
-  derived selectors and persistence continue to work as expected.
+- The optimistic reducer reuses the same merge logic as the `StatusUpdateManager`, guaranteeing consistency with live event handling.
+- If the payload is incomplete (missing a monitor or site snapshot), the helper no-ops and logs a debug message--callers do not need additional guards.
+- Always update store state through the injected `setSites` action so that derived selectors and persistence continue to work as expected.
 
 ## IPC Communication
 
@@ -599,15 +585,12 @@ the follow-up event broadcast.
 
 Standardized IPC protocol using contextBridge with type safety, validation, and consistent error handling.
 
-> **Generation-first workflow:** The preload bridge and channel documentation
-> are generated from the canonical schema. Update the schema (typically
-> `RendererEventPayloadMap`/`IpcInvokeChannelMap`) and re-run
-> `npm run generate:ipc`; CI enforces drift detection via `npm run check:ipc`.
+> **Generation-first workflow:** The preload bridge and channel documentation are generated from the canonical schema. Update the schema (typically `RendererEventPayloadMap`/`IpcInvokeChannelMap`) and re-run `npm run generate:ipc`; CI enforces drift detection via `npm run check:ipc`.
 
 ### Handler Registration Pattern
 
 ```typescript
-// 1. Define validation functions
+// 1\. Define validation functions
 export function isExampleParams(data: unknown): data is ExampleParams {
     return typeof data === 'object' &&
            data !== null &&
@@ -615,7 +598,7 @@ export function isExampleParams(data: unknown): data is ExampleParams {
            typeof (data as any).field === 'string';
 }
 
-// 2. Register handlers by domain
+// 2\. Register handlers by domain
 private registerExampleHandlers(deps: IpcServiceDependencies): void {
     this.registerStandardizedIpcHandler(
         'create-example',
@@ -669,18 +652,10 @@ declare global {
 
 #### Sites domain contract highlights
 
-- `remove-monitor` **must** resolve to the persisted `Site` snapshot provided by
-  the orchestrator. Treat the payload as authoritative and feed it directly
-  into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
-- Cross-check the canonical implementation in
-  [`SiteService.removeMonitor`](../../../src/services/SiteService.ts),
-  which demonstrates validating the persisted snapshot with
-  `validateSiteSnapshot` before mutating store state.
-- Avoid reconstructing monitor arrays in the renderer. Any transformation risks
-  diverging from the validated schema maintained in
-  [`@shared/validation/schemas`](../../../shared/validation/schemas.ts).
-- Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and
-  optimistic update guidance.
+- `remove-monitor` **must** resolve to the persisted `Site` snapshot provided by the orchestrator. Treat the payload as authoritative and feed it directly into `SiteService.removeMonitor` ➔ `applySavedSiteToStore`.
+- Cross-check the canonical implementation in [`SiteService.removeMonitor`](../../../src/services/SiteService.ts), which demonstrates validating the persisted snapshot with `validateSiteSnapshot` before mutating store state.
+- Avoid reconstructing monitor arrays in the renderer. Any transformation risks diverging from the validated schema maintained in [`@shared/validation/schemas`](../../../shared/validation/schemas.ts).
+- Reference `docs/TSDoc/stores/sites.md` for the end-to-end mutation flow and optimistic update guidance.
 
 ### IPC Communication Usage Guidelines
 
@@ -809,13 +784,13 @@ const tempCache = new StandardizedCache<Site>({
 
 ### Cache Type Guidelines
 
-| Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled |
-| -------------- | ------ | -------- | -------------------------- | ------------- |
-| **SITES**      | 10 min | 500      | Site management operations | ✓             |
-| **MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
-| **SETTINGS**   | 30 min | 100      | Application configuration  | ✓             |
-| **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
-| **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
+Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled
+-------------- | ------ | -------- | -------------------------- | -------------
+**SITES**      | 10 min | 500      | Site management operations | ✓
+**MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓
+**SETTINGS**   | 30 min | 100      | Application configuration  | ✓
+**VALIDATION** | 5 min  | 200      | Validation result caching  | ✓
+**TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗
 
 ### Cache Configuration Implementation Template
 
@@ -1229,14 +1204,19 @@ sequenceDiagram
 ### Layer Responsibilities
 
 - **SiteManager**
+
   - Protects domain invariants (e.g., cannot remove the final monitor from a site).
-  - Performs structured validation with [`ERROR_CATALOG`](../../shared/utils/errorCatalog.ts) for consistent messaging.
+  - Performs structured validation with [`ERROR_CATALOG`](../../../shared/utils/errorCatalog.ts) for consistent messaging.
   - Emits fully populated events with timestamps and updated field metadata.
+
 - **SiteWriterService**
+
   - Owns transactional boundaries via `DatabaseService.executeTransaction`.
   - Applies monitor updates through `updateMonitorsPreservingHistory` so historical rows remain attached to surviving monitors.
   - Writes sanitized copies into the shared `StandardizedCache` instance.
+
 - **Repositories**
+
   - Contain only synchronous `*_Internal` helpers that assume an active transaction.
   - Never call `getDatabase()` directly inside internal helpers; transaction management is delegated to the caller.
 

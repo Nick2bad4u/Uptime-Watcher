@@ -2,7 +2,7 @@
  * Tests for the in-app alert store implementation.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { StatusUpdate } from "@shared/types";
 import { STATUS_KIND } from "@shared/types";
 
@@ -185,5 +185,131 @@ describe(useAlertStore, () => {
         expect(alert.siteIdentifier).toBe("alpha");
         expect(alert.siteName).toBe("Alpha");
         expect(alert.previousStatus).toBe(STATUS_KIND.UP);
+    });
+
+    it("derives site name from identifier when the name is blank", () => {
+        const update = createStatusUpdate({
+            site: {
+                identifier: "  site-slug   ",
+                monitoring: true,
+                monitors: [],
+                name: "   ",
+            },
+            siteIdentifier: "   outer-id   ",
+        });
+
+        const alert = mapStatusUpdateToAlert(update);
+
+        // deriveSiteName should fall back to the trimmed identifier
+        expect(alert.siteName).toBe("site-slug");
+    });
+
+    it("derives site name from the event identifier when site name and identifier are blank", () => {
+        const update = createStatusUpdate({
+            site: {
+                identifier: "   ",
+                monitoring: true,
+                monitors: [],
+                name: "   ",
+            },
+            siteIdentifier: "   event-id   ",
+        });
+
+        const alert = mapStatusUpdateToAlert(update);
+
+        // deriveSiteName should use the trimmed siteIdentifier from the event
+        expect(alert.siteName).toBe("event-id");
+    });
+
+    it("falls back to unknown-site when no site identifiers are available", () => {
+        const base = createStatusUpdate({
+            site: {
+                identifier: "   ",
+                monitoring: true,
+                monitors: [],
+                name: "   ",
+            },
+            siteIdentifier: "   ",
+        });
+
+        const alert = mapStatusUpdateToAlert(base);
+
+        expect(alert.siteName).toBe("unknown-site");
+    });
+
+    it("normalizes invalid timestamps to Date.now() when mapping status updates", () => {
+        const fixedNow = 1_725_000_000_000;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+        const update = createStatusUpdate({
+            // Force deriveAlertTimestamp to take the Date.now() fallback path
+            timestamp: "not-a-valid-timestamp",
+        });
+
+        const alert = mapStatusUpdateToAlert(update);
+
+        expect(alert.timestamp).toBe(fixedNow);
+
+        nowSpy.mockRestore();
+    });
+});
+
+describe("useAlertStore identifier generation fallbacks", () => {
+    afterEach(() => {
+        resetAlertStore();
+    });
+
+    it("uses crypto.getRandomValues when randomUUID is not available", () => {
+        const originalCrypto = globalThis.crypto;
+
+        const mockGetRandomValues = vi.fn((buffer: Uint32Array) => {
+            // Use deterministic values so the generated ID is predictable
+            buffer[0] = 123_456;
+            buffer[1] = 654_321;
+            return buffer;
+        });
+
+        try {
+            globalThis.crypto = {
+                // randomUUID intentionally omitted to hit the getRandomValues branch
+                getRandomValues: mockGetRandomValues,
+            } as unknown as Crypto;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: "monitor-id",
+                monitorName: "HTTP monitor",
+                siteIdentifier: "site-id",
+                siteName: "Example Site",
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
+            expect(alert.id).toMatch(/^alert-[0-9a-z]+-[0-9a-z]+$/);
+        } finally {
+            globalThis.crypto = originalCrypto;
+        }
+    });
+
+    it("falls back to Date.now-based identifiers when crypto is unavailable", () => {
+        const originalCrypto = globalThis.crypto;
+        const fixedNow = 1_730_000_000_000;
+        const nowSpy = vi.spyOn(Date, "now").mockReturnValue(fixedNow);
+
+        try {
+            globalThis.crypto = undefined as any;
+
+            const alert = useAlertStore.getState().enqueueAlert({
+                monitorId: "monitor-id",
+                monitorName: "HTTP monitor",
+                siteIdentifier: "site-id",
+                siteName: "Example Site",
+                status: STATUS_KIND.DOWN,
+            });
+
+            expect(alert.id).toMatch(/^alert-1730000000000-\d+$/);
+        } finally {
+            nowSpy.mockRestore();
+            globalThis.crypto = originalCrypto;
+        }
     });
 });

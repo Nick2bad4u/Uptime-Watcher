@@ -1,3 +1,21 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Website"
+description: "README for the Docusaurus documentation site, covering installation, local development, build, and deployment commands."
+keywords:
+	- "uptime-watcher"
+	- "docusaurus"
+	- "documentation-site"
+	- "deployment"
+misc:
+	doc_category: "Docusaurus"
+	source: "Uptime-Watcher docs"
+---
+
 # Website
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.

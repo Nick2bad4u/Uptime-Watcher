@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "UI Feature Development Guide"
+description: "Covers architecture, props standards, state management, event handling, modals, reusable components, testing, and common pitfalls when developing UI features."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "ui"
+  - "react"
+  - "zustand"
+  - "development"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # UI Feature Development Guide
 
 This document provides comprehensive guidelines for adding and modifying UI features in the Uptime Watcher application, based on lessons learned from implementing the site monitoring functionality and modal improvements.
@@ -124,7 +144,7 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
 ## Development Process
 
-### 1. Planning Phase
+### 1\. Planning Phase
 
 Before implementing any UI feature:
 
@@ -134,7 +154,7 @@ Before implementing any UI feature:
 4. **Check Existing Patterns**: Look for similar implementations to follow established patterns
 5. **Plan State Management**: Determine which stores need updates and what new state is required
 
-### 2. Implementation Order
+### 2\. Implementation Order
 
 Always follow this order to minimize breaking changes:
 
@@ -145,7 +165,7 @@ Always follow this order to minimize breaking changes:
 5. **Integration**: Wire up components with state and event handlers
 6. **Testing**: Verify functionality and run all tests
 
-### 3. Code Review Checklist
+### 3\. Code Review Checklist
 
 - [ ] Follows established architectural patterns
 - [ ] No direct state mutations
@@ -162,7 +182,6 @@ Always follow this order to minimize breaking changes:
 **Current Implementation Pattern:**
 
 ````tsx
-
 // Import standardized prop types for consistency
 import type {
  ComponentSize,
@@ -515,8 +534,8 @@ Each store module has clear responsibilities:
 ```typescript
 // ✅ Good: Consistent error handling with withErrorHandling
 import { withErrorHandling } from "@shared/utils/errorHandling";
-import { useErrorStore } from "../error/useErrorStore";
-import { SiteService } from "src/services/SiteService";
+import { useErrorStore } from "@app/stores/error/useErrorStore";
+import { SiteService } from "@app/services/SiteService";
 
 export const createSiteOperationsActions = (
  deps: SiteOperationsDependencies
@@ -957,26 +976,20 @@ describe("MyIntegratedComponent Integration", () => {
 
 Follow the base tag guidelines in `docs/TSDoc/`:
 
-/\*\*
+/**
 
-- Brief component description.
--
+- Brief component description. -
 - @remarks
 - Detailed explanation of component behavior, patterns used, and any important
-- implementation details.
--
-- @example
--
-- /\`\`\`tsx
-- <Component prop="value" />;
-- /\`\`\`
--
-- @param props - Component props
--
-- @returns JSX element description
--
-- @public
-  \*/
+- implementation details. -
+- @example -
+- /```tsx
+- <component prop="value">;</component>
+
+- /``` -
+- @param props - Component props -
+- @returns JSX element description -
+- @public */
 
 ### Code Comments
 
@@ -987,7 +1000,7 @@ Follow the base tag guidelines in `docs/TSDoc/`:
 
 ## Common Pitfalls
 
-### 1. Event Propagation
+### 1\. Event Propagation
 
 **Problem**: Button clicks in cards trigger card click handlers
 
@@ -1004,7 +1017,7 @@ onClick={(event) => {
 }}
 ```
 
-### 2. State Mutations
+### 2\. State Mutations
 
 **Problem**: Directly mutating store state
 
@@ -1018,7 +1031,7 @@ sites[0].name = "New Name";
 updateSiteName(siteIdentifier, "New Name");
 ```
 
-### 3. Prop Drilling
+### 3\. Prop Drilling
 
 **Problem**: Passing props through many component levels
 
@@ -1037,7 +1050,7 @@ const Component = () => {
 };
 ```
 
-### 4. Missing Dependencies
+### 4\. Missing Dependencies
 
 **Problem**: useCallback/useEffect missing dependencies
 
@@ -1055,7 +1068,7 @@ const handler = useCallback(() => {
 }, [prop]);
 ```
 
-### 5. Improper Error Handling
+### 5\. Improper Error Handling
 
 **Problem**: Errors not properly caught and logged
 
@@ -1327,11 +1340,11 @@ This guide provides comprehensive guidelines for UI development in the Uptime Wa
 
 ### Current Implementation Standards
 
-6. **Component Structure**: Use `JSX.Element` return types, named functions in useEffect, and proper cleanup patterns
-7. **Store Patterns**: Choose between direct create (simple stores) and modular composition (complex stores) appropriately
-8. **Event Integration**: Use EventsService abstraction for backend communication and cache synchronization
-9. **Type Safety**: Use readonly props, specific React event types, and avoid `any` or `unknown`
-10. **Testing Strategy**: Use Vitest with comprehensive mocking and proper store state management
+1. **Component Structure**: Use `JSX.Element` return types, named functions in useEffect, and proper cleanup patterns
+2. **Store Patterns**: Choose between direct create (simple stores) and modular composition (complex stores) appropriately
+3. **Event Integration**: Use EventsService abstraction for backend communication and cache synchronization
+4. **Type Safety**: Use readonly props, specific React event types, and avoid `any` or `unknown`
+5. **Testing Strategy**: Use Vitest with comprehensive mocking and proper store state management
 
 ### Quality Assurance
 

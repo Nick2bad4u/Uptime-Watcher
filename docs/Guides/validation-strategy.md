@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Layered validation strategy for Uptime Watcher, from UI through IPC, managers, repositories, and background services."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Validation Strategy"
+description: "Describes validation responsibilities per layer, principles like fail-fast and structured errors, and how to implement and test new validation rules."
+category: "guide"
+keywords:
+   - "uptime-watcher"
+   - "validation"
+   - "ipc"
+   - "managers"
+   - "repositories"
+misc:
+   doc_category: "Guides"
+   source: "Uptime-Watcher docs"
+---
+
 # Validation Strategy
 
 The application enforces data quality through a layered validation pipeline. Each layer owns a clearly defined set of responsibilities so that validation code stays maintainable, testable, and consistent across domains.

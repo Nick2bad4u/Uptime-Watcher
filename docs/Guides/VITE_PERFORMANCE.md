@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Guide to profiling, warming, and optimizing Vite performance for the Uptime Watcher application."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Vite Performance Profiling and Optimization Guide"
+description: "Documents the available profiling scripts, warmup configuration, bundle analysis, and performance best practices for Vite in Uptime Watcher."
+category: "guide"
+keywords:
+   - "uptime-watcher"
+   - "vite"
+   - "performance"
+   - "profiling"
+   - "optimization"
+misc:
+   doc_category: "Guides"
+   source: "Uptime-Watcher docs"
+---
+
 # Vite Performance Profiling and Optimization Guide
 
 This document outlines how to use the performance profiling scripts and warmup configuration for the Uptime Watcher application.

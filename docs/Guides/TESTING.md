@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Testing and Coverage Setup"
+description: "Describes the triple Vitest configuration, Electron API mocking, coverage reporters, CI integration, and best practices for maintaining high test coverage."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "testing"
+  - "vitest"
+  - "coverage"
+  - "ci"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Testing and Coverage Setup
 
 This project uses Vitest for testing with separate configurations for frontend (React), backend (Electron), and shared utilities, integrated with comprehensive mocking strategies and coverage reporting.
@@ -9,23 +29,26 @@ This project uses Vitest for testing with separate configurations for frontend (
 The project has three separate Vitest configurations:
 
 1. **Frontend Tests** (`vitest.config.ts`):
-   - Tests React components in `src/` directory
-   - Merges configuration from `vite.config.ts`
-   - Uses jsdom environment with React Testing Library
-   - Comprehensive ElectronAPI mocking
-   - Coverage reports to `./coverage/`
+
+  - Tests React components in `src/` directory
+  - Merges configuration from `vite.config.ts`
+  - Uses jsdom environment with React Testing Library
+  - Comprehensive ElectronAPI mocking
+  - Coverage reports to `./coverage/`
 
 2. **Backend Tests** (`vitest.electron.config.ts`):
-   - Tests Electron main process code in `electron/` directory
-   - Uses Node.js environment
-   - Database and service layer testing
-   - Coverage reports to `./coverage/electron/`
+
+  - Tests Electron main process code in `electron/` directory
+  - Uses Node.js environment
+  - Database and service layer testing
+  - Coverage reports to `./coverage/electron/`
 
 3. **Shared Tests** (`vitest.shared.config.ts`):
-   - Tests shared utilities in `shared/` directory
-   - Cross-platform utility testing
-   - Type validation and error handling
-   - Coverage reports to `./coverage/shared/`
+
+  - Tests shared utilities in `shared/` directory
+  - Cross-platform utility testing
+  - Type validation and error handling
+  - Coverage reports to `./coverage/shared/`
 
 ### Files Created/Modified
 
@@ -36,63 +59,71 @@ The project has three separate Vitest configurations:
 5. **`electron/test/setup.ts`** - Backend test setup with database mocking
 6. **`shared/test/setup.ts`** - Shared utilities test setup
 7. **Test files**:
-   - Component tests in `src/components/`
-   - Store tests in `src/stores/`
-   - Service tests in `electron/services/`
-   - Utility tests in `shared/utils/`
+
+  - Component tests in `src/components/`
+  - Store tests in `src/stores/`
+  - Service tests in `electron/services/`
+  - Utility tests in `shared/utils/`
 
 ### Coverage Configuration
 
 - **Provider**: V8 (fast and accurate)
 - **Reporters**: text, json, lcov, html
 - **Environments**:
+
   - jsdom (for React component testing with full DOM simulation)
   - node (for Electron backend and shared utilities)
+
 - **Coverage Flags**:
+
   - `frontend` - React/src code coverage
   - `electron` - Electron/backend code coverage
   - `shared` - Shared utilities coverage
+
 - **Excludes**: Build artifacts, configuration files, test files
 
 ### Commands
 
 ```bash
-# Run all tests (frontend + electron + shared)
+# Aggregate suites (frontend, electron, shared, Storybook)
 npm run test:all
 
-# Run frontend tests only
-npm run test:frontend
+# Frontend tests (renderer)
+npm run test               # Frontend tests via vitest.config.ts
+npm run test:frontend      # Explicit alias for renderer suite
+npm run test:coverage      # Frontend coverage
 
-# Run frontend tests with coverage
-npm run test:coverage
-
-# Run electron tests only
+# Electron (main process) tests
 npm run test:electron
-
-# Run electron tests with coverage
 npm run test:electron:coverage
 
-# Run shared utility tests only
+# Shared module tests
 npm run test:shared
-
-# Run shared tests with coverage
 npm run test:shared:coverage
 
-# Run all test suites with coverage (recommended for Codecov)
+# Storybook component tests
+npm run test:storybook
+npm run test:storybook:coverage
+npm run test:storybook:runner
+npm run test:storybook:runner:coverage
+
+# Playwright / E2E tests
+npm run test:playwright
+npm run test:e2e
+npm run test:playwright:coverage
+
+# Aggregate coverage (recommended for Codecov)
 npm run test:all:coverage
 
-# Interactive testing
-npm run test:ui              # Frontend tests UI
-npm run test:electron:ui     # Electron tests UI
-npm run test:shared:ui       # Shared tests UI
-npm run test:watch           # Frontend tests in watch mode
-npm run test:electron:watch  # Electron tests in watch mode
-npm run test:shared:watch    # Shared tests in watch mode
+# Interactive UIs (where available)
+npm run test:electron:ui    # Electron tests UI
+npm run test:shared:ui      # Shared tests UI
 ```
 
 Notes:
 
-- `npm run test` executes all three test configurations: shared, electron, and frontend tests sequentially.
+- `npm run test` runs the frontend Vitest configuration (renderer) only.
+- `npm run test:all` orchestrates the full test matrix across frontend, electron, shared, and Storybook.
 
 ### ElectronAPI Mocking Strategy
 
@@ -282,7 +313,7 @@ The test suite implements modern testing patterns:
 - **Service Layer**: EventsService and utility functions fully tested
 - **Type Guards**: All validation functions tested with edge cases
 - **Error Handling**: Comprehensive error boundary and handling tests
-- **Overall Frontend**: \~95%+ coverage
+- **Overall Frontend**: ~95%+ coverage
 
 **Backend Coverage** (`electron/` directory):
 
@@ -290,7 +321,7 @@ The test suite implements modern testing patterns:
 - **Repository Pattern**: All database operations tested with mocking
 - **Event System**: TypedEventBus and middleware comprehensively tested
 - **Manager Classes**: Business logic and orchestration tested
-- **Overall Backend**: \~90%+ coverage
+- **Overall Backend**: ~90%+ coverage
 
 **Shared Coverage** (`shared/` directory):
 
@@ -298,7 +329,7 @@ The test suite implements modern testing patterns:
 - **Type Validation**: Zod schemas and type guards fully tested
 - **Error Handling**: Shared error utilities completely covered
 - **Type Definitions**: Interface and type consistency verified
-- **Overall Shared**: \~95%+ coverage
+- **Overall Shared**: ~95%+ coverage
 
 **Current Test Structure**:
 

@@ -64,6 +64,10 @@ description: "Instructions for the extremely capable TypeScript AI coding assist
   - Rollup/Vite chunk-size warnings for large bundles
   - Electron dev-mode CSP warnings referencing `unsafe-eval`
   - Codecov `get-pre-signed-url` failures when running locally
-
+- You should never use Python scripts to edit or manipulate code or documentation in this repository. Always use the proper tools provided to you, it will be much more efficient and reliable. Example tools are tools: `edit/createFile` `edit/createDirectory`, `edit/editFiles`, `vscode-mcp/execute_command`, `vscode-mcp/get_diagnostics`, `vscode-mcp/get_references`, `runSubagent` and more.
+- Reading files, running commands and tasks, running tests, checking information, etc should use the proper tools as well: `vscode-mcp/get_symbol_lsp_info`, `vscode-mcp/rename_symbol`, `runCommands/getTerminalOutput`, `runCommands/runInTerminal`, `runTasks/runTask`, `runTasks/getTaskOutput`, `usages`, `problems`, `changes`, `testFailure`, `fetch`, `memory`, `todos`, `runSubagent`, `runTests`.
+- Web fetch tools include `fetch` and `Tavily-Remote-MCP/tavily_{crawl,extract,map,search}`
+- If you're having trouble with tool use, syntax, tool parameters, or anything else related to tools, there is a good document called `TOOLS_AND_COMMANDS_GUIDE.md` in the `docs/Guides/` folder that can help you understand how to use tools effectively. You should refer to that document whenever you have questions about tools or are hitting syntax errors, tool malformed errors, or other issues related to tool usage.
+- `Memory` tool should only be used to store or retrieve important context that you will need carried over between context resets, windows, and agents. Do not use it for temporary context or information you only need for the current session.
   </coding>
   </instructions>

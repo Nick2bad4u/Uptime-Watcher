@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Developer Quick Start Guide"
+description: "Step-by-step instructions to clone the repository, install dependencies, run the dev environment, and understand the core architecture of Uptime Watcher."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "development"
+  - "setup"
+  - "quick-start"
+  - "architecture"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # 🚀 Developer Quick Start Guide
 
 > **Fast Track**: Get up and running with Uptime Watcher development in minutes.
@@ -14,7 +34,7 @@ Uptime Watcher is a sophisticated Electron desktop application for monitoring we
 - **npm**: 11.5.2+ (comes with Node.js)
 - **Git**: Latest version
 
-### 1. Clone & Install
+### 1\. Clone & Install
 
 ```bash
 git clone https://github.com/Nick2bad4u/Uptime-Watcher.git
@@ -22,7 +42,7 @@ cd Uptime-Watcher
 npm install
 ```
 
-### 2. Start Development
+### 2\. Start Development
 
 ```bash
 # Start both Vite dev server and Electron (concurrently)
@@ -33,7 +53,7 @@ npm run dev           # Terminal 1: Vite dev server (port 5173)
 npm run electron      # Terminal 2: Electron shell (waits for Vite)
 ```
 
-### 3. Verify Setup
+### 3\. Verify Setup
 
 - Application window should open automatically
 - React DevTools available in development
@@ -146,19 +166,21 @@ npm run dist           # Build and package application
 ### Testing
 
 ```bash
-npm test              # Run all tests
-npm run test:electron # Backend tests only
-npm run test:frontend # Frontend tests only
-npm run test:watch    # Watch mode
+npm test               # Run all tests (Vitest)
+npm run test:electron  # Backend tests only (Electron-focused Vitest config)
+npm run test:frontend  # Frontend tests only (renderer Vitest config)
 ```
 
 ### Code Quality
 
 ```bash
-npm run lint          # ESLint + Stylelint
-npm run lint:fix      # Auto-fix lint issues
-npm run format        # Prettier formatting
-npm run check-types   # TypeScript type checking
+npm run lint           # ESLint (JS/TS) with caching
+npm run lint:css       # Stylelint for CSS/Tailwind layers (src/electron/shared/docs)
+npm run lint:fix       # ESLint auto-fix pass
+npm run lint:css:fix   # Stylelint auto-fix pass
+npm run format         # Runs Prettier + Stylelint + ESLint + remark fixers
+npm run check-types    # Full TypeScript project reference build
+npm run docs:check-links # Validate documentation cross-links
 ```
 
 ### Documentation
@@ -177,7 +199,7 @@ npm run check:ipc      # Ensure generated IPC artifacts are in sync with schemas
 
 ## 🎯 Key Development Patterns
 
-### 1. Repository Pattern (Database)
+### 1\. Repository Pattern (Database)
 
 All database operations use the repository pattern with transaction safety:
 
@@ -199,7 +221,7 @@ const sites = await siteRepository.findAll();
 const newSite = await siteRepository.create(siteData);
 ```
 
-### 2. IPC Communication with Validation
+### 2\. IPC Communication with Validation
 
 All IPC handlers use standardized registration with validation:
 
@@ -231,7 +253,7 @@ const handleCreateSite = async (siteData: SiteCreationData) => {
 };
 ```
 
-### 3. Optimistic Manual Monitor Checks
+### 3\. Optimistic Manual Monitor Checks
 
 Manual health checks resolve with enriched `StatusUpdate` payloads so the UI can update before the event bus broadcasts the completion event.
 
@@ -252,7 +274,7 @@ await checkSiteNow(siteIdentifier, monitorId);
 - Telemetry (`logStoreAction`) captures whether the optimistic payload was applied for observability.
 - Subsequent `monitor:check-completed` or `monitor:status-changed` events reconcile the state and are idempotent.
 
-### 4. Event-Driven Updates with TypedEventBus
+### 4\. Event-Driven Updates with TypedEventBus
 
 Cross-service communication uses type-safe events:
 
@@ -284,7 +306,7 @@ useEffect(() => {
 }, []);
 ```
 
-### 5. Modular Zustand Store Pattern
+### 5\. Modular Zustand Store Pattern
 
 Complex stores use modular composition for maintainability:
 
@@ -315,7 +337,7 @@ export const useSitesStore = create<SitesStore>()((set, get) => {
 const { sites, addSite, startMonitoring } = useSitesStore();
 ```
 
-### 6. Shared Validation Patterns
+### 6\. Shared Validation Patterns
 
 Use centralized validation for consistency:
 
@@ -426,6 +448,6 @@ npm run electron -- --log-debug
 2. **Patterns**: Reference [`docs/Architecture/`](../Architecture/) for coding patterns
 3. **Examples**: Use templates in [`docs/Architecture/Templates/`](../Architecture/Templates/)
 
----
+--------------------------------------------------------------------------------
 
 🎉 **Ready to contribute!** The codebase follows strict patterns and comprehensive documentation. When in doubt, check the existing code and documentation patterns.

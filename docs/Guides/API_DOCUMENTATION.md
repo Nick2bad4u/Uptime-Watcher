@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "API & IPC Documentation"
+description: "Detailed documentation of Electron IPC handlers, renderer services, event flows, and data contracts used by the Uptime Watcher application."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "ipc"
+  - "api"
+  - "electron"
+  - "events"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # 📡 API & IPC Documentation
 
 > **Interface Reference**: Comprehensive guide to IPC communication, events, and API patterns in Uptime Watcher.
@@ -8,182 +28,71 @@ Uptime Watcher uses type-safe IPC (Inter-Process Communication) between the Elec
 
 ### Store Integration with Event Listeners (Zustand example)
 
-````typescript
-import { create } from "zustand";
+The renderer uses a dedicated Zustand store (`useSitesStore`) that consumes IPC-backed services (`SiteService`, `StateSyncService`, and others) and reacts to typed events. For a complete, up-to-date code sample, see the **Store Integration with Event Listeners** section later in this document.
+
+### Site lifecycle subscriptions via `EventsService`
+
+````markdown
+The renderer now exposes dedicated helpers for site lifecycle events. Using the
+service keeps cleanup logic consistent with other IPC subscriptions and avoids
+directly referencing `window.electronAPI` throughout the UI layer.
+
+```typescript
 import { useEffect } from "react";
-import { SiteService } from "../services/SiteService";
-import { StateSyncService } from "../services/StateSyncService";
 
-// Zustand store with comprehensive IPC and event integration
-export const useSitesStore = create<SitesStore>()((set, get) => ({
-  sites: [],
-  isLoading: false,
-  lastSyncTime: null,
+import { EventsService } from "../services/EventsService";
+import { useSitesStore } from "../stores/useSitesStore";
 
-  // State actions
-  setSites: (sites: Site[]) => set({ sites }),
-  addSite: (site: Site) =>
-    set((state) => ({
-      sites: [...state.sites, site],
-    })),
+export function useSiteLifecycleEvents(): void {
+  const addSite = useSitesStore((state) => state.addSite);
+  const updateSite = useSitesStore((state) => state.updateSite);
+  const removeSite = useSitesStore((state) => state.removeSite);
 
-  // Operations actions
-  fetchSites: async () => {
-    set({ isLoading: true });
-    try {
-      const sites = await SiteService.getSites();
-      set({ sites, lastSyncTime: Date.now() });
-    } catch (error) {
-      console.error("Failed to fetch sites:", error);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+  useEffect(() => {
+    const disposers: Array<() => void> = [];
+    let cancelled = false;
 
-  createSite: async (siteData: SiteCreationData) => {
-    const newSite = await SiteService.addSite(siteData);
-    // Don't manually add - event listener will handle it
-    ### Store Integration with Event Listeners
-
-    ```typescript
-    import { create } from "zustand";
-    import { useEffect } from "react";
-    import { SiteService } from "../services/SiteService";
-    import { StateSyncService } from "../services/StateSyncService";
-
-    // Zustand store with comprehensive IPC and event integration
-    export const useSitesStore = create<SitesStore>()((set, get) => ({
-      sites: [],
-      isLoading: false,
-      lastSyncTime: null,
-
-      // State actions
-      setSites: (sites: Site[]) => set({ sites }),
-      addSite: (site: Site) => set((state) => ({ sites: [...state.sites, site] })),
-
-      // Operations actions
-      fetchSites: async () => {
-        set({ isLoading: true });
-        try {
-          const sites = await SiteService.getSites();
-          set({ sites, lastSyncTime: Date.now() });
-        } catch (error) {
-          console.error("Failed to fetch sites:", error);
-        } finally {
-          set({ isLoading: false });
+    void EventsService.initialize()
+      .then(async () => {
+        if (cancelled) {
+          return;
         }
-      },
 
-      createSite: async (siteData: SiteCreationData) => {
-        const newSite = await SiteService.addSite(siteData);
-        // Don't manually add - event listener will handle it
-        return newSite;
-      },
-
-      // Event-driven sync (called by event listeners)
-      syncFromBackend: async () => {
-        const { sites } = await StateSyncService.requestFullSync();
-        set({ sites, lastSyncTime: Date.now() });
-      },
-    }));
-
-    // Setup event listeners (typically in root component or hook)
-    export const useSiteEventListeners = () => {
-      const syncFromBackend = useSitesStore((state) => state.syncFromBackend);
-
-      useEffect(() => {
-        let disposed = false;
-
-        const setup = async () => {
-          const cleanup = await StateSyncService.onStateSyncEvent((event) => {
-            if (disposed) {
-              return;
-            }
-
-            switch (event.action) {
-              case "bulk-sync":
-                syncFromBackend();
-                break;
-              case "update":
-              case "delete":
-                useSitesStore.getState().setSites(event.sites);
-                break;
-            }
-          });
-
-          return cleanup;
-        };
-
-        const subscriptionPromise = setup();
-
-        return () => {
-          disposed = true;
-          subscriptionPromise.then((cleanup) => cleanup?.()).catch(console.error);
-        };
-      }, [syncFromBackend]);
-    };
-    ```
-
-    ### Site lifecycle subscriptions via `EventsService`
-
-    The renderer now exposes dedicated helpers for site lifecycle events. Using the
-    service keeps cleanup logic consistent with other IPC subscriptions and avoids
-    directly referencing `window.electronAPI` throughout the UI layer.
-
-    ```typescript
-    import { useEffect } from "react";
-
-    import { EventsService } from "../services/EventsService";
-    import { useSitesStore } from "../stores/useSitesStore";
-
-    export function useSiteLifecycleEvents(): void {
-      const addSite = useSitesStore((state) => state.addSite);
-      const updateSite = useSitesStore((state) => state.updateSite);
-      const removeSite = useSitesStore((state) => state.removeSite);
-
-      useEffect(() => {
-        const disposers: Array<() => void> = [];
-        let cancelled = false;
-
-        void EventsService.initialize()
-          .then(async () => {
-            if (cancelled) {
-              return;
-            }
-
-            disposers.push(
-              await EventsService.onSiteAdded(({ site }) => {
-                addSite(site);
-              }),
-              await EventsService.onSiteUpdated(({ site }) => {
-                updateSite(site.identifier, site);
-              }),
-              await EventsService.onSiteRemoved(({ siteIdentifier }) => {
-                removeSite(siteIdentifier);
-              })
-            );
+        disposers.push(
+          await EventsService.onSiteAdded(({ site }) => {
+            addSite(site);
+          }),
+          await EventsService.onSiteUpdated(({ site }) => {
+            updateSite(site.identifier, site);
+          }),
+          await EventsService.onSiteRemoved(({ siteIdentifier }) => {
+            removeSite(siteIdentifier);
           })
-          .catch((error) => {
-            console.error("Failed to subscribe to site events", error);
-          });
+        );
+      })
+      .catch((error) => {
+        console.error("Failed to subscribe to site events", error);
+      });
 
-        return () => {
-          cancelled = true;
-          disposers.splice(0).forEach((dispose) => {
-            try {
-              dispose();
-            } catch (error) {
-              console.error("Failed to dispose site event handler", error);
-            }
-          });
-        };
-      }, [addSite, updateSite, removeSite]);
-    }
-    ```
-if (result) {
- console.log(`Manual check completed at ${new Date(result.timestamp)}`);
+    return () => {
+      cancelled = true;
+      disposers.splice(0).forEach((dispose) => {
+        try {
+          dispose();
+        } catch (error) {
+          console.error("Failed to dispose site event handler", error);
+        }
+      });
+    };
+  }, [addSite, updateSite, removeSite]);
 }
-````
+```
+
+```typescript
+if (result) {
+  console.log(`Manual check completed at ${new Date(result.timestamp)}`);
+}
+```
 
 #### `startMonitoring(): Promise<MonitoringStartSummary>`
 
@@ -226,9 +135,14 @@ if (summary.partialFailures) {
 }
 ```
 
-#### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<boolean>`
+#### `startMonitoringForMonitor(siteIdentifier: string, monitorId: string): Promise<void>`
 
-Starts monitoring for a specific monitor belonging to the given site. Emits the standard monitoring lifecycle and cache invalidation events when successful.
+Starts monitoring for a specific monitor belonging to the given site.
+
+- Resolves when the backend confirms that monitoring has started for the targeted monitor.
+- Throws an `Error` when the backend reports failure for that monitor.
+
+The renderer services and stores treat this method as a fire-and-validate operation; any follow-up status updates arrive via the usual monitoring events.
 
 ```typescript
 await MonitoringService.startMonitoringForMonitor(
@@ -1018,7 +932,7 @@ ipcService.registerStandardizedIpcHandler(
 
 ## 📝 Adding New APIs
 
-### 1. Define Types
+### 1\. Define Types
 
 ```typescript
 // shared/types/apiTypes.ts
@@ -1028,7 +942,7 @@ export interface NewFeatureData {
 }
 ```
 
-### 2. Create IPC Handler
+### 2\. Create IPC Handler
 
 ```typescript
 // electron/services/ipc/IpcService.ts
@@ -1041,7 +955,7 @@ ipcService.registerStandardizedIpcHandler(
 );
 ```
 
-### 3. Expose in Preload
+### 3\. Expose in Preload
 
 ```typescript
 // electron/preload.ts
@@ -1053,7 +967,7 @@ const electronAPI = {
 };
 ```
 
-### 4. Use in Frontend
+### 4\. Use in Frontend
 
 ```typescript
 // src/components/FeatureComponent.tsx
@@ -1065,3 +979,4 @@ const newFeature = await FeatureService.create(featureData);
 ---
 
 💡 **Best Practices**: Always use TypeScript interfaces, validate inputs, handle errors gracefully, and follow the verb-first hyphenated naming convention (`create-feature`, `get-sites`).
+````

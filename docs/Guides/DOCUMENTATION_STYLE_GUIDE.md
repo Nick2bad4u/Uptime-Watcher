@@ -1,3 +1,22 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Documentation Style Guide"
+description: "Guidelines covering file naming, headings, tables, code blocks, images, language, and structure for Uptime Watcher documentation."
+category: "guide"
+keywords:
+  - "uptime-watcher"
+  - "documentation"
+  - "style-guide"
+  - "markdown"
+misc:
+  doc_category: "Guides"
+  source: "Uptime-Watcher docs"
+---
+
 # Documentation Style Guide
 
 This guide establishes consistent formatting and content standards for all Markdown documentation in the Uptime Watcher project.

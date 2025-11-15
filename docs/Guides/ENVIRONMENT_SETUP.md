@@ -1,3 +1,23 @@
+---
+ai_note: "Updated by AI on 2025-11-15 to add metadata."
+summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
+creation_date: "unknown"
+last_modified_date: "2025-11-15"
+author: "Nick2bad4u"
+title: "Environment Setup Guide"
+description: "Describes required tools, IDE configuration, environment variables, database setup, testing commands, and platform-specific tips for Uptime Watcher development."
+category: "guide"
+keywords:
+   - "uptime-watcher"
+   - "environment"
+   - "setup"
+   - "development"
+   - "configuration"
+misc:
+   doc_category: "Guides"
+   source: "Uptime-Watcher docs"
+---
+
 # 🛠️ Environment Setup Guide
 
 > **Complete Setup**: Comprehensive guide for setting up the perfect development environment for Uptime Watcher.
@@ -6,8 +26,8 @@
 
 ### Required Software
 
-- **Node.js**: 20.15+ LTS (required)
-- **npm**: 10+ (comes with Node.js)
+- **Node.js**: 24.8+ (required)
+- **npm**: 11.5.2+ (comes with Node.js)
 - **Git**: Latest version
 - **VS Code**: Recommended IDE (with extensions)
 
@@ -19,7 +39,7 @@
 
 ## 🔧 Development Environment
 
-### 1. Node.js Setup
+### 1\. Node.js Setup
 
 #### Installation
 
@@ -27,11 +47,11 @@
 # Using Node Version Manager (recommended)
 # macOS/Linux
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-nvm install 20.15
-nvm use 20.15
+nvm install 24.8.0
+nvm use 24.8.0
 
 # Windows (using Chocolatey)
-choco install nodejs --version=20.15.0
+choco install nodejs --version=24.8.0
 
 # Or download directly from nodejs.org
 ```
@@ -39,11 +59,11 @@ choco install nodejs --version=20.15.0
 #### Verification
 
 ```bash
-node --version  # Should be 20.15+
-npm --version   # Should be 10+
+node --version  # Should be 24.8+
+npm --version   # Should be 11.5.2+
 ```
 
-### 2. VS Code Configuration
+### 2\. VS Code Configuration
 
 #### Required Extensions
 
@@ -135,7 +155,7 @@ Debugging configuration (`.vscode/launch.json`):
 }
 ```
 
-### 3. Git Configuration
+### 3\. Git Configuration
 
 #### Global Settings
 
@@ -158,7 +178,7 @@ npx husky install
 
 ## 🚀 Project Setup
 
-### 1. Clone and Install
+### 1\. Clone and Install
 
 ```bash
 # Clone the repository
@@ -174,7 +194,7 @@ npm run lint
 npm run test
 ```
 
-### 2. Environment Variables
+### 2\. Environment Variables
 
 Create `.env` file in project root (if needed):
 
@@ -199,7 +219,7 @@ DATABASE_PATH=./data/uptime-watcher.db
 # service.
 ```
 
-### 3. Database Setup
+### 3\. Database Setup
 
 The SQLite database is automatically initialized:
 
@@ -211,7 +231,7 @@ npm run copy-wasm
 npm run electron-dev
 ```
 
-### 4. Verify Setup
+### 4\. Verify Setup
 
 ```bash
 # Type checking
@@ -381,7 +401,7 @@ npm outdated
 
 For consistent development environments:
 
-```dockerfile
+```docker
 # Dockerfile.dev
 FROM node:20-alpine
 
@@ -505,7 +525,7 @@ sudo apt update
 sudo apt install build-essential git curl
 
 # Install Node.js via NodeSource
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
@@ -513,8 +533,8 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- [ ] Node.js 20.15+ installed and active
-- [ ] npm 10+ available
+- [ ] Node.js 24.8+ installed and active
+- [ ] npm 11.5.2+ available
 - [ ] Git configured with user details
 - [ ] VS Code with recommended extensions
 - [ ] Project cloned and dependencies installed
@@ -537,6 +557,6 @@ sudo apt-get install -y nodejs
 - [ ] Debugging configuration functional
 - [ ] Git hooks executing properly
 
----
+--------------------------------------------------------------------------------
 
 🎉 **You're all set!** Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER_QUICK_START.md) for next steps.
