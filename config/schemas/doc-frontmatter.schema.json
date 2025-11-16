@@ -1,0 +1,88 @@
+{
+    "$id": "https://uptime-watcher.dev/schemas/doc-frontmatter.schema.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "description": "Schema for YAML front-matter used in Uptime Watcher Markdown guides (e.g. docs/Guides/*.md).",
+    "properties": {
+        "audience": {
+            "description": "Optional intended audience labels (e.g. frontend, backend, ai-assistant).",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+        },
+        "author": {
+            "description": "Primary author or maintainer of the document.",
+            "minLength": 1,
+            "type": "string"
+        },
+        "category": {
+            "description": "Coarse document type; currently always 'guide' for docs/Guides/*.md.",
+            "enum": [
+                "guide"
+            ],
+            "type": "string"
+        },
+        "created": {
+            "description": "Date the document was originally created (YYYY-MM-DD), usually from git log.",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+        },
+        "last_reviewed": {
+            "description": "Date the content was last reviewed/updated (YYYY-MM-DD).",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "type": "string"
+        },
+        "status": {
+            "description": "Optional lifecycle state of the document.",
+            "enum": [
+                "draft",
+                "active",
+                "deprecated"
+            ],
+            "type": "string"
+        },
+        "summary": {
+            "description": "One-line description used for indexes and search.",
+            "minLength": 1,
+            "type": "string"
+        },
+        "tags": {
+            "description": "Small set of focused keywords describing technologies or domains.",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+        },
+        "title": {
+            "description": "Human-friendly document title (usually matches the H1).",
+            "minLength": 1,
+            "type": "string"
+        },
+        "topics": {
+            "description": "Optional higher-level areas (e.g. monitoring, architecture).",
+            "items": {
+                "minLength": 1,
+                "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+        }
+    },
+    "required": [
+        "author",
+        "category",
+        "created",
+        "last_reviewed",
+        "summary",
+        "tags",
+        "title"
+    ],
+    "title": "Uptime Watcher Documentation Front Matter",
+    "type": "object"
+}

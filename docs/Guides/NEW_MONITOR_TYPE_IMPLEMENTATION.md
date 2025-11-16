@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "New Monitor Type Implementation Guide"
-description: "Walks through all layers required to add a new monitor type, from shared contracts and backend services to persistence, renderer UI, and tests."
+summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
+created: "2025-08-01"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
    - "uptime-watcher"
    - "monitoring"
    - "monitor-types"
    - "implementation"
    - "guide"
-misc:
-   doc_category: "Guides"
-   source: "Uptime-Watcher docs"
 ---
 
 # Uptime Monitoring System - New Monitor Type Implementation Guide

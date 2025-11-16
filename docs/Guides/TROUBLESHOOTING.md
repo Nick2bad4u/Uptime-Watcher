@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Troubleshooting Guide"
-description: "Collects common problems and solutions covering SQLite WASM issues, ports, Electron startup, database locks, events, TypeScript, builds, performance, and debugging tooling."
+summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
+created: "2025-08-05"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
     - "uptime-watcher"
     - "troubleshooting"
     - "debugging"
     - "database"
     - "performance"
-misc:
-    doc_category: "Guides"
-    source: "Uptime-Watcher docs"
 ---
 
 # 🔧 Troubleshooting Guide

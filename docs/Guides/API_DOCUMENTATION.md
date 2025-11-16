@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "API & IPC Documentation"
-description: "Detailed documentation of Electron IPC handlers, renderer services, event flows, and data contracts used by the Uptime Watcher application."
+summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
+created: "2025-09-22"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "ipc"
   - "api"
   - "electron"
   - "events"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # 📡 API & IPC Documentation

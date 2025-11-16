@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "UI Feature Development Guide"
-description: "Covers architecture, props standards, state management, event handling, modals, reusable components, testing, and common pitfalls when developing UI features."
+summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
+created: "2025-08-02"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "ui"
   - "react"
   - "zustand"
   - "development"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # UI Feature Development Guide

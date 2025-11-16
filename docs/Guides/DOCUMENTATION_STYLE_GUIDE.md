@@ -1,25 +1,90 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Documentation Style Guide"
-description: "Guidelines covering file naming, headings, tables, code blocks, images, language, and structure for Uptime Watcher documentation."
+summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
+created: "2025-09-18"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "documentation"
   - "style-guide"
   - "markdown"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Documentation Style Guide
 
 This guide establishes consistent formatting and content standards for all Markdown documentation in the Uptime Watcher project.
+
+## Front matter schema
+
+All first-class documentation pages (including files under `docs/Guides/`) use a lightweight, internal-only front-matter format. This is **not** tied to any static site generator; it exists purely for search, tooling, and AI context.
+
+### Required fields
+
+Each file should start with:
+
+```yaml
+---
+title: "Human-friendly document title"
+summary: "One-line description used in indexes and search."
+created: "YYYY-MM-DD"        # usually taken from `git log --diff-filter=A`
+last_reviewed: "YYYY-MM-DD"  # last date the content was reviewed/updated
+category: "guide"            # coarse type; currently always "guide" for Guides
+author: "GitHub username or name"
+tags:
+  - "keyword-one"
+  - "keyword-two"
+---
+```
+
+Notes:
+
+- **title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
+- **summary**: Single sentence, kept short enough to show in an index or hover tooltip.
+- **created**: The original introduction date of the document. We typically derive this from git:
+
+  ```powershell
+  git log --diff-filter=A --follow --date=short --format="%ad" -- docs/Guides/FILE.md | Select-Object -Last 1
+  ```
+
+- **last_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
+- **category**: For now, this is simply `"guide"` for all files under `docs/Guides/`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
+- **author**: Use a consistent handle (for example, `"Nick2bad4u"`). Multiple authors are fine but uncommon.
+- **tags**: Small set of focused keywords. Prefer 3–7 tags that reflect technology (for example, `"vitest"`, `"ipc"`, `"zustand"`) or domain (for example, `"monitoring"`, `"events"`).
+
+### Deprecated / removed fields
+
+Older versions of the docs used additional fields like:
+
+- `ai_note`
+- `description`
+- `keywords`
+- `misc.doc_category`
+- `misc.source`
+
+These have been removed in favor of the simpler schema above:
+
+- `summary` replaces `description` as the canonical short description.
+- `tags` replaces both `keywords` and `misc.doc_category`.
+- `ai_note` and `misc.source` are no longer used.
+
+When editing existing docs, do not reintroduce these fields.
+
+### Optional fields for future use
+
+We may introduce a few optional metadata fields over time. If you use them, keep names and shapes consistent:
+
+```yaml
+status: "active"        # or "draft" | "deprecated"
+topics:
+  - "monitoring"       # higher-level areas than tags
+  - "architecture"
+audience:
+  - "frontend"         # "backend" | "full-stack" | "ai-assistant" etc.
+```
+
+These are not required today but give us room to express intent (for example, marking a doc as deprecated, or indicating it is primarily for backend engineers).
 
 ## � File Naming Conventions
 

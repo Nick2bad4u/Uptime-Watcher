@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Layered validation strategy for Uptime Watcher, from UI through IPC, managers, repositories, and background services."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Validation Strategy"
-description: "Describes validation responsibilities per layer, principles like fail-fast and structured errors, and how to implement and test new validation rules."
+summary: "Layered validation strategy for Uptime Watcher, from UI through IPC, managers, repositories, and background services."
+created: "2025-10-21"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
    - "uptime-watcher"
    - "validation"
    - "ipc"
    - "managers"
    - "repositories"
-misc:
-   doc_category: "Guides"
-   source: "Uptime-Watcher docs"
 ---
 
 # Validation Strategy

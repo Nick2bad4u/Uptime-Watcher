@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Setup and architecture of the Docusaurus + TypeDoc documentation site for Uptime Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Docusaurus Documentation Setup Guide"
-description: "Explains how Docusaurus, TypeDoc, and project documents are wired together, including configs, build scripts, and deployment to GitHub Pages."
+summary: "Setup and architecture of the Docusaurus + TypeDoc documentation site for Uptime Watcher."
+created: "2025-08-22"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
    - "uptime-watcher"
    - "docusaurus"
    - "typedoc"
    - "documentation"
    - "github-pages"
-misc:
-   doc_category: "Guides"
-   source: "Uptime-Watcher docs"
 ---
 
 # Docusaurus Documentation Setup Guide

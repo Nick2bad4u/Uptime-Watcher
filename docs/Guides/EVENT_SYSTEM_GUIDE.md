@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Guide to the TypedEventBus-based event system used for real-time communication in Uptime Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Event System Guide"
-description: "Explains the architecture, metadata, middleware, frontend integration, and testing strategies for the TypedEventBus and EventsService event system."
+summary: "Guide to the TypedEventBus-based event system used for real-time communication in Uptime Watcher."
+created: "2025-09-22"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "events"
   - "TypedEventBus"
   - "ipc"
   - "realtime"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Event System Guide

@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Error Handling Guide"
-description: "Documents the centralized error store, withErrorHandling utilities, validation error handling, and best practices for propagating and testing errors across the app."
+summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
+created: "2025-09-22"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "error-handling"
   - "zustand"
   - "validation"
   - "testing"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Error Handling Guide

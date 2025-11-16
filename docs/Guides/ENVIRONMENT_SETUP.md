@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Environment Setup Guide"
-description: "Describes required tools, IDE configuration, environment variables, database setup, testing commands, and platform-specific tips for Uptime Watcher development."
+summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
+created: "2025-08-05"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
    - "uptime-watcher"
    - "environment"
    - "setup"
    - "development"
    - "configuration"
-misc:
-   doc_category: "Guides"
-   source: "Uptime-Watcher docs"
 ---
 
 # 🛠️ Environment Setup Guide
@@ -363,7 +358,13 @@ npm run test:shared    # Shared utility tests
 
 ```bash
 # Generate coverage reports
-npm run test:coverage
+npm run test:coverage             # Combined frontend + electron + shared coverage
+# Frontend-only coverage (if you want a faster run focused on the renderer)
+npm run test:coverage:frontend
+# Electron-only coverage
+npm run test:electron:coverage
+# Shared-only coverage
+npm run test:shared:coverage
 
 # View coverage reports
 open coverage/index.html          # macOS
@@ -468,7 +469,10 @@ npm run copy-wasm              # Copy SQLite WASM files
 
 # Testing commands
 npm run test                   # Run all tests
-npm run test:coverage          # Run tests with coverage
+npm run test:coverage          # Run tests with coverage (frontend + electron + shared)
+npm run test:coverage:frontend # Run frontend tests with coverage only
+npm run test:electron:coverage # Run Electron/backend tests with coverage only
+npm run test:shared:coverage   # Run shared utility tests with coverage only
 npm run test:electron          # Run Electron/backend tests
 npm run test:frontend          # Run frontend tests
 npm run test:shared            # Run shared utility tests

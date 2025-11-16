@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Type-fest Integration Patterns"
-description: "Outlines when and how to use type-fest helpers such as UnknownRecord, LiteralUnion, Simplify, SetOptional, CamelCase, ReadonlyDeep, and PartialDeep for safer TypeScript."
+summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
+created: "2025-08-28"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "type-fest"
   - "typescript"
   - "types"
   - "patterns"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Type-fest Integration Patterns

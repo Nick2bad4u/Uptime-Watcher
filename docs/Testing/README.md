@@ -119,9 +119,10 @@ npm run test:electron
 npm run test:shared
 
 # Run tests with coverage
-npm run test:coverage
-npm run test:electron:coverage
-npm run test:shared:coverage
+npm run test:coverage             # Frontend + Electron + Shared coverage
+npm run test:coverage:frontend    # Frontend-only coverage
+npm run test:electron:coverage    # Electron-only coverage
+npm run test:shared:coverage      # Shared-only coverage
 
 # Playwright / E2E suites
 npm run test:playwright

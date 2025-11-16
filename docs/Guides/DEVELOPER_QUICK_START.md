@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Developer Quick Start Guide"
-description: "Step-by-step instructions to clone the repository, install dependencies, run the dev environment, and understand the core architecture of Uptime Watcher."
+summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
+created: "2025-09-22"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "development"
   - "setup"
   - "quick-start"
   - "architecture"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # 🚀 Developer Quick Start Guide

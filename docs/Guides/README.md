@@ -1,20 +1,15 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Overview of the docs/Guides directory, its structure, and how to navigate and contribute to Uptime Watcher guides."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Guides Documentation"
-description: "Describes the contents of the Guides folder, recommended starting points for developers and AI assistants, and how to keep guides up to date."
+summary: "Overview of the docs/Guides directory, its structure, and how to navigate and contribute to Uptime Watcher guides."
+created: "2025-09-18"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
 	- "uptime-watcher"
 	- "guides"
 	- "documentation"
 	- "index"
-misc:
-	doc_category: "Guides"
-	source: "Uptime-Watcher docs"
 ---
 
 # Guides documentation

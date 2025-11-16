@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Testing and Coverage Setup"
-description: "Describes the triple Vitest configuration, Electron API mocking, coverage reporters, CI integration, and best practices for maintaining high test coverage."
+summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
+created: "2025-06-30"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "testing"
   - "vitest"
   - "coverage"
   - "ci"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Testing and Coverage Setup
@@ -91,7 +86,8 @@ npm run test:all
 # Frontend tests (renderer)
 npm run test               # Frontend tests via vitest.config.ts
 npm run test:frontend      # Explicit alias for renderer suite
-npm run test:coverage      # Frontend coverage
+npm run test:coverage      # Combined coverage (frontend + electron + shared)
+npm run test:coverage:frontend      # Frontend-only coverage
 
 # Electron (main process) tests
 npm run test:electron

@@ -80,11 +80,15 @@ Uses `--reporter=verbose --no-truncate` for complete output with no truncation.
 
 Coverage tests also support verbosity levels:
 
-- `npm run test:coverage` (default)
-- `npm run test:coverage:quiet`
-- `npm run test:coverage:minimal`
-- `npm run test:coverage:verbose`
-- `npm run test:coverage:detailed`
+- `npm run test:coverage` (default aggregate: frontend + electron + shared)
+- `npm run test:coverage:quiet` (frontend-only, quiet)
+- `npm run test:coverage:minimal` (frontend-only, dot reporter)
+- `npm run test:coverage:verbose` (frontend-only, verbose reporter)
+- `npm run test:coverage:detailed` (frontend-only, verbose + no truncation)
+
+For suite-specific coverage with custom verbosity, pair the appropriate
+frontend coverage command with `npm run test:electron:coverage` and
+`npm run test:shared:coverage` as needed.
 
 ## Special Documentation Downloader Tests
 

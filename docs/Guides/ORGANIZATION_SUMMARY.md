@@ -1,20 +1,15 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Summary of the documentation reorganization, including the new structure for essential docs and archived materials."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Documentation Organization Summary"
-description: "Describes how the docs folder was cleaned up, the new layout for essential, architecture, guides, and archive sections, and the benefits for developers."
+summary: "Summary of the documentation reorganization, including the new structure for essential docs and archived materials."
+created: "2025-08-05"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
     - "uptime-watcher"
     - "documentation"
     - "organization"
     - "archive"
-misc:
-    doc_category: "Guides"
-    source: "Uptime-Watcher docs"
 ---
 
 # 📁 Documentation Organization Summary

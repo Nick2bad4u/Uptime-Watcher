@@ -5,6 +5,8 @@ name: "AddToDo"
 description: "Create Detailed TODO List and Address Issues"
 ---
 
+# Uptime Watcher TODO Management Prompt
+
 - Begin by clearing any existing TODO list to ensure a fresh start. Then, compile a comprehensive list of all pending tasks, issues, or requirements into detailed TODO items.
 - Each TODO item must include sufficient context, such as the problem description, relevant files or components, potential dependencies, estimated effort, and any prerequisites or blockers.
 - Store these in the designated TODO.md file at the repository root, ensuring the descriptions are thorough enough that anyone can resume work on them without prior knowledge of the project or task history.

@@ -1,21 +1,16 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Guide to running Storybook-driven component tests using Vitest, Playwright, and MSW within Uptime Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
 title: "Storybook Vitest Component Testing"
-description: "Explains how Storybook, the Vitest addon, Playwright browser mode, and MSW are configured to run component tests and generate coverage for Uptime Watcher."
+summary: "Guide to running Storybook-driven component tests using Vitest, Playwright, and MSW within Uptime Watcher."
+created: "2025-09-25"
+last_reviewed: "2025-11-15"
 category: "guide"
-keywords:
+author: "Nick2bad4u"
+tags:
   - "uptime-watcher"
   - "storybook"
   - "vitest"
   - "playwright"
   - "testing"
-misc:
-  doc_category: "Guides"
-  source: "Uptime-Watcher docs"
 ---
 
 # Storybook Vitest Component Testing
