@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing and Coverage Setup"
 summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
 created: "2025-06-30"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

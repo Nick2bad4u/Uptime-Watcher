@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Vite Performance Profiling and Optimization Guide"
 summary: "Guide to profiling, warming, and optimizing Vite performance for the Uptime Watcher application."
 created: "2025-09-22"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

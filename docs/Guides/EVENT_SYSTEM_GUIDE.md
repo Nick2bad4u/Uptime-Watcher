@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Event System Guide"
 summary: "Guide to the TypedEventBus-based event system used for real-time communication in Uptime Watcher."
 created: "2025-09-22"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

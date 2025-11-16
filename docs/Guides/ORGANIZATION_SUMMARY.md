@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Organization Summary"
 summary: "Summary of the documentation reorganization, including the new structure for essential docs and archived materials."
 created: "2025-08-05"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

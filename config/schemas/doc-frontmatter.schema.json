@@ -40,6 +40,11 @@
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
             "type": "string"
         },
+        "schema": {
+            "description": "Optional JSON Schema reference used by editors to validate front matter.",
+            "minLength": 1,
+            "type": "string"
+        },
         "status": {
             "description": "Optional lifecycle state of the document.",
             "enum": [

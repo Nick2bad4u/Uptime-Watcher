@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Docusaurus Documentation Setup Guide"
 summary: "Setup and architecture of the Docusaurus + TypeDoc documentation site for Uptime Watcher."
 created: "2025-08-22"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

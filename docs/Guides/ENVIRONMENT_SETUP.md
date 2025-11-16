@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Environment Setup Guide"
 summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
 created: "2025-08-05"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

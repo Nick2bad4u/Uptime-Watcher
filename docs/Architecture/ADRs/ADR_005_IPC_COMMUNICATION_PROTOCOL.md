@@ -4,7 +4,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-005: IPC Communication Protocol"
 summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation and error handling."
 created: "2025-08-05"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

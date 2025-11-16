@@ -4,7 +4,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Uptime Watcher Architecture Diagram"
 summary: "High-level architecture diagram showing data flow between frontend, preload bridge, IPC service, orchestrator, managers, repositories, and database."
 created: "2025-10-15"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

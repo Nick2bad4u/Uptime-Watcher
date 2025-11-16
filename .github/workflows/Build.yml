@@ -465,36 +465,152 @@ jobs:
               id: organize_distributables
               shell: bash
               run: |
-                  mkdir -p release-dist
-                  echo "Before copy, contents of ./artifacts:"
-                  ls -R ./artifacts
+                  set -uo pipefail
+                  # NOTE: not using `set -e` so we can log and continue on some failures
 
-                  for artifact_dir in ./artifacts/dist-*; do
-                    [ -d "$artifact_dir" ] || continue
+                  echo "=== Step: Organize distributables by platform and arch ==="
+                  echo "Working directory: $(pwd)"
+                  echo "Directory listing (.)"
+                  ls -la
+
+                  echo
+                  echo "=== Check ./artifacts exists and contents ==="
+                  if [ ! -d "./artifacts" ]; then
+                    echo "ERROR: ./artifacts directory does not exist."
+                    exit 1
+                  fi
+
+                  echo "Before copy, contents of ./artifacts:"
+                  ls -R ./artifacts || { echo "ERROR: ls -R ./artifacts failed"; exit 1; }
+
+                  echo
+                  echo "=== Creating release-dist directory ==="
+                  mkdir -p release-dist
+                  echo "Created release-dist. Current contents:"
+                  ls -la release-dist || echo "WARNING: ls release-dist failed (non-fatal)."
+
+                  echo
+                  echo "=== Finding dist-* artifact directories ==="
+                  shopt -s nullglob
+                  artifact_dirs=(./artifacts/dist-*)
+                  shopt -u nullglob
+
+                  echo "Number of matching artifact dirs: ${#artifact_dirs[@]}"
+                  if [ "${#artifact_dirs[@]}" -eq 0 ]; then
+                    echo "WARNING: No ./artifacts/dist-* directories found."
+                  else
+                    printf 'Found artifact dirs:\n'
+                    for d in "${artifact_dirs[@]}"; do
+                      echo "  - $d"
+                    done
+                  fi
+
+                  echo
+                  echo "=== Begin processing artifacts ==="
+                  for artifact_dir in "${artifact_dirs[@]}"; do
+                    echo
+                    echo "----- Processing artifact_dir: $artifact_dir -----"
+
+                    if [ ! -d "$artifact_dir" ]; then
+                      echo "SKIP: $artifact_dir is not a directory."
+                      continue
+                    fi
+
                     artifact_name=$(basename "$artifact_dir")
                     platform_arch=${artifact_name#dist-}
-                    mkdir -p "release-dist/$platform_arch"
-                    echo "Copying main files from $artifact_dir to release-dist/$platform_arch/"
-                    cp -v "$artifact_dir"/Uptime-Watcher-* "$artifact_dir"/*.yml "release-dist/$platform_arch/" 2>/dev/null || true
-                    # Rename latest-mac.yml if it exists
-                    if [ -f "$artifact_dir/latest-mac.yml" ]; then
-                      cp "$artifact_dir/latest-mac.yml" "release-dist/$platform_arch/latest-$platform_arch.yml"
-                      rm "$artifact_dir/latest-mac.yml"
-                    fi
-                    for subdir in nsis-web squirrel-windows squirrel-windows-ia32; do
-                      if [ -d "$artifact_dir/$subdir" ]; then
-                        echo "Copying $artifact_dir/$subdir to release-dist/$platform_arch/"
-                        cp -r "$artifact_dir/$subdir" "release-dist/$platform_arch/"
+
+                    echo "artifact_name: $artifact_name"
+                    echo "platform_arch: $platform_arch"
+
+                    target_dir="release-dist/$platform_arch"
+                    echo "Target directory: $target_dir"
+
+                    mkdir -p "$target_dir" || { echo "ERROR: Failed to create $target_dir"; exit 1; }
+
+                    echo
+                    echo "Listing artifact_dir contents for debugging:"
+                    ls -la "$artifact_dir" || { echo "ERROR: Failed to list $artifact_dir"; exit 1; }
+
+                    echo
+                    echo "Copying main files from $artifact_dir to $target_dir"
+                    echo "Glob patterns:"
+                    echo "  - $artifact_dir/Uptime-Watcher-*"
+                    echo "  - $artifact_dir/*.yml"
+
+                    # Expand globs explicitly so we can see what exists
+                    main_files=()
+                    for f in "$artifact_dir"/Uptime-Watcher-* "$artifact_dir"/*.yml; do
+                      if [ -e "$f" ]; then
+                        main_files+=("$f")
                       fi
                     done
-                    # Remove generic latest-mac.yml if it was copied, only keep the renamed one
-                    if [ -f "release-dist/$platform_arch/latest-mac.yml" ]; then
-                      rm "release-dist/$platform_arch/latest-mac.yml"
+
+                    echo "Resolved main_files (${#main_files[@]}):"
+                    if [ "${#main_files[@]}" -eq 0 ]; then
+                      echo "  (none found)"
+                    else
+                      for f in "${main_files[@]}"; do
+                        echo "  - $f"
+                      done
                     fi
+
+                    if [ "${#main_files[@]}" -gt 0 ]; then
+                      if ! cp -v "${main_files[@]}" "$target_dir/"; then
+                        echo "ERROR: Failed to copy main files for $artifact_dir"
+                        # Do not exit so we can continue and see other artifacts
+                      fi
+                    fi
+
+                    echo
+                    echo "Handling latest-mac.yml rename, if present"
+                    if [ -f "$artifact_dir/latest-mac.yml" ]; then
+                      new_latest="$target_dir/latest-$platform_arch.yml"
+                      echo "Found $artifact_dir/latest-mac.yml, copying to $new_latest"
+                      if cp -v "$artifact_dir/latest-mac.yml" "$new_latest"; then
+                        echo "Removing original latest-mac.yml from $artifact_dir"
+                        rm -v "$artifact_dir/latest-mac.yml" || echo "WARNING: Failed to remove $artifact_dir/latest-mac.yml"
+                      else
+                        echo "ERROR: Failed to copy latest-mac.yml for $artifact_dir"
+                      fi
+                    else
+                      echo "No latest-mac.yml found in $artifact_dir"
+                    fi
+
+                    echo
+                    echo "Copying subdirectories (nsis-web, squirrel-windows, squirrel-windows-ia32)"
+                    for subdir in nsis-web squirrel-windows squirrel-windows-ia32; do
+                      src_subdir="$artifact_dir/$subdir"
+                      if [ -d "$src_subdir" ]; then
+                        echo "Copying directory: $src_subdir -> $target_dir/"
+                        if ! cp -rv "$src_subdir" "$target_dir/"; then
+                          echo "ERROR: Failed to copy $src_subdir"
+                        fi
+                      else
+                        echo "Subdir not found (skipping): $src_subdir"
+                      fi
+                    done
+
+                    echo
+                    echo "Checking for stray latest-mac.yml in $target_dir"
+                    if [ -f "$target_dir/latest-mac.yml" ]; then
+                      echo "Removing stray $target_dir/latest-mac.yml"
+                      rm -v "$target_dir/latest-mac.yml" || echo "WARNING: Failed to remove $target_dir/latest-mac.yml"
+                    else
+                      echo "No stray latest-mac.yml found in $target_dir"
+                    fi
+
+                    echo "----- Finished artifact_dir: $artifact_dir -----"
                   done
 
-                  echo "After copy, contents of release-dist:"
-                  ls -R release-dist
+                  echo
+                  echo "=== Final contents of release-dist ==="
+                  if [ -d "release-dist" ]; then
+                    ls -R release-dist || echo "WARNING: ls -R release-dist failed."
+                  else
+                    echo "WARNING: release-dist directory was not created."
+                  fi
+
+                  echo "=== Organize step complete ==="
 
             - name: Fix all sha512 in latest*.yml files
               id: fix_sha512

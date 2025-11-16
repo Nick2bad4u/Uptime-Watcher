@@ -4,7 +4,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Repository Template (Clean Variant)"
 summary: "Clean repository template variant for repositories that depend only on DatabaseService and shared operational hooks without additional logging abstractions."
 created: "2025-08-05"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

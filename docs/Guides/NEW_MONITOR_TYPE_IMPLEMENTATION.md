@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "New Monitor Type Implementation Guide"
 summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
 created: "2025-08-01"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

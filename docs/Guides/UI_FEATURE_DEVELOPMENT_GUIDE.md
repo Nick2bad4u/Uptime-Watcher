@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "UI Feature Development Guide"
 summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
 created: "2025-08-02"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

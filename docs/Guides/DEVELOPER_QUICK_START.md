@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Developer Quick Start Guide"
 summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
 created: "2025-09-22"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

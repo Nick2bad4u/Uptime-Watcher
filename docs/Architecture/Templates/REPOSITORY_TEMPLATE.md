@@ -4,7 +4,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Repository Template"
 summary: "Provides a template for implementing repository classes with the dual-method pattern, transaction safety, and operational hooks."
 created: "2025-08-05"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

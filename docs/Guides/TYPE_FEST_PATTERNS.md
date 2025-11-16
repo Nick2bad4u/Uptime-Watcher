@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Type-fest Integration Patterns"
 summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
 created: "2025-08-28"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:

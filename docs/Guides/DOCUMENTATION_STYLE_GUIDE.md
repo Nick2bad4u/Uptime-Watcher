@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Style Guide"
 summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
 created: "2025-09-18"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -59,7 +59,7 @@ Notes:
   git log --diff-filter=A --follow --date=short --format="%ad" -- docs/Guides/FILE.md | Select-Object -Last 1
   ```
 
-- **last\_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
+- **last_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
 
 - **category**: For now, this is simply `"guide"` for all files under `docs/Guides/` and `docs/Architecture/**`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
 

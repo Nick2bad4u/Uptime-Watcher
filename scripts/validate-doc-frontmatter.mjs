@@ -15,7 +15,8 @@
  *   `tags`, `title`
  * - Allowed keys only (no deprecated/unknown fields)
  * - Basic type and format checks (arrays vs strings, date formats, enums)
- * - `$schema` value points at the doc-frontmatter schema file
+ * - `schema` value points at the doc-frontmatter schema file (legacy `$schema`
+ *   still accepted)
  */
 
 import { readFile, readdir } from "node:fs/promises";
@@ -356,14 +357,16 @@ function validateAgainstSchema(schema, data, filePath) {
 
     // Per-property checks
     for (const [key, rawDefinition] of Object.entries(properties)) {
-        const definition = /** @type {{
-    type?: string;
-    enum?: string[];
-    minLength?: number;
-    pattern?: string;
-    minItems?: number;
-    items?: { type?: string };
-}} */ (rawDefinition);
+        const definition = /**
+         * @type {{
+         *     type?: string;
+         *     enum?: string[];
+         *     minLength?: number;
+         *     pattern?: string;
+         *     minItems?: number;
+         *     items?: { type?: string };
+         * }}
+         */ (rawDefinition);
 
         const value = data[key];
         if (value === undefined || value === null) {
@@ -432,17 +435,23 @@ function validateAgainstSchema(schema, data, filePath) {
         }
     }
 
-    // Additional check for $schema to catch path mistakes.
-    const schemaRef = data["$schema"];
-    if (typeof schemaRef !== "string") {
+    // Additional check for schema reference to catch path mistakes.
+    const schemaRef =
+        typeof data["schema"] === "string"
+            ? data["schema"]
+            : typeof data["$schema"] === "string"
+              ? data["$schema"]
+              : null;
+
+    if (schemaRef === null) {
         errors.push(
-            "Front matter must include a string '$schema' property pointing to config/schemas/doc-frontmatter.schema.json."
+            "Front matter must include a string 'schema' property (or legacy '$schema') pointing to config/schemas/doc-frontmatter.schema.json."
         );
     } else if (
         !schemaRef.endsWith("config/schemas/doc-frontmatter.schema.json")
     ) {
         errors.push(
-            `'$schema' should reference config/schemas/doc-frontmatter.schema.json (received '${schemaRef}').`
+            `'schema' should reference config/schemas/doc-frontmatter.schema.json (received '${schemaRef}').`
         );
     }
 

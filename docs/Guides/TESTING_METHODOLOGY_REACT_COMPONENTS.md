@@ -4,7 +4,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "React Component Testing Methodology"
 summary: "Testing methodology and patterns for React components in Uptime Watcher using Vitest and React Testing Library."
 created: "2025-09-22"
-last\_reviewed: "2025-11-15"
+last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
