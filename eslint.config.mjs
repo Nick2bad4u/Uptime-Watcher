@@ -8119,6 +8119,7 @@ export default /** @type {EslintConfig} */ [
                         "config/testing/vitest.zero-coverage.config.ts",
                         "config/tools/knip.config.ts",
                         "config/tools/createPlaywrightCoveragePlugin.ts",
+                        "electron-builder.config.ts",
                     ],
                     defaultProject: "config/testing/tsconfig.configs.json",
                     maximumDefaultProjectFileMatchCount_THIS_WILL_SLOW_DOWN_LINTING: 24,

@@ -71,6 +71,7 @@
         "../../storybook/vitest.setup.ts",
         "../../vite.config.ts",
         "../../tailwind.config.mjs",
+        "../../electron-builder.config.ts",
         "storybook/viteSharedConfig",
         "vite/client"
     ],

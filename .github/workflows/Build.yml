@@ -252,30 +252,40 @@ jobs:
               id: build_app
               shell: bash
               run: |
+                  # For macOS universal builds, remove optional native ws accelerators
+                  # (bufferutil, utf-8-validate) so @electron/universal does not attempt
+                  # to merge their non-Mach-O .node binaries. ws will transparently
+                  # fall back to its pure JS implementation when these modules are
+                  # missing, which is acceptable for the macOS universal target.
+                  if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+                    echo "Removing optional ws native deps (bufferutil, utf-8-validate) for macOS universal build"
+                    rm -rf node_modules/bufferutil node_modules/utf-8-validate || true
+                  fi
+
                   if [[ "${{ runner.os }}" == "Windows" ]]; then
                     if [[ "${{ matrix.arch }}" == "x64" ]]; then
-                      npx electron-builder --win
+                      npx electron-builder --config electron-builder.config.ts --win
                     else
-                      npx electron-builder --win --ia32
+                      npx electron-builder --config electron-builder.config.ts --win --ia32
                     fi
                   elif [[ "${{ matrix.os }}" == "macos-15" ]]; then
-                    npx electron-builder --arm64
+                    npx electron-builder --config electron-builder.config.ts --arm64
                   elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-                    npx electron-builder --universal
+                    npx electron-builder --config electron-builder.config.ts --universal
                   elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
-                    npx electron-builder --mac --${{ matrix.arch }}
+                    npx electron-builder --config electron-builder.config.ts --mac --${{ matrix.arch }}
                   elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
                     if [[ "${{ matrix.arch }}" == "x64" ]]; then
-                      npx electron-builder --win
+                      npx electron-builder --config electron-builder.config.ts --win
                     else
-                      npx electron-builder --win --ia32
+                      npx electron-builder --config electron-builder.config.ts --win --ia32
                     fi
                   elif [[ "${{ matrix.os }}" == "ubuntu-24.04-arm" ]]; then
-                    npx electron-builder --linux --arm64
+                    npx electron-builder --config electron-builder.config.ts --linux --arm64
                   elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-                    npx electron-builder --linux --${{ matrix.arch }}
+                    npx electron-builder --config electron-builder.config.ts --linux --${{ matrix.arch }}
                   else
-                    npx electron-builder --${{ matrix.arch }}
+                    npx electron-builder --config electron-builder.config.ts --${{ matrix.arch }}
                   fi
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

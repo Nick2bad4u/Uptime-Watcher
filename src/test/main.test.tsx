@@ -138,20 +138,22 @@ describe("Main Entry Point", () => {
         annotate("Category: Core", "category");
         annotate("Type: Error Handling", "type");
 
-        const consoleErrorSpy = vi
-            .spyOn(console, "error")
-            .mockImplementation(() => {});
+        // Ensure the root element lookup fails
         (document.getElementById as any).mockReturnValue(null);
 
-        // The import should succeed but log an error
+        // Spy on the structured application logger to verify error handling
+        const { logger } = await import("../services/logger");
+        const loggerErrorSpy = vi.spyOn(logger.app, "error");
+
+        // The import should succeed but log an initialization error
         await import("../main");
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Failed to initialize application:",
+        expect(loggerErrorSpy).toHaveBeenCalledWith(
+            "initializeApp",
             expect.any(Error)
         );
 
-        consoleErrorSpy.mockRestore();
+        loggerErrorSpy.mockRestore();
     });
 
     it("should use getElementById for root element lookup", async ({
