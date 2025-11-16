@@ -7,19 +7,818 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[6aecdbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)...
-[6aecdbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6aecdbd448df65bde76b32248727a91da1553394...6aecdbd448df65bde76b32248727a91da1553394))
+[[bde7592](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)...
+[bde7592](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bde7592599f3ebe80f497f5c85fb7bfe0e59e308...bde7592599f3ebe80f497f5c85fb7bfe0e59e308))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 18.6.0 [`(bde7592)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)
+
+
+
+
+
+
+## [18.6.0] - 2025-11-16
+
+
+[[a8fcd7d](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a8fcd7dc2f03f1760700d93f8bd393152851abe0)...
+[e605499](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6054997dc4d74ced490662e94c0156e153b3414)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/a8fcd7dc2f03f1760700d93f8bd393152851abe0...e6054997dc4d74ced490662e94c0156e153b3414))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.5.0 [`(a8fcd7d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a8fcd7dc2f03f1760700d93f8bd393152851abe0)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update metadata and structure in documentation files
+
+ - 📄 Update last reviewed date and created date in Architecture documentation
+ - 📄 Refactor Consistency Guide to include metadata, topics, and tags
+ - 📄 Enhance Testing documentation with metadata, topics, and tags
+ - 📄 Revise Docusaurus README to include metadata and topics
+ - 📄 Improve ESLint Config Inspector Deployment summary with metadata and topics
+ - 📄 Modify Markdown page example to include metadata and topics
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(ab90f2f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ab90f2fa1cca5634195783f3e79a5fa7dd8e4ecf)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Optimize file handling in build workflow
+ - 🛠️ Move main files instead of copying to reduce disk usage
+ - 🛠️ Rename latest-mac.yml to architecture-specific name after moving
+ - 🛠️ Update directory handling to use move instead of copy for subdirectories
+
+🧪 [test] Enhance error logging in main application tests
+ - 🛠️ Mock structured logger for consistent error assertions
+ - 🛠️ Update tests to verify structured logger captures initialization errors
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e605499)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e6054997dc4d74ced490662e94c0156e153b3414)
+
+
+
+
+
+
+## [18.5.0] - 2025-11-16
+
+
+[[2410d14](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2410d14d94638f5148ea949e7f3332a4935c989b)...
+[a271f8a](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a271f8aa5516cee2d7604a6ace12612a5a51be81)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/2410d14d94638f5148ea949e7f3332a4935c989b...a271f8aa5516cee2d7604a6ace12612a5a51be81))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.4.0 [`(2410d14)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2410d14d94638f5148ea949e7f3332a4935c989b)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update documentation front-matter and content
+
+ - 📝 Update front-matter in multiple guide documents to include schema reference
+ - 📝 Adjust tags formatting for consistency across documentation
+ - 📝 Revise section headings in UI Feature Development Guide for clarity
+ - 📝 Enhance validation strategy documentation with improved summaries
+
+🛠️ [fix] Modify types and interfaces for better clarity
+
+ - 🔧 Change `monitorId` in `StopMonitoringRequestData` to be required
+ - 🛠️ Update event types to mark `monitorId` as optional in relevant events
+
+🎨 [style] Improve code comments and formatting
+
+ - 🎨 Standardize comment styles in Playwright testing guide for better readability
+ - 🎨 Refactor comments in `useAlertStore` tests for consistency in capitalization
+
+🧪 [test] Enhance test cases for alert store
+
+ - 🧪 Update assertions in `useAlertStore` tests to improve clarity and accuracy
+ - 🧪 Refine regex patterns in tests to ensure they match expected alert ID formats
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(aae9ed0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/aae9ed0c28634c745bfa2e5c6dffcea4e2b9443b)
+
+
+- 📝 [docs] Update documentation metadata and structure across multiple guides
+
+ - 📝 [docs] Revise metadata in `DOCUSAURUS_SETUP_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `ENVIRONMENT_SETUP.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `ERROR_HANDLING_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `EVENT_SYSTEM_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `FALLBACK_SYSTEM_USAGE_ANALYSIS.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `IPC_AUTOMATION_WORKFLOW.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `MONITORING_RACE_CONDITION_SOLUTION_PLAN.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `NEW_MONITOR_TYPE_IMPLEMENTATION.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `ORGANIZATION_SUMMARY.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `README.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `RENDERER_INTEGRATION_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `STORYBOOK_VITEST_COMPONENT_TESTING.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `STYLE_LAYOUT_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TECHNOLOGY_EVOLUTION.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TESTING.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TESTING_METHODOLOGY_REACT_COMPONENTS.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TOOLS_AND_COMMANDS_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TROUBLESHOOTING.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `TYPE_FEST_PATTERNS.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `UI_FEATURE_DEVELOPMENT_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `VITE_PERFORMANCE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `ZUSTAND_STORE_PATTERN_GUIDE.md` to include created and last reviewed dates, and update summary and tags.
+ - 📝 [docs] Revise metadata in `validation-strategy.md` to include created and last reviewed dates, and update summary and tags.
+ - 🧪 [test] Add unit tests for monitor-specific type guards in `typeGuards.monitor.test.ts`.
+ - 🧪 [test] Add focused tests for the `DashboardOverview` component in `DashboardOverview.test.tsx`.
+ - 📝 [docs] Update testing commands in `README.md` and `TEST_VERBOSITY_GUIDE.md` for clarity and detail.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9baac00)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9baac00ca9c88ebb45a33d1ee25f694a87da716b)
+
+
+- 📝 [docs] Update documentation with metadata and summaries
+ - Added metadata to multiple guides including UI Feature Development, Vite Performance, Zustand Store Pattern, and Validation Strategy
+ - Enhanced descriptions and keywords for better searchability
+ - Updated README files for Testing and Docusaurus with relevant summaries and metadata
+
+🛠️ [fix] Corrected links and paths in documentation
+ - Fixed paths in TSDoc README and other documentation files to ensure proper navigation
+ - Updated script to check document links to include new directories
+
+✨ [feat] Enhance alert store tests with additional scenarios
+ - Added tests for deriving site names from identifiers when names are blank
+ - Implemented tests for normalizing invalid timestamps to Date.now()
+ - Introduced tests for identifier generation fallbacks using crypto and Date.now()
+
+🚜 [refactor] Refactor Storybook configuration
+ - Changed import paths in Storybook main configuration to include file extensions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(abc5dca)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/abc5dca68427da99938430a87052204c985d76df)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Update `@cspell/cspell-bundled-dicts` and `@cspell/cspell-types` to version `9.3.2` for improved spell checking.
+ - 🔄 Upgrade `@eslint/compat` to version `2.0.0` for better compatibility with ESLint.
+ - 🔄 Upgrade `@eslint/mcp` to version `0.2.0` for enhanced linting capabilities.
+ - 🔄 Update `@types/react` to version `19.2.5` for better type definitions.
+ - 🔄 Update `@types/validator` to version `13.15.9` for improved validation types.
+ - 🔄 Upgrade `cspell` to version `9.3.2` for better spell checking functionality.
+ - 🔄 Update `electron` to version `39.2.1` for the latest features and fixes.
+ - 🔄 Upgrade `eslint-plugin-boundaries` to version `5.2.0` for improved linting rules.
+ - 🔄 Update `eslint-plugin-package-json` to version `0.79.0` for better package.json linting.
+ - 🔄 Upgrade `eslint-plugin-putout` to version `28.2.0` for enhanced linting capabilities.
+ - 🔄 Update `globals-vitest` to version `4.0.9` for better global definitions.
+ - 🔄 Upgrade `msw` to version `2.12.2` for improved mocking capabilities.
+ - 🔄 Update `typedoc-plugin-dt-links` to version `2.0.29` for better documentation generation.
+
+📝 [docs] Enhance frontmatter validation in validate-doc-frontmatter.mjs
+
+ - 🔄 Update validation logic to accept both `schema` and legacy `$schema` properties for schema references.
+ - 🔄 Improve error messages to clarify the requirement for a string `schema` property pointing to the schema file.
+ - 🔄 Ensure that the validation checks for the correct schema reference path, enhancing the robustness of the frontmatter validation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a271f8a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a271f8aa5516cee2d7604a6ace12612a5a51be81)
+
+
+
+
+
+
+## [18.4.0] - 2025-11-15
+
+
+[[b43ef03](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b43ef03d94dc701c75a76138ff1b71303e72b24f)...
+[b43ef03](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b43ef03d94dc701c75a76138ff1b71303e72b24f)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/b43ef03d94dc701c75a76138ff1b71303e72b24f...b43ef03d94dc701c75a76138ff1b71303e72b24f))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.3.0 [`(b43ef03)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/b43ef03d94dc701c75a76138ff1b71303e72b24f)
+
+
+
+
+
+
+## [18.3.0] - 2025-11-15
+
+
+[[6aecdbd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)...
+[2b14f01](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b14f0111b29fc307052ea69b99b90f9e7d6bcc5)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/6aecdbd448df65bde76b32248727a91da1553394...2b14f0111b29fc307052ea69b99b90f9e7d6bcc5))
+
+
+### ✨ Features
+
+- ✨ [feat] Update configuration schemas and tools
+ - 🔧 [build] Change schema URL in generic.schema.json to raw GitHub link for better accessibility.
+ - 📝 [docs] Update cliff.toml to point to the new schema URL and improve formatting for readability.
+ - 📝 [docs] Modify lychee.toml to use the new schema URL and enhance formatting consistency.
+
+🎨 [style] Refactor eslint.config.mjs
+ - 🧹 [chore] Adjust ignore patterns to include all subdirectories under .cache.
+
+🛠️ [fix] Enhance run-storybook-tests script
+ - 🔧 [build] Add local storage handling for Storybook tests to improve test consistency.
+ - 🛠️ [fix] Ensure local storage directory is created if it doesn't exist.
+
+🧪 [test] Add specialized monitor type tests
+ - 🧪 [test] Implement tests for CDN edge consistency, DNS records, and replication monitors to ensure correct display identifiers.
+
+⚡ [perf] Optimize monitor title formatting
+ - 🛠️ [fix] Update titleSuffixFormatters to prefer baseline URL and replica status URL for better monitor identification.
+
+🧹 [chore] Clean up test runner configurations
+ - 🧹 [chore] Adjust Jest configuration to use default export from Storybook test runner config.
+ - 🧹 [chore] Remove unnecessary environment setting in vitest.storybook.config.ts.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1487dc7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1487dc76e76eeadd3f1c542998af53cf9d998b9f)
+
+
+- ✨ [feat] Introduce optimistic monitoring locks and enhance site store functionality
+ - 🛠️ [fix] Refactor `useSitesStore` to streamline state actions and improve type handling
+ - 🆕 [new] Add `OptimisticMonitoringLock` interface and `buildMonitoringLockKey` utility for managing optimistic locks
+ - 🧪 [test] Update tests for `AddSiteForm` to improve input handling and ensure robust coverage
+ - 🧪 [test] Enhance input fuzzing tests for `AddSiteForm` to validate user input handling
+ - 🧪 [test] Comprehensive tests for `useSelectedSite` and `useSiteSync` to include optimistic monitoring locks
+ - 🧪 [test] Update mock store implementations to include optimistic monitoring locks for consistency
+ - 🎨 [style] Modify animation keyframes to use percentage values for opacity for better clarity
+ - ⚡ [perf] Optimize stylelint configuration for improved performance and stricter linting rules
+ - 👷 [ci] Increase startup timeout for Vitest configurations to accommodate slower environments
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3f51866)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3f51866d9dfd59bbab17831e78348e08fc6f74aa)
+
+
+- ✨ [feat] Enhance settings and monitoring functionality
+ - 🔧 [settings] Refactor system notification sound handling
+   - Removed dependency on `systemNotificationsEnabled` for sound setting changes
+   - Updated checkbox labels for clarity
+ - 🔧 [error] Improve error logging in ErrorBoundary
+   - Added component stack information to error logs for better debugging
+ - 🔧 [settings] Add detailed logging for settings hydration process
+   - Introduced logs for normalization and synchronization status
+ - 🔧 [sites] Introduce optimistic monitoring locks
+   - Added `optimisticMonitoringLocks` to manage monitor states optimistically
+   - Implemented functions to register and clear monitoring locks
+   - Enhanced site monitoring actions to utilize optimistic updates
+ - 🔧 [tests] Update AddSiteForm tests for async rendering
+   - Refactored tests to ensure proper cleanup and rendering of components
+   - Ensured all tests wait for asynchronous updates to complete
+ - 🔧 [utils] Create utility for optimistic monitoring locks
+   - Added `OptimisticMonitoringLock` interface and key builder function
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(49f9f39)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/49f9f3958d342a29bd8488a3c0723ea3d32c8066)
+
+
+- ✨ [feat] Implement usePrefersReducedMotion hook
+ - Introduced a new React hook `usePrefersReducedMotion` to track user's reduced-motion preference using the `prefers-reduced-motion` media query.
+ - Ensured compatibility with server-side rendering by defaulting to `false` when the match media API is unavailable.
+ - Added subscription to preference changes to dynamically update the state.
+
+🛠️ [fix] Normalize in-app alert volume settings
+ - Added `inAppAlertVolume` to the settings state and default settings.
+ - Implemented `clampInAppAlertVolume` function to ensure volume values are clamped between 0 and 1.
+ - Updated `normalizeAppSettings` to normalize persisted or partial settings objects, including the new volume setting.
+
+📝 [docs] Update AppSettings interface
+ - Extended the `AppSettings` interface to include `inAppAlertVolume` for managing in-app alert sound levels.
+
+🧪 [test] Enhance settings tests for in-app alert volume
+ - Updated tests to include scenarios for the new `inAppAlertVolume` setting.
+ - Added tests to ensure proper normalization of volume values and behavior when sound alerts are disabled.
+
+🎨 [style] Create ThemedSlider component
+ - Developed a new `ThemedSlider` component for consistent styling of range inputs across the application.
+ - Ensured accessibility support and theming integration for better user experience.
+
+🎨 [style] Add styles for ThemedSlider
+ - Created CSS styles for the `themed-slider` class to ensure consistent appearance and behavior across browsers.
+ - Included focus and hover states for improved interactivity.
+
+🧪 [test] Comprehensive tests for NotificationPreferenceService
+ - Added tests to ensure proper functionality of the `NotificationPreferenceService`, including error handling for missing methods and uninitialized API.
+
+🧪 [test] Targeted tests for useSettingsStore
+ - Updated targeted tests for `useSettingsStore` to include scenarios for the new `inAppAlertVolume` setting.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c19d8e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c19d8e2c3373eed0a1413570afbfffb18d725afb)
+
+
+- ✨ [feat] Enhance configuration and testing coverage
+ - 🔧 [build] Update Knip configuration to include additional files for dependency analysis
+ - 🎨 [style] Refactor Docusaurus config to use ESM paths for client modules
+ - 🧪 [test] Add strict regression tests for Docusaurus configuration
+ - 🧪 [test] Implement strict coverage tests for NotificationPreferenceService
+ - 🧪 [test] Add strict coverage tests for monitor identifier utilities
+ - 🧪 [test] Introduce strict edge-case coverage for monitor title formatter utilities
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0e30778)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0e307788ca50503c23e343ba376a1545ca3ef73b)
+
+
+- ✨ [feat] Update settings structure and enhance notification preferences
+ - 🔧 Refactor settings structure to replace legacy notification flags with more granular options:
+   - `inAppAlertsEnabled`: Enables in-app alerts.
+   - `inAppAlertsSoundEnabled`: Controls sound for in-app alerts.
+   - `systemNotificationsEnabled`: Enables system notifications.
+   - `systemNotificationsSoundEnabled`: Controls sound for system notifications.
+ - 🧪 Update tests across multiple files to reflect new settings structure and ensure comprehensive coverage:
+   - Adjusted mock settings in `Settings.test.tsx`, `DataService.comprehensive.test.ts`, and others to use new notification flags.
+   - Enhanced fuzzing tests in `database.comprehensive-fuzzing.test.ts` and `ipc.comprehensive-fuzzing.test.ts` to include new settings.
+ - 📝 Updated documentation and storybook examples to demonstrate new settings structure in `Settings.stories.tsx`.
+ - 🧹 Cleaned up legacy notification handling in `useSettingsStore` and related tests to ensure consistency with new settings.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f94f595)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f94f595708e329c867b01a856aa26f27ff636895)
+
+
+- ✨ [feat] Add generic schema and update configuration files
+ - 📝 Create a new JSON schema for cliff.toml and lychee.toml configuration files
+ - 🔧 Update cliff.toml to include schema reference and additional metadata
+ - 🔧 Modify lychee.toml to include schema reference and configuration details
+ - 🔧 Enhance repomix.config.json with new options for logging and directory structure
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d918210)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d918210e861c65096d4c87a3cc3826ffc90c0309)
+
+
+- ✨ [feat] Enhance monitor schema types and error handling
+ - 🛠️ [refactor] Introduce `BaseMonitorSchemaShape` interface to streamline monitor schema definitions
+ - 🛠️ [refactor] Replace repetitive monitor schema definitions with a generic `MonitorSchema` type
+ - 🛠️ [refactor] Update all monitor schema types to extend from the new `MonitorSchema`
+ - 🔧 [build] Add `@snyk/protect` dependency for improved security checks
+
+🛠️ [fix] Improve error handling in hooks
+ - 🛠️ [fix] Integrate `convertError` utility in `useDynamicHelpText` and `useMonitorTypes` hooks for better error normalization
+ - 📝 [test] Update tests to reflect changes in error handling logic for `useMonitorTypes`
+
+⚡ [perf] Optimize utility functions for monitor UI operations
+ - 🛠️ [refactor] Create `runMonitorUiOperation` to standardize error handling across monitor UI operations
+ - 🛠️ [refactor] Replace direct error handling with `runMonitorUiOperation` in multiple utility functions
+
+⚡ [perf] Streamline monitor validation logic
+ - 🛠️ [refactor] Introduce `runMonitorValidationOperation` for consistent error handling in validation functions
+ - 🛠️ [refactor] Update validation functions to utilize the new standardized operation
+
+🎨 [style] Enhance duration formatting utility
+ - 🛠️ [refactor] Implement `formatRoundedDuration` for consistent duration formatting across the application
+ - 🛠️ [refactor] Update `formatIntervalDuration` and `formatResponseDuration` to use the new formatting utility
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(8a32e63)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8a32e63addb1d41c2da29f9318b80bdb8222a795)
+
+
+- ✨ [feat] Refactor IPC channel usage across multiple APIs
+
+ - 🔧 [refactor] Update systemApi to use SYSTEM_CHANNELS for openExternal and quitAndInstall methods
+ - 🔧 [refactor] Modify dataApi tests to utilize DATA_CHANNELS for downloadSqliteBackup, exportData, and importData
+ - 🔧 [refactor] Enhance monitorTypesApi tests to incorporate MONITOR_TYPES_CHANNELS for formatMonitorDetail, formatMonitorTitleSuffix, and validateMonitorData
+ - 🔧 [refactor] Adjust monitoringApi tests to leverage MONITORING_CHANNELS for startMonitoringForSite, startMonitoringForMonitor, stopMonitoringForSite, and stopMonitoringForMonitor
+ - 🔧 [refactor] Update settingsApi tests to use SETTINGS_CHANNELS for updateHistoryLimit, getHistoryLimit, and resetSettings
+ - 🔧 [refactor] Revise sitesApi tests to implement SITES_CHANNELS for addSite, getSites, removeSite, removeMonitor, updateSite, and deleteAllSites
+ - 🔧 [refactor] Modify stateSyncApi tests to utilize STATE_SYNC_CHANNELS for getSyncStatus and requestFullSync
+ - 🔧 [refactor] Update systemApi tests to use SYSTEM_CHANNELS for openExternal and quitAndInstall
+ - 🔧 [refactor] Revise preload types to define and export new channel mappings for monitoring, monitorTypes, and other APIs
+ - 🔧 [refactor] Update MonitorTypesService to correctly wrap methods from the monitorTypes domain
+ - 🔧 [refactor] Adjust mock setups in tests to reflect changes in channel usage for monitorTypes and monitoring APIs
+ - 🔧 [refactor] Update storybook DetailLabel stories to use the new monitorTypes API structure
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(57d1110)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/57d11107677cc0e63290ee0a9845d02e23d34cf2)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Refactor site store mocks and tests for improved clarity and maintainability
+ - 🔧 Introduced `createSelectorHookMock` utility to simplify mock creation for Zustand selector hooks
+ - 🔧 Added `createSitesStoreMock` utility to generate fully typed `SitesStore` mocks with customizable overrides
+ - 🔧 Updated tests across multiple components to utilize the new mock utilities for better consistency
+ - 🧪 Enhanced test coverage for `SiteList`, `Settings`, and `AddSiteForm` components by integrating the new mock structure
+ - 🧪 Improved error handling in tests by ensuring mocks reset correctly between test cases
+ - 🧪 Refactored site monitoring tests to utilize the new mock structure, ensuring clearer assertions and error handling
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3b78b17)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b78b1762ee08b0534b6a3f3876a952049b01d47)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the npm-all group [`(4c88e65)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c88e6555363c1c7f942ead98c8e15f1ab48d149)
+
+
+- *(deps)* [dependency] Update dependency group [`(50d3c27)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/50d3c27b25035b5ad4128d05776163e32f852dd8)
+
+
+- *(deps)* [dependency] Update the npm-all group (#97) [`(77cf1be)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/77cf1bea163b8feec0afda3a697f13d0719c5621)
+
+
 - [dependency] Update version 18.2.0 [`(6aecdbd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6aecdbd448df65bde76b32248727a91da1553394)
 
 
-### 🛠️ Other Changes
 
-- Remove legacy `prestart:old` / `pretest:old` scripts and update monitor configuration docs to reference `createMonitorConfig`.
+### 📝 Documentation
+
+- 📝 [docs] Update documentation for clarity and consistency
+
+ - 📝 Refactor documentation index for improved readability
+   - Adjusted table formatting for better alignment
+   - Updated links to follow consistent naming conventions (e.g., `AI_CONTEXT.md` to `AI\_CONTEXT.md`)
+
+ - 📝 Enhance IPC Automation Workflow troubleshooting section
+   - Reformatted troubleshooting table for clarity
+   - Improved descriptions for common issues and fixes
+
+ - 📝 Revise New Monitor Type Implementation guide
+   - Clarified file impact matrix with better formatting
+
+ - 📝 Update Organization Summary for new user onboarding
+   - Adjusted document links to follow consistent naming conventions
+
+ - 📝 Revise Renderer Integration Guide for better structure
+   - Improved IPC & Event Channels section with clearer formatting
+   - Enhanced testing guidance for better clarity
+
+ - 📝 Improve Vite Performance guide
+   - Cleaned up import optimization examples for better understanding
+
+ - 📝 Update Validation Strategy documentation
+   - Enhanced layer overview table for better clarity and consistency
+
+ - 📝 Revise Fast Check Fuzzing Guide
+   - Improved formatting for environment variable descriptions
+
+ - 📝 Update Playwright Testing Guide
+   - Enhanced emergency fixes section for clarity
+
+ - 📝 Revise Testing README for better organization
+   - Improved section headers and descriptions for testing guides
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2b14f01)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2b14f0111b29fc307052ea69b99b90f9e7d6bcc5)
+
+
+- 📝 [docs] Remove references to Packages documentation in Docusaurus setup and TypeDoc configuration
+ - 📝 Update `.remarkrc.mjs` to remove processing settings comment
+ - 📝 Remove `Packages` directory references from `DOCUSAURUS_SETUP_GUIDE.md`
+ - 📝 Eliminate `Packages` directory from entry points in `typedoc.config.json`
+ - 📝 Remove `Packages` directory from entry points in `typedoc.local.config.json`
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(d8965a8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/d8965a8f2f411515538639fbf6d78ebc3a748918)
+
+
+- 📝 [docs] Update documentation style guide and file naming conventions
+ - 📄 Change documentation file names to use uppercase and underscores for consistency
+ - 📄 Update links in various guides to reflect new file naming conventions
+ - 📄 Revise examples in the style guide to match updated naming standards
+
+📝 [docs] Revise environment setup documentation
+ - 📄 Update links to the Developer Quick Start Guide to match new naming conventions
+
+📝 [docs] Modify error handling and event system guides
+ - 📄 Update related resource links to reflect new file naming conventions
+
+📝 [docs] Remove obsolete logger migration report
+ - 🗑️ Delete the Logger Migration Complete Report as it is no longer needed
+
+📝 [docs] Add new Style & Layout Guide
+ - 📄 Introduce guidelines for consistent styling and layout practices across the application
+
+📝 [docs] Update testing documentation
+ - 📄 Revise related resource links to reflect new file naming conventions
+ - 📄 Improve clarity in fuzzing guide regarding environment variables
+
+📝 [docs] Update Vite performance guide
+ - 📄 Revise related resource links to reflect new file naming conventions
+
+📝 [docs] Update Zustand store pattern guide
+ - 📄 Revise related resource links to reflect new file naming conventions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7b7cc46)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7b7cc46def581c60e8b73026fed18387529e20b6)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Update color values to use full hex codes for consistency
+ - 🔧 Updated background and text colors in various CSS files to use full hex codes (e.g., #ffffff instead of #fff) for better readability and consistency.
+ - 📝 Modified gradient color definitions to replace shorthand hex codes with full hex codes across multiple components including buttons, cards, forms, and overlays.
+ - 🎨 Adjusted hover and focus states in button styles to ensure uniformity in color representation.
+ - 🎨 Enhanced tooltip and alert styles by standardizing color definitions to full hex codes.
+ - 🎨 Refined status indicator styles to utilize full hex codes for improved clarity in color mixing.
+ - 🎨 Updated media query styles to ensure consistent color definitions across different themes.
+ - 🎨 Revised settings and header styles to reflect the change in color definitions, ensuring a cohesive design language.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2cddf72)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2cddf7243b81e8fa7055d4c7dc383cc5e4c4c76f)
+
+
+- 🎨 [style] Refactor ESLint configurations and improve code styling
+ - 🧹 Remove unused ESLint disable comments in multiple files
+ - 🎨 Update CSS styles for StatusAlertToaster component
+ - 🎨 Adjust layout and styling for SiteList component
+ - 🎨 Enhance Docusaurus configuration and remove unnecessary comments
+ - 🎨 Modify GitHubStats component to clean up ESLint rules
+ - 🎨 Update Storybook helpers for better clarity and organization
+ - 📝 Add new TSDoc tags for improved documentation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5c0bcf9)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5c0bcf9b6fcd8134ff448d4a892442de0301b62c)
+
+
+
+### 🧹 Chores
+
+- 🧹 [chore] Remove outdated documentation download scripts
+
+ - 🗑️ Deleted `download-validator-docs.mjs` script as it is no longer needed.
+ - 🗑️ Deleted `download-zustand-docs.mjs` script to streamline the codebase.
+
+🛠️ [fix] Improve type annotations in utility scripts
+
+ - ✏️ Added JSDoc type annotation for `files` array in `find-shared-imports.js` to enhance type safety.
+ - ✏️ Added JSDoc type annotations for parameters in `getArgValue` function in `fix-test-quotes.mjs` for better clarity and documentation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(58703e2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/58703e2a6614710f580350d809a5f6493b3bc058)
+
+
+- Update changelogs for v18.2.0 [skip ci] [`(a77aa85)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a77aa85ed03e935f80b34602be298e5f0112cbe9)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update Electron startup script for improved execution
+ - Adjusted the execution command in `run-electron.sh` to ensure proper execution of the Electron binary.
+ - Ensured that the script checks for the Electron binary in both the app directory and node_modules.
+
+🛠️ [fix] Refactor site monitoring logic to enhance optimistic updates
+ - Removed unnecessary `noop` function and introduced `trackStorePromise` to handle unhandled promise rejections gracefully.
+ - Updated `createSiteMonitoringActions` to return a `whenReady` promise, allowing callers to await the completion of optimistic updates.
+ - Enhanced error handling in monitoring operations to ensure proper rollback of optimistic states on failure.
+
+🧪 [test] Add comprehensive tests for site monitoring edge cases
+ - Implemented tests to verify optimistic monitoring updates for site-wide and individual monitor operations.
+ - Added tests to ensure proper rollback of optimistic updates when service calls fail.
+ - Included tests for monitoring lock registration and expiration cleanup.
+
+🎨 [style] Improve code readability and organization
+ - Reformatted code for better readability, including consistent indentation and spacing.
+ - Added comments to clarify the purpose of complex logic and functions.
+
+📝 [docs] Update documentation for monitoring functions
+ - Enhanced inline documentation for `trackStorePromise` and other monitoring functions to clarify their purpose and usage.
+
+⚡ [perf] Optimize storage type checks in nodeWebStorage shim
+ - Refined the `isStorageLike` function to use `Reflect.get` for property access, improving performance and clarity.
+ - Added type guards to ensure proper handling of potential storage candidates.
+
+🧹 [chore] Update Vite configuration for better asset handling
+ - Adjusted Vite configuration to exclude CSS and asset files from certain processing steps, improving build performance.
+ - Ensured regex patterns are correctly defined for node protocol imports.
+
+👷 [ci] Configure Vitest for Storybook environment
+ - Set the environment to "browser" in the Vitest configuration for better compatibility with Storybook tests.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(96600ec)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/96600ec07f3feedc7b0d47110c65bc11645d05d8)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - 🔄 [dependency] Update versions of Vitest packages to ^4.0.9 for improved functionality
+ - 🔄 Update Electron version to 39.1 for better stability
+ - 🔄 Upgrade eslint-plugin-import-zod to ^1.2.1 for enhanced linting
+ - 🔄 Upgrade eslint-plugin-putout to ^28.1.0 for better code quality checks
+ - 🔄 Update node-abi to ^4.24.0 for compatibility improvements
+ - 🔄 Upgrade putout to ^40.14.0 for better performance
+ - 🔄 Update vitest-environment-browser to npm:@vitest/browser@^4.0.9 for consistency
+
+🎨 [style] Refactor CSS for Settings component
+ - ✨ Combine styles for .settings-field__helper and .settings-alert-volume-control__note for cleaner code
+ - 🔄 Remove redundant CSS rules for .settings-alert-volume-control__note
+
+🚜 [refactor] Optimize forms.css for themed slider
+ - 🔄 Refactor slider styles to use nested selectors for better readability
+ - 🔄 Remove unnecessary comments and unused styles for cleaner code
+
+🛠️ [fix] Improve error handling in nodeWebStorage
+ - 🔄 Add functions to handle storage initialization errors and define properties more robustly
+ - 🔄 Refactor storage installation logic for better clarity and error management
+
+🔧 [build] Enhance Vite configuration for Electron
+ - 🔄 Add rollupOptions to externalize dependencies in the main process for better performance
+ - 🔄 Ensure compatibility with native modules and Electron internals
+
+🧪 [test] Update Vitest configuration for Storybook
+ - 🔄 Integrate Playwright as the provider for improved testing capabilities
+ - 🔄 Remove deprecated environment setting for cleaner configuration
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(efcef35)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/efcef35ed994e403c6016706c16d45f41c2603df)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔄 Update "@cspell/cspell-bundled-dicts" from "^9.3.0" to "^9.3.1"
+ - 🔄 Update "@cspell/cspell-types" from "^9.3.0" to "^9.3.1"
+ - 🔄 Update "@eslint-react/eslint-plugin" from "^2.3.4" to "^2.3.5"
+ - 🔄 Update "@types/node" from "^24.10.0" to "^24.10.1"
+ - 🔄 Update "@types/react" from "^19.2.3" to "^19.2.4"
+ - 🔄 Update "@types/react-dom" from "^19.2.2" to "^19.2.3"
+ - 🔄 Update "@types/validator" from "^13.15.4" to "^13.15.8"
+ - 🔄 Update "@vitejs/plugin-react" from "^5.1.0" to "^5.1.1"
+ - 🔄 Update "cspell" from "^9.3.0" to "^9.3.1"
+ - 🔄 Update "eslint-plugin-depend" from "^1.3.1" to "^1.4.0"
+ - 🔄 Update "eslint-plugin-package-json" from "^0.65.3" to "^0.74.0"
+ - 🔄 Update "eslint-plugin-react-dom" from "^2.3.4" to "^2.3.5"
+ - 🔄 Update "eslint-plugin-react-hooks-extra" from "^2.3.4" to "^2.3.5"
+ - 🔄 Update "eslint-plugin-react-naming-convention" from "^2.3.4" to "^2.3.5"
+ - 🔄 Update "eslint-plugin-react-web-api" from "^2.3.4" to "^2.3.5"
+ - 🔄 Update "eslint-plugin-testing-library" from "^7.13.3" to "^7.13.4"
+ - 🔄 Update "jsdom" from "^27.1.0" to "^27.2.0"
+ - 🔄 Update "knip" from "^5.69.0" to "^5.69.1"
+ - 🔄 Update "node-abi" from "^4.17.0" to "^4.23.0"
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6a44b3b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6a44b3bf4526dd108222cd38f887cfc754e1ad5e)
+
+
+- 🔧 [build] Update project configuration and dependencies
+ - ✨ [feat] Add Prettier XML plugin to enhance formatting capabilities
+ - 🎨 [style] Refactor .editorconfig for consistent indentation and line endings
+ - 🎨 [style] Adjust indentation settings for various file types in .editorconfig
+ - 📝 [docs] Improve description in BeastMode.agent.md for clarity
+ - 🔧 [build] Update package.json and package-lock.json to include new Prettier plugin
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(cc1a2d8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/cc1a2d82ded40bd6ff8f17c041fb90848b9d6aef)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - Updated Storybook addons to version 10.0.7 for improved functionality and bug fixes.
+ - Updated ESLint plugin for Storybook to version 10.0.7 for better linting support.
+ - Updated @types/react to version 19.2.3 for type definitions.
+ - Updated storybook package to version 10.0.7 for consistency across packages.
+
+🛠️ [fix] Refactor error message handling in useMonitorTypes hook
+ - Changed error message assignment to use trimmed message for better clarity.
+ - Ensured fallback message is used when no error message is available.
+
+🧪 [test] Enhance comprehensive tests for App component
+ - Reset default settings store state before each test to ensure clean state.
+
+🧪 [test] Improve additional coverage tests for Submit component
+ - Refactored validation mocks to use a consistent approach for better readability.
+ - Created utility functions to apply validation results, reducing redundancy in tests.
+
+🧪 [test] Add comprehensive tests for Submit component
+ - Implemented validation result application to streamline test setup.
+ - Ensured validation results are consistently applied across multiple test cases.
+
+🧪 [test] Update StatusAlertToast and StatusAlertToaster tests
+ - Added tests for rendering alerts from status updates when in-app alerts are enabled.
+ - Verified that alerts are not enqueued when in-app alerts are disabled.
+
+🧪 [test] Enhance alertCoordinator tests
+ - Added test to ensure notification preferences are synchronized when toggles change.
+
+🧪 [test] Refactor useMonitorTypes tests for clarity
+ - Improved promise handling in tests to ensure proper async behavior.
+
+📝 [docs] Update TSDoc configuration
+ - Changed noStandardTags to true for stricter documentation rules.
+ - Added custom tag definitions for better documentation support.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(15dd069)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/15dd0694e0503073320045b06221d03bbaec0f39)
+
+
+- 🔧 [build] Update dependencies in package.json
+
+ - 🔧 Update "validator" from "^13.15.20" to "^13.15.23" for improved validation features.
+ - 🔧 Update "@biomejs/biome" from "^2.3.4" to "^2.3.5" for bug fixes and enhancements.
+ - 🔧 Update "@eslint-react/eslint-plugin" from "^2.3.1" to "^2.3.4" for better linting support.
+ - 🔧 Update "@microsoft/tsdoc-config" from "^0.17.1" to "^0.18.0" for updated TypeScript documentation support.
+ - 🔧 Update "@storybook/addon-coverage" from "^2.0.0" to "^3.0.0" for new features and improvements.
+ - 🔧 Update "@typescript-eslint/eslint-plugin" from "^8.46.3" to "^8.46.4" for TypeScript linting improvements.
+ - 🔧 Update "autoprefixer" from "^10.4.21" to "^10.4.22" for better CSS compatibility.
+ - 🔧 Update "electron" from "^39.1.1" to "^39.1.2" for security and performance improvements.
+ - 🔧 Update "eslint-plugin-json-schema-validator" from "^5.4.1" to "^5.5.0" for enhanced JSON schema validation.
+ - 🔧 Update "eslint-plugin-package-json" from "^0.65.0" to "^0.65.3" for improved package.json linting.
+ - 🔧 Update "eslint-plugin-react-dom" from "^2.3.1" to "^2.3.4" for better React DOM linting support.
+ - 🔧 Update "eslint-plugin-react-hooks-extra" from "^2.3.2-beta.1" to "^2.3.4" for additional hooks linting rules.
+ - 🔧 Update "eslint-plugin-tsdoc" from "^0.4.0" to "^0.5.0" for improved TSDoc linting capabilities.
+ - 🔧 Update "knip" from "^5.68.0" to "^5.69.0" for better code analysis.
+ - 🔧 Update "msw" from "^2.12.0" to "^2.12.1" for bug fixes and enhancements.
+ - 🔧 Update "putout" from "^40.12.0" to "^40.13.0" for improved code quality checks.
+ - 🔧 Update "typedoc-plugin-dt-links" from "^2.0.27" to "^2.0.28" for better documentation generation.
+ - 🔧 Update "typescript-eslint" from "^8.46.3" to "^8.46.4" for TypeScript linting improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(45ebc0d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/45ebc0dee61497f2ea93c01ed31c640e09211fc7)
+
+
+- 🔧 [build] Update monitoring service tests to use createMonitorConfig
+
+ - 🛠️ [fix] Refactor HttpHeaderMonitor, HttpJsonMonitor, HttpKeywordMonitor, HttpLatencyMonitor, HttpStatusMonitor, and SslMonitor tests to replace extractMonitorConfig with createMonitorConfig for better clarity and consistency.
+ - 🧪 [test] Enhance PortMonitor tests to utilize createMonitorConfig, ensuring all configurations are handled uniformly across tests.
+ - 📝 [docs] Add type guards for monitor types in shared/typeGuards/monitor.ts to improve type safety and runtime checks.
+ - 🧹 [chore] Introduce utility functions in shared/utils/assertions.ts for better error handling and assertions.
+ - 🎨 [style] Improve App component to handle undefined site identifiers gracefully, enhancing robustness.
+ - 🧪 [test] Update AddSiteForm tests to bridge store mocks through global references, preventing hoist-time import errors and ensuring proper mock initialization.
+ - 🧪 [test] Adjust Settings component tests to standardize store mock creation, avoiding early access issues.
+ - 🧪 [test] Refactor Dashboard SiteList tests to create sites store state outside hoisted blocks, ensuring proper mock behavior.
+ - 🔧 [build] Update package-lock.json and package.json for dependency management and script improvements.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c949975)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c949975a6e90e0c8598a2607793ad0a4c765c2eb)
+
+
+- 🔧 [build] Update package.json and package-lock.json for improved linting and dependency management
+ - 🔧 Update linting scripts to include package sorting and checks
+ - 🔧 Upgrade stylelint-plugin-use-baseline to version 1.1.0
+ - 📝 Add new script to find and report @shared imports for better import management
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c92269d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c92269d27cdfc471650262c2c78f0b591b8d1c50)
+
+
+- 🔧 [build] Refactor IPC handlers to use centralized channel constants
+ - 🔧 Update IpcService to utilize constants from @shared/types/preload for data, monitoring, and settings channels
+ - 🔧 Modify utils.ts to reference MONITOR_TYPES_CHANNELS for high frequency operations
+ - 🧪 Enhance ipcContractConsistency tests to validate channel registration
+ - 📝 Improve App component logging to include resolved site identifiers
+ - 🔧 Refactor SiteList and StatusSubscriptionIndicator components to use selectors for state management
+ - 🧪 Add additional coverage for App and StatusSubscriptionIndicator components
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(a37d0a8)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/a37d0a8174a91ae3f6cec0b5be0f7a16b3fa4c0a)
+
+
+- 🔧 [build] Update configuration and scripts for improved functionality
+ - 🛠️ [fix] Modify jsconfig.json to include "erasableSyntaxOnly" and adjust exclusion patterns
+ - 🛠️ [fix] Change environment variable access syntax in postcss.config.mjs and analyze-coverage.mjs
+ - 🛠️ [fix] Enhance robustness in augment-benchmark-docs.mjs by skipping empty lines
+ - 🛠️ [fix] Improve link normalization in check-doc-links.mjs to handle empty paths
+ - 🛠️ [fix] Ensure type safety in clean-generated-docs.mjs when creating removal targets
+ - 🛠️ [fix] Update codegen.mjs to handle undefined command arguments gracefully
+ - 🛠️ [fix] Enhance error handling in Add-All-Test-Sites.js for unknown monitor types
+ - 🛠️ [fix] Safeguard against undefined arguments in download-docs-template.mjs
+ - 🛠️ [fix] Improve test name extraction in extract-test-names.mjs with type casting
+ - 🛠️ [fix] Ensure empty directory results are handled correctly in find-empty-dirs.mjs
+ - 🛠️ [fix] Refine error handling in verify-eslint-inspector.mjs for better clarity
+ - 🛠️ [fix] Adjust Jest configuration in test-runner-jest.config.js for compatibility
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(1ea7db3)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1ea7db39beafe543895896df7be16387fd2ee688)
+
+
+- 🔧 [build] Update ESLint configuration for improved type handling
+ - Refactor environment variable access to use bracket notation for RECHECK_JAR
+ - Replace multiple `@ts-ignore` comments with `@ts-expect-error` for better type error handling
+ - Ensure compatibility with updated ESLint plugin configurations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(7e4f297)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/7e4f297179f2ac19dd9245c591125a82d7b80829)
+
+
+- 🔧 [build] Update dependencies in package.json
+ - 🔄 Upgrade `@html-eslint/eslint-plugin` and `@html-eslint/parser` to version `0.48.0`
+ - 🔄 Upgrade Storybook addons and core packages to version `10.0.6`
+ - 🔄 Upgrade Vitest packages to version `4.0.8`
+ - 🔄 Upgrade `eslint-plugin-storybook` to version `10.0.6`
+ - 🔄 Upgrade `globals-vitest` to version `4.0.8`
+ - 🔄 Upgrade `vite` to version `7.2.2`
+ - 🔄 Upgrade `remark-lint` packages to latest versions
+ - 🔄 Upgrade `storybook` to version `10.0.6`
+ - 🔄 Upgrade TypeScript related packages to latest versions
+
+🛠️ [fix] Refactor App component logging
+ - 🔄 Change logging statement to use `update.site.identifier` directly instead of fallback
+
+🚜 [refactor] Enhance site monitoring type definitions
+ - 🔄 Introduce `StatusUpdateSnapshotPayload` type for better clarity in `useSiteMonitoring.ts`
+ - 🔄 Update `applyStatusUpdate` method signature to use the new type
+
+🛠️ [fix] Improve status update handler
+ - 🔄 Modify `applyStatusUpdateSnapshot` to accept `StatusUpdateSnapshotPayload` instead of `StatusUpdate`
+ - 🔄 Destructure `monitor` and `site` from `statusUpdate` for cleaner code
+
+🧹 [chore] Update ESLint and Stylelint configurations
+ - 🔄 Add ESLint disable comments for better clarity in config files
+
+📝 [docs] Update TypeScript configuration
+ - 🔄 Add various TypeScript compiler options for improved project management
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(34ffd89)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/34ffd89d2eb6cd9f529280316e56422f24cf6284)
+
+
+- 🔧 [build] Update package and lock files for version 18.2.0
+ - 🔧 [build] [dependency] Update version 18.2.0 in package.json and package-lock.json
+ - 🔧 [build] Update electron dependency to version 39.1.1
+📝 [docs] Fix title in troubleshooting guide
+ - 📝 [docs] Correct heading from "Troubl&#x65;**&#x53;olutions**" to "Troubleshooting Guide"
+🎨 [style] Adjust linting rules in .npmpackagejsonlintrc.json
+ - 🎨 [style] Disable 'require-directories' and 'require-files' rules
+✨ [feat] Enhance remark configuration in .remarkrc.mjs
+ - ✨ [feat] Add new properties for bullet and thematic break markers
+🛠️ [fix] Refactor stateSyncApi.ts imports
+ - 🛠️ [fix] Move import statements for better organization
+🧪 [test] Update electron-api-mock.ts to restructure monitor types
+ - 🧪 [test] Move formatMonitorDetail and formatMonitorTitleSuffix to monitorTypes
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(75c7997)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/75c7997912901f8527278d2be5b7dc9843f71b7f)
 
 
 
