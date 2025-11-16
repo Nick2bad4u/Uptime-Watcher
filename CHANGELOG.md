@@ -7,14 +7,51 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+[[22d06e1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/22d06e103ecff7341fd68cdfbf77999ff543faeb)...
+[22d06e1](https://github.com/Nick2bad4u/Uptime-Watcher/commit/22d06e103ecff7341fd68cdfbf77999ff543faeb)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/22d06e103ecff7341fd68cdfbf77999ff543faeb...22d06e103ecff7341fd68cdfbf77999ff543faeb))
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.7.0 [`(22d06e1)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/22d06e103ecff7341fd68cdfbf77999ff543faeb)
+
+
+
+
+
+
+## [18.7.0] - 2025-11-16
+
+
 [[bde7592](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)...
-[bde7592](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bde7592599f3ebe80f497f5c85fb7bfe0e59e308...bde7592599f3ebe80f497f5c85fb7bfe0e59e308))
+[f3c3362](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3c33621152d7d92e19de018a3d2d05411dc8cea)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/bde7592599f3ebe80f497f5c85fb7bfe0e59e308...f3c33621152d7d92e19de018a3d2d05411dc8cea))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce electron-builder configuration and update build scripts
+ - 🛠️ [fix] Update build commands in package.json to use new electron-builder config
+ - 📝 [docs] Add electron-builder.config.ts for centralized build configuration
+ - 🔧 [build] Modify Build.yml to handle macOS universal builds by removing optional native dependencies
+ - 🧪 [test] Enhance main.test.tsx to verify error handling during application initialization
+ - 🧹 [chore] Update tsconfig.configs.json and eslint.config.mjs to include new electron-builder config
+ - 🔧 [build] [dependency] Update version 18.6.0 in package.json and package-lock.json
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f3c3362)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f3c33621152d7d92e19de018a3d2d05411dc8cea)
+
 
 
 ### 📦 Dependencies
 
 - [dependency] Update version 18.6.0 [`(bde7592)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/bde7592599f3ebe80f497f5c85fb7bfe0e59e308)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v18.6.0 [skip ci] [`(2a7708b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2a7708b06d676b943c32b96318410e3679e71041)
 
 
 
