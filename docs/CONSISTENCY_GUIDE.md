@@ -100,6 +100,13 @@ console.log("Service started");
 console.error("Failed to connect");
 ```
 
+> **Exception:** Low-level shared utilities under `shared/utils` that are
+> consumed by both Electron and frontend layers may use `console` for their
+> internal fallback logging when they cannot safely depend on the Electron
+> logger. These cases are explicitly documented in the respective modules
+> (for example, `shared/utils/errorHandling.ts`) and are considered
+> intentional exceptions to this rule.
+
 ### 2. Structured Logging
 
 Use structured logging with context objects:

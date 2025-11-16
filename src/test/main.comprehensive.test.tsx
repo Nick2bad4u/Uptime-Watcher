@@ -4,6 +4,48 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock structured renderer logger so we can assert initialization errors are logged consistently
+vi.mock("../services/logger", () => {
+    const mockAppLogger = {
+        error: vi.fn(),
+        performance: vi.fn(),
+        started: vi.fn(),
+        stopped: vi.fn(),
+    };
+
+    const mockLogger = {
+        app: mockAppLogger,
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        raw: { default: {} } as any,
+        silly: vi.fn(),
+        site: {
+            added: vi.fn(),
+            check: vi.fn(),
+            error: vi.fn(),
+            removed: vi.fn(),
+            statusChange: vi.fn(),
+        },
+        system: {
+            notification: vi.fn(),
+            tray: vi.fn(),
+            window: vi.fn(),
+        },
+        user: {
+            action: vi.fn(),
+            settingsChange: vi.fn(),
+        },
+        verbose: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        logger: mockLogger,
+        Logger: mockLogger,
+    };
+});
+
 // Simple mocks without complex implementations
 vi.mock("react-dom/client", () => ({
     createRoot: vi.fn(() => ({
@@ -83,9 +125,11 @@ describe("main.tsx - Application Entry Point", () => {
             // Import main.tsx
             await import("../main");
 
-            // Should log an error due to missing root element
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            // Should log an error via structured logger due to missing root element
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.any(Error)
             );
         });
@@ -111,9 +155,11 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             // Verify error logging
-            expect(console.error).toHaveBeenCalledTimes(1);
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledTimes(1);
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.any(Error)
             );
         });
@@ -174,8 +220,10 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             // Verify the error handling path was executed
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.any(Error)
             );
         });

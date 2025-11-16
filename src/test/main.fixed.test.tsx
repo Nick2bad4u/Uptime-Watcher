@@ -5,6 +5,48 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createElement, StrictMode } from "react";
 
+// Mock structured renderer logger so we can assert initialization errors are logged consistently
+vi.mock("../services/logger", () => {
+    const mockAppLogger = {
+        error: vi.fn(),
+        performance: vi.fn(),
+        started: vi.fn(),
+        stopped: vi.fn(),
+    };
+
+    const mockLogger = {
+        app: mockAppLogger,
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        raw: { default: {} } as any,
+        silly: vi.fn(),
+        site: {
+            added: vi.fn(),
+            check: vi.fn(),
+            error: vi.fn(),
+            removed: vi.fn(),
+            statusChange: vi.fn(),
+        },
+        system: {
+            notification: vi.fn(),
+            tray: vi.fn(),
+            window: vi.fn(),
+        },
+        user: {
+            action: vi.fn(),
+            settingsChange: vi.fn(),
+        },
+        verbose: vi.fn(),
+        warn: vi.fn(),
+    };
+
+    return {
+        logger: mockLogger,
+        Logger: mockLogger,
+    };
+});
+
 // Mock ReactDOM.createRoot properly
 const mockRender = vi.fn();
 const mockCreateRoot = vi.fn(() => ({
@@ -67,9 +109,11 @@ describe("main.tsx - Application Entry Point", () => {
             // Import and execute main.tsx - it should handle the error gracefully
             await import("../main");
 
-            // Since main.tsx wraps in try-catch, we expect console.error to be called
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            // Since main.tsx wraps in try-catch, we expect the structured logger to be called
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.objectContaining({
                     message: "Root element not found",
                 })
@@ -97,8 +141,10 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             // Verify error was caught and logged
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.objectContaining({
                     message: "Root element not found",
                 })
@@ -216,8 +262,10 @@ describe("main.tsx - Application Entry Point", () => {
             // Import main.tsx fresh after setting up the failing mock
             await import("../main");
 
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.objectContaining({
                     message: expect.stringContaining(
                         "ReactDOM createRoot failed"
@@ -257,8 +305,10 @@ describe("main.tsx - Application Entry Point", () => {
             // Import main.tsx
             await import("../main");
 
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.objectContaining({
                     message: "createRoot failed",
                 })
@@ -319,8 +369,10 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             // Verify error logging was triggered
-            expect(console.error).toHaveBeenCalledWith(
-                "Failed to initialize application:",
+            const { logger } = await import("../services/logger");
+
+            expect(logger.app.error).toHaveBeenCalledWith(
+                "initializeApp",
                 expect.any(Error)
             );
         });
@@ -378,7 +430,10 @@ describe("main.tsx - Application Entry Point", () => {
             await import("../main");
 
             // Verify no errors were logged
+            const { logger } = await import("../services/logger");
+
             expect(console.error).not.toHaveBeenCalled();
+            expect(logger.app.error).not.toHaveBeenCalled();
 
             // Verify successful initialization
             expect(mockCreateRoot).toHaveBeenCalledWith(rootDiv);

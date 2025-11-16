@@ -84,9 +84,13 @@ import { OperationTimeoutManager } from "./OperationTimeoutManager";
  * const dependencies: EnhancedMonitoringDependencies = {
  *     eventEmitter: new TypedEventBus(),
  *     getHistoryLimit: () => userSettings.historyLimit,
- *     historyRepository: new HistoryRepository(dbService),
- *     monitorRepository: new MonitorRepository(dbService),
- *     siteRepository: new SiteRepository(dbService),
+ *     historyRepository: new HistoryRepository({
+ *         databaseService: dbService,
+ *     }),
+ *     monitorRepository: new MonitorRepository({
+ *         databaseService: dbService,
+ *     }),
+ *     siteRepository: new SiteRepository({ databaseService: dbService }),
  *     sites: new StandardizedCache<Site>(),
  * };
  * ```

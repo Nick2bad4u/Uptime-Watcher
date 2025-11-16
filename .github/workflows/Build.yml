@@ -555,25 +555,27 @@ jobs:
                     fi
 
                     if [ "${#main_files[@]}" -gt 0 ]; then
-                      if ! cp -v "${main_files[@]}" "$target_dir/"; then
-                        echo "ERROR: Failed to copy main files for $artifact_dir"
+                      echo "Moving main files into $target_dir to avoid duplicating large artifacts..."
+                      # Use mv instead of cp to avoid quickly exhausting the ephemeral runner disk
+                      if ! mv -v "${main_files[@]}" "$target_dir/"; then
+                        echo "ERROR: Failed to move main files for $artifact_dir"
                         # Do not exit so we can continue and see other artifacts
                       fi
                     fi
 
                     echo
                     echo "Handling latest-mac.yml rename, if present"
-                    if [ -f "$artifact_dir/latest-mac.yml" ]; then
+                    # At this point main files (including latest-mac.yml) have been moved into $target_dir
+                    if [ -f "$target_dir/latest-mac.yml" ]; then
                       new_latest="$target_dir/latest-$platform_arch.yml"
-                      echo "Found $artifact_dir/latest-mac.yml, copying to $new_latest"
-                      if cp -v "$artifact_dir/latest-mac.yml" "$new_latest"; then
-                        echo "Removing original latest-mac.yml from $artifact_dir"
-                        rm -v "$artifact_dir/latest-mac.yml" || echo "WARNING: Failed to remove $artifact_dir/latest-mac.yml"
+                      echo "Found $target_dir/latest-mac.yml, renaming to $new_latest"
+                      if mv -v "$target_dir/latest-mac.yml" "$new_latest"; then
+                        echo "Renamed latest-mac.yml to architecture-specific name for $platform_arch"
                       else
-                        echo "ERROR: Failed to copy latest-mac.yml for $artifact_dir"
+                        echo "ERROR: Failed to rename latest-mac.yml for $artifact_dir"
                       fi
                     else
-                      echo "No latest-mac.yml found in $artifact_dir"
+                      echo "No latest-mac.yml found in $target_dir"
                     fi
 
                     echo
@@ -581,9 +583,10 @@ jobs:
                     for subdir in nsis-web squirrel-windows squirrel-windows-ia32; do
                       src_subdir="$artifact_dir/$subdir"
                       if [ -d "$src_subdir" ]; then
-                        echo "Copying directory: $src_subdir -> $target_dir/"
-                        if ! cp -rv "$src_subdir" "$target_dir/"; then
-                          echo "ERROR: Failed to copy $src_subdir"
+                        echo "Moving directory: $src_subdir -> $target_dir/"
+                        # Move the directory rather than copying to avoid doubling disk usage
+                        if ! mv -v "$src_subdir" "$target_dir/"; then
+                          echo "ERROR: Failed to move $src_subdir"
                         fi
                       else
                         echo "Subdir not found (skipping): $src_subdir"

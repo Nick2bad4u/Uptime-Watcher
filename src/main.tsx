@@ -10,10 +10,12 @@
  *   DOM.
  */
 
+import { ensureError } from "@shared/utils/errorHandling";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "./App";
+import { logger } from "./services/logger";
 import "./index.css";
 
 /**
@@ -52,6 +54,7 @@ function initializeApp(): void {
 try {
     initializeApp();
 } catch (error) {
-    console.error("Failed to initialize application:", error);
+    const normalizedError = ensureError(error);
+    logger.app.error("initializeApp", normalizedError);
     // Could show an error boundary or fallback UI here
 }
