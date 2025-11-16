@@ -1,19 +1,20 @@
 ---
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Example markdown-only page used within the Docusaurus site."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
+schema: "../../../../config/schemas/doc-frontmatter.schema.json"
 title: "Markdown page example"
-description: "Simple standalone markdown page demonstrating that Docusaurus can render pages without React components."
-keywords:
-	- "uptime-watcher"
-	- "docusaurus"
-	- "markdown"
-	- "example"
-anything_else:
-	doc_category: "Docusaurus"
-	source: "Uptime-Watcher docs"
+summary: Example markdown-only page used within the Docusaurus site.
+created: "2025-11-15"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "uptime-watcher"
+  - "docusaurus"
+  - "markdown"
+  - "example"
+topics:
+  - "documentation"
+  - "docusaurus"
+description: Simple standalone markdown page demonstrating that Docusaurus can render pages without React components.
 ---
 
 # Markdown page example

@@ -1,23 +1,24 @@
 ---
-ai_note: Updated by AI on 2025-11-15 to add metadata.
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Testing documentation"
 summary: >-
   Index of testing documentation, guides, and best practices for the Uptime
   Watcher application.
-creation_date: unknown
-last_modified_date: '2025-11-15'
-author: Nick2bad4u
-title: Testing documentation
+created: "2025-11-15"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "uptime-watcher"
+  - "testing"
+  - "vitest"
+  - "playwright"
+topics:
+  - "testing"
+  - "quality-assurance"
 description: >-
   Top-level overview of the testing documentation, including unit, integration,
   E2E, and fuzzing strategies used in the Uptime-Watcher project.
-keywords:
-  - uptime-watcher
-  - testing
-  - vitest
-  - playwright
-misc:
-  doc_category: Testing
-  source: Uptime-Watcher docs
 ---
 
 # Testing documentation
@@ -82,26 +83,26 @@ For new developers getting started with testing:
 
 ### Playwright testing
 
-Guide                                                     | Description                              | Use case
---------------------------------------------------------- | ---------------------------------------- | ---------------------------
-[Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md) | Comprehensive Playwright setup and usage | E2E and Electron testing
-[Playwright codegen guide](./PLAYWRIGHT_CODEGEN_GUIDE.md) | Test generation workflows and automation | Creating new test cases
-[Headless testing](./HEADLESS_TESTING.md)                 | Running tests without UI in CI/CD        | Automated testing pipelines
+| Guide                                                     | Description                              | Use case                    |
+| --------------------------------------------------------- | ---------------------------------------- | --------------------------- |
+| [Playwright testing guide](./PLAYWRIGHT_TESTING_GUIDE.md) | Comprehensive Playwright setup and usage | E2E and Electron testing    |
+| [Playwright codegen guide](./PLAYWRIGHT_CODEGEN_GUIDE.md) | Test generation workflows and automation | Creating new test cases     |
+| [Headless testing](./HEADLESS_TESTING.md)                 | Running tests without UI in CI/CD        | Automated testing pipelines |
 
 ### Code generation and templates
 
-Guide                                                 | Description                                   | Use case
------------------------------------------------------ | --------------------------------------------- | ----------------------------
-[Codegen best practices](./CODEGEN_BEST_PRACTICES.md) | Guidelines for effective code generation      | Test maintenance and quality
-[Template usage](./CODEGEN_TEMPLATE_USAGE.md)         | Using templates for consistent test structure | Standardizing test patterns
+| Guide                                                 | Description                                   | Use case                     |
+| ----------------------------------------------------- | --------------------------------------------- | ---------------------------- |
+| [Codegen best practices](./CODEGEN_BEST_PRACTICES.md) | Guidelines for effective code generation      | Test maintenance and quality |
+| [Template usage](./CODEGEN_TEMPLATE_USAGE.md)         | Using templates for consistent test structure | Standardizing test patterns  |
 
 ### Advanced testing techniques
 
-Guide                                                        | Description                                   | Use case
------------------------------------------------------------- | --------------------------------------------- | ----------------------------------
-[Fast-check fuzzing coverage](./FAST_CHECK_FUZZING_GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs
-[Zero coverage audit](./ZERO_COVERAGE_AUDIT.md)              | Isolate tests that no longer execute code     | Pruning stale specs safely
-[Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)            | Configuring test output and debugging         | Test debugging and CI optimization
+| Guide                                                        | Description                                   | Use case                           |
+| ------------------------------------------------------------ | --------------------------------------------- | ---------------------------------- |
+| [Fast-check fuzzing coverage](./FAST_CHECK_FUZZING_GUIDE.md) | Property-based testing and fuzzing strategies | Finding edge cases and bugs        |
+| [Zero coverage audit](./ZERO_COVERAGE_AUDIT.md)              | Isolate tests that no longer execute code     | Pruning stale specs safely         |
+| [Test verbosity guide](./TEST_VERBOSITY_GUIDE.md)            | Configuring test output and debugging         | Test debugging and CI optimization |
 
 ## 🏃‍♂️ Running tests
 

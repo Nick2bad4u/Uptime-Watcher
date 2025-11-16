@@ -1,19 +1,20 @@
----
-ai_note: "Updated by AI on 2025-11-15 to add metadata."
-summary: "Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher."
-creation_date: "unknown"
-last_modified_date: "2025-11-15"
-author: "Nick2bad4u"
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Website"
-description: "README for the Docusaurus documentation site, covering installation, local development, build, and deployment commands."
-keywords:
-	- "uptime-watcher"
-	- "docusaurus"
-	- "documentation-site"
-	- "deployment"
-misc:
-	doc_category: "Docusaurus"
-	source: "Uptime-Watcher docs"
+summary: Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher.
+created: "2025-11-15"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "uptime-watcher"
+  - "docusaurus"
+  - "documentation-site"
+  - "deployment"
+topics:
+  - "documentation"
+  - "docusaurus"
+description: README for the Docusaurus documentation site, covering installation, local development, build, and deployment commands.
+
 ---
 
 # Website
