@@ -946,7 +946,7 @@ export interface UptimeEvents extends UnknownRecord {
      * site.
      *
      * @param identifier - The unique identifier for the site.
-     * @param monitorId - The monitor ID.
+     * @param monitorId - Optional monitor ID.
      * @param operation - The operation type (always
      *   "is-monitoring-active-requested").
      * @param timestamp - Unix timestamp (ms) when the request was made.
@@ -954,8 +954,8 @@ export interface UptimeEvents extends UnknownRecord {
     "internal:site:is-monitoring-active-requested": {
         /** The unique identifier for the site. */
         identifier: string;
-        /** The monitor ID. */
-        monitorId: string;
+        /** Optional monitor ID. */
+        monitorId?: string;
         /** The operation type (always "is-monitoring-active-requested"). */
         operation: "is-monitoring-active-requested";
         /** Unix timestamp (ms) when the request was made. */
@@ -1027,7 +1027,7 @@ export interface UptimeEvents extends UnknownRecord {
      * Emitted in response to a restart monitoring request.
      *
      * @param identifier - The unique identifier for the site.
-     * @param monitorId - The monitor ID.
+     * @param monitorId - Optional monitor ID.
      * @param operation - The operation type (always
      *   "restart-monitoring-response").
      * @param success - Whether the restart was successful.
@@ -1036,8 +1036,8 @@ export interface UptimeEvents extends UnknownRecord {
     "internal:site:restart-monitoring-response": {
         /** The unique identifier for the site. */
         identifier: string;
-        /** The monitor ID. */
-        monitorId: string;
+        /** Optional monitor ID. */
+        monitorId?: string;
         /** The operation type (always "restart-monitoring-response"). */
         operation: "restart-monitoring-response";
         /** Whether the restart was successful. */
@@ -1083,6 +1083,29 @@ export interface UptimeEvents extends UnknownRecord {
         /** The operation type (always "stop-monitoring-requested"). */
         operation: "stop-monitoring-requested";
         /** Unix timestamp (ms) when the request was made. */
+        timestamp: number;
+    };
+
+    /**
+     * Emitted in response to a stop monitoring request.
+     *
+     * @param identifier - The unique identifier for the site.
+     * @param monitorId - Optional monitor ID.
+     * @param operation - The operation type (always
+     *   "stop-monitoring-response").
+     * @param success - Whether the stop operation was successful.
+     * @param timestamp - Unix timestamp (ms) when the response was sent.
+     */
+    "internal:site:stop-monitoring-response": {
+        /** The unique identifier for the site. */
+        identifier: string;
+        /** Optional monitor ID. */
+        monitorId?: string;
+        /** The operation type (always "stop-monitoring-response"). */
+        operation: "stop-monitoring-response";
+        /** Whether the stop operation was successful. */
+        success: boolean;
+        /** Unix timestamp (ms) when the response was sent. */
         timestamp: number;
     };
 
@@ -1650,6 +1673,7 @@ export const EVENT_CATEGORIES = {
         "internal:site:restart-monitoring-response",
         "internal:site:start-monitoring-requested",
         "internal:site:stop-monitoring-requested",
+        "internal:site:stop-monitoring-response",
         "internal:site:updated",
     ] as const,
 

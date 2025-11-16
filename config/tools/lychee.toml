@@ -2,13 +2,13 @@
 
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
-name = "lychee"
+name        = "lychee"
 description = "Configuration file for lychee link checker."
-version = "1.0.0"
-git = "LycheeOrg/Lychee"
-changelog = "https://github.com/LycheeOrg/Lychee/blob/master/README.md"
-"$schema" = "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json"
-verbose = "info"
+version     = "1.0.0"
+git         = "LycheeOrg/Lychee"
+changelog   = "https://github.com/LycheeOrg/Lychee/blob/master/README.md"
+"$schema"   = "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json"
+verbose     = "info"
 
 # Don't show interactive progress bar while checking links.
 no_progress = false
@@ -61,7 +61,10 @@ retry_wait_time = 2
 # accept = "200..=204, 429"
 # accept = ["200", "429"]
 # accept = "200, 429"
-accept = ["200", "429"]
+accept = [
+    "200",
+    "429",
+]
 
 # Proceed for server connections considered insecure (invalid TLS).
 insecure = false
@@ -69,7 +72,7 @@ insecure = false
 # Only test links with the given schemes (e.g. https).
 # Omit to check links with any other scheme.
 # At the moment, we support http, https, file, and mailto.
-scheme = ["https"]
+scheme = [ "https" ]
 
 # When links are available using HTTPS, treat HTTP links as errors.
 require_https = false
@@ -81,11 +84,14 @@ method = "get"
 # header = { "accept" = "text/html", "x-custom-header" = "value" }
 
 # Remap URI matching pattern to different URI.
-remap = ["https://example.com http://example.invalid"]
+remap = [ "https://example.com http://example.invalid" ]
 
 # Fallback extensions to apply when a URL does not specify one.
 # This is common in documentation tools that cross-reference files without extensions.
-fallback_extensions = ["html", "md"]
+fallback_extensions = [
+    "html",
+    "md",
+]
 
 # Base URL or website root directory to check relative URLs.
 base_url = "https://example.com"
@@ -96,7 +102,7 @@ root_dir = "/dist"
 # HTTP basic auth support. This will be the username and password passed to the
 # authorization HTTP header. See
 # <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization>
-basic_auth = ["example.com user:pwd"]
+basic_auth = [ "example.com user:pwd" ]
 
 # Enable the checking of fragments in links.
 include_fragments = true
@@ -129,7 +135,7 @@ exclude_path = [
 ]
 
 # URLs to check (supports regex). Has preference over all excludes.
-include = ['gist\.github\.com.*']
+include = [ 'gist\.github\.com.*' ]
 
 # Exclude all private IPs from checking.
 # Equivalent to setting `exclude_private`, `exclude_link_local`, and

@@ -200,7 +200,7 @@ describe(useAlertStore, () => {
 
         const alert = mapStatusUpdateToAlert(update);
 
-        // deriveSiteName should fall back to the trimmed identifier
+        // DeriveSiteName should fall back to the trimmed identifier
         expect(alert.siteName).toBe("site-slug");
     });
 
@@ -217,7 +217,7 @@ describe(useAlertStore, () => {
 
         const alert = mapStatusUpdateToAlert(update);
 
-        // deriveSiteName should use the trimmed siteIdentifier from the event
+        // DeriveSiteName should use the trimmed siteIdentifier from the event
         expect(alert.siteName).toBe("event-id");
     });
 
@@ -271,7 +271,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
 
         try {
             globalThis.crypto = {
-                // randomUUID intentionally omitted to hit the getRandomValues branch
+                // RandomUUID intentionally omitted to hit the getRandomValues branch
                 getRandomValues: mockGetRandomValues,
             } as unknown as Crypto;
 
@@ -284,7 +284,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
             });
 
             expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
-            expect(alert.id).toMatch(/^alert-[0-9a-z]+-[0-9a-z]+$/);
+            expect(alert.id).toMatch(/^alert(?:-[\da-z]+){2}$/);
         } finally {
             globalThis.crypto = originalCrypto;
         }
@@ -306,7 +306,7 @@ describe("useAlertStore identifier generation fallbacks", () => {
                 status: STATUS_KIND.DOWN,
             });
 
-            expect(alert.id).toMatch(/^alert-1730000000000-\d+$/);
+            expect(alert.id).toMatch(/^alert-1730{10}-\d+$/);
         } finally {
             nowSpy.mockRestore();
             globalThis.crypto = originalCrypto;

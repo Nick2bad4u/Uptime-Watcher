@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "New Monitor Type Implementation Guide"
 summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
 created: "2025-08-01"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-   - "uptime-watcher"
-   - "monitoring"
-   - "monitor-types"
-   - "implementation"
-   - "guide"
+
+- "uptime-watcher"
+- "monitoring"
+- "monitor-types"
+- "implementation"
+- "guide"
+
 ---
 
 # Uptime Monitoring System - New Monitor Type Implementation Guide
@@ -132,8 +136,8 @@ Run the shared unit tests before moving on: `npm run test:shared`.
    - Mirror `electron/test/services/monitoring/SslMonitor.test.ts`. Cover success, degraded thresholds, failure states, timeouts, and invalid configurations.
 3. Register the monitor type
    - Update `electron/services/monitoring/MonitorTypeRegistry.ts`:
-     - Import the service and call `registerMonitorType({ ... })` with description, display name, `fields` metadata, `serviceFactory`, `uiConfig`, and `validationSchema` (the shared schema you added).
-     - Set the implementation version through `versionManager.setVersion(type, semver)` in the version block near the end of `MonitorTypeRegistry.ts` so telemetry and migrations stay aligned.
+   - Import the service and call `registerMonitorType({ ... })` with description, display name, `fields` metadata, `serviceFactory`, `uiConfig`, and `validationSchema` (the shared schema you added).
+   - Set the implementation version through `versionManager.setVersion(type, semver)` in the version block near the end of `MonitorTypeRegistry.ts` so telemetry and migrations stay aligned.
    - Provide history and analytics formatters as needed through the `uiConfig` hooks.
 4. Route checks
    - In `electron/services/monitoring/EnhancedMonitorChecker.ts`, add a class property for the new service and handle it inside the `switch (monitor.type)` block.

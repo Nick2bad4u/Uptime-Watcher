@@ -1,3 +1,21 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "Development Patterns Guide"
+summary: "Documents the core architectural and development patterns used across Uptime Watcher, including repositories, events, state, IPC, and testing."
+created: "2025-08-05"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "patterns"
+- "guidelines"
+
+---
+
 # Development Patterns Guide
 
 This guide documents the established architectural patterns used throughout the Uptime-Watcher application. Following these patterns ensures consistency, maintainability, predictable behavior, and production-grade quality across the codebase.
@@ -784,13 +802,13 @@ const tempCache = new StandardizedCache<Site>({
 
 ### Cache Type Guidelines
 
-Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled
--------------- | ------ | -------- | -------------------------- | -------------
-**SITES**      | 10 min | 500      | Site management operations | ✓
-**MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓
-**SETTINGS**   | 30 min | 100      | Application configuration  | ✓
-**VALIDATION** | 5 min  | 200      | Validation result caching  | ✓
-**TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗
+| Cache Type     | TTL    | Max Size | Use Case                   | Stats Enabled |
+| -------------- | ------ | -------- | -------------------------- | ------------- |
+| **SITES**      | 10 min | 500      | Site management operations | ✓             |
+| **MONITORS**   | 5 min  | 1000     | Real-time monitoring data  | ✓             |
+| **SETTINGS**   | 30 min | 100      | Application configuration  | ✓             |
+| **VALIDATION** | 5 min  | 200      | Validation result caching  | ✓             |
+| **TEMPORARY**  | 5 min  | 1000     | Short-term operations      | ✗             |
 
 ### Cache Configuration Implementation Template
 

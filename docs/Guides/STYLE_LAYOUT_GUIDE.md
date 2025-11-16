@@ -1,4 +1,5 @@
 ---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Style & Layout Guide"
 summary: "Guide to shared styling primitives and layout conventions used in the Uptime Watcher renderer UI."
 created: "2025-10-07"
@@ -6,11 +7,11 @@ last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-	- "uptime-watcher"
-	- "styling"
-	- "layout"
-	- "ui"
-	- "css"
+  - "uptime-watcher"
+  - "styling"
+  - "layout"
+  - "ui"
+  - "css"
 ---
 
 # Style & Layout Guide

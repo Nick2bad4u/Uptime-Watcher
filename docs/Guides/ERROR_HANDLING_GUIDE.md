@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "error-handling"
-  - "zustand"
-  - "validation"
-  - "testing"
+
+- "uptime-watcher"
+- "error-handling"
+- "zustand"
+- "validation"
+- "testing"
+
 ---
 
 # Error Handling Guide
@@ -827,14 +831,14 @@ describe("Store Error Handling", () => {
 
 ## Best Practices
 
-### 1\. Error Handling Hierarchy
+### 1. Error Handling Hierarchy
 
 - **Local Component Errors**: Handle UI-specific errors locally
 - **Store-Specific Errors**: Use domain isolation for business logic errors
 - **Global Errors**: Reserve for application-wide critical errors
 - **Operation Errors**: Use operation-specific loading and error states
 
-### 2\. Consistent Error Patterns
+### 2. Consistent Error Patterns
 
 ```typescript
 // ✅ Good: Consistent error handling
@@ -868,7 +872,7 @@ const handleOperation = async () => {
 };
 ```
 
-### 3\. Error Logging Standards
+### 3. Error Logging Standards
 
 ```typescript
 // ✅ Good: Comprehensive error logging
@@ -893,7 +897,7 @@ try {
 }
 ```
 
-### 4\. Error Recovery Patterns
+### 4. Error Recovery Patterns
 
 ```typescript
 // ✅ Good: Error recovery with user actions
@@ -924,7 +928,7 @@ const FeatureComponent = () => {
 };
 ```
 
-### 5\. Testing Error Scenarios
+### 5. Testing Error Scenarios
 
 - **Test both success and error paths**
 - **Verify error state management**

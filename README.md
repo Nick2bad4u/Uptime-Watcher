@@ -80,22 +80,22 @@ Uptime Watcher is a desktop application built with modern web technologies that 
 
 ## Monitor types
 
-Category           | Monitor                     | Primary objective                              | Highlights
------------------- | --------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------
-HTTP Availability  | **HTTP (Website/API)**      | Measure general availability and response time | Handles redirects, captures response code, records latency
-HTTP Validation    | **HTTP Status Code**        | Enforce an exact response status               | Marks monitor degraded/down when status deviates from expectation
-HTTP Content       | **HTTP Header Match**       | Validate specific response headers             | Case-insensitive comparisons with retry-aware checks
-HTTP Content       | **HTTP Keyword Match**      | Ensure body contains a keyword                 | Case-insensitive substring search for rapid regressions
-HTTP Content       | **HTTP JSON Match**         | Inspect JSON payload fields                    | JSON path extraction with typed comparison
-HTTP Performance   | **HTTP Latency Threshold**  | Detect slow responses                          | Flags degraded when latency exceeds configured threshold
-Transport          | **Port (Host/Port)**        | Verify TCP connectivity                        | Connection handshake timing with configurable ports
-Transport          | **Ping (Host)**             | Check reachability                             | ICMP ping with latency sampling and packet loss handling
-Network Services   | **DNS (Domain Resolution)** | Resolve DNS records                            | Supports A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY
-Security           | **SSL Certificate**         | Track TLS validity                             | Warns on expiry windows and handshake anomalies
-Edge Delivery      | **CDN Edge Consistency**    | Compare edge vs origin responses               | Detects drift in status/content across edge nodes
-Data Platforms     | **Replication Lag**         | Monitor replica freshness                      | Compares timestamps between primary and replica endpoints
-Application Health | **Server Heartbeat**        | Validate custom heartbeat payloads             | Status/timestamp drift analysis with JSON path extraction
-Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsiveness                | Ping/pong watchdog for stalled connections
+| Category           | Monitor                     | Primary objective                              | Highlights                                                                 |
+| ------------------ | --------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
+| HTTP Availability  | **HTTP (Website/API)**      | Measure general availability and response time | Handles redirects, captures response code, records latency                 |
+| HTTP Validation    | **HTTP Status Code**        | Enforce an exact response status               | Marks monitor degraded/down when status deviates from expectation          |
+| HTTP Content       | **HTTP Header Match**       | Validate specific response headers             | Case-insensitive comparisons with retry-aware checks                       |
+| HTTP Content       | **HTTP Keyword Match**      | Ensure body contains a keyword                 | Case-insensitive substring search for rapid regressions                    |
+| HTTP Content       | **HTTP JSON Match**         | Inspect JSON payload fields                    | JSON path extraction with typed comparison                                 |
+| HTTP Performance   | **HTTP Latency Threshold**  | Detect slow responses                          | Flags degraded when latency exceeds configured threshold                   |
+| Transport          | **Port (Host/Port)**        | Verify TCP connectivity                        | Connection handshake timing with configurable ports                        |
+| Transport          | **Ping (Host)**             | Check reachability                             | ICMP ping with latency sampling and packet loss handling                   |
+| Network Services   | **DNS (Domain Resolution)** | Resolve DNS records                            | Supports A, AAAA, CNAME, MX, TXT, NS, SRV, CAA, PTR, NAPTR, SOA, TLSA, ANY |
+| Security           | **SSL Certificate**         | Track TLS validity                             | Warns on expiry windows and handshake anomalies                            |
+| Edge Delivery      | **CDN Edge Consistency**    | Compare edge vs origin responses               | Detects drift in status/content across edge nodes                          |
+| Data Platforms     | **Replication Lag**         | Monitor replica freshness                      | Compares timestamps between primary and replica endpoints                  |
+| Application Health | **Server Heartbeat**        | Validate custom heartbeat payloads             | Status/timestamp drift analysis with JSON path extraction                  |
+| Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsiveness                | Ping/pong watchdog for stalled connections                                 |
 
 ## 🛠️ Technology stack
 
@@ -125,7 +125,7 @@ Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsivene
   <img src="https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js&amp;logoColor=white" alt="Node.js">
 </a>
 
-### <strong>State &amp; Data Management</strong>
+### <strong>State & Data Management</strong>
 
 <a href="https://github.com/pmndrs/zustand">
   <img src="https://img.shields.io/badge/Zustand-State_Management-FF6B6B" alt="Zustand">
@@ -134,7 +134,7 @@ Realtime Channels  | **WebSocket Keepalive**     | Ensure WebSocket responsivene
   <img src="https://img.shields.io/badge/SQLite-node--sqlite3--wasm-003B57?logo=sqlite&amp;logoColor=white" alt="SQLite">
 </a>
 
-### <strong>Development &amp; Quality</strong>
+### <strong>Development & Quality</strong>
 
 <a href="https://vitest.dev/">
   <img src="https://img.shields.io/badge/Vitest-Testing-6E9F18?logo=vitest&amp;logoColor=white" alt="Vitest">
@@ -186,7 +186,7 @@ npm run electron-dev               # Append flags if needed: npm run electron-de
 
 </div>
 
---------------------------------------------------------------------------------
+---
 
 ## 👨‍💻 Development
 
@@ -219,7 +219,7 @@ npm run dist
 | <strong>npm</strong>     | 11.5.2+ (included with Node.js) | <a href="https://www.npmjs.com/">Docs</a>   |
 | <strong>Git</strong>     | Latest version                  | <a href="https://git-scm.com/">Download</a> |
 
-&gt; <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
+\> <strong>💡 Tip</strong>: Check out the <a href="./docs/Guides/DEVELOPER_QUICK_START.md">Developer Quick Start Guide</a> for detailed setup instructions and architecture overview.
 
 </div>
 
@@ -245,13 +245,13 @@ For practical guidance on configuring monitors and writing tests, see our compre
 
 For running and tuning our fast-check based fuzzing suites, see:
 
-- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST_CHECK_FUZZING_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
+- Fast-Check Fuzzing Coverage Guide → [docs/Testing/FAST\_CHECK\_FUZZING\_GUIDE.md](./docs/Testing/FAST_CHECK_FUZZING_GUIDE.md)
 
 ### End-to-end testing with Playwright
 
 For comprehensive testing with Playwright, including setup, configuration, and troubleshooting common issues:
 
-- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
+- Playwright Testing Guide → [docs/Testing/PLAYWRIGHT\_TESTING\_GUIDE.md](./docs/Testing/PLAYWRIGHT_TESTING_GUIDE.md)
 
 ### IPC automation workflow
 
@@ -369,7 +369,7 @@ We welcome contributions from the community! Here's how you can help:
 4. **Update Documentation** for any user-facing changes
 5. **Submit a Pull Request** with a clear description
 
---------------------------------------------------------------------------------
+---
 
 ## 📄 License
 
@@ -381,13 +381,13 @@ We welcome contributions from the community! Here's how you can help:
 
 <em>You are free to use, modify, and distribute this software for any purpose, commercial or non-commercial, without any restrictions. Credit is appreciated but not required.</em></div>
 
---------------------------------------------------------------------------------
+---
 
 ## Get help
 
 [![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
---------------------------------------------------------------------------------
+---
 
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 

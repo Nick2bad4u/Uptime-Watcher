@@ -1,23 +1,23 @@
 ---
-ai_note: Updated by AI on 2025-11-15 to add metadata.
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Architecture Documentation Index"
 summary: >-
-  Index of architectural documentation for the Uptime-Watcher application,
-  including ADRs, patterns, templates, and standards.
-creation_date: unknown
-last_modified_date: '2025-11-15'
-author: Nick2bad4u
-title: Architecture Documentation Index
-description: >-
-  Top-level index for the Architecture docs directory, mapping ADRs, patterns,
-  templates, and documentation standards for the Uptime-Watcher project.
-keywords:
-  - uptime-watcher
-  - architecture
-  - adr
-  - patterns
-misc:
-  doc_category: Architecture
-  source: Uptime-Watcher docs
+Index of architectural documentation for the Uptime-Watcher application,
+including ADRs, patterns, templates, and standards.
+created: "2025-08-05"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "adr"
+- "patterns"
+- "templates"
+- "standards"
+
 ---
 
 # Architecture Documentation Index

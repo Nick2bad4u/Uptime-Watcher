@@ -1,68 +1,71 @@
 # ~/.taplo.toml
 # yaml-language-server: $schema=https://www.schemastore.org/taplo.json
 [schema]
-enabled = true
-url = "https://www.schemastore.org/taplo.json"
+    enabled = true
+    url     = "https://www.schemastore.org/taplo.json"
 
 [formatting]
-# Match Prettier's 4-space indent / spaces, not tabs
-indent_string = "    "
-use_tabs = false
-align_comments = true
-align_entries = true
-align_single_comments = true
-allowed_blank_lines = 1
-array_auto_expand = true
-compact_arrays = false
-compact_entries = false
-crlf = false
-indent_entries = true
-indent_tables = true
-inline_table_expand = true
-reorder_arrays = true
-trailing_newline = true
-# Keep inline tables expanded (avoid “compaction” look)
-compact_inline_tables = false
+    # Match Prettier's 4-space indent / spaces, not tabs
+    indent_string         = "    "
+    use_tabs              = false
+    align_comments        = true
+    align_entries         = true
+    align_single_comments = true
+    allowed_blank_lines   = 1
+    array_auto_expand     = true
+    compact_arrays        = false
+    compact_entries       = false
+    crlf                  = false
+    indent_entries        = true
+    indent_tables         = true
+    inline_table_expand   = true
+    reorder_arrays        = true
+    trailing_newline      = true
+    # Keep inline tables expanded (avoid “compaction” look)
+    compact_inline_tables = false
 
-# Wrap lines at ~Prettier's printWidth of 80
-column_width = 80
+    # Wrap lines at ~Prettier's printWidth of 80
+    column_width = 80
 
-# Arrays: prefer multi-line for longer content; allow trailing commas
-array_auto_collapse = false
-array_trailing_comma = true
+    # Arrays: prefer multi-line for longer content; allow trailing commas
+    array_auto_collapse  = false
+    array_trailing_comma = true
 
-# Always insert a final newline
-newline_at_eof = true
+    # Always insert a final newline
+    newline_at_eof = true
 
-# Don't reorder keys (stay close to Prettier’s unsorted JSON stance)
-reorder_keys = false
+    # Don't reorder keys (stay close to Prettier’s unsorted JSON stance)
+    reorder_keys = false
 
-# Rules to emulate your Prettier overrides
-
-[[rule]]
-include = ["*.css", "*.user.css"]
-
-[rule.formatting]
-column_width = 80
-# Encourage multi-line when arrays get long (closest analogue to threshold=1)
-array_auto_collapse = false
+    # Rules to emulate your Prettier overrides
 
 [[rule]]
-include = ["eslint.config.mjs"]
+    include = [
+        "*.css",
+        "*.user.css",
+    ]
 
-[rule.formatting]
-array_auto_collapse = false
-
-[[rule]]
-include = ["*.html"]
-
-[rule.formatting]
-column_width = 80
-compact_inline_tables = false
+    [rule.formatting]
+        column_width = 80
+        # Encourage multi-line when arrays get long (closest analogue to threshold=1)
+        array_auto_collapse = false
 
 [[rule]]
-include = ["*.md"]
+    include = [ "eslint.config.mjs" ]
 
-[rule.formatting]
-# Prettier tabWidth: 1
-indent_string = " "
+    [rule.formatting]
+        array_auto_collapse = false
+
+[[rule]]
+    include = [ "*.html" ]
+
+    [rule.formatting]
+        column_width          = 80
+        compact_inline_tables = false
+
+[[rule]]
+    include = [ "*.md" ]
+
+    [rule.formatting]
+        # Prettier tabWidth: 1
+        indent_string = " "

@@ -1,3 +1,22 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "Component Props Standards"
+summary: "Defines standardized patterns and conventions for React component props in the Uptime Watcher frontend."
+created: "2025-08-23"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "react"
+- "components"
+- "props"
+
+---
+
 # Component Props Standards
 
 ## 📋 **Overview**

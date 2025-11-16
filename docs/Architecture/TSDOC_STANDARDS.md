@@ -1,3 +1,22 @@
+---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "TSDoc Standardization Guide"
+summary: "Standardizes TSDoc usage patterns and inline code examples across the Uptime-Watcher codebase."
+created: "2025-08-05"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "tsdoc"
+- "documentation"
+- "standards"
+
+---
+
 # TSDoc Standardization Guide
 
 This document standardizes inline code examples and TSDoc patterns across the Uptime-Watcher codebase, reflecting current production-grade documentation practices.

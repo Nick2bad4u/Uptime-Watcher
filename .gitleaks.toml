@@ -2,7 +2,7 @@
 # Modern configuration following Gitleaks v8.28+ best practices with latest rules
 # See: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
 "$schema" = "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json"
-title = "Uptime Watcher - Enhanced Secret Detection Configuration"
+title     = "Uptime Watcher - Enhanced Secret Detection Configuration"
 
 # Extend the default Gitleaks configuration with modern v8.28+ rules
 # The default configuration includes comprehensive patterns for:
@@ -13,222 +13,267 @@ title = "Uptime Watcher - Enhanced Secret Detection Configuration"
 # - Service-specific secrets
 # - New AI platform keys (OpenAI, Anthropic, etc.)
 [extend]
-useDefault = true
+    useDefault = true
 
-# Disable overly broad rules that generate false positives
-# in JavaScript/TypeScript development environments
-disabledRules = ["generic-api-key"]
+    # Disable overly broad rules that generate false positives
+    # in JavaScript/TypeScript development environments
+    disabledRules = [ "generic-api-key" ]
 
-# Performance optimizations enabled by default in v8.28+
-# - Stopword optimization (promoted from experimental)
-# - Fragment newline calculation optimization
-# - Enhanced allowlist processing
+    # Performance optimizations enabled by default in v8.28+
+    # - Stopword optimization (promoted from experimental)
+    # - Fragment newline calculation optimization
+    # - Enhanced allowlist processing
 
 # Custom rules for project-specific patterns
 [[rules]]
-id = "electron-config-secrets"
-description = "Detect hardcoded secrets in Electron configuration files"
-regex = '''(?i)(electron[_-]?(?:secret|key|token|password|credential))\s*[:=]\s*["']?([a-zA-Z0-9]{16,})["']?'''
-secretGroup = 2
-keywords = ["electron", "key", "password", "secret", "token"]
-tags = ["configuration", "electron", "secrets"]
+    id = "electron-config-secrets"
+    description = "Detect hardcoded secrets in Electron configuration files"
+    regex = '''(?i)(electron[_-]?(?:secret|key|token|password|credential))\s*[:=]\s*["']?([a-zA-Z0-9]{16,})["']?'''
+    secretGroup = 2
+    keywords = [
+        "electron",
+        "key",
+        "password",
+        "secret",
+        "token",
+    ]
+    tags = [
+        "configuration",
+        "electron",
+        "secrets",
+    ]
 
-[[rules.allowlists]]
-description = "Allow example values in documentation"
-paths = ['''docs/.*\.(md|txt|rst)$''']
-regexTarget = "secret"
-regexes = ['''(?i)(example|demo|placeholder|test|sample)''']
-
-[[rules]]
-id = "database-connection-strings"
-description = "Detect database connection strings with embedded credentials"
-regex = '''(?i)(database_url|db_url|connection_string)\s*[:=]\s*["']?([^"'\s]+://[^"'\s]*:[^"'\s]*@[^"'\s]+)["']?'''
-secretGroup = 2
-keywords = ["connection", "database", "db", "url"]
-tags = ["connection-string", "credentials", "database"]
-
-[[rules.allowlists]]
-description = "Allow example connection strings in documentation"
-paths = ['''docs/.*\.(md|txt|rst)$''']
-regexTarget = "secret"
-regexes = ['''(?i)(example|localhost|127\.0\.0\.1|test|demo)''']
+    [[rules.allowlists]]
+        description = "Allow example values in documentation"
+        paths       = [ '''docs/.*\.(md|txt|rst)$''' ]
+        regexTarget = "secret"
+        regexes     = [ '''(?i)(example|demo|placeholder|test|sample)''' ]
 
 [[rules]]
-id = "vite-env-secrets"
-description = "Detect secrets in Vite environment variable definitions"
-regex = '''(?i)VITE_(?:API_|SECRET_|PASSWORD_|TOKEN_|KEY_)[A-Z0-9_]*\s*[:=]\s*["']?([a-zA-Z0-9+/=]{16,})["']?'''
-secretGroup = 1
-keywords = ["api_", "key_", "password_", "secret_", "token_", "vite_"]
-tags = ["environment", "frontend", "secrets", "vite"]
+    id = "database-connection-strings"
+    description = "Detect database connection strings with embedded credentials"
+    regex = '''(?i)(database_url|db_url|connection_string)\s*[:=]\s*["']?([^"'\s]+://[^"'\s]*:[^"'\s]*@[^"'\s]+)["']?'''
+    secretGroup = 2
+    keywords = [
+        "connection",
+        "database",
+        "db",
+        "url",
+    ]
+    tags = [
+        "connection-string",
+        "credentials",
+        "database",
+    ]
 
-[[rules.allowlists]]
-description = "Allow development and test values"
-regexTarget = "secret"
-regexes = [
-    '''(?i)(development|dev|test|local|localhost|example|demo|placeholder)''',
-    '''^(true|false|1|0|yes|no|enabled|disabled)$''',
-]
+    [[rules.allowlists]]
+        description = "Allow example connection strings in documentation"
+        paths       = [ '''docs/.*\.(md|txt|rst)$''' ]
+        regexTarget = "secret"
+        regexes     = [ '''(?i)(example|localhost|127\.0\.0\.1|test|demo)''' ]
+
+[[rules]]
+    id = "vite-env-secrets"
+    description = "Detect secrets in Vite environment variable definitions"
+    regex = '''(?i)VITE_(?:API_|SECRET_|PASSWORD_|TOKEN_|KEY_)[A-Z0-9_]*\s*[:=]\s*["']?([a-zA-Z0-9+/=]{16,})["']?'''
+    secretGroup = 1
+    keywords = [
+        "api_",
+        "key_",
+        "password_",
+        "secret_",
+        "token_",
+        "vite_",
+    ]
+    tags = [
+        "environment",
+        "frontend",
+        "secrets",
+        "vite",
+    ]
+
+    [[rules.allowlists]]
+        description = "Allow development and test values"
+        regexTarget = "secret"
+        regexes = [
+            '''(?i)(development|dev|test|local|localhost|example|demo|placeholder)''',
+            '''^(true|false|1|0|yes|no|enabled|disabled)$''',
+        ]
 
 # Enhanced AI platform detection rules (v8.28+ features)
 [[rules]]
-id = "anthropic-enhanced-detection"
-description = "Enhanced detection for Anthropic API keys including all variants"
-regex = '''\b(sk-ant-(?:api03|admin01)-[a-zA-Z0-9_\-]{93}AA)(?:[\x60'"\s;]|\\[nr]|$)'''
-keywords = ["sk-ant-admin01", "sk-ant-api03"]
-tags = ["ai", "anthropic", "api-key"]
+    id = "anthropic-enhanced-detection"
+    description = "Enhanced detection for Anthropic API keys including all variants"
+    regex = '''\b(sk-ant-(?:api03|admin01)-[a-zA-Z0-9_\-]{93}AA)(?:[\x60'"\s;]|\\[nr]|$)'''
+    keywords = [
+        "sk-ant-admin01",
+        "sk-ant-api03",
+    ]
+    tags = [
+        "ai",
+        "anthropic",
+        "api-key",
+    ]
 
 [[rules]]
-id = "perplexity-api-detection"
-description = "Detect Perplexity AI API keys"
-regex = '''\b(pplx-[a-zA-Z0-9]{48})(?:[\x60'"\s;]|\\[nr]|$)'''
-keywords = ["pplx-"]
-tags = ["ai", "api-key", "perplexity"]
+    id = "perplexity-api-detection"
+    description = "Detect Perplexity AI API keys"
+    regex = '''\b(pplx-[a-zA-Z0-9]{48})(?:[\x60'"\s;]|\\[nr]|$)'''
+    keywords = [ "pplx-" ]
+    tags = [
+        "ai",
+        "api-key",
+        "perplexity",
+    ]
 
 # Global allowlists to reduce false positives
 [[allowlists]]
-description = "Ignore test and example files"
-paths = [
-    '''.*\.spec\.(js|ts|jsx|tsx)$''',
-    '''.*\.test\.(js|ts|jsx|tsx)$''',
-    '''CHANGELOG\.md$''',
-    '''CONTRIBUTING\.md$''',
-    '''README\.md$''',
-    '''__tests__/.*''',
-    '''demo/.*''',
-    '''docs/.*\.(md|txt|rst)$''',
-    '''examples?/.*''',
-    '''samples?/.*''',
-    '''test/.*''',
-    '''tests/.*''',
-]
+    description = "Ignore test and example files"
+    paths = [
+        '''.*\.spec\.(js|ts|jsx|tsx)$''',
+        '''.*\.test\.(js|ts|jsx|tsx)$''',
+        '''CHANGELOG\.md$''',
+        '''CONTRIBUTING\.md$''',
+        '''README\.md$''',
+        '''__tests__/.*''',
+        '''demo/.*''',
+        '''docs/.*\.(md|txt|rst)$''',
+        '''examples?/.*''',
+        '''samples?/.*''',
+        '''test/.*''',
+        '''tests/.*''',
+    ]
 
 [[allowlists]]
-description = "Ignore build artifacts and dependencies"
-paths = [
-    '''.*\.(map|d\.ts)$''',
-    '''.*\.log$''',
-    '''.*\.min\.(js|css)$''',
-    '''.*\.snap$''',
-    '''.*\.wasm$''',
-    '''\.git/.*''',
-    '''build/.*''',
-    '''coverage/.*''',
-    '''dist/.*''',
-    '''node_modules/.*''',
-]
+    description = "Ignore build artifacts and dependencies"
+    paths = [
+        '''.*\.(map|d\.ts)$''',
+        '''.*\.log$''',
+        '''.*\.min\.(js|css)$''',
+        '''.*\.snap$''',
+        '''.*\.wasm$''',
+        '''\.git/.*''',
+        '''build/.*''',
+        '''coverage/.*''',
+        '''dist/.*''',
+        '''node_modules/.*''',
+    ]
 
 [[allowlists]]
-description = "Ignore configuration files with known false positives"
-paths = [
-    '''.*config\.(js|ts|mjs|json)$''',
-    '''\.eslintrc.*''',
-    '''\.gitignore$''',
-    '''\.gitleaks\.toml$''',
-    '''biome\.json$''',
-    '''package(-lock)?\.json$''',
-    '''pnpm-lock\.yaml$''',
-    '''postcss\.config\.(js|ts|mjs)$''',
-    '''tailwind\.config\.(js|ts|mjs)$''',
-    '''tsconfig.*\.json$''',
-    '''vite\.config\.(js|ts|mjs)$''',
-    '''vitest\.config\.(js|ts|mjs)$''',
-    '''yarn\.lock$''',
-]
+    description = "Ignore configuration files with known false positives"
+    paths = [
+        '''.*config\.(js|ts|mjs|json)$''',
+        '''\.eslintrc.*''',
+        '''\.gitignore$''',
+        '''\.gitleaks\.toml$''',
+        '''biome\.json$''',
+        '''package(-lock)?\.json$''',
+        '''pnpm-lock\.yaml$''',
+        '''postcss\.config\.(js|ts|mjs)$''',
+        '''tailwind\.config\.(js|ts|mjs)$''',
+        '''tsconfig.*\.json$''',
+        '''vite\.config\.(js|ts|mjs)$''',
+        '''vitest\.config\.(js|ts|mjs)$''',
+        '''yarn\.lock$''',
+    ]
 
 [[allowlists]]
-description = "Ignore documentation files"
-paths = ['''LICENSE$''', '''docs/.*\.(md|txt|rst)$''']
+    description = "Ignore documentation files"
+    paths = [
+        '''LICENSE$''',
+        '''docs/.*\.(md|txt|rst)$''',
+    ]
 
 [[allowlists]]
-description = "Ignore Chart.js usage documentation with cubeToken example"
-paths = ['''docs/Packages/Chart\.js/getting-started/usage\.md''']
-regexTarget = "line"
-regexes = ['''cubeToken''']
+    description = "Ignore Chart.js usage documentation with cubeToken example"
+    paths       = [ '''docs/Packages/Chart\.js/getting-started/usage\.md''' ]
+    regexTarget = "line"
+    regexes     = [ '''cubeToken''' ]
 
 # Enhanced allowlist for common development patterns (v8.28+ optimizations)
 [[allowlists]]
-description = "Common non-secret patterns in development"
-regexTarget = "secret"
-stopwords = [
-    "127.0.0.1",
-    "client",
-    "default",
-    "demo",
-    "development",
-    "endpoint",
-    "example",
-    "false",
-    "localhost",
-    "null",
-    "placeholder",
-    "production",
-    "public",
-    "sample",
-    "staging",
-    "test",
-    "true",
-    "undefined",
-]
+    description = "Common non-secret patterns in development"
+    regexTarget = "secret"
+    stopwords = [
+        "127.0.0.1",
+        "client",
+        "default",
+        "demo",
+        "development",
+        "endpoint",
+        "example",
+        "false",
+        "localhost",
+        "null",
+        "placeholder",
+        "production",
+        "public",
+        "sample",
+        "staging",
+        "test",
+        "true",
+        "undefined",
+    ]
 
 # Enhanced allowlist for TypeScript/JavaScript development
 [[allowlists]]
-description = "TypeScript/JavaScript development patterns"
-regexTarget = "line"
-regexes = [
-    '''@types/.*''',
-    '''console\.(log|error|warn|info)''',
-    '''development|staging|production''',
-    '''eslint-disable''',
-    '''export.*\{.*\}.*from''',
-    '''gitleaks:allow''',
-    '''http://127\.0\.0\.1''',
-    '''https?://localhost''',
-    '''import.*from.*['"]/.*['"]''',
-    '''prettier-ignore''',
-    '''process\.env\.NODE_ENV''',
-]
+    description = "TypeScript/JavaScript development patterns"
+    regexTarget = "line"
+    regexes = [
+        '''@types/.*''',
+        '''console\.(log|error|warn|info)''',
+        '''development|staging|production''',
+        '''eslint-disable''',
+        '''export.*\{.*\}.*from''',
+        '''gitleaks:allow''',
+        '''http://127\.0\.0\.1''',
+        '''https?://localhost''',
+        '''import.*from.*['"]/.*['"]''',
+        '''prettier-ignore''',
+        '''process\.env\.NODE_ENV''',
+    ]
 
 [[allowlists]]
-description = "Electron and desktop app specific patterns"
-regexTarget = "line"
-regexes = [
-    '''BrowserWindow''',
-    '''__dirname''',
-    '''__filename''',
-    '''contextBridge''',
-    '''electron/.*''',
-    '''ipcMain''',
-    '''ipcRenderer''',
-    '''process\.platform''',
-]
+    description = "Electron and desktop app specific patterns"
+    regexTarget = "line"
+    regexes = [
+        '''BrowserWindow''',
+        '''__dirname''',
+        '''__filename''',
+        '''contextBridge''',
+        '''electron/.*''',
+        '''ipcMain''',
+        '''ipcRenderer''',
+        '''process\.platform''',
+    ]
 
 # Enhanced AI/ML development patterns
 [[allowlists]]
-description = "AI/ML development and testing patterns"
-regexTarget = "line"
-regexes = [
-    '''api-key-demo''',
-    '''fake-api-key''',
-    '''mock-token''',
-    '''placeholder-key''',
-    '''sk-test-''',
-    '''test-api-secret''',
-]
+    description = "AI/ML development and testing patterns"
+    regexTarget = "line"
+    regexes = [
+        '''api-key-demo''',
+        '''fake-api-key''',
+        '''mock-token''',
+        '''placeholder-key''',
+        '''sk-test-''',
+        '''test-api-secret''',
+    ]
 
 # Modern framework and build tool patterns
 [[allowlists]]
-description = "Modern framework patterns"
-regexTarget = "line"
-regexes = [
-    '''\$\{(?:process\.)?env\.[A-Z_]+\}''',
-    '''biome\.json''',
-    '''postcss\.config\.(js|ts|mjs)''',
-    '''process\.env\.[A-Z_]+''',
-    '''tailwind\.config\.(js|ts|mjs)''',
-    '''vite\.config\.(js|ts|mjs)''',
-    '''vitest\.config\.(js|ts|mjs)''',
-]
+    description = "Modern framework patterns"
+    regexTarget = "line"
+    regexes = [
+        '''\$\{(?:process\.)?env\.[A-Z_]+\}''',
+        '''biome\.json''',
+        '''postcss\.config\.(js|ts|mjs)''',
+        '''process\.env\.[A-Z_]+''',
+        '''tailwind\.config\.(js|ts|mjs)''',
+        '''vite\.config\.(js|ts|mjs)''',
+        '''vitest\.config\.(js|ts|mjs)''',
+    ]
 
 [[allowlists]]
-description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
-paths = ['''\.secretlintrc\.json$''']
+    description = "Ignore all secrets in .secretlintrc.json (contains placeholder values)"
+    paths       = [ '''\.secretlintrc\.json$''' ]

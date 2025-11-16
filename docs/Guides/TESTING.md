@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing and Coverage Setup"
 summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
 created: "2025-06-30"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "coverage"
-  - "ci"
+
+- "uptime-watcher"
+- "testing"
+- "vitest"
+- "coverage"
+- "ci"
+
 ---
 
 # Testing and Coverage Setup
@@ -25,25 +29,25 @@ The project has three separate Vitest configurations:
 
 1. **Frontend Tests** (`vitest.config.ts`):
 
-  - Tests React components in `src/` directory
-  - Merges configuration from `vite.config.ts`
-  - Uses jsdom environment with React Testing Library
-  - Comprehensive ElectronAPI mocking
-  - Coverage reports to `./coverage/`
+- Tests React components in `src/` directory
+- Merges configuration from `vite.config.ts`
+- Uses jsdom environment with React Testing Library
+- Comprehensive ElectronAPI mocking
+- Coverage reports to `./coverage/`
 
 2. **Backend Tests** (`vitest.electron.config.ts`):
 
-  - Tests Electron main process code in `electron/` directory
-  - Uses Node.js environment
-  - Database and service layer testing
-  - Coverage reports to `./coverage/electron/`
+- Tests Electron main process code in `electron/` directory
+- Uses Node.js environment
+- Database and service layer testing
+- Coverage reports to `./coverage/electron/`
 
 3. **Shared Tests** (`vitest.shared.config.ts`):
 
-  - Tests shared utilities in `shared/` directory
-  - Cross-platform utility testing
-  - Type validation and error handling
-  - Coverage reports to `./coverage/shared/`
+- Tests shared utilities in `shared/` directory
+- Cross-platform utility testing
+- Type validation and error handling
+- Coverage reports to `./coverage/shared/`
 
 ### Files Created/Modified
 
@@ -55,15 +59,17 @@ The project has three separate Vitest configurations:
 6. **`shared/test/setup.ts`** - Shared utilities test setup
 7. **Test files**:
 
-  - Component tests in `src/components/`
-  - Store tests in `src/stores/`
-  - Service tests in `electron/services/`
-  - Utility tests in `shared/utils/`
+- Component tests in `src/components/`
+- Store tests in `src/stores/`
+- Service tests in `electron/services/`
+- Utility tests in `shared/utils/`
 
 ### Coverage Configuration
 
 - **Provider**: V8 (fast and accurate)
+
 - **Reporters**: text, json, lcov, html
+
 - **Environments**:
 
   - jsdom (for React component testing with full DOM simulation)
@@ -309,7 +315,7 @@ The test suite implements modern testing patterns:
 - **Service Layer**: EventsService and utility functions fully tested
 - **Type Guards**: All validation functions tested with edge cases
 - **Error Handling**: Comprehensive error boundary and handling tests
-- **Overall Frontend**: ~95%+ coverage
+- **Overall Frontend**: \~95%+ coverage
 
 **Backend Coverage** (`electron/` directory):
 
@@ -317,7 +323,7 @@ The test suite implements modern testing patterns:
 - **Repository Pattern**: All database operations tested with mocking
 - **Event System**: TypedEventBus and middleware comprehensively tested
 - **Manager Classes**: Business logic and orchestration tested
-- **Overall Backend**: ~90%+ coverage
+- **Overall Backend**: \~90%+ coverage
 
 **Shared Coverage** (`shared/` directory):
 
@@ -325,7 +331,7 @@ The test suite implements modern testing patterns:
 - **Type Validation**: Zod schemas and type guards fully tested
 - **Error Handling**: Shared error utilities completely covered
 - **Type Definitions**: Interface and type consistency verified
-- **Overall Shared**: ~95%+ coverage
+- **Overall Shared**: \~95%+ coverage
 
 **Current Test Structure**:
 

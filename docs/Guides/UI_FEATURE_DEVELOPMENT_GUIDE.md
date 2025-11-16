@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "UI Feature Development Guide"
 summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
 created: "2025-08-02"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "ui"
-  - "react"
-  - "zustand"
-  - "development"
+
+- "uptime-watcher"
+- "ui"
+- "react"
+- "zustand"
+- "development"
+
 ---
 
 # UI Feature Development Guide
@@ -139,7 +143,7 @@ const useFormValidation = <T>(schema: z.ZodSchema<T>) => {
 
 ## Development Process
 
-### 1\. Planning Phase
+### 1. Planning Phase
 
 Before implementing any UI feature:
 
@@ -149,7 +153,7 @@ Before implementing any UI feature:
 4. **Check Existing Patterns**: Look for similar implementations to follow established patterns
 5. **Plan State Management**: Determine which stores need updates and what new state is required
 
-### 2\. Implementation Order
+### 2. Implementation Order
 
 Always follow this order to minimize breaking changes:
 
@@ -160,7 +164,7 @@ Always follow this order to minimize breaking changes:
 5. **Integration**: Wire up components with state and event handlers
 6. **Testing**: Verify functionality and run all tests
 
-### 3\. Code Review Checklist
+### 3. Code Review Checklist
 
 - [ ] Follows established architectural patterns
 - [ ] No direct state mutations
@@ -971,20 +975,29 @@ describe("MyIntegratedComponent Integration", () => {
 
 Follow the base tag guidelines in `docs/TSDoc/`:
 
-/**
+/\*\*
 
 - Brief component description. -
+
 - @remarks
+
 - Detailed explanation of component behavior, patterns used, and any important
+
 - implementation details. -
+
 - @example -
-- /```tsx
+
+- /\`\`\`tsx
+
 - <component prop="value">;</component>
 
-- /``` -
+- /\`\`\` -
+
 - @param props - Component props -
+
 - @returns JSX element description -
-- @public */
+
+- @public \*/
 
 ### Code Comments
 
@@ -995,7 +1008,7 @@ Follow the base tag guidelines in `docs/TSDoc/`:
 
 ## Common Pitfalls
 
-### 1\. Event Propagation
+### 1. Event Propagation
 
 **Problem**: Button clicks in cards trigger card click handlers
 
@@ -1012,7 +1025,7 @@ onClick={(event) => {
 }}
 ```
 
-### 2\. State Mutations
+### 2. State Mutations
 
 **Problem**: Directly mutating store state
 
@@ -1026,7 +1039,7 @@ sites[0].name = "New Name";
 updateSiteName(siteIdentifier, "New Name");
 ```
 
-### 3\. Prop Drilling
+### 3. Prop Drilling
 
 **Problem**: Passing props through many component levels
 
@@ -1045,7 +1058,7 @@ const Component = () => {
 };
 ```
 
-### 4\. Missing Dependencies
+### 4. Missing Dependencies
 
 **Problem**: useCallback/useEffect missing dependencies
 
@@ -1063,7 +1076,7 @@ const handler = useCallback(() => {
 }, [prop]);
 ```
 
-### 5\. Improper Error Handling
+### 5. Improper Error Handling
 
 **Problem**: Errors not properly caught and logged
 

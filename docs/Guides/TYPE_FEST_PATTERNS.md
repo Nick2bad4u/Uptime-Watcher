@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Type-fest Integration Patterns"
 summary: "Patterns and best practices for integrating type-fest utilities across the Uptime Watcher codebase."
 created: "2025-08-28"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "type-fest"
-  - "typescript"
-  - "types"
-  - "patterns"
+
+- "uptime-watcher"
+- "type-fest"
+- "typescript"
+- "types"
+- "patterns"
+
 ---
 
 # Type-fest Integration Patterns
@@ -609,7 +613,7 @@ function createTestState(
 
 ## Implementation Guidelines
 
-### 1\. Import Management
+### 1. Import Management
 
 - Import only needed type-fest utilities
 - Use `import type` for type-only imports
@@ -627,7 +631,7 @@ import type {
 } from "type-fest";
 ```
 
-### 2\. File Enhancement Order
+### 2. File Enhancement Order
 
 1. Add type-fest imports
 2. Apply UnknownRecord replacements
@@ -638,13 +642,13 @@ import type {
 7. Apply PartialDeep in test utilities
 8. Use CamelCase for string transformations
 
-### 3\. Documentation Requirements
+### 3. Documentation Requirements
 
 - Update TSDoc comments when types change
 - Add examples showing enhanced autocomplete
 - Document benefits of type-fest usage
 
-### 4\. Testing Strategy
+### 4. Testing Strategy
 
 - Run TypeScript type checking after each enhancement
 - Verify no compilation errors
@@ -662,15 +666,21 @@ import type {
 ### During Implementation
 
 - [ ] Type-fest imports added correctly
-- [ ] All Record\
 
-  <string, unknown=""> replaced with UnknownRecord</string,>
+- [ ] All Record\\
+
+  \<string, unknown=""> replaced with UnknownRecord\</string,>
 
 - [ ] String literal unions enhanced with LiteralUnion
+
 - [ ] Complex unions simplified with Simplify
+
 - [ ] Optional parameters optimized with SetOptional
+
 - [ ] Immutable data protected with ReadonlyDeep
+
 - [ ] Test utilities use PartialDeep for flexibility
+
 - [ ] String transformations use CamelCase where applicable
 
 ### After Implementation
@@ -685,15 +695,21 @@ import type {
 ### Global Consistency
 
 - [ ] Pattern applied consistently across similar files
-- [ ] No remaining Record\
 
-  <string, unknown=""> instances</string,>
+- [ ] No remaining Record\\
+
+  \<string, unknown=""> instances\</string,>
 
 - [ ] All eligible string unions use LiteralUnion
+
 - [ ] Complex unions use Simplify where beneficial
+
 - [ ] Optional parameters use SetOptional appropriately
+
 - [ ] Immutable configurations use ReadonlyDeep
+
 - [ ] Test utilities leverage PartialDeep patterns
+
 - [ ] String transformations use CamelCase for type safety
 
 ## Search Patterns for Global Application

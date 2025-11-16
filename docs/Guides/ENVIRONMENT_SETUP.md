@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Environment Setup Guide"
 summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-   - "uptime-watcher"
-   - "environment"
-   - "setup"
-   - "development"
-   - "configuration"
+
+- "uptime-watcher"
+- "environment"
+- "setup"
+- "development"
+- "configuration"
+
 ---
 
 # 🛠️ Environment Setup Guide
@@ -34,7 +38,7 @@ tags:
 
 ## 🔧 Development Environment
 
-### 1\. Node.js Setup
+### 1. Node.js Setup
 
 #### Installation
 
@@ -58,7 +62,7 @@ node --version  # Should be 24.8+
 npm --version   # Should be 11.5.2+
 ```
 
-### 2\. VS Code Configuration
+### 2. VS Code Configuration
 
 #### Required Extensions
 
@@ -150,7 +154,7 @@ Debugging configuration (`.vscode/launch.json`):
 }
 ```
 
-### 3\. Git Configuration
+### 3. Git Configuration
 
 #### Global Settings
 
@@ -173,7 +177,7 @@ npx husky install
 
 ## 🚀 Project Setup
 
-### 1\. Clone and Install
+### 1. Clone and Install
 
 ```bash
 # Clone the repository
@@ -189,7 +193,7 @@ npm run lint
 npm run test
 ```
 
-### 2\. Environment Variables
+### 2. Environment Variables
 
 Create `.env` file in project root (if needed):
 
@@ -214,7 +218,7 @@ DATABASE_PATH=./data/uptime-watcher.db
 # service.
 ```
 
-### 3\. Database Setup
+### 3. Database Setup
 
 The SQLite database is automatically initialized:
 
@@ -226,7 +230,7 @@ npm run copy-wasm
 npm run electron-dev
 ```
 
-### 4\. Verify Setup
+### 4. Verify Setup
 
 ```bash
 # Type checking
@@ -428,8 +432,8 @@ services:
    - .:/app
    - /app/node_modules
   ports:
-   - "5173:5173"
-   - "9229:9229"
+     - "5173:5173"
+     - "9229:9229"
   environment:
    - NODE_ENV=development
 ```
@@ -561,6 +565,6 @@ sudo apt-get install -y nodejs
 - [ ] Debugging configuration functional
 - [ ] Git hooks executing properly
 
---------------------------------------------------------------------------------
+---
 
 🎉 **You're all set!** Your development environment is now ready for productive Uptime Watcher development. Check out the [Developer Quick Start Guide](./DEVELOPER_QUICK_START.md) for next steps.

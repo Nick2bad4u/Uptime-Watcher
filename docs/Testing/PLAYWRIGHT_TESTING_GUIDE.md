@@ -228,31 +228,31 @@ for (let i = 0; i < buttons.length; i++) {
 
 ## 🎯 Best Practices
 
-### 1\. **Always Use Proper Launch Method**
+### 1. **Always Use Proper Launch Method**
 
 - Use `args: ["."]` not absolute paths to `main.js`
 - Include timeout for reliability
 - Don't override `NODE_ENV` unless necessary
 
-### 2\. **Test Isolation**
+### 2. **Test Isolation**
 
 - Each test should launch its own Electron instance
 - Always close apps in `finally` blocks
 - Use unique test data to avoid conflicts
 
-### 3\. **Wait Strategies**
+### 3. **Wait Strategies**
 
 - Use `waitForAppInitialization()` for app readiness
 - Use appropriate timeouts for different operations
 - Wait for specific elements before interacting
 
-### 4\. **Error Handling**
+### 4. **Error Handling**
 
 - Wrap tests in try/finally blocks
 - Take screenshots on failures for debugging
 - Log relevant state for troubleshooting
 
-### 5\. **Performance**
+### 5. **Performance**
 
 - Use `fullyParallel: false` for Electron tests
 - Limit workers for stability
@@ -264,30 +264,30 @@ for (let i = 0; i < buttons.length; i++) {
 
 1. Check if app is actually launching:
 
-  ```typescript
-  console.log("App launched successfully");
-  const windows = electronApp.windows();
-  console.log("Window count:", windows.length);
-  ```
+```typescript
+console.log("App launched successfully");
+const windows = electronApp.windows();
+console.log("Window count:", windows.length);
+```
 
 2. Verify environment setup:
 
-  ```bash
-  # Check NODE_ENV
-  echo $NODE_ENV  # Should be 'development' for dev mode
+```bash
+# Check NODE_ENV
+echo $NODE_ENV  # Should be 'development' for dev mode
 
-  # Verify build exists
-  ls dist/main.js
+# Verify build exists
+ls dist/main.js
 
-  # Check if dev server is running
-  curl http://localhost:5173
-  ```
+# Check if dev server is running
+curl http://localhost:5173
+```
 
 3. Take screenshots to see what's rendered:
 
-  ```typescript
-  await page.screenshot({ path: "debug.png", fullPage: true });
-  ```
+```typescript
+await page.screenshot({ path: "debug.png", fullPage: true });
+```
 
 ### Blank Windows
 
@@ -316,7 +316,7 @@ Usually caused by:
 If tests suddenly stop working:
 
 1. **Check Electron launch method** - ensure using `args: ["."]`
-2. **Verify NODE_ENV** - should inherit from environment
+2. **Verify NODE\_ENV** - should inherit from environment
 3. **Confirm build exists** - run `npm run build`
 4. **Test manually** - try `node scripts/codegen.mjs --electron`
 5. **Check dev server** - ensure it starts when needed

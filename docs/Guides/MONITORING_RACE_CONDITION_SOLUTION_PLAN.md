@@ -1,16 +1,20 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Monitoring State Race Condition Solution Plan"
 summary: "Solution plan and status report for eliminating monitoring state race conditions via operation correlation and enhanced monitoring."
 created: "2025-08-02"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-    - "uptime-watcher"
-    - "monitoring"
-    - "race-conditions"
-    - "operations"
-    - "architecture"
+
+- "uptime-watcher"
+- "monitoring"
+- "race-conditions"
+- "operations"
+- "architecture"
+
 ---
 
 # Monitoring State Race Condition Solution Plan

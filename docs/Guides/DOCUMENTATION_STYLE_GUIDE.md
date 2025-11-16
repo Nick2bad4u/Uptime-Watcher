@@ -1,15 +1,21 @@
 ---
+
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Style Guide"
 summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
 created: "2025-09-18"
-last_reviewed: "2025-11-15"
+last\_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "documentation"
-  - "style-guide"
-  - "markdown"
+
+- "uptime-watcher"
+- "documentation"
+- "style-guide"
+- "markdown"
+  topics:
+- "documentation"
+
 ---
 
 # Documentation Style Guide
@@ -18,7 +24,7 @@ This guide establishes consistent formatting and content standards for all Markd
 
 ## Front matter schema
 
-All first-class documentation pages (including files under `docs/Guides/`) use a lightweight, internal-only front-matter format. This is **not** tied to any static site generator; it exists purely for search, tooling, and AI context.
+All first-class documentation pages (files under `docs/Guides/` and `docs/Architecture/**`) use a lightweight, internal-only front-matter format validated by `config/schemas/doc-frontmatter.schema.json`. This is **not** tied to any static site generator; it exists purely for search, tooling, and AI context.
 
 ### Required fields
 
@@ -26,6 +32,7 @@ Each file should start with:
 
 ```yaml
 ---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Human-friendly document title"
 summary: "One-line description used in indexes and search."
 created: "YYYY-MM-DD"        # usually taken from `git log --diff-filter=A`
@@ -33,24 +40,31 @@ last_reviewed: "YYYY-MM-DD"  # last date the content was reviewed/updated
 category: "guide"            # coarse type; currently always "guide" for Guides
 author: "GitHub username or name"
 tags:
-  - "keyword-one"
-  - "keyword-two"
+    - "keyword-one"
+    - "keyword-two"
 ---
 ```
 
 Notes:
 
+- **$schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
+
 - **title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
+
 - **summary**: Single sentence, kept short enough to show in an index or hover tooltip.
+
 - **created**: The original introduction date of the document. We typically derive this from git:
 
   ```powershell
   git log --diff-filter=A --follow --date=short --format="%ad" -- docs/Guides/FILE.md | Select-Object -Last 1
   ```
 
-- **last_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
-- **category**: For now, this is simply `"guide"` for all files under `docs/Guides/`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
+- **last\_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
+
+- **category**: For now, this is simply `"guide"` for all files under `docs/Guides/` and `docs/Architecture/**`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
+
 - **author**: Use a consistent handle (for example, `"Nick2bad4u"`). Multiple authors are fine but uncommon.
+
 - **tags**: Small set of focused keywords. Prefer 3–7 tags that reflect technology (for example, `"vitest"`, `"ipc"`, `"zustand"`) or domain (for example, `"monitoring"`, `"events"`).
 
 ### Deprecated / removed fields
@@ -78,10 +92,10 @@ We may introduce a few optional metadata fields over time. If you use them, keep
 ```yaml
 status: "active"        # or "draft" | "deprecated"
 topics:
-  - "monitoring"       # higher-level areas than tags
-  - "architecture"
+    - "monitoring"       # higher-level areas than tags
+    - "architecture"
 audience:
-  - "frontend"         # "backend" | "full-stack" | "ai-assistant" etc.
+    - "frontend"         # "backend" | "full-stack" | "ai-assistant" etc.
 ```
 
 These are not required today but give us room to express intent (for example, marking a doc as deprecated, or indicating it is primarily for backend engineers).
@@ -182,25 +196,14 @@ circuit-breaker-implementation-plan.md
 <a href="https://github.com/project/releases">
   <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version">
 </a>
-<a href="LICENSE">
-  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
-</a>
 
 </div>
-```
 
-### Tables
-
-- Use proper table formatting with clear headers
-- Align columns consistently
-- Include descriptive content in cells
-
-```markdown
-| Feature | Description | Status |
-| --- | --- | --- |
-| Monitoring | Real-time uptime tracking | ✅ |
-| Alerts | Desktop notifications | ✅ |
-| Analytics | Historical data visualization | 🚧 |
+| Feature    | Description                     | Status |
+| ---------- | ------------------------------- | ------ |
+| Monitoring | Real-time uptime tracking       | ✅     |
+| Alerts     | Desktop notifications           | ✅     |
+| Analytics  | Historical data visualization   | 🚧     |
 ```
 
 ### Code Blocks

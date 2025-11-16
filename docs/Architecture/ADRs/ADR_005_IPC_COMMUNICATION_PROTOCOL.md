@@ -1,3 +1,23 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "ADR-005: IPC Communication Protocol"
+summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation and error handling."
+created: "2025-08-05"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "adr"
+- "ipc"
+- "electron"
+- "communication"
+
+---
+
 # ADR-005: IPC Communication Protocol
 
 ## Status
@@ -87,7 +107,7 @@ graph TB
     class ChannelValidation,TypeSafety,ParameterSanitization,ErrorSanitization security
 ```
 
-### 1\. Centralized IPC Service
+### 1. Centralized IPC Service
 
 All IPC handlers are registered through a central `IpcService`:
 
@@ -130,7 +150,7 @@ export class IpcService {
 
 > **Implementation note:** The production implementation reuses the shared helper in `electron/services/ipc/utils.ts`. That module exposes `registerStandardizedIpcHandler` and `createValidationResponse`, so every handler registration in `IpcService` passes the channel name, async handler, validator, and the shared `registeredIpcHandlers` set. The helper takes care of duplicate registration checks, timing diagnostics, and consistent logging.
 
-### 2\. Domain-Specific Handler Groups
+### 2. Domain-Specific Handler Groups
 
 IPC handlers are organized by domain with consistent validation:
 
@@ -169,7 +189,7 @@ private setupSiteHandlers(): void {
 
 Validators live in `electron/services/ipc/validators.ts` and, in turn, rely on the shared schema guards under `@shared/validation/*`. Keeping validation logic centralized prevents drift between IPC contracts and renderer-side TypeScript definitions.
 
-### 3\. Type-Safe Preload API
+### 3. Type-Safe Preload API
 
 The preload script exposes a type-safe API to the renderer:
 
@@ -207,7 +227,7 @@ The `remove-monitor` invoke channel now returns the persisted `Site` snapshot em
 - Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel inventory documentation are now generated from the canonical `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run `npm run generate:ipc` whenever event contracts change and gate CI with `npm run check:ipc` to detect drift between code and docs.
 - The authoritative channel catalogue lives in `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the table; update the schema and regenerate instead.
 
-### 4\. Event Forwarding Protocol
+### 4. Event Forwarding Protocol
 
 Backend events are automatically forwarded to the frontend:
 
@@ -224,7 +244,7 @@ await this.eventBus.emitTyped('monitor:status-changed', eventData);
 // → Automatically sent to renderer via IPC
 ```
 
-### 5\. Validation and Error Handling
+### 5. Validation and Error Handling
 
 All IPC operations include validation and consistent error handling:
 
@@ -386,7 +406,7 @@ flowchart TD
     class ChannelActive success;
 ```
 
-### 1\. Request-Response Pattern
+### 1. Request-Response Pattern
 
 Standard async operations use the request-response pattern:
 
@@ -403,7 +423,7 @@ async (params: SiteCreationData) => {
 };
 ```
 
-### 2\. Event Broadcasting Pattern
+### 2. Event Broadcasting Pattern
 
 State changes are broadcast as events:
 
@@ -419,7 +439,7 @@ const cleanup = await EventsService.onSiteAdded((data) => {
 });
 ```
 
-### 3\. Cleanup Pattern
+### 3. Cleanup Pattern
 
 Event listeners return cleanup functions:
 
@@ -524,21 +544,21 @@ mindmap
 
 ## Security Considerations
 
-### 1\. ContextBridge Isolation
+### 1. ContextBridge Isolation
 
 All IPC communication goes through contextBridge - no direct Node.js access in renderer.
 
-### 2\. Parameter Validation
+### 2. Parameter Validation
 
 All parameters are validated before processing to prevent injection attacks.
 
-### 3\. Error Sanitization
+### 3. Error Sanitization
 
 Error messages are sanitized before sending to renderer to prevent information leakage.
 
 ## Testing Strategy
 
-### 1\. Mock ElectronAPI
+### 1. Mock ElectronAPI
 
 Global mock for testing:
 
@@ -560,7 +580,7 @@ Object.defineProperty(window, "electronAPI", {
 });
 ```
 
-### 2\. Handler Testing
+### 2. Handler Testing
 
 IPC handlers are tested by mocking dependencies:
 
@@ -609,23 +629,23 @@ describe("Sites IPC Handlers", () => {
 
 ## Implementation Requirements
 
-### 1\. Handler Registration
+### 1. Handler Registration
 
 All IPC handlers must be registered through `IpcService.registerStandardizedIpcHandler()`.
 
-### 2\. Type Definitions
+### 2. Type Definitions
 
 All IPC operations must have corresponding TypeScript interfaces.
 
-### 3\. Validation Functions
+### 3. Validation Functions
 
 All parameterized operations must include validation functions.
 
-### 4\. Error Handling
+### 4. Error Handling
 
 All handlers must use try-catch with proper error logging.
 
-### 5\. Cleanup Support
+### 5. Cleanup Support
 
 Event listeners must return cleanup functions.
 

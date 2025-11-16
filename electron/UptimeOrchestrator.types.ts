@@ -75,8 +75,8 @@ export interface StartMonitoringRequestData {
 export interface StopMonitoringRequestData {
     /** Site identifier for the monitoring request. */
     identifier: string;
-    /** Specific monitor ID to stop (optional for stopping all monitors). */
-    monitorId?: string;
+    /** Specific monitor ID to stop. */
+    monitorId: string;
 }
 
 /**

@@ -1,3 +1,22 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "IPC Handler Template"
+summary: "Provides a template for implementing new IPC handlers aligned with the central IpcService, validation, and error-handling patterns."
+created: "2025-08-05"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "template"
+- "ipc"
+- "electron"
+
+---
+
 # IPC Handler Template
 
 Use this template when creating new IPC handlers for Electron communication.

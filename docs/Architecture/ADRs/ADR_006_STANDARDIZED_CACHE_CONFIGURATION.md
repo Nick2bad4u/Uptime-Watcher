@@ -1,3 +1,22 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "ADR-006: Standardized Cache Configuration"
+summary: "Defines standardized cache configuration constants and patterns for managers and services to ensure consistent TTLs and limits."
+created: "2025-08-23"
+last\_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+
+- "uptime-watcher"
+- "architecture"
+- "adr"
+- "cache"
+- "configuration"
+
+---
+
 # ADR-006: Standardized Cache Configuration
 
 ## Status

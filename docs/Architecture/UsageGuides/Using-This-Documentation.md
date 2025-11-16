@@ -1,3 +1,20 @@
+---
+
+schema: "../../../config/schemas/doc-frontmatter.schema.json"
+title: "Using This Documentation"
+summary: "Explains how to navigate the architecture knowledge base and select the most relevant ADRs, patterns, and templates for your work."
+created: "2025-10-05"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "uptime-watcher"
+  - "architecture"
+  - "documentation"
+  - "onboarding"
+
+---
+
 # Using This Documentation
 
 This guide describes how to navigate the architecture knowledge base effectively and locate the material relevant to your work.
