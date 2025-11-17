@@ -1,24 +1,28 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Index"
 summary: "Navigation hub and master index for all Uptime Watcher documentation, organized by topic and audience."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "documentation"
-- "index"
-- "navigation"
-
+  - "uptime-watcher"
+  - "documentation"
+  - "index"
+  - "navigation"
 ---
 
 # 📚 Documentation Index
 
-> **Navigation Hub**: Complete guide to all Uptime Watcher documentation with quick links and descriptions.
+## Table of Contents
+
+1. [Quick links](#quick-links)
+2. [� Documentation structure](#-documentation-structure)
+3. [🎯 Documentation by Role](#-documentation-by-role)
+4. [🔍 Documentation by Topic](#-documentation-by-topic)
+5. [📋 Documentation Maintenance](#-documentation-maintenance)
+6. [🎯 Recommended Reading Paths](#-recommended-reading-paths)
 
 ## Quick links
 

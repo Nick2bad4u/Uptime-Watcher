@@ -1,25 +1,29 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Tools and Commands Guide"
 summary: "Reference for how the AI agent uses editing tools, search, tasks, tests, and diagnostics in the Uptime Watcher repository."
 created: "2025-11-15"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "tools"
-- "commands"
-- "ai-agent"
-- "workflow"
-
+  - "uptime-watcher"
+  - "tools"
+  - "commands"
+  - "ai-agent"
+  - "workflow"
 ---
 
 # Tools and commands guide
 
-This guide documents how the agent interacts with project tools: editing helpers, search/navigation, commands/tasks, diagnostics, and orchestration. It captures practical behavior observed in this repo rather than abstract theory.
+## Table of Contents
+
+1. [🔧 Editing and filesystem operations](#-editing-and-filesystem-operations)
+2. [🔍 Reading and search](#-reading-and-search)
+3. [🧪 Commands, tasks, and test runs](#-commands-tasks-and-test-runs)
+4. [🧰 Diagnostics and IDE integration](#-diagnostics-and-ide-integration)
+5. [🗂️ Orchestration and meta-tools](#️-orchestration-and-meta-tools)
+6. [🌐 External documentation helpers](#-external-documentation-helpers)
 
 ## 🔧 Editing and filesystem operations
 

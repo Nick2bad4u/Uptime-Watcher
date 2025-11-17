@@ -1,29 +1,30 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Renderer Integration Guide"
 summary: "Renderer integration guidelines for Uptime Watcher 17.4.0+, focusing on IPC channels, events, and manual check flows."
 created: "2025-10-26"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "renderer"
-- "ipc"
-- "integration"
-- "events"
-
+  - "uptime-watcher"
+  - "renderer"
+  - "ipc"
+  - "integration"
+  - "events"
 ---
 
 # Renderer Integration Guide
 
-> **Audience**: Teams integrating custom renderer extensions, white-label shells, or third-party dashboards with Uptime Watcher 17.4.0 and later.
->
-> **Scope**: Highlights the IPC/event contract updates delivered on 2025-10-26, including channel normalization, optimistic manual-check feedback, and history-limit synchronization.
+## Table of Contents
 
----
+1. [1. Executive Summary](#1-executive-summary)
+2. [2. Canonical IPC & Event Channels](#2-canonical-ipc--event-channels)
+3. [3. Manual Check Flow Enhancements](#3-manual-check-flow-enhancements)
+4. [4. History Limit Synchronization](#4-history-limit-synchronization)
+5. [5. Migration Checklist](#5-migration-checklist)
+6. [6. Tooling & Automation](#6-tooling--automation)
+7. [7. Appendix: Reference Implementations](#7-appendix-reference-implementations)
 
 ## 1. Executive Summary
 

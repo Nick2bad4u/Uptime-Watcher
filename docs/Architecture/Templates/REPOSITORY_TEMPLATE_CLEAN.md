@@ -1,25 +1,28 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Repository Template (Clean Variant)"
 summary: "Clean repository template variant for repositories that depend only on DatabaseService and shared operational hooks without additional logging abstractions."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "template"
-- "repository"
-- "database"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "repository"
+  - "database"
 ---
 
 # Repository Template
 
-This template provides a standard structure for implementing repository classes following the established patterns in the Uptime Watcher application.
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+3. [Template Structure](#template-structure)
+4. [Customization Checklist](#customization-checklist)
+5. [Testing Template](#testing-template)
 
 ## Overview
 
@@ -403,14 +406,14 @@ export class ExampleRepository {
 
 When using this template, replace the following placeholders:
 
-- [ ] `ExampleRepository` → Your repository class name
-- [ ] `ExampleRow` → Your entity row interface
-- [ ] `example_table` → Your database table name
-- [ ] `EXAMPLE_QUERIES` → Your query constants object
-- [ ] Add entity-specific fields to `ExampleRow` interface
-- [ ] Update SQL queries for your table structure
-- [ ] Add any entity-specific methods needed
-- [ ] Update TSDoc comments with entity-specific information
+- \[ ] `ExampleRepository` → Your repository class name
+- \[ ] `ExampleRow` → Your entity row interface
+- \[ ] `example_table` → Your database table name
+- \[ ] `EXAMPLE_QUERIES` → Your query constants object
+- \[ ] Add entity-specific fields to `ExampleRow` interface
+- \[ ] Update SQL queries for your table structure
+- \[ ] Add any entity-specific methods needed
+- \[ ] Update TSDoc comments with entity-specific information
 
 ## Testing Template
 

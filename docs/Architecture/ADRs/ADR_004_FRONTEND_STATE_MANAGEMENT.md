@@ -1,24 +1,35 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-004: Frontend State Management with Zustand"
 summary: "Defines the frontend state management strategy using Zustand with modular composition and selective persistence."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "adr"
-- "zustand"
-- "state-management"
-- "frontend"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "zustand"
+  - "state-management"
+  - "frontend"
 ---
 
 # ADR-004: Frontend State Management with Zustand
+
+## Table of Contents
+
+1. [Status](#status)
+2. [Context](#context)
+3. [Decision](#decision)
+4. [Store Categories](#store-categories)
+5. [Integration with IPC](#integration-with-ipc)
+6. [Testing Patterns](#testing-patterns)
+7. [Consequences](#consequences)
+8. [Implementation Guidelines](#implementation-guidelines)
+9. [Compliance](#compliance)
+10. [Store Pattern Examples](#store-pattern-examples)
+11. [Related ADRs](#related-adrs)
 
 ## Status
 

@@ -1,25 +1,32 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Storybook Vitest Component Testing"
 summary: "Guide to running Storybook-driven component tests using Vitest, Playwright, and MSW within Uptime Watcher."
 created: "2025-09-25"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "storybook"
-- "vitest"
-- "playwright"
-- "testing"
-
+  - "uptime-watcher"
+  - "storybook"
+  - "vitest"
+  - "playwright"
+  - "testing"
 ---
 
 # Storybook Vitest Component Testing
 
-This guide explains how the project runs browser-driven tests against Storybook stories using the `@storybook/addon-vitest` integration.
+## Table of Contents
+
+1. [Why This Exists](#why-this-exists)
+2. [Configuration Overview](#configuration-overview)
+3. [Running the Suite](#running-the-suite)
+4. [Execution Flow](#execution-flow)
+5. [Writing Tests](#writing-tests)
+6. [Coverage](#coverage)
+7. [Mocking Network Traffic with MSW](#mocking-network-traffic-with-msw)
+8. [CI Reporting Outputs](#ci-reporting-outputs)
+9. [Troubleshooting](#troubleshooting)
 
 ## Why This Exists
 

@@ -1,5 +1,17 @@
 # 🎭 Playwright Testing Guide for Uptime-Watcher
 
+## Table of Contents
+
+1. [📖 Overview](#-overview)
+2. [🚀 Quick Start](#-quick-start)
+3. [🔧 Configuration](#-configuration)
+4. [⚠️ Critical Issues & Solutions](#️-critical-issues--solutions)
+5. [🧪 Common Test Patterns](#-common-test-patterns)
+6. [🎯 Best Practices](#-best-practices)
+7. [🔍 Troubleshooting](#-troubleshooting)
+8. [📚 Additional Resources](#-additional-resources)
+9. [🚨 Emergency Fixes](#-emergency-fixes)
+
 ## 📖 Overview
 
 This guide covers Playwright test configuration, common issues, and best practices specific to the Uptime-Watcher Electron application.

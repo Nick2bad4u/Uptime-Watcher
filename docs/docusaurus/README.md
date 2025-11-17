@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Website"
 summary: "Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher."
 created: "2025-11-15"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:

@@ -1,19 +1,16 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "AI Context Guide"
 summary: "Central reference for AI assistants working with the Uptime-Watcher codebase, including context regeneration steps and key docs."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "ai-assistant"
-- "context"
-- "documentation"
-
+  - "uptime-watcher"
+  - "ai-assistant"
+  - "context"
+  - "documentation"
 ---
 
 # AI Context Guide

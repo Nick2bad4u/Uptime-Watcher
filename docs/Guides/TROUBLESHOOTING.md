@@ -1,35 +1,28 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Troubleshooting Guide"
 summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "troubleshooting"
-- "debugging"
-- "database"
-- "performance"
-
+  - "uptime-watcher"
+  - "troubleshooting"
+  - "debugging"
+  - "database"
+  - "performance"
 ---
 
 # 🔧 Troubleshooting Guide
 
-```bash
-# Copy WASM file to dist
-npm run copy-wasm
+## Table of Contents
 
-# Verify WASM files are present
-ls dist/*.wasm
-```
-
-**Prevention**: The `postbuild` script should handle this automatically, but sometimes fails in certain environments.uide
-
-> **Debug Like a Pro**: Common issues, solutions, and debugging techniques for Uptime Watcher development.
+1. [🚨 Common Issues & Solutions](#-common-issues--solutions)
+2. [🔍 Debugging Techniques](#-debugging-techniques)
+3. [🛠️ Development Tools](#️-development-tools)
+4. [🔧 Performance Optimization](#-performance-optimization)
+5. [📞 Getting Help](#-getting-help)
 
 ## 🚨 Common Issues & Solutions
 

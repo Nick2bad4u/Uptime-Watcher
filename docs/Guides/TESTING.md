@@ -1,25 +1,24 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing and Coverage Setup"
 summary: "Overview of Uptime Watcher's testing configurations, coverage setup, and testing commands across frontend, backend, shared, and Storybook projects."
 created: "2025-06-30"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "testing"
-- "vitest"
-- "coverage"
-- "ci"
-
+  - "uptime-watcher"
+  - "testing"
+  - "vitest"
+  - "coverage"
+  - "ci"
 ---
 
 # Testing and Coverage Setup
 
-This project uses Vitest for testing with separate configurations for frontend (React), backend (Electron), and shared utilities, integrated with comprehensive mocking strategies and coverage reporting.
+## Table of Contents
+
+1. [Setup Summary](#setup-summary)
 
 ## Setup Summary
 

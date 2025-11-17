@@ -1,29 +1,29 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Zustand Store Template"
 summary: "Provides templates for creating new Zustand stores using direct-create and modular composition patterns in the frontend."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "template"
-- "zustand"
-- "state-management"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "zustand"
+  - "state-management"
 ---
 
 # Zustand Store Template
 
-> **Note:** Replace `ExampleService` with your domain-specific renderer service
-> implementation under `src/services`. The snippets below assume such a facade
-> exists to encapsulate all preload bridge access.
+## Table of Contents
 
-Use this template when creating new Zustand stores for frontend state management.
+1. [Simple Store Template](#simple-store-template)
+2. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+3. [Complex Store with Modules Template](#complex-store-with-modules-template)
+4. [Module Template](#module-template)
+5. [Testing Template](#testing-template)
+6. [Customization Checklist](#customization-checklist)
 
 ## Simple Store Template
 
@@ -689,12 +689,12 @@ describe("useExampleStore", () => {
 
 When using this template:
 
-- [ ] Replace `Example` with your domain name
-- [ ] Update state interface with your specific properties
-- [ ] Add your specific actions and their implementations
-- [ ] Configure persistence settings if needed
-- [ ] Update TSDoc comments with domain-specific information
-- [ ] Add any domain-specific computed values
-- [ ] Create corresponding test file
-- [ ] Add IPC integration for backend communication
-- [ ] Consider if modular composition is needed for complex state
+- \[ ] Replace `Example` with your domain name
+- \[ ] Update state interface with your specific properties
+- \[ ] Add your specific actions and their implementations
+- \[ ] Configure persistence settings if needed
+- \[ ] Update TSDoc comments with domain-specific information
+- \[ ] Add any domain-specific computed values
+- \[ ] Create corresponding test file
+- \[ ] Add IPC integration for backend communication
+- \[ ] Consider if modular composition is needed for complex state

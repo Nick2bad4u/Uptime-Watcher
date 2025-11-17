@@ -1,20 +1,17 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Technology Evolution Guide"
 summary: "Chronological guide to Uptime Watcher's architectural evolution, migrations, and key technical decisions."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "evolution"
-- "migrations"
-- "history"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "evolution"
+  - "migrations"
+  - "history"
 ---
 
 ## 🔄 Technology Evolution Guide
@@ -510,6 +507,10 @@ export class CustomMonitorService implements IMonitorService {
 
 ```bash
 # Current testing capabilities
+
+## Table of Contents
+
+
 npm run test:all              # All tests (frontend + electron + shared)
 npm run test:electron         # Backend tests
 npm run test:frontend         # Frontend tests
@@ -540,16 +541,16 @@ npm run test:all:coverage     # Coverage reports (all configurations)
 
 #### ✅ Completed Migrations
 
-- [x] **Database**: LowDB → SQLite (COMPLETE)
-- [x] **State Management**: React Context → Zustand with modular composition (COMPLETE)
-- [x] **Build System**: webpack → Vite (COMPLETE)
-- [x] **Architecture**: Monolithic → Service-oriented (COMPLETE)
-- [x] **IPC**: Untyped → Type-safe with validation (COMPLETE)
-- [x] **Event System**: Basic events → TypedEventBus with metadata (COMPLETE)
-- [x] **Monitoring**: Basic → Enhanced with race condition prevention (COMPLETE)
-- [x] **Testing**: Manual → Automated with comprehensive mocking (COMPLETE)
-- [x] **Documentation**: Minimal → Comprehensive with current patterns (COMPLETE)
-- [x] **Error Handling**: Scattered → Centralized with withErrorHandling utility (COMPLETE)
+- \[x] **Database**: LowDB → SQLite (COMPLETE)
+- \[x] **State Management**: React Context → Zustand with modular composition (COMPLETE)
+- \[x] **Build System**: webpack → Vite (COMPLETE)
+- \[x] **Architecture**: Monolithic → Service-oriented (COMPLETE)
+- \[x] **IPC**: Untyped → Type-safe with validation (COMPLETE)
+- \[x] **Event System**: Basic events → TypedEventBus with metadata (COMPLETE)
+- \[x] **Monitoring**: Basic → Enhanced with race condition prevention (COMPLETE)
+- \[x] **Testing**: Manual → Automated with comprehensive mocking (COMPLETE)
+- \[x] **Documentation**: Minimal → Comprehensive with current patterns (COMPLETE)
+- \[x] **Error Handling**: Scattered → Centralized with withErrorHandling utility (COMPLETE)
 
 #### 🔧 Ongoing Improvements
 

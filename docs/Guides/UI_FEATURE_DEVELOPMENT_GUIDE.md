@@ -1,20 +1,17 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "UI Feature Development Guide"
 summary: "Guidelines for adding and modifying UI features in Uptime Watcher, including stores, events, and validation."
 created: "2025-08-02"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "ui"
-- "react"
-- "zustand"
-- "development"
-
+  - "uptime-watcher"
+  - "ui"
+  - "react"
+  - "zustand"
+  - "development"
 ---
 
 # UI Feature Development Guide
@@ -24,17 +21,19 @@ This document provides comprehensive guidelines for adding and modifying UI feat
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
-2. [Development Process](#development-process)
-3. [Component Creation Guidelines](#component-creation-guidelines)
-4. [Component Props Standards](#component-props-standards)
-5. [State Management](#state-management)
-6. [Event Handling](#event-handling)
-7. [Modal Development](#modal-development)
-8. [Reusable Components](#reusable-components)
-9. [Validation Best Practices](#validation-best-practices)
+2. [Validation Best Practices](#validation-best-practices)
+3. [Development Process](#development-process)
+4. [Component Creation Guidelines](#component-creation-guidelines)
+5. [Component Props Standards](#component-props-standards)
+6. [State Management](#state-management)
+7. [Event Handling](#event-handling)
+8. [Modal Development](#modal-development)
+9. [Reusable Components](#reusable-components)
 10. [Testing Strategy](#testing-strategy)
 11. [Documentation Requirements](#documentation-requirements)
 12. [Common Pitfalls](#common-pitfalls)
+13. [Real-Time Updates & Event Integration](#real-time-updates--event-integration)
+14. [Summary](#summary)
 
 ## Architecture Overview
 

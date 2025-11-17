@@ -3,7 +3,7 @@ schema: "../../../../config/schemas/doc-frontmatter.schema.json"
 title: "ESLint Config Inspector Deployment - Implementation Summary"
 summary: "Implementation summary for deploying the ESLint Config Inspector static build into the Uptime-Watcher Docusaurus site."
 created: "2025-11-15"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:

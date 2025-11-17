@@ -1,25 +1,34 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Environment Setup Guide"
 summary: "Comprehensive guide for configuring a full Uptime Watcher development environment across platforms."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "environment"
-- "setup"
-- "development"
-- "configuration"
-
+  - "uptime-watcher"
+  - "environment"
+  - "setup"
+  - "development"
+  - "configuration"
 ---
 
 # 🛠️ Environment Setup Guide
 
-> **Complete Setup**: Comprehensive guide for setting up the perfect development environment for Uptime Watcher.
+## Table of Contents
+
+1. [📋 Prerequisites](#-prerequisites)
+2. [🔧 Development Environment](#-development-environment)
+3. [🚀 Project Setup](#-project-setup)
+4. [🔍 Development Tools](#-development-tools)
+5. [⚙️ IDE-Specific Setup](#️-ide-specific-setup)
+6. [🧪 Testing Environment](#-testing-environment)
+7. [🔒 Security Setup](#-security-setup)
+8. [🐳 Optional: Docker Setup](#-optional-docker-setup)
+9. [🚀 Performance Optimization](#-performance-optimization)
+10. [📱 Platform-Specific Setup](#-platform-specific-setup)
+11. [✅ Verification Checklist](#-verification-checklist)
 
 ## 📋 Prerequisites
 
@@ -541,29 +550,29 @@ sudo apt-get install -y nodejs
 
 ### Environment Verification
 
-- [ ] Node.js 24.8+ installed and active
-- [ ] npm 11.5.2+ available
-- [ ] Git configured with user details
-- [ ] VS Code with recommended extensions
-- [ ] Project cloned and dependencies installed
+- \[ ] Node.js 24.8+ installed and active
+- \[ ] npm 11.5.2+ available
+- \[ ] Git configured with user details
+- \[ ] VS Code with recommended extensions
+- \[ ] Project cloned and dependencies installed
 
 ### Development Verification
 
-- [ ] `npm run dev` starts Vite dev server successfully
-- [ ] `npm run electron-dev` starts both Vite and Electron
-- [ ] Hot reload works for both frontend and backend changes
-- [ ] TypeScript compilation works without errors
-- [ ] Linting passes without errors
-- [ ] Tests run successfully
-- [ ] Build process completes successfully
+- \[ ] `npm run dev` starts Vite dev server successfully
+- \[ ] `npm run electron-dev` starts both Vite and Electron
+- \[ ] Hot reload works for both frontend and backend changes
+- \[ ] TypeScript compilation works without errors
+- \[ ] Linting passes without errors
+- \[ ] Tests run successfully
+- \[ ] Build process completes successfully
 
 ### Tool Verification
 
-- [ ] ESLint integration working in IDE
-- [ ] Prettier formatting on save
-- [ ] TypeScript IntelliSense working
-- [ ] Debugging configuration functional
-- [ ] Git hooks executing properly
+- \[ ] ESLint integration working in IDE
+- \[ ] Prettier formatting on save
+- \[ ] TypeScript IntelliSense working
+- \[ ] Debugging configuration functional
+- \[ ] Git hooks executing properly
 
 ---
 

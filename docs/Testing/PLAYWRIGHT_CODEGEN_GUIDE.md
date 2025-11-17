@@ -1,5 +1,19 @@
 # 🎭 **Playwright Codegen Setup Guide for Uptime-Watcher**
 
+## Table of Contents
+
+1. [� **Quick Start with Helper Script**](#-quick-start-with-helper-script)
+2. [📋 **Manual Setup**](#-manual-setup)
+3. [🚀 **Step-by-Step Setup for Uptime-Watcher**](#-step-by-step-setup-for-uptime-watcher)
+4. [🛠 **Codegen Best Practices for Your Project**](#-codegen-best-practices-for-your-project)
+5. [📝 **Advanced Codegen Techniques**](#-advanced-codegen-techniques)
+6. [🎯 **Workflow for Creating Tests**](#-workflow-for-creating-tests)
+7. [🧪 **Testing Different Scenarios**](#-testing-different-scenarios)
+8. [🔧 **Troubleshooting Codegen**](#-troubleshooting-codegen)
+9. [📚 **Next Steps**](#-next-steps)
+10. [🎉 **Example Generated Test (Adapted)**](#-example-generated-test-adapted)
+11. [📚 **Related Documentation**](#-related-documentation)
+
 ## � **Quick Start with Helper Script**
 
 We've included a helper script to make codegen easier:

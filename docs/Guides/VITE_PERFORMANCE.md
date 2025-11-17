@@ -1,25 +1,34 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Vite Performance Profiling and Optimization Guide"
 summary: "Guide to profiling, warming, and optimizing Vite performance for the Uptime Watcher application."
 created: "2025-09-22"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "vite"
-- "performance"
-- "profiling"
-- "optimization"
-
+  - "uptime-watcher"
+  - "vite"
+  - "performance"
+  - "profiling"
+  - "optimization"
 ---
 
 # Vite Performance Profiling and Optimization Guide
 
-This document outlines how to use the performance profiling scripts and warmup configuration for the Uptime Watcher application.
+## Table of Contents
+
+1. [🔧 Available Scripts](#-available-scripts)
+2. [📊 How to Use Profiling](#-how-to-use-profiling)
+3. [🚀 Warmup Configuration](#-warmup-configuration)
+4. [🎯 Performance Benefits](#-performance-benefits)
+5. [🔍 Identifying Additional Warmup Candidates](#-identifying-additional-warmup-candidates)
+6. [⚡ Current Performance Optimizations](#-current-performance-optimizations)
+7. [🎯 Performance Best Practices](#-performance-best-practices)
+8. [📚 Related Resources](#-related-resources)
+9. [🎯 Quick Reference](#-quick-reference)
+10. [📝 Notes](#-notes)
+11. [🚨 Troubleshooting](#-troubleshooting)
 
 ## 🔧 Available Scripts
 

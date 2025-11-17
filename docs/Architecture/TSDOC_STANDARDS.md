@@ -1,25 +1,27 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "TSDoc Standardization Guide"
 summary: "Standardizes TSDoc usage patterns and inline code examples across the Uptime-Watcher codebase."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "tsdoc"
-- "documentation"
-- "standards"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "tsdoc"
+  - "documentation"
+  - "standards"
 ---
 
 # TSDoc Standardization Guide
 
-This document standardizes inline code examples and TSDoc patterns across the Uptime-Watcher codebase, reflecting current production-grade documentation practices.
+## Table of Contents
+
+1. [TSDoc Standards](#tsdoc-standards)
+2. [Code Example Standards](#code-example-standards)
+3. [TSDoc Tags Reference](#tsdoc-tags-reference)
+4. [Validation Checklist](#validation-checklist)
 
 ## TSDoc Standards
 
@@ -680,16 +682,16 @@ Show complex scenarios and integration patterns:
 
 When documenting code, ensure:
 
-- [ ] Brief description is clear and specific
-- [ ] `@remarks` explains the "why" and important behaviors
-- [ ] All parameters are documented with types and constraints
-- [ ] Return value is clearly described
-- [ ] Error conditions are documented with `@throws`
-- [ ] At least one `@example` showing basic usage
-- [ ] Complex scenarios have additional examples
-- [ ] Error handling patterns are demonstrated
-- [ ] Related functions are cross-referenced with `@see`
-- [ ] Visibility tags (`@public`, `@internal`) are used appropriately
-- [ ] Examples use realistic data and variable names
-- [ ] Code examples are syntactically correct TypeScript
-- [ ] Examples follow the established patterns from the codebase
+- \[ ] Brief description is clear and specific
+- \[ ] `@remarks` explains the "why" and important behaviors
+- \[ ] All parameters are documented with types and constraints
+- \[ ] Return value is clearly described
+- \[ ] Error conditions are documented with `@throws`
+- \[ ] At least one `@example` showing basic usage
+- \[ ] Complex scenarios have additional examples
+- \[ ] Error handling patterns are demonstrated
+- \[ ] Related functions are cross-referenced with `@see`
+- \[ ] Visibility tags (`@public`, `@internal`) are used appropriately
+- \[ ] Examples use realistic data and variable names
+- \[ ] Code examples are syntactically correct TypeScript
+- \[ ] Examples follow the established patterns from the codebase

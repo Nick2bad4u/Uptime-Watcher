@@ -1,19 +1,16 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Guides Documentation"
 summary: "Overview of the docs/Guides directory, its structure, and how to navigate and contribute to Uptime Watcher guides."
 created: "2025-09-18"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "guides"
-- "documentation"
-- "index"
-
+  - "uptime-watcher"
+  - "guides"
+  - "documentation"
+  - "index"
 ---
 
 # Guides documentation
@@ -42,7 +39,6 @@ docs/Guides/
 ├── FALLBACK_SYSTEM_USAGE_ANALYSIS.md      # System reliability patterns
 ├── MONITORING_RACE_CONDITION_SOLUTION_PLAN.md # Concurrency handling
 ├── NEW_MONITOR_TYPE_IMPLEMENTATION.md     # Adding new monitor types
-├── LOGGER_MIGRATION_COMPLETE_REPORT.md    # Logging system migration
 └── ORGANIZATION_SUMMARY.md                # Documentation cleanup summary
 ```
 
@@ -88,7 +84,6 @@ For new developers, start with these essential guides:
 | [Fallback system analysis](./FALLBACK_SYSTEM_USAGE_ANALYSIS.md)          | System reliability and resilience patterns | Backend developers |
 | [Race condition solutions](./MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Concurrency handling in monitoring system  | Backend developers |
 | [New monitor implementation](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)       | Adding new monitoring capabilities         | Feature developers |
-| [Logger migration report](./LOGGER_MIGRATION_COMPLETE_REPORT.md)         | Logging system architecture changes        | System architects  |
 | [Tools and commands guide](./TOOLS_AND_COMMANDS_GUIDE.md)                | Practical reference for tools and commands | All developers     |
 
 ## 🗂️ Navigation

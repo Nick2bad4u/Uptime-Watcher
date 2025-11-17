@@ -29,6 +29,8 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  *     | [string | Plugin | Preset, ...unknown[]]} PluginEntry
  */
 
+/** @typedef {import("remark-inline-links").default} remarkInlineLinks */
+
 /**
  * Remark settings for markdown processing
  *
@@ -48,6 +50,14 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  * @property {"ordered"} [style] - List style preference
  * @property {boolean} [referenceLinks] - Use reference-style links
  * @property {boolean} [incrementListMarker] - Increment ordered list markers
+ * @property {'"' | "'"} [quote] - Preferred quote style for titles
+ * @property {string} [rule] - Marker to use for rules
+ * @property {number} [ruleRepetition] - Number of rule markers
+ * @property {boolean} [ruleSpaces] - Whether to include spaces in rules
+ * @property {boolean} [setext] - Use Setext-style headings
+ * @property {boolean} [closeAtx] - Require closing hashes for ATX headings
+ * @property {boolean} [resourceLink] - Enable resource-style links
+ * @property {boolean} [tightDefinitions] - Use tight definitions
  */
 
 /**
@@ -59,26 +69,17 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 
 // Plugin-specific options types
 /** @typedef {{ schemas?: Record<string, string[]> }} FrontmatterSchemaOptions */
-/** @typedef {'"' | "'"} QuoteStyle */
-/** @typedef {"consistent" | "*" | "_"} EmphasisStyle */
-/** @typedef {"one" | "ordered" | "single"} OrderedListMarkerValue */
-/** @typedef {{ allowExtensionless?: boolean; extensions?: string[] }} FileExtensionOptions */
+/** @typedef {import("remark-lint-mdx-jsx-quote-style").Options} QuoteStyle */
+/** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValue */
+/** @typedef {import("remark-lint-file-extension").Options} FileExtensionOptions */
 /** @typedef {{ entries?: { pattern: string; snippets: string[] }[] }} RequireSnippetsOptions */
-/** @typedef {() => (tree: Root, file: VFile) => void} CustomValidationPlugin */
+/** @typedef {import("unified").Plugin<[RequireSnippetsOptions?], Root>} CustomValidationPlugin */
 
-// Remark plugin option types
-/**
- * @typedef {{
- *     tight?: boolean;
- *     ordered?: boolean;
- *     heading?: string;
- *     maxDepth?: number;
- *     parents?: string[];
- * }} RemarkTocOptions
- */
+// Remark plugin option types (prefer real plugin-exported types where available)
+/** @typedef {import("remark-toc").Options} RemarkTocOptions */
 /** @typedef {{ collapseSpace?: boolean }} ReferenceLinksOptions */
-/** @typedef {{ checked?: string; unchecked?: string }} CheckboxCharacterStyleOptions */
-/** @typedef {{ allowEmpty?: boolean; flags?: string[] }} FencedCodeFlagOptions */
+/** @typedef {import("remark-lint-checkbox-character-style").Options} CheckboxCharacterStyleOptions */
+/** @typedef {import("remark-lint-fenced-code-flag").Options} FencedCodeFlagOptions */
 /**
  * @typedef {{
  *     passive?: boolean;
@@ -93,17 +94,18 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  *     whitelist?: string[];
  * }} WriteGoodOptions
  */
-/** @typedef {{ skipUrlPatterns?: (string | RegExp)[] }} ValidateLinksOptions */
-/** @typedef {{ style?: "atx" | "atx-closed" | "setext" }} HeadingStyleOptions */
-/** @typedef {{ marker?: string }} RuleStyleOptions */
-/** @typedef {{ style?: "fenced" | "indented" }} CodeBlockStyleOptions */
-/** @typedef {{ marker?: "`" | "~" }} FencedCodeMarkerOptions */
-/** @typedef {{ style?: "consistent" | "*" | "_" }} EmphasisMarkerOptions */
-/** @typedef {{ style?: "consistent" | "*" | "**" | "__" }} StrongMarkerOptions */
-/** @typedef {{ style?: "consistent" | "*" | "+" | "-" }} UnorderedListMarkerStyleOptions */
-/** @typedef {{ style?: "one" | "ordered" | "single" }} OrderedListMarkerValueOptions */
-/** @typedef {{ style?: '"' | "'" | "consistent" }} LinkTitleStyleOptions */
+/** @typedef {import("remark-validate-links").Options} ValidateLinksOptions */
+/** @typedef {import("remark-lint-heading-style").Options} HeadingStyleOptions */
+/** @typedef {import("remark-lint-rule-style").Options} RuleStyleOptions */
+/** @typedef {import("remark-lint-code-block-style").Options} CodeBlockStyleOptions */
+/** @typedef {import("remark-lint-fenced-code-marker").Options} FencedCodeMarkerOptions */
+/** @typedef {import("remark-lint-emphasis-marker").Options} EmphasisMarkerOptions */
+/** @typedef {import("remark-lint-strong-marker").Options} StrongMarkerOptions */
+/** @typedef {import("remark-lint-unordered-list-marker-style").Options} UnorderedListMarkerStyleOptions */
+/** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValueOptions */
+/** @typedef {import("remark-lint-link-title-style").Options} LinkTitleStyleOptions */
 
+/** @type {RemarkConfig} */
 const remarkConfig = {
     // Core plugins for GitHub Flavored Markdown and formatting integration
     plugins: [
@@ -127,11 +129,12 @@ const remarkConfig = {
         "remark-math",
         "rehype-katex", // If you have math content
         // Bibliography and references
-        // "remark-wiki-link", // Support [[wiki-style]] links
+        "remark-wiki-link", // Support [[wiki-style]] links
 
         /** @type {[string, ReferenceLinksOptions]} */
-        ["remark-reference-links", { collapseSpace: false }],
-
+        // ["remark-reference-links", { collapseSpace: false }],
+        /** @type {[string, remarkInlineLinks]} */
+        "remark-inline-links",
         // Content analysis
         /** @type {[string, ["warn", WriteGoodOptions]]} */
         [
@@ -253,7 +256,7 @@ const remarkConfig = {
             "remark-toc",
             {
                 heading: "table of contents|toc",
-                maxDepth: 1,
+                maxDepth: 2,
                 ordered: true,
                 tight: true,
             },
@@ -289,7 +292,7 @@ const remarkConfig = {
         ],
 
         // Custom Uptime Watcher validation rules
-        validateUptimeWatcherDocs,
+        /** @type {PluginEntry} */ (validateUptimeWatcherDocs),
 
         // Require specific code snippets in documentation
         /** @type {[CustomValidationPlugin, RequireSnippetsOptions]} */

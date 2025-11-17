@@ -1,29 +1,31 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "New Monitor Type Implementation Guide"
 summary: "End-to-end guide for implementing a new monitor type in the Uptime Monitoring System."
 created: "2025-08-01"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "monitoring"
-- "monitor-types"
-- "implementation"
-- "guide"
-
+  - "uptime-watcher"
+  - "monitoring"
+  - "monitor-types"
+  - "implementation"
+  - "guide"
 ---
 
 # Uptime Monitoring System - New Monitor Type Implementation Guide
 
-`Last reviewed: September 30, 2025`
+## Table of Contents
 
-This guide walks you through every layer required to introduce a brand-new monitor type into the Uptime Monitoring System. It is written so that an engineer who has never touched this codebase can ship a production-ready monitor with confidence.
-
----
+1. [1. Who Should Use This Guide](#1-who-should-use-this-guide)
+2. [2. End-to-End Flyover](#2-end-to-end-flyover)
+3. [3. Architecture Recap](#3-architecture-recap)
+4. [4. File Impact Matrix](#4-file-impact-matrix)
+5. [5. Step-by-Step Implementation](#5-step-by-step-implementation)
+6. [6. Troubleshooting and FAQ](#6-troubleshooting-and-faq)
+7. [7. Appendix - Reference Snippets](#7-appendix---reference-snippets)
+8. [8. Change Log for This Guide](#8-change-log-for-this-guide)
 
 ## 1. Who Should Use This Guide
 
@@ -228,12 +230,12 @@ Capture any additional scripts, environment variables, or fixtures required to e
 
 ### Step 6 - Deployment and Release Checklist
 
-- [ ] All automated tests above pass locally and in CI.
-- [ ] Updated user docs, runbooks, and screenshots if the UI changed.
-- [ ] Updated `CHANGELOG.md` and release notes with the new monitor capability.
-- [ ] Completed security or privacy review if the monitor touches new protocols or credentials.
-- [ ] Verified dynamic schema output against staging or production snapshots when possible.
-- [ ] Finalized rollout plan (feature flag, staged release, or full launch).
+- \[ ] All automated tests above pass locally and in CI.
+- \[ ] Updated user docs, runbooks, and screenshots if the UI changed.
+- \[ ] Updated `CHANGELOG.md` and release notes with the new monitor capability.
+- \[ ] Completed security or privacy review if the monitor touches new protocols or credentials.
+- \[ ] Verified dynamic schema output against staging or production snapshots when possible.
+- \[ ] Finalized rollout plan (feature flag, staged release, or full launch).
 
 Once merged, monitor the first production checks closely. Add telemetry if the monitor depends on upstream services whose outages you want to isolate.
 

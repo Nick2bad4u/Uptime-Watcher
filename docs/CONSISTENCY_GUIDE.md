@@ -3,7 +3,7 @@ schema: "../config/schemas/doc-frontmatter.schema.json"
 title: "Uptime Watcher Consistency Guide"
 summary: "Architectural patterns, conventions, and standards for consistency across the Uptime Watcher codebase."
 created: "2025-11-15"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -22,13 +22,16 @@ This document outlines the architectural patterns, conventions, and standards fo
 
 ## Table of Contents
 
-- [Error Handling Standards](#error-handling-standards)
-- [Logging Patterns](#logging-patterns)
-- [Dependency Injection](#dependency-injection)
-- [Code Documentation](#code-documentation)
-- [Architectural Patterns](#architectural-patterns)
-- [TypeScript Standards](#typescript-standards)
-- [Testing Conventions](#testing-conventions)
+1. [Error Handling Standards](#error-handling-standards)
+2. [Logging Patterns](#logging-patterns)
+3. [Dependency Injection](#dependency-injection)
+4. [Code Documentation](#code-documentation)
+5. [Architectural Patterns](#architectural-patterns)
+6. [TypeScript Standards](#typescript-standards)
+7. [Testing Conventions](#testing-conventions)
+8. [Implementation Checklist](#implementation-checklist)
+9. [Validation Commands](#validation-commands)
+10. [Contributing](#contributing)
 
 ## Error Handling Standards
 

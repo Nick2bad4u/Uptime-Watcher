@@ -1,25 +1,30 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Chrome DevTools Snippets for Testing"
 summary: "Chrome DevTools snippets for adding, listing, and removing test sites in the Uptime Watcher renderer."
 created: "2025-10-27"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "devtools"
-- "snippets"
-- "testing"
-- "sites"
-
+  - "uptime-watcher"
+  - "devtools"
+  - "snippets"
+  - "testing"
+  - "sites"
 ---
 
 # Chrome DevTools Snippets for Testing
 
-This document contains useful Chrome DevTools snippets for testing the Uptime Watcher application.
+## Table of Contents
+
+1. [How to Use These Snippets](#how-to-use-these-snippets)
+2. [Snippet 1: Add Test Sites (One of Each Monitor Type)](#snippet-1-add-test-sites-one-of-each-monitor-type)
+3. [Snippet 2: Remove All Sites](#snippet-2-remove-all-sites)
+4. [Snippet 3: Add Minimal Test Sites (Quick Testing)](#snippet-3-add-minimal-test-sites-quick-testing)
+5. [Snippet 4: List All Sites](#snippet-4-list-all-sites)
+6. [Tips](#tips)
+7. [Troubleshooting](#troubleshooting)
 
 ## How to Use These Snippets
 

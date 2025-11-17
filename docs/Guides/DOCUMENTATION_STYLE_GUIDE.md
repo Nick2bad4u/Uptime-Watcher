@@ -1,26 +1,33 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Style Guide"
 summary: "Style and formatting standards for all Markdown documentation in the Uptime Watcher project."
 created: "2025-09-18"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "documentation"
-- "style-guide"
-- "markdown"
-  topics:
-- "documentation"
-
+  - "uptime-watcher"
+  - "documentation"
+  - "style-guide"
+  - "markdown"
+topics:
+  - "documentation"
 ---
 
 # Documentation Style Guide
 
-This guide establishes consistent formatting and content standards for all Markdown documentation in the Uptime Watcher project.
+## Table of Contents
+
+1. [Front matter schema](#front-matter-schema)
+2. [� File Naming Conventions](#-file-naming-conventions)
+3. [�📝 Formatting Standards](#-formatting-standards)
+4. [📋 Content Standards](#-content-standards)
+5. [🎯 Document Types](#-document-types)
+6. [🔧 Tools and Validation](#-tools-and-validation)
+7. [📚 Examples](#-examples)
+8. [🎨 Visual Consistency](#-visual-consistency)
+9. [📊 Maintenance](#-maintenance)
 
 ## Front matter schema
 
@@ -47,7 +54,7 @@ tags:
 
 Notes:
 
-- **$schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
+- **\$schema**: Always points to `../../config/schemas/doc-frontmatter.schema.json` for files directly under `docs/Guides/` and `docs/Architecture/`. For files in subdirectories (for example, `docs/Architecture/ADRs/*`), adjust the relative path accordingly (for example, `../../../config/schemas/doc-frontmatter.schema.json`).
 
 - **title**: Matches the main H1 where practical but does not need to include emojis or decorative prefixes.
 

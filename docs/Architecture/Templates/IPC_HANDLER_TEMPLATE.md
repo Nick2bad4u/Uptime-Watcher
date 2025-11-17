@@ -1,25 +1,33 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "IPC Handler Template"
 summary: "Provides a template for implementing new IPC handlers aligned with the central IpcService, validation, and error-handling patterns."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "template"
-- "ipc"
-- "electron"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "template"
+  - "ipc"
+  - "electron"
 ---
 
 # IPC Handler Template
 
-Use this template when creating new IPC handlers for Electron communication.
+## Table of Contents
+
+1. [File Structure](#file-structure)
+2. [Handler Implementation Template](#handler-implementation-template)
+3. [Validation Functions Template](#validation-functions-template)
+4. [Preload API Extension Template](#preload-api-extension-template)
+5. [Type Definitions Template](#type-definitions-template)
+6. [Test Template](#test-template)
+7. [Integration Checklist](#integration-checklist)
+8. [Channel Naming Convention](#channel-naming-convention)
+9. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
+10. [Error Handling](#error-handling)
 
 ## File Structure
 
@@ -656,16 +664,16 @@ describe("Example IPC Handlers", () => {
 
 When creating new IPC handlers:
 
-- [ ] Create handler registration function in domain-specific file
-- [ ] Create comprehensive validation functions
-- [ ] Add handlers to main IpcService initialization
-- [ ] Update preload API with new methods
-- [ ] Add TypeScript type definitions
-- [ ] Create comprehensive tests
-- [ ] Update documentation with examples
-- [ ] Test error handling paths
-- [ ] Verify type safety works end-to-end
-- [ ] Add logging for debugging
+- \[ ] Create handler registration function in domain-specific file
+- \[ ] Create comprehensive validation functions
+- \[ ] Add handlers to main IpcService initialization
+- \[ ] Update preload API with new methods
+- \[ ] Add TypeScript type definitions
+- \[ ] Create comprehensive tests
+- \[ ] Update documentation with examples
+- \[ ] Test error handling paths
+- \[ ] Verify type safety works end-to-end
+- \[ ] Add logging for debugging
 
 ## Channel Naming Convention
 

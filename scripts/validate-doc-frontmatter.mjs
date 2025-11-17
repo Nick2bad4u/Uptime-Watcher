@@ -27,7 +27,11 @@ const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.resolve(__dirname, "..");
 
 /** @type {readonly string[]} */
-const DOC_DIRECTORIES = ["docs/Guides", "docs/Architecture"];
+const DOC_DIRECTORIES = [
+    "docs/Guides",
+    "docs/Architecture",
+    "docs/Testing",
+];
 
 /**
  * Certain Markdown files are intentionally generated or use a different

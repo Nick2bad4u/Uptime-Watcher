@@ -374,7 +374,7 @@ We welcome contributions from the community! Here's how you can help:
 ## 📄 License
 
 <div align="center"><a href="LICENSE">
-  <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License">
+  <img src="https://img.shields.io/badge/license-Unlicense-green.svg" alt="License badge.">
 </a>
 
 <strong>This project is released under the <a href="LICENSE">Unlicense</a> - Public Domain</strong>
@@ -385,7 +385,7 @@ We welcome contributions from the community! Here's how you can help:
 
 ## Get help
 
-[![GitHub Issues](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
+[![GitHub Issues badge.](https://img.shields.io/badge/Issues-GitHub-blue?logo=github)](https://github.com/Nick2bad4u/Uptime-Watcher/issues) [![Documentation badge.](https://img.shields.io/badge/Docs-Available-brightgreen)](./docs/)
 
 ---
 

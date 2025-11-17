@@ -1,20 +1,17 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Site Loading & Monitoring Orchestration"
 summary: "Documents how DatabaseManager, SiteLoadingOrchestrator, and SiteManager coordinate database hydration, cache synchronization, and monitoring bootstrap."
 created: "2025-10-31"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "site-loading"
-- "monitoring"
-- "orchestration"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "site-loading"
+  - "monitoring"
+  - "orchestration"
 ---
 
 # Site Loading & Monitoring Orchestration

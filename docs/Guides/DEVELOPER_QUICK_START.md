@@ -1,25 +1,34 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Developer Quick Start Guide"
 summary: "Quick-start guide for setting up the Uptime Watcher development environment and understanding the architecture."
 created: "2025-09-22"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "development"
-- "setup"
-- "quick-start"
-- "architecture"
-
+  - "uptime-watcher"
+  - "development"
+  - "setup"
+  - "quick-start"
+  - "architecture"
 ---
 
 # 🚀 Developer Quick Start Guide
 
-> **Fast Track**: Get up and running with Uptime Watcher development in minutes.
+## Table of Contents
+
+1. [📋 Overview](#-overview)
+2. [⚡ Quick Setup](#-quick-setup)
+3. [🏗️ Architecture Quick Reference](#️-architecture-quick-reference)
+4. [🔄 Data Flow Architecture](#-data-flow-architecture)
+5. [🛠️ Common Development Tasks](#️-common-development-tasks)
+6. [🔧 Available Scripts](#-available-scripts)
+7. [🎯 Key Development Patterns](#-key-development-patterns)
+8. [🚨 Important Guidelines](#-important-guidelines)
+9. [🐛 Debugging](#-debugging)
+10. [📚 Essential Documentation](#-essential-documentation)
+11. [🎯 Next Steps](#-next-steps)
 
 ## 📋 Overview
 

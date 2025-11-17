@@ -1,20 +1,17 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "error-handling"
-- "zustand"
-- "validation"
-- "testing"
-
+  - "uptime-watcher"
+  - "error-handling"
+  - "zustand"
+  - "validation"
+  - "testing"
 ---
 
 # Error Handling Guide
@@ -44,6 +41,9 @@ The application uses a **multi-layered error handling approach** with:
 7. [Validation Error Handling](#validation-error-handling)
 8. [Testing Error Scenarios](#testing-error-scenarios)
 9. [Best Practices](#best-practices)
+10. [Summary](#summary)
+11. [📚 Related Resources](#-related-resources)
+12. [🎯 Quick Reference](#-quick-reference)
 
 ## Centralized Error Store
 

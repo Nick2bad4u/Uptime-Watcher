@@ -1,28 +1,36 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
-summary: >-
-Index of architectural documentation for the Uptime-Watcher application,
-including ADRs, patterns, templates, and standards.
+summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "adr"
-- "patterns"
-- "templates"
-- "standards"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "patterns"
+  - "templates"
+  - "standards"
 ---
 
 # Architecture Documentation Index
 
-This directory contains comprehensive architectural documentation for the Uptime-Watcher application, including Architecture Decision Records (ADRs), development patterns, code templates, and documentation standards.
+## Table of Contents
+
+1. [📁 Directory Structure](#-directory-structure)
+2. [🏗️ Architecture Decision Records (ADRs)](#️-architecture-decision-records-adrs)
+3. [📋 Development Patterns](#-development-patterns)
+4. [🛠️ Code Templates](#️-code-templates)
+5. [📚 Documentation Standards](#-documentation-standards)
+6. [🧾 Generated Artifacts](#-generated-artifacts)
+7. [🎯 Using This Documentation](#-using-this-documentation)
+8. [🔄 Maintenance Guidelines](#-maintenance-guidelines)
+9. [📊 Compliance Tracking](#-compliance-tracking)
+10. [Current Documentation Audit (2025-11-04)](#current-documentation-audit-2025-11-04)
+11. [🚀 Quick Start](#-quick-start)
+12. [📞 Support](#-support)
 
 ## 📁 Directory Structure
 

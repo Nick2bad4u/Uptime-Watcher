@@ -1,19 +1,16 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Development Patterns Guide"
 summary: "Documents the core architectural and development patterns used across Uptime Watcher, including repositories, events, state, IPC, and testing."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "patterns"
-- "guidelines"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "patterns"
+  - "guidelines"
 ---
 
 # Development Patterns Guide
@@ -101,16 +98,18 @@ graph TB
 
 1. [Repository Pattern](#repository-pattern)
 2. [Event-Driven Communication](#event-driven-communication)
-3. [Error Handling Patterns](#error-handling-patterns)
-4. [Frontend State Management](#frontend-state-management)
-5. [IPC Communication](#ipc-communication)
-6. [Standardized Cache Configuration](#standardized-cache-configuration)
-7. [Memory Management](#memory-management)
-8. [Race Condition Prevention](#race-condition-prevention)
-9. [Site Mutation Pipeline](#site-mutation-pipeline)
-10. [Shared Utility Imports](#shared-utility-imports)
-11. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
-12. [Testing Patterns](#testing-patterns)
+3. [Shared Utility Imports](#shared-utility-imports)
+4. [Logging Format & Prefix Standards](#logging-format--prefix-standards)
+5. [Error Handling Patterns](#error-handling-patterns)
+6. [Frontend State Management](#frontend-state-management)
+7. [IPC Communication](#ipc-communication)
+8. [Testing Patterns](#testing-patterns)
+9. [Standardized Cache Configuration](#standardized-cache-configuration)
+10. [Memory Management](#memory-management)
+11. [Race Condition Prevention](#race-condition-prevention)
+12. [Site Mutation Pipeline](#site-mutation-pipeline)
+13. [Best Practices Summary](#best-practices-summary)
+14. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
 
 ## Repository Pattern
 

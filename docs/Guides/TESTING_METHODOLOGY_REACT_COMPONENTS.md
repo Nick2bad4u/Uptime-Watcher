@@ -1,23 +1,32 @@
 ---
-
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "React Component Testing Methodology"
 summary: "Testing methodology and patterns for React components in Uptime Watcher using Vitest and React Testing Library."
 created: "2025-09-22"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "react"
-- "testing"
-- "vitest"
-- "rtl"
-
+  - "uptime-watcher"
+  - "react"
+  - "testing"
+  - "vitest"
+  - "rtl"
 ---
 
 # React Component Testing Methodology
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Current Testing Architecture](#current-testing-architecture)
+3. [Validated Testing Patterns](#validated-testing-patterns)
+4. [Current Testing Configuration](#current-testing-configuration)
+5. [Test Structure Templates](#test-structure-templates)
+6. [Testing Best Practices](#testing-best-practices)
+7. [Common Testing Patterns](#common-testing-patterns)
+8. [Testing Tools and Commands](#testing-tools-and-commands)
+9. [Success Metrics](#success-metrics)
 
 ## Overview
 

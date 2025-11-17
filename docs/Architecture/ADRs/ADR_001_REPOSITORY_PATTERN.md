@@ -1,23 +1,30 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-001: Repository Pattern for Database Access"
 summary: "Establishes a repository pattern for all database access with transaction safety, caching, and event-driven hooks."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "adr"
-- "database"
-- "repository-pattern"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "adr"
+  - "database"
+  - "repository-pattern"
 ---
 
 # ADR-001: Repository Pattern for Database Access
+
+## Table of Contents
+
+1. [Status](#status)
+2. [Context](#context)
+3. [Decision](#decision)
+4. [Consequences](#consequences)
+5. [Implementation Quality Assurance](#implementation-quality-assurance)
+6. [Compliance](#compliance)
+7. [Related ADRs](#related-adrs)
 
 ## Status
 

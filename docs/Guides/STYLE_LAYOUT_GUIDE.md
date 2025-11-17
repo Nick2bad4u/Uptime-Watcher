@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Style & Layout Guide"
 summary: "Guide to shared styling primitives and layout conventions used in the Uptime Watcher renderer UI."
 created: "2025-10-07"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "ui"
   - "css"
 ---
-
 # Style & Layout Guide
 
 This guide documents the shared styling primitives that keep the renderer consistent. Follow these practices whenever you add screens, modals, or high-level layout primitives.

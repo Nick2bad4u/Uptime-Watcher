@@ -1,23 +1,34 @@
 ---
-
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Component Props Standards"
 summary: "Defines standardized patterns and conventions for React component props in the Uptime Watcher frontend."
 created: "2025-08-23"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-
-- "uptime-watcher"
-- "architecture"
-- "react"
-- "components"
-- "props"
-
+  - "uptime-watcher"
+  - "architecture"
+  - "react"
+  - "components"
+  - "props"
 ---
 
 # Component Props Standards
+
+## Table of Contents
+
+1. [📋 **Overview**](#-overview)
+2. [🎯 **Standardization Goals**](#-standardization-goals)
+3. [🏗️ **Core Prop Patterns**](#️-core-prop-patterns)
+4. [📏 **Size and Variant Standards**](#-size-and-variant-standards)
+5. [🧩 **Composition Patterns**](#-composition-patterns)
+6. [📝 **Documentation Standards**](#-documentation-standards)
+7. [🎨 **Implementation Templates**](#-implementation-templates)
+8. [✅ **Compliance Checklist**](#-compliance-checklist)
+9. [🔧 **Migration Guide**](#-migration-guide)
+10. [📚 **Related Documentation**](#-related-documentation)
+11. [Current Implementation Audit (2025-11-04)](#current-implementation-audit-2025-11-04)
 
 ## 📋 **Overview**
 
@@ -502,39 +513,39 @@ export default FormComponent;
 
 ### **Interface Design**
 
-- [ ] Uses `Properties` suffix for prop interfaces
-- [ ] All props marked as `readonly`
-- [ ] Proper TSDoc documentation for all props
-- [ ] Consistent event handler signatures
-- [ ] Appropriate use of optional vs required props
+- \[ ] Uses `Properties` suffix for prop interfaces
+- \[ ] All props marked as `readonly`
+- \[ ] Proper TSDoc documentation for all props
+- \[ ] Consistent event handler signatures
+- \[ ] Appropriate use of optional vs required props
 
 ### **Event Handlers**
 
-- [ ] Simple `() => void` for basic actions
-- [ ] Event object included when needed
-- [ ] Consistent naming (onClick, onChange, onSubmit)
-- [ ] Value-based handlers for form components
+- \[ ] Simple `() => void` for basic actions
+- \[ ] Event object included when needed
+- \[ ] Consistent naming (onClick, onChange, onSubmit)
+- \[ ] Value-based handlers for form components
 
 ### **Accessibility**
 
-- [ ] Appropriate ARIA props included
-- [ ] Screen reader considerations
-- [ ] Keyboard navigation support
-- [ ] Focus management
+- \[ ] Appropriate ARIA props included
+- \[ ] Screen reader considerations
+- \[ ] Keyboard navigation support
+- \[ ] Focus management
 
 ### **Documentation**
 
-- [ ] Component purpose clearly documented
-- [ ] Usage examples provided
-- [ ] Props documented with descriptions
-- [ ] Default values specified
+- \[ ] Component purpose clearly documented
+- \[ ] Usage examples provided
+- \[ ] Props documented with descriptions
+- \[ ] Default values specified
 
 ### **Type Safety**
 
-- [ ] Strong TypeScript typing
-- [ ] No `any` types used
-- [ ] Proper generic constraints
-- [ ] Interface composition over inheritance
+- \[ ] Strong TypeScript typing
+- \[ ] No `any` types used
+- \[ ] Proper generic constraints
+- \[ ] Interface composition over inheritance
 
 ---
 

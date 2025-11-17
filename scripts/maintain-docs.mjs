@@ -14,6 +14,9 @@
 import { readFile, writeFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { execSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
+import { remark } from "remark";
+import remarkToc from "remark-toc";
 
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.join(__dirname, "..");
@@ -25,6 +28,13 @@ const ROOT_DIRECTORY = path.join(__dirname, "..");
  * @property {string[]} tocGenerated - Files that had TOC generated
  * @property {string[]} linksFixed - Files that had broken links fixed
  * @property {string[]} warnings - Issues that need manual attention
+ */
+
+/**
+ * Simple representation of parsed frontmatter. Keys map to either scalar string
+ * values or string arrays (for fields like `tags`/`topics`).
+ *
+ * @typedef {Record<string, string | string[]>} Frontmatter
  */
 
 /**
@@ -59,7 +69,7 @@ async function getGitLastModified(filePath) {
  * @param {string} content - Markdown content
  *
  * @returns {{
- *     frontmatter: Object | null;
+ *     frontmatter: Frontmatter | null;
  *     content: string;
  *     yamlLines: number;
  * }}
@@ -69,41 +79,112 @@ function parseFrontmatter(content) {
         /^---\s*\n(?<yaml>[\S\s]*?)\n---\s*\n/
     );
 
-    if (!frontmatterMatch) {
+    if (frontmatterMatch === null) {
         return { frontmatter: null, content, yamlLines: 0 };
     }
 
-    const yamlContent = frontmatterMatch.groups?.yaml ?? "";
-    const yamlLines = yamlContent.split("\n").length + 2; // +2 for the --- delimiters
+    const yamlContent = frontmatterMatch.groups?.["yaml"] ?? "";
+    const yamlLineCount = yamlContent.split("\n").length + 2; // +2 for the --- delimiters
     const contentAfterFrontmatter = content.slice(frontmatterMatch[0].length);
+    const yamlLines = yamlContent.split("\n");
 
-    // Simple YAML parser for frontmatter
+    // Simple YAML parser for frontmatter supporting scalar and list values
+    /** @type {Frontmatter} */
     const frontmatter = {};
-    yamlContent.split("\n").forEach((line) => {
-        const colonIndex = line.indexOf(":");
-        if (colonIndex > 0) {
-            const key = line.slice(0, colonIndex).trim();
-            let value = line.slice(colonIndex + 1).trim();
+    for (let index = 0; index < yamlLines.length; index += 1) {
+        const line = yamlLines[index];
+        if (!line || line.trim().length === 0 || line.trim().startsWith("#")) {
+            continue;
+        }
 
-            // Handle quoted values
-            if (
-                (value.startsWith('"') && value.endsWith('"')) ||
-                (value.startsWith("'") && value.endsWith("'"))
-            ) {
-                value = value.slice(1, -1);
+        const colonIndex = line.indexOf(":");
+        if (colonIndex <= 0) {
+            continue;
+        }
+
+        const key = line.slice(0, colonIndex).trim();
+        const rawValue = line.slice(colonIndex + 1).trim();
+
+        // Handle multi-line list values (e.g., tags/topics)
+        if (rawValue === "" || rawValue === "|") {
+            const listItems = [];
+            let lookaheadIndex = index + 1;
+
+            while (lookaheadIndex < yamlLines.length) {
+                const candidateLine = yamlLines[lookaheadIndex];
+                if (typeof candidateLine !== "string") {
+                    break;
+                }
+
+                if (/^\s*-/u.test(candidateLine)) {
+                    const listValue = candidateLine
+                        .replace(/^\s*-\s*/u, "")
+                        .trim();
+                    listItems.push(stripYamlQuotes(listValue));
+                    lookaheadIndex += 1;
+                    continue;
+                }
+
+                // Allow blank lines inside list blocks
+                if (candidateLine.trim().length === 0) {
+                    lookaheadIndex += 1;
+                    continue;
+                }
+
+                break;
             }
 
-            frontmatter[key] = value;
+            if (listItems.length > 0) {
+                frontmatter[key] = listItems;
+                index = lookaheadIndex - 1;
+                continue;
+            }
         }
-    });
 
-    return { frontmatter, content: contentAfterFrontmatter, yamlLines };
+        // Inline JSON-like arrays (e.g., tags: ["a", "b"])
+        if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
+            const trimmedValue = rawValue.slice(1, -1).trim();
+            frontmatter[key] =
+                trimmedValue.length === 0
+                    ? []
+                    : trimmedValue
+                          .split(",")
+                          .map((item) => stripYamlQuotes(item.trim()));
+            continue;
+        }
+
+        frontmatter[key] = stripYamlQuotes(rawValue);
+    }
+
+    return {
+        frontmatter,
+        content: contentAfterFrontmatter,
+        yamlLines: yamlLineCount,
+    };
+}
+
+/**
+ * Remove surrounding single/double quotes from YAML values
+ *
+ * @param {string} value - Raw YAML scalar
+ *
+ * @returns {string} Unquoted value
+ */
+function stripYamlQuotes(value) {
+    if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+    ) {
+        return value.slice(1, -1);
+    }
+
+    return value;
 }
 
 /**
  * Serialize frontmatter back to YAML
  *
- * @param {Object} frontmatter - Frontmatter object
+ * @param {Frontmatter} frontmatter - Frontmatter object
  *
  * @returns {string} YAML string
  */
@@ -168,12 +249,12 @@ async function updateLastReviewedDate(filePath) {
         const content = await readFile(filePath, "utf8");
         const { frontmatter, content: bodyContent } = parseFrontmatter(content);
 
-        if (!frontmatter) {
+        if (frontmatter === null) {
             return false;
         }
 
         const lastModified = await getGitLastModified(filePath);
-        if (!lastModified) {
+        if (lastModified === null) {
             return false;
         }
 
@@ -182,14 +263,15 @@ async function updateLastReviewedDate(filePath) {
 
         // Only update if file was modified recently and last_reviewed is older
         if (lastModified > thirtyDaysAgo) {
-            const currentLastReviewed = frontmatter.last_reviewed
-                ? new Date(frontmatter.last_reviewed)
-                : null;
+            const rawLastReviewed = frontmatter["last_reviewed"];
+            const currentLastReviewed =
+                typeof rawLastReviewed === "string" && rawLastReviewed
+                    ? new Date(rawLastReviewed)
+                    : null;
 
             if (!currentLastReviewed || lastModified > currentLastReviewed) {
-                frontmatter.last_reviewed = lastModified
-                    .toISOString()
-                    .split("T")[0];
+                const isoDate = lastModified.toISOString().split("T")[0] || "";
+                frontmatter["last_reviewed"] = isoDate;
 
                 const newContent =
                     serializeFrontmatter(frontmatter) + bodyContent;
@@ -200,16 +282,17 @@ async function updateLastReviewedDate(filePath) {
 
         return false;
     } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
         console.warn(
             `Failed to update last_reviewed for ${filePath}:`,
-            error.message
+            message
         );
         return false;
     }
 }
 
 /**
- * Generate table of contents for files that need them
+ * Generate table of contents for files that need them using remark-toc.
  *
  * @param {string} filePath - Path to the markdown file
  *
@@ -219,7 +302,6 @@ async function generateTableOfContents(filePath) {
     try {
         const content = await readFile(filePath, "utf8");
 
-        // Skip if file already has TOC
         if (
             content.includes("## Table of Contents") ||
             content.includes("## TOC")
@@ -232,53 +314,44 @@ async function generateTableOfContents(filePath) {
             .split(/\s+/)
             .filter((word) => word.length > 0).length;
 
-        // Only add TOC for substantial documents with multiple sections
-        if (wordCount > 1000 && headings.length > 5) {
-            const { frontmatter, content: bodyContent } =
-                parseFrontmatter(content);
-
-            // Generate TOC from headings
-            const tocLines = ["## Table of Contents", ""];
-
-            headings.slice(1).forEach((heading) => {
-                // Skip the main title
-                const level = (heading.match(/^#+/) || [""])[0].length;
-                const text = heading.replace(/^#+\s+/, "").trim();
-                const anchor = text
-                    .toLowerCase()
-                    .replaceAll(/[^\s\w-]/g, "")
-                    .replaceAll(/\s+/g, "-");
-
-                const indent = "  ".repeat(Math.max(0, level - 2));
-                tocLines.push(`${indent}- [${text}](#${anchor})`);
-            });
-
-            tocLines.push("");
-
-            // Insert TOC after first heading
-            const firstHeadingIndex = bodyContent.indexOf("\n# ");
-            if (firstHeadingIndex !== -1) {
-                const endOfFirstHeading = bodyContent.indexOf(
-                    "\n",
-                    firstHeadingIndex + 1
-                );
-                const beforeToc = bodyContent.slice(0, endOfFirstHeading + 1);
-                const afterToc = bodyContent.slice(endOfFirstHeading + 1);
-
-                const newBodyContent = `${beforeToc}\n${tocLines.join("\n")}${afterToc}`;
-
-                const newContent = frontmatter
-                    ? serializeFrontmatter(frontmatter) + newBodyContent
-                    : newBodyContent;
-
-                await writeFile(filePath, newContent, "utf8");
-                return true;
-            }
+        if (!(wordCount > 1000 && headings.length > 5)) {
+            return false;
         }
 
-        return false;
+        const { frontmatter, content: bodyContent } = parseFrontmatter(content);
+
+        const firstHeadingMatch = bodyContent.match(/^#\s.+$/m);
+        if (!firstHeadingMatch || firstHeadingMatch.index === undefined) {
+            return false;
+        }
+
+        const headingEndIndex =
+            firstHeadingMatch.index + firstHeadingMatch[0].length;
+        const beforeToc = bodyContent.slice(0, headingEndIndex);
+        const afterToc = bodyContent.slice(headingEndIndex);
+
+        const placeholderHeading = "\n\n## Table of Contents\n\n";
+        const bodyWithPlaceholder = `${beforeToc}${placeholderHeading}${afterToc}`;
+
+        const processed = await remark()
+            .use(remarkToc, {
+                heading: "table of contents",
+                maxDepth: 2,
+                ordered: true,
+                tight: true,
+            })
+            .process(bodyWithPlaceholder);
+
+        const newBodyContent = String(processed);
+        const newContent = frontmatter
+            ? serializeFrontmatter(frontmatter) + newBodyContent
+            : newBodyContent;
+
+        await writeFile(filePath, newContent, "utf8");
+        return true;
     } catch (error) {
-        console.warn(`Failed to generate TOC for ${filePath}:`, error.message);
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(`Failed to generate TOC for ${filePath}:`, message);
         return false;
     }
 }
@@ -306,11 +379,15 @@ async function fixCrossReferences(filePath) {
                 continue;
             }
 
-            const linkText = groups.text;
-            const linkUrl = groups.url;
+            const linkText = groups["text"]; // From named capture group
+            const linkUrl = groups["url"]; // From named capture group
 
             // Fix common path issues
-            if (linkUrl.includes("../") && !linkUrl.startsWith("http")) {
+            if (
+                linkUrl &&
+                linkUrl.includes("../") &&
+                !linkUrl.startsWith("http")
+            ) {
                 const correctedUrl = linkUrl.replaceAll(/\.\.\/+/g, "../");
                 if (correctedUrl !== linkUrl) {
                     updatedContent = updatedContent.replace(
@@ -329,9 +406,10 @@ async function fixCrossReferences(filePath) {
 
         return false;
     } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
         console.warn(
             `Failed to fix cross-references for ${filePath}:`,
-            error.message
+            message
         );
         return false;
     }
@@ -345,6 +423,7 @@ async function fixCrossReferences(filePath) {
 async function maintainDocs() {
     console.log("🔧 Starting documentation maintenance...\n");
 
+    /** @type {MaintenanceReport} */
     const report = {
         updatedFiles: [],
         tocGenerated: [],
@@ -354,7 +433,15 @@ async function maintainDocs() {
 
     const docsDir = path.join(ROOT_DIRECTORY, "docs");
 
+    /**
+     * Recursively collect Markdown files under a directory.
+     *
+     * @param {string} dir
+     *
+     * @returns {Promise<string[]>}
+     */
     async function collectMarkdownFiles(dir) {
+        /** @type {string[]} */
         const files = [];
         const entries = await readdir(dir, { withFileTypes: true });
 
@@ -461,8 +548,26 @@ function displayMaintenanceReport(report) {
     }
 }
 
+/**
+ * Determine whether the current ES module is the entry point.
+ *
+ * @param {string} moduleUrl - URL for the executing module (typically
+ *   import.meta.url)
+ *
+ * @returns {boolean} True when the module is being run directly via Node
+ */
+function isExecutedDirectly(moduleUrl) {
+    const entryFilePath = process.argv[1];
+    if (!entryFilePath) {
+        return false;
+    }
+
+    const normalizedEntryUrl = pathToFileURL(path.resolve(entryFilePath)).href;
+    return moduleUrl === normalizedEntryUrl;
+}
+
 // Run maintenance if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isExecutedDirectly(import.meta.url)) {
     try {
         const report = await maintainDocs();
         displayMaintenanceReport(report);

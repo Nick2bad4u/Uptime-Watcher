@@ -7,6 +7,7 @@
 
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 const __dirname = import.meta.dirname;
 const ROOT_DIRECTORY = path.join(__dirname, "..");
@@ -19,12 +20,18 @@ const ROOT_DIRECTORY = path.join(__dirname, "..");
  * @property {number} averageReadingTime - Average reading time in minutes
  * @property {string[]} missingFrontmatter - Files without proper frontmatter
  * @property {string[]} outdatedDocs - Files not reviewed recently
- * @property {Object<string, number>} complexityScore - Complexity metrics per
+ * @property {Record<string, number>} complexityScore - Complexity metrics per
  *   file
- * @property {Object<string, number>} wordCounts - Word count per file
+ * @property {Record<string, number>} wordCounts - Word count per file
  * @property {string[]} missingTOC - Files that should have table of contents
- * @property {Object<string, string[]>} brokenLinks - Files with potential
+ * @property {Record<string, string[]>} brokenLinks - Files with potential
  *   broken internal links
+ */
+
+/**
+ * Parsed frontmatter representation used by this script.
+ *
+ * @typedef {Record<string, string>} Frontmatter
  */
 
 /**
@@ -66,7 +73,7 @@ async function collectMarkdownFiles(dir) {
  *
  * @param {string} content - Markdown file content
  *
- * @returns {Object | null} Parsed frontmatter or null if not found
+ * @returns {Frontmatter | null} Parsed frontmatter or null if not found
  */
 function extractFrontmatter(content) {
     const frontmatterMatch = content.match(/^---\s*\n(?<yaml>[\S\s]*?)\n---/);
@@ -74,7 +81,8 @@ function extractFrontmatter(content) {
 
     try {
         // Simple YAML parser for basic frontmatter
-        const yamlContent = frontmatterMatch.groups?.yaml ?? "";
+        const yamlContent = frontmatterMatch.groups?.["yaml"] ?? "";
+        /** @type {Frontmatter} */
         const frontmatter = {};
 
         yamlContent.split("\n").forEach((line) => {
@@ -158,15 +166,17 @@ function checkInternalLinks(content, filePath, allFiles) {
         const { groups } = match;
         if (!groups) continue;
 
-        const linkUrl = groups.url;
+        const rawLinkUrl = groups["url"];
+        if (typeof rawLinkUrl !== "string" || rawLinkUrl.length === 0) {
+            continue;
+        }
+
+        const linkUrl = rawLinkUrl;
 
         // Check internal relative links
         if (linkUrl.startsWith("./") || linkUrl.startsWith("../")) {
-            const resolvedPath = path.join(
-                filePath,
-                "..",
-                linkUrl.split("#")[0]
-            );
+            const baseTarget = /** @type {string} */ (linkUrl.split("#")[0]);
+            const resolvedPath = path.join(filePath, "..", baseTarget);
             const relativePath = path.relative(ROOT_DIRECTORY, resolvedPath);
 
             if (
@@ -194,6 +204,7 @@ async function analyzeDocumentation() {
     const docsDir = path.join(ROOT_DIRECTORY, "docs");
     const markdownFiles = await collectMarkdownFiles(docsDir);
 
+    /** @type {DocumentationStats} */
     const stats = {
         totalFiles: markdownFiles.length,
         totalWords: 0,
@@ -228,7 +239,7 @@ async function analyzeDocumentation() {
         if (frontmatter) {
             // Check if documentation is outdated
             const lastReviewed =
-                frontmatter.last_reviewed || frontmatter.last_updated;
+                frontmatter["last_reviewed"] || frontmatter["last_updated"];
             if (lastReviewed) {
                 const reviewDate = new Date(lastReviewed);
                 if (reviewDate < threeMonthsAgo) {
@@ -379,8 +390,25 @@ function displayReport(stats) {
     );
 }
 
+/**
+ * Determine whether the current module is executed directly through Node.
+ *
+ * @param {string} moduleUrl - The module's import.meta.url value
+ *
+ * @returns {boolean} True when the module is the program entry point
+ */
+function isExecutedDirectly(moduleUrl) {
+    const entryFilePath = process.argv[1];
+    if (!entryFilePath) {
+        return false;
+    }
+
+    const normalizedEntryUrl = pathToFileURL(path.resolve(entryFilePath)).href;
+    return moduleUrl === normalizedEntryUrl;
+}
+
 // Run analysis if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isExecutedDirectly(import.meta.url)) {
     try {
         const stats = await analyzeDocumentation();
         displayReport(stats);
