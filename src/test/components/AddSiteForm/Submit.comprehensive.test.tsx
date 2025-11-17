@@ -902,7 +902,7 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
                 ).toHaveBeenCalled();
                 const calls =
                     validationModule.validateMonitorFormData.mock.calls;
-                const lastCall = calls[calls.length - 1];
+                const lastCall = calls.at(-1);
                 const formData = (lastCall?.[1] ?? {}) as Record<
                     string,
                     unknown

@@ -402,13 +402,12 @@ describe("playInAppAlertTone", () => {
 
     it("logs and aborts when resuming a suspended context fails", async () => {
         const resumeFailure = vi
-            .fn()
+            .fn<() => Promise<undefined>>()
             .mockRejectedValue(new Error("resume-failed"));
 
         class SuspendedAudioContext extends TestAudioContext {
             public override state: AudioContextState = "suspended";
-            public override resume =
-                resumeFailure as unknown as () => Promise<void>;
+            public override resume = resumeFailure;
         }
 
         (

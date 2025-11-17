@@ -1,14 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Site } from "@shared/types";
+import type { Monitor, Site, StatusHistory } from "@shared/types";
+import { STATUS_KIND } from "@shared/types";
 
 import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteCompactCard";
 
 const mockUseSite = vi.hoisted(() => vi.fn());
-const monitorSelectorCalls: Array<{ selectedMonitorId: string }> = [];
-const actionButtonCalls: Array<{ isMonitoring: boolean }> = [];
+const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
+const actionButtonCalls: { isMonitoring: boolean }[] = [];
 
 vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: mockUseSite,
@@ -23,7 +25,7 @@ vi.mock("../../../../theme/components/ThemedBox", () => ({
 }));
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children }: { children: React.ReactNode }) => (
+    ThemedText: ({ children }: { children: ReactNode }) => (
         <span>{children}</span>
     ),
 }));
@@ -73,26 +75,27 @@ vi.mock(
     })
 );
 
-const baseSite = {
-    id: "site-1",
-    identifier: "site-identifier",
-    monitors: [
-        {
-            checkInterval: 60_000,
-            history: [],
-            id: "monitor-1",
-            monitoring: true,
-            type: "http",
-            status: "up",
-        },
-    ],
+const baseMonitorHistory: StatusHistory[] = [];
+const baseMonitor: Monitor = {
+    checkInterval: 60_000,
+    history: baseMonitorHistory,
+    id: "monitor-1",
     monitoring: true,
-    name: "Production",
-    status: "up",
-    history: [],
-} as Site;
+    responseTime: 0,
+    retryAttempts: 0,
+    status: STATUS_KIND.UP,
+    timeout: 10_000,
+    type: "http",
+};
 
-describe("SiteCompactCard", () => {
+const baseSite: Site = {
+    identifier: "site-identifier",
+    monitoring: true,
+    monitors: [baseMonitor],
+    name: "Production",
+};
+
+describe(SiteCompactCard, () => {
     const user = userEvent.setup();
     let siteState: any;
 
@@ -155,6 +158,6 @@ describe("SiteCompactCard", () => {
 
         render(<SiteCompactCard site={baseSite} />);
 
-        expect(screen.getByText(/No Monitor Selected/i)).toBeInTheDocument();
+        expect(screen.getByText(/no monitor selected/i)).toBeInTheDocument();
     });
 });

@@ -1,16 +1,17 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Site } from "@shared/types";
 
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 
-const monitorSelectorCalls: Array<{ selectedMonitorId: string }> = [];
-const actionButtonCalls: Array<{ disabled: boolean }> = [];
+const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
+const actionButtonCalls: { disabled: boolean }[] = [];
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
-    ThemedText: ({ children }: { children: React.ReactNode }) => (
+    ThemedText: ({ children }: { children: ReactNode }) => (
         <span data-testid="themed-text">{children}</span>
     ),
 }));
@@ -56,7 +57,7 @@ vi.mock("../../../../components/Dashboard/SiteCard/SiteCardFooter", () => ({
     SiteCardFooter: () => <div data-testid="site-card-footer" />,
 }));
 
-describe("SiteCardHeader", () => {
+describe(SiteCardHeader, () => {
     const baseSite = {
         id: "site-1",
         identifier: "site-1",
@@ -89,7 +90,7 @@ describe("SiteCardHeader", () => {
     beforeEach(() => {
         monitorSelectorCalls.length = 0;
         actionButtonCalls.length = 0;
-        Object.values(baseProps.interactions).forEach((fn) => fn.mockClear());
+        for (const fn of Object.values(baseProps.interactions)) fn.mockClear();
     });
 
     it("renders the site name in the title", () => {

@@ -160,6 +160,16 @@ Additional patterns:
   - Delete it once you have summarized the key information.
 - Avoid chaining more than a couple of operations into a single shell line; keep commands small and inspect results between steps.
 
+### Project test suites
+
+- `npm run test` — renderer + shared Vitest suites (default configuration).
+- `npm run test:electron` — Electron-specific Vitest config (`vitest.electron.config.ts`).
+- `npm run test:shared` — shared package suites that exercise code reused by both runtimes.
+- `npm run type-check:test` — strict TypeScript program that only targets the test graph; run this whenever you add new helpers or mocks.
+- `npm run lint:fix` / `npm run lint:all:fix` — baseline lint passes before and after writing new suites to keep noise out of coverage runs.
+
+These scripts should all run cleanly before pursuing coverage work so regressions surface in the suite that introduced them instead of inside aggregate coverage output.
+
 #### Package metadata and dependency commands
 
 - `npm view <package> version` is the fastest way to inspect the latest published release before upgrading a plugin. Run it from the repo root so `npm` picks up the correct registry config.
@@ -220,28 +230,29 @@ Formatting notes:
 - Task IDs are the exact strings shown in the workspace config (for example, `npm: Test`, `npm: Test:Coverage`).
 - When invoking tasks programmatically, always provide the absolute `workspaceFolder` path along with the task ID, and read output via the associated task terminal or task-output helpers.
 
-### Direct test runs
+### Targeted Vitest executions
 
-- Tests can be run via project scripts (e.g. `npm run test`) or via a test runner abstraction.
-- The test runner supports:
-  - Filtering by file path.
-  - Filtering by test names.
-  - A mode dedicated to coverage reporting.
+- Tests can be run via project scripts (see the previous section) or directly via the Vitest CLI. The CLI route is ideal when you are iterating on a small set of suites.
+- Run targeted suites with `npx vitest run src/test/foo.test.ts src/test/bar.test.ts`. This automatically picks up repo-specific Vitest config and tsconfig path aliases without invoking every suite.
+- Capture noisy output (for example, fast-check shrinking logs) into `temp/` when needed: `npx vitest run src/test/foo.test.ts *> temp/foo.log`. Skim the log with `Get-Content -Tail` or `Select-String`, then delete it immediately so stale results do not linger.
 - This repo uses **Vitest**, not Jest, so Jest-only flags such as `--runTestsByPath` are **not supported**. Passing them will cause a CLI error like `Unknown option --runTestsByPath`.
-- Prefer the existing scripts instead of hand-crafting complex Vitest invocations:
+- Default workflow for a fast feedback loop:
   ```powershell
   Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"
-  # Fast signal: run the main suite with a compact reporter
+  # Fast signal for specific suites
+  npx vitest run src/test/services/StateSyncService.comprehensive.test.ts src/test/stores/ui/useConfirmDialogStore.test.ts
+  # Full renderer suite with the default reporter
   npm run test
-  # Full coverage run with the default reporter
-  npm run test:coverage
-  # Analyze coverage results to find the weakest files
-  node scripts/analyze-coverage.mjs --no-color --format table --limit 20
+  # Coverage + weakest-file analysis
+  npm run test:coverage *> temp/coverage-main.log
+  Select-String -Path temp/coverage-main.log -Pattern "All files"
+  node scripts/analyze-coverage.mjs --limit 5
+  Remove-Item temp/coverage-main.log
   ```
 
 Focused runs:
 
-- When possible, run only the tests you care about by specifying a single test file (via the test runner abstraction) instead of the whole suite; this keeps feedback fast.
+- When possible, run only the tests you care about by specifying a single test file (or even a `--testNamePattern`) instead of the whole suite; this keeps feedback fast and reduces local flakiness.
 - Use coverage mode sparingly during iteration and more heavily when validating a finished change.
 
 Vitest CLI flags:
@@ -294,6 +305,45 @@ This prints a table of files sorted by lowest coverage. For example, it may show
    ```
 
 6. **Clean up temporary logs** created during this workflow (for example, any coverage logs captured under `temp/`). Keeping `temp/` tidy prevents accidental re-use of stale analysis.
+
+### Coverage analysis workflow
+
+1. Run the relevant coverage scripts (`npm run test:coverage`, `npm run test:electron:coverage`, `npm run test:shared:coverage`) to refresh `coverage/lcov.info`.
+2. Redirect each run into `temp/coverage-*.log` so the terminal stays readable. Use `Select-String -Path temp/coverage-main.log -Pattern "All files"` (or `Get-Content -Tail`) to grab the summary lines quickly.
+3. Execute `node scripts/analyze-coverage.mjs --limit 5` (optionally `--no-color --format table`) to list the files with the lowest coverage. This script expects the `coverage/` artifacts from step 1.
+4. Target the flagged files with focused suites (component tests, store tests, or fast-check properties) instead of adding blanket snapshots. For example, `src/App.tsx`, `src/components/SiteDetails/*`, and `src/stores/sites/useSitesStore.ts` frequently need bespoke coverage.
+5. Re-run the targeted Vitest commands plus the global coverage scripts. Repeat the analyzer step until every metric clears the repository-wide 95% thresholds.
+6. Delete the temporary coverage logs as soon as you extract their data so stale numbers never get mistaken for the latest run.
+
+### Fast-check fuzzing runs
+
+- Use `@fast-check/vitest` for property-based suites: `import { fc, test as fcTest } from "@fast-check/vitest"; fcTest.prop([arbs])("description", async (...args) => { ... });`.
+- Favor domain-specific arbitraries (for example, `fc.record` mirroring dialog stores, monitor builder props, etc.) so shrink results map directly to production data.
+- Keep arbitraries deterministic where possible (bounded strings, limited arrays) to avoid timeouts when running alongside the broader Vitest suite.
+- Redirect verbose shrinking traces to `temp/` when necessary (`npx vitest run path *> temp/shrinks.log`) and delete those logs after triaging the failure.
+- Combine fast-check suites with classical examples so baseline regressions fail fast even when property runs are skipped.
+
+### Component smoke suites
+
+When chasing coverage or debugging UI regressions, it is often faster to run the component-focused suites that exercise individual widgets in isolation:
+
+- `src/test/components/Alerts/StatusAlertToaster.test.tsx` — validates alert queue rendering and dismissal wiring.
+- `src/test/components/Dashboard/SiteCard/SiteCardHeader.test.tsx` — covers monitor selector propagation and action-button enablement.
+- `src/test/components/Dashboard/SiteCard/SiteCompactCard.test.tsx` — validates compact card metrics, handler plumbing, and fallback monitor summaries.
+- `src/test/components/SiteDetails/tabs/AnalyticsTab.comprehensive.test.tsx` — high-signal coverage for analytics formatting, logging, and toggles.
+
+Run them together via:
+
+```powershell
+Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"
+npx vitest run \
+  src/test/components/Alerts/StatusAlertToaster.test.tsx \
+  src/test/components/Dashboard/SiteCard/SiteCardHeader.test.tsx \
+  src/test/components/Dashboard/SiteCard/SiteCompactCard.test.tsx \
+  src/test/components/SiteDetails/tabs/AnalyticsTab.comprehensive.test.tsx
+```
+
+Because each suite focuses on deterministic render logic, they finish quickly and produce actionable failures whenever UI contracts change.
 
 ## 🧰 Diagnostics and IDE integration
 

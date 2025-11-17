@@ -34,7 +34,9 @@ import {
     validateMonitorField as sharedValidateMonitorField,
 } from "@shared/validation/schemas";
 
-const mockedMonitorTypesStore = vi.mocked(useMonitorTypesStore);
+type MonitorTypesStoreState = ReturnType<typeof useMonitorTypesStore.getState>;
+
+const mockedMonitorTypesStore = vi.mocked(useMonitorTypesStore.getState);
 const mockedSharedSchemas = {
     validateMonitorData: vi.mocked(sharedValidateMonitorData),
     validateMonitorField: vi.mocked(sharedValidateMonitorField),
@@ -49,13 +51,29 @@ const resolveValidationResult = (
     ...overrides,
 });
 
+const createMockMonitorTypesStoreState = (
+    overrides: Partial<MonitorTypesStoreState> = {}
+): MonitorTypesStoreState => ({
+    clearError: vi.fn(),
+    isLoading: false,
+    lastError: undefined,
+    setError: vi.fn(),
+    setLoading: vi.fn(),
+    formatMonitorDetail: vi.fn(async () => ""),
+    formatMonitorTitleSuffix: vi.fn(async () => ""),
+    getFieldConfig: vi.fn(),
+    loadMonitorTypes: vi.fn(async () => undefined),
+    refreshMonitorTypes: vi.fn(async () => undefined),
+    validateMonitorData: vi.fn().mockResolvedValue(resolveValidationResult()),
+    fieldConfigs: {},
+    isLoaded: true,
+    monitorTypes: [],
+    ...overrides,
+});
+
 beforeEach(() => {
     vi.clearAllMocks();
-    mockedMonitorTypesStore.getState.mockReturnValue({
-        validateMonitorData: vi
-            .fn()
-            .mockResolvedValue(resolveValidationResult()),
-    });
+    mockedMonitorTypesStore.mockReturnValue(createMockMonitorTypesStoreState());
     mockedSharedSchemas.validateMonitorData.mockReturnValue(
         resolveValidationResult()
     );
@@ -88,7 +106,9 @@ describe("monitorValidation error handling", () => {
     );
 
     it("returns fallback result when monitor type store is unavailable", async () => {
-        mockedMonitorTypesStore.getState.mockReturnValueOnce({});
+        mockedMonitorTypesStore.mockReturnValueOnce(
+            undefined as unknown as MonitorTypesStoreState
+        );
 
         const result = await validateMonitorData("http", {});
         expect(result.success).toBeFalsy();
@@ -100,9 +120,11 @@ describe("monitorValidation error handling", () => {
     it("surfaces monitor type store validation results", async () => {
         const expected = resolveValidationResult({ warnings: ["note"] });
         const validateSpy = vi.fn().mockResolvedValue(expected);
-        mockedMonitorTypesStore.getState.mockReturnValue({
-            validateMonitorData: validateSpy,
-        });
+        mockedMonitorTypesStore.mockReturnValue(
+            createMockMonitorTypesStoreState({
+                validateMonitorData: validateSpy,
+            })
+        );
 
         const result = await validateMonitorData("ping", { host: "host" });
         expect(validateSpy).toHaveBeenCalledWith("ping", { host: "host" });
@@ -142,9 +164,11 @@ describe("monitorValidation error handling", () => {
                 warnings: ["url might redirect"],
             })
         );
-        mockedMonitorTypesStore.getState.mockReturnValue({
-            validateMonitorData: validateSpy,
-        });
+        mockedMonitorTypesStore.mockReturnValue(
+            createMockMonitorTypesStoreState({
+                validateMonitorData: validateSpy,
+            })
+        );
 
         const result = await validateMonitorFieldEnhanced(
             "http",
@@ -163,9 +187,11 @@ describe("monitorValidation error handling", () => {
                 success: false,
             })
         );
-        mockedMonitorTypesStore.getState.mockReturnValue({
-            validateMonitorData: validateSpy,
-        });
+        mockedMonitorTypesStore.mockReturnValue(
+            createMockMonitorTypesStoreState({
+                validateMonitorData: validateSpy,
+            })
+        );
 
         const result = await validateMonitorFieldEnhanced(
             "http",
@@ -183,9 +209,11 @@ describe("monitorValidation error handling", () => {
                 success: false,
             })
         );
-        mockedMonitorTypesStore.getState.mockReturnValue({
-            validateMonitorData: validateSpy,
-        });
+        mockedMonitorTypesStore.mockReturnValue(
+            createMockMonitorTypesStoreState({
+                validateMonitorData: validateSpy,
+            })
+        );
 
         const errors = await validateMonitorField("ping", "host", "");
         expect(errors).toEqual(["host missing"]);

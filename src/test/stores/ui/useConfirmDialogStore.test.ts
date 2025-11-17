@@ -7,6 +7,7 @@ import { fc, test as fcTest } from "@fast-check/vitest";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+    type ConfirmDialogOptions,
     type ConfirmDialogStoreState,
     type ConfirmDialogTone,
     requestConfirmation,
@@ -168,7 +169,16 @@ describe(useConfirmDialogStore, () => {
         expect(result.current.isOpen).toBeFalsy();
     });
 
-    const confirmDialogOptionsArb = fc.record({
+    interface ArbitraryConfirmDialogOptions {
+        cancelLabel?: string;
+        confirmLabel?: string;
+        details?: string;
+        message: string;
+        title: string;
+        tone?: ConfirmDialogTone;
+    }
+
+    const confirmDialogOptionsArb = fc.record<ArbitraryConfirmDialogOptions>({
         cancelLabel: fc.option(fc.string({ minLength: 1, maxLength: 24 }), {
             nil: undefined,
         }),
@@ -188,12 +198,29 @@ describe(useConfirmDialogStore, () => {
         ),
     });
 
+    const buildConfirmDialogOptions = (
+        options: ArbitraryConfirmDialogOptions
+    ): ConfirmDialogOptions => ({
+        message: options.message,
+        title: options.title,
+        ...(options.cancelLabel === undefined
+            ? {}
+            : { cancelLabel: options.cancelLabel }),
+        ...(options.confirmLabel === undefined
+            ? {}
+            : { confirmLabel: options.confirmLabel }),
+        ...(options.details === undefined ? {} : { details: options.details }),
+        ...(options.tone === undefined ? {} : { tone: options.tone }),
+    });
+
     fcTest.prop([confirmDialogOptionsArb, fc.boolean()])(
         "resolves to the caller's decision for arbitrary dialog options",
         async (options, shouldConfirm) => {
             resetConfirmDialogState();
 
-            const confirmation = requestConfirmation(options);
+            const confirmation = requestConfirmation(
+                buildConfirmDialogOptions(options)
+            );
 
             const state = useConfirmDialogStore.getState();
             const expectedRequest = {
@@ -226,7 +253,7 @@ describe(useConfirmDialogStore, () => {
             resetConfirmDialogState();
 
             const confirmations = requests.map((request) =>
-                requestConfirmation(request)
+                requestConfirmation(buildConfirmDialogOptions(request))
             );
 
             for (let index = 0; index < confirmations.length - 1; index += 1) {
@@ -235,9 +262,7 @@ describe(useConfirmDialogStore, () => {
 
             useConfirmDialogStore.getState().confirm();
 
-            await expect(
-                confirmations[confirmations.length - 1]
-            ).resolves.toBeTruthy();
+            await expect(confirmations.at(-1)).resolves.toBeTruthy();
             expect(useConfirmDialogStore.getState().request).toBeNull();
         }
     );
@@ -262,7 +287,7 @@ describe(useConfirmDialogStore, () => {
             title: "Automation",
         });
 
-        const snapshots: Array<ConfirmDialogStoreState> = [];
+        const snapshots: ConfirmDialogStoreState[] = [];
         const unsubscribe = bridge?.subscribe((state) => {
             snapshots.push(state);
         });

@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { STATUS_KIND } from "@shared/types";
+
 import type {
     AlertStore,
     StatusAlert,
@@ -32,19 +34,17 @@ vi.mock("../../../components/Alerts/StatusAlertToast", () => ({
 
 const mockedUseAlertStore = vi.mocked(useAlertStore);
 
-describe("StatusAlertToaster", () => {
+describe(StatusAlertToaster, () => {
     const dismissAlert = vi.fn();
     const baseAlert: StatusAlert = {
-        createTime: Date.now(),
         id: "alert-1",
-        message: "Service recovered",
         monitorId: "monitor-1",
         monitorName: "Monitor",
-        previousStatus: "down",
-        severity: "info",
+        previousStatus: STATUS_KIND.DOWN,
         siteIdentifier: "site-1",
         siteName: "Site",
-        status: "up",
+        status: STATUS_KIND.UP,
+        timestamp: Date.now(),
     };
 
     beforeEach(() => {
@@ -53,7 +53,12 @@ describe("StatusAlertToaster", () => {
             alerts: [],
             clearAlerts: vi.fn(),
             dismissAlert,
-            enqueueAlert: vi.fn(),
+            enqueueAlert: vi.fn().mockImplementation((input) => ({
+                ...baseAlert,
+                ...input,
+                id: input.id ?? baseAlert.id,
+                timestamp: input.timestamp ?? baseAlert.timestamp,
+            })),
         } as AlertStore;
 
         mockedUseAlertStore.mockImplementation(((
@@ -67,7 +72,10 @@ describe("StatusAlertToaster", () => {
     });
 
     it("renders alerts and forwards dismiss callbacks", () => {
-        const alerts = [baseAlert, { ...baseAlert, id: "alert-2" }];
+        const alerts: StatusAlert[] = [
+            baseAlert,
+            { ...baseAlert, id: "alert-2", timestamp: baseAlert.timestamp + 1 },
+        ];
 
         mockedUseAlertStore.mockImplementation(((
             selector: (state: AlertStore) => unknown
@@ -84,7 +92,8 @@ describe("StatusAlertToaster", () => {
         const renderedAlerts = screen.getAllByTestId(/status-alert-/);
         expect(renderedAlerts).toHaveLength(2);
 
-        fireEvent.click(renderedAlerts[0]);
+        const firstAlert = renderedAlerts[0]!;
+        fireEvent.click(firstAlert);
         expect(dismissAlert).toHaveBeenCalledWith("alert-1");
     });
 });
