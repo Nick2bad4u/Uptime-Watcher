@@ -429,6 +429,92 @@ try {
 - ❌ Don't swallow errors without proper handling
 - ❌ Don't lose original error context and stack traces
 
+### Store Error Handling Patterns
+
+Zustand stores apply the shared error-handling utilities in a consistent way
+to avoid UI crashes and keep error state centralized. Two complementary
+patterns are used when wiring store actions to `withErrorHandling()`:
+
+1. #### Standard async operations (factory-based)
+
+   For most async store actions (for example sites sync, monitoring, settings
+   initialization/reset), use the `createStoreErrorHandler()` factory to
+   construct an `ErrorHandlingFrontendStore` context:
+
+   ```typescript
+   import { withErrorHandling } from "@shared/utils/errorHandling";
+   import { createStoreErrorHandler } from "src/stores/utils/storeErrorHandling";
+
+   // Inside a store module
+   const initializeSettings = async (): Promise<void> => {
+      await withErrorHandling(
+       async () => {
+          const historyLimit = await SettingsService.getHistoryLimit();
+          setState({
+           settings: normalizeAppSettings({
+              ...getState().settings,
+              historyLimit,
+           }),
+          });
+       },
+       createStoreErrorHandler("settings", "initializeSettings")
+      );
+   };
+   ```
+
+   This pattern delegates error/loading state to the global error store via
+   `ErrorHandlingFrontendStore` and avoids repeating boilerplate in every
+   module.
+
+2. #### Operations with custom rollback/side effects (inline context)
+
+   Some actions need additional behavior when an error occurs, such as
+   reverting optimistic updates or coordinating updates across slices. In
+   these cases, the store constructs the `ErrorHandlingFrontendStore` context
+   inline:
+
+   ```typescript
+   await withErrorHandling(
+      async () => {
+       const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
+       getState().updateSettings({ historyLimit: sanitizedLimit });
+       const backendLimit = await SettingsService.updateHistoryLimit(
+          sanitizedLimit
+       );
+       // ...apply normalized backendLimit...
+      },
+      {
+       clearError: () => useErrorStore.getState().clearStoreError("settings"),
+       setError: (error) => {
+          const errorStore = useErrorStore.getState();
+          errorStore.setStoreError("settings", error);
+          // Revert optimistic update on failure
+          getState().updateSettings({
+           historyLimit: currentSettings.historyLimit,
+          });
+       },
+       setLoading: (loading) =>
+          useErrorStore
+           .getState()
+           .setOperationLoading("updateHistoryLimit", loading),
+      }
+   );
+   ```
+
+   Similar inline contexts are used in modules such as
+   `src/stores/monitor/operations.ts` when store-specific error state must be
+   coordinated with domain-specific behavior.
+
+**Guidelines:**
+
+- Default to `createStoreErrorHandler(storeKey, operationName)` for new async
+  actions.
+- Reach for inline `ErrorHandlingFrontendStore` contexts only when additional
+  side effects (rollback, cross-slice updates, bespoke telemetry) are required
+  by the operation.
+- See ADR-003 "Frontend Store Error Protection" for the authoritative design
+  rationale and further examples.
+
 ## Frontend State Management
 
 ### State Management Overview

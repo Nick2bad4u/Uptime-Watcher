@@ -1,8 +1,7 @@
+---
 schema: "../../../../config/schemas/doc-frontmatter.schema.json"
 title: "ESLint Config Inspector Deployment - Implementation Summary"
-summary: >-
-  Implementation summary for deploying the ESLint Config Inspector static build
-  into the Uptime-Watcher Docusaurus site.
+summary: "Implementation summary for deploying the ESLint Config Inspector static build into the Uptime-Watcher Docusaurus site."
 created: "2025-11-15"
 last_reviewed: "2025-11-15"
 category: "guide"
@@ -17,10 +16,6 @@ topics:
   - "docusaurus"
   - "eslint"
   - "config-inspector"
-description: >-
-  Step-by-step summary of scripts, configuration changes, dependencies, and
-  static file generation used to deploy ESLint Config Inspector to the docs
-  site.
 ---
 
 # ESLint Config Inspector Deployment - Implementation Summary

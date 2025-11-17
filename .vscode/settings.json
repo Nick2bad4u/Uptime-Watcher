@@ -1,5 +1,9 @@
 {
     "$schema": "vscode://schemas/settings/workspace",
+    "[markdown]": {
+        "editor.defaultFormatter": "unifiedjs.vscode-remark",
+        "editor.formatOnSave": true
+    },
     "chat.mcp.serverSampling": {
         "Uptime-Watcher/.vscode/mcp.json: storybook": {
             "allowedModels": [
@@ -130,6 +134,16 @@
         "**/release/**": true,
         "**/report/**": true,
         "**/reports/**": true
+    },
+    "markdownlint.config": {
+        "extends": ".remarkrc.mjs"
+    },
+    "remark.format": {
+        "settings": {
+            "bullet": "-",
+            "emphasis": "_",
+            "strong": "*"
+        }
     },
     "search.exclude": {
         "**/.cache/**": true,

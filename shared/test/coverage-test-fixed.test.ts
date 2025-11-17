@@ -120,6 +120,18 @@ describe("Fixed Coverage Tests", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
+            const consoleWarnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {
+                    /* noop – capture warning without polluting test output */
+                });
+
+            const consoleErrorSpy = vi
+                .spyOn(console, "error")
+                .mockImplementation(() => {
+                    /* noop – capture error without polluting test output */
+                });
+
             const mockStore = {
                 clearError: vi.fn(),
                 setError: vi.fn(),
@@ -144,6 +156,16 @@ describe("Fixed Coverage Tests", () => {
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);
             expect(mockStore.setLoading).toHaveBeenNthCalledWith(1, true);
             expect(mockStore.setLoading).toHaveBeenNthCalledWith(2, false);
+
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                "Store operation failed for:",
+                "clear loading state in finally block",
+                expect.any(Error)
+            );
+            expect(consoleErrorSpy).not.toHaveBeenCalled();
+
+            consoleWarnSpy.mockRestore();
+            consoleErrorSpy.mockRestore();
         });
     });
 

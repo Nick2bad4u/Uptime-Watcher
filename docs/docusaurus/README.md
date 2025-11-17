@@ -1,6 +1,7 @@
+---
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Website"
-summary: Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher.
+summary: "Instructions for working with the Docusaurus-based documentation website for Uptime-Watcher."
 created: "2025-11-15"
 last_reviewed: "2025-11-15"
 category: "guide"
@@ -13,8 +14,6 @@ tags:
 topics:
   - "documentation"
   - "docusaurus"
-description: README for the Docusaurus documentation site, covering installation, local development, build, and deployment commands.
-
 ---
 
 # Website

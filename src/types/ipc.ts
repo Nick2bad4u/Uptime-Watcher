@@ -29,15 +29,19 @@
  * const sites = await SiteService.getSites();
  * setSites(sites);
  *
- * // Low-level example for service authors extending the preload bridge.
- * const response = await window.electronAPI.sites.getSites();
- * if (isIpcResponse<Site[]>(response)) {
- *     const sites = extractIpcData<Site[]>(response);
+ * // Low-level example for preload authors wiring a new invoke channel.
+ * // In the preload layer, handlers return `IpcResponse<T>` instances, which
+ * // are validated and unwrapped by the typed bridge factory before reaching
+ * // `window.electronAPI`.
+ * const rawResponse = await ipcRenderer.invoke("get-sites");
+ * if (isIpcResponse<Site[]>(rawResponse)) {
+ *     const sites = extractIpcData<Site[]>(rawResponse);
  *     setSites(sites);
  * }
  *
- * // Safe extraction with fallback when raw responses are unavoidable.
- * const sites = safeExtractIpcData(response, []);
+ * // Safe extraction with fallback when raw responses are unavoidable (e.g.
+ * // diagnostics helpers that must operate on untyped IPC calls).
+ * const sites = safeExtractIpcData(rawResponse, []);
  * ```
  *
  * @packageDocumentation

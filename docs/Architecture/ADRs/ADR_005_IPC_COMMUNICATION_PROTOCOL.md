@@ -2,9 +2,9 @@
 
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-005: IPC Communication Protocol"
-summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation and error handling."
+summary: "Defines a standardized, type-safe IPC communication protocol using Electron's contextBridge with validation, error handling, and static guard rails."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -226,6 +226,41 @@ The `remove-monitor` invoke channel now returns the persisted `Site` snapshot em
 - Added the `settings:history-limit-updated` renderer broadcast to surface persistence changes originating from imports, orchestrator migrations, or database maintenance. Renderer consumers **must** subscribe via `EventsService.onHistoryLimitUpdated` to keep the settings store in sync even when the local UI did not initiate the change. The payload includes both the new limit and the previously observed value so clients can display contextual messaging.
 - Preload bridge types (`shared/types/eventsBridge.ts`) and the IPC channel inventory documentation are now generated from the canonical `RendererEventPayloadMap`/`IpcInvokeChannelMap` schema. Run `npm run generate:ipc` whenever event contracts change and gate CI with `npm run check:ipc` to detect drift between code and docs.
 - The authoritative channel catalogue lives in `docs/Architecture/generated/IPC_CHANNEL_INVENTORY.md`. Do not hand-edit the table; update the schema and regenerate instead.
+
+### 3.1 Static IPC Architecture Guards
+
+To keep the IPC security boundary and layering guarantees enforceable over time, a dedicated static guard script validates key invariants on every lint run:
+
+- **Command**: `npm run lint:architecture`
+- **Integration**: Invoked automatically from `lint:all:fix` (local quality runs) and `lint:ci` (CI pipelines).
+
+The script (`scripts/architecture-static-guards.mjs`) performs the following checks:
+
+1. **Centralized `ipcMain.handle` registration** – Direct `ipcMain.handle(...)` calls are only allowed in the centralized IPC registration layer:
+
+   - `electron/services/ipc/IpcService.ts`
+   - `electron/services/ipc/utils.ts` (shared helper for handler wiring)
+
+   Any other usage is flagged as a violation to prevent ad-hoc handlers that bypass validation, logging, or standardized response formatting.
+
+2. **No direct `ipcRenderer` imports in `src/**`** – Renderer code may not import `ipcRenderer` directly from the `electron` package (excluding tests). All renderer IPC goes through the typed preload bridge (`window.electronAPI`) and domain-specific renderer services (for example `SiteService`, `SettingsService`). This guarantees that:
+   - Renderer code never crosses the security boundary directly.
+   - All IPC calls benefit from the shared `IpcResponse` validation and error handling implemented in the preload layer.
+
+3. **Scoped `window.electronAPI` usage** – Direct references to `window.electronAPI` in `src/**` are limited to a small set of explicit helper/service modules and type definitions:
+
+   - `src/types/ipc.ts` (documentation/example usage)
+   - `src/services/DataService.ts`
+   - `src/services/NotificationPreferenceService.ts`
+   - `src/services/StateSyncService.ts`
+   - `src/services/utils/createIpcServiceHelpers.ts`
+   - `src/services/utils/electronBridgeReadiness.ts`
+
+   All other renderer code, including Zustand stores and React components, must depend on the typed renderer service facades instead of touching `window.electronAPI` directly. Unit tests under `src/test/**` are exempt so they can freely mock the bridge.
+
+4. **Typed event usage** – Event names passed to `.emitTyped()`, `.onTyped()`, `.offTyped()`, and `.onceTyped()` in production Electron code must be declared in `electron/events/eventTypes.ts`. This prevents drift between the authoritative event catalogue and the actual event bus usage.
+
+These guard rails make the IPC protocol self-enforcing: new features that attempt to bypass the established patterns will fail fast during `lint:architecture`, rather than silently weakening the security or maintainability of the boundary.
 
 ### 4. Event Forwarding Protocol
 

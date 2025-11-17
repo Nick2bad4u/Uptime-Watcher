@@ -59,7 +59,7 @@ Notes:
   git log --diff-filter=A --follow --date=short --format="%ad" -- docs/Guides/FILE.md | Select-Object -Last 1
   ```
 
-- **last_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
+- **last\_reviewed**: The last date someone confirmed the content is still accurate. This should change whenever you make a meaningful content update, not for trivial whitespace edits.
 
 - **category**: For now, this is simply `"guide"` for all files under `docs/Guides/` and `docs/Architecture/**`. If we introduce other doc types later (for example, `"adr"`, `"reference"`), this can be extended.
 

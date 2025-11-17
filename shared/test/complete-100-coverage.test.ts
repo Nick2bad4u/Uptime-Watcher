@@ -180,6 +180,12 @@ describe("Complete 100% Coverage - Final Tests", () => {
             await annotate("Category: Shared", "category");
             await annotate("Type: Error Handling", "type");
 
+            const consoleWarnSpy = vi
+                .spyOn(console, "warn")
+                .mockImplementation(() => {
+                    /* noop – avoid noisy test output while still capturing calls */
+                });
+
             const mockStore = {
                 setError: vi.fn(),
                 setLoading: vi
@@ -204,6 +210,12 @@ describe("Complete 100% Coverage - Final Tests", () => {
             expect(mockStore.setLoading).toHaveBeenCalledTimes(2);
             expect(mockStore.setLoading).toHaveBeenNthCalledWith(1, true);
             expect(mockStore.setLoading).toHaveBeenNthCalledWith(2, false);
+
+            expect(consoleWarnSpy).toHaveBeenCalledWith(
+                "Store operation failed for:",
+                "clear loading state in finally block",
+                expect.any(Error)
+            );
         });
     });
 

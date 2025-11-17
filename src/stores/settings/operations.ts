@@ -122,6 +122,8 @@ export const createSettingsOperationsSlice = (
             success: boolean;
         }> => {
             try {
+                // Standardized store error handling; context is created via
+                // factory as recommended in ADR-003 ("Store Error Handling Contexts").
                 const result = await withErrorHandling(
                     async () => {
                         const historyLimit =
@@ -186,6 +188,11 @@ export const createSettingsOperationsSlice = (
 
             const currentSettings = getState().settings;
 
+            // Inline ErrorHandlingFrontendStore context: in addition to updating
+            // error/loading state, this operation must revert the optimistic
+            // historyLimit update when backend persistence fails. See
+            // ADR-003 section "Store Error Handling Contexts" for details
+            // on when inline contexts are appropriate.
             await withErrorHandling(
                 async () => {
                     const sanitizedLimit: number = normalizeHistoryLimit(

@@ -258,6 +258,12 @@ describe(withUtilityErrorHandling, () => {
     });
 
     it("rethrows when instructed to do so", async () => {
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {
+                /* noop – captured for assertions */
+            });
+
         await expect(
             withUtilityErrorHandling(
                 async () => {
@@ -268,13 +274,29 @@ describe(withUtilityErrorHandling, () => {
                 true
             )
         ).rejects.toThrow("fatal");
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "dangerous failed",
+            expect.any(Error)
+        );
     });
 
     it("throws informative error when fallback missing", async () => {
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {
+                /* noop – captured for assertions */
+            });
+
         await expect(
             withUtilityErrorHandling(async () => {
                 throw new Error("fatal");
             }, "dangerous")
         ).rejects.toThrow("dangerous failed and no fallback value provided");
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            "dangerous failed",
+            expect.any(Error)
+        );
     });
 });

@@ -2,9 +2,9 @@
 
 schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-003: Comprehensive Error Handling Strategy"
-summary: "Establishes a comprehensive multi-layer error handling strategy with shared utilities and production-grade resilience."
+summary: "Establishes a comprehensive multi-layer error handling strategy with shared utilities, store-safe patterns, and production-grade resilience."
 created: "2025-08-05"
-last_reviewed: "2025-11-15"
+last_reviewed: "2025-11-16"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -101,6 +101,107 @@ function safeStoreOperation(storeOperation: () => void, operationName: string) {
  }
 }
 ```
+
+#### 3.1 Store Error Handling Contexts
+
+Asynchronous store actions that call renderer services use the shared
+`withErrorHandling()` utility together with an `ErrorHandlingFrontendStore`
+context. This context encapsulates how errors and loading state are surfaced to
+the global error store while keeping individual stores free of ad-hoc
+try/catch blocks.
+
+There are two supported patterns for constructing this context:
+
+1. **Factory-based context (default)** – use `createStoreErrorHandler()`
+   for standard operations that only need to clear/set store-specific errors
+   and update a loading flag.
+
+   ```typescript
+   // src/stores/utils/storeErrorHandling.ts
+   export function createStoreErrorHandler(
+      storeKey: string,
+      operationName: string
+   ): ErrorHandlingFrontendStore {
+      const errorStore = useErrorStore.getState();
+
+      return {
+       clearError: () => errorStore.clearStoreError(storeKey),
+       setError: (error) => errorStore.setStoreError(storeKey, error),
+       setLoading: (loading) =>
+          errorStore.setOperationLoading(operationName, loading),
+      };
+   }
+
+   // Example: settings initialization
+   const result = await withErrorHandling(
+      async () => {
+       const historyLimit = await SettingsService.getHistoryLimit();
+       // ...update store state...
+       return {
+          message: "Successfully loaded settings",
+          settingsLoaded: true,
+          success: true,
+       } as const;
+      },
+      createStoreErrorHandler("settings", "initializeSettings")
+   );
+   ```
+
+   This pattern should be used for **most** async store operations, including
+   site synchronization (`"sites-sync"`), monitoring, and general settings
+   initialization/reset flows.
+
+2. **Inline context (special cases)** – construct an
+   `ErrorHandlingFrontendStore` object inline when additional side effects are
+   required for a specific operation, such as reverting optimistic updates or
+   coordinating multiple slices.
+
+   ```typescript
+   // Example: revert historyLimit on failure while preserving user-facing error
+   await withErrorHandling(
+      async () => {
+       const sanitizedLimit = normalizeHistoryLimit(limit, RULES);
+       getState().updateSettings({ historyLimit: sanitizedLimit });
+       const backendLimit = await SettingsService.updateHistoryLimit(
+          sanitizedLimit
+       );
+       // ...normalize and apply backendLimit...
+      },
+      {
+       clearError: () => {
+          useErrorStore.getState().clearStoreError("settings");
+       },
+       setError: (error) => {
+          const errorStore = useErrorStore.getState();
+          errorStore.setStoreError("settings", error);
+          // Revert historyLimit when persistence fails
+          getState().updateSettings({
+           historyLimit: currentSettings.historyLimit,
+          });
+       },
+       setLoading: (loading) => {
+          useErrorStore
+           .getState()
+           .setOperationLoading("updateHistoryLimit", loading);
+       },
+      }
+   );
+   ```
+
+   Inline contexts are intentionally rare and **must** document their
+   additional side effects (for example in the store module’s comments) so
+   future maintainers understand why the factory is not used.
+
+**Guidelines:**
+
+- Prefer `createStoreErrorHandler()` for standard operations that only need to
+  set/clear error and loading state.
+- Use inline `ErrorHandlingFrontendStore` contexts when you need to coordinate
+  error handling with extra behavior (rollback, cross-slice updates, telemetry
+  tweaks).
+- Keep error-handling logic close to the store module that owns the state,
+  while centralizing shared mechanisms in `@shared/utils/errorHandling` and
+  `src/stores/utils/storeErrorHandling.ts`.
 
 ### 4. Error Preservation Principle
 

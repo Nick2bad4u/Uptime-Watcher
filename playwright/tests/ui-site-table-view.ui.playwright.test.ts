@@ -80,7 +80,12 @@ test.describe(
                 tag: ["@workflow", "@table"],
             },
             async () => {
-                const listButton = page.getByRole("button", { name: "List" });
+                const layoutToggleGroup = page.getByRole("radiogroup", {
+                    name: "Card layout",
+                });
+                const listButton = layoutToggleGroup.getByRole("button", {
+                    name: "List",
+                });
                 await expect(page.getByText(/Tracking 2 sites/i)).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
@@ -131,7 +136,12 @@ test.describe(
                 tag: ["@navigation", "@table"],
             },
             async () => {
-                const listButton = page.getByRole("button", { name: "List" });
+                const layoutToggleGroup = page.getByRole("radiogroup", {
+                    name: "Card layout",
+                });
+                const listButton = layoutToggleGroup.getByRole("button", {
+                    name: "List",
+                });
                 await listButton.click();
 
                 const table = page.getByRole("table");
@@ -150,8 +160,7 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await triggerButton.scrollIntoViewIfNeeded();
-                await triggerButton.focus();
-                await triggerButton.press("Enter", {
+                await triggerButton.click({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
 

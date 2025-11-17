@@ -1,24 +1,27 @@
 ---
+
 schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Testing documentation"
 summary: >-
-  Index of testing documentation, guides, and best practices for the Uptime
-  Watcher application.
+Index of testing documentation, guides, and best practices for the Uptime
+Watcher application.
 created: "2025-11-15"
 last_reviewed: "2025-11-15"
 category: "guide"
 author: "Nick2bad4u"
 tags:
-  - "uptime-watcher"
-  - "testing"
-  - "vitest"
-  - "playwright"
-topics:
-  - "testing"
-  - "quality-assurance"
-description: >-
+
+- "uptime-watcher"
+- "testing"
+- "vitest"
+- "playwright"
+  topics:
+- "testing"
+- "quality-assurance"
+  description: >-
   Top-level overview of the testing documentation, including unit, integration,
   E2E, and fuzzing strategies used in the Uptime-Watcher project.
+
 ---
 
 # Testing documentation

@@ -1,5 +1,5 @@
 // eslint-disable-next-line import-x/no-unassigned-import -- ensure web storage shim registers before Storybook config executes
-import "./shims/nodeWebStorage.ts";
+import "./shims/nodeWebStorage";
 
 import type { AddonOptionsVite } from "@storybook/addon-coverage";
 import type { StorybookConfig } from "@storybook/react-vite";
@@ -13,7 +13,7 @@ import {
     createStorybookReactPluginOptions,
     storybookCoverageExcludeGlobs,
     storybookCoverageIncludeGlobs,
-} from "./viteSharedConfig.ts";
+} from "./viteSharedConfig";
 
 /**
  * Storybook 9 migration reference:

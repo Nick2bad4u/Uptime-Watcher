@@ -791,6 +791,33 @@ coverage/
 *.wasm
 *.pdf
 
+# Temporary files
+**/*~
+**/*.tmp
+**/*.swp
+
+# Generated content
+**/generated/**
+**/auto-generated/**
+**/build/**
+**/dist/**
+
+# Version-specific ignores
+**/node_modules/**
+**/coverage/**
+**/playwright-report/**
+
+# Complex diagrams requiring manual formatting
+**/*-diagram.md
+**/*-architecture.md
+
+# API reference files (if auto-generated)
+**/api-reference/**
+
+# Changelog and similar files with different formatting needs
+CHANGELOG.md
+HISTORY.md
+
 # Documentation that may have different formatting requirements
 CHANGELOG.md
 LICENSE
@@ -802,3 +829,8 @@ docs/Packages/
 docs/TSDoc/
 docs/Architecture/UsageGuides/Using-This-Documentation.md
 docs/Guides/STYLE_LAYOUT_GUIDE.md
+
+# Todo files
+TODO.md
+docs/Guides/TODO.md
+**/TODO/**

@@ -18,24 +18,28 @@ const config: Configuration = {
     apk: {
         artifactName: `Uptime-Watcher-\${arch}-\${version}.\${ext}`,
     },
-    buildDependenciesFromSource: false,
-    copyright: "Copyright © 2025 Nick2bad4u",
     appId: "io.github.uptime-watcher",
     appImage: {
         artifactName: `Uptime-Watcher-appimage-\${arch}-\${version}.\${ext}`,
     },
     artifactName: `Uptime-Watcher-\${platform}-\${arch}-\${version}.\${ext}`,
     asar: true,
+    buildDependenciesFromSource: false,
     compression: "normal",
+    copyright: "Copyright © 2025 Nick2bad4u",
     deb: {
         artifactName: `Uptime-Watcher-deb-\${arch}-\${version}.\${ext}`,
     },
     directories: {
         output: "dist",
     },
+    disableDefaultIgnoredFiles: false,
+    disableSanityCheckAsar: false,
     dmg: {
         artifactName: `Uptime-Watcher-dmg-\${arch}-\${version}.\${ext}`,
     },
+    downloadAlternateFFmpeg: false,
+    executableName: "Uptime-Watcher",
     files: [
         "dist/**/*",
         "node_modules/**/*",
@@ -49,10 +53,15 @@ const config: Configuration = {
     flatpak: {
         artifactName: `Uptime-Watcher-flatpak-\${arch}-\${version}.\${ext}`,
     },
+    forceCodeSigning: false,
+    framework: "electron",
     freebsd: {
         artifactName: `Uptime-Watcher-freebsd-\${arch}-\${version}.\${ext}`,
     },
+    generateUpdatesFilesForAllChannels: false,
+
     icon: "icons/favicon.ico",
+    includePdb: false,
     linux: {
         category: "Utility",
         desktop: {
@@ -99,6 +108,10 @@ const config: Configuration = {
     msi: {
         artifactName: `Uptime-Watcher-msi-\${arch}-\${version}.\${ext}`,
     },
+    nativeRebuilder: "sequential",
+    nodeGypRebuild: false,
+    nodeVersion: "current",
+    npmRebuild: true,
     nsis: {
         allowElevation: true,
         allowToChangeInstallationDirectory: true,
@@ -131,6 +144,8 @@ const config: Configuration = {
             repo: "Uptime-Watcher",
         },
     ],
+    removePackageKeywords: true,
+    removePackageScripts: true,
     rpm: {
         artifactName: `Uptime-Watcher-rpm-\${arch}-\${version}.\${ext}`,
     },

@@ -655,6 +655,9 @@ export const createSiteSyncActions = (
             };
         },
         syncSites: async (): Promise<void> => {
+            // Sync operations use the standard factory-based store error
+            // handler; no custom rollback logic is required here. See
+            // ADR-003 "Store Error Handling Contexts" for the rationale.
             await withErrorHandling(
                 async () => {
                     logStoreAction("SitesStore", "syncSites", {

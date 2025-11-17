@@ -138,7 +138,7 @@ Behavior notes:
 
 - Commands run inside a persistent PowerShell session.
 - Key rules for this project environment:
-  - Use `;` to chain commands, **not** `&&` .Example: `Get-Location; Write-Host "Ready"`
+  - Use `;` to chain commands, **not** `&&`. Example: `Get-Location; Write-Host "Ready"`
   - Use `Set-Location` with absolute paths. Example: `Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"`
   - Quote paths with spaces using double quotes.
 - For noisy commands, redirect output to a temp file:

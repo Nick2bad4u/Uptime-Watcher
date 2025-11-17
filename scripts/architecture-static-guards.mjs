@@ -5,11 +5,16 @@
  * This script enforces a few core architectural invariants that are easy to
  * accidentally violate during refactors:
  *
- * 1. Direct `ipcMain.handle(...)` calls must live only in
- *    `electron/services/ipc/IpcService.ts`.
- * 2. Direct `window.electronAPI` usage must not appear outside of approved
- *    locations (tests and type definitions).
- * 3. Event names passed to `.emitTyped()` / `.onTyped()` / `.offTyped()` /
+ * 1. Direct `ipcMain.handle(...)` calls must live only in the centralized
+ *    IPC registration layer (`electron/services/ipc/IpcService.ts` and its
+ *    shared helper module `electron/services/ipc/utils.ts`).
+ * 2. Direct `ipcRenderer` imports from the `electron` package are forbidden in
+ *    `src/**` (excluding tests). Renderer code must always go through the
+ *    typed preload bridge (`window.electronAPI`) and renderer services rather
+ *    than talking to Electron primitives directly.
+ * 3. Direct `window.electronAPI` usage must not appear outside of approved
+ *    locations (tests and explicit helper/type-definition files).
+ * 4. Event names passed to `.emitTyped()` / `.onTyped()` / `.offTyped()` /
  *    `.onceTyped()` in production code must be defined in
  *    `electron/events/eventTypes.ts`.
  */
@@ -155,7 +160,7 @@ async function checkIpcMainUsage(electronFiles) {
         if (content.includes("ipcMain.handle(")) {
             const relative = toPosixPath(path.relative(ROOT_DIRECTORY, file));
             errors.push(
-                `${relative}: direct ipcMain.handle(...) usage is forbidden outside electron/services/ipc/IpcService.ts.`
+                `${relative}: direct ipcMain.handle(...) usage is forbidden outside electron/services/ipc/IpcService.ts and electron/services/ipc/utils.ts.`
             );
         }
     }
@@ -207,6 +212,40 @@ async function checkWindowElectronApiUsage(srcFiles) {
             const relative = toPosixPath(path.relative(ROOT_DIRECTORY, file));
             errors.push(
                 `${relative}: direct window.electronAPI usage is restricted to tests and explicit helper/type-definition files.`
+            );
+        }
+    }
+
+    return errors;
+}
+
+/**
+ * Ensure `ipcRenderer` is not imported directly from Electron in src/**.
+ *
+ * @param {string[]} srcFiles
+ *
+ * @returns {Promise<string[]>}
+ */
+async function checkIpcRendererImportsInSrc(srcFiles) {
+    /** @type {string[]} */
+    const errors = [];
+
+    const importPattern =
+        /import\s+{[^}]*\bipcRenderer\b[^}]*}\s+from\s+["']electron["']/;
+    const requirePattern =
+        /(?:const|let|var)\s+{[^}]*\bipcRenderer\b[^}]*}\s*=\s*require\(["']electron["']\)/;
+
+    for (const file of srcFiles) {
+        if (isSrcTestFile(file)) {
+            continue;
+        }
+
+        const content = await readFile(file, "utf8");
+
+        if (importPattern.test(content) || requirePattern.test(content)) {
+            const relative = toPosixPath(path.relative(ROOT_DIRECTORY, file));
+            errors.push(
+                `${relative}: direct ipcRenderer imports from 'electron' are forbidden in src/**. Use the typed preload bridge (window.electronAPI) via renderer services instead.`
             );
         }
     }
@@ -286,6 +325,8 @@ async function main() {
 
     const ipcMainErrors = await checkIpcMainUsage(electronFiles);
     const windowApiErrors = await checkWindowElectronApiUsage(srcFiles);
+    const ipcRendererImportErrors =
+        await checkIpcRendererImportsInSrc(srcFiles);
     const typedEventErrors = await checkTypedEventUsage(
         electronFiles,
         knownEventNames
@@ -295,6 +336,7 @@ async function main() {
     const errors = [
         ...ipcMainErrors,
         ...windowApiErrors,
+        ...ipcRendererImportErrors,
         ...typedEventErrors,
     ];
 

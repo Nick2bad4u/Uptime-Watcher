@@ -3,7 +3,7 @@
  *   comprehensive testing of all exported functions
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 // Import all modules that contribute to function coverage
 import * as sharedTypes from "../types";
@@ -596,6 +596,18 @@ describe("Final 90% Function Coverage Push", () => {
         annotate("Category: Shared", "category");
         annotate("Type: Business Logic", "type");
 
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {
+                /* Captured to avoid noisy output while still verifying calls */
+            });
+
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {
+                /* Captured to avoid noisy output while still verifying calls */
+            });
+
         annotate(`Testing: ${task.name}`, "functional");
         annotate("Component: final-90-percent-function-coverage", "component");
         annotate("Category: Shared", "category");
@@ -726,6 +738,12 @@ describe("Final 90% Function Coverage Push", () => {
 
         // Process each module
         await Promise.all(allModules.map((module) => processModule(module)));
+
+        expect(consoleWarnSpy).toHaveBeenCalled();
+        expect(consoleErrorSpy).toHaveBeenCalled();
+
+        consoleWarnSpy.mockRestore();
+        consoleErrorSpy.mockRestore();
 
         expect(true).toBeTruthy();
     });

@@ -34,6 +34,12 @@ export const createMonitorTypesOperationsSlice = (
     | "refreshMonitorTypes"
     | "validateMonitorData"
 > => ({
+    // MonitorTypesStore wires its error handling inline by passing the
+    // store's own clearError/setError/setLoading actions to
+    // withErrorHandling. This is an intentional use of the inline
+    // ErrorHandlingFrontendStore pattern described in ADR-003 ("Store Error
+    // Handling Contexts") so that monitor-type operations can reuse their
+    // local error state rather than going through createStoreErrorHandler.
     formatMonitorDetail: async (type, details) =>
         withErrorHandling(
             async () => {
