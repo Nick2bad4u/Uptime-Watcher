@@ -14,11 +14,11 @@ tags:
   - "history"
 ---
 
-## 🔄 Technology Evolution Guide
+# 🔄 Technology Evolution Guide
 
 > **Migration History**: Understanding how Uptime Watcher evolved to its current sophisticated architecture.
 
-### 📋 Overview
+## 📋 Overview
 
 Uptime Watcher has undergone significant architectural evolution to become the robust, enterprise-grade monitoring application it is today. This document explains the technology migrations, their rationale, and current state.
 
@@ -186,7 +186,7 @@ export class SiteRepository {
 - **Performance**: Selective subscriptions
 - **Simplicity**: Minimal boilerplate
 - **Flexibility**: Modular store composition
-- **TypeScript**: Excellent type inference
+- **TypeScript**: Strong type inference support
 
 ##### Migration Example
 
@@ -265,6 +265,11 @@ export const useUIStore = create<UIStore>((set) => ({
 ```
 
 #### Build System: webpack → Vite
+
+The renderer build migrated from webpack to Vite to unlock native ES module
+support, instant HMR, and a dev server that mirrors production routing. The
+shift removed dozens of custom plugins and replaced them with the lean Vite
+config that powers both the web preview and the Electron renderer bundle.
 
 #### Migration Benefits
 
@@ -504,6 +509,8 @@ export class CustomMonitorService implements IMonitorService {
 - **Integration Tests**: IPC and database testing
 - **Type Testing**: TypeScript compilation verification
 - **Coverage Reports**: Automated coverage tracking
+
+##### Test command reference
 
 ```bash
 # Current testing capabilities

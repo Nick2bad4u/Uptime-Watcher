@@ -35,6 +35,8 @@ For stores with straightforward state that don't require modular composition:
 - Verified renderer services under `src/services` continue to expose typed facades consumed by the templates' async actions.
 - Checked utility helpers (`src/stores/utils/storeErrorHandling.ts`, `src/stores/utils/index.ts`) to ensure logging and error propagation remain consistent with the documented patterns.
 
+<!-- keep template code outside of the audit list -->
+
 ````typescript
 
 /**

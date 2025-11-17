@@ -354,7 +354,7 @@ Middleware enables cross-cutting concerns like logging, validation, and rate lim
 
 ### Built-in Middleware
 
-The system includes several built-in middleware functions:
+The system includes built-in middleware functions for logging, validation, and rate limiting:
 
 ```typescript
 // Logging middleware (automatically applied)

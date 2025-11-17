@@ -685,7 +685,7 @@ When documenting code, ensure:
 - \[ ] Brief description is clear and specific
 - \[ ] `@remarks` explains the "why" and important behaviors
 - \[ ] All parameters are documented with types and constraints
-- \[ ] Return value is clearly described
+- \[ ] Return value is described precisely
 - \[ ] Error conditions are documented with `@throws`
 - \[ ] At least one `@example` showing basic usage
 - \[ ] Complex scenarios have additional examples

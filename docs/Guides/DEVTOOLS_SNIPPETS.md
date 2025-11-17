@@ -421,7 +421,7 @@ This snippet removes all sites from the application. **Use with caution!**
 
 ## Snippet 3: Add Minimal Test Sites (Quick Testing)
 
-A simpler version that adds just a few basic sites for quick testing.
+A simpler version that adds three basic sites for quick testing.
 
 ```javascript
 /**

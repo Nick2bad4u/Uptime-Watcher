@@ -6,6 +6,10 @@ Thank you for using Uptime Watcher! This document provides information on how to
 
 ### 📚 Documentation
 
+Review the primary references (README, full docs, and troubleshooting guide)
+before opening an issue so that straightforward configuration problems can be
+resolved immediately.
+
 ### Support triage flow
 
 ```mermaid
@@ -36,8 +40,8 @@ flowchart TD
 
 First, please check our comprehensive documentation:
 
-- **[README.md](README.md)** - Project overview and quick start
-- **[docs/](docs/)** - Detailed documentation and guides
+- **[Project README](README.md)** - Project overview and quick start
+- **[Documentation directory](docs/)** - Detailed documentation and guides
 - **[Troubleshooting Guide](docs/Guides/troubleshooting.md)** - Common issues and solutions
 
 ### 🐛 Reporting Bugs

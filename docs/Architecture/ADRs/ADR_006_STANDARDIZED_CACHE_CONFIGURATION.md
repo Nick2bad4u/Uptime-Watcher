@@ -162,16 +162,16 @@ export const CACHE_CONFIG = Object.freeze({
 - **Dynamic naming** for temporary operations (`temporary-import`, `temporary-export`)
 - **Suffix support** for specialized caches (`sites-temp`, `monitors-backup`)
 
-```typescript
-export const CACHE_NAMES = Object.freeze({
- temporary: (operation: string): string => `temporary-${operation}`,
- sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
- monitors: (suffix?: string): string =>
-  suffix ? `monitors-${suffix}` : "monitors",
- settings: (suffix?: string): string =>
-  suffix ? `settings-${suffix}` : "settings",
-} as const);
-```
+  ```typescript
+  export const CACHE_NAMES = Object.freeze({
+   temporary: (operation: string): string => `temporary-${operation}`,
+   sites: (suffix?: string): string => (suffix ? `sites-${suffix}` : "sites"),
+   monitors: (suffix?: string): string =>
+      suffix ? `monitors-${suffix}` : "monitors",
+   settings: (suffix?: string): string =>
+      suffix ? `settings-${suffix}` : "settings",
+  } as const);
+  ```
 
 ### 4. Integration Pattern
 
@@ -193,6 +193,11 @@ const sitesCache = new StandardizedCache<Site>({
 ```
 
 ### 5. TTL Reasoning
+
+Cache TTLs intentionally align with the freshness requirements of each domain so
+that frequently changing data (monitors, validation) expires quickly while
+slower-moving configuration relies on longer windows. The diagrams below
+illustrate those refresh cadences and capacity tradeoffs.
 
 ### Cache Lifecycle and TTL Management
 
@@ -344,7 +349,7 @@ flowchart LR
 
 This ADR should be reviewed when:
 
-- Cache performance requirements change significantly
+- Cache performance requirements change beyond documented service expectations
 - New cache types are introduced to the system
 - TTL requirements change based on usage patterns
 - Memory constraints require cache size adjustments

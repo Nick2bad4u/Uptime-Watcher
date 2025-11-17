@@ -1040,7 +1040,7 @@ updateSiteName(siteIdentifier, "New Name");
 
 ### 3. Prop Drilling
 
-**Problem**: Passing props through many component levels
+**Problem**: Passing props through three or more component levels
 
 **Solution**: Use appropriate stores or context, or compose with hooks
 
@@ -1361,4 +1361,4 @@ This guide provides comprehensive guidelines for UI development in the Uptime Wa
 - **Security**: Validate all inputs and use secure JSON parsing patterns
 - **Documentation**: Maintain TSDoc comments following project guidelines
 
-By following these practices, we ensure a consistent, maintainable, and scalable codebase that reflects the current architectural patterns and provides excellent developer experience.
+By following these practices, we ensure a consistent, maintainable, and scalable codebase that reflects the current architectural patterns and provides a reliable developer experience.

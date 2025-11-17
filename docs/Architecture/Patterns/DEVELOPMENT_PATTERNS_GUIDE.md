@@ -1283,26 +1283,26 @@ The site mutation pipeline enforces a strict layering contract that keeps the da
 5. **Cache synchronization** happens inside `SiteWriterService`, which updates the `StandardizedCache` instance that backs `SiteManager`. Only sanitized copies are stored to avoid accidental mutations.
 6. **Event emission** completes the cycle: `SiteManager` publishes `internal:site:*` and `sites:state-synchronized` events so the renderer, orchestrator, and automation hooks receive consistent updates.
 
-```mermaid
-sequenceDiagram
-        participant Orchestrator
-        participant SiteManager
-        participant SiteWriter
-        participant Database
-        participant Cache
-        participant EventBus
+   ```mermaid
+   sequenceDiagram
+       participant Orchestrator
+       participant SiteManager
+       participant SiteWriter
+       participant Database
+       participant Cache
+       participant EventBus
 
-        Orchestrator->>SiteManager: removeMonitor(siteId, monitorId)
-        SiteManager->>SiteManager: getSiteSnapshotForMutation()
-        SiteManager->>SiteManager: enforce invariants / validateSite()
-        SiteManager->>SiteWriter: updateSite({ monitors })
-        SiteWriter->>Database: executeTransaction(upsert/delete)
-        Database-->>SiteWriter: commit
-        SiteWriter->>Cache: set(siteId, updatedSite)
-        SiteManager->>EventBus: emit internal:site:updated
-        SiteManager->>EventBus: emit sites:state-synchronized
-        EventBus-->>Orchestrator: broadcast update
-```
+       Orchestrator->>SiteManager: removeMonitor(siteId, monitorId)
+       SiteManager->>SiteManager: getSiteSnapshotForMutation()
+       SiteManager->>SiteManager: enforce invariants / validateSite()
+       SiteManager->>SiteWriter: updateSite({ monitors })
+       SiteWriter->>Database: executeTransaction(upsert/delete)
+       Database-->>SiteWriter: commit
+       SiteWriter->>Cache: set(siteId, updatedSite)
+       SiteManager->>EventBus: emit internal:site:updated
+       SiteManager->>EventBus: emit sites:state-synchronized
+       EventBus-->>Orchestrator: broadcast update
+   ```
 
 ### Layer Responsibilities
 

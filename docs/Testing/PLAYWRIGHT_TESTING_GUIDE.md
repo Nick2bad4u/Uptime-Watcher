@@ -276,30 +276,30 @@ for (let i = 0; i < buttons.length; i++) {
 
 1. Check if app is actually launching:
 
-```typescript
-console.log("App launched successfully");
-const windows = electronApp.windows();
-console.log("Window count:", windows.length);
-```
+   ```typescript
+   console.log("App launched successfully");
+   const windows = electronApp.windows();
+   console.log("Window count:", windows.length);
+   ```
 
 2. Verify environment setup:
 
-```bash
-# Check NODE_ENV
-echo $NODE_ENV  # Should be 'development' for dev mode
+   ```bash
+   # Check NODE_ENV
+   echo $NODE_ENV  # Should be 'development' for dev mode
 
-# Verify build exists
-ls dist/main.js
+   # Verify build exists
+   ls dist/main.js
 
-# Check if dev server is running
-curl http://localhost:5173
-```
+   # Check if dev server is running
+   curl http://localhost:5173
+   ```
 
 3. Take screenshots to see what's rendered:
 
-```typescript
-await page.screenshot({ path: "debug.png", fullPage: true });
-```
+   ```typescript
+   await page.screenshot({ path: "debug.png", fullPage: true });
+   ```
 
 ### Blank Windows
 

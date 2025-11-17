@@ -30,7 +30,7 @@ tags:
 
 #### 1. SQLite WASM Not Found
 
-**Error**: `Error: Cannot find module 'node-sqlite3-wasm.wasm'`
+**Symptom**: `Cannot find module 'node-sqlite3-wasm.wasm'`
 
 **Solution**:
 
@@ -45,7 +45,7 @@ npm run copy-wasm
 
 #### 2. Port 5173 Already in Use
 
-**Error**: `Port 5173 is already in use`
+**Symptom**: `Port 5173 is already in use`
 
 **Solutions**:
 
@@ -143,6 +143,8 @@ await databaseService.executeTransaction(async (db) => {
 3. **Check middleware errors**: Look for middleware that might prevent emission
 4. **Debug correlation IDs**: Use correlation IDs to trace event flow
 
+##### Event emission debug snippet
+
 ```typescript
 // Debug event emission
 eventBus.onTyped("site:updated", (data) => {
@@ -161,6 +163,8 @@ await eventBus.emitTyped("site:updated", { siteIdentifier: "123" });
 1. **Check EventsService initialization**: Ensure the renderer facade initializes successfully
 2. **Verify preload exposure**: If initialization fails, confirm the relevant domain exists in the preload script
 3. **Inspect bridge diagnostics**: Use structured logging to verify events are forwarded across the boundary
+
+##### IPC bridge debug snippet
 
 ```typescript
 import { EventsService } from "src/services/EventsService";
@@ -189,6 +193,8 @@ eventBus.use(async (event, data, next) => {
 1. **Always clean up listeners**: Use cleanup functions returned by EventsService
 2. **Use AbortController**: For automatic cleanup on component unmount
 3. **Monitor listener counts**: Check event bus diagnostics
+
+##### Cleanup debug snippet
 
 ```typescript
 // Proper cleanup pattern
@@ -222,6 +228,8 @@ useEffect(() => {
 2. **Check error boundaries**: Ensure React error boundaries are in place
 3. **Centralized error handling**: Use error store for consistent handling
 
+##### Error handling wrapper example
+
 ```typescript
 // Use withErrorHandling wrapper
 import { SiteService } from "src/services/SiteService";
@@ -248,6 +256,8 @@ const handleSiteCreation = withErrorHandling(
 2. **Validate data shapes**: Check that data being sent matches expected types
 3. **Update shared types**: Ensure frontend and backend use same type definitions
 
+##### Type guard debug snippet
+
 ```typescript
 // Debug type validation
 const data = { name: "Test Site", url: "https://test.com" };
@@ -267,6 +277,8 @@ if (!isSiteCreationData(data)) {
 1. **Check action implementations**: Ensure state updates are immutable
 2. **Use store debugging**: Enable Zustand devtools
 3. **Reset store state**: Provide reset functionality for development
+
+##### Store debugging snippet
 
 ```typescript
 // Store debugging
@@ -309,9 +321,11 @@ export const useSitesStore = create<SitesStore>()(
 
 #### 1. Build Fails
 
-**Error**: Various build-time errors
+**Symptoms**: Build tool reports compile-time errors (see terminal output for specifics)
 
 **Solutions**:
+
+##### Build recovery commands
 
 ```bash
 # Clean and rebuild

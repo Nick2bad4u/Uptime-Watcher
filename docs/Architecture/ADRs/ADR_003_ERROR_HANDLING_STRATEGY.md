@@ -92,12 +92,12 @@ All database operations use `withDatabaseOperation()` which provides:
 - **Correlation tracking** for distributed debugging
 - **Circuit breaker pattern** for failing operations
 
-```typescript
-return withDatabaseOperation(
- async () => this.databaseService.executeTransaction(operation),
- "SiteRepository.deleteAll"
-);
-```
+  ```typescript
+  return withDatabaseOperation(
+   async () => this.databaseService.executeTransaction(operation),
+   "SiteRepository.deleteAll"
+  );
+  ```
 
 ### 3. Frontend Store Error Protection
 
@@ -652,7 +652,7 @@ try {
 - **Superior debugging capability** - Rich error context and correlation tracking
 - **Optimal user experience** - Graceful error handling with appropriate messaging
 - **Comprehensive monitoring** - Error tracking, metrics, and observability
-- **Excellent maintainability** - Consistent error handling patterns across all layers
+- **Improved maintainability** - Consistent error handling patterns across all layers
 - **Memory safety** - Proper resource cleanup and leak prevention
 - **Race condition immunity** - Operation correlation prevents state corruption
 - **Production readiness** - Circuit breakers and retry mechanisms

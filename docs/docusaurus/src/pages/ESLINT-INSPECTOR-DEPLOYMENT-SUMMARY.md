@@ -144,16 +144,16 @@ docs/docusaurus/
 
 1. **Commit Changes**:
 
-```bash
-git add .
-git commit -m "feat: add ESLint Config Inspector to Docusaurus site"
-```
+   ```bash
+   git add .
+   git commit -m "feat: add ESLint Config Inspector to Docusaurus site"
+   ```
 
 2. **Push to GitHub**:
 
-```bash
-git push origin main
-```
+   ```bash
+   git push origin main
+   ```
 
 3. **Access Deployed Inspector**:
 

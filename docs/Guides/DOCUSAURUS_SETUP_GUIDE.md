@@ -257,6 +257,8 @@ The documentation is deployed to GitHub Pages via:
 - **Repository**: `Uptime-Watcher`
 - **Branch**: `gh-pages`
 
+#### Deployment commands
+
 ```bash
 # Deploy to GitHub Pages
 npm run docs:deploy

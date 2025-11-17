@@ -53,7 +53,7 @@ Practical notes:
     - Lines to add start with `+`.
 - **Context matters**:
   - The patch engine matches on context, not line numbers.
-  - Provide a few **stable** lines before and after the change to avoid mismatches; copying them from a fresh file read is safest.
+  - Provide at least two **stable** lines before and after the change to avoid mismatches; copying them from a fresh file read is safest.
   - For ambiguous areas, add `@@` markers to anchor a class or function.
 - Only text files are supported; binary assets and notebooks are out of scope.
 
@@ -63,7 +63,7 @@ Advanced usage:
 - For multiple changes in the same file:
   - Use a separate `*** Update File: ...` hunk for each distinct region.
   - Make sure the pre/post context for each hunk does **not** overlap, to keep matching unambiguous.
-  - If similar code appears many times, rely on `@@` markers plus slightly larger context windows.
+  - If similar code appears in multiple locations, rely on `@@` markers plus slightly larger context windows.
 - When a patch fails to apply, do **not** retry blindly with the same context; re-read the file and regenerate the patch from the current contents.
 
 Multi-file patches:
@@ -93,8 +93,8 @@ Common failure modes:
   - `offset` is **1-based** line number.
   - `limit` bounds the number of lines returned.
 - Large files are truncated around \~2000 lines, so pagination is required for long docs or configs.
-- For understanding a section, request a generous slice (e.g. 200–400 lines) rather than many tiny reads.
-- For **very large logs** (coverage runs, fuzzing output, etc.), it is often faster to:
+- For understanding a section, request a generous slice (e.g. 200–400 lines) rather than issuing dozens of micro-reads.
+- For large logs (coverage runs, fuzzing output, etc.), it is often faster to:
   - Capture the command output into `temp/` via PowerShell redirection.
   - Read only the tail or a high `offset` window to see the summary.
   - Delete the temporary log once you have extracted what you need.
@@ -115,7 +115,7 @@ Additional tips:
 Formatting tips:
 
 - Treat `includePattern` as a glob, not a regex. Use forward slashes and keep it relative to the workspace root (for example, `src/test/stores/alerts/**`).
-- When looking for a symbol that appears in many places, narrow the pattern early (e.g. to `src/stores/**`) to avoid excessive, low-signal matches.
+- When looking for a symbol that appears across multiple files, narrow the pattern early (e.g. to `src/stores/**`) to avoid excessive, low-signal matches.
 
 ### File search (glob-based)
 
@@ -158,7 +158,22 @@ Additional patterns:
 - Use `*> temp\command-output.log` for commands that produce long or noisy output, then:
   - Inspect the log via file reads.
   - Delete it once you have summarized the key information.
-- Avoid chaining too many operations into a single shell line; keep commands small and inspect results between steps.
+- Avoid chaining more than a couple of operations into a single shell line; keep commands small and inspect results between steps.
+
+#### Package metadata and dependency commands
+
+- `npm view <package> version` is the fastest way to inspect the latest published release before upgrading a plugin. Run it from the repo root so `npm` picks up the correct registry config.
+- Use `npm install -D <package>@<range>` when adding remark/ESLint rules or other tooling dependencies. Keeping the `-D` flag consistent prevents runtime bundles from bloating with dev-only modules.
+- `npm uninstall <package>` cleanly removes a dependency (and its entry in `package.json`) when experimentation shows it is incompatible. Always re-run `npm install` afterwards if you expect the lockfile to change.
+- `npm run remark:check` executes the documentation lint pipeline. Capture its noisy output into `temp/remark-check.log` whenever you need to audit dozens of warnings:
+
+  ```powershell
+  npm run remark:check *> temp/remark-check.log
+  Select-String -Path temp/remark-check.log -Pattern "code-block-split-list"
+  Remove-Item temp/remark-check.log
+  ```
+
+  Reading the log via file tooling keeps the main terminal uncluttered and satisfies the "delete temp artifacts" guideline once the analysis is done.
 
 #### Complex PowerShell Syntax Patterns
 
@@ -184,6 +199,10 @@ Additional patterns:
 - **Array and hashtable operations**:
   - `$errors = @(); if ($error) { $errors += $error[0] }`
   - `$config = @{ "key" = "value" }; Write-Host $config.key`
+- **Log filtering and counting**:
+  - `Select-String -Path temp/remark-check.log -Pattern "code-block-split-list"` surfaces only the warnings you care about from a captured log.
+  - `(Select-String -Path temp/remark-check.log -Pattern "code-block-split-list" | Measure-Object).Count` gives a quick total without opening the file repeatedly.
+  - `Remove-Item temp/remark-check.log` cleans up temporary artifacts immediately after summarizing.
 
 ### VS Code tasks
 
@@ -240,17 +259,17 @@ The typical workflow used to raise coverage for `src/stores/alerts/useAlertStore
 
 1. **Run the tests and coverage once** to get a baseline:
 
-```powershell
-Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"
-npm run test
-npm run test:coverage
-```
+   ```powershell
+   Set-Location "c:\Users\Nick\Dropbox\PC (2)\Documents\GitHub\Uptime-Watcher"
+   npm run test
+   npm run test:coverage
+   ```
 
 2. **Locate weak spots** using the coverage analyzer:
 
-```powershell
-node scripts/analyze-coverage.mjs --no-color --format table --limit 20
-```
+   ```powershell
+   node scripts/analyze-coverage.mjs --no-color --format table --limit 20
+   ```
 
 This prints a table of files sorted by lowest coverage. For example, it may show that `src/stores/alerts/useAlertStore.ts` has lower function/branch coverage than the surrounding code.
 
@@ -268,11 +287,11 @@ This prints a table of files sorted by lowest coverage. For example, it may show
 
 5. **Re-run tests and coverage** to confirm the new behavior and improved metrics:
 
-```powershell
-npm run test
-npm run test:coverage
-node scripts/analyze-coverage.mjs --no-color --format table --limit 20
-```
+   ```powershell
+   npm run test
+   npm run test:coverage
+   node scripts/analyze-coverage.mjs --no-color --format table --limit 20
+   ```
 
 6. **Clean up temporary logs** created during this workflow (for example, any coverage logs captured under `temp/`). Keeping `temp/` tidy prevents accidental re-use of stale analysis.
 

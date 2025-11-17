@@ -94,7 +94,7 @@ When editing existing docs, do not reintroduce these fields.
 
 ### Optional fields for future use
 
-We may introduce a few optional metadata fields over time. If you use them, keep names and shapes consistent:
+We may introduce additional optional metadata fields over time. If you use them, keep names and shapes consistent:
 
 ```yaml
 status: "active"        # or "draft" | "deprecated"
@@ -180,6 +180,8 @@ circuit-breaker-implementation-plan.md
 - Include descriptive emoji prefix for main sections (optional but encouraged)
 - Use proper heading hierarchy (H1 for title, H2 for main sections, etc.)
 
+#### Header example
+
 ```markdown
 # 📊 Main document title
 
@@ -196,6 +198,8 @@ circuit-breaker-implementation-plan.md
 - Use consistent style (`flat` or `flat-square`)
 - Align badges in center for README files
 - Include alt text for accessibility
+
+#### Badge example
 
 ```markdown
 <div align="center">
@@ -219,6 +223,8 @@ circuit-breaker-implementation-plan.md
 - Use descriptive comments
 - Include full file paths when relevant
 
+#### Code block example
+
 ````markdown
 ```typescript
 // electron/services/monitoring/HttpMonitor.ts
@@ -235,6 +241,8 @@ export class HttpMonitor implements IMonitorService {
 - Use consistent bullet style (- for unordered, 1. for ordered)
 - Add empty lines between complex list items
 - Use proper indentation for nested items
+
+#### List example
 
 ```markdown
 - **Feature name**: Brief description
@@ -253,6 +261,8 @@ export class HttpMonitor implements IMonitorService {
 - Use `inline code` for file names, commands, and code snippets
 - Use > blockquotes for important notes or warnings
 
+#### Emphasis example
+
 ```markdown
 **Important**: Always use `npm install` before running the development server.
 
@@ -267,6 +277,8 @@ The `package.json` file contains all _dependencies_ and **scripts**.
 - Include relative paths for internal documentation
 - Use absolute URLs for external resources
 
+#### Link example
+
 ```markdown
 See the [environment setup guide](./ENVIRONMENT_SETUP.md) for setup instructions.
 
@@ -279,6 +291,8 @@ Learn more about [TypeScript](https://www.typescriptlang.org/) documentation.
 - Use relative paths for project assets
 - Center important images
 - Include captions when helpful
+
+#### Image example
 
 ```markdown
 <div align="center">
@@ -356,7 +370,9 @@ Brief description of what the project does.
 
 ### API Documentation
 
-`````markdown
+Use the following template when documenting low-level APIs:
+
+````markdown
 # API Reference
 
 ## Overview
@@ -379,19 +395,15 @@ Description of what the method does.
 
 **Example:**
 
-````typescript
-
-
-
-// Usage exampleconst result = methodName(value);```typescript
+```typescript
 // Usage example
 const result = methodName(value);
-````
-`````
+```
 
 **Throws:**
 
 - `ErrorType`: When this error occurs
+````
 
 ````text
 

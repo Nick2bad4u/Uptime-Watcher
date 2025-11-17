@@ -199,7 +199,7 @@ export type BadgeSize = LiteralUnion<"lg" | "md" | "sm" | "xs", string>;
 
 ### Simplify - When to Apply
 
-- Complex union types with many branches
+- Complex union types with five or more branches
 - Types that would benefit from flattened IntelliSense
 - Cache value types, configuration unions
 
@@ -616,6 +616,8 @@ function createTestState(
 - Import only needed type-fest utilities
 - Use `import type` for type-only imports
 - Group type-fest imports together
+
+#### Import example
 
 ```typescript
 import type {

@@ -535,7 +535,7 @@ export default FormComponent;
 
 ### **Documentation**
 
-- \[ ] Component purpose clearly documented
+- \[ ] Component purpose documented with a concise summary
 - \[ ] Usage examples provided
 - \[ ] Props documented with descriptions
 - \[ ] Default values specified

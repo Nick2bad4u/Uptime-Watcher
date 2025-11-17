@@ -16,7 +16,7 @@ tags:
 
 # Validation Strategy
 
-The application enforces data quality through a layered validation pipeline. Each layer owns a clearly defined set of responsibilities so that validation code stays maintainable, testable, and consistent across domains.
+The application enforces data quality through a layered validation pipeline. Each layer owns a well-defined set of responsibilities so that validation code stays maintainable, testable, and consistent across domains.
 
 ## Layer Overview
 

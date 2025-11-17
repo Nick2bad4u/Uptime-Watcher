@@ -328,6 +328,8 @@ Maintain clear separation between services:
 - Use proper type guards and assertions
 - Leverage TypeScript's strict configuration
 
+#### Strict Type Safety Examples
+
 ```typescript
 // ✅ Type-safe approach
 function isValidMonitor(monitor: unknown): monitor is Site["monitors"][0] {
@@ -341,6 +343,8 @@ const monitor = data as Site["monitors"][0];
 ### 2. Interface Design
 
 Design interfaces for extensibility and clarity:
+
+#### Interface Design Examples
 
 ```typescript
 // ✅ Clear, extensible interface

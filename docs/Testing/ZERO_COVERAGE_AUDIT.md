@@ -50,7 +50,7 @@ The summary section provides totals plus a ranked list of the top coverage-produ
 
 ## Triage guidelines
 
-- Double-check zero-coverage candidates before removal; many failures indicate that helpers or mocks stub out the interesting parts.
+- Double-check zero-coverage candidates before removal; repeated failures indicate that helpers or mocks stub out the interesting parts.
 - If a file intentionally asserts runtime behavior without hitting instrumented code (for example, type-only tests), consider removing it or moving the assertions into a smoke test that does execute logic.
 - Keep the generated JSON reports (`--keep-reports`) when you want to diff coverage maps or inspect the raw Istanbul data.
 
