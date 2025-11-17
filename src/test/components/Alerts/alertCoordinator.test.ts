@@ -7,8 +7,20 @@ import type { StatusUpdate } from "@shared/types";
 import { STATUS_KIND } from "@shared/types";
 
 import * as alertCoordinator from "../../../components/Alerts/alertCoordinator";
-import { useAlertStore } from "../../../stores/alerts/useAlertStore";
+import { logger } from "../../../services/logger";
+import {
+    MAX_ALERT_QUEUE_LENGTH,
+    useAlertStore,
+} from "../../../stores/alerts/useAlertStore";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+vi.mock("../../../services/logger", () => ({
+    logger: {
+        debug: vi.fn(),
+        error: vi.fn(),
+        info: vi.fn(),
+        warn: vi.fn(),
+    },
+}));
 
 vi.mock("../../../services/NotificationPreferenceService", () => ({
     NotificationPreferenceService: {
@@ -131,6 +143,80 @@ describe("alertCoordinator", () => {
         alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
 
         expect(toneSpy).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        ["greater than one", 1.25],
+        ["infinite", Number.POSITIVE_INFINITY],
+        ["not-a-number", Number.NaN],
+    ])("normalizes %s alert volume candidates", (_, volume) => {
+        const toneSpy = vi.fn().mockResolvedValue(undefined);
+        alertCoordinator.setAlertToneInvoker(toneSpy);
+
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsSoundEnabled: true,
+                inAppAlertVolume: volume,
+            },
+        }));
+
+        alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
+
+        expect(toneSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it("logs when sound is enabled but the normalized volume is zero", () => {
+        const toneSpy = vi.fn().mockResolvedValue(undefined);
+        alertCoordinator.setAlertToneInvoker(toneSpy);
+
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsSoundEnabled: true,
+                inAppAlertVolume: -2,
+            },
+        }));
+
+        alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
+
+        expect(toneSpy).not.toHaveBeenCalled();
+        expect(logger.debug).toHaveBeenCalledWith(
+            "Skipping alert tone playback because the volume is muted"
+        );
+    });
+
+    it("logs when the alert queue reaches the configured capacity", () => {
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsSoundEnabled: false,
+            },
+        }));
+
+        const existingAlerts = Array.from(
+            { length: MAX_ALERT_QUEUE_LENGTH },
+            (_, index) => ({
+                id: `existing-${index}`,
+                monitorId: `monitor-${index}`,
+                monitorName: `Monitor ${index}`,
+                siteIdentifier: `site-${index}`,
+                siteName: `Site ${index}`,
+                status: STATUS_KIND.UP,
+                timestamp: Date.now(),
+            })
+        );
+
+        useAlertStore.setState((state) => ({
+            ...state,
+            alerts: existingAlerts,
+        }));
+
+        alertCoordinator.enqueueAlertFromStatusUpdate(createStatusUpdate());
+
+        expect(logger.debug).toHaveBeenCalledWith(
+            "Alert queue reached capacity; oldest alerts will be discarded"
+        );
     });
 
     it("synchronizes system notification preferences", async () => {
@@ -263,5 +349,93 @@ describe("playInAppAlertTone", () => {
         expect(
             gainRampValues.some((value) => Math.abs(value - 0.04) < 0.0005)
         ).toBeTruthy();
+    });
+
+    it("logs when neither standard nor prefixed AudioContext is available", async () => {
+        delete (globalThis as unknown as { AudioContext?: typeof AudioContext })
+            .AudioContext;
+        delete (
+            globalThis as unknown as {
+                webkitAudioContext?: typeof AudioContext;
+            }
+        ).webkitAudioContext;
+
+        await alertCoordinator.resetAlertAudioContextForTesting();
+
+        await alertCoordinator.playInAppAlertTone();
+
+        expect(logger.debug).toHaveBeenCalledWith(
+            "AudioContext unavailable; skipping alert tone"
+        );
+    });
+
+    it("falls back to webkitAudioContext when necessary", async () => {
+        delete (globalThis as unknown as { AudioContext?: typeof AudioContext })
+            .AudioContext;
+
+        (
+            globalThis as unknown as {
+                webkitAudioContext?: typeof AudioContext;
+            }
+        ).webkitAudioContext =
+            TestAudioContext as unknown as typeof AudioContext;
+
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsSoundEnabled: true,
+                inAppAlertVolume: 0.4,
+            },
+        }));
+
+        await alertCoordinator.resetAlertAudioContextForTesting();
+        await alertCoordinator.playInAppAlertTone();
+
+        expect(createOscillatorSpy).toHaveBeenCalledTimes(1);
+
+        delete (
+            globalThis as unknown as {
+                webkitAudioContext?: typeof AudioContext;
+            }
+        ).webkitAudioContext;
+    });
+
+    it("logs and aborts when resuming a suspended context fails", async () => {
+        const resumeFailure = vi
+            .fn()
+            .mockRejectedValue(new Error("resume-failed"));
+
+        class SuspendedAudioContext extends TestAudioContext {
+            public override state: AudioContextState = "suspended";
+            public override resume =
+                resumeFailure as unknown as () => Promise<void>;
+        }
+
+        (
+            globalThis as unknown as { AudioContext: typeof AudioContext }
+        ).AudioContext =
+            SuspendedAudioContext as unknown as typeof AudioContext;
+
+        useSettingsStore.setState((state) => ({
+            settings: {
+                ...state.settings,
+                inAppAlertsSoundEnabled: true,
+                inAppAlertVolume: 0.75,
+            },
+        }));
+
+        await alertCoordinator.resetAlertAudioContextForTesting();
+        await alertCoordinator.playInAppAlertTone();
+
+        expect(resumeFailure).toHaveBeenCalledTimes(1);
+        expect(logger.debug).toHaveBeenCalledWith(
+            "Failed to resume AudioContext; skipping alert tone",
+            expect.any(Error)
+        );
+        expect(createOscillatorSpy).not.toHaveBeenCalled();
+
+        (
+            globalThis as unknown as { AudioContext: typeof AudioContext }
+        ).AudioContext = TestAudioContext as unknown as typeof AudioContext;
     });
 });

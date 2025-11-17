@@ -6,6 +6,7 @@ import {
     AnalyticsTab,
     type AnalyticsTabProperties,
 } from "../../../../components/SiteDetails/tabs/AnalyticsTab";
+import { logger } from "../../../../services/logger";
 import type { DowntimePeriod } from "../../../../hooks/site/useSiteAnalytics";
 import type {
     ResponseTimeChartData,
@@ -996,6 +997,93 @@ describe(AnalyticsTab, () => {
             expect(() => {
                 render(<AnalyticsTab {...props} />);
             }).not.toThrow();
+        });
+
+        it.each([
+            { uptime: "99.9", expected: "Good" },
+            { uptime: "95.5", expected: "Fair" },
+            { uptime: "87.2", expected: "Poor" },
+        ])(
+            "uses fallback availability descriptions when formatter fails (%s)",
+            ({ uptime, expected }) => {
+                const props = createMockProps({
+                    uptime,
+                    getAvailabilityDescription: vi.fn(() => {
+                        throw new Error("Formatter offline");
+                    }),
+                });
+
+                render(<AnalyticsTab {...props} />);
+
+                expect(screen.getAllByText(`${uptime}%`)).not.toHaveLength(0);
+                expect(screen.getAllByText(expected)).not.toHaveLength(0);
+            }
+        );
+
+        it("falls back to basic response time formatting when formatter throws", () => {
+            const props = createMockProps({
+                avgResponseTime: 275,
+                formatResponseTime: vi.fn(() => {
+                    throw new Error("No formatter");
+                }),
+                p50: 125,
+                p95: 525,
+                p99: 900,
+            });
+
+            render(<AnalyticsTab {...props} />);
+
+            expect(screen.getAllByText("275ms")).not.toHaveLength(0);
+            expect(screen.getAllByText("125ms")).not.toHaveLength(0);
+            expect(screen.getAllByText("525ms")).not.toHaveLength(0);
+            expect(screen.getAllByText("900ms")).not.toHaveLength(0);
+        });
+
+        it("logs time range changes with detailed metadata", () => {
+            const setSiteDetailsChartTimeRange = vi.fn();
+            const props = createMockProps({
+                monitorType: "http",
+                setSiteDetailsChartTimeRange,
+                siteDetailsChartTimeRange: "24h",
+            });
+
+            render(<AnalyticsTab {...props} />);
+
+            const targetButton = screen.getByRole("button", { name: "7d" });
+            fireEvent.click(targetButton);
+
+            expect(setSiteDetailsChartTimeRange).toHaveBeenCalledWith("7d");
+            expect(logger.user.action).toHaveBeenCalledWith(
+                "Chart time range changed",
+                expect.objectContaining({
+                    monitorType: "http",
+                    newRange: "7d",
+                    previousRange: "24h",
+                })
+            );
+        });
+
+        it("records analytics when toggling advanced metrics", () => {
+            const setShowAdvancedMetrics = vi.fn();
+            const props = createMockProps({
+                monitorType: "ping",
+                setShowAdvancedMetrics,
+                showAdvancedMetrics: false,
+            });
+
+            render(<AnalyticsTab {...props} />);
+
+            fireEvent.click(screen.getByRole("button", { name: /advanced/i }));
+
+            expect(setShowAdvancedMetrics).toHaveBeenCalledWith(true);
+            expect(logger.user.action).toHaveBeenCalledWith(
+                "Advanced metrics toggle",
+                expect.objectContaining({
+                    monitorType: "ping",
+                    newValue: true,
+                    previousValue: false,
+                })
+            );
         });
     });
 });

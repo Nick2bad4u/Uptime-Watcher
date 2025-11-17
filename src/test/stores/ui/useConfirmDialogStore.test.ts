@@ -3,9 +3,12 @@
  */
 
 import { act, renderHook } from "@testing-library/react";
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+    type ConfirmDialogStoreState,
+    type ConfirmDialogTone,
     requestConfirmation,
     resetConfirmDialogState,
     useConfirmDialogControls,
@@ -163,5 +166,116 @@ describe(useConfirmDialogStore, () => {
 
         rerender();
         expect(result.current.isOpen).toBeFalsy();
+    });
+
+    const confirmDialogOptionsArb = fc.record({
+        cancelLabel: fc.option(fc.string({ minLength: 1, maxLength: 24 }), {
+            nil: undefined,
+        }),
+        confirmLabel: fc.option(fc.string({ minLength: 1, maxLength: 24 }), {
+            nil: undefined,
+        }),
+        details: fc.option(fc.string({ minLength: 1, maxLength: 80 }), {
+            nil: undefined,
+        }),
+        message: fc.string({ minLength: 1, maxLength: 120 }),
+        title: fc.string({ minLength: 1, maxLength: 80 }),
+        tone: fc.option(
+            fc.constantFrom<ConfirmDialogTone>("default", "danger"),
+            {
+                nil: undefined,
+            }
+        ),
+    });
+
+    fcTest.prop([confirmDialogOptionsArb, fc.boolean()])(
+        "resolves to the caller's decision for arbitrary dialog options",
+        async (options, shouldConfirm) => {
+            resetConfirmDialogState();
+
+            const confirmation = requestConfirmation(options);
+
+            const state = useConfirmDialogStore.getState();
+            const expectedRequest = {
+                cancelLabel: options.cancelLabel ?? "Cancel",
+                confirmLabel: options.confirmLabel ?? "Confirm",
+                message: options.message,
+                title: options.title,
+                tone: options.tone ?? "default",
+                ...(options.details ? { details: options.details } : {}),
+            } as const;
+
+            expect(state.request).toStrictEqual(expectedRequest);
+
+            if (shouldConfirm) {
+                state.confirm();
+            } else {
+                state.cancel();
+            }
+
+            await expect(confirmation).resolves.toBe(shouldConfirm);
+            expect(useConfirmDialogStore.getState().request).toBeNull();
+        }
+    );
+
+    fcTest.prop([
+        fc.array(confirmDialogOptionsArb, { minLength: 2, maxLength: 5 }),
+    ])(
+        "cancels previous confirmations when a new dialog is requested",
+        async (requests) => {
+            resetConfirmDialogState();
+
+            const confirmations = requests.map((request) =>
+                requestConfirmation(request)
+            );
+
+            for (let index = 0; index < confirmations.length - 1; index += 1) {
+                await expect(confirmations[index]).resolves.toBeFalsy();
+            }
+
+            useConfirmDialogStore.getState().confirm();
+
+            await expect(
+                confirmations[confirmations.length - 1]
+            ).resolves.toBeTruthy();
+            expect(useConfirmDialogStore.getState().request).toBeNull();
+        }
+    );
+
+    it("exposes Playwright automation helpers on the global scope", async () => {
+        const automationTarget = globalThis as typeof globalThis & {
+            playwrightConfirmDialog?: {
+                cancel: () => void;
+                confirm: () => void;
+                getState: () => ConfirmDialogStoreState;
+                subscribe: (
+                    listener: (state: ConfirmDialogStoreState) => void
+                ) => () => void;
+            };
+        };
+
+        const bridge = automationTarget.playwrightConfirmDialog;
+        expect(bridge).toBeDefined();
+
+        const confirmation = requestConfirmation({
+            message: "Automated confirmation",
+            title: "Automation",
+        });
+
+        const snapshots: Array<ConfirmDialogStoreState> = [];
+        const unsubscribe = bridge?.subscribe((state) => {
+            snapshots.push(state);
+        });
+
+        expect(bridge?.getState().request?.message).toBe(
+            "Automated confirmation"
+        );
+
+        bridge?.confirm();
+
+        await expect(confirmation).resolves.toBeTruthy();
+        expect(bridge?.getState().request).toBeNull();
+        unsubscribe?.();
+        expect(snapshots.length).toBeGreaterThanOrEqual(1);
     });
 });

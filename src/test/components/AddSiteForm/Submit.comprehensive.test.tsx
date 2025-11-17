@@ -712,4 +712,224 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             propertyTimeoutMs
         );
     });
+
+    describe("handleSubmit - monitor builder normalization", () => {
+        const monitorBuilderScenarios = [
+            {
+                monitorType: "cdn-edge-consistency" as const,
+                overrides: {
+                    baselineUrl: "  https://edge.example.com  ",
+                    edgeLocations: "us-east-1",
+                },
+                expectation: {
+                    baselineUrl: "https://edge.example.com",
+                    edgeLocations: "us-east-1",
+                },
+            },
+            {
+                monitorType: "dns" as const,
+                overrides: {
+                    expectedValue: "  1.2.3.4  ",
+                    host: "example.com",
+                    recordType: "A",
+                },
+                expectation: {
+                    expectedValue: "1.2.3.4",
+                    host: "example.com",
+                    recordType: "A",
+                },
+            },
+            {
+                monitorType: "dns" as const,
+                overrides: {
+                    expectedValue: "should be dropped",
+                    host: "",
+                    recordType: "ANY",
+                },
+                expectation: {
+                    expectedValue: undefined,
+                    host: undefined,
+                    recordType: "ANY",
+                },
+            },
+            {
+                monitorType: "http-header" as const,
+                overrides: {
+                    expectedHeaderValue: " application/json ",
+                    headerName: "  X-Test  ",
+                    url: "https://headers.example.com ",
+                },
+                expectation: {
+                    expectedHeaderValue: "application/json",
+                    headerName: "X-Test",
+                    url: "https://headers.example.com",
+                },
+            },
+            {
+                monitorType: "http-json" as const,
+                overrides: {
+                    expectedJsonValue: "42",
+                    jsonPath: " $.data.value ",
+                    url: "https://json.example.com",
+                },
+                expectation: {
+                    expectedJsonValue: "42",
+                    jsonPath: "$.data.value",
+                },
+            },
+            {
+                monitorType: "http-keyword" as const,
+                overrides: {
+                    bodyKeyword: " uptime ",
+                    url: "https://keyword.example.com",
+                },
+                expectation: {
+                    bodyKeyword: "uptime",
+                },
+            },
+            {
+                monitorType: "http-latency" as const,
+                overrides: {
+                    maxResponseTime: " 2500 ",
+                    url: "https://latency.example.com",
+                },
+                expectation: {
+                    maxResponseTime: 2500,
+                },
+            },
+            {
+                monitorType: "http-status" as const,
+                overrides: {
+                    expectedStatusCode: " 204 ",
+                    url: "https://status.example.com",
+                },
+                expectation: {
+                    expectedStatusCode: 204,
+                },
+            },
+            {
+                monitorType: "ping" as const,
+                overrides: {
+                    host: " ping.example.com ",
+                },
+                expectation: {
+                    host: "ping.example.com",
+                },
+            },
+            {
+                monitorType: "port" as const,
+                overrides: {
+                    host: " port.example.com ",
+                    port: " 8080 ",
+                },
+                expectation: {
+                    host: "port.example.com",
+                    port: 8080,
+                },
+            },
+            {
+                monitorType: "replication" as const,
+                overrides: {
+                    maxReplicationLagSeconds: " 90 ",
+                    primaryStatusUrl: " https://primary.example.com",
+                    replicaStatusUrl: "https://replica.example.com ",
+                    replicationTimestampField: " updatedAt ",
+                },
+                expectation: {
+                    maxReplicationLagSeconds: 90,
+                    primaryStatusUrl: "https://primary.example.com",
+                    replicaStatusUrl: "https://replica.example.com",
+                    replicationTimestampField: "updatedAt",
+                },
+            },
+            {
+                monitorType: "server-heartbeat" as const,
+                overrides: {
+                    heartbeatExpectedStatus: "OK",
+                    heartbeatMaxDriftSeconds: "120",
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
+                    url: "https://heartbeat.example.com",
+                },
+                expectation: {
+                    heartbeatExpectedStatus: "OK",
+                    heartbeatMaxDriftSeconds: 120,
+                    heartbeatStatusField: "status",
+                    heartbeatTimestampField: "timestamp",
+                },
+            },
+            {
+                monitorType: "ssl" as const,
+                overrides: {
+                    certificateWarningDays: " 15 ",
+                    host: " cert.example.com ",
+                    port: " 443 ",
+                },
+                expectation: {
+                    certificateWarningDays: 15,
+                    host: "cert.example.com",
+                    port: 443,
+                },
+            },
+            {
+                monitorType: "websocket-keepalive" as const,
+                overrides: {
+                    maxPongDelayMs: " 5000 ",
+                    url: "wss://socket.example.com",
+                },
+                expectation: {
+                    maxPongDelayMs: 5000,
+                },
+            },
+        ] as const;
+
+        it.each(monitorBuilderScenarios)(
+            "normalizes %s monitor fields before validation",
+            async (scenario) => {
+                const mockEvent = { preventDefault: vi.fn() } as any;
+                const properties = createMockProperties({
+                    monitorType: scenario.monitorType,
+                    ...scenario.overrides,
+                });
+
+                applyValidationResult(validationSuccessResult);
+                applyFieldValidationResult(validationSuccessResult);
+
+                await handleSubmit(mockEvent, properties);
+
+                expect(
+                    validationModule.validateMonitorFormData
+                ).toHaveBeenCalled();
+                const calls =
+                    validationModule.validateMonitorFormData.mock.calls;
+                const lastCall = calls[calls.length - 1];
+                const formData = (lastCall?.[1] ?? {}) as Record<
+                    string,
+                    unknown
+                >;
+
+                for (const [key, value] of Object.entries(
+                    scenario.expectation
+                )) {
+                    if (value === undefined) {
+                        expect(formData[key]).toBeUndefined();
+                    } else {
+                        expect(formData[key]).toBe(value);
+                    }
+                }
+            }
+        );
+
+        it("throws when the monitor type is unsupported", async () => {
+            const mockEvent = { preventDefault: vi.fn() } as any;
+            const properties = createMockProperties({
+                monitorType:
+                    "unsupported-type" as unknown as FormSubmitProperties["monitorType"],
+            });
+
+            await expect(handleSubmit(mockEvent, properties)).rejects.toThrow(
+                "Unsupported monitor type"
+            );
+        });
+    });
 });

@@ -2,6 +2,7 @@
  * Comprehensive tests for StateSyncService
  */
 
+import { fc, test as fcTest } from "@fast-check/vitest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { STATE_SYNC_ACTION } from "@shared/types/stateSync";
@@ -362,5 +363,147 @@ describe("StateSyncService", () => {
             );
         });
         expect(callback).not.toHaveBeenCalled();
+    });
+
+    fcTest.prop([
+        fc.anything().filter((candidate) => typeof candidate !== "function"),
+    ])(
+        "wraps invalid cleanup candidates returned by the preload bridge",
+        async (invalidCleanup) => {
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+                (handler: (event: unknown) => void) => {
+                    capturedHandler = handler;
+                    return invalidCleanup;
+                }
+            );
+
+            const callback = vi.fn();
+            const initialErrorCount = mockLogger.error.mock.calls.length;
+            const cleanup = await StateSyncService.onStateSyncEvent(callback);
+
+            expect(typeof cleanup).toBe("function");
+
+            const invalidCleanupCall =
+                mockLogger.error.mock.calls[initialErrorCount];
+            expect(invalidCleanupCall).toEqual([
+                "[StateSyncService] Preload bridge returned an invalid unsubscribe handler",
+                expect.objectContaining({
+                    actualType: typeof invalidCleanup,
+                    value: invalidCleanup,
+                }),
+            ]);
+
+            cleanup();
+
+            const skipCleanupCall =
+                mockLogger.error.mock.calls[initialErrorCount + 1];
+            expect(skipCleanupCall).toEqual([
+                "[StateSyncService] Skip cleanup, unsubscribe handler was not a function",
+            ]);
+        }
+    );
+
+    fcTest.prop([
+        fc.string({ minLength: 1 }).map((message) => new Error(message)),
+    ])(
+        "reports cleanup errors through the logger while preserving control flow",
+        async (cleanupError) => {
+            mockElectronAPI.stateSync.onStateSyncEvent.mockImplementationOnce(
+                (handler: (event: unknown) => void) => {
+                    capturedHandler = handler;
+                    return () => {
+                        throw cleanupError;
+                    };
+                }
+            );
+
+            const callback = vi.fn();
+            const initialErrorCount = mockLogger.error.mock.calls.length;
+            const cleanup = await StateSyncService.onStateSyncEvent(callback);
+
+            expect(() => cleanup()).not.toThrow();
+
+            const cleanupErrorCall =
+                mockLogger.error.mock.calls[initialErrorCount];
+            expect(cleanupErrorCall).toEqual([
+                "[StateSyncService] Failed to cleanup state sync subscription:",
+                cleanupError,
+            ]);
+        }
+    );
+
+    it("logs a warning when recovery broadcasts are not observed", async () => {
+        vi.useFakeTimers();
+
+        try {
+            const callback = vi.fn();
+            const fullSyncPayload = {
+                completedAt: Date.now(),
+                siteCount: 1,
+                sites: [
+                    {
+                        identifier: "site-timeout",
+                        monitoring: true,
+                        monitors: [
+                            {
+                                checkInterval: 60_000,
+                                history: [],
+                                id: "monitor-timeout",
+                                monitoring: true,
+                                responseTime: -1,
+                                retryAttempts: 0,
+                                status: "up",
+                                timeout: 5000,
+                                type: "http",
+                                url: "https://timeout.example.com",
+                            },
+                        ],
+                        name: "Timeout Site",
+                    },
+                ],
+                source: "database" as const,
+                synchronized: true,
+            };
+
+            mockElectronAPI.stateSync.requestFullSync.mockResolvedValueOnce(
+                fullSyncPayload
+            );
+
+            await StateSyncService.onStateSyncEvent(callback);
+            expect(capturedHandler).toBeTypeOf("function");
+
+            capturedHandler?.({ invalid: true });
+
+            await vi.waitFor(() => {
+                expect(
+                    mockElectronAPI.stateSync.requestFullSync
+                ).toHaveBeenCalledTimes(1);
+            });
+
+            await vi.waitFor(() => {
+                expect(mockLogger.info).toHaveBeenCalledWith(
+                    "[StateSyncService] Full sync recovery snapshot retrieved",
+                    expect.objectContaining({
+                        timestamp: fullSyncPayload.completedAt,
+                    })
+                );
+            });
+
+            await vi.advanceTimersByTimeAsync(5000);
+
+            const timeoutWarning = mockLogger.warn.mock.calls.find(
+                ([message]) =>
+                    message ===
+                    "[StateSyncService] Full sync recovery broadcast not received within expected window"
+            );
+
+            expect(timeoutWarning?.[1]).toEqual(
+                expect.objectContaining({
+                    expectedTimestamp: fullSyncPayload.completedAt,
+                })
+            );
+        } finally {
+            vi.useRealTimers();
+        }
     });
 });
