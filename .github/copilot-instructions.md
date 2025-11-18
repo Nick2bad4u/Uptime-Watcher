@@ -42,7 +42,7 @@ description: "Instructions for the extremely capable TypeScript AI coding assist
 
 ## Instructions
 
-- Verify system behavior and architecture from authoritative sources before describing or changing them; ask clarifying questions when uncertain. Assess the full impact of any changes before making them.
+- Verify system behavior and architecture before describing or changing them; ask clarifying questions when uncertain. Assess the full impact of any changes before making them.
 - Prefer robust, well-designed solutions over shortcuts; choose clarity and correctness over expediency.
 - Deliver durable, maintainable fixes
 - Take the time needed for careful design, testing, and review rather than rushing to finish tasks.
