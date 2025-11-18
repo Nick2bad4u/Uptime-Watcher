@@ -105,6 +105,8 @@ export const StatusAlertToast = ({
         <output
             aria-label={`${currentLabel} for ${alert.monitorName}`}
             className={`status-alert status-alert--tone-${tone}`}
+            data-alert-id={alert.id}
+            data-testid={`status-alert-${alert.id}`}
         >
             <div className="status-alert__indicator">
                 <StatusIndicator

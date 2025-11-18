@@ -14,7 +14,13 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { test } from "@fast-check/vitest";
 import * as fc from "fast-check";
 
-import type { Monitor, MonitorStatus, Site } from "@shared/types";
+import type {
+    Monitor,
+    MonitorStatus,
+    Site,
+    StatusHistoryStatus,
+} from "@shared/types";
+import { MONITOR_STATUS_VALUES, STATUS_HISTORY_VALUES } from "@shared/types";
 
 import {
     applyStatusUpdateSnapshot,
@@ -43,12 +49,12 @@ const mockedLogger = vi.mocked(logger);
 type MonitorHistoryEntry = Required<Monitor>["history"][number];
 
 const createHistoryEntry = (
-    status: MonitorStatus,
+    status: StatusHistoryStatus,
     seed: number
 ): MonitorHistoryEntry => ({
     responseTime: 100 + seed,
     status,
-    timestamp: new Date(Date.UTC(2024, 0, seed + 1)).toISOString(),
+    timestamp: Date.UTC(2024, 0, seed + 1),
 });
 
 const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
@@ -57,7 +63,6 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
         history: overrides.history ?? [],
         id: overrides.id ?? "monitor-default",
         monitoring: overrides.monitoring ?? true,
-        name: overrides.name ?? "Primary Monitor",
         responseTime: overrides.responseTime ?? 150,
         retryAttempts: overrides.retryAttempts ?? 3,
         status: overrides.status ?? "up",
@@ -75,17 +80,21 @@ const createSite = (
     overrides: Partial<Site> = {}
 ): Site =>
     ({
-        history: overrides.history ?? [],
-        id: overrides.id ?? identifier,
         identifier,
         monitoring: overrides.monitoring ?? true,
-        monitors: monitors as Site["monitors"],
+        monitors: overrides.monitors ?? Array.from(monitors),
         name: overrides.name ?? `Site ${identifier}`,
-        status: overrides.status ?? "up",
-        ...overrides,
     }) as Site;
 
-describe("applyStatusUpdateSnapshot", () => {
+const ensureSite = (site: Site | undefined): Site => {
+    expect(site).toBeDefined();
+    if (!site) {
+        throw new Error("Expected site to be defined after status update");
+    }
+    return site;
+};
+
+describe(applyStatusUpdateSnapshot, () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockedIsDevelopment.mockReturnValue(false);
@@ -142,7 +151,8 @@ describe("applyStatusUpdateSnapshot", () => {
         };
 
         const [updatedSite] = applyStatusUpdateSnapshot(sites, payload);
-        const updatedMonitor = updatedSite.monitors.find(
+        const resolvedSite = ensureSite(updatedSite);
+        const updatedMonitor = resolvedSite.monitors.find(
             ({ id }) => id === monitor.id
         );
 
@@ -172,7 +182,8 @@ describe("applyStatusUpdateSnapshot", () => {
         };
 
         const [updatedSite] = applyStatusUpdateSnapshot(sites, payload);
-        const updatedMonitor = updatedSite.monitors.find(
+        const resolvedSite = ensureSite(updatedSite);
+        const updatedMonitor = resolvedSite.monitors.find(
             ({ id }) => id === monitor.id
         );
 
@@ -180,10 +191,23 @@ describe("applyStatusUpdateSnapshot", () => {
         expect(updatedMonitor?.status).toBe("down");
     });
 
-    const historyStatuses = fc.array(
-        fc.constantFrom<MonitorStatus>("up", "down", "pending", "unknown"),
-        { maxLength: 5 }
-    );
+    const historyEntries = fc
+        .array(fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES), {
+            maxLength: 5,
+        })
+        .map((statuses) =>
+            statuses.map((status, index) => createHistoryEntry(status, index))
+        );
+
+    const snapshotHistoryEntries = fc
+        .array(fc.constantFrom<StatusHistoryStatus>(...STATUS_HISTORY_VALUES), {
+            maxLength: 5,
+        })
+        .map((statuses) =>
+            statuses.map((status, index) =>
+                createHistoryEntry(status, index + 10)
+            )
+        );
 
     test.prop([
         fc
@@ -194,15 +218,9 @@ describe("applyStatusUpdateSnapshot", () => {
             .string({ minLength: 3, maxLength: 24 })
             .filter((value) => /\S/.test(value))
             .map((value) => value.trim()),
-        historyStatuses.map((statuses) =>
-            statuses.map((status, index) => createHistoryEntry(status, index))
-        ),
-        historyStatuses.map((statuses) =>
-            statuses.map((status, index) =>
-                createHistoryEntry(status, index + 10)
-            )
-        ),
-        fc.constantFrom<MonitorStatus>("up", "down", "pending", "unknown"),
+        historyEntries,
+        snapshotHistoryEntries,
+        fc.constantFrom<MonitorStatus>(...MONITOR_STATUS_VALUES),
     ])(
         "applies snapshot data without disturbing unaffected monitors",
         (
@@ -243,10 +261,11 @@ describe("applyStatusUpdateSnapshot", () => {
             };
 
             const [updatedSite] = applyStatusUpdateSnapshot([site], payload);
-            const updatedMonitor = updatedSite.monitors.find(
+            const resolvedSite = ensureSite(updatedSite);
+            const updatedMonitor = resolvedSite.monitors.find(
                 ({ id }) => id === monitorId
             );
-            const untouchedMonitor = updatedSite.monitors.find(
+            const untouchedMonitor = resolvedSite.monitors.find(
                 ({ id }) => id === siblingMonitor.id
             );
 

@@ -360,14 +360,20 @@ describe("validateMonitorFormData advanced monitor coverage", () => {
     it.each(missingFieldCases)(
         "returns explicit error when %s is missing for %s monitors",
         async (_fieldName, _monitorType, field, scenario) => {
-            const invalidData: Record<string, unknown> = {
+            let invalidData: Record<string, unknown> = {
                 ...scenario.validData,
             };
 
             if (field.invalidValue === undefined) {
-                delete invalidData[field.field];
+                const { [field.field]: removedValue, ...remainingData } =
+                    invalidData;
+                void removedValue;
+                invalidData = remainingData;
             } else {
-                invalidData[field.field] = field.invalidValue;
+                invalidData = {
+                    ...invalidData,
+                    [field.field]: field.invalidValue,
+                };
             }
 
             const result = await validateMonitorFormData(

@@ -151,5 +151,79 @@ test.describe(
                 ).toBe(true);
             }
         );
+
+        test(
+            "should enforce server heartbeat dynamic field validation before creation",
+            {
+                tag: ["@validation", "@monitor-types"],
+            },
+            async () => {
+                const heartbeatSiteName = generateSiteName(
+                    "Server Heartbeat Validation"
+                );
+
+                await openAddSiteModal(page);
+                await fillAddSiteForm(page, {
+                    monitorType: "server-heartbeat",
+                    name: heartbeatSiteName,
+                });
+
+                const heartbeatFieldLabels = [
+                    /Heartbeat URL/i,
+                    /Status Field/i,
+                    /Expected Status/i,
+                    /Timestamp Field/i,
+                    /Max Drift \(seconds\)/i,
+                ];
+
+                for (const label of heartbeatFieldLabels) {
+                    const fieldInput = page.getByLabel(label);
+                    await fieldInput.fill("");
+                }
+
+                await page.getByRole("button", { name: /Add Site/i }).click();
+
+                await expect(page.getByTestId("add-site-form")).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
+
+                const siteCountAfterInvalid = await page.evaluate(async () => {
+                    const automationWindow = window as typeof window & {
+                        electronAPI?: {
+                            sites?: {
+                                getSites?: () => Promise<unknown>;
+                            };
+                        };
+                    };
+
+                    const response =
+                        await automationWindow.electronAPI?.sites?.getSites?.();
+                    return Array.isArray(response) ? response.length : 0;
+                });
+                expect(siteCountAfterInvalid).toBe(0);
+
+                await fillAddSiteForm(page, {
+                    dynamicFields: [
+                        { label: "Status Field", value: "data.status" },
+                        { label: "Expected Status", value: "running" },
+                        { label: "Timestamp Field", value: "data.timestamp" },
+                        { label: "Max Drift (seconds)", value: "60" },
+                    ],
+                    monitorType: "server-heartbeat",
+                    name: heartbeatSiteName,
+                    url: "https://heartbeat.example.com/api",
+                });
+
+                await submitAddSiteForm(page);
+
+                const heartbeatSiteCard = getSiteCardLocator(
+                    page,
+                    heartbeatSiteName
+                );
+                await expect(heartbeatSiteCard).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+            }
+        );
     }
 );

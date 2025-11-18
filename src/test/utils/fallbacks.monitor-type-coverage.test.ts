@@ -76,11 +76,13 @@ function createMonitorFixture(
 describe("getMonitorDisplayIdentifier monitor type coverage", () => {
     const fallbackLabel = "Site Fallback";
 
-    const monitorTypeCases: Array<{
+    interface MonitorTypeCase {
         readonly description: string;
         readonly expected: string;
         readonly monitor: Monitor;
-    }> = [
+    }
+
+    const monitorTypeCases = [
         {
             description: "http-header monitors reuse the request URL",
             monitor: createMonitorFixture("http-header", {
@@ -146,12 +148,12 @@ describe("getMonitorDisplayIdentifier monitor type coverage", () => {
         {
             description: "WebSocket keepalive monitors emit their endpoint URL",
             monitor: createMonitorFixture("websocket-keepalive", {
-                maxPongDelayMs: 5_000,
+                maxPongDelayMs: 5000,
                 url: "wss://socket.example.com/keepalive",
             }),
             expected: "wss://socket.example.com/keepalive",
         },
-    ];
+    ] as const satisfies readonly MonitorTypeCase[];
 
     it.each(monitorTypeCases)("$description", ({ monitor, expected }) => {
         expect(getMonitorDisplayIdentifier(monitor, fallbackLabel)).toBe(
