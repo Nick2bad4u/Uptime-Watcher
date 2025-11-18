@@ -60,8 +60,7 @@
         "reports/**",
         "../.cache/builds/dist-playwright",
         "../coverage/**",
-        "../node_modules/**",
-        "codegen-template.mjs"
+        "../node_modules/**"
     ],
     "extends": "../tsconfig.json",
     "include": [
@@ -74,7 +73,8 @@
         "fixtures/**/*.tsx",
         "fixtures/**/*.js",
         "fixtures/**/*.mjs",
-        "fixtures/**/*.cjs"
+        "fixtures/**/*.cjs",
+        "**/codegen-template.mjs"
     ],
     "references": [
         {
