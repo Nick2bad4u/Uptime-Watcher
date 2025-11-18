@@ -7,6 +7,12 @@ import GitHubButton from "react-github-btn";
 import styles from "../pages/index.module.css";
 import { useGitHubStats, usePackageVersion } from "../hooks/useGitHubStats";
 
+/**
+ * Renders the GitHub statistics panel on the documentation home page.
+ *
+ * @returns A React node displaying star counts and the latest release version,
+ *   or a loading indicator while data is being fetched.
+ */
 export default function GitHubStatsComponent(): ReactNode {
     const { loading: statsLoading, stats } = useGitHubStats();
     const { loading: versionLoading, version } = usePackageVersion();

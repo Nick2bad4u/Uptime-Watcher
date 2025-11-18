@@ -44,6 +44,7 @@ export interface DetailLabelProperties {
     readonly monitorType: MonitorType;
 }
 
+/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
 /**
  * Conditionally renders children based on monitor type's response time support.
  *
@@ -57,7 +58,6 @@ export interface DetailLabelProperties {
  *
  * @public
  */
-/* eslint-disable @typescript-eslint/no-unsafe-type-assertion -- Safe: Error type casting in catch blocks for logging */
 export function ConditionalResponseTime({
     children,
     fallback,

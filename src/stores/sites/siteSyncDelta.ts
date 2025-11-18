@@ -22,4 +22,8 @@ export function calculateSiteSyncDelta(
     return sharedCalculateSiteSyncDelta(previousSites, nextSites);
 }
 
+/**
+ * Renderer-scoped alias of the shared {@link SiteSyncDelta} type used by the
+ * sites store.
+ */
 export type SiteSyncDelta = SharedSiteSyncDelta;

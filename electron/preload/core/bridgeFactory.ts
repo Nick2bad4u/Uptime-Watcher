@@ -27,6 +27,11 @@ import {
     preloadLogger,
 } from "../utils/preloadLogger";
 
+/**
+ * Canonical IPC response shape used by the preload bridge.
+ *
+ * @typeParam T - Payload type carried by a successful IPC response.
+ */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
 
 const DIAGNOSTICS_CHANNEL = "diagnostics-verify-ipc-handler" as const;
@@ -74,9 +79,15 @@ export function resetDiagnosticsVerificationStateForTesting(): void {
 }
 
 /**
- * Event listener management types
+ * Event callback signature used when registering IPC listeners from the preload
+ * bridge.
  */
 export type EventCallback = (...args: unknown[]) => void;
+
+/**
+ * Function returned by IPC subscription helpers that removes the corresponding
+ * listener when invoked.
+ */
 export type RemoveListener = () => void;
 
 /**

@@ -70,6 +70,11 @@ type MonitorValidationResult<TContext> =
     | { context: TContext; kind: "context" }
     | { kind: "error"; result: MonitorCheckResult };
 
+/**
+ * Concrete monitor service instance produced by
+ * {@link createHttpMonitorService}, exposing the standard {@link IMonitorService}
+ * contract plus access to the resolved {@link MonitorConfig}.
+ */
 export type HttpMonitorServiceInstance = IMonitorService & {
     getConfig: () => MonitorConfig;
 };

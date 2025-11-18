@@ -299,6 +299,21 @@ type WebsocketKeepaliveOptionalKeys = "maxPongDelayMs" | "url";
  * @public
  */
 /* eslint-disable no-redeclare -- Function overloads are legitimate TypeScript pattern */
+/**
+ * Creates default monitor form data for the specified monitor type.
+ *
+ * @remarks
+ * This overloaded helper centralizes the initial values used by the add-site
+ * and monitor editing flows so that new monitor types can define sensible
+ * defaults in one place.
+ *
+ * @param type - Monitor type identifier for which to generate default form
+ *   data.
+ *
+ * @returns A partially-populated form data object with required fields for the
+ *   given monitor type.
+ */
+/* eslint-disable tsdoc-require/require -- Overloaded signatures share the implementation TSDoc. */
 export function createDefaultFormData(
     type: "cdn-edge-consistency"
 ): SetOptional<CdnEdgeConsistencyFormData, CdnEdgeConsistencyOptionalKeys>;
@@ -353,6 +368,8 @@ export function createDefaultFormData(
         type,
     };
 }
+
+/* eslint-enable tsdoc-require/require -- re-enable after overloaded signatures */
 
 /**
  * Type guard to check if form data is for HTTP monitor.

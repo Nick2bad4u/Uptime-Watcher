@@ -200,7 +200,6 @@ export function isValidNumeric(
  *
  * @public
  */
-
 export function isValidHost(value: unknown): value is string {
     if (typeof value !== "string") {
         return false;

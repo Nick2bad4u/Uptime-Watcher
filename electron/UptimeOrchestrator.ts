@@ -186,6 +186,12 @@ function mergeSiteSnapshots(canonicalSite: Site, cachedSite?: Site): Site {
     } satisfies Site;
 }
 
+/**
+ * Core application orchestrator responsible for wiring together the monitoring,
+ * database, and event-bus subsystems in the Electron main process.
+ *
+ * @public
+ */
 export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     /**
      * Database manager for all data persistence operations.
@@ -1944,12 +1950,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
     public getHistoryLimit(): number {
         return this.databaseManager.getHistoryLimit();
     }
-
-    // Site Management Operations
-
-    // Monitoring Operations
-
-    // Database Operations
 
     /**
      * Set up database manager event handlers.

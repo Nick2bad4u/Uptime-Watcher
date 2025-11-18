@@ -21,6 +21,10 @@ const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
       })()
     : config.stories;
 
+/**
+ * Legacy Storybook configuration shim used to bridge the new `storybook/`
+ * directory structure with the classic `.storybook` entry points.
+ */
 const storybookConfig: StorybookConfig = {
     ...config,
     addons,

@@ -20,6 +20,9 @@ import {
 
 const dirname = import.meta.dirname;
 
+/**
+ * Vitest configuration for shared utility and cross-process test suites.
+ */
 const vitestConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-shared",
     esbuild: {

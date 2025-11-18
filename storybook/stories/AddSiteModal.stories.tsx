@@ -47,6 +47,9 @@ const withAddSiteEnvironment: Decorator = (StoryComponent) => {
     return <StoryComponent />;
 };
 
+/**
+ * Storybook metadata for the {@link AddSiteModal} component stories.
+ */
 const meta: Meta<typeof AddSiteModal> = {
     args: {
         onClose: action("add-site-modal/close"),

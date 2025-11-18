@@ -143,6 +143,13 @@ function isImportContext(
     return typeof data === "string";
 }
 
+/**
+ * Base class for database commands executed by the
+ * {@link DatabaseCommandExecutor}.
+ *
+ * @typeParam TResult - The result type produced by the command when
+ *   {@link DatabaseCommand.execute} resolves.
+ */
 export abstract class DatabaseCommand<TResult = void>
     implements IDatabaseCommand<TResult>
 {

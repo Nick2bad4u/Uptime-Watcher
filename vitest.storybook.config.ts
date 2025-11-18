@@ -121,6 +121,9 @@ const createStorybookVitestConfig = async (): Promise<ViteUserConfig> => {
     };
 };
 
+/**
+ * Vitest configuration tailored for running tests against Storybook stories.
+ */
 const storybookVitestConfig: ViteUserConfigExport = defineConfig(
     createStorybookVitestConfig
 );

@@ -40,6 +40,9 @@ const STATUS_HEADLINE: Record<MonitorStatus, string> = {
 
 const CloseIcon = AppIcons.ui.close;
 
+/**
+ * Properties for the {@link StatusAlertToast} component.
+ */
 export interface StatusAlertToastProperties {
     readonly alert: StatusAlert;
     readonly onDismiss: (id: string) => void;

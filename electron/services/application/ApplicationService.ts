@@ -77,6 +77,12 @@ const hasCloseFunction = (
     "close" in candidate &&
     typeof (candidate as { close?: unknown }).close === "function";
 
+/**
+ * High-level coordinator responsible for wiring Electron application lifecycle
+ * events to the underlying service container and orchestrator.
+ *
+ * @public
+ */
 export class ApplicationService {
     /**
      * The container for all application services.

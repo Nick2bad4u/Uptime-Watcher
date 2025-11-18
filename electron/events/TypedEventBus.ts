@@ -108,6 +108,10 @@ export interface EventBusDiagnostics {
  * @throws Error if the middleware wishes to abort event processing.
  */
 
+/**
+ * Middleware function signature used by {@link TypedEventBus} to process events
+ * before they are emitted to listeners.
+ */
 export type EventMiddleware<T = unknown> = (
     event: string,
     data: T,

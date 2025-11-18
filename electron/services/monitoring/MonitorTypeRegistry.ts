@@ -126,7 +126,10 @@ export interface BaseMonitorConfig {
     readonly version: string;
 }
 
-// UI configuration for monitor type display
+/**
+ * UI configuration used by the frontend to render monitor-type specific labels,
+ * help text, and analytics controls.
+ */
 export interface MonitorUIConfig {
     /** Chart data formatters */
     chartFormatters?: {
@@ -1251,7 +1254,14 @@ export function createMonitorWithTypeGuards(
     };
 }
 
-// Type guard for runtime validation
+/**
+ * Runtime type guard that verifies a value is a string corresponding to a
+ * registered monitor type.
+ *
+ * @param type - Unknown value to validate.
+ *
+ * @returns `true` when the value is a registered monitor type string.
+ */
 export function isValidMonitorTypeGuard(type: unknown): type is string {
     return typeof type === "string" && isValidMonitorType(type);
 }

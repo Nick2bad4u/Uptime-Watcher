@@ -13,6 +13,9 @@ import log from "electron-log/main";
 
 import * as loggerModule from "../../utils/logger";
 
+/**
+ * Snapshot of IPC diagnostics metrics maintained by the main process.
+ */
 export interface DiagnosticsMetricsSnapshot {
     lastMissingChannel?: string;
     lastPreloadGuard?: {

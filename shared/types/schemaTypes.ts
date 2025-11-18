@@ -83,7 +83,9 @@ type MonitorSchemaShape<TAdditional extends z.ZodRawShape> =
 type MonitorSchema<TAdditional extends z.ZodRawShape> = z.ZodObject<
     MonitorSchemaShape<TAdditional>
 >;
-
+/**
+ * Base monitor Zod schema type shared by all monitor variants.
+ */
 export type BaseMonitorSchemaType = MonitorSchema<{
     type: MonitorTypeEnum;
 }>;

@@ -24,6 +24,15 @@ import baseViteConfig from "../../vite.config";
 // Use isolated caches so zero-coverage probes do not contend with the primary Vite/Vitest pipeline.
 const zeroCoverageViteCacheDir = "./.cache/vite-zero-coverage/";
 
+/**
+ * Vitest configuration tuned for zero-coverage detection runs.
+ *
+ * @remarks
+ * This configuration disables global coverage thresholds and limits
+ * instrumentation to files touched by each spec so that the
+ * `scripts/run-fast-check-fuzzing.ts` utilities can cheaply discover untested
+ * modules.
+ */
 const zeroCoverageConfig: ViteUserConfigFnObject = defineConfig((env) =>
     mergeConfig(
         baseViteConfig(env),

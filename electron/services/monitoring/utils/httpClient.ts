@@ -174,6 +174,16 @@ const DEFAULT_MAX_CONTENT_LENGTH =
 const DEFAULT_MAX_BODY_LENGTH =
     Number.parseInt(getEnv("UW_HTTP_MAX_BODY_LENGTH", `${8 * 1024}`), 10) ||
     8 * 1024; // 8KB request body cap
+
+/**
+ * Creates a hardened Axios HTTP client instance suitable for monitor services.
+ *
+ * @param config - Normalized monitor configuration containing HTTP transport
+ *   options.
+ *
+ * @returns Configured Axios instance with pooling, bounds, and timing
+ *   interceptors enabled.
+ */
 export function createHttpClient(config: MonitorConfig): AxiosInstance {
     const headers: Record<string, string> = {};
     if (config.userAgent !== undefined) {

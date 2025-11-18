@@ -13,6 +13,10 @@ import { useCallback } from "react";
 
 import { requestConfirmation } from "../../stores/ui/useConfirmDialogStore";
 
+/**
+ * Options accepted by the {@link useConfirmDialog} hook when requesting a
+ * confirmation dialog.
+ */
 export type ConfirmDialogOptions = Parameters<typeof requestConfirmation>[0];
 
 /**

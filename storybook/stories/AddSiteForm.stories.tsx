@@ -35,6 +35,9 @@ const withMonitorTypes: Decorator = (StoryComponent) => {
     return <StoryComponent />;
 };
 
+/**
+ * Storybook metadata for the {@link AddSiteForm} component stories.
+ */
 const meta: Meta<typeof AddSiteForm> = {
     args: {
         onSuccess: action("add-site-form/success"),

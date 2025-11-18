@@ -1,14 +1,6 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair -- Docusaurus Requirement */
 /* eslint-disable import-x/no-anonymous-default-export -- Docusaurus Requirement */
 /* eslint-disable tsdoc/syntax -- Docusaurus Requirement */
-/**
- * Stylelint configuration for the Uptime Watcher project. Enforces modern CSS
- * coding standards, logical properties, OKLCH colors, and best practices.
- *
- * Extends stylelint-config-standard which provides sensible defaults for CSS
- * property order, formatting, and modern CSS practices.
- */
-/** @type {import("stylelint").Config} */
 
 /**
  * Type definition for the complete Stylelint configuration object.
@@ -26,6 +18,14 @@
 /** @typedef {import("stylelint").LinterOptions} */
 /** @typedef {import("stylelint").GetPostcssOptions} */
 
+/**
+ * Stylelint configuration for the Uptime Watcher project. Enforces modern CSS
+ * coding standards, logical properties, OKLCH colors, and best practices.
+ *
+ * Extends stylelint-config-standard which provides sensible defaults for CSS
+ * property order, formatting, and modern CSS practices.
+ */
+/** @type {import("stylelint").Config} */
 export default {
     extends: [
         "stylelint-config-standard",

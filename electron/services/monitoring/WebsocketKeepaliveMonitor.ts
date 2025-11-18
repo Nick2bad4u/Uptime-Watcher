@@ -31,6 +31,10 @@ import {
 
 const DEFAULT_PONG_TIMEOUT_MS = 1500;
 
+/**
+ * Monitor service that validates WebSocket connectivity using a ping/pong-style
+ * keepalive handshake.
+ */
 export class WebsocketKeepaliveMonitor implements IMonitorService {
     private config: MonitorConfig;
 

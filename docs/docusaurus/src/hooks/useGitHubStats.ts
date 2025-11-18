@@ -2,21 +2,35 @@
 
 import { useEffect, useState } from "react";
 
+/**
+ * Shape of the GitHub repository statistics response used by the documentation
+ * site.
+ */
 interface GitHubStats {
     stargazers_count: number;
     watchers_count: number;
 }
 
+/**
+ * Minimal package.json shape required to read the current version from the
+ * GitHub repository.
+ */
 interface PackageInfo {
     version: string;
 }
 
+/**
+ * State returned by the {@link useGitHubStats} hook.
+ */
 interface UseGitHubStatsReturn {
     error: null | string;
     loading: boolean;
     stats: GitHubStats | null;
 }
 
+/**
+ * State returned by the {@link usePackageVersion} hook.
+ */
 interface UsePackageVersionReturn {
     error: null | string;
     loading: boolean;
@@ -44,6 +58,12 @@ function isPackageInfo(data: unknown): data is PackageInfo {
     );
 }
 
+/**
+ * Fetches and exposes GitHub repository statistics for the documentation site.
+ *
+ * @returns Loading, error, and stats information for the
+ *   `Nick2bad4u/Uptime-Watcher` repository.
+ */
 export function useGitHubStats(): UseGitHubStatsReturn {
     const [stats, setStats] = useState<GitHubStats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -83,6 +103,13 @@ export function useGitHubStats(): UseGitHubStatsReturn {
     return { error, loading, stats };
 }
 
+/**
+ * Fetches and exposes the latest package version from the main branch
+ * package.json.
+ *
+ * @returns Loading, error, and semantic version information for the published
+ *   application.
+ */
 export function usePackageVersion(): UsePackageVersionReturn {
     const [version, setVersion] = useState<string>("12.5.0");
     const [loading, setLoading] = useState(true);

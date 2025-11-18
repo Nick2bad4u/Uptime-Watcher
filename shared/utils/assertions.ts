@@ -40,6 +40,16 @@ function describeValue(v: unknown): string {
     }
 }
 
+/**
+ * Helper for enforcing exhaustive checks in discriminated unions.
+ *
+ * @param value - Value that should be impossible at this point in the control
+ *   flow.
+ * @param context - Optional label describing the check site.
+ *
+ * @throws Always throws an error including a description of the unexpected
+ *   value.
+ */
 export function assertNever(
     value: never,
     context: string = "exhaustive-check"

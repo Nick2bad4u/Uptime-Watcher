@@ -19,6 +19,9 @@ import {
 
 const dirname = import.meta.dirname;
 
+/**
+ * Vitest configuration for Electron backend test suites.
+ */
 const vitestConfig = defineConfig({
     cacheDir: "./.cache/vitest/.vitest-backend",
     esbuild: {

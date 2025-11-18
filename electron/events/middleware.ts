@@ -245,6 +245,10 @@ const EVENT_EMITTED_MSG = "[EventBus] Event emitted";
  */
 /* eslint-disable n/callback-return -- Middleware pattern doesn't follow Node.js callback convention */
 
+/**
+ * Composes multiple {@link EventMiddleware} functions into a single middleware
+ * chain.
+ */
 export function composeMiddleware(
     ...middlewares: EventMiddleware[]
 ): EventMiddleware {
@@ -296,6 +300,10 @@ export function composeMiddleware(
  *   information
  */
 
+/**
+ * Creates an {@link EventMiddleware} instance that logs event processing for
+ * debugging purposes.
+ */
 export function createDebugMiddleware(options: {
     enabled?: boolean;
     verbose?: boolean;

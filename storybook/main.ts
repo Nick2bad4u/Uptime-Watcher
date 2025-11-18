@@ -40,12 +40,20 @@ const coverageOptions: AddonOptionsVite = {
     },
 };
 
+/**
+ * Primary Storybook configuration for the React/Vite renderer.
+ *
+ * @remarks
+ * This config is shared between the modern `storybook/` layout and the legacy
+ * `.storybook` shim to keep addons and Vite settings aligned.
+ */
 const config: StorybookConfig = {
     addons: [
         "@storybook/addon-a11y",
         "@storybook/addon-docs",
         "@storybook/addon-links",
         "@storybook/addon-themes",
+        "storybook-addon-jsx",
         {
             name: "@storybook/addon-coverage",
             options: coverageOptions,

@@ -208,12 +208,19 @@ const withApplicationProviders: Decorator = (storyFn, context) => {
     return createElement(ApplicationProvidersDecorator);
 };
 
+/**
+ * Default Mock Service Worker options used to initialize Storybook network
+ * handlers.
+ */
 const mswInitializeOptions: Parameters<typeof initialize>[0] = {
     onUnhandledRequest: "bypass",
 };
 
 initialize(mswInitializeOptions);
 
+/**
+ * Global Storybook preview configuration shared across all stories.
+ */
 const preview: Preview = {
     decorators: [withTailwindThemeClasses, withApplicationProviders],
     initialGlobals: {

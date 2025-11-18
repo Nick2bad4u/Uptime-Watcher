@@ -8,6 +8,8 @@
  * @packageDocumentation
  */
 
+/* eslint-disable tsdoc-require/require -- This module has comprehensive TSDoc coverage, but the tsdoc-require rule currently mis-detects documentation on normalizeMonitor due to nearby directives and complex comments. */
+
 import type { UnknownRecord } from "type-fest";
 
 import {
@@ -933,6 +935,8 @@ export function normalizeMonitor(monitor: Partial<Monitor>): Monitor {
 
     return baseMonitor;
 }
+
+/* eslint-enable tsdoc-require/require -- Re-enable after normalizeMonitor documentation */
 /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe monitor configuration type assertions */
 
 /**

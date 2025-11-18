@@ -36,10 +36,15 @@ import { SiteNotFoundError } from "./interfaces";
 import { deleteSiteWithAdapters } from "./siteDeletion";
 
 /**
- * Service for handling site writing operations. Separates data operations from
- * side effects for better testability.
+ * Service responsible for writing site and monitor records to the database.
+ *
+ * @remarks
+ * Encapsulates multi-step write operations behind a testable API so callers do
+ * not need to manage transactions, cache updates, or repository wiring
+ * directly.
+ *
+ * @public
  */
-
 export class SiteWriterService {
     private readonly databaseService: DatabaseService;
 

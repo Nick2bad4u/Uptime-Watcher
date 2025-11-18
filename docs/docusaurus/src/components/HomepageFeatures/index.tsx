@@ -103,6 +103,12 @@ const FeatureList: FeatureItem[] = [
     },
 ];
 
+/**
+ * Displays the feature grid on the documentation home page.
+ *
+ * @returns A section element highlighting the primary benefits of Uptime
+ *   Watcher.
+ */
 export default function HomepageFeatures(): ReactNode {
     return (
         <section className={styles["features"]}>

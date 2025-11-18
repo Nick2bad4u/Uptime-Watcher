@@ -69,6 +69,10 @@ export const eventMetadataSchema: z.ZodType<EventMetadata> = z
  * @public
  */
 /* eslint-disable perfectionist/sort-interfaces -- Maintain timestamp-first ordering to satisfy sort-class-members. */
+/**
+ * Common base shape shared by all event payloads emitted through the typed
+ * event bus.
+ */
 export interface BaseEventData {
     /** The time (in milliseconds since epoch) when the event occurred. */
     readonly timestamp: number;

@@ -224,19 +224,24 @@ export interface OverflowMarqueeOptions<ElementType extends HTMLElement> {
 }
 
 /**
- * Detects horizontal overflow to support marquee animations.
- *
- * @param dependencies - Values that should trigger an overflow re-evaluation
- *   when they change (e.g., content strings, layout toggles).
- *
- * @returns {@link OverflowMarqueeReturn} With the container ref and current
- *   overflow state.
- *
- * @public
+ * Reducer used by {@link useOverflowMarquee} to avoid unnecessary state updates
+ * when the overflow state has not changed.
  */
 const overflowReducer = (state: boolean, next: boolean): boolean =>
     state === next ? state : next;
 
+/**
+ * Detects horizontal overflow to support marquee-style animations and
+ * truncation indicators.
+ *
+ * @typeParam ElementType - Element type whose overflow should be tracked.
+ *
+ * @param options - Configuration including an optional external ref and
+ *   dependency list used to trigger re-measurement.
+ *
+ * @returns {@link OverflowMarqueeReturn} With the container ref and current
+ *   overflow state.
+ */
 export function useOverflowMarquee<
     ElementType extends HTMLElement = HTMLElement,
 >(

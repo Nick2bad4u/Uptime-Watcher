@@ -4,6 +4,9 @@ import { defineConfig, mergeConfig } from "vitest/config";
 
 import baseConfig from "./vitest.config";
 
+/**
+ * Vitest configuration variant used by Stryker mutation testing runs.
+ */
 const config = defineConfig((configEnv) => {
     const resolvedBase = baseConfig(configEnv);
 

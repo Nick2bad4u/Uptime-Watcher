@@ -47,6 +47,13 @@ const modernEnhancementsClientModule = fileURLToPath(
     new URL("src/js/modernEnhancements.ts", import.meta.url)
 );
 
+/**
+ * Docusaurus site configuration for the Uptime Watcher documentation.
+ *
+ * @remarks
+ * Controls the docs, blog, pages, theming, plugins, and deployment settings
+ * used when building the documentation site hosted on GitHub Pages.
+ */
 const config: Config = {
     // Set the /<baseUrl>/ pathname under which your site is served
     baseUrl,

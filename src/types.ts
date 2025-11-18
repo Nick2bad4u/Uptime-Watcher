@@ -14,6 +14,9 @@ import type {
 
 type RendererSystemApi = SystemDomainBridge;
 
+/**
+ * Strongly typed renderer-side view of the Electron preload bridge API.
+ */
 export type ElectronAPI = ElectronBridgeApi<
     EventsDomainBridge,
     RendererSystemApi

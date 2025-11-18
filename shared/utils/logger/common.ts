@@ -6,6 +6,21 @@
  * log output regardless of execution environment.
  */
 
+/**
+ * Structured error payload for serialized Error instances.
+ *
+ * @remarks
+ * Used to ensure consistent error logging shape across process boundaries.
+ *
+ * @param cause - Optional error cause when provided.
+ * @param message - Error message for display.
+ * @param name - Error name for identification.
+ * @param stack - Optional stack trace if available.
+ *
+ * @returns Serialized error payload.
+ *
+ * @public
+ */
 export interface SerializedError {
     /** Optional error cause when provided. */
     readonly cause?: unknown;

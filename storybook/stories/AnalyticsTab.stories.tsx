@@ -238,6 +238,9 @@ const AnalyticsTabStory = ({
     );
 };
 
+/**
+ * Storybook metadata for the {@link AnalyticsTab} component stories.
+ */
 const meta: Meta<typeof AnalyticsTab> = {
     args: {
         avgResponseTime: 225,

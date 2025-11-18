@@ -157,6 +157,9 @@ export const buildPayloadPreview = (
     return undefined;
 };
 
+/**
+ * Context payload describing why a preload guard rejected a value or operation.
+ */
 export interface GuardFailureContext {
     readonly channel: string;
     readonly guard: string;

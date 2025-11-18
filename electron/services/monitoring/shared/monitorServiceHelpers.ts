@@ -10,12 +10,25 @@ import type { MonitorCheckResult } from "../types";
 
 import { createMonitorConfig as createMonitorConfigFactory } from "../createMonitorConfig";
 
+/**
+ * Derives a {@link NormalizedMonitorConfig} from a partial monitor and optional
+ * default values.
+ *
+ * @param partial - Monitor fields to derive configuration from.
+ * @param defaults - Optional overrides for normalized configuration defaults.
+ *
+ * @returns Fully normalized monitor configuration object.
+ */
 export function createMonitorConfig(
     partial: Partial<Monitor>,
     defaults: Partial<NormalizedMonitorConfigType> = {}
 ): NormalizedMonitorConfigType {
     return createMonitorConfigFactory(partial, defaults);
 }
+
+/**
+ * Normalized monitor configuration used by monitor service implementations.
+ */
 export type NormalizedMonitorConfig = NormalizedMonitorConfigType;
 
 /**
@@ -97,12 +110,28 @@ export function validateMonitorUrl(monitor: Monitor): null | string {
     return null;
 }
 
+/**
+ * Returns the provided value when it is not `null`/`undefined`, otherwise
+ * yields the specified fallback.
+ *
+ * @typeParam T - The value type.
+ *
+ * @param value - Candidate value to unwrap.
+ * @param fallback - Fallback value to use when `value` is nullish.
+ */
 export function withFallback<T>(value: null | T | undefined, fallback: T): T {
     return value ?? fallback;
 }
-
 const URL_LIST_SEPARATOR = /\r?\n|,/v;
 
+/**
+ * Parses a monitor URL list from a comma and/or newline separated string into a
+ * normalized array of non-empty, trimmed URLs.
+ *
+ * @param value - Raw URL list string to parse.
+ *
+ * @returns Array of normalized URL strings.
+ */
 export function parseMonitorUrlList(value: string): string[] {
     if (typeof value !== "string" || value.trim().length === 0) {
         return [];
@@ -114,6 +143,15 @@ export function parseMonitorUrlList(value: string): string[] {
         .filter((entry) => entry.length > 0);
 }
 
+/**
+ * Extracts a nested field value from an arbitrary object using a dot-separated
+ * path.
+ *
+ * @param source - Source object to traverse.
+ * @param path - Dot-separated path (for example `details.status.code`).
+ *
+ * @returns The nested value when found; otherwise `undefined`.
+ */
 export function extractNestedFieldValue(
     source: unknown,
     path: string
@@ -146,6 +184,15 @@ export function extractNestedFieldValue(
 
 const UNIX_SECONDS_THRESHOLD = 10_000_000_000;
 
+/**
+ * Normalizes a timestamp-like value into a Unix epoch millisecond value.
+ *
+ * @param value - Candidate timestamp expressed as a Date, seconds, or an
+ *   ISO/string representation.
+ *
+ * @returns Epoch milliseconds when the value can be interpreted as a timestamp;
+ *   otherwise `undefined`.
+ */
 export function normalizeTimestampValue(value: unknown): number | undefined {
     if (value instanceof Date) {
         return value.getTime();

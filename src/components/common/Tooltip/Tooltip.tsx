@@ -60,6 +60,9 @@ export interface TooltipTriggerProperties {
     readonly onTouchStart?: TouchEventHandler<HTMLElement>;
 }
 
+/**
+ * Properties for the {@link Tooltip} component.
+ */
 export interface TooltipProperties {
     /** Function that renders the trigger element */
     readonly children: (trigger: TooltipTriggerProperties) => ReactNode;

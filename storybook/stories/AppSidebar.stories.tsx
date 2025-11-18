@@ -110,6 +110,9 @@ const SidebarPreview = (): JSX.Element => {
     );
 };
 
+/**
+ * Storybook metadata for the application sidebar layout stories.
+ */
 const meta: Meta<AppSidebarStoryArgs> = {
     args: {
         isSidebarOpen: true,

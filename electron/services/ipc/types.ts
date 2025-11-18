@@ -8,7 +8,17 @@ import type {
     IpcValidationResponse as SharedIpcValidationResponse,
 } from "@shared/types/ipc";
 
+/**
+ * Canonical IPC response shape used by Electron IPC handlers.
+ *
+ * @typeParam T - Payload type carried by a successful IPC response.
+ */
 export type IpcResponse<T = unknown> = SharedIpcResponse<T>;
+
+/**
+ * Validation response shape returned when IPC parameter validation runs before
+ * invoking a handler.
+ */
 export type IpcValidationResponse = SharedIpcValidationResponse;
 
 /**
@@ -35,4 +45,8 @@ export interface IpcHandlerConfig<TParams = unknown[], TResult = unknown> {
  * @public
  */
 
+/**
+ * Function signature for validating IPC parameter arrays prior to handler
+ * execution.
+ */
 export type IpcParameterValidator = (params: unknown[]) => null | string[];

@@ -49,6 +49,9 @@ interface NormalizedTelemetry {
     readonly success: UnknownRecord;
 }
 
+/**
+ * Optional configuration flags accepted by site store operations.
+ */
 export interface SiteOperationOptions {
     readonly syncAfter?: boolean;
     readonly telemetry?: OperationTelemetryInput;

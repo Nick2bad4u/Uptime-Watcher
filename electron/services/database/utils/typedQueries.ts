@@ -22,6 +22,9 @@ export interface CountResult {
     count: number;
 }
 
+/**
+ * Database result shape containing only an auto-generated numeric ID.
+ */
 export interface IdOnlyResult {
     id: number;
 }

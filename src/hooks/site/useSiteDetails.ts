@@ -1,3 +1,6 @@
+/* eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- Disabled for entire file */
+/* eslint-disable complexity -- The useSiteDetails hook intentionally coordinates multiple store concerns and UI flows, and extracting smaller hooks would hurt cohesion. TSDoc is provided, but the rule currently mis-detects it. */
+
 /**
  * Custom hook for managing site details state and operations
  *
@@ -178,8 +181,6 @@ export interface UseSiteDetailsResult {
  *
  * @see {@link UseSiteDetailsResult} for the complete return shape.
  */
-
-// eslint-disable-next-line complexity -- Complex hook that manages multiple site detail states and operations, breaking down would reduce cohesion
 export function useSiteDetails({
     site,
 }: UseSiteDetailsProperties): UseSiteDetailsResult {

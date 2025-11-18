@@ -33,6 +33,10 @@ const ensurePluginArray = (value: UserConfig["plugins"]): PluginOption[] => {
     return [value as PluginOption];
 };
 
+/**
+ * Vite configuration used when running Playwright tests with coverage
+ * instrumentation enabled.
+ */
 const playwrightCoverageConfig: UserConfigExport = defineConfig(async (env) => {
     const baseConfigFn = baseViteConfig as UserConfigFn;
     const resolvedBaseConfig = await baseConfigFn(env);
