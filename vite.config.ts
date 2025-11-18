@@ -677,15 +677,15 @@ export default defineConfig(({ mode }) => {
                 "@shared": normalizePath(path.resolve(dirname, "shared")),
             },
             extensions: [
-                ".mjs",
-                ".js",
-                ".mts",
                 ".ts",
-                ".jsx",
                 ".tsx",
-                ".json",
+                ".js",
+                ".jsx",
+                ".mjs",
+                ".mts",
                 ".cjs",
                 ".cts",
+                ".json",
             ],
         },
         server: {
@@ -781,52 +781,51 @@ export default defineConfig(({ mode }) => {
                 clean: true, // Clean coverage directory before each run
                 cleanOnRerun: true, // Clean on rerun in watch mode
                 exclude: [
+                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files,
                     "**/*.config.*",
+                    "**/*.css", // CSS modules are transformed into JS stubs but contain no executable logic.
                     "**/*.d.ts",
-                    // CSS modules are transformed into JS stubs but contain no executable logic.
-                    "**/*.css",
-                    "**/*.scss",
-                    "**/*.sass",
                     "**/*.less",
+                    "**/*.sass",
+                    "**/*.scss",
+                    "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
                     "**/assets/**", // Exclude any assets folder anywhere
+                    "**/config/**",
                     "**/dist/**", // Exclude any dist folder anywhere
                     "**/docs/**", // Exclude documentation files
+                    "**/html/**",
                     "**/index.ts", // Exclude all barrel export files
                     "**/index.tsx", // Exclude JSX barrel export files
                     "**/node_modules/**",
-                    "src/**/types.ts", // Exclude type definition files only in src directory
-                    "**/types.tsx", // Exclude type definition files with JSX
-                    "src/**/baseTypes.ts", // Exclude interface-only files that contain only TypeScript interfaces
-                    "src/test/**",
-                    "shared/test",
-                    "coverage/**",
-                    "electron/**", // Exclude all electron files from frontend coverage
-                    "playwright/**", // Exclude all playwright files from coverage
                     "**/playwright/**", // Exclude playwright directories anywhere
-                    "index.ts", // Barrel export file at root
-                    "release/**",
-                    "scripts/**",
-                    "report/**", // Exclude report files
-                    "benchmarks/**", // Exclude all benchmark files from coverage
-                    "html/**", // Exclude generated HTML files
-                    "**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-                    "**/*.bench.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}", // Exclude benchmark files,
-                    ".stryker-tmp/**", // Exclude Stryker mutation testing temp files
-                    "reports/**", // Exclude test report files
-                    "stryker_prompts_by_mutator/**",
+                    "**/types.tsx", // Exclude type definition files with JSX
                     "**/types/**",
-                    "**/html/**",
-                    "**/config/**",
-                    "shared",
-                    "out",
-                    "storybook/**",
-                    "temp",
-                    "temp/**",
                     ".cache",
                     ".cache/**",
                     ".coverage",
                     ".storybook/**",
+                    ".stryker-tmp/**", // Exclude Stryker mutation testing temp files
+                    "benchmarks/**", // Exclude all benchmark files from coverage
+                    "coverage/**",
+                    "electron/**", // Exclude all electron files from frontend coverage
+                    "html/**", // Exclude generated HTML files
+                    "index.ts", // Barrel export file at root
+                    "out",
+                    "playwright/**", // Exclude all playwright files from coverage
+                    "release/**",
+                    "report/**", // Exclude report files
+                    "reports/**", // Exclude test report files
+                    "scripts/**",
+                    "shared",
+                    "shared/test",
+                    "src/**/baseTypes.ts", // Exclude interface-only files that contain only TypeScript interfaces
+                    "src/**/types.ts", // Exclude type definition files only in src directory
+                    "src/test/**",
                     "storybook-static/**",
+                    "storybook/**",
+                    "stryker_prompts_by_mutator/**",
+                    "temp",
+                    "temp/**",
                     ...coverageConfigDefaults.exclude,
                 ],
                 excludeAfterRemap: true, // Exclude files after remapping for accuracy
@@ -899,11 +898,11 @@ export default defineConfig(({ mode }) => {
             environment: "jsdom", // Default for React components
             // Test file patterns - exclude electron tests as they have their own config
             exclude: [
-                "**/node_modules/**",
-                "**/docs/**",
-                "**/dist/**",
-                "electron/**",
                 "**/coverage/**",
+                "**/dist/**",
+                "**/docs/**",
+                "**/node_modules/**",
+                "electron/**",
                 ...defaultExclude,
             ],
             expect: {
@@ -919,9 +918,7 @@ export default defineConfig(({ mode }) => {
             },
             fileParallelism: true,
             globals: true, // Enable global test functions (describe, it, expect)
-            include: [
-                "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
-            ],
+            include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
             includeTaskLocation: true,
             isolate: true,
             logHeapUsage: true,
@@ -984,9 +981,9 @@ export default defineConfig(({ mode }) => {
                 checker: "tsc",
                 enabled: true,
                 exclude: [
+                    "**/.{idea,git,cache,output,temp}/**",
                     "**/dist*/**",
                     "**/html/**",
-                    "**/.{idea,git,cache,output,temp}/**",
                     ...defaultExclude,
                 ],
                 ignoreSourceErrors: false,
