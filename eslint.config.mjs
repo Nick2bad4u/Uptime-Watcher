@@ -183,6 +183,8 @@ import pluginTopLevel from "eslint-plugin-toplevel";
 import pluginTotalFunctions from "eslint-plugin-total-functions";
 import pluginTsdoc from "eslint-plugin-tsdoc";
 // @ts-expect-error -- No Types for this Package
+import pluginTSDocRequire from "eslint-plugin-tsdoc-require";
+// @ts-expect-error -- No Types for this Package
 import pluginUndefinedCss from "eslint-plugin-undefined-css-classes";
 import pluginUnicorn from "eslint-plugin-unicorn";
 import pluginUnusedImports from "eslint-plugin-unused-imports";
@@ -367,7 +369,6 @@ export default /** @type {EslintConfig} */ [
     // @ts-expect-error: nitpick.configs.recommended may not have correct types, but runtime usage is verified and safe
     nitpick.configs.recommended,
     pluginComments.recommended,
-
     arrayFunc.configs.all,
     ...storybook.configs["flat/recommended"],
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1334,6 +1335,7 @@ export default /** @type {EslintConfig} */ [
             "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -1344,7 +1346,6 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript backend rules
-
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -2466,9 +2467,9 @@ export default /** @type {EslintConfig} */ [
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
             "total-functions/require-strict-mode": "off",
+            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
-            // Backend-specific unicorn rules
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -2726,6 +2727,7 @@ export default /** @type {EslintConfig} */ [
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -2736,7 +2738,6 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript rules
-
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -4054,9 +4055,9 @@ export default /** @type {EslintConfig} */ [
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
+            "tsdoc-require/require": "warn", // Optimized Unicorn rules (reduced false positives)
             // Documentation
             "tsdoc/syntax": "warn",
-            // Optimized Unicorn rules (reduced false positives)
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -4301,6 +4302,7 @@ export default /** @type {EslintConfig} */ [
             "switch-case": pluginSwitchCase,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -4311,7 +4313,6 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // TypeScript Backend (Electron) Rules
-
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -5425,9 +5426,9 @@ export default /** @type {EslintConfig} */ [
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
+            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
-            // Backend-specific unicorn rules
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -5689,6 +5690,7 @@ export default /** @type {EslintConfig} */ [
             tailwind: tailwind,
             "total-functions": fixupPluginRules(pluginTotalFunctions),
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "usememo-recommendations": pluginUseMemo,
@@ -7044,9 +7046,9 @@ export default /** @type {EslintConfig} */ [
             "total-functions/no-unsafe-mutable-readonly-assignment": "off",
             "total-functions/no-unsafe-readonly-mutable-assignment": "off",
             "total-functions/no-unsafe-type-assertion": "off",
+            "tsdoc-require/require": "warn", // Optimized Unicorn rules (reduced false positives)
             // Documentation
             "tsdoc/syntax": "warn",
-            // Optimized Unicorn rules (reduced false positives)
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -7270,7 +7272,6 @@ export default /** @type {EslintConfig} */ [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             // Relaxed function rules for tests (explicit for clarity)
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
@@ -7499,7 +7500,6 @@ export default /** @type {EslintConfig} */ [
             ...vitest.configs.recommended.rules,
             ...pluginUnicorn.configs.all.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
-
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -7729,7 +7729,6 @@ export default /** @type {EslintConfig} */ [
             ...pluginComments.recommended.rules,
             ...pluginTestingLibrary.configs["flat/react"].rules,
             ...pluginUnicorn.configs.all.rules,
-
             "@jcoreio/implicit-dependencies/no-implicit": "off",
             "@typescript-eslint/no-empty-function": "off", // Empty mocks/stubs are common
             "@typescript-eslint/no-explicit-any": "off",
@@ -8156,6 +8155,7 @@ export default /** @type {EslintConfig} */ [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -8164,7 +8164,6 @@ export default /** @type {EslintConfig} */ [
         rules: {
             // TypeScript Config Files Rules
             // TypeScript backend rules
-
             ...js.configs.all.rules,
             ...tseslint.configs["recommendedTypeChecked"],
             // @ts-expect-error -- Wrong or Missing Types due to old plugin, or types dont sastify strict mode
@@ -8582,9 +8581,9 @@ export default /** @type {EslintConfig} */ [
             "sonarjs/too-many-break-or-continue-in-loop": "warn",
             "sort-imports": "off",
             "sort-keys": "off",
+            "tsdoc-require/require": "warn", // Backend-specific unicorn rules
             // Documentation
             "tsdoc/syntax": "warn",
-            // Backend-specific unicorn rules
             "unicorn/filename-case": [
                 "warn",
                 {
@@ -8874,6 +8873,7 @@ export default /** @type {EslintConfig} */ [
             sonarjs: pluginSonarjs,
             "sort-class-members": pluginSortClassMembers,
             tsdoc: pluginTsdoc,
+            "tsdoc-require": pluginTSDocRequire,
             unicorn: pluginUnicorn,
             "unused-imports": pluginUnusedImports,
             "write-good-comments": pluginWriteGood,
@@ -9289,6 +9289,10 @@ export default /** @type {EslintConfig} */ [
             "storybook/no-renderer-packages": "warn",
             "storybook/no-stories-of": "warn",
             "storybook/no-title-property-in-meta": "warn",
+            // Story metadata is already documented by component-level TSDoc.
+            // Disable tsdoc-require here to avoid noisy warnings on Storybook
+            // `meta` objects that are not part of the public API surface.
+            "tsdoc-require/require": "off",
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -9434,7 +9438,6 @@ export default /** @type {EslintConfig} */ [
             "unicorn/no-instanceof-array": "off",
             "unicorn/no-length-as-slice-end": "off",
             "unicorn/prefer-spread": "off", // Prefer Array.from
-
             "write-good-comments/write-good-comments": "off", // Too strict
         },
     }, // eslint-config-prettier MUST be last to override conflicting rules

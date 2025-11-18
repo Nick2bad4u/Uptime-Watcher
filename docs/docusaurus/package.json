@@ -86,6 +86,8 @@
     "devDependencies": {
         "@docusaurus/module-type-aliases": "^3.9.2",
         "@docusaurus/tsconfig": "^3.9.2",
+        "@types/react": "^19.2.5",
+        "@types/react-dom": "^19.2.3",
         "cross-env": "^10.1.0",
         "typedoc": "^0.28.14",
         "typedoc-docusaurus-theme": "^1.4.2",
