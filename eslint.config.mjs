@@ -3430,7 +3430,11 @@ export default /** @type {EslintConfig} */ [
             "max-classes-per-file": "off",
             "max-lines": [
                 "warn",
-                { max: 1000, skipBlankLines: true, skipComments: true },
+                {
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
+                },
             ],
             "max-lines-per-function": [
                 "error",
@@ -5069,7 +5073,11 @@ export default /** @type {EslintConfig} */ [
             "max-classes-per-file": "off",
             "max-lines": [
                 "warn",
-                { max: 1000, skipBlankLines: true, skipComments: true },
+                {
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
+                },
             ],
             // Sonar quality helpers
             "max-lines-per-function": [
@@ -6420,7 +6428,11 @@ export default /** @type {EslintConfig} */ [
             "max-classes-per-file": "off",
             "max-lines": [
                 "warn",
-                { max: 1000, skipBlankLines: true, skipComments: true },
+                {
+                    max: 1000,
+                    skipBlankLines: true,
+                    skipComments: true,
+                },
             ],
             // Sonar quality helpers
             "max-lines-per-function": [

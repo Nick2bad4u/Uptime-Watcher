@@ -29,7 +29,37 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  *     | [string | Plugin | Preset, ...unknown[]]} PluginEntry
  */
 
-/** @typedef {import("remark-inline-links").default} remarkInlineLinks */
+// Imported plugin types - these plugins don't typically export specific option types
+/** @typedef {import("remark-inline-links")} RemarkInlineLinks */
+/** @typedef {import("remark-lint-heading-increment")} RemarkLintHeadingIncrement */
+/** @typedef {import("@double-great/remark-lint-alt-text")} RemarkLintAltText */
+/** @typedef {import("rehype-katex")} RehypeKatex */
+/** @typedef {import("remark-lint-no-blockquote-without-marker")} RemarkLintNoBlockquoteWithoutMarker */
+/** @typedef {import("remark-lint-definition-case")} RemarkLintDefinitionCase */
+/** @typedef {import("remark-lint-final-definition")} RemarkLintFinalDefinition */
+/** @typedef {import("remark-lint-no-unused-definitions")} RemarkLintNoUnusedDefinitions */
+/** @typedef {import("remark-lint-ordered-list-marker-style")} RemarkLintOrderedListMarkerStyle */
+/** @typedef {import("remark-lint-list-item-indent")} RemarkLintListItemIndent */
+/** @typedef {import("remark-lint-no-duplicate-headings")} RemarkLintNoDuplicateHeadings */
+/** @typedef {import("remark-lint-no-emphasis-as-heading")} RemarkLintNoEmphasisAsHeading */
+/** @typedef {import("remark-lint-no-heading-content-indent")} RemarkLintNoHeadingContentIndent */
+/** @typedef {import("remark-lint-no-file-name-articles")} RemarkLintNoFileNameArticles */
+/** @typedef {import("remark-lint-no-file-name-consecutive-dashes")} RemarkLintNoFileNameConsecutiveDashes */
+/** @typedef {import("remark-lint-no-file-name-outer-dashes")} RemarkLintNoFileNameOuterDashes */
+
+// Additional missing plugin types for completeness
+/** @typedef {import("remark-frontmatter")} RemarkFrontmatter */
+/** @typedef {import("remark-gfm")} RemarkGfm */
+/** @typedef {import("remark-preset-lint-recommended")} RemarkPresetLintRecommended */
+/** @typedef {import("remark-preset-lint-consistent")} RemarkPresetLintConsistent */
+/** @typedef {import("remark-preset-lint-markdown-style-guide")} RemarkPresetLintMarkdownStyleGuide */
+/** @typedef {import("remark-lint-correct-media-syntax")} RemarkLintCorrectMediaSyntax */
+/** @typedef {import("remark-lint-heading-whitespace")} RemarkLintHeadingWhitespace */
+/** @typedef {import("remark-validate-links")} RemarkValidateLinks */
+/** @typedef {import("remark-math")} RemarkMath */
+/** @typedef {import("remark-wiki-link")} RemarkWikiLink */
+/** @typedef {import("remark-directive")} RemarkDirective */
+/** @typedef {import("remark-preset-prettier")} RemarkPresetPrettier */
 
 /**
  * Remark settings for markdown processing
@@ -70,7 +100,7 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 // Plugin-specific options types
 /** @typedef {{ schemas?: Record<string, string[]> }} FrontmatterSchemaOptions */
 /** @typedef {import("remark-lint-mdx-jsx-quote-style").Options} QuoteStyle */
-/** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValue */
+/** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValueOptions */
 /** @typedef {import("remark-lint-file-extension").Options} FileExtensionOptions */
 /** @typedef {{ entries?: { pattern: string; snippets: string[] }[] }} RequireSnippetsOptions */
 /** @typedef {import("unified").Plugin<[RequireSnippetsOptions?], Root>} CustomValidationPlugin */
@@ -102,8 +132,11 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 /** @typedef {import("remark-lint-emphasis-marker").Options} EmphasisMarkerOptions */
 /** @typedef {import("remark-lint-strong-marker").Options} StrongMarkerOptions */
 /** @typedef {import("remark-lint-unordered-list-marker-style").Options} UnorderedListMarkerStyleOptions */
-/** @typedef {import("remark-lint-ordered-list-marker-value").Options} OrderedListMarkerValueOptions */
 /** @typedef {import("remark-lint-link-title-style").Options} LinkTitleStyleOptions */
+
+// Missing option types that are actually used in the config
+/** @typedef {{ case?: "lower" | "upper" }} FencedCodeFlagCaseOptions */
+/** @typedef {{ skipUrlPatterns?: (string | RegExp)[] }} NoDeadUrlsOptions */
 
 /** @type {RemarkConfig} */
 const remarkConfig = {
@@ -115,7 +148,7 @@ const remarkConfig = {
         // GitHub Flavored Markdown support (tables, strikethrough, checkboxes, etc.)
         "remark-gfm",
 
-        // Use only one main preset to avoid conflicts
+        // Core remark-lint presets: recommended rules, consistency, and style guide
         "remark-preset-lint-recommended", // Recommended best practices
         "remark-preset-lint-consistent", // Consistency rules
         "remark-preset-lint-markdown-style-guide", // Enforce common style guide
@@ -134,7 +167,7 @@ const remarkConfig = {
 
         /** @type {[string, ReferenceLinksOptions]} */
         // ["remark-reference-links", { collapseSpace: false }],
-        /** @type {[string, remarkInlineLinks]} */
+        /** @type {string} */
         "remark-inline-links",
         // Content analysis
         /** @type {[string, ["warn", WriteGoodOptions]]} */
@@ -193,7 +226,7 @@ const remarkConfig = {
         ["remark-lint-no-tabs", true], // Prevent tab characters
         ["remark-lint-hard-break-spaces", true], // Enforce proper line breaks
         ["remark-lint-linebreak-style", "unix"], // Normalize files to LF endings
-        ["remark-lint-no-missing-blank-lines", false], // Require blank lines between block nodes
+        ["remark-lint-no-missing-blank-lines", false], // Disabled: blank-line handling is delegated to Prettier and other rules
         ["remark-lint-no-paragraph-content-indent", true], // Disallow unintended paragraph indentation
 
         // List and heading formatting
@@ -238,6 +271,7 @@ const remarkConfig = {
         ["remark-lint-code-block-style", "fenced"], // Prefer fenced code blocks
         /** @type {[string, FencedCodeMarkerOptions]} */
         ["remark-lint-fenced-code-marker", "`"], // Use backticks for fenced code blocks
+        /** @type {[string, FencedCodeFlagCaseOptions]} */
         ["remark-lint-fenced-code-flag-case", { case: "lower" }], // Normalize language identifiers for Prettier compatibility
         "remark-lint-code-block-split-list", // Prevent poorly indented code fences from breaking list structure
 
@@ -257,7 +291,7 @@ const remarkConfig = {
 
         // File naming conventions
         ["remark-lint-no-file-name-irregular-characters", /[^-._\dA-Za-z]/], // Allow underscores in filenames
-        ["remark-lint-no-file-name-mixed-case", true], // Allow mixed case in filenames
+        ["remark-lint-no-file-name-mixed-case", true], // Enforce lowercase/kebab-case style filenames
         ["remark-lint-no-file-name-articles", true], // Avoid leading articles in filenames
         ["remark-lint-no-file-name-consecutive-dashes", true], // Prevent accidental double dashes
         ["remark-lint-no-file-name-outer-dashes", true], // Guard against leading/trailing dashes
@@ -275,14 +309,14 @@ const remarkConfig = {
 
         // Emphasis and style preferences
         /** @type {[string, EmphasisMarkerOptions]} */
-        ["remark-lint-emphasis-marker", "consistent"], // Allow both * and _
+        ["remark-lint-emphasis-marker", "consistent"], // Allow * or _ but require per-file consistency
         ["remark-lint-strikethrough-marker", "consistent"], // Keep ~~ delimiters uniform
         /** @type {[string, StrongMarkerOptions]} */
         ["remark-lint-strong-marker", "*"], // Prefer double asterisk for strong emphasis
         /** @type {[string, UnorderedListMarkerStyleOptions]} */
         ["remark-lint-unordered-list-marker-style", "-"], // Prefer hyphen list markers to match Prettier
         ["remark-lint-no-literal-urls", false], // Allow bare URLs for now
-        ["remark-lint-no-heading-punctuation", /[!,.;]/u], // Allow punctuation in headings
+        ["remark-lint-no-heading-punctuation", /[!,.;]/u], // Disallow headings ending with ! , . or ;
         ["remark-lint-table-cell-padding", false], // Don't require padded table cells
 
         // URL and link validation
