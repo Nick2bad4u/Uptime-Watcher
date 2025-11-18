@@ -77,7 +77,8 @@
  * @see {@link TypedEventBus} for event system implementation
  */
 
-/* eslint max-lines: ["error", { "max": 2100 }] -- Main orchestrator module */
+// eslint-disable-next-line comment-length/limit-multi-line-comments -- custom rule for eslint
+/* eslint max-lines: ["error", { "max": 2100, "skipBlankLines": true, "skipComments": true }] -- Main orchestrator module */
 
 import type {
     Monitor,
