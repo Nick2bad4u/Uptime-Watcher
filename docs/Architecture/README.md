@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-18"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -179,6 +179,77 @@ End-to-end walkthrough of the main-process site loading pipeline:
 - Asynchronous `MonitoringConfig` guarantees (history limit, start/stop propagation)
 - Renderer synchronization (`sites:state-synchronized`) and background hydration logic
 
+### History limit propagation (settings & database)
+
+This subsection summarizes how history limit changes flow through the system.
+For full implementation details, see the code references listed in
+`docs/Architecture/ADRs/ADR_002_EVENT_DRIVEN_ARCHITECTURE.md` and
+`docs/Architecture/ADRs/ADR_004_FRONTEND_STATE_MANAGEMENT.md`.
+
+**End-to-end flow**
+
+1. **Renderer settings request**
+   - The UI calls `SettingsService.updateHistoryLimit` in
+     `src/services/SettingsService.ts`.
+   - The service validates the requested limit with
+     `normalizeHistoryLimit(DEFAULT_HISTORY_LIMIT_RULES)` and forwards the
+     request over the typed IPC channel `"update-history-limit"` (via
+     `SETTINGS_CHANNELS.updateHistoryLimit`).
+
+2. **Main-process IPC handling**
+   - `electron/services/ipc/IpcService.ts` registers the
+     `SETTINGS_CHANNELS.updateHistoryLimit` handler through
+     `registerStandardizedIpcHandler`, delegating to
+     `DatabaseManager.setHistoryLimit` on the orchestrator.
+   - The IPC handler uses the shared parameter validators in
+     `electron/services/ipc/validators.ts` to enforce a numeric payload before
+     invoking the manager.
+
+3. **Database history limit update**
+   - `electron/managers/DatabaseManager.ts` normalizes the limit using the
+     shared history rules from `@shared/constants/history`.
+   - The manager calls `setHistoryLimit` in
+     `electron/utils/database/historyLimitManager.ts` to persist the new limit
+     and prune history in a single transaction.
+   - As soon as the limit has been normalized, the manager updates its
+     in-memory `historyLimit` and calls `emitHistoryLimitUpdated` with the
+     final value.
+
+4. **Internal database event emission**
+   - `emitHistoryLimitUpdated` emits the typed event
+     `"internal:database:history-limit-updated"` via
+     `TypedEventBus<UptimeEvents>`.
+   - The event payload includes the new `limit`, the `operation`
+     `"history-limit-updated"`, and a `timestamp`.
+
+5. **HistoryLimitCoordinator forwarding**
+   - `electron/coordinators/HistoryLimitCoordinator.ts` subscribes to
+     `"internal:database:history-limit-updated"` on the orchestrator event
+     bus.
+   - It validates the new limit, tracks `previousLimit`, and forwards a
+     sanitized `settings:history-limit-updated` event to renderer listeners
+     using the shared `HistoryLimitUpdatedEventData` contract from
+     `@shared/types/events` and `shared/ipc/rendererEvents.ts`.
+
+6. **Preload bridge and renderer events**
+   - `electron/preload/domains/eventsApi.ts` exposes the
+     `settings:history-limit-updated` renderer channel and validates incoming
+     payloads before forwarding them to `window.electronAPI.events`.
+   - `src/services/EventsService.ts` provides
+     `EventsService.onHistoryLimitUpdated`, wiring the preload contract into a
+     typed renderer subscription with validated cleanup semantics.
+
+7. **Renderer consumption**
+   - The settings store (`src/stores/settings/useSettingsStore.ts`) and any
+     interested components subscribe via `EventsService.onHistoryLimitUpdated`.
+   - Store operations update local state based on the authoritative event
+     payload, ensuring the renderer reflects the same limit as the backend and
+     that future monitoring operations use the updated retention rules.
+
+This flow keeps history-limit logic centralized in the database/manager layer
+while providing a clear, event-driven path from a user action in the UI to the
+final persisted configuration and back to the renderer.
+
 ## 🛠️ Code Templates
 
 Ready-to-use templates for implementing common patterns:
@@ -320,6 +391,77 @@ Auto-generated reference documenting the authoritative list of IPC channels expo
 - ✅ All parameters are validated
 - ✅ All channels follow naming conventions
 - ✅ Preload API is type-safe
+
+### State synchronization pipeline (sites & cache)
+
+This subsection summarizes how site state synchronization works across main,
+preload, and renderer. It complements the detailed mutation and lifecycle
+guidance in `docs/TSDoc/stores/sites.md`.
+
+**Main-process responsibilities**
+
+1. **Authoritative state and events**
+   - `SiteManager` maintains the canonical in-memory cache of `Site` entities
+     and emits `sites:state-synchronized` events when bulk or targeted sync
+     operations occur.
+   - `UptimeOrchestrator` coordinates site and monitoring managers and
+     forwards relevant events through its own typed event bus.
+
+2. **IPC endpoints**
+   - `electron/services/ipc/IpcService.ts` registers the typed
+     state-synchronization handlers:
+     - `STATE_SYNC_CHANNELS.requestFullSync` (`"request-full-sync"`) for
+       explicit full resync requests.
+     - `STATE_SYNC_CHANNELS.getSyncStatus` (`"get-sync-status"`) for
+       lightweight status snapshots.
+   - Both handlers use shared `StateSyncStatusSummary` and
+     `StateSyncFullSyncResult` contracts from `@shared/types/stateSync`.
+
+**Preload responsibilities**
+
+3. **Validation and channel exposure**
+   - `electron/preload/domains/eventsApi.ts` validates
+     state-sync-related events using the `StateSyncEventData` guard from
+     `@shared/types/events` before they reach renderer callbacks.
+   - The preload layer exposes `stateSync` IPC methods and event hooks on
+     `window.electronAPI.stateSync` according to the
+     `StateSyncDomainBridge` mapping in `shared/types/preload.ts`.
+
+**Renderer responsibilities**
+
+4. **IPC abstraction**
+   - `src/services/StateSyncService.ts` is the single renderer entrypoint for
+     state-sync IPC:
+     - `getSyncStatus()` wraps `stateSync.getSyncStatus()` and parses the
+       result via `parseStateSyncStatusSummary`.
+     - `requestFullSync()` wraps `stateSync.requestFullSync()` and parses the
+       payload via `parseStateSyncFullSyncResult`.
+     - `onStateSyncEvent()` subscribes to incremental state sync events,
+       handling invalid payloads and coordinating automatic recovery via full
+       sync when needed.
+
+5. **Store coordination**
+   - `src/stores/sites/useSiteSync.ts` composes the site sync actions on top
+     of `StateSyncService` and the shared snapshot utilities:
+     - `fullResyncSites()` coalesces concurrent resync requests and replaces
+       the local `sites` state with the authoritative backend snapshot.
+     - `syncSites()` and related helpers derive diffs using
+       `prepareSiteSyncSnapshot` / `deriveSiteSnapshot` so updates can be
+       applied incrementally.
+     - Status-update subscription helpers rely on `StatusUpdateManager` while
+       keeping cache invalidations and state sync semantics aligned.
+
+6. **Cache invalidation and debounce**
+   - Cache invalidation events (`cache:invalidated`) remain the primary
+     mechanism for signaling when a resync is necessary. The site store uses a
+     short debounce window so clustered invalidations lead to a single
+     resynchronization.
+   - This design ensures the renderer reacts promptly to backend changes
+     without performing unnecessary full-sync operations.
+
+Together, these responsibilities ensure that the renderer's view of site data
+remains consistent with the backend while preserving the event-driven,
+debounced synchronization strategy defined in ADR-002 and ADR-004.
 
 ## 🚀 Quick Start
 

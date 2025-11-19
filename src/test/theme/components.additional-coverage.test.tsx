@@ -16,108 +16,113 @@ import { ThemedProgress } from "../../theme/components/ThemedProgress";
 import { ThemedSelect } from "../../theme/components/ThemedSelect";
 
 // Mock theme hooks with factory function to avoid hoisting issues
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: vi.fn(() => ({
-        currentTheme: {
-            borderRadius: {
-                full: "50%",
-                lg: "8px",
-                md: "6px",
-                none: "0px",
-                sm: "4px",
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: vi.fn(() => ({
+            currentTheme: {
+                borderRadius: {
+                    full: "50%",
+                    lg: "8px",
+                    md: "6px",
+                    none: "0px",
+                    sm: "4px",
+                },
+                colors: {
+                    background: {
+                        primary: "#ffffff",
+                        secondary: "#f8f9fa",
+                    },
+                    surface: "#f8f9fa",
+                    text: {
+                        primary: "#000000",
+                        secondary: "#6c757d",
+                    },
+                    border: {
+                        primary: "#dee2e6",
+                        secondary: "#e9ecef",
+                    },
+                    primary: {
+                        100: "#e3f2fd",
+                        200: "#bbdefb",
+                        500: "#2196f3",
+                        700: "#1976d2",
+                    },
+                    secondary: {
+                        100: "#f3e5f5",
+                        200: "#ce93d8",
+                        500: "#9c27b0",
+                        700: "#7b1fa2",
+                    },
+                    success: {
+                        500: "#4caf50",
+                    },
+                    warning: {
+                        500: "#ff9800",
+                    },
+                    error: {
+                        500: "#f44336",
+                    },
+                    status: {
+                        up: "#28a745",
+                        down: "#dc3545",
+                        pending: "#ffc107",
+                        paused: "#6c757d",
+                    },
+                },
+                spacing: {
+                    xs: "4px",
+                    sm: "8px",
+                    md: "16px",
+                    lg: "24px",
+                    xl: "32px",
+                },
+                typography: {
+                    fontFamily: {
+                        sans: ["Arial", "sans-serif"],
+                        mono: ["monospace"],
+                    },
+                    fontSize: {
+                        xs: "12px",
+                        sm: "14px",
+                        md: "16px",
+                        lg: "18px",
+                    },
+                    fontWeight: {
+                        medium: "500",
+                    },
+                    lineHeight: {
+                        normal: "1.5",
+                        relaxed: "1.75",
+                        tight: "1.25",
+                    },
+                },
             },
-            colors: {
-                background: {
-                    primary: "#ffffff",
-                    secondary: "#f8f9fa",
-                },
-                surface: "#f8f9fa",
-                text: {
-                    primary: "#000000",
-                    secondary: "#6c757d",
-                },
-                border: {
-                    primary: "#dee2e6",
-                    secondary: "#e9ecef",
-                },
-                primary: {
-                    100: "#e3f2fd",
-                    200: "#bbdefb",
-                    500: "#2196f3",
-                    700: "#1976d2",
-                },
-                secondary: {
-                    100: "#f3e5f5",
-                    200: "#ce93d8",
-                    500: "#9c27b0",
-                    700: "#7b1fa2",
-                },
-                success: {
-                    500: "#4caf50",
-                },
-                warning: {
-                    500: "#ff9800",
-                },
-                error: {
-                    500: "#f44336",
-                },
-                status: {
+            getStatusColor: vi.fn((status: string) => {
+                const colors = {
                     up: "#28a745",
                     down: "#dc3545",
                     pending: "#ffc107",
                     paused: "#6c757d",
-                },
-            },
-            spacing: {
-                xs: "4px",
-                sm: "8px",
-                md: "16px",
-                lg: "24px",
-                xl: "32px",
-            },
-            typography: {
-                fontFamily: {
-                    sans: ["Arial", "sans-serif"],
-                    mono: ["monospace"],
-                },
-                fontSize: {
-                    xs: "12px",
-                    sm: "14px",
-                    md: "16px",
-                    lg: "18px",
-                },
-                fontWeight: {
-                    medium: "500",
-                },
-                lineHeight: {
-                    normal: "1.5",
-                    relaxed: "1.75",
-                    tight: "1.25",
-                },
-            },
-        },
-        getStatusColor: vi.fn((status: string) => {
-            const colors = {
-                up: "#28a745",
-                down: "#dc3545",
-                pending: "#ffc107",
-                paused: "#6c757d",
-            };
-            return colors[status as keyof typeof colors] || "#000000";
-        }),
-    })),
-    useThemeClasses: vi.fn(() => ({
-        getBackgroundClass: vi.fn((variant: string) => ({
-            backgroundColor: `var(--color-background-${variant})`,
+                };
+                return colors[status as keyof typeof colors] || "#000000";
+            }),
         })),
-        getTextClass: vi.fn((variant: string) => ({
-            color: `var(--color-text-${variant})`,
+        useThemeClasses: vi.fn(() => ({
+            getBackgroundClass: vi.fn((variant: string) => ({
+                backgroundColor: `var(--color-background-${variant})`,
+            })),
+            getTextClass: vi.fn((variant: string) => ({
+                color: `var(--color-text-${variant})`,
+            })),
+            getBorderClass: vi.fn((variant: string) => ({
+                borderColor: `var(--color-border-${variant})`,
+            })),
         })),
-        getBorderClass: vi.fn((variant: string) => ({
-            borderColor: `var(--color-border-${variant})`,
-        })),
-    })),
-}));
+    };
+});
 
 // Mock status utilities
 vi.mock("../../utils/status", () => {
@@ -152,11 +157,15 @@ vi.mock("../../utils/time", () => ({
     formatResponseTime: vi.fn((time?: number) => (time ? `${time}ms` : "0ms")),
 }));
 
-// Mock constants
-vi.mock("../../constants", () => ({
-    ARIA_LABEL: "aria-label",
-    TRANSITION_ALL: "transition-all",
-}));
+// Mock constants (partial to preserve other exports used by stores/settings)
+vi.mock("../../constants", async (importOriginal) => {
+    const actual = (await importOriginal()) as typeof import("../../constants");
+    return {
+        ...actual,
+        ARIA_LABEL: "aria-label",
+        TRANSITION_ALL: "transition-all",
+    };
+});
 
 describe("Theme Components - Missing Coverage", () => {
     beforeEach(() => {

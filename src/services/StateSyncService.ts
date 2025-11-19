@@ -6,6 +6,11 @@
  * with proper initialization, logging, and error handling. Provides typed
  * wrappers for sync status retrieval, full sync requests, and event
  * subscriptions.
+ *
+ * For a store-level view of how these operations integrate with the sites
+ * cache, see the "State sync pipeline" section in `docs/TSDoc/stores/sites.md`
+ * and the "State synchronization pipeline (sites & cache)" subsection in
+ * `docs/Architecture/README.md`.
  */
 
 import {

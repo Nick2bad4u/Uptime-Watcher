@@ -183,45 +183,15 @@ test.describe(
                 });
                 await stopMonitoring.click();
 
-                const toaster = page.locator(".status-alert-toaster");
-                await expect(toaster).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
+                // Locate the global toaster region by role and the presence of
+                // status-alert toasts, then verify its live-region semantics.
+                const toaster = page
+                    .getByRole("complementary")
+                    .filter({ has: page.getByTestId(/status-alert-/) });
+
                 await expect(toaster).toHaveAttribute("aria-live", "polite");
 
-                const pausedToast = toaster.locator(".status-alert").first();
-                await expect(pausedToast).toContainText("Monitoring paused", {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await expect(
-                    pausedToast.locator("[aria-label='Dismiss alert']")
-                ).toBeVisible();
-
-                const startMonitoring = siteCardLocator.getByRole("button", {
-                    name: "Start Monitoring",
-                });
-                await expect(startMonitoring).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                await startMonitoring.click();
-
-                const alertEntries = toaster.locator(".status-alert");
-                await expect(async () => {
-                    const toastCount = await alertEntries.count();
-                    expect(toastCount).toBeGreaterThanOrEqual(2);
-                }).toPass({ timeout: WAIT_TIMEOUTS.LONG });
-
-                const newestToast = alertEntries.first();
-                await expect(newestToast).toContainText("Monitor recovered", {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-                const dismissedAlertId =
-                    await newestToast.getAttribute("data-alert-id");
-                expect(dismissedAlertId).toBeTruthy();
-                const dismissedToastById = page.locator(
-                    `.status-alert[data-alert-id="${dismissedAlertId}"]`
-                );
-
+                const alertEntries = page.getByTestId(/status-alert-/);
                 const pausedToastEntry = alertEntries.filter({
                     hasText: "Monitoring paused",
                 });
@@ -229,22 +199,35 @@ test.describe(
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const newestToastVisible = await newestToast
-                    .isVisible({ timeout: WAIT_TIMEOUTS.MEDIUM })
-                    .catch(() => false);
-                if (newestToastVisible) {
-                    await page.evaluate(() => {
-                        window.scrollTo({ top: 0, behavior: "instant" });
-                    });
-                    await newestToast.scrollIntoViewIfNeeded();
-                    await newestToast.evaluate((toast) => {
-                        const dismissButton =
-                            toast.querySelector<HTMLButtonElement>(
-                                "button[aria-label='Dismiss alert']"
-                            );
-                        dismissButton?.click();
-                    });
-                }
+                const startMonitoring = siteCardLocator.getByRole("button", {
+                    name: "Start Monitoring",
+                });
+                await startMonitoring.click();
+
+                // Ensure that a second toast is rendered for the recovered
+                // state so stacking behavior is exercised.
+                await expect(alertEntries).toHaveCount(2, {
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+
+                const newestToast = alertEntries.first();
+                await expect(newestToast).toContainText("Monitor recovered", {
+                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                });
+
+                const dismissedAlertId =
+                    await newestToast.getAttribute("data-alert-id");
+                expect(dismissedAlertId).not.toBeNull();
+
+                const dismissedToastById = page.getByTestId(
+                    `status-alert-${dismissedAlertId}`
+                );
+
+                const dismissButton = newestToast.getByRole("button", {
+                    name: "Dismiss alert",
+                });
+                await dismissButton.click();
+
                 await expect(dismissedToastById).toHaveCount(0, {
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });

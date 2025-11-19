@@ -26,10 +26,15 @@ import type { ThemedIconButtonProperties } from "../../theme/components/ThemedIc
 const mockUseTheme = vi.fn();
 const mockUseThemeClasses = vi.fn();
 
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: () => mockUseTheme(),
-    useThemeClasses: () => mockUseThemeClasses(),
-}));
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: () => mockUseTheme(),
+        useThemeClasses: () => mockUseThemeClasses(),
+    };
+});
 
 // Mock status utilities
 vi.mock("../../utils/status", () => {
@@ -64,11 +69,15 @@ vi.mock("../../utils/time", () => ({
     formatResponseTime: vi.fn((time?: number) => (time ? `${time}ms` : "0ms")),
 }));
 
-// Mock constants
-vi.mock("../../constants", () => ({
-    ARIA_LABEL: "aria-label",
-    TRANSITION_ALL: "transition-all",
-}));
+// Mock constants (partial to preserve other exports used by stores/settings)
+vi.mock("../../constants", async (importOriginal) => {
+    const actual = (await importOriginal()) as typeof import("../../constants");
+    return {
+        ...actual,
+        ARIA_LABEL: "aria-label",
+        TRANSITION_ALL: "transition-all",
+    };
+});
 
 describe("Theme Components - Comprehensive Coverage", () => {
     const mockTheme = {

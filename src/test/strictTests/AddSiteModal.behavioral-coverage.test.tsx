@@ -11,11 +11,16 @@ const themeState = vi.hoisted(() => ({
     isDark: false,
 }));
 
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: () => ({
-        isDark: themeState.isDark,
-    }),
-}));
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: () => ({
+            isDark: themeState.isDark,
+        }),
+    };
+});
 
 const addSiteFormMock = vi.hoisted(() => ({
     lastOnSuccess: undefined as undefined | (() => void),

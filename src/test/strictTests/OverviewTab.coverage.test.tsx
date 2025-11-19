@@ -13,19 +13,24 @@ const availabilityMock = vi.hoisted(() => ({
     getAvailabilityVariant: vi.fn(() => "success" as const),
 }));
 
-vi.mock("../../theme/useTheme", () => ({
-    useAvailabilityColors: () => availabilityMock,
-    useTheme: () => ({
-        currentTheme: {
-            colors: {
-                error: "#ef4444",
-                primary: { 500: "#2563eb" },
-                success: "#22c55e",
-                warning: "#f59e0b",
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useAvailabilityColors: () => availabilityMock,
+        useTheme: () => ({
+            currentTheme: {
+                colors: {
+                    error: "#ef4444",
+                    primary: { 500: "#2563eb" },
+                    success: "#22c55e",
+                    warning: "#f59e0b",
+                },
             },
-        },
-    }),
-}));
+        }),
+    };
+});
 
 const statusIndicatorProps = vi.hoisted(() => [] as Record<string, unknown>[]);
 

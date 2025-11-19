@@ -13,6 +13,15 @@ import {
 } from "../../utils/createSitesStoreMock";
 
 // Mock logger service with inline functions
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../../constants");
+    return {
+        ...actual,
+        ARIA_LABEL: "aria-label",
+        TRANSITION_ALL: "transition-all",
+    };
+});
 vi.mock("../../../services/logger", () => ({
     logger: {
         error: vi.fn(),
@@ -181,29 +190,28 @@ vi.mock("../../../components/AddSiteForm/SelectField", () => ({
 }));
 
 vi.mock("../../../components/AddSiteForm/RadioGroup", () => ({
-    RadioGroup: ({ onChange, options, id }: any) => (
-        <div data-testid={id}>
-            {options?.map((option: any) => (
-                <label key={option.value}>
-                    <input
-                        type="radio"
-                        value={option.value}
-                        onChange={(e) => onChange?.(e.target.value)}
-                    />
-                    {option.label}
-                </label>
-            ))}
-            {/* Add invalid option for testing purposes */}
-            <label>
-                <input
-                    type="radio"
-                    value="invalid-add-mode"
-                    onChange={(e) => onChange?.(e.target.value)}
-                />
-                Invalid Add Mode
-            </label>
-        </div>
-    ),
+    RadioGroup: ({ onChange, options, id }: any) => {
+        React.useEffect(() => {
+            // Trigger an invalid add mode value once on mount to exercise the
+            // error-logging branch in handleAddModeChange.
+            onChange?.("invalid-add-mode");
+        }, [onChange]);
+
+        return (
+            <div data-testid={id}>
+                {options?.map((option: any) => (
+                    <label key={option.value}>
+                        <input
+                            type="radio"
+                            value={option.value}
+                            onChange={(e) => onChange?.(e.target.value)}
+                        />
+                        {option.label}
+                    </label>
+                ))}
+            </div>
+        );
+    },
 }));
 
 vi.mock("../../../components/AddSiteForm/TextField", () => ({
@@ -244,18 +252,23 @@ vi.mock("../../../hooks/useMonitorTypes", () => ({
     }),
 }));
 
-vi.mock("../../../constants", () => ({
-    CHECK_INTERVALS: [
-        { label: "1 minute", value: 60_000 },
-        { label: "5 minutes", value: 300_000 },
-        { label: "10 minutes", value: 600_000 },
-    ],
-    UI_DELAYS: {
-        LOADING_BUTTON: 100,
-        LOADING_OVERLAY: 100,
-        STATE_UPDATE_DEFER: 0,
-    },
-}));
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../../constants");
+    return {
+        ...actual,
+        CHECK_INTERVALS: [
+            { label: "1 minute", value: 60_000 },
+            { label: "5 minutes", value: 300_000 },
+            { label: "10 minutes", value: 600_000 },
+        ],
+        UI_DELAYS: {
+            LOADING_BUTTON: 100,
+            LOADING_OVERLAY: 100,
+            STATE_UPDATE_DEFER: 0,
+        },
+    };
+});
 
 vi.mock("../../../utils/data/generateUuid", () => ({
     generateUuid: () => "mock-uuid",

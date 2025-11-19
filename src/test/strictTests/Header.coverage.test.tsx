@@ -111,15 +111,20 @@ const themeState = vi.hoisted(() => ({
     toggleTheme: vi.fn(),
 }));
 
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: () => ({
-        isDark: themeState.isDark,
-        toggleTheme: themeState.toggleTheme,
-    }),
-    useAvailabilityColors: () => ({
-        getAvailabilityColor: (value: number) => `color-${value}`,
-    }),
-}));
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: () => ({
+            isDark: themeState.isDark,
+            toggleTheme: themeState.toggleTheme,
+        }),
+        useAvailabilityColors: () => ({
+            getAvailabilityColor: (value: number) => `color-${value}`,
+        }),
+    };
+});
 
 const metricsState = vi.hoisted(() => ({
     metrics: {

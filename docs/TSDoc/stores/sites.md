@@ -60,6 +60,51 @@ When introducing additional mutations, compose these helpers instead of inventin
 - `retryStatusSubscription` clears the previous snapshot before re-subscribing so the indicator reflects the latest attempt. Consumers should rely on the returned summary rather than mixing derived state.
 - The `deriveStatusSubscriptionHealth` helper converts raw listener counts into a normalized health state (`healthy`, `degraded`, `failed`, `unknown`). Use it instead of duplicating heuristics in components.
 
+## State sync pipeline
+
+State synchronization for the sites store is deliberately layered to keep the
+IPC surface, orchestration logic, and local cache responsibilities separated:
+
+1. **StateSyncService (renderer IPC façade)**
+   - `src/services/StateSyncService.ts` exposes the renderer-facing
+     state-sync API:
+     - `getSyncStatus()` wraps the `stateSync.getSyncStatus` IPC endpoint and
+       parses the result into `StateSyncStatusSummary`.
+     - `requestFullSync()` wraps `stateSync.requestFullSync` and returns a
+       validated `StateSyncFullSyncResult` snapshot.
+     - `onStateSyncEvent()` subscribes to incremental `StateSyncEventData`
+       emissions from the preload events domain, including recovery when
+       malformed payloads are encountered.
+   - All methods rely on `getIpcServiceHelpers("StateSyncService")` so
+     callers never touch `window.electronAPI` directly.
+
+2. **useSiteSync (store-level orchestration)**
+   - `src/stores/sites/useSiteSync.ts` composes the store actions on top of
+     `StateSyncService` and the shared snapshot helpers:
+     - `fullResyncSites()` coalesces concurrent requests, calls
+       `StateSyncService.requestFullSync()`, normalizes the resulting
+       snapshot, and replaces the local `sites` state in a single step.
+     - `syncSites()` uses `prepareSiteSyncSnapshot` / `deriveSiteSnapshot` to
+       apply incremental updates based on the authoritative backend data.
+     - `subscribeToSyncEvents()` wires `StateSyncService.onStateSyncEvent`
+       into the store, dispatching sync actions whenever the backend emits
+       state-sync events.
+     - `getSyncStatus()` is surfaced through the store so components can
+       render high-level sync diagnostics without talking to the IPC layer.
+
+3. **Interaction with cache invalidation**
+   - Cache invalidation (`cache:invalidated`) remains the primary trigger for
+     resynchronization. `useSiteSync` uses a short debounce window when
+     responding to invalidations so bursts of events result in a single
+     `fullResyncSites()` call.
+   - State-sync events describe *what* changed, while cache invalidation
+     drives *when* a resync should occur. This split keeps the pipeline
+     predictable and minimizes redundant work.
+
+For a high-level, cross-layer overview of how these pieces interact with the
+main process and preload bridge, see the "State synchronization pipeline
+(sites & cache)" subsection in `docs/Architecture/README.md`.
+
 ## Monitoring lifecycle resync policy
 
 Main-process managers now emit the **internal lifecycle** topics for monitoring

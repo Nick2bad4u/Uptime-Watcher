@@ -117,25 +117,30 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     },
 }));
 
-vi.mock("../../../constants", () => ({
-    ARIA_LABEL: "aria-label",
-    TRANSITION_ALL: "all 0.2s ease-in-out",
-    CHECK_INTERVALS: [
-        { label: "1 minute", value: 60_000 },
-        { label: "5 minutes", value: 300_000 },
-        { label: "10 minutes", value: 600_000 },
-    ],
-    DEFAULT_CHECK_INTERVAL: 60_000,
-    UI_DELAYS: {
-        STATE_UPDATE_DEFER: 100,
-    },
-    FALLBACK_MONITOR_TYPE_OPTIONS: [
-        { label: "HTTP", value: "http" },
-        { label: "Ping", value: "ping" },
-        { label: "Port", value: "port" },
-        { label: "DNS", value: "dns" },
-    ],
-}));
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../../constants");
+    return {
+        ...actual,
+        ARIA_LABEL: "aria-label",
+        TRANSITION_ALL: "all 0.2s ease-in-out",
+        CHECK_INTERVALS: [
+            { label: "1 minute", value: 60_000 },
+            { label: "5 minutes", value: 300_000 },
+            { label: "10 minutes", value: 600_000 },
+        ],
+        DEFAULT_CHECK_INTERVAL: 60_000,
+        UI_DELAYS: {
+            STATE_UPDATE_DEFER: 100,
+        },
+        FALLBACK_MONITOR_TYPE_OPTIONS: [
+            { label: "HTTP", value: "http" },
+            { label: "Ping", value: "ping" },
+            { label: "Port", value: "port" },
+            { label: "DNS", value: "dns" },
+        ],
+    };
+});
 
 vi.mock("../../../stores/error/useErrorStore", () => ({
     useErrorStore: vi.fn(() => ({

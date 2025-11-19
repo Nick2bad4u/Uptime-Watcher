@@ -1,5 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair -- project-wide disable pattern for build configs
-/* eslint-disable regexp/require-unicode-sets-regexp, array-func/from-map  */
+/* eslint-disable regexp/require-unicode-sets-regexp, array-func/from-map, n/no-process-env  -- Disable specific rules for build configs */
 /**
  * Vite configuration for the Uptime Watcher Electron application. Configures
  * React frontend build and Electron main/preload process compilation.
@@ -937,7 +937,6 @@ export default defineConfig(({ mode }) => {
                     maxThreads: Math.max(
                         1,
                         Number(
-                            // eslint-disable-next-line n/no-process-env -- safe for test time use
                             process.env["MAX_THREADS"] ??
                                 (process.env["CI"] ? "1" : "16")
                         )

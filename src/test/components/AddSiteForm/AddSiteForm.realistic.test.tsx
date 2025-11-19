@@ -78,29 +78,34 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false),
 }));
 
-// Mock constants
-vi.mock("../../../constants", () => ({
-    ARIA_LABEL: {
-        CLOSE_BUTTON: "Close",
-        DELETE_BUTTON: "Delete",
-    },
-    CHECK_INTERVALS: [
-        { label: "1 minute", value: 60_000 },
-        { label: "5 minutes", value: 300_000 },
-        { label: "10 minutes", value: 600_000 },
-    ],
-    DEFAULT_CHECK_INTERVAL: 60_000,
-    FALLBACK_MONITOR_TYPE_OPTIONS: [
-        { label: "HTTP", value: "http" },
-        { label: "Port", value: "port" },
-    ],
-    UI_DELAYS: {
-        LOADING_BUTTON: 100,
-        LOADING_OVERLAY: 100,
-        STATE_UPDATE_DEFER: 0,
-    },
-    TRANSITION_ALL: "all 0.2s ease-in-out",
-}));
+// Mock constants (partial to preserve other exports)
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../../constants");
+    return {
+        ...actual,
+        ARIA_LABEL: {
+            CLOSE_BUTTON: "Close",
+            DELETE_BUTTON: "Delete",
+        },
+        CHECK_INTERVALS: [
+            { label: "1 minute", value: 60_000 },
+            { label: "5 minutes", value: 300_000 },
+            { label: "10 minutes", value: 600_000 },
+        ],
+        DEFAULT_CHECK_INTERVAL: 60_000,
+        FALLBACK_MONITOR_TYPE_OPTIONS: [
+            { label: "HTTP", value: "http" },
+            { label: "Port", value: "port" },
+        ],
+        UI_DELAYS: {
+            LOADING_BUTTON: 100,
+            LOADING_OVERLAY: 100,
+            STATE_UPDATE_DEFER: 0,
+        },
+        TRANSITION_ALL: "all 0.2s ease-in-out",
+    };
+});
 
 // Mock other components
 vi.mock("../../../components/AddSiteForm/DynamicMonitorFields", () => ({

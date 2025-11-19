@@ -29,9 +29,14 @@ const themeMock = vi.hoisted(() => ({
     ),
 }));
 
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: () => themeMock,
-}));
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: () => themeMock,
+    };
+});
 
 const statusUtilsMock = vi.hoisted(() => ({
     formatStatusLabel: vi.fn((status: string) => `label-${status}`),

@@ -5,39 +5,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 
-// Mock modules to avoid complex dependencies
-vi.mock("../../theme/ThemeManager", () => ({
-    themeManager: {
-        getTheme: vi.fn(() => ({
-            name: "light",
-            isDark: false,
-            colors: {
-                status: {
-                    up: "#10b981",
-                    down: "#ef4444",
-                    pending: "#f59e0b",
-                    unknown: "#6b7280",
-                },
-                success: "#10b981",
-                error: "#ef4444",
-                warning: "#f59e0b",
-                background: { primary: "#ffffff" },
-                text: { primary: "#000000" },
-                border: { primary: "#e5e7eb" },
-                surface: { primary: "#ffffff" },
-            },
-        })),
-        applyTheme: vi.fn(),
-        onSystemThemeChange: vi.fn(() => vi.fn()),
-        getSystemThemePreference: vi.fn(() => "light"),
-        getAvailableThemes: vi.fn(() => [
-            "light",
-            "dark",
-            "system",
-        ]),
-    },
-}));
-
 vi.mock("../../stores/settings/useSettingsStore", () => ({
     useSettingsStore: vi.fn(() => ({
         settings: { theme: "light" },

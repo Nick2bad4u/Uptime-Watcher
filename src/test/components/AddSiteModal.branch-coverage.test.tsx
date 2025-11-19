@@ -22,23 +22,28 @@ import { AddSiteModal } from "../../components/AddSiteForm/AddSiteModal";
 
 // Mock the dependencies
 vi.mock("../../stores/ui/useUiStore");
-vi.mock("../../theme/useTheme", () => ({
-    useTheme: vi.fn(),
-    useThemeClasses: vi.fn(() => ({
-        getBackgroundClass: vi.fn(() => ({
-            backgroundColor: "var(--color-background-primary)",
+vi.mock("../../theme/useTheme", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../theme/useTheme");
+    return {
+        ...actual,
+        useTheme: vi.fn(),
+        useThemeClasses: vi.fn(() => ({
+            getBackgroundClass: vi.fn(() => ({
+                backgroundColor: "var(--color-background-primary)",
+            })),
+            getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
+            getBorderClass: vi.fn(() => ({
+                borderColor: "var(--color-border-primary)",
+            })),
+            getSurfaceClass: vi.fn(() => ({
+                backgroundColor: "var(--color-surface-base)",
+            })),
+            getStatusClass: vi.fn(() => ({ color: "var(--color-status-up)" })),
+            getColor: vi.fn(() => "#000000"),
         })),
-        getTextClass: vi.fn(() => ({ color: "var(--color-text-primary)" })),
-        getBorderClass: vi.fn(() => ({
-            borderColor: "var(--color-border-primary)",
-        })),
-        getSurfaceClass: vi.fn(() => ({
-            backgroundColor: "var(--color-surface-base)",
-        })),
-        getStatusClass: vi.fn(() => ({ color: "var(--color-status-up)" })),
-        getColor: vi.fn(() => "#000000"),
-    })),
-}));
+    };
+});
 vi.mock("../../components/AddSiteForm/AddSiteForm", () => ({
     AddSiteForm: ({ onSuccess }: { onSuccess: () => void }) => (
         <div data-testid="add-site-form">

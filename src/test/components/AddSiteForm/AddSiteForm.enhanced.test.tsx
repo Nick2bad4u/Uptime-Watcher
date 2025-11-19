@@ -254,21 +254,26 @@ vi.mock("../../../hooks/useDelayedButtonLoading", () => ({
     useDelayedButtonLoading: vi.fn(() => false), // Returns boolean directly
 }));
 
-vi.mock("../../../constants", () => ({
-    CHECK_INTERVALS: [
-        { label: "1 minute", value: 60_000 },
-        { label: "5 minutes", value: 300_000 },
-        { label: "10 minutes", value: 600_000 },
-    ],
-    DEFAULT_CHECK_INTERVAL: 60_000,
-    ARIA_LABEL: "aria-label",
-    TRANSITION_ALL: "all 0.2s ease-in-out",
-    FALLBACK_MONITOR_TYPE_OPTIONS: [
-        { label: "HTTP (Website/API)", value: "http" },
-        { label: "Port (Host/Port)", value: "port" },
-        { label: "Ping (Host)", value: "ping" },
-    ],
-}));
+vi.mock("../../../constants", async (importOriginal) => {
+    const actual =
+        (await importOriginal()) as typeof import("../../../constants");
+    return {
+        ...actual,
+        CHECK_INTERVALS: [
+            { label: "1 minute", value: 60_000 },
+            { label: "5 minutes", value: 300_000 },
+            { label: "10 minutes", value: 600_000 },
+        ],
+        DEFAULT_CHECK_INTERVAL: 60_000,
+        ARIA_LABEL: "aria-label",
+        TRANSITION_ALL: "all 0.2s ease-in-out",
+        FALLBACK_MONITOR_TYPE_OPTIONS: [
+            { label: "HTTP (Website/API)", value: "http" },
+            { label: "Port (Host/Port)", value: "port" },
+            { label: "Ping (Host)", value: "ping" },
+        ],
+    };
+});
 
 // Default props for testing
 const defaultProps = {

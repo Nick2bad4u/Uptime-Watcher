@@ -169,6 +169,12 @@ export const SettingsService: SettingsServiceContract = {
     /**
      * Updates the history retention limit and prunes existing history.
      *
+     * @remarks
+     * For an end-to-end view of how history limit updates propagate through the
+     * system (including database coordination and renderer events), see the
+     * "History limit propagation (settings & database)" subsection in
+     * `docs/Architecture/README.md`.
+     *
      * @example
      *
      * ```typescript

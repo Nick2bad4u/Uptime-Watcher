@@ -525,6 +525,47 @@
             },
             "script": "lint:all:fix",
             "type": "npm"
+        },
+        {
+            "detail": "Builds the Electron main process for debugging (tsconfig.electron.json).",
+            "group": "build",
+            "icon": {
+                "color": "terminal.ansiBlue",
+                "id": "bug"
+            },
+            "label": "Build Electron Main (Dev)",
+            "presentation": {
+                "clear": false,
+                "close": false,
+                "echo": true,
+                "focus": false,
+                "group": "electron-build",
+                "panel": "shared",
+                "preserveTerminalName": false,
+                "reveal": "always",
+                "revealProblems": "onProblem",
+                "showReuseMessage": true
+            },
+            "problemMatcher": {
+                "applyTo": "allDocuments",
+                "owner": "typescript",
+                "pattern": {
+                    "code": 5,
+                    "column": 3,
+                    "file": 1,
+                    "line": 2,
+                    "message": 6,
+                    "regexp": "^(?:\\x1b\\[[0-9;]*m)*(.+?)\\((\\d+),(\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+):\\s*(.*)$",
+                    "severity": 4
+                },
+                "severity": "error"
+            },
+            "runOptions": {
+                "instanceLimit": 1,
+                "instancePolicy": "terminateOldest"
+            },
+            "script": "build:electron",
+            "type": "npm"
         }
     ],
     "version": "2.0.0"
