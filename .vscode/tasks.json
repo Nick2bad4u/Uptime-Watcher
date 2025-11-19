@@ -20,7 +20,7 @@
                 "preserveTerminalName": false,
                 "reveal": "always",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -67,7 +67,7 @@
                 "preserveTerminalName": false,
                 "reveal": "always",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -111,7 +111,7 @@
                 "preserveTerminalName": false,
                 "reveal": "always",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "promptOnClose": false,
             "runOptions": {
@@ -139,7 +139,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -185,7 +185,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -225,7 +225,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -266,7 +266,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -312,7 +312,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -356,7 +356,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -395,7 +395,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",
@@ -439,7 +439,7 @@
                 "preserveTerminalName": false,
                 "reveal": "silent",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": [
                 {
@@ -544,7 +544,7 @@
                 "preserveTerminalName": false,
                 "reveal": "always",
                 "revealProblems": "onProblem",
-                "showReuseMessage": true
+                "showReuseMessage": false
             },
             "problemMatcher": {
                 "applyTo": "allDocuments",

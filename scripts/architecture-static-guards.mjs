@@ -5,13 +5,13 @@
  * This script enforces a few core architectural invariants that are easy to
  * accidentally violate during refactors:
  *
- * 1. Direct `ipcMain.handle(...)` calls must live only in the centralized
- *    IPC registration layer (`electron/services/ipc/IpcService.ts` and its
- *    shared helper module `electron/services/ipc/utils.ts`).
+ * 1. Direct `ipcMain.handle(...)` calls must live only in the centralized IPC
+ *    registration layer (`electron/services/ipc/IpcService.ts` and its shared
+ *    helper module `electron/services/ipc/utils.ts`).
  * 2. Direct `ipcRenderer` imports from the `electron` package are forbidden in
- *    `src/**` (excluding tests). Renderer code must always go through the
- *    typed preload bridge (`window.electronAPI`) and renderer services rather
- *    than talking to Electron primitives directly.
+ *    `src/**` (excluding tests). Renderer code must always go through the typed
+ *    preload bridge (`window.electronAPI`) and renderer services rather than
+ *    talking to Electron primitives directly.
  * 3. Direct `window.electronAPI` usage must not appear outside of approved
  *    locations (tests and explicit helper/type-definition files).
  * 4. Event names passed to `.emitTyped()` / `.onTyped()` / `.offTyped()` /

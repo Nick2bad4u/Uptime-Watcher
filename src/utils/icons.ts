@@ -16,6 +16,7 @@ import {
     BsActivity,
     BsCheckCircle,
     BsClockHistory,
+    BsCollectionPlay,
     BsExclamationTriangle,
     BsGearFill,
     BsGrid3X3Gap,
@@ -53,7 +54,7 @@ import {
     HiOutlineViewColumns,
 } from "react-icons/hi2";
 import { IoAdd } from "react-icons/io5";
-import { MdCheckCircle, MdError, MdPlayArrow, MdWarning } from "react-icons/md";
+import { MdCheckCircle, MdError, MdWarning } from "react-icons/md";
 import {
     RiCheckboxCircleFill,
     RiErrorWarningFill,
@@ -151,7 +152,7 @@ export const AppIcons: {
         pause: HiMiniPause,
         pauseFilled: RiPauseCircleFill,
         play: HiMiniPlay,
-        playAll: MdPlayArrow,
+        playAll: BsCollectionPlay,
         playFilled: RiPlayCircleFill,
         refresh: FiRefreshCw,
         refreshAlt: TbRefresh,

@@ -6,6 +6,7 @@
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
+    SiteTableDensity,
 } from "@app/stores/ui/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -18,8 +19,10 @@ type SiteListLayoutSelectorMeta = Meta<typeof SiteListLayoutSelector>;
 const meta: SiteListLayoutSelectorMeta = {
     args: {
         cardPresentation: "grid",
+        listDensity: "comfortable",
         layout: "card-large",
         onLayoutChange: action("site-list/layout-change"),
+        onListDensityChange: action("site-list/density-change"),
         onPresentationChange: action("site-list/presentation-change"),
     },
     component: SiteListLayoutSelector,
@@ -30,6 +33,9 @@ const meta: SiteListLayoutSelectorMeta = {
         const [layout, setLayout] = useState<SiteListLayoutMode>(args.layout);
         const [presentation, setPresentation] = useState<SiteCardPresentation>(
             args.cardPresentation
+        );
+        const [density, setDensity] = useState<SiteTableDensity>(
+            args.listDensity ?? "comfortable"
         );
 
         const handleLayoutChange = (nextLayout: SiteListLayoutMode): void => {
@@ -47,11 +53,18 @@ const meta: SiteListLayoutSelectorMeta = {
             args.onPresentationChange?.(nextPresentation);
         };
 
+        const handleDensityChange = (nextDensity: SiteTableDensity): void => {
+            setDensity(nextDensity);
+            args.onListDensityChange?.(nextDensity);
+        };
+
         return (
             <SiteListLayoutSelector
                 cardPresentation={presentation}
                 layout={layout}
+                listDensity={density}
                 onLayoutChange={handleLayoutChange}
+                onListDensityChange={handleDensityChange}
                 onPresentationChange={handlePresentationChange}
             />
         );
@@ -74,5 +87,6 @@ export const CompactCards: Story = {
 export const ListView: Story = {
     args: {
         layout: "list",
+        listDensity: "cozy",
     },
 };

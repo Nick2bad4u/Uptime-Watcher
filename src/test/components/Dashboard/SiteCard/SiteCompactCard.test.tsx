@@ -128,10 +128,9 @@ describe(SiteCompactCard, () => {
 
         render(<SiteCompactCard {...props} />);
 
-        expect(screen.getByTestId("marquee-text")).toHaveTextContent(
-            "Production"
-        );
-        expect(screen.getByText("site-identifier")).toBeInTheDocument();
+        const marqueeTexts = screen.getAllByTestId("marquee-text");
+        expect(marqueeTexts[0]).toHaveTextContent("Production");
+        expect(screen.getByText(/site-identifier/)).toBeInTheDocument();
         expect(screen.getByText("42")).toBeInTheDocument();
 
         await user.click(screen.getByTestId("themed-box"));

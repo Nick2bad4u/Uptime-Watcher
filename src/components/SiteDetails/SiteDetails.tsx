@@ -468,30 +468,32 @@ export const SiteDetails = ({
                 surface="overlay"
             >
                 <div className="site-details-modal__body">
-                    <SiteDetailsHeader
-                        onClose={onClose}
-                        site={currentSite}
-                        {...(selectedMonitor ? { selectedMonitor } : {})}
-                    />
-
-                    <SiteDetailsNavigation
-                        activeSiteDetailsTab={activeSiteDetailsTab}
-                        currentSite={currentSite}
-                        handleMonitorIdChange={handleMonitorIdChange}
-                        handleStartMonitoring={handleStartMonitoring}
-                        handleStartSiteMonitoring={handleStartSiteMonitoring}
-                        handleStopMonitoring={handleStopMonitoring}
-                        handleStopSiteMonitoring={handleStopSiteMonitoring}
-                        isLoading={isLoading}
-                        isMonitoring={isMonitoring}
-                        selectedMonitorId={selectedMonitorId}
-                        setActiveSiteDetailsTab={setActiveSiteDetailsTab}
-                    />
-
                     <div
                         className={`site-details-modal__content-wrapper custom-scrollbar ${isDark ? "dark" : ""}`}
                         style={scrollContainerStyle}
                     >
+                        <SiteDetailsHeader
+                            onClose={onClose}
+                            site={currentSite}
+                            {...(selectedMonitor ? { selectedMonitor } : {})}
+                        />
+
+                        <SiteDetailsNavigation
+                            activeSiteDetailsTab={activeSiteDetailsTab}
+                            currentSite={currentSite}
+                            handleMonitorIdChange={handleMonitorIdChange}
+                            handleStartMonitoring={handleStartMonitoring}
+                            handleStartSiteMonitoring={
+                                handleStartSiteMonitoring
+                            }
+                            handleStopMonitoring={handleStopMonitoring}
+                            handleStopSiteMonitoring={handleStopSiteMonitoring}
+                            isLoading={isLoading}
+                            isMonitoring={isMonitoring}
+                            selectedMonitorId={selectedMonitorId}
+                            setActiveSiteDetailsTab={setActiveSiteDetailsTab}
+                        />
+
                         <SurfaceContainer
                             className={`site-details-modal__content flex flex-col gap-6${isDark ? "dark" : ""}`}
                             padding="xl"

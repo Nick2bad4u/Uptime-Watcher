@@ -4,23 +4,24 @@
 .app-topbar {
     position: relative;
     z-index: var(--z-index-header, 50);
-    padding: clamp(0.8rem, 1.25vi, 1.15rem) clamp(0.75rem, 2.4vi, 2rem)
-        clamp(0.55rem, 0.8vi, 0.9rem);
-    backdrop-filter: blur(12px);
+    padding: clamp(1rem, 0.8rem + 0.8vi, 1.5rem)
+        clamp(1rem, 1.5rem + 1.5vi, 2.5rem)
+        clamp(0.75rem, 0.5rem + 1vi, 1.25rem);
+    backdrop-filter: blur(16px);
     background: linear-gradient(
         180deg,
         color-mix(
                 in srgb,
-                var(--color-app-background, rgb(8 14 26)) 82%,
+                var(--color-app-background, rgb(8 14 26)) 88%,
                 transparent
             )
             0%,
         color-mix(
                 in srgb,
-                var(--color-app-background, rgb(8 14 26)) 60%,
+                var(--color-app-background, rgb(8 14 26)) 65%,
                 transparent
             )
-            36%,
+            40%,
         transparent 100%
     );
     inset-block-start: auto;
@@ -30,16 +31,17 @@
     position: relative;
     overflow: hidden;
     border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 48%, transparent);
-    backdrop-filter: blur(20px);
+        color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
+    backdrop-filter: blur(24px);
     background: linear-gradient(
         135deg,
-        color-mix(in srgb, var(--color-surface-elevated) 95%, transparent) 0%,
-        color-mix(in srgb, var(--color-surface-overlay) 88%, transparent) 100%
+        color-mix(in srgb, var(--color-surface-elevated) 97%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-overlay) 90%, transparent) 100%
     );
     box-shadow:
-        0 28px 60px rgb(8 12 24 / 42%),
-        inset 0 0 0 1px rgb(255 255 255 / 2%);
+        0 32px 72px -12px rgb(8 12 24 / 48%),
+        0 12px 28px -8px rgb(8 12 24 / 36%),
+        inset 0 0 0 1px rgb(255 255 255 / 4%);
     inline-size: min(100%, 120rem);
     margin-inline: auto;
 
@@ -64,8 +66,8 @@
     }
 
     &.themed-box--padding-lg {
-        padding-block: clamp(1.1rem, 0.95rem + 0.55vi, 1.5rem);
-        padding-inline: clamp(1.4rem, 1.15rem + 1.1vi, 2.1rem);
+        padding-block: clamp(1.25rem, 1rem + 0.75vi, 1.75rem);
+        padding-inline: clamp(1.5rem, 1.2rem + 1.2vi, 2.25rem);
     }
 }
 
@@ -74,12 +76,12 @@
     z-index: 1;
     display: grid;
     align-items: stretch;
-    gap: clamp(1rem, 1.2rem + 1vi, 2rem);
+    gap: clamp(1.25rem, 1rem + 1.25vi, 2.25rem);
     grid-template-columns:
         minmax(0, 1.2fr)
         minmax(0, 1.5fr)
-        minmax(200px, 0.65fr);
-    padding-inline-end: clamp(1rem, 0.9rem + 1vi, 1.5rem);
+        minmax(220px, 0.7fr);
+    padding-inline-end: clamp(1.25rem, 1rem + 1.25vi, 1.75rem);
 }
 
 .app-topbar__status-indicator {
@@ -152,26 +154,28 @@
 }
 
 .app-topbar__title {
-    font-size: clamp(1.25rem, 1rem + 0.55vi, 1.75rem);
-    letter-spacing: 0.015em;
-    line-height: 1.125;
-    text-shadow: 0 10px 28px rgb(59 130 246 / 26%);
+    font-size: clamp(1.25rem, 1.125rem + 0.65vi, 1.75rem);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    text-shadow: 0 12px 32px rgb(59 130 246 / 32%);
 }
 
 .app-topbar__subtitle {
     color: color-mix(
         in srgb,
-        var(--color-text-secondary, rgb(148 163 184)) 88%,
+        var(--color-text-secondary, rgb(148 163 184)) 90%,
         transparent
     );
-    font-size: clamp(0.75rem, 0.75rem + 0.22vi, 0.875rem);
-    letter-spacing: 0.08em;
+    font-size: clamp(0.75rem, 0.75rem + 0.25vi, 0.875rem);
+    letter-spacing: 0.02em;
+    line-height: 1.375;
+    margin-block-start: 0.25rem;
 }
 
 .app-topbar__badges {
     display: flex;
     flex-wrap: wrap;
-    gap: clamp(0.85rem, 0.7rem + 0.6vi, 1.1rem);
+    gap: clamp(1rem, 0.8rem + 0.75vi, 1.25rem);
     min-inline-size: 0;
 }
 
@@ -184,45 +188,56 @@
 
 .app-topbar__badge {
     display: flex;
-    flex: 1 1 clamp(12rem, 11rem + 2vi, 14rem);
+    flex: 1 1 clamp(13rem, 11.5rem + 2.5vi, 15rem);
     align-items: center;
-    padding: clamp(0.9rem, 0.8rem + 0.3vi, 1.1rem)
-        clamp(0.95rem, 0.85rem + 0.4vi, 1.25rem);
+    padding: clamp(1rem, 0.85rem + 0.4vi, 1.25rem)
+        clamp(1.125rem, 0.95rem + 0.5vi, 1.375rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 42%, transparent);
-    border-radius: 1rem;
+        color-mix(in srgb, var(--color-border-secondary) 46%, transparent);
+    border-radius: 1.125rem;
     background: color-mix(
         in srgb,
-        var(--color-surface-elevated) 94%,
+        var(--color-surface-elevated) 96%,
         transparent
     );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 2%),
-        0 16px 38px rgb(8 12 24 / 26%);
-    gap: 0.75rem;
-    min-inline-size: clamp(10.5rem, 9.5rem + 2vi, 12.5rem);
+        inset 0 0 0 1px rgb(255 255 255 / 4%),
+        0 18px 42px -6px rgb(8 12 24 / 32%);
+    gap: 0.875rem;
+    min-inline-size: clamp(11.5rem, 10rem + 2.5vi, 13.5rem);
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+
+    &:hover {
+        box-shadow:
+            inset 0 0 0 1px rgb(255 255 255 / 6%),
+            0 22px 48px -8px rgb(8 12 24 / 38%);
+        transform: translateY(-2px);
+    }
 }
 
 .app-topbar__badge-icon {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 0.85rem;
+    border-radius: 0.9375rem;
     background: color-mix(
         in srgb,
-        var(--color-primary-500) 12%,
-        var(--color-surface-overlay) 88%
+        var(--color-primary-500) 14%,
+        var(--color-surface-overlay) 86%
     );
-    block-size: 2.25rem;
+    block-size: 2.5rem;
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 6%),
-        0 12px 28px rgb(8 12 24 / 24%);
+        inset 0 0 0 1px rgb(255 255 255 / 8%),
+        0 14px 32px -4px rgb(8 12 24 / 28%);
     color: color-mix(
         in srgb,
-        var(--color-primary-500) 72%,
-        rgb(255 255 255) 28%
+        var(--color-primary-500) 76%,
+        rgb(255 255 255) 24%
     );
-    inline-size: 2.25rem;
+    inline-size: 2.5rem;
     pointer-events: none;
 
     .app-topbar__badge--primary & {
@@ -242,18 +257,23 @@
 .app-topbar__badge-label {
     color: color-mix(
         in srgb,
-        var(--color-text-secondary) 88%,
-        rgb(255 255 255) 12%
+        var(--color-text-secondary) 90%,
+        rgb(255 255 255) 10%
     );
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
+    font-size: 0.625rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.12em;
+    line-height: 1.25;
     text-transform: uppercase;
 }
 
 .app-topbar__badge-value {
     color: var(--color-text-primary);
-    font-size: clamp(1rem, 1rem + 0.22vi, 1.25rem);
+    font-size: clamp(1.125rem, 1rem + 0.35vi, 1.25rem);
     font-weight: var(--font-weight-semibold);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin-block-start: 0.125rem;
 }
 
 .app-topbar__badge--primary {

@@ -1,16 +1,16 @@
 .dashboard-overview {
-    margin-block-end: 1.5rem;
+    margin-block-end: clamp(1.5rem, 1.25rem + 1vi, 2.25rem);
 }
 
 .dashboard-overview__grid {
     display: grid;
     align-items: stretch;
-    gap: 1.25rem;
+    gap: clamp(1.25rem, 1rem + 0.75vi, 1.75rem);
     grid-auto-flow: dense;
-    grid-auto-rows: minmax(14rem, auto);
+    grid-auto-rows: minmax(15rem, auto);
 
     /* Default: Responsive auto-fit */
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
 }
 
 /* Ensure optimal layout at different breakpoints */
@@ -77,25 +77,29 @@
     border: 1px solid
         color-mix(
             in srgb,
-            var(--color-border-primary) 52%,
-            var(--dashboard-overview-card-accent-soft) 48%
+            var(--color-border-primary) 56%,
+            var(--dashboard-overview-card-accent-soft) 44%
         );
     background: linear-gradient(
         140deg,
-        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent),
+        color-mix(in srgb, var(--color-surface-elevated) 97%, transparent),
         color-mix(
             in srgb,
-            var(--color-surface-overlay) 74%,
-            var(--dashboard-overview-card-accent-soft) 26%
+            var(--color-surface-overlay) 78%,
+            var(--dashboard-overview-card-accent-soft) 22%
         )
     );
     block-size: 100%;
-    gap: 0.6rem;
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 3%),
+        0 16px 40px -8px rgb(8 12 24 / 28%);
+    gap: clamp(0.625rem, 0.5rem + 0.35vi, 0.875rem);
     isolation: isolate;
-    min-block-size: 15rem;
+    min-block-size: 16rem;
     transition:
         transform var(--transition-normal),
-        box-shadow var(--transition-normal);
+        box-shadow var(--transition-normal),
+        border-color var(--transition-normal);
 
     @media screen and (prefers-reduced-motion: reduce) {
         transition: none;
@@ -171,9 +175,20 @@
 
 .dashboard-overview__card:hover,
 .dashboard-overview__card:focus {
+    border-color: color-mix(
+        in srgb,
+        var(--dashboard-overview-card-accent) 42%,
+        var(--color-border-primary) 58%
+    );
     box-shadow:
-        0 22px 50px var(--dashboard-overview-card-shadow-strong),
-        0 0 0 1px color-mix(in srgb, var(--color-primary-500) 18%, transparent);
+        inset 0 0 0 1px rgb(255 255 255 / 5%),
+        0 24px 56px -10px var(--dashboard-overview-card-shadow-strong),
+        0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--dashboard-overview-card-accent) 22%,
+                transparent
+            );
     transform: translateY(-4px);
 }
 
@@ -182,37 +197,39 @@
     z-index: 1;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: clamp(0.75rem, 0.625rem + 0.35vi, 1rem);
+    margin-block-end: clamp(0.25rem, 0.125rem + 0.35vi, 0.5rem);
 }
 
 .dashboard-overview__card-icon {
     position: relative;
     z-index: 1;
     display: grid;
+    flex-shrink: 0;
     border-radius: var(--border-radius-full);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(10px);
     background: color-mix(
         in srgb,
-        var(--dashboard-overview-card-accent) 26%,
-        var(--color-surface-elevated) 74%
+        var(--dashboard-overview-card-accent) 28%,
+        var(--color-surface-elevated) 72%
     );
-    block-size: 2.6rem;
+    block-size: 2.75rem;
     box-shadow:
         inset 0 0 0 1px
-            color-mix(in srgb, var(--shadow-inverse-color) 6%, transparent),
-        0 12px 28px
+            color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent),
+        0 14px 32px -4px
             color-mix(
                 in srgb,
-                var(--dashboard-overview-card-accent) 24%,
+                var(--dashboard-overview-card-accent) 28%,
                 transparent
             );
     color: color-mix(
         in srgb,
-        var(--dashboard-overview-card-accent) 82%,
-        var(--shadow-inverse-color) 18%
+        var(--dashboard-overview-card-accent) 84%,
+        var(--shadow-inverse-color) 16%
     );
     font-size: 1.25rem;
-    inline-size: 2.6rem;
+    inline-size: 2.75rem;
     place-items: center;
 }
 
@@ -220,17 +237,21 @@
     position: relative;
     z-index: 1;
     color: var(--color-text-primary);
-    font-size: clamp(1.5rem, 1.5rem + 0.6vi, 2rem);
+    font-size: clamp(1.75rem, 1.5rem + 0.75vi, 2rem);
     font-weight: var(--font-weight-semibold);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    line-height: 1.125;
+    margin-block-end: clamp(0.375rem, 0.25rem + 0.35vi, 0.625rem);
 }
 
 .dashboard-overview__card-description {
     position: relative;
     z-index: 1;
-    color: color-mix(in srgb, var(--color-text-primary) 92%, transparent);
-    max-inline-size: 25ch;
-    opacity: 0.95;
+    color: color-mix(in srgb, var(--color-text-secondary) 92%, transparent);
+    font-size: clamp(0.75rem, 0.75rem + 0.2vi, 0.875rem);
+    line-height: 1.5;
+    max-inline-size: 28ch;
+    opacity: 0.96;
 }
 
 .dashboard-overview__card-trend {
@@ -238,12 +259,15 @@
     z-index: 1;
     color: color-mix(
         in srgb,
-        var(--dashboard-overview-card-accent) 75%,
-        var(--color-text-primary) 25%
+        var(--dashboard-overview-card-accent) 78%,
+        var(--color-text-primary) 22%
     );
-    font-weight: var(--font-weight-semibold);
+    font-size: clamp(0.75rem, 0.625rem + 0.2vi, 0.75rem);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.375;
     margin-block-start: auto;
-    opacity: 0.95;
+    opacity: 0.96;
+    padding-block-start: clamp(0.5rem, 0.375rem + 0.35vi, 0.75rem);
 }
 
 @media (width <= 640px) {

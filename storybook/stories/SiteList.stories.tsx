@@ -6,6 +6,7 @@
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
+    SiteTableDensity,
 } from "@app/stores/ui/types";
 import type { Site } from "@shared/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
@@ -21,6 +22,7 @@ import {
 } from "../helpers/siteStoryHelpers";
 
 interface SiteListStoryArgs {
+    density: SiteTableDensity;
     layout: SiteListLayoutMode;
     presentation: SiteCardPresentation;
     sites: readonly Site[];
@@ -70,7 +72,7 @@ const defaultSites: readonly Site[] = [
 ] as const;
 
 const withLayoutState: Decorator = (StoryComponent, context) => {
-    const { layout, presentation } =
+    const { density, layout, presentation } =
         context.args as unknown as SiteListStoryArgs;
 
     useEffect(
@@ -79,21 +81,28 @@ const withLayoutState: Decorator = (StoryComponent, context) => {
                 siteCardPresentation:
                     useUIStore.getState().siteCardPresentation,
                 siteListLayout: useUIStore.getState().siteListLayout,
+                siteTableDensity: useUIStore.getState().siteTableDensity,
             } as const;
 
             useUIStore.setState({
                 siteCardPresentation: presentation,
                 siteListLayout: layout,
+                siteTableDensity: density,
             });
 
             return function restoreSiteListLayout(): void {
                 useUIStore.setState({
                     siteCardPresentation: previous.siteCardPresentation,
                     siteListLayout: previous.siteListLayout,
+                    siteTableDensity: previous.siteTableDensity,
                 });
             };
         },
-        [layout, presentation]
+        [
+            density,
+            layout,
+            presentation,
+        ]
     );
 
     return <StoryComponent />;
@@ -101,6 +110,7 @@ const withLayoutState: Decorator = (StoryComponent, context) => {
 
 const meta: Meta<typeof SiteList> = {
     args: {
+        density: "comfortable",
         layout: "card-large",
         presentation: "stacked",
         sites: defaultSites,
@@ -120,6 +130,22 @@ const meta: Meta<typeof SiteList> = {
                 "card-large",
                 "card-compact",
                 "list",
+            ],
+        },
+        density: {
+            control: {
+                labels: {
+                    comfortable: "Comfortable",
+                    cozy: "Cozy",
+                    compact: "Compact",
+                },
+                type: "radio",
+            },
+            description: "Row density used when layout is set to list (table)",
+            options: [
+                "comfortable",
+                "cozy",
+                "compact",
             ],
         },
         presentation: {
@@ -175,6 +201,7 @@ export const CompactCards: Story = {
 
 export const ListView: Story = {
     args: {
+        density: "cozy",
         layout: "list",
     },
 };

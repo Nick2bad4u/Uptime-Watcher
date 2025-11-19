@@ -102,26 +102,26 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: clamp(0.75rem, 0.6rem + 0.4vi, 1.1rem)
-        clamp(0.85rem, 0.7rem + 0.5vi, 1.4rem);
+    padding: clamp(0.875rem, 0.7rem + 0.5vi, 1.25rem)
+        clamp(1rem, 0.8rem + 0.6vi, 1.5rem);
     border: 1px solid
-        color-mix(in srgb, var(--color-border-secondary) 42%, transparent);
-    border-radius: 1.1rem;
+        color-mix(in srgb, var(--color-border-secondary) 46%, transparent);
+    border-radius: 1.1875rem;
     background: linear-gradient(
         150deg,
-        color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
+        color-mix(in srgb, var(--color-surface-elevated) 97%, transparent) 0%,
         color-mix(
                 in srgb,
-                var(--color-primary-500) 14%,
-                var(--color-surface-overlay) 86%
+                var(--color-primary-500) 16%,
+                var(--color-surface-overlay) 84%
             )
             52%,
-        color-mix(in srgb, var(--color-surface-base) 80%, transparent) 100%
+        color-mix(in srgb, var(--color-surface-base) 82%, transparent) 100%
     );
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 4%),
-        0 18px 36px rgb(8 12 24 / 20%);
-    gap: clamp(0.75rem, 0.6rem + 0.35vi, 1.35rem);
+        inset 0 0 0 1px rgb(255 255 255 / 5%),
+        0 20px 40px -8px rgb(8 12 24 / 24%);
+    gap: clamp(0.875rem, 0.7rem + 0.5vi, 1.5rem);
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),
@@ -130,24 +130,24 @@
 
 .history-tab__row:hover,
 .history-tab__row:focus-within {
-    border-color: color-mix(in srgb, var(--color-primary-500) 32%, transparent);
+    border-color: color-mix(in srgb, var(--color-primary-500) 36%, transparent);
     box-shadow:
-        inset 0 0 0 1px rgb(255 255 255 / 6%),
-        0 24px 48px
-            color-mix(in srgb, var(--color-primary-500) 26%, transparent);
+        inset 0 0 0 1px rgb(255 255 255 / 7%),
+        0 26px 52px -10px
+            color-mix(in srgb, var(--color-primary-500) 30%, transparent);
     transform: translateY(-2px);
 }
 
 .history-tab__row-content {
     display: inline-flex;
     align-items: center;
-    gap: clamp(0.65rem, 0.5rem + 0.4vi, 1.05rem);
+    gap: clamp(0.75rem, 0.6rem + 0.45vi, 1.125rem);
 }
 
 .history-tab__row-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.4375rem;
     min-inline-size: 0;
 }
 

@@ -132,15 +132,16 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
         );
 
         return (
-            <tr
+            <div
                 aria-label={`Open details for ${latestSite.name}`}
-                className="site-table__row"
+                className="site-table__row site-table__grid-layout"
                 data-site-identifier={latestSite.identifier}
                 onClick={handleRowActivation}
                 onKeyDown={handleRowKeyDown}
+                role="row"
                 tabIndex={0}
             >
-                <th className="site-table__site" scope="row">
+                <div className="site-table__cell site-table__site" role="cell">
                     <button
                         className="site-table__site-trigger"
                         onClick={handleCardClick}
@@ -166,16 +167,16 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                             View details
                         </span>
                     </button>
-                </th>
-                <td>
+                </div>
+                <div className="site-table__cell" role="cell">
                     <MonitorSelector
                         className="site-table__monitor-selector"
                         monitors={latestSite.monitors}
                         onChange={handleMonitorIdChange}
                         selectedMonitorId={selectedMonitorId}
                     />
-                </td>
-                <td>
+                </div>
+                <div className="site-table__cell" role="cell">
                     <StatusBadge
                         formatter={statusFormatter}
                         label="Status"
@@ -183,21 +184,24 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         size="xs"
                         status={status}
                     />
-                </td>
-                <td>
+                </div>
+                <div className="site-table__cell" role="cell">
                     <ThemedText size="sm">{uptime}%</ThemedText>
-                </td>
-                <td>
+                </div>
+                <div className="site-table__cell" role="cell">
                     <ThemedText size="sm">
                         {responseTime ? `${responseTime} ms` : "—"}
                     </ThemedText>
-                </td>
-                <td>
+                </div>
+                <div className="site-table__cell" role="cell">
                     <ThemedText size="sm">
                         {runningMonitors}/{totalMonitors}
                     </ThemedText>
-                </td>
-                <td className="site-table__actions">
+                </div>
+                <div
+                    className="site-table__cell site-table__cell--end"
+                    role="cell"
+                >
                     <ActionButtonGroup
                         allMonitorsRunning={allMonitorsRunning}
                         buttonSize="xs"
@@ -210,8 +214,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         onStopMonitoring={handleStopMonitoring}
                         onStopSiteMonitoring={handleStopSiteMonitoring}
                     />
-                </td>
-            </tr>
+                </div>
+            </div>
         );
     }
 );

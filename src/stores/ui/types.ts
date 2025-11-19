@@ -29,6 +29,13 @@ export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 export type SiteCardPresentation = "grid" | "stacked";
 
 /**
+ * Density options for the tabular site list view.
+ *
+ * @public
+ */
+export type SiteTableDensity = "comfortable" | "compact" | "cozy";
+
+/**
  * Resizable column identifiers for the list layout table.
  *
  * @public
@@ -179,6 +186,13 @@ export interface UIStore {
     ) => void;
 
     /**
+     * Updates the row density for the tabular list layout.
+     *
+     * @param density - The density level to apply to the site table.
+     */
+    setSiteTableDensity: (density: SiteTableDensity) => void;
+
+    /**
      * Whether the add site modal is currently open.
      */
     showAddSiteModal: boolean;
@@ -235,6 +249,11 @@ export interface UIStore {
      * Current percentage widths for the list layout columns.
      */
     siteTableColumnWidths: Record<SiteTableColumnKey, number>;
+
+    /**
+     * Current density setting for the table-based site list view.
+     */
+    siteTableDensity: SiteTableDensity;
 
     /**
      * Synchronizes the active tab with the last tab opened for a site.

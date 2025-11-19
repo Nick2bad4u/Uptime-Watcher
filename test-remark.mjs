@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 // Quick test script to validate our remark configuration
 
-import { readFile } from 'fs/promises';
-import { remark } from 'remark';
-import remarkFrontmatter from 'remark-frontmatter';
-import remarkGfm from 'remark-gfm';
-import validateUptimeWatcherDocs from './config/linting/remark/validate-uptime-watcher-docs.mjs';
+import { readFile } from "fs/promises";
+import { remark } from "remark";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
+import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-watcher-docs.mjs";
 
 async function testRemarkConfig() {
-  console.log('🧪 Testing remark configuration...\n');
-  
-  try {
-    // Test with a sample markdown file
-    const testContent = `---
+    console.log("🧪 Testing remark configuration...\n");
+
+    try {
+        // Test with a sample markdown file
+        const testContent = `---
 title: "Test Document"
 summary: "This is a test"
 author: "Test Author"
@@ -39,28 +39,27 @@ const test = "hello world";
 More content here.
 `;
 
-    const processor = remark()
-      .use(remarkFrontmatter)
-      .use(remarkGfm)
-      .use(validateUptimeWatcherDocs);
+        const processor = remark()
+            .use(remarkFrontmatter)
+            .use(remarkGfm)
+            .use(validateUptimeWatcherDocs);
 
-    const result = await processor.process(testContent);
-    
-    console.log('✅ Remark configuration is working!');
-    
-    if (result.messages.length > 0) {
-      console.log('\n📝 Validation messages:');
-      result.messages.forEach(msg => {
-        console.log(`   ${msg.severity}: ${msg.message}`);
-      });
-    } else {
-      console.log('✅ No validation issues found!');
+        const result = await processor.process(testContent);
+
+        console.log("✅ Remark configuration is working!");
+
+        if (result.messages.length > 0) {
+            console.log("\n📝 Validation messages:");
+            result.messages.forEach((msg) => {
+                console.log(`   ${msg.severity}: ${msg.message}`);
+            });
+        } else {
+            console.log("✅ No validation issues found!");
+        }
+    } catch (error) {
+        console.error("❌ Remark configuration error:", error);
+        process.exit(1);
     }
-    
-  } catch (error) {
-    console.error('❌ Remark configuration error:', error);
-    process.exit(1);
-  }
 }
 
 testRemarkConfig();

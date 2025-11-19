@@ -146,7 +146,7 @@
             "request": "launch",
             "runtimeArgs": [
                 "${workspaceFolder}/dist/main.js",
-                "--remote-debugging-port=9222"
+                "--remote-debugging-port=9223"
             ],
             "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
             "skipFiles": [

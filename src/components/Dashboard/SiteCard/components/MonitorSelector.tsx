@@ -266,6 +266,24 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
             .filter(Boolean)
             .join(" ");
 
+        const selectedMonitorText = useMemo(() => {
+            if (!hasSelection) {
+                return placeholderLabel;
+            }
+            const selectedMonitor = monitors.find(
+                (m) => m.id === selectedMonitorId
+            );
+            return selectedMonitor
+                ? formatMonitorOption(selectedMonitor)
+                : placeholderLabel;
+        }, [
+            formatMonitorOption,
+            hasSelection,
+            monitors,
+            placeholderLabel,
+            selectedMonitorId,
+        ]);
+
         const MonitorIcon = AppIcons.metrics.monitor;
         const ChevronIcon = AppIcons.ui.expand;
 
@@ -283,6 +301,7 @@ export const MonitorSelector: NamedExoticComponent<MonitorSelectorProperties> =
                 onKeyDown={handleWrapperKeyDown}
                 role="button"
                 tabIndex={isDisabled ? -1 : 0}
+                title={selectedMonitorText}
             >
                 <span
                     aria-hidden="true"

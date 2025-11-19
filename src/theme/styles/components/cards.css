@@ -326,7 +326,8 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: 1rem;
+    max-inline-size: 100%;
 
     .site-grid--compact & {
         justify-content: space-between;
@@ -342,6 +343,9 @@
 }
 
 .site-card__inline-hint {
+    position: absolute;
+    inset-block-end: clamp(0.7rem, 0.55rem + 0.35vi, 1rem);
+    inset-inline-end: clamp(0.75rem, 0.6rem + 0.35vi, 1.15rem);
     display: inline-flex;
     align-items: center;
     color: color-mix(in srgb, var(--color-text-tertiary) 82%, transparent);
@@ -353,6 +357,11 @@
     text-transform: uppercase;
     transition: opacity var(--transition-normal);
     white-space: nowrap;
+    z-index: 1;
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        transition: none;
+    }
 
     .site-card:hover &,
     .site-card:focus-within & {
@@ -380,8 +389,8 @@
             color-mix(in srgb, var(--shadow-base-color) 24%, transparent);
     cursor: pointer;
     gap: 0.65rem;
-    inline-size: clamp(12rem, 24vi, 20rem);
-    max-inline-size: 100%;
+    inline-size: 100%;
+    max-inline-size: 20rem;
     min-inline-size: 12rem;
     transition:
         border-color var(--transition-fast),

@@ -205,9 +205,9 @@ if (
     !process.env["HEADLESS"]
 ) {
     try {
-        app.commandLine.appendSwitch("remote-debugging-port", "9222");
+        app.commandLine.appendSwitch("remote-debugging-port", "9223");
         logger.info(
-            "[Main] Remote debugging enabled on port 9222 (Electron MCP)"
+            "[Main] Remote debugging enabled on port 9223 (Electron MCP)"
         );
     } catch (error) {
         logger.warn("[Main] Failed to set remote debugging port", error);

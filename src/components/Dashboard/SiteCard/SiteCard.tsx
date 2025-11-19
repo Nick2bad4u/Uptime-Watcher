@@ -356,10 +356,12 @@ export const SiteCard: NamedExoticComponent<SiteCardProperties> = memo(
         );
 
         const historySection = (
-            <SiteCardHistory
-                filteredHistory={filteredHistory}
-                monitor={monitor}
-            />
+            <div className="mt-auto w-full">
+                <SiteCardHistory
+                    filteredHistory={filteredHistory}
+                    monitor={monitor}
+                />
+            </div>
         );
 
         // Memoize the complete props object to prevent unnecessary re-renders

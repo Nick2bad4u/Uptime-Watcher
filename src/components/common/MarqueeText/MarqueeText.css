@@ -43,11 +43,22 @@
 }
 
 @keyframes marquee-text-scroll {
-    from {
+    0% {
         transform: translateX(0);
     }
 
-    to {
-        transform: translateX(-100%);
+    /* Scroll phase: Move content to the left */
+    65% {
+        transform: translateX(calc(-50% - var(--marquee-gap, 1.5rem) / 2));
+    }
+
+    /* Snap back phase: Instantly reset to start */
+    65.01% {
+        transform: translateX(0);
+    }
+
+    /* Pause phase: Hold at start before repeating */
+    100% {
+        transform: translateX(0);
     }
 }

@@ -13,6 +13,7 @@ import { useCallback, useMemo } from "react";
 import type {
     SiteCardPresentation,
     SiteListLayoutMode,
+    SiteTableDensity,
 } from "../../../stores/ui/types";
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
@@ -50,6 +51,13 @@ const selectSetSiteCardPresentation = (
     state: UiStoreState
 ): UiStoreState["setSiteCardPresentation"] => state.setSiteCardPresentation;
 
+const selectSiteTableDensity = (state: UiStoreState): SiteTableDensity =>
+    state.siteTableDensity;
+
+const selectSetSiteTableDensity = (
+    state: UiStoreState
+): UiStoreState["setSiteTableDensity"] => state.setSiteTableDensity;
+
 /**
  * Main site list component that displays all monitored sites.
  *
@@ -78,6 +86,8 @@ export const SiteList = (): JSX.Element => {
     const setLayout = useUIStore(selectSetSiteListLayout);
     const cardPresentation = useUIStore(selectSiteCardPresentation);
     const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
+    const tableDensity = useUIStore(selectSiteTableDensity);
+    const setTableDensity = useUIStore(selectSetSiteTableDensity);
     const { isDark } = useTheme();
 
     const handleLayoutChange = useCallback(
@@ -92,6 +102,13 @@ export const SiteList = (): JSX.Element => {
             setCardPresentation(presentation);
         },
         [setCardPresentation]
+    );
+
+    const handleListDensityChange = useCallback(
+        (density: SiteTableDensity) => {
+            setTableDensity(density);
+        },
+        [setTableDensity]
     );
 
     const gridClassName = useMemo(() => {
@@ -143,13 +160,15 @@ export const SiteList = (): JSX.Element => {
                 <SiteListLayoutSelector
                     cardPresentation={cardPresentation}
                     layout={layout}
+                    listDensity={tableDensity}
                     onLayoutChange={handleLayoutChange}
+                    onListDensityChange={handleListDensityChange}
                     onPresentationChange={handlePresentationChange}
                 />
             </div>
 
             {layout === "list" ? (
-                <SiteTableView sites={sites} />
+                <SiteTableView density={tableDensity} sites={sites} />
             ) : (
                 <div className={gridClassName}>
                     {sites.map((site) =>

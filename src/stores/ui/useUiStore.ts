@@ -43,6 +43,7 @@ import type {
     SiteDetailsTab,
     SiteListLayoutMode,
     SiteTableColumnKey,
+    SiteTableDensity,
     UIStore,
 } from "./types";
 
@@ -61,6 +62,7 @@ interface UIPersistedState {
     siteDetailsTabState: Record<string, SiteDetailsTab>;
     siteListLayout: SiteListLayoutMode;
     siteTableColumnWidths: Record<SiteTableColumnKey, number>;
+    siteTableDensity: SiteTableDensity;
 }
 
 const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
@@ -308,6 +310,10 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     };
                 });
             },
+            setSiteTableDensity: (density: SiteTableDensity): void => {
+                logStoreAction("UIStore", "setSiteTableDensity", { density });
+                set({ siteTableDensity: density });
+            },
             showAddSiteModal: false,
             showAdvancedMetrics: false,
             showSettings: false,
@@ -319,6 +325,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+            siteTableDensity: "comfortable",
             syncActiveSiteDetailsTab: (siteIdentifier: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteIdentifier,
@@ -400,6 +407,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 siteDetailsTabState: state.siteDetailsTabState,
                 siteListLayout: state.siteListLayout,
                 siteTableColumnWidths: state.siteTableColumnWidths,
+                siteTableDensity: state.siteTableDensity,
                 // Don't persist modal states or selected site
             }),
         }

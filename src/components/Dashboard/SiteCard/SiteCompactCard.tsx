@@ -99,6 +99,21 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
             return monitorTypeLabel;
         }, [monitor]);
 
+        const subtitleText = useMemo(
+            () => `${site.identifier} • ${monitorSummary}`,
+            [monitorSummary, site.identifier]
+        );
+
+        const subtitleTextProps = useMemo<
+            NonNullable<MarqueeTextProperties["textProps"]>
+        >(
+            () => ({
+                size: "xs",
+                variant: "secondary",
+            }),
+            []
+        );
+
         const monitorStatus: MonitorStatus = monitor?.status ?? status;
         const monitorStatusLabel = monitor
             ? getMonitorTypeDisplayLabel(monitor.type)
@@ -161,30 +176,12 @@ export const SiteCompactCard: NamedExoticComponent<SiteCompactCardProperties> =
                             textProps={marqueeTextProps}
                             trackClassName="site-card__compact-name-track"
                         />
-                        <ThemedText
+                        <MarqueeText
+                            activeClassName="site-card__compact-subtitle--marquee"
                             className="site-card__compact-subtitle"
-                            size="xs"
-                            variant="secondary"
-                        >
-                            <span
-                                className="site-card__compact-subtitle-url"
-                                title={site.identifier}
-                            >
-                                {site.identifier}
-                            </span>
-                            <span
-                                aria-hidden="true"
-                                className="site-card__compact-subtitle-separator"
-                            >
-                                •
-                            </span>
-                            <span
-                                className="site-card__compact-subtitle-text"
-                                title={monitorSummary}
-                            >
-                                {monitorSummary}
-                            </span>
-                        </ThemedText>
+                            text={subtitleText}
+                            textProps={subtitleTextProps}
+                        />
                     </div>
                     <div className="site-card__compact-status">
                         {compactStatusEntries.map(

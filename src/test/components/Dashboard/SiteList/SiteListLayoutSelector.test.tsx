@@ -64,6 +64,7 @@ vi.mock("../../../../utils/icons", () => {
 describe("site list layout selector", () => {
     const onLayoutChange = vi.fn();
     const onPresentationChange = vi.fn();
+    const onListDensityChange = vi.fn();
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -73,8 +74,10 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
+                listDensity="comfortable"
                 layout="card-large"
                 onLayoutChange={onLayoutChange}
+                onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
             />
         );
@@ -93,8 +96,10 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
+                listDensity="comfortable"
                 layout="card-large"
                 onLayoutChange={onLayoutChange}
+                onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
             />
         );
@@ -111,8 +116,10 @@ describe("site list layout selector", () => {
         render(
             <SiteListLayoutSelector
                 cardPresentation="grid"
+                listDensity="comfortable"
                 layout="list"
                 onLayoutChange={onLayoutChange}
+                onListDensityChange={onListDensityChange}
                 onPresentationChange={onPresentationChange}
             />
         );
@@ -120,5 +127,36 @@ describe("site list layout selector", () => {
         expect(
             screen.queryByRole("button", { name: "Grid" })
         ).not.toBeInTheDocument();
+
+        // Density controls should be present in list mode
+        expect(
+            screen.getByRole("button", { name: "Comfortable" })
+        ).toBeInTheDocument();
+    });
+
+    it("should toggle list density when list view is active", () => {
+        render(
+            <SiteListLayoutSelector
+                cardPresentation="grid"
+                listDensity="comfortable"
+                layout="list"
+                onLayoutChange={onLayoutChange}
+                onListDensityChange={onListDensityChange}
+                onPresentationChange={onPresentationChange}
+            />
+        );
+
+        const comfortableButton = screen.getByRole("button", {
+            name: "Comfortable",
+        });
+        const compactButton = screen.getByRole("button", {
+            name: "Compact",
+        });
+
+        expect(comfortableButton).toHaveAttribute("aria-pressed", "true");
+        expect(compactButton).toHaveAttribute("aria-pressed", "false");
+
+        fireEvent.click(compactButton);
+        expect(onListDensityChange).toHaveBeenCalledWith("compact");
     });
 });
