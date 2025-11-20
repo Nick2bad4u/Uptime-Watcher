@@ -936,7 +936,7 @@
     "lcov-result-merger": "^5.0.1",
     "leasot": "^14.4.0",
     "madge": "^8.0.0",
-    "markdown-link-check": "^3.14.1",
+    "markdown-link-check": "^3.14.2",
     "markdown-to-jsx": "^8.0.0",
     "markdownlint": "^0.39.0",
     "msw": "^2.12.2",
