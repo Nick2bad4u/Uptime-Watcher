@@ -9,9 +9,9 @@ import { describe, expect, it, beforeEach, vi } from "vitest";
 import { SiteList } from "../../../../components/Dashboard/SiteList/SiteList";
 import type { Site } from "@shared/types";
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteListLayoutMode,
-    SiteTableDensity,
 } from "../../../../stores/ui/types";
 import { createSelectorHookMock } from "../../../utils/createSelectorHookMock";
 import {
@@ -24,8 +24,8 @@ interface UiStoreState {
     setSiteListLayout: ReturnType<typeof vi.fn>;
     siteCardPresentation: SiteCardPresentation;
     setSiteCardPresentation: ReturnType<typeof vi.fn>;
-    siteTableDensity: SiteTableDensity;
-    setSiteTableDensity: ReturnType<typeof vi.fn>;
+    surfaceDensity: InterfaceDensity;
+    setSurfaceDensity: ReturnType<typeof vi.fn>;
 }
 
 interface Invocation<TProps extends Record<string, unknown>> {
@@ -47,11 +47,11 @@ const {
         setSiteListLayout: vi.fn(),
         siteCardPresentation: "grid" as SiteCardPresentation,
         setSiteCardPresentation: vi.fn(),
-        siteTableDensity: "comfortable" as SiteTableDensity,
-        setSiteTableDensity: vi.fn(),
+        surfaceDensity: "comfortable" as InterfaceDensity,
+        setSurfaceDensity: vi.fn(),
     } as UiStoreState,
     tableViewInvocations: [] as Invocation<{
-        density: SiteTableDensity;
+        density: InterfaceDensity;
         sites: Site[];
     }>[],
     compactCardInvocations: [] as Invocation<{ site: Site }>[],
@@ -61,10 +61,10 @@ const {
     }>[],
     selectorInvocations: [] as Invocation<{
         cardPresentation: SiteCardPresentation;
-        listDensity: SiteTableDensity;
+        listDensity: InterfaceDensity;
         layout: SiteListLayoutMode;
         onLayoutChange: (mode: SiteListLayoutMode) => void;
-        onListDensityChange: (density: SiteTableDensity) => void;
+        onListDensityChange: (density: InterfaceDensity) => void;
         onPresentationChange: (presentation: SiteCardPresentation) => void;
     }>[],
     iconInvocations: [] as Invocation<Record<string, unknown>>[],
@@ -132,10 +132,10 @@ vi.mock(
     () => ({
         SiteListLayoutSelector: (props: {
             readonly cardPresentation: SiteCardPresentation;
-            readonly listDensity: SiteTableDensity;
+            readonly listDensity: InterfaceDensity;
             readonly layout: SiteListLayoutMode;
             readonly onLayoutChange: (mode: SiteListLayoutMode) => void;
-            readonly onListDensityChange: (density: SiteTableDensity) => void;
+            readonly onListDensityChange: (density: InterfaceDensity) => void;
             readonly onPresentationChange: (
                 presentation: SiteCardPresentation
             ) => void;
@@ -151,7 +151,7 @@ vi.mock("../../../../components/Dashboard/SiteList/SiteTableView", () => ({
         density,
         sites,
     }: {
-        readonly density: SiteTableDensity;
+        readonly density: InterfaceDensity;
         readonly sites: Site[];
     }) => {
         tableViewInvocations.push({ props: { density, sites } });
@@ -205,7 +205,7 @@ beforeEach(() => {
     uiStoreState.siteCardPresentation = "grid";
     uiStoreState.setSiteListLayout.mockReset();
     uiStoreState.setSiteCardPresentation.mockReset();
-    uiStoreState.setSiteTableDensity.mockReset();
+    uiStoreState.setSurfaceDensity.mockReset();
     updateSitesStoreMock(sitesStoreState, { sites: [] });
     useSitesStoreMock.mockClear();
     tableViewInvocations.length = 0;
@@ -232,11 +232,11 @@ describe("SiteList layout behavior", () => {
         expect(screen.getByTestId("site-table-view")).toBeInTheDocument();
         expect(tableViewInvocations[0]?.props.sites).toEqual(sampleSites);
         expect(tableViewInvocations[0]?.props.density).toBe(
-            uiStoreState.siteTableDensity
+            uiStoreState.surfaceDensity
         );
         expect(selectorInvocations[0]?.props.layout).toBe("list");
         expect(selectorInvocations[0]?.props.listDensity).toBe(
-            uiStoreState.siteTableDensity
+            uiStoreState.surfaceDensity
         );
 
         selectorInvocations[0]?.props.onLayoutChange("card-compact");
@@ -245,9 +245,7 @@ describe("SiteList layout behavior", () => {
         );
 
         selectorInvocations[0]?.props.onListDensityChange("compact");
-        expect(uiStoreState.setSiteTableDensity).toHaveBeenCalledWith(
-            "compact"
-        );
+        expect(uiStoreState.setSurfaceDensity).toHaveBeenCalledWith("compact");
     });
 
     it("renders stacked and grid presentations with dark mode styling", () => {

@@ -6,7 +6,7 @@ import type { Site } from "@shared/types";
 
 import { memo, type NamedExoticComponent } from "react";
 
-import type { SiteTableDensity } from "../../../stores/ui/types";
+import type { InterfaceDensity } from "../../../stores/ui/types";
 
 import { ThemedBox } from "../../../theme/components/ThemedBox";
 import { SiteTableRow } from "./SiteTableRow";
@@ -38,10 +38,10 @@ const COLUMN_DEFINITIONS: readonly ColumnDefinition[] = [
     },
 ] as const;
 
-const DENSITY_CLASS_MAP: Record<SiteTableDensity, string | undefined> = {
-    comfortable: "site-table--comfortable",
-    compact: "site-table--compact",
-    cozy: "site-table--cozy",
+const DENSITY_CLASS_MAP: Record<InterfaceDensity, string> = {
+    comfortable: "site-table--comfortable density--comfortable",
+    compact: "site-table--compact density--compact",
+    cozy: "site-table--cozy density--cozy",
 };
 
 /**
@@ -49,7 +49,7 @@ const DENSITY_CLASS_MAP: Record<SiteTableDensity, string | undefined> = {
  */
 export interface SiteTableViewProperties {
     /** Density setting controlling row spacing and compactness. */
-    readonly density: SiteTableDensity;
+    readonly density: InterfaceDensity;
     /** Collection of sites to display. */
     readonly sites: readonly Site[];
 }
@@ -59,11 +59,8 @@ export interface SiteTableViewProperties {
  */
 export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
     memo(function SiteTableView({ density, sites }: SiteTableViewProperties) {
-        const densityClassName =
-            DENSITY_CLASS_MAP[density] ?? DENSITY_CLASS_MAP.comfortable ?? "";
-        const tableClassName = densityClassName
-            ? `site-table ${densityClassName}`
-            : "site-table";
+        const densityClassName = DENSITY_CLASS_MAP[density];
+        const tableClassName = `site-table ${densityClassName}`;
 
         return (
             <ThemedBox
@@ -73,41 +70,45 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                 shadow="sm"
                 surface="elevated"
             >
-                <div
-                    aria-label="Monitored Sites"
-                    className="site-table__container"
-                    role="table"
-                >
-                    <div
-                        className="site-table__header site-table__grid-layout"
-                        role="row"
-                    >
-                        {COLUMN_DEFINITIONS.map((column) => {
-                            const headingClass =
-                                column.align === "end"
-                                    ? "site-table__heading site-table__heading--end"
-                                    : "site-table__heading";
+                <div className="site-table__container">
+                    <table aria-label="Monitored Sites">
+                        <thead className="site-table__header">
+                            <tr className="site-table__grid-layout">
+                                {COLUMN_DEFINITIONS.map((column) => {
+                                    const headingBaseClass =
+                                        column.align === "end"
+                                            ? "site-table__heading site-table__heading--end"
+                                            : "site-table__heading";
+                                    const headingClass = column.className
+                                        ? `${headingBaseClass} ${column.className}`
+                                        : headingBaseClass;
 
-                            return (
-                                <div
-                                    className={headingClass}
-                                    key={column.key}
-                                    role="columnheader"
-                                    title={column.label}
-                                >
-                                    <span>{column.label}</span>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div className="site-table__body" role="rowgroup">
-                        {sites.map((siteEntry) => (
-                            <SiteTableRow
-                                key={siteEntry.identifier}
-                                site={siteEntry}
-                            />
-                        ))}
-                    </div>
+                                    return (
+                                        <th
+                                            className={headingClass}
+                                            key={column.key}
+                                            scope="col"
+                                            title={column.label}
+                                        >
+                                            <span>{column.label}</span>
+                                        </th>
+                                    );
+                                })}
+                            </tr>
+                        </thead>
+                        <tbody className="site-table__body">
+                            {sites.map((siteEntry, index) => (
+                                <SiteTableRow
+                                    key={siteEntry.identifier}
+                                    rowOrder={index}
+                                    rowVariant={
+                                        index % 2 === 0 ? "even" : "odd"
+                                    }
+                                    site={siteEntry}
+                                />
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </ThemedBox>
         );

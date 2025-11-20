@@ -1,0 +1,526 @@
+.galaxy-background {
+    position: absolute;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    inset: 0;
+    pointer-events: none;
+}
+
+.galaxy-background--dark {
+    background:
+        radial-gradient(
+            ellipse 120% 80% at 20% 30%,
+            #1e1b4b 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse 100% 70% at 80% 70%,
+            #0f172a 0%,
+            transparent 50%
+        ),
+        radial-gradient(ellipse at bottom, #0a0e1a 0%, #020617 100%);
+}
+
+.galaxy-background--light {
+    background:
+        radial-gradient(
+            ellipse 120% 80% at 20% 30%,
+            #dbeafe 0%,
+            transparent 50%
+        ),
+        radial-gradient(
+            ellipse 100% 70% at 80% 70%,
+            #bae6fd 0%,
+            transparent 50%
+        ),
+        radial-gradient(ellipse at bottom, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.galaxy-overlay {
+    position: absolute;
+    z-index: 1;
+    animation: nebula-pulse 20s ease-in-out infinite alternate;
+    inset: 0;
+    mix-blend-mode: screen;
+
+    .galaxy-background--dark & {
+        background:
+            radial-gradient(
+                ellipse 140% 100% at 50% 120%,
+                rgb(124 58 237 / 0.25),
+                rgb(139 92 246 / 0.15) 40%,
+                transparent 70%
+            ),
+            radial-gradient(
+                circle at 5% 15%,
+                rgb(14 165 233 / 0.18),
+                rgb(56 189 248 / 0.08) 35%,
+                transparent 55%
+            ),
+            radial-gradient(
+                circle at 95% 25%,
+                rgb(236 72 153 / 0.16),
+                rgb(244 114 182 / 0.08) 35%,
+                transparent 55%
+            ),
+            radial-gradient(
+                circle at 75% 85%,
+                rgb(99 102 241 / 0.14),
+                transparent 50%
+            ),
+            repeating-radial-gradient(
+                circle at 50% 50%,
+                transparent,
+                transparent 200px,
+                rgb(139 92 246 / 0.03) 200px,
+                rgb(139 92 246 / 0.03) 400px
+            );
+    }
+
+    .galaxy-background--light & {
+        background:
+            radial-gradient(
+                ellipse 140% 100% at 50% 120%,
+                rgb(56 189 248 / 0.22),
+                rgb(125 211 252 / 0.12) 40%,
+                transparent 70%
+            ),
+            radial-gradient(
+                circle at 8% 18%,
+                rgb(129 140 248 / 0.15),
+                rgb(165 180 252 / 0.08) 35%,
+                transparent 55%
+            ),
+            radial-gradient(
+                circle at 92% 28%,
+                rgb(167 139 250 / 0.14),
+                rgb(196 181 253 / 0.07) 35%,
+                transparent 55%
+            );
+        mix-blend-mode: multiply;
+    }
+}
+
+.galaxy-objects {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+}
+
+.galaxy-object {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.9;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.galaxy-object--planet-1 {
+    animation:
+        float-planet-1 90s linear infinite,
+        planet-glow-1 6s ease-in-out infinite alternate;
+    background:
+        radial-gradient(
+            circle at 25% 25%,
+            rgb(221 214 254 / 0.95) 0%,
+            rgb(196 181 253 / 0.9) 12%,
+            rgb(167 139 250 / 0.85) 25%,
+            rgb(139 92 246 / 0.9) 45%,
+            rgb(124 58 237 / 0.95) 70%,
+            rgb(109 40 217 / 1) 100%
+        ),
+        repeating-conic-gradient(
+            from 0deg at 50% 50%,
+            rgb(147 51 234 / 0.15) 0deg,
+            transparent 8deg,
+            rgb(147 51 234 / 0.15) 15deg
+        ),
+        repeating-linear-gradient(
+            135deg,
+            transparent 0,
+            transparent 8px,
+            rgb(255 255 255 / 0.08) 8px,
+            rgb(255 255 255 / 0.08) 12px,
+            transparent 12px,
+            transparent 20px
+        );
+    background-blend-mode: overlay, soft-light, normal;
+    block-size: 70px;
+    box-shadow:
+        0 0 30px rgb(124 58 237 / 0.6),
+        0 0 60px rgb(124 58 237 / 0.3),
+        inset -15px -15px 30px rgb(88 28 135 / 0.6),
+        inset 10px 10px 20px rgb(233 213 255 / 0.2),
+        inset 0 0 40px rgb(124 58 237 / 0.1);
+    filter: drop-shadow(0 8px 16px rgb(124 58 237 / 0.4));
+    inline-size: 70px;
+    inset-block-start: 8%;
+    inset-inline-start: 8%;
+}
+
+.galaxy-object--planet-2 {
+    animation:
+        float-planet-2 140s linear infinite,
+        planet-glow-2 8s ease-in-out infinite alternate;
+    background:
+        radial-gradient(
+            circle at 28% 28%,
+            rgb(251 207 232 / 0.95) 0%,
+            rgb(249 168 212 / 0.9) 10%,
+            rgb(244 114 182 / 0.88) 22%,
+            rgb(236 72 153 / 0.92) 40%,
+            rgb(219 39 119 / 0.95) 65%,
+            rgb(190 24 93 / 1) 100%
+        ),
+        repeating-radial-gradient(
+            ellipse at 45% 45%,
+            transparent 0,
+            transparent 6px,
+            rgb(244 114 182 / 0.12) 6px,
+            rgb(244 114 182 / 0.12) 8px,
+            transparent 8px,
+            transparent 15px
+        ),
+        repeating-conic-gradient(
+            from 45deg at 60% 50%,
+            rgb(219 39 119 / 0.18) 0deg,
+            transparent 12deg,
+            rgb(236 72 153 / 0.15) 24deg,
+            transparent 30deg
+        );
+    background-blend-mode: overlay, color-dodge, normal;
+    block-size: 52px;
+    box-shadow:
+        0 0 25px rgb(219 39 119 / 0.5),
+        0 0 50px rgb(219 39 119 / 0.25),
+        inset -12px -12px 24px rgb(157 23 77 / 0.65),
+        inset 8px 8px 16px rgb(251 207 232 / 0.25),
+        inset 0 0 30px rgb(219 39 119 / 0.12);
+    filter: drop-shadow(0 6px 12px rgb(219 39 119 / 0.35));
+    inline-size: 52px;
+    inset-block-start: 58%;
+    inset-inline-end: 12%;
+}
+
+.galaxy-object--quasar {
+    animation:
+        pulse-quasar 10s ease-in-out infinite alternate,
+        quasar-rotate 60s linear infinite;
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgb(224 242 254 / 0.9) 0%,
+            rgb(125 211 252 / 0.7) 15%,
+            rgb(56 189 248 / 0.5) 30%,
+            rgb(14 165 233 / 0.3) 45%,
+            transparent 70%
+        ),
+        repeating-conic-gradient(
+            from 0deg at 50% 50%,
+            transparent 0deg,
+            rgb(56 189 248 / 0.2) 3deg,
+            transparent 6deg
+        );
+    block-size: 140px;
+    box-shadow:
+        0 0 40px rgb(56 189 248 / 0.5),
+        0 0 80px rgb(56 189 248 / 0.3),
+        0 0 120px rgb(56 189 248 / 0.15);
+    filter: blur(2px) saturate(1.5);
+    inline-size: 140px;
+    inset-block-start: -30px;
+    inset-inline-end: 28%;
+    mix-blend-mode: screen;
+    opacity: 0.7;
+}
+
+@keyframes float-planet-1 {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(12px, -18px) rotate(90deg);
+    }
+    50% {
+        transform: translate(20px, -25px) rotate(180deg);
+    }
+    75% {
+        transform: translate(8px, -12px) rotate(270deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+    }
+}
+
+@keyframes float-planet-2 {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    33% {
+        transform: translate(-18px, 12px) rotate(-120deg);
+    }
+    66% {
+        transform: translate(-25px, 18px) rotate(-240deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(-360deg);
+    }
+}
+
+@keyframes planet-glow-1 {
+    0% {
+        filter: drop-shadow(0 8px 16px rgb(124 58 237 / 0.4)) brightness(1)
+            saturate(1);
+    }
+    100% {
+        filter: drop-shadow(0 12px 24px rgb(124 58 237 / 0.6)) brightness(1.1)
+            saturate(1.2);
+    }
+}
+
+@keyframes planet-glow-2 {
+    0% {
+        filter: drop-shadow(0 6px 12px rgb(219 39 119 / 0.35)) brightness(1)
+            saturate(1);
+    }
+    100% {
+        filter: drop-shadow(0 10px 20px rgb(219 39 119 / 0.55)) brightness(1.08)
+            saturate(1.15);
+    }
+}
+
+@keyframes pulse-quasar {
+    0% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.8;
+        transform: scale(1.15);
+    }
+}
+
+@keyframes quasar-rotate {
+    from {
+        transform: rotate(0deg) scale(1);
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .galaxy-overlay {
+        animation: none;
+    }
+
+    .galaxy-object--planet-1 {
+        animation: none;
+        transform: translate(10px, -12px);
+    }
+
+    .galaxy-object--planet-2 {
+        animation: none;
+        transform: translate(-12px, 10px);
+    }
+
+    .galaxy-object--quasar {
+        animation: none;
+        opacity: 0.6;
+    }
+}
+
+.stars-container {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    mask-image: linear-gradient(to bottom, #000000 60%, transparent 100%);
+}
+
+.stars {
+    position: absolute;
+    background: transparent;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+}
+
+/* Small stars: Move Up (Standard) */
+.stars-sm {
+    animation: anim-star-up 150s linear infinite;
+    block-size: 1px;
+    inline-size: 1px;
+    opacity: 0.8;
+
+    &::after {
+        position: absolute;
+        background: transparent;
+        block-size: inherit;
+        box-shadow: inherit;
+        content: " ";
+        inline-size: inherit;
+        inset-block-start: 2000px;
+    }
+    @media screen and (prefers-reduced-motion: reduce) {
+        animation: none;
+        block-size: 1px;
+        inline-size: 1px;
+        opacity: 0.8;
+
+        &::after {
+            position: absolute;
+            background: transparent;
+            block-size: inherit;
+            box-shadow: inherit;
+            content: " ";
+            inline-size: inherit;
+            inset-block-start: 2000px;
+        }
+    }
+}
+
+/* Medium stars: Move Down */
+.stars-md {
+    animation: anim-star-down 200s linear infinite;
+    block-size: 2px;
+    inline-size: 2px;
+    opacity: 0.6;
+
+    &::after {
+        position: absolute;
+        background: transparent;
+        block-size: inherit;
+        box-shadow: inherit;
+        content: " ";
+        inline-size: inherit;
+        inset-block-start: -2000px; /* Position above for downward movement */
+    }
+    @media screen and (prefers-reduced-motion: reduce) {
+        animation: none;
+        block-size: 2px;
+        inline-size: 2px;
+        opacity: 0.6;
+
+        &::after {
+            position: absolute;
+            background: transparent;
+            block-size: inherit;
+            box-shadow: inherit;
+            content: " ";
+            inline-size: inherit;
+            inset-block-start: -2000px; /* Position above for downward movement */
+        }
+    }
+}
+
+/* Large stars: Move Right */
+.stars-lg {
+    animation: anim-star-right 250s linear infinite;
+    block-size: 3px;
+    inline-size: 3px;
+    opacity: 0.5;
+
+    &::after {
+        position: absolute;
+        background: transparent;
+        block-size: inherit;
+        box-shadow: inherit;
+        content: " ";
+        inline-size: inherit;
+        inset-block-start: 0;
+        inset-inline-start: -2000px; /* Position left for rightward movement */
+    }
+    @media screen and (prefers-reduced-motion: reduce) {
+        animation: none;
+        block-size: 3px;
+        inline-size: 3px;
+        opacity: 0.5;
+
+        &::after {
+            position: absolute;
+            background: transparent;
+            block-size: inherit;
+            box-shadow: inherit;
+            content: " ";
+            inline-size: inherit;
+            inset-block-start: 0;
+            inset-inline-start: -2000px; /* Position left for rightward movement */
+        }
+    }
+}
+
+/* Twinkle stars: Static with opacity pulse */
+.stars-twinkle {
+    animation: anim-twinkle 4s ease-in-out infinite alternate;
+    block-size: 2px;
+    inline-size: 2px;
+    opacity: 0.8;
+    @media screen and (prefers-reduced-motion: reduce) {
+        animation: none;
+        block-size: 2px;
+        inline-size: 2px;
+        opacity: 0.8;
+    }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .stars-sm,
+    .stars-md,
+    .stars-lg,
+    .stars-twinkle {
+        animation: none;
+    }
+}
+
+@keyframes anim-star-up {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-2000px);
+    }
+}
+
+@keyframes anim-star-down {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(2000px);
+    }
+}
+
+@keyframes anim-star-right {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(2000px);
+    }
+}
+
+@keyframes anim-twinkle {
+    0% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes nebula-pulse {
+    0% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 0.9;
+        transform: scale(1.05);
+    }
+}

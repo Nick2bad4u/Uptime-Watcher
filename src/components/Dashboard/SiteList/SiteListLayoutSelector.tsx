@@ -13,9 +13,9 @@ import {
 } from "react";
 
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteListLayoutMode,
-    SiteTableDensity,
 } from "../../../stores/ui/types";
 
 import { AppIcons } from "../../../utils/icons";
@@ -30,11 +30,11 @@ export interface SiteListLayoutSelectorProperties {
     /** Currently active layout mode. */
     readonly layout: SiteListLayoutMode;
     /** Active density for the list (table) layout. */
-    readonly listDensity: SiteTableDensity;
+    readonly listDensity: InterfaceDensity;
     /** Callback invoked when a new layout is selected. */
     readonly onLayoutChange: (layout: SiteListLayoutMode) => void;
     /** Callback invoked when list density changes. */
-    readonly onListDensityChange: (density: SiteTableDensity) => void;
+    readonly onListDensityChange: (density: InterfaceDensity) => void;
     /** Callback invoked when presentation mode changes. */
     readonly onPresentationChange: (presentation: SiteCardPresentation) => void;
 }
@@ -93,7 +93,7 @@ interface DensityOption {
     readonly description: string;
     readonly Icon: IconType;
     readonly label: string;
-    readonly value: SiteTableDensity;
+    readonly value: InterfaceDensity;
 }
 
 const DENSITY_OPTIONS: readonly DensityOption[] = [
@@ -123,7 +123,7 @@ const isLayoutMode = (value: string): value is SiteListLayoutMode =>
 const isPresentationMode = (value: string): value is SiteCardPresentation =>
     PRESENTATION_OPTIONS.some((option) => option.value === value);
 
-const isDensityMode = (value: string): value is SiteTableDensity =>
+const isDensityMode = (value: string): value is InterfaceDensity =>
     DENSITY_OPTIONS.some((option) => option.value === value);
 
 /**

@@ -24,11 +24,20 @@
     gap: var(--spacing-md, 1rem);
     grid-template-columns: auto 1fr auto;
     pointer-events: none;
+    transition: transform 160ms ease-out;
 
     @media (prefers-color-scheme: light) {
         background-color: var(--color-surface-light, rgb(255 255 255 / 96%));
         box-shadow: 0 16px 32px rgb(15 23 42 / 18%);
         color: var(--color-text-primary, #111827);
+    }
+
+    &:hover,
+    &:focus-visible {
+        box-shadow:
+            0 22px 52px rgb(15 23 42 / 34%),
+            0 0 0 1px rgb(15 23 42 / 35%);
+        transform: translateY(-2px);
     }
 }
 
@@ -115,9 +124,20 @@
         transition: none;
     }
 
-    &:focus-visible,
-    &:hover {
+    &:hover,
+    &:focus {
         background-color: var(--color-border-primary, rgb(148 163 184 / 16%));
+        transform: scale(1.05);
+    }
+
+    &:focus-visible {
+        background-color: var(--color-border-primary, rgb(148 163 184 / 16%));
+        box-shadow: 0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--color-primary-500, #3b82f6) 55%,
+                transparent
+            );
         transform: scale(1.05);
     }
 }

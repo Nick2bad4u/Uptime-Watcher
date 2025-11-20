@@ -43,6 +43,10 @@
 }
 
 .site-details-url {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0;
     margin: 0;
     background: none;
@@ -56,13 +60,35 @@
     line-height: 1.5;
     max-inline-size: 100%;
     opacity: 0.96;
+    text-decoration: none;
     transition:
         color var(--transition-normal),
         opacity var(--transition-normal),
         transform var(--transition-fast);
     word-break: break-all;
 
-    &:hover {
+    &::after {
+        position: absolute;
+        border-radius: 999px;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            color-mix(in srgb, var(--site-header-trace-line) 80%, transparent),
+            transparent
+        );
+        block-size: 2px;
+        content: "";
+        inline-size: 0;
+        inset-block-end: -0.15rem;
+        inset-inline-start: 0;
+        opacity: 0.7;
+        transition:
+            inline-size var(--transition-fast),
+            opacity var(--transition-fast);
+    }
+
+    &:hover,
+    &:focus-visible {
         color: color-mix(
             in srgb,
             var(--color-primary-400) 75%,
@@ -70,6 +96,11 @@
         );
         opacity: 1;
         transform: translateX(2px);
+
+        &::after {
+            inline-size: 100%;
+            opacity: 1;
+        }
     }
 }
 
@@ -99,16 +130,6 @@
     font-weight: var(--font-weight-medium);
     opacity: 0.9;
 }
-
-.site-details-refresh-indicator {
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-    background: var(--color-success);
-    block-size: 8px;
-    box-shadow: 0 0 6px 0 var(--color-success-99);
-    inline-size: 8px;
-}
-
 .site-details-refresh-text {
     margin: 0;
     color: var(--color-success);
@@ -173,11 +194,68 @@
     display: flex;
     overflow: hidden;
     flex-direction: column;
+    padding: clamp(1.5rem, 1.2rem + 1vi, 2.2rem);
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 55%, transparent);
+    border-radius: 1.2rem;
+    background:
+        linear-gradient(
+            145deg,
+            color-mix(in srgb, var(--color-surface-overlay) 96%, transparent) 0%,
+            color-mix(
+                    in srgb,
+                    var(--color-surface-elevated) 88%,
+                    var(--color-primary-500) 8%
+                )
+                50%,
+            color-mix(in srgb, var(--color-surface-base) 85%, transparent) 100%
+        );
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 5%),
+        0 36px 96px -28px rgb(5 8 18 / 80%);
+    isolation: isolate;
+
+    &::before {
+        position: absolute;
+        z-index: 0;
+        background:
+            radial-gradient(
+                140% 110% at 10% 0%,
+                color-mix(in srgb, var(--color-primary-500) 22%, transparent),
+                transparent 70%
+            ),
+            radial-gradient(
+                120% 100% at 95% 0%,
+                color-mix(in srgb, var(--color-status-up) 16%, transparent),
+                transparent 65%
+            );
+        content: "";
+        filter: blur(70px);
+        inset: -30% -20% -15%;
+        opacity: 0.55;
+        pointer-events: none;
+    }
+
+    &::after {
+        position: absolute;
+        z-index: 0;
+        background-image:
+            radial-gradient(circle, rgb(255 255 255 / 15%) 1px, transparent 50%),
+            radial-gradient(circle, color-mix(in srgb, var(--color-primary-200) 60%, transparent) 0.8px, transparent 45%);
+        background-size: 260px 220px, 340px 300px;
+        background-position: 20px 30px, 130px 110px;
+        content: "";
+        inset: -20% -15% 0;
+        mix-blend-mode: screen;
+        opacity: 0.18;
+        pointer-events: none;
+    }
 
     &[data-collapsed="true"] {
+        padding: clamp(1rem, 0.8rem + 0.6vi, 1.4rem);
         transition:
             transform var(--transition-fast),
-            filter var(--transition-fast);
+            padding var(--transition-fast);
     }
 }
 
@@ -188,7 +266,10 @@
     gap: clamp(1.25rem, 1rem + 0.75vi, 2rem);
     min-inline-size: 0;
     padding-block-end: clamp(0.5rem, 0.375rem + 0.35vi, 0.875rem);
+    z-index: 2;
 }
+
+
 
 .site-details-header-thumbnail {
     display: flex;
@@ -443,6 +524,13 @@
     max-block-size: 100%;
     max-inline-size: 100%;
     object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-details-header::before,
+    .site-details-header::after {
+        animation: none;
+    }
 }
 
 /* Responsive adjustments */

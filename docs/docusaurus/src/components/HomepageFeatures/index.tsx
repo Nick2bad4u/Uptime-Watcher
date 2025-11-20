@@ -23,7 +23,6 @@ const Feature: FC<FeatureProps> = ({
     title,
 }: Readonly<FeatureProps>) => (
     <div className={clsx("col col--4")} style={style}>
-        {}
         <div className={clsx("text--center", styles["featureCard"])}>
             <div className={styles["featureIcon"]}>{icon}</div>
             <div className="padding-horiz--md">

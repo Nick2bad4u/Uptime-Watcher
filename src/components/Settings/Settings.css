@@ -106,6 +106,17 @@
         translate: 0 -1px;
     }
 
+    &:focus-visible {
+        background: color-mix(
+            in srgb,
+            var(--shadow-base-color) 35%,
+            transparent
+        );
+        box-shadow: 0 0 0 1px
+            color-mix(in srgb, var(--shadow-inverse-color) 40%, transparent);
+        translate: 0 -1px;
+    }
+
     &:active {
         translate: 0;
     }

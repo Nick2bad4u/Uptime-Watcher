@@ -36,6 +36,10 @@
     flex-wrap: wrap;
     align-items: center;
     gap: clamp(0.75rem, 0.625rem + 0.35vi, 1rem);
+    overflow-inline: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable both-edges;
+    scrollbar-width: thin;
 }
 
 .site-details-navigation__controls {

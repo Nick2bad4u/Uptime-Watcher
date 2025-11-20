@@ -11,9 +11,9 @@ import type { JSX } from "react/jsx-runtime";
 import { useCallback, useMemo } from "react";
 
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteListLayoutMode,
-    SiteTableDensity,
 } from "../../../stores/ui/types";
 
 import { useSitesStore } from "../../../stores/sites/useSitesStore";
@@ -51,12 +51,12 @@ const selectSetSiteCardPresentation = (
     state: UiStoreState
 ): UiStoreState["setSiteCardPresentation"] => state.setSiteCardPresentation;
 
-const selectSiteTableDensity = (state: UiStoreState): SiteTableDensity =>
-    state.siteTableDensity;
+const selectSurfaceDensity = (state: UiStoreState): InterfaceDensity =>
+    state.surfaceDensity;
 
-const selectSetSiteTableDensity = (
+const selectSetSurfaceDensity = (
     state: UiStoreState
-): UiStoreState["setSiteTableDensity"] => state.setSiteTableDensity;
+): UiStoreState["setSurfaceDensity"] => state.setSurfaceDensity;
 
 /**
  * Main site list component that displays all monitored sites.
@@ -86,8 +86,8 @@ export const SiteList = (): JSX.Element => {
     const setLayout = useUIStore(selectSetSiteListLayout);
     const cardPresentation = useUIStore(selectSiteCardPresentation);
     const setCardPresentation = useUIStore(selectSetSiteCardPresentation);
-    const tableDensity = useUIStore(selectSiteTableDensity);
-    const setTableDensity = useUIStore(selectSetSiteTableDensity);
+    const surfaceDensity = useUIStore(selectSurfaceDensity);
+    const setSurfaceDensity = useUIStore(selectSetSurfaceDensity);
     const { isDark } = useTheme();
 
     const handleLayoutChange = useCallback(
@@ -105,10 +105,10 @@ export const SiteList = (): JSX.Element => {
     );
 
     const handleListDensityChange = useCallback(
-        (density: SiteTableDensity) => {
-            setTableDensity(density);
+        (density: InterfaceDensity) => {
+            setSurfaceDensity(density);
         },
-        [setTableDensity]
+        [setSurfaceDensity]
     );
 
     const gridClassName = useMemo(() => {
@@ -160,7 +160,7 @@ export const SiteList = (): JSX.Element => {
                 <SiteListLayoutSelector
                     cardPresentation={cardPresentation}
                     layout={layout}
-                    listDensity={tableDensity}
+                    listDensity={surfaceDensity}
                     onLayoutChange={handleLayoutChange}
                     onListDensityChange={handleListDensityChange}
                     onPresentationChange={handlePresentationChange}
@@ -168,7 +168,7 @@ export const SiteList = (): JSX.Element => {
             </div>
 
             {layout === "list" ? (
-                <SiteTableView density={tableDensity} sites={sites} />
+                <SiteTableView density={surfaceDensity} sites={sites} />
             ) : (
                 <div className={gridClassName}>
                     {sites.map((site) =>

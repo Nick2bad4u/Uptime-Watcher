@@ -223,46 +223,42 @@
 
 .site-card--modern::before {
     position: absolute;
-    border-radius: 50%;
+    z-index: 0;
+    border-radius: inherit;
     background:
         radial-gradient(
-            circle at 24% 22%,
-            color-mix(in srgb, var(--color-primary-500) 44%, transparent),
-            transparent 72%
+            140% 120% at 12% 0%,
+            color-mix(in srgb, var(--color-primary-500) 28%, transparent),
+            transparent 70%
         ),
         radial-gradient(
-            circle at 56% 84%,
-            color-mix(in srgb, var(--color-status-up) 30%, transparent),
-            transparent 76%
+            120% 110% at 90% 0%,
+            color-mix(in srgb, var(--color-status-up) 20%, transparent),
+            transparent 65%
         );
-    block-size: 68%;
     content: "";
-    inline-size: 68%;
-    inset-block-start: -30%;
-    inset-inline-end: -24%;
-    opacity: 0.45;
+    filter: blur(60px);
+    inset: -30% -20% 30% -20%;
+    opacity: 0.5;
     pointer-events: none;
 }
 
 .site-card--modern::after {
     position: absolute;
+    z-index: 0;
     border-radius: inherit;
     background:
+        radial-gradient(circle, rgb(255 255 255 / 18%) 1px, transparent 50%),
         linear-gradient(
-            180deg,
-            color-mix(in srgb, var(--shadow-inverse-color) 9%, transparent),
-            transparent 58%
-        ),
-        radial-gradient(
-            circle at 16% 0%,
-            color-mix(in srgb, var(--overlay-highlight-color) 18%, transparent)
-                0%,
-            transparent 60%
+            140deg,
+            color-mix(in srgb, var(--shadow-inverse-color) 8%, transparent),
+            transparent 55%
         );
     content: "";
     inset: 0;
-    opacity: 0.36;
+    opacity: 0.3;
     pointer-events: none;
+    mix-blend-mode: screen;
     transition: opacity var(--transition-normal);
 }
 
@@ -344,12 +340,13 @@
 
 .site-card__inline-hint {
     position: absolute;
-    inset-block-end: clamp(0.7rem, 0.55rem + 0.35vi, 1rem);
-    inset-inline-end: clamp(0.75rem, 0.6rem + 0.35vi, 1.15rem);
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     color: color-mix(in srgb, var(--color-text-tertiary) 82%, transparent);
     gap: 0.35rem;
+    inset-block-end: clamp(0.7rem, 0.55rem + 0.35vi, 1rem);
+    inset-inline-end: clamp(0.75rem, 0.6rem + 0.35vi, 1.15rem);
     letter-spacing: 0.08em;
     opacity: 0;
     padding-inline: 0.35rem;
@@ -357,7 +354,6 @@
     text-transform: uppercase;
     transition: opacity var(--transition-normal);
     white-space: nowrap;
-    z-index: 1;
 
     @media screen and (prefers-reduced-motion: reduce) {
         transition: none;
@@ -391,7 +387,7 @@
     gap: 0.65rem;
     inline-size: 100%;
     max-inline-size: 20rem;
-    min-inline-size: 12rem;
+    min-inline-size: 2rem;
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),
@@ -890,6 +886,8 @@
     block-size: 0.95rem;
     inline-size: 0.95rem;
 }
+
+
 
 @media (width <= 1200px) {
     .site-card__stacked-grid {

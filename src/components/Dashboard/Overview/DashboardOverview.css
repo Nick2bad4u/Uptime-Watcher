@@ -174,7 +174,7 @@
 }
 
 .dashboard-overview__card:hover,
-.dashboard-overview__card:focus {
+.dashboard-overview__card:focus-visible {
     border-color: color-mix(
         in srgb,
         var(--dashboard-overview-card-accent) 42%,

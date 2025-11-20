@@ -5,6 +5,7 @@
 import type { MonitorStatus, Site } from "@shared/types";
 
 import {
+    type CSSProperties,
     type KeyboardEvent,
     memo,
     type MouseEvent,
@@ -29,15 +30,27 @@ import { MonitorSelector } from "../SiteCard/components/MonitorSelector";
  * Properties for {@link SiteTableRow}.
  */
 export interface SiteTableRowProperties {
+    /** Zero-based order used for staggered animations. */
+    readonly rowOrder?: number;
+    /** Optional visual variant for zebra striping. */
+    readonly rowVariant?: "even" | "odd";
     /** Site to present in the table row. */
     readonly site: Site;
 }
+
+type SurfaceOrderStyle = CSSProperties & {
+    "--surface-order"?: number;
+};
 
 /**
  * Table row displaying monitoring information for a single site.
  */
 export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
-    function SiteTableRow({ site }: SiteTableRowProperties) {
+    function SiteTableRow({
+        rowOrder,
+        rowVariant,
+        site,
+    }: SiteTableRowProperties) {
         const {
             handleCardClick,
             handleCheckNow,
@@ -131,17 +144,32 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
             [handleCardClick]
         );
 
+        const rowClassName = [
+            "site-table__row",
+            "site-table__grid-layout",
+            rowVariant ? `site-table__row--${rowVariant}` : "",
+        ]
+            .filter(Boolean)
+            .join(" ");
+        const rowStyle = useMemo<SurfaceOrderStyle | undefined>(
+            () =>
+                rowOrder === undefined
+                    ? undefined
+                    : { "--surface-order": rowOrder },
+            [rowOrder]
+        );
+
         return (
-            <div
+            <tr
                 aria-label={`Open details for ${latestSite.name}`}
-                className="site-table__row site-table__grid-layout"
+                className={rowClassName}
                 data-site-identifier={latestSite.identifier}
                 onClick={handleRowActivation}
                 onKeyDown={handleRowKeyDown}
-                role="row"
+                style={rowStyle}
                 tabIndex={0}
             >
-                <div className="site-table__cell site-table__site" role="cell">
+                <td className="site-table__cell site-table__cell--site site-table__site">
                     <button
                         className="site-table__site-trigger"
                         onClick={handleCardClick}
@@ -167,41 +195,39 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                             View details
                         </span>
                     </button>
-                </div>
-                <div className="site-table__cell" role="cell">
+                </td>
+                <td className="site-table__cell site-table__cell--monitor">
                     <MonitorSelector
                         className="site-table__monitor-selector"
                         monitors={latestSite.monitors}
                         onChange={handleMonitorIdChange}
                         selectedMonitorId={selectedMonitorId}
                     />
-                </div>
-                <div className="site-table__cell" role="cell">
+                </td>
+                <td className="site-table__cell site-table__cell--status">
                     <StatusBadge
+                        className="truncate-flex-row site-table__status-badge"
                         formatter={statusFormatter}
                         label="Status"
                         showIcon
                         size="xs"
                         status={status}
                     />
-                </div>
-                <div className="site-table__cell" role="cell">
+                </td>
+                <td className="site-table__cell site-table__cell--uptime">
                     <ThemedText size="sm">{uptime}%</ThemedText>
-                </div>
-                <div className="site-table__cell" role="cell">
+                </td>
+                <td className="site-table__cell site-table__cell--response">
                     <ThemedText size="sm">
                         {responseTime ? `${responseTime} ms` : "—"}
                     </ThemedText>
-                </div>
-                <div className="site-table__cell" role="cell">
+                </td>
+                <td className="site-table__cell site-table__cell--running">
                     <ThemedText size="sm">
                         {runningMonitors}/{totalMonitors}
                     </ThemedText>
-                </div>
-                <div
-                    className="site-table__cell site-table__cell--end"
-                    role="cell"
-                >
+                </td>
+                <td className="site-table__cell site-table__cell--end site-table__cell--controls">
                     <ActionButtonGroup
                         allMonitorsRunning={allMonitorsRunning}
                         buttonSize="xs"
@@ -214,8 +240,8 @@ export const SiteTableRow: NamedExoticComponent<SiteTableRowProperties> = memo(
                         onStopMonitoring={handleStopMonitoring}
                         onStopSiteMonitoring={handleStopSiteMonitoring}
                     />
-                </div>
-            </div>
+                </td>
+            </tr>
         );
     }
 );

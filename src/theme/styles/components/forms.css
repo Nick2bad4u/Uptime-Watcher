@@ -7,9 +7,15 @@
 .themed-input {
     position: relative;
     padding: 0.625rem 0.875rem;
-    border: 1px solid;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 55%, transparent);
     border-radius: var(--border-radius-md);
-    background: transparent;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-elevated) 96%,
+        transparent
+    );
+    color: var(--color-text-primary);
     font-size: 0.875rem;
     line-height: 1.25rem;
     transition:
@@ -17,6 +23,11 @@
         transform var(--transition-normal);
 
     &:focus {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 65%,
+            transparent
+        );
         box-shadow: 0 0 0 3px var(--color-primary-200);
         outline: none;
         transform: translateY(-1px);
@@ -35,10 +46,15 @@
 
 .themed-select {
     padding: 0.625rem 0.875rem;
-    border: 1px solid;
+    border: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 55%, transparent);
     border-radius: var(--border-radius-md);
     appearance: none;
-    background: transparent;
+    background: color-mix(
+        in srgb,
+        var(--color-surface-elevated) 96%,
+        transparent
+    );
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
@@ -52,6 +68,11 @@
         transform var(--transition-normal);
 
     &:focus {
+        border-color: color-mix(
+            in srgb,
+            var(--color-primary-500) 65%,
+            transparent
+        );
         box-shadow: 0 0 0 3px var(--color-primary-200);
         outline: none;
         transform: translateY(-1px);

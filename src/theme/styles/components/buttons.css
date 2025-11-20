@@ -80,6 +80,17 @@
             transform var(--transition-fast),
             box-shadow var(--transition-fast);
     }
+
+    &:focus-visible {
+        box-shadow:
+            0 0 0 1px
+                color-mix(in srgb, var(--shadow-inverse-color) 10%, transparent),
+            0 0 0 3px
+                color-mix(in srgb, var(--themed-button-accent) 70%, transparent),
+            0 24px 52px
+                color-mix(in srgb, var(--themed-button-accent) 26%, transparent);
+        transform: translateY(-1px);
+    }
 }
 
 .themed-button:disabled,
@@ -308,6 +319,12 @@
 
     &:active::before {
         opacity: 0.2;
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px
+            color-mix(in srgb, var(--color-primary-500) 75%, transparent);
+        transform: translateY(-1px);
     }
 }
 

@@ -32,6 +32,8 @@
 }
 
 .modal-overlay--immersive {
+    position: relative;
+    overflow: hidden;
     backdrop-filter: blur(28px) saturate(1.38);
     background:
         linear-gradient(
@@ -48,6 +50,20 @@
             color-mix(in srgb, var(--color-primary-500) 14%, transparent) 0%,
             transparent 72%
         );
+
+    &::before {
+        position: absolute;
+        z-index: 0;
+        background-image:
+            radial-gradient(circle, rgb(255 255 255 / 12%) 1px, transparent 50%);
+        background-size: 300px 260px;
+        background-position: 0 0;
+        content: "";
+        inset: 0;
+        mix-blend-mode: screen;
+        opacity: 0.15;
+        pointer-events: none;
+    }
 }
 
 .modal-overlay dialog {
@@ -70,6 +86,7 @@
             var(--modal-accent) 16%
         );
     border-radius: 1.2rem;
+    animation: modal-shell-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
     background:
         linear-gradient(
             145deg,
@@ -92,6 +109,9 @@
     inline-size: min(96vi, 46rem);
     isolation: isolate;
     max-block-size: clamp(32rem, 88vb, 54rem);
+    opacity: 0;
+    pointer-events: auto;
+    transform-origin: top center;
 
     &::before,
     &::after {
@@ -105,46 +125,28 @@
     &::after {
         border: 1px solid
             color-mix(in srgb, var(--modal-shell-accent) 22%, transparent);
-        background: radial-gradient(
-            120% 120% at 100% 0%,
-            color-mix(in srgb, var(--modal-shell-accent) 54%, transparent) 0%,
-            color-mix(
-                    in srgb,
-                    var(--modal-shell-overlay-muted) 72%,
-                    transparent
-                )
-                72%
-        );
+        background:
+            radial-gradient(
+                120% 120% at 100% 0%,
+                color-mix(in srgb, var(--modal-shell-accent) 54%, transparent) 0%,
+                color-mix(
+                        in srgb,
+                        var(--modal-shell-overlay-muted) 72%,
+                        transparent
+                    )
+                    72%
+            ),
+            radial-gradient(circle, rgb(255 255 255 / 12%) 1.5px, transparent 50%);
         inline-size: clamp(22rem, 40vi, 32rem);
         inset-block-start: -35%;
         inset-inline-end: -40%;
-        opacity: 0.55;
+        mix-blend-mode: screen;
+        opacity: 0.5;
     }
-}
-
-.modal-shell__header {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: clamp(0.85rem, 0.6rem + 0.6vi, 1.4rem);
-}
-
-.modal-shell__title-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    min-inline-size: 0;
-}
-
-.modal-shell__title {
-    margin: 0;
-    color: var(--color-text-primary);
-    font-size: clamp(1.5rem, 1.25rem + 0.6vi, 1.75rem);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: -0.01em;
-    line-height: 1.25;
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+        opacity: 1;
+    }
 }
 
 .modal-shell__subtitle {
@@ -179,9 +181,9 @@
     cursor: pointer;
     inline-size: 2.5rem;
     transition:
-        transform var(--transition-fast),
-        box-shadow var(--transition-fast),
-        border-color var(--transition-fast);
+        background-color var(--transition-normal),
+        color var(--transition-normal),
+        transform var(--transition-normal);
 
     &:hover {
         border-color: color-mix(in srgb, var(--modal-accent) 48%, transparent);
@@ -303,7 +305,6 @@
     color: var(--color-error);
     margin-inline-start: auto;
     transition:
-        background-color var(--transition-normal),
         color var(--transition-normal),
         transform var(--transition-normal);
 
@@ -313,8 +314,6 @@
         transform: scale(1.1);
     }
 }
-
-.error-alert__icon,
 .text-error-default {
     color: var(--color-error);
 }
@@ -474,5 +473,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 3%);
     gap: 1rem;
 }

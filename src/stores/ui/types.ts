@@ -29,11 +29,12 @@ export type SiteListLayoutMode = "card-compact" | "card-large" | "list";
 export type SiteCardPresentation = "grid" | "stacked";
 
 /**
- * Density options for the tabular site list view.
+ * Shared density options for compact/comfortable UI surfaces (tables, history,
+ * cards, etc.).
  *
  * @public
  */
-export type SiteTableDensity = "comfortable" | "compact" | "cozy";
+export type InterfaceDensity = "comfortable" | "compact" | "cozy";
 
 /**
  * Resizable column identifiers for the list layout table.
@@ -186,11 +187,11 @@ export interface UIStore {
     ) => void;
 
     /**
-     * Updates the row density for the tabular list layout.
+     * Updates the shared interface density used across list-based surfaces.
      *
-     * @param density - The density level to apply to the site table.
+     * @param density - The density level to apply to table/history views.
      */
-    setSiteTableDensity: (density: SiteTableDensity) => void;
+    setSurfaceDensity: (density: InterfaceDensity) => void;
 
     /**
      * Whether the add site modal is currently open.
@@ -251,9 +252,10 @@ export interface UIStore {
     siteTableColumnWidths: Record<SiteTableColumnKey, number>;
 
     /**
-     * Current density setting for the table-based site list view.
+     * Current density setting for key interface surfaces (site list, history,
+     * cards).
      */
-    siteTableDensity: SiteTableDensity;
+    surfaceDensity: InterfaceDensity;
 
     /**
      * Synchronizes the active tab with the last tab opened for a site.

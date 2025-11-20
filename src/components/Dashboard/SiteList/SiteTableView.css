@@ -1,5 +1,17 @@
 /* Site table layout styling */
 
+@keyframes site-table-row-enter {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 14px, 0);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
 .site-table {
     inline-size: 100%;
     overflow-inline: auto;
@@ -23,27 +35,42 @@
     );
 
     /* Default row spacing; overridden by density modifier classes. */
-    --site-table-row-padding-block: 0.75rem;
-    --site-table-row-padding-inline: 1.5rem;
-    --site-table-row-gap: 1rem;
+    --density-row-block: 0.75rem;
+    --density-row-inline: 1.5rem;
+    --density-row-gap: 1rem;
+    --site-table-body-gap: 0.35rem;
+
+    /* Default column widths for the list view table */
+    --site-table-col-site: minmax(200px, 1.5fr);
+    --site-table-col-monitor: minmax(180px, 1.2fr);
+    --site-table-col-status: 110px;
+    --site-table-col-uptime: 90px;
+    --site-table-col-response: 110px;
+    --site-table-col-running: 90px;
+    --site-table-col-controls: minmax(160px, 1fr);
 }
 
-.site-table--comfortable {
-    --site-table-row-padding-block: 0.75rem;
-    --site-table-row-padding-inline: 1.5rem;
-    --site-table-row-gap: 1rem;
+.site-table--comfortable,
+.site-table.density--comfortable {
+    --density-row-block: 0.75rem;
+    --density-row-inline: 1.5rem;
+    --density-row-gap: 1rem;
 }
 
-.site-table--cozy {
-    --site-table-row-padding-block: 0.5rem;
-    --site-table-row-padding-inline: 1.25rem;
-    --site-table-row-gap: 0.75rem;
+.site-table--cozy,
+.site-table.density--cozy {
+    --density-row-block: 0.5rem;
+    --density-row-inline: 1.25rem;
+    --density-row-gap: 0.75rem;
+    --site-table-body-gap: 0.25rem;
 }
 
-.site-table--compact {
-    --site-table-row-padding-block: 0.25rem;
-    --site-table-row-padding-inline: 0.75rem;
-    --site-table-row-gap: 0.25rem;
+.site-table--compact,
+.site-table.density--compact {
+    --density-row-block: 0.25rem;
+    --density-row-inline: 0.75rem;
+    --density-row-gap: 0.25rem;
+    --site-table-body-gap: 0.1rem; /* Tighter vertical spacing between rows in compact density */
 }
 
 .site-table__container {
@@ -51,42 +78,57 @@
     flex-direction: column;
     gap: 0.5rem;
     min-inline-size: 0; /* Allow shrinking */
+
+    & table {
+        border-collapse: separate;
+        border-spacing: 0 var(--site-table-body-gap, 0.35rem);
+        inline-size: 100%;
+    }
 }
 
 /* Grid layout definition shared between header and rows */
 .site-table__grid-layout {
     display: grid;
     align-items: center;
-    padding: var(--site-table-row-padding-block)
-        var(--site-table-row-padding-inline);
-    gap: var(--site-table-row-gap);
+    padding: var(--density-row-block) var(--density-row-inline);
+    gap: var(--density-row-gap);
     grid-template-columns:
-        minmax(200px, 1.5fr) minmax(180px, 1.2fr)
-        110px 90px 110px 90px minmax(160px, 1fr);
+        var(--site-table-col-site)
+        var(--site-table-col-monitor)
+        var(--site-table-col-status)
+        var(--site-table-col-uptime)
+        var(--site-table-col-response)
+        var(--site-table-col-running)
+        var(--site-table-col-controls);
 
     @media (width <= 1200px) {
         padding: 0.75rem 1rem;
         gap: 0.75rem;
-        grid-template-columns:
-            minmax(180px, 1.5fr) minmax(150px, 1.2fr)
-            100px 80px 100px 80px minmax(140px, 1fr);
     }
+}
 
-    @media (width <= 1024px) {
-        /* Hide Monitor, Response, Running on smaller screens */
-        grid-template-columns: minmax(180px, 2fr) 100px 80px minmax(140px, 1fr);
+@media (width <= 1200px) {
+    .site-table {
+        --site-table-col-site: minmax(180px, 1.5fr);
+        --site-table-col-monitor: minmax(150px, 1.2fr);
+        --site-table-col-status: 100px;
+        --site-table-col-uptime: 80px;
+        --site-table-col-response: 100px;
+        --site-table-col-running: 80px;
+        --site-table-col-controls: minmax(140px, 1fr);
     }
 }
 
 @media (width <= 1024px) {
-    /* Hide specific columns */
-    .site-table__col-monitor,
-    .site-table__col-response,
-    .site-table__col-running,
-    .site-table__cell:nth-child(2), /* Monitor */
-    .site-table__cell:nth-child(5), /* Response */
-    .site-table__cell:nth-child(6)  /* Running */ {
-        display: none;
+    .site-table {
+        /* Hide Monitor, Response, Running via zero-width tracks */
+        --site-table-col-site: minmax(180px, 2fr);
+        --site-table-col-monitor: 0;
+        --site-table-col-response: 0;
+        --site-table-col-running: 0;
+        --site-table-col-status: 100px;
+        --site-table-col-uptime: 80px;
+        --site-table-col-controls: minmax(140px, 1fr);
     }
 }
 
@@ -94,53 +136,47 @@
     .site-table__grid-layout {
         padding: 0.75rem 0.5rem;
         gap: 0.5rem;
-        /* Hide Uptime as well, just Site, Status, Controls */
-        grid-template-columns: minmax(120px, 2fr) 90px minmax(100px, 1fr);
     }
 
+    .site-table {
+        --site-table-col-site: minmax(120px, 2fr);
+        --site-table-col-status: 90px;
+        --site-table-col-uptime: 0;
+        --site-table-col-controls: minmax(100px, 1fr);
+    }
+}
+
+@media (width <= 480px) {
+    .site-table {
+        --site-table-col-site: 1fr;
+        --site-table-col-status: 0;
+        --site-table-col-controls: minmax(80px, auto);
+    }
+}
+
+@media (width <= 1024px) {
+    /* Hide columns on smaller screens using semantic cell classes */
+    .site-table__col-monitor,
+    .site-table__col-response,
+    .site-table__col-running,
+    .site-table__cell--monitor,
+    .site-table__cell--response,
+    .site-table__cell--running {
+        display: none;
+    }
+}
+
+@media (width <= 768px) {
     .site-table__col-uptime,
-    .site-table__cell:nth-child(4) /* Uptime */ {
+    .site-table__cell--uptime {
         display: none;
     }
 }
 
 @media (width <= 480px) {
-    .site-table__grid-layout {
-        gap: 0.5rem;
-        /* Even tighter for mobile */
-        grid-template-columns: 1fr auto;
-    }
-
-    /* Hide Status column text, maybe just show icon? Or hide column entirely and rely on row color/indicator? */
-    /* For now, let's keep Status but maybe hide Controls or simplify them */
-
-    /* Actually, let's hide the Status column and integrate status into the Site column or just keep it tight */
-    /* Let's try: Site (with status indicator) + Controls */
-
     .site-table__col-status,
-    .site-table__cell:nth-child(3) {
+    .site-table__cell--status {
         display: none;
-    }
-
-    /* We need to make sure the user can still see status.
-       The SiteTableRow has a status badge.
-       Maybe we can't hide it easily without changing the component structure.
-       Let's stick to the 3-column layout but make it very tight.
-    */
-
-    .site-table__grid-layout {
-        grid-template-columns: minmax(100px, 1fr) 80px 40px; /* Controls just for the menu button if it collapses? */
-        /* The controls are a button group. They might be too wide. */
-    }
-
-    /* Let's hide the controls column on very small screens and assume the user clicks the row to see details */
-    .site-table__col-controls,
-    .site-table__cell:nth-child(7) {
-        display: none;
-    }
-
-    .site-table__grid-layout {
-        grid-template-columns: 1fr 90px;
     }
 }
 
@@ -182,26 +218,28 @@
     position: relative;
     border: 1px solid transparent;
     border-radius: 1rem;
+    animation: site-table-row-enter var(--transition-normal) ease forwards;
+    animation-delay: calc(var(--surface-order, 0) * 120ms);
     background-color: color-mix(
         in srgb,
         var(--color-surface-elevated) 40%,
         transparent
     );
     cursor: pointer;
-    transition:
-        transform var(--transition-normal),
-        background-color var(--transition-fast);
+    /*
+     * Rows must be visible even if the entrance animation fails to run for
+     * any reason (for example if keyframes are stripped or the animation
+     * declaration becomes invalid). Previously this was set to 0 and relied
+     * entirely on the keyframe to bring the opacity back to 1, which could
+     * leave rows permanently invisible. Keeping the opacity at 1 here makes
+     * the animation an enhancement instead of a hard dependency.
+     */
+    opacity: 1;
+    transition: transform var(--transition-normal);
 
     @media screen and (prefers-reduced-motion: reduce) {
-        position: relative;
-        border: 1px solid transparent;
-        border-radius: 1rem;
-        background-color: color-mix(
-            in srgb,
-            var(--color-surface-elevated) 40%,
-            transparent
-        );
-        cursor: pointer;
+        animation: none;
+        opacity: 1;
         transition: none;
     }
 
@@ -219,24 +257,10 @@
 }
 
 .site-table__body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    display: table-row-group;
 }
 
-.site-table__body > .site-table__row {
-    margin-block: 0;
-}
-
-.site-table__body > .site-table__row:nth-child(odd) {
-    background-color: color-mix(
-        in srgb,
-        var(--color-surface-elevated) 46%,
-        transparent
-    );
-}
-
-.site-table__body > .site-table__row:nth-child(even) {
+.site-table__row--even {
     background-color: color-mix(
         in srgb,
         var(--color-surface-overlay) 40%,
@@ -244,30 +268,49 @@
     );
 }
 
-.site-table--compact .site-table__row {
-    border-radius: 0.75rem;
-}
-
-.site-table--compact .site-table__row:hover,
-.site-table--compact .site-table__row:focus {
-    transform: translateY(-0.5px);
-}
-
-.site-table--compact .site-table__site-trigger {
-    gap: 0.15rem;
+.site-table__row--odd {
+    background-color: color-mix(
+        in srgb,
+        var(--color-surface-elevated) 46%,
+        transparent
+    );
 }
 
 .site-table__cell {
     display: flex;
     overflow: hidden;
     align-items: center;
+    justify-content: flex-start;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* Allow status badge to show its glow/shadow without clipping */
-.site-table__cell:nth-child(3) {
+/* Allow status dot glow to render fully while keeping content width constrained */
+.site-table__cell--status {
     overflow: visible;
+    padding-inline-start: 0.5rem;
+}
+
+/* Status column layout: keep dot fixed and text truncated within column */
+.site-table__status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding-inline-start: 0.5rem;
+
+    & .themed-status-indicator {
+        flex-shrink: 0;
+    }
+
+    & .themed-text {
+        overflow: hidden;
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .site-table__cell--end {
@@ -310,6 +353,10 @@
     &:focus {
         opacity: 0.8;
     }
+
+    .site-table--compact & {
+        gap: 0.15rem;
+    }
 }
 
 .site-table__row-hint {
@@ -320,7 +367,9 @@
     opacity: 0;
     text-transform: uppercase;
     transform: translateX(-4px);
-    transition: all var(--transition-normal);
+    transition:
+        opacity var(--transition-normal),
+        transform var(--transition-normal);
 
     @media screen and (prefers-reduced-motion: reduce) {
         color: var(--color-primary-400);

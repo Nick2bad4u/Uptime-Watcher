@@ -48,6 +48,11 @@
     --overlay-highlight-color: var(--color-overlay-highlight, rgb(148 163 255));
     --overlay-deep-color: var(--color-overlay-deep, rgb(21 30 46));
     --overlay-mid-color: var(--color-overlay-mid, rgb(30 41 67));
+
+    /* Layout content width caps */
+    --content-max-sm: 48rem;
+    --content-max-md: 80rem;
+    --content-max-lg: 120rem;
 }
 
 /* Themed Box Classes */

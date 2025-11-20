@@ -51,6 +51,9 @@
     box-shadow:
         inset 0 0 0 1px rgb(255 255 255 / 4%),
         0 16px 38px -6px rgb(8 12 24 / 24%);
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .site-settings-duration__body {
@@ -128,7 +131,7 @@
         box-shadow var(--transition-fast);
 
     &:hover,
-    &:focus {
+    &:focus-visible {
         box-shadow:
             inset 0 0 0 1px rgb(255 255 255 / 6%),
             0 18px 38px -8px rgb(8 12 24 / 26%);
@@ -153,14 +156,20 @@
             0 16px 34px -6px rgb(8 12 24 / 22%);
         gap: clamp(0.85rem, 0.7rem + 0.4vi, 1.125rem);
         transition: none;
+    }
+}
 
-        &:hover,
-        &:focus {
-            box-shadow:
-                inset 0 0 0 1px rgb(255 255 255 / 6%),
-                0 18px 38px -8px rgb(8 12 24 / 26%);
-            transform: translateY(-1px);
-        }
+.site-settings-duration:hover,
+.site-settings-duration:focus-visible {
+    box-shadow:
+        inset 0 0 0 1px rgb(255 255 255 / 5%),
+        0 18px 42px -8px rgb(8 12 24 / 26%);
+    transform: translateY(-1px);
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+    .site-settings-duration {
+        transition: none;
     }
 }
 

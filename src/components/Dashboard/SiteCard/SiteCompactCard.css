@@ -283,8 +283,8 @@
 .monitor-selector__wrapper.site-card__compact-selector {
     inline-size: 100%;
     margin-inline: 0;
-    min-inline-size: 0;
     max-inline-size: 100%;
+    min-inline-size: 0;
 
     &::before {
         position: absolute;
@@ -311,12 +311,13 @@
 
 .site-card__compact-hint {
     position: absolute;
-    inset-block-end: clamp(0.55rem, 0.45rem + 0.35vi, 0.9rem);
-    inset-inline-end: clamp(0.6rem, 0.45rem + 0.45vi, 1.15rem);
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: flex-end;
     gap: 0.4rem;
+    inset-block-end: clamp(0.55rem, 0.45rem + 0.35vi, 0.9rem);
+    inset-inline-end: clamp(0.6rem, 0.45rem + 0.45vi, 1.15rem);
     letter-spacing: 0.08em;
     opacity: 0;
     pointer-events: none;
@@ -324,7 +325,6 @@
     text-transform: uppercase;
     transition: opacity var(--transition-normal);
     white-space: nowrap;
-    z-index: 1;
 
     @media screen and (prefers-reduced-motion: reduce) {
         transition: none;

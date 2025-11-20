@@ -74,7 +74,18 @@
     display: flex;
     flex-direction: column;
     backdrop-filter: blur(16px);
-    background: color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
+    background:
+        radial-gradient(
+            140% 180% at 0% 0%,
+            color-mix(in srgb, var(--color-primary-500) 20%, transparent),
+            transparent 68%
+        ),
+        radial-gradient(
+            160% 200% at 100% 0%,
+            color-mix(in srgb, var(--color-status-up) 16%, transparent),
+            transparent 76%
+        ),
+        color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
     grid-column: 2 / -1;
     grid-row: 1;
     min-block-size: 100vb;
@@ -99,6 +110,9 @@
     padding: clamp(0.75rem, 0.5rem + 1vi, 1.5rem)
         clamp(1rem, 0.75rem + 2vi, 2.25rem) clamp(2.5rem, 2rem + 2vi, 3.5rem);
     gap: clamp(1.5rem, 1.25rem + 1vi, 2.25rem);
+    inline-size: 100%;
+    margin-inline: auto;
+    max-inline-size: min(var(--content-max-lg, 120rem), 100%);
     min-block-size: 0;
 }
 
@@ -115,7 +129,7 @@
             color-mix(in srgb, var(--shadow-inverse-color) 3%, transparent);
     inline-size: 100%;
     margin-inline: auto;
-    max-inline-size: min(120rem, 100%);
+    max-inline-size: min(var(--content-max-lg, 120rem), 100%);
 
     .app-shell--light & {
         border-color: color-mix(
@@ -167,7 +181,7 @@
 .header-container {
     padding: 0 1rem;
     margin: 0 auto;
-    max-inline-size: 80rem;
+    max-inline-size: var(--content-max-md, 80rem);
 
     @media (width >= 640px) {
         padding: 0 1.5rem;

@@ -120,13 +120,24 @@
     letter-spacing: 0.08em;
     line-height: 1;
     text-transform: uppercase;
-    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+        color var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1),
+        transform var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
 
     &:hover,
     &:focus {
         border-color: var(--site-list-border-strong);
         background: var(--site-list-highlight);
+        color: var(--site-list-text-strong);
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        border-color: var(--site-list-border-strong);
+        background: var(--site-list-highlight);
+        box-shadow: 0 0 0 1px
+            color-mix(in srgb, var(--color-primary-500) 26%, transparent);
         color: var(--site-list-text-strong);
         transform: translateY(-1px);
     }
@@ -193,7 +204,9 @@
     letter-spacing: 0.06em;
     line-height: 1;
     text-transform: uppercase;
-    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+        color var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1),
+        transform var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover,
     &:focus {
@@ -204,6 +217,20 @@
             transparent
         );
         color: var(--site-list-text-strong);
+        transform: translateY(-1px);
+    }
+
+    &:focus-visible {
+        border-color: var(--site-list-border-strong);
+        background: color-mix(
+            in srgb,
+            var(--color-text-secondary) 22%,
+            transparent
+        );
+        box-shadow: 0 0 0 1px
+            color-mix(in srgb, var(--color-primary-500) 24%, transparent);
+        color: var(--site-list-text-strong);
+        transform: translateY(-1px);
     }
 
     @media screen and (prefers-reduced-motion: reduce) {

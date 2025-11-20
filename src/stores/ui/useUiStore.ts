@@ -39,11 +39,11 @@ import { persist, type PersistOptions } from "zustand/middleware";
 
 import type { ChartTimeRange } from "../types";
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteDetailsTab,
     SiteListLayoutMode,
     SiteTableColumnKey,
-    SiteTableDensity,
     UIStore,
 } from "./types";
 
@@ -62,7 +62,7 @@ interface UIPersistedState {
     siteDetailsTabState: Record<string, SiteDetailsTab>;
     siteListLayout: SiteListLayoutMode;
     siteTableColumnWidths: Record<SiteTableColumnKey, number>;
-    siteTableDensity: SiteTableDensity;
+    surfaceDensity: InterfaceDensity;
 }
 
 const SITE_TABLE_COLUMN_KEYS: readonly SiteTableColumnKey[] = [
@@ -310,9 +310,9 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                     };
                 });
             },
-            setSiteTableDensity: (density: SiteTableDensity): void => {
-                logStoreAction("UIStore", "setSiteTableDensity", { density });
-                set({ siteTableDensity: density });
+            setSurfaceDensity: (density: InterfaceDensity): void => {
+                logStoreAction("UIStore", "setSurfaceDensity", { density });
+                set({ surfaceDensity: density });
             },
             showAddSiteModal: false,
             showAdvancedMetrics: false,
@@ -325,7 +325,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
             siteDetailsTabState: {} as Record<string, SiteDetailsTab>,
             siteListLayout: "card-large",
             siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
-            siteTableDensity: "comfortable",
+            surfaceDensity: "comfortable",
             syncActiveSiteDetailsTab: (siteIdentifier: string): void => {
                 logStoreAction("UIStore", "syncActiveSiteDetailsTab", {
                     siteIdentifier,
@@ -407,7 +407,7 @@ export const useUIStore: UIStoreWithPersist = create<UIStore>()(
                 siteDetailsTabState: state.siteDetailsTabState,
                 siteListLayout: state.siteListLayout,
                 siteTableColumnWidths: state.siteTableColumnWidths,
-                siteTableDensity: state.siteTableDensity,
+                surfaceDensity: state.surfaceDensity,
                 // Don't persist modal states or selected site
             }),
         }

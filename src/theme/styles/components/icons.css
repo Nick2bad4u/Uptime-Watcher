@@ -15,6 +15,20 @@
     transition:
         box-shadow var(--transition-normal),
         transform var(--transition-normal);
+
+    &:hover,
+    &:focus-visible {
+        box-shadow:
+            0 0 0 1px
+                color-mix(
+                    in srgb,
+                    var(--color-border-secondary) 55%,
+                    transparent
+                ),
+            0 12px 22px
+                color-mix(in srgb, var(--shadow-base-color) 26%, transparent);
+        transform: translateY(-1px) scale(1.02);
+    }
 }
 
 .site-icon-fallback {

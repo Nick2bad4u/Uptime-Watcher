@@ -17,6 +17,16 @@
     display: flex;
     flex-direction: column;
 
+    border: 1px solid var(--confirm-dialog-border);
+    border-radius: clamp(1rem, 0.9rem + 0.35vi, 1.25rem);
+    animation: confirm-dialog-scale-in 0.28s cubic-bezier(0.2, 0.7, 0.4, 1) both;
+    background: var(--confirm-dialog-glow), var(--confirm-dialog-surface);
+    box-shadow:
+        0 28px 68px rgb(8 12 24 / 48%),
+        inset 0 1px 0 rgb(255 255 255 / 6%);
+    gap: clamp(1rem, 0.9rem + 0.4vi, 1.35rem);
+    inline-size: min(30rem, 100%);
+
     --confirm-dialog-border: color-mix(
         in srgb,
         var(--color-border-secondary) 38%,
@@ -32,15 +42,6 @@
         color-mix(in srgb, var(--color-surface-elevated) 96%, transparent) 0%,
         color-mix(in srgb, var(--color-surface-overlay) 90%, transparent) 100%
     );
-
-    border: 1px solid var(--confirm-dialog-border);
-    border-radius: clamp(1rem, 0.9rem + 0.35vi, 1.25rem);
-    background: var(--confirm-dialog-glow), var(--confirm-dialog-surface);
-    box-shadow:
-        0 28px 68px rgb(8 12 24 / 48%),
-        inset 0 1px 0 rgb(255 255 255 / 6%);
-    gap: clamp(1rem, 0.9rem + 0.4vi, 1.35rem);
-    inline-size: min(30rem, 100%);
 
     &.themed-box--padding-lg {
         padding: clamp(1.35rem, 1.1rem + 0.65vi, 1.8rem)
@@ -75,6 +76,7 @@
         transparent
     );
     margin-block-start: clamp(0.65rem, 0.55rem + 0.25vi, 0.85rem);
+    overflow-wrap: anywhere;
 }
 
 .confirm-dialog__actions {
@@ -91,5 +93,23 @@
     .confirm-dialog__actions {
         flex-direction: column;
         align-items: stretch;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .confirm-dialog__container {
+        animation: none;
+    }
+}
+
+@keyframes confirm-dialog-scale-in {
+    0% {
+        opacity: 0;
+        transform: translateY(6px) scale(0.97);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
     }
 }

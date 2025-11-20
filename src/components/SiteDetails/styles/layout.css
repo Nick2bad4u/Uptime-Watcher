@@ -21,7 +21,8 @@ body:has(.site-details-modal-overlay) {
 .site-details-modal {
     display: flex;
     flex-direction: column;
-    animation: modal-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modal-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: opacity, transform;
     gap: clamp(1.2rem, 0.9rem + 1vi, 2rem);
     inline-size: 100%;
     max-block-size: 90vb; /* Ensure it doesn't exceed viewport height */
@@ -31,6 +32,7 @@ body:has(.site-details-modal-overlay) {
         display: flex;
         flex-direction: column;
         animation: none;
+        opacity: 1;
         gap: clamp(1.2rem, 0.9rem + 1vi, 2rem);
         inline-size: 100%;
         max-block-size: 90vb; /* Ensure it doesn't exceed viewport height */

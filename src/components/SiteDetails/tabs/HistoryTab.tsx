@@ -25,15 +25,23 @@
  */
 
 import type { Monitor, SiteStatus, StatusHistory } from "@shared/types";
-import type { ChangeEvent, NamedExoticComponent, ReactElement } from "react";
+import type {
+    ChangeEvent,
+    CSSProperties,
+    NamedExoticComponent,
+    ReactElement,
+} from "react";
 import type { JSX } from "react/jsx-runtime";
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiFilter, FiInbox } from "react-icons/fi";
 import { MdHistory } from "react-icons/md";
 
+import type { InterfaceDensity } from "../../../stores/ui/types";
+
 import { logger } from "../../../services/logger";
 import { useSettingsStore } from "../../../stores/settings/useSettingsStore";
+import { useUIStore } from "../../../stores/ui/useUiStore";
 import { StatusIndicator } from "../../../theme/components/StatusIndicator";
 import { ThemedButton } from "../../../theme/components/ThemedButton";
 import { ThemedCard } from "../../../theme/components/ThemedCard";
@@ -46,6 +54,30 @@ import {
     getStatusIconComponent,
 } from "../../../utils/status";
 import { DetailLabel } from "../../common/MonitorUiComponents";
+
+type UiStoreState = ReturnType<typeof useUIStore.getState>;
+
+const selectSurfaceDensity = (state: UiStoreState): InterfaceDensity =>
+    state.surfaceDensity;
+
+const selectSetSurfaceDensity = (
+    state: UiStoreState
+): UiStoreState["setSurfaceDensity"] => state.setSurfaceDensity;
+
+const HISTORY_DENSITY_OPTIONS: readonly InterfaceDensity[] = [
+    "comfortable",
+    "cozy",
+    "compact",
+];
+
+const HISTORY_DENSITY_LABELS: Record<InterfaceDensity, string> = {
+    comfortable: "Comfort",
+    compact: "Compact",
+    cozy: "Cozy",
+};
+type HistoryRowStyle = CSSProperties & {
+    "--surface-order"?: number;
+};
 
 /**
  * Props for the HistoryTab component.
@@ -117,6 +149,11 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
         selectedMonitor,
     }: HistoryTabProperties): JSX.Element {
         const { settings } = useSettingsStore();
+        const historyDensity = useUIStore(selectSurfaceDensity);
+        const setHistoryDensity = useUIStore(selectSetSurfaceDensity);
+        const [userHistoryLimit, setUserHistoryLimit] = useState<
+            number | undefined
+        >();
         const { currentTheme } = useTheme();
         const [historyFilter, setHistoryFilter] =
             useState<HistoryFilter>("all");
@@ -178,9 +215,6 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                 showOptions.push(10);
             }
         }
-
-        // Track user's manual history limit selection
-        const [userHistoryLimit, setUserHistoryLimit] = useState<number>();
 
         // Compute effective history limit - use user preference or auto-calculated
         // value
@@ -299,8 +333,61 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
             () => <MdHistory color={iconColors.history} />,
             [iconColors.history]
         );
+
+        const handleHistoryDensityChange = useCallback(
+            (density: InterfaceDensity): void => {
+                setHistoryDensity(density);
+                logger.user.action("History density changed", {
+                    density,
+                    monitorId: selectedMonitor.id,
+                    totalRecords: historyLength,
+                });
+            },
+            [
+                historyLength,
+                selectedMonitor.id,
+                setHistoryDensity,
+            ]
+        );
+
+        const createDensityHandler = useCallback(
+            (density: InterfaceDensity): (() => void) =>
+                () => {
+                    handleHistoryDensityChange(density);
+                },
+            [handleHistoryDensityChange]
+        );
+
+        const densityButtons = useMemo(
+            () =>
+                HISTORY_DENSITY_OPTIONS.map((density) => {
+                    const isActive = historyDensity === density;
+
+                    return (
+                        <ThemedButton
+                            key={density}
+                            onClick={createDensityHandler(density)}
+                            size="xs"
+                            variant={isActive ? "primary" : "ghost"}
+                        >
+                            {HISTORY_DENSITY_LABELS[density]}
+                        </ThemedButton>
+                    );
+                }),
+            [createDensityHandler, historyDensity]
+        );
+
+        const historyTabClassName = `space-y-6 history-tab history-tab--${historyDensity} density--${historyDensity}`;
+        const historyRowStyles = useMemo<HistoryRowStyle[]>(
+            () =>
+                filteredHistoryRecords.map((_, index) => ({
+                    "--surface-order": index,
+                })),
+            [filteredHistoryRecords]
+        );
+
         return (
-            <div className="space-y-6" data-testid="history-tab">
+            <div className={historyTabClassName} data-testid="history-tab">
                 {/* History Controls */}
                 <ThemedCard icon={filterIcon} title="History Filters">
                     <div className="flex flex-wrap items-center gap-4">
@@ -364,13 +451,22 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                     ` (${historyFilter} filter)`}
                             </ThemedText>
                         </div>
+
+                        <div className="flex items-center space-x-3">
+                            <ThemedText size="sm" variant="secondary">
+                                Density:
+                            </ThemedText>
+                            <div className="flex space-x-1">
+                                {densityButtons}
+                            </div>
+                        </div>
                     </div>
                 </ThemedCard>
 
                 {/* History List */}
                 <ThemedCard icon={historyIcon} title="Check History">
                     <div className="history-tab__list">
-                        {filteredHistoryRecords.map((record) => {
+                        {filteredHistoryRecords.map((record, index) => {
                             const rawStatus = record.status as
                                 | SiteStatus
                                 | undefined;
@@ -380,11 +476,16 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                 getStatusIconComponent(resolvedStatus);
                             const statusLabel =
                                 formatStatusLabel(resolvedStatus);
+                            const detailContent = renderDetails(record);
+                            const rowClassName = detailContent
+                                ? "history-tab__row history-tab__row--with-detail"
+                                : "history-tab__row history-tab__row--no-detail";
 
                             return (
                                 <div
-                                    className="history-tab__row"
+                                    className={rowClassName}
                                     key={record.timestamp}
+                                    style={historyRowStyles[index]}
                                 >
                                     <div className="history-tab__row-content">
                                         <StatusIndicator
@@ -392,30 +493,36 @@ export const HistoryTab: NamedExoticComponent<HistoryTabProperties> = memo(
                                             status={resolvedStatus}
                                         />
                                         <div className="history-tab__row-meta">
-                                            <ThemedText
-                                                size="sm"
-                                                weight="medium"
-                                            >
-                                                {formatFullTimestamp(
-                                                    record.timestamp
-                                                )}
-                                            </ThemedText>
-                                            <ThemedText
-                                                className="history-tab__row-sequence"
-                                                size="xs"
-                                                variant="secondary"
-                                            >
-                                                Record #
-                                                {historyLength -
-                                                    selectedMonitor.history.findIndex(
-                                                        (r) =>
-                                                            r.timestamp ===
-                                                            record.timestamp
+                                            <div className="history-tab__row-meta-header">
+                                                <ThemedText
+                                                    size="sm"
+                                                    weight="medium"
+                                                >
+                                                    {formatFullTimestamp(
+                                                        record.timestamp
                                                     )}
-                                            </ThemedText>
-                                            {renderDetails(record)}
+                                                </ThemedText>
+                                                <ThemedText
+                                                    className="history-tab__row-sequence"
+                                                    size="xs"
+                                                    variant="secondary"
+                                                >
+                                                    Record #
+                                                    {historyLength -
+                                                        selectedMonitor.history.findIndex(
+                                                            (r) =>
+                                                                r.timestamp ===
+                                                                record.timestamp
+                                                        )}
+                                                </ThemedText>
+                                            </div>
                                         </div>
                                     </div>
+                                    {detailContent ? (
+                                        <div className="history-tab__row-detail">
+                                            {detailContent}
+                                        </div>
+                                    ) : null}
                                     <div className="history-tab__row-stats">
                                         <ThemedText
                                             className="history-tab__row-response"

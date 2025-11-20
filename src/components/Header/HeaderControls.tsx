@@ -6,13 +6,21 @@
  * reducing nesting complexity in the main Header component.
  */
 
-import type { JSX } from "react";
+import type { CSSProperties, JSX } from "react";
 
 import { AppIcons } from "../../utils/icons";
 import {
     Tooltip,
     type TooltipTriggerProperties,
 } from "../common/Tooltip/Tooltip";
+
+type HeaderControlOrderStyle = CSSProperties & {
+    "--header-control-order"?: number;
+};
+
+const getHeaderControlOrderStyle = (
+    order: number
+): HeaderControlOrderStyle => ({ "--header-control-order": order });
 
 /**
  * Properties for the HeaderControls component.
@@ -59,10 +67,10 @@ export const HeaderControls = ({
             <Tooltip content="Add new site to monitor" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button
-                        aria-label="Add new site"
                         className="header-controls__button header-controls__button--add"
                         data-testid="header-control-add-site"
                         onClick={onShowAddSiteModal}
+                        style={getHeaderControlOrderStyle(0)}
                         type="button"
                         {...triggerProps}
                     >
@@ -90,6 +98,7 @@ export const HeaderControls = ({
                         className="header-controls__button header-controls__button--theme"
                         data-testid="header-control-toggle-theme"
                         onClick={onToggleTheme}
+                        style={getHeaderControlOrderStyle(1)}
                         type="button"
                         {...triggerProps}
                     >
@@ -104,10 +113,10 @@ export const HeaderControls = ({
             <Tooltip content="Open application settings" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button
-                        aria-label="Open settings"
                         className="header-controls__button header-controls__button--settings"
                         data-testid="header-control-open-settings"
                         onClick={onShowSettings}
+                        style={getHeaderControlOrderStyle(2)}
                         type="button"
                         {...triggerProps}
                     >
