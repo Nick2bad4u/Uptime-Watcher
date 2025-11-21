@@ -5,12 +5,12 @@
 @keyframes history-row-enter {
     from {
         opacity: 0;
-        transform: translate3d(0, 18px, 0);
+        transform: translate3d(0, 12px, 0) scale(0.98);
     }
 
     to {
         opacity: 1;
-        transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0) scale(1);
     }
 }
 
@@ -133,14 +133,16 @@
 
 .history-tab__row {
     position: relative;
+    z-index: 1;
     display: grid;
     align-items: center;
     padding: var(--density-row-block) var(--density-row-inline);
     border: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 46%, transparent);
     border-radius: 1.1875rem;
-    animation: history-row-enter var(--transition-normal) ease forwards;
-    animation-delay: calc(var(--surface-order, 0) * 120ms);
+    animation: history-row-enter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)
+        backwards;
+    animation-delay: calc(var(--surface-order, 0) * 0.1s);
     background: linear-gradient(
         150deg,
         color-mix(in srgb, var(--color-surface-elevated) 97%, transparent) 0%,
@@ -157,7 +159,6 @@
         0 20px 40px -8px rgb(8 12 24 / 24%);
     gap: var(--density-row-gap, 0.5rem);
     grid-template-columns: minmax(0, 1.4fr) minmax(140px, 0.9fr) auto;
-    opacity: 0;
     transition:
         border-color var(--transition-fast),
         box-shadow var(--transition-fast),

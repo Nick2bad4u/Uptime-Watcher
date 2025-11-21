@@ -22,21 +22,21 @@ body:has(.site-details-modal-overlay) {
     display: flex;
     flex-direction: column;
     animation: modal-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    will-change: opacity, transform;
     gap: clamp(1.2rem, 0.9rem + 1vi, 2rem);
     inline-size: 100%;
     max-block-size: 90vb; /* Ensure it doesn't exceed viewport height */
     min-block-size: 0;
+    will-change: opacity, transform;
 
     @media screen and (prefers-reduced-motion: reduce) {
         display: flex;
         flex-direction: column;
         animation: none;
-        opacity: 1;
         gap: clamp(1.2rem, 0.9rem + 1vi, 2rem);
         inline-size: 100%;
         max-block-size: 90vb; /* Ensure it doesn't exceed viewport height */
         min-block-size: 0;
+        opacity: 1;
     }
 }
 
@@ -92,8 +92,10 @@ body:has(.site-details-modal-overlay) {
 
 .site-details-modal__content {
     display: flex;
+    overflow: visible; /* Allow button hover effects to extend */
     flex: 1;
     flex-direction: column;
+    padding: clamp(1.125rem, 0.875rem + 0.9vi, 1.75rem);
     border: 1px solid
         color-mix(in srgb, var(--color-border-secondary) 52%, transparent);
     border-radius: 1.125rem; /* More rounded */

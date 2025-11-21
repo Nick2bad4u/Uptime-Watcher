@@ -267,8 +267,16 @@ describe(HistoryTab, () => {
 
             render(<HistoryTab {...defaultProps} />);
 
-            const buttons = document.querySelectorAll(".themed-button");
-            expect(buttons).toHaveLength(3); // All, Up, Down filter buttons
+            const filterLabels = [
+                "All",
+                "Up",
+                "Down",
+            ];
+            const filterButtons = filterLabels.map((label) =>
+                screen.getByRole("button", { name: label })
+            );
+
+            expect(filterButtons).toHaveLength(filterLabels.length);
         });
 
         it("should display history records when available", ({

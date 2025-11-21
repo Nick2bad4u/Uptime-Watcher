@@ -71,7 +71,10 @@ export const SiteTableView: NamedExoticComponent<SiteTableViewProperties> =
                 surface="elevated"
             >
                 <div className="site-table__container">
-                    <table aria-label="Monitored Sites">
+                    <table
+                        aria-label="Monitored Sites"
+                        className={densityClassName}
+                    >
                         <thead className="site-table__header">
                             <tr className="site-table__grid-layout">
                                 {COLUMN_DEFINITIONS.map((column) => {

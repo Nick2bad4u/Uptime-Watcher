@@ -241,6 +241,7 @@
     "lint:config:build": "npm run build:eslint-inspector",
     "lint:config:inspect": "npx eslint --inspect-config",
     "lint:css": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .cache/stylelintcache src/ electron/ shared/ docs/ --custom-formatter stylelint-formatter-pretty && echo \"Stylelint done!\"",
+    "lint:css:verbose": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .cache/stylelintcache src/ electron/ shared/ docs/ --formatter verbose && echo \"Stylelint done!\"",
     "lint:css:docs": "stylelint --cache --config ./docs/docusaurus/stylelint.config.mjs --ignore-path ./docs/docusaurus/.stylelintignore --cache-strategy content --cache-location docs/docusaurus/stylelintcache docs/docusaurus --custom-formatter stylelint-formatter-pretty && echo \"Stylelint done!\"",
     "lint:css:docs:fix": "stylelint --cache --config ./docs/docusaurus/stylelint.config.mjs --ignore-path ./docs/docusaurus/.stylelintignore --cache-strategy content --cache-location docs/docusaurus/stylelintcache docs/docusaurus --custom-formatter stylelint-formatter-pretty --fix && echo \"Stylelint done!\"",
     "lint:css:fix": "stylelint --cache --config stylelint.config.mjs --cache-strategy content --cache-location .cache/stylelintcache src/ electron/ shared/ docs/ --custom-formatter stylelint-formatter-pretty --fix && echo \"Stylelint done!\"",
@@ -1253,10 +1254,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "icon": "icons/favicon.ico",
+  "icon": "src/components/icons/icon.ico",
   "appid": "io.github.uptime-watcher",
   "build": {
-    "icon": "icons/favicon.ico",
+    "icon": "src/components/icons/icon.ico",
     "appId": "io.github.uptime-watcher",
     "artifactName": "Uptime-Watcher-${platform}-${arch}-${version}.${ext}",
     "asar": true,
@@ -1282,7 +1283,7 @@
       "!dist/*.zip"
     ],
     "win": {
-      "icon": "icons/favicon-256x256.ico",
+      "icon": "src/components/icons/icon.ico",
       "target": [
         "nsis",
         "nsis-web",
@@ -1353,7 +1354,7 @@
       "artifactName": "Uptime-Watcher-flatpak-${arch}-${version}.${ext}"
     },
     "mac": {
-      "icon": "icons/favicon-512x512.icns",
+      "icon": "src/components/icons/favicon-512x512.icns",
       "target": [
         "dmg",
         "zip",
@@ -1368,7 +1369,7 @@
       "x64ArchFiles": "Contents/Resources/app.asar.unpacked/node_modules/lightningcss-darwin-arm64/**"
     },
     "linux": {
-      "icon": "icons/favicon-256x256.png",
+      "icon": "src/components/icons/icon-256.png",
       "target": [
         "AppImage",
         "deb",

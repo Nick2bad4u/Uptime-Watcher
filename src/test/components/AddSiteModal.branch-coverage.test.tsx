@@ -12,7 +12,7 @@
  * - Theme state branches
  */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -449,7 +449,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             });
             await userEvent.click(closeButton);
 
-            expect(mockOnClose).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(mockOnClose).toHaveBeenCalledTimes(1);
+            });
         });
 
         it("should call setShowAddSiteModal(false) when backdrop is clicked", async ({
@@ -473,7 +475,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             expect(backdrop).not.toBeNull();
             fireEvent.click(backdrop as Element);
 
-            expect(mockOnClose).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(mockOnClose).toHaveBeenCalledTimes(1);
+            });
         });
 
         it("should not close modal when clicking inside the modal content", async ({
@@ -518,7 +522,9 @@ describe("AddSiteModal - Branch Coverage Tests", () => {
             const successButton = screen.getByTestId("mock-success-button");
             await userEvent.click(successButton);
 
-            expect(mockOnClose).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(mockOnClose).toHaveBeenCalledTimes(1);
+            });
         });
     });
 });

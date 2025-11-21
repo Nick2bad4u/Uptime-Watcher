@@ -171,12 +171,12 @@ modules:
               install -Dm644 io.github.uptimewatcher.desktop /app/share/applications/io.github.uptimewatcher.desktop
 
               # Install application icons (multiple resolutions for HiDPI)
-              install -Dm644 icons/icon.png /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
-              install -Dm644 icons/icon-256.png /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
-              install -Dm644 icons/icon-128.png /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
-              install -Dm644 icons/icon-64.png /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
-              install -Dm644 icons/icon-24.png /app/share/icons/hicolor/24x24/apps/io.github.uptimewatcher.png
-              install -Dm644 icons/icon-16.png /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-512.png /app/share/icons/hicolor/512x512/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-256.png /app/share/icons/hicolor/256x256/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-128.png /app/share/icons/hicolor/128x128/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-64.png /app/share/icons/hicolor/64x64/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-24.png /app/share/icons/hicolor/24x24/apps/io.github.uptimewatcher.png
+              install -Dm644 src/components/icons/icon-16.png /app/share/icons/hicolor/16x16/apps/io.github.uptimewatcher.png
 
               # Install AppStream metadata for software centers
               install -Dm644 io.github.uptimewatcher.metainfo.xml /app/share/metainfo/io.github.uptimewatcher.metainfo.xml

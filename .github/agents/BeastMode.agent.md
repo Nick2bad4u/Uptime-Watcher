@@ -2,7 +2,7 @@
 name: BeastMode
 description: Beast Mode 3.1 (Custom)
 argument-hint: "💻 🤖 😈 Beast Mode agent ready. 👿 🤖 💻"
-tools: ['launch/runTask', 'launch/getTaskOutput', 'launch/runTests', 'launch/testFailure', 'shell/getTerminalOutput', 'shell/runInTerminal', 'Tavily-Remote-MCP/*', 'deepwiki/*', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'agents', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'read/readFile', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/problems', 'search/textSearch', 'search/usages', 'todo', 'updateUserPreferences', 'memory']
+tools: ['launch/testFailure', 'launch/runTask', 'launch/getTaskOutput', 'launch/runTests', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'read/readFile', 'search/changes', 'search/codebase', 'search/fileSearch', 'search/listDirectory', 'search/problems', 'search/textSearch', 'search/usages', 'shell/getTerminalOutput', 'shell/runInTerminal', 'Tavily-Remote-MCP/*', 'deepwiki/*', 'vscode-mcp/execute_command', 'vscode-mcp/get_diagnostics', 'vscode-mcp/get_references', 'vscode-mcp/get_symbol_lsp_info', 'vscode-mcp/rename_symbol', 'agents', 'updateUserPreferences', 'memory', 'todo']
 handoffs:
  - label: Consistency
    agent: BeastMode

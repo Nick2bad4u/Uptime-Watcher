@@ -767,7 +767,7 @@ benchmarks/**/*.jsx
 benchmarks/**/*.ts
 benchmarks/**/*.tsx
 scripts/
-icons/
+**/icons/**
 
 # Ignore non-CSS file types
 **/*.cjs
@@ -836,7 +836,7 @@ benchmarks/**/*.jsx
 benchmarks/**/*.ts
 benchmarks/**/*.tsx
 scripts/
-icons/
+**/icons/**
 
 # License file
 license

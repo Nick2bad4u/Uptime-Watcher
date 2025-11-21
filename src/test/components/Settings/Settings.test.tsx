@@ -293,7 +293,7 @@ describe("Settings Component", () => {
         expect(within(modal).getByText(/history limit/i)).toBeInTheDocument();
     });
 
-    it("should call onClose when close button is clicked", ({
+    it("should call onClose when close button is clicked", async ({
         task,
         annotate,
     }) => {
@@ -314,7 +314,9 @@ describe("Settings Component", () => {
         });
         fireEvent.click(closeButton);
 
-        expect(mockOnClose).toHaveBeenCalled();
+        await waitFor(() => {
+            expect(mockOnClose).toHaveBeenCalled();
+        });
     });
 
     it("should show error when lastError exists", ({ task, annotate }) => {

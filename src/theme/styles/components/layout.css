@@ -33,10 +33,12 @@
 
 .app-shell {
     display: grid;
+    overflow: hidden;
     background: linear-gradient(180deg, rgb(15 23 42) 0%, rgb(8 11 19) 100%);
+    block-size: 100vb;
     grid-template-columns: minmax(18rem, 20rem) minmax(0, 1fr);
     inline-size: 100%;
-    min-block-size: 100vb;
+    max-block-size: 100vb;
     transition:
         background var(--transition-normal),
         grid-template-columns var(--transition-normal);
@@ -86,11 +88,13 @@
             transparent 76%
         ),
         color-mix(in srgb, var(--shadow-base-color) 65%, transparent);
+    block-size: 100vb;
     grid-column: 2 / -1;
     grid-row: 1;
-    min-block-size: 100vb;
+    max-block-size: 100vb;
     min-inline-size: 0;
     overflow-block: auto;
+    overflow-inline: hidden;
     overscroll-behavior: contain;
     scrollbar-gutter: stable both-edges;
 

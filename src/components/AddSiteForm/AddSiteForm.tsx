@@ -1,28 +1,8 @@
-/**
- * AddSiteForm component for creating new sites and adding monitors to existing
- * sites.
- *
- * @remarks
- * - Provides a comprehensive form with validation and flexible configuration
- *   options. - Supports both HTTP and port monitoring types, with customizable
- *   check intervals. - Uses domain-specific Zustand stores for state
- *   management.
- * - Loads monitor types dynamically from the backend.
- * - Handles errors via a centralized error store and logger.
- * - All form state is managed via the {@link useAddSiteForm} custom hook.
- *
- * @packageDocumentation
- */
+import type { FormEvent, NamedExoticComponent } from "react";
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
-import {
-    type FormEvent,
-    memo,
-    type NamedExoticComponent,
-    useCallback,
-    useMemo,
-} from "react";
+import { memo, useCallback, useMemo } from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -34,81 +14,101 @@ import { useSitesStore } from "../../stores/sites/useSitesStore";
 import { ThemedButton } from "../../theme/components/ThemedButton";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { generateUuid } from "../../utils/data/generateUuid";
+import { AppIcons } from "../../utils/icons";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
-import { useAddSiteForm } from "../SiteDetails/useAddSiteForm";
+import { type FormMode, useAddSiteForm } from "../SiteDetails/useAddSiteForm";
 import { DynamicMonitorFields } from "./DynamicMonitorFields";
 import { RadioGroup } from "./RadioGroup";
 import { SelectField } from "./SelectField";
 import { handleSubmit } from "./Submit";
 import { TextField } from "./TextField";
+import "./AddSiteForm.css";
 
 /**
- * Props for the AddSiteForm component.
+ * Props accepted by the {@link AddSiteForm} component.
  *
  * @public
  */
 export interface AddSiteFormProperties {
-    /** Optional callback to execute on successful form submission */
+    /** Optional callback invoked after a successful submission. */
     readonly onSuccess?: () => void;
 }
-/**
- * Supported add modes for the form.
- *
- * @public
- */
-type AddMode = "existing" | "new";
 
 /**
- * Type-safe validation for add mode values.
- *
- * @example
- *
- * ```typescript
- * isValidAddMode("new"); // true
- * isValidAddMode("invalid"); // false
- * ```
- *
- * @param value - The value to validate as an add mode.
- *
- * @returns True if the value is a valid {@link AddMode}, otherwise false.
+ * Metadata for helper bullet text displayed beneath the form actions.
  */
-function isValidAddMode(value: string): value is AddMode {
-    return value === "existing" || value === "new";
+interface HelperBullet {
+    /** Unique identifier used for list rendering keys. */
+    readonly id: string;
+    /** Display text shown to the user. */
+    readonly text: string;
 }
 
-/**
- * Type-safe validation for monitor type values.
- *
- * @remarks
- * Checks against {@link BASE_MONITOR_TYPES} for allowed types.
- *
- * @param value - The value to validate as a monitor type.
- *
- * @returns True if the value is a valid {@link MonitorType}, otherwise false.
- */
-function isValidMonitorType(value: string): value is MonitorType {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- Safe: Type guard validation against known monitor types
-    return BASE_MONITOR_TYPES.includes(value as MonitorType);
-}
+const MONITOR_TYPE_SET = new Set<string>(BASE_MONITOR_TYPES);
 
 /**
- * Main form component for adding new monitoring sites or monitors.
+ * Type guard that validates whether a candidate string is a supported monitor
+ * type.
+ *
+ * @param value - Candidate value provided by the user.
+ *
+ * @returns True if the value is a valid {@link MonitorType}.
+ */
+const isValidMonitorType = (value: string): value is MonitorType =>
+    MONITOR_TYPE_SET.has(value);
+
+/**
+ * Type guard verifying whether the provided string matches a supported form
+ * mode.
+ *
+ * @param value - Candidate form mode.
+ *
+ * @returns True when the value is "existing" or "new".
+ */
+const isValidAddMode = (value: string): value is FormMode =>
+    value === "existing" || value === "new";
+
+const SiteTargetIcon = AppIcons.ui.link;
+const MonitorConfigIcon = AppIcons.metrics.monitor;
+
+/**
+ * AddSiteForm component for creating new sites and adding monitors to existing
+ * sites.
  *
  * @remarks
- * - Allows creation of new sites with monitors, or adding monitors to existing
- *   sites. - Supports HTTP and port monitoring, with dynamic fields based on
- *   monitor type. - Handles form validation, error display, and loading
- *   states.
- * - Uses Zustand stores for state and error management.
- * - Loads monitor types from backend and displays dynamic help text.
+ * - Provides a comprehensive form with validation and flexible configuration
+ *   options.
+ * - Supports both HTTP and port monitoring types with customizable intervals.
+ * - Uses domain-specific Zustand stores for state management.
+ * - Loads monitor types dynamically from the backend.
+ * - Handles errors via a centralized error store and logger.
+ * - All form state is managed via the {@link useAddSiteForm} custom hook.
  *
- * @example
+ * @example Basic usage
  *
  * ```tsx
  * import { logger } from "@app/services/logger";
  *
  * <AddSiteForm onSuccess={() => logger.info("Site added")} />;
+ * ```
+ *
+ * @example Layout structure
+ *
+ * ```tsx
+ * <div className="add-site-form__layout">
+ *     <section className="add-site-form__section">
+ *         <header className="add-site-form__section-header">
+ *             <ThemedText size="md" weight="semibold">
+ *                 Site Target
+ *             </ThemedText>
+ *             <ThemedText size="xs" variant="secondary">
+ *                 Configure monitoring for a new property or link
+ *                 additional monitors to an existing site.
+ *             </ThemedText>
+ *         </header>
+ *     </section>
+ * </div>;
  * ```
  *
  * @param props - AddSiteForm component props
@@ -195,6 +195,42 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         // Get dynamic help text for the current monitor type
         const helpTexts = useDynamicHelpText(monitorType);
+        const helperBullets = useMemo<HelperBullet[]>(() => {
+            const bullets: HelperBullet[] = [
+                {
+                    id: "mode",
+                    text:
+                        addMode === "new"
+                            ? "Provide a descriptive site name for new entries"
+                            : "Select a site to add the monitor to",
+                },
+            ];
+
+            if (helpTexts.primary) {
+                bullets.push({
+                    id: `primary-${helpTexts.primary}`,
+                    text: helpTexts.primary,
+                });
+            }
+
+            if (helpTexts.secondary) {
+                bullets.push({
+                    id: `secondary-${helpTexts.secondary}`,
+                    text: helpTexts.secondary,
+                });
+            }
+
+            bullets.push({
+                id: "interval",
+                text: "The monitor will be checked according to your monitoring interval",
+            });
+
+            return bullets;
+        }, [
+            addMode,
+            helpTexts.primary,
+            helpTexts.secondary,
+        ]);
 
         // Memoized handlers for form field changes
         const handleMonitorTypeChange = useCallback(
@@ -542,142 +578,183 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         return (
             <SurfaceContainer
-                className="mx-auto max-w-md"
+                className="add-site-form__container"
                 data-testid="add-site-form-container"
             >
                 <form
                     aria-label="Add Site Form"
-                    className="space-y-4"
+                    className="add-site-form"
                     data-testid="add-site-form"
                     onSubmit={handleFormSubmit}
                 >
-                    {/* Add mode toggle */}
-                    <RadioGroup
-                        disabled={isLoading}
-                        id="addMode"
-                        label="Add Mode"
-                        name="addMode"
-                        onChange={handleAddModeChange}
-                        options={addModeOptions}
-                        value={addMode}
-                    />
+                    <section className="add-site-form__section">
+                        <header className="add-site-form__section-header">
+                            <div className="add-site-form__section-icon">
+                                <SiteTargetIcon size={18} />
+                            </div>
+                            <div>
+                                <ThemedText
+                                    className="add-site-form__section-title"
+                                    size="md"
+                                    weight="semibold"
+                                >
+                                    Site Target
+                                </ThemedText>
+                                <ThemedText
+                                    className="add-site-form__section-description"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    Configure monitoring for a new property or
+                                    link additional monitors to an existing
+                                    site.
+                                </ThemedText>
+                            </div>
+                        </header>
+                        <div className="add-site-form__section-body">
+                            <RadioGroup
+                                disabled={isLoading}
+                                id="addMode"
+                                label="Add Mode"
+                                name="addMode"
+                                onChange={handleAddModeChange}
+                                options={addModeOptions}
+                                value={addMode}
+                            />
 
-                    {/* Existing site selector */}
-                    {addMode === "existing" && (
-                        <SelectField
-                            disabled={isLoading}
-                            id="selectedSite"
-                            label="Select Site"
-                            onChange={setSelectedExistingSite}
-                            options={sites.map((site) => ({
-                                label: site.name,
-                                value: site.identifier,
-                            }))}
-                            placeholder="-- Select a site --"
-                            required
-                            value={selectedExistingSite}
-                        />
-                    )}
+                            {addMode === "existing" ? (
+                                <SelectField
+                                    disabled={isLoading}
+                                    id="selectedSite"
+                                    label="Select Site"
+                                    onChange={setSelectedExistingSite}
+                                    options={sites.map((site) => ({
+                                        label: site.name,
+                                        value: site.identifier,
+                                    }))}
+                                    placeholder="-- Select a site --"
+                                    required
+                                    value={selectedExistingSite}
+                                />
+                            ) : (
+                                <TextField
+                                    disabled={isLoading}
+                                    id="siteName"
+                                    label="Site Name"
+                                    onChange={setName}
+                                    placeholder="My Website"
+                                    required
+                                    type="text"
+                                    value={name}
+                                />
+                            )}
 
-                    {/* Site Name (only for new site) */}
-                    {addMode === "new" && (
-                        <TextField
-                            disabled={isLoading}
-                            id="siteName"
-                            label="Site Name"
-                            onChange={setName}
-                            placeholder="My Website"
-                            required
-                            type="text"
-                            value={name}
-                        />
-                    )}
-
-                    {/* Show generated UUID (for new site) */}
-                    {addMode === "new" && (
-                        <div>
-                            <ThemedText
-                                className="block select-all"
-                                size="xs"
-                                variant="tertiary"
-                            >
-                                Site Identifier:{" "}
-                                <span className="font-mono">
-                                    {siteIdentifier}
-                                </span>
-                            </ThemedText>
+                            {addMode === "new" ? (
+                                <div className="add-site-form__identifier-card">
+                                    <ThemedText
+                                        className="add-site-form__identifier-label"
+                                        size="xs"
+                                        variant="secondary"
+                                        weight="medium"
+                                    >
+                                        Site Identifier:
+                                    </ThemedText>
+                                    <ThemedText
+                                        className="add-site-form__identifier-value"
+                                        size="sm"
+                                        variant="primary"
+                                        weight="semibold"
+                                    >
+                                        {siteIdentifier}
+                                    </ThemedText>
+                                </div>
+                            ) : null}
                         </div>
-                    )}
+                    </section>
 
-                    {/* Monitor Type Selector */}
-                    <SelectField
-                        disabled={isLoading || isLoadingMonitorTypes}
-                        id="monitorType"
-                        label="Monitor Type"
-                        onChange={handleMonitorTypeChange}
-                        options={monitorTypeOptions}
-                        value={monitorType}
-                    />
+                    <section className="add-site-form__section">
+                        <header className="add-site-form__section-header">
+                            <div className="add-site-form__section-icon">
+                                <MonitorConfigIcon size={18} />
+                            </div>
+                            <div>
+                                <ThemedText
+                                    className="add-site-form__section-title"
+                                    size="md"
+                                    weight="semibold"
+                                >
+                                    Monitor Configuration
+                                </ThemedText>
+                                <ThemedText
+                                    className="add-site-form__section-description"
+                                    size="xs"
+                                    variant="secondary"
+                                >
+                                    Define what gets checked and how frequently
+                                    to run each monitor.
+                                </ThemedText>
+                            </div>
+                        </header>
+                        <div className="add-site-form__section-body">
+                            <SelectField
+                                disabled={isLoading || isLoadingMonitorTypes}
+                                id="monitorType"
+                                label="Monitor Type"
+                                onChange={handleMonitorTypeChange}
+                                options={monitorTypeOptions}
+                                value={monitorType}
+                            />
 
-                    {/* Dynamic Monitor Fields */}
-                    <DynamicMonitorFields
-                        isLoading={isLoading}
-                        monitorType={monitorType}
-                        onChange={handleDynamicFieldChange}
-                        values={dynamicFieldValues}
-                    />
+                            <DynamicMonitorFields
+                                isLoading={isLoading}
+                                monitorType={monitorType}
+                                onChange={handleDynamicFieldChange}
+                                values={dynamicFieldValues}
+                            />
 
-                    <SelectField
-                        disabled={isLoading}
-                        id="checkInterval"
-                        label="Check Interval"
-                        onChange={handleCheckIntervalChange}
-                        options={checkIntervalOptions}
-                        value={String(checkInterval)}
-                    />
+                            <SelectField
+                                disabled={isLoading}
+                                id="checkInterval"
+                                label="Check Interval"
+                                onChange={handleCheckIntervalChange}
+                                options={checkIntervalOptions}
+                                value={String(checkInterval)}
+                            />
+                        </div>
+                    </section>
 
-                    <ThemedButton
-                        data-testid="add-site-submit"
-                        disabled={isLoading}
-                        fullWidth
-                        loading={showButtonLoading}
-                        type="submit"
-                        variant="primary"
-                    >
-                        {addMode === "new" ? "Add Site" : "Add Monitor"}
-                    </ThemedButton>
-
-                    {/* Error Message */}
                     {shouldRenderErrorAlert ? (
-                        <ErrorAlert
-                            message={resolvedErrorMessage}
-                            onDismiss={onClearError}
-                            variant="error"
-                        />
+                        <section className="add-site-form__section add-site-form__section--alert">
+                            <ErrorAlert
+                                message={resolvedErrorMessage}
+                                onDismiss={onClearError}
+                                variant="error"
+                            />
+                        </section>
                     ) : null}
 
-                    <div className="space-y-1">
-                        <ThemedText size="xs" variant="tertiary">
-                            •{" "}
-                            {addMode === "new"
-                                ? "Site name is required"
-                                : "Select a site to add the monitor to"}
-                        </ThemedText>
-                        {helpTexts.primary ? (
-                            <ThemedText size="xs" variant="tertiary">
-                                • {helpTexts.primary}
-                            </ThemedText>
-                        ) : null}
-                        {helpTexts.secondary ? (
-                            <ThemedText size="xs" variant="tertiary">
-                                • {helpTexts.secondary}
-                            </ThemedText>
-                        ) : null}
-                        <ThemedText size="xs" variant="tertiary">
-                            • The monitor will be checked according to your
-                            monitoring interval
-                        </ThemedText>
-                    </div>
+                    <footer className="add-site-form__footer">
+                        <ThemedButton
+                            data-testid="add-site-submit"
+                            disabled={isLoading}
+                            fullWidth
+                            loading={showButtonLoading}
+                            type="submit"
+                            variant="primary"
+                        >
+                            {addMode === "new" ? "Add Site" : "Add Monitor"}
+                        </ThemedButton>
+
+                        <ul className="add-site-form__helper-list">
+                            {helperBullets.map((bullet) => (
+                                <li key={`add-site-form-helper-${bullet.id}`}>
+                                    <ThemedText size="xs" variant="tertiary">
+                                        {`\u2022 ${bullet.text}`}
+                                    </ThemedText>
+                                </li>
+                            ))}
+                        </ul>
+                    </footer>
                 </form>
             </SurfaceContainer>
         );

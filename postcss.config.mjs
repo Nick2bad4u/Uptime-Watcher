@@ -133,7 +133,7 @@ export default {
             cachebuster: true,
             loadPaths: [
                 "assets/", // WASM and binary assets
-                "icons/", // Favicon and app icons
+                "components/icons/", // Favicon and app icons
                 "src/assets/", // Source assets
                 "html/", // HTML assets
             ],
@@ -144,7 +144,7 @@ export default {
         "postcss-inline-svg": {
             encode: true, // URL encode the SVG
             paths: [
-                "./icons",
+                "./src/components/icons",
                 "./assets",
                 "./src/assets",
             ],

@@ -3,7 +3,7 @@
  * theming, and form integration logic are covered.
  */
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, beforeEach, vi } from "vitest";
 
@@ -54,6 +54,14 @@ vi.mock("../../../theme/components/ThemedText", () => ({
 
 vi.mock("../../../utils/icons", () => ({
     AppIcons: {
+        actions: {
+            add: ({ size }: { readonly size?: number }) => (
+                <svg
+                    data-testid="add-site-modal-action-icon"
+                    data-size={size}
+                />
+            ),
+        },
         ui: {
             close: closeIconSpy,
         },
@@ -83,7 +91,7 @@ beforeEach(() => {
 });
 
 describe(AddSiteModal, () => {
-    it("renders modal content and wires the form success handler", () => {
+    it("renders modal content and wires the form success handler", async () => {
         const handleClose = vi.fn();
 
         render(<AddSiteModal onClose={handleClose} />);
@@ -93,29 +101,35 @@ describe(AddSiteModal, () => {
         ).toBeInTheDocument();
         expect(
             screen.getByText(
-                /configure monitoring details and instantly join uptime tracking/i
+                /configure monitoring for a new property or link additional monitors to an existing site/i
             )
         ).toBeInTheDocument();
         expect(formInvocations).toHaveLength(1);
-        expect(formInvocations[0]!.onSuccess).toBe(handleClose);
+        expect(typeof formInvocations[0]!.onSuccess).toBe("function");
 
         fireEvent.click(screen.getByTestId("add-site-form-stub"));
-        expect(handleClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(handleClose).toHaveBeenCalledTimes(1);
+        });
     });
 
-    it("only triggers onClose when the overlay backdrop is clicked", () => {
+    it("only triggers onClose when the overlay backdrop is clicked", async () => {
         const handleClose = vi.fn();
 
         render(<AddSiteModal onClose={handleClose} />);
 
         fireEvent.click(screen.getByTestId("add-site-modal-overlay"));
-        expect(handleClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(handleClose).toHaveBeenCalledTimes(1);
+        });
 
         fireEvent.click(screen.getByTestId("add-site-modal"));
-        expect(handleClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(handleClose).toHaveBeenCalledTimes(1);
+        });
     });
 
-    it("applies dark theme styling and respects explicit close action", () => {
+    it("applies dark theme styling and respects explicit close action", async () => {
         const handleClose = vi.fn();
         themeState.isDark = true;
 
@@ -126,7 +140,9 @@ describe(AddSiteModal, () => {
         );
 
         fireEvent.click(screen.getByTestId("add-site-modal-close"));
-        expect(handleClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(handleClose).toHaveBeenCalledTimes(1);
+        });
         expect(closeIconSpy).toHaveBeenCalled();
         expect(closeIconSpy.mock.calls[0]?.[0]).toEqual({ size: 18 });
     });

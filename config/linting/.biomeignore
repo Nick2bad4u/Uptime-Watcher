@@ -10,5 +10,5 @@ html/
 report/
 docs/
 assets/
-icons/
+**/icons/**
 benchmarks/

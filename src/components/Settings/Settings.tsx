@@ -62,8 +62,10 @@ import { ThemedSlider } from "../../theme/components/ThemedSlider";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
+import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { playInAppAlertTone } from "../Alerts/alertCoordinator";
 import { ErrorAlert } from "../common/ErrorAlert/ErrorAlert";
+import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { Tooltip } from "../common/Tooltip/Tooltip";
 import { SettingItem } from "../shared/SettingItem";
 import "./Settings.css";
@@ -207,6 +209,7 @@ export const Settings = ({
     const showButtonLoading = useDelayedButtonLoading(isLoading);
     // Local state for sync success message
     const [syncSuccess, setSyncSuccess] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
 
     const {
         autoStart,
@@ -767,6 +770,16 @@ export const Settings = ({
     /* eslint-enable @typescript-eslint/no-unsafe-type-assertion -- Re-enable after safe file system operations */
 
     // Click handlers for buttons
+    const handleClose = useCallback(async () => {
+        setIsClosing(true);
+        await waitForAnimation();
+        onClose();
+    }, [onClose]);
+
+    const handleCloseButtonClick = useCallback(() => {
+        void handleClose();
+    }, [handleClose]);
+
     const handleSyncNowClick = useCallback(() => {
         void handleSyncNow();
     }, [handleSyncNow]);
@@ -786,10 +799,10 @@ export const Settings = ({
     const handleOverlayClick = useCallback(
         (event: MouseEvent<HTMLDivElement>) => {
             if (event.target === event.currentTarget) {
-                onClose();
+                void handleClose();
             }
         },
-        [onClose]
+        [handleClose]
     );
 
     const CloseIcon = AppIcons.ui.close;
@@ -815,13 +828,15 @@ export const Settings = ({
         <div
             className={`modal-overlay modal-overlay--frosted ${
                 isDark ? "dark" : ""
-            }`}
+            } ${isClosing ? "modal-overlay--closing" : ""}`}
             data-testid="settings-modal-overlay"
             onClick={handleOverlayClick}
         >
             <ThemedBox
                 as="dialog"
-                className="modal-shell modal-shell--form modal-shell--accent-success settings-modal"
+                className={`modal-shell modal-shell--form modal-shell--accent-success settings-modal ${
+                    isClosing ? "modal-shell--closing" : ""
+                }`}
                 data-testid="settings-modal"
                 open
                 padding="xl"
@@ -829,44 +844,50 @@ export const Settings = ({
                 shadow="xl"
                 surface="overlay"
             >
-                <div className="modal-shell__header">
-                    <div className="modal-shell__title-group">
-                        <div className="flex items-center gap-2">
-                            <div className="settings-modal__header-icon">
-                                <SettingsHeaderIcon size={22} />
+                <div className="modal-shell__header settings-modal__header">
+                    <GalaxyBackground
+                        className="galaxy-background--banner galaxy-background--banner-compact"
+                        isDark={isDark}
+                    />
+                    <div className="modal-shell__header-content">
+                        <div className="modal-shell__title-group">
+                            <div className="flex items-center gap-2">
+                                <div className="modal-shell__accent-icon settings-modal__header-icon">
+                                    <SettingsHeaderIcon size={22} />
+                                </div>
+                                {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
+                                <ThemedText
+                                    aria-level={1}
+                                    as="h2"
+                                    className="modal-shell__title"
+                                    role="heading"
+                                    size="xl"
+                                    weight="semibold"
+                                >
+                                    Settings
+                                </ThemedText>
                             </div>
-                            {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
                             <ThemedText
-                                aria-level={1}
-                                as="h2"
-                                className="modal-shell__title"
-                                role="heading"
-                                size="xl"
-                                weight="semibold"
+                                className="modal-shell__subtitle"
+                                size="sm"
+                                variant="secondary"
                             >
-                                Settings
+                                Fine-tune monitoring, notifications, and data
+                                workflows.
                             </ThemedText>
                         </div>
-                        <ThemedText
-                            className="modal-shell__subtitle"
-                            size="sm"
-                            variant="secondary"
-                        >
-                            Fine-tune monitoring, notifications, and data
-                            workflows.
-                        </ThemedText>
-                    </div>
-                    <div className="modal-shell__actions">
-                        <button
-                            aria-label="Close settings"
-                            className="modal-shell__close"
-                            data-testid="settings-modal-close"
-                            onClick={onClose}
-                            title="Close"
-                            type="button"
-                        >
-                            <CloseIcon size={18} />
-                        </button>
+                        <div className="modal-shell__actions">
+                            <button
+                                aria-label="Close settings"
+                                className="modal-shell__close"
+                                data-testid="settings-modal-close"
+                                onClick={handleCloseButtonClick}
+                                title="Close"
+                                type="button"
+                            >
+                                <CloseIcon size={18} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1122,7 +1143,7 @@ export const Settings = ({
                             <ThemedButton
                                 data-testid="settings-close"
                                 disabled={isLoading}
-                                onClick={onClose}
+                                onClick={handleCloseButtonClick}
                                 size="sm"
                                 variant="secondary"
                             >

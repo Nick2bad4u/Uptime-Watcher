@@ -838,6 +838,7 @@ const rendererNoBrowserDialogsRule = {
     create(context) {
         const rawFilename = context.getFilename();
         const normalizedFilename = normalizePath(rawFilename);
+        const sourceCode = context.sourceCode ?? context.getSourceCode();
 
         if (
             normalizedFilename === "<input>" ||
@@ -847,8 +848,8 @@ const rendererNoBrowserDialogsRule = {
             return {};
         }
 
-        function hasLocalBinding(name) {
-            let scope = context.getScope();
+        function hasLocalBinding(name, node) {
+            let scope = sourceCode.getScope(node);
             while (scope) {
                 const variable = scope.set.get(name);
                 if (variable && variable.defs.length > 0) {
@@ -883,13 +884,13 @@ const rendererNoBrowserDialogsRule = {
             return null;
         }
 
-        function getForbiddenDialogFromCallee(callee) {
+        function getForbiddenDialogFromCallee(callee, node) {
             const unwrapped = unwrapChain(callee);
 
             if (unwrapped.type === "Identifier") {
                 if (
                     FORBIDDEN_BROWSER_DIALOG_NAMES.has(unwrapped.name) &&
-                    !hasLocalBinding(unwrapped.name)
+                    !hasLocalBinding(unwrapped.name, node)
                 ) {
                     return unwrapped.name;
                 }
@@ -924,7 +925,7 @@ const rendererNoBrowserDialogsRule = {
 
         return {
             CallExpression(node) {
-                const dialog = getForbiddenDialogFromCallee(node.callee);
+                const dialog = getForbiddenDialogFromCallee(node.callee, node);
                 if (!dialog) {
                     return;
                 }

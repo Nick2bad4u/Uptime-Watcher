@@ -14,7 +14,7 @@ package-lock.json
 **/*.cjs
 **/*.mjs
 scripts/
-icons/
+**/icons/**
 **/*.png
 **/*.ps1
 **/*.disabled

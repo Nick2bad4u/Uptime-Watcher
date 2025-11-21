@@ -27,6 +27,7 @@ import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useAvailabilityColors, useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
+import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import "./Header.css";
 import { HeaderControls } from "./HeaderControls";
 import { StatusSubscriptionIndicator } from "./StatusSubscriptionIndicator";
@@ -84,18 +85,22 @@ export const Header = (): JSX.Element => {
     return (
         <header className="app-topbar" data-testid="app-header" role="banner">
             <ThemedBox
-                className="app-topbar__container"
+                className="app-topbar__container relative overflow-hidden"
                 data-testid="app-header-container"
                 padding="lg"
                 rounded="xl"
                 shadow="md"
                 surface="elevated"
             >
-                <div className="app-topbar__status-indicator">
+                <GalaxyBackground
+                    className="galaxy-background--hero"
+                    isDark={isDark}
+                />
+                <div className="app-topbar__status-indicator relative z-10">
                     <StatusSubscriptionIndicator />
                 </div>
 
-                <div className="app-topbar__grid">
+                <div className="app-topbar__grid relative z-10">
                     <div className="app-topbar__identity">
                         <div className="app-topbar__identity-text">
                             <ThemedText
@@ -164,7 +169,7 @@ export const Header = (): JSX.Element => {
                 </div>
 
                 {shouldShowSummary ? (
-                    <div className="app-topbar__summary-bar">
+                    <div className="app-topbar__summary-bar relative z-10">
                         <StatusSummary
                             degradedMonitors={degradedMonitors}
                             downMonitors={downMonitors}

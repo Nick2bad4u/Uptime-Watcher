@@ -67,6 +67,7 @@ export const HeaderControls = ({
             <Tooltip content="Add new site to monitor" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button
+                        aria-label="Add new site"
                         className="header-controls__button header-controls__button--add"
                         data-testid="header-control-add-site"
                         onClick={onShowAddSiteModal}
@@ -113,6 +114,7 @@ export const HeaderControls = ({
             <Tooltip content="Open application settings" position="bottom">
                 {(triggerProps: TooltipTriggerProperties) => (
                     <button
+                        aria-label="Open settings"
                         className="header-controls__button header-controls__button--settings"
                         data-testid="header-control-open-settings"
                         onClick={onShowSettings}

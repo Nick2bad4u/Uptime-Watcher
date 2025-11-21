@@ -904,8 +904,9 @@ describe("Settings - Branch Coverage Tests", () => {
                 name: "Close settings",
             });
             await user.click(closeButton);
-
-            expect(mockOnClose).toHaveBeenCalled();
+            await waitFor(() => {
+                expect(mockOnClose).toHaveBeenCalled();
+            });
         });
     });
 

@@ -60,7 +60,7 @@ skip-path:
     - coverage/
     - .vscode/
     - docs/assets/
-    - icons/
+    - "**/icons/**"
     - html/
     - release/
     - .secretlintrc.json

@@ -15,13 +15,17 @@ import {
     type MouseEvent,
     type NamedExoticComponent,
     useCallback,
+    useState,
 } from "react";
 
 import { ThemedBox } from "../../theme/components/ThemedBox";
 import { ThemedText } from "../../theme/components/ThemedText";
 import { useTheme } from "../../theme/useTheme";
 import { AppIcons } from "../../utils/icons";
+import { waitForAnimation } from "../../utils/time/waitForAnimation";
+import { GalaxyBackground } from "../common/GalaxyBackground/GalaxyBackground";
 import { AddSiteForm } from "./AddSiteForm";
+import "./AddSiteModal.css";
 
 /**
  * Props for the AddSiteModal component
@@ -48,6 +52,20 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
     function AddSiteModal({ onClose }: AddSiteModalProperties) {
         const { isDark } = useTheme();
         const CloseIcon = AppIcons.ui.close;
+        const AddIcon = AppIcons.actions.add;
+        const [isClosing, setIsClosing] = useState(false);
+
+        const handleClose = useCallback((): void => {
+            setIsClosing(true);
+            void (async (): Promise<void> => {
+                await waitForAnimation(300);
+                onClose();
+            })();
+        }, [onClose]);
+
+        const handleCloseButtonClick = useCallback((): void => {
+            handleClose();
+        }, [handleClose]);
 
         /**
          * Handles overlay clicks to support closing the modal when the user
@@ -56,10 +74,10 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
         const handleOverlayClick = useCallback(
             (event: MouseEvent<HTMLDivElement>) => {
                 if (event.target === event.currentTarget) {
-                    onClose();
+                    handleClose();
                 }
             },
-            [onClose]
+            [handleClose]
         );
 
         return (
@@ -67,13 +85,15 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
             <div
                 className={`modal-overlay modal-overlay--frosted ${
                     isDark ? "dark" : ""
-                }`}
+                } ${isClosing ? "modal-overlay--closing" : ""}`}
                 data-testid="add-site-modal-overlay"
                 onClick={handleOverlayClick}
             >
                 <ThemedBox
                     as="dialog"
-                    className="modal-shell modal-shell--form modal-shell--accent-success"
+                    className={`modal-shell modal-shell--form modal-shell--accent-success add-site-modal ${
+                        isClosing ? "modal-shell--closing" : ""
+                    }`}
                     data-testid="add-site-modal"
                     open
                     padding="xl"
@@ -81,44 +101,56 @@ export const AddSiteModal: NamedExoticComponent<AddSiteModalProperties> = memo(
                     shadow="xl"
                     surface="overlay"
                 >
-                    <div className="modal-shell__header">
-                        <div className="modal-shell__title-group">
-                            {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
-                            <ThemedText
-                                aria-level={1}
-                                as="h2"
-                                className="modal-shell__title"
-                                role="heading"
-                                size="xl"
-                                weight="semibold"
-                            >
-                                Add New Site
-                            </ThemedText>
-                            <ThemedText
-                                className="modal-shell__subtitle"
-                                size="sm"
-                                variant="secondary"
-                            >
-                                Configure monitoring details and instantly join
-                                uptime tracking for your next property.
-                            </ThemedText>
-                        </div>
-                        <div className="modal-shell__actions">
-                            <button
-                                aria-label="Close modal"
-                                className="modal-shell__close"
-                                data-testid="add-site-modal-close"
-                                onClick={onClose}
-                                title="Close"
-                                type="button"
-                            >
-                                <CloseIcon size={18} />
-                            </button>
+                    <div className="modal-shell__header add-site-modal__header">
+                        <GalaxyBackground
+                            className="galaxy-background--banner galaxy-background--banner-compact"
+                            isDark={isDark}
+                        />
+                        <div className="modal-shell__header-content">
+                            <div className="modal-shell__title-group">
+                                <div className="flex items-center gap-2">
+                                    <div className="modal-shell__accent-icon add-site-modal__header-icon">
+                                        <AddIcon size={22} />
+                                    </div>
+                                    {/* eslint-disable-next-line jsx-a11y/prefer-tag-over-role -- Modal header requires explicit role for testing and assistive tech */}
+                                    <ThemedText
+                                        aria-level={1}
+                                        as="h2"
+                                        className="modal-shell__title"
+                                        role="heading"
+                                        size="xl"
+                                        weight="semibold"
+                                    >
+                                        Add New Site
+                                    </ThemedText>
+                                </div>
+                                <ThemedText
+                                    className="modal-shell__subtitle"
+                                    size="sm"
+                                    variant="secondary"
+                                >
+                                    Configure monitoring for a new property or
+                                    link additional monitors to an existing
+                                    site.
+                                </ThemedText>
+                            </div>
+                            <div className="modal-shell__actions">
+                                <button
+                                    aria-label="Close modal"
+                                    className="modal-shell__close"
+                                    data-testid="add-site-modal-close"
+                                    onClick={handleCloseButtonClick}
+                                    title="Close"
+                                    type="button"
+                                >
+                                    <CloseIcon size={18} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <div className="modal-shell__body modal-shell__body-scrollable">
-                        <AddSiteForm onSuccess={onClose} />
+                        <AddSiteForm onSuccess={handleClose} />
                     </div>
                 </ThemedBox>
             </div>

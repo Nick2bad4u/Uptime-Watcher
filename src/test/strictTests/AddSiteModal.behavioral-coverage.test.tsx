@@ -4,7 +4,7 @@
 
 import type { ReactNode } from "react";
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const themeState = vi.hoisted(() => ({
@@ -62,7 +62,7 @@ describe("AddSiteModal coverage", () => {
         addSiteFormMock.lastOnSuccess = undefined;
     });
 
-    it("closes when overlay is clicked but not when dialog is clicked", () => {
+    it("closes when overlay is clicked but not when dialog is clicked", async () => {
         const onClose = vi.fn();
         render(<AddSiteModal onClose={onClose} />);
 
@@ -73,19 +73,25 @@ describe("AddSiteModal coverage", () => {
         expect(onClose).not.toHaveBeenCalled();
 
         fireEvent.click(overlay);
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
     });
 
-    it("invokes close handler for close button and form success", () => {
+    it("invokes close handler for close button and form success", async () => {
         const onClose = vi.fn();
         render(<AddSiteModal onClose={onClose} />);
 
         fireEvent.click(screen.getByTestId("add-site-modal-close"));
-        expect(onClose).toHaveBeenCalledTimes(1);
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledTimes(1);
+        });
 
         expect(addSiteFormMock.lastOnSuccess).toBeTypeOf("function");
         addSiteFormMock.lastOnSuccess?.();
-        expect(onClose).toHaveBeenCalledTimes(2);
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalledTimes(2);
+        });
     });
 
     it("applies dark theme modifier when theme is dark", () => {

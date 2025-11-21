@@ -40,8 +40,11 @@ import type { Site } from "@shared/types";
 import type { MouseEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { JSX } from "react/jsx-runtime";
 
-import { useEscapeKeyModalHandler } from "@shared/utils/modalHandlers";
-import { useCallback, useMemo } from "react";
+import {
+    type EscapeKeyModalConfig,
+    useEscapeKeyModalHandler,
+} from "@shared/utils/modalHandlers";
+import { useCallback, useMemo, useState } from "react";
 
 import { useSiteDetails } from "../../hooks/site/useSiteDetails";
 import { ChartConfigService } from "../../services/chartConfig";
@@ -53,6 +56,7 @@ import {
     formatFullTimestamp,
     formatResponseTime,
 } from "../../utils/time";
+import { waitForAnimation } from "../../utils/time/waitForAnimation";
 import { SurfaceContainer } from "../shared/SurfaceContainer";
 import { SiteDetailsHeader } from "./SiteDetailsHeader";
 import { SiteDetailsNavigation } from "./SiteDetailsNavigation";
@@ -103,17 +107,26 @@ export const SiteDetails = ({
 }: SiteDetailsProperties): JSX.Element | null => {
     const { currentTheme, isDark } = useTheme();
     const { getAvailabilityDescription } = useAvailabilityColors();
+    const [isClosing, setIsClosing] = useState(false);
+
+    const handleClose = useCallback((): void => {
+        setIsClosing(true);
+        void (async (): Promise<void> => {
+            await waitForAnimation();
+            onClose();
+        })();
+    }, [onClose]);
 
     // Add global escape key handler
-    const modalConfigs = useMemo(
-        () => [
+    const modalConfigs = useMemo<EscapeKeyModalConfig[]>(
+        (): EscapeKeyModalConfig[] => [
             {
                 isOpen: true, // SiteDetails is always considered "open" when rendered
-                onClose,
+                onClose: handleClose,
                 priority: 1,
             },
         ],
-        [onClose]
+        [handleClose]
     );
 
     useEscapeKeyModalHandler(modalConfigs);
@@ -322,10 +335,10 @@ export const SiteDetails = ({
     const handleOverlayClick = useCallback(
         (event: MouseEvent<HTMLDivElement>): void => {
             if (event.target === event.currentTarget) {
-                onClose();
+                handleClose();
             }
         },
-        [onClose]
+        [handleClose]
     );
 
     const handleOverlayKeyDown = useCallback(
@@ -341,10 +354,10 @@ export const SiteDetails = ({
 
             if (shouldClose) {
                 event.preventDefault();
-                onClose();
+                handleClose();
             }
         },
-        [onClose]
+        [handleClose]
     );
 
     // Extract tab JSX to avoid IIFE pattern and complex conditional rendering
@@ -450,7 +463,7 @@ export const SiteDetails = ({
             aria-label="Close site details"
             className={`modal-overlay modal-overlay--immersive site-details-modal-overlay ${
                 isDark ? "dark" : ""
-            }`}
+            } ${isClosing ? "modal-overlay--closing" : ""}`}
             onClick={handleOverlayClick}
             onKeyDown={handleOverlayKeyDown}
             role="button"
@@ -459,7 +472,9 @@ export const SiteDetails = ({
             <ThemedBox
                 aria-label="Site details"
                 as="dialog"
-                className="modal-shell modal-shell--site-details modal-shell--accent-success site-details-modal"
+                className={`modal-shell modal-shell--site-details modal-shell--accent-success site-details-modal ${
+                    isClosing ? "modal-shell--closing" : ""
+                }`}
                 data-testid="site-details-modal"
                 open
                 padding="xl"
@@ -473,7 +488,7 @@ export const SiteDetails = ({
                         style={scrollContainerStyle}
                     >
                         <SiteDetailsHeader
-                            onClose={onClose}
+                            onClose={handleClose}
                             site={currentSite}
                             {...(selectedMonitor ? { selectedMonitor } : {})}
                         />

@@ -1,5 +1,6 @@
 /* stylelint-disable a11y/selector-pseudo-class-focus -- TODO: Create Script to Fix at release to reduce LoC */
 /* stylelint-disable a11y/media-prefers-reduced-motion -- TODO: Create Script to Fix at release to reduce LoC */
+/* stylelint-disable scss/function-color-relative -- file relies on color-mix for gradients */
 
 @keyframes header-control-enter {
     from {
@@ -65,10 +66,23 @@
         position: absolute;
         z-index: 0;
         background-image:
-            radial-gradient(circle, rgb(255 255 255 / 18%) 1px, transparent 50%),
-            radial-gradient(circle, color-mix(in srgb, var(--color-primary-200) 60%, transparent) 0.8px, transparent 45%);
-        background-size: 280px 240px, 360px 320px;
-        background-position: 0 0, 140px 120px;
+            radial-gradient(
+                circle,
+                rgb(255 255 255 / 18%) 1px,
+                transparent 50%
+            ),
+            radial-gradient(
+                circle,
+                color-mix(in srgb, var(--color-primary-200) 60%, transparent)
+                    0.8px,
+                transparent 45%
+            );
+        background-position:
+            0 0,
+            140px 120px;
+        background-size:
+            280px 240px,
+            360px 320px;
         content: "";
         inset: -20% -10% 0;
         mix-blend-mode: screen;
@@ -120,10 +134,13 @@
     &::after {
         position: absolute;
         z-index: 0;
-        background-image:
-            radial-gradient(circle, rgb(255 255 255 / 12%) 1px, transparent 45%);
-        background-size: 320px 280px;
+        background-image: radial-gradient(
+            circle,
+            rgb(255 255 255 / 12%) 1px,
+            transparent 45%
+        );
         background-position: 0 0;
+        background-size: 320px 280px;
         content: "";
         inset: 0;
         mix-blend-mode: screen;
@@ -220,10 +237,18 @@
 }
 
 .app-topbar__title {
+    color: color-mix(
+        in srgb,
+        var(--color-text-primary, rgb(248 250 252)) 96%,
+        rgb(255 255 255) 4%
+    );
     font-size: clamp(1.25rem, 1.125rem + 0.65vi, 1.75rem);
     letter-spacing: -0.01em;
     line-height: 1.25;
-    text-shadow: 0 12px 32px rgb(59 130 246 / 32%);
+    text-shadow:
+        0 18px 42px rgb(37 99 235 / 45%),
+        0 0 28px rgb(59 130 246 / 55%),
+        0 4px 12px rgb(2 8 23 / 65%);
 }
 
 .app-topbar__subtitle {
@@ -236,6 +261,9 @@
     letter-spacing: 0.02em;
     line-height: 1.375;
     margin-block-start: 0.25rem;
+    text-shadow:
+        0 8px 26px rgb(15 23 42 / 55%),
+        0 0 12px rgb(59 130 246 / 35%);
 }
 
 .app-topbar__badges {
@@ -936,7 +964,6 @@
 .status-subscription-indicator__dot--unknown {
     background: color-mix(
         in srgb,
-
 
         var(--color-border-secondary) 60%,
         transparent

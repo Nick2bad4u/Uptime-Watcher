@@ -6,10 +6,8 @@ import type { Configuration } from "electron-builder";
  *
  * @remarks
  * This is a TypeScript mirror of the existing `build` section in
- * `package.json`. It is not wired into the build pipeline yet; electron-builder
- * still reads from `package.json` by default. To use this file instead, invoke
- * electron-builder with `--config electron-builder.config.ts` and keep this
- * file as the single source of truth going forward.
+ * `package.json`. It is now the primary source of truth for build
+ * configuration.
  *
  * @see {@link https://www.electron.build/configuration}
  * @see {@link https://www.schemastore.org/electron-builder.json}
@@ -60,7 +58,7 @@ const config: Configuration = {
     },
     generateUpdatesFilesForAllChannels: false,
 
-    icon: "icons/favicon.ico",
+    icon: "src/components/icons/icon.ico",
     includePdb: false,
     linux: {
         category: "Utility",
@@ -71,7 +69,7 @@ const config: Configuration = {
                 Name: "Uptime Watcher",
             },
         },
-        icon: "icons/favicon-256x256.png",
+        icon: "src/components/icons/icon-256.png",
         maintainer: "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com>",
         synopsis:
             "A cross-platform Electron app to monitor website uptime status",
@@ -93,7 +91,7 @@ const config: Configuration = {
         category: "public.app-category.productivity",
         gatekeeperAssess: true,
         hardenedRuntime: true,
-        icon: "icons/favicon-512x512.icns",
+        icon: "src/components/icons/favicon-512x512.icns",
         target: [
             "dmg",
             "zip",
@@ -156,7 +154,7 @@ const config: Configuration = {
         artifactName: `Uptime-Watcher-squirrel-\${arch}-\${version}.\${ext}`,
     },
     win: {
-        icon: "icons/favicon-256x256.ico",
+        icon: "src/components/icons/icon.ico",
         legalTrademarks: "Uptime Watcher",
         requestedExecutionLevel: "asInvoker",
         target: [

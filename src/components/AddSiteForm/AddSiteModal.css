@@ -1,0 +1,52 @@
+.add-site-modal {
+    --modal-accent: var(--color-success);
+    display: flex;
+    flex-direction: column;
+    max-block-size: min(92vb, 65rem);
+    max-inline-size: min(90vi, 56rem);
+
+    & .modal-shell__body {
+        display: flex;
+        overflow: auto;
+        flex: 1;
+        flex-direction: column;
+        padding: 1.25rem 1.5rem 1.5rem;
+        gap: 1rem;
+        max-block-size: calc(90vb - 8rem);
+        min-block-size: 0;
+        overflow-block: auto;
+        overflow-inline: hidden;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable both-edges;
+    }
+
+    & .modal-shell__body-scrollable {
+        overflow: auto;
+        flex: 1;
+        max-block-size: calc(82vb - 6rem);
+        min-block-size: 0;
+        overflow-block: auto;
+        overflow-inline: hidden;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable both-edges;
+    }
+}
+
+.add-site-modal__header {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 1.2rem + 1vi, 2.2rem);
+    border-block-end: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 32%, transparent);
+}
+
+.add-site-modal__header-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--modal-accent) 12%, transparent);
+    block-size: 2rem;
+    color: var(--modal-accent);
+    inline-size: 2rem;
+}

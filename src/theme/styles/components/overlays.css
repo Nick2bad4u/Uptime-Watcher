@@ -17,6 +17,10 @@
     inset: 0;
 }
 
+.modal-overlay--closing {
+    animation: fade-out 0.3s ease-in-out forwards;
+}
+
 .modal-overlay--confirm {
     z-index: 80;
 }
@@ -54,10 +58,13 @@
     &::before {
         position: absolute;
         z-index: 0;
-        background-image:
-            radial-gradient(circle, rgb(255 255 255 / 12%) 1px, transparent 50%);
-        background-size: 300px 260px;
+        background-image: radial-gradient(
+            circle,
+            rgb(255 255 255 / 12%) 1px,
+            transparent 50%
+        );
         background-position: 0 0;
+        background-size: 300px 260px;
         content: "";
         inset: 0;
         mix-blend-mode: screen;
@@ -128,7 +135,8 @@
         background:
             radial-gradient(
                 120% 120% at 100% 0%,
-                color-mix(in srgb, var(--modal-shell-accent) 54%, transparent) 0%,
+                color-mix(in srgb, var(--modal-shell-accent) 54%, transparent)
+                    0%,
                 color-mix(
                         in srgb,
                         var(--modal-shell-overlay-muted) 72%,
@@ -136,7 +144,11 @@
                     )
                     72%
             ),
-            radial-gradient(circle, rgb(255 255 255 / 12%) 1.5px, transparent 50%);
+            radial-gradient(
+                circle,
+                rgb(255 255 255 / 12%) 1.5px,
+                transparent 50%
+            );
         inline-size: clamp(22rem, 40vi, 32rem);
         inset-block-start: -35%;
         inset-inline-end: -40%;
@@ -149,11 +161,57 @@
     }
 }
 
+.modal-shell--closing {
+    animation: modal-shell-exit 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
 .modal-shell__subtitle {
     margin: 0;
     color: color-mix(in srgb, var(--color-text-secondary) 88%, #ffffff 12%);
     font-size: 1rem;
     max-inline-size: 46ch;
+}
+
+.modal-shell__header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(1.5rem, 1.2rem + 1vi, 2.2rem);
+    border-block-end: 1px solid
+        color-mix(in srgb, var(--color-border-secondary) 32%, transparent);
+    gap: 1rem;
+    min-block-size: 4.25rem;
+}
+
+.modal-shell__header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    inline-size: 100%;
+}
+
+.modal-shell__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-shell__accent-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background: color-mix(in srgb, var(--modal-accent) 12%, transparent);
+    block-size: 2rem;
+    box-shadow: 0 0 16px
+        color-mix(in srgb, var(--modal-accent) 25%, transparent);
+    color: var(--modal-accent);
+    inline-size: 2rem;
 }
 
 .modal-shell__actions {
@@ -181,19 +239,43 @@
     cursor: pointer;
     inline-size: 2.5rem;
     transition:
-        background-color var(--transition-normal),
-        color var(--transition-normal),
-        transform var(--transition-normal);
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-normal),
+        color var(--transition-fast),
+        transform var(--transition-fast);
 
     &:hover {
         border-color: color-mix(in srgb, var(--modal-accent) 48%, transparent);
+        background: linear-gradient(
+            140deg,
+            color-mix(in srgb, var(--modal-accent) 24%, transparent),
+            color-mix(in srgb, var(--modal-accent) 8%, transparent)
+        );
         box-shadow: 0 18px 40px
             color-mix(in srgb, var(--modal-accent) 34%, transparent);
-        transform: translateY(-1px) scale(1.02);
+        color: color-mix(in srgb, var(--modal-accent) 60%, #ffffff 40%);
+        transform: translateY(-2px) scale(1.04);
     }
 
     &:active {
-        transform: scale(0.96);
+        transform: scale(0.94);
+        transition-duration: 0.1s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition:
+            background-color var(--transition-fast),
+            border-color var(--transition-fast),
+            color var(--transition-fast);
+
+        &:hover {
+            transform: none;
+        }
+
+        &:active {
+            transform: none;
+        }
     }
 }
 
@@ -228,6 +310,7 @@
     flex: 1;
     min-block-size: 0;
     overscroll-behavior: contain;
+    scroll-behavior: smooth;
     scrollbar-gutter: stable both-edges;
 }
 
@@ -477,4 +560,24 @@
     border-radius: 1rem;
     background: rgb(255 255 255 / 3%);
     gap: 1rem;
+}
+
+@keyframes modal-shell-exit {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
 }
