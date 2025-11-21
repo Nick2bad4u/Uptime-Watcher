@@ -135,19 +135,15 @@ async function getIdentifierLabel(selectedMonitor: Monitor): Promise<string> {
 }
 
 /**
- * Resolves and renders the primary identifier label for the selected monitor
- * type.
+ * Computes the primary identifier label for the selected monitor type and keeps
+ * it in sync as monitor configuration is loaded.
  *
  * @param selectedMonitor - Monitor whose identifier metadata should be
  *   displayed.
  *
  * @returns Localised label string for the monitor identifier field.
  */
-interface IdentifierLabelProps {
-    selectedMonitor: Monitor;
-}
-
-function IdentifierLabel({ selectedMonitor }: IdentifierLabelProps): string {
+function useIdentifierLabel(selectedMonitor: Monitor): string {
     const [label, setLabel] = useState<string>(UiDefaults.loadingLabel);
 
     useEffect(
@@ -215,6 +211,7 @@ export const SettingsTab = ({
     timeoutChanged,
 }: SettingsTabProperties): JSX.Element => {
     const { currentTheme } = useTheme();
+    const identifierLabel = useIdentifierLabel(selectedMonitor);
     const trimmedSiteName = localName.trim();
     const isSiteNameValid = trimmedSiteName.length > 0;
     const isTimeoutValid =
@@ -421,9 +418,7 @@ export const SettingsTab = ({
                             variant="secondary"
                             weight="medium"
                         >
-                            <IdentifierLabel
-                                selectedMonitor={selectedMonitor}
-                            />
+                            {identifierLabel}
                         </ThemedText>
                         <ThemedInput
                             className="opacity-70"
@@ -645,9 +640,7 @@ export const SettingsTab = ({
                                     size="sm"
                                     variant="secondary"
                                 >
-                                    <IdentifierLabel
-                                        selectedMonitor={selectedMonitor}
-                                    />
+                                    {identifierLabel}
                                 </ThemedText>
                                 <ThemedBadge size="sm" variant="secondary">
                                     {getDisplayIdentifier(

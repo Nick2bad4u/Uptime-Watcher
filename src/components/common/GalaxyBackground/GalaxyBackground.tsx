@@ -2,7 +2,7 @@ import React, { useId, useMemo } from "react";
 
 import "./GalaxyBackground.css";
 
-interface GalaxyBackgroundProps {
+interface GalaxyBackgroundProperties {
     readonly className?: string;
     readonly isDark?: boolean;
 }
@@ -63,7 +63,7 @@ const generateBoxShadow = (
     return value.slice(0, -2);
 };
 
-export const GalaxyBackground: React.FC<GalaxyBackgroundProps> = ({
+export const GalaxyBackground: React.FC<GalaxyBackgroundProperties> = ({
     className = "",
     isDark = true,
 }) => {
