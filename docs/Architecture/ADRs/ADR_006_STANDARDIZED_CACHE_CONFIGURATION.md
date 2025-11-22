@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-006: Standardized Cache Configuration"
 summary: "Defines standardized cache configuration constants and patterns for managers and services to ensure consistent TTLs and limits."
 created: "2025-08-23"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "cache"
   - "configuration"
 ---
-
 # ADR-006: Standardized Cache Configuration
 
 ## Table of Contents

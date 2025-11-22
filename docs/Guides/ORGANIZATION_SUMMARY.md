@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Documentation Organization Summary"
 summary: "Summary of the documentation reorganization, including the new structure for essential docs and archived materials."
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -12,7 +12,6 @@ tags:
   - "organization"
   - "archive"
 ---
-
 # 📁 Documentation Organization Summary
 
 > **Clean Slate**: The docs folder has been reorganized to focus on current, actionable documentation while preserving historical materials in an archive.

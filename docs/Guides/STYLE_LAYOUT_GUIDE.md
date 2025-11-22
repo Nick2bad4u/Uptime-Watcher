@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Style & Layout Guide"
 summary: "Guide to shared styling primitives and layout conventions used in the Uptime Watcher renderer UI."
 created: "2025-10-07"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:

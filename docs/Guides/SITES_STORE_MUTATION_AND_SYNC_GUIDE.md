@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Sites Store Mutation and Sync Guide"
 summary: "Canonical guidance for mutating, synchronizing, and monitoring site data in the Zustand-based sites store."
 created: "2025-11-21"
-last_reviewed: "2025-11-21"
+last_reviewed: "2025-11-22"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -19,7 +19,6 @@ topics:
   - "state-sync"
 status: "active"
 ---
-
 # Sites Store Mutation and Sync Guide
 
 This guide captures the **canonical approach** for mutating site data from the

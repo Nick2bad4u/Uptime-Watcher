@@ -1,3 +1,17 @@
+---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Test Scripts Verbosity Guide"
+summary: "Overview of the different Vitest script variants and reporters available in Uptime Watcher, from quiet CI-friendly runs to detailed debugging output."
+created: "2025-11-21"
+last_reviewed: "2025-11-16"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "testing"
+  - "vitest"
+  - "tooling"
+  - "uptime-watcher"
+---
 # Test Scripts Verbosity Guide
 
 This document explains the different verbosity levels available for running tests in the Uptime Watcher project.

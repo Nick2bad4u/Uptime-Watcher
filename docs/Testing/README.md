@@ -12,7 +12,6 @@ tags:
   - "vitest"
   - "playwright"
 ---
-
 # Testing documentation
 
 This directory contains comprehensive testing guides, best practices, and methodology documentation for the Uptime Watcher application.

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Renderer Integration Guide"
 summary: "Renderer integration guidelines for Uptime Watcher 17.4.0+, focusing on IPC channels, events, and manual check flows."
 created: "2025-10-26"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "integration"
   - "events"
 ---
-
 # Renderer Integration Guide
 
 ## Table of Contents

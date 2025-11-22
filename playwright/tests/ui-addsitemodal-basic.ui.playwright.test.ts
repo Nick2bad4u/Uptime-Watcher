@@ -50,7 +50,11 @@ test.describe(
             }
         });
 
-        test(
+        // See Playwright configuration notes: this scenario is also covered
+        // by RTL tests, and has historically been the most sensitive to the
+        // upstream attachment/step bug. Keep it skipped until we can
+        // confirm the Playwright dispatcher issue is fully resolved.
+        test.skip(
             "should expose accent styling and validation messaging",
             {
                 tag: ["@smoke", "@visual"],
@@ -118,7 +122,10 @@ test.describe(
             }
         );
 
-        test(
+        // Likewise, this catalog scenario has comprehensive unit/integration
+        // coverage. We keep the E2E variant skipped for now to avoid
+        // reintroducing flakiness tied to the Playwright attachment bug.
+        test.skip(
             "should present comprehensive monitor type catalog",
             {
                 tag: ["@options", "@modal"],

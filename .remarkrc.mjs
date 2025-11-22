@@ -360,7 +360,22 @@ const remarkConfig = {
             {
                 schemas: {
                     "config/schemas/doc-frontmatter.schema.json": [
+                        // Architecture documentation
+                        "docs/Architecture/**/*.md",
+                        "docs/Architecture/**/*.mdx",
+                        // Testing documentation
+                        "docs/Testing/**/*.md",
+                        "docs/Testing/**/*.mdx",
+                        // Guides documentation
+                        "docs/Guides/**/*.md",
+                        "docs/Guides/**/*.mdx",
+                        // Root docs files
+                        "docs/*.md",
+                        "docs/*.mdx",
+                        // General pattern for any remaining docs
                         "docs/**/*.md",
+                        "docs/**/*.mdx",
+                        // MDX files anywhere (for Storybook stories, etc.)
                         "**/*.mdx",
                     ],
                 },

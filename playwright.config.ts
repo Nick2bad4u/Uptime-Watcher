@@ -125,7 +125,7 @@ const config: PlaywrightTestConfig = defineConfig({
 
     // Reporter configuration with multiple formats
     reporter: [
-        ["list", { FORCE_COLOR: true, printSteps: true }],
+        ["list"],
         [
             "html",
             {
@@ -234,7 +234,12 @@ const config: PlaywrightTestConfig = defineConfig({
 
         navigationTimeout: 30 * 1000, // 30 seconds for navigation
 
-        // Recording configuration - capture failures
+        // Recording configuration - capture failures.
+        //
+        // NOTE: The Playwright dispatcher can still occasionally report
+        // "Internal error: step id not found: fixture@…" when attachments
+        // target fixture steps that have already been discarded. In this
+        // project we accept that noise in exchange for full diagnostics.
         screenshot: "only-on-failure",
 
         // Custom test ID attribute for better selector reliability

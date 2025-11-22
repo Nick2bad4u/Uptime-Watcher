@@ -1,3 +1,17 @@
+---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Playwright Codegen Template Usage"
+summary: "How to use the custom Playwright codegen template and helper scripts to transform recorded tests into lint-compliant suites for Uptime Watcher."
+created: "2025-11-21"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "testing"
+  - "playwright"
+  - "codegen"
+  - "uptime-watcher"
+---
 # 🎭 **Using the Codegen Template with Recorded Tests**
 
 ## **🚀 Quick Start (Recommended)**

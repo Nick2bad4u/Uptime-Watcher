@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "IPC Automation Workflow"
 summary: "Workflow for generating, validating, and documenting IPC channels and preload bridges from shared TypeScript schemas."
 created: "2025-10-26"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "codegen"
   - "ci"
 ---
-
 # IPC Automation Workflow
 
 > **Last updated**: 2025-10-26 \

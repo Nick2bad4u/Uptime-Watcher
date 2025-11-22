@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Using This Documentation"
 summary: "Explains how to navigate the architecture knowledge base and select the most relevant ADRs, patterns, and templates for your work."
 created: "2025-10-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:

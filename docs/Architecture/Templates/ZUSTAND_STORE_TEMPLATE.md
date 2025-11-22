@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "Zustand Store Template"
 summary: "Provides templates for creating new Zustand stores using direct-create and modular composition patterns in the frontend."
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "zustand"
   - "state-management"
 ---
-
 # Zustand Store Template
 
 ## Table of Contents

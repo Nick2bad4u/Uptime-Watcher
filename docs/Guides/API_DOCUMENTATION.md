@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "API & IPC Documentation"
 summary: "Comprehensive reference for Uptime Watcher's IPC communication and API surface."
 created: "2025-09-22"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "electron"
   - "events"
 ---
-
 # 📡 API & IPC Documentation
 
 ## Table of Contents

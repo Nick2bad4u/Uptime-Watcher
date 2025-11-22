@@ -1,5 +1,5 @@
-// eslint-disable-next-line import-x/no-unassigned-import -- ensure web storage shim registers before Storybook config executes
-import "./shims/nodeWebStorage";
+// eslint-disable-next-line import-x/no-unassigned-import, import-x/extensions -- ensure web storage shim registers before Storybook config executes
+import "./shims/nodeWebStorage.ts";
 
 import type { AddonOptionsVite } from "@storybook/addon-coverage";
 import type { StorybookConfig } from "@storybook/react-vite";
@@ -13,7 +13,8 @@ import {
     createStorybookReactPluginOptions,
     storybookCoverageExcludeGlobs,
     storybookCoverageIncludeGlobs,
-} from "./viteSharedConfig";
+    // eslint-disable-next-line import-x/extensions -- storybook wants an extension
+} from "./viteSharedConfig.ts";
 
 /**
  * Storybook 9 migration reference:
@@ -41,6 +42,18 @@ const coverageOptions: AddonOptionsVite = {
 };
 
 /**
+ * Determines whether we're running in test mode (Vitest) vs. dev mode (browser
+ * UI).
+ */
+const isTestMode = (): boolean =>
+    /* eslint-disable n/no-process-env -- used to detect test mode */
+    process.env["VITEST"] === "true" ||
+    process.env["NODE_ENV"] === "test" ||
+    process.argv.includes("--test");
+
+/* eslint-enable n/no-process-env -- turn back on */
+
+/**
  * Primary Storybook configuration for the React/Vite renderer.
  *
  * @remarks
@@ -59,7 +72,9 @@ const config: StorybookConfig = {
             options: coverageOptions,
         },
         "@storybook/addon-designs",
-        "@storybook/addon-vitest",
+        // Only load @storybook/addon-vitest during test runs, not in the browser UI
+        // This prevents "store not ready" errors when clicking test buttons in the UI
+        ...(isTestMode() ? ["@storybook/addon-vitest" as const] : []),
         "msw-storybook-addon",
     ],
     docs: {
@@ -70,7 +85,7 @@ const config: StorybookConfig = {
         name: "@storybook/react-vite",
         options: {},
     },
-    stories: ["./stories/**/*.mdx", "./stories/**/*.stories.@(ts|tsx)"],
+    stories: ["./stories/**/*.stories.@(ts|tsx)"],
     viteFinal: (existingConfig) => {
         const toArray = (
             plugins: PluginOption | PluginOption[] | undefined

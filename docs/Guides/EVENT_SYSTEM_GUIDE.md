@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Event System Guide"
 summary: "Guide to the TypedEventBus-based event system used for real-time communication in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "ipc"
   - "realtime"
 ---
-
 # Event System Guide
 
 This guide provides comprehensive documentation for the TypedEventBus-based event system in Uptime Watcher, covering event-driven architecture patterns, automatic metadata injection, IPC forwarding, and real-time communication between backend and frontend.

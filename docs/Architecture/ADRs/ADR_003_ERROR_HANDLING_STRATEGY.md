@@ -13,7 +13,6 @@ tags:
   - "error-handling"
   - "resilience"
 ---
-
 # ADR-003: Comprehensive Error Handling Strategy
 
 ## Table of Contents

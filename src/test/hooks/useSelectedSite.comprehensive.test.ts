@@ -7,7 +7,11 @@ import type { Mocked } from "vitest";
 import type { Monitor, Site, StatusUpdate } from "@shared/types";
 import type { StateSyncStatusSummary } from "@shared/types/stateSync";
 import type { SitesStore } from "../../stores/sites/types";
-import type { SiteDetailsTab, UIStore } from "../../stores/ui/types";
+import type {
+    InterfaceDensity,
+    SiteDetailsTab,
+    UIStore,
+} from "../../stores/ui/types";
 import { DEFAULT_SITE_TABLE_COLUMN_WIDTHS } from "../../stores/ui/useUiStore";
 import type { ChartTimeRange } from "../../stores/types";
 
@@ -52,6 +56,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     setSiteDetailsHeaderCollapsed: vi.fn(),
     setSiteListLayout: (_layout) => {},
     setSiteTableColumnWidths: () => {},
+    setSurfaceDensity: (_density: InterfaceDensity) => {},
     showAddSiteModal: false,
     showAdvancedMetrics: false,
     showSettings: false,
@@ -62,6 +67,7 @@ const createMockUiStore = (overrides: Partial<UIStore> = {}): UIStore => ({
     siteDetailsTabState: {},
     siteListLayout: "card-compact",
     siteTableColumnWidths: { ...DEFAULT_SITE_TABLE_COLUMN_WIDTHS },
+    surfaceDensity: "comfortable",
     sidebarCollapsedPreference: false,
     syncActiveSiteDetailsTab: (_siteIdentifier: string) => {},
     toggleSiteDetailsHeaderCollapsed: vi.fn(),

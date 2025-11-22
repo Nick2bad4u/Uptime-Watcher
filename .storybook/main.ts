@@ -1,11 +1,7 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 
-import config from "../storybook/main";
-
-const addons = Array.from(
-    // eslint-disable-next-line perfectionist/sort-sets -- keep sorted
-    new Set([...(config.addons ?? []), "@storybook/addon-vitest"])
-);
+// eslint-disable-next-line import-x/extensions -- storybook wants an extension
+import config from "../storybook/main.ts";
 
 const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
     ? ((): typeof config.stories => {
@@ -27,7 +23,6 @@ const stories: StorybookConfig["stories"] = Array.isArray(config.stories)
  */
 const storybookConfig: StorybookConfig = {
     ...config,
-    addons,
     stories,
 };
 

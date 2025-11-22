@@ -9,6 +9,12 @@
  * - Validating cross-references and internal links
  * - Checking for outdated API documentation
  * - Analyzing content quality metrics
+ *
+ * Processes all documentation folders:
+ *
+ * - Docs/Architecture/ - Architecture decision records and patterns
+ * - Docs/Testing/ - Testing guides and best practices
+ * - Docs/Guides/ - User and developer guides
  */
 
 import { readFile, writeFile, readdir } from "node:fs/promises";
@@ -238,7 +244,7 @@ function serializeFrontmatter(frontmatter) {
 }
 
 /**
- * Update last_reviewed date for files modified within the last 30 days
+ * Update last_reviewed date for files modified within the last 180 days
  *
  * @param {string} filePath - Path to the markdown file
  *
@@ -258,26 +264,21 @@ async function updateLastReviewedDate(filePath) {
             return false;
         }
 
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const oneHundredEightyDaysAgo = new Date();
+        oneHundredEightyDaysAgo.setDate(
+            oneHundredEightyDaysAgo.getDate() - 180
+        );
 
-        // Only update if file was modified recently and last_reviewed is older
-        if (lastModified > thirtyDaysAgo) {
-            const rawLastReviewed = frontmatter["last_reviewed"];
-            const currentLastReviewed =
-                typeof rawLastReviewed === "string" && rawLastReviewed
-                    ? new Date(rawLastReviewed)
-                    : null;
+        // Update if file was modified in the last 180 days, always updating last_reviewed
+        if (lastModified > oneHundredEightyDaysAgo) {
+            const isoDate = lastModified.toISOString().split("T")[0] || "";
 
-            if (!currentLastReviewed || lastModified > currentLastReviewed) {
-                const isoDate = lastModified.toISOString().split("T")[0] || "";
-                frontmatter["last_reviewed"] = isoDate;
+            // Always update last_reviewed to the git modification date
+            frontmatter["last_reviewed"] = isoDate;
 
-                const newContent =
-                    serializeFrontmatter(frontmatter) + bodyContent;
-                await writeFile(filePath, newContent, "utf8");
-                return true;
-            }
+            const newContent = serializeFrontmatter(frontmatter) + bodyContent;
+            await writeFile(filePath, newContent, "utf8");
+            return true;
         }
 
         return false;
@@ -454,6 +455,8 @@ async function maintainDocs() {
                         "node_modules",
                         "build",
                         "dist",
+                        "docusaurus", // Skip Docusaurus build output
+                        "TSDoc", // Skip external TSDoc documentation
                     ].includes(entry.name)
                 ) {
                     files.push(...(await collectMarkdownFiles(fullPath)));
@@ -466,7 +469,30 @@ async function maintainDocs() {
         return files;
     }
 
-    const markdownFiles = await collectMarkdownFiles(docsDir);
+    // Collect markdown files from all documentation folders
+    const documentationFolders = [
+        path.join(docsDir, "Architecture"),
+        path.join(docsDir, "Testing"),
+        path.join(docsDir, "Guides"),
+        docsDir, // Include root-level docs
+    ];
+
+    /** @type {string[]} */
+    let markdownFiles = [];
+    for (const folder of documentationFolders) {
+        try {
+            const folderFiles = await collectMarkdownFiles(folder);
+            markdownFiles.push(...folderFiles);
+        } catch {
+            // Folder might not exist, skip it
+            console.log(
+                `⚠️  Skipping ${path.relative(ROOT_DIRECTORY, folder)} (not found)`
+            );
+        }
+    }
+
+    // Remove duplicates (in case root docs overlaps with subfolder docs)
+    markdownFiles = Array.from(new Set(markdownFiles));
 
     console.log(
         `📝 Processing ${markdownFiles.length} documentation files...\n`

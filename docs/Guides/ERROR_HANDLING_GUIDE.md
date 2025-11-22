@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Error Handling Guide"
 summary: "Comprehensive overview of error handling patterns, stores, and utilities in Uptime Watcher."
 created: "2025-09-22"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "validation"
   - "testing"
 ---
-
 # Error Handling Guide
 
 ## Overview

@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Troubleshooting Guide"
 summary: "Troubleshooting guide for common development, database, event system, error handling, build, and runtime issues in Uptime Watcher."
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "database"
   - "performance"
 ---
-
 # 🔧 Troubleshooting Guide
 
 ## Table of Contents

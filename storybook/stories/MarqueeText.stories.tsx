@@ -72,19 +72,7 @@ const meta: Meta<MarqueeStoryArgs> = {
     component: MarqueeText,
     decorators: [
         (StoryComponent): JSX.Element => (
-            <div
-                style={{
-                    alignItems: "center",
-                    background: "rgba(15, 23, 42, 0.9)",
-                    border: "1px solid rgba(148, 163, 184, 0.35)",
-                    borderRadius: "1rem",
-                    display: "flex",
-                    justifyContent: "center",
-                    maxWidth: "24rem",
-                    padding: "1.25rem",
-                    width: "100%",
-                }}
-            >
+            <div className="flex w-full max-w-96 items-center justify-center rounded-2xl border border-slate-400/35 bg-slate-900/90 p-5">
                 <StoryComponent />
             </div>
         ),

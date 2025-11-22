@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "ADR-004: Frontend State Management with Zustand"
 summary: "Defines the frontend state management strategy using Zustand with modular composition and selective persistence."
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -14,7 +14,6 @@ tags:
   - "state-management"
   - "frontend"
 ---
-
 # ADR-004: Frontend State Management with Zustand
 
 ## Table of Contents

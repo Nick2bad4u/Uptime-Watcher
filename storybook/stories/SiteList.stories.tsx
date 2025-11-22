@@ -4,9 +4,9 @@
  */
 
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteListLayoutMode,
-    SiteTableDensity,
 } from "@app/stores/ui/types";
 import type { Site } from "@shared/types";
 import type { Decorator, Meta, StoryObj } from "@storybook/react-vite";
@@ -22,7 +22,7 @@ import {
 } from "../helpers/siteStoryHelpers";
 
 interface SiteListStoryArgs {
-    density: SiteTableDensity;
+    density: InterfaceDensity;
     layout: SiteListLayoutMode;
     presentation: SiteCardPresentation;
     sites: readonly Site[];
@@ -81,20 +81,20 @@ const withLayoutState: Decorator = (StoryComponent, context) => {
                 siteCardPresentation:
                     useUIStore.getState().siteCardPresentation,
                 siteListLayout: useUIStore.getState().siteListLayout,
-                siteTableDensity: useUIStore.getState().siteTableDensity,
+                surfaceDensity: useUIStore.getState().surfaceDensity,
             } as const;
 
             useUIStore.setState({
                 siteCardPresentation: presentation,
                 siteListLayout: layout,
-                siteTableDensity: density,
+                surfaceDensity: density,
             });
 
             return function restoreSiteListLayout(): void {
                 useUIStore.setState({
                     siteCardPresentation: previous.siteCardPresentation,
                     siteListLayout: previous.siteListLayout,
-                    siteTableDensity: previous.siteTableDensity,
+                    surfaceDensity: previous.surfaceDensity,
                 });
             };
         },

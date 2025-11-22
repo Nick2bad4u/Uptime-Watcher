@@ -31,10 +31,10 @@ const { ActionButtonGroupMock, MonitorSelectorMock, StatusIndicatorMock } =
 
 vi.mock("../../../../components/common/MarqueeText/MarqueeText", () => ({
     MarqueeText: (props: MarqueeTextProperties) => (
-            <div data-testid="marquee-text" data-text={props.text}>
-                {props.text}
-            </div>
-        ),
+        <div data-testid="marquee-text" data-text={props.text}>
+            {props.text}
+        </div>
+    ),
 }));
 
 vi.mock(
@@ -311,7 +311,10 @@ describe("SiteCompactCard", () => {
             expect(
                 screen.getByText(
                     new RegExp(
-                        expectedSummary.replaceAll(/[$()*+.?[\\\]^{|}]/g, String.raw`\$&`)
+                        expectedSummary.replaceAll(
+                            /[$()*+.?[\\\]^{|}]/g,
+                            String.raw`\$&`
+                        )
                     )
                 )
             ).toBeInTheDocument();

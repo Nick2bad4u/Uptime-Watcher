@@ -4,9 +4,9 @@
  */
 
 import type {
+    InterfaceDensity,
     SiteCardPresentation,
     SiteListLayoutMode,
-    SiteTableDensity,
 } from "@app/stores/ui/types";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
@@ -34,7 +34,7 @@ const meta: SiteListLayoutSelectorMeta = {
         const [presentation, setPresentation] = useState<SiteCardPresentation>(
             args.cardPresentation
         );
-        const [density, setDensity] = useState<SiteTableDensity>(
+        const [density, setDensity] = useState<InterfaceDensity>(
             args.listDensity ?? "comfortable"
         );
 
@@ -53,7 +53,7 @@ const meta: SiteListLayoutSelectorMeta = {
             args.onPresentationChange?.(nextPresentation);
         };
 
-        const handleDensityChange = (nextDensity: SiteTableDensity): void => {
+        const handleDensityChange = (nextDensity: InterfaceDensity): void => {
             setDensity(nextDensity);
             args.onListDensityChange?.(nextDensity);
         };

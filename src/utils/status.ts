@@ -10,8 +10,11 @@
  * @public
  */
 
+import type { MonitorStatus, SiteStatus } from "@shared/types";
 import type { IconType } from "react-icons";
 import type { CamelCase } from "type-fest";
+
+import { isMonitorStatus, isSiteStatus, STATUS_KIND } from "@shared/types";
 
 import { AppIcons } from "./icons";
 
@@ -22,24 +25,47 @@ import { AppIcons } from "./icons";
  */
 export type StatusWithIcon = `${string} ${string}`;
 
-const STATUS_ICON_GLYPHS: Record<string, string> = {
-    degraded: "⚠️",
-    down: "❌",
-    mixed: "🔄",
-    paused: "⏸️",
-    pending: "⏳",
-    unknown: "❓",
-    up: "✅",
+/**
+ * Union of status literals used for UI presentation.
+ *
+ * @remarks
+ * Mirrors the shared monitor and site status enums so that icon mapping stays
+ * aligned with the canonical domain contracts.
+ */
+type KnownStatus = MonitorStatus | SiteStatus;
+
+const STATUS_ICON_GLYPHS: Record<KnownStatus, string> = {
+    [STATUS_KIND.DEGRADED]: "⚠️",
+    [STATUS_KIND.DOWN]: "❌",
+    [STATUS_KIND.MIXED]: "🔄",
+    [STATUS_KIND.PAUSED]: "⏸️",
+    [STATUS_KIND.PENDING]: "⏳",
+    [STATUS_KIND.UNKNOWN]: "❓",
+    [STATUS_KIND.UP]: "✅",
 };
 
-const STATUS_ICON_COMPONENTS: Record<string, IconType> = {
-    degraded: AppIcons.status.warning,
-    down: AppIcons.status.downFilled,
-    mixed: AppIcons.actions.refresh,
-    paused: AppIcons.status.pausedFilled,
-    pending: AppIcons.status.pendingFilled,
-    unknown: AppIcons.ui.info,
-    up: AppIcons.status.upFilled,
+const STATUS_ICON_COMPONENTS: Record<KnownStatus, IconType> = {
+    [STATUS_KIND.DEGRADED]: AppIcons.status.warning,
+    [STATUS_KIND.DOWN]: AppIcons.status.downFilled,
+    [STATUS_KIND.MIXED]: AppIcons.actions.refresh,
+    [STATUS_KIND.PAUSED]: AppIcons.status.pausedFilled,
+    [STATUS_KIND.PENDING]: AppIcons.status.pendingFilled,
+    [STATUS_KIND.UNKNOWN]: AppIcons.ui.info,
+    [STATUS_KIND.UP]: AppIcons.status.upFilled,
+};
+
+const normalizeStatus = (status: string): KnownStatus | null => {
+    const candidate = status.toLowerCase();
+
+    if (isMonitorStatus(candidate)) {
+        return candidate;
+    }
+
+    if (isSiteStatus(candidate)) {
+        return candidate;
+    }
+
+    return null;
 };
 /**
  * Get the icon component for a given status. Provides visual indicators for
@@ -58,10 +84,9 @@ const STATUS_ICON_COMPONENTS: Record<string, IconType> = {
  * @public
  */
 export function getStatusIcon(status: string): string {
-    const normalizedStatus = status.toLowerCase();
-    const glyph = Object.hasOwn(STATUS_ICON_GLYPHS, normalizedStatus)
-        ? STATUS_ICON_GLYPHS[normalizedStatus]
-        : undefined;
+    const knownStatus = normalizeStatus(status);
+    const glyph =
+        knownStatus === null ? undefined : STATUS_ICON_GLYPHS[knownStatus];
 
     return typeof glyph === "string" ? glyph : "⚪";
 }
@@ -113,8 +138,11 @@ export function formatStatusWithIcon(status: string): StatusWithIcon {
  * @public
  */
 export function getStatusIconComponent(status: string): IconType {
-    const normalizedStatus = status.toLowerCase();
-    return STATUS_ICON_COMPONENTS[normalizedStatus] ?? AppIcons.ui.info;
+    const knownStatus = normalizeStatus(status);
+    const icon =
+        knownStatus === null ? undefined : STATUS_ICON_COMPONENTS[knownStatus];
+
+    return icon ?? AppIcons.ui.info;
 }
 
 /**

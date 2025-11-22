@@ -3,7 +3,7 @@ schema: "../../config/schemas/doc-frontmatter.schema.json"
 title: "Architecture Documentation Index"
 summary: ">-"
 created: "2025-08-05"
-last_reviewed: "2025-11-18"
+last_reviewed: "2025-11-19"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -14,7 +14,6 @@ tags:
   - "templates"
   - "standards"
 ---
-
 # Architecture Documentation Index
 
 ## Table of Contents
@@ -443,25 +442,42 @@ guidance in `docs/TSDoc/stores/sites.md`.
 5. **Store coordination**
    - `src/stores/sites/useSiteSync.ts` composes the site sync actions on top
      of `StateSyncService` and the shared snapshot utilities:
-     - `fullResyncSites()` coalesces concurrent resync requests and replaces
-       the local `sites` state with the authoritative backend snapshot.
-     - `syncSites()` and related helpers derive diffs using
-       `prepareSiteSyncSnapshot` / `deriveSiteSnapshot` so updates can be
-       applied incrementally.
+     - `fullResyncSites()` coalesces concurrent resync requests, delegates to
+       `syncSites()`, and logs pending/success/failure telemetry for
+       diagnostics.
+     - `syncSites()` always performs a backend `requestFullSync()`,
+       normalizes the resulting snapshot with `deriveSiteSnapshot`, and
+       replaces the local `sites` state in a single step.
+     - `subscribeToSyncEvents()` wires `StateSyncService.onStateSyncEvent`
+       into the store and uses `prepareSiteSyncSnapshot` plus
+       `hasSiteSyncChanges` to derive incremental deltas without redundant
+       store updates.
      - Status-update subscription helpers rely on `StatusUpdateManager` while
        keeping cache invalidations and state sync semantics aligned.
 
 6. **Cache invalidation and debounce**
-   - Cache invalidation events (`cache:invalidated`) remain the primary
-     mechanism for signaling when a resync is necessary. The site store uses a
-     short debounce window so clustered invalidations lead to a single
-     resynchronization.
-   - This design ensures the renderer reacts promptly to backend changes
-     without performing unnecessary full-sync operations.
+   - Cache invalidation events (`cache:invalidated`) act as **coarse-grained
+     triggers** that tell the renderer “something changed” at the cache or
+     database layer, but they do **not** carry the new site data themselves.
+   - The site store uses a short debounce window so clustered invalidations
+     (for example, during bulk imports or monitor lifecycle transitions) lead
+     to a **single** resynchronization request rather than a cascade of
+     redundant full-syncs.
+
+7. **State-sync events as the payload carrier**
+   - The actual site snapshots and deltas always flow through
+     `sites:state-synchronized` events and the state-sync IPC surface
+     (`STATE_SYNC_CHANNELS.requestFullSync` / `STATE_SYNC_CHANNELS.getSyncStatus`).
+   - Renderer consumers combine these **fine-grained** state-sync payloads
+     with the **coarse** `cache:invalidated` triggers: invalidations prompt a
+     refresh, while state-sync events provide the authoritative data used to
+     update local stores.
 
 Together, these responsibilities ensure that the renderer's view of site data
 remains consistent with the backend while preserving the event-driven,
-debounced synchronization strategy defined in ADR-002 and ADR-004.
+debounced synchronization strategy defined in ADR-002 and ADR-004. Cache
+events remain the wake-up signal, while state-sync events are the single
+source of truth for what actually changed.
 
 ## 🚀 Quick Start
 

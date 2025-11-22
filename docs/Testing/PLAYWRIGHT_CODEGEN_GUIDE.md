@@ -1,3 +1,17 @@
+---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Playwright Codegen Setup Guide for Uptime-Watcher"
+summary: "End-to-end instructions for using Playwright codegen with Uptime Watcher, including Electron launch patterns, template adaptation, and workflow examples."
+created: "2025-11-21"
+last_reviewed: "2025-11-17"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "testing"
+  - "playwright"
+  - "codegen"
+  - "uptime-watcher"
+---
 # 🎭 **Playwright Codegen Setup Guide for Uptime-Watcher**
 
 ## Table of Contents

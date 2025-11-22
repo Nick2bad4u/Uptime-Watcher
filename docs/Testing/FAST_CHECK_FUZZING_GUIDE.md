@@ -1,3 +1,17 @@
+---
+schema: "../../config/schemas/doc-frontmatter.schema.json"
+title: "Fast-Check Fuzzing Coverage Guide"
+summary: "How to run and interpret property-based fast-check fuzzing suites across frontend, electron, and shared test targets in Uptime Watcher."
+created: "2025-11-21"
+last_reviewed: "2025-11-15"
+category: "guide"
+author: "Nick2bad4u"
+tags:
+  - "testing"
+  - "fast-check"
+  - "fuzzing"
+  - "uptime-watcher"
+---
 # Fast-Check Fuzzing Coverage Guide
 
 This guide explains how to run our property-based tests powered by fast-check and how to interpret coverage for the fuzzing suites.

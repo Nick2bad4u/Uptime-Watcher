@@ -3,7 +3,7 @@ schema: "../../../config/schemas/doc-frontmatter.schema.json"
 title: "IPC Handler Template"
 summary: "Provides a template for implementing new IPC handlers aligned with the central IpcService, validation, and error-handling patterns."
 created: "2025-08-05"
-last_reviewed: "2025-11-16"
+last_reviewed: "2025-11-17"
 category: "guide"
 author: "Nick2bad4u"
 tags:
@@ -13,7 +13,6 @@ tags:
   - "ipc"
   - "electron"
 ---
-
 # IPC Handler Template
 
 ## Table of Contents
