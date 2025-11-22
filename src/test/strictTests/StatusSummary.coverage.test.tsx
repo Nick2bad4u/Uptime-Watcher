@@ -153,4 +153,25 @@ describe("StatusSummary coverage", () => {
         );
         expect(singularTooltipCall).toBeTruthy();
     });
+
+    it("omits the degraded pill when there are zero degraded monitors", () => {
+        render(
+            <StatusSummary
+                degradedMonitors={0}
+                downMonitors={2}
+                getAvailabilityColor={() => "green"}
+                pausedMonitors={1}
+                pendingMonitors={1}
+                totalMonitors={5}
+                upMonitors={5}
+                uptimePercentage={97}
+            />
+        );
+
+        const degradedIndicator = statusIndicatorCalls.find(
+            (call) => call.status === "degraded"
+        );
+        expect(degradedIndicator).toBeUndefined();
+        expect(screen.queryByTestId("status-indicator-degraded")).toBeNull();
+    });
 });

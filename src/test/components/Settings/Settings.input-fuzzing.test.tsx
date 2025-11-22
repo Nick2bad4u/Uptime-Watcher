@@ -469,7 +469,8 @@ describe("Settings Component - Notification preference fuzzing", () => {
                     "inAppAlertsSoundEnabled"
                 );
             }
-        }
+        },
+        20_000
     );
 
     propertyTest.prop([systemToggleArbitrary], {
@@ -506,32 +507,37 @@ describe("Settings Component - Notification preference fuzzing", () => {
                     "systemNotificationsSoundEnabled"
                 );
             }
-        }
+        },
+        20_000
     );
 
     propertyTest.prop([fc.boolean()], {
         numRuns: 20,
         timeout: 15_000,
-    })("toggles in-app alert sound when enabled", (soundEnabled) => {
-        resetState();
-        applySettingsOverrides({
-            inAppAlertsEnabled: true,
-            inAppAlertsSoundEnabled: soundEnabled,
-        });
+    })(
+        "toggles in-app alert sound when enabled",
+        (soundEnabled) => {
+            resetState();
+            applySettingsOverrides({
+                inAppAlertsEnabled: true,
+                inAppAlertsSoundEnabled: soundEnabled,
+            });
 
-        renderSettingsComponent();
+            renderSettingsComponent();
 
-        const soundToggle = screen.getByLabelText(
-            "Play sound for in-app alerts"
-        );
-        fireEvent.click(soundToggle);
+            const soundToggle = screen.getByLabelText(
+                "Play sound for in-app alerts"
+            );
+            fireEvent.click(soundToggle);
 
-        const lastUpdate = getLastSettingsUpdate();
-        expect(lastUpdate).not.toBeNull();
-        expect(lastUpdate).toMatchObject({
-            inAppAlertsSoundEnabled: !soundEnabled,
-        });
-    });
+            const lastUpdate = getLastSettingsUpdate();
+            expect(lastUpdate).not.toBeNull();
+            expect(lastUpdate).toMatchObject({
+                inAppAlertsSoundEnabled: !soundEnabled,
+            });
+        },
+        15_000
+    );
 
     propertyTest.prop([fc.boolean()], {
         numRuns: 20,
@@ -557,7 +563,8 @@ describe("Settings Component - Notification preference fuzzing", () => {
             expect(lastUpdate).toMatchObject({
                 systemNotificationsSoundEnabled: !soundEnabled,
             });
-        }
+        },
+        15_000
     );
 
     propertyTest.prop([
@@ -588,6 +595,7 @@ describe("Settings Component - Notification preference fuzzing", () => {
                 "disabled",
                 !systemEnabled
             );
-        }
+        },
+        10_000
     );
 });

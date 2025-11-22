@@ -6,19 +6,22 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-import { OverviewTab } from "../../../../components/SiteDetails/tabs/OverviewTab";
 import type { Monitor } from "@shared/types";
+import { OverviewTab } from "../../../../components/SiteDetails/tabs/OverviewTab";
+import { logger } from "../../../../services/logger";
+import { useAvailabilityColors } from "../../../../theme/useTheme";
+import { getIntervalLabel } from "../../../../utils/time";
 
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
     CHECK_INTERVALS: [
-        30_000,
+        { label: "Custom (45 seconds)", value: 45_000 },
         60_000,
         300_000,
         600_000,
     ],
-    TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000 },
+    TIMEOUT_CONSTRAINTS: { MIN: 1000, MAX: 30_000, STEP: 1000 },
     TRANSITION_ALL: "all 0.2s ease-in-out",
 }));
 
@@ -109,60 +112,133 @@ vi.mock("../../../../theme/useTheme", () => ({
         getBorderClass: vi.fn(),
         getTextClass: vi.fn(),
     })),
-    useAvailabilityColors: vi.fn(() => ({
-        excellent: "#10B981",
-        good: "#6EE7B7",
-        fair: "#FCD34D",
-        poor: "#F87171",
-        getAvailabilityColor: vi.fn((value: number) => {
-            if (value >= 99) return "#10B981";
-            if (value >= 95) return "#6EE7B7";
-            if (value >= 90) return "#FCD34D";
-            return "#F87171";
-        }),
-        getAvailabilityVariant: vi.fn((value: number) => {
-            if (value >= 99) return "success";
-            if (value >= 95) return "success";
-            if (value >= 90) return "warning";
-            return "danger";
-        }),
-    })),
+    useAvailabilityColors: vi.fn(),
 }));
 
-vi.mock("../../../../theme/components", () => ({
-    StatusIndicator: ({ children, ...props }: any) => (
-        <div data-testid="status-indicator" {...props}>
+const withBaseClass = (base: string, provided?: string): string =>
+    provided ? `${base} ${provided}` : base;
+
+vi.mock("../../../../theme/components/StatusIndicator", () => ({
+    StatusIndicator: ({ children, className, showText, ...props }: any) => (
+        <div
+            className={withBaseClass("themed-status-indicator", className)}
+            data-testid="status-indicator"
+            {...props}
+        >
             {children}
         </div>
     ),
-    ThemedBadge: ({ children, ...props }: any) => (
-        <span data-testid="themed-badge" {...props}>
+}));
+
+vi.mock("../../../../theme/components/ThemedBadge", () => ({
+    ThemedBadge: ({ children, className, icon, iconColor, ...props }: any) => (
+        <span
+            className={withBaseClass("themed-badge", className)}
+            data-testid="themed-badge"
+            {...props}
+        >
+            {icon ? (
+                <span
+                    className="themed-badge__icon"
+                    data-testid="themed-badge-icon"
+                    style={{ color: iconColor }}
+                >
+                    {icon}
+                </span>
+            ) : null}
             {children}
         </span>
     ),
-    ThemedButton: ({ children, ...props }: any) => (
-        <button data-testid="themed-button" {...props}>
+}));
+
+vi.mock("../../../../theme/components/ThemedButton", () => ({
+    ThemedButton: ({ children, className, ...props }: any) => (
+        <button
+            className={withBaseClass("themed-button", className)}
+            data-testid="themed-button"
+            {...props}
+        >
             {children}
         </button>
     ),
-    ThemedCard: ({ children, ...props }: any) => (
-        <div data-testid="themed-card" {...props}>
+}));
+
+vi.mock("../../../../theme/components/ThemedCard", () => ({
+    ThemedCard: ({
+        children,
+        className,
+        hoverable: _hoverable,
+        icon,
+        iconColor,
+        title,
+        ...props
+    }: any) => (
+        <div
+            className={withBaseClass("themed-card", className)}
+            data-testid="themed-card"
+            {...props}
+        >
+            {icon ? (
+                <span
+                    className="themed-card__icon"
+                    data-testid="themed-card-icon"
+                    style={{ color: iconColor }}
+                >
+                    {icon}
+                </span>
+            ) : null}
+            {title ? (
+                <span
+                    className="themed-card__title"
+                    data-testid="themed-card-title"
+                >
+                    {title}
+                </span>
+            ) : null}
             {children}
         </div>
     ),
-    ThemedInput: (props: any) => (
-        <input data-testid="themed-input" {...props} />
+}));
+
+vi.mock("../../../../theme/components/ThemedInput", () => ({
+    ThemedInput: ({ className, ...props }: any) => (
+        <input
+            className={withBaseClass("themed-input", className)}
+            data-testid="themed-input"
+            {...props}
+        />
     ),
-    ThemedProgress: (props: any) => (
-        <div data-testid="themed-progress" {...props} />
+}));
+
+vi.mock("../../../../theme/components/ThemedProgress", () => ({
+    ThemedProgress: ({ className, showLabel: _showLabel, ...props }: any) => (
+        <div
+            className={withBaseClass("themed-progress", className)}
+            data-testid="themed-progress"
+            {...props}
+        />
     ),
-    ThemedSelect: ({ children, ...props }: any) => (
-        <select data-testid="themed-select" {...props}>
+}));
+
+vi.mock("../../../../theme/components/ThemedSelect", () => ({
+    ThemedSelect: ({ children, className, ...props }: any) => (
+        <select
+            className={withBaseClass("themed-select", className)}
+            data-testid="themed-select"
+            {...props}
+        >
             {children}
         </select>
     ),
-    ThemedText: ({ children, ...props }: any) => (
-        <span data-testid="themed-text" {...props}>
+}));
+
+vi.mock("../../../../theme/components/ThemedText", () => ({
+    ThemedText: ({ children, className, ...props }: any) => (
+        <span
+            className={withBaseClass("themed-text", className)}
+            data-testid="themed-text"
+            {...props}
+        >
             {children}
         </span>
     ),
@@ -178,6 +254,31 @@ vi.mock("../../../../utils/time", () => ({
         return `${interval / 60_000}m`;
     }),
 }));
+
+const mockUseAvailabilityColors = vi.mocked(useAvailabilityColors);
+const loggerMock = vi.mocked(logger);
+const getIntervalLabelMock = vi.mocked(getIntervalLabel);
+
+const createAvailabilityColors = () => ({
+    excellent: "#10B981",
+    good: "#6EE7B7",
+    fair: "#FCD34D",
+    poor: "#F87171",
+    getAvailabilityColor: vi.fn((value: number) => {
+        if (value >= 99) return "#10B981";
+        if (value >= 95) return "#6EE7B7";
+        if (value >= 90) return "#FCD34D";
+        return "#F87171";
+    }),
+    getAvailabilityVariant: vi.fn((value: number) => {
+        if (value >= 99) return "success";
+        if (value >= 95) return "success";
+        if (value >= 90) return "warning";
+        return "danger";
+    }),
+});
+
+let availabilityColorsMock: ReturnType<typeof createAvailabilityColors>;
 
 describe(OverviewTab, () => {
     const mockFormatResponseTime = vi.fn((time: number) => `${time}ms`);
@@ -225,6 +326,8 @@ describe(OverviewTab, () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        availabilityColorsMock = createAvailabilityColors();
+        mockUseAvailabilityColors.mockReturnValue(availabilityColorsMock);
     });
 
     describe("Component Rendering", () => {
@@ -709,6 +812,71 @@ describe(OverviewTab, () => {
             render(<OverviewTab {...baseProps} localTimeout={30_000} />);
 
             expect(document.querySelector(".themed-input")).toBeInTheDocument();
+        });
+    });
+
+    describe("Availability variants and interval formatting", () => {
+        it("falls back to derived interval label when formatting fails", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Error Handling", "type");
+
+            const formattingError = new Error("interval-formatting-failed");
+            getIntervalLabelMock.mockImplementationOnce(() => {
+                throw formattingError;
+            });
+
+            render(<OverviewTab {...baseProps} />);
+
+            const fallbackOption = screen.getByRole("option", { name: "45s" });
+            expect(fallbackOption).toHaveValue("45000");
+
+            expect(loggerMock.warn).toHaveBeenCalledWith(
+                "Failed to format interval option",
+                expect.objectContaining({
+                    error: formattingError,
+                    intervalOption: expect.objectContaining({
+                        label: "Custom (45 seconds)",
+                        value: 45_000,
+                    }),
+                })
+            );
+            expect(getIntervalLabelMock).toHaveBeenCalledWith(45_000);
+        });
+
+        it("maps danger availability variant to error badges and progress", ({
+            task,
+            annotate,
+        }) => {
+            annotate(`Testing: ${task.name}`, "functional");
+            annotate("Component: OverviewTab", "component");
+            annotate("Category: Component", "category");
+            annotate("Type: Display Logic", "type");
+
+            availabilityColorsMock.getAvailabilityVariant.mockReturnValue(
+                "danger"
+            );
+            availabilityColorsMock.getAvailabilityColor.mockReturnValue(
+                "#F87171"
+            );
+
+            render(<OverviewTab {...baseProps} uptime="42.0" />);
+
+            const uptimeBadge = screen
+                .getAllByTestId("themed-badge")
+                .find((badge) => badge.textContent?.includes("42.0%"));
+            expect(uptimeBadge).toBeDefined();
+            expect(uptimeBadge).toHaveAttribute("variant", "error");
+
+            const progress = screen.getByTestId("themed-progress");
+            expect(progress).toHaveAttribute("variant", "error");
+            expect(
+                availabilityColorsMock.getAvailabilityVariant
+            ).toHaveBeenCalledWith(42);
         });
     });
 

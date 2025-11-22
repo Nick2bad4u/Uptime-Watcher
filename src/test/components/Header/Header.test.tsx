@@ -315,4 +315,16 @@ describe(Header, () => {
             metricsFixture.uptimePercentage
         );
     });
+
+    it("hides the status summary when using the large card layout", () => {
+        const uiState = createUiState();
+        uiState.siteListLayout = "card-large";
+        mockUseUIStore.mockReturnValue(uiState);
+
+        render(<Header />);
+
+        expect(
+            document.querySelector(".header-status-summary__container")
+        ).toBeNull();
+    });
 });

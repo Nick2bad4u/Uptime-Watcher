@@ -10,7 +10,8 @@ import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteC
 
 const mockUseSite = vi.hoisted(() => vi.fn());
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
-const actionButtonCalls: { isMonitoring: boolean }[] = [];
+const actionButtonCalls: Array<{ disabled: boolean; isMonitoring: boolean }> =
+    [];
 
 vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: mockUseSite,
@@ -64,10 +65,14 @@ vi.mock(
 vi.mock(
     "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
-        ActionButtonGroup: ({ isMonitoring, onCheckNow }: any) => {
-            actionButtonCalls.push({ isMonitoring });
+        ActionButtonGroup: ({ disabled, isMonitoring, onCheckNow }: any) => {
+            actionButtonCalls.push({ disabled, isMonitoring });
             return (
-                <button data-testid="action-group" onClick={onCheckNow}>
+                <button
+                    data-disabled={disabled}
+                    data-testid="action-group"
+                    onClick={onCheckNow}
+                >
                     action
                 </button>
             );
@@ -143,7 +148,10 @@ describe(SiteCompactCard, () => {
     it("passes monitoring state to action buttons and handlers", async () => {
         render(<SiteCompactCard site={baseSite} />);
 
-        expect(actionButtonCalls.at(-1)).toEqual({ isMonitoring: true });
+        expect(actionButtonCalls.at(-1)).toEqual({
+            disabled: false,
+            isMonitoring: true,
+        });
 
         await user.click(screen.getByTestId("action-group"));
         expect(siteState.handleCheckNow).toHaveBeenCalled();
@@ -158,5 +166,42 @@ describe(SiteCompactCard, () => {
         render(<SiteCompactCard site={baseSite} />);
 
         expect(screen.getByText(/no monitor selected/i)).toBeInTheDocument();
+    });
+
+    it("renders fallback metrics and disables actions without monitor data", () => {
+        const monitors: Monitor[] = [
+            { ...baseMonitor, id: "monitor-a", monitoring: true },
+            { ...baseMonitor, id: "monitor-b", monitoring: false },
+        ];
+
+        mockUseSite.mockReturnValueOnce({
+            ...siteState,
+            checkCount: 0,
+            latestSite: { ...siteState.latestSite, monitors },
+            monitor: undefined,
+            responseTime: undefined,
+            uptime: undefined,
+        });
+
+        const { container } = render(<SiteCompactCard site={baseSite} />);
+
+        const metricValues = Array.from(
+            container.querySelectorAll(".site-card__compact-metric-value")
+        ).map((node) => node.textContent?.trim());
+        expect(metricValues).toEqual([
+            "—",
+            "—",
+            "0",
+            "1/2",
+        ]);
+
+        expect(actionButtonCalls.at(-1)).toEqual({
+            disabled: true,
+            isMonitoring: true,
+        });
+
+        expect(
+            screen.getByText(/tap for detailed analytics/i)
+        ).toHaveTextContent("Tap for detailed analytics • Degraded");
     });
 });

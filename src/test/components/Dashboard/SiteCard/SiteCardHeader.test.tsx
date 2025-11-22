@@ -8,7 +8,11 @@ import type { Site } from "@shared/types";
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
-const actionButtonCalls: { disabled: boolean }[] = [];
+const actionButtonCalls: Array<{
+    allMonitorsRunning: boolean;
+    disabled: boolean;
+    isMonitoring: boolean;
+}> = [];
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (
@@ -38,16 +42,59 @@ vi.mock(
 vi.mock(
     "../../../../components/Dashboard/SiteCard/components/ActionButtonGroup",
     () => ({
-        ActionButtonGroup: ({ disabled, onCheckNow }: any) => {
-            actionButtonCalls.push({ disabled });
+        ActionButtonGroup: ({
+            allMonitorsRunning,
+            disabled,
+            isMonitoring,
+            onCheckNow,
+            onStartMonitoring,
+            onStartSiteMonitoring,
+            onStopMonitoring,
+            onStopSiteMonitoring,
+        }: any) => {
+            actionButtonCalls.push({
+                allMonitorsRunning,
+                disabled,
+                isMonitoring,
+            });
             return (
-                <button
-                    data-testid="action-buttons"
-                    disabled={disabled}
-                    onClick={onCheckNow}
-                >
-                    actions
-                </button>
+                <div data-disabled={disabled} data-testid="action-buttons">
+                    <button
+                        data-testid="action-check-now"
+                        onClick={onCheckNow}
+                        type="button"
+                    >
+                        check
+                    </button>
+                    <button
+                        data-testid="action-start-monitoring"
+                        onClick={onStartMonitoring}
+                        type="button"
+                    >
+                        start-monitor
+                    </button>
+                    <button
+                        data-testid="action-start-site-monitoring"
+                        onClick={onStartSiteMonitoring}
+                        type="button"
+                    >
+                        start-site
+                    </button>
+                    <button
+                        data-testid="action-stop-monitoring"
+                        onClick={onStopMonitoring}
+                        type="button"
+                    >
+                        stop-monitor
+                    </button>
+                    <button
+                        data-testid="action-stop-site-monitoring"
+                        onClick={onStopSiteMonitoring}
+                        type="button"
+                    >
+                        stop-site
+                    </button>
+                </div>
             );
         },
     })
@@ -121,7 +168,39 @@ describe(SiteCardHeader, () => {
             />
         );
 
-        expect(actionButtonCalls.at(-1)).toEqual({ disabled: true });
-        expect(screen.getByTestId("action-buttons")).toBeDisabled();
+        expect(actionButtonCalls.at(-1)).toEqual({
+            allMonitorsRunning: true,
+            disabled: true,
+            isMonitoring: true,
+        });
+        expect(screen.getByTestId("action-buttons")).toHaveAttribute(
+            "data-disabled",
+            "true"
+        );
+    });
+
+    it("invokes interaction handlers via action buttons", async () => {
+        const user = userEvent.setup();
+        render(<SiteCardHeader {...baseProps} />);
+
+        await user.click(screen.getByTestId("action-check-now"));
+        await user.click(screen.getByTestId("action-start-monitoring"));
+        await user.click(screen.getByTestId("action-start-site-monitoring"));
+        await user.click(screen.getByTestId("action-stop-monitoring"));
+        await user.click(screen.getByTestId("action-stop-site-monitoring"));
+
+        expect(baseProps.interactions.onCheckNow).toHaveBeenCalledTimes(1);
+        expect(baseProps.interactions.onStartMonitoring).toHaveBeenCalledTimes(
+            1
+        );
+        expect(
+            baseProps.interactions.onStartSiteMonitoring
+        ).toHaveBeenCalledTimes(1);
+        expect(baseProps.interactions.onStopMonitoring).toHaveBeenCalledTimes(
+            1
+        );
+        expect(
+            baseProps.interactions.onStopSiteMonitoring
+        ).toHaveBeenCalledTimes(1);
     });
 });
