@@ -19,12 +19,13 @@ applyTo: "**/*.playwright.ts"
 -   **Organization**: Group related tests for a feature under a `test.describe()` block.
 -   **Hooks**: Use `beforeEach` for setup actions common to all tests in a `describe` block (e.g., navigating to a page).
 -   **Titles**: Follow a clear naming convention, such as `Feature - Specific action or scenario`.
+-   **Metadata**: Apply `tag` arrays in `test.describe`/`test` options to align with the suite’s filtering conventions (see existing suites for common tags such as `@ui`, `@smoke`, `@regression`).
 
 ### File Organization
 
--   **Location**: Store all test files in the `tests/` directory.
--   **Naming**: Use the convention `<feature-or-page>.spec.ts` (e.g., `login.spec.ts`, `search.spec.ts`).
--   **Scope**: Aim for one test file per major application feature or page.
+-   **Location**: Store `.playwright.ts` files under the Playwright tests root (for this repo, `playwright/tests/`).
+-   **Naming**: Use a clear naming convention such as `<feature-or-page>.playwright.ts` when adding dedicated Playwright suites (e.g., `dashboard.playwright.ts`, `settings.playwright.ts`).
+-   **Scope**: Aim for one test file per major application feature or page, and keep them focused on end-to-end behaviour.
 
 ### Assertion Best Practices
 
@@ -81,3 +82,4 @@ test.describe("Movie Search Feature", () => {
     -   [Electron Playwright Setup](https://www.electronjs.org/docs/latest/tutorial/automated-testing#using-playwright)
 -   **Misc** When writing tests for Electron applications, ensure you are interacting with the correct windows and contexts. Use `electronApp` to manage application instances and windows.
 -   **Note** Electron applications may have different behaviors compared to standard web applications, so ensure your tests account for these differences.
+-   **Fixtures** Launch Electron via the shared helpers in `playwright/fixtures/electron-helpers.ts` (for example `launchElectronApp`) and close the app in `afterEach` hooks to keep tests isolated. Coverage utilities such as `tagElectronAppCoverage` live under `playwright/utils/`—reuse them instead of recreating instrumentation logic.

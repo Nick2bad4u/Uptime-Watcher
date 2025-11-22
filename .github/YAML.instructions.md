@@ -61,3 +61,4 @@ These aren't hard rules, but rather recommendations to improve consistency, read
 -   **PREFER** centralizing YAML linting rules (e.g. in `.yamllint.yml`) and writing new files to comply with them.
 -   **CONSIDER** adding comments for non-obvious values (e.g., timeouts, risk thresholds, feature flags).
 -   **DON'T** rely on tool-specific quirks that contradict standard YAML; prefer portable patterns that work across parsers and CI environments.
+-   **Tooling alignment**: Run `npm run lint:yaml` to validate YAML files against the repository’s yamllint configuration before submitting changes.

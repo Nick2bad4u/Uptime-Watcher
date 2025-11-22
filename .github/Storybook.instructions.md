@@ -387,14 +387,54 @@ export const ControlledInput: Story = {
 };
 ```
 
-### 9.2 Async Data
+### 9.2 Async Data and MSW Handlers
 
--   Avoid real network calls in stories.
--   Use mocks or static data. If needed, use MSW (Mock Service Worker) with Storybook:
+-   Avoid real network calls in stories—Storybook should remain deterministic offline.
+-   Register request mocks with MSW, which is already initialised globally in `storybook/preview.ts` via `msw-storybook-addon`.
+-   Keep handlers local to the story (or colocated helper) so they are easy to trace and reset between stories.
 
 ```ts
+import { rest } from "msw";
+
+const mockSites = [
+    {
+        id: "demo-site",
+        label: "Demo",
+        status: "up",
+    },
+];
+
 export const WithMockedData: Story = {
-  parameters: {
-    msw: {
-      handlers
+    parameters: {
+        msw: {
+            handlers: [
+                rest.get("/api/sites", (_request, response, context) =>
+                    response(context.delay(100), context.json(mockSites))
+                ),
+            ],
+        },
+    },
+    args: {
+        sites: mockSites,
+    },
+};
 ```
+
+-   Use `context.delay(0)` or deterministic delays when demonstrating loading states; avoid randomised latency.
+-   When mocking Electron bridge behaviour, reuse helpers from `storybook/setup/electron-api-mock.ts` instead of ad-hoc stubs.
+
+### 9.3 Resilience for Electron-Specific Stories
+
+-   Stories that rely on preload APIs must import the shared mock (`electron-api-mock`) and update the mock implementation via `window.electronAPI.__setMock(...)` before rendering.
+-   Provide fallbacks for environments where the Electron bridge is unavailable so that stories also work in Chromatic/CI.
+-   Reset any global mock state in a `play` function `finally` block to avoid leaking configuration to the next story.
+
+---
+
+## 10. Final Checklist Before Raising a PR
+
+-   ✅ Story renders deterministically with no reliance on the system clock, randomness, or real network calls.
+-   ✅ Args, controls, and documentation match the actual component API (cross-check with `ComponentProps<typeof Component>`).
+-   ✅ a11y checks pass locally (`npm run storybook:test-server` + `npm run test:storybook:runner:a11y`).
+-   ✅ Added or updated stories follow the enforced lint rules (`npm run test:storybook:runner`).
+-   ✅ Any MSW handlers or Electron mocks are colocated and cleaned up.

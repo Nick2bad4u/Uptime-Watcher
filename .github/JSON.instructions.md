@@ -62,3 +62,7 @@ These aren't hard rules, but rather recommendations to improve consistency, read
     -   A `"rules"` array containing rule `id`s, optional `severity`, and `options`.
 -   **CONSIDER** adding `$schema` for tools like markdownlint, eslint, or other JSON-based configs to improve editor support.
 -   **AVOID** tool-specific hacks that break standard JSON; keep configs valid JSON so they can be processed by generic tooling (formatters, linters, CI scripts).
+-   **Tooling alignment**: Use the provided npm scripts to maintain JSON order and validation:
+    -   `npm run lint:package-sort` / `npm run sort-package` keep `package.json` files sorted via `sort-package-json`.
+    -   `npm run lint:package` runs the additional package.json linting suite.
+    -   `npm run lint:json` targets arbitrary JSON files with ESLint’s JSON plugins.

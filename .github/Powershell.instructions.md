@@ -82,7 +82,7 @@ function Get-UserProfile {
     -   Enable tab completion where possible
 
 -   **Switch Parameters:**
-    -   Use [switch] for boolean flags
+    -   Use `[switch]` for boolean flags
     -   Avoid $true/$false parameters
     -   Default to $false when omitted
     -   Use clear action names
@@ -322,6 +322,7 @@ function Remove-UserAccount {
     -   Use `Where-Object` instead of `?` or `where`
     -   Use `ForEach-Object` instead of `%`
     -   Use `Get-ChildItem` instead of `ls` or `dir`
+-   **Repository conventions:** Scripts live under `scripts/` (or `.github/` for automation helpers) and are executed with PowerShell 7. Ensure they run cross-platform where feasible—gate Windows-specific logic behind explicit OS checks and document any prerequisites in the script header.
 
 ## Full Example: End-to-End Cmdlet Pattern
 

@@ -14,7 +14,12 @@ Instructions for writing high-quality, maintainable, and modern CSS in this proj
 
 -   **Framework**: Tailwind CSS v4 (CSS-first configuration).
 -   **Structure**: Component-based CSS files imported into a central `index.css`.
+    -   Global theme styles live in `src/theme/styles/components/`.
+    -   Component-specific styles are co-located or imported from `src/components/...`.
 -   **Methodology**: Hybrid approach using Tailwind utilities and custom BEM-like component classes.
+-   **Configuration**:
+    -   `postcss.config.mjs` handles Tailwind processing and plugins (autoprefixer, nesting, etc.).
+    -   `src/index.css` is the main entry point, importing Tailwind and theme layers.
 -   **Linting**: Stylelint is enforced.
 
 ---
@@ -107,6 +112,7 @@ Instructions for writing high-quality, maintainable, and modern CSS in this proj
     -   Colors: `--color-primary-500`, `--color-surface-elevated`, `--color-text-primary`
     -   Spacing: `--spacing-md`, `--spacing-lg`
     -   Shadows: `--shadow-elevation-1`, `--shadow-base-color`
+-   Canonical token definitions live in `src/theme/styles/components/foundation.css`; add or adjust variables there first before referencing them in component styles.
 -   **Tailwind Configuration**: Define theme extensions in the `@theme` block in `index.css` or relevant CSS files.
 
 ```css

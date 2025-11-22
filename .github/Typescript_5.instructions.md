@@ -46,6 +46,8 @@ applyTo: "**/*.ts, **/*.tsx"
   - `import` / `export` only; no `require`, `module.exports`, or dynamic `import()` without strong reason.
 - Prefer **named exports** over default exports for better refactoring and discoverability.
 - Ensure internal import paths are stable and non-circular; no barrel files at all.
+- Leverage the configured path aliases (`@app/*`, `@shared/*`, `@electron/*`, `@assets/*`) instead of relative `../../` chains; keep `tsconfig.json` and Vite aliases in sync when introducing new folders.
+- The project uses `moduleResolution: "bundler"` with extension rewriting—import source files without explicit `.js`/`.ts` extensions so the build can rewrite correctly.
 ---
 
 ## Type System Expectations – Extreme Strict Mode

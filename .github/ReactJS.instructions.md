@@ -28,7 +28,7 @@ Type-Fest is available in this project and should be used where it improves type
   - Each component should do one coherent thing.
 - Use descriptive and consistent naming conventions:
   - Components must be **PascalCase**.
-  - Props/interfaces must clearly describe their role (`ButtonProps`, `UserCardProps`).
+  - Props/interfaces must clearly describe their role and, for new code in this repo, should use the `Properties` suffix (e.g., `AddSiteFormProperties`, `GalaxyBackgroundProperties`) in line with `COMPONENT_PROPS_STANDARDS.md`.
 - Prefer **props typed via interfaces or type aliases**:
 
   ```ts
@@ -56,6 +56,9 @@ Type-Fest is available in this project and should be used where it improves type
 
 - Avoid deep prop drilling:
   - If state must be shared across distant components, use `Zustand` or `Context` with custom hooks.
+- Integrate with the platform through the existing service layer:
+  - Renderer code should call `src/services/*` modules (for example `EventsService`, `SettingsService`, `StateSyncService`) instead of touching IPC channels directly.
+  - Import contracts from `@shared/*` so renderer types stay aligned with Electron domain models; avoid duplicating literals or enums locally.
 
 ---
 

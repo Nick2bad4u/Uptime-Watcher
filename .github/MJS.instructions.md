@@ -34,3 +34,6 @@ These guidelines focus ESM-first JavaScript using `.mjs` files. These aren't har
 
 -   Prefer JSDoc type annotations or `.d.ts` files for `.mjs` modules.
 -   Document public functions and exports with concise JSDoc comments explaining purpose and parameters.
+-   Repository conventions:
+	-   Target Node.js 24+ (ES2024). Use the `node:`-prefixed built-ins and `import.meta.url` + `fileURLToPath` when you need `__dirname`-style resolution.
+	-   Keep modules compatible with the shared tooling tsconfig (`config/testing/tsconfig.js.json`) so that `npm run check:js` and `npm run lint:js` succeed without extra config.
