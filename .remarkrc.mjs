@@ -11,6 +11,7 @@
  * @see {@link https://github.com/remarkjs/remark-lint} for available rules
  * @see {@link https://github.com/remarkjs/remark-gfm} for GitHub Flavored Markdown
  * @see {@link https://www.schemastore.org/remarkrc.json} for JSON schema validation
+ * # yaml-language-server: https://www.schemastore.org/schemas/json/remarkrc.json
  */
 // @ts-check
 

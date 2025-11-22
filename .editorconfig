@@ -1,6 +1,7 @@
 # EditorConfig file for Uptime Watcher
 # This file defines consistent coding styles across different editors and IDEs
 # See: https://editorconfig.org/
+# yaml-language-server: $schema=https://www.schemastore.org/any.json
 
 # Top-most EditorConfig file
 root = true

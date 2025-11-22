@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/any.json",
     "AbsolutePaths": false,
     "BasePath": "",
     "CacheLocation": ".devskim-cache",

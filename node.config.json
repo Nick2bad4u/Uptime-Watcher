@@ -1,0 +1,87 @@
+{
+  "$schema": "https://nodejs.org/docs/latest/node-config-schema.json",
+  "nodeOptions": {
+    "allow-fs-read": [
+      "./src",
+      "./electron",
+      "./shared",
+      "./dist",
+      "./node_modules",
+      "./coverage",
+      "./tests",
+      "./config",
+      "./scripts",
+      "./docs"
+    ],
+    "allow-fs-write": [
+      "./dist",
+      "./coverage",
+      "./temp",
+      "./.cache",
+      "./node_modules/.cache"
+    ],
+    "conditions": [
+      "development",
+      "node"
+    ],
+    "diagnostic-dir": "./temp",
+    "disable-warning": [
+      "DEP0190",
+      "ExperimentalWarning"
+    ],
+    "enable-source-maps": true,
+    "experimental-detect-module": true,
+    "experimental-require-module": true,
+    "experimental-transform-types": true,
+    "max-old-space-size-percentage": "80",
+    "redirect-warnings": "./temp/node-warnings.log",
+    "trace-deprecation": false,
+    "trace-warnings": false,
+    "warnings": false
+  },
+  "testRunner": {
+    "experimental-test-coverage": true,
+    "test-concurrency": 4,
+    "test-coverage-branches": 90,
+    "test-coverage-exclude": [
+      "**/test/**",
+      "**/tests/**",
+      "**/*.test.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/coverage/**"
+    ],
+    "test-coverage-functions": 95,
+    "test-coverage-include": [
+      "src/**/*.{ts,tsx}",
+      "electron/**/*.ts",
+      "shared/**/*.ts"
+    ],
+    "test-coverage-lines": 90,
+    "test-force-exit": true,
+    "test-isolation": "process",
+    "test-reporter": [
+      "spec",
+      "json"
+    ],
+    "test-reporter-destination": [
+      "stdout",
+      "./coverage/test-results.json"
+    ],
+    "test-timeout": 30000,
+    "test-update-snapshots": true
+  },
+  "watch": {
+    "watch": true,
+    "watch-kill-signal": "SIGTERM",
+    "watch-path": [
+      "./src",
+      "./electron",
+      "./shared",
+      "./index.html",
+      "./vite.config.ts"
+    ],
+    "watch-preserve-output": true
+  }
+}

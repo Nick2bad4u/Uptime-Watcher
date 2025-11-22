@@ -1,0 +1,28 @@
+{
+  "config": {
+    "githubBranch": "main",
+    "githubSlug": "Nick2bad4u/Uptime-Watcher",
+    "githubUsername": "Nick2bad4u",
+    "githubWorkflow": "ci.yml",
+    "homepage": "https://nick2bad4u.github.io/Uptime-Watcher/",
+    "nodeicoQueryString": {
+      "compact": true,
+      "downloads": true,
+      "stars": true
+    },
+    "npmPackageName": "uptime-watcher"
+  },
+  "list": [
+    "npmversion",
+    "npmdownloads",
+    "---",
+    "githubworkflow",
+    "coveralls",
+    "codeclimate",
+    "---",
+    "githubstar",
+    "githubfollow",
+    "---",
+    "nodeico"
+  ]
+}

@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.schemastore.org/any.json",
     "baseDir": ".",
     "tsConfig": "./tsconfig.json",
     "fileExtensions": [

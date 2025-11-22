@@ -1,5 +1,4 @@
 {
-    "$schema": "https://www.schemastore.org/jscpd.json",
     "absolute": false,
     "blame": false,
     "exitCode": 0,
@@ -64,6 +63,7 @@
     "mode": "mild",
     "noSymlinks": false,
     "output": "./reports/jscpd/",
+    "pattern": "**/*",
     "reporters": [
         "html",
         "markdown",

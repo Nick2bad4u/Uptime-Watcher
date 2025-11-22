@@ -201,6 +201,7 @@
     ],
     "loadDefaultConfiguration": true,
     "maxDuplicateProblems": 5,
+    "maxFileSize": 0,
     "maxNumberOfProblems": 100,
     "minRandomLength": 40,
     "minWordLength": 3,

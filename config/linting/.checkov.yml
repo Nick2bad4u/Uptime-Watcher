@@ -1,6 +1,7 @@
 # Checkov configuration for GitHub Actions security scans
 # Configuration follows modern best practices for 2025
 # See: https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
+# yaml-language-server: $schema=https://www.schemastore.org/any.json
 
 # Compact output to reduce noise
 compact: true
