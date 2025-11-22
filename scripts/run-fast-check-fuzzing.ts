@@ -216,12 +216,17 @@ function parseCliOptions(argv: readonly string[]): CliOptions {
                 : DEFAULT_TARGETS;
     }
 
-    return {
+    const options: CliOptions = {
         runs,
-        seed,
         targets,
         passthroughArgs,
     };
+
+    if (seed !== undefined) {
+        return { ...options, seed };
+    }
+
+    return options;
 }
 
 /**

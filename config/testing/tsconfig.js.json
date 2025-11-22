@@ -35,7 +35,8 @@
         "../../electron/**/*.test.ts",
         "../../electron/**/*.test.tsx",
         "../../**/docs/docusaurus",
-        "**/node_modules/**"
+        "**/node_modules/**",
+        "../../node_modules/**"
     ],
     "extends": "../../tsconfig.json",
     "include": [
@@ -49,7 +50,8 @@
         "../../scripts/*.mjs",
         "../../scripts/*.cjs",
         "../../scripts/*.js",
-        "../../config/linting/**/**.mjs"
+        "../../config/linting/**/**.mjs",
+        "../../playwright/codegen-template.mjs"
     ],
     "references": [
         {

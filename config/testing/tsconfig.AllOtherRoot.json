@@ -26,7 +26,9 @@
     },
     "exclude": [
         "../../electron/**/*.test.ts",
-        "../../electron/**/*.test.tsx"
+        "../../electron/**/*.test.tsx",
+        "node_modules",
+        "eslint.config.mjs"
     ],
     "extends": "../../tsconfig.json",
     "include": [],

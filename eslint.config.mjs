@@ -560,6 +560,7 @@ export default /** @type {EslintConfig} */ [
             xss: xss,
         },
         rules: {
+            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
             "html/id-naming-convention": "warn",
             "html/indent": "error",
@@ -637,6 +638,7 @@ export default /** @type {EslintConfig} */ [
         },
         rules: {
             // HTML Eslint Plugin Rules (html/*)
+            // @ts-expect-error -- No Types for this Package
             ...html.configs.recommended.rules,
             "html/indent": "error",
             "html/no-extra-spacing-attrs": [

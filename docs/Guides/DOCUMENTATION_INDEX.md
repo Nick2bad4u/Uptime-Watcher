@@ -12,6 +12,7 @@ tags:
   - "index"
   - "navigation"
 ---
+
 # 📚 Documentation Index
 
 ## Table of Contents
@@ -29,7 +30,6 @@ tags:
 
 - **[Developer Quick Start](./DEVELOPER_QUICK_START.md)** - Get up and running in minutes
 - **[Environment Setup](./ENVIRONMENT_SETUP.md)** - Complete development environment configuration
-- **[AI Context Guide](./AI_CONTEXT.md)** - Essential context for AI assistants
 
 ### Core documentation
 
@@ -43,16 +43,15 @@ tags:
 
 Essential documentation for developers and contributors:
 
-| Document                                                 | Purpose                         | Audience                      |
-| -------------------------------------------------------- | ------------------------------- | ----------------------------- |
-| [AI\_CONTEXT.md](./AI_CONTEXT.md)                        | Quick AI onboarding             | AI Assistants, New Developers |
-| [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors              |
-| [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)          | Complete environment guide      | Developers                    |
-| [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md)          | IPC and API reference           | Frontend/Backend Developers   |
-| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)               | Debug and fix issues            | All Developers                |
-| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)    | Migration history and rationale | Architects, Contributors      |
-| [DOCUMENTATION\_INDEX.md](./DOCUMENTATION_INDEX.md)      | This index document             | All Users                     |
-| [ORGANIZATION\_SUMMARY.md](./ORGANIZATION_SUMMARY.md)    | Documentation cleanup summary   | Maintainers                   |
+| Document                                                 | Purpose                         | Audience                    |
+| -------------------------------------------------------- | ------------------------------- | --------------------------- |
+| [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) | Fast developer setup            | New Contributors            |
+| [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)          | Complete environment guide      | Developers                  |
+| [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md)          | IPC and API reference           | Frontend/Backend Developers |
+| [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)               | Debug and fix issues            | All Developers              |
+| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)    | Migration history and rationale | Architects, Contributors    |
+| [DOCUMENTATION\_INDEX.md](./DOCUMENTATION_INDEX.md)      | This index document             | All Users                   |
+| [ORGANIZATION\_SUMMARY.md](./ORGANIZATION_SUMMARY.md)    | Documentation cleanup summary   | Maintainers                 |
 
 ### 🏗️ Architecture (`/docs/Architecture/`)
 
@@ -98,17 +97,15 @@ Step-by-step implementation instructions:
 
 Relevant historical context and lessons learned:
 
-| Document                                                                                               | Purpose                     | Relevance                          |
-| ------------------------------------------------------------------------------------------------------ | --------------------------- | ---------------------------------- |
-| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md)                                                  | Complete migration history  | Understanding current architecture |
-| [FALLBACK\_SYSTEM\_USAGE\_ANALYSIS.md](../Guides/FALLBACK_SYSTEM_USAGE_ANALYSIS.md)                    | Migration completion status | Historical context                 |
-| [MONITORING\_RACE\_CONDITION\_SOLUTION\_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Race condition prevention   | Architecture understanding         |
+| Document                                              | Purpose                    | Relevance                          |
+| ----------------------------------------------------- | -------------------------- | ---------------------------------- |
+| [TECHNOLOGY\_EVOLUTION.md](./TECHNOLOGY_EVOLUTION.md) | Complete migration history | Understanding current architecture |
 
 ## 🎯 Documentation by Role
 
 ### 🤖 AI Assistants
 
-**Start Here**: [AI\_CONTEXT.md](./AI_CONTEXT.md)
+**Start Here**: [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)
 
 - Complete project overview and patterns
 - Common development tasks
@@ -193,7 +190,6 @@ Relevant historical context and lessons learned:
 ### 🔍 Monitoring & Performance
 
 - [NEW\_MONITOR\_TYPE\_IMPLEMENTATION.md](../Guides/NEW_MONITOR_TYPE_IMPLEMENTATION.md) - Monitor types
-- [MONITORING\_RACE\_CONDITION\_SOLUTION\_PLAN.md](../Guides/MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) - Race condition prevention
 - [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) - Performance tips
 
 ### ⚠️ Error Handling & Debugging
@@ -231,17 +227,15 @@ Track documentation health:
 
 ### 📚 Complete Onboarding (New Team Member)
 
-1. [AI\_CONTEXT.md](./AI_CONTEXT.md) - Project overview
-2. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
-3. [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
-4. [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
-5. [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
+1. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
+2. [ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md) - Environment
+3. [Architecture/ADRs/](../Architecture/ADRs/) - Design decisions
+4. [API\_DOCUMENTATION.md](./API_DOCUMENTATION.md) - Interfaces
 
 ### ⚡ Quick Start (Experienced Developer)
 
-1. [AI\_CONTEXT.md](./AI_CONTEXT.md) - Architecture overview
-2. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
-3. [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Patterns
+1. [DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md) - Setup
+2. [Architecture/Patterns/DEVELOPMENT\_PATTERNS\_GUIDE.md](../Architecture/Patterns/DEVELOPMENT_PATTERNS_GUIDE.md) - Patterns
 
 ### 🐛 Debugging Focus
 

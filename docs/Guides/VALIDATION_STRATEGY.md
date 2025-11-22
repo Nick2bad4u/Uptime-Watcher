@@ -60,9 +60,104 @@ The application enforces data quality through a layered validation pipeline. Eac
 When adding a new monitor type:
 
 1. **IPC Schema**: Update the monitor configuration Zod schema so preload rejects malformed input.
+
+   ```typescript
+   // shared/validation/MonitorSchemas.ts
+   import { z } from "zod";
+
+   export const MonitorConfigSchema = z.object({
+       id: z.string().uuid(),
+       url: z.string().url(),
+       interval: z.number().min(5000).max(3600000), // 5s to 1hr
+       type: z.enum(["http", "https", "tcp", "icmp"]),
+       enabled: z.boolean().default(true),
+   });
+   ```
+
 2. **Manager Rule**: Extend `MonitorManager` to verify business requirements (e.g., mutually exclusive options, interval bounds) and throw an `ApplicationError` if invalid.
+
+   ```typescript
+   // electron/managers/MonitorManager.ts
+   import { ApplicationError } from "@shared/errors";
+
+   class MonitorManager {
+       async createMonitor(config: MonitorConfig): Promise<Monitor> {
+           // Business rule validation
+           if (config.type === "tcp" && config.interval < 10000) {
+               throw new ApplicationError({
+                   code: "INVALID_MONITOR_CONFIG",
+                   message: "TCP monitors require minimum 10-second interval",
+                   operation: "MonitorManager.createMonitor",
+                   details: { interval: config.interval, minimumInterval: 10000 },
+               });
+           }
+
+           return await this.repository.create(config);
+       }
+   }
+   ```
+
 3. **Repository Guard**: Ensure monitor persistence paths normalize identifiers and wrap writes in `DatabaseService.executeTransaction`.
+
+   ```typescript
+   // electron/services/database/MonitorRepository.ts
+   class MonitorRepository {
+       async create(config: MonitorConfig): Promise<Monitor> {
+           return await this.db.executeTransaction(async (tx) => {
+               // Normalize data before persistence
+               const normalized = {
+                   ...config,
+                   url: config.url.trim().toLowerCase(),
+                   createdAt: Date.now(),
+               };
+
+               return await tx.run(
+                   `INSERT INTO monitors (id, url, interval, type, enabled, createdAt)
+                    VALUES (?, ?, ?, ?, ?, ?)`,
+                   [
+                       normalized.id,
+                       normalized.url,
+                       normalized.interval,
+                       normalized.type,
+                       normalized.enabled ? 1 : 0,
+                       normalized.createdAt,
+                   ]
+               );
+           });
+       }
+   }
+   ```
+
 4. **Testing**: Cover each validation stage with targeted tests to prevent regressions.
+
+   ```typescript
+   // tests/MonitorValidation.test.ts
+   describe("Monitor Validation", () => {
+       describe("IPC Schema Validation", () => {
+           it("should reject invalid interval", () => {
+               const invalid = { interval: 1000 }; // Too short
+               expect(() => MonitorConfigSchema.parse(invalid)).toThrow();
+           });
+       });
+
+       describe("Manager Business Rules", () => {
+           it("should enforce TCP minimum interval", async () => {
+               const config = { type: "tcp", interval: 5000 };
+               await expect(monitorManager.createMonitor(config)).rejects.toThrow(
+                   ApplicationError
+               );
+           });
+       });
+
+       describe("Repository Persistence", () => {
+           it("should normalize URLs before saving", async () => {
+               const config = { url: " HTTPS://EXAMPLE.COM " };
+               const saved = await repository.create(config);
+               expect(saved.url).toBe("https://example.com");
+           });
+       });
+   });
+   ```
 
 ## Checklist for Reviews
 

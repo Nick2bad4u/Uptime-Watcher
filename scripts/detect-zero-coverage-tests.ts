@@ -259,10 +259,12 @@ function parseCliArguments(argv: readonly string[]): CliOptions {
                 break;
             }
             default: {
-                if (token.startsWith("-")) {
-                    throw new Error(`Unknown flag: ${token}`);
+                if (token !== undefined) {
+                    if (token.startsWith("-")) {
+                        throw new Error(`Unknown flag: ${token}`);
+                    }
+                    explicitFiles.push(token);
                 }
-                explicitFiles.push(token);
             }
         }
     }

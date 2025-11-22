@@ -22,13 +22,11 @@
             return;
         }
 
-        // @ts-expect-error -- For use after application is running
         sites.forEach((site, index) => {
             console.log(`${index + 1}. ${site.name} (${site.identifier})`);
             console.log(`   Monitoring: ${site.monitoring ? "✅" : "❌"}`);
             console.log(`   Monitors: ${site.monitors.length}`);
 
-            // @ts-expect-error -- For use after application is running
             site.monitors.forEach((monitor, mIndex) => {
                 console.log(
                     `      ${mIndex + 1}. ${monitor.type} - ${monitor.status || "pending"}`

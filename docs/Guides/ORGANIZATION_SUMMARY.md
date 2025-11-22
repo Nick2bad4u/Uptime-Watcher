@@ -12,6 +12,7 @@ tags:
   - "organization"
   - "archive"
 ---
+
 # 📁 Documentation Organization Summary
 
 > **Clean Slate**: The docs folder has been reorganized to focus on current, actionable documentation while preserving historical materials in an archive.
@@ -114,9 +115,8 @@ Moved **30+ historical documents** to organized archive:
 
 ### 🎯 **For New Users**
 
-1. **[AI\_CONTEXT.md](./AI_CONTEXT.md)** - AI assistant fast onboarding
-2. **[DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)** - Developer setup
-3. **[ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment guide
+1. **[DEVELOPER\_QUICK\_START.md](./DEVELOPER_QUICK_START.md)** - Developer setup
+2. **[ENVIRONMENT\_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment guide
 
 ### 🛠️ **For Development**
 

@@ -97,6 +97,7 @@ const knipConfig: KnipConfig = {
         "@secretlint/secretlint-rule-secp256k1-privatekey",
         "@secretlint/types",
         "@snyk/protect",
+        "@storybook/addon-vitest",
         "@storybook/builder-vite",
         "@storybook/react",
         "@storybook/test-runner",

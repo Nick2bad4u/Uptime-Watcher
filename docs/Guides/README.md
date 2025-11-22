@@ -12,6 +12,7 @@ tags:
   - "documentation"
   - "index"
 ---
+
 # Guides documentation
 
 This directory contains comprehensive guides for developers, contributors, and users of the Uptime Watcher application.
@@ -21,7 +22,6 @@ This directory contains comprehensive guides for developers, contributors, and u
 ```text
 docs/Guides/
 ├── README.md                              # This file
-├── AI_CONTEXT.md                          # Essential context for AI assistants
 ├── API_DOCUMENTATION.md                   # IPC interfaces and communication patterns
 ├── DEVELOPER_QUICK_START.md               # Fast developer setup guide
 ├── DOCUMENTATION_INDEX.md                 # Complete documentation navigation hub
@@ -35,8 +35,6 @@ docs/Guides/
 ├── TYPE_FEST_PATTERNS.md                  # TypeScript utility patterns
 ├── TESTING_METHODOLOGY_REACT_COMPONENTS.md # React component testing
 ├── VITE_PERFORMANCE.md                    # Build optimization guide
-├── FALLBACK_SYSTEM_USAGE_ANALYSIS.md      # System reliability patterns
-├── MONITORING_RACE_CONDITION_SOLUTION_PLAN.md # Concurrency handling
 ├── NEW_MONITOR_TYPE_IMPLEMENTATION.md     # Adding new monitor types
 └── ORGANIZATION_SUMMARY.md                # Documentation cleanup summary
 ```
@@ -47,7 +45,6 @@ For new developers, start with these essential guides:
 
 1. **[Developer quick start](./DEVELOPER_QUICK_START.md)** - Get up and running in minutes
 2. **[Environment setup](./ENVIRONMENT_SETUP.md)** - Complete development environment
-3. **[AI context guide](./AI_CONTEXT.md)** - Essential context for AI assistants
 
 ## 📖 Core documentation
 
@@ -78,12 +75,10 @@ For new developers, start with these essential guides:
 
 ### Advanced topics
 
-| Guide                                                                    | Description                                | Audience           |
-| ------------------------------------------------------------------------ | ------------------------------------------ | ------------------ |
-| [Fallback system analysis](./FALLBACK_SYSTEM_USAGE_ANALYSIS.md)          | System reliability and resilience patterns | Backend developers |
-| [Race condition solutions](./MONITORING_RACE_CONDITION_SOLUTION_PLAN.md) | Concurrency handling in monitoring system  | Backend developers |
-| [New monitor implementation](./NEW_MONITOR_TYPE_IMPLEMENTATION.md)       | Adding new monitoring capabilities         | Feature developers |
-| [Tools and commands guide](./TOOLS_AND_COMMANDS_GUIDE.md)                | Practical reference for tools and commands | All developers     |
+| Guide                                                              | Description                                | Audience           |
+| ------------------------------------------------------------------ | ------------------------------------------ | ------------------ |
+| [New monitor implementation](./NEW_MONITOR_TYPE_IMPLEMENTATION.md) | Adding new monitoring capabilities         | Feature developers |
+| [Tools and commands guide](./TOOLS_AND_COMMANDS_GUIDE.md)          | Practical reference for tools and commands | All developers     |
 
 ## 🗂️ Navigation
 

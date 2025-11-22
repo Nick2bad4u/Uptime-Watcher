@@ -73,7 +73,8 @@
         "../../scripts/**/*.js",
         "../../scripts/**/*.ts",
         "../../scripts/**/*.tsx",
-        "../../scripts/**/*.jsx"
+        "../../scripts/**/*.jsx",
+        "../../playwright/codegen-template.mjs"
     ],
     "references": []
 }

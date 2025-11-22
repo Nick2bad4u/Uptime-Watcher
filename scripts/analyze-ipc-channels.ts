@@ -109,7 +109,10 @@ export class IpcChannelAnalyzer {
             if (!domainMap[channel.domain]) {
                 domainMap[channel.domain] = [];
             }
-            domainMap[channel.domain].push(channel);
+            const domainChannels = domainMap[channel.domain];
+            if (domainChannels) {
+                domainChannels.push(channel);
+            }
         }
 
         return domainMap;

@@ -6,5 +6,16 @@
  *
  * @file Entry point for Jest overrides used by the Storybook test runner.
  */
-// eslint-disable-next-line unicorn/prefer-module, sonarjs/no-require-or-define -- Storybook consumes CommonJS configuration files
-module.exports = require("./storybook/test-runner-jest.config.js").default;
+
+// eslint-disable-next-line unicorn/prefer-module, sonarjs/no-require-or-define -- CommonJS required for Storybook test runner
+const path = require("node:path");
+
+/**
+ * Re-export the canonical Storybook test runner configuration. Uses absolute
+ * path resolution to ensure correct loading regardless of working directory.
+ */
+// eslint-disable-next-line unicorn/prefer-module -- Storybook consumes CommonJS configuration files
+module.exports = require(
+    // eslint-disable-next-line unicorn/prefer-module -- __dirname is required for absolute path resolution in CommonJS
+    path.resolve(__dirname, "storybook/test-runner-jest.config.js")
+);
