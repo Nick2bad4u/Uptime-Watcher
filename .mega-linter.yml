@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/oxsecurity/megalinter/refs/heads/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
 # Config file references
-ACTION_ACTIONLINT_CONFIG_FILE: config/tools/ActionLintConfig.yaml
+ACTION_ACTIONLINT_CONFIG_FILE: "config/tools/ActionLintConfig.yaml"
 # Fixes
 APPLY_FIXES: all
 BITBUCKET_COMMENT_REPORTER: false
@@ -9,8 +9,10 @@ BITBUCKET_COMMENT_REPORTER: false
 CONFIG_REPORTER: true
 CONSOLE_REPORTER: true
 CONSOLE_REPORTER_SECTIONS: true
-COPYPASTE_JSCPD_CONFIG_FILE: config/linting/jscpd.json
-CSS_STYLELINT_CONFIG_FILE: stylelint.config.mjs
+COPYPASTE_JSCPD_CONFIG_FILE: "config/linting/jscpd.json"
+CSS_STYLELINT_CONFIG_FILE: "stylelint.config.mjs"
+DEFAULT_BRANCH: main
+DEFAULT_WORKSPACE: "/tmp/lint"
 # Core configuration
 DISABLE_ERRORS: true
 # Disabled linters (use project-specific tools instead)
@@ -33,6 +35,7 @@ DISABLE_LINTERS:
 
 EMAIL_REPORTER: false
 
+ERROR_ON_MISSING_EXEC_BIT: false
 # Excluded directories
 EXCLUDED_DIRECTORIES:
     - node_modules
@@ -48,33 +51,44 @@ EXCLUDED_DIRECTORIES:
     - .vscode
     - .idea
 
+FAIL_IF_MISSING_LINTER_IN_FLAVOR: true
+
 FAIL_IF_UPDATED_SOURCES: false
 FILEIO_REPORTER: false
 FLAVOR_SUGGESTIONS: true
 FORMATTERS_DISABLE_ERRORS: true
 GITHUB_COMMENT_REPORTER: true
 GITHUB_STATUS_REPORTER: true
+GITHUB_WORKSPACE: "/tmp/lint"
 GITLAB_COMMENT_REPORTER: false
-HTML_HTMLHINT_CONFIG_FILE: config/linting/.htmlhintrc
+HTML_HTMLHINT_CONFIG_FILE: "config/linting/.htmlhintrc"
 IGNORE_GENERATED_FILES: true
 IGNORE_GITIGNORED_FILES: true
 # Linters configuration
 JAVASCRIPT_DEFAULT_STYLE: prettier
-JAVASCRIPT_PRETTIER_CONFIG_FILE: .prettierrc
-JSON_PRETTIER_CONFIG_FILE: .prettierrc
+JAVASCRIPT_PRETTIER_CONFIG_FILE: ".prettierrc"
+JSON_PRETTIER_CONFIG_FILE: ".prettierrc"
 # Error handling for specific linters
 JSON_PRETTIER_DISABLE_ERRORS: true
 JSON_REPORTER: true
 JSON_REPORTER_OUTPUT_DETAIL: detailed
 JSON_V8R_DISABLE_ERRORS_IF_LESS_THAN: 2
-LOG_FILE: .mega-linter.log
+# LLM Advisor configuration
+LLM_ADVISOR_ENABLED: "true"
+LLM_ADVISOR_LEVEL: WARNING
+LLM_ADVISOR_POSITION: "after_linter_output"
+LLM_MAX_TOKENS: "1048576"
+LLM_MODEL_NAME: "gemini-2.5-flash"
+LLM_PROVIDER: google
+LLM_TEMPERATURE: "0.03"
+# Logging configuration
+LOG_FILE: ".mega-linter.log"
 LOG_LEVEL: WARNING
+#  Markdown configuration
 MARKDOWN_DEFAULT_STYLE: markdownlint
-MARKDOWN_MARKDOWNLINT_CONFIG_FILE: config/linting/markdownlint.json
-MARKDOWN_MARKDOWN_LINK_CHECK_CONFIG_FILE: config/tools/.markdown-link-check.json
-# Markdown configuration
-MARKDOWN_MARKDOWN_TABLE_FORMATTER_FILTER_REGEX_EXCLUDE: ^.*(CHANGELOG|README|SECURITY)\.md$
-
+MARKDOWN_MARKDOWNLINT_CONFIG_FILE: "config/linting/markdownlint.json"
+MARKDOWN_MARKDOWN_LINK_CHECK_CONFIG_FILE: "config/tools/.markdown-link-check.json"
+MARKDOWN_MARKDOWN_TABLE_FORMATTER_FILTER_REGEX_EXCLUDE: "^.*(CHANGELOG|README|SECURITY)\\.md$"
 MARKDOWN_SUMMARY_REPORTER: true
 OUTPUT_DETAIL: simple
 # Schema: https://raw.githubusercontent.com/megalinter/megalinter/main/megalinter/descriptors/schemas/megalinter-configuration.jsonschema.json
@@ -87,28 +101,24 @@ PLUGINS:
     - https://raw.githubusercontent.com/ssc-services/mega-linter-plugin-salt/main/mega-linter-plugin-salt/salt.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/andreoliwa/nitpick/v0.35.0/mega-linter-plugin-nitpick/nitpick.megalinter-descriptor.yml
     - https://raw.githubusercontent.com/hype8912/check-toml-megalinter-plugin/main/mega-linter-plugin-checktoml/checktoml.megalinter-descriptor.yml
-
+    - https://raw.githubusercontent.com/wesley-dean/mega-linter-plugin-fmlint/refs/heads/main/mega-linter-plugin-fmlint/fmlint.megalinter-descriptor.yml
 PRINT_ALL_FILES: false
 PRINT_ALPACA: true
-REPOSITORY_CHECKOV_CONFIG_FILE: config/linting/.checkov.yml
-REPOSITORY_DEVSKIM_CONFIG_FILE: .devskim.json
+REPOSITORY_CHECKOV_CONFIG_FILE: "config/linting/.checkov.yml"
+REPOSITORY_DEVSKIM_CONFIG_FILE: ".devskim.json"
 REPOSITORY_DEVSKIM_DISABLE_ERRORS: true
-REPOSITORY_GRYPE_CONFIG_FILE: config/linting/.grype.yaml
-REPOSITORY_KICS_CONFIG_FILE: config/tools/kics.yaml
-REPOSITORY_SECRETLINT_CONFIG_FILE: config/linting/.secretlintrc.json
+REPOSITORY_GRYPE_CONFIG_FILE: "config/linting/.grype.yaml"
+REPOSITORY_KICS_CONFIG_FILE: "config/tools/kics.yaml"
+REPOSITORY_SECRETLINT_CONFIG_FILE: "config/linting/.secretlintrc.json"
 SARIF_REPORTER: true
 SHOW_ELAPSED_TIME: true
 SHOW_SKIPPED_LINTERS: true
-
-SPELL_CSPELL_CONFIG_FILE: .cspell.json
-SPELL_LYCHEE_CONFIG_FILE: config/tools/lychee.toml
+SPELL_CSPELL_CONFIG_FILE: ".cspell.json"
+SPELL_LYCHEE_CONFIG_FILE: "config/tools/lychee.toml"
 TAP_REPORTER: true
 TEXT_REPORTER: true
 TYPESCRIPT_DEFAULT_STYLE: prettier
-
 TYPESCRIPT_STANDARD_DISABLE_ERRORS: true
-
 UPDATED_SOURCES_REPORTER: true
 VALIDATE_ALL_CODEBASE: true
-
-YAML_YAMLLINT_CONFIG_FILE: config/linting/.yamllint.yaml
+YAML_YAMLLINT_CONFIG_FILE: "config/linting/.yamllint.yaml"

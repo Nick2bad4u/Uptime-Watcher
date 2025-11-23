@@ -1,5 +1,5 @@
 # ############################  Display  #############################
-
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json
 # Verbose program output
 # Accepts log level: "error", "warn", "info", "debug", "trace"
 name        = "lychee"

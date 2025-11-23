@@ -1,6 +1,7 @@
 # KICS Configuration v2.1.13+
 # Infrastructure as Code Security Scanner
 # https://docs.kics.io/latest/configuration-file/
+# yaml-language-server: $schema=https://www.schemastore.org/any.json
 
 # Cloud provider specific settings
 cloud-provider: []

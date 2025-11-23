@@ -79,6 +79,11 @@
             "enabled": true
         }
     },
+    "grit": {
+        "assist": {
+            "enabled": true
+        }
+    },
     "html": {
         "formatter": {
             "attributePosition": "auto",
@@ -322,6 +327,7 @@
             }
         }
     ],
+    "root": true,
     "vcs": {
         "clientKind": "git",
         "defaultBranch": "main",

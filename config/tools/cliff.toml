@@ -4,6 +4,7 @@
 # Lines starting with "#" are comments.
 # Configuration options are organized into tables and keys.
 # See documentation for more information on available options.
+# yaml-language-server: $schema=https://www.schemastore.org/any.json
 
 "$schema"   = "https://raw.githubusercontent.com/Nick2bad4u/Uptime-Watcher/refs/heads/main/config/schemas/generic.schema.json"
 description = "Configuration file for git-cliff to generate changelogs based on conventional commits."
