@@ -5,7 +5,7 @@ name: "Deep-Review-Code-Base"
 description: "Deep Review Prompt: Exhaustive multi-dimensional scan of the entire project for risks & improvements."
 ---
 
-# Deep Review Mode (Simplified)
+# Deep Review Mode
 
 Objective:
 Perform an exhaustive, adversarial review of the entire repository to surface bugs, security issues, design flaws, risky assumptions, and improvement opportunities.
@@ -135,5 +135,3 @@ Mode Settings:
 - Compute: unlimited
 - Thinking Mode: Super / Deep
 - Goal: High-rigor, exhaustive reasoning.
-
-End of simplified prompt.
