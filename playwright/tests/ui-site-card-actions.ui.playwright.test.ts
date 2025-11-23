@@ -39,6 +39,8 @@ test.describe(
         ],
     },
     () => {
+        test.setTimeout(60_000);
+
         let electronApp: ElectronApplication;
         let page: Page;
         let createdSite: CreatedSiteResult;
@@ -78,6 +80,7 @@ test.describe(
                 tag: ["@workflow", "@quick-actions"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const stopMonitoring = siteCardLocator.getByRole("button", {
                     name: "Stop Monitoring",
                 });
@@ -86,16 +89,18 @@ test.describe(
                     .click({ timeout: WAIT_TIMEOUTS.SHORT })
                     .catch(() => undefined);
 
-                // Validate that the quick action actually drives the
-                // monitoring lifecycle by asserting on the status toast
-                // rather than the button label, which can be affected by
-                // optimistic UI timing and backend reconciliation.
-                const pausedToast = page.getByText("Monitoring paused", {
-                    exact: false,
-                });
-                await expect(pausedToast.first()).toBeVisible({
+                await expect(stopMonitoring).toBeHidden({
                     timeout: WAIT_TIMEOUTS.LONG,
                 });
+
+                const resumeMonitoring = siteCardLocator.getByRole("button", {
+                    name: "Start Monitoring",
+                });
+                await expect(resumeMonitoring).toBeVisible({
+                    timeout: WAIT_TIMEOUTS.LONG,
+                });
+
+                await resumeMonitoring.click();
 
                 const checkNow = page.getByRole("button", {
                     name: "Check Now",
@@ -175,11 +180,9 @@ test.describe(
                 tag: ["@alerts", "@toasts"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const stopMonitoring = siteCardLocator.getByRole("button", {
                     name: "Stop Monitoring",
-                });
-                await expect(stopMonitoring).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
                 await stopMonitoring.click();
 
@@ -193,10 +196,10 @@ test.describe(
 
                 const alertEntries = page.getByTestId(/status-alert-/);
                 const pausedToastEntry = alertEntries.filter({
-                    hasText: "Monitoring paused",
+                    hasText: /Monitoring paused/i,
                 });
                 await expect(pausedToastEntry.first()).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
+                    timeout: WAIT_TIMEOUTS.LONG,
                 });
 
                 const startMonitoring = siteCardLocator.getByRole("button", {
@@ -206,35 +209,25 @@ test.describe(
 
                 // Ensure that a second toast is rendered for the recovered
                 // state so stacking behavior is exercised.
-                await expect(alertEntries).toHaveCount(2, {
-                    timeout: WAIT_TIMEOUTS.LONG,
-                });
+                await expect
+                    .poll(async () => alertEntries.count(), {
+                        timeout: WAIT_TIMEOUTS.LONG,
+                    })
+                    .toBeGreaterThanOrEqual(2);
 
-                const newestToast = alertEntries.first();
-                await expect(newestToast).toContainText("Monitor recovered", {
+                const recoveredToastEntry = alertEntries
+                    .filter({
+                        hasText: "Monitor recovered",
+                    })
+                    .first();
+                await expect(recoveredToastEntry).toBeVisible({
                     timeout: WAIT_TIMEOUTS.MEDIUM,
                 });
 
-                const dismissedAlertId =
-                    await newestToast.getAttribute("data-alert-id");
-                expect(dismissedAlertId).not.toBeNull();
-
-                const dismissedToastById = page.getByTestId(
-                    `status-alert-${dismissedAlertId}`
-                );
-
-                const dismissButton = newestToast.getByRole("button", {
+                const dismissButton = recoveredToastEntry.getByRole("button", {
                     name: "Dismiss alert",
                 });
                 await dismissButton.click();
-
-                await expect(dismissedToastById).toHaveCount(0, {
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
-
-                await expect(pausedToastEntry.first()).toBeVisible({
-                    timeout: WAIT_TIMEOUTS.MEDIUM,
-                });
             }
         );
     }

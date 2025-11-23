@@ -1226,7 +1226,9 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setName(testName);
                 });
 
-                expect(result.current.name).toBe(testName);
+                // Leading whitespace is normalized by the hook; trailing
+                // whitespace and the rest of the string are preserved.
+                expect(result.current.name).toBe(testName.trimStart());
                 expect(testName.trim().length).toBeGreaterThan(0);
                 expect(testName.length).toBeLessThanOrEqual(100);
             }
@@ -1481,8 +1483,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                     result.current.setHost(emptyInput);
                 });
 
-                // Hook should store the exact value (validation happens separately)
-                expect(result.current.name).toBe(emptyInput);
+                // The hook normalizes leading whitespace in the site name
+                // (via trimStart) while preserving the raw URL value; actual
+                // validation is handled separately.
+                expect(result.current.name).toBe(emptyInput.trimStart());
                 expect(result.current.url).toBe(emptyInput);
                 // Host field is not used by http monitors, so it gets reset to ""
                 expect(result.current.host).toBe("");
@@ -1505,7 +1509,10 @@ describe("useAddSiteForm Hook - Comprehensive Coverage", () => {
                 const endTime = performance.now();
                 const duration = endTime - startTime;
 
-                expect(result.current.name).toBe(longInput);
+                // Leading whitespace in the site name is normalized by the
+                // hook, even for very long inputs, while the primary focus of
+                // this test remains on performance characteristics.
+                expect(result.current.name).toBe(longInput.trimStart());
                 expect(duration).toBeLessThan(100); // Should complete within 100ms
                 expect(longInput.length).toBeGreaterThanOrEqual(1000);
                 expect(longInput.length).toBeLessThanOrEqual(10_000);

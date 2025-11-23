@@ -5,6 +5,7 @@
  */
 
 import { act, render, screen, waitFor } from "@testing-library/react";
+import type { RenderResult } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom";
@@ -17,6 +18,8 @@ import { useSitesStore } from "../stores/sites/useSitesStore";
 import { useUIStore } from "../stores/ui/useUiStore";
 import { useUpdatesStore } from "../stores/updates/useUpdatesStore";
 import { useTheme } from "../theme/useTheme";
+import { darkTheme, lightTheme } from "../theme/themes";
+import type { Theme } from "../theme/types";
 
 // Mock all required modules
 vi.mock("../hooks/useBackendFocusSync", () => ({
@@ -178,28 +181,75 @@ describe("App Component - Comprehensive Coverage", () => {
         updateStatus: "idle" as const,
     };
 
-    const createMockTheme = (isDark = false) =>
-        ({
-            availableThemes: ["light", "dark"],
-            currentTheme: {
-                isDark,
-                colors: {
-                    status: { up: "#green", down: "#red", pending: "#yellow" },
-                    success: "#green",
-                    error: "#red",
-                    warning: "#yellow",
-                },
-            },
-            getColor: vi.fn(),
-            getStatusColor: vi.fn(),
+    const cloneTheme = (theme: Theme): Theme => structuredClone(theme);
+
+    const getThemeColorByPath = (theme: Theme, path: string): string => {
+        if (!path) {
+            return "";
+        }
+
+        const segments = path.split(".");
+        let current: unknown = theme;
+
+        for (const segment of segments) {
+            if (
+                current !== null &&
+                typeof current === "object" &&
+                segment in (current as Record<string, unknown>)
+            ) {
+                current = (current as Record<string, unknown>)[segment];
+            } else {
+                return "";
+            }
+        }
+
+        return typeof current === "string" ? current : "";
+    };
+
+    const createMockTheme = (isDark = false) => {
+        const baseTheme = isDark ? darkTheme : lightTheme;
+        const currentTheme = cloneTheme(baseTheme);
+        const mockGetColor = vi.fn((path: string) =>
+            getThemeColorByPath(currentTheme, path)
+        );
+        const mockGetStatusColor = vi.fn(
+            (status: keyof typeof currentTheme.colors.status) =>
+                currentTheme.colors.status[status] ??
+                currentTheme.colors.status.up
+        );
+
+        return {
+            availableThemes: [
+                "light",
+                "dark",
+                "system",
+            ],
+            currentTheme,
+            getColor: mockGetColor,
+            getStatusColor: mockGetStatusColor,
             isDark,
             setTheme: vi.fn(),
-            systemTheme: "light",
-            themeManager: {},
-            themeName: "light",
+            systemTheme: isDark ? "dark" : "light",
+            themeManager: {
+                applyTheme: vi.fn(),
+                getTheme: vi.fn().mockReturnValue(currentTheme),
+            },
+            themeName: isDark ? "dark" : "light",
             themeVersion: 1,
             toggleTheme: vi.fn(),
-        }) as any;
+        } as any;
+    };
+
+    const renderApp = (): RenderResult => render(<App />);
+
+    const rerenderApp = (utils: RenderResult): RenderResult => {
+        utils.rerender(<App />);
+        return utils;
+    };
+
+    const unmountApp = (utils: RenderResult): void => {
+        utils.unmount();
+    };
 
     /**
      * Retrieves the dashboard overview card that displays the monitored sites
@@ -323,7 +373,7 @@ describe("App Component - Comprehensive Coverage", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            render(<App />);
+            await renderApp();
 
             expect(screen.getByTestId("header")).toBeInTheDocument();
             expect(screen.getByTestId("site-list")).toBeInTheDocument();
@@ -347,7 +397,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             mockUseTheme.mockReturnValue(createMockTheme(true));
 
-            render(<App />);
+            await renderApp();
 
             const appContainer = screen.getByTestId("app-container");
             expect(appContainer).toHaveClass("app-shell--dark");
@@ -369,7 +419,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             mockUseTheme.mockReturnValue(createMockTheme(false));
 
-            render(<App />);
+            await renderApp();
 
             const appContainer = screen.getByTestId("app-container");
             expect(appContainer).not.toHaveClass("app-shell--dark");
@@ -391,7 +441,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 { ...mockSite, identifier: "test-site-2" },
             ];
 
-            render(<App />);
+            await renderApp();
 
             expect(getMonitoredSitesCardValue()).toBe("2");
         });
@@ -417,7 +467,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 isLoading: true,
             });
 
-            render(<App />);
+            await renderApp();
 
             // Wait for loading overlay to appear (after 100ms delay)
             await waitFor(
@@ -452,7 +502,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 isLoading: false,
             });
 
-            render(<App />);
+            await renderApp();
 
             // Wait a moment to ensure any potential loading overlay would have appeared
             await new Promise((resolve) => setTimeout(resolve, 150));
@@ -482,14 +532,14 @@ describe("App Component - Comprehensive Coverage", () => {
                 isLoading: true,
             });
 
-            const { rerender } = render(<App />);
+            const utils = renderApp();
 
             // Quickly change to not loading before delay
             mockUseErrorStore.mockReturnValue({
                 ...defaultErrorStore,
                 isLoading: false,
             });
-            rerender(<App />);
+            rerenderApp(utils);
 
             // Should not show loading overlay
             expect(
@@ -518,7 +568,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 lastError: "Test error message",
             });
 
-            render(<App />);
+            await renderApp();
 
             expect(screen.getByRole("alert")).toBeInTheDocument();
             expect(screen.getByText("Test error message")).toBeInTheDocument();
@@ -546,7 +596,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 clearError,
             });
 
-            render(<App />);
+            await renderApp();
 
             const closeButton = screen.getByLabelText("Dismiss error");
             await userEvent.click(closeButton);
@@ -573,7 +623,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 lastError: null,
             });
 
-            render(<App />);
+            await renderApp();
 
             expect(screen.queryByRole("alert")).not.toBeInTheDocument();
         });
@@ -599,7 +649,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 updateStatus: "available",
             });
 
-            render(<App />);
+            await renderApp();
 
             const message = screen.getByText(
                 "A new update is available. Downloading..."
@@ -633,7 +683,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 updateStatus: "downloading",
             });
 
-            render(<App />);
+            await renderApp();
 
             const message = screen.getByText("Update is downloading...");
             expect(message).toBeInTheDocument();
@@ -665,7 +715,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 updateStatus: "downloaded",
             });
 
-            render(<App />);
+            await renderApp();
 
             const message = screen.getByText(
                 "Update downloaded! Restart to apply."
@@ -701,7 +751,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 updateError: "Custom error message",
             });
 
-            render(<App />);
+            await renderApp();
 
             const message = screen.getByText("Custom error message");
             expect(message).toBeInTheDocument();
@@ -735,7 +785,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 updateError: null,
             });
 
-            render(<App />);
+            await renderApp();
 
             const fallback = screen.getByText("Update failed.");
             expect(fallback).toBeInTheDocument();
@@ -769,7 +819,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 applyUpdate,
             });
 
-            render(<App />);
+            await renderApp();
 
             const restartButton = screen.getByText("Restart Now");
             await userEvent.click(restartButton);
@@ -801,7 +851,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 setUpdateError,
             });
 
-            render(<App />);
+            await renderApp();
 
             const dismissButton = screen.getByText("Dismiss");
             await userEvent.click(dismissButton);
@@ -831,7 +881,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 showSettings: true,
             });
 
-            render(<App />);
+            await renderApp();
 
             await expect(
                 screen.findByTestId("settings-modal")
@@ -857,7 +907,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 showSettings: false,
             });
 
-            render(<App />);
+            await renderApp();
 
             expect(
                 screen.queryByTestId("settings-modal")
@@ -885,7 +935,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 setShowSettings,
             });
 
-            render(<App />);
+            await renderApp();
 
             const closeButton = screen.getByTestId("close-settings");
             await userEvent.click(closeButton);
@@ -920,7 +970,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 mockSite
             );
 
-            render(<App />);
+            await renderApp();
 
             await expect(
                 screen.findByTestId("site-details-modal")
@@ -957,7 +1007,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 undefined
             );
 
-            render(<App />);
+            await renderApp();
 
             expect(
                 screen.queryByTestId("site-details-modal")
@@ -993,7 +1043,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 mockSite
             );
 
-            render(<App />);
+            await renderApp();
 
             const closeButton = screen.getByTestId("close-site-details");
             await userEvent.click(closeButton);
@@ -1032,7 +1082,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 settingsStore
             );
 
-            render(<App />);
+            await renderApp();
 
             await waitFor(() => {
                 expect(initializeSites).toHaveBeenCalledTimes(1);
@@ -1056,7 +1106,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             const mockCacheSync = await import("../utils/cacheSync");
 
-            render(<App />);
+            await renderApp();
 
             await waitFor(() => {
                 expect(mockCacheSync.setupCacheSync).toHaveBeenCalledTimes(1);
@@ -1086,7 +1136,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             (mockUseSitesStore as any).getState.mockReturnValue(sitesStore);
 
-            render(<App />);
+            await renderApp();
 
             await waitFor(() => {
                 expect(subscribeToStatusUpdates).toHaveBeenCalledTimes(1);
@@ -1122,14 +1172,14 @@ describe("App Component - Comprehensive Coverage", () => {
                 cacheSyncCleanup
             );
 
-            const { unmount } = render(<App />);
+            const utils = renderApp();
 
             // Wait for initialization to complete
             await waitFor(() => {
                 expect(mockCacheSync.setupCacheSync).toHaveBeenCalled();
             });
 
-            unmount();
+            unmountApp(utils);
 
             expect(unsubscribeFromStatusUpdates).toHaveBeenCalledTimes(1);
             expect(cacheSyncCleanup).toHaveBeenCalledTimes(1);
@@ -1170,7 +1220,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             (mockUseSitesStore as any).getState.mockReturnValue(sitesStore);
 
-            render(<App />);
+            await renderApp();
 
             await waitFor(() => {
                 expect(subscribeToStatusUpdates).toHaveBeenCalled();
@@ -1211,7 +1261,7 @@ describe("App Component - Comprehensive Coverage", () => {
                 "../hooks/useBackendFocusSync"
             );
 
-            render(<App />);
+            await renderApp();
 
             expect(
                 mockBackendFocusSync.useBackendFocusSync
@@ -1241,7 +1291,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             const mockLogger = await import("../services/logger");
 
-            render(<App />);
+            await renderApp();
 
             await waitFor(() => {
                 expect(mockLogger.logger.app.started).toHaveBeenCalledTimes(1);
@@ -1269,7 +1319,7 @@ describe("App Component - Comprehensive Coverage", () => {
 
             const mockLogger = await import("../services/logger");
 
-            render(<App />);
+            await renderApp();
 
             // Wait a bit to ensure initialization completes
             await new Promise((resolve) => setTimeout(resolve, 50));

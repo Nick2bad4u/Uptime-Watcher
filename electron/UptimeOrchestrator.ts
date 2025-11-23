@@ -458,28 +458,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         { identifier, monitorId, scope }
                     );
                 }
-
-                const invalidationType = scope === "global" ? "all" : "site";
-
-                // Emit cache invalidation to trigger frontend state refresh
-                const cacheInvalidationPayload = {
-                    ...(invalidationType === "site" ? { identifier } : {}),
-                    reason: "update",
-                    timestamp: Date.now(),
-                    type: invalidationType,
-                } satisfies UptimeEvents["cache:invalidated"];
-
-                attachForwardedMetadata({
-                    busId: ORCHESTRATOR_BUS_ID,
-                    forwardedEvent: "cache:invalidated",
-                    payload: cacheInvalidationPayload,
-                    source: eventData,
-                });
-
-                await this.emitTyped(
-                    "cache:invalidated",
-                    cacheInvalidationPayload
-                );
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:started:",
@@ -546,28 +524,6 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
                         { identifier, monitorId, scope }
                     );
                 }
-
-                const invalidationType = scope === "global" ? "all" : "site";
-
-                // Emit cache invalidation to trigger frontend state refresh
-                const cacheInvalidationPayload = {
-                    ...(invalidationType === "site" ? { identifier } : {}),
-                    reason: "update",
-                    timestamp: Date.now(),
-                    type: invalidationType,
-                } satisfies UptimeEvents["cache:invalidated"];
-
-                attachForwardedMetadata({
-                    busId: ORCHESTRATOR_BUS_ID,
-                    forwardedEvent: "cache:invalidated",
-                    payload: cacheInvalidationPayload,
-                    source: eventData,
-                });
-
-                await this.emitTyped(
-                    "cache:invalidated",
-                    cacheInvalidationPayload
-                );
             } catch (error) {
                 logger.error(
                     "[UptimeOrchestrator] Error handling internal:monitor:stopped:",
@@ -1746,6 +1702,15 @@ export class UptimeOrchestrator extends TypedEventBus<OrchestratorEvents> {
      * @returns Promise that resolves when the event handling is complete
      */
     private async handleDatabaseInitialized(): Promise<void> {
+        // NOTE: DatabaseManager.initialize() already emits a
+        // "database:transaction-completed" event with operation
+        // "database:initialize" for the low-level schema/setup work. This
+        // orchestrator-level event intentionally uses the shorter
+        // "initialize" operation label to represent the higher-level
+        // Orchestrator bootstrap phase (database + site manager + monitoring
+        // wiring). Consumers that care about a specific phase should filter
+        // on the `operation` field rather than assuming a single
+        // initialization emission.
         await this.emitTyped("database:transaction-completed", {
             duration: 0,
             operation: "initialize",

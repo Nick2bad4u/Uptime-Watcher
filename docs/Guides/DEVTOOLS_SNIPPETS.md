@@ -13,6 +13,7 @@ tags:
   - "testing"
   - "sites"
 ---
+
 # Chrome DevTools Snippets for Testing
 
 ## Table of Contents

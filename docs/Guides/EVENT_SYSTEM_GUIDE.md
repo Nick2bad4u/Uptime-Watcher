@@ -13,6 +13,7 @@ tags:
   - "ipc"
   - "realtime"
 ---
+
 # Event System Guide
 
 This guide provides comprehensive documentation for the TypedEventBus-based event system in Uptime Watcher, covering event-driven architecture patterns, automatic metadata injection, IPC forwarding, and real-time communication between backend and frontend.

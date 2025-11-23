@@ -12,6 +12,7 @@ tags:
   - "fuzzing"
   - "uptime-watcher"
 ---
+
 # Fast-Check Fuzzing Coverage Guide
 
 This guide explains how to run our property-based tests powered by fast-check and how to interpret coverage for the fuzzing suites.

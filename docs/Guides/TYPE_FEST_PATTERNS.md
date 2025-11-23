@@ -13,6 +13,7 @@ tags:
   - "types"
   - "patterns"
 ---
+
 # Type-fest Integration Patterns
 
 This document provides comprehensive patterns for integrating type-fest utilities consistently across the Uptime-Watcher codebase. These patterns ensure type safety, better developer experience, and maintainable code.

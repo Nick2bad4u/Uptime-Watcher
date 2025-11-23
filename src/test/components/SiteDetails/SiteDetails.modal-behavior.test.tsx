@@ -162,7 +162,7 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         totalDowntime: 1200,
         upCount: 5,
         uptime: "95.5%",
-        ...(overrides.analytics as Record<string, unknown> | undefined),
+        ...(overrides["analytics"] as Record<string, unknown> | undefined),
     };
 
     return {
@@ -191,7 +191,7 @@ const createHookState = (overrides: Record<string, unknown> = {}) => {
         localCheckInterval: 60_000,
         localName: baseSite.name,
         localRetryAttempts: 2,
-        localTimeout: 5_000,
+        localTimeout: 5000,
         retryAttemptsChanged: false,
         selectedMonitor: baseMonitor,
         selectedMonitorId: baseMonitor.id,
@@ -211,7 +211,7 @@ const renderSiteDetails = (hookOverrides?: Record<string, unknown>) => {
     return render(<SiteDetails onClose={vi.fn()} site={baseSite} />);
 };
 
-describe("SiteDetails", () => {
+describe(SiteDetails, () => {
     beforeEach(() => {
         waitForAnimationMock.mockClear();
         mockUseSiteDetails.mockReset();

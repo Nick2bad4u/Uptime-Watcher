@@ -2,7 +2,7 @@ import type { FormEvent, NamedExoticComponent } from "react";
 
 import { BASE_MONITOR_TYPES, type MonitorType } from "@shared/types";
 import { ensureError } from "@shared/utils/errorHandling";
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 
 import { CHECK_INTERVALS } from "../../constants";
 import { useDelayedButtonLoading } from "../../hooks/useDelayedButtonLoading";
@@ -46,6 +46,7 @@ interface HelperBullet {
 }
 
 const MONITOR_TYPE_SET = new Set<string>(BASE_MONITOR_TYPES);
+const SITE_NAME_REQUIRED_MESSAGE = "Site name is required";
 
 /**
  * Type guard that validates whether a candidate string is a supported monitor
@@ -90,6 +91,14 @@ const MonitorConfigIcon = AppIcons.metrics.monitor;
  * ```tsx
  * import { logger } from "@app/services/logger";
  *
+ * useEffect(
+ *     function clearSiteNameErrorOnInput() {
+ *         if (formError === SITE_NAME_REQUIRED_MESSAGE && !isNameMissing) {
+ *             setFormError(undefined);
+ *         }
+ *     },
+ *     [formError, isNameMissing, setFormError]
+ * );
  * <AddSiteForm onSuccess={() => logger.info("Site added")} />;
  * ```
  *
@@ -115,6 +124,7 @@ const MonitorConfigIcon = AppIcons.metrics.monitor;
  *
  * @returns The rendered AddSiteForm JSX element.
  */
+
 export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
     function AddSiteForm({ onSuccess }: AddSiteFormProperties) {
         // Combine store calls to avoid duplicates and improve performance
@@ -193,6 +203,8 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             url,
         } = formState;
 
+        const [hasSubmitted, setHasSubmitted] = useState(false);
+
         // Get dynamic help text for the current monitor type
         const helpTexts = useDynamicHelpText(monitorType);
         const helperBullets = useMemo<HelperBullet[]>(() => {
@@ -232,6 +244,15 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
             helpTexts.secondary,
         ]);
 
+        // Normalize potential undefined values from the store for robust
+        // tests and edge cases.
+        const normalizedName = typeof name === "string" ? name : "";
+        const isNameMissing = normalizedName.trim().length === 0;
+        const shouldShowNameError =
+            addMode === "new" &&
+            (formError === SITE_NAME_REQUIRED_MESSAGE ||
+                (hasSubmitted && isNameMissing));
+
         // Memoized handlers for form field changes
         const handleMonitorTypeChange = useCallback(
             (value: string) => {
@@ -259,8 +280,13 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Combined success callback that resets form and calls prop callback
         const handleSuccess = useCallback(() => {
             resetForm();
+            setHasSubmitted(false);
             onSuccess?.();
-        }, [onSuccess, resetForm]);
+        }, [
+            onSuccess,
+            resetForm,
+            setHasSubmitted,
+        ]);
 
         // Dynamic monitor field change handlers
         const handleDynamicFieldChange = useMemo(
@@ -531,12 +557,45 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
          *
          * @param e - The form submission event
          */
+        const handleSiteNameChange = useCallback(
+            (value: string) => {
+                setName(value);
+
+                if (
+                    formError === SITE_NAME_REQUIRED_MESSAGE &&
+                    value.trim().length > 0
+                ) {
+                    setFormError(undefined);
+                }
+            },
+            [
+                formError,
+                setFormError,
+                setName,
+            ]
+        );
+
         const handleFormSubmit = useCallback(
             (e: FormEvent) => {
                 e.preventDefault();
+                setHasSubmitted(true);
+
+                if (addMode === "new" && isNameMissing) {
+                    logger.debug(
+                        "[AddSiteForm] Blocking submit due to empty name"
+                    );
+                    return;
+                }
+
+                setFormError(undefined);
                 void onSubmit(e);
             },
-            [onSubmit]
+            [
+                addMode,
+                isNameMissing,
+                onSubmit,
+                setFormError,
+            ]
         );
         const onClearError = useCallback(() => {
             clearError();
@@ -546,13 +605,22 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
         // Memoized callbacks for form components to optimize re-renders
         const handleAddModeChange = useCallback(
             (value: string) => {
-                if (isValidAddMode(value)) {
-                    setAddMode(value);
-                } else {
+                if (!isValidAddMode(value)) {
                     logger.error(`Invalid add mode value: ${value}`);
+                    return;
                 }
+
+                if (value !== addMode) {
+                    setHasSubmitted(false);
+                }
+
+                setAddMode(value);
             },
-            [setAddMode]
+            [
+                addMode,
+                setAddMode,
+                setHasSubmitted,
+            ]
         );
 
         // Memoized options arrays to prevent unnecessary re-renders
@@ -575,16 +643,17 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
 
         const resolvedErrorMessage = formError ?? lastError ?? "";
         const shouldRenderErrorAlert = resolvedErrorMessage.length > 0;
-
         return (
             <SurfaceContainer
                 className="add-site-form__container"
                 data-testid="add-site-form-container"
             >
+                {/* Disable native validation so custom messaging renders */}
                 <form
                     aria-label="Add Site Form"
                     className="add-site-form"
                     data-testid="add-site-form"
+                    noValidate
                     onSubmit={handleFormSubmit}
                 >
                     <section className="add-site-form__section">
@@ -637,16 +706,28 @@ export const AddSiteForm: NamedExoticComponent<AddSiteFormProperties> = memo(
                                     value={selectedExistingSite}
                                 />
                             ) : (
-                                <TextField
-                                    disabled={isLoading}
-                                    id="siteName"
-                                    label="Site Name"
-                                    onChange={setName}
-                                    placeholder="My Website"
-                                    required
-                                    type="text"
-                                    value={name}
-                                />
+                                <div className="add-site-form__field-group">
+                                    <TextField
+                                        disabled={isLoading}
+                                        id="siteName"
+                                        label="Site Name"
+                                        onChange={handleSiteNameChange}
+                                        placeholder="My Website"
+                                        required
+                                        type="text"
+                                        value={name}
+                                    />
+                                    {shouldShowNameError ? (
+                                        <ThemedText
+                                            className="add-site-form__field-error"
+                                            role="alert"
+                                            size="xs"
+                                            variant="error"
+                                        >
+                                            {SITE_NAME_REQUIRED_MESSAGE}
+                                        </ThemedText>
+                                    ) : null}
+                                </div>
                             )}
 
                             {addMode === "new" ? (

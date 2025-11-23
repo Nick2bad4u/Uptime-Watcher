@@ -13,6 +13,7 @@ tags:
   - "database"
   - "repository-pattern"
 ---
+
 # ADR-001: Repository Pattern for Database Access
 
 ## Table of Contents

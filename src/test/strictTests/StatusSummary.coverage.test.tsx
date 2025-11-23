@@ -169,7 +169,7 @@ describe("StatusSummary coverage", () => {
         );
 
         const degradedIndicator = statusIndicatorCalls.find(
-            (call) => call.status === "degraded"
+            (call) => call["status"] === "degraded"
         );
         expect(degradedIndicator).toBeUndefined();
         expect(screen.queryByTestId("status-indicator-degraded")).toBeNull();

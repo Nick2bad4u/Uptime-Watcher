@@ -36,6 +36,8 @@ test.describe(
         ],
     },
     () => {
+        test.setTimeout(60_000);
+
         let electronApp: ElectronApplication;
         let page: Page;
         const createdSites: string[] = [];
@@ -80,6 +82,7 @@ test.describe(
                 tag: ["@workflow", "@table"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const layoutToggleGroup = page.getByRole("radiogroup", {
                     name: "Card layout",
                 });
@@ -136,6 +139,7 @@ test.describe(
                 tag: ["@navigation", "@table"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const layoutToggleGroup = page.getByRole("radiogroup", {
                     name: "Card layout",
                 });

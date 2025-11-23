@@ -12,6 +12,7 @@ tags:
   - "codegen"
   - "uptime-watcher"
 ---
+
 # Playwright Codegen Best Practices
 
 This guide explains how to improve Playwright codegen output to align with our lint standards.

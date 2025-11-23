@@ -13,11 +13,16 @@
 
 import type { Site } from "@shared/types";
 
+import { DEFAULT_SITE_NAME } from "@shared/constants/sites";
 import { SITE_ADDED_SOURCE } from "@shared/types/events";
+import { ensureError } from "@shared/utils/errorHandling";
+import { ensureUniqueSiteIdentifiers } from "@shared/validation/siteIntegrity";
 
 import type { UptimeEvents } from "../../events/eventTypes";
 import type { TypedEventBus } from "../../events/TypedEventBus";
+import type { ConfigurationManager } from "../../managers/ConfigurationManager";
 import type { StandardizedCache } from "../../utils/cache/StandardizedCache";
+import type { ImportSite } from "../../utils/database/DataImportExportService";
 import type { DatabaseServiceFactory } from "../factories/DatabaseServiceFactory";
 
 import { logger as backendLogger } from "../../utils/logger";
@@ -94,8 +99,10 @@ export interface IDatabaseCommand<TResult = void> {
  */
 export interface DatabaseCommandContext {
     cache: StandardizedCache<Site>;
+    configurationManager?: ConfigurationManager | undefined;
     eventEmitter: TypedEventBus<UptimeEvents>;
     serviceFactory: DatabaseServiceFactory;
+    updateHistoryLimit?: ((limit: number) => Promise<void>) | undefined;
 }
 
 function isDatabaseCommandContext(
@@ -161,6 +168,14 @@ export abstract class DatabaseCommand<TResult = void>
 
     /** Factory for accessing database services and repositories */
     protected readonly serviceFactory: DatabaseServiceFactory;
+
+    /** Optional configuration manager used for validation flows */
+    protected readonly configurationManager: ConfigurationManager | undefined;
+
+    /** Optional history limit updater for settings propagation */
+    protected readonly updateHistoryLimit:
+        | ((limit: number) => Promise<void>)
+        | undefined;
 
     /**
      * Emits a failure event for the command operation.
@@ -228,6 +243,8 @@ export abstract class DatabaseCommand<TResult = void>
         this.serviceFactory = context.serviceFactory;
         this.eventEmitter = context.eventEmitter;
         this.cache = context.cache;
+        this.configurationManager = context.configurationManager;
+        this.updateHistoryLimit = context.updateHistoryLimit;
     }
 
     public abstract execute(): Promise<TResult>;
@@ -507,7 +524,14 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         // Parse and import data
         const { settings, sites } =
             await dataImportExportService.importDataFromJson(this.data);
-        await dataImportExportService.persistImportedData(sites, settings);
+
+        const canonicalSites = await this.validateImportedSites(sites);
+        await dataImportExportService.persistImportedData(
+            canonicalSites,
+            settings
+        );
+
+        await this.applyImportedHistoryLimit(settings);
 
         // Reload sites from database
         const siteRepositoryService =
@@ -515,21 +539,23 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
         const reloadedSites =
             await siteRepositoryService.getSitesFromDatabase();
 
-        // Update cache
         const previousSiteIdentifiers = new Set(
             this.backupSites.map((site) => site.identifier)
         );
 
-        this.cache.clear();
         const newlyImportedSites: Site[] = [];
-
         for (const site of reloadedSites) {
-            this.cache.set(site.identifier, site);
-
             if (!previousSiteIdentifiers.has(site.identifier)) {
                 newlyImportedSites.push(site);
             }
         }
+
+        this.cache.replaceAll(
+            reloadedSites.map((site) => ({
+                data: structuredClone(site),
+                key: site.identifier,
+            }))
+        );
 
         if (newlyImportedSites.length > 0) {
             await Promise.all(
@@ -549,11 +575,13 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             operation: "data-imported",
         });
 
-        await this.eventEmitter.emitTyped("cache:invalidated", {
-            reason: "update",
-            timestamp: Date.now(),
-            type: "site",
-        });
+        // NOTE: We intentionally do NOT emit `sites:state-synchronized` here.
+        // That responsibility belongs to SiteManager/UptimeOrchestrator so
+        // that all bulk sync events flow through a single high-level
+        // coordinator. The orchestrator will call
+        // `emitSitesStateSynchronized()` after a successful import, which
+        // computes deltas based on the last known snapshot and ensures
+        // consistent semantics across all synchronization paths.
 
         return true;
     }
@@ -591,6 +619,99 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
             errors,
             isValid: errors.length === 0,
         };
+    }
+
+    private async applyImportedHistoryLimit(
+        settings: Record<string, string>
+    ): Promise<void> {
+        if (!this.updateHistoryLimit) {
+            return;
+        }
+
+        const rawHistoryLimit = settings["historyLimit"];
+        if (rawHistoryLimit === undefined) {
+            return;
+        }
+
+        const parsedHistoryLimit = Number(rawHistoryLimit);
+        if (!Number.isFinite(parsedHistoryLimit)) {
+            backendLogger.warn(
+                "[ImportDataCommand] Imported history limit is not a valid number",
+                {
+                    rawHistoryLimit,
+                }
+            );
+            return;
+        }
+
+        try {
+            await this.updateHistoryLimit(parsedHistoryLimit);
+        } catch (error) {
+            backendLogger.error(
+                "[ImportDataCommand] Failed to apply imported history limit",
+                ensureError(error),
+                {
+                    parsedHistoryLimit,
+                }
+            );
+        }
+    }
+
+    private async validateImportedSites(sites: ImportSite[]): Promise<Site[]> {
+        const { configurationManager } = this;
+        const canonicalSites = sites.map((site) => this.toCanonicalSite(site));
+
+        ensureUniqueSiteIdentifiers(
+            canonicalSites,
+            "ImportDataCommand.validateImportedSites"
+        );
+
+        if (!configurationManager) {
+            backendLogger.warn(
+                "[ImportDataCommand] ConfigurationManager unavailable; skipping import validation"
+            );
+            return canonicalSites;
+        }
+
+        const validationResults = await Promise.all(
+            canonicalSites.map((site) =>
+                configurationManager.validateSiteConfiguration(site)
+            )
+        );
+
+        const invalidSites: Array<{
+            errors: readonly string[];
+            identifier: string;
+        }> = [];
+
+        validationResults.forEach((result, index) => {
+            if (result.success) {
+                return;
+            }
+
+            const canonicalSite = canonicalSites[index];
+            invalidSites.push({
+                errors: result.errors,
+                identifier: canonicalSite
+                    ? canonicalSite.identifier
+                    : "<unknown>",
+            });
+        });
+
+        if (invalidSites.length > 0) {
+            const formattedErrors = invalidSites
+                .map(
+                    ({ errors, identifier }) =>
+                        `${identifier}: ${errors.join(", ")}`
+                )
+                .join("; ");
+
+            throw new Error(
+                `Import aborted due to invalid site configuration(s): ${formattedErrors}`
+            );
+        }
+
+        return canonicalSites;
     }
 
     public constructor(
@@ -632,6 +753,21 @@ export class ImportDataCommand extends DatabaseCommand<boolean> {
 
     public getDescription(): string {
         return "Import application data from JSON";
+    }
+
+    private toCanonicalSite(site: ImportSite): Site {
+        const trimmedName = site.name?.trim();
+        const safeName =
+            trimmedName && trimmedName.length > 0
+                ? trimmedName
+                : DEFAULT_SITE_NAME;
+
+        return {
+            identifier: site.identifier.trim(),
+            monitoring: site.monitoring ?? true,
+            monitors: Array.isArray(site.monitors) ? site.monitors : [],
+            name: safeName,
+        } satisfies Site;
     }
 }
 

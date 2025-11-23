@@ -215,6 +215,22 @@
     gap: 0.75rem;
 }
 
+.add-site-form__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.add-site-form__field-error {
+    color: color-mix(
+        in srgb,
+        var(--color-status-error-foreground) 96%,
+        transparent
+    );
+    font-size: 0.75rem;
+    line-height: 1.25;
+}
+
 .add-site-form__identifier-card {
     position: relative;
     padding: 0.75rem 1rem;

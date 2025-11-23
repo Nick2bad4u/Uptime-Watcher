@@ -19,6 +19,7 @@ topics:
   - "state-sync"
 status: "active"
 ---
+
 # Sites Store Mutation and Sync Guide
 
 This guide captures the **canonical approach** for mutating site data from the

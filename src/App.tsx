@@ -8,6 +8,7 @@
  */
 
 import type { StatusUpdate } from "@shared/types";
+import type { UpdateStatusEventData } from "@shared/types/events";
 import type { JSX } from "react/jsx-runtime";
 
 import { isDevelopment, isProduction } from "@shared/utils/environment";
@@ -47,6 +48,7 @@ import { useBackendFocusSync } from "./hooks/useBackendFocusSync";
 import { useGlobalMonitoringMetrics } from "./hooks/useGlobalMonitoringMetrics";
 import { useMount } from "./hooks/useMount";
 import { useSelectedSite } from "./hooks/useSelectedSite";
+import { EventsService } from "./services/EventsService";
 import { logger } from "./services/logger";
 import { NotificationPreferenceService } from "./services/NotificationPreferenceService";
 import { useAlertStore } from "./stores/alerts/useAlertStore";
@@ -349,116 +351,133 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             logger.app.started();
         }
 
-        // Get fresh references to avoid stale closures
-        const sitesStoreGetter =
-            typeof useSitesStore.getState === "function"
-                ? useSitesStore.getState
-                : undefined;
-        const settingsStoreGetter =
-            typeof useSettingsStore.getState === "function"
-                ? useSettingsStore.getState
-                : undefined;
-
-        const sitesStore = sitesStoreGetter?.();
-        const settingsStore = settingsStoreGetter?.();
-
-        // Initialize stores sequentially to avoid state conflicts during startup
-        const initializeSettings = settingsStore?.initializeSettings;
-        if (typeof initializeSettings === "function") {
-            logger.debug("[App:init] invoking settings initialize");
-            await initializeSettings.call(settingsStore);
-            logger.debug("[App:init] settings initialized");
-        } else {
-            warnMissingImplementation(
-                "Settings store missing initializeSettings implementation during app bootstrap"
-            );
-        }
-
         try {
+            // Get fresh references to avoid stale closures
+            const sitesStoreGetter =
+                typeof useSitesStore.getState === "function"
+                    ? useSitesStore.getState
+                    : undefined;
+            const settingsStoreGetter =
+                typeof useSettingsStore.getState === "function"
+                    ? useSettingsStore.getState
+                    : undefined;
+
+            const sitesStore = sitesStoreGetter?.();
+            const settingsStore = settingsStoreGetter?.();
+
+            // Initialize stores sequentially to avoid state conflicts during startup
+            const initializeSettings = settingsStore?.initializeSettings;
+            if (typeof initializeSettings === "function") {
+                logger.debug("[App:init] invoking settings initialize");
+                await initializeSettings.call(settingsStore);
+                logger.debug("[App:init] settings initialized");
+            } else {
+                warnMissingImplementation(
+                    "Settings store missing initializeSettings implementation during app bootstrap"
+                );
+            }
+
+            try {
+                logger.debug(
+                    "[App:init] initializing notification preference bridge"
+                );
+                await NotificationPreferenceService.initialize();
+            } catch (error) {
+                logger.warn(
+                    "Failed to initialize notification preference bridge",
+                    error instanceof Error ? error : new Error(String(error))
+                );
+            }
+
             logger.debug(
-                "[App:init] initializing notification preference bridge"
+                "[App:init] running initial notification preference synchronization"
             );
-            await NotificationPreferenceService.initialize();
+            await synchronizeNotificationPreferences();
+            logger.debug(
+                "[App:init] initial notification preference synchronization completed"
+            );
+
+            const initializeSites = sitesStore?.initializeSites;
+            if (typeof initializeSites === "function") {
+                logger.debug("[App:init] invoking sites initialize");
+                await initializeSites.call(sitesStore);
+                logger.debug("[App:init] sites initialized");
+            } else {
+                warnMissingImplementation(
+                    "Sites store missing initializeSites implementation during app bootstrap"
+                );
+            }
+
+            // Set up cache synchronization with backend and store cleanup
+            // function
+            logger.debug("[App:init] setting up cache synchronization");
+            // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
+            const cacheSyncCleanup = setupCacheSync();
+            logger.debug("[App:init] cache synchronization enabled");
+            cacheSyncCleanupRef.current = cacheSyncCleanup;
+
+            // Subscribe to state sync events
+            const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
+
+            if (typeof subscribeToSyncEvents === "function") {
+                logger.debug("[App:init] subscribing to sync events");
+                syncEventsCleanupRef.current = subscribeToSyncEvents();
+                logger.debug("[App:init] sync events subscription established");
+            } else {
+                warnMissingImplementation(
+                    "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
+                );
+            }
+
+            // Subscribe to status updates
+            const subscribeToStatusUpdates =
+                sitesStore?.subscribeToStatusUpdates;
+
+            if (typeof subscribeToStatusUpdates === "function") {
+                logger.debug("[App:init] subscribing to status updates");
+                const subscriptionResult = (await subscribeToStatusUpdates(
+                    (update: StatusUpdate) => {
+                        enqueueAlertFromStatusUpdate(update);
+                        logStatusUpdateDebugInfo(update);
+                    }
+                )) as StatusUpdateSubscriptionSummary | undefined;
+
+                reportSubscriptionDiagnostics(subscriptionResult);
+                logger.debug(
+                    "[App:init] status updates subscription completed"
+                );
+            } else {
+                warnMissingImplementation(
+                    "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
+                );
+            }
+
+            // Mark initialization as complete to enable loading overlay for future operations
+            logger.debug(
+                "[App:init] initialization pipeline finished, marking initialized"
+            );
+            setIsInitialized(true);
+            logger.info("[App:init] store update counts after initialization", {
+                alertUpdates: alertsUpdateCountRef.current,
+                errorUpdates: errorUpdateCountRef.current,
+                settingsUpdates: settingsUpdateCountRef.current,
+                siteUpdates: sitesUpdateCountRef.current,
+                uiUpdates: uiUpdateCountRef.current,
+                updatesStoreUpdates: updatesUpdateCountRef.current,
+            });
         } catch (error) {
-            logger.warn(
-                "Failed to initialize notification preference bridge",
-                error instanceof Error ? error : new Error(String(error))
+            const normalizedError = ensureError(error);
+            logger.error(
+                "[App:init] Unhandled error during initialization pipeline",
+                normalizedError
             );
+            useErrorStore
+                .getState()
+                .setError(
+                    normalizedError.message ||
+                        "Failed to initialize application. Please restart and try again."
+                );
         }
-
-        logger.debug(
-            "[App:init] running initial notification preference synchronization"
-        );
-        await synchronizeNotificationPreferences();
-        logger.debug(
-            "[App:init] initial notification preference synchronization completed"
-        );
-
-        const initializeSites = sitesStore?.initializeSites;
-        if (typeof initializeSites === "function") {
-            logger.debug("[App:init] invoking sites initialize");
-            await initializeSites.call(sitesStore);
-            logger.debug("[App:init] sites initialized");
-        } else {
-            warnMissingImplementation(
-                "Sites store missing initializeSites implementation during app bootstrap"
-            );
-        }
-
-        // Set up cache synchronization with backend and store cleanup
-        // function
-        logger.debug("[App:init] setting up cache synchronization");
-        // eslint-disable-next-line n/no-sync -- Function name contains 'sync' but is not a synchronous file operation
-        const cacheSyncCleanup = setupCacheSync();
-        logger.debug("[App:init] cache synchronization enabled");
-        cacheSyncCleanupRef.current = cacheSyncCleanup;
-
-        // Subscribe to state sync events
-        const subscribeToSyncEvents = sitesStore?.subscribeToSyncEvents;
-
-        if (typeof subscribeToSyncEvents === "function") {
-            logger.debug("[App:init] subscribing to sync events");
-            syncEventsCleanupRef.current = subscribeToSyncEvents();
-            logger.debug("[App:init] sync events subscription established");
-        } else {
-            warnMissingImplementation(
-                "Sites store missing subscribeToSyncEvents implementation during app bootstrap"
-            );
-        }
-
-        // Subscribe to status updates
-        const subscribeToStatusUpdates = sitesStore?.subscribeToStatusUpdates;
-
-        if (typeof subscribeToStatusUpdates === "function") {
-            logger.debug("[App:init] subscribing to status updates");
-            const subscriptionResult = (await subscribeToStatusUpdates(
-                (update: StatusUpdate) => {
-                    enqueueAlertFromStatusUpdate(update);
-                    logStatusUpdateDebugInfo(update);
-                }
-            )) as StatusUpdateSubscriptionSummary | undefined;
-
-            reportSubscriptionDiagnostics(subscriptionResult);
-            logger.debug("[App:init] status updates subscription completed");
-        } else {
-            warnMissingImplementation(
-                "Sites store missing subscribeToStatusUpdates implementation during app bootstrap"
-            );
-        }
-
-        // Mark initialization as complete to enable loading overlay for future operations
-        logger.debug(
-            "[App:init] initialization pipeline finished, marking initialized"
-        );
-        setIsInitialized(true);
-        logger.info("[App:init] store update counts after initialization", {
-            alertUpdates: alertsUpdateCountRef.current,
-            errorUpdates: errorUpdateCountRef.current,
-            settingsUpdates: settingsUpdateCountRef.current,
-            siteUpdates: sitesUpdateCountRef.current,
-            uiUpdates: uiUpdateCountRef.current,
-            updatesStoreUpdates: updatesUpdateCountRef.current,
-        });
     }, []);
 
     /**
@@ -546,6 +565,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         };
 
         const sitesUnsubscribe = useSitesStore.subscribe((state) => {
+            if (!isDevelopment()) {
+                return;
+            }
             sitesUpdateCountRef.current += 1;
             logger.info("[App:debug] sites store update", {
                 count: sitesUpdateCountRef.current,
@@ -555,6 +577,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         registerSubscription(sitesUnsubscribe, "sites");
 
         const uiUnsubscribe = useUIStore.subscribe((state) => {
+            if (!isDevelopment()) {
+                return;
+            }
             uiUpdateCountRef.current += 1;
             logger.info("[App:debug] ui store update", {
                 count: uiUpdateCountRef.current,
@@ -566,6 +591,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         registerSubscription(uiUnsubscribe, "ui");
 
         const errorUnsubscribe = useErrorStore.subscribe((state) => {
+            if (!isDevelopment()) {
+                return;
+            }
             errorUpdateCountRef.current += 1;
             logger.info("[App:debug] error store update", {
                 count: errorUpdateCountRef.current,
@@ -576,6 +604,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         registerSubscription(errorUnsubscribe, "error");
 
         const updatesUnsubscribe = useUpdatesStore.subscribe((state) => {
+            if (!isDevelopment()) {
+                return;
+            }
             updatesUpdateCountRef.current += 1;
             logger.info("[App:debug] updates store update", {
                 count: updatesUpdateCountRef.current,
@@ -586,6 +617,9 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
         registerSubscription(updatesUnsubscribe, "updates");
 
         const alertsUnsubscribe = useAlertStore.subscribe((state) => {
+            if (!isDevelopment()) {
+                return;
+            }
             alertsUpdateCountRef.current += 1;
             logger.info("[App:debug] alerts store update", {
                 alertCount: state.alerts.length,
@@ -630,6 +664,79 @@ export const App: NamedExoticComponent = memo(function App(): JSX.Element {
             void synchronizeNotificationPreferences();
         },
         [systemNotificationsEnabled, systemNotificationsSoundEnabled]
+    );
+
+    useEffect(
+        function subscribeToUpdateStatusEvents(): () => void {
+            const cleanupHandleRef: {
+                current: (() => void) | undefined;
+            } = {
+                current: undefined,
+            };
+            const cleanupRequestedRef: { current: boolean } = {
+                current: false,
+            };
+
+            const subscriptionPromise = (async (): Promise<
+                (() => void) | undefined
+            > => {
+                try {
+                    const cleanup = await EventsService.onUpdateStatus(
+                        ({ error, status }: UpdateStatusEventData) => {
+                            applyUpdateStatus(status);
+                            setUpdateError(error);
+                        }
+                    );
+
+                    if (cleanupRequestedRef.current) {
+                        cleanup();
+                        return cleanup;
+                    }
+
+                    cleanupHandleRef.current = cleanup;
+                    return cleanup;
+                } catch (error: unknown) {
+                    logger.error(
+                        "[App] Failed to subscribe to update status events",
+                        ensureError(error)
+                    );
+                    return undefined;
+                }
+            })();
+
+            return (): void => {
+                cleanupRequestedRef.current = true;
+
+                const cleanupHandle = cleanupHandleRef.current;
+                if (typeof cleanupHandle === "function") {
+                    try {
+                        cleanupHandle();
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[App] Failed to cleanup update status subscription",
+                            ensureError(error)
+                        );
+                    }
+
+                    return;
+                }
+
+                void (async (): Promise<void> => {
+                    try {
+                        const deferredCleanup = await subscriptionPromise;
+                        if (typeof deferredCleanup === "function") {
+                            deferredCleanup();
+                        }
+                    } catch (error: unknown) {
+                        logger.error(
+                            "[App] Failed to cleanup deferred update status subscription",
+                            ensureError(error)
+                        );
+                    }
+                })();
+            };
+        },
+        [applyUpdateStatus, setUpdateError]
     );
 
     // Focus-based state synchronization (disabled by default for performance)

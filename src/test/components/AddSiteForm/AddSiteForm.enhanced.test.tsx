@@ -1190,10 +1190,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
 
             renderAddSiteForm();
 
-            // Check if error message is displayed
-            const errorText = screen.queryByText("Site name is required");
-            if (errorText) {
-                expect(errorText).toBeInTheDocument();
+            // Check if at least one error message instance is displayed.
+            // Both the field-level error and ErrorAlert summary may contain
+            // the same text for improved accessibility.
+            const errorTexts = screen.queryAllByText("Site name is required");
+            if (errorTexts.length > 0) {
+                for (const node of errorTexts) expect(node).toBeInTheDocument();
             } else {
                 // Error might be displayed differently or as form error
                 const { getForm } = renderAddSiteForm();
@@ -1819,11 +1821,14 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             );
 
             renderAddSiteForm();
-            // Check if error message exists with proper accessibility
-            const errorMessage = screen.queryByText("Site name is required");
-            if (errorMessage) {
-                expect(errorMessage).toBeInTheDocument();
-                // Accessibility attribute might be applied differently
+            // Check if error message exists with proper accessibility. There
+            // may be multiple instances (field error + summary region).
+            const errorMessages = screen.queryAllByText(
+                "Site name is required"
+            );
+            if (errorMessages.length > 0) {
+                for (const node of errorMessages)
+                    expect(node).toBeInTheDocument();
             } else {
                 // Error might be displayed differently
                 const { getForm } = renderAddSiteForm();

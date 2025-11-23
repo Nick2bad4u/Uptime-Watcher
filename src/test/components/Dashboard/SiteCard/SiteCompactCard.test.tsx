@@ -10,8 +10,7 @@ import { SiteCompactCard } from "../../../../components/Dashboard/SiteCard/SiteC
 
 const mockUseSite = vi.hoisted(() => vi.fn());
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
-const actionButtonCalls: Array<{ disabled: boolean; isMonitoring: boolean }> =
-    [];
+const actionButtonCalls: { disabled: boolean; isMonitoring: boolean }[] = [];
 
 vi.mock("../../../../hooks/site/useSite", () => ({
     useSite: mockUseSite,
@@ -183,11 +182,12 @@ describe(SiteCompactCard, () => {
             uptime: undefined,
         });
 
-        const { container } = render(<SiteCompactCard site={baseSite} />);
+        render(<SiteCompactCard site={baseSite} />);
 
         const metricValues = Array.from(
-            container.querySelectorAll(".site-card__compact-metric-value")
-        ).map((node) => node.textContent?.trim());
+            document.querySelectorAll(".site-card__compact-metric-value"),
+            (node) => node.textContent?.trim() ?? ""
+        );
         expect(metricValues).toEqual([
             "—",
             "—",

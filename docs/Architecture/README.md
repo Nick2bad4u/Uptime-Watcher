@@ -14,6 +14,7 @@ tags:
   - "templates"
   - "standards"
 ---
+
 # Architecture Documentation Index
 
 ## Table of Contents
@@ -85,6 +86,7 @@ flowchart TD
     Patterns --> PatternGuide["Development Patterns Guide"]
     Patterns --> ComponentProps["Component Props Standards"]
     Patterns --> SiteLoading["Site Loading & Monitoring"]
+    Patterns --> InitImport["Initialization & Data Import"]
     Templates --> RepoTemplate["Repository Template"]
     Templates --> RepoTemplateClean["Repository Template (Clean)"]
     Templates --> StoreTemplate["Zustand Store Template"]
@@ -95,7 +97,7 @@ flowchart TD
 
     class Docs hub;
     class ADRs,Patterns,Templates,Standards,UsageGuides,Generated section;
-    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,PatternGuide,ComponentProps,SiteLoading,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,IPCInventory file;
+    class ADR1,ADR2,ADR3,ADR4,ADR5,ADR6,PatternGuide,ComponentProps,SiteLoading,InitImport,RepoTemplate,RepoTemplateClean,StoreTemplate,IPCTemplate,TsdocStandards,QuickStart,IPCInventory file;
 ```
 
 ## 🏗️ Architecture Decision Records (ADRs)
@@ -248,6 +250,17 @@ For full implementation details, see the code references listed in
 This flow keeps history-limit logic centralized in the database/manager layer
 while providing a clear, event-driven path from a user action in the UI to the
 final persisted configuration and back to the renderer.
+
+### [Initialization & Data Import Orchestration](./Patterns/INITIALIZATION_AND_DATA_IMPORT_ORCHESTRATION.md)
+
+Documents how `DatabaseManager`, `UptimeOrchestrator`, and the React `App`
+coordinate:
+
+- Startup phases across main and renderer processes
+- `database:transaction-completed` event semantics and `operation` values
+- JSON data import flows and related `internal:database:data-imported` events
+- End-to-end site lifecycle flows for adding sites, adding monitors, and
+  importing data
 
 ## 🛠️ Code Templates
 

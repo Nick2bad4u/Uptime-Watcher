@@ -13,6 +13,7 @@ tags:
   - "implementation"
   - "guide"
 ---
+
 # Uptime Monitoring System - New Monitor Type Implementation Guide
 
 ## Table of Contents

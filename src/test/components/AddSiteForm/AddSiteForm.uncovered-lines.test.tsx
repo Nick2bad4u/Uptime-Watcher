@@ -121,7 +121,9 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
         // Form state
         addMode: "new",
         setAddMode: mockSetAddMode,
-        name: "",
+        // Use a non-empty default name so submit handlers execute without
+        // being blocked by AddSiteForm's empty-name guard.
+        name: "Mock Site",
         setName: vi.fn(),
         url: "",
         setUrl: vi.fn(),

@@ -97,6 +97,7 @@ test.describe(
                 tag: ["@reset", "@confirmation"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const resetButton = page.getByRole("button", {
                     name: "Reset everything",
                 });

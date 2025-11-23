@@ -45,3 +45,9 @@ sonar-project.properties
 
 # Prettier fails on this for some reason
 useMonitorTypesStore.100percent.test.ts
+
+# covered by remark lint / remark
+.gitleaks.toml
+.taplo.toml
+cliff.toml
+lychee.toml

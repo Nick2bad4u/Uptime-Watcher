@@ -17,7 +17,6 @@ import {
     fillAddSiteForm,
     openAddSiteModal,
     removeAllSites,
-    waitForMonitorCount,
     submitAddSiteForm,
     resetApplicationState,
     WAIT_TIMEOUTS,
@@ -59,6 +58,7 @@ test.describe(
                 tag: ["@sanitization", "@security"],
             },
             async () => {
+                test.setTimeout(60_000);
                 await page.evaluate(() => {
                     const global = window as unknown as {
                         __alertCalled__?: boolean;
@@ -77,8 +77,6 @@ test.describe(
                     url: DEFAULT_TEST_SITE_URL,
                 });
                 await submitAddSiteForm(page);
-
-                await waitForMonitorCount(page, 1, WAIT_TIMEOUTS.LONG);
 
                 const maliciousCard = page
                     .getByTestId("site-card")

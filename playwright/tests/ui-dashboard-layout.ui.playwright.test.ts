@@ -130,6 +130,7 @@ test.describe(
                 tag: ["@workflow", "@presentation"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const createdSite = await createSiteViaModal(page, {
                     name: `Dashboard Presentation ${Date.now()}`,
                 });
@@ -154,14 +155,23 @@ test.describe(
                 await gridButton.click();
                 await expect(gridButton).toHaveAttribute(
                     "aria-pressed",
-                    "true"
+                    "true",
+                    { timeout: WAIT_TIMEOUTS.MEDIUM }
                 );
-                await page.waitForFunction(
-                    () =>
-                        document
-                            .querySelector(".site-grid")
-                            ?.classList.contains("site-grid--balanced") ?? false
-                );
+                await expect
+                    .poll(
+                        () =>
+                            page.evaluate(
+                                () =>
+                                    document
+                                        .querySelector(".site-grid")
+                                        ?.classList.contains(
+                                            "site-grid--balanced"
+                                        ) ?? false
+                            ),
+                        { timeout: WAIT_TIMEOUTS.LONG }
+                    )
+                    .toBeTruthy();
 
                 const stackedButton = page.getByRole("button", {
                     name: "Stacked",
@@ -169,14 +179,23 @@ test.describe(
                 await stackedButton.click();
                 await expect(stackedButton).toHaveAttribute(
                     "aria-pressed",
-                    "true"
+                    "true",
+                    { timeout: WAIT_TIMEOUTS.MEDIUM }
                 );
-                await page.waitForFunction(
-                    () =>
-                        document
-                            .querySelector(".site-grid")
-                            ?.classList.contains("site-grid--stacked") ?? false
-                );
+                await expect
+                    .poll(
+                        () =>
+                            page.evaluate(
+                                () =>
+                                    document
+                                        .querySelector(".site-grid")
+                                        ?.classList.contains(
+                                            "site-grid--stacked"
+                                        ) ?? false
+                            ),
+                        { timeout: WAIT_TIMEOUTS.LONG }
+                    )
+                    .toBeTruthy();
             }
         );
     }

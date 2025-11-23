@@ -238,6 +238,7 @@ export class DatabaseManager {
     }> {
         const command = new DownloadBackupCommand({
             cache: this.siteCache,
+            configurationManager: this.configurationManager,
             eventEmitter: this.eventEmitter,
             serviceFactory: this.serviceFactory,
         });
@@ -265,6 +266,7 @@ export class DatabaseManager {
     public async exportData(): Promise<string> {
         const command = new ExportDataCommand({
             cache: this.siteCache,
+            configurationManager: this.configurationManager,
             eventEmitter: this.eventEmitter,
             serviceFactory: this.serviceFactory,
         });
@@ -277,7 +279,17 @@ export class DatabaseManager {
      * @remarks
      * Uses the standard error handling pattern: {@link withErrorHandling} for
      * logging and debugging, and `.catch()` for method-specific recovery and
-     * event emission. Always emits a failure event if import fails.
+     * event emission.
+     *
+     * Event semantics:
+     *
+     * - On success, {@link ImportDataCommand} emits
+     *   `internal:database:data-imported` with `success: true` after cache and
+     *   persistence have been updated.
+     * - On failure (including command-level or validation errors), this method
+     *   emits `internal:database:data-imported` with `success: false` before
+     *   returning `false`. This keeps success/failure reporting centralized
+     *   while still allowing the command to own the happy-path emission.
      *
      * @param data - The JSON string containing import data.
      *
@@ -289,9 +301,12 @@ export class DatabaseManager {
                 async () => {
                     const command = new ImportDataCommand({
                         cache: this.siteCache,
+                        configurationManager: this.configurationManager,
                         data,
                         eventEmitter: this.eventEmitter,
                         serviceFactory: this.serviceFactory,
+                        updateHistoryLimit: (limit: number): Promise<void> =>
+                            this.setHistoryLimit(limit),
                     });
                     await this.commandExecutor.execute(command);
                     await this.emitSitesCacheUpdateRequested();

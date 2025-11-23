@@ -13,6 +13,7 @@ tags:
   - "electron"
   - "events"
 ---
+
 # 📡 API & IPC Documentation
 
 ## Table of Contents

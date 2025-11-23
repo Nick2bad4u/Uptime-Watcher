@@ -518,6 +518,21 @@ const validateFormFields = (
  *
  * @public
  */
+/**
+ * Normalizes user-provided site names by trimming leading whitespace.
+ *
+ * @param value - Raw input from the text field.
+ *
+ * @returns The input string without leading whitespace characters.
+ */
+const trimLeadingWhitespace = (value: string): string => value.trimStart();
+
+/**
+ * Creates the full state and action surface for the add-site form.
+ *
+ * @returns The complete {@link UseAddSiteFormReturn} object consumed by
+ *   {@link AddSiteForm}.
+ */
 export function useAddSiteForm(): UseAddSiteFormReturn {
     // Form field state
     const [url, setUrl] = useState("");
@@ -556,6 +571,13 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     const [siteIdentifier, setSiteIdentifier] = useState<string>(() =>
         generateUuid()
     ); // Lazy initialization
+
+    const setSanitizedName = useCallback(
+        (value: string): void => {
+            setName(trimLeadingWhitespace(value));
+        },
+        [setName]
+    );
 
     const monitorFieldValues = useMemo<MonitorFieldValues>(
         () => ({
@@ -691,13 +713,13 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
     useEffect(
         function resetFieldsOnAddModeChange() {
             resetFieldsForModeChange(addMode, {
-                setName,
+                setName: setSanitizedName,
                 setSiteIdentifier,
             });
         },
         [
             addMode,
-            setName,
+            setSanitizedName,
             setSiteIdentifier,
         ]
     );
@@ -747,7 +769,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setHeartbeatTimestampField("timestamp");
         setHeartbeatExpectedStatus("ok");
         setHeartbeatMaxDriftSeconds("60");
-        setName("");
+        setSanitizedName("");
         setMonitorType("http");
         setCheckInterval(DEFAULT_CHECK_INTERVAL);
         setSiteIdentifier(generateUuid());
@@ -777,12 +799,12 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setMaxReplicationLagSeconds,
         setMaxResponseTime,
         setMonitorType,
-        setName,
         setPort,
         setPrimaryStatusUrl,
         setRecordType,
         setReplicaStatusUrl,
         setReplicationTimestampField,
+        setSanitizedName,
         setSelectedExistingSite,
         setSiteIdentifier,
         setUrl,
@@ -842,7 +864,7 @@ export function useAddSiteForm(): UseAddSiteFormReturn {
         setMaxReplicationLagSeconds,
         setMaxResponseTime,
         setMonitorType,
-        setName,
+        setName: setSanitizedName,
         setPort,
         setPrimaryStatusUrl,
         setRecordType,

@@ -14,6 +14,7 @@ tags:
   - "typed-event-bus"
   - "ipc"
 ---
+
 # ADR-002: Event-Driven Architecture with TypedEventBus
 
 ## Table of Contents

@@ -14,6 +14,7 @@ tags:
   - "electron"
   - "communication"
 ---
+
 # ADR-005: IPC Communication Protocol
 
 ## Table of Contents

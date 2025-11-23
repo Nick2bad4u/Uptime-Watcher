@@ -22,6 +22,19 @@ import type { PlaywrightTestConfig } from "@playwright/test";
 
 import { defineConfig, devices } from "@playwright/test";
 
+function isPlaywrightAttachmentDiagnosticsEnabled(): boolean {
+    if (typeof process === "undefined") {
+        return false;
+    }
+
+    // Use bracket notation with a focused eslint suppression to keep
+    // configuration-time environment access explicit and contained.
+    // eslint-disable-next-line n/no-process-env -- Configuration utility needs controlled process.env access
+    const flagValue = process.env["PLAYWRIGHT_ENABLE_ATTACHMENTS"];
+
+    return flagValue === "true";
+}
+
 /**
  * Playwright configuration with TypeScript support and comprehensive settings.
  * Includes proper test isolation, recording options, and Electron-specific
@@ -236,17 +249,27 @@ const config: PlaywrightTestConfig = defineConfig({
 
         // Recording configuration - capture failures.
         //
-        // NOTE: The Playwright dispatcher can still occasionally report
-        // "Internal error: step id not found: fixture@…" when attachments
-        // target fixture steps that have already been discarded. In this
-        // project we accept that noise in exchange for full diagnostics.
-        screenshot: "only-on-failure",
+        // NOTE: Playwright 1.56.x can intermittently emit
+        // "Internal error: step id not found: fixture@…" when diagnostics
+        // attachments target fixture steps that have already been discarded
+        // (see https://github.com/microsoft/playwright/issues/37147 and
+        // https://github.com/microsoft/playwright/issues/37747). To keep the
+        // dashboard layout tests stable, we disable automatic attachments by
+        // default and allow opt-in for local debugging via the
+        // PLAYWRIGHT_ENABLE_ATTACHMENTS flag.
+        screenshot: isPlaywrightAttachmentDiagnosticsEnabled()
+            ? "only-on-failure"
+            : "off",
 
         // Custom test ID attribute for better selector reliability
         testIdAttribute: "data-testid",
         timezoneId: "America/Detroit",
-        trace: "on-first-retry",
-        video: "retain-on-failure",
+        trace: isPlaywrightAttachmentDiagnosticsEnabled()
+            ? "on-first-retry"
+            : "off",
+        video: isPlaywrightAttachmentDiagnosticsEnabled()
+            ? "retain-on-failure"
+            : "off",
         // Viewport configuration for consistent testing
         viewport: { height: 720, width: 1280 },
     },

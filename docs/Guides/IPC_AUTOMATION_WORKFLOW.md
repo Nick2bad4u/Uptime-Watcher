@@ -13,6 +13,7 @@ tags:
   - "codegen"
   - "ci"
 ---
+
 # IPC Automation Workflow
 
 > **Last updated**: 2025-10-26 \

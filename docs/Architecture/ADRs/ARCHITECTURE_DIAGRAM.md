@@ -12,6 +12,7 @@ tags:
   - "diagram"
   - "overview"
 ---
+
 # Uptime Watcher Architecture Diagram
 
 ## Complete Data Flow Visualization

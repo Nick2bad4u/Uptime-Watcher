@@ -26,6 +26,49 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
 
 vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
     useAddSiteForm: vi.fn(() => ({
+        // Current hook-based form API shape (minimal subset for these smoke
+        // tests). The enhanced AddSiteForm tests exercise the full surface;
+        // here we only need enough structure for the component to render.
+        addMode: "existing", // Ensures the primary button label is "Add Monitor"
+        name: "", // non-null string so AddSiteForm's name.trim() guard is safe
+        formError: undefined,
+        siteIdentifier: "test-id",
+
+        // No-op action stubs used by internal handlers
+        resetForm: vi.fn(),
+        setAddMode: vi.fn(),
+        setName: vi.fn(),
+        setCheckInterval: vi.fn(),
+        setBaselineUrl: vi.fn(),
+        setBodyKeyword: vi.fn(),
+        setCertificateWarningDays: vi.fn(),
+        setEdgeLocations: vi.fn(),
+        setExpectedHeaderValue: vi.fn(),
+        setExpectedJsonValue: vi.fn(),
+        setExpectedStatusCode: vi.fn(),
+        setExpectedValue: vi.fn(),
+        setFormError: vi.fn(),
+        setHeaderName: vi.fn(),
+        setHeartbeatExpectedStatus: vi.fn(),
+        setHeartbeatMaxDriftSeconds: vi.fn(),
+        setHeartbeatStatusField: vi.fn(),
+        setHeartbeatTimestampField: vi.fn(),
+        setHost: vi.fn(),
+        setJsonPath: vi.fn(),
+        setMaxPongDelayMs: vi.fn(),
+        setMaxReplicationLagSeconds: vi.fn(),
+        setMaxResponseTime: vi.fn(),
+        setMonitorType: vi.fn(),
+        setPort: vi.fn(),
+        setPrimaryStatusUrl: vi.fn(),
+        setRecordType: vi.fn(),
+        setReplicaStatusUrl: vi.fn(),
+        setReplicationTimestampField: vi.fn(),
+        setSelectedExistingSite: vi.fn(),
+        setSiteIdentifier: vi.fn(),
+        setUrl: vi.fn(),
+
+        // Legacy properties kept for backwards compatibility with older tests
         formData: {
             siteName: "",
             url: "",
@@ -42,7 +85,6 @@ vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
             },
         },
         updateFormData: vi.fn(),
-        resetForm: vi.fn(),
         isValid: true,
         validationErrors: {},
     })),

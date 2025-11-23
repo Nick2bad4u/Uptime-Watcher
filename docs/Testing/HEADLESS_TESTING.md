@@ -12,6 +12,7 @@ tags:
   - "playwright"
   - "uptime-watcher"
 ---
+
 # Headless Electron Testing
 
 This document explains how headless mode works for Electron testing in this project.

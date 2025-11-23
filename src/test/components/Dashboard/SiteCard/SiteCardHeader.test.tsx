@@ -8,11 +8,11 @@ import type { Site } from "@shared/types";
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 
 const monitorSelectorCalls: { selectedMonitorId: string }[] = [];
-const actionButtonCalls: Array<{
+const actionButtonCalls: {
     allMonitorsRunning: boolean;
     disabled: boolean;
     isMonitoring: boolean;
-}> = [];
+}[] = [];
 
 vi.mock("../../../../theme/components/ThemedText", () => ({
     ThemedText: ({ children }: { children: ReactNode }) => (

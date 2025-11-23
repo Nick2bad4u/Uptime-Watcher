@@ -12,6 +12,7 @@ tags:
   - "codegen"
   - "uptime-watcher"
 ---
+
 # 🎭 **Using the Codegen Template with Recorded Tests**
 
 ## **🚀 Quick Start (Recommended)**

@@ -276,6 +276,15 @@ const createAvailabilityColors = () => ({
         if (value >= 90) return "warning";
         return "danger";
     }),
+    getAvailabilityDescription: vi.fn((value: number) =>
+        value >= 99
+            ? "Excellent"
+            : value >= 95
+              ? "Great"
+              : value >= 90
+                ? "Fair"
+                : "Poor"
+    ),
 });
 
 let availabilityColorsMock: ReturnType<typeof createAvailabilityColors>;

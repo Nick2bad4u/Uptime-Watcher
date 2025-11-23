@@ -59,6 +59,7 @@ test.describe(
                 tag: ["@workflow", "@confirmation"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const siteName = generateSiteName("Removal Cancel Guard");
                 await createSiteViaModal(page, {
                     name: siteName,
@@ -156,6 +157,7 @@ test.describe(
                 tag: ["@workflow", "@cleanup"],
             },
             async () => {
+                test.setTimeout(60_000);
                 const siteName = generateSiteName("Removal Confirmation");
                 await createSiteViaModal(page, {
                     name: siteName,

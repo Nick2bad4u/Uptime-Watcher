@@ -11,6 +11,7 @@ import type { TypedEventBus } from "../../../events/TypedEventBus";
 import type { Site } from "@shared/types";
 import type { StandardizedCache } from "../../../utils/cache/StandardizedCache";
 import type { DatabaseServiceFactory } from "../../../services/factories/DatabaseServiceFactory";
+import type { ConfigurationManager } from "../../../managers/ConfigurationManager";
 import { logger as backendLogger } from "../../../utils/logger";
 
 import {
@@ -36,7 +37,9 @@ const createTestSite = createEnhancedTestSite;
 
 const createMockCache = () => {
     const cache = new Map<string, Site>();
-    const mockCache = {
+    const mockCache: Partial<StandardizedCache<Site>> & {
+        replaceAll: ReturnType<typeof vi.fn>;
+    } = {
         clear: vi.fn(() => cache.clear()),
         delete: vi.fn((key: string) => cache.delete(key)),
         entries: vi.fn(() => cache.entries()),
@@ -45,10 +48,17 @@ const createMockCache = () => {
         has: vi.fn((key: string) => cache.has(key)),
         set: vi.fn((key: string, value: Site) => {
             cache.set(key, value);
-            return cache as unknown as StandardizedCache<Site>;
+            return mockCache as unknown as StandardizedCache<Site>;
         }),
         size: 0 as unknown as number,
+        replaceAll: vi.fn((items: { data: Site; key: string }[]) => {
+            mockCache.clear?.();
+            for (const item of items) {
+                mockCache.set?.(item.key, item.data);
+            }
+        }),
     };
+
     return mockCache as unknown as StandardizedCache<Site>;
 };
 
@@ -118,12 +128,23 @@ describe("DatabaseCommands", () => {
     let mockServiceFactory: ReturnType<typeof createMockServiceFactory>;
     let mockEventBus: ReturnType<typeof createMockEventBus>;
     let mockCache: ReturnType<typeof createMockCache>;
+    let mockConfigurationManager: {
+        validateSiteConfiguration: ReturnType<typeof vi.fn>;
+    };
+    let mockUpdateHistoryLimit: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
         vi.clearAllMocks();
         mockServiceFactory = createMockServiceFactory();
         mockEventBus = createMockEventBus();
         mockCache = createMockCache();
+        mockConfigurationManager = {
+            validateSiteConfiguration: vi.fn().mockResolvedValue({
+                errors: [],
+                success: true,
+            }),
+        };
+        mockUpdateHistoryLimit = vi.fn().mockResolvedValue(undefined);
     });
 
     describe("DatabaseCommand (abstract base class)", () => {
@@ -741,12 +762,19 @@ describe("DatabaseCommands", () => {
                 mockSiteRepositoryService
             );
 
-            command = new ImportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>,
-                '{"sites": [], "settings": {}}'
-            );
+            command = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: '{"sites": [], "settings": {}}',
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+                updateHistoryLimit: mockUpdateHistoryLimit as unknown as (
+                    limit: number
+                ) => Promise<void>,
+            });
         });
 
         it("should execute data import successfully", async ({
@@ -774,8 +802,7 @@ describe("DatabaseCommands", () => {
             expect(
                 mockSiteRepositoryService.getSitesFromDatabase
             ).toHaveBeenCalled();
-            expect(mockCache.clear).toHaveBeenCalledTimes(1); // Clear once before reloading
-            expect(mockCache.set).toHaveBeenCalledTimes(2); // For reloaded sites
+            expect(mockCache.replaceAll).toHaveBeenCalledTimes(1);
             expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
                 1,
                 "internal:site:added",
@@ -802,15 +829,97 @@ describe("DatabaseCommands", () => {
                     operation: "data-imported",
                 })
             );
-            expect(mockEventBus.emitTyped).toHaveBeenNthCalledWith(
-                4,
-                "cache:invalidated",
-                expect.objectContaining({
-                    reason: "update",
-                    timestamp: expect.any(Number),
-                    type: "site",
-                })
+            // ImportDataCommand no longer emits `sites:state-synchronized`
+            // directly; that responsibility belongs to SiteManager /
+            // UptimeOrchestrator so that all bulk sync events are
+            // coordinated through a single high-level entry point.
+            expect(mockEventBus.emitTyped).toHaveBeenCalledTimes(3);
+        });
+
+        it("should propagate imported history limit when provided", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Settings", "type");
+
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                sites: [createTestSite("test1")],
+                settings: { historyLimit: "2048" },
+            });
+
+            await command.execute();
+
+            expect(mockUpdateHistoryLimit).toHaveBeenCalledWith(2048);
+        });
+
+        it("should skip history limit propagation when value invalid", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Settings", "type");
+
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                sites: [createTestSite("test1")],
+                settings: { historyLimit: "not-a-number" },
+            });
+
+            await command.execute();
+
+            expect(mockUpdateHistoryLimit).not.toHaveBeenCalled();
+        });
+
+        it("should fail when site validation fails", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            mockConfigurationManager.validateSiteConfiguration.mockResolvedValue(
+                {
+                    errors: ["Invalid monitor"],
+                    success: false,
+                }
             );
+
+            await expect(command.execute()).rejects.toThrow(
+                /invalid site configuration/i
+            );
+            expect(
+                mockImportExportService.persistImportedData
+            ).not.toHaveBeenCalled();
+        });
+
+        it("should fail when duplicate site identifiers detected", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: DatabaseCommands", "component");
+            await annotate("Category: Service", "category");
+            await annotate("Type: Validation", "type");
+
+            const duplicateSites = [
+                createTestSite("dup"),
+                createTestSite("dup"),
+            ];
+            mockImportExportService.importDataFromJson.mockResolvedValue({
+                settings: {},
+                sites: duplicateSites,
+            });
+
+            await expect(command.execute()).rejects.toThrow(/duplicate/i);
+            expect(
+                mockImportExportService.persistImportedData
+            ).not.toHaveBeenCalled();
         });
 
         it("should handle import service errors", async ({
@@ -872,12 +981,16 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const invalidCommand = new ImportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>,
-                ""
-            );
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: "",
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+            });
 
             const result = await invalidCommand.validate();
 
@@ -899,12 +1012,16 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const invalidCommand = new ImportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>,
-                "   \n\t   "
-            );
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: "   \n\t   ",
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+            });
 
             const result = await invalidCommand.validate();
 
@@ -926,12 +1043,16 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Validation", "type");
 
-            const invalidCommand = new ImportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>,
-                '{"invalid": json}'
-            );
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: '{"invalid": json}',
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+            });
 
             const result = await invalidCommand.validate();
 
@@ -947,12 +1068,16 @@ describe("DatabaseCommands", () => {
             await annotate("Category: Service", "category");
             await annotate("Type: Error Handling", "type");
 
-            const invalidCommand = new ImportDataCommand(
-                mockServiceFactory as unknown as DatabaseServiceFactory,
-                mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                mockCache as StandardizedCache<Site>,
-                ""
-            );
+            const invalidCommand = new ImportDataCommand({
+                cache: mockCache as StandardizedCache<Site>,
+                configurationManager:
+                    mockConfigurationManager as unknown as ConfigurationManager,
+                data: "",
+                eventEmitter:
+                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                serviceFactory:
+                    mockServiceFactory as unknown as DatabaseServiceFactory,
+            });
 
             const result = await invalidCommand.validate();
 
@@ -1170,12 +1295,16 @@ describe("DatabaseCommands", () => {
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,
                     mockCache as StandardizedCache<Site>
                 ),
-                new ImportDataCommand(
-                    mockServiceFactory as unknown as DatabaseServiceFactory,
-                    mockEventBus as unknown as TypedEventBus<UptimeEvents>,
-                    mockCache as StandardizedCache<Site>,
-                    '{"test": "data"}'
-                ),
+                new ImportDataCommand({
+                    cache: mockCache as StandardizedCache<Site>,
+                    configurationManager:
+                        mockConfigurationManager as unknown as ConfigurationManager,
+                    data: '{"sites": [], "settings": {}}',
+                    eventEmitter:
+                        mockEventBus as unknown as TypedEventBus<UptimeEvents>,
+                    serviceFactory:
+                        mockServiceFactory as unknown as DatabaseServiceFactory,
+                }),
                 new LoadSitesCommand(
                     mockServiceFactory as unknown as DatabaseServiceFactory,
                     mockEventBus as unknown as TypedEventBus<UptimeEvents>,

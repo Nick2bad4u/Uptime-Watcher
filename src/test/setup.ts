@@ -19,6 +19,8 @@ import EventEmitter from "node:events";
 
 import "./mock-setup";
 
+Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
+
 type GenericEmitWarning = (...emitArgs: unknown[]) => unknown;
 
 const SUPPRESSED_WARNING_SIGNATURES = [
@@ -581,6 +583,29 @@ const mockElectronAPI: {
         openExternal: vi.fn().mockResolvedValue(true),
         quitAndInstall: vi.fn().mockResolvedValue(true),
     },
+};
+
+// Suppress noisy CSS parse errors emitted by JSDOM for modern CSS features
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+const cssParseWarningPrefix = "Could not parse CSS stylesheet";
+const suppressCssParseWarning = (...args: unknown[]): boolean =>
+    typeof args[0] === "string" && args[0].startsWith(cssParseWarningPrefix);
+
+console.error = (...args: unknown[]): void => {
+    if (suppressCssParseWarning(...args)) {
+        return;
+    }
+
+    originalConsoleError(...args);
+};
+
+console.warn = (...args: unknown[]): void => {
+    if (suppressCssParseWarning(...args)) {
+        return;
+    }
+
+    originalConsoleWarn(...args);
 };
 
 // Mock window.electronAPI globally

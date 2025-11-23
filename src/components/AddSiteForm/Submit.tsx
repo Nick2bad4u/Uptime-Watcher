@@ -117,6 +117,10 @@ interface MonitorValidationFields {
     url: string;
 }
 
+// NOTE: The builders below intentionally mirror the field-mapping logic in
+// `buildMonitorFormData`. When adding new monitor types or fields, update both
+// the validation builders and the form-data builder so that client-side
+// validation and monitor creation stay in sync.
 const monitorValidationBuilders: Record<
     MonitorType,
     (fields: MonitorValidationFields) => UnknownRecord
@@ -334,11 +338,19 @@ function createMonitor(properties: FormSubmitProperties): Monitor {
 /**
  * Validates the add mode selection and site information.
  *
- * @param addMode - Mode of adding ("existing" or "new")
- * @param name - Site name for new sites
- * @param selectedExistingSite - Selected existing site identifier
+ * @remarks
+ * The {@link AddSiteForm} component performs an immediate UI-level check for a
+ * missing site name when `addMode === "new"` and will block submission before
+ * calling this function. This helper remains as a defensive guard for other
+ * potential callers of {@link handleSubmit} (including tests) and to ensure
+ * consistent error messaging when the submission utility is reused outside the
+ * primary form.
  *
- * @returns Array of validation error messages
+ * @param addMode - Mode of adding ("existing" or "new").
+ * @param name - Site name for new sites.
+ * @param selectedExistingSite - Selected existing site identifier.
+ *
+ * @returns Array of validation error messages.
  */
 function validateAddMode(
     addMode: "existing" | "new",
@@ -433,12 +445,13 @@ async function performSubmission(
  * @returns Promise resolving to array of validation error messages
  */
 async function validateCheckInterval(
+    monitorType: MonitorType,
     checkInterval: number
 ): Promise<readonly string[]> {
     return withUtilityErrorHandling(
         async () => {
             const validationResult = await validateMonitorFieldClientSide(
-                "http",
+                monitorType,
                 "checkInterval",
                 checkInterval
             );
@@ -582,9 +595,28 @@ export async function handleSubmit(
         selectedExistingSite: Boolean(selectedExistingSite),
     });
 
-    // Collect all validation errors
+    const synchronousValidationErrors = validateAddMode(
+        addMode,
+        name,
+        selectedExistingSite
+    );
+
+    if (synchronousValidationErrors.length > 0) {
+        logger.debug("Form validation failed (synchronous phase)", {
+            errors: synchronousValidationErrors,
+            formData: {
+                addMode,
+                name: truncateForLogging(name),
+                selectedExistingSite,
+            },
+        });
+
+        setFormError(synchronousValidationErrors[0]);
+        return;
+    }
+
+    // Collect asynchronous validation errors
     const validationErrors: string[] = [
-        ...validateAddMode(addMode, name, selectedExistingSite),
         ...(await validateMonitorType(monitorType, {
             baselineUrl,
             bodyKeyword,
@@ -611,8 +643,14 @@ export async function handleSubmit(
             replicationTimestampField,
             url,
         })),
-        ...(await validateCheckInterval(checkInterval)),
+        ...(await validateCheckInterval(monitorType, checkInterval)),
     ];
+    logger.debug("AddSiteForm validation results", {
+        addMode,
+        name,
+        selectedExistingSite,
+        validationErrors,
+    });
 
     // Handle validation failures
     if (validationErrors.length > 0) {

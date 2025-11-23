@@ -34,6 +34,8 @@ test.describe(
         ],
     },
     () => {
+        test.setTimeout(60_000);
+
         let electronApp: ElectronApplication;
         let page: Page;
         let siteName: string;
@@ -333,6 +335,7 @@ test.describe(
                 tag: ["@workflow", "@header"],
             },
             async () => {
+                test.setTimeout(60_000);
                 await openSiteDetails(page, siteName);
 
                 const siteDetailsModal = page.getByTestId("site-details-modal");

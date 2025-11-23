@@ -13,6 +13,7 @@ tags:
   - "cache"
   - "configuration"
 ---
+
 # ADR-006: Standardized Cache Configuration
 
 ## Table of Contents

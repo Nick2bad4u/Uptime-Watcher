@@ -13,6 +13,7 @@ tags:
   - "profiling"
   - "optimization"
 ---
+
 # Vite Performance Profiling and Optimization Guide
 
 ## Table of Contents

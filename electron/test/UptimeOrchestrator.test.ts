@@ -1739,16 +1739,13 @@ describe(UptimeOrchestrator, () => {
                 "monitoring:started",
                 expect.anything()
             );
-            expect(emitTypedSpy).toHaveBeenCalledWith(
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
                 "cache:invalidated",
-                expect.objectContaining({
-                    identifier: "test-site",
-                    type: "site",
-                })
+                expect.anything()
             );
         });
 
-        it("should emit global cache invalidation for bulk monitor start", async ({
+        it("should avoid cache invalidation for bulk monitor start", async ({
             task,
             annotate,
         }) => {
@@ -1774,12 +1771,9 @@ describe(UptimeOrchestrator, () => {
                     siteCount: expect.any(Number),
                 })
             );
-            expect(emitTypedSpy).toHaveBeenCalledWith(
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
                 "cache:invalidated",
-                expect.objectContaining({
-                    reason: "update",
-                    type: "all",
-                })
+                expect.anything()
             );
         });
 
@@ -2062,16 +2056,13 @@ describe(UptimeOrchestrator, () => {
                 "monitoring:stopped",
                 expect.anything()
             );
-            expect(emitTypedSpy).toHaveBeenCalledWith(
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
                 "cache:invalidated",
-                expect.objectContaining({
-                    identifier: "test-site",
-                    type: "site",
-                })
+                expect.anything()
             );
         });
 
-        it("should emit global cache invalidation for bulk monitor stop", async ({
+        it("should avoid cache invalidation for bulk monitor stop", async ({
             task,
             annotate,
         }) => {
@@ -2091,12 +2082,9 @@ describe(UptimeOrchestrator, () => {
 
             await new Promise((resolve) => setTimeout(resolve, 10));
 
-            expect(emitTypedSpy).toHaveBeenCalledWith(
+            expect(emitTypedSpy).not.toHaveBeenCalledWith(
                 "cache:invalidated",
-                expect.objectContaining({
-                    reason: "update",
-                    type: "all",
-                })
+                expect.anything()
             );
         });
 
