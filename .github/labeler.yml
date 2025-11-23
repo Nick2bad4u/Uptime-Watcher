@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=https://www.schemastore.org/pull-request-labeler.json
+"$schema": "https://www.schemastore.org/pull-request-labeler.json"
+
+"CI/CD":
+    - changed-files:
+          - any-glob-to-any-file: ".github/workflows/**"
+          - any-glob-to-any-file: ".github/actions/**"
+          - any-glob-to-any-file: "*.yml"
+          - any-glob-to-any-file: "*.yaml"
+
+backend:
+    - changed-files:
+          - any-glob-to-any-file: "electron/**/*"
+          - any-glob-to-any-file: "server/**/*"
+          - any-glob-to-any-file: "api/**/*"
+
+"breaking change":
+    - body:
+          - pattern: "(?i)breaking change"
+          - pattern: "(?i)breaking"
+          - pattern: "(?i)major version"
+    - title:
+          - pattern: "(?i)breaking"
+          - pattern: "(?i)major"
+
+bug:
+    - body:
+          - pattern: "(?i)\b(fix|fixes|bug|error|issue)\b"
+    - title:
+          - pattern: "(?i)\b(fix|bug|hotfix|patch)\b"
+
+build:
+    - changed-files:
+          - any-glob-to-any-file: "build/**/*"
+          - any-glob-to-any-file: "dist/**/*"
+          - any-glob-to-any-file: "webpack*"
+          - any-glob-to-any-file: "rollup*"
+          - any-glob-to-any-file: "esbuild*"
+          - any-glob-to-any-file: "vite*"
+    - title:
+          - pattern: "(?i)build"
+          - pattern: "(?i)bundle"
+          - pattern: "(?i)compile"
+
+configuration:
+    - changed-files:
+          - any-glob-to-any-file: "*.config.{js,ts,json}"
+          - any-glob-to-any-file: "*.json"
+          - any-glob-to-any-file: "*.yml"
+          - any-glob-to-any-file: "*.yaml"
+          - any-glob-to-any-file: ".eslint*"
+          - any-glob-to-any-file: ".prettier*"
+          - any-glob-to-any-file: "tsconfig*.json"
+          - any-glob-to-any-file: "vite.config.*"
+          - any-glob-to-any-file: "vitest.config.*"
+
+dependencies:
+    - changed-files:
+          - any-glob-to-any-file: "package.json"
+          - any-glob-to-any-file: "package-lock.json"
+          - any-glob-to-any-file: "yarn.lock"
+          - any-glob-to-any-file: "pnpm-lock.yaml"
+          - any-glob-to-any-file: "**/package.json"
+
+documentation:
+    - body:
+          - pattern: "(?i)documentation"
+          - pattern: "(?i)readme"
+          - pattern: "(?i)docs"
+    - changed-files:
+          - any-glob-to-any-file: "**/*.md"
+          - any-glob-to-any-file: "docs/**/*"
+          - any-glob-to-any-file: "README*"
+    - title:
+          - pattern: "(?i)docs"
+          - pattern: "(?i)documentation"
+          - pattern: "(?i)readme"
+
+enhancement:
+    - body:
+          - pattern: "(?i)feature"
+          - pattern: "(?i)enhancement"
+          - pattern: "(?i)improve"
+          - pattern: "(?i)add"
+    - title:
+          - pattern: "(?i)feat"
+          - pattern: "(?i)feature"
+          - pattern: "(?i)enhancement"
+          - pattern: "(?i)improve"
+
+frontend:
+    - changed-files:
+          - any-glob-to-any-file: "src/**/*.{tsx,jsx,ts,js}"
+          - any-glob-to-any-file: "src/components/**/*"
+          - any-glob-to-any-file: "src/pages/**/*"
+
+"good first issue":
+    - body:
+          - pattern: "(?i)good first issue"
+          - pattern: "(?i)beginner friendly"
+          - pattern: "(?i)easy"
+    - title:
+          - pattern: "(?i)good first issue"
+          - pattern: "(?i)beginner"
+          - pattern: "(?i)starter"
+
+"help wanted":
+    - body:
+          - pattern: "(?i)help wanted"
+          - pattern: "(?i)looking for help"
+          - pattern: "(?i)assistance needed"
+    - title:
+          - pattern: "(?i)help wanted"
+          - pattern: "(?i)help"
+
+performance:
+    - body:
+          - pattern: "(?i)performance"
+          - pattern: "(?i)optimize"
+          - pattern: "(?i)faster"
+          - pattern: "(?i)speed"
+          - pattern: "(?i)memory"
+    - title:
+          - pattern: "(?i)perf"
+          - pattern: "(?i)performance"
+          - pattern: "(?i)optimize"
+          - pattern: "(?i)speed"
+
+refactor:
+    - body:
+          - pattern: "(?i)refactor"
+          - pattern: "(?i)cleanup"
+          - pattern: "(?i)code quality"
+          - pattern: "(?i)restructure"
+    - title:
+          - pattern: "(?i)refactor"
+          - pattern: "(?i)refactoring"
+          - pattern: "(?i)cleanup"
+          - pattern: "(?i)clean"
+
+security:
+    - body:
+          - pattern: "(?i)security"
+          - pattern: "(?i)vulnerability"
+          - pattern: "(?i)exploit"
+          - pattern: "(?i)cve"
+    - title:
+          - pattern: "(?i)security"
+          - pattern: "(?i)vuln"
+          - pattern: "(?i)cve"
+
+style:
+    - body:
+          - pattern: "(?i)formatting"
+          - pattern: "(?i)style"
+          - pattern: "(?i)linting"
+          - pattern: "(?i)prettier"
+          - pattern: "(?i)eslint"
+    - title:
+          - pattern: "(?i)style"
+          - pattern: "(?i)formatting"
+          - pattern: "(?i)lint"
+
+testing:
+    - changed-files:
+          - any-glob-to-any-file: "**/*.test.{js,ts,tsx}"
+          - any-glob-to-any-file: "**/*.spec.{js,ts,tsx}"
+          - any-glob-to-any-file: "tests/**/*"
+          - any-glob-to-any-file: "test/**/*"
+          - any-glob-to-any-file: "__tests__/**/*"
+    - title:
+          - pattern: "(?i)test"
+          - pattern: "(?i)tests"
+          - pattern: "(?i)testing"

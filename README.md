@@ -392,3 +392,45 @@ We welcome contributions from the community! Here's how you can help:
 <div align="center"><strong>Made with ❤️ by <a href="https://github.com/Nick2bad4u">Nick2bad4u</a></strong>
 
 <em>Last updated: November 2025 • Version 18.0.0</em></div>
+
+<!-- remark-ignore-start -->
+
+<!--lint disable-->
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+
+<!-- prettier-ignore-start -->
+
+<!-- markdownlint-disable -->
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://nick2bad4u.github.io/Uptime-Watcher/"><img src="https://avatars.githubusercontent.com/u/20943337?v=4?s=100" width="100px;" alt="Nick2bad4u"/><br /><sub><b>Nick2bad4u</b></sub></a><br /><a href="#a11y-Nick2bad4u" title="Accessibility">️️️️♿️</a> <a href="#audio-Nick2bad4u" title="Audio">🔊</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/issues?q=author%3ANick2bad4u" title="Bug reports">🐛</a> <a href="#business-Nick2bad4u" title="Business development">💼</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/commits?author=Nick2bad4u" title="Code">💻</a> <a href="#content-Nick2bad4u" title="Content">🖋</a> <a href="#design-Nick2bad4u" title="Design">🎨</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/commits?author=Nick2bad4u" title="Documentation">📖</a> <a href="#financial-Nick2bad4u" title="Financial">💵</a> <a href="#ideas-Nick2bad4u" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-Nick2bad4u" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-Nick2bad4u" title="Maintenance">🚧</a> <a href="#plugin-Nick2bad4u" title="Plugin/utility libraries">🔌</a> <a href="#projectManagement-Nick2bad4u" title="Project Management">📆</a> <a href="#research-Nick2bad4u" title="Research">🔬</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/pulls?q=is%3Apr+reviewed-by%3ANick2bad4u" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/commits?author=Nick2bad4u" title="Tests">⚠️</a> <a href="#tool-Nick2bad4u" title="Tools">🔧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/apps/github-actions"><img src="https://avatars.githubusercontent.com/in/15368?v=4?s=100" width="100px;" alt="github-actions[bot]"/><br /><sub><b>github-actions[bot]</b></sub></a><br /><a href="#infra-github-actions[bot]" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#security-github-actions[bot]" title="Security">🛡️</a> <a href="#tool-github-actions[bot]" title="Tools">🔧</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/commits?author=github-actions[bot]" title="Tests">⚠️</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/pulls?q=is%3Apr+reviewed-by%3Agithub-actions[bot]" title="Reviewed Pull Requests">👀</a> <a href="#maintenance-github-actions[bot]" title="Maintenance">🚧</a> <a href="#maintenance-github-actions[bot]" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?v=4?s=100" width="100px;" alt="dependabot[bot]"/><br /><sub><b>dependabot[bot]</b></sub></a><br /><a href="#infra-dependabot[bot]" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#security-dependabot[bot]" title="Security">🛡️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.stepsecurity.io/"><img src="https://avatars.githubusercontent.com/u/89328645?v=4?s=100" width="100px;" alt="StepSecurity Bot"/><br /><sub><b>StepSecurity Bot</b></sub></a><br /><a href="#security-step-security-bot" title="Security">🛡️</a> <a href="#infra-step-security-bot" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-step-security-bot" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://snyk.io/"><img src="https://avatars.githubusercontent.com/u/19733683?v=4?s=100" width="100px;" alt="Snyk bot"/><br /><sub><b>Snyk bot</b></sub></a><br /><a href="#security-snyk-bot" title="Security">🛡️</a> <a href="#infra-snyk-bot" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-snyk-bot" title="Maintenance">🚧</a> <a href="https://github.com/Nick2bad4u/Uptime-Watcher/pulls?q=is%3Apr+reviewed-by%3Asnyk-bot" title="Reviewed Pull Requests">👀</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+<!--lint enable-->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

@@ -15,6 +15,8 @@
  */
 // @ts-check
 
+import { ignoreStart, ignoreEnd } from "remark-ignore";
+
 import requireSnippets from "./config/linting/remark/require-snippets.mjs";
 import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-watcher-docs.mjs";
 
@@ -31,64 +33,119 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
  */
 
 // Imported plugin types - these plugins don't typically export specific option types
-/** @typedef {import("remark-inline-links")} RemarkInlineLinks */
-/** @typedef {import("remark-lint-heading-increment")} RemarkLintHeadingIncrement */
 /** @typedef {import("@double-great/remark-lint-alt-text")} RemarkLintAltText */
 /** @typedef {import("rehype-katex")} RehypeKatex */
-/** @typedef {import("remark-lint-no-blockquote-without-marker")} RemarkLintNoBlockquoteWithoutMarker */
-/** @typedef {import("remark-lint-definition-case")} RemarkLintDefinitionCase */
-/** @typedef {import("remark-lint-final-definition")} RemarkLintFinalDefinition */
-/** @typedef {import("remark-lint-no-unused-definitions")} RemarkLintNoUnusedDefinitions */
-/** @typedef {import("remark-lint-ordered-list-marker-style")} RemarkLintOrderedListMarkerStyle */
-/** @typedef {import("remark-lint-list-item-indent")} RemarkLintListItemIndent */
-/** @typedef {import("remark-lint-no-duplicate-headings")} RemarkLintNoDuplicateHeadings */
-/** @typedef {import("remark-lint-no-emphasis-as-heading")} RemarkLintNoEmphasisAsHeading */
-/** @typedef {import("remark-lint-no-heading-content-indent")} RemarkLintNoHeadingContentIndent */
-/** @typedef {import("remark-lint-no-file-name-articles")} RemarkLintNoFileNameArticles */
-/** @typedef {import("remark-lint-no-file-name-consecutive-dashes")} RemarkLintNoFileNameConsecutiveDashes */
-/** @typedef {import("remark-lint-no-file-name-outer-dashes")} RemarkLintNoFileNameOuterDashes */
-
-// Additional missing plugin types for completeness
+/** @typedef {import("remark-directive")} RemarkDirective */
 /** @typedef {import("remark-frontmatter")} RemarkFrontmatter */
 /** @typedef {import("remark-gfm")} RemarkGfm */
-/** @typedef {import("remark-preset-lint-recommended")} RemarkPresetLintRecommended */
+/** @typedef {import("remark-ignore")} RemarkIgnore */
+/** @typedef {import("remark-inline-links")} RemarkInlineLinks */
+/** @typedef {import("remark-lint-blockquote-indentation")} RemarkLintBlockquoteIndentation */
+/** @typedef {import("remark-lint-checkbox-character-style")} RemarkLintCheckboxCharacterStyle */
+/** @typedef {import("remark-lint-checkbox-content-indent")} RemarkLintCheckboxContentIndent */
+/** @typedef {import("remark-lint-code-block-split-list")} RemarkLintCodeBlockSplitList */
+/** @typedef {import("remark-lint-code-block-style")} RemarkLintCodeBlockStyle */
+/** @typedef {import("remark-lint-correct-media-syntax")} RemarkLintCorrectMediaSyntax */
+/** @typedef {import("remark-lint-definition-case")} RemarkLintDefinitionCase */
+/** @typedef {import("remark-lint-definition-sort")} RemarkLintDefinitionSort */
+/** @typedef {import("remark-lint-definition-spacing")} RemarkLintDefinitionSpacing */
+/** @typedef {import("remark-lint-directive-attribute-sort")} RemarkLintDirectiveAttributeSort */
+/** @typedef {import("remark-lint-directive-collapsed-attribute")} RemarkLintDirectiveCollapsedAttribute */
+/** @typedef {import("remark-lint-directive-quote-style")} RemarkLintDirectiveQuoteStyle */
+/** @typedef {import("remark-lint-directive-shortcut-attribute")} RemarkLintDirectiveShortcutAttribute */
+/** @typedef {import("remark-lint-directive-unique-attribute-name")} RemarkLintDirectiveUniqueAttributeName */
+/** @typedef {import("remark-lint-emphasis-marker")} RemarkLintEmphasisMarker */
+/** @typedef {import("remark-lint-fenced-code-flag")} RemarkLintFencedCodeFlag */
+/** @typedef {import("remark-lint-fenced-code-flag-case")} RemarkLintFencedCodeFlagCase */
+/** @typedef {import("remark-lint-fenced-code-marker")} RemarkLintFencedCodeMarker */
+/** @typedef {import("remark-lint-file-extension")} RemarkLintFileExtension */
+/** @typedef {import("remark-lint-final-definition")} RemarkLintFinalDefinition */
+/** @typedef {import("remark-lint-final-newline")} RemarkLintFinalNewline */
+/** @typedef {import("remark-lint-first-heading-level")} RemarkLintFirstHeadingLevel */
+/** @typedef {import("remark-lint-frontmatter-schema")} RemarkLintFrontmatterSchema */
+/** @typedef {import("remark-lint-hard-break-spaces")} RemarkLintHardBreakSpaces */
+/** @typedef {import("remark-lint-heading-increment")} RemarkLintHeadingIncrement */
+/** @typedef {import("remark-lint-heading-style")} RemarkLintHeadingStyle */
+/** @typedef {import("remark-lint-heading-whitespace")} RemarkLintHeadingWhitespace */
+/** @typedef {import("remark-lint-linebreak-style")} RemarkLintLinebreakStyle */
+/** @typedef {import("remark-lint-link-title-style")} RemarkLintLinkTitleStyle */
+/** @typedef {import("remark-lint-list-item-bullet-indent")} RemarkLintListItemBulletIndent */
+/** @typedef {import("remark-lint-list-item-content-indent")} RemarkLintListItemContentIndent */
+/** @typedef {import("remark-lint-list-item-indent")} RemarkLintListItemIndent */
+/** @typedef {import("remark-lint-media-style")} RemarkLintMediaStyle */
+/** @typedef {import("remark-lint-no-blockquote-without-marker")} RemarkLintNoBlockquoteWithoutMarker */
+/** @typedef {import("remark-lint-no-consecutive-blank-lines")} RemarkLintNoConsecutiveBlankLines */
+/** @typedef {import("remark-lint-no-dead-urls")} RemarkLintNoDeadUrls */
+/** @typedef {import("remark-lint-no-duplicate-definitions")} RemarkLintNoDuplicateDefinitions */
+/** @typedef {import("remark-lint-no-duplicate-headings")} RemarkLintNoDuplicateHeadings */
+/** @typedef {import("remark-lint-no-duplicate-headings-in-section")} RemarkLintNoDuplicateHeadingsInSection */
+/** @typedef {import("remark-lint-no-emphasis-as-heading")} RemarkLintNoEmphasisAsHeading */
+/** @typedef {import("remark-lint-no-empty-sections")} RemarkLintNoEmptySections */
+/** @typedef {import("remark-lint-no-file-name-articles")} RemarkLintNoFileNameArticles */
+/** @typedef {import("remark-lint-no-file-name-consecutive-dashes")} RemarkLintNoFileNameConsecutiveDashes */
+/** @typedef {import("remark-lint-no-file-name-irregular-characters")} RemarkLintNoFileNameIrregularCharacters */
+/** @typedef {import("remark-lint-no-file-name-outer-dashes")} RemarkLintNoFileNameOuterDashes */
+/** @typedef {import("remark-lint-no-heading-content-indent")} RemarkLintNoHeadingContentIndent */
+/** @typedef {import("remark-lint-no-heading-indent")} RemarkLintNoHeadingIndent */
+/** @typedef {import("remark-lint-no-heading-like-paragraph")} RemarkLintNoHeadingLikeParagraph */
+/** @typedef {import("remark-lint-no-hidden-table-cell")} RemarkLintNoHiddenTableCell */
+/** @typedef {import("remark-lint-no-html")} RemarkLintNoHtml */
+/** @typedef {import("remark-lint-no-missing-blank-lines")} RemarkLintNoMissingBlankLines */
+/** @typedef {import("remark-lint-no-multiple-toplevel-headings")} RemarkLintNoMultipleToplevelHeadings */
+/** @typedef {import("remark-lint-no-paragraph-content-indent")} RemarkLintNoParagraphContentIndent */
+/** @typedef {import("remark-lint-no-reference-like-url")} RemarkLintNoReferenceLikeUrl */
+/** @typedef {import("remark-lint-no-shell-dollars")} RemarkLintNoShellDollars */
+/** @typedef {import("remark-lint-no-shortcut-reference-image")} RemarkLintNoShortcutReferenceImage */
+/** @typedef {import("remark-lint-no-shortcut-reference-link")} RemarkLintNoShortcutReferenceLink */
+/** @typedef {import("remark-lint-no-table-indentation")} RemarkLintNoTableIndentation */
+/** @typedef {import("remark-lint-no-tabs")} RemarkLintNoTabs */
+/** @typedef {import("remark-lint-no-unneeded-full-reference-image")} RemarkLintNoUnneededFullReferenceImage */
+/** @typedef {import("remark-lint-no-unneeded-full-reference-link")} RemarkLintNoUnneededFullReferenceLink */
+/** @typedef {import("remark-lint-no-unused-definitions")} RemarkLintNoUnusedDefinitions */
+/** @typedef {import("remark-lint-ordered-list-marker-style")} RemarkLintOrderedListMarkerStyle */
+/** @typedef {import("remark-lint-ordered-list-marker-value")} RemarkLintOrderedListMarkerValue */
+/** @typedef {import("remark-lint-rule-style")} RemarkLintRuleStyle */
+/** @typedef {import("remark-lint-strong-marker")} RemarkLintStrongMarker */
+/** @typedef {import("remark-lint-table-pipe-alignment")} RemarkLintTablePipeAlignment */
+/** @typedef {import("remark-lint-table-pipes")} RemarkLintTablePipes */
+/** @typedef {import("remark-lint-unordered-list-marker-style")} RemarkLintUnorderedListMarkerStyle */
+/** @typedef {import("remark-lint-write-good")} RemarkLintWriteGood */
+/** @typedef {import("remark-math")} RemarkMath */
 /** @typedef {import("remark-preset-lint-consistent")} RemarkPresetLintConsistent */
 /** @typedef {import("remark-preset-lint-markdown-style-guide")} RemarkPresetLintMarkdownStyleGuide */
-/** @typedef {import("remark-lint-correct-media-syntax")} RemarkLintCorrectMediaSyntax */
-/** @typedef {import("remark-lint-heading-whitespace")} RemarkLintHeadingWhitespace */
-/** @typedef {import("remark-validate-links")} RemarkValidateLinks */
-/** @typedef {import("remark-math")} RemarkMath */
-/** @typedef {import("remark-wiki-link")} RemarkWikiLink */
-/** @typedef {import("remark-directive")} RemarkDirective */
+/** @typedef {import("remark-preset-lint-recommended")} RemarkPresetLintRecommended */
 /** @typedef {import("remark-preset-prettier")} RemarkPresetPrettier */
+/** @typedef {import("remark-validate-links")} RemarkValidateLinks */
+/** @typedef {import("remark-wiki-link")} RemarkWikiLink */
+// Additional missing plugin types for completeness
 
 /**
  * Remark settings for markdown processing
  *
  * @typedef {Object} RemarkSettings
  *
- * @property {boolean} [yaml] - Handle frontmatter in markdown files
+ * @property {"*" | "+" | "-"} [bullet] - Preferred unordered list marker
  * @property {boolean} [commonmark] - Enable commonmark compliance
  * @property {boolean} [gfm] - Enable GitHub Flavored Markdown features
- * @property {"*" | "+" | "-"} [bullet] - Preferred unordered list marker
+ * @property {boolean} [yaml] - Handle frontmatter in markdown files
  * @property {"tab" | "one" | "mixed"} [listItemIndent] - List item indentation
  *   style
  * @property {"*" | "_"} [emphasis] - Character to use for emphasis
  * @property {"*" | "_"} [strong] - Character to use for strong emphasis
- * @property {boolean} [fences] - Use fenced code blocks
- * @property {"`" | "~"} [fence] - Character to use for fences
  * @property {"***" | "---"} [thematicBreak] - Marker to use for thematic breaks
+ * @property {"`" | "~"} [fence] - Character to use for fences
  * @property {"ordered"} [style] - List style preference
- * @property {boolean} [referenceLinks] - Use reference-style links
- * @property {boolean} [incrementListMarker] - Increment ordered list markers
  * @property {'"' | "'"} [quote] - Preferred quote style for titles
- * @property {string} [rule] - Marker to use for rules
- * @property {number} [ruleRepetition] - Number of rule markers
+ * @property {boolean} [closeAtx] - Require closing hashes for ATX headings
+ * @property {boolean} [fences] - Use fenced code blocks
+ * @property {boolean} [incrementListMarker] - Increment ordered list markers
+ * @property {boolean} [referenceLinks] - Use reference-style links
+ * @property {boolean} [resourceLink] - Enable resource-style links
  * @property {boolean} [ruleSpaces] - Whether to include spaces in rules
  * @property {boolean} [setext] - Use Setext-style headings
- * @property {boolean} [closeAtx] - Require closing hashes for ATX headings
- * @property {boolean} [resourceLink] - Enable resource-style links
  * @property {boolean} [tightDefinitions] - Use tight definitions
+ * @property {number} [ruleRepetition] - Number of rule markers
+ * @property {string} [rule] - Marker to use for rules
  */
 
 /**
@@ -143,6 +200,7 @@ import validateUptimeWatcherDocs from "./config/linting/remark/validate-uptime-w
 const remarkConfig = {
     // Core plugins for GitHub Flavored Markdown and formatting integration
     plugins: [
+        "remark-ignore/start", // Enable ignore regions in markdown files
         // Frontmatter support - must come early in plugin chain
         "remark-frontmatter",
 
@@ -421,6 +479,8 @@ const remarkConfig = {
         ["remark-lint-mdx-jsx-shorthand-attribute", true], // Prefer JSX shorthand for booleans
         "remark-lint-mdx-jsx-unique-attribute-name", // Avoid duplicate attribute names in MDX elements
         ["remark-lint-no-undefined-references", false], // Allow undefined references in MDX
+
+        "remark-ignore/end", // Enable ignore regions in markdown files
 
         // Prettier integration for consistent formatting
         "remark-preset-prettier",

@@ -69,6 +69,9 @@ rules:
         level: warning
         max-spaces-inside: 20
         min-spaces-inside: 0
+        min-spaces-inside-empty: -1
+        max-spaces-inside-empty: -1
+        forbid: false
 
     # Colons configuration
     colons:
@@ -88,11 +91,11 @@ rules:
         require-starting-space: true
         ignore-shebangs: true
         min-spaces-from-content: 1
-    comments-indentation: enable
+    comments-indentation: disable
 
     # Document start/end configuration
-    document-start: disable
-    document-end: disable
+    document-start: false
+    document-end: false
 
     # Empty lines configuration
     empty-lines:
@@ -120,8 +123,9 @@ rules:
         check-multi-line-strings: false
 
     # Key rules for structure
-    key-duplicates: enable
-    key-ordering: disable
+    key-duplicates:
+        forbid-duplicated-merge-keys: true
+    key-ordering: false
 
     # Line length for readability (relaxed for modern screens)
     line-length:
@@ -133,11 +137,27 @@ rules:
     # File ending requirements
     new-line-at-end-of-file: enable
 
+    float-values:
+        forbid-inf: false
+        forbid-nan: false
+        forbid-scientific-notation: false
+        require-numeral-before-decimal: false
+
+    octal-values: enable
+
+    quoted-strings:
+        allow-quoted-quotes: false
+        check-keys: false
+        quote-type: double
+        required: false
+
     # New lines configuration (allow platform defaults)
-    new-lines: disable
+    new-lines:
+        type: platform
 
     # Disable truthy for flexibility with CI/CD configs
-    truthy: disable
+    truthy:
+        check-keys: false
 
     # Enable trailing spaces check
     trailing-spaces: enable

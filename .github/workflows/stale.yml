@@ -29,9 +29,15 @@ on:
     schedule:
         - cron: "38 7 * * *"
     pull_request_target:
-        types: [opened, reopened, synchronize]
+        types:
+            - opened
+            - reopened
+            - synchronize
     issues:
-        types: [opened, reopened, edited]
+        types:
+            - opened
+            - reopened
+            - edited
     workflow_dispatch:
 
 permissions:

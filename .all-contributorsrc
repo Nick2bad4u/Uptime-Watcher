@@ -1,0 +1,94 @@
+{
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg?style=flat-square)](#contributors-)",
+  "commit": false,
+  "commitConvention": "angular",
+  "commitType": "docs",
+  "contributors": [
+    {
+      "avatar_url": "https://avatars.githubusercontent.com/u/20943337?v=4",
+      "contributions": [
+        "a11y",
+        "audio",
+        "bug",
+        "business",
+        "code",
+        "content",
+        "design",
+        "doc",
+        "financial",
+        "ideas",
+        "infra",
+        "maintenance",
+        "plugin",
+        "projectManagement",
+        "research",
+        "review",
+        "test",
+        "tool"
+      ],
+      "login": "Nick2bad4u",
+      "name": "Nick2bad4u",
+      "profile": "https://nick2bad4u.github.io/Uptime-Watcher/"
+    },
+    {
+      "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+      "contributions": [
+        "infra",
+        "security",
+        "tool",
+        "test",
+        "review",
+        "maintenance",
+        "maintenance"
+      ],
+      "login": "github-actions[bot]",
+      "name": "github-actions[bot]",
+      "profile": "https://github.com/apps/github-actions"
+    },
+    {
+      "avatar_url": "https://avatars.githubusercontent.com/in/29110?v=4",
+      "contributions": [
+        "infra",
+        "security"
+      ],
+      "login": "dependabot[bot]",
+      "name": "dependabot[bot]",
+      "profile": "https://github.com/apps/dependabot"
+    },
+    {
+      "login": "step-security-bot",
+      "name": "StepSecurity Bot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/89328645?v=4",
+      "profile": "https://www.stepsecurity.io/",
+      "contributions": [
+        "security",
+        "infra",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "snyk-bot",
+      "name": "Snyk bot",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19733683?v=4",
+      "profile": "https://snyk.io/",
+      "contributions": [
+        "security",
+        "infra",
+        "maintenance",
+        "review"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": false,
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "linkToUsage": false,
+  "projectName": "Uptime-Watcher",
+  "projectOwner": "Nick2bad4u",
+  "repoHost": "https://github.com",
+  "repoType": "github",
+  "skipCi": true
+}

@@ -1,0 +1,49 @@
+"$schema": "https://json.schemastore.org/stale.json"
+"closeComment": "This issue has been automatically closed due to inactivity. If you believe this issue is still relevant, please reopen it with updated information."
+"daysUntilClose": 7
+"daysUntilStale": 60
+"exemptAssignees": true
+"exemptLabels":
+    - "pinned"
+    - "security"
+    - "enhancement"
+    - "good first issue"
+    - "help wanted"
+    - "bug"
+    - "feature"
+
+"exemptMilestones": true
+"exemptProjects": true
+"limitPerRun": 30
+"markComment": "This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs. Thank you for your contributions."
+"operations":
+    "issues":
+        "closeComment": "This issue has been automatically closed due to inactivity. If you believe this issue is still relevant, please reopen it with updated information."
+
+        "daysUntilClose": 7
+        "daysUntilStale": 60
+        "exemptLabels":
+            - "pinned"
+            - "security"
+            - "enhancement"
+            - "good first issue"
+            - "help wanted"
+            - "bug"
+            - "feature"
+            - "documentation"
+
+        "markComment": "This issue has been automatically marked as stale because it has not had recent activity."
+    "pullRequests":
+        "closeComment": "This pull request has been automatically closed due to inactivity. If you would like to continue working on this, please reopen it."
+
+        "daysUntilClose": 14
+        "daysUntilStale": 30
+        "exemptLabels":
+            - "work in progress"
+            - "wip"
+            - "do not merge"
+            - "security"
+            - "breaking change"
+
+        "markComment": "This pull request has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs."
+"staleLabel": "stale"

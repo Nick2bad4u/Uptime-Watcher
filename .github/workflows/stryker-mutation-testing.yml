@@ -196,8 +196,8 @@ jobs:
                     npx stryker run --concurrency "$CONCURRENCY" --maxConcurrentTestRunners 1 --timeoutMS 600000 --logLevel warn --fileLogLevel error
                     Write-Host "✅ Stryker completed successfully"
                   } catch {
-                    Write-Host "❌ Stryker failed with error: $($_.Exception.Message)"
-                    Write-Host "🔧 Check logs for details; consider reducing concurrency or increasing timeout"
+                      Write-Host "❌ Stryker failed with error: $($_.Exception.Message)"
+                      Write-Host "🔧 Check logs for details; consider reducing concurrency or increasing timeout"
                     throw
                   }
               continue-on-error: true
