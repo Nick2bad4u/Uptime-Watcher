@@ -2,11 +2,11 @@
 
 <div align="center">
 
-[![Docusaurus](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus\&logoColor=white)](https://docusaurus.io/)
-[![Node.js](https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js\&logoColor=white)](https://nodejs.org/)
-[![Deployment](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github\&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
+[![Docusaurus badge.](https://img.shields.io/badge/Docusaurus-3.0+-green?logo=docusaurus\&logoColor=white)](https://docusaurus.io/)
+[![Node.js badge.](https://img.shields.io/badge/Node.js-24.8+-339933?logo=node.js\&logoColor=white)](https://nodejs.org/)
+[![Deployment badge.](https://img.shields.io/badge/Deployment-GitHub_Pages-blue?logo=github\&logoColor=white)](https://nick2bad4u.github.io/Uptime-Watcher/)
 
-**📖 Official documentation website for Uptime Watcher**
+## 📖 Official documentation website for Uptime Watcher
 
 _Built with Docusaurus - Modern static website generator for technical documentation_
 
@@ -16,7 +16,7 @@ _Built with Docusaurus - Modern static website generator for technical documenta
 
 This is the **backup documentation repository** for the Uptime Watcher project. The documentation is automatically generated from the main repository and deployed to GitHub Pages at:
 
-**🌐 <https://nick2bad4u.github.io/Uptime-Watcher/>**
+**🌐 Live site:** [nick2bad4u.github.io/Uptime-Watcher](https://nick2bad4u.github.io/Uptime-Watcher/)
 
 ### 📂 Repository Structure
 
@@ -278,13 +278,13 @@ Need help with the documentation site?
 
 ## 📄 License
 
-This documentation site is part of the Uptime Watcher project and is released under the [Unlicense](../../LICENSE) - Public Domain.
+This documentation site is part of the Uptime Watcher project and is released under the [Unlicense](../../README.md#-license) - Public Domain.
 
 ---
 
 <div align="center">
 
-**📚 Documentation powered by [Docusaurus](https://docusaurus.io/)**
+### 📚 Documentation powered by [Docusaurus](https://docusaurus.io/)
 
 _Last updated: November 2025_
 

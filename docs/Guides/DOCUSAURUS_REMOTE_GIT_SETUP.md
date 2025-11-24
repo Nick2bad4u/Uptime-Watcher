@@ -26,7 +26,7 @@ topics:
 
 ## Manual Setup Steps:
 
-### 1. Add the git remote for the docusaurus repository:
+### 1. Add the Git remote for the docusaurus repository:
 
 ```bash
 git remote add origin-docs https://github.com/Nick2bad4u/Uptime-Watcher-Docusaurus.git

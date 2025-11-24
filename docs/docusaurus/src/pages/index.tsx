@@ -196,31 +196,6 @@ const UIDemo = (): JSX.Element => {
 
 const HomepageHeader = (): JSX.Element => (
         <header className={styles["heroSection"]}>
-            <div className={styles["heroBackground"]} aria-hidden="true">
-                <span className={styles["heroGradientOrb"]} />
-                <span className={styles["auroraRibbon"]} />
-                <span className={styles["auroraVeil"]} />
-                <span className={styles["heroGridGlow"]} />
-                <span
-                    className={clsx(
-                        styles["starfieldLayer"],
-                        styles["starfieldLayerSlow"]
-                    )}
-                />
-                <span
-                    className={clsx(
-                        styles["starfieldLayer"],
-                        styles["starfieldLayerFast"]
-                    )}
-                />
-                <span
-                    className={clsx(
-                        styles["starfieldLayer"],
-                        styles["starfieldLayerPulse"]
-                    )}
-                />
-                <span className={styles["shootingStar"]} />
-            </div>
             <div className="container">
                 <div className={styles["heroContent"]}>
                     <div className={styles["heroText"]}>
@@ -272,8 +247,8 @@ const HomepageHeader = (): JSX.Element => (
     ),
     /**
      * Renders a section displaying real monitoring stories from users in the
-     * field. This component showcases testimonials about the effectiveness of
-     * Uptime Watcher.
+     * field. field. field. This component showcases testimonials about the
+     * effectiveness of Uptime Watcher.
      */
     RealTimeStatus = (): JSX.Element => (
         <section className={styles["statusSection"]}>
@@ -346,17 +321,13 @@ const HomepageHeader = (): JSX.Element => (
                 </div>
             </div>
         </section>
-    );
-
-/**
- * Renders a section highlighting the technology stack and philosophy behind
- * Uptime Watcher. This component showcases the open-source nature, data
- * privacy, and performance focus of the app.
- *
- * @returns A section element highlighting the technical philosophy.
- */
-function TechStack(): JSX.Element {
-    return (
+    ),
+    /**
+     * Renders a section highlighting the technology stack and philosophy behind
+     * Uptime Watcher. This component showcases the open-source nature, data
+     * privacy, and performance focus of the app.
+     */
+    TechStack = (): JSX.Element => (
         <section className={styles["techSection"]}>
             <div className="container">
                 <div className={styles["techContent"]}>
@@ -445,8 +416,6 @@ function TechStack(): JSX.Element {
             </div>
         </section>
     );
-}
-
 /**
  * Renders the main homepage layout for the Uptime Watcher documentation site.
  * This function composes the hero section, features, real-time status stories,

@@ -57,9 +57,9 @@ jobs:
                     exit 1
                   }
                   if (Test-Path "package-lock.json") {
-                    npm ci
+                    npm ci --force
                   } elseif (Test-Path "package.json") {
-                    npm install
+                    npm install --force
                   } else {
                     Write-Error "Neither package-lock.json nor package.json found. Cannot install dependencies."
                     exit 1

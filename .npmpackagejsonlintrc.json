@@ -145,7 +145,7 @@
         "require-name": "error",
         "require-optionalDependencies": "off",
         "require-os": "error",
-        "require-peerDependencies": "error",
+        "require-peerDependencies": "off",
         "require-preferGlobal": "error",
         "require-private": "error",
         "require-publishConfig": "error",

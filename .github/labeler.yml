@@ -1,5 +1,4 @@
 # yaml-language-server: $schema=https://www.schemastore.org/pull-request-labeler.json
-"$schema": "https://www.schemastore.org/pull-request-labeler.json"
 
 "CI/CD":
     - changed-files:

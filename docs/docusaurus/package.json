@@ -70,6 +70,7 @@
         "@docusaurus/theme-search-algolia": "^3.9.2",
         "@docusaurus/types": "^3.9.2",
         "@easyops-cn/docusaurus-search-local": "^0.52.1",
+        "@eslint/config-inspector": "^1.4.2",
         "@grnet/docusaurus-glossary-view": "^2.0.0-rc.2",
         "@grnet/docusaurus-term-preview": "^2.0.0-rc.2",
         "@grnet/docusaurus-terminology": "^2.0.0-rc.2",
@@ -81,7 +82,6 @@
         "prism-react-renderer": "^2.4.1",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
-        "@eslint/config-inspector": "^1.4.2",
         "react-github-btn": "^1.4.0"
     },
     "devDependencies": {
@@ -96,12 +96,12 @@
         "typescript": "^5.9.3"
     },
     "bundledDependencies": [],
+    "bundleDependencies": [],
     "engines": {
         "node": ">=18.0"
     },
     "os": [],
     "cpu": [],
     "preferGlobal": false,
-    "publishConfig": {},
-    "bundleDependencies": []
+    "publishConfig": {}
 }

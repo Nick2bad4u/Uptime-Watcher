@@ -79,6 +79,10 @@ jobs:
                   if ! git remote | grep -q "origin-docs"; then
                       git remote add origin-docs https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
                   fi
+
+                  # Fetch the remote to get latest state
+                  git fetch origin-docs main || true
+
                   git remote -v
 
             - name: Install dependencies - Main App
@@ -175,8 +179,9 @@ jobs:
                   # Go back to root
                   cd ../..
 
-                  # Run the backup command with built files
-                  npm run docs:backup
+                  # Use force push with subtree to override remote changes
+                  echo "🔄 Force pushing documentation to backup repository..."
+                  git push origin-docs `git subtree split --prefix=docs/docusaurus`:main --force
 
                   echo "✅ Documentation backup with built files completed successfully"
 
