@@ -4,7 +4,10 @@
  */
 
 import { describe, it, expect, vi } from "vitest";
+import fc from "fast-check";
 import type { UnknownRecord } from "type-fest";
+import { MIN_MONITOR_CHECK_INTERVAL_MS } from "@shared/constants/monitoring";
+import { STATUS_HISTORY_VALUES, STATUS_KIND } from "@shared/types";
 import {
     validateMonitorData,
     validateMonitorField,
@@ -26,9 +29,117 @@ import {
     type PortMonitor,
     type PingMonitor,
     type SslMonitor,
-    type Monitor,
     type Site,
 } from "../../validation/schemas";
+
+const MAX_MONITOR_CHECK_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
+const MIN_TIMEOUT_MS = 1e3;
+const MAX_TIMEOUT_MS = 3e5;
+
+const monitorStatusArbitrary = fc.constantFrom(
+    STATUS_KIND.DEGRADED,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.PAUSED,
+    STATUS_KIND.PENDING,
+    STATUS_KIND.UP
+);
+
+const historyStatusArbitrary = fc.constantFrom(...STATUS_HISTORY_VALUES);
+
+const statusHistoryEntryArbitrary = fc.record({
+    details: fc.option(fc.string({ maxLength: 64 }), { nil: undefined }),
+    responseTime: fc.integer({ min: -1, max: MAX_TIMEOUT_MS }),
+    status: historyStatusArbitrary,
+    timestamp: fc.integer({ min: 0, max: Number.MAX_SAFE_INTEGER }),
+});
+
+const historyArbitrary = fc.array(statusHistoryEntryArbitrary, {
+    maxLength: 5,
+});
+
+const monitorTypeArbitrary = fc.constantFrom(
+    "http",
+    "http-header",
+    "http-keyword",
+    "http-json",
+    "http-latency",
+    "http-status",
+    "port",
+    "ping",
+    "dns",
+    "ssl",
+    "cdn-edge-consistency",
+    "replication",
+    "server-heartbeat",
+    "websocket-keepalive"
+);
+
+const hostArbitrary = fc.oneof(fc.domain(), fc.constant("localhost"));
+
+const siteIdentifierAlphabet = [
+    ..."abcdefghijklmnopqrstuvwxyz",
+    ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    ..."0123456789",
+    "-",
+    "_",
+] as const;
+
+const siteIdentifierArbitrary = fc
+    .array(fc.constantFrom(...siteIdentifierAlphabet), {
+        minLength: 1,
+        maxLength: 24,
+    })
+    .map((chars) => chars.join(""))
+    .filter((identifier) => /[a-zA-Z0-9]/u.test(identifier));
+
+const nonEmptyNameArbitrary = fc
+    .string({ minLength: 1, maxLength: 48 })
+    .filter((value) => value.trim().length > 0);
+
+const baseMonitorArbitrary = fc.record({
+    id: fc.uuid(),
+    checkInterval: fc.integer({
+        min: MIN_MONITOR_CHECK_INTERVAL_MS,
+        max: MAX_MONITOR_CHECK_INTERVAL_MS,
+    }),
+    timeout: fc.integer({ min: MIN_TIMEOUT_MS, max: MAX_TIMEOUT_MS }),
+    retryAttempts: fc.integer({ min: 0, max: 10 }),
+    monitoring: fc.boolean(),
+    status: monitorStatusArbitrary,
+    responseTime: fc.oneof(
+        fc.constant(-1),
+        fc.integer({ min: 0, max: MAX_TIMEOUT_MS })
+    ),
+    history: historyArbitrary,
+    type: monitorTypeArbitrary,
+});
+
+const httpUrlArbitrary = fc
+    .webUrl()
+    .filter((url) => url.startsWith("http://") || url.startsWith("https://"));
+
+const pingMonitorArbitrary: fc.Arbitrary<PingMonitor> = fc
+    .tuple(baseMonitorArbitrary, hostArbitrary)
+    .map(([monitor, host]) => ({
+        ...monitor,
+        type: "ping" as const,
+        host,
+    })) as fc.Arbitrary<PingMonitor>;
+
+const httpMonitorArbitrary: fc.Arbitrary<HttpMonitor> = fc
+    .tuple(baseMonitorArbitrary, httpUrlArbitrary)
+    .map(([monitor, url]) => ({
+        ...monitor,
+        type: "http" as const,
+        url,
+    })) as fc.Arbitrary<HttpMonitor>;
+
+const siteArbitrary = fc.record({
+    identifier: siteIdentifierArbitrary,
+    name: nonEmptyNameArbitrary,
+    monitoring: fc.boolean(),
+    monitors: fc.array(httpMonitorArbitrary, { minLength: 1, maxLength: 4 }),
+}) as fc.Arbitrary<Site>;
 
 // eslint-disable-next-line max-lines-per-function -- Comprehensive tests for validation schemas
 describe("Validation Schemas - Comprehensive Coverage", () => {
@@ -42,19 +153,13 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Validation", "type");
 
-            const baseMonitor = {
-                id: "test-monitor",
-                type: "http",
-                checkInterval: 30_000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "pending",
-                responseTime: -1,
-                history: [],
-            };
-
-            expect(() => baseMonitorSchema.parse(baseMonitor)).not.toThrow();
+            await fc.assert(
+                fc.property(baseMonitorArbitrary, (baseMonitor) => {
+                    expect(() =>
+                        baseMonitorSchema.parse(baseMonitor)
+                    ).not.toThrow();
+                })
+            );
         });
 
         it("should require valid check interval range", async ({
@@ -1398,21 +1503,19 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Monitoring", "type");
 
-            const pingMonitor: PingMonitor = {
-                id: "test",
-                type: "ping",
-                host: "example.com",
-                checkInterval: 30_000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "pending",
-                responseTime: -1,
-                history: [],
-            };
-
-            expect(pingMonitor.type).toBe("ping");
-            expect(pingMonitor.host).toBe("example.com");
+            await fc.assert(
+                fc.property(
+                    pingMonitorArbitrary,
+                    (pingMonitor: PingMonitor) => {
+                        const parsed = pingMonitorSchema.parse(pingMonitor);
+                        expect(parsed.type).toBe("ping");
+                        expect(parsed.host).toBe(pingMonitor.host);
+                        expect(parsed.retryAttempts).toBe(
+                            pingMonitor.retryAttempts
+                        );
+                    }
+                )
+            );
         });
 
         it("should properly type generic monitors", async ({
@@ -1424,20 +1527,14 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Monitoring", "type");
 
-            const monitor: Monitor = {
-                id: "test",
-                type: "http",
-                url: "https://example.com",
-                checkInterval: 30_000,
-                timeout: 5000,
-                retryAttempts: 3,
-                monitoring: true,
-                status: "pending",
-                responseTime: -1,
-                history: [],
-            };
-
-            expect(monitor.type).toBe("http");
+            await fc.assert(
+                fc.property(httpMonitorArbitrary, (monitor: HttpMonitor) => {
+                    const parsed = monitorSchema.parse(monitor) as HttpMonitor;
+                    expect(parsed.type).toBe("http");
+                    expect(parsed.url).toBe(monitor.url);
+                    expect(parsed.id).toBe(monitor.id);
+                })
+            );
         });
 
         it("should properly type sites", async ({ task, annotate }) => {
@@ -1446,28 +1543,18 @@ describe("Validation Schemas - Comprehensive Coverage", () => {
             await annotate("Category: Validation", "category");
             await annotate("Type: Business Logic", "type");
 
-            const site: Site = {
-                identifier: "test-site",
-                name: "Test Site",
-                monitoring: true,
-                monitors: [
-                    {
-                        id: "test-monitor",
-                        type: "http",
-                        url: "https://example.com",
-                        checkInterval: 30_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        monitoring: true,
-                        status: "pending",
-                        responseTime: -1,
-                        history: [],
-                    },
-                ],
-            };
-
-            expect(site.identifier).toBe("test-site");
-            expect(site.monitors).toHaveLength(1);
+            await fc.assert(
+                fc.property(siteArbitrary, (site: Site) => {
+                    const parsed = siteSchema.parse(site);
+                    expect(parsed.identifier).toBe(site.identifier);
+                    expect(parsed.monitors).toHaveLength(site.monitors.length);
+                    for (const [index, monitor] of parsed.monitors.entries()) {
+                        const source = site.monitors[index];
+                        expect(monitor.type).toBe(source?.type);
+                        expect(monitor.id).toBe(source?.id);
+                    }
+                })
+            );
         });
     });
 

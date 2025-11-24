@@ -3,8 +3,10 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import fc from "fast-check";
 
 import type { Monitor } from "@shared/types";
+import { assertProperty } from "../../test-utils/fastcheckConfig";
 
 const loggerErrorSpy = vi.fn();
 
@@ -30,6 +32,29 @@ const createMonitor = (overrides: Partial<Monitor> = {}): Monitor =>
         history: [],
         ...overrides,
     }) as Monitor;
+
+const hostLabelCharacters = [
+    ..."abcdefghijklmnopqrstuvwxyz",
+    ..."0123456789",
+    "-",
+] as const;
+
+const hostLabelArbitrary = fc
+    .array(fc.constantFrom(...hostLabelCharacters), {
+        minLength: 1,
+        maxLength: 8,
+    })
+    .map((chars) => chars.join(""))
+    .filter((label) => /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/u.test(label));
+
+const portMonitorHostArbitrary = fc.oneof(
+    fc.domain(),
+    fc.constant("localhost")
+);
+
+const fallbackLabelArbitrary = fc
+    .string({ minLength: 1, maxLength: 48 })
+    .filter((value) => value.trim().length > 0);
 
 describe("monitor identifier fallbacks (strict coverage)", () => {
     beforeEach(() => {
@@ -62,14 +87,25 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
             "@app/utils/fallbacks"
         );
 
-        const monitor = createMonitor({
-            type: "port",
-            host: "database.internal",
-        });
+        await assertProperty(
+            fc.property(
+                portMonitorHostArbitrary,
+                fallbackLabelArbitrary,
+                (host, siteFallback) => {
+                    const monitor = createMonitor({
+                        type: "port",
+                        host,
+                    });
 
-        const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
+                    const result = getMonitorDisplayIdentifier(
+                        monitor,
+                        siteFallback
+                    );
 
-        expect(result).toBe("database.internal");
+                    expect(result).toBe(host);
+                }
+            )
+        );
     });
 
     it("returns the provided site fallback when no identifier can be derived", async () => {
@@ -77,13 +113,20 @@ describe("monitor identifier fallbacks (strict coverage)", () => {
             "@app/utils/fallbacks"
         );
 
-        const monitor = createMonitor({
-            type: "http",
-        });
+        await assertProperty(
+            fc.property(fallbackLabelArbitrary, (siteFallback) => {
+                const monitor = createMonitor({
+                    type: "http",
+                });
 
-        const result = getMonitorDisplayIdentifier(monitor, "Site Fallback");
+                const result = getMonitorDisplayIdentifier(
+                    monitor,
+                    siteFallback
+                );
 
-        expect(result).toBe("Site Fallback");
+                expect(result).toBe(siteFallback);
+            })
+        );
     });
 
     it("logs and returns the fallback when a generator throws", async () => {

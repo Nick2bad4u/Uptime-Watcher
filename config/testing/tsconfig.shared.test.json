@@ -32,6 +32,11 @@
         "../../shared/**/*.mts",
         "../../shared/**/*.cts",
         "../../shared/**/*.tsx",
-        "../../shared/test/**/*"
+        "../../shared/test/**/*",
+        "../../tests/strictTests/shared/**/*.ts",
+        "../../tests/strictTests/shared/**/*.mts",
+        "../../tests/strictTests/shared/**/*.cts",
+        "../../tests/strictTests/shared/**/*.tsx",
+        "../../tests/strictTests/shared/**/*"
     ]
 }

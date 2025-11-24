@@ -8,6 +8,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import fc from "fast-check";
 import type { MonitorStatus, MonitorType } from "../types";
 import {
     createValidMonitor,
@@ -168,6 +169,23 @@ describe("testHelpers", () => {
             expect(monitor.activeOperations).toBe(customOperations);
             expect(monitor.checkInterval).toBe(60_000);
             expect(monitor.timeout).toBe(10_000);
+        });
+
+        it("should respect randomized host overrides", async ({
+            task,
+            annotate,
+        }) => {
+            await annotate(`Testing: ${task.name}`, "functional");
+            await annotate("Component: testHelpers", "component");
+            await annotate("Category: Shared", "category");
+            await annotate("Type: Property", "type");
+
+            await fc.assert(
+                fc.property(fc.domain(), (host) => {
+                    const monitor = createValidMonitor({ host });
+                    expect(monitor.host).toBe(host);
+                })
+            );
         });
     });
 

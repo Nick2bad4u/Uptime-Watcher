@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import fc from "fast-check";
 
 import {
     DEFAULT_MONITOR_STATUS,
+    STATUS_KIND,
     type Monitor,
     type MonitorType,
     type Site,
@@ -33,6 +35,27 @@ const mockCrypto = {
 };
 
 const SHARED_HTTP_TIMEOUT = SHARED_MONITOR_CONFIG.http?.timeout ?? 30_000;
+
+const MONITOR_STATUS_VALUES = [
+    STATUS_KIND.DEGRADED,
+    STATUS_KIND.DOWN,
+    STATUS_KIND.PAUSED,
+    STATUS_KIND.PENDING,
+    STATUS_KIND.UP,
+] as const;
+
+const validMonitorStatusArbitrary = fc.constantFrom(...MONITOR_STATUS_VALUES);
+
+const monitorStatusSet = new Set<string>(MONITOR_STATUS_VALUES);
+
+const invalidMonitorStatusArbitrary = fc
+    .string({ minLength: 1, maxLength: 24 })
+    .filter((candidate) => !monitorStatusSet.has(candidate));
+
+const belowMinimumIntervalArbitrary = fc.integer({
+    min: -1_000_000,
+    max: MIN_MONITOR_CHECK_INTERVAL_MS - 1,
+});
 
 Object.defineProperty(globalThis, "crypto", {
     value: mockCrypto,
@@ -422,29 +445,18 @@ describe("monitorOperations", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const statusValues = [
-                "pending",
-                "up",
-                "down",
-            ];
+            await fc.assert(
+                fc.property(validMonitorStatusArbitrary, (status) => {
+                    const monitor = {
+                        ...createDefaultMonitor(),
+                        status,
+                    };
 
-            for (const status of statusValues) {
-                const monitor = {
-                    activeOperations: [],
-                    checkInterval: 300_000,
-                    history: [],
-                    id: "test-id",
-                    monitoring: true,
-                    responseTime: -1,
-                    retryAttempts: 3,
-                    status,
-                    timeout: 5000,
-                    type: "http" as MonitorType,
-                };
-                expect(
-                    validateMonitor(monitor as unknown as Monitor)
-                ).toBeTruthy();
-            }
+                    expect(
+                        validateMonitor(monitor as unknown as Monitor)
+                    ).toBeTruthy();
+                })
+            );
         });
     });
 
@@ -507,13 +519,14 @@ describe("monitorOperations", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Business Logic", "type");
 
-            const result = normalizeMonitor({
-                status: "invalid-status" as unknown as
-                    | "up"
-                    | "down"
-                    | "pending",
-            });
-            expect(result.status).toBe("pending");
+            await fc.assert(
+                fc.property(invalidMonitorStatusArbitrary, (invalidStatus) => {
+                    const result = normalizeMonitor({
+                        status: invalidStatus as Monitor["status"],
+                    });
+                    expect(result.status).toBe(DEFAULT_MONITOR_STATUS);
+                })
+            );
         });
 
         it("should clamp checkInterval values below the shared minimum", async ({
@@ -525,11 +538,16 @@ describe("monitorOperations", () => {
             await annotate("Category: Core", "category");
             await annotate("Type: Validation", "type");
 
-            const result = normalizeMonitor({
-                checkInterval: MIN_MONITOR_CHECK_INTERVAL_MS - 2000,
-            });
-
-            expect(result.checkInterval).toBe(MIN_MONITOR_CHECK_INTERVAL_MS);
+            await fc.assert(
+                fc.property(belowMinimumIntervalArbitrary, (interval) => {
+                    const result = normalizeMonitor({
+                        checkInterval: interval,
+                    });
+                    expect(result.checkInterval).toBe(
+                        MIN_MONITOR_CHECK_INTERVAL_MS
+                    );
+                })
+            );
         });
 
         it("should preserve existing id", async ({ task, annotate }) => {

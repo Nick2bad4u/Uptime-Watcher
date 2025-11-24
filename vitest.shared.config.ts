@@ -177,6 +177,7 @@ const vitestConfig = defineConfig({
         globals: true, // Enable global test functions
         include: [
             "shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
+            "tests/strictTests/shared/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx,css}",
         ],
         includeTaskLocation: true, // Parity: enable task location annotations
         isolate: true,

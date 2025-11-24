@@ -918,7 +918,10 @@ export default defineConfig(({ mode }) => {
             },
             fileParallelism: true,
             globals: true, // Enable global test functions (describe, it, expect)
-            include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+            include: [
+                "src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+                "tests/strictTests/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+            ],
             includeTaskLocation: true,
             isolate: true,
             logHeapUsage: true,
