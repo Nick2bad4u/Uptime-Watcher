@@ -41,8 +41,6 @@ export interface SettingsApiInterface extends SettingsDomainBridge {
     /**
      * Updates the history retention limit
      *
-     * @param limitDays - New history limit in days
-     *
      * @returns Promise resolving to the updated history limit value
      */
     updateHistoryLimit: SettingsDomainBridge["updateHistoryLimit"];

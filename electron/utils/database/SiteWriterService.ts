@@ -905,8 +905,7 @@ export class SiteWriterService {
      * database instance to maintain transactional consistency. All database
      * operations must use the same transaction instance.
      *
-     * @param db - Database transaction instance to ensure transactional
-     *   consistency
+     * @param monitorTx - Monitor repository transaction adapter
      * @param siteIdentifier - The site identifier to update monitors for
      * @param newMonitors - Array of new monitor configurations
      *

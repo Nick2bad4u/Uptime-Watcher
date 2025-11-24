@@ -1,6 +1,6 @@
-import fc from "fast-check";
+import fc, { type Arbitrary } from "fast-check";
 
-import { STATUS_KIND } from "@shared/types";
+import { STATUS_KIND, type StatusKind } from "@shared/types";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 
 const readableCharacters = [
@@ -30,7 +30,7 @@ const hasVisibleCharacters = (value: string): boolean => value.length > 0;
 const stringFromCharacters = (
     characters: readonly string[],
     constraints: { maxLength: number; minLength: number }
-) =>
+): Arbitrary<string> =>
     fc
         .array(fc.constantFrom(...characters), constraints)
         .map((chars) => chars.join(""));
@@ -38,22 +38,25 @@ const stringFromCharacters = (
 /**
  * Generates trimmed, human-friendly labels that avoid control characters.
  */
-export const readableLabelArbitrary = stringFromCharacters(readableCharacters, {
-    maxLength: 48,
-    minLength: 3,
-})
+export const readableLabelArbitrary: Arbitrary<string> = stringFromCharacters(
+    readableCharacters,
+    {
+        maxLength: 48,
+        minLength: 3,
+    }
+)
     .map((value) => collapseWhitespace(value))
     .filter((value) => hasVisibleCharacters(value));
 
 /**
  * Arbitrary producing realistic site names for renderer and electron tests.
  */
-export const siteNameArbitrary = readableLabelArbitrary;
+export const siteNameArbitrary: Arbitrary<string> = readableLabelArbitrary;
 
 /**
  * Arbitrary producing monitor names with the same constraints as site names.
  */
-export const monitorNameArbitrary = readableLabelArbitrary;
+export const monitorNameArbitrary: Arbitrary<string> = readableLabelArbitrary;
 
 /**
  * Arbitrary emitting kebab-case identifiers suitable for site slugs.
@@ -63,19 +66,19 @@ const slugSegmentArbitrary = stringFromCharacters(slugCharacters, {
     minLength: 3,
 });
 
-export const siteIdentifierArbitrary = fc
+export const siteIdentifierArbitrary: Arbitrary<string> = fc
     .tuple(slugSegmentArbitrary, slugSegmentArbitrary)
     .map(([left, right]) => `${left}-${right}`.toLowerCase());
 
 /**
  * Arbitrary generating unique monitor identifiers using uuid v4 strings.
  */
-export const monitorIdArbitrary = fc.uuid();
+export const monitorIdArbitrary: Arbitrary<string> = fc.uuid();
 
 /**
  * Arbitrary emitting valid HTTP/HTTPS URLs with optional queries and fragments.
  */
-export const siteUrlArbitrary = fc
+export const siteUrlArbitrary: Arbitrary<string> = fc
     .webUrl({
         authoritySettings: {
             withIPv4: true,
@@ -90,7 +93,7 @@ export const siteUrlArbitrary = fc
 /**
  * Arbitrary spanning every STATUS_KIND option for alerts and monitors.
  */
-export const statusKindArbitrary = fc.constantFrom(
+export const statusKindArbitrary: Arbitrary<StatusKind> = fc.constantFrom(
     STATUS_KIND.DEGRADED,
     STATUS_KIND.DOWN,
     STATUS_KIND.PENDING,

@@ -25,8 +25,6 @@ export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Adds a new site to be monitored
      *
-     * @param siteData - Site configuration data
-     *
      * @returns Promise resolving to the created site
      */
     addSite: SitesDomainBridge["addSite"];
@@ -48,9 +46,6 @@ export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Removes a monitor from a site
      *
-     * @param siteIdentifier - Identifier of the site containing the monitor
-     * @param monitorId - Identifier of the monitor to remove
-     *
      * @returns Promise resolving to the updated site snapshot emitted by the
      *   backend after removal
      */
@@ -59,17 +54,12 @@ export interface SitesApiInterface extends SitesDomainBridge {
     /**
      * Removes a site from monitoring
      *
-     * @param siteIdentifier - Identifier of the site to remove
-     *
      * @returns Promise resolving to a boolean indicating removal success
      */
     removeSite: SitesDomainBridge["removeSite"];
 
     /**
      * Updates an existing site's configuration
-     *
-     * @param siteIdentifier - Identifier of the site to update
-     * @param siteData - Partial site data to update
      *
      * @returns Promise resolving to the updated site
      */

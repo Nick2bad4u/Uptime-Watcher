@@ -41,8 +41,6 @@ export interface DataApiInterface extends DataDomainBridge {
     /**
      * Imports application data from a JSON string
      *
-     * @param jsonData - JSON string containing application data to import
-     *
      * @returns Promise resolving to a boolean success flag
      */
     importData: DataDomainBridge["importData"];

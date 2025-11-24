@@ -180,6 +180,8 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
 
         const baseProperties: FormSubmitProperties = {
             addMode: "new",
+            baselineUrl: generatedUrl,
+            bodyKeyword: "",
             checkInterval: 300_000,
             expectedValue: "",
             formError: undefined,
@@ -187,10 +189,26 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             monitorType: "http",
             name: generatedName,
             port: "80",
+            edgeLocations: "",
+            expectedHeaderValue: "",
+            expectedJsonValue: "",
+            expectedStatusCode: "200",
             recordType: "A",
+            headerName: "",
+            heartbeatExpectedStatus: "",
+            heartbeatMaxDriftSeconds: "",
+            heartbeatStatusField: "",
+            heartbeatTimestampField: "",
             selectedExistingSite: "",
             siteIdentifier: generatedIdentifier,
             url: generatedUrl,
+            jsonPath: "",
+            maxPongDelayMs: "",
+            maxReplicationLagSeconds: "",
+            maxResponseTime: "",
+            primaryStatusUrl: "",
+            replicaStatusUrl: "",
+            replicationTimestampField: "",
             setFormError: vi.fn(),
             addMonitorToSite: vi.fn(),
             clearError: vi.fn(),
@@ -204,7 +222,7 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
         const merged = {
             ...baseProperties,
             ...overrides,
-        } as FormSubmitProperties;
+        } satisfies FormSubmitProperties;
 
         if (overrides.host === undefined) {
             merged.host = deriveHost(merged.url);

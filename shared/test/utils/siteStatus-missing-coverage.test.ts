@@ -24,15 +24,15 @@ const createHttpMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
 });
 
 const createPortMonitor = (overrides: Partial<Monitor> = {}): Monitor => {
-    const host = overrides.host
-        ? overrides.host
-        : (() => {
-              try {
-                  return new URL(sampleOne(siteUrlArbitrary)).hostname;
-              } catch {
-                  return "example.dev";
-              }
-          })();
+    const host =
+        overrides.host ??
+        (() => {
+            try {
+                return new URL(sampleOne(siteUrlArbitrary)).hostname;
+            } catch {
+                return "example.dev";
+            }
+        })();
 
     return createHttpMonitor({
         host,

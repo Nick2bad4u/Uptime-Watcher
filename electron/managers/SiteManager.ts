@@ -234,12 +234,14 @@ export class SiteManager {
      * leaking mutable references to consumers. The cloned snapshot is returned
      * to callers for further processing (for example, IPC responses).
      *
-     * @param action - Synchronization action that triggered the emission.
-     * @param siteIdentifier - Identifier associated with the synchronization.
-     * @param sites - Optional site collection to broadcast; defaults to the
-     *   current cache snapshot.
-     * @param source - Origin of the synchronization event.
-     * @param timestamp - Optional timestamp override for deterministic testing.
+     * @param params - Synchronization parameters containing:
+     *
+     *   - `action`: Synchronization action that triggered the emission.
+     *   - `siteIdentifier`: Identifier associated with the synchronization.
+     *   - `sites`: Optional site collection to broadcast; defaults to the current
+     *       cache snapshot.
+     *   - `source`: Origin of the synchronization event.
+     *   - `timestamp`: Optional timestamp override for deterministic testing.
      *
      * @returns Cloned site snapshots that were dispatched with the event.
      */

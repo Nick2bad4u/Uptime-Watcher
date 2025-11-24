@@ -182,14 +182,33 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
 
         const baseProperties: FormSubmitProperties = {
             addMode: "new",
+            baselineUrl: generatedUrl,
+            bodyKeyword: "",
+            certificateWarningDays: "30",
             checkInterval: 300_000,
+            edgeLocations: "",
+            expectedHeaderValue: "",
+            expectedJsonValue: "",
+            expectedStatusCode: "200",
             expectedValue: "",
             formError: undefined,
+            headerName: "",
+            heartbeatExpectedStatus: "",
+            heartbeatMaxDriftSeconds: "",
+            heartbeatStatusField: "",
+            heartbeatTimestampField: "",
             host: deriveHost(generatedUrl),
+            jsonPath: "",
+            maxPongDelayMs: "",
+            maxReplicationLagSeconds: "",
+            maxResponseTime: "",
             monitorType: "http",
             name: generatedName,
             port: "80",
+            primaryStatusUrl: "",
             recordType: "A",
+            replicaStatusUrl: "",
+            replicationTimestampField: "",
             selectedExistingSite: "",
             siteIdentifier: generatedIdentifier,
             url: generatedUrl,
@@ -200,13 +219,12 @@ describe("Submit.tsx - Comprehensive Coverage", () => {
             generateUuid: vi.fn(() => "test-uuid"),
             logger: createMockLogger(),
             onSuccess: vi.fn(),
-            certificateWarningDays: "30",
         };
 
-        const merged: FormSubmitProperties = {
+        const merged = {
             ...baseProperties,
             ...overrides,
-        } as FormSubmitProperties;
+        } satisfies FormSubmitProperties;
 
         if (overrides.host === undefined) {
             merged.host = deriveHost(merged.url);

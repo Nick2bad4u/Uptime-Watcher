@@ -7,6 +7,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
+import type { Monitor, Site } from "@shared/types";
 import {
     monitorIdArbitrary,
     sampleOne,
@@ -243,7 +244,15 @@ vi.mock("../../../components/error/DefaultErrorFallback", () => ({
     )),
 }));
 
-const mockSite = {
+const requireFirstMonitor = (site: Pick<Site, "monitors">): Monitor => {
+    const [firstMonitor] = site.monitors;
+    if (firstMonitor === undefined) {
+        throw new Error("Test fixtures require at least one monitor");
+    }
+    return firstMonitor;
+};
+
+const mockSite: Site = {
     identifier: sampledSiteIdentifier,
     name: sampledSiteName,
     monitoring: true,
@@ -262,6 +271,8 @@ const mockSite = {
         },
     ],
 };
+
+const primaryMonitor = requireFirstMonitor(mockSite);
 
 // Mock all the hook functions and properties
 const mockUseSiteDetailsReturn = {
@@ -309,8 +320,8 @@ const mockUseSiteDetailsReturn = {
     localRetryAttempts: 3,
     localTimeout: 30_000,
     retryAttemptsChanged: false,
-    selectedMonitor: mockSite.monitors[0],
-    selectedMonitorId: sampledMonitorId,
+    selectedMonitor: primaryMonitor,
+    selectedMonitorId: primaryMonitor.id,
     setActiveSiteDetailsTab: vi.fn(),
     setLocalName: vi.fn(),
     setShowAdvancedMetrics: vi.fn(),
@@ -538,7 +549,7 @@ describe(SiteDetails, () => {
             expect(headerElement).toBeInTheDocument();
             expect(headerElement).toHaveTextContent(`Site: ${mockSite.name}`);
             expect(headerElement).toHaveTextContent(
-                `Monitor: ${mockSite.monitors[0].id}`
+                `Monitor: ${primaryMonitor.id}`
             );
         });
 
@@ -877,16 +888,30 @@ describe(SiteDetails, () => {
             annotate("Category: Component", "category");
             annotate("Type: Data Update", "type");
 
-            const initialSite = {
+            const initialSite: Site & { id: string } = {
                 ...mockSite,
                 id: "initial-id",
                 name: "Initial Site",
+            };
+            const initialMonitor = requireFirstMonitor(initialSite);
+            const updatedSite: Site & { id: string } = {
+                ...initialSite,
+                id: "updated-id",
+                name: "Updated Site",
+                monitors: [
+                    {
+                        ...initialMonitor,
+                        id: "updated-monitor-id",
+                        status:
+                            initialMonitor.status === "down" ? "up" : "down",
+                    },
+                ],
             };
             expect(
                 screen.getByText(`Site: ${mockSite.name}`)
             ).toBeInTheDocument();
             expect(
-                screen.getByText(`Monitor: ${mockSite.monitors[0].id}`)
+                screen.getByText(`Monitor: ${primaryMonitor.id}`)
             ).toBeInTheDocument();
             const { rerender } = renderSiteDetails(initialSite);
 

@@ -29,9 +29,6 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Performs an immediate check for a specific monitor
      *
-     * @param siteIdentifier - Identifier of the site containing the monitor
-     * @param monitorId - ID of the monitor to check
-     *
      * @returns Promise resolving to the latest {@link StatusUpdate} or undefined
      *   when no update is available
      */
@@ -48,17 +45,12 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Starts monitoring for a specific monitor within a site
      *
-     * @param siteIdentifier - The site identifier
-     * @param monitorId - The monitor identifier to start
-     *
      * @returns Promise resolving to true if monitoring started successfully
      */
     startMonitoringForMonitor: MonitoringDomainBridge["startMonitoringForMonitor"];
 
     /**
      * Starts monitoring for all monitors belonging to a specific site
-     *
-     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring started successfully
      */
@@ -75,17 +67,12 @@ export interface MonitoringApiInterface extends MonitoringDomainBridge {
     /**
      * Stops monitoring for a specific monitor within a site
      *
-     * @param siteIdentifier - The site identifier
-     * @param monitorId - The monitor identifier to stop
-     *
      * @returns Promise resolving to true if monitoring stopped successfully
      */
     stopMonitoringForMonitor: MonitoringDomainBridge["stopMonitoringForMonitor"];
 
     /**
      * Stops monitoring for all monitors belonging to a specific site
-     *
-     * @param siteIdentifier - The site identifier
      *
      * @returns Promise resolving to true if monitoring stopped successfully
      */

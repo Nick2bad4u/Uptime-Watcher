@@ -14,7 +14,7 @@ import {
     getSiteStatusDescription,
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
-import type { SiteStatus } from "@shared/types";
+import type { MonitorStatus, SiteStatus } from "@shared/types";
 import {
     sampleOne,
     siteIdentifierArbitrary,
@@ -27,14 +27,14 @@ const createTestSite = (
         id: string;
         name: string;
         url: string;
-        monitors: { monitoring: boolean; status: SiteStatus }[];
+        monitors: { monitoring: boolean; status: MonitorStatus }[];
     }> = {}
 ) => ({
     id: overrides.id ?? sampleOne(siteIdentifierArbitrary),
     name: overrides.name ?? sampleOne(siteNameArbitrary),
     url: overrides.url ?? sampleOne(siteUrlArbitrary),
     monitors: overrides.monitors ?? [
-        { monitoring: true, status: "up" as SiteStatus },
+        { monitoring: true, status: "up" as MonitorStatus },
     ],
 });
 
@@ -54,8 +54,8 @@ describe("Frontend siteStatus re-exports", () => {
             // Test actual usage to ensure the function works through re-export
             const site = createTestSite({
                 monitors: [
-                    { monitoring: true, status: "up" as SiteStatus },
-                    { monitoring: false, status: "down" as SiteStatus },
+                    { monitoring: true, status: "up" as MonitorStatus },
+                    { monitoring: false, status: "down" as MonitorStatus },
                 ],
             });
             const result = calculateSiteMonitoringStatus(site);
@@ -75,7 +75,7 @@ describe("Frontend siteStatus re-exports", () => {
 
             // Test actual usage
             const site = createTestSite({
-                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+                monitors: [{ monitoring: true, status: "up" as MonitorStatus }],
             });
             const result = calculateSiteStatus(site);
             expect(typeof result).toBe("string");
@@ -94,7 +94,7 @@ describe("Frontend siteStatus re-exports", () => {
 
             // Test actual usage
             const site = createTestSite({
-                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+                monitors: [{ monitoring: true, status: "up" as MonitorStatus }],
             });
             const result = getSiteDisplayStatus(site);
             expect(typeof result).toBe("string");
@@ -161,8 +161,8 @@ describe("Frontend siteStatus re-exports", () => {
 
             const site = createTestSite({
                 monitors: [
-                    { monitoring: true, status: "up" as SiteStatus },
-                    { monitoring: true, status: "down" as SiteStatus },
+                    { monitoring: true, status: "up" as MonitorStatus },
+                    { monitoring: true, status: "down" as MonitorStatus },
                 ],
             });
 
@@ -185,7 +185,7 @@ describe("Frontend siteStatus re-exports", () => {
             await annotate("Type: Export Operation", "type");
 
             const site = createTestSite({
-                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+                monitors: [{ monitoring: true, status: "up" as MonitorStatus }],
             });
 
             const result = getSiteDisplayStatus(site);

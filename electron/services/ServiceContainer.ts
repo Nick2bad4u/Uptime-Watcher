@@ -422,15 +422,13 @@ export class ServiceContainer {
     }
 
     /**
-     * Gets the singleton {@link ServiceContainer} instance.
+     * Gets or creates the {@link MonitorOperationRegistry} singleton instance.
      *
      * @remarks
-     * If the instance does not exist, it is created with the provided
-     * configuration.
+     * Lazily initializes the registry if it does not exist. Debug logging
+     * tracks creation when enabled.
      *
-     * @param config - Optional configuration for the container.
-     *
-     * @returns The singleton {@link ServiceContainer} instance.
+     * @returns The singleton {@link MonitorOperationRegistry} instance.
      */
     private getMonitorOperationRegistry(): MonitorOperationRegistry {
         if (!this.monitorOperationRegistry) {
