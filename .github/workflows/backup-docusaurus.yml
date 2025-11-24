@@ -30,6 +30,9 @@ jobs:
     build-and-backup:
         name: Build and Backup Documentation
         runs-on: ubuntu-latest
+        env:
+            DOCUSAURUS_BACKUP_REPO: Nick2bad4u/Uptime-Watcher-Docusaurus
+            DOCUSAURUS_BACKUP_BRANCH: main
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
@@ -38,7 +41,7 @@ jobs:
                   egress-policy: audit
 
             - name: Checkout repository
-              uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
               with:
                   fetch-depth: 0 # Need full history for git subtree operations
                   token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,18 +75,6 @@ jobs:
               run: |
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-            - name: Add backup repository remote
-              run: |
-                  # Check if origin-docs remote exists, if not add it
-                  if ! git remote | grep -q "origin-docs"; then
-                      git remote add origin-docs https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-                  fi
-
-                  # Fetch the remote to get latest state
-                  git fetch origin-docs main || true
-
-                  git remote -v
 
             - name: Install dependencies - Main App
               run: npm install --force
@@ -135,66 +126,53 @@ jobs:
                       echo "❌ Build directory not found"
                   fi
 
-            - name: Force add built files and backup documentation
+            - name: Ensure backup token is configured
               if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  echo "🚀 Starting documentation backup with built files..."
-
-                  # Move to docusaurus directory
-                  cd docs/docusaurus
-
-                  echo "📁 Force-adding build artifacts (ignoring .gitignore):"
-
-                  # Force add main build directory (static site output)
-                  echo "  - Adding build/ directory..."
-                  git add --force build/
-
-                  # Force add generated TypeDoc documentation folders that are ignored
-                  echo "  - Adding generated docs subdirectories..."
-                  git add --force docs/_media/ docs/assets/ docs/documents/ docs/electron/ docs/shared/ docs/src/ 2>/dev/null || true
-
-                  # Add all other files normally
-                  echo "  - Adding other documentation files..."
-                  git add .
-
-                  # Show what we're about to commit
-                  echo "📊 Files staged for commit:"
-                  git diff --staged --name-only | head -20
-
-                  # Check if there are any changes to commit
-                  if git diff --staged --quiet; then
-                      echo "ℹ️ No changes to commit"
-                  else
-                      echo "📝 Committing built documentation..."
-                      git commit -m "📚 Auto-backup: Built Docusaurus documentation [skip ci]
-
-                      - Generated from commit: ${{ github.sha }}
-                      - Built on: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
-                      - Includes production build artifacts and generated docs
-                      - Build directory: docs/docusaurus/build/
-                      - Generated TypeDoc docs: docs/docusaurus/docs/
-                      - Triggered by: ${{ github.event_name }}"
+                  if [ -z "${GITHUB_TOKEN}" ]; then
+                      echo "❌ GITHUB_TOKEN secret is not configured."
+                      echo "Please add a classic PAT with repo:status, repo_deployment, public_repo, and workflow scopes."
+                      exit 1
                   fi
 
-                  # Go back to root
-                  cd ../..
+                        - name: Clone backup repository
+                            if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+                            env:
+                                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                            run: |
+                                    echo "📥 Cloning backup repository ${{ env.DOCUSAURUS_BACKUP_REPO }}..."
+                                    rm -rf backup-repo
+                                    git clone --depth=1 "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ env.DOCUSAURUS_BACKUP_REPO }}" backup-repo
+                                    cd backup-repo
+                                    git checkout ${{ env.DOCUSAURUS_BACKUP_BRANCH }} 2>/dev/null || git checkout -b ${{ env.DOCUSAURUS_BACKUP_BRANCH }}
 
-                  # Use force push with subtree to override remote changes
-                  echo "🔄 Force pushing documentation to backup repository..."
-                  git push origin-docs `git subtree split --prefix=docs/docusaurus`:main --force
-
-                  echo "✅ Documentation backup with built files completed successfully"
-
-            - name: Verify backup with build artifacts
+            - name: Sync documentation artifacts to backup repository
               if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
               run: |
-                  echo "🔍 Verifying backup includes build artifacts..."
+                  echo "🧽 Cleaning tracked files in backup repository"
+                  rsync -a --delete \
+                      --exclude '.git/' \
+                      --exclude 'node_modules/' \
+                      --exclude '.cache/' \
+                      --exclude 'build/.cache/' \
+                      docs/docusaurus/ backup-repo/
 
-                  # Check if the push was successful by verifying the remote branch
-                  git ls-remote --heads origin-docs main
+            - name: Commit and push backup repository
+              if: steps.check_changes.outputs.changes == 'true' || github.event_name == 'workflow_dispatch'
+              working-directory: backup-repo
+              run: |
+                  echo "📝 Preparing backup commit"
+                  git add --all
+                  if git diff --staged --quiet; then
+                      echo "ℹ️ No documentation changes detected after sync."
+                      exit 0
+                  fi
 
-                  # Try to verify build directory exists in backup (this may not work depending on subtree setup)
-                  echo "✅ Backup verification completed"
+                  git commit -m "📚 Auto-backup: Docusaurus artifacts from ${{ github.sha }}" || true
+                  echo "🚀 Pushing to backup repository"
+                  git push origin ${{ env.DOCUSAURUS_BACKUP_BRANCH }}
 
             - name: Summary
               if: always()

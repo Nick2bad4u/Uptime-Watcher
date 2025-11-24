@@ -61,6 +61,10 @@ paths:
         ignore:
             # Match unknown permission scope "SOMETHING" (matches any scope name inside quotes)
             - '^unknown permission scope "[^"]+".*'
+secrets:
+    - GITHUB_TOKEN
+    - DOCUSAURUS_BACKUP_TOKEN
+
 # Configuration for self-hosted runner environments
 # Supports modern GitHub-hosted and enterprise self-hosted runners
 self-hosted-runner:
