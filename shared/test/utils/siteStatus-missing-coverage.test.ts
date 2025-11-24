@@ -1,65 +1,89 @@
-import { getSiteStatusDescription } from "../../utils/siteStatus";
+import { describe, expect, test } from "vitest";
+import { getSiteStatusDescription } from "@shared/utils/siteStatus";
+import type { Monitor, Site } from "@shared/types";
+import {
+    monitorIdArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+const createHttpMonitor = (overrides: Partial<Monitor> = {}): Monitor => ({
+    checkInterval: 300_000,
+    history: [],
+    id: sampleOne(monitorIdArbitrary),
+    monitoring: true,
+    responseTime: 100,
+    retryAttempts: 3,
+    status: "up",
+    timeout: 30_000,
+    type: "http",
+    url: sampleOne(siteUrlArbitrary),
+    ...overrides,
+});
+
+const createPortMonitor = (overrides: Partial<Monitor> = {}): Monitor => {
+    const host = overrides.host
+        ? overrides.host
+        : (() => {
+              try {
+                  return new URL(sampleOne(siteUrlArbitrary)).hostname;
+              } catch {
+                  return "example.dev";
+              }
+          })();
+
+    return createHttpMonitor({
+        host,
+        id: sampleOne(monitorIdArbitrary),
+        port: overrides.port ?? 3000,
+        type: "port",
+        url: undefined,
+        ...overrides,
+    });
+};
+
+const createSite = (overrides: Partial<Site> = {}): Site => ({
+    identifier: sampleOne(siteIdentifierArbitrary),
+    monitoring: true,
+    monitors: [],
+    name: sampleOne(siteNameArbitrary),
+    ...overrides,
+});
 
 describe("SiteStatus - Missing Coverage", () => {
     describe("getSiteStatusDescription default case", () => {
         test("should handle unknown status values (lines 199-200)", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: siteStatus-missing-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
-            // Test the default case in getSiteStatusDescription
-            // This should hit lines 199-200 where we return "Unknown status"
-
-            const siteWithUnknownStatus = {
-                id: "1",
-                name: "Test Site",
-                url: "https://example.com",
-                isActive: true,
+            const siteWithUnknownStatus = createSite({
                 monitors: [
-                    {
-                        id: "1",
-                        name: "Monitor 1",
-                        type: "http" as const,
-                        status: "invalid-status" as any, // This should trigger the default case
-                        monitoring: true,
-                        responseTime: 100,
-                        checkInterval: 60_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        url: "https://example.com",
-                        lastChecked: Date.now(),
-                    },
+                    createHttpMonitor({
+                        status: "invalid-status" as Monitor["status"],
+                    }),
                 ],
-            };
+            });
 
             const description = getSiteStatusDescription(siteWithUnknownStatus);
             expect(description).toBe("Unknown status");
         });
 
         test("should handle various invalid status values", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: siteStatus-missing-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
-            // Test multiple invalid status values to ensure we hit the default case
             const invalidStatuses = [
                 "invalid",
                 "random",
@@ -72,27 +96,13 @@ describe("SiteStatus - Missing Coverage", () => {
             ];
 
             for (const invalidStatus of invalidStatuses) {
-                const siteWithInvalidStatus = {
-                    id: "1",
-                    name: "Test Site",
-                    url: "https://example.com",
-                    isActive: true,
+                const siteWithInvalidStatus = createSite({
                     monitors: [
-                        {
-                            id: "1",
-                            name: "Monitor 1",
-                            type: "http" as const,
-                            status: invalidStatus as any,
-                            monitoring: true,
-                            responseTime: 100,
-                            checkInterval: 60_000,
-                            timeout: 5000,
-                            retryAttempts: 3,
-                            url: "https://example.com",
-                            lastChecked: Date.now(),
-                        },
+                        createHttpMonitor({
+                            status: invalidStatus as Monitor["status"],
+                        }),
                     ],
-                };
+                });
 
                 const description = getSiteStatusDescription(
                     siteWithInvalidStatus
@@ -102,103 +112,48 @@ describe("SiteStatus - Missing Coverage", () => {
         });
 
         test("should hit default case with mixed invalid statuses", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: siteStatus-missing-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
-            // Test a site with multiple monitors having invalid statuses
-            const siteWithMixedInvalidStatuses = {
-                id: "1",
-                name: "Test Site",
-                url: "https://example.com",
-                isActive: true,
+            const siteWithMixedInvalidStatuses = createSite({
                 monitors: [
-                    {
-                        id: "1",
-                        name: "Monitor 1",
-                        type: "http" as const,
-                        status: "invalid-status-1" as any,
-                        monitoring: true,
-                        responseTime: 100,
-                        checkInterval: 60_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        url: "https://example.com",
-                        lastChecked: Date.now(),
-                    },
-                    {
-                        id: "2",
-                        name: "Monitor 2",
-                        type: "port" as const,
-                        status: "invalid-status-2" as any,
-                        monitoring: true,
-                        responseTime: 150,
-                        checkInterval: 60_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        host: "example.com",
-                        port: 80,
-                        lastChecked: Date.now(),
-                    },
+                    createHttpMonitor({
+                        status: "invalid-status-1" as Monitor["status"],
+                    }),
+                    createPortMonitor({
+                        status: "invalid-status-2" as Monitor["status"],
+                    }),
                 ],
-            };
+            });
 
             const description = getSiteStatusDescription(
                 siteWithMixedInvalidStatuses
             );
-            // The function will calculate this as "mixed" status since monitors have different statuses
             expect(description).toBe("Mixed status (2/2 monitoring active)");
         });
 
         test("should verify the switch statement default behavior", ({
-            task,
             annotate,
+            task,
         }) => {
             annotate(`Testing: ${task.name}`, "functional");
             annotate("Component: siteStatus-missing-coverage", "component");
             annotate("Category: Utility", "category");
             annotate("Type: Business Logic", "type");
 
-            annotate(`Testing: ${task.name}`, "functional");
-            annotate("Component: siteStatus-missing-coverage", "component");
-            annotate("Category: Utility", "category");
-            annotate("Type: Business Logic", "type");
-
-            // Explicitly test the switch statement default case
-            // by providing a status that doesn't match any known cases
-
-            const testSite = {
-                id: "1",
-                name: "Test Site",
-                url: "https://example.com",
-                isActive: true,
+            const testSite = createSite({
                 monitors: [
-                    {
-                        id: "1",
-                        name: "Test Monitor",
-                        type: "http" as const,
-                        status: "definitely-not-a-valid-status" as any,
-                        monitoring: true,
-                        responseTime: 100,
-                        checkInterval: 60_000,
-                        timeout: 5000,
-                        retryAttempts: 3,
-                        url: "https://example.com",
-                        lastChecked: Date.now(),
-                    },
+                    createHttpMonitor({
+                        status: "definitely-not-a-valid-status" as Monitor["status"],
+                    }),
                 ],
-            };
+            });
 
-            // This should definitely hit the default case
             const result = getSiteStatusDescription(testSite);
             expect(result).toBe("Unknown status");
             expect(typeof result).toBe("string");

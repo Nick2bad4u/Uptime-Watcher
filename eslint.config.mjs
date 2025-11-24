@@ -423,6 +423,8 @@ export default /** @type {EslintConfig} */ [
             "report/**",
             "reports/**",
             "scripts/devtools-snippets/**",
+            "public/mockServiceWorker.js",
+            "storybook/test-runner-jest.config.js",
         ],
         name: "Global Ignore Patterns **/**",
     },

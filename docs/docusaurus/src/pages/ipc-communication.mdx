@@ -1,0 +1,381 @@
+---
+title: IPC Communication Architecture
+description: Inter-Process Communication patterns and data flow in Uptime Watcher
+---
+
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function IpcCommunication() {
+    return (
+        <Layout
+            title="IPC Communication Architecture"
+            description="Inter-Process Communication patterns and data flow in Uptime Watcher"
+        >
+            <div className="container margin-vert--lg">
+                <div className="row">
+                    <div className="col">
+
+# IPC Communication Architecture
+
+This page details the Inter-Process Communication (IPC) architecture that enables secure, type-safe communication between the Electron main process and renderer processes.
+
+## IPC Communication Flow
+
+The following diagram shows the complete IPC communication stack from renderer to main process:
+
+<Mermaid value={`graph TB
+    subgraph Renderer["Renderer Process (React)"]
+        Component[React Components]
+        Store[Zustand Stores]
+        Services[Renderer Services]
+        ElectronAPI[window.electronAPI]
+    end
+
+    subgraph Preload["Preload Script (Context Bridge)"]
+        ContextBridge[contextBridge.exposeInMainWorld]
+        IPCRendererOn[ipcRenderer.on]
+        IPCRendererInvoke[ipcRenderer.invoke]
+        IPCRendererSend[ipcRenderer.send]
+        Guards[Runtime Type Guards]
+    end
+
+    subgraph MainProcess["Main Process (Electron)"]
+        IPCMain[ipcMain.handle/on]
+        IPCService[IpcService]
+        Orchestrator[UptimeOrchestrator]
+        Managers[Service Managers]
+        EventBus[TypedEventBus]
+    end
+
+    subgraph Broadcasting["Event Broadcasting"]
+        RendererBridge[RendererEventBridge]
+        WebContents[webContents.send]
+        EventListeners[Event Listeners]
+    end
+
+    %% Request flow (invoke)
+    Component --> Services
+    Services --> ElectronAPI
+    ElectronAPI --> IPCRendererInvoke
+    IPCRendererInvoke --> IPCMain
+    IPCMain --> IPCService
+    IPCService --> Orchestrator
+    Orchestrator --> Managers
+
+    %% Response flow
+    Managers -.->|response| IPCService
+    IPCService -.->|serialized| IPCRendererInvoke
+    IPCRendererInvoke -.->|validated| Guards
+    Guards -.->|safe data| ElectronAPI
+    ElectronAPI -.->|typed| Services
+    Services -.->|update| Store
+    Store -.->|react| Component
+
+    %% Event broadcasting
+    Managers --> EventBus
+    EventBus --> RendererBridge
+    RendererBridge --> WebContents
+    WebContents --> IPCRendererOn
+    IPCRendererOn --> ElectronAPI
+    ElectronAPI --> EventListeners
+    EventListeners --> Store
+
+    %% Styling
+    classDef renderer fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef preload fill:#ea580c,stroke:#c2410c,color:#ffffff
+    classDef main fill:#059669,stroke:#047857,color:#ffffff
+    classDef broadcast fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+
+    class Component,Store,Services,ElectronAPI renderer
+    class ContextBridge,IPCRendererOn,IPCRendererInvoke,IPCRendererSend,Guards preload
+    class IPCMain,IPCService,Orchestrator,Managers,EventBus main
+    class RendererBridge,WebContents,EventListeners broadcast`} />
+
+## IPC Channel Registry
+
+This diagram shows the standardized IPC channel registration and handler mapping:
+
+<Mermaid value={`classDiagram
+    class IpcService {
+        +registerStandardizedIpcHandler(channel, handler)
+        +registerHandler(channel, handler)
+        +sendToRenderer(webContents, channel, data)
+        +broadcast(channel, data)
+    }
+
+    class StandardizedIpcHandler {
+        <<interface>>
+        +handle(event, payload): Promise~Result~
+        +validate(payload): boolean
+    }
+
+    class SitesChannel {
+        +handle("add-site", payload)
+        +handle("update-site", payload)
+        +handle("delete-site", payload)
+        +handle("get-sites", payload)
+        +handle("get-site", payload)
+    }
+
+    class MonitoringChannel {
+        +handle("start-monitoring", payload)
+        +handle("stop-monitoring", payload)
+        +handle("get-monitor-types", payload)
+        +handle("run-manual-check", payload)
+    }
+
+    class SettingsChannel {
+        +handle("get-settings", payload)
+        +handle("update-settings", payload)
+        +handle("reset-settings", payload)
+    }
+
+    class EventsChannel {
+        +emit("site:added", data)
+        +emit("site:updated", data)
+        +emit("site:deleted", data)
+        +emit("monitor:status-changed", data)
+        +emit("monitor:up", data)
+        +emit("monitor:down", data)
+        +emit("state-sync-event", data)
+    }
+
+    IpcService --> StandardizedIpcHandler
+    StandardizedIpcHandler <|.. SitesChannel
+    StandardizedIpcHandler <|.. MonitoringChannel
+    StandardizedIpcHandler <|.. SettingsChannel
+    IpcService --> EventsChannel`} />
+
+## Request-Response Pattern
+
+This sequence diagram illustrates a typical IPC request-response cycle:
+
+<Mermaid value={`sequenceDiagram
+    autonumber
+    participant UI as React Component
+    participant Service as SiteService
+    participant API as electronAPI.sites
+    participant Preload as Preload Bridge
+    participant IPC as ipcMain.handle
+    participant Handler as IPC Handler
+    participant Orchestrator as UptimeOrchestrator
+    participant Manager as SiteManager
+    participant DB as Database
+    participant Cache as StandardizedCache
+    participant Events as TypedEventBus
+
+    UI->>Service: addSite(siteData)
+    Service->>API: addSite(siteData)
+    API->>Preload: ipcRenderer.invoke("add-site", siteData)
+    Preload->>IPC: forward invoke
+    IPC->>Handler: execute handler
+    Handler->>Orchestrator: orchestrator.addSite(siteData)
+    Orchestrator->>Manager: siteManager.addSite(siteData)
+
+    Manager->>DB: persist site
+    DB-->>Manager: confirm
+    Manager->>Cache: cache.set(site)
+    Manager->>Events: emit("site:added", site)
+
+    Manager-->>Orchestrator: return site
+    Orchestrator-->>Handler: return result
+    Handler-->>IPC: serialize result
+    IPC-->>Preload: return promise
+    Preload-->>API: return typed data
+    API-->>Service: return site
+    Service-->>UI: update complete
+
+    Note over Events: Parallel broadcast
+    Events->>Preload: webContents.send("site:added")
+    Preload->>API: dispatch event
+    API->>Service: event listener
+    Service->>UI: reactive update`} />
+
+## Type Safety Layers
+
+This diagram shows the multiple layers of type safety in IPC communication:
+
+<Mermaid value={`flowchart TD
+    subgraph TypeDefinition["Type Definition (TypeScript)"]
+        SharedTypes[Shared Types\n@shared/types]
+        IPCTypes[IPC Channel Types\n@shared/types/ipc]
+        PreloadTypes[Preload Types\n@shared/types/preload]
+    end
+
+    subgraph CompileTime["Compile-Time Safety"]
+        TSC[TypeScript Compiler]
+        Strict[Strict Mode Checks]
+        NoAny[No Implicit Any]
+    end
+
+    subgraph RuntimeSafety["Runtime Safety"]
+        Zod[Zod Schema Validation]
+        TypeGuards[Type Guard Functions]
+        Guards[Runtime Payload Guards]
+    end
+
+    subgraph IPCLayer["IPC Layer"]
+        Serialization[JSON Serialization]
+        Deserialization[JSON Deserialization]
+        StructuredClone[StructuredClone Validation]
+    end
+
+    subgraph ErrorHandling["Error Handling"]
+        ValidationErrors[Validation Errors]
+        SerializationErrors[Serialization Errors]
+        Recovery[Automatic Recovery]
+    end
+
+    SharedTypes --> TSC
+    IPCTypes --> TSC
+    PreloadTypes --> TSC
+
+    TSC --> Strict
+    Strict --> NoAny
+    NoAny --> Zod
+
+    Zod --> TypeGuards
+    TypeGuards --> Guards
+    Guards --> Serialization
+
+    Serialization --> Deserialization
+    Deserialization --> StructuredClone
+
+    Serialization -.->|error| SerializationErrors
+    Deserialization -.->|error| ValidationErrors
+    Guards -.->|invalid| ValidationErrors
+
+    ValidationErrors --> Recovery
+    SerializationErrors --> Recovery
+    Recovery -.->|full sync| Guards
+
+    classDef types fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef compile fill:#10b981,stroke:#059669,color:#ffffff
+    classDef runtime fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef ipc fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef error fill:#ef4444,stroke:#dc2626,color:#ffffff
+
+    class SharedTypes,IPCTypes,PreloadTypes types
+    class TSC,Strict,NoAny compile
+    class Zod,TypeGuards,Guards runtime
+    class Serialization,Deserialization,StructuredClone ipc
+    class ValidationErrors,SerializationErrors,Recovery error`} />
+
+## Event Broadcasting Architecture
+
+This diagram shows how events are broadcast from main to all renderer windows:
+
+<Mermaid value={`graph LR
+    subgraph MainProcess["Main Process"]
+        EventEmitter[Event Emitter]
+        EventBus[TypedEventBus<UptimeEvents>]
+        RendererBridge[RendererEventBridge]
+    end
+
+    subgraph Windows["Renderer Windows"]
+        Window1[Main Window]
+        Window2[Settings Window]
+        Window3[Details Window]
+    end
+
+    subgraph EventHandlers["Event Handlers"]
+        Handler1[useSiteSync]
+        Handler2[useMonitorEvents]
+        Handler3[useStateSync]
+    end
+
+    EventEmitter --> EventBus
+    EventBus -->|typed events| RendererBridge
+
+    RendererBridge -->|webContents.send| Window1
+    RendererBridge -->|webContents.send| Window2
+    RendererBridge -->|webContents.send| Window3
+
+    Window1 --> Handler1
+    Window2 --> Handler2
+    Window3 --> Handler3
+
+    Handler1 -.->|update| Store1[Sites Store]
+    Handler2 -.->|update| Store2[Monitor Store]
+    Handler3 -.->|sync| Store3[UI Store]
+
+    classDef main fill:#059669,stroke:#047857,color:#ffffff
+    classDef window fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef handler fill:#7c3aed,stroke:#5b21b6,color:#ffffff
+
+    class EventEmitter,EventBus,RendererBridge main
+    class Window1,Window2,Window3 window
+    class Handler1,Handler2,Handler3,Store1,Store2,Store3 handler`} />
+
+## IPC Security Model
+
+This diagram illustrates the security boundaries and validation in IPC:
+
+<Mermaid value={`flowchart TB
+    subgraph Untrusted["Untrusted Zone (Renderer)"]
+        UserInput[User Input]
+        RendererCode[Renderer Code]
+        ThirdPartyLibs[Third-Party Libraries]
+    end
+
+    subgraph SecurityBoundary["Security Boundary"]
+        ContextBridge[Context Bridge\nIsolated API]
+        AllowList[Allowed Channels]
+        TypeValidation[Type Validation]
+    end
+
+    subgraph Trusted["Trusted Zone (Main Process)"]
+        IPCHandlers[IPC Handlers]
+        BusinessLogic[Business Logic]
+        SystemAccess[System Access]
+    end
+
+    subgraph Protections["Security Protections"]
+        Sanitization[Input Sanitization]
+        SchemaValidation[Schema Validation]
+        RateLimiting[Rate Limiting]
+        Logging[Security Logging]
+    end
+
+    UserInput --> RendererCode
+    ThirdPartyLibs --> RendererCode
+    RendererCode --> ContextBridge
+
+    ContextBridge --> AllowList
+    AllowList -->|approved| TypeValidation
+    AllowList -.->|rejected| Logging
+
+    TypeValidation --> Sanitization
+    Sanitization --> SchemaValidation
+    SchemaValidation --> RateLimiting
+
+    RateLimiting --> IPCHandlers
+    IPCHandlers --> BusinessLogic
+    BusinessLogic --> SystemAccess
+
+    SchemaValidation -.->|invalid| Logging
+    RateLimiting -.->|exceeded| Logging
+
+    classDef untrusted fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef boundary fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef trusted fill:#10b981,stroke:#059669,color:#ffffff
+    classDef protection fill:#3b82f6,stroke:#1e40af,color:#ffffff
+
+    class UserInput,RendererCode,ThirdPartyLibs untrusted
+    class ContextBridge,AllowList,TypeValidation boundary
+    class IPCHandlers,BusinessLogic,SystemAccess trusted
+    class Sanitization,SchemaValidation,RateLimiting,Logging protection`} />
+
+---
+
+The IPC architecture ensures type-safe, secure communication between processes while maintaining high performance and developer ergonomics through strong TypeScript typing and runtime validation.
+
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
+
+}

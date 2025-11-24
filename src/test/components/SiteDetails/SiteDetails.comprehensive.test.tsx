@@ -7,6 +7,18 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import React from "react";
 import { SiteDetails } from "../../../components/SiteDetails/SiteDetails";
 import { useSiteDetails } from "../../../hooks/site/useSiteDetails";
+import {
+    monitorIdArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+const sampledSiteName = sampleOne(siteNameArbitrary);
+const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+const sampledMonitorId = sampleOne(monitorIdArbitrary);
+const sampledMonitorUrl = sampleOne(siteUrlArbitrary);
 
 // Mock BrowserRouter to avoid react-router-dom dependency
 const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
@@ -232,14 +244,14 @@ vi.mock("../../../components/error/DefaultErrorFallback", () => ({
 }));
 
 const mockSite = {
-    identifier: "test-site-1",
-    name: "Test Site",
+    identifier: sampledSiteIdentifier,
+    name: sampledSiteName,
     monitoring: true,
     monitors: [
         {
-            id: "monitor-1",
+            id: sampledMonitorId,
             type: "http" as const,
-            url: "https://example.com",
+            url: sampledMonitorUrl,
             checkInterval: 300_000,
             timeout: 30_000,
             retryAttempts: 3,
@@ -293,12 +305,12 @@ const mockUseSiteDetailsReturn = {
     isLoading: false,
     isMonitoring: true,
     localCheckInterval: 300_000,
-    localName: "Test Site",
+    localName: sampledSiteName,
     localRetryAttempts: 3,
     localTimeout: 30_000,
     retryAttemptsChanged: false,
     selectedMonitor: mockSite.monitors[0],
-    selectedMonitorId: "monitor-1",
+    selectedMonitorId: sampledMonitorId,
     setActiveSiteDetailsTab: vi.fn(),
     setLocalName: vi.fn(),
     setShowAdvancedMetrics: vi.fn(),
@@ -440,7 +452,7 @@ describe(SiteDetails, () => {
 
             (useSiteDetails as any).mockReturnValue({
                 ...mockUseSiteDetailsReturn,
-                activeSiteDetailsTab: "monitor-1-analytics", // Use monitor ID format
+                activeSiteDetailsTab: `${sampledMonitorId}-analytics`, // Use monitor ID format
             });
 
             renderSiteDetails();
@@ -524,8 +536,10 @@ describe(SiteDetails, () => {
 
             const headerElement = screen.getByTestId("site-details-header");
             expect(headerElement).toBeInTheDocument();
-            expect(headerElement).toHaveTextContent("Site: Test Site");
-            expect(headerElement).toHaveTextContent("Monitor: monitor-1");
+            expect(headerElement).toHaveTextContent(`Site: ${mockSite.name}`);
+            expect(headerElement).toHaveTextContent(
+                `Monitor: ${mockSite.monitors[0].id}`
+            );
         });
 
         it("should display site data in header", ({ task, annotate }) => {
@@ -541,8 +555,12 @@ describe(SiteDetails, () => {
 
             renderSiteDetails();
 
-            expect(screen.getByText("Site: Test Site")).toBeInTheDocument();
-            expect(screen.getByText("Monitor: monitor-1")).toBeInTheDocument();
+            expect(
+                screen.getByText(`Site: ${sampledSiteName}`)
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(`Monitor: ${sampledMonitorId}`)
+            ).toBeInTheDocument();
         });
 
         it("should handle different site data in header", ({
@@ -864,13 +882,12 @@ describe(SiteDetails, () => {
                 id: "initial-id",
                 name: "Initial Site",
             };
-
-            const updatedSite = {
-                ...mockSite,
-                id: "updated-id",
-                name: "Updated Site",
-            };
-
+            expect(
+                screen.getByText(`Site: ${mockSite.name}`)
+            ).toBeInTheDocument();
+            expect(
+                screen.getByText(`Monitor: ${mockSite.monitors[0].id}`)
+            ).toBeInTheDocument();
             const { rerender } = renderSiteDetails(initialSite);
 
             // Rerender with different site

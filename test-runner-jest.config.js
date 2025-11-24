@@ -1,10 +1,9 @@
-/**
- * @remarks
+/* eslint-disable jsdoc/require-file-overview, jsdoc/text-escaping */
+
+/*
  * Delegates to the canonical configuration located under
  * `storybook/test-runner-jest.config.js` so the runner behaves the same
  * regardless of the working directory that invokes it.
- *
- * @file Entry point for Jest overrides used by the Storybook test runner.
  */
 
 // eslint-disable-next-line unicorn/prefer-module, sonarjs/no-require-or-define -- CommonJS required for Storybook test runner
@@ -19,3 +18,5 @@ module.exports = require(
     // eslint-disable-next-line unicorn/prefer-module -- __dirname is required for absolute path resolution in CommonJS
     path.resolve(__dirname, "storybook/test-runner-jest.config.js")
 );
+
+/* eslint-enable jsdoc/require-file-overview, jsdoc/text-escaping */

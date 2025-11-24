@@ -239,7 +239,7 @@ This snippet adds one site for each supported monitor type with realistic test c
     {
      id: `monitor-dns-${baseTimestamp}`,
      type: "dns",
-     hostname: "example.com",
+     host: "example.com",
      recordType: "A",
      checkInterval: 60000,
      timeout: 10000,
@@ -259,7 +259,7 @@ This snippet adds one site for each supported monitor type with realistic test c
     {
      id: `monitor-ssl-${baseTimestamp}`,
      type: "ssl",
-     hostname: "example.com",
+     host: "example.com",
      certificateWarningDays: 30,
      checkInterval: 86400000, // 24 hours
      timeout: 10000,

@@ -10,6 +10,18 @@ import { describe, expect, it, vi } from "vitest";
 
 import { SiteDetailsHeader } from "../../../components/SiteDetails/SiteDetailsHeader";
 import type { Monitor, Site } from "@shared/types";
+import {
+    monitorIdArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+const sampledSiteName = sampleOne(siteNameArbitrary);
+const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+const sampledMonitorId = sampleOne(monitorIdArbitrary);
+const sampledMonitorUrl = sampleOne(siteUrlArbitrary);
 
 // Mock the UI store
 const mockOpenExternal = vi.fn();
@@ -91,16 +103,16 @@ vi.mock("../../../components/SiteDetails/MonitoringStatusDisplay", () => ({
 
 describe("SiteDetailsHeader - Additional Coverage", () => {
     const mockSite: Site = {
-        identifier: "coverage-site-1",
-        name: "Coverage Test Site",
+        identifier: sampledSiteIdentifier,
+        name: sampledSiteName,
         monitors: [],
         monitoring: true,
     };
 
     const mockHttpMonitor: Monitor = {
-        id: "coverage-monitor-1",
+        id: sampledMonitorId,
         type: "http",
-        url: "https://test-coverage.com",
+        url: sampledMonitorUrl,
         status: "up",
         responseTime: 150,
         monitoring: true,
@@ -159,12 +171,9 @@ describe("SiteDetailsHeader - Additional Coverage", () => {
 
             // Verify openExternal was called with correct URL (targeting line 72)
             expect(mockOpenExternal).toHaveBeenCalledTimes(1);
-            expect(mockOpenExternal).toHaveBeenCalledWith(
-                "https://test-coverage.com",
-                {
-                    siteName: "Coverage Test Site",
-                }
-            );
+            expect(mockOpenExternal).toHaveBeenCalledWith(sampledMonitorUrl, {
+                siteName: mockSite.name,
+            });
         });
 
         it("should call openExternal with empty URL when monitor has no URL", async ({

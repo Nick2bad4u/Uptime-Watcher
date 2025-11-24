@@ -87,16 +87,16 @@ Element.prototype.setAttribute = function (name: string, value: string) {
 };
 
 describe("ScreenshotThumbnail Arithmetic Mutations", () => {
-    const renderThumbnail = (
+    const mountThumbnail = (
         overrides: Partial<ScreenshotThumbnailProperties> = {}
     ): ScreenshotThumbnailProperties => {
-        const thumbnailProps: ScreenshotThumbnailProperties = {
+        const thumbnailConfig: ScreenshotThumbnailProperties = {
             siteName: sampleOne(siteNameArbitrary),
             url: sampleOne(siteUrlArbitrary),
             ...overrides,
         };
-        render(<ScreenshotThumbnail {...thumbnailProps} />);
-        return thumbnailProps;
+        render(<ScreenshotThumbnail {...thumbnailConfig} />);
+        return thumbnailConfig;
     };
 
     // Mock getBoundingClientRect to control positioning calculations
@@ -139,12 +139,12 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
     });
 
     it("should render component (debug test)", () => {
-        const thumbnailProps = renderThumbnail();
+        const thumbnailConfig = mountThumbnail();
 
         // Use Testing Library methods instead of querySelector
         const link = screen.getByRole("link");
         const image = screen.getByAltText(
-            `Screenshot of ${thumbnailProps.siteName}`
+            `Screenshot of ${thumbnailConfig.siteName}`
         );
 
         // Should have a link element and image
@@ -157,7 +157,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
      * maxImgW = Math.min(viewportW * 0.9, 900);
      */
     it("should detect viewport width multiplication mutation (viewportW * 0.9)", async () => {
-        renderThumbnail();
+        mountThumbnail();
 
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
@@ -195,7 +195,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
      * maxImgH = Math.min(viewportH * 0.9, 700);
      */
     it("should detect viewport height multiplication mutation (viewportH * 0.9)", async () => {
-        renderThumbnail();
+        mountThumbnail();
 
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
@@ -229,7 +229,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
      * - OverlayW / 2
      */
     it("should detect width division mutation (rect.width / 2)", async () => {
-        renderThumbnail();
+        mountThumbnail();
 
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
@@ -262,7 +262,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
      * rect.width / 2 - overlayW / 2
      */
     it("should detect overlay width division mutation (overlayW / 2)", async () => {
-        renderThumbnail();
+        mountThumbnail();
 
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();
@@ -295,7 +295,7 @@ describe("ScreenshotThumbnail Arithmetic Mutations", () => {
      * rect.top - overlayH - 16;
      */
     it("should detect top positioning subtraction mutations (rect.top - overlayH - 16)", async () => {
-        renderThumbnail();
+        mountThumbnail();
 
         const link = screen.getByRole("link");
         expect(link).toBeTruthy();

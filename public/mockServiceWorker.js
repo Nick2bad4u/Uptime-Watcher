@@ -1,9 +1,14 @@
 // @ts-nocheck
 /* eslint-env serviceworker */
 /* tslint:disable */
+/* eslint-disable jsdoc/match-name, jsdoc/no-undefined-types, jsdoc/require-description, jsdoc/require-description-complete-sentence, jsdoc/require-file-overview, jsdoc/require-jsdoc, jsdoc/require-param-description, jsdoc/require-param-type, jsdoc/require-returns, jsdoc/require-returns-description, jsdoc/text-escaping */
 
 /**
  * Mock Service Worker.
+ *
+ * @file MockServiceWorker.js
+ *
+ * @escapeHTML
  *
  * @see https://github.com/mswjs/msw
  * - Please do NOT modify this file.
@@ -358,3 +363,5 @@ async function serializeRequest(request) {
         keepalive: request.keepalive,
     };
 }
+
+/* eslint-enable jsdoc/match-name, jsdoc/no-undefined-types, jsdoc/require-description, jsdoc/require-description-complete-sentence, jsdoc/require-file-overview, jsdoc/require-jsdoc, jsdoc/require-param-description, jsdoc/require-param-type, jsdoc/require-returns, jsdoc/require-returns-description, jsdoc/text-escaping */

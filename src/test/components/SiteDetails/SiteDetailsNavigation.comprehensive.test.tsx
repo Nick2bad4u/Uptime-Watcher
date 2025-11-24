@@ -8,9 +8,28 @@ import "@testing-library/jest-dom";
 import React from "react";
 import { SiteDetailsNavigation } from "../../../components/SiteDetails/SiteDetailsNavigation";
 import type { SiteDetailsNavigationProperties } from "../../../components/SiteDetails/SiteDetailsNavigation";
-import type { Site } from "@shared/types";
-import type { Monitor } from "@shared/types";
+import type { Site, Monitor } from "@shared/types";
 import { getMonitorTypeDisplayLabel } from "../../../utils/fallbacks";
+import {
+    monitorIdArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+const sampledSiteName = sampleOne(siteNameArbitrary);
+const sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+const httpMonitorId = sampleOne(monitorIdArbitrary);
+const httpMonitorUrl = sampleOne(siteUrlArbitrary);
+const portMonitorId = sampleOne(monitorIdArbitrary);
+const portMonitorHost = (() => {
+    try {
+        return new URL(sampleOne(siteUrlArbitrary)).hostname;
+    } catch {
+        return "example.dev";
+    }
+})();
 
 // Mock BrowserRouter to avoid react-router-dom dependency
 const MockBrowserRouter = ({ children }: { children: React.ReactNode }) => (
@@ -117,14 +136,14 @@ vi.mock(
 );
 
 const mockSite: Site = {
-    identifier: "test-site-1",
-    name: "Test Site",
+    identifier: sampledSiteIdentifier,
+    name: sampledSiteName,
     monitoring: true,
     monitors: [
         {
-            id: "monitor-1",
+            id: httpMonitorId,
             type: "http" as const,
-            url: "https://example.com",
+            url: httpMonitorUrl,
             checkInterval: 300_000,
             timeout: 30_000,
             retryAttempts: 3,
@@ -134,9 +153,9 @@ const mockSite: Site = {
             status: "up" as const,
         },
         {
-            id: "monitor-2",
+            id: portMonitorId,
             type: "port" as const,
-            host: "localhost",
+            host: portMonitorHost,
             port: 8080,
             checkInterval: 300_000,
             timeout: 30_000,
@@ -159,7 +178,7 @@ const defaultProps: SiteDetailsNavigationProperties = {
     handleStopSiteMonitoring: vi.fn(),
     isLoading: false,
     isMonitoring: true,
-    selectedMonitorId: "monitor-1",
+    selectedMonitorId: httpMonitorId,
     setActiveSiteDetailsTab: vi.fn(),
 };
 
@@ -316,7 +335,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             const selector = screen.getByTestId(
                 "monitor-selector"
             ) as HTMLSelectElement;
-            expect(selector).toHaveValue("monitor-1");
+            expect(selector).toHaveValue(httpMonitorId);
         });
 
         it("should display all monitors in selector", ({ task, annotate }) => {
@@ -364,7 +383,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             const selector = screen.getByTestId(
                 "monitor-selector"
             ) as HTMLSelectElement;
-            fireEvent.change(selector, { target: { value: "monitor-2" } });
+            fireEvent.change(selector, { target: { value: portMonitorId } });
 
             expect(handleMonitorIdChange).toHaveBeenCalled();
         });
@@ -493,7 +512,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             fireEvent.click(screen.getByText(/Website URL Analytics/));
 
             expect(setActiveSiteDetailsTab).toHaveBeenCalledWith(
-                "monitor-1-analytics"
+                `${httpMonitorId}-analytics`
             );
         });
     });
@@ -583,7 +602,7 @@ describe("SiteDetailsNavigation Navigation Tests", () => {
             annotate("Type: Monitoring", "type");
 
             renderSiteDetailsNavigation({
-                activeSiteDetailsTab: "monitor-1-analytics",
+                activeSiteDetailsTab: `${httpMonitorId}-analytics`,
             });
 
             const monitorButton = screen.getByRole("button", {

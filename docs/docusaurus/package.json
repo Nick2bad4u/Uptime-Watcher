@@ -81,6 +81,7 @@
         "prism-react-renderer": "^2.4.1",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
+        "@eslint/config-inspector": "^1.4.2",
         "react-github-btn": "^1.4.0"
     },
     "devDependencies": {
@@ -94,8 +95,6 @@
         "typedoc-plugin-markdown": "^4.9.0",
         "typescript": "^5.9.3"
     },
-    "peerDependencies": {},
-    "optionalDependencies": {},
     "bundledDependencies": [],
     "engines": {
         "node": ">=18.0"
@@ -103,5 +102,6 @@
     "os": [],
     "cpu": [],
     "preferGlobal": false,
-    "publishConfig": {}
+    "publishConfig": {},
+    "bundleDependencies": []
 }

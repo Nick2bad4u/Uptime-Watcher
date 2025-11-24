@@ -42,6 +42,13 @@ import { vi, type Mock } from "vitest";
 import type { PartialDeep, SetOptional } from "type-fest";
 
 import type { MonitorStatus, MonitorType, StatusHistory } from "@shared/types";
+import {
+    monitorIdArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 /**
  * Create a strongly typed Vitest mock for a given function signature.
@@ -190,9 +197,9 @@ export const createMockMonitorOptional = (
 export const createMockMonitor = (
     overrides: Partial<CompleteMonitor> = {}
 ): CompleteMonitor => ({
-    id: "monitor-1",
+    id: sampleOne(monitorIdArbitrary),
     type: "http",
-    url: "https://example.com",
+    url: sampleOne(siteUrlArbitrary),
     checkInterval: 300_000,
     timeout: 30_000,
     retryAttempts: 3,
@@ -236,8 +243,8 @@ export const createMockMonitor = (
 export const createMockSite = (
     overrides: Partial<CompleteSite> = {}
 ): CompleteSite => ({
-    identifier: "site-1",
-    name: "Test Site",
+    identifier: sampleOne(siteIdentifierArbitrary),
+    name: sampleOne(siteNameArbitrary),
     monitoring: true,
     monitors: [createMockMonitor()],
     ...overrides,

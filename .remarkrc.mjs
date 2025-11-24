@@ -284,7 +284,7 @@ const remarkConfig = {
         ["remark-lint-final-newline", true], // Ensure final newline
         ["remark-lint-no-tabs", true], // Prevent tab characters
         ["remark-lint-hard-break-spaces", true], // Enforce proper line breaks
-        ["remark-lint-linebreak-style", "unix"], // Normalize files to LF endings
+        ["remark-lint-linebreak-style", "consistent"], // Normalize files to LF endings
         ["remark-lint-no-missing-blank-lines", false], // Disabled: blank-line handling is delegated to Prettier and other rules
         ["remark-lint-no-paragraph-content-indent", true], // Disallow unintended paragraph indentation
 

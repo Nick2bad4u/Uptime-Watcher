@@ -1,0 +1,445 @@
+---
+title: Error Handling & Recovery
+description: Error handling strategies and recovery mechanisms in Uptime Watcher
+---
+
+{/* eslint-disable no-unused-vars,@eslint-community/eslint-comments/disable-enable-pair -- Layout component consumed by MDX JSX */}
+import Layout from '@theme/Layout';
+import Mermaid from '@theme/Mermaid';
+
+export default function ErrorHandling() {
+    return (
+        <Layout
+            title="Error Handling & Recovery"
+            description="Error handling strategies and recovery mechanisms in Uptime Watcher"
+        >
+            <div className="container margin-vert--lg">
+                <div className="row">
+                    <div className="col">
+
+# Error Handling & Recovery
+
+This page documents the comprehensive error handling and recovery strategies implemented throughout Uptime Watcher.
+
+## Error Handling Architecture
+
+The following diagram shows the layered error handling architecture:
+
+<Mermaid value={`graph TB
+    subgraph ErrorSources["Error Sources"]
+        UserInput[User Input Errors]
+        NetworkErrors[Network Errors]
+        DatabaseErrors[Database Errors]
+        IPCErrors[IPC Errors]
+        SystemErrors[System Errors]
+        UnexpectedErrors[Unexpected Errors]
+    end
+
+    subgraph ErrorDetection["Error Detection"]
+        Validation[Input Validation\nZod Schemas]
+        TryCatch[Try-Catch Blocks]
+        PromiseRejection[Promise Rejection Handlers]
+        ErrorBoundary[React Error Boundaries]
+        GlobalHandler[Global Error Handler]
+    end
+
+    subgraph ErrorProcessing["Error Processing"]
+        Normalize[Error Normalization\nensureError()]
+        Classify[Error Classification]
+        Enrich[Context Enrichment]
+        Transform[User-Friendly Messages]
+    end
+
+    subgraph ErrorResponse["Error Response"]
+        Log[Structured Logging]
+        Notify[User Notification]
+        Report[Error Reporting]
+        Telemetry[Telemetry Collection]
+    end
+
+    subgraph Recovery["Recovery Strategies"]
+        Retry[Automatic Retry\nExponential Backoff]
+        Fallback[Fallback Values]
+        Graceful[Graceful Degradation]
+        FullSync[Full State Sync]
+        Restart[Component Restart]
+    end
+
+    UserInput --> Validation
+    NetworkErrors --> TryCatch
+    DatabaseErrors --> TryCatch
+    IPCErrors --> PromiseRejection
+    SystemErrors --> GlobalHandler
+    UnexpectedErrors --> ErrorBoundary
+
+    Validation --> Normalize
+    TryCatch --> Normalize
+    PromiseRejection --> Normalize
+    ErrorBoundary --> Normalize
+    GlobalHandler --> Normalize
+
+    Normalize --> Classify
+    Classify --> Enrich
+    Enrich --> Transform
+
+    Transform --> Log
+    Transform --> Notify
+    Transform --> Report
+    Transform --> Telemetry
+
+    Log --> Retry
+    Notify --> Fallback
+    Report --> Graceful
+    Telemetry --> FullSync
+    Graceful --> Restart
+
+    classDef source fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef detect fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef process fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef respond fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef recover fill:#10b981,stroke:#059669,color:#ffffff
+
+    class UserInput,NetworkErrors,DatabaseErrors,IPCErrors,SystemErrors,UnexpectedErrors source
+    class Validation,TryCatch,PromiseRejection,ErrorBoundary,GlobalHandler detect
+    class Normalize,Classify,Enrich,Transform process
+    class Log,Notify,Report,Telemetry respond
+    class Retry,Fallback,Graceful,FullSync,Restart recover`} />
+
+## Error Classification Hierarchy
+
+This diagram shows how errors are classified and routed:
+
+<Mermaid value={`classDiagram
+    class BaseError {
+        <<abstract>>
+        +name: string
+        +message: string
+        +stack: string
+        +timestamp: Date
+        +context: ErrorContext
+        +toJSON(): object
+    }
+
+    class ValidationError {
+        +field: string
+        +constraint: string
+        +value: unknown
+    }
+
+    class NetworkError {
+        +url: string
+        +statusCode: number
+        +timeout: boolean
+        +retryable: boolean
+    }
+
+    class DatabaseError {
+        +query: string
+        +code: string
+        +constraint: string
+    }
+
+    class IPCError {
+        +channel: string
+        +direction: "send" | "receive"
+        +payload: unknown
+    }
+
+    class MonitorError {
+        +monitorId: string
+        +siteId: string
+        +checkType: MonitorType
+        +recoverable: boolean
+    }
+
+    class StateError {
+        +storeName: string
+        +operation: string
+        +invalidData: unknown
+    }
+
+    class SystemError {
+        +code: string
+        +errno: number
+        +syscall: string
+    }
+
+    BaseError <|-- ValidationError
+    BaseError <|-- NetworkError
+    BaseError <|-- DatabaseError
+    BaseError <|-- IPCError
+    BaseError <|-- MonitorError
+    BaseError <|-- StateError
+    BaseError <|-- SystemError
+
+    class ErrorHandler {
+        +handle(error: BaseError): void
+        +recover(error: BaseError): Promise~void~
+        +report(error: BaseError): void
+    }
+
+    ErrorHandler --> BaseError`} />
+
+## Error Recovery Flow
+
+This flowchart shows the error recovery decision tree:
+
+<Mermaid value={`flowchart TD
+    Error[Error Detected] --> Capture[Capture Error Context]
+    Capture --> Normalize[Normalize Error]
+    Normalize --> Classify{Classify Error Type}
+
+    Classify -->|Validation| ValidationFlow[Validation Error]
+    Classify -->|Network| NetworkFlow[Network Error]
+    Classify -->|Database| DatabaseFlow[Database Error]
+    Classify -->|IPC| IPCFlow[IPC Error]
+    Classify -->|Monitor| MonitorFlow[Monitor Error]
+    Classify -->|State| StateFlow[State Error]
+    Classify -->|System| SystemFlow[System Error]
+    Classify -->|Unknown| UnknownFlow[Unknown Error]
+
+    ValidationFlow --> ShowUser[Show Validation Message]
+    ShowUser --> HighlightField[Highlight Invalid Field]
+    HighlightField --> WaitCorrection[Wait for User Correction]
+
+    NetworkFlow --> CheckRetryable{Retryable?}
+    CheckRetryable -->|Yes| ExponentialBackoff[Exponential Backoff]
+    ExponentialBackoff --> Retry[Retry Request]
+    Retry --> CheckSuccess{Success?}
+    CheckSuccess -->|Yes| Recovered[Recovered]
+    CheckSuccess -->|No| CheckMaxRetries{Max Retries?}
+    CheckMaxRetries -->|No| ExponentialBackoff
+    CheckMaxRetries -->|Yes| ShowNetworkError[Show Network Error]
+    CheckRetryable -->|No| ShowNetworkError
+
+    DatabaseFlow --> CheckConstraint{Constraint Violation?}
+    CheckConstraint -->|Yes| ShowConstraintError[Show Constraint Error]
+    CheckConstraint -->|No| CheckRecoverable{Recoverable?}
+    CheckRecoverable -->|Yes| RetryDB[Retry Database Operation]
+    RetryDB --> RecoverSuccess{Success?}
+    RecoverSuccess -->|Yes| Recovered
+    RecoverSuccess -->|No| ShowDBError[Show Database Error]
+    CheckRecoverable -->|No| ShowDBError
+
+    IPCFlow --> LogIPC[Log IPC Error]
+    LogIPC --> CheckPayload{Payload Valid?}
+    CheckPayload -->|No| FullSync[Request Full State Sync]
+    FullSync --> Recovered
+    CheckPayload -->|Yes| ShowIPCError[Show IPC Error]
+
+    MonitorFlow --> LogMonitor[Log Monitor Error]
+    LogMonitor --> PauseMonitor[Pause Monitor]
+    PauseMonitor --> NotifyUser[Notify User]
+    NotifyUser --> ScheduleRetry[Schedule Retry]
+
+    StateFlow --> LogState[Log State Error]
+    LogState --> InvalidateCache[Invalidate Cache]
+    InvalidateCache --> RequestSync[Request Full Sync]
+    RequestSync --> RehydrateStore[Rehydrate Store]
+    RehydrateStore --> Recovered
+
+    SystemFlow --> LogSystem[Log System Error]
+    LogSystem --> CheckCritical{Critical?}
+    CheckCritical -->|Yes| GracefulShutdown[Graceful Shutdown]
+    CheckCritical -->|No| ShowSystemError[Show System Error]
+
+    UnknownFlow --> LogUnknown[Log Unknown Error]
+    LogUnknown --> Telemetry[Send Telemetry]
+    Telemetry --> ShowGenericError[Show Generic Error]
+
+    %% Error reporting
+    ShowNetworkError --> Report[Report to Error Store]
+    ShowDBError --> Report
+    ShowIPCError --> Report
+    ShowSystemError --> Report
+    ShowGenericError --> Report
+
+    Report --> End[End]
+    Recovered --> End
+    WaitCorrection --> End
+    ScheduleRetry --> End
+    GracefulShutdown --> End
+
+    classDef errorNode fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef decision fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef recovery fill:#10b981,stroke:#059669,color:#ffffff
+    classDef log fill:#3b82f6,stroke:#1e40af,color:#ffffff
+
+    class Error,ShowUser,ShowNetworkError,ShowDBError,ShowIPCError,ShowSystemError,ShowGenericError,ShowConstraintError errorNode
+    class Classify,CheckRetryable,CheckSuccess,CheckMaxRetries,CheckConstraint,CheckRecoverable,RecoverSuccess,CheckPayload,CheckCritical decision
+    class ExponentialBackoff,Retry,RetryDB,FullSync,InvalidateCache,RequestSync,RehydrateStore,Recovered,ScheduleRetry recovery
+    class Capture,Normalize,LogIPC,LogMonitor,LogState,LogSystem,LogUnknown,Telemetry,Report log`} />
+
+## Retry Strategy with Exponential Backoff
+
+This diagram shows the retry mechanism with exponential backoff:
+
+<Mermaid value={`sequenceDiagram
+    autonumber
+    participant Operation as Failed Operation
+    participant Retry as Retry Handler
+    participant Backoff as Exponential Backoff
+    participant Logger as Error Logger
+    participant User as User Notification
+
+    Operation->>Retry: operation failed
+    Retry->>Retry: attempt = 1
+    Retry->>Backoff: calculate delay (2^1 * 100ms)
+    Note over Backoff: Delay: 200ms
+    Backoff->>Retry: wait 200ms
+    Retry->>Operation: retry attempt 1
+
+    alt Success
+        Operation-->>Retry: success
+        Retry->>Logger: log recovery
+    else Failure
+        Operation-->>Retry: failed
+        Retry->>Retry: attempt = 2
+        Retry->>Backoff: calculate delay (2^2 * 100ms)
+        Note over Backoff: Delay: 400ms
+        Backoff->>Retry: wait 400ms
+        Retry->>Operation: retry attempt 2
+
+        alt Success
+            Operation-->>Retry: success
+            Retry->>Logger: log recovery
+        else Failure
+            Operation-->>Retry: failed
+            Retry->>Retry: attempt = 3
+            Retry->>Backoff: calculate delay (2^3 * 100ms)
+            Note over Backoff: Delay: 800ms
+            Backoff->>Retry: wait 800ms
+            Retry->>Operation: retry attempt 3
+
+            alt Success
+                Operation-->>Retry: success
+                Retry->>Logger: log recovery
+            else Max Retries Reached
+                Operation-->>Retry: failed
+                Retry->>Logger: log permanent failure
+                Retry->>User: show error notification
+            end
+        end
+    end`} />
+
+## Error Boundary Component Tree
+
+This diagram shows React Error Boundary placement:
+
+<Mermaid value={`graph TB
+    App[App Root] --> RootBoundary[Root Error Boundary]
+
+    RootBoundary --> Theme[Theme Provider]
+    Theme --> Layout[App Layout]
+
+    Layout --> Header[Header]
+    Layout --> MainBoundary[Main Content Boundary]
+    Layout --> Footer[Footer]
+
+    MainBoundary --> Dashboard[Dashboard]
+    Dashboard --> SiteListBoundary[Site List Boundary]
+    SiteListBoundary --> SiteCards[Site Cards...]
+
+    MainBoundary --> ModalBoundary[Modal Boundary]
+    ModalBoundary --> AddSite[Add Site Modal]
+    ModalBoundary --> Settings[Settings Modal]
+    ModalBoundary --> Details[Details Modal]
+
+    Details --> TabBoundary[Tab Content Boundary]
+    TabBoundary --> Overview[Overview Tab]
+    TabBoundary --> History[History Tab]
+    TabBoundary --> Analytics[Analytics Tab]
+
+    RootBoundary -.->|catch all| FallbackUI[Fallback UI]
+    MainBoundary -.->|catch main| ErrorDisplay[Error Display]
+    SiteListBoundary -.->|catch list| EmptyState[Empty State]
+    ModalBoundary -.->|catch modal| ModalError[Modal Error]
+    TabBoundary -.->|catch tab| TabError[Tab Error]
+
+    classDef boundary fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef component fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef fallback fill:#f59e0b,stroke:#d97706,color:#ffffff
+
+    class RootBoundary,MainBoundary,SiteListBoundary,ModalBoundary,TabBoundary boundary
+    class App,Theme,Layout,Header,Footer,Dashboard,SiteCards,AddSite,Settings,Details,Overview,History,Analytics component
+    class FallbackUI,ErrorDisplay,EmptyState,ModalError,TabError fallback`} />
+
+## Error Logging and Telemetry
+
+This diagram shows the error logging and telemetry pipeline:
+
+<Mermaid value={`flowchart LR
+    subgraph Sources["Error Sources"]
+        Renderer[Renderer Errors]
+        Main[Main Process Errors]
+        Monitors[Monitor Errors]
+    end
+
+    subgraph Processing["Error Processing"]
+        Normalize[Normalize Error]
+        Enrich[Add Context]
+        Sanitize[Sanitize PII]
+        Format[Format for Storage]
+    end
+
+    subgraph Storage["Local Storage"]
+        ErrorLog[Error Log File]
+        ErrorStore[Error Store\nZustand]
+        Console[Console Output]
+    end
+
+    subgraph Analysis["Analysis"]
+        Patterns[Pattern Detection]
+        Frequency[Frequency Analysis]
+        Severity[Severity Classification]
+    end
+
+    subgraph Actions["Actions"]
+        Alert[User Alerts]
+        Recovery[Auto Recovery]
+        Report[Error Report]
+    end
+
+    Renderer --> Normalize
+    Main --> Normalize
+    Monitors --> Normalize
+
+    Normalize --> Enrich
+    Enrich --> Sanitize
+    Sanitize --> Format
+
+    Format --> ErrorLog
+    Format --> ErrorStore
+    Format --> Console
+
+    ErrorLog --> Patterns
+    ErrorStore --> Frequency
+    Console --> Severity
+
+    Patterns --> Alert
+    Frequency --> Recovery
+    Severity --> Report
+
+    classDef source fill:#ef4444,stroke:#dc2626,color:#ffffff
+    classDef process fill:#3b82f6,stroke:#1e40af,color:#ffffff
+    classDef storage fill:#f59e0b,stroke:#d97706,color:#ffffff
+    classDef analysis fill:#8b5cf6,stroke:#7c3aed,color:#ffffff
+    classDef action fill:#10b981,stroke:#059669,color:#ffffff
+
+    class Renderer,Main,Monitors source
+    class Normalize,Enrich,Sanitize,Format process
+    class ErrorLog,ErrorStore,Console storage
+    class Patterns,Frequency,Severity analysis
+    class Alert,Recovery,Report action`} />
+
+---
+
+The error handling system ensures robust operation through comprehensive error detection, classification, recovery strategies, and user-friendly error messaging across all application layers.
+
+                    </div>
+                </div>
+            </div>
+        </Layout>
+    );
+
+}

@@ -105,5 +105,10 @@ export const statusKindArbitrary = fc.constantFrom(
  *
  * @returns The generated value.
  */
-export const sampleOne = <TValue>(arbitrary: fc.Arbitrary<TValue>): TValue =>
-    fc.sample(arbitrary, 1)[0];
+export const sampleOne = <TValue>(arbitrary: fc.Arbitrary<TValue>): TValue => {
+    const [value] = fc.sample(arbitrary, 1);
+    if (value === undefined) {
+        throw new Error("fast-check failed to sample a value");
+    }
+    return value;
+};
