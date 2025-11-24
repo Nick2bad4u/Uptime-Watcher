@@ -128,6 +128,8 @@
     "docs:clean": "rimraf docs",
     "docs:deploy": "npm run docs:typedoc && npm run build:eslint-inspector && cd docs/docusaurus && yarn deploy",
     "docs:deploy:local": "npm run docs:deploy",
+    "docs:backup": "git subtree push --prefix=docs/docusaurus origin-docs main",
+    "docs:backup:force": "git push origin-docs `git subtree split --prefix=docs/docusaurus`:main --force",
     "docs:download:all": "npm run docs:download:axios && npm run docs:download:react && npm run docs:download:chartjs && npm run docs:download:zustand && npm run docs:download:electron && npm run docs:download:validator && npm run docs:download:zod && npm run docs:download:sqlite3 && npm run docs:download:sqlite3-wasm && npm run docs:download:nodeping && npm run docs:download:tsdoc",
     "docs:download:axios": "node scripts/download-axios-docs.mjs",
     "docs:download:chartjs": "node scripts/download-chartjs-docs.mjs",

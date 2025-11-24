@@ -66,7 +66,7 @@ description: "Improve Test Coverage by Replacing Generic Tests with Property-Bas
 - Express invariants with fc.property and domain-specific arbitraries (fc.record, fc.tuple, fc.oneof).
 - Avoid excessive use of fc.pre to reduce rejection rates; prefer constrained arbitraries.
 - Ensure arbitraries are shrinkable so failing cases produce minimal counterexamples.
-- Combine property tests with example-based tests for well-known edgecases (null, undefined, empty, max/min).
+- Combine property tests with example-based tests for well-known edge cases (null, undefined, empty, max/min).
 - Use deterministic seeds in CI when necessary: fc.assert(..., { seed: <number>, numRuns: <number> }).
 - When properties uncover bugs, record the counterexample and document the issue; fix only with clear test-based justification.
 
@@ -84,7 +84,9 @@ description: "Improve Test Coverage by Replacing Generic Tests with Property-Bas
 
 # Search & Replace heuristics for generic tests
 - Find test titles matching:
-  - ^\s*(works|does (something|something else)|basic|smoke|sanity|handles (input|errors)?)\b
+  - (JavaScript/IDE regex) ^\s*(works|does (something|something else)|basic|smoke|sanity|handles (input|errors)?)\b
+    # Note: Parentheses are used for grouping/alternation, not for matching literal parentheses.
+    # If using grep, escape parentheses as needed: \(
   - Titles under ~5 words that do not describe a behavior
 - Find assertions that only assert definedness: expect(x).toBeDefined() with no further checks
 - Prioritize replacing generic tests covering core logic first
@@ -104,5 +106,9 @@ description: "Improve Test Coverage by Replacing Generic Tests with Property-Bas
 - A short report summarizing changes, listing files that required non-test fixes or refactors, and any bugs discovered
 
 Begin by analyzing current test outputs and the testing codebase for generic tests. Start with the most critical modules and work your way through the testing codebase methodically. Your focus is on quality, maintainability, and robustness of tests using property-based testing principles. We want to replace generic names/objects with property-based tests wherever feasible while improving overall test quality. Improve metadata and maintainability throughout.
+
+If you need more resources on fast-check and testing, refer to these documents:
+- Vitest and Fast-Check Instructions: `.github/Vite-FastCheck-Typescript.instructions.md`
+- Test Folder Instructions: `.github/Tests-Folder.instructions.md`
 
 Start now!!!

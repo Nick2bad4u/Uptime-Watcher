@@ -7,6 +7,23 @@
 # Generated files
 .docusaurus
 .cache-loader
+# Docusaurus documentation
+docs/_media
+**/docs/_media
+docs/assets
+**/docs/assets
+docs/documents
+**/docs/documents
+docs/electron
+**/docs/electron
+docs/shared
+**/docs/shared
+docs/src
+**/docs/src
+/build
+**/build
+/.docusaurus
+**/.docusaurus
 
 # Misc
 .DS_Store

@@ -791,6 +791,8 @@ docs/docusaurus/docs/src
 **/docs/docusaurus/docs/src
 docs/docusaurus/build
 **/docs/docusaurus/build
+docs/docusaurus/.docusaurus
+**/docs/docusaurus/.docusaurus
 
 # AI tools
 .agentic-tools*
