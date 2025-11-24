@@ -12,6 +12,8 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import {
     isNonEmptyString,
     isValidFQDN,
@@ -24,6 +26,30 @@ import {
     isValidUrl,
     safeInteger,
 } from "../../validation/validatorUtils";
+
+const alphanumericChars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const separatorChars = "-_";
+const alphanumericCharArb = fc.constantFrom(...alphanumericChars.split(""));
+const identifierCharArb = fc.constantFrom(
+    ...(alphanumericChars + separatorChars).split("")
+);
+const validIdentifierArb = fc
+    .tuple(alphanumericCharArb, fc.array(identifierCharArb, { maxLength: 47 }))
+    .map(([firstChar, rest]) => `${firstChar}${rest.join("")}`);
+const invalidIdentifierArb = fc
+    .tuple(
+        fc.array(identifierCharArb, { maxLength: 10 }),
+        fc.constantFrom("@", " ", ".", "#", "%", "+"),
+        fc.array(identifierCharArb, { maxLength: 10 })
+    )
+    .map(
+        ([
+            prefix,
+            invalidChar,
+            suffix,
+        ]) => `${prefix.join("")}${invalidChar}${suffix.join("")}`
+    );
 
 describe("validatorUtils", () => {
     describe(isNonEmptyString, () => {
@@ -86,6 +112,15 @@ describe("validatorUtils", () => {
             expect(isNonEmptyString("\thello\t")).toBeTruthy();
             expect(isNonEmptyString("\nhello\n")).toBeTruthy();
         });
+
+        test.prop([fc.string()], { numRuns: 100 })(
+            "is equivalent to checking trimmed length greater than zero",
+            (candidate) => {
+                expect(isNonEmptyString(candidate)).toBe(
+                    candidate.trim().length > 0
+                );
+            }
+        );
     });
 
     describe(isValidFQDN, () => {
@@ -234,6 +269,20 @@ describe("validatorUtils", () => {
             expect(isValidIdentifier("-hyphen")).toBeTruthy();
             expect(isValidIdentifier("test_-_test")).toBeTruthy();
         });
+
+        test.prop([validIdentifierArb], { numRuns: 80 })(
+            "accepts identifiers composed of the allowed alphabet",
+            (identifier) => {
+                expect(isValidIdentifier(identifier)).toBe(true);
+            }
+        );
+
+        test.prop([invalidIdentifierArb], { numRuns: 80 })(
+            "rejects identifiers that include invalid characters",
+            (identifier) => {
+                expect(isValidIdentifier(identifier)).toBe(false);
+            }
+        );
     });
 
     describe(isValidIdentifierArray, () => {
@@ -273,6 +322,19 @@ describe("validatorUtils", () => {
             expect(isValidIdentifierArray(["valid", "in@valid"])).toBeFalsy();
             expect(isValidIdentifierArray(["valid", null])).toBeFalsy();
             expect(isValidIdentifierArray(["valid", undefined])).toBeFalsy();
+        });
+
+        test.prop([fc.array(validIdentifierArb, { maxLength: 6 })], {
+            numRuns: 60,
+        })("is true for arrays containing only valid identifiers", (ids) => {
+            expect(isValidIdentifierArray(ids)).toBe(true);
+        });
+
+        test.prop([fc.array(validIdentifierArb, { maxLength: 6 })], {
+            numRuns: 60,
+        })("is false when any entry contains an invalid character", (ids) => {
+            const invalidItem = `${ids.join("-")}@`;
+            expect(isValidIdentifierArray([...ids, invalidItem])).toBe(false);
         });
 
         it("should return false for non-array values", async ({

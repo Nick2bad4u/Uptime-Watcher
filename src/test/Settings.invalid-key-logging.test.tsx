@@ -77,11 +77,6 @@ describe("Settings - Invalid Key Logging", () => {
         annotate("Category: Core", "category");
         annotate("Type: Data Update", "type");
 
-        annotate(`Testing: ${task.name}`, "functional");
-        annotate("Component: Settings.invalid-key-logging", "component");
-        annotate("Category: Core", "category");
-        annotate("Type: Data Update", "type");
-
         // Create a component that will trigger the invalid key scenario
         const TestComponent = () => {
             interface SettingsType {

@@ -4,12 +4,43 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { test } from "@fast-check/vitest";
+import fc from "fast-check";
 import { isValidUrl } from "@shared/validation/validatorUtils";
 import {
     parseUptimeValue,
     safeGetHostname,
 } from "../../../utils/monitoring/dataValidation";
 import { logger } from "../../../services/logger";
+
+const alphaNumericChars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
+const alphaNumCharArb = fc.constantFrom(...alphaNumericChars.split(""));
+const safeSegmentArb = fc
+    .array(alphaNumCharArb, { minLength: 1, maxLength: 8 })
+    .map((chars) => chars.join(""));
+const safeQueryArb = fc
+    .array(alphaNumCharArb, { minLength: 1, maxLength: 6 })
+    .map((chars) => chars.join(""));
+const safeHttpUrlArb = fc
+    .tuple(
+        fc.constantFrom("http", "https"),
+        fc.domain(),
+        fc.array(safeSegmentArb, { maxLength: 3 }),
+        fc.option(safeQueryArb, { nil: undefined })
+    )
+    .map(
+        ([
+            scheme,
+            host,
+            segments,
+            query,
+        ]) => {
+            const path = segments.length > 0 ? `/${segments.join("/")}` : "";
+            const queryPart = query ? `?${query}=1` : "";
+            return `${scheme}://${host}${path}${queryPart}`;
+        }
+    );
 
 // Mock the logger
 vi.mock("../../../services/logger", () => ({
@@ -124,6 +155,31 @@ describe("Monitoring Data Validation", () => {
             expect(parseUptimeValue("-999%")).toBe(0);
             expect(parseUptimeValue(" -10% ")).toBe(0);
         });
+
+        test.prop(
+            [
+                fc.float({ min: -5000, max: 5000, noNaN: true }),
+                fc.boolean(),
+                fc.boolean(),
+            ],
+            { numRuns: 75 }
+        )(
+            "parses numeric strings with optional percent sign and whitespace",
+            (value, includePercent, includeWhitespace) => {
+                let text = value.toString();
+                if (includePercent) {
+                    text = `${text}%`;
+                }
+                if (includeWhitespace) {
+                    text = `\n ${text} \t`;
+                }
+
+                const parsed = parseUptimeValue(text);
+                const expected = Math.max(0, Math.min(100, value));
+
+                expect(parsed).toBeCloseTo(expected, 10);
+            }
+        );
 
         it("should return 0 for invalid numeric strings and log warning", async ({
             task,
@@ -324,6 +380,21 @@ describe("Monitoring Data Validation", () => {
                 isValidUrl("https://example.com/path?param=value&other=test")
             ).toBeTruthy();
         });
+
+        test.prop([safeHttpUrlArb], { numRuns: 50 })(
+            "returns true for any http/https URL with limited safe characters",
+            (url) => {
+                expect(isValidUrl(url)).toBe(true);
+            }
+        );
+
+        test.prop([fc.domain()], { numRuns: 30 })(
+            "returns false for inputs missing a scheme",
+            (domain) => {
+                expect(isValidUrl(domain)).toBe(false);
+                expect(isValidUrl(`${domain}/path`)).toBe(false);
+            }
+        );
     });
 
     describe(safeGetHostname, () => {
@@ -448,6 +519,20 @@ describe("Monitoring Data Validation", () => {
             expect(safeGetHostname("invalid-url")).toBe("");
             expect(safeGetHostname("")).toBe("");
         });
+
+        test.prop([safeHttpUrlArb], { numRuns: 50 })(
+            "matches URL.hostname for any valid http/https URL",
+            (url) => {
+                expect(safeGetHostname(url)).toBe(new URL(url).hostname);
+            }
+        );
+
+        test.prop([fc.domain()], { numRuns: 30 })(
+            "returns empty string for scheme-less domain strings",
+            (domain) => {
+                expect(safeGetHostname(domain)).toBe("");
+            }
+        );
     });
 
     describe("Integration tests", () => {

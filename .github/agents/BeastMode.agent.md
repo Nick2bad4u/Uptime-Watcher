@@ -35,6 +35,10 @@ handoffs:
    agent: BeastMode
    prompt: Review the recent work and ToDo list to ensure all tasks are complete. Follow the plan in .github/prompts/Review.prompt.md - If everything is complete, clear the todo list.
    send: false
+ - label: FC Prop
+   agent: BeastMode
+   prompt: "Keep looking for generic name/objects and change them into fast-check props. Make sure you're looking in all test folders: `src/tests` `tests/` `electron/tests` `shared/tests` - Don't slack off and look hard for more generic names to fix. Keep going until you can't find any more. Search deeply and thoroughly."
+   send: true
 target: vscode
 ---
 

@@ -11,6 +11,7 @@ import {
     act,
     createEvent,
 } from "@testing-library/react";
+import { test, fc } from "@fast-check/vitest";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
@@ -222,6 +223,39 @@ describe(ScreenshotThumbnail, () => {
                 "https://api.microlink.io/?url=https%3A%2F%2Fexample.com%2Fpath%3Fquery%3Dtest%26value%3D123&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
             expect(image).toHaveAttribute("src", expectedUrl);
         });
+    });
+
+    describe("Property-based invariants", () => {
+        /**
+         * Property: rendered output mirrors the provided site name and URL data
+         * for accessible labels, captions, and the Microlink screenshot URL.
+         */
+        test.prop([fc.string({ maxLength: 60 }), fc.webUrl()], { numRuns: 30 })(
+            "renders snapshot details for any site name and URL",
+            (siteName, url) => {
+                const trimmedUrl = url.trim();
+                render(<ScreenshotThumbnail siteName={siteName} url={url} />);
+
+                const link = screen.getByRole("link");
+                const expectedAriaLabel = `Open ${trimmedUrl} in browser`;
+                expect(link).toHaveAttribute("aria-label", expectedAriaLabel);
+
+                const image = screen.getByRole("img");
+                expect(image).toHaveAttribute(
+                    "alt",
+                    `Screenshot of ${siteName}`
+                );
+                expect(image).toHaveAttribute(
+                    "src",
+                    `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
+                );
+
+                const caption = screen.getByText(
+                    (_, node) => node?.textContent === `Preview: ${siteName}`
+                );
+                expect(caption).toBeInTheDocument();
+            }
+        );
     });
 
     describe("Click Handling", () => {
