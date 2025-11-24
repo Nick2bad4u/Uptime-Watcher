@@ -7,14 +7,302 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[126e1ad](https://github.com/Nick2bad4u/Uptime-Watcher/commit/126e1ad6a1618085d04933aa6dd14c4c3e3f1438)...
-[126e1ad](https://github.com/Nick2bad4u/Uptime-Watcher/commit/126e1ad6a1618085d04933aa6dd14c4c3e3f1438)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/126e1ad6a1618085d04933aa6dd14c4c3e3f1438...126e1ad6a1618085d04933aa6dd14c4c3e3f1438))
+[[c45c0af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)...
+[c45c0af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b...c45c0afefb7fc80a40f8b55f26e3ca69de288c5b))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 19.0.0 [`(c45c0af)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)
+
+
+
+
+
+
+## [19.0.0] - 2025-11-24
+
+
+[[8c6fd44](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8c6fd44be31e1ac45712d06e3ff0b8650b483917)...
+[4a0e1fd](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a0e1fdf142441c46574b6d98b8655e3671d6061)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/8c6fd44be31e1ac45712d06e3ff0b8650b483917...4a0e1fdf142441c46574b6d98b8655e3671d6061))
+
+
+### ✨ Features
+
+- ✨ [feat] Update documentation and configuration files
+ - 📝 Update `.github/labeler.yml` to remove unnecessary schema declaration
+ - 🛠️ Modify `backup-docusaurus.yml` to fetch the latest state from the remote before pushing documentation
+ - 🛠️ Change `playwright.yml` to force install dependencies using `npm ci --force`
+ - 🛠️ Update `stryker-mutation-testing.yml` to force install dependencies with `npm ci --force`
+ - 📝 Simplify `.remarkignore` to ignore all MDX files in the specified directory
+ - 📝 Add TypeScript ignore directive in `.remarkrc.mjs` for missing types
+ - 📝 Correct title casing in `DOCUSAURUS_REMOTE_GIT_SETUP.md`
+ - 🎨 Update badges in `README.md` for better clarity and consistency
+ - ✨ Add `@eslint/config-inspector` to `package.json` dependencies
+ - 🎨 Refactor `index.module.css` to enhance hero section styles and animations
+ - 📝 Clean up `index.tsx` by removing unused components and improving readability
+ - 📝 Enhance `typedoc.config.json` with additional links for better documentation navigation
+ - ✨ Add new scripts in `package.json` for backing up documentation with subtree commands
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f6e2cb2)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f6e2cb2a42af563a51c07d8be9046d32b5b43672)
+
+
+
+### 📦 Dependencies
+
+- [dependency] Update version 18.9.0 [`(8c6fd44)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8c6fd44be31e1ac45712d06e3ff0b8650b483917)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update TSDoc links for consistency
+ - Correct links in TSDoc-Home.md to point to the appropriate files
+ - Update TSDoc-Package-Tsdoc.md link to reflect the correct path
+ - Modify TSDoc-Spec-Overview.md to ensure accurate package reference
+ - Adjust comments in StatusSubscriptionIndicator.utils.ts for clarity
+ - Refine useAddSiteForm.ts documentation by removing unnecessary link syntax
+ - Enhance chartConfig.ts comments for better readability
+ - Add Stylelint config schema reference in stylelint.config.mjs
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4a0e1fd)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4a0e1fdf142441c46574b6d98b8655e3671d6061)
+
+
+
+
+
+
+## [18.9.0] - 2025-11-24
+
+
+[[126e1ad](https://github.com/Nick2bad4u/Uptime-Watcher/commit/126e1ad6a1618085d04933aa6dd14c4c3e3f1438)...
+[24b157e](https://github.com/Nick2bad4u/Uptime-Watcher/commit/24b157e533d42c459e4e75066ea156653e5be135)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/126e1ad6a1618085d04933aa6dd14c4c3e3f1438...24b157e533d42c459e4e75066ea156653e5be135))
+
+
+### ✨ Features
+
+- ✨ [feat] Introduce property-based testing for various components and utilities
+ - 🧪 [test] Add property-based tests for `normalizeHistoryLimit` to ensure idempotence, range constraints, and monotonicity
+ - 🧪 [test] Implement property-based tests for `isNonEmptyString` and `isValidIdentifier` to validate string conditions
+ - 🧪 [test] Create property-based tests for `useAlertStore` to verify site name derivation logic
+ - 🧪 [test] Add property-based tests for `dataValidation` to ensure URL validation and parsing of numeric strings
+ - 📝 [docs] Add README for strict tests directory outlining scope, structure, and naming conventions
+ - 🧪 [test] Introduce shared fast-check arbitraries for consistent testing across strict tests
+ - 🧪 [test] Implement `assertProperty` helper for standardized property assertions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0797d4d)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0797d4d6f05ea3713188f8e7a10650760a41d7b7)
+
+
+- ✨ [feat] Implement Docusaurus documentation backup workflow
+ - 🛠️ Add GitHub Actions workflow for building and backing up Docusaurus documentation
+ - 📁 Create backup-docusaurus.yml to automate documentation deployment
+ - 🔧 Update package.json with commands for subtree backup and force push
+ - 📝 Add documentation style guide for Docusaurus setup
+ - 🎨 Enhance README with detailed site structure and deployment instructions
+ - 🧹 Update .gitignore to exclude Docusaurus build artifacts and generated files
+ - 🔍 Refine prompts for property-based testing in Enhance-Tests prompt
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(542eb08)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/542eb08db4a5d1f8a625c38778732533dc155683)
+
+
+- ✨ [feat] Update BeastMode agent tools and add Enhance-Tests prompt
+ - 🔧 Updated tools in BeastMode.agent.md to include new functionalities from Tavily-Remote-MCP and deepwiki.
+ - 📝 Added new Enhance-Tests prompt to improve test coverage with property-based tests using fast-check.
+ - 📝 Refined Review-Code-Base prompt by removing "Simplified" from the title for clarity.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(e369ba0)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/e369ba0670f757cbfef34ef3ed94281acfe9fb20)
+
+
+- ✨ [feat] Enhance AddSiteForm with improved validation and error handling
+ - 🛠️ Introduced a new error message for required site names to improve user feedback.
+ - 🧪 Added state management for form submission to track if the form has been submitted.
+ - ⚡ Updated the site name input to trim leading whitespace, ensuring cleaner data entry.
+ - 🎨 Refactored the error display logic to show error messages conditionally based on user input.
+ - 📝 Enhanced the CSS for field groups and error messages for better visual hierarchy.
+
+🧪 [test] Expand AddSiteForm tests for comprehensive coverage
+ - 🧪 Added tests to verify the presence of error messages for required fields.
+ - 🧪 Updated existing tests to check for multiple instances of error messages.
+ - 🧪 Enhanced behavioral tests to ensure proper form submission and error handling.
+
+🚜 [refactor] Clean up and optimize existing test cases
+ - 🎨 Improved readability of test cases by consolidating repeated logic.
+ - 🧹 Removed unnecessary console logs and debug statements from tests.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6e05b33)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/6e05b3315f5a5d41ae3f7aa7eec048acbeebfa7d)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update SiteCardHeader and SiteCompactCard action button behavior
+ - 🔧 Modify action button props to include `allMonitorsRunning`, `isMonitoring`, and `disabled` states for better control over button interactions.
+ - 📝 Enhance tests for `SiteCardHeader` to verify interaction handlers for action buttons, ensuring they are called correctly.
+ - 📝 Update `SiteCompactCard` tests to reflect changes in action button props and verify the correct state is passed to buttons.
+
+🧪 [test] Add SiteTableRow tests for interaction and rendering
+ - 📝 Introduce comprehensive tests for `SiteTableRow` to validate rendering of metrics, interaction handling, and keyboard accessibility.
+ - 🔧 Mock necessary hooks and components to isolate tests and ensure accurate behavior validation.
+
+📝 [test] Enhance Header tests for layout behavior
+ - 🧪 Add test to verify that the status summary is hidden when using the large card layout in the Header component.
+
+🧪 [test] Improve Settings component fuzzing tests
+ - 🔧 Extend timeout for fuzzing tests to ensure stability and reliability during execution.
+
+🧪 [test] Create SiteDetails modal behavior tests
+ - 📝 Implement tests for the `SiteDetails` component to validate modal behavior, including closing actions and tab navigation.
+
+🧪 [test] Update OverviewTab tests for availability and interval handling
+ - 📝 Add tests to ensure correct handling of availability variants and interval formatting, including error handling for formatting failures.
+
+🧪 [test] Add coverage for StatusSummary component
+ - 📝 Introduce tests to verify that the degraded pill is omitted when there are zero degraded monitors, ensuring accurate UI representation.
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(5343aaa)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/5343aaaf0c5f3cb5cc02f99447aafff2ea633c49)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update the npm-all group across 1 directory with 53 updates [`(8444d6b)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/8444d6bc735cc9f5090d854b7e6adb473ddfb26e)
+
+
 - [dependency] Update version 18.8.0 [`(126e1ad)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/126e1ad6a1618085d04933aa6dd14c4c3e3f1438)
+
+
+
+### 📝 Documentation
+
+- 📝 [docs] Update parameter descriptions in SiteManager and API interfaces
+ - Refactor synchronization parameter documentation in SiteManager to improve clarity
+ - Remove unnecessary parameter descriptions in DataApi, MonitoringApi, SettingsApi, and SitesApi interfaces
+ - Enhance documentation for the ServiceContainer's singleton instance retrieval
+ - Clarify transaction parameter in SiteWriterService
+ - Improve type annotations in siteArbitraries for better type safety
+ - Update test cases in Submit components for additional coverage and clarity
+ - Refactor site status tests to use MonitorStatus for improved type accuracy
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(24b157e)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/24b157e533d42c459e4e75066ea156653e5be135)
+
+
+- 📝 [docs] Update README to include contributors section
+ - Added All Contributors badge to README
+ - Listed contributors with their respective contributions and links
+ - Updated last modified date to November 2025 and version to 18.0.0
+
+🔧 [build] Update package-lock.json and package.json for new dependencies
+ - [dependency] Updateed version from 18.7.0 to 18.8.0 in package-lock.json and package.json
+ - Added all-contributors-cli as a dependency in package.json
+ - Added remark-ignore as a dependency in package.json
+ - Updated various dependencies in package-lock.json
+
+🧹 [chore] Modify linting configuration in .yamllint
+ - Adjusted rules for comments-indentation, document-start, and document-end
+ - Enabled checks for float-values and octal-values
+ - Updated key-duplicates and key-ordering rules for better structure
+ - Disabled truthy checks for flexibility with CI/CD configurations
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(6747906)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/67479062c69d367287022e80760c2e799d47e14a)
+
+
+
+### 🎨 Styling
+
+- 🎨 [style] Standardize indentation style and adjust Markdown settings
+ - Change `indent_style` from `spaces` to `space` for consistency
+ - Update Markdown file settings to use `indent_size` of 2 and increase `max_line_length` to 5000
+ - Ensure all configuration files use the same `indent_style` for better readability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(2ba2828)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/2ba2828934168e0837e698d1b92374bd75cf7864)
+
+
+
+### 🧪 Testing
+
+- 🧪 [test] Enhance comprehensive test coverage for site-related components
+ - ✨ [feat] Utilize arbitrary values for site names, URLs, and identifiers in tests to improve randomness and coverage
+ - 🔧 [build] Refactor test setup for `Submit.comprehensive.test.tsx` to generate dynamic site properties using `sampleOne` from `siteArbitraries`
+ - 🛠️ [fix] Update `StatusAlertToast.test.tsx` to use generated site names for consistency in alert rendering
+ - 🚜 [refactor] Modify `SiteCardHeader.behavior.test.tsx` to utilize arbitrary site names for improved test reliability
+ - 🧪 [test] Revise `ScreenshotThumbnail.arithmetic-mutations.test.tsx` to generate dynamic props for rendering tests
+ - 🧪 [test] Update `ScreenshotThumbnail.basic.test.tsx` to use arbitrary values for site names and URLs, enhancing test coverage
+ - 🔧 [build] Refactor `SettingsTab` tests to use arbitrary site names and identifiers for better test variability
+ - 🧪 [test] Enhance `SiteOverviewTab.comprehensive.test.tsx` to utilize arbitrary values for site identifiers and names
+ - 🧪 [test] Update `useAlertStore.test.ts` to use arbitrary values for monitor and site identifiers in alert tests
+ - 🧪 [test] Revise `MonitoringService.test.ts` to use arbitrary site names for creating mock site data
+ - 🧪 [test] Update `useSiteMonitoring.comprehensive.test.ts` to utilize arbitrary site names for improved test coverage
+ - 🧪 [test] Enhance `dataValidation.test.ts` to ensure URL validation tests cover a wider range of inputs
+ - 🧪 [test] Revise `siteStatus.direct.test.ts` to use arbitrary site data for testing site status functions
+ - 🎨 [style] Clean up fastcheck configuration to improve readability and maintainability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(acb4981)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/acb498188e77d853495bc1c22e4d3978aac10be8)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v18.8.0 [skip ci] [`(ada7b60)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ada7b605ccf6f2cbbbf2ae0a84b0ee624e57e869)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update ESLint configuration to include additional ignore patterns
+ - Added "public/mockServiceWorker.js" and "storybook/test-runner-jest.config.js" to global ignore patterns
+
+🛠️ [fix] Enhance error handling in sampleOne function
+ - Updated sampleOne function to throw an error if fast-check fails to sample a value
+
+🧪 [test] Refactor site status tests to use factory functions for creating test data
+ - Introduced createHttpMonitor and createSite functions to streamline test data creation
+ - Updated tests to utilize these factory functions for better readability and maintainability
+
+🎨 [style] Improve naming consistency in ScreenshotThumbnail tests
+ - Renamed renderThumbnail to mountThumbnail for clarity in purpose
+ - Updated references in tests to reflect the new naming
+
+📝 [docs] Add JSDoc comments to mockServiceWorker.js
+ - Included detailed file overview and documentation for functions within mockServiceWorker.js
+
+🎨 [style] Update Jest configuration files to improve documentation
+ - Added JSDoc comments to storybook/test-runner-jest.config.js and test-runner-jest.config.js for clarity
+ - Disabled specific ESLint rules for better compatibility with JSDoc formatting
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(0ddd1c4)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/0ddd1c4ca53d8984916e75fd138de63a8dabfc19)
+
+
+- 🔧 [build] Update configuration files for improved linting and schema validation
+ - 🛠️ [fix] Modify .mega-linter.yml to include quotes around file paths and add default workspace
+ - 🛠️ [fix] Enhance biome.json with new 'grit' assist configuration and set root to true
+ - 🛠️ [fix] Add YAML schema references to cliff.toml, kics.yaml, and lychee.toml
+ - 🛠️ [fix] Introduce npm-badges.json for GitHub integration with npm package details
+ - 📝 [docs] Correct schema reference in typedoc.config.json and typedoc.local.config.json
+ - 🔧 [build] Update package.json and package-lock.json with new type definitions for postcss
+ - 🎨 [style] Add typedoc-plugin-markdown.json for enhanced documentation generation
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(4c29fc6)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/4c29fc698149e8fc8944d9d07d518221e04415fa)
+
+
+- 🔧 [build] Update configuration files for improved linting and schema validation
+ - 🛠️ [fix] Add maxFileSize setting to .cspell.json for better file handling
+ - 📝 [docs] Include schema reference in .devskim.json for enhanced validation
+ - 🔧 [build] Extend .djlintrc with additional formatting options for better code style enforcement
+ - 📝 [docs] Add schema reference in .editorconfig for consistent coding styles
+ - 🛠️ [fix] Include schema in .madgerc for improved configuration validation
+ - 📝 [docs] Add schema reference in .remarkrc.mjs for better markdown linting
+ - 📝 [docs] Include schema reference in .checkov.yml for enhanced security scanning
+ - 📝 [docs] Add schema reference in .grype.yaml for improved vulnerability scanning
+ - 📝 [docs] Include schema in .secretlintrc.json for better secret detection
+ - 📝 [docs] Add schema reference in ActionLintConfig.yaml for enhanced linting
+ - 🛠️ [fix] Remove outdated schema from jscpd.json and add pattern for better duplication detection
+ - ✨ [feat] Create node.config.json for enhanced Node.js configuration management
+ - ✨ [feat] Add npm-badges.json for improved npm package badge management
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(32bba34)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/32bba346aaa6fb24ffab74b2624586be43673ffb)
 
 
 
