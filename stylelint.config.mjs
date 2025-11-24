@@ -22,6 +22,7 @@
  *
  * @see {@link https://stylelint.io/user-guide/configure | Stylelint Configuration Guide}
  * @see {@link https://github.com/stylelint/stylelint-config-standard | stylelint-config-standard}
+ * @see {@link https://www.schemastore.org/stylelintrc.json | Stylelint Config Schema}
  */
 
 /**

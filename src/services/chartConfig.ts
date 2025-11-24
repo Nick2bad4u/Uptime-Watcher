@@ -52,7 +52,7 @@ export interface ChartConfigs {
  * Response time line chart data structure.
  *
  * @remarks
- * Aligns with the dataset shape produced by {@link useSiteAnalytics} for
+ * Aligns with the dataset shape produced by the site analytics hook for
  * time-series response visualisations.
  *
  * @public

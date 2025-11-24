@@ -1,6 +1,5 @@
 /**
- * Shared utilities supporting {@link StatusSubscriptionIndicator} formatting
- * logic.
+ * Shared utilities supporting StatusSubscriptionIndicator formatting logic.
  *
  * @packageDocumentation
  */

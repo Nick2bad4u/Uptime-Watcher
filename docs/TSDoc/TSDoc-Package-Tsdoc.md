@@ -5,7 +5,7 @@ package](https://www.npmjs.com/package/@microsoft/tsdoc)`<br/>`{=html}
 The **@microsoft/tsdoc** package is the reference implementation of a
 parser for the TSDoc syntax. You cannot use it directly. It is an engine
 component intended to be incorporated into [other documentation
-tools](../intro/using_tsdoc.md).
+tools](./TSDoc-Intro-UsingTsdoc.md).
 
 If you are implementing a tool that needs to extract information from
 TypeScript code comments, **@microsoft/tsdoc** provides an easy solution

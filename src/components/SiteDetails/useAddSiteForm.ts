@@ -531,7 +531,7 @@ const trimLeadingWhitespace = (value: string): string => value.trimStart();
  * Creates the full state and action surface for the add-site form.
  *
  * @returns The complete {@link UseAddSiteFormReturn} object consumed by
- *   {@link AddSiteForm}.
+ *   AddSiteForm.
  */
 export function useAddSiteForm(): UseAddSiteFormReturn {
     // Form field state

@@ -149,8 +149,8 @@ Contributing design input:
 
 ## Next steps
 
-👉 [Learn more](./pages/intro/approach.md) -- about the goals and
+👉 [Learn more](./TSDoc-Intro-Approach.md) -- about the goals and
 approach
 
-👉 [How can I use TSDoc?](./pages/intro/using_tsdoc.md) -- learn about
+👉 [How can I use TSDoc?](./TSDoc-Intro-UsingTsdoc.md) -- learn about
 tools and resources for developing with TSDoc
