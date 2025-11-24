@@ -6,6 +6,10 @@ import type { StatusUpdate } from "@shared/types";
 import { STATUS_KIND } from "@shared/types";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import {
     enqueueAlertFromStatusUpdate,
@@ -23,7 +27,7 @@ const createAlert = (overrides: Partial<StatusAlert> = {}): StatusAlert => ({
     monitorId: overrides.monitorId ?? "monitor-1",
     monitorName: overrides.monitorName ?? "Primary HTTP",
     siteIdentifier: overrides.siteIdentifier ?? "site-1",
-    siteName: overrides.siteName ?? "Example",
+    siteName: overrides.siteName ?? sampleOne(siteNameArbitrary),
     status: overrides.status ?? "down",
     timestamp: overrides.timestamp ?? Date.now(),
     ...(overrides.previousStatus === undefined
@@ -40,6 +44,9 @@ const createStatusUpdate = (
         "timestamp" in overrides
             ? overrides.timestamp
             : new Date().toISOString();
+
+    const fallbackSiteName =
+        overrides.site?.name ?? sampleOne(siteNameArbitrary);
 
     return {
         details: overrides.details ?? "",
@@ -63,7 +70,7 @@ const createStatusUpdate = (
             identifier: siteIdentifier,
             monitoring: true,
             monitors: [],
-            name: overrides.site?.name ?? "Example Site",
+            name: fallbackSiteName,
         },
         siteIdentifier,
         status: overrides.status ?? STATUS_KIND.DOWN,
@@ -139,8 +146,9 @@ describe(StatusAlertToaster, () => {
     });
 
     it("renders alerts produced from status updates when in-app alerts are enabled", () => {
+        const statusUpdate = createStatusUpdate();
         act(() => {
-            enqueueAlertFromStatusUpdate(createStatusUpdate());
+            enqueueAlertFromStatusUpdate(statusUpdate);
         });
 
         render(<StatusAlertToaster />);
@@ -150,7 +158,7 @@ describe(StatusAlertToaster, () => {
                 name: /down for http/i,
             })
         ).toBeInTheDocument();
-        expect(screen.getByText(/example site/i)).toBeInTheDocument();
+        expect(screen.getByText(statusUpdate.site.name)).toBeInTheDocument();
     });
 
     it("does not enqueue alerts when in-app alerts are disabled", () => {

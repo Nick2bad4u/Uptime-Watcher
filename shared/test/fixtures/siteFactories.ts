@@ -8,6 +8,10 @@ import {
     type Site,
     type StatusHistory,
 } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 /**
  * Deterministic timestamp used across shared tests.
@@ -54,6 +58,6 @@ export const createSiteSnapshot = (overrides?: Partial<Site>): Site => ({
     identifier: "site-1",
     monitoring: true,
     monitors: [createMonitorSnapshot()],
-    name: "Example Site",
+    name: sampleOne(siteNameArbitrary),
     ...overrides,
 });

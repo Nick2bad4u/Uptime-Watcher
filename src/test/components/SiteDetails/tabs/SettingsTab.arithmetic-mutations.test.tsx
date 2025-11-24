@@ -12,6 +12,17 @@ import { describe, expect, it, vi } from "vitest";
 import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
 import type { Monitor, Site } from "@shared/types";
 import { calculateMaxDuration } from "../../../../utils/duration";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+let sampledSiteName: string;
+let sampledSiteIdentifier: string;
+let sampledMonitorUrl: string;
+const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
 vi.mock("../../../../services/logger", () => ({
@@ -177,7 +188,7 @@ vi.mock("../../../../utils/monitorTypeHelper", () => ({
 }));
 
 vi.mock("../../../../utils/fallbacks", () => ({
-    getMonitorDisplayIdentifier: vi.fn().mockReturnValue("https://example.com"),
+    getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
         unknownLabel: "Unknown",
@@ -205,10 +216,19 @@ vi.mock("../../../../constants", () => ({
     ARIA_LABEL: "aria-label",
 }));
 
+const initializeSampledSiteData = () => {
+    sampledSiteName = sampleOne(siteNameArbitrary);
+    sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+    sampledMonitorUrl = sampleOne(siteUrlArbitrary);
+    monitorIdentifierRef.value = sampledMonitorUrl;
+};
+
+initializeSampledSiteData();
+
 describe("SettingsTab arithmetic mutations", () => {
     const mockSite: Site = {
-        identifier: "test-site",
-        name: "Test Site",
+        identifier: sampledSiteIdentifier,
+        name: sampledSiteName,
         monitoring: true,
         monitors: [],
     };
@@ -216,7 +236,7 @@ describe("SettingsTab arithmetic mutations", () => {
     const mockMonitor: Monitor = {
         id: "monitor-1",
         type: "http",
-        url: "https://example.com",
+        url: sampledMonitorUrl,
         checkInterval: 60_000,
         timeout: 30_000,
         retryAttempts: 3,
@@ -239,7 +259,7 @@ describe("SettingsTab arithmetic mutations", () => {
         hasUnsavedChanges: false,
         intervalChanged: false,
         isLoading: false,
-        localName: "Test Site",
+        localName: sampledSiteName,
         retryAttemptsChanged: false,
         selectedMonitor: mockMonitor,
         setLocalName: vi.fn(),
@@ -274,7 +294,6 @@ describe("SettingsTab arithmetic mutations", () => {
                 ...defaultProps,
                 localCheckInterval: 500, // 500ms should round to 1s
             };
-
             render(<SettingsTab {...props} />);
 
             // Should display "Monitor checks every 1 seconds" (Math.round(0.5) = 1)

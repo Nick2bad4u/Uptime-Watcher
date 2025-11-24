@@ -14,6 +14,10 @@ import {
 import { fc, test } from "@fast-check/vitest";
 
 import type { Database } from "node-sqlite3-wasm";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import {
     insertWithReturning,
@@ -991,10 +995,11 @@ describe("typedQueries - Comprehensive Database Query Helpers", () => {
                 monitor_id: number;
                 monitor_url: string;
             }
+            const siteName = sampleOne(siteNameArbitrary);
             const mockResults: JoinedRecord[] = [
                 {
                     site_id: 1,
-                    site_name: "Example Site",
+                    site_name: siteName,
                     monitor_id: 1,
                     monitor_url: "https://example.com",
                 },

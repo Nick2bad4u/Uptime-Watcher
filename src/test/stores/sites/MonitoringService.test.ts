@@ -8,6 +8,10 @@ import type {
     MonitoringStopSummary,
     StatusUpdate,
 } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import { MonitoringService } from "../../../services/MonitoringService";
 
@@ -105,7 +109,7 @@ const createStatusUpdateFixture = (): StatusUpdate => {
         identifier: "site-abc",
         monitoring: true,
         monitors: [createMonitorFixture()],
-        name: "Example Site",
+        name: sampleOne(siteNameArbitrary),
     };
 
     return {

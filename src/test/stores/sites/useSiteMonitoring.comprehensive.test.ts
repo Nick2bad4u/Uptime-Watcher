@@ -7,6 +7,10 @@ import { describe, expect, it, vi, beforeEach, type Mock } from "vitest";
 
 import { createSiteMonitoringActions } from "../../../stores/sites/useSiteMonitoring";
 import type { Site, StatusUpdate } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 import type { StatusUpdateSnapshotPayload } from "../../../stores/sites/utils/statusUpdateHandler";
 import { createMockFunction } from "../../utils/mockFactories";
 
@@ -156,7 +160,7 @@ describe("useSiteMonitoring", () => {
                     url: "https://example.com",
                 },
             ],
-            name: "Example Site",
+            name: sampleOne(siteNameArbitrary),
         };
 
         const [primaryMonitor] = site.monitors;

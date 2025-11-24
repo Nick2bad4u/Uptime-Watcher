@@ -6,6 +6,11 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
+import {
+    sampleOne,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Import constants
 import { DEFAULT_CHECK_INTERVAL } from "../../../constants";
@@ -326,18 +331,23 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("New Site Mode", () => {
+        let newSiteName: string;
+        let newSiteUrl: string;
+
         beforeEach(() => {
+            newSiteName = sampleOne(siteNameArbitrary);
+            newSiteUrl = sampleOne(siteUrlArbitrary);
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "new" as "new" | "existing",
                 checkInterval: DEFAULT_CHECK_INTERVAL,
                 formError: undefined as string | undefined,
                 host: "",
                 monitorType: "http" as "http" | "port" | "ping",
-                name: "Test Site",
+                name: newSiteName,
                 port: "",
                 selectedExistingSite: "",
                 siteIdentifier: "test-site-id",
-                url: "https://example.com",
+                url: newSiteUrl,
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
                 setAddMode: mockSetAddMode,
@@ -370,7 +380,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
 
             const nameInput = screen.getByLabelText(/site name/i);
             expect(nameInput).toBeInTheDocument();
-            expect(nameInput).toHaveValue("Test Site");
+            expect(nameInput).toHaveValue(newSiteName);
         });
 
         it("should show URL field for HTTP monitor", ({ task, annotate }) => {
@@ -394,7 +404,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 port: "0",
                 selectedExistingSite: "",
                 siteIdentifier: "test-site-id",
-                url: "https://example.com",
+                url: sampleOne(siteUrlArbitrary),
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
                 setAddMode: mockSetAddMode,
@@ -434,7 +444,8 @@ describe("AddSiteForm - Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             const nameInput = screen.getByLabelText(/site name/i);
-            await user.type(nameInput, "Test Site");
+            const typedSiteName = sampleOne(siteNameArbitrary);
+            await user.type(nameInput, typedSiteName);
 
             // Check that setName was called (accepting any pattern for now)
             expect(mockSetName).toHaveBeenCalled();
@@ -493,7 +504,10 @@ describe("AddSiteForm - Comprehensive Tests", () => {
     });
 
     describe("Existing Site Mode", () => {
+        let existingSiteUrl: string;
+
         beforeEach(() => {
+            existingSiteUrl = sampleOne(siteUrlArbitrary);
             mockUseAddSiteForm.mockReturnValue({
                 addMode: "existing" as "new" | "existing",
                 checkInterval: DEFAULT_CHECK_INTERVAL,
@@ -504,7 +518,7 @@ describe("AddSiteForm - Comprehensive Tests", () => {
                 port: "",
                 selectedExistingSite: "existing-site-id",
                 siteIdentifier: "test-site-id",
-                url: "https://example.com",
+                url: existingSiteUrl,
                 isFormValid: mockIsFormValid,
                 resetForm: mockResetForm,
                 setAddMode: mockSetAddMode,

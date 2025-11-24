@@ -16,6 +16,12 @@ import { handleSubmit } from "../../../components/AddSiteForm/Submit";
 import type { FormSubmitProperties } from "../../../components/AddSiteForm/Submit";
 import type { Logger } from "../../../services/logger";
 import type { ValidationResult } from "@shared/types/validation";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock the validation functions
 vi.mock("../../../utils/monitorValidation", () => ({
@@ -160,21 +166,31 @@ beforeEach(async () => {
 describe("Submit.tsx - Additional Coverage Tests", () => {
     const createMockProperties = (
         overrides: Partial<FormSubmitProperties> = {}
-    ): FormSubmitProperties =>
-        ({
+    ): FormSubmitProperties => {
+        const generatedName = sampleOne(siteNameArbitrary);
+        const generatedUrl = sampleOne(siteUrlArbitrary);
+        const generatedIdentifier = sampleOne(siteIdentifierArbitrary);
+        const deriveHost = (urlValue: string): string => {
+            try {
+                return new URL(urlValue).hostname;
+            } catch {
+                return "localhost";
+            }
+        };
+
+        const baseProperties: FormSubmitProperties = {
             addMode: "new",
             checkInterval: 300_000,
             expectedValue: "",
             formError: undefined,
-            host: "example.com",
+            host: deriveHost(generatedUrl),
             monitorType: "http",
-            name: "Test Site",
+            name: generatedName,
             port: "80",
             recordType: "A",
             selectedExistingSite: "",
-            siteIdentifier: "test-site-id",
-            url: "https://example.com",
-
+            siteIdentifier: generatedIdentifier,
+            url: generatedUrl,
             setFormError: vi.fn(),
             addMonitorToSite: vi.fn(),
             clearError: vi.fn(),
@@ -182,9 +198,24 @@ describe("Submit.tsx - Additional Coverage Tests", () => {
             generateUuid: vi.fn(() => "test-uuid"),
             logger: createMockLogger(),
             onSuccess: vi.fn(),
+            certificateWarningDays: "30",
+        };
+
+        const merged = {
+            ...baseProperties,
             ...overrides,
-            certificateWarningDays: overrides.certificateWarningDays ?? "30",
-        }) as FormSubmitProperties;
+        } as FormSubmitProperties;
+
+        if (overrides.host === undefined) {
+            merged.host = deriveHost(merged.url);
+        }
+
+        if (overrides.certificateWarningDays === undefined) {
+            merged.certificateWarningDays = "30";
+        }
+
+        return merged;
+    };
 
     describe("Coverage for Lines 109-122 (ping and port monitor types)", () => {
         it("should handle ping monitor type submission (lines 109-114)", async ({

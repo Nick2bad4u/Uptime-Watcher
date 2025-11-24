@@ -384,15 +384,15 @@ describe("Monitoring Data Validation", () => {
         test.prop([safeHttpUrlArb], { numRuns: 50 })(
             "returns true for any http/https URL with limited safe characters",
             (url) => {
-                expect(isValidUrl(url)).toBe(true);
+                expect(isValidUrl(url)).toBeTruthy();
             }
         );
 
         test.prop([fc.domain()], { numRuns: 30 })(
             "returns false for inputs missing a scheme",
             (domain) => {
-                expect(isValidUrl(domain)).toBe(false);
-                expect(isValidUrl(`${domain}/path`)).toBe(false);
+                expect(isValidUrl(domain)).toBeFalsy();
+                expect(isValidUrl(`${domain}/path`)).toBeFalsy();
             }
         );
     });

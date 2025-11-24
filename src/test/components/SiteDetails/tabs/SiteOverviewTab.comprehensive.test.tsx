@@ -22,23 +22,40 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import type { Site, Monitor } from "@shared/types";
 import { createValidMonitor } from "@shared/test/testHelpers";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Unmock the theme module to test the actual implementation
 vi.unmock("../../../../theme/useTheme");
 
 import { SiteOverviewTab } from "../../../../components/SiteDetails/tabs/SiteOverviewTab";
 
+const mockSiteName = sampleOne(siteNameArbitrary);
+const mockSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+const httpMonitorUrl = sampleOne(siteUrlArbitrary);
+const pingMonitorHost = (() => {
+    try {
+        return new URL(sampleOne(siteUrlArbitrary)).hostname;
+    } catch {
+        return "example.com";
+    }
+})();
+
 describe("SiteOverviewTab - Complete Coverage", () => {
     // Mock data for testing
     const mockSite: Site = {
-        identifier: "test-site",
-        name: "Test Site",
+        identifier: mockSiteIdentifier,
+        name: mockSiteName,
         monitoring: true,
         monitors: [
             {
                 id: "monitor-1",
                 type: "http",
-                url: "https://example.com",
+                url: httpMonitorUrl,
                 checkInterval: 30_000,
                 timeout: 5000,
                 retryAttempts: 3,
@@ -51,7 +68,7 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             {
                 id: "monitor-2",
                 type: "ping",
-                host: "example.com",
+                host: pingMonitorHost,
                 checkInterval: 60_000,
                 timeout: 3000,
                 retryAttempts: 2,
@@ -127,8 +144,8 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             render(<SiteOverviewTab {...defaultProps} />);
 
             // Site name should appear multiple times
-            expect(screen.getAllByText("Test Site")).toHaveLength(2);
-            expect(screen.getByText("test-site")).toBeInTheDocument();
+            expect(screen.getAllByText(mockSiteName)).toHaveLength(2);
+            expect(screen.getByText(mockSiteIdentifier)).toBeInTheDocument();
             // Check specific monitor count context instead of just "2"
             expect(screen.getByText("1/2")).toBeInTheDocument(); // Active/total format
         });
@@ -187,8 +204,8 @@ describe("SiteOverviewTab - Complete Coverage", () => {
             // Check individual monitor details
             expect(screen.getByText("HTTP Monitor")).toBeInTheDocument();
             expect(screen.getByText("PING Monitor")).toBeInTheDocument();
-            expect(screen.getByText("https://example.com")).toBeInTheDocument();
-            expect(screen.getByText("example.com")).toBeInTheDocument(); // Ping monitor display
+            expect(screen.getByText(httpMonitorUrl)).toBeInTheDocument();
+            expect(screen.getByText(pingMonitorHost)).toBeInTheDocument(); // Ping monitor display
         });
 
         it("should show correct monitor status badges", ({

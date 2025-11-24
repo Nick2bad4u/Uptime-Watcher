@@ -42,6 +42,11 @@ vi.mock("../../../components/AddSiteForm/Submit", () => ({
 
 // Import the mocked handleSubmit
 import { handleSubmit } from "../../../components/AddSiteForm/Submit";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock console.error to capture error handling
 const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -49,14 +54,14 @@ const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 // Mock stores and hooks with proper setup to trigger specific conditions
 const createDefaultSites = (): Site[] => [
     createMockSite({
-        identifier: "site-1",
+        identifier: sampleOne(siteIdentifierArbitrary),
         monitors: [],
-        name: "Test Site 1",
+        name: sampleOne(siteNameArbitrary),
     }),
     createMockSite({
-        identifier: "site-2",
+        identifier: sampleOne(siteIdentifierArbitrary),
         monitors: [],
-        name: "Test Site 2",
+        name: sampleOne(siteNameArbitrary),
     }),
 ];
 

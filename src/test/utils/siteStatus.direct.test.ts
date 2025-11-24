@@ -15,6 +15,28 @@ import {
     getSiteStatusVariant,
 } from "@shared/utils/siteStatus";
 import type { SiteStatus } from "@shared/types";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+const createTestSite = (
+    overrides: Partial<{
+        id: string;
+        name: string;
+        url: string;
+        monitors: { monitoring: boolean; status: SiteStatus }[];
+    }> = {}
+) => ({
+    id: overrides.id ?? sampleOne(siteIdentifierArbitrary),
+    name: overrides.name ?? sampleOne(siteNameArbitrary),
+    url: overrides.url ?? sampleOne(siteUrlArbitrary),
+    monitors: overrides.monitors ?? [
+        { monitoring: true, status: "up" as SiteStatus },
+    ],
+});
 
 describe("Frontend siteStatus re-exports", () => {
     describe("Function re-exports", () => {
@@ -30,15 +52,12 @@ describe("Frontend siteStatus re-exports", () => {
             expect(typeof calculateSiteMonitoringStatus).toBe("function");
 
             // Test actual usage to ensure the function works through re-export
-            const site = {
-                id: "test1",
-                name: "Test Site 1",
-                url: "https://example.com",
+            const site = createTestSite({
                 monitors: [
-                    { monitoring: true, status: "up" as const },
-                    { monitoring: false, status: "down" as const },
+                    { monitoring: true, status: "up" as SiteStatus },
+                    { monitoring: false, status: "down" as SiteStatus },
                 ],
-            };
+            });
             const result = calculateSiteMonitoringStatus(site);
             expect(typeof result).toBe("string");
         });
@@ -55,12 +74,9 @@ describe("Frontend siteStatus re-exports", () => {
             expect(typeof calculateSiteStatus).toBe("function");
 
             // Test actual usage
-            const site = {
-                id: "test",
-                name: "Test Site",
-                url: "https://example.com",
-                monitors: [{ monitoring: true, status: "up" as const }],
-            };
+            const site = createTestSite({
+                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+            });
             const result = calculateSiteStatus(site);
             expect(typeof result).toBe("string");
         });
@@ -77,12 +93,9 @@ describe("Frontend siteStatus re-exports", () => {
             expect(typeof getSiteDisplayStatus).toBe("function");
 
             // Test actual usage
-            const site = {
-                id: "test",
-                name: "Test Site",
-                url: "https://example.com",
-                monitors: [{ monitoring: true, status: "up" as const }],
-            };
+            const site = createTestSite({
+                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+            });
             const result = getSiteDisplayStatus(site);
             expect(typeof result).toBe("string");
         });
@@ -99,12 +112,9 @@ describe("Frontend siteStatus re-exports", () => {
             expect(typeof getSiteStatusDescription).toBe("function");
 
             // Test actual usage
-            const site = {
-                id: "test",
-                name: "Test Site",
-                url: "https://example.com",
+            const site = createTestSite({
                 monitors: [],
-            };
+            });
             const result = getSiteStatusDescription(site);
             expect(typeof result).toBe("string");
         });
@@ -149,15 +159,12 @@ describe("Frontend siteStatus re-exports", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const site = {
-                id: "test-integration",
-                name: "Integration Test Site",
-                url: "https://integration.example.com",
+            const site = createTestSite({
                 monitors: [
-                    { monitoring: true, status: "up" as const },
-                    { monitoring: true, status: "down" as const },
+                    { monitoring: true, status: "up" as SiteStatus },
+                    { monitoring: true, status: "down" as SiteStatus },
                 ],
-            };
+            });
 
             const result = calculateSiteStatus(site);
             expect([
@@ -177,12 +184,9 @@ describe("Frontend siteStatus re-exports", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const site = {
-                id: "test-display",
-                name: "Display Test Site",
-                url: "https://display.example.com",
-                monitors: [{ monitoring: true, status: "up" as const }],
-            };
+            const site = createTestSite({
+                monitors: [{ monitoring: true, status: "up" as SiteStatus }],
+            });
 
             const result = getSiteDisplayStatus(site);
             expect(typeof result).toBe("string");
@@ -198,12 +202,7 @@ describe("Frontend siteStatus re-exports", () => {
             await annotate("Category: Utility", "category");
             await annotate("Type: Export Operation", "type");
 
-            const site = {
-                id: "test-desc",
-                name: "Description Test Site",
-                url: "https://desc.example.com",
-                monitors: [],
-            };
+            const site = createTestSite({ monitors: [] });
 
             const result = getSiteStatusDescription(site);
             expect(typeof result).toBe("string");

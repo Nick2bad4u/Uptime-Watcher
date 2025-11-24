@@ -8,6 +8,17 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 
 import { SettingsTab } from "../../../../components/SiteDetails/tabs/SettingsTab";
 import type { Monitor, Site } from "@shared/types";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
+
+let sampledSiteName: string;
+let sampledSiteIdentifier: string;
+let sampledMonitorUrl: string;
+const monitorIdentifierRef = { value: "" };
 
 // Mock all external dependencies
 vi.mock("../../../../constants", () => ({
@@ -189,7 +200,7 @@ vi.mock("../../../../utils/monitorTypeHelper", () => ({
 }));
 
 vi.mock("../../../../utils/fallbacks", () => ({
-    getMonitorDisplayIdentifier: vi.fn().mockReturnValue("https://example.com"),
+    getMonitorDisplayIdentifier: vi.fn(() => monitorIdentifierRef.value),
     getMonitorTypeDisplayLabel: vi.fn().mockReturnValue("URL"),
     UiDefaults: {
         unknownLabel: "Unknown",
@@ -229,9 +240,14 @@ describe(SettingsTab, () => {
     beforeEach(() => {
         vi.clearAllMocks();
 
+        sampledSiteName = sampleOne(siteNameArbitrary);
+        sampledSiteIdentifier = sampleOne(siteIdentifierArbitrary);
+        sampledMonitorUrl = sampleOne(siteUrlArbitrary);
+        monitorIdentifierRef.value = sampledMonitorUrl;
+
         baseMockSite = {
-            identifier: "test-site",
-            name: "Test Site",
+            identifier: sampledSiteIdentifier,
+            name: sampledSiteName,
             monitors: [],
             monitoring: true,
         };
@@ -239,7 +255,7 @@ describe(SettingsTab, () => {
         baseMockMonitor = {
             id: "monitor-1",
             type: "http",
-            url: "https://example.com",
+            url: sampledMonitorUrl,
             timeout: 10_000,
             checkInterval: 60_000,
             retryAttempts: 3,
@@ -264,7 +280,7 @@ describe(SettingsTab, () => {
         baseProps = {
             currentSite: baseMockSite,
             selectedMonitor: baseMockMonitor,
-            localName: "Test Site",
+            localName: sampledSiteName,
             localCheckInterval: 60_000,
             localTimeout: 10,
             localRetryAttempts: 3,
@@ -327,7 +343,7 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            const siteNameInput = screen.getByDisplayValue("Test Site");
+            const siteNameInput = screen.getByDisplayValue(baseProps.localName);
             expect(siteNameInput).toBeInTheDocument();
             expect(siteNameInput).not.toBeDisabled();
         });
@@ -349,7 +365,7 @@ describe(SettingsTab, () => {
             render(<SettingsTab {...baseProps} />);
 
             const identifierInput = screen.getByDisplayValue(
-                "https://example.com"
+                baseMockMonitor.url as string
             );
             expect(identifierInput).toBeInTheDocument();
             expect(identifierInput).toBeDisabled();
@@ -439,7 +455,7 @@ describe(SettingsTab, () => {
 
             render(<SettingsTab {...baseProps} />);
 
-            const siteNameInput = screen.getByDisplayValue("Test Site");
+            const siteNameInput = screen.getByDisplayValue(baseProps.localName);
             fireEvent.change(siteNameInput, {
                 target: { value: "New Site Name" },
             });

@@ -6,7 +6,15 @@ import { render, screen, act, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import "@testing-library/jest-dom";
 
-import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
+import {
+    ScreenshotThumbnail,
+    type ScreenshotThumbnailProperties,
+} from "../components/SiteDetails/ScreenshotThumbnail";
+import {
+    sampleOne,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock logger
 vi.mock("../services/logger", () => {
@@ -129,10 +137,15 @@ if ((globalThis as any).electronAPI) {
 }
 
 describe("ScreenshotThumbnail - Complete Coverage", () => {
-    const defaultProps = {
-        siteName: "Example Site",
-        url: "https://example.com",
-    };
+    const createProps = (
+        overrides: Partial<ScreenshotThumbnailProperties> = {}
+    ): ScreenshotThumbnailProperties => ({
+        siteName: sampleOne(siteNameArbitrary),
+        url: sampleOne(siteUrlArbitrary),
+        ...overrides,
+    });
+
+    const defaultProps = createProps();
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -173,10 +186,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = {
-            siteName: "Test Site",
-            url: "https://test.com",
-        };
+        const props = createProps();
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
@@ -195,7 +205,9 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         });
 
         // The component should now be in hover state with portal
-        expect(screen.getByText("Preview: Test Site")).toBeInTheDocument();
+        expect(
+            screen.getByText(`Preview: ${props.siteName}`)
+        ).toBeInTheDocument();
 
         // Unmount component to trigger cleanup useEffect
         act(() => {
@@ -223,10 +235,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = {
-            siteName: "Test Site",
-            url: "https://test.com",
-        };
+        const props = createProps();
 
         render(<ScreenshotThumbnail {...props} />);
 
@@ -257,10 +266,7 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         annotate("Category: Core", "category");
         annotate("Type: Business Logic", "type");
 
-        const props = {
-            siteName: "Test Site",
-            url: "https://test.com",
-        };
+        const props = createProps();
 
         const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
@@ -303,8 +309,8 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
         fireEvent.click(thumbnail);
 
         // Verify UI store openExternal was called with correct arguments
-        expect(mockOpenExternal).toHaveBeenCalledWith("https://example.com", {
-            siteName: "Example Site",
+        expect(mockOpenExternal).toHaveBeenCalledWith(props.url, {
+            siteName: props.siteName,
         });
     });
 
@@ -318,9 +324,12 @@ describe("ScreenshotThumbnail - Complete Coverage", () => {
 
         render(<ScreenshotThumbnail {...props} />);
 
-        // Use the aria-label to find the link (based on defaultProps URL)
+        const trimmedUrl = defaultProps.url.trim();
         const thumbnail = screen.getByRole("link", {
-            name: /open.*example\.com.*in browser/i,
+            name:
+                trimmedUrl.length > 0
+                    ? `Open ${trimmedUrl} in browser`
+                    : "Open in browser",
         });
 
         // Rapid hover/unhover to test timeout handling

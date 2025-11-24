@@ -7,6 +7,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { test, fc } from "@fast-check/vitest";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Ensure the hook is mocked correctly instead of suppressing React warnings.
 
@@ -52,14 +58,24 @@ vi.mock("../../../stores/useErrorStore", () => ({
     })),
 }));
 
+const mockSiteEntries = [
+    {
+        identifier: sampleOne(siteIdentifierArbitrary),
+        name: sampleOne(siteNameArbitrary),
+        url: sampleOne(siteUrlArbitrary),
+    },
+    {
+        identifier: sampleOne(siteIdentifierArbitrary),
+        name: sampleOne(siteNameArbitrary),
+        url: sampleOne(siteUrlArbitrary),
+    },
+];
+
 vi.mock("../../../stores/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         addMonitorToSite: vi.fn(),
         createSite: vi.fn(),
-        sites: [
-            { identifier: "site1", name: "Test Site 1" },
-            { identifier: "site2", name: "Test Site 2" },
-        ],
+        sites: mockSiteEntries,
     })),
 }));
 

@@ -4,6 +4,10 @@
  */
 
 import { describe, expect, it } from "vitest";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import {
     isValidHistoryRow,
@@ -498,7 +502,7 @@ describe("shared/types/database additional function coverage", () => {
 
             const validSiteRow: SiteRow = {
                 identifier: "site1",
-                name: "Example Site",
+                name: sampleOne(siteNameArbitrary),
                 monitoring: 1,
             };
 

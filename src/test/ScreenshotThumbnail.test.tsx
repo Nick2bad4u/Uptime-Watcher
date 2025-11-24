@@ -11,12 +11,20 @@ import {
     act,
     createEvent,
 } from "@testing-library/react";
-import { test, fc } from "@fast-check/vitest";
+import fc from "fast-check";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
-import { ScreenshotThumbnail } from "../components/SiteDetails/ScreenshotThumbnail";
+import {
+    ScreenshotThumbnail,
+    type ScreenshotThumbnailProperties,
+} from "../components/SiteDetails/ScreenshotThumbnail";
 import { logger } from "../services/logger";
+import {
+    sampleOne,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock the logger
 vi.mock("../services/logger", () => {
@@ -93,10 +101,20 @@ const createMockBoundingClientRect = (overrides = {}) => ({
 });
 
 describe(ScreenshotThumbnail, () => {
-    const defaultProps = {
-        siteName: "Example Site",
-        url: "https://example.com",
-    };
+    const screenshotThumbnailPropsArbitrary =
+        fc.record<ScreenshotThumbnailProperties>({
+            siteName: siteNameArbitrary,
+            url: siteUrlArbitrary,
+        });
+
+    const createThumbnailProps = (
+        overrides: Partial<ScreenshotThumbnailProperties> = {}
+    ): ScreenshotThumbnailProperties => ({
+        ...sampleOne(screenshotThumbnailPropsArbitrary),
+        ...overrides,
+    });
+
+    const defaultProps = createThumbnailProps();
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -159,18 +177,27 @@ describe(ScreenshotThumbnail, () => {
 
             render(<ScreenshotThumbnail {...defaultProps} />);
 
+            const trimmedUrl = defaultProps.url.trim();
+            const expectedAriaLabel =
+                trimmedUrl.length > 0
+                    ? `Open ${trimmedUrl} in browser`
+                    : "Open in browser";
             const link = screen.getByRole("link", {
-                name: "Open https://example.com in browser",
+                name: expectedAriaLabel,
             });
             expect(link).toBeInTheDocument();
             // Note: href is mocked to "#" to prevent JSDOM navigation errors
             expect(link).toHaveAttribute("href", "#");
 
-            const image = screen.getByAltText("Screenshot of Example Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${defaultProps.siteName}`
+            );
             expect(image).toBeInTheDocument();
             expect(image).toHaveAttribute("loading", "lazy");
 
-            const caption = screen.getByText("Preview: Example Site");
+            const caption = screen.getByText(
+                `Preview: ${defaultProps.siteName}`
+            );
             expect(caption).toBeInTheDocument();
         });
 
@@ -190,10 +217,11 @@ describe(ScreenshotThumbnail, () => {
 
             render(<ScreenshotThumbnail {...defaultProps} />);
 
-            const image = screen.getByAltText("Screenshot of Example Site");
-            // The actual URL encoding will encode both colons and slashes
-            const expectedUrl =
-                "https://api.microlink.io/?url=https%3A%2F%2Fexample.com&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
+            const image = screen.getByAltText(
+                `Screenshot of ${defaultProps.siteName}`
+            );
+            const encodedUrl = encodeURIComponent(defaultProps.url.trim());
+            const expectedUrl = `https://api.microlink.io/?url=${encodedUrl}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`;
             expect(image).toHaveAttribute("src", expectedUrl);
         });
 
@@ -211,14 +239,15 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const propsWithSpecialChars = {
-                siteName: "Test Site",
+            const propsWithSpecialChars = createThumbnailProps({
                 url: "https://example.com/path?query=test&value=123",
-            };
+            });
 
             render(<ScreenshotThumbnail {...propsWithSpecialChars} />);
 
-            const image = screen.getByAltText("Screenshot of Test Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${propsWithSpecialChars.siteName}`
+            );
             const expectedUrl =
                 "https://api.microlink.io/?url=https%3A%2F%2Fexample.com%2Fpath%3Fquery%3Dtest%26value%3D123&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto";
             expect(image).toHaveAttribute("src", expectedUrl);
@@ -230,32 +259,69 @@ describe(ScreenshotThumbnail, () => {
          * Property: rendered output mirrors the provided site name and URL data
          * for accessible labels, captions, and the Microlink screenshot URL.
          */
-        test.prop([fc.string({ maxLength: 60 }), fc.webUrl()], { numRuns: 30 })(
-            "renders snapshot details for any site name and URL",
-            (siteName, url) => {
-                const trimmedUrl = url.trim();
-                render(<ScreenshotThumbnail siteName={siteName} url={url} />);
+        it("renders snapshot details for any site name and URL", async () => {
+            await fc.assert(
+                fc.asyncProperty(
+                    siteNameArbitrary,
+                    siteUrlArbitrary,
+                    async (siteName, url) => {
+                        const trimmedUrl = url.trim();
+                        render(
+                            <ScreenshotThumbnail
+                                siteName={siteName}
+                                url={url}
+                            />
+                        );
 
-                const link = screen.getByRole("link");
-                const expectedAriaLabel = `Open ${trimmedUrl} in browser`;
-                expect(link).toHaveAttribute("aria-label", expectedAriaLabel);
+                        const expectedAriaLabel =
+                            trimmedUrl.length > 0
+                                ? `Open ${trimmedUrl} in browser`
+                                : "Open in browser";
+                        const links = screen.queryAllByRole("link");
+                        expect(links.length).toBeGreaterThan(0);
+                        expect(
+                            links.some(
+                                (linkElement) =>
+                                    linkElement.getAttribute("aria-label") ===
+                                    expectedAriaLabel
+                            )
+                        ).toBeTruthy();
 
-                const image = screen.getByRole("img");
-                expect(image).toHaveAttribute(
-                    "alt",
-                    `Screenshot of ${siteName}`
-                );
-                expect(image).toHaveAttribute(
-                    "src",
-                    `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
-                );
+                        const images = screen.queryAllByRole("img");
+                        expect(images.length).toBeGreaterThan(0);
+                        const matchingImage = images.find(
+                            (element) =>
+                                element.getAttribute("alt") ===
+                                `Screenshot of ${siteName}`
+                        );
+                        expect(matchingImage).toBeDefined();
+                        if (matchingImage) {
+                            expect(matchingImage).toHaveAttribute(
+                                "src",
+                                `https://api.microlink.io/?url=${encodeURIComponent(trimmedUrl)}&screenshot=true&meta=false&embed=screenshot.url&colorScheme=auto`
+                            );
+                        }
 
-                const caption = screen.getByText(
-                    (_, node) => node?.textContent === `Preview: ${siteName}`
-                );
-                expect(caption).toBeInTheDocument();
-            }
-        );
+                        const captionElements = Array.from(
+                            document.querySelectorAll(
+                                ".site-details-thumbnail-caption"
+                            )
+                        );
+                        expect(captionElements.length).toBeGreaterThan(0);
+                        expect(
+                            captionElements.some(
+                                (element) =>
+                                    element.textContent ===
+                                    `Preview: ${siteName}`
+                            )
+                        ).toBeTruthy();
+                    }
+                ),
+                {
+                    numRuns: 30,
+                }
+            );
+        });
     });
 
     describe("Click Handling", () => {
@@ -281,7 +347,7 @@ describe(ScreenshotThumbnail, () => {
 
             await waitFor(() => {
                 expect(mockSystemService.openExternal).toHaveBeenCalledWith(
-                    "https://example.com"
+                    defaultProps.url
                 );
             });
 
@@ -289,8 +355,8 @@ describe(ScreenshotThumbnail, () => {
                 expect(logger.user.action).toHaveBeenCalledWith(
                     "External URL opened",
                     {
-                        siteName: "Example Site",
-                        url: "https://example.com",
+                        siteName: defaultProps.siteName,
+                        url: defaultProps.url,
                     }
                 );
             });
@@ -354,7 +420,7 @@ describe(ScreenshotThumbnail, () => {
             // Verify window.open was called with the correct parameters (due to fallback)
             await waitFor(() => {
                 expect(mockWindowOpen).toHaveBeenCalledWith(
-                    "https://example.com",
+                    defaultProps.url,
                     "_blank",
                     "noopener,noreferrer"
                 );
@@ -397,7 +463,7 @@ describe(ScreenshotThumbnail, () => {
             expect(overlayImage).toBeInTheDocument();
             expect(overlayImage).toHaveAttribute(
                 "alt",
-                "Large screenshot of Example Site"
+                `Large screenshot of ${defaultProps.siteName}`
             );
         });
 
@@ -945,10 +1011,7 @@ describe(ScreenshotThumbnail, () => {
             annotate("Category: Core", "category");
             annotate("Type: Business Logic", "type");
 
-            const propsWithEmptyUrl = {
-                siteName: "Test Site",
-                url: "",
-            };
+            const propsWithEmptyUrl = createThumbnailProps({ url: "" });
 
             render(<ScreenshotThumbnail {...propsWithEmptyUrl} />);
 
@@ -975,7 +1038,9 @@ describe(ScreenshotThumbnail, () => {
             const link = screen.getByRole("link");
             expect(link).toHaveAttribute(
                 "aria-label",
-                "Open https://example.com in browser"
+                defaultProps.url.trim().length > 0
+                    ? `Open ${defaultProps.url.trim()} in browser`
+                    : "Open in browser"
             );
         });
 
@@ -1011,7 +1076,7 @@ describe(ScreenshotThumbnail, () => {
             render(<ScreenshotThumbnail {...defaultProps} />);
 
             const thumbnailImage = screen.getByAltText(
-                "Screenshot of Example Site"
+                `Screenshot of ${defaultProps.siteName}`
             );
             expect(thumbnailImage).toBeInTheDocument();
 
@@ -1025,7 +1090,7 @@ describe(ScreenshotThumbnail, () => {
                 );
                 expect(overlayImage).toHaveAttribute(
                     "alt",
-                    "Large screenshot of Example Site"
+                    `Large screenshot of ${defaultProps.siteName}`
                 );
             });
         });
@@ -1055,7 +1120,7 @@ describe(ScreenshotThumbnail, () => {
 
             await waitFor(() => {
                 expect(mockSystemService.openExternal).toHaveBeenCalledWith(
-                    "https://example.com"
+                    defaultProps.url
                 );
             });
 
@@ -1089,7 +1154,7 @@ describe(ScreenshotThumbnail, () => {
 
             await waitFor(() => {
                 expect(mockWindowOpen).toHaveBeenCalledWith(
-                    "https://example.com",
+                    defaultProps.url,
                     "_blank",
                     "noopener,noreferrer"
                 );
@@ -1115,12 +1180,8 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            const { unmount } = render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
 
@@ -1138,7 +1199,7 @@ describe(ScreenshotThumbnail, () => {
 
             // The cleanup should happen through the useEffect cleanup
             expect(() =>
-                screen.queryByAltText("Screenshot of Test Site")
+                screen.queryByAltText(`Screenshot of ${props.siteName}`)
             ).not.toThrow();
 
             clearTimeoutSpy.mockRestore();
@@ -1162,13 +1223,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
 
@@ -1205,13 +1264,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
 
@@ -1247,13 +1304,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // First hover then leave to create timeout
 
@@ -1289,13 +1344,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // First mouse enter/leave to create initial timeout
 
@@ -1333,14 +1386,12 @@ describe(ScreenshotThumbnail, () => {
 
             // This test verifies that the useEffect cleanup function exists and can handle
             // the case where timeout and portal refs have values during cleanup
-            const { unmount } = render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
-            const image = screen.getByAltText("Screenshot of Test Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
+            );
 
             // Create hover state to trigger portal creation
 
@@ -1378,13 +1429,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // Create timeout with mouse leave
 
@@ -1422,12 +1471,8 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
@@ -1465,12 +1510,8 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
             const link = screen.getByRole("link");
 
             // Create timeout with mouse leave
@@ -1508,13 +1549,11 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
             );
-            const image = screen.getByAltText("Screenshot of Test Site");
 
             // First trigger mouseEnter then mouseLeave to create a timeout
 
@@ -1575,13 +1614,13 @@ describe(ScreenshotThumbnail, () => {
                 writable: true,
             });
 
+            const caseOneProps = createThumbnailProps();
             const { unmount } = render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site 1"
-                />
+                <ScreenshotThumbnail {...caseOneProps} />
             );
-            const image = screen.getByAltText("Screenshot of Test Site 1");
+            const image = screen.getByAltText(
+                `Screenshot of ${caseOneProps.siteName}`
+            );
 
             // Hover to trigger overlay
 
@@ -1610,13 +1649,13 @@ describe(ScreenshotThumbnail, () => {
             };
             Element.prototype.getBoundingClientRect = vi.fn(() => mockRect2);
 
+            const caseTwoProps = createThumbnailProps();
             const { unmount: unmount2 } = render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site 2"
-                />
+                <ScreenshotThumbnail {...caseTwoProps} />
             );
-            const image2 = screen.getByAltText("Screenshot of Test Site 2");
+            const image2 = screen.getByAltText(
+                `Screenshot of ${caseTwoProps.siteName}`
+            );
 
             // Hover to trigger overlay
 
@@ -1652,12 +1691,8 @@ describe(ScreenshotThumbnail, () => {
             vi.useFakeTimers();
             const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
 
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
             const link = screen.getByRole("link");
 
             // Test sequence: enter -> leave -> enter (should clear timeout)
@@ -1712,12 +1747,8 @@ describe(ScreenshotThumbnail, () => {
             // The cleanup function captures the initial undefined values of the refs,
             // not their current values at cleanup time
 
-            const { unmount } = render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            const { unmount } = render(<ScreenshotThumbnail {...props} />);
 
             // The component should still unmount cleanly even though the cleanup
             // doesn't actually clear the current timeout/portal refs due to closure

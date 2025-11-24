@@ -10,6 +10,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteCardHeader } from "../../../../components/Dashboard/SiteCard/SiteCardHeader";
 import type { Monitor, Site } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 const monitorSelectorPropsSpy = vi.fn();
 const actionButtonGroupPropsSpy = vi.fn();
@@ -129,6 +133,7 @@ describe(SiteCardHeader, () => {
         ...overrides,
     });
 
+    const siteName = sampleOne(siteNameArbitrary);
     const site: Site = {
         identifier: "site-123",
         monitoring: true,
@@ -139,7 +144,7 @@ describe(SiteCardHeader, () => {
                 url: "https://status-backup.example",
             }),
         ],
-        name: "Example Site",
+        name: siteName,
     };
 
     /**
@@ -179,7 +184,7 @@ describe(SiteCardHeader, () => {
         const props = createDefaultProps();
         render(<SiteCardHeader {...props} />);
 
-        expect(screen.getByText("Example Site")).toBeInTheDocument();
+        expect(screen.getByText(site.name)).toBeInTheDocument();
         expect(screen.getByTestId("site-card-footer")).toBeInTheDocument();
 
         expect(monitorSelectorPropsSpy).toHaveBeenCalledWith(

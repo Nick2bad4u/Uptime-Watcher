@@ -7,6 +7,14 @@ import { test } from "@fast-check/vitest";
 import fc from "fast-check";
 import type { StatusUpdate } from "@shared/types";
 import { STATUS_KIND } from "@shared/types";
+import {
+    monitorIdArbitrary,
+    monitorNameArbitrary,
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import {
     MAX_ALERT_QUEUE_LENGTH,
@@ -34,31 +42,37 @@ const createStatusUpdate = (
     overrides: Partial<StatusUpdate> = {}
 ): StatusUpdate => {
     const timestamp = overrides.timestamp ?? new Date().toISOString();
+    const baseMonitorId =
+        overrides.monitor?.id ?? sampleOne(monitorIdArbitrary);
+    const monitorId = overrides.monitorId ?? baseMonitorId;
+    const baseSiteIdentifier =
+        overrides.site?.identifier ?? sampleOne(siteIdentifierArbitrary);
+    const siteIdentifier = overrides.siteIdentifier ?? baseSiteIdentifier;
     return {
         details: overrides.details ?? "",
         monitor: {
             activeOperations: [],
             checkInterval: 60_000,
             history: [],
-            id: overrides.monitor?.id ?? "monitor-id",
+            id: overrides.monitor?.id ?? baseMonitorId,
             monitoring: true,
             responseTime: overrides.monitor?.responseTime ?? 120,
             retryAttempts: 0,
             status: overrides.monitor?.status ?? STATUS_KIND.DOWN,
             timeout: 10_000,
             type: overrides.monitor?.type ?? "http",
-            url: overrides.monitor?.url ?? "https://example.com",
+            url: overrides.monitor?.url ?? sampleOne(siteUrlArbitrary),
         },
-        monitorId: overrides.monitorId ?? "monitor-id",
+        monitorId,
         previousStatus: overrides.previousStatus ?? STATUS_KIND.UP,
         responseTime: overrides.responseTime ?? 120,
         site: {
-            identifier: overrides.site?.identifier ?? "site-id",
+            identifier: overrides.site?.identifier ?? baseSiteIdentifier,
             monitoring: true,
             monitors: [],
-            name: overrides.site?.name ?? "Example Site",
+            name: overrides.site?.name ?? sampleOne(siteNameArbitrary),
         },
-        siteIdentifier: overrides.siteIdentifier ?? "site-id",
+        siteIdentifier,
         status: overrides.status ?? STATUS_KIND.DOWN,
         timestamp,
     } satisfies StatusUpdate;
@@ -86,17 +100,26 @@ describe(useAlertStore, () => {
     });
 
     it("respects provided identifiers and timestamps", () => {
+        const monitorId = sampleOne(monitorIdArbitrary);
+        const monitorName = sampleOne(monitorNameArbitrary);
+        const siteIdentifier = sampleOne(siteIdentifierArbitrary);
+        const siteName = sampleOne(siteNameArbitrary);
+
         const customAlert = useAlertStore.getState().enqueueAlert({
             id: "custom-id",
-            monitorId: "monitor-id",
-            monitorName: "HTTP monitor",
-            siteIdentifier: "site-id",
-            siteName: "Example Site",
+            monitorId,
+            monitorName,
+            siteIdentifier,
+            siteName,
             status: STATUS_KIND.DEGRADED,
             timestamp: 1_700_000_000_000,
         });
 
         expect(customAlert.id).toBe("custom-id");
+        expect(customAlert.monitorId).toBe(monitorId);
+        expect(customAlert.monitorName).toBe(monitorName);
+        expect(customAlert.siteIdentifier).toBe(siteIdentifier);
+        expect(customAlert.siteName).toBe(siteName);
         expect(customAlert.timestamp).toBe(1_700_000_000_000);
     });
 
@@ -104,6 +127,8 @@ describe(useAlertStore, () => {
         const { enqueueAlert } = useAlertStore.getState();
 
         const overflowCount = 5;
+        const siteIdentifier = sampleOne(siteIdentifierArbitrary);
+        const siteName = sampleOne(siteNameArbitrary);
 
         for (
             let index = 0;
@@ -113,8 +138,8 @@ describe(useAlertStore, () => {
             enqueueAlert({
                 monitorId: `monitor-${index}`,
                 monitorName: `Monitor ${index}`,
-                siteIdentifier: "site-id",
-                siteName: "Example Site",
+                siteIdentifier,
+                siteName,
                 status: STATUS_KIND.PENDING,
             });
         }
@@ -130,11 +155,15 @@ describe(useAlertStore, () => {
 
     it("dismisses individual alerts", () => {
         const store = useAlertStore.getState();
+        const monitorId = sampleOne(monitorIdArbitrary);
+        const monitorName = sampleOne(monitorNameArbitrary);
+        const siteIdentifier = sampleOne(siteIdentifierArbitrary);
+        const siteName = sampleOne(siteNameArbitrary);
         const alert = store.enqueueAlert({
-            monitorId: "monitor-id",
-            monitorName: "HTTP monitor",
-            siteIdentifier: "site-id",
-            siteName: "Example Site",
+            monitorId,
+            monitorName,
+            siteIdentifier,
+            siteName,
             status: STATUS_KIND.DOWN,
         });
 
@@ -144,11 +173,15 @@ describe(useAlertStore, () => {
 
     it("clears all alerts", () => {
         const store = useAlertStore.getState();
+        const monitorId = sampleOne(monitorIdArbitrary);
+        const monitorName = sampleOne(monitorNameArbitrary);
+        const siteIdentifier = sampleOne(siteIdentifierArbitrary);
+        const siteName = sampleOne(siteNameArbitrary);
         store.enqueueAlert({
-            monitorId: "monitor-id",
-            monitorName: "HTTP monitor",
-            siteIdentifier: "site-id",
-            siteName: "Example Site",
+            monitorId,
+            monitorName,
+            siteIdentifier,
+            siteName,
             status: STATUS_KIND.UP,
         });
 
@@ -317,10 +350,10 @@ describe("useAlertStore identifier generation fallbacks", () => {
             } as unknown as Crypto;
 
             const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: "monitor-id",
-                monitorName: "HTTP monitor",
-                siteIdentifier: "site-id",
-                siteName: "Example Site",
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
                 status: STATUS_KIND.DOWN,
             });
 
@@ -340,10 +373,10 @@ describe("useAlertStore identifier generation fallbacks", () => {
             globalThis.crypto = undefined as any;
 
             const alert = useAlertStore.getState().enqueueAlert({
-                monitorId: "monitor-id",
-                monitorName: "HTTP monitor",
-                siteIdentifier: "site-id",
-                siteName: "Example Site",
+                monitorId: sampleOne(monitorIdArbitrary),
+                monitorName: sampleOne(monitorNameArbitrary),
+                siteIdentifier: sampleOne(siteIdentifierArbitrary),
+                siteName: sampleOne(siteNameArbitrary),
                 status: STATUS_KIND.DOWN,
             });
 

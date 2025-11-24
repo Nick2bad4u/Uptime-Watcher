@@ -8,6 +8,10 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import type { RenderResult } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 import "@testing-library/jest-dom";
 
 import { App } from "../App";
@@ -113,7 +117,7 @@ vi.mock("../../shared/utils/environment", () => ({
 // Create a mock site for testing
 const mockSite = {
     identifier: "test-site-1",
-    name: "Example Site",
+    name: sampleOne(siteNameArbitrary),
     url: "https://example.com",
     monitors: [],
     monitoring: true,

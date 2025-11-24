@@ -7,6 +7,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import fc from "fast-check";
 
 import type { Monitor, Site, StatusHistory } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock electron using vi.hoisted() to ensure proper initialization order
 const mockIpcRenderer = vi.hoisted(() => ({
@@ -83,7 +87,7 @@ const createSiteFixture = (overrides: Partial<Site> = {}): Site => ({
     identifier: "site-abc",
     monitoring: true,
     monitors: [createMonitorFixture()],
-    name: "Example site",
+    name: overrides.name ?? sampleOne(siteNameArbitrary),
     ...overrides,
 });
 

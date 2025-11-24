@@ -5,6 +5,10 @@
 import { STATUS_KIND, type Monitor, type Site } from "@shared/types";
 import type { MonitorStatusChangedEventData } from "@shared/types/events";
 import { describe, expect, it } from "vitest";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import {
     isEnrichedMonitorStatusChangedEventData,
@@ -28,7 +32,7 @@ const createSiteSnapshot = (monitor: Monitor): Site => ({
     identifier: "site-1",
     monitoring: true,
     monitors: [monitor],
-    name: "Example Site",
+    name: sampleOne(siteNameArbitrary),
 });
 
 const createBasePayload = () => {

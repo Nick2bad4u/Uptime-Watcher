@@ -11,7 +11,15 @@ import { useEffect } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import "@testing-library/jest-dom";
 
-import { ScreenshotThumbnail } from "../../../components/SiteDetails/ScreenshotThumbnail";
+import {
+    ScreenshotThumbnail,
+    type ScreenshotThumbnailProperties,
+} from "../../../components/SiteDetails/ScreenshotThumbnail";
+import {
+    sampleOne,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock state for UI store
 let mockUIState = {
@@ -94,6 +102,14 @@ Object.defineProperty(window, "innerHeight", {
     value: 1080,
 });
 
+const createThumbnailProps = (
+    overrides: Partial<ScreenshotThumbnailProperties> = {}
+): ScreenshotThumbnailProperties => ({
+    siteName: sampleOne(siteNameArbitrary),
+    url: sampleOne(siteUrlArbitrary),
+    ...overrides,
+});
+
 describe("ScreenshotThumbnail Component - Basic Tests", () => {
     beforeEach(() => {
         // Reset mocks
@@ -132,83 +148,63 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
 
     describe("Basic Rendering", () => {
         it("should render without crashing", () => {
+            const props = createThumbnailProps();
             expect(() => {
-                render(
-                    <ScreenshotThumbnail
-                        url="https://example.com"
-                        siteName="Test Site"
-                    />
-                );
+                render(<ScreenshotThumbnail {...props} />);
             }).not.toThrow();
         });
 
         it("should display the correct site name in caption", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
-            expect(screen.getByText("Preview: Test Site")).toBeInTheDocument();
+            expect(
+                screen.getByText(`Preview: ${props.siteName}`)
+            ).toBeInTheDocument();
         });
 
         it("should render a link element", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
             expect(link).toBeInTheDocument();
-            expect(link).toHaveAttribute("href", "https://example.com");
+            expect(link).toHaveAttribute("href", props.url);
         });
 
         it("should render screenshot image with correct src", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
-            const image = screen.getByAltText("Screenshot of Test Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
+            );
             expect(image).toBeInTheDocument();
             expect(image).toHaveAttribute("src");
 
             const src = image.getAttribute("src");
+            const encodedUrl = encodeURIComponent(props.url);
             expect(src).toContain("api.microlink.io");
-            expect(src).toContain("https%3A%2F%2Fexample.com"); // URL encoded
+            expect(src).toContain(encodedUrl); // URL encoded
         });
     });
 
     describe("User Interactions", () => {
         it("should call openExternal when clicked", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
             fireEvent.click(link);
 
-            expect(mockUIState.openExternal).toHaveBeenCalledWith(
-                "https://example.com",
-                { siteName: "Test Site" }
-            );
+            expect(mockUIState.openExternal).toHaveBeenCalledWith(props.url, {
+                siteName: props.siteName,
+            });
         });
 
         it("should have mouse event handlers attached", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
 
@@ -221,12 +217,8 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
         });
 
         it("should handle focus and blur events", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
 
@@ -244,27 +236,24 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
 
     describe("Accessibility", () => {
         it("should have proper ARIA attributes", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
-            expect(link).toHaveAttribute("href", "https://example.com");
+            expect(link).toHaveAttribute("href", props.url);
 
-            const image = screen.getByAltText("Screenshot of Test Site");
-            expect(image).toHaveAttribute("alt", "Screenshot of Test Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
+            );
+            expect(image).toHaveAttribute(
+                "alt",
+                `Screenshot of ${props.siteName}`
+            );
         });
 
         it("should be keyboard accessible", () => {
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName="Test Site"
-                />
-            );
+            const props = createThumbnailProps();
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
 
@@ -280,9 +269,8 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
 
     describe("Edge Cases", () => {
         it("should handle empty site name", () => {
-            render(
-                <ScreenshotThumbnail url="https://example.com" siteName="" />
-            );
+            const props = createThumbnailProps({ siteName: "" });
+            render(<ScreenshotThumbnail {...props} />);
 
             // Look for the text pattern including the space after colon
             expect(screen.getByText(/Preview:\s*$/)).toBeInTheDocument();
@@ -294,14 +282,15 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
 
         it("should handle special characters in URL", () => {
             const specialUrl = "https://example.com/path?param=value&other=123";
-            render(
-                <ScreenshotThumbnail url={specialUrl} siteName="Special Site" />
-            );
+            const props = createThumbnailProps({ url: specialUrl });
+            render(<ScreenshotThumbnail {...props} />);
 
             const link = screen.getByRole("link");
             expect(link).toHaveAttribute("href", specialUrl);
 
-            const image = screen.getByAltText("Screenshot of Special Site");
+            const image = screen.getByAltText(
+                `Screenshot of ${props.siteName}`
+            );
             const src = image.getAttribute("src");
             expect(src).toContain("api.microlink.io");
         });
@@ -309,18 +298,14 @@ describe("ScreenshotThumbnail Component - Basic Tests", () => {
         it("should handle long site names", () => {
             const longName =
                 "This is a very long site name that might cause issues with layout";
-            render(
-                <ScreenshotThumbnail
-                    url="https://example.com"
-                    siteName={longName}
-                />
-            );
+            const props = createThumbnailProps({ siteName: longName });
+            render(<ScreenshotThumbnail {...props} />);
 
             expect(
-                screen.getByText(`Preview: ${longName}`)
+                screen.getByText(`Preview: ${props.siteName}`)
             ).toBeInTheDocument();
             expect(
-                screen.getByAltText(`Screenshot of ${longName}`)
+                screen.getByAltText(`Screenshot of ${props.siteName}`)
             ).toBeInTheDocument();
         });
     });

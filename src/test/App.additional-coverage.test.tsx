@@ -20,6 +20,10 @@ import {
 } from "vitest";
 import "@testing-library/jest-dom";
 import React from "react";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 import { isDevelopment } from "@shared/utils/environment";
 
@@ -115,12 +119,14 @@ const mockUpdatesStoreState = {
     subscribeToStatusUpdates: vi.fn(),
 };
 
+const mockSiteName = sampleOne(siteNameArbitrary);
+
 const mockSitesStoreState = {
     sites: [
         {
             id: "1",
             url: "https://example.com",
-            name: "Example Site",
+            name: mockSiteName,
             status: "up" as any,
             lastChecked: new Date().toISOString(),
             interval: 5000,
@@ -408,7 +414,7 @@ describe("App Additional Coverage Tests", () => {
                 {
                     id: "1",
                     url: "https://example.com",
-                    name: "Example Site",
+                    name: mockSiteName,
                     status: "up" as const,
                     lastChecked: new Date().toISOString(),
                     interval: 5000,

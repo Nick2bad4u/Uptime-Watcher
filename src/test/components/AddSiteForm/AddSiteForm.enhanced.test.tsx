@@ -12,6 +12,12 @@ import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import type { RenderResult } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
+import {
+    sampleOne,
+    siteIdentifierArbitrary,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Component imports
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
@@ -185,8 +191,16 @@ const createMockFormState = (
     }) as ReturnType<typeof useAddSiteForm>;
 
 const mockSites = [
-    { id: "site1", name: "Test Site 1", url: "https://example1.com" },
-    { id: "site2", name: "Test Site 2", url: "https://example2.com" },
+    {
+        id: sampleOne(siteIdentifierArbitrary),
+        name: sampleOne(siteNameArbitrary),
+        url: sampleOne(siteUrlArbitrary),
+    },
+    {
+        id: sampleOne(siteIdentifierArbitrary),
+        name: sampleOne(siteNameArbitrary),
+        url: sampleOne(siteUrlArbitrary),
+    },
 ];
 
 // Setup mocks with static implementations
@@ -563,20 +577,20 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Category: Component", "category");
             annotate("Type: Initialization", "type");
 
+            const populatedName = sampleOne(siteNameArbitrary);
+            const populatedUrl = sampleOne(siteUrlArbitrary);
             mockUseAddSiteForm.mockReturnValue(
                 createMockFormState({
-                    name: "Test Site",
-                    url: "https://test.com",
+                    name: populatedName,
+                    url: populatedUrl,
                     checkInterval: 300_000, // 5 minutes in milliseconds
                 })
             );
 
             renderAddSiteForm();
 
-            expect(screen.getByDisplayValue("Test Site")).toBeInTheDocument();
-            expect(
-                screen.getByDisplayValue("https://test.com")
-            ).toBeInTheDocument();
+            expect(screen.getByDisplayValue(populatedName)).toBeInTheDocument();
+            expect(screen.getByDisplayValue(populatedUrl)).toBeInTheDocument();
             // Check for the interval option selected (5 minutes)
             expect(screen.getByDisplayValue("5 minutes")).toBeInTheDocument();
         });
@@ -1115,10 +1129,12 @@ describe("AddSiteForm Component - Enhanced Coverage", () => {
             annotate("Type: Business Logic", "type");
 
             // Mock the form hook to return valid form data
+            const validSiteName = sampleOne(siteNameArbitrary);
+            const validUrl = sampleOne(siteUrlArbitrary);
             const mockFormActions = createMockFormState({
                 addMode: "new",
-                name: "Test Site", // Required for new sites
-                url: "https://example.com", // Required field
+                name: validSiteName,
+                url: validUrl,
                 monitorType: "http",
                 checkInterval: 60_000,
             });

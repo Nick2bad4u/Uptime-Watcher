@@ -7,6 +7,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import React from "react";
+import {
+    sampleOne,
+    siteNameArbitrary,
+    siteUrlArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock all dependencies with proper structure
 vi.mock("../../../components/SiteDetails/useAddSiteForm", () => ({
@@ -313,11 +318,15 @@ describe("AddSiteForm Comprehensive Tests", () => {
             const nameInput = screen.getByRole("textbox", {
                 name: /site name/i,
             });
-            await user.type(nameInput, "Test Site");
+            const typedSiteName = sampleOne(siteNameArbitrary);
+            await user.type(nameInput, typedSiteName);
 
-            // Check that setName was called with each character as user types
-            expect(mockFormHook.setName).toHaveBeenCalledTimes(9); // "Test Site" = 9 characters
-            expect(mockFormHook.setName).toHaveBeenLastCalledWith("e"); // Last character typed
+            expect(mockFormHook.setName).toHaveBeenCalledTimes(
+                typedSiteName.length
+            );
+            expect(mockFormHook.setName).toHaveBeenLastCalledWith(
+                typedSiteName.slice(-1)
+            );
         });
 
         it("calls setUrl when URL input changes", async ({
@@ -338,11 +347,13 @@ describe("AddSiteForm Comprehensive Tests", () => {
             render(<AddSiteForm />);
 
             const urlInput = screen.getByRole("textbox", { name: /url/i });
-            await user.type(urlInput, "https://example.com");
+            const typedUrl = sampleOne(siteUrlArbitrary);
+            await user.type(urlInput, typedUrl);
 
-            // Check that setUrl was called with each character as user types
-            expect(mockFormHook.setUrl).toHaveBeenCalledTimes(19); // "https://example.com" = 19 characters
-            expect(mockFormHook.setUrl).toHaveBeenLastCalledWith("m"); // Last character typed
+            expect(mockFormHook.setUrl).toHaveBeenCalledTimes(typedUrl.length);
+            expect(mockFormHook.setUrl).toHaveBeenLastCalledWith(
+                typedUrl.slice(-1)
+            );
         });
 
         it("calls setMonitorType when monitor type changes", async ({

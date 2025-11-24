@@ -106,7 +106,7 @@ yarn format
 
 ## 📁 Site Architecture
 
-```
+```folder
 docs/docusaurus/
 ├── blog/                   # Blog posts and announcements
 ├── docs/                   # Main documentation content
@@ -164,7 +164,7 @@ The site build process:
 
 ### Build Artifacts
 
-```
+```folder
 build/                     # Production build output
 ├── index.html            # Homepage
 ├── docs/                 # Documentation pages

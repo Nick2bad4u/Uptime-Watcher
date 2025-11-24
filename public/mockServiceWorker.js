@@ -213,6 +213,7 @@ async function resolveMainClient(event) {
  * @param {FetchEvent} event
  * @param {Client | undefined} client
  * @param {string} requestId
+ * @param requestInterceptedAt
  *
  * @returns {Promise<Response>}
  */

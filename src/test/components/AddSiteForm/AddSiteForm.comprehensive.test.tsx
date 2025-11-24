@@ -2,6 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type ReactNode } from "react";
 import { AddSiteForm } from "../../../components/AddSiteForm/AddSiteForm";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock external dependencies
 vi.mock("../../../constants", async (importOriginal) => {
@@ -49,6 +53,8 @@ vi.mock("../../../stores/error/useErrorStore", () => ({
     })),
 }));
 
+const mockSiteName = sampleOne(siteNameArbitrary);
+
 vi.mock("../../../stores/sites/useSitesStore", () => ({
     useSitesStore: vi.fn(() => ({
         sites: [
@@ -56,7 +62,7 @@ vi.mock("../../../stores/sites/useSitesStore", () => ({
                 id: "1",
                 identifier: "1",
                 url: "https://example.com",
-                name: "Example Site",
+                name: mockSiteName,
                 monitors: [],
             },
         ],

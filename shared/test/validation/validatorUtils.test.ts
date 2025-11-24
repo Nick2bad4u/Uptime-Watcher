@@ -273,14 +273,14 @@ describe("validatorUtils", () => {
         test.prop([validIdentifierArb], { numRuns: 80 })(
             "accepts identifiers composed of the allowed alphabet",
             (identifier) => {
-                expect(isValidIdentifier(identifier)).toBe(true);
+                expect(isValidIdentifier(identifier)).toBeTruthy();
             }
         );
 
         test.prop([invalidIdentifierArb], { numRuns: 80 })(
             "rejects identifiers that include invalid characters",
             (identifier) => {
-                expect(isValidIdentifier(identifier)).toBe(false);
+                expect(isValidIdentifier(identifier)).toBeFalsy();
             }
         );
     });
@@ -327,14 +327,14 @@ describe("validatorUtils", () => {
         test.prop([fc.array(validIdentifierArb, { maxLength: 6 })], {
             numRuns: 60,
         })("is true for arrays containing only valid identifiers", (ids) => {
-            expect(isValidIdentifierArray(ids)).toBe(true);
+            expect(isValidIdentifierArray(ids)).toBeTruthy();
         });
 
         test.prop([fc.array(validIdentifierArb, { maxLength: 6 })], {
             numRuns: 60,
         })("is false when any entry contains an invalid character", (ids) => {
             const invalidItem = `${ids.join("-")}@`;
-            expect(isValidIdentifierArray([...ids, invalidItem])).toBe(false);
+            expect(isValidIdentifierArray([...ids, invalidItem])).toBeFalsy();
         });
 
         it("should return false for non-array values", async ({

@@ -9,6 +9,10 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { NotificationService } from "../../../services/notifications/NotificationService";
 import type { NotificationConfig } from "../../../services/notifications/NotificationService";
 import type { Site } from "@shared/types";
+import {
+    sampleOne,
+    siteNameArbitrary,
+} from "@shared/test/arbitraries/siteArbitraries";
 
 // Mock Electron modules
 vi.mock("electron", () => {
@@ -104,9 +108,10 @@ describe(NotificationService, () => {
         });
     });
     describe("notifyMonitorDown", () => {
+        const siteName = sampleOne(siteNameArbitrary);
         const mockSite: Site = {
             identifier: "example.com",
-            name: "Example Site",
+            name: siteName,
             monitors: [
                 {
                     id: "monitor-1",
@@ -134,7 +139,7 @@ describe(NotificationService, () => {
             notificationService.notifyMonitorDown(mockSite, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
-                body: "Example Site (http) is currently down!",
+                body: `${mockSite.name} (http) is currently down!`,
                 silent: true,
                 title: "Monitor Down Alert",
                 urgency: "critical",
@@ -165,7 +170,7 @@ describe(NotificationService, () => {
             notificationService.notifyMonitorDown(mockSite, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
-                body: "Example Site (http) is currently down!",
+                body: `${mockSite.name} (http) is currently down!`,
                 silent: false,
                 title: "Monitor Down Alert",
                 urgency: "critical",
@@ -232,9 +237,10 @@ describe(NotificationService, () => {
         });
     });
     describe("notifyMonitorUp", () => {
+        const siteName = sampleOne(siteNameArbitrary);
         const mockSite: Site = {
             identifier: "example.com",
-            name: "Example Site",
+            name: siteName,
             monitors: [
                 {
                     id: "monitor-1",
@@ -262,7 +268,7 @@ describe(NotificationService, () => {
             notificationService.notifyMonitorUp(mockSite, "monitor-1");
 
             expect(Notification).toHaveBeenCalledWith({
-                body: "Example Site (http) is back online!",
+                body: `${mockSite.name} (http) is back online!`,
                 silent: true,
                 title: "Monitor Restored",
                 urgency: "normal",

@@ -79,6 +79,8 @@ import { importX } from "eslint-plugin-import-x";
 import importZod from "eslint-plugin-import-zod";
 // @ts-expect-error -- No Types for this Package
 import istanbul from "eslint-plugin-istanbul";
+// eslint-disable-next-line import-x/no-named-as-default -- required
+import jsdoc from "eslint-plugin-jsdoc";
 import eslintPluginJsonSchemaValidator from "eslint-plugin-json-schema-validator";
 import eslintPluginJsonc from "eslint-plugin-jsonc";
 import jsxA11y from "eslint-plugin-jsx-a11y";
@@ -8832,6 +8834,99 @@ export default /** @type {EslintConfig} */ [
                 ],
             },
             react: { version: "19" },
+        },
+    },
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARK: JS JsDoc
+    // ═══════════════════════════════════════════════════════════════════════════════
+    {
+        files: ["**/*.{js,cjs}"],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                __dirname: "readonly",
+                __filename: "readonly",
+                module: "readonly",
+                process: "readonly",
+                require: "readonly",
+            },
+        },
+        name: "JS JsDoc - **/*.{JS,CJS}",
+        plugins: {
+            jsdoc: jsdoc,
+        },
+        rules: {
+            "jsdoc/check-access": "warn", // Recommended
+            "jsdoc/check-alignment": "warn", // Recommended
+            "jsdoc/check-indentation": "warn",
+            "jsdoc/check-line-alignment": "warn",
+            "jsdoc/check-param-names": "warn", // Recommended
+            "jsdoc/check-property-names": "warn", // Recommended
+            "jsdoc/check-syntax": "warn",
+            "jsdoc/check-tag-names": "off", // Recommended
+            "jsdoc/check-template-names": "warn",
+            "jsdoc/check-types": "warn", // Recommended
+            "jsdoc/check-values": "warn", // Recommended
+            "jsdoc/convert-to-jsdoc-comments": "warn",
+            "jsdoc/empty-tags": "warn", // Recommended
+            "jsdoc/escape-inline-tags": "warn", // Recommended for TS configs
+            "jsdoc/implements-on-classes": "warn", // Recommended
+            "jsdoc/imports-as-dependencies": "warn",
+            "jsdoc/informative-docs": "warn",
+            "jsdoc/lines-before-block": "warn",
+            "jsdoc/match-description": "warn",
+            "jsdoc/match-name": "off",
+            "jsdoc/multiline-blocks": "warn", // Recommended
+            "jsdoc/no-bad-blocks": "warn",
+            "jsdoc/no-blank-block-descriptions": "warn",
+            "jsdoc/no-defaults": "warn", // Recommended
+            "jsdoc/no-missing-syntax": "off",
+            "jsdoc/no-multi-asterisks": "warn", // Recommended
+            "jsdoc/no-restricted-syntax": "off",
+            "jsdoc/no-types": "off", // Recommended for TS configs
+            "jsdoc/no-undefined-types": "warn", // Recommended for non-TS configs
+            "jsdoc/reject-function-type": "warn", // Recommended
+            "jsdoc/require-asterisk-prefix": "warn",
+            "jsdoc/require-description": "warn",
+            "jsdoc/require-description-complete-sentence": "warn",
+            "jsdoc/require-example": "off",
+            "jsdoc/require-file-overview": "warn",
+            "jsdoc/require-hyphen-before-param-description": "warn",
+            "jsdoc/require-jsdoc": "warn", // Recommended
+            "jsdoc/require-next-description": "warn",
+            "jsdoc/require-next-type": "warn", // Recommended
+            "jsdoc/require-param": "warn", // Recommended
+            "jsdoc/require-param-description": "warn", // Recommended
+            "jsdoc/require-param-name": "warn", // Recommended
+            "jsdoc/require-param-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-property": "warn", // Recommended
+            "jsdoc/require-property-description": "warn", // Recommended
+            "jsdoc/require-property-name": "warn", // Recommended
+            "jsdoc/require-property-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-rejects": "warn", // Recommended
+            "jsdoc/require-returns": "warn", // Recommended
+            "jsdoc/require-returns-check": "warn", // Recommended
+            "jsdoc/require-returns-description": "warn", // Recommended
+            "jsdoc/require-returns-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-template": "warn",
+            "jsdoc/require-template-description": "warn",
+            "jsdoc/require-throws": "warn",
+            "jsdoc/require-throws-description": "warn",
+            "jsdoc/require-throws-type": "warn", // Recommended
+            "jsdoc/require-yields": "warn", // Recommended
+            "jsdoc/require-yields-check": "warn", // Recommended
+            "jsdoc/require-yields-description": "warn",
+            "jsdoc/require-yields-type": "warn", // Recommended
+            "jsdoc/sort-tags": "off",
+            "jsdoc/tag-lines": "off", // Recommended
+            "jsdoc/text-escaping": "warn",
+            "jsdoc/ts-method-signature-style": "warn",
+            "jsdoc/ts-no-unnecessary-template-expression": "warn",
+            "jsdoc/ts-prefer-function-type": "warn",
+            "jsdoc/type-formatting": "warn",
+            "jsdoc/valid-types": "warn", // Recommended
+            // "jsdoc/check-examples": "warn", // Deprecated and not for ESLint >= 8
+            // "jsdoc/rejct-any-type": "warn", // broken
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
