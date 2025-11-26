@@ -142,7 +142,7 @@ describe("objectSafety Direct Function Coverage", () => {
             if (keys.length >= 2) {
                 const keyToOmit = keys[0]!;
                 const result = safeObjectOmit(obj, [keyToOmit]);
-                expect(result).not.toHaveProperty(keyToOmit);
+                expect(Object.hasOwn(result, keyToOmit)).toBeFalsy();
                 expect(Object.keys(result)).toHaveLength(keys.length - 1);
             }
         });
@@ -159,7 +159,7 @@ describe("objectSafety Direct Function Coverage", () => {
                 const result = safeObjectPick(obj, keysToPick);
                 expect(Object.keys(result)).toHaveLength(keysToPick.length);
                 for (const key of keysToPick) {
-                    expect(result).toHaveProperty(key);
+                    expect(Object.hasOwn(result, key)).toBeTruthy();
                 }
             }
         });

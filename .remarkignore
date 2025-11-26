@@ -14,7 +14,7 @@
 /build/
 
 # Skip complex MDX architecture diagrams (handled manually)
-docs/docusaurus/src/**/*.mdx
+docs/docusaurus/**/*.mdx
 
 ### Docusaurus.Node Stack ###
 # Logs

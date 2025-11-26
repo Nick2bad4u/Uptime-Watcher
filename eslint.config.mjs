@@ -708,12 +708,15 @@ export default /** @type {EslintConfig} */ [
         plugins: { json: json, "package-json": packageJson },
         rules: {
             ...json.configs.recommended.rules,
+            "package-json/bin-name-casing": "warn",
             "package-json/exports-subpaths-style": "warn",
             "package-json/no-empty-fields": "warn",
             // Package.json Plugin Rules (package-json/*)
             "package-json/no-redundant-files": "warn",
+            "package-json/no-redundant-publishConfig": "warn",
             "package-json/order-properties": "warn",
             "package-json/repository-shorthand": "warn",
+            "package-json/require-attribution": "warn",
             "package-json/require-author": "warn",
             "package-json/require-bugs": "warn",
             "package-json/require-bundleDependencies": "off",
@@ -721,39 +724,56 @@ export default /** @type {EslintConfig} */ [
             "package-json/require-description": "warn",
             "package-json/require-devDependencies": "warn",
             "package-json/require-engines": "warn",
+            "package-json/require-exports": "warn",
             "package-json/require-files": "off", // Not needed for Electron applications
             "package-json/require-keywords": "warn",
             "package-json/require-license": "warn",
             "package-json/require-name": "warn",
             "package-json/require-optionalDependencies": "off", // Not needed for Electron applications
             "package-json/require-peerDependencies": "off",
+            "package-json/require-sideEffects": "warn",
             "package-json/require-type": "warn",
             "package-json/require-types": "off", // Not needed for Electron applications
             "package-json/require-version": "warn",
             "package-json/restrict-dependency-ranges": "warn",
+            "package-json/restrict-private-properties": "warn",
             "package-json/scripts-name-casing": "warn",
             "package-json/sort-collections": "warn",
+            "package-json/specify-peers-locally": "warn",
             "package-json/unique-dependencies": "warn",
             "package-json/valid-author": "warn",
             "package-json/valid-bin": "warn",
             "package-json/valid-bundleDependencies": "warn",
             "package-json/valid-config": "warn",
+            "package-json/valid-contributors": "warn",
             "package-json/valid-cpu": "warn",
             "package-json/valid-dependencies": "warn",
             "package-json/valid-description": "warn",
             "package-json/valid-devDependencies": "warn",
             "package-json/valid-directories": "warn",
+            "package-json/valid-engines": "warn",
             "package-json/valid-exports": "warn",
+            "package-json/valid-files": "warn",
+            "package-json/valid-homepage": "warn",
+            "package-json/valid-keywords": "warn",
             "package-json/valid-license": "warn",
             "package-json/valid-local-dependency": "off",
+            "package-json/valid-main": "warn",
+            "package-json/valid-man": "warn",
             "package-json/valid-name": "warn",
             "package-json/valid-optionalDependencies": "warn",
+            "package-json/valid-os": "warn",
             "package-json/valid-package-definition": "warn",
             "package-json/valid-peerDependencies": "warn",
+            "package-json/valid-private": "warn",
+            "package-json/valid-publishConfig": "warn",
+            "package-json/valid-repository": "warn",
             "package-json/valid-repository-directory": "warn",
             "package-json/valid-scripts": "warn",
+            "package-json/valid-sideEffects": "warn",
             "package-json/valid-type": "warn",
             "package-json/valid-version": "warn",
+            "package-json/valid-workspaces": "warn",
         },
     },
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1669,6 +1689,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-unsafe-type-assertion": "warn",
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-private-class-members": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
@@ -3077,6 +3098,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-unsafe-type-assertion": "warn",
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-private-class-members": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
@@ -4645,6 +4667,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-unsafe-type-assertion": "warn",
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-private-class-members": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
@@ -6045,6 +6068,7 @@ export default /** @type {EslintConfig} */ [
             "@typescript-eslint/no-unsafe-type-assertion": "warn",
             "@typescript-eslint/no-unsafe-unary-minus": "warn",
             "@typescript-eslint/no-unused-expressions": "warn",
+            "@typescript-eslint/no-unused-private-class-members": "warn",
             "@typescript-eslint/no-unused-vars": "warn",
             // Disabled: Function declarations are hoisted in JS/TS, and this rule creates unnecessary constraints
             // For Electron projects that often organize helper functions after main functions for better readability
@@ -8887,12 +8911,15 @@ export default /** @type {EslintConfig} */ [
             "jsdoc/multiline-blocks": "warn", // Recommended
             "jsdoc/no-bad-blocks": "warn",
             "jsdoc/no-blank-block-descriptions": "warn",
+            "jsdoc/no-blank-blocks": "warn", // Recommended
             "jsdoc/no-defaults": "warn", // Recommended
             "jsdoc/no-missing-syntax": "off",
             "jsdoc/no-multi-asterisks": "warn", // Recommended
             "jsdoc/no-restricted-syntax": "off",
             "jsdoc/no-types": "off", // Recommended for TS configs
             "jsdoc/no-undefined-types": "warn", // Recommended for non-TS configs
+            "jsdoc/prefer-import-tag": "off",
+            "jsdoc/reject-any-type": "off",
             "jsdoc/reject-function-type": "warn", // Recommended
             "jsdoc/require-asterisk-prefix": "warn",
             "jsdoc/require-description": "warn",
@@ -8916,6 +8943,7 @@ export default /** @type {EslintConfig} */ [
             "jsdoc/require-returns-check": "warn", // Recommended
             "jsdoc/require-returns-description": "warn", // Recommended
             "jsdoc/require-returns-type": "warn", // Recommended in non-TS configs
+            "jsdoc/require-tags": "off",
             "jsdoc/require-template": "warn",
             "jsdoc/require-template-description": "warn",
             "jsdoc/require-throws": "warn",
@@ -8929,6 +8957,7 @@ export default /** @type {EslintConfig} */ [
             "jsdoc/tag-lines": "off", // Recommended
             "jsdoc/text-escaping": "warn",
             "jsdoc/ts-method-signature-style": "warn",
+            "jsdoc/ts-no-empty-object-type": "warn",
             "jsdoc/ts-no-unnecessary-template-expression": "warn",
             "jsdoc/ts-prefer-function-type": "warn",
             "jsdoc/type-formatting": "warn",

@@ -8,8 +8,7 @@
  * user interactions remain deterministic under arbitrary store configurations.
  */
 
-import { afterEach, beforeEach, describe, expect, vi } from "vitest";
-import { test as propertyTest, fc } from "@fast-check/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 
 import "@testing-library/jest-dom";
@@ -426,23 +425,16 @@ afterEach(() => {
     document.body.innerHTML = "";
 });
 
-describe("Settings Component - Notification preference fuzzing", () => {
-    const inAppToggleArbitrary = fc.record({
-        alertsEnabled: fc.boolean(),
-        soundEnabled: fc.boolean(),
-    });
+describe("Settings Component - Notification preference scenarios", () => {
+    const inAppToggleScenarios = [
+        { alertsEnabled: true, soundEnabled: true },
+        { alertsEnabled: true, soundEnabled: false },
+        { alertsEnabled: false, soundEnabled: true },
+        { alertsEnabled: false, soundEnabled: false },
+    ] as const;
 
-    const systemToggleArbitrary = fc.record({
-        notificationsEnabled: fc.boolean(),
-        soundEnabled: fc.boolean(),
-    });
-
-    propertyTest.prop([inAppToggleArbitrary], {
-        numRuns: 24,
-        timeout: 20_000,
-    })(
-        "enforces invariants when toggling in-app alerts",
-        ({ alertsEnabled, soundEnabled }) => {
+    for (const { alertsEnabled, soundEnabled } of inAppToggleScenarios) {
+        it(`enforces invariants when toggling in-app alerts (alertsEnabled=${alertsEnabled}, soundEnabled=${soundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 inAppAlertsEnabled: alertsEnabled,
@@ -469,16 +461,18 @@ describe("Settings Component - Notification preference fuzzing", () => {
                     "inAppAlertsSoundEnabled"
                 );
             }
-        },
-        20_000
-    );
+        });
+    }
 
-    propertyTest.prop([systemToggleArbitrary], {
-        numRuns: 24,
-        timeout: 20_000,
-    })(
-        "enforces invariants when toggling system notifications",
-        ({ notificationsEnabled, soundEnabled }) => {
+    const systemToggleScenarios = [
+        { notificationsEnabled: true, soundEnabled: true },
+        { notificationsEnabled: true, soundEnabled: false },
+        { notificationsEnabled: false, soundEnabled: true },
+        { notificationsEnabled: false, soundEnabled: false },
+    ] as const;
+
+    for (const { notificationsEnabled, soundEnabled } of systemToggleScenarios) {
+        it(`enforces invariants when toggling system notifications (notificationsEnabled=${notificationsEnabled}, soundEnabled=${soundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 systemNotificationsEnabled: notificationsEnabled,
@@ -507,16 +501,13 @@ describe("Settings Component - Notification preference fuzzing", () => {
                     "systemNotificationsSoundEnabled"
                 );
             }
-        },
-        20_000
-    );
+        });
+    }
 
-    propertyTest.prop([fc.boolean()], {
-        numRuns: 20,
-        timeout: 15_000,
-    })(
-        "toggles in-app alert sound when enabled",
-        (soundEnabled) => {
+    const soundToggleCases = [true, false] as const;
+
+    for (const soundEnabled of soundToggleCases) {
+        it(`toggles in-app alert sound when enabled (initialSound=${soundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 inAppAlertsEnabled: true,
@@ -535,16 +526,11 @@ describe("Settings Component - Notification preference fuzzing", () => {
             expect(lastUpdate).toMatchObject({
                 inAppAlertsSoundEnabled: !soundEnabled,
             });
-        },
-        15_000
-    );
+        });
+    }
 
-    propertyTest.prop([fc.boolean()], {
-        numRuns: 20,
-        timeout: 15_000,
-    })(
-        "toggles system notification sound when notifications are enabled",
-        (soundEnabled) => {
+    for (const soundEnabled of soundToggleCases) {
+        it(`toggles system notification sound when notifications are enabled (initialSound=${soundEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 systemNotificationsEnabled: true,
@@ -563,18 +549,18 @@ describe("Settings Component - Notification preference fuzzing", () => {
             expect(lastUpdate).toMatchObject({
                 systemNotificationsSoundEnabled: !soundEnabled,
             });
-        },
-        15_000
-    );
+        });
+    }
 
-    propertyTest.prop([
-        fc.record({
-            inAppEnabled: fc.boolean(),
-            systemEnabled: fc.boolean(),
-        }),
-    ])(
-        "reflects disabled state for dependent sound toggles",
-        ({ inAppEnabled, systemEnabled }) => {
+    const dependentToggleScenarios = [
+        { inAppEnabled: true, systemEnabled: true },
+        { inAppEnabled: true, systemEnabled: false },
+        { inAppEnabled: false, systemEnabled: true },
+        { inAppEnabled: false, systemEnabled: false },
+    ] as const;
+
+    for (const { inAppEnabled, systemEnabled } of dependentToggleScenarios) {
+        it(`reflects disabled state for dependent sound toggles (inAppEnabled=${inAppEnabled}, systemEnabled=${systemEnabled})`, () => {
             resetState();
             applySettingsOverrides({
                 inAppAlertsEnabled: inAppEnabled,
@@ -595,7 +581,6 @@ describe("Settings Component - Notification preference fuzzing", () => {
                 "disabled",
                 !systemEnabled
             );
-        },
-        10_000
-    );
+        });
+    }
 });

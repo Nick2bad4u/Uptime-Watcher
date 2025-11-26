@@ -60,7 +60,8 @@ paths:
     ".github/workflows/summary.{yml,yaml}":
         ignore:
             # Match unknown permission scope "SOMETHING" (matches any scope name inside quotes)
-            - '^unknown permission scope "[^"]+".*'
+            # prettier-ignore
+            - "^unknown permission scope \"[^\"]+\".*"
 secrets:
     - GITHUB_TOKEN
     - DOCUSAURUS_BACKUP_TOKEN
