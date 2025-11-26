@@ -851,7 +851,7 @@ export class MonitorRepository {
             if (shouldProcess) {
                 // Ensure we only bind primitive types that SQLite can handle
                 const fieldValue = this.convertValueForDatabase(key, value);
-                if (fieldValue !== null) {
+                if (fieldValue !== undefined) {
                     updateFields.push(`${key} = ?`);
                     updateValues.push(fieldValue);
                 }
@@ -871,12 +871,13 @@ export class MonitorRepository {
      * @param key - Field name for logging purposes.
      * @param value - Value to convert for database storage.
      *
-     * @returns Database-compatible value or null if conversion not possible.
+     * @returns Database-compatible value or `undefined` when conversion is not
+     *   possible.
      */
     private convertValueForDatabase(
         key: string,
         value: unknown
-    ): DbValue | null {
+    ): DbValue | undefined {
         if (typeof value === "string" || typeof value === "number") {
             return value;
         }
@@ -890,7 +891,7 @@ export class MonitorRepository {
                 value
             );
         }
-        return null;
+        return undefined;
     }
 
     /**

@@ -204,7 +204,7 @@ export class HistoryRepository {
      */
     public async bulkInsert(
         monitorId: string,
-        historyEntries: Array<StatusHistory & { details?: string | undefined }>
+        historyEntries: StatusHistory[]
     ): Promise<void> {
         if (historyEntries.length === 0) {
             return;

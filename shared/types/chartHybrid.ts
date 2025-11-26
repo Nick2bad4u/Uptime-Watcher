@@ -208,7 +208,7 @@ export interface ChartUtilities {
     getPluginConfig: (
         options: ChartOptions | UptimeChartOptions,
         pluginId: string
-    ) => ChartPluginsConfig[keyof ChartPluginsConfig] | undefined;
+    ) => ChartPluginsConfig[keyof ChartPluginsConfig];
 
     /**
      * Safely get scale configuration from chart options.
@@ -221,7 +221,7 @@ export interface ChartUtilities {
     getScaleConfig: (
         options: ChartOptions | UptimeChartOptions,
         scaleId: string
-    ) => ChartScalesConfig[keyof ChartScalesConfig] | undefined;
+    ) => ChartScalesConfig[keyof ChartScalesConfig];
 
     /**
      * Convert hybrid chart configuration to Chart.js official format.

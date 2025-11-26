@@ -2,7 +2,7 @@
  * MiniChartBar component for displaying status in compact chart form.
  */
 
-import type { MonitorStatus, SiteStatus } from "@shared/types";
+import type { SiteStatus } from "@shared/types";
 import type { CoreComponentProperties } from "@shared/types/componentProps";
 import type { CSSProperties, JSX, NamedExoticComponent } from "react";
 
@@ -19,8 +19,14 @@ import { useTheme } from "../useTheme";
 export interface MiniChartBarProperties extends CoreComponentProperties {
     /** Response time in milliseconds for the status check */
     readonly responseTime?: number;
-    /** Current status of the monitor or site */
-    readonly status: MonitorStatus | SiteStatus;
+    /**
+     * Current status of the monitor or site.
+     *
+     * @remarks
+     * {@link SiteStatus} already includes all monitor-level status literals, so
+     * a single type keeps the prop well-aligned with the domain contract.
+     */
+    readonly status: SiteStatus;
     /** Timestamp when the status was recorded */
     readonly timestamp: Date | number | string;
 }

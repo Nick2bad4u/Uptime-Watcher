@@ -110,6 +110,7 @@ const knipConfig: KnipConfig = {
         "@types/async",
         "@types/babel__core",
         "@types/cssnano",
+        "@types/debug",
         "@types/eslint",
         "@types/eslint-config-prettier",
         "@types/eslint-plugin-prettier",

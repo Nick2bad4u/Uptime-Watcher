@@ -10,11 +10,11 @@
  * @public
  */
 
-import type { MonitorStatus, SiteStatus } from "@shared/types";
+import type { SiteStatus } from "@shared/types";
 import type { IconType } from "react-icons";
 import type { CamelCase } from "type-fest";
 
-import { isMonitorStatus, isSiteStatus, STATUS_KIND } from "@shared/types";
+import { isSiteStatus, STATUS_KIND } from "@shared/types";
 
 import { AppIcons } from "./icons";
 
@@ -32,7 +32,7 @@ export type StatusWithIcon = `${string} ${string}`;
  * Mirrors the shared monitor and site status enums so that icon mapping stays
  * aligned with the canonical domain contracts.
  */
-type KnownStatus = MonitorStatus | SiteStatus;
+type KnownStatus = SiteStatus;
 
 const STATUS_ICON_GLYPHS: Record<KnownStatus, string> = {
     [STATUS_KIND.DEGRADED]: "⚠️",
@@ -56,10 +56,6 @@ const STATUS_ICON_COMPONENTS: Record<KnownStatus, IconType> = {
 
 const normalizeStatus = (status: string): KnownStatus | null => {
     const candidate = status.toLowerCase();
-
-    if (isMonitorStatus(candidate)) {
-        return candidate;
-    }
 
     if (isSiteStatus(candidate)) {
         return candidate;

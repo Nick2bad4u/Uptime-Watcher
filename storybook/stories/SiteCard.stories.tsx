@@ -70,7 +70,7 @@ const meta: SiteCardMeta = {
     component: SiteCard,
     decorators: [
         createSiteDecorator((context) => {
-            const args = context.args as SiteCardMeta["args"] | undefined;
+            const args = context.args as SiteCardMeta["args"];
             const site = args?.site ?? primarySite;
             return [site];
         }),

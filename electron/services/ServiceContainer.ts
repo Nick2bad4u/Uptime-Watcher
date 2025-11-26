@@ -92,6 +92,10 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
     return typeof then === "function";
 }
 
+function isNonNullObject(value: unknown): value is UnknownRecord {
+    return typeof value === "object" && value !== null;
+}
+
 /**
  * Supported payload formats for manager events forwarded to the orchestrator.
  *
@@ -102,15 +106,19 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
  * representations so forwarding helpers can normalize payloads safely while
  * preserving type safety.
  */
+type ForwardablePayloadBase<EventName extends keyof UptimeEvents> = Omit<
+    UptimeEvents[EventName],
+    "_meta" | "_originalMeta"
+>;
+
 type ForwardableEventPayload<EventName extends keyof UptimeEvents> =
-    | UptimeEvents[EventName]
-    | (UptimeEvents[EventName] & {
-          _meta: EventMetadata;
-          _originalMeta?: unknown;
-      });
+    ForwardablePayloadBase<EventName> & {
+        _meta?: EventMetadata;
+        _originalMeta?: unknown;
+    };
 
 type ForwardablePayloadWithMeta<EventName extends keyof UptimeEvents> =
-    ForwardableEventPayload<EventName> & {
+    ForwardablePayloadBase<EventName> & {
         _meta: EventMetadata;
         _originalMeta?: unknown;
     };
@@ -1184,8 +1192,7 @@ export class ServiceContainer {
         payload: ForwardableEventPayload<EventName>
     ): payload is ForwardablePayloadWithMeta<EventName> {
         return (
-            typeof payload === "object" &&
-            payload !== null &&
+            isNonNullObject(payload) &&
             FORWARDED_METADATA_PROPERTY_KEY in payload
         );
     }

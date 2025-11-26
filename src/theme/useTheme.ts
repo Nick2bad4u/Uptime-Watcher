@@ -9,11 +9,7 @@
 
 import type { UnknownRecord } from "type-fest";
 
-import {
-    isSiteStatus,
-    type MonitorStatus,
-    type SiteStatus,
-} from "@shared/types";
+import { isSiteStatus, type SiteStatus } from "@shared/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { SystemThemePreference } from "./components/types";
@@ -54,7 +50,7 @@ interface UseThemeClassesReturn {
         borderColor: string;
     };
     getColor: (path: string) => string;
-    getStatusClass: (status: MonitorStatus | SiteStatus) => {
+    getStatusClass: (status: SiteStatus) => {
         color: string;
     };
     getSurfaceClass: (variant?: "base" | "elevated" | "overlay") => {
@@ -477,7 +473,7 @@ export function useThemeClasses(): UseThemeClassesReturn {
     );
 
     const getStatusClass = useCallback(
-        (status: MonitorStatus | SiteStatus) => ({
+        (status: SiteStatus) => ({
             color: `var(--color-status-${status})`,
         }),
         []

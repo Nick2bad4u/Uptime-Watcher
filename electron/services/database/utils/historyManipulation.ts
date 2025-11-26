@@ -119,7 +119,7 @@ export function addHistoryEntry(
 export function bulkInsertHistory(
     db: Database,
     monitorId: string,
-    historyEntries: Array<StatusHistory & { details?: string | undefined }>
+    historyEntries: StatusHistory[]
 ): void {
     if (historyEntries.length === 0) {
         return;
