@@ -7,14 +7,164 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
-[[c45c0af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)...
-[c45c0af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)]
-([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b...c45c0afefb7fc80a40f8b55f26e3ca69de288c5b))
+[[95f3aa7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)...
+[95f3aa7](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/95f3aa7ca783508d99ec60facbb772a714eb5f04...95f3aa7ca783508d99ec60facbb772a714eb5f04))
 
 
 ### 📦 Dependencies
 
+- [dependency] Update version 19.1.0 [`(95f3aa7)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/95f3aa7ca783508d99ec60facbb772a714eb5f04)
+
+
+
+
+
+
+## [19.1.0] - 2025-11-26
+
+
+[[c45c0af](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)...
+[3b43b50](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b43b504ee555122a743752534238a1d9387d2d7)]
+([compare](https://github.com/Nick2bad4u/Uptime-Watcher/compare/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b...3b43b504ee555122a743752534238a1d9387d2d7))
+
+
+### ✨ Features
+
+- ✨ [feat] Enhance testing configurations and add property-based tests
+ - 🧪 [test] Update tsconfig to include strict test directories for better coverage
+ - 🧪 [test] Introduce fast-check for property-based testing in monitor operations and validation schemas
+ - 🧪 [test] Add comprehensive property tests for monitor identifiers and status validation
+ - 🧪 [test] Improve test coverage for monitor operations with randomized input testing
+ - 🧪 [test] Extend vitest configuration to include strict test directories
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(c851e5a)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c851e5a3cfe62b34ef946fabecb6742b8623f0e2)
+
+
+- ✨ [feat] Enhance Docusaurus backup workflow and linting configuration
+ - 🛠️ Update backup workflow to include environment variables for backup repository and branch
+ - 🔄 Remove redundant remote addition steps and streamline backup process
+ - 📝 Add checks for GITHUB_TOKEN in backup steps to ensure proper configuration
+ - 🧹 Sync documentation artifacts to backup repository using rsync for cleaner management
+ - 🔧 Update ActionLint configuration to include necessary secrets for enhanced security
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(f339a66)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/f339a6693e141ef67f6026a7ebfe4554962dca37)
+
+
+
+### 🛠️ Bug Fixes
+
+- 🛠️ [fix] Update type guard tests for improved clarity and coverage
+ - 🔧 Refactor test objects in `typeGuards.comprehensive.test.ts` for better naming consistency
+ - 🔧 Ensure all type guard functions are tested with relevant sample data
+ - 🔧 Add false case tests to validate type guard functions thoroughly
+
+📝 [docs] Enhance documentation in `SettingsService.ts`
+ - 📜 Add detailed explanations regarding validation behavior for history limits
+ - 📜 Clarify the return values and error handling in the `updateHistoryLimit` method
+
+🧪 [test] Improve comprehensive tests for `SiteDetails` component
+ - 🔧 Fix rerendering logic in `SiteDetails.comprehensive.test.tsx` to ensure accurate testing of component updates
+
+🧪 [test] Enhance `useAddSiteForm` hook tests
+ - 🔧 Normalize values in `useAddSiteForm.comprehensive.test.ts` to ensure consistent state updates
+
+🧪 [test] Expand coverage in `objectSafety-coverage.test.ts`
+ - 🔧 Introduce property-based tests using `fast-check` for various object safety utilities
+ - 🔧 Validate behavior of `safeObjectAccess`, `safeObjectIteration`, `safeObjectOmit`, and `safeObjectPick` functions
+
+🧪 [test] Add property-based tests for store utility functions
+ - 🔧 Implement property-based tests in `utils.test.ts` to validate logging behavior under various conditions
+
+🧪 [test] Enhance type guard utility tests with property-based testing
+ - 🔧 Introduce property-based tests in `typeguard-utility-test.test.ts` to validate property existence and absence in objects
+
+🧪 [test] Improve JSON safety tests with advanced fuzzing
+ - 🔧 Update `jsonSafety.advanced-fuzzing.test.ts` to test performance with varied payloads
+
+🧪 [test] Add property-based tests for site deletion functionality
+ - 🔧 Implement tests in `siteDeletion.test.ts` to validate deletion behavior with various site identifiers and monitor arrays
+
+🧪 [test] Refactor monitor identifier tests for clarity
+ - 🔧 Remove unnecessary character arrays in `monitorIdentifiers.test.ts` to streamline test setup
+
+🎨 [style] Clean up fast-check configuration
+ - 🔧 Remove unnecessary whitespace in `fastcheckConfig.ts` for improved readability
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(9b07a14)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/9b07a1471b4e52d090c56f7f472c2867c618c515)
+
+
+
+### 📦 Dependencies
+
+- *(deps)* [dependency] Update sucrase [`(1bdb297)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/1bdb2979eb333748b43e95737d2cc6e78d0f7be3)
+
+
+- *(deps)* [dependency] Update the github-actions group across 1 directory with 8 updates [`(c3a8c9f)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c3a8c9fc3509d3fa46395c426dc6d66e37bcc70b)
+
+
 - [dependency] Update version 19.0.0 [`(c45c0af)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/c45c0afefb7fc80a40f8b55f26e3ca69de288c5b)
+
+
+
+### 🧹 Chores
+
+- Update changelogs for v19.0.0 [skip ci] [`(ef6e0dc)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/ef6e0dc1a2261807a7bac572a590317ff89184ce)
+
+
+
+### 🔧 Build System
+
+- 🔧 [build] Update ESLint configuration for improved package.json validation
+ - 🛠️ Add new rules for package.json validation including:
+   - "package-json/bin-name-casing": "warn"
+   - "package-json/no-redundant-publishConfig": "warn"
+   - "package-json/require-attribution": "warn"
+   - "package-json/require-exports": "warn"
+   - "package-json/restrict-private-properties": "warn"
+   - "package-json/valid-homepage": "warn"
+   - "package-json/valid-publishConfig": "warn"
+   - "package-json/valid-repository": "warn"
+   - "package-json/valid-sideEffects": "warn"
+   - "package-json/valid-workspaces": "warn"
+ - 🛠️ Enable warnings for TypeScript private class members:
+   - "@typescript-eslint/no-unused-private-class-members": "warn"
+ - 🛠️ Enhance JSDoc rules for better documentation practices:
+   - "jsdoc/no-blank-blocks": "warn"
+   - "jsdoc/ts-no-empty-object-type": "warn"
+
+✨ [feat] Add favicon and icon assets for improved branding
+ - 🎨 Add favicon.ico for application branding
+ - 🎨 Update icon-512.png for enhanced visual representation
+ - 🎨 Add icon-transparent-512.png for transparent icon support
+
+🧪 [test] Refactor Settings component tests for clarity and maintainability
+ - 🔄 Replace property-based tests with explicit scenarios for better readability
+ - 🛠️ Update test descriptions to reflect the new structure
+ - 🔄 Ensure all test cases are covered with clear assertions
+
+🛠️ [fix] Improve object safety tests for better accuracy
+ - 🔄 Change property checks to use Object.hasOwn for more reliable assertions
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(3b43b50)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/3b43b504ee555122a743752534238a1d9387d2d7)
+
+
+- 🔧 [build] Update configurations and type definitions
+ - 🛠️ [fix] Modify `.remarkignore` to include all MDX files in Docusaurus
+ - 🔧 [build] Add `@types/debug` to Knip configuration for improved type support
+ - 🔧 [build] Update `package.json` to include `@docusaurus/eslint-plugin` in devDependencies
+ - 🚜 [refactor] Introduce `isNonNullObject` utility function in `ServiceContainer.ts` for better null checks
+ - 🛠️ [fix] Change `bulkInsert` method in `HistoryRepository.ts` to accept `StatusHistory[]` instead of a more complex type
+ - 🛠️ [fix] Update `convertValueForDatabase` method in `MonitorRepository.ts` to return `undefined` instead of `null`
+ - 🛠️ [fix] Refactor `bulkInsertHistory` function to accept `StatusHistory[]` in `historyManipulation.ts`
+ - 🎨 [style] Adjust ESLint configuration to disable specific Vitest rules for better test clarity
+ - 🛠️ [fix] Simplify type definitions in `chartHybrid.ts` for `ChartUtilities`
+ - 🛠️ [fix] Refactor `MiniChartBar` component to align status prop with `SiteStatus`
+ - 🛠️ [fix] Update `useTheme` hook to remove unnecessary `MonitorStatus` type
+ - 🛠️ [fix] Streamline status handling in `status.ts` to focus on `SiteStatus`
+ - 🛠️ [fix] Correct type assertion in `SiteCard.stories.tsx` for better type safety
+
+Signed-off-by: Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> [`(12f16de)`](https://github.com/Nick2bad4u/Uptime-Watcher/commit/12f16de81989c547622c71c8c39a4bf66778d7c8)
 
 
 
